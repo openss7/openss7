@@ -1,0 +1,616 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-11 16:08:54 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2008-04-11 16:08:54 $ by $Author: brian $
+##
+## =============================================================================
+
+DVIS	= $(LATEXS:%.tex=%.dvi)
+PSS	= $(LATEXS:%.tex=%.ps)
+PDFS	= $(LATEXS:%.tex=%.pdf)
+HTMLS	= $(LATEXS:%.tex=%.html)
+BIBTEXS	= $(LATEXS:%.tex=%.bib)
+
+#AUXS	= $(LATEXS:%.tex=%.aux)
+#BBLS	= $(LATEXS:%.tex=%.bbl)
+#BLGS	= $(LATEXS:%.tex=%.blg)
+#GLOS	= $(LATEXS:%.tex=%.glo)
+#LOGS	= $(LATEXS:%.tex=%.log)
+#PLS	= $(LATEXS:%.tex=%.pl)
+
+.tex.dvi:
+	$(LATEX) `echo $< | sed -e 's,.*/,,'` || :
+	$(LATEX) `echo $< | sed -e 's,.*/,,'`
+	$(BIBTEX) `echo $< | sed -e 's,.*/,,;s,\.tex,,'`
+	$(LATEX) `echo $< | sed -e 's,.*/,,'`
+
+.tex.ps:
+	$(PSLATEX) `echo $< | sed -e 's,.*/,,'` || :
+	$(PSLATEX) `echo $< | sed -e 's,.*/,,'`
+	$(BIBTEX) `echo $< | sed -e 's,.*/,,;s,\.tex,,'`
+	$(PSLATEX) `echo $< | sed -e 's,.*/,,'`
+	$(DVI2PS) -t letter -f -o $@ `echo $< | sed -e 's,.*/,,;s,\.tex,\.dvi,'`
+
+.tex.pdf:
+	$(PDFLATEX) `echo $< | sed -e 's,.*/,,'` || :
+	$(PDFLATEX) `echo $< | sed -e 's,.*/,,'`
+	$(BIBTEX) `echo $< | sed -e 's,.*/,,;s,\.tex,,'`
+	$(PDFLATEX) `echo $< | sed -e 's,.*/,,'`
+
+.tex.html:
+	$(LATEX2HTML) -split 0 -noexternal_images -noascii_mode -font_size 12pt \
+		-nonavigation -numbered_footnotes -nosubdir -rooted -noinfo \
+		-norooted -antialias_text -antialias -white -image_type png \
+		-scalable_fonts `echo $< | sed -e 's,.*/,,'`
+	cat org.css >> `echo $< | sed -e 's,.*/,,;s,\.tex,\.css,'`
+
+dvi-am: $(DVIS)
+ps-am: $(PSS)
+pdf-am: $(PDFS)
+html-am: $(HTMLS)
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+csss-am:
+	@list='$(CSSS)'; for f in $$list; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f; then \
+			if test -f $(srcdir)/$$f; then \
+				$(ECHO) "cp -pf '$(srcdir)/$$f' '$$f'"; \
+				cp -pf "$(srcdir)/$$f" "$$f"; \
+			else \
+				$(ECHO) "touch '$$f'"; \
+				touch "$$f"; \
+			fi; \
+		fi ; \
+	done
+
+$(CSSS): csss-am
+
+tex-am:
+	@list='$(LATEXS)'; for f in $$list; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f; then \
+			if test -f $(srcdir)/$$f; then \
+				$(ECHO) "cp -pf '$(srcdir)/$$f' '$$f'"; \
+				cp -pf "$(srcdir)/$$f" "$$f"; \
+			else \
+				$(ECHO) "touch '$$f'"; \
+				touch "$$f"; \
+			fi; \
+		fi ; \
+	done
+
+$(LATEXS): tex-am
+
+bibs-am:
+	@list='$(BIBTEXS)'; for f in $$list; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f; then \
+			if test -f $(srcdir)/$$f; then \
+				$(ECHO) "cp -pf '$(srcdir)/$$f' '$$f'"; \
+				cp -pf "$(srcdir)/$$f" "$$f"; \
+			else \
+				$(ECHO) "touch '$$f'"; \
+				touch "$$f"; \
+			fi; \
+		fi ; \
+	done
+
+$(BIBTEXS): bibs-am
+
+dats-am:
+	@list='$(PLOT_DATS)'; for f in $$list; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f; then \
+			if test -f $(srcdir)/$$f; then \
+				$(ECHO) "cp -pf '$(srcdir)/$$f' '$$f'"; \
+				cp -pf "$(srcdir)/$$f" "$$f"; \
+			else \
+				$(ECHO) "touch '$$f'"; \
+				touch "$$f"; \
+			fi; \
+		fi ; \
+	done
+
+$(PLOT_DATS): dats-am
+
+plots-am:
+	@list='$(PLOT_PLOTS)'; for f in $$list; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f; then \
+			if test -f $(srcdir)/$$f; then \
+				$(ECHO) "cp -pf '$(srcdir)/$$f' '$$f'"; \
+				cp -pf "$(srcdir)/$$f" "$$f"; \
+			else \
+				$(ECHO) "touch '$$f'"; \
+				touch "$$f"; \
+			fi; \
+		fi ; \
+	done
+
+PLOT_FIGS = $(PLOT_PLOTS:%.plot=%.fig)
+PLOT_PSS  = $(PLOT_PLOTS:%.plot=%.ps)
+PLOT_EPSS = $(PLOT_PLOTS:%.plot=%.eps)
+PLOT_PDFS = $(PLOT_PLOTS:%.plot=%.pdf)
+PLOT_PNGS = $(PLOT_PLOTS:%.plot=%.png)
+PLOT_GIFS = $(PLOT_PLOTS:%.plot=%.gif)
+PLOT_JPGS = $(PLOT_PLOTS:%.plot=%.jpg)
+
+$(PLOT_FIGS) : %.fig : %.plot ; $(GNUPLOT) $<
+
+$(PLOT_PLOTS): plots-am
+
+FIG_PSS  = $(FIG_FIGS:%.fig=%.ps)
+FIG_EPSS = $(FIG_FIGS:%.fig=%.eps)
+FIG_PDFS = $(FIG_FIGS:%.fig=%.pdf)
+FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
+FIG_GIFS = $(FIG_FIGS:%.fig=%.gif)
+FIG_JPGS = $(FIG_FIGS:%.fig=%.jpg)
+
+.INTERMEDIATE: $(PLOT_GIFS) $(FIG_GIFS)
+
+$(FIG_PSS)  $(PLOT_PSS) : %.ps  : %.fig ; $(FIG2DEV) -L  ps -p dummy -e -g '#ffffff' -b 0 $< $@
+$(FIG_EPSS) $(PLOT_EPSS): %.eps : %.fig ; $(FIG2DEV) -L eps -p dummy -e -g '#ffffff' -b 0 $< $@
+$(FIG_PDFS) $(PLOT_PDFS): %.pdf : %.fig ; $(FIG2DEV) -L pdf -p dummy -e -g '#ffffff' -b 0 $< $@
+
+$(FIG_GIFS) : %.gif : %.fig ; $(FIG2DEV) -L gif -g '#c0d0f0' -t '#c0d0f0' -b 0 -S 2 $< $@
+$(PLOT_GIFS): %.gif : %.fig ; $(FIG2DEV) -L gif -g 'white' -b 15 -S 2 $< $@
+$(FIG_PNGS) : %.png : %.gif ; $(CONVERT) -background '#c0d0f0' -transparent '#c0d0f0' -mattecolor '#ffffff' -interlace Line $< $@
+$(PLOT_PNGS): %.png : %.gif ; $(CONVERT) -background 'white' -interlace Line $< $@
+$(FIG_JPGS) : %.jpg : %.gif ; $(CONVERT) -background '#c0d0f0' -transparent '#c0d0f0' -mattecolor '#ffffff' $< $@
+$(PLOT_JPGS): %.jpg : %.gif ; $(CONVERT) -background 'white' $< $@
+
+pngs-am:
+	@list="$(PNG_PNGS)"; for f in $$list; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f; then \
+			if test -f $(srcdir)/$$f; then \
+				$(ECHO) "cp -pf $(srcdir)/$$f $$f"; \
+				cp -pf $(srcdir)/$$f $$f; \
+			else \
+				$(ECHO) "touch $$f"; \
+				touch $$f; \
+			fi; \
+		fi; \
+	done
+
+PNG_PSS  = $(PNG_PNGS:%.png=%.ps)
+PNG_EPSS = $(PNG_PNGS:$.png=%.eps)
+PNG_PDFS = $(PNG_PNGS:$.png=%.pdf)
+PNG_JPGS = $(PNG_PNGS:$.png=%.jpg)
+
+$(PNG_PSS) : %.ps  : %.png ; $(CONVERT) -density 144 $< $@
+$(PNG_EPSS): %.eps : %.ps  ; $(PS2EPSI) $< $@ || $(CONVERT) $< $@
+$(PNG_PDFS): %.pdf : %.eps ; $(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
+$(PNG_JPGS): %.jpg : %.png ; $(CONVERT) -density 144 $< $@
+
+$(PNG_PNGS): pngs-am
+
+pss-am:
+	@list="$(PS_PSS)"; for f in $$list; do \
+		if test ! -f $$f -o $(srcdir)/$$f -nt $$f; then \
+			if test -f $(srcdir)/$$f; then \
+				$(ECHO) "cp -pf $(srcdir)/$$f $$f"; \
+				cp -pf $(srcdir)/$$f $$f; \
+			else \
+				$(ECHO) "touch $$f"; \
+				touch $$f; \
+			fi; \
+		fi; \
+	done
+
+PS_EPSS = $(PS_PSS:%.ps=%.eps)
+PS_PDFS = $(PS_PSS:%.ps=%.pdf)
+PS_PNGS = $(PS_PSS:%.ps=%.png)
+PS_JPGS = $(PS_PSS:%.ps=%.jpg)
+
+$(PS_EPSS): %.eps : %.ps  ; $(PS2EPSI) $< $@ || $(CONVERT) $< $@
+$(PS_PDFS): %.pdf : %.eps ; $(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
+$(PS_PNGS): %.png : %.eps ; $(CONVERT) -antialias $< $@
+$(PS_JPGS): %.jpg : %.eps ; $(CONVERT) -antialias $< $@
+
+$(PS_PSS): pss-am
+
+IMG_EPSS = $(PLOT_EPSS) $(FIG_EPSS) $(PNG_EPSS) $(PS_EPSS)
+IMG_PDFS = $(PLOT_PDFS) $(FIG_PDFS) $(PNG_PDFS) $(PS_PDFS)
+IMG_PNGS = $(PLOT_PNGS) $(FIG_PNGS) $(PNG_PNGS) $(PS_PNGS)
+IMG_JPGS = $(PLOT_JPGS) $(FIG_JPGS) $(PNG_JPGS) $(PS_JPGS)
+
+MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps
+
+if AMDEP
+## AMDEP
+$(DVIS)		: %.dvi  : %.tex $(IMG_EPSS) $(BIBTEXS)
+$(PSS)		: %.ps   : %.tex $(IMG_EPSS) $(BIBTEXS)
+$(PDFS)		: %.pdf  : %.tex $(IMG_PDFS) $(BIBTEXS)
+$(HTMLS)	: %.html : %.tex $(IMG_PNGS) $(BIBTEXS) $(CSSS)
+## AMDEP
+else
+## !AMDEP
+.SECONDARY: $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_JPGS)
+
+$(DVIS)		: %.dvi  : %.tex $(IMG_EPSS)
+$(PSS)		: %.ps   : %.tex $(IMG_EPSS)
+$(PDFS)		: %.pdf  : %.tex $(IMG_PDFS)
+$(HTMLS)	: %.html : %.tex $(IMG_PNGS)
+## !AMDEP
+endif
+
+EXTRA_DIST	+= $(LATEXS) $(BIBTEXS) $(PLOT_PLOTS) $(PLOT_DATS) $(FIG_FIGS) $(PNG_PNGS) $(PS_PSS)
+EXTRA_DIST	+= $(PDFS)
+EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS) $(CSSS)
+
+clean-dvi:
+	@$(ECHO) "Making $@ in `pwd`"
+	rm -f -- $(DVIS)
+
+clean-ps:
+	@$(ECHO) "Making $@ in `pwd`"
+	rm -f -- $(PSS)
+
+clean-pdf:
+	@$(ECHO) "Making $@ in `pwd`"
+	rm -f -- $(PDFS)
+
+clean-html:
+	@$(ECHO) "Making $@ in `pwd`"
+	rm -f -- $(HTMLS) index.html internals.pl labels.pl WARNINGS $(HTMLS:%.html=%.css)
+	@b=org.css; \
+	if test ! $$b -ef $(srcdir)/$$b; then \
+		$(ECHO) "rm -f -- '$$b'"; \
+		rm -f -- "$$b"; \
+	fi
+
+clean-bibs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(BIBTEXS)'; for f in $$list; do \
+		b=`$(ECHO) $$f | sed -e 's,.*/,,'`; \
+		if test ! $$b -ef $(srcdir)/$$b; then \
+			$(ECHO) "rm -f -- '$$b'"; \
+			rm -f -- "$$b"; \
+		fi ; \
+	done
+
+clean-dats:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(PLOT_DATS)'; for f in $$list; do \
+		b=`$(ECHO) $$f | sed -e 's,.*/,,'`; \
+		if test ! $$b -ef $(srcdir)/$$b; then \
+			$(ECHO) "rm -f -- '$$b'"; \
+			rm -f -- "$$b"; \
+		fi ; \
+	done
+
+clean-plots:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(PLOT_PLOTS)'; for f in $$list; do \
+		d=`$(ECHO) $$f | sed -e 's,\.plot,,'`; \
+		$(ECHO) "rm -f -- '$$d.fig' '$$d.ps' '$$d.eps' '$$d.pdf' '$$d.png' '$$d.jpg'"; \
+		rm -f -- "$$d.fig" "$$d.ps" "$$d.eps" "$$d.pdf" "$$d.png" "$$d.jpg"; \
+		b=`$(ECHO) $$f | sed -e 's,.*/,,'`; \
+		if test ! $$b -ef $(srcdir)/$$b; then \
+			$(ECHO) "rm -f -- '$$b'"; \
+			rm -f -- "$$b"; \
+		fi ; \
+	done
+
+clean-figs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(FIG_FIGS)'; for f in $$list; do \
+		d=`$(ECHO) $$f | sed -e 's,\.fig,,'`; \
+		$(ECHO) "rm -f -- '$$d.ps' '$$d.eps' '$$d.pdf' '$$d.png' '$$d.jpg'"; \
+		rm -f -- "$$d.ps" "$$d.eps" "$$d.pdf" "$$d.png" "$$d.jpg"; \
+		b=`$(ECHO) $$f | sed -e 's,.*/,,'`; \
+		if test ! $$b -ef $(srcdir)/$$b; then \
+			$(ECHO) "rm -f -- '$$b'"; \
+			rm -f -- "$$b"; \
+		fi ; \
+	done
+
+clean-pngs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(PNG_PNGS)'; for f in $$list; do \
+		d=`$(ECHO) $$f | sed -e 's,\.fig,,'`; \
+		$(ECHO) "rm -f -- '$$d.ps' '$$d.eps' '$$d.pdf' '$$d.jpg'"; \
+		rm -f -- "$$d.ps" "$$d.eps" "$$d.pdf" "$$d.jpg"; \
+		b=`$(ECHO) $$f | sed -e 's,.*/,,'`; \
+		if test ! $$b -ef $(srcdir)/$$b; then \
+			$(ECHO) "rm -f -- '$$b'"; \
+			rm -f -- "$$b"; \
+		fi ; \
+	done
+
+clean-pss:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(PS_PSS)'; for f in $$list; do \
+		d=`$(ECHO) $$f | sed -e 's,\.fig,,'`; \
+		$(ECHO) "rm -f -- '$$d.eps' '$$d.pdf' '$$d.png' '$$d.jpg'"; \
+		rm -f -- "$$d.eps" "$$d.pdf" "$$d.png" "$$d.jpg"; \
+		b=`$(ECHO) $$f | sed -e 's,.*/,,'`; \
+		if test ! $$b -ef $(srcdir)/$$b; then \
+			$(ECHO) "rm -f -- '$$b'"; \
+			rm -f -- "$$b"; \
+		fi ; \
+	done
+
+clean-latexs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(LATEXS)'; for f in $$list; do \
+		d=`$(ECHO) $$f | sed -e 's,\.tex,,'`; \
+		$(ECHO) "rm -f -- '$$d.aux' '$$d.bbl' '$$d.blg' '$$d.glo' '$$d.log' '$$d.pl' '$$d.css' '$$d.dvi' '$$d.ps' '$$d.pdf' '$$d.html'"; \
+		rm -f -- "$$d.aux" "$$d.bbl" "$$d.blg" "$$d.glo" "$$d.log" "$$d.pl" "$$d.css" "$$d.dvi" "$$d.ps" "$$d.pdf" "$$d.html"; \
+		b=`$(ECHO) $$f | sed -e 's,.*/,,'`; \
+		if test ! $$b -ef $(srcdir)/$$b; then \
+			$(ECHO) "rm -f -- '$$b'"; \
+			rm -f -- "$$b"; \
+		fi ; \
+	done
+
+distclean-bibs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-dats:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-plots:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-figs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-pngs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-pss:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-latexs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+maintainer-clean-bibs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+maintainer-clean-dats:
+	@$(ECHO) "Making $@ in `pwd`"
+
+maintainer-clean-plots:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(PLOT_PLOTS)'; for p in $$list; do \
+		f=`$(ECHO) "$(srcdir)/$$p" | sed -e 's,\.plot$$,,'`; \
+		$(ECHO) "rm -f -- '$$f.fig' '$$f.ps' '$$f.eps' '$$f.pdf' '$$f.png' '$$f.jpg'"; \
+		rm -f -- "$$f.fig" "$$f.ps" "$$f.eps" "$$f.pdf" "$$f.png" "$$f.jpg"; \
+	done
+
+maintainer-clean-figs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(FIG_FIGS)'; for p in $$list; do \
+		f=`$(ECHO) "$(srcdir)/$$p" | sed -e 's,\.fig$$,,'`; \
+		$(ECHO) "rm -f -- '$$f.ps' '$$f.eps' '$$f.pdf' '$$f.png' '$$f.jpg'"; \
+		rm -f -- "$$f.ps" "$$f.eps" "$$f.pdf" "$$f.png" "$$f.jpg"; \
+	done
+
+maintainer-clean-pngs:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(PNG_PNGS)'; for p in $$list; do \
+		f=`$(ECHO) "$(srcdir)/$$p" | sed -e 's,\.png$$,,'`; \
+		$(ECHO) "rm -f -- '$$f.ps' '$$f.eps' '$$f.pdf' '$$f.jpg'"; \
+		rm -f -- "$$f.ps" "$$f.eps" "$$f.pdf" "$$f.jpg"; \
+	done
+
+maintainer-clean-pss:
+	@$(ECHO) "Making $@ in `pwd`"
+	@list='$(PS_PSS)'; for p in $$list; do \
+		f=`$(ECHO) "$(srcdir)/$$p" | sed -e 's,\.ps$$,,'`; \
+		$(ECHO) "rm -f -- '$$f.eps' '$$f.pdf' '$$f.png' '$$f.jpg'"; \
+		rm -f -- "$$f.eps" "$$f.pdf" "$$f.png" "$$f.jpg"; \
+	done
+
+maintainer-clean-latexs:
+	@$(ECHO) "Making $@ in `pwd`"
+
+install-dvi: install-dvi-am
+
+install-dvi-am: $(DVIS)
+	@$(NORMAL_INSTALL)
+	test -z "$(dvidir)" || $(MKDIR_P) "$(DESTDIR)$(dvidir)"
+	@list='$(DVIS)'; for p in $$list; do \
+		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+		f=$(am__strip_dir) \
+		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(dvidir)/$$f'"; \
+		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(dvidir)/$$f"; \
+	done
+
+install-ps: install-ps-am
+
+install-ps-am: $(PSS)
+	@$(NORMAL_INSTALL)
+	test -z "$(psdir)" || $(MKDIR_P) "$(DESTDIR)$(psdir)"
+	@list='$(PSS)'; for p in $$list; do \
+		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+		f=$(am__strip_dir) \
+		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(psdir)/$$f"; \
+		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(psdir)/$$f"; \
+	done
+
+install-pdf: install-pdf-am
+
+install-pdf-am: $(PDFS)
+	@$(NORMAL_INSTALL)
+	test -z "$(pdfdir)" || $(MKDIR_P) "$(DESTDIR)$(pdfdir)"
+	@list='$(PDFS)' ; for p in $$list; do \
+		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+		f=$(am__strip_dir) \
+		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(pdfdir)/$$f'"; \
+		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(pdfdir)/$$f"; \
+	done
+
+install-html: install-html-am
+
+install-html-am: $(HTMLS) install-html-local
+	@$(NORMAL_INSTALL)
+	test -z "$(htmldir)" || $(MKDIR_P) "$(DESTDIR)$(htmldir)"
+	@list='$(HTMLS)'; for p in $$list; do \
+		if test -f "$$p" || test -d "$$p"; then d=; else d="$(srcdir)/"; fi; \
+		f=$(am__strip_dir) \
+		if test -d "$$d$$p"; then \
+			echo " $(MKDIR_P) '$(DESTDIR)$(htmldir)/$$f'"; \
+			$(MKDIR_P) "$(DESTDIR)$(htmldir)/$$f" || exit 1; \
+			echo " $(INSTALL_DATA) '$$d$$p'/* '$(DESTDIR)$(htmldir)/$$f'"; \
+			$(INSTALL_DATA) "$$d$$p"/* "$(DESTDIR)$(htmldir)/$$f"; \
+		else \
+			echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(htmldir)/$$f'"; \
+			$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(htmldir)/$$f"; \
+		fi; \
+	done
+
+install-epss: $(IMG_EPSS)
+
+install-pngs: $(IMG_PNGS)
+
+INSTALL_DATA_LOCAL	+= install-epss
+INSTALL_HTML_LOCAL	+= install-pngs
+
+uninstall-dvi: uninstall-dvi-am
+
+uninstall-dvi-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(DVIS)'; for p in $$list; do \
+		f=$(am__strip_dir) \
+		echo " rm -f '$(DESTDIR)$(dvidir)/$$f'"; \
+		rm -f "$(DESTDIR)$(dvidir)/$$f"; \
+	done
+
+uninstall-ps: uninstall-ps-am
+
+uninstall-ps-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(PSS)'; for p in $$list; do \
+		f=$(am__strip_dir) \
+		echo " rm -f '$(DESTDIR)$(psdir)/$$f'"; \
+		rm -f "$(DESTDIR)$(psdir)/$$f"; \
+	done
+
+uninstall-pdf: uninstall-pdf-am
+
+uninstall-pdf-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(PDFS)'; for p in $$list; do \
+		f=$(am__strip_dir) \
+		echo " rm -f '$(DESTDIR)$(pdfdir)/$$f'"; \
+		rm -f "$(DESTDIR)$(pdfdir)/$$f"; \
+	done
+
+uninstall-html: uninstall-html-am
+
+uninstall-html-am:
+	@$(NORMAL_UNINSTALL)
+	@list='$(HTMLS)'; for p in $$list; do \
+		f=$(am__strip_dir) \
+		echo " rm -rf '$(DESTDIR)$(htmldir)/$$f'"; \
+		rm -rf "$(DESTDIR)$(htmldir)/$$f"; \
+	done
+
+uninstall-epss:
+
+uninstall-pngs:
+
+UNINSTALL_LOCAL		+= uninstall-epss uninstall-pngs
+
+MY_PHONY		+= tex-am bibs-am dats-am plots-am figs-am pps-am pngs-am
+
+CLEAN_LOCAL		+= clean-dvi \
+			   clean-ps \
+			   clean-pdf \
+			   clean-html \
+			   clean-bibs \
+			   clean-dats \
+			   clean-plots \
+			   clean-figs \
+			   clean-pngs \
+			   clean-pss \
+			   clean-latexs
+
+DISTCLEAN_LOCAL		+= distclean-bibs \
+			   distclean-dats \
+			   distclean-plots \
+			   distclean-figs \
+			   distclean-pngs \
+			   distclean-pss \
+			   distclean-latexs
+
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-bibs \
+			   maintainer-clean-dats \
+			   maintainer-clean-plots \
+			   maintainer-clean-figs \
+			   maintainer-clean-pngs \
+			   maintainer-clean-pss \
+			   maintainer-clean-latexs
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+##
+# Only build docs in maintainer mode, don't build what we don't distribute.
+##
+ALL_LOCAL		+= dvi ps pdf html
+## MAINTAINER_MODE
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
+endif
+
+## =============================================================================
+##
+## $Log: papers.am,v $
+## Revision 0.9.2.1  2008-04-11 16:08:54  brian
+## - added papers automake fragment
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
