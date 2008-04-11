@@ -84,7 +84,6 @@ Additional funding for @uref{http://www.openss7.org/,, The OpenSS7 Project} was 
 @multitable @columnfractions .05 .95
 @item @tab @bullet{} @uref{http://www.openss7.com/,, OpenSS7 Corporation}
 @item @tab @bullet{} @uref{http://www.lmco.com/,, Lockheed Martin Co.}
-@item @tab @bullet{} @uref{http://www.pti.com/,, Performance Technologies Inc.}
 @item @tab @bullet{} @uref{http://www.motorola.com/,, Motorola}
 @item @tab @bullet{} @uref{http://www.hob.de/,, HOB International}
 @item @tab @bullet{} @uref{http://www.comverse.com/,, Comverse Ltd.}

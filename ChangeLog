@@ -1,3 +1,17 @@
+2008-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* THANKS: remove deprecated Nexusware support
+	* doc/manual/bugs.texi: remove deprecated Nexusware support
+	* doc/manual/install.texi: remove deprecated Nexusware support
+	* doc/manual/todo.texi: remove deprecated Nexusware support
+	* doc/manual/texi/install.texi: remove deprecated Nexusware support
+	* scripts/texi/compat.texi: remove deprecated Nexusware support
+	* scripts/texi/funding.texi: remove deprecated Nexusware support
+	* scripts/texi/install.texi: remove deprecated Nexusware support
+	* texi/install.texi: remove deprecated Nexusware support
+
+	* m4/openss7.m4: automake 1.10 ok with defining DVIPS
+
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: distribute agpl.texi

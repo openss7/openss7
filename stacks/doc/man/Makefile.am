@@ -70,7 +70,6 @@ ss7_man_MANS = \
 	man4/bssap_ioctl.4 \
 	man4/ch-sdl.4 \
 	man4/ch_x400p.4 \
-	man4/cpc388.4 \
 	man4/dl.4 \
 	man4/dlb.4 \
 	man4/dl_gsma.4 \
@@ -549,7 +548,6 @@ ss7_man_MANS = \
 	man7/TR_uni_ind_t.7 \
 	man7/TR_uni_req.7 \
 	man7/TR_uni_req_t.7 \
-	man8/cpc388.8 \
 	man8/isup.8 \
 	man8/mtp.8 \
 	man8/sccp.8 \
@@ -1681,7 +1679,6 @@ ss7_dist_noinst_MANS = \
 	man4/bua_ioctl.4.man \
 	man4/ch-sdl.4.man \
 	man4/ch_x400p.4.man \
-	man4/cpc388.4.man \
 	man4/dl.4.man \
 	man4/dlb.4.man \
 	man4/dl_dua.4.man \
@@ -2219,7 +2216,6 @@ ss7_dist_noinst_MANS = \
 	man7/TR_uni_req.7.man \
 	man7/TR_uni_req_t.7.man \
 	man8/bua.8.man \
-	man8/cpc388.8.man \
 	man8/isua.8.man \
 	man8/isup.8.man \
 	man8/iua.8.man \
@@ -3338,7 +3334,6 @@ MANS_UNUSED = \
 	man4/capi_ioctl.4 \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
-	man4/cpc388.4 \
 	man4/dass.4 \
 	man4/dlb.4 \
 	man4/dl_ioctl.4 \
@@ -3411,7 +3406,6 @@ MANS_UNUSED = \
 	man4/x400p-ss7.4 \
 	man8/bicc.8 \
 	man8/bua.8 \
-	man8/cpc388.8 \
 	man8/h225.8 \
 	man8/h323confd.8 \
 	man8/isdn.8 \

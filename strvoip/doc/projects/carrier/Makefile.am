@@ -104,8 +104,6 @@ PNG_PNGS		= \
 			t400p-ss7.png \
 			a101c.png \
 			acb56.png \
-			cpc388.png \
-			cpc396.png \
 			pca200e.png \
 			bri.png
 

@@ -1,3 +1,14 @@
+2008-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile.am: better paper handling
+	* doc/projects/Makefile.am: better paper handling
+	* THANKS: removed deprecated Nexusware support
+	* doc/manual/texi/install.texi: removed deprecated Nexusware support
+	* doc/projects/sg.texi: removed deprecated Nexusware support
+	* scripts/texi/compat.texi: removed deprecated Nexusware support
+	* scripts/texi/funding.texi: removed deprecated Nexusware support
+	* scripts/texi/install.texi: removed deprecated Nexusware support
+
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added yacc built headers to sources

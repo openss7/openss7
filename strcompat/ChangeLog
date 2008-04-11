@@ -1,3 +1,11 @@
+2008-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* THANKS: removed deprecated Nexusware support
+	* doc/manual/texi/install.texi: removed deprecated Nexusware support
+	* scripts/texi/compat.texi: removed deprecated Nexusware support
+	* scripts/texi/funding.texi: removed deprecated Nexusware support
+	* scripts/texi/install.texi: removed deprecated Nexusware support
+
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: distribute agpl.texi

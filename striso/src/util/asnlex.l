@@ -153,6 +153,12 @@ TAGS			return TOK_TAGS;
 "]"			return TOK_CLOSE_BRACKET;
 "-"			return TOK_HYPHEN;
 ";"			return TOK_SEMICOLON;
+'[01]*'B		return TOK_bstring;
+'[0-9a-fA-F]*'H		return TOK_hstring;
+\"([^\"]*|\\\"|\"\")*\"	return TOK_cstring;
+[A-Z][-a-zA-Z0-9]*	return TOK_identifier;
+[a-z][-a-zA-Z0-9]*	return TOK_reference;
+[1-9][0-9]*		return TOK_number;
 
 
 

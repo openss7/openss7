@@ -733,7 +733,7 @@ Configuration as a National originating or terminating office is also possible. 
 testing, blocking and management of ISUP circuits is provided for by the OpenSS7 ISUP protocol
 module.
 
-The device is attached to the SS7 utilizing CPC-388 or lesser grade OpenSS7 SS7 link and media
+The device is attached to the SS7 utilizing V401P or lesser grade OpenSS7 SS7 link and media
 channel TDM interface cards,
 @footnote{For other hardware alternatives, @pxref{Hardware Architecture}}
 terminating SS7 A-links or F-links, either 64kbps Q.703 links or full span
@@ -754,12 +754,9 @@ The device is also responsible for switching and converting 64kbps digital paths
 terminated on the telephone network side to RTP media streams (using any encoding) on the OpenSS7
 complex side.  Full interworking of echo suppression/silence detection/comfort tone between ISUP and
 RTP will be performed.  This switching is performed using the OpenSS7 internal Media Switch (MG)
-switching which provides for non-blocking switching of voice channels across TE410, CPC 384 or
-CPC 388 devices in the platform, as well as switching and conversion between RTP streams on dual
-Ethernet rails.
+switching which provides for non-blocking switching of voice channels across TE410 devices in the
+platform, as well as switching and conversion between RTP streams on dual Ethernet rails.
 @cindex TE410
-@cindex CPC 384
-@cindex CPC 388
 
 On the OpenSS7 complex side of the device, calls are connected to RTP streams on attached Ethernet
 and routed using the Client IP network.  The VoIP Switch will act as a SIP proxy and H.323
@@ -2229,22 +2226,20 @@ evaluation platform.
 The VoIP Switch prototype platform consists of a high-end ix86 single or multi processor PC loaded
 with Linux running a 2.4 production kernel, LiS 2.16.18-22 and the OpenSS7 stack software.
 
-As a highly scalable and carrier grade alternative, the prototype system could use the CPC 388 cards
-@cindex CPC 388
-running embedded Linux 2.4.18 (NexusWare24) on MPC8260 and performing backplane switching on H.100
-and Ethernet rails on PCIMG 2.16 packet bus loaded with NexusWare (Linux 2.4.18), LiS 2.16.18-22 and
-the OpenSS7 stack software.
+As a highly scalable and carrier grade alternative, the prototype system could use the CompactPCI
+cards running embedded Linux on MPC8260 and performing backplane switching on H.100 and Ethernet
+rails on PCIMG 2.16 packet bus loaded with Linux, LiS 2.16.18-22 and the OpenSS7 stack software.
 
 SS7 ISUP IMTs and signalling links are terminated on the telephone network side of the device on one
-of a number of TE410, CPC-384 or CPC-388 cards installed in either platform.  On the other side
-of the platform, RTP connections are terminated on dual Ethernet devices or the PCIMG 2.16 packet
-bus.  Signalling is performed over the same IP connections using BICC/M3UA (NNI), SIP (UNI) or H.245
-(UNI).  The OpenSS7 complex side of the device is attached directly to the IP backbone and signals
-to remote BICC switches, SIP proxies/clients or H.323 gatekeepers/clients.
+of a number of TE410 cards installed in either platform.  On the other side of the platform, RTP
+connections are terminated on dual Ethernet devices or the PCIMG 2.16 packet bus.  Signalling is
+performed over the same IP connections using BICC/M3UA (NNI), SIP (UNI) or H.245 (UNI).  The OpenSS7
+complex side of the device is attached directly to the IP backbone and signals to remote BICC
+switches, SIP proxies/clients or H.323 gatekeepers/clients.
 
 The VoIP Switch prototype device performs conversion between the 64kbps voice channels terminated on
-the TE410, CPC-384 or CPC-388 cards on the telephone network side of the device to RTP streams
-on dual 10/100/1000 baseT or PICMG 2.16 packet bus using host or MPC8260 resources.
+the TE410 cards on the telephone network side of the device to RTP streams on dual 10/100/1000 baseT
+or PICMG 2.16 packet bus using host or MPC8260 resources.
 
 OAM&P of the prototype platform is performed over an internal LAN connection.
 
@@ -2275,7 +2270,6 @@ required.
 * T400P/E400P::
 * TE405/410::
 * A101/102/104c::
-* PCI 384::
 * Other Interface Cards::
 @end menu
 
@@ -2284,8 +2278,7 @@ interface device hardware listed here has good price-performance, however, varyi
 performance (and therefore price) is available.  These cards are available either directly from the
 card manufacturer or are also resold by @uref{http://www.openss7.com/, OpenSS7 Corporation}.
 
-For the VoIP Switch application, either the CPC 388 cards are recommended.
-@cindex CPC 388
+For the VoIP Switch application, the V401P cards are recommended.
 
 The following interface device hardware is available for the OpenSS7 Platform:
 
@@ -2533,90 +2526,6 @@ SIGTRAN and SS7 is not required, this is not a limitation.
 These cards have excellent price-performance and can provide 64kbps SS7 links at average incremental
 interface cost of approximately $12.00 USD per signalling link.
 
-@node PCI 384
-@subsection PCI 384
-@cindex PCI 384
-
-The PCI 384 card is a 4-span E1/T1/J1 cards with 10/100baseT Ethernet manufactured by
-@uref{http://www.pti.com/, Performance Technologies}.
-@figref{27} shows a picture of an PCI 384 card.
-
-@figure{t400p-ss7,27,PCI 384}
-
-The PCI 384 cards have the highest level of signalling performance because they have an on-board
-PowerQUICC II processor that performs Layer 2 (HDLC) and even some Layer 3 functions.  Transfers to
-the host are performed over SIGTRAN protocols using the on-board Ethernet interface, or over the PCI
-bus in a bus mastering mode.  OpenSS7 @dfn{STREAMS} drivers and modules run directly on the card.
-
-The PCI 384 cards have an integral H.110 bus that can be connected using ribbon cable between cards
-providing for non-blocking switching of 4096 channels between cards.  In E1 mode, these cards each
-provide 124 channels of SS7, ISDN or voice.  In T1 or J1 mode, these cards each provide 96 channels
-of SS7, ISDN or voice.
-
-The PCI 384 card accepts the same software as the CPC 388 (@pxref{CPC 388}) card for a carrier-grade
-evolution path.
-@cindex CPC 388
-
-@subsubheading Driver
-
-These cards are supported by the CPC-388 drivers.
-
-The function of the CPC-388 MG driver is to provide for the switching and termination of 2.048Mbps,
-1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
-or unchannelized T1 or E1 digital patchs to OpenSS7 meida and signalling protocol modules as well as
-providing T1 or E1 management, protection switching, monitoring, framing, coding, alarms, and
-synchronization.  It also provides to the switching of TDM channels on card and between cards via
-the H.110 TDM bus.
-
-@subsubheading Features
-
-Following are the features of the PCI 384 cards:
-
-@itemize @bullet
-@item 4 T1 or E1 spans per card.
-@item FALC framer.
-@cindex FALC framer
-@item Motorola PowerQUICC II MPC 8260 200Mhz processor running embedded Linux.
-@item PowerSpan Bus-mastering PCI interface with mailbox support.
-@item OpenSS7 SS7, SIGTRAN, ISDN and VoIP stacks run on-card.
-@item Minimal host processor transfer over PCI bus.
-@item Scalable to 4096 channels.
-@item Can utilizes OpenSS7 Soft-HDLC engine on-card for SS7, ISDN and ISO.
-@item 96 channels per card (T1).
-@item 124 channels per card (E1).
-@item Full span addressable.
-@item Internal H.110 expansion bus.
-@item Integrated 10/100baseT Ethernet (MPC8260 FCC).
-@end itemize
-
-@subsubheading Advantages
-
-Following are the advantages of the PCI 384 cards:
-
-@itemize @bullet
-@item Highest performance.
-@item Internal H.110 bus.
-@item Internal/External 10/100baseT Ethernet.
-@item On-board TDM switch.
-@item Flash programmable MPC8260 chip.
-@item Field upgradable.
-@item Software compatible with CPC 388 (@pxref{CPC 388}).
-@item OpenSource NexusWare Linux Kernel distribution.
-@item Multiple cards can synchronize of of same H.110 bus.
-@cindex CPC 388
-@end itemize
-
-@subsubheading Disadvantages
-
-Following are the disadvantages of the PCI 384 cards:
-
-@itemize @bullet
-@item Higher cost.
-@item Non-redundant.
-@item Cannot be hot-swapped.
-@end itemize
-
-
 @node Other Interface Cards
 @subsection Other Interface Cards
 @cindex Other interface cards
@@ -2648,14 +2557,9 @@ The PC chassis is equipped with the following:
 @footnote{For detailed sizing considerations, @pxref{Platform Sizing}.}
 
 @menu
-* PT CPC 388 Based Platform::
 * HP cc3310 Based Platform::
 * Dell PowerEdge 2650 Based Platform::
 @end menu
-
-@node PT CPC 388 Based Platform
-@section PT CPC 388 Based Platform
-@cindex CPC 388
 
 @node HP cc3310 Based Platform
 @section HP cc3310 Based Platform
@@ -2682,14 +2586,9 @@ The solution system has the following requirements:
 @end itemize
 
 @menu
-* PT CPC 388 Based System::
 * HP cc3310 Based System::
 * Dell PowerEdge 2650 Based System::
 @end menu
-
-@node PT CPC 388 Based System
-@section PT CPC 388 Based System
-@cindex CPC 388
 
 @node HP cc3310 Based System
 @section HP cc3310 Based System
@@ -2835,8 +2734,6 @@ SS7, SIGTRAN, ISDN and VoIP stacks:
 
 @menu
 * ACB56::
-* CPC 388::
-* CPC 396::
 * PCA 200E::
 * BRI::
 @end menu
@@ -2846,13 +2743,6 @@ SS7, SIGTRAN, ISDN and VoIP stacks:
 
 @item @ref{ACB56}
 An EISA V.35 card.
-
-@item @ref{CPC 388}
-A CompactPCI Octal E1/T1/J1 card with embedded Linux.
-@cindex CPC 388
-
-@item @ref{CPC 396}
-A CompactPCI Dual T3 card with embedded Linux.
 
 @item @ref{PCA 200E}
 A 155 MHz ATM card.
@@ -2924,126 +2814,6 @@ The OpenSS7 VoIP Switch does not have a requirement for V.35 interface and this 
 the deployment platform.  If V.35 interface becomes a requirement at a later date, a different card
 will be selected.  The selected card will have a higher density, PCI with PCI DMA and bus-mastering,
 integrated CSU/DSU, and other features absent from the ACB56 card.
-
-@node CPC 388
-@subsection CPC 388
-@cindex CPC 388
-
-The CPC 388 cards are 8-span E1/T1/J1 cards with dual-port Ethernet in a CompactPCI PCMIG 2.15 card
-manufactured by @uref{http://www.pti.com/, Performance Technologies}.
-@figref{A-14} shows a picture of an CPC 388 card.
-
-@figure{cpc388,A-14,CPC 388}
-
-The CPC 388 cards have a high level of signalling performance because they have an on-board
-PowerQUICC II processor running an embedded Linux operating system (NexusWare based on YellowDog).
-The embedded processor performs Layer 2 (HDLC) and even some Layer 3 functions and higher functions.
-These cards can run as stand-alone hosts or can transfer to a host SBC over the PCMIG 2.15 dual
-Ethernet bus or CompactPCI bus.  OpenSS7 @dfn{STREAMS} drivers and modules, as well as complete
-applications can be run directly on the card.
-
-The CPC 388 cards have an integral H.110 bus and TDM switch that communicate over the PCMIG 2.15 TDM
-bus.  This provides for non-blocking switching of up to 4096 TDM channels across the backplane.  In
-E1 mode (and with an E1 RTM), these cards provide 248 channels of SS7, ISDN or voice.  In T1 or J1
-mode, these cards each provide 192 channels of SS7, ISDN or voice.
-
-The CPC 388 cards accept the same software as the PCI 384 cards (and dual T3 CPC 396 cards,
-@cindex CPC 396
-@pxref{CPC 396}) providing a carrier-grade evolution path from m the PCI 384.
-
-@subsubheading Driver
-
-@itemize @bullet
-@item Provides @dfn{STREAMS} Media Gateway (MG) Interface that controls onboard TDM switch and H.110 bus.
-@item Provides Soft-HDLC for Q.703 and
-@cindex Q.703 Annex B
-Q.703 Annex B operation.
-@item Provides G.804/AF-PHY-00016 ATM/PDH E1 or T1 SAAL.
-@end itemize
-
-@subsubheading Features
-
-Following are the features of the CPC 388 cards:
-
-@itemize @bullet
-@item Octal E1/T1/J1 (requires appropriate RTM).
-@item Dual E1/T1/J1 monitoring ports.
-@item Dual QuadFALC framers.
-@item Mitel/Zarlink MT 20098 H.110 switch.
-@item Dual FCC 10/100baseT Ethernet Ports (RTM RJ-45 or J5 connector).
-@item Tundra PowerSpan CompactPCI interface.
-@item 200MHz Motorola PowerQUICC II (MPC8260) processor.
-@item 256 Mb SDRAM.
-@item 128 Mb Flash.
-@item Runs NexusWare embedded Linux operating system.
-@item 2 serial ports.
-@item Individual E1/T1/J1 status LEDs on front panel.
-@item Blue ejector LED.
-@item Hot swappable (per PCMIG 2.15).
-@item NEBS Compliant (lights on front, wires on back)
-@end itemize
-
-@subsubheading Advantages
-
-Following are the advantages of the CPC 388 cards:
-
-@itemize @bullet
-@item
-@item
-@item
-@end itemize
-
-@subsubheading Disadvantages
-
-Following are the disadvantages of the CPC 388 cards:
-
-@itemize @bullet
-@item
-@item
-@item
-@end itemize
-
-@node CPC 396
-@subsection CPC 396
-@cindex CPC 396
-
-The CPC 396 cards are dual T3 cards with dual-port Ethernet in a CompactPCI PCMIG 2.15 card
-manufactured by @uref{http://www.pti.com/, Performance Technologies}.
-@figref{A-15} shows a picture of an CPC 396 card.
-
-@figure{cpc396,A-15,CPC 396}
-
-@subsubheading Driver
-
-@subsubheading Features
-
-Following are the features of the CPC 396 cards:
-
-@itemize @bullet
-@item
-@item
-@item
-@end itemize
-
-@subsubheading Advantages
-
-Following are the advantages of the CPC 396 cards:
-
-@itemize @bullet
-@item
-@item
-@item
-@end itemize
-
-@subsubheading Disadvantages
-
-Following are the disadvantages of the CPC 396 cards:
-
-@itemize @bullet
-@item
-@item
-@item
-@end itemize
 
 @node PCA 200E
 @subsection PCA 200E

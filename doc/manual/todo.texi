@@ -96,10 +96,7 @@ would also be nice to cross-test.  We can accomplish this nicely within the auto
 DejaGNU.  DejaGNU configured under the LiS, but we need a more general autoconf .m4 fragement check
 for the existence of DejaGNU, and automake and DejaGNU expect wrappers for the existing test
 programs (and integration into the make check-DEJAGNU target).  Then we could cross-build the
-package
-@c (e.g.  for NexusWare)
-and then execute the test scripts on the result on a remote board
-using DEJAGNU.
+package and then execute the test scripts on the result on a remote board using DEJAGNU.
 
 @item Distributed testing framework.
 

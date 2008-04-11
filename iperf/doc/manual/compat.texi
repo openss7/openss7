@@ -93,8 +93,6 @@ release.}
 @item Mandriva Linux LE2005 (MDK102) -- TBD
 @item Mandriva Linux LE2006 (MDK103)
 @item Mandriva One (untested)
-@c @item Performance Technlogies @dfn{NexusWare24} -- TBD
-@c @item Performance Technologies NexusWare 8.0
 @item RedHat Linux 7.2 (RH7)
 @item RedHat Linux 7.3 (RH7)
 @item RedHat Linux 8.0 (RH8) -- TBD
