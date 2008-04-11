@@ -1,5 +1,5 @@
-OpenSS7 INET Networking -- read me first file.  2008-04-10
-$Id: README,v 0.9.2.43 2008-04-10 08:14:41 brian Exp $
+OpenSS7 INET Networking -- read me first file.  2008-04-11
+$Id: README,v 0.9.2.44 2008-04-11 17:09:53 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 INET Networking
 ========================
 
-Package strinet-0.9.2.7 was released under AGPLv3 2008-04-10.
+Package strinet-0.9.2.7 was released under AGPLv3 2008-04-11.
 
 The `OpenSS7 INET Networking' package is an implementation of the
 Internet Protocol suite for `Linux Fast-STREAMS' directly over Linux
@@ -65,7 +65,7 @@ well.
  Release
 --------
 
-This is the `strinet-0.9.2.7' package, released 2008-04-10.  This
+This is the `strinet-0.9.2.7' package, released 2008-04-11.  This
 `0.9.2.7' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
