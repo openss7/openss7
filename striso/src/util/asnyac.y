@@ -173,6 +173,12 @@ extern FILE *yyin, *yyout;
 %token <str> TOK_CLOSE_BRACKET
 %token <str> TOK_HYPHEN
 %token <str> TOK_SEMICOLON
+%token <str> TOK_reference
+%token <str> TOK_bstring
+%token <str> TOK_hstring
+%token <str> TOK_cstring
+%token <str> TOK_identifier
+%token <str> TOK_number
 
 /* GRAMAR RULES */
 
@@ -180,7 +186,7 @@ extern FILE *yyin, *yyout;
 
 ModuleDefinition:
     ModuleIdentifier
-    TOK_DEFINTIONS
+    TOK_DEFINITIONS
     TagDefault
     TOK_ASSIGNMENT
     TOK_BEGIN
@@ -202,7 +208,7 @@ modulereference:
     ;
 
 reference:
-    TOK_REFERENCE
+    TOK_reference
     ;
 
 AssignedIdentifier:
@@ -239,8 +245,13 @@ SymbolsFromModule:
     ;
 
 SymbolList:
-    Symbol TOK_COMMA SumbolList
+    Symbol TOK_COMMA SymbolList
     | Symbol
+    ;
+
+Symbol:
+    reference
+    | identifier
     ;
 
 AssignmentList:
@@ -253,9 +264,17 @@ Assignment:
     | ValueAssignment
     ;
 
+typereference:
+    TOK_identifier
+    ;
+
 Externaltypereference:
     modulereference
     typereference
+    ;
+
+valuereference:
+    reference
     ;
 
 Externalvaluereference:
@@ -273,11 +292,11 @@ DefinedValue:
     | valuereference
     ;
 
-Typeassignment:
+TypeAssignment:
     typereference TOK_ASSIGNMENT Type
     ;
 
-Valueassignment:
+ValueAssignment:
     valuereference TOK_ASSIGNMENT Value
     ;
 
@@ -288,7 +307,7 @@ Type:
     ;
 
 BuiltinType:
-    BoleanType
+    BooleanType
     | IntegerType
     | BitStringType
     | OctetStringType
@@ -306,6 +325,10 @@ BuiltinType:
     | UsefulType
     | EnumeratedType
     | RealType
+    ;
+
+identifier:
+    TOK_identifier
     ;
 
 NamedType:
@@ -371,6 +394,10 @@ NamedNumber:
 SignedNumberOrDefinedValue:
     SignedNumber
     | DefinedValue
+    ;
+
+number:
+    TOK_number
     ;
 
 SignedNumber:
@@ -447,6 +474,18 @@ NamedBit:
 NumberOrDefinedValue:
     number
     | DefinedValue
+    ;
+
+bstring:
+    TOK_bstring
+    ;
+
+hstring:
+    TOK_hstring
+    ;
+
+cstring:
+    TOK_cstring
     ;
 
 BitStringValue:
@@ -653,6 +692,10 @@ UsefulType:
     typereference
     ;
 
+VisibleString:
+    cstring
+    ;
+
 GeneralizedTime:
     TOK_OPEN_BRACKET TOK_UNIVERSAL "24" TOK_CLOSE_BRACKET TOK_IMPLICIT
     VisibleString
@@ -667,6 +710,10 @@ ExternalType:
     TOK_EXTERNAL
     ;
 
+GraphicString:
+    cstring
+    ;
+
 ObjectDescriptor:
     TOK_OPEN_BRACKET TOK_UNIVERSAL "7" TOK_CLOSE_BRACKET TOK_IMPLICIT
     GraphicString
@@ -674,7 +721,7 @@ ObjectDescriptor:
 
 Subtype:
     ParentType SubtypeSpec
-    | TOK_SET SizeContraint TOK_OF Type
+    | TOK_SET SizeConstraint TOK_OF Type
     | TOK_SEQUENCE SizeConstraint TOK_OF Type
     ;
 
@@ -709,7 +756,7 @@ ContainedSubtype:
     ;
 
 ValueRange:
-    LowerEndpoint TOK_PERIOD TOK_PERIOD UpperEndpoint
+    LowerEndPoint TOK_PERIOD TOK_PERIOD UpperEndPoint
     ;
 
 LowerEndPoint:
@@ -737,11 +784,11 @@ SizeConstraint:
     ;
 
 PermittedAlphabet:
-    TOK_FROM Subtypespec
+    TOK_FROM SubtypeSpec
     ;
 
 InnerTypeConstraints:
-    TOK_WITH TOK_COMPONENT SingeTypeConstraint
+    TOK_WITH TOK_COMPONENT SingleTypeConstraint
     | TOK_WITH TOK_COMPONENTS MultipleTypeConstraint
     ;
 
@@ -759,7 +806,7 @@ FullSpecification:
     ;
 
 PartialSpecification:
-    TOKE_OPEN_BRACE TOK_PERIOD TOK_PERIOD TOK_PERIOD TOK_COMMA TypeConstraints TOK_CLOSE_BRACE
+    TOK_OPEN_BRACE TOK_PERIOD TOK_PERIOD TOK_PERIOD TOK_COMMA TypeConstraints TOK_CLOSE_BRACE
     ;
 
 TypeConstraints:

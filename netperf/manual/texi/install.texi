@@ -554,8 +554,8 @@ To configure the source RPM, @xrefman{Configuring the Debian DSC}.
 @cindex downloading, tar ball
 @cindex tar ball
 
-For non-@manpage{rpm(1)} architectures, such as @cite{Nex@-us@-Ware} embedded target, download the
-tarball as follows:
+For non-@manpage{rpm(1)} and non-@manpage{dpkg(1)} architectures,
+download the tarball as follows:
 
 @table @asis
 @item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.gz,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.gz}
@@ -1245,7 +1245,6 @@ script configuration, and if one is not found, the @command{init} scripts are in
 directories, but the symbolic links to the run level script directories are not generated and the
 script is not invoked.  Therefore, it is safe to leave this option unchanged, even on distributions
 that do not support System V @command{init} script layout.
-@c (such as @cite{NexusWare}).
 
 @item --disable-32bit-libs
 @opindex 32bit-libs
@@ -1728,10 +1727,7 @@ Configure loader command, @manref{ldconfig(8)}.  Command used to configure the l
 are installed.  By default, @file{configure} will search for this tool.
 
 @item DESTDIR
-Cross build root directory.  Specifies the root directory for build and installation.  For example,
-for @cite{Nex@-us@-Ware} cross-builds, this is set to environment variable
-@var{NEX@-US@-WARE@-_@-PRE@-FIX} on configuration to point to the root of the cross-build tree for
-both configuration and installation.
+Cross build root directory.  Specifies the root directory for build and installation.
 
 @item DEPMOD
 Build kernel module dependencies command, @manref{depmod(8)}.  This is used during installation of
@@ -1927,9 +1923,8 @@ is unlikely to be the kernel version of the target machine, except by coincidenc
 cross-building, specify the root for the build with environment variable @var{DESTDIR}.  The
 cross-compile host must also be specified if different from the build host.  Either the compiler and
 other tools must be in the usual places where GNU @manpage{autoconf(1)} can find them, or they must
-be specified with declarations such as @samp{CC=/u5/@-Nex@-us@-Ware@-24/@-ppc@--linux/@-gcc} on the
+be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} on the
 @file{configure} command line.
-@c Look in the file @file{configure.nexusware} in the release package for an example.
 
 @cartouche
 @example
@@ -1942,166 +1937,6 @@ be specified with declarations such as @samp{CC=/u5/@-Nex@-us@-Ware@-24/@-ppc@--
 % popd
 @end example
 @end cartouche
-
-@c @subsubsection NexusWare Build
-@c 
-@c Additional support is provided for cross-building for the @cite{Performance Technologies Inc.}
-@c @cite{Nex@-us@-Ware} embedded target for the CPC-384, CPC-388 and CPC-396 cards.  A configuration
-@c script wrapper (@file{configure.nexusware}) is provided to simplify the cross-build operation for
-@c these targets.  The following steps describe the process:
-@c 
-@c @enumerate
-@c @item Follow the normal @cite{Nex@-us@-Ware} instructions for rebuilding a
-@c @file{generic} kernel and flash image as follows:  (Note that I keep my
-@c @cite{Nex@-us@-Ware} build in @file{/u5/@-Nex@-us@-Ware@-24}.)
-@c 
-@c @cartouche
-@c @example
-@c % pushd /u5/@-Nex@-us@-Ware@-24
-@c % source SETUP.sh
-@c % make
-@c % popd
-@c @end example
-@c @end cartouche
-@c 
-@c For more recent @cite{Nex@-us@-Ware} releases, the method for rebuilding a
-@c kernel is a little different as follows:
-@c 
-@c @cartouche
-@c @example
-@c % pushd /u5/@-Nex@-us@-Ware@-80
-@c % ./nexus 2.4
-@c % ./nexus 8260
-@c % ./nexus quick
-@c % . SETUP.sh
-@c % popd
-@c @end example
-@c @end cartouche
-@c 
-@c @item Next download, unpack (@pxrefman{Downloading the Tar Ball}) and configure (@pxrefman{Configuring the
-@c Tar Ball}) using the provided @file{configure.nexusware} wrapper for @file{configure}.  This
-@c wrapper simply tells the @file{configure} script where to find the @cite{Nex@-us@-Ware} sources
-@c and which @cite{Nex@-us@-Ware} cross-building tools to use for a cross-compile.@footnote{Although I
-@c have not tried it, because we use GNU @manpage{autoconf(1)} for configuration, these instructions
-@c should work equally well for the Solaris @cite{Nex@-us@-Ware} cross-building environment as it does
-@c for the Linux @cite{Nex@-us@-Ware} cross-building environment.}
-@c 
-@c Any of the normal @file{configure} script options (@pxrefman{Configuring the Tar Ball}) can be used
-@c on the same line as @samp{./configure.nexusware}.  One of particular interest to embedded targets is
-@c @option{--with-k-optimize=size} to attempt to reduce the size of the kernel modules.  Another is
-@c @option{--disable-docs} which can suppress the build and installation of major documentation.
-@c 
-@c You must specify the kernel version of the kernel for which you are configuring.  Add the
-@c @option{--with-k-release=2.4.18} option for older @cite{Nex@-us@-Ware} releases,
-@c @option{--with-k-release=2.4.25} or @option{--with-k-release=2.6.12} for more current
-@c @cite{Nex@-us@-Ware} releases.
-@c 
-@c @item Install as normal (@pxrefman{Installing the Tar Ball}), however, for embedded targets the
-@c @samp{install-strip} @manpage{automake(1)} target should be used instead of the @samp{install}
-@c @manpage{automake(1)} target.  The @samp{install-strip} target will strip unnecessary symbols from
-@c kernel modules and further reduce the size in the root file system flash image.
-@c 
-@c @end enumerate
-@c 
-@c Following is what I use for configuration and installation: (My @cite{Nex@-us@-Ware} tree is rooted
-@c at @file{/u5/@-Nex@-us@-Ware}.)
-@c 
-@c @cartouche
-@c @example
-@c % pushd /u5/@-Nex@-us@-Ware@-80
-@c % ./nexus 2.4
-@c % ./nexus 8260
-@c % ./nexus quick
-@c % . SETUP.sh
-@c % popd
-@c % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
-@c % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
-@c % pushd @value{PACKAGE}-@value{VERSION}
-@c % ./configure.nexusware --with-k-release=2.4.25 --with-k-optimize=size
-@c % make
-@c % make DESTDIR="$NEXUSWARE_PREFIX" install-strip
-@c % popd
-@c @end example
-@c @end cartouche
-@c 
-@c Once built and installed in the @cite{Nex@-us@-Ware} directory, you will have to (currently) hand
-@c edit a @file{.spec} file to include the components you want in the @cite{Nex@-us@-Ware} root file
-@c system.  If you are cross-building for @cite{Nex@-us@-Ware} you should already know what that means.
-@c Objects that you might be interested in copying to the root file system are kernel modules that were
-@c installed in
-@c @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-lib/@-modules/@-2.4.18/@-@value{PACKAGE_LCNAME}},
-@c libraries installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-lib} and utility functions
-@c installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-bin} and
-@c @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-sbin} and test programs in
-@c @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-usr/@-libexec}.  If you would prefer that these programs
-@c be installed in @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-lib},
-@c @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-bin}, @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-sbin} and
-@c @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/@-libexec}, (say because you want to remote mount the
-@c @file{/usr} directory after boot), then specify the @option{--exec-prefix=/} option to
-@c @samp{./configure.nexusware}.
-@c 
-@c Because @cite{Nex@-us@-Ware} does not include an @file{/etc/@-modules.conf} file by default, it will
-@c be necessary to add one or edit your @file{rc.4} file to @manpage{insmod(8)} the necessary
-@c @file{@value{PACKAGE_NAME}} modules at boot time.
-@c 
-@c @cite{Nex@-us@-Ware} does not configure its kernels for @var{CONFIG_KMOD}, so any kernel modules
-@c must be loaded by the @file{rc.4} @command{init} script at boot.  On more recent @cite{Nex@-us@-Ware}
-@c releases, the @command{init} scripts will be installed in
-@c @file{@var{$NEX@-US@-WARE@-_PRE@-FIX}/etc/rc.d/init.d/} but you must manually edit your @file{rc.4}
-@c script to invoke these scripts.
-@c 
-@c Once you have completed the necessary @file{.spec} and @file{rc.4} file entries, you need to rebuild
-@c the @samp{generic} kernel flash image once more for these objects to be included in the flash file
-@c system.  It is important that this second build of the kernel image be the same as the first.
-@c 
-@c When modifying and rebuilding a @cite{Nex@-us@-Ware} kernel, it will be necessary to rebuild and
-@c install @file{@value{PACKAGE_NAME}}.  Simply perform the last @samp{make install-strip} stage or
-@c start again with @samp{./configure.nexusware}.  You can place the unpacked tarball in
-@c @file{@var{$NEX@-US@-WARE@-_@-PRE@-FIX}/usr/src/@value{PACKAGE}}, and add the following to the
-@c top-level @cite{Nex@-us@-Ware} @file{Makefile} to make the build process a single step process
-@c instead of dual pass:
-@c 
-@c @cartouche
-@c @smallexample
-@c all:
-@c ...
-@c         (cd kernels/generic; $(MAKE) depend)
-@c         (cd usr/src/pcmcia-cs-3.2.1; $(MAKE) config)
-@c         (cd kernels/generic; $(MAKE))
-@c         (cd usr/src/pcmcia-cs-3.2.1; $(MAKE) pti)
-@c         (cd usr/src/pti; $(MAKE))
-@c         (cd drivers; $(MAKE))
-@c         (cd utility; $(MAKE))
-@c #       uncomment for LiS build
-@c #       (cd usr/src/LiS; ./configure.nexusware; $(MAKE) install-strip)
-@c #       uncomment for LfS build
-@c         (cd usr/src/streams; ./configure.nexusware; $(MAKE) install-strip)
-@c #       uncomment for @value{PACKAGE} build
-@c #       (cd usr/src/@value{PACKAGE}; ./configure.nexusware; $(MAKE) install-strip)
-@c         (cd build/generic; $(MAKE))
-@c ...
-@c @end smallexample
-@c @end cartouche
-@c 
-@c Another, perhaps simpler approach, is to make the necessary edits to the @cite{Nex@-us@-Ware}
-@c top-level @file{Makefile} and @file{.spec} and @file{rc.4} files, download and unpack the tar ball
-@c into the @cite{Nex@-us@-Ware} directory, and build the @cite{Nex@-us@-Ware} flash image as normal:
-@c 
-@c @cartouche
-@c @example
-@c % wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
-@c % pushd /u5/@-Nex@-us@-Ware@-24
-@c % source SETUP.sh
-@c % pushd usr/src
-@c % tar -xjvf $@{DIRSTACK[2]@}/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2
-@c % ln -sf @value{PACKAGE}-@value{VERSION} @value{PACKAGE}
-@c % popd
-@c % make
-@c % popd
-@c @end example
-@c @end cartouche
-@c 
-@c The situation is a little more complex for recent @cite{Nex@-us@-Ware} releases.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -2386,15 +2221,6 @@ Note that @dfn{STREAMS} modules are not listed in this file, but will be loaded 
 @cite{Linux Fast-STREAMS} has a wider range of kernel module loading mechanisms than is provided by
 the deprecated @cite{LiS}.  For mechanisms used for kernel module loading under @cite{Linux
 Fast-STREAMS}, @xref{Top, About This Manual, , STREAMS, Linux Fast-STREAMS Reference Manual}.
-
-@c @subsection NexusWare Module Loading
-@c @cindex NexusWare
-@c @cindex loading kernel modules
-@c 
-@c Under exceptional circumstances, such as a @cite{Nex@-us@-Ware} build, it is necessary to hand-edit
-@c a @file{.spec} and @file{rc.4} file to load the modules at boot time.@footnote{At some time I expect
-@c to create an @samp{install-nexusware} target that will make the necessary modifications to the
-@c @file{.spec} and @file{rc.4} files automatically.}
 
 @subsubsection Linux STREAMS Module Loading
 

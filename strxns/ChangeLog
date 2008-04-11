@@ -1,3 +1,11 @@
+2008-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* THANKS
+	* doc/manual/texi/install.texi
+	* scripts/texi/compat.texi
+	* scripts/texi/funding.texi
+	* scripts/texi/install.texi
+
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/Makefile.am: distribute agpl.texi

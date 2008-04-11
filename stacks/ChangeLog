@@ -1,3 +1,17 @@
+2008-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* THANKS: removed deprecated Nexusware support
+	* doc/man/Makefile.am: removed deprecated Nexusware support
+	* doc/manual/texi/install.texi: removed deprecated Nexusware support
+	* doc/projects/Makefile.am: removed deprecated Nexusware support
+	* doc/projects/cnam.texi: removed deprecated Nexusware support
+	* doc/projects/hlr.texi: removed deprecated Nexusware support
+	* doc/projects/voip.texi: removed deprecated Nexusware support
+	* lib32/Makefile.am: removed deprecated Nexusware support
+	* scripts/texi/compat.texi: removed deprecated Nexusware support
+	* scripts/texi/funding.texi: removed deprecated Nexusware support
+	* scripts/texi/install.texi: removed deprecated Nexusware support
+
 2008-04-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/Makefile.am: distribute missing sl_mux.h header

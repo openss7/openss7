@@ -207,8 +207,6 @@ TBL_TBLS		= \
 
 PNG_PNGS		= \
 			acb56.png \
-			cpc388.png \
-			cpc396.png \
 			pca200e.png \
 			t400p-ss7.png \
 			v400p.png \
