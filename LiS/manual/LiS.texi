@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.24 2007/08/12 06:43:35 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.25 2008-04-11 16:58:11 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:43:35 $ by $Author: brian $
+% Last Modified $Date: 2008-04-11 16:58:11 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.25  2008-04-11 16:58:11  brian
+- removed deprecated NEXUSWARE support
+
 Revision 1.1.6.24  2007/08/12 06:43:35  brian
 - updated licenses in manuals
 
