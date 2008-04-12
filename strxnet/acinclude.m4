@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/14 04:00:17 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-04-12 10:06:45 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 04:00:17 $ by $Author: brian $
+# Last Modified $Date: 2008-04-12 10:06:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -167,9 +167,8 @@ AC_DEFUN([_XNET_OPTIONS], [dnl
 	     @<:@default=enabled@:>@]),
 	[enable_xti_servtype="$enableval"],
 	[enable_xti_servtype='yes'])
-    AC_CACHE_CHECK([for XTI service type checks], [xti_servtype], [dnl
-	xti_servtype="${enable_xti_servtype:-yes}"])
-    if test ${xti_servtype:-yes} != yes ; then
+    AC_MSG_CHECKING([for XTI service type checks])
+    if test ${enable_xti_servtype:-yes} != yes ; then
 	AC_DEFINE_UNQUOTED([CONFIG_XTI_IS_TYPELESS], [1], [Define when the XTI
 	    library is not to check service types.  This is necessary when
 	    T_COTS semantics are expected to be applied to T_CLTS providers.
@@ -177,15 +176,15 @@ AC_DEFUN([_XNET_OPTIONS], [dnl
 	    determine whether T_COTS/T_COTS_ORD primitives are supported or
 	    not.])
     fi
+    AC_MSG_RESULT([${enable_xti_servtype:-yes}])
     AC_ARG_ENABLE([xti-states],
 	AS_HELP_STRING([--disable-xti-states],
 	    [disable xnet library checks for state.
 	     @<:@default=enabled@:>@]),
 	[enable_xti_states="$enableval"],
 	[enable_xti_states='yes'])
-    AC_CACHE_CHECK([for XTI state checks], [xti_states], [dnl
-	xti_states="${enable_xti_states:-yes}"])
-    if test ${xti_states:-yes} != yes ; then
+    AC_MSG_CHECKING([for XTI state checks])
+    if test ${enable_xti_states:-yes} != yes ; then
 	AC_DEFINE_UNQUOTED([CONFIG_XTI_IS_STATELESS], [1], [Define when the
 	    XTI library is not to check states.  This is necessary when T_COTS
 	    semantics are expected to be applied to T_CLTS providers and
@@ -193,6 +192,7 @@ AC_DEFUN([_XNET_OPTIONS], [dnl
 	    defined, the XTI library lets the underlying TPI driver determine
 	    whether the primitive is issued out of state or not.])
     fi
+    AC_MSG_RESULT([${enable_xti_states:-yes}])
 ])# _XNET_OPTIONS
 # =============================================================================
 
@@ -390,6 +390,9 @@ AC_DEFUN([_XNET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.53  2008-04-12 10:06:45  brian
+# - updates for autoconf 2.62
+#
 # Revision 0.9.2.52  2007/08/14 04:00:17  brian
 # - GPLv3 header update
 #

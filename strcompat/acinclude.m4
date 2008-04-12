@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/12/15 20:19:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-04-12 10:06:45 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:19:20 $ by $Author: brian $
+# Last Modified $Date: 2008-04-12 10:06:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -234,120 +234,120 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_compat_mac="$enableval"],
 	    [enable_compat_mac='module'])
-    AC_CACHE_CHECK([for STREAMS OpenSS7 compatibility], [compat_compat_os7], [dnl
-	compat_compat_os7="${enable_compat_os7:-module}"
-	if test :$compat_compat_os7 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_os7='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 3.2 compatibility], [compat_compat_svr3], [dnl
-	compat_compat_svr3="${enable_compat_svr3:-module}"
-	if test :$compat_compat_svr3 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_svr3='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS UNIX(R) SVR 4.2 compatibility], [compat_compat_svr4], [dnl
-	compat_compat_svr4="${enable_compat_svr4:-module}"
-	if test :$compat_compat_svr4 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_svr4='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS MPS(R) compatibility], [compat_compat_mps], [dnl
-	compat_compat_mps="${enable_compat_mps:-module}"
-	if test :$compat_compat_mps = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_mps='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS Solaris(R) 8 compatibility], [compat_compat_sol8], [dnl
+    AC_MSG_CHECKING([for STREAMS OpenSS7 compatibility])
+	if test :${enable_compat_os7:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_os7='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_os7:-module}])
+    AC_MSG_CHECKING([for STREAMS UNIX(R) SVR 3.2 compatibility])
+	if test :${enable_compat_svr3:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_svr3='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_svr3:-module}])
+    AC_MSG_CHECKING([for STREAMS UNIX(R) SVR 4.2 compatibility])
+	if test :${enable_compat_svr4:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_svr4='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_svr4:-module}])
+    AC_MSG_CHECKING([for STREAMS MPS(R) compatibility])
+	if test :${enable_compat_mps:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_mps='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_mps:-module}])
+    AC_MSG_CHECKING([for STREAMS Solaris(R) 8 compatibility])
 	case ${enable_compat_sol8:-module} in
-	    (yes) compat_compat_svr4=yes ;;
-	    (module) if test :$compat_compat_svr4 != :yes ; then compat_compat_svr4=module ; fi ;;
+	    (yes) enable_compat_svr4=yes ;;
+	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	compat_compat_sol8="${enable_compat_sol8:-module}"
-	if test :$compat_compat_sol8 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_sol8='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS UnixWare(R) 7 compatibility], [compat_compat_uw7], [dnl
+	if test :${enable_compat_sol8:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_sol8='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_sol8:-module}])
+    AC_MSG_CHECKING([for STREAMS UnixWare(R) 7 compatibility])
 	case ${enable_compat_uw7:-module} in
-	    (yes) compat_compat_svr4=yes ;;
-	    (module) if test :$compat_compat_svr4 != :yes ; then compat_compat_svr4=module ; fi ;;
+	    (yes) enable_compat_svr4=yes ;;
+	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	compat_compat_uw7="${enable_compat_uw7:-module}"
-	if test :$compat_compat_uw7 = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_uw7='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS OSF/1.2 compatibility], [compat_compat_osf], [dnl
+	if test :${enable_compat_uw7:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_uw7='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_uw7:-module}])
+    AC_MSG_CHECKING([for STREAMS OSF/1.2 compatibility])
 	case ${enable_compat_osf:-module} in
-	    (yes) compat_compat_svr4=yes ;;
-	    (module) if test :$compat_compat_svr4 != :yes ; then compat_compat_svr4=module ; fi ;;
+	    (yes) enable_compat_svr4=yes ;;
+	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
 	case ${enable_compat_osf:-module} in
-	    (yes) compat_compat_mps=yes ;;
-	    (module) if test :$compat_compat_mps != :yes ; then compat_compat_mps=module ; fi ;;
+	    (yes) enable_compat_mps=yes ;;
+	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	compat_compat_osf="${enable_compat_osf:-module}"
-	if test :$compat_compat_osf = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_osf='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS AIX(R) 4 compatibility], [compat_compat_aix], [dnl
+	if test :${enable_compat_osf:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_osf='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_osf:-module}])
+    AC_MSG_CHECKING([for STREAMS AIX(R) 4 compatibility])
 	case ${enable_compat_aix:-module} in
-	    (yes) compat_compat_svr4=yes ;;
-	    (module) if test :$compat_compat_svr4 != :yes ; then compat_compat_svr4=module ; fi ;;
+	    (yes) enable_compat_svr4=yes ;;
+	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
 	case ${enable_compat_aix:-module} in
-	    (yes) compat_compat_mps=yes ;;
-	    (module) if test :$compat_compat_mps != :yes ; then compat_compat_mps=module ; fi ;;
+	    (yes) enable_compat_mps=yes ;;
+	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	compat_compat_aix="${enable_compat_aix:-module}"
-	if test :$compat_compat_aix = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_aix='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS HPUX(R) compatibility], [compat_compat_hpux], [dnl
+	if test :${enable_compat_aix:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_aix='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_aix:-module}])
+    AC_MSG_CHECKING([for STREAMS HPUX(R) compatibility])
 	case ${enable_compat_hpux:-module} in
-	    (yes) compat_compat_svr4=yes ;;
-	    (module) if test :$compat_compat_svr4 != :yes ; then compat_compat_svr4=module ; fi ;;
+	    (yes) enable_compat_svr4=yes ;;
+	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
 	case ${enable_compat_hpux:-module} in
-	    (yes) compat_compat_mps=yes ;;
-	    (module) if test :$compat_compat_mps != :yes ; then compat_compat_mps=module ; fi ;;
+	    (yes) enable_compat_mps=yes ;;
+	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	compat_compat_hpux="${enable_compat_hpux:-module}"
-	if test :$compat_compat_hpux = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_hpux='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS IRIX(R) compatibility], [compat_compat_irix], [dnl
+	if test :${enable_compat_hpux:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_hpux='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_hpux:-module}])
+    AC_MSG_CHECKING([for STREAMS IRIX(R) compatibility])
 	case ${enable_compat_irix:-module} in
-	    (yes) compat_compat_svr4=yes ;;
-	    (module) if test :$compat_compat_svr4 != :yes ; then compat_compat_svr4=module ; fi ;;
+	    (yes) enable_compat_svr4=yes ;;
+	    (module) if test :$enable_compat_svr4 != :yes ; then enable_compat_svr4=module ; fi ;;
 	esac
-	compat_compat_irix="${enable_compat_irix:-module}"
-	if test :$compat_compat_irix = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_irix='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS LiS compatibility], [compat_compat_lis], [dnl
+	if test :${enable_compat_irix:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_irix='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_irix:-module}])
+    AC_MSG_CHECKING([for STREAMS LiS compatibility])
 	if test :$streams_cv_package = :LiS ; then
-	    compat_compat_lis='not required'
+	    enable_compat_lis='not required'
 	else
-	    compat_compat_lis="${enable_compat_lis:-module}"
-	    if test ":$compat_compat_lis" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-		compat_compat_lis='yes'
+	    if test :${enable_compat_lis:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+		enable_compat_lis='yes'
 	    fi
-	fi])
-    AC_CACHE_CHECK([for STREAMS LfS compatibility], [compat_compat_lfs], [dnl
+	fi
+    AC_MSG_RESULT([${enable_compat_lis:-module}])
+    AC_MSG_CHECKING([for STREAMS LfS compatibility])
 	if test :$streams_cv_package = :LfS ; then
-	    compat_compat_lfs='not required'
+	    enable_compat_lfs='not required'
 	else
-	    compat_compat_lfs="${enable_compat_lfs:-module}"
-	    if test ":$compat_compat_lfs" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-		compat_compat_lfs='yes'
+	    if test :${enable_compat_lfs:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+		enable_compat_lfs='yes'
 	    fi
-	fi])
-    AC_CACHE_CHECK([for STREAMS MacOT compatibility], [compat_compat_mac], [dnl
+	fi
+    AC_MSG_RESULT([${enable_compat_lfs:-module}])
+    AC_MSG_CHECKING([for STREAMS MacOT compatibility])
 	case ${enable_compat_mac:-module} in
-	    (yes) compat_compat_mps=yes ;;
-	    (module) if test :$compat_compat_mps != :yes ; then compat_compat_mps=module ; fi ;;
+	    (yes) enable_compat_mps=yes ;;
+	    (module) if test :$enable_compat_mps != :yes ; then enable_compat_mps=module ; fi ;;
 	esac
-	compat_compat_mac="${enable_compat_mac:-module}"
-	if test :$compat_compat_mac = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    compat_compat_mac='yes'
-	fi])
-    case ${compat_compat_os7:-module} in
+	if test :$enable_compat_mac = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_compat_mac='yes'
+	fi
+    AC_MSG_RESULT([${enable_compat_mac:-module}])
+    case ${enable_compat_os7:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OS7], [], [When defined, Linux Fast STREAMS
 	    will attempt to be as compatible as possible (without replicating any bugs) with the
@@ -365,7 +365,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_svr3:-module} in
+    case ${enable_compat_svr3:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR3], [], [When defined, Linux Fast STREAMS
 	    will attempt to be as compatible as possible (without replicating any bugs) with the
@@ -385,7 +385,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_svr4:-module} in
+    case ${enable_compat_svr4:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SVR4], [], [When defined, Linux Fast STREAMS
 	    will attempt to be as compatible as possible (without replicating any bugs) with the
@@ -405,7 +405,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_mps:-module} in
+    case ${enable_compat_mps:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MPS], [], [When defined, Linux Fast STREAMS
 	    will attempt to be as compatible as possible (without replicating any bugs) with the
@@ -425,7 +425,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_sol8:-module} in
+    case ${enable_compat_sol8:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_SUN], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -443,7 +443,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    whether compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_uw7:-module} in
+    case ${enable_compat_uw7:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_UW7], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -461,7 +461,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    whether compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_osf:-module} in
+    case ${enable_compat_osf:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_OSF], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -479,7 +479,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_aix:-module} in
+    case ${enable_compat_aix:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_AIX], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -499,7 +499,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_hpux:-module} in
+    case ${enable_compat_hpux:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_HPUX], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -517,7 +517,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_irix:-module} in
+    case ${enable_compat_irix:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_IRIX], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -535,7 +535,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case "${compat_compat_lis:-module}" in
+    case "${enable_compat_lis:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LIS], [], [When defined, Linux Fast
 	    STREAMS will attempt to be as compatible as possible (without replicating any bugs) with
@@ -553,7 +553,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    case "${compat_compat_lfs:-module}" in
+    case "${enable_compat_lfs:-module}" in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_LFS], [], [When defined, Linux STREAMS
 	    will attempt to be as compatible as possible (without replicating any bugs) with
@@ -571,7 +571,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compiled as a loadable module to Linux STREAMS.])
 	    ;;
     esac
-    case ${compat_compat_mac:-module} in
+    case ${enable_compat_mac:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_COMPAT_MAC], [], [When defined, Linux Fast STREAMS
 	    will attempt to be as compatible as possible (without replicating any bugs) with the
@@ -589,32 +589,32 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	    compatibility will be compiled as a loadable module to Linux Fast-STREAMS.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7],		[test :${compat_compat_os7:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7_MODULE],	[test :${compat_compat_os7:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3],	[test :${compat_compat_svr3:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE],	[test :${compat_compat_svr3:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${compat_compat_svr4:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE],	[test :${compat_compat_svr4:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS],		[test :${compat_compat_mps:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS_MODULE],	[test :${compat_compat_mps:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN],		[test :${compat_compat_sol8:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN_MODULE],	[test :${compat_compat_sol8:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7],		[test :${compat_compat_uw7:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7_MODULE],	[test :${compat_compat_uw7:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF],		[test :${compat_compat_osf:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF_MODULE],	[test :${compat_compat_osf:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX],		[test :${compat_compat_aix:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX_MODULE],	[test :${compat_compat_aix:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX],	[test :${compat_compat_hpux:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${compat_compat_hpux:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX],	[test :${compat_compat_irix:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test :${compat_compat_irix:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test ":${compat_compat_lis:-module}"	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test ":${compat_compat_lis:-module}"	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test ":${compat_compat_lfs:-module}"	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test ":${compat_compat_lfs:-module}"	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${compat_compat_mac:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE],	[test :${compat_compat_mac:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7],		[test :${enable_compat_os7:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OS7_MODULE],	[test :${enable_compat_os7:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3],	[test :${enable_compat_svr3:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR3_MODULE],	[test :${enable_compat_svr3:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4],	[test :${enable_compat_svr4:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SVR4_MODULE],	[test :${enable_compat_svr4:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS],		[test :${enable_compat_mps:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MPS_MODULE],	[test :${enable_compat_mps:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN],		[test :${enable_compat_sol8:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_SUN_MODULE],	[test :${enable_compat_sol8:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7],		[test :${enable_compat_uw7:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_UW7_MODULE],	[test :${enable_compat_uw7:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF],		[test :${enable_compat_osf:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_OSF_MODULE],	[test :${enable_compat_osf:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX],		[test :${enable_compat_aix:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_AIX_MODULE],	[test :${enable_compat_aix:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX],	[test :${enable_compat_hpux:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${enable_compat_hpux:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX],	[test :${enable_compat_irix:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test :${enable_compat_irix:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test :${enable_compat_lis:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test :${enable_compat_lis:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test :${enable_compat_lfs:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test :${enable_compat_lfs:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${enable_compat_mac:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE],	[test :${enable_compat_mac:-module}	= :module])
 ])# _COMPAT_SETUP_COMPAT
 # =============================================================================
 
@@ -1190,6 +1190,9 @@ AC_DEFUN([_COMPAT_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.35  2008-04-12 10:06:45  brian
+# - updates for autoconf 2.62
+#
 # Revision 0.9.2.34  2007/12/15 20:19:20  brian
 # - updates
 #

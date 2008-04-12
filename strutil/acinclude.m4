@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:57:54 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-04-12 10:06:45 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 12:57:54 $ by $Author: brian $
+# Last Modified $Date: 2008-04-12 10:06:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -177,23 +177,23 @@ AC_DEFUN([_UTIL_SETUP_MODULES], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_module_sc="$enableval"],
 	    [enable_module_sc='module'])
-    AC_CACHE_CHECK([for util module pipemod], [util_module_pipemod], [dnl
-	util_module_pipemod="${enable_module_pipemod:-module}"
-	if test :$util_module_pipemod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_module_pipemod='yes'
-	fi])
-    AC_CACHE_CHECK([for util module connld], [util_module_connld], [dnl
-	util_module_connld="${enable_module_connld:-module}"
-	if test :$util_module_connld = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_module_connld='yes'
-	fi])
-    AC_CACHE_CHECK([for util module sc], [util_module_sc], [dnl
-	util_module_sc="${enable_module_sc:-module}"
-	if test :$util_module_sc = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_module_sc='yes'
-	fi])
+    AC_MSG_CHECKING([for util module pipemod])
+	if test :${enable_module_pipemod:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_pipemod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_pipemod:-module}])
+    AC_MSG_CHECKING([for util module connld])
+	if test :${enable_module_connld:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_connld='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_connld:-module}])
+    AC_MSG_CHECKING([for util module sc])
+	if test :${enable_module_sc:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_sc='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_sc:-module}])
 dnl --------------------------------------
-    case ${util_module_pipemod:-module} in
+    case ${enable_module_pipemod:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_PIPEMOD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the pipemod module for linkage with the kernel.  When undefined,]
@@ -206,7 +206,7 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_module_connld:-module} in
+    case ${enable_module_connld:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_CONNLD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the connld module for linkage with the kernel.  When undefined,]
@@ -219,7 +219,7 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_module_sc:-module} in
+    case ${enable_module_sc:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_SC], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sc module for linkage with the kernel.  When undefined,]
@@ -233,12 +233,12 @@ dnl --------------------------------------
 	    ;;
     esac
 dnl ===========================
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD],		[test :${util_module_pipemod:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE],	[test :${util_module_pipemod:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD],		[test :${util_module_connld:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE],	[test :${util_module_connld:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SC],			[test :${util_module_sc:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE],		[test :${util_module_sc:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD],		[test :${enable_module_pipemod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE],	[test :${enable_module_pipemod:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD],		[test :${enable_module_connld:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE],	[test :${enable_module_connld:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC],			[test :${enable_module_sc:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE],		[test :${enable_module_sc:-module}	= :module])
 ])# _UTIL_SETUP_MODULES
 # =============================================================================
 
@@ -312,63 +312,63 @@ AC_DEFUN([_UTIL_SETUP_DRIVERS], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_driver_spx="$enableval"],
 	    [enable_driver_spx='module'])
-    AC_CACHE_CHECK([for util driver clone], [util_driver_clone], [dnl
-	util_driver_clone="${enable_driver_clone:-module}"
-	if test :$util_driver_clone = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_clone='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver echo], [util_driver_echo], [dnl
-	util_driver_echo="${enable_driver_echo:-module}"
-	if test :$util_driver_echo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_echo='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver fifo], [util_driver_fifo], [dnl
-	util_driver_fifo="${enable_driver_fifo:-module}"
-	if test :$util_driver_fifo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_fifo='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver log], [util_driver_log], [dnl
-	util_driver_log="${enable_driver_log:-module}"
-	if test :$util_driver_log = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_log='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver loop],  [util_driver_loop], [dnl
-	util_driver_loop="${enable_driver_loop:-module}"
-	if test :$util_driver_loop = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_loop='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver nsdev], [util_driver_nsdev], [dnl
-	util_driver_nsdev="${enable_driver_nsdev:-module}"
-	if test :$util_driver_nsdev = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_nsdev='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver nuls], [util_driver_nuls], [dnl
-	util_driver_nuls="${enable_driver_nuls:-module}"
-	if test :$util_driver_nuls = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_nuls='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver pipe], [util_driver_pipe], [dnl
-	util_driver_pipe="${enable_driver_pipe:-module}"
-	if test :$util_driver_pipe = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_pipe='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver sad], [util_driver_sad], [dnl
-	util_driver_sad="${enable_driver_sad:-module}"
-	if test :$util_driver_sad = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_sad='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver sfx], [util_driver_sfx], [dnl
-	util_driver_sfx="${enable_driver_sfx:-module}"
-	if test :$util_driver_sfx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_sfx='yes'
-	fi])
-    AC_CACHE_CHECK([for util driver spx], [util_driver_spx], [dnl
-	util_driver_spx="${enable_driver_spx:-module}"
-	if test :$util_driver_spx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    util_driver_spx='yes'
-	fi])
+    AC_MSG_CHECKING([for util driver clone])
+	if test :${enable_driver_clone:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_clone='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_clone:-module}])
+    AC_MSG_CHECKING([for util driver echo])
+	if test :${enable_driver_echo:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_echo='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_echo:-module}])
+    AC_MSG_CHECKING([for util driver fifo])
+	if test :${enable_driver_fifo:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_fifo='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_fifo:-module}])
+    AC_MSG_CHECKING([for util driver log])
+	if test :${enable_driver_log:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_log='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_log:-module}])
+    AC_MSG_CHECKING([for util driver loop])
+	if test :${enable_driver_loop:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_loop='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_loop:-module}])
+    AC_MSG_CHECKING([for util driver nsdev])
+	if test :${enable_driver_nsdev:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_nsdev='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_nsdev:-module}])
+    AC_MSG_CHECKING([for util driver nuls])
+	if test :${enable_driver_nuls:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_nuls='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_nuls:-module}])
+    AC_MSG_CHECKING([for util driver pipe])
+	if test :${enable_driver_pipe:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_pipe='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_pipe:-module}])
+    AC_MSG_CHECKING([for util driver sad])
+	if test :${enable_driver_sad:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_sad='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_sad:-module}])
+    AC_MSG_CHECKING([for util driver sfx])
+	if test :${enable_driver_sfx:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_sfx='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_sfx:-module}])
+    AC_MSG_CHECKING([for util driver spx])
+	if test :${enable_driver_spx:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_spx='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_spx:-module}])
 dnl ------------------------------------
-    case ${util_driver_clone:-module} in
+    case ${enable_driver_clone:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_CLONE], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the clone driver for linkage with the kernel.  When undefined,]
@@ -381,7 +381,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_echo:-module} in
+    case ${enable_driver_echo:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_ECHO], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the echo driver for linkage with the kernel.  When undefined,]
@@ -394,7 +394,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_fifo:-module} in
+    case ${enable_driver_fifo:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the fifo driver for linkage with the kernel.  When undefined,]
@@ -407,7 +407,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_log:-module} in
+    case ${enable_driver_log:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the log driver for linkage with the kernel.  When undefined,]
@@ -420,7 +420,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_loop:-module} in
+    case ${enable_driver_loop:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_LOOP], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the loop driver for linkage with the kernel.  When undefined,]
@@ -433,7 +433,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_nsdev:-module} in
+    case ${enable_driver_nsdev:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_NSDEV], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the nsdev driver for linkage with the kernel.  When undefined,]
@@ -446,7 +446,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_nuls:-module} in
+    case ${enable_driver_nuls:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_NULS], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the nuls driver for linkage with the kernel.  When undefined,]
@@ -459,7 +459,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_pipe:-module} in
+    case ${enable_driver_pipe:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_PIPE], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the pipe driver for linkage with the kernel.  When undefined,]
@@ -472,7 +472,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_sad:-module} in
+    case ${enable_driver_sad:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_SAD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sad driver for linkage with the kernel.  When undefined,]
@@ -485,7 +485,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_sfx:-module} in
+    case ${enable_driver_sfx:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_SFX], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sfx driver for linkage with the kernel.  When undefined,]
@@ -498,7 +498,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${util_driver_spx:-module} in
+    case ${enable_driver_spx:-module} in
 	(yes)
 	    AC_DEFINE([CONFIG_STREAMS_SPX], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the spx driver for linkage with the kernel.  When undefined,]
@@ -512,28 +512,28 @@ dnl ------------------------------------
 	    ;;
     esac
 dnl =================================
-    AM_CONDITIONAL([CONFIG_STREAMS_CLONE],		[test :${util_driver_clone:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE],	[test :${util_driver_clone:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_ECHO],		[test :${util_driver_echo:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE],	[test :${util_driver_echo:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_FIFO],		[test :${util_driver_fifo:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE],	[test :${util_driver_fifo:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOG],		[test :${util_driver_log:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE],		[test :${util_driver_log:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOOP],		[test :${util_driver_loop:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE],	[test :${util_driver_loop:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV],		[test :${util_driver_nsdev:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE],	[test :${util_driver_nsdev:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULS],		[test :${util_driver_nuls:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE],	[test :${util_driver_nuls:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPE],		[test :${util_driver_pipe:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE],	[test :${util_driver_pipe:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SAD],		[test :${util_driver_sad:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE],		[test :${util_driver_sad:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SFX],		[test :${util_driver_sfx:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SFX_MODULE],		[test :${util_driver_sfx:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SPX],		[test :${util_driver_spx:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE],		[test :${util_driver_spx:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE],		[test :${enable_driver_clone:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE],	[test :${enable_driver_clone:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO],		[test :${enable_driver_echo:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE],	[test :${enable_driver_echo:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO],		[test :${enable_driver_fifo:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE],	[test :${enable_driver_fifo:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG],		[test :${enable_driver_log:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE],		[test :${enable_driver_log:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP],		[test :${enable_driver_loop:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE],	[test :${enable_driver_loop:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV],		[test :${enable_driver_nsdev:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE],	[test :${enable_driver_nsdev:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS],		[test :${enable_driver_nuls:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE],	[test :${enable_driver_nuls:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE],		[test :${enable_driver_pipe:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE],	[test :${enable_driver_pipe:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD],		[test :${enable_driver_sad:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE],		[test :${enable_driver_sad:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX],		[test :${enable_driver_sfx:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX_MODULE],		[test :${enable_driver_sfx:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX],		[test :${enable_driver_spx:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE],		[test :${enable_driver_spx:-module}	= :module])
 ])# _UTIL_SETUP_DRIVERS
 # =============================================================================
 
@@ -955,6 +955,9 @@ AC_DEFUN([_UTIL_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.25  2008-04-12 10:06:45  brian
+# - updates for autoconf 2.62
+#
 # Revision 0.9.2.24  2007/08/14 12:57:54  brian
 # - GNUv3 header updates
 #

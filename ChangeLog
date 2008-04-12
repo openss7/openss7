@@ -1,3 +1,9 @@
+2008-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: had to drop archive compatibility back to UNIX V7 on the
+	  master package due to the maximum path length restrictions.
+	* doc/Makefile.am: added projects subdirectory to pass distcheck
+
 2008-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* THANKS: remove deprecated Nexusware support
