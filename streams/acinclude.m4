@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.149 $) $Date: 2007/12/15 20:19:26 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2008-04-12 10:06:45 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:19:26 $ by $Author: brian $
+# Last Modified $Date: 2008-04-12 10:06:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -240,9 +240,8 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
 	     @<:@default=enabled@:>@]),
 	    [enable_streams_irq="$enableval"],
 	    [enable_streams_irq='yes'])
-    AC_CACHE_CHECK([for STREAMS irq suppression], [lfs_streams_irq], [dnl
-	lfs_streams_irq="${enable_streams_irq:-yes}"])
-    case ${lfs_streams_irq:-yes} in
+    AC_MSG_CHECKING([for STREAMS irq suppression])
+    case ${enable_streams_irq:-yes} in
 	(no)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NOIRQ], [1], [When defined]
 	    AC_PACKAGE_TITLE [will not suppress interrupts for stream or queue
@@ -252,7 +251,8 @@ AC_DEFUN([_LFS_SETUP_IRQ], [dnl
 	    this except for interrupt based profiling.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${lfs_streams_irq:-yes} = :no])
+    AM_CONDITIONAL([CONFIG_STREAMS_NOIRQ], [test :${enable_streams_irq:-yes} = :no])
+    AC_MSG_RESULT([${enable_streams_irq:-yes}])
 ])# _LFS_SETUP_IRQ
 # =============================================================================
 
@@ -266,9 +266,8 @@ AC_DEFUN([_LFS_SETUP_STATS], [dnl
 	     @<:@default=enabled@:>@]),
 	    [enable_streams_stats="$enableval"],
 	    [enable_streams_stats='yes'])
-    AC_CACHE_CHECK([for STREAMS stats counting], [lfs_streams_stats], [dnl
-	lfs_streams_stats="${enable_streams_stats:-yes}"])
-    case ${lfs_streams_stats:-yes} in
+    AC_MSG_CHECKING([for STREAMS stats counting])
+    case ${enable_streams_stats:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_DO_STATS], [1], [When defined]
 	    AC_PACKAGE_TITLE [will perform STREAMS entry point counting in the
@@ -276,7 +275,8 @@ AC_DEFUN([_LFS_SETUP_STATS], [dnl
 	    driver.  This is a low cost item and is enabled by default.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_DO_STATS], [test :${lfs_streams_stats:-yes} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_DO_STATS], [test :${enable_streams_stats:-yes} = :yes])
+    AC_MSG_RESULT([${enable_streams_stats:-yes}])
 ])# _LFS_SETUP_STATS
 # =============================================================================
 
@@ -290,16 +290,16 @@ AC_DEFUN([_LFS_SETUP_SYNCQS], [dnl
 	    @<:@default=enabled@:>@]),
 	    [enable_streams_syncqs="$enableval"],
 	    [enable_streams_syncqs='yes'])
-    AC_CACHE_CHECK([for STREAMS synchronization], [lfs_streams_syncqs], [dnl
-	lfs_streams_syncqs="${enable_streams_syncqs:-yes}"])
-    case ${lfs_streams_syncqs:-yes} in
+    AC_MSG_CHECKING([for STREAMS synchronization])
+    case ${enable_streams_syncqs:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SYNCQS], [1], [When defined]
 	    AC_PACKAGE_TITLE [will include support for synchronization queues
 	    and levels.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_SYNCQS], [test :${lfs_streams_syncqs:-yes} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SYNCQS], [test :${enable_streams_syncqs:-yes} = :yes])
+    AC_MSG_RESULT([${enable_streams_syncqs:-yes}])
 ])# _LFS_SETUP_SYNCQS
 # =============================================================================
 
@@ -321,12 +321,11 @@ AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
 	     'no'. @<:@default=nice@:>@]),
 	    [with_streams_kthreads="$withval"],
 	    [with_streams_kthreads='nice'])
-    AC_CACHE_CHECK([for STREAMS kernel threads], [lfs_streams_kthreads], [dnl
-	lfs_streams_kthreads="${with_streams_kthreads:-nice}"
-	case ${lfs_streams_kthreads:-nice} in
-	    (no|rt|normal) ;;
-	    (*) lfs_streams_kthreads=nice ;;
-	esac])
+    AC_MSG_CHECKING([for STREAMS kernel threads])
+    case ${with_streams_kthreads:-nice} in
+	(no|rt|normal) ;;
+	(*) with_streams_kthreads=nice ;;
+    esac
     AH_TEMPLATE([CONFIG_STREAMS_KTHREADS], [When defined] AC_PACKAGE_TITLE
 	[will include use kernel threads for the STREAMS scheduler; when
 	undefined,] AC_PACKAGE_TITLE [will use softirqs for the STREAMS
@@ -337,7 +336,7 @@ AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
     AH_TEMPLATE([CONFIG_STREAMS_NN_KTHREADS], [When defined] AC_PACKAGE_TITLE
 	[will run kernel threads under normal scheduling priority when
 	CONFIG_STREAMS_RT_KTHREADS is not defined instead of at nice level 19.])
-    case ${lfs_streams_kthreads:-nice} in
+    case ${with_streams_kthreads:-nice} in
 	(no) ;;
 	(rt)	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1])
 		    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_RT_KTHREADS], [1]) ;;
@@ -345,7 +344,8 @@ AC_DEFUN([_LFS_SETUP_KTHREADS], [dnl
 		    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NN_KTHREADS], [1]) ;;
 	(nice)	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_KTHREADS], [1]) ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${lfs_streams_kthreads:-nice} != :no])
+    AM_CONDITIONAL([CONFIG_STREAMS_KTHREADS], [test :${with_streams_kthreads:-nice} != :no])
+    AC_MSG_RESULT([${with_streams_kthreads:-nice}])
 ])# _LFS_SETUP_KTHREADS
 # =============================================================================
 
@@ -359,15 +359,15 @@ AC_DEFUN([_LFS_SETUP_UTILS], [dnl
 	    @<:@default=enabled@:>@]),
 	    [enable_streams_utils="$enableval"],
 	    [enable_streams_utils='yes'])
-    AC_CACHE_CHECK([for STREAMS utilities], [lfs_streams_utils], [dnl
-	lfs_streams_utils="${enable_streams_utils:-yes}"])
-    case ${lfs_streams_utils:-yes} in
+    AC_MSG_CHECKING([for STREAMS utilities])
+    case ${enable_streams_utils:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_UTILS], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will include additional STREAMS utilities.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_UTILS], [test :${lfs_streams_utils:-yes} = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_UTILS], [test :${enable_streams_utils:-yes} = :yes])
+    AC_MSG_RESULT([${enable_streams_utils:-yes}])
 ])# _LFS_SETUP_UTILS
 # =============================================================================
 
@@ -381,15 +381,15 @@ AC_DEFUN([_LFS_SETUP_COMPILE], [dnl
 	    @<:@default=enabled@:>@]),
 	    [enable_big_compile="$enableval"],
 	    [enable_big_comiple='yes'])
-    AC_CACHE_CHECK([for STREAMS big compile], [lfs_big_compile], [dnl
-	lfs_big_compile="${enable_big_compile:-yes}"])
-    case ${lfs_big_compile:-yes} in
+    AC_MSG_CHECKING([for STREAMS big compile])
+    case ${enable_big_compile:-yes} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SEPARATE_COMPILE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will compile streams objects separately.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_SEPARATE_COMPILE], [test :${lfs_big_compile:-yes} != :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SEPARATE_COMPILE], [test :${enable_big_compile:-yes} != :yes])
+    AC_MSG_RESULT([${enable_big_compile:-yes}])
 ])# _LFS_SETUP_COMPILE
 # =============================================================================
 
@@ -402,7 +402,7 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	    [enable module sth for linkage with STREAMS.
 	    @<:@default=module@:>@]),
 	    [enable_module_sth="$enableval"],
-	    [if test :${lfs_big_compile:-yes} = :yes ; then enable_module_sth='yes' ; else enable_module_sth='module' ; fi])
+	    [if test :${enable_big_compile:-yes} = :yes ; then enable_module_sth='yes' ; else enable_module_sth='module' ; fi])
     AC_ARG_ENABLE([module-bufmod],
 	AS_HELP_STRING([--enable-module-bufmod],
 	    [enable bufmod module for linkage with STREAMS.
@@ -439,42 +439,42 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_module_testmod="$enableval"],
 	    [enable_module_testmod='module'])
-    AC_CACHE_CHECK([for STREAMS module sth], [lfs_module_sth], [dnl
-	lfs_module_sth="${enable_module_sth:-module}"
-	if test :$lfs_module_sth = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_module_sth='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS module bufmod], [lfs_module_bufmod], [dnl
-	lfs_module_bufmod="${enable_module_bufmod:-module}"
-	if test :$lfs_module_bufmod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_module_bufmod='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS module nullmod], [lfs_module_nullmod], [dnl
-	lfs_module_nullmod="${enable_module_nullmod:-module}"
-	if test :$lfs_module_nullmod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_module_nullmod='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS module pipemod], [lfs_module_pipemod], [dnl
-	lfs_module_pipemod="${enable_module_pipemod:-module}"
-	if test :$lfs_module_pipemod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_module_pipemod='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS module connld], [lfs_module_connld], [dnl
-	lfs_module_connld="${enable_module_connld:-module}"
-	if test :$lfs_module_connld = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_module_connld='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS module sc], [lfs_module_sc], [dnl
-	lfs_module_sc="${enable_module_sc:-module}"
-	if test :$lfs_module_sc = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_module_sc='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS module testmod], [lfs_module_testmod], [dnl
-	lfs_module_testmod="${enable_module_testmod:-module}"
-	if test :$lfs_module_testmod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_module_testmod='yes'
-	fi])
-    case ${lfs_module_sth:-module} in
+    AC_MSG_CHECKING([for STREAMS module sth])
+	if test :${enable_module_sth:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_sth='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_sth:-module}])
+    AC_MSG_CHECKING([for STREAMS module bufmod])
+	if test :${enable_module_bufmod:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_bufmod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_bufmod:-module}])
+    AC_MSG_CHECKING([for STREAMS module nullmod])
+	if test :${enable_module_nullmod:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_nullmod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_nullmod:-module}])
+    AC_MSG_CHECKING([for STREAMS module pipemod])
+	if test :${enable_module_pipemod:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_pipemod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_pipemod:-module}])
+    AC_MSG_CHECKING([for STREAMS module connld])
+	if test :${enable_module_connld:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_connld='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_connld:-module}])
+    AC_MSG_CHECKING([for STREAMS module sc])
+	if test :${enable_module_sc:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_sc='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_sc:-module}])
+    AC_MSG_CHECKING([for STREAMS module testmod])
+	if test :$enable_module_testmod = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_testmod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_testmod:-module}])
+    case ${enable_module_sth:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_STH], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sth module for linkage with STREAMS.  When undefined,]
@@ -488,7 +488,7 @@ AC_DEFUN([_LFS_SETUP_MODULES], [dnl
 	    ;;
     esac
 dnl --------------------------------------
-    case ${lfs_module_bufmod:-module} in
+    case ${enable_module_bufmod:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BUFMOD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the bufmod module for linkage with STREAMS.  When undefined,]
@@ -501,7 +501,7 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_module_nullmod:-module} in
+    case ${enable_module_nullmod:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULLMOD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the nullmod module for linkage with STREAMS.  When undefined,]
@@ -514,7 +514,7 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_module_pipemod:-module} in
+    case ${enable_module_pipemod:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPEMOD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the pipemod module for linkage with STREAMS.  When undefined,]
@@ -527,7 +527,7 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_module_connld:-module} in
+    case ${enable_module_connld:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CONNLD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the connld module for linkage with STREAMS.  When undefined,]
@@ -540,7 +540,7 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_module_sc:-module} in
+    case ${enable_module_sc:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SC], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sc module for linkage with STREAMS.  When undefined,]
@@ -553,7 +553,7 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_module_testmod:-module} in
+    case ${enable_module_testmod:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_TESTMOD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the testmod module for linkage with STREAMS.  When undefined,]
@@ -566,21 +566,21 @@ dnl --------------------------------------
 	    module.])
 	    ;;
     esac
-    AM_CONDITIONAL([CONFIG_STREAMS_STH],		[test :${lfs_module_sth:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE],		[test :${lfs_module_sth:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_STH],		[test :${enable_module_sth:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE],		[test :${enable_module_sth:-module}	= :module])
 dnl ===========================
-    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD],		[test :${lfs_module_bufmod:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD_MODULE],	[test :${lfs_module_bufmod:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD],		[test :${lfs_module_nullmod:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD_MODULE],	[test :${lfs_module_nullmod:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD],		[test :${lfs_module_pipemod:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE],	[test :${lfs_module_pipemod:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD],		[test :${lfs_module_connld:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE],	[test :${lfs_module_connld:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SC],			[test :${lfs_module_sc:-module}		= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE],		[test :${lfs_module_sc:-module}		= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD],		[test :${lfs_module_testmod:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD_MODULE],	[test :${lfs_module_testmod:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD],		[test :${enable_module_bufmod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD_MODULE],	[test :${enable_module_bufmod:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD],		[test :${enable_module_nullmod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULLMOD_MODULE],	[test :${enable_module_nullmod:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD],		[test :${enable_module_pipemod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPEMOD_MODULE],	[test :${enable_module_pipemod:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD],		[test :${enable_module_connld:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CONNLD_MODULE],	[test :${enable_module_connld:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC],			[test :${enable_module_sc:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SC_MODULE],		[test :${enable_module_sc:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD],		[test :${enable_module_testmod:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_TESTMOD_MODULE],	[test :${enable_module_testmod:-module}	= :module])
 ])# _LFS_SETUP_MODULES
 # =============================================================================
 
@@ -593,7 +593,7 @@ AC_DEFUN([_LFS_SETUP_DRIVERS], [dnl
 	    [enable clone driver for linkage with STREAMS.
 	    @<:@default=module@:>@]),
 	    [enable_driver_clone="$enableval"],
-	    [if test :${lfs_big_compile:-yes} = :yes ; then enable_driver_clone='yes' ; else enable_driver_clone='module' ; fi])
+	    [if test :${enable_big_compile:-yes} = :yes ; then enable_driver_clone='yes' ; else enable_driver_clone='module' ; fi])
     AC_ARG_ENABLE([driver-echo],
 	AS_HELP_STRING([--enable-driver-echo],
 	    [enable echo driver for linkage with STREAMS.
@@ -660,68 +660,68 @@ AC_DEFUN([_LFS_SETUP_DRIVERS], [dnl
 	    @<:@default=module@:>@]),
 	    [enable_driver_spx="$enableval"],
 	    [enable_driver_spx='module'])
-    AC_CACHE_CHECK([for STREAMS driver clone], [lfs_driver_clone], [dnl
-	lfs_driver_clone="${enable_driver_clone:-module}"
-	if test :$lfs_driver_clone = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_clone='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver echo],  [lfs_driver_echo], [dnl
-	lfs_driver_echo="${enable_driver_echo:-module}"
-	if test :$lfs_driver_echo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_echo='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver fifo],  [lfs_driver_fifo], [dnl
-	lfs_driver_fifo="${enable_driver_fifo:-module}"
-	if test :$lfs_driver_fifo = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_fifo='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver log],   [lfs_driver_log], [dnl
-	lfs_driver_log="${enable_driver_log:-module}"
-	if test :$lfs_driver_log = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_log='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver loop],  [lfs_driver_loop], [dnl
-	lfs_driver_loop="${enable_driver_loop:-module}"
-	if test :$lfs_driver_loop = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_loop='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver nsdev], [lfs_driver_nsdev], [dnl
-	lfs_driver_nsdev="${enable_driver_nsdev:-module}"
-	if test :$lfs_driver_nsdev = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_nsdev='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver mux],  [lfs_driver_mux], [dnl
-	lfs_driver_mux="${enable_driver_mux:-module}"
-	if test :$lfs_driver_mux = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_mux='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver nuls],  [lfs_driver_nuls], [dnl
-	lfs_driver_nuls="${enable_driver_nuls:-module}"
-	if test :$lfs_driver_nuls = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_nuls='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver pipe],  [lfs_driver_pipe], [dnl
-	lfs_driver_pipe="${enable_driver_pipe:-module}"
-	if test :$lfs_driver_pipe = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_pipe='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver sad],   [lfs_driver_sad], [dnl
-	lfs_driver_sad="${enable_driver_sad:-module}"
-	if test :$lfs_driver_sad = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_sad='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver sfx], [lfs_driver_sfx], [dnl
-	lfs_driver_sfx="${enable_driver_sfx:-module}"
-	if test :$lfs_driver_sfx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_sfx='yes'
-	fi])
-    AC_CACHE_CHECK([for STREAMS driver spx], [lfs_driver_spx], [dnl
-	lfs_driver_spx="${enable_driver_spx:-module}"
-	if test :$lfs_driver_spx = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    lfs_driver_spx='yes'
-	fi])
+    AC_MSG_CHECKING([for STREAMS driver clone])
+	if test :${enable_driver_clone:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_clone='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_clone:-module}])
+    AC_MSG_CHECKING([for STREAMS driver echo])
+	if test :${enable_driver_echo:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_echo='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_echo:-module}])
+    AC_MSG_CHECKING([for STREAMS driver fifo])
+	if test :${enable_driver_fifo:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_fifo='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_fifo:-module}])
+    AC_MSG_CHECKING([for STREAMS driver log])
+	if test :${enable_driver_log:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_log='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_log:-module}])
+    AC_MSG_CHECKING([for STREAMS driver loop])
+	if test :${enable_driver_loop:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_loop='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_loop:-module}])
+    AC_MSG_CHECKING([for STREAMS driver nsdev])
+	if test :${enable_driver_nsdev:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_nsdev='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_nsdev:-module}])
+    AC_MSG_CHECKING([for STREAMS driver mux])
+	if test :${enable_driver_mux:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_mux='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_mux:-module}])
+    AC_MSG_CHECKING([for STREAMS driver nuls])
+	if test :${enable_driver_nuls:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_nuls='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_nuls:-module}])
+    AC_MSG_CHECKING([for STREAMS driver pipe])
+	if test :${enable_driver_pipe:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_pipe='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_pipe:-module}])
+    AC_MSG_CHECKING([for STREAMS driver sad])
+	if test :${enable_driver_sad:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_sad='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_sad:-module}])
+    AC_MSG_CHECKING([for STREAMS driver sfx])
+	if test :${enable_driver_sfx:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_sfx='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_sfx:-module}])
+    AC_MSG_CHECKING([for STREAMS driver spx])
+	if test :${enable_driver_spx:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_driver_spx='yes'
+	fi
+    AC_MSG_RESULT([${enable_driver_spx:-module}])
 dnl ------------------------------------
-    case ${lfs_driver_clone:-module} in
+    case ${enable_driver_clone:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_CLONE], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the clone driver for linkage with STREAMS.  When undefined,]
@@ -734,7 +734,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_echo:-module} in
+    case ${enable_driver_echo:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_ECHO], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the echo driver for linkage with STREAMS.  When undefined,]
@@ -747,7 +747,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_fifo:-module} in
+    case ${enable_driver_fifo:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_FIFO], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the fifo driver for linkage with STREAMS.  When undefined,]
@@ -760,7 +760,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_log:-module} in
+    case ${enable_driver_log:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOG], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the log driver for linkage with STREAMS.  When undefined,]
@@ -773,7 +773,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_loop:-module} in
+    case ${enable_driver_loop:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_LOOP], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the loop driver for linkage with STREAMS.  When undefined,]
@@ -786,7 +786,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_nsdev:-module} in
+    case ${enable_driver_nsdev:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NSDEV], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the nsdev driver for linkage with STREAMS.  When undefined,]
@@ -799,7 +799,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_mux:-module} in
+    case ${enable_driver_mux:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_MUX], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the mux driver for linkage with STREAMS.  When undefined,]
@@ -812,7 +812,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_nuls:-module} in
+    case ${enable_driver_nuls:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NULS], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the nuls driver for linkage with STREAMS.  When undefined,]
@@ -825,7 +825,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_pipe:-module} in
+    case ${enable_driver_pipe:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PIPE], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the pipe driver for linkage with STREAMS.  When undefined,]
@@ -838,7 +838,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_sad:-module} in
+    case ${enable_driver_sad:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SAD], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sad driver for linkage with STREAMS.  When undefined,]
@@ -851,7 +851,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_sfx:-module} in
+    case ${enable_driver_sfx:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SFX], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the sfx driver for linkage with STREAMS.  When undefined,]
@@ -864,7 +864,7 @@ dnl ------------------------------------
 	    module.])
 	    ;;
     esac
-    case ${lfs_driver_spx:-module} in
+    case ${enable_driver_spx:-module} in
 	(yes)
 	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SPX], [1], [When defined,] AC_PACKAGE_TITLE [
 	    will include the spx driver for linkage with STREAMS.  When undefined,]
@@ -878,30 +878,30 @@ dnl ------------------------------------
 	    ;;
     esac
 dnl =================================
-    AM_CONDITIONAL([CONFIG_STREAMS_CLONE],		[test :${lfs_driver_clone:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE],	[test :${lfs_driver_clone:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_ECHO],		[test :${lfs_driver_echo:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE],	[test :${lfs_driver_echo:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_FIFO],		[test :${lfs_driver_fifo:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE],	[test :${lfs_driver_fifo:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOG],		[test :${lfs_driver_log:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE],		[test :${lfs_driver_log:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOOP],		[test :${lfs_driver_loop:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE],	[test :${lfs_driver_loop:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV],		[test :${lfs_driver_nsdev:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE],	[test :${lfs_driver_nsdev:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_MUX],		[test :${lfs_driver_mux:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_MUX_MODULE],		[test :${lfs_driver_mux:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULS],		[test :${lfs_driver_nuls:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE],	[test :${lfs_driver_nuls:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPE],		[test :${lfs_driver_pipe:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE],	[test :${lfs_driver_pipe:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SAD],		[test :${lfs_driver_sad:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE],		[test :${lfs_driver_sad:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SFX],		[test :${lfs_driver_sfx:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SFX_MODULE],		[test :${lfs_driver_sfx:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_SPX],		[test :${lfs_driver_spx:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE],		[test :${lfs_driver_spx:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE],		[test :${enable_driver_clone:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_CLONE_MODULE],	[test :${enable_driver_clone:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO],		[test :${enable_driver_echo:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_ECHO_MODULE],	[test :${enable_driver_echo:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO],		[test :${enable_driver_fifo:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_FIFO_MODULE],	[test :${enable_driver_fifo:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG],		[test :${enable_driver_log:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOG_MODULE],		[test :${enable_driver_log:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP],		[test :${enable_driver_loop:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_LOOP_MODULE],	[test :${enable_driver_loop:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV],		[test :${enable_driver_nsdev:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NSDEV_MODULE],	[test :${enable_driver_nsdev:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_MUX],		[test :${enable_driver_mux:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_MUX_MODULE],		[test :${enable_driver_mux:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS],		[test :${enable_driver_nuls:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NULS_MODULE],	[test :${enable_driver_nuls:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE],		[test :${enable_driver_pipe:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PIPE_MODULE],	[test :${enable_driver_pipe:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD],		[test :${enable_driver_sad:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SAD_MODULE],		[test :${enable_driver_sad:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX],		[test :${enable_driver_sfx:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SFX_MODULE],		[test :${enable_driver_sfx:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX],		[test :${enable_driver_spx:-module}	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SPX_MODULE],		[test :${enable_driver_spx:-module}	= :module])
 ])# _LFS_SETUP_DRIVERS
 # =============================================================================
 
@@ -1687,6 +1687,9 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.150  2008-04-12 10:06:45  brian
+# - updates for autoconf 2.62
+#
 # Revision 0.9.2.149  2007/12/15 20:19:26  brian
 # - updates
 #

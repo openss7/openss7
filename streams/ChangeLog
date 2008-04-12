@@ -1,5 +1,7 @@
 2008-04-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: autoconf 2.62 can't handle non-cache
+	  variable names being used like cache variables
 	* am/openss7.am: better paper compiling
 	* am/papers.am: better paper compiling
 
