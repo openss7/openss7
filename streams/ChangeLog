@@ -1,3 +1,8 @@
+2008-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/openss7.am: better paper compiling
+	* am/papers.am: better paper compiling
+
 2008-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/Makefile.am: better handling of papers
