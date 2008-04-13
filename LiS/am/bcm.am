@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: bcm.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:19:27 $
+# @(#) $RCSfile: bcm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-04-13 08:02:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/12/15 20:19:27 $ by $Author: brian $
+## Last Modified $Date: 2008-04-13 08:02:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -65,7 +65,7 @@ if AMDEP
 ## AMDEP
 @am__include@ @am__quote@./$(DEPDIR)/BCM.Ph@am__quote@
 
-$(DEPDIR)/BCM.Ph:
+$(DEPDIR)/BCM.Ph: Makefile
 	@$(ECHO) "Creating $@ dependencies..." ; \
 	( \
 		objs= ; \
@@ -156,6 +156,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: bcm.am,v $
+## Revision 0.9.2.4  2008-04-13 08:02:45  brian
+## - prepare for doc/papers
+##
 ## Revision 0.9.2.3  2007/12/15 20:19:27  brian
 ## - updates
 ##
