@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/10/16 06:04:34 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-13 08:02:54 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/16 06:04:34 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 08:02:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strsock],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.12 $) $Date: 2007/10/16 06:04:34 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-13 08:02:54 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -183,6 +183,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/texi/args.texi
 		 doc/manual/Makefile
+		 doc/papers/Makefile
 		 src/modules/Config
 		 src/drivers/Config])
 
@@ -193,6 +194,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.13  2008-04-13 08:02:54  brian
+# - prepare for doc/papers
+#
 # Revision 0.9.2.12  2007/10/16 06:04:34  brian
 # - fix cross-compile bug
 #
@@ -236,7 +240,7 @@ AC_OUTPUT
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

@@ -1,3 +1,8 @@
+2008-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* openss7.spec.in: prepare for doc/papers
+	* debian/rules.in: prepare for doc/papers
+
 2008-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: had to drop archive compatibility back to UNIX V7 on the

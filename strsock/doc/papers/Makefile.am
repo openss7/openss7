@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-11 16:58:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-13 08:02:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-11 16:58:52 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 08:02:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,7 +59,7 @@ if DEVELOPMENT
 
 PAPER_PREFIX = socktest
 
-PLOT_PLOTS =  \
+PLOT_PLOTS =
 
 FIG_FIGS = \
 	  bsdnet.fig \
@@ -70,7 +70,7 @@ FIG_FIGS = \
 
 NAME = sockimp
 
-PLOT_DATS = \
+PLOT_DATS =
 
 
 LATEXS = \
@@ -85,6 +85,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2008-04-13 08:02:55  brian
+# - prepare for doc/papers
+#
 # Revision 0.9.2.6  2008-04-11 16:58:52  brian
 # - removed deprecated NEXUSWARE support
 #

@@ -1,3 +1,8 @@
+2008-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* strcompat.spec.in: prepare for doc/papers
+	* debian/rules.in: prepare for doc/papers
+
 2008-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: autoconf 2.62 can't handle non-cache

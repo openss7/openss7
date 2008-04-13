@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:47:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-13 08:02:47 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 06:47:16 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 08:02:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -286,6 +286,9 @@ man_MANS = \
 	man7/MX_optmgmt_req_t.7 \
 	man8/test-chan.8 \
 	man8/strchan_mknod.8 \
+	man8/mxmib.8 \
+	man8/phymib.8 \
+	man8/x400pmib.8 \
 	man9/zaptel.9 \
 	man9/zt_alarm_notify.9 \
 	man9/zt_dtmf_tone.9 \
@@ -538,6 +541,9 @@ dist_noinst_MANS = \
 	man7/MX_optmgmt_req_t.7.man \
 	man8/test-chan.8.man \
 	man8/strchan_mknod.8.man \
+	man8/mxmib.8.man \
+	man8/phymib.8.man \
+	man8/x400pmib.8.man \
 	man9/zaptel.9.man \
 	man9/zt_alarm_notify.9.man \
 	man9/zt_dtmf_tone.9.man \
@@ -566,6 +572,7 @@ MANS_UNUSED = \
 	man4/mg_ioctl.4 \
 	man4/mx_ioctl.4 \
 	man4/mx_sdl.4 \
+	man4/mxi_ioctl.4 \
 	man4/v401p.4 \
 	man5/strchan.5 \
 	man9/zaptel.9 \
@@ -598,6 +605,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2008-04-13 08:02:47  brian
+# - prepare for doc/papers
+#
 # Revision 0.9.2.8  2007/08/14 06:47:16  brian
 # - GPLv3 header update
 #
