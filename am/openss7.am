@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2008-04-10 23:17:45 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2008/04/12 16:46:52 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-10 23:17:45 $ by $Author: brian $
+## Last Modified $Date: 2008/04/12 16:46:52 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -120,6 +120,8 @@ EXTRA_TEX		=
 ##
 MY_SUFFIXES		=
 MY_PHONY		=
+MY_INTERMEDIATE		=
+MY_SECONDARY		=
 
 dist_noinst_SCRIPTS	=
 
@@ -671,9 +673,22 @@ SUFFIXES = $(MY_SUFFIXES)
 ##
 .PHONY: $(MY_PHONY)
 
+#.INTERMEDIATE: $(MY_INTERMEDIATE)
+
+#.SECONDARY: $(MY_SECONDARY)
+
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.125  2008/04/12 16:46:52  brian
+## - secondary doesn't work too good
+##
+## Revision 0.9.2.124  2008/04/12 05:20:15  brian
+## - get dates straight
+##
+## Revision 0.9.2.123  2008-04-12 02:44:24  brian
+## - better paper compiling
+##
 ## Revision 0.9.2.122  2008-04-10 23:17:45  brian
 ## - BUILT_SOURCES accumulates
 ##

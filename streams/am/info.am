@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/12/15 20:19:28 $
+# @(#) $RCSfile: info.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.54 $) $Date: 2008-04-12 10:06:44 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/12/15 20:19:28 $ by $Author: brian $
+## Last Modified $Date: 2008-04-12 10:06:44 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -186,6 +186,7 @@ IMG_JPGS = $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
 # pretty much assume you have some GNU tools around...
 # also, automake misses dependencies for ps files
 ##
+MY_SECONDARY	+= $(IMG_JPGS) $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS)
 
 if AMDEP
 ## AMDEP
@@ -204,9 +205,6 @@ else
 # to be rebuilt  we really only want to rebuild documentation in maintainer
 # mode
 ##
-.SECONDARY: $(IMG_JPGS) $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS)
-
-$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
 $(DVIS)      : %.dvi  : %.texi $(IMG_EPSS)
 $(PSS)       : %.ps   : %.dvi  $(IMG_EPSS)
 $(PDFS)      : %.pdf  : %.texi $(IMG_PDFS)
@@ -394,6 +392,12 @@ endif
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 0.9.2.54  2008-04-12 10:06:44  brian
+## - updates for autoconf 2.62
+##
+## Revision 0.9.2.53  2008/04/12 05:20:41  brian
+## - handle secondary better
+##
 ## Revision 0.9.2.52  2007/12/15 20:19:28  brian
 ## - updates
 ##
