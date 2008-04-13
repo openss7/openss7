@@ -2,11 +2,11 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-10 10:35:39 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-13 08:02:46 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:35:39 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 08:02:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -227,6 +227,7 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 	  echo "TODO" ; \
 	  [ ! -d manual ] || echo "manual" ; \
 	  [ ! -d doc/manual ] || echo "doc/manual" ; \
+	  [ ! -d doc/papers ] || echo "doc/papers" ; \
 	  [ ! -d doc/projects ] || echo "doc/projects" ; \
 	  [ ! -d doc/drafts ] || echo "doc/drafts" ; \
 	  [ ! -d doc/specs ] || echo "doc/specs" ; \
@@ -473,6 +474,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.18  2008-04-13 08:02:46  brian
+# - prepare for doc/papers
+#
 # Revision 0.9.2.17  2008-04-10 10:35:39  brian
 # - removed deprecated Nexusware support
 #

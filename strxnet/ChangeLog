@@ -1,3 +1,9 @@
+2008-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxnet.spec.in: prepare for doc/papers
+	* debian/rules.in: prepare for doc/papers
+	* doc/man/man8/test-xnet_thr.8.man: correct for make check
+
 2008-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: autoconf 2.62 can't handle non-cache

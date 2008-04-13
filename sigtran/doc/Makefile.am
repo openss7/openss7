@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:21 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-13 08:02:44 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 08:33:21 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 08:02:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -54,7 +54,7 @@ include ../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = . man manual projects
+SUBDIRS = . man manual papers projects
 
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
@@ -72,6 +72,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2008-04-13 08:02:44  brian
+# - prepare for doc/papers
+#
 # Revision 0.9.2.3  2007/08/14 08:33:21  brian
 # - GPLv3 header update
 #

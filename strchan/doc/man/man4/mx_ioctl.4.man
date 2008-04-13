@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mx_ioctl.4.man,v 0.9.2.3 2008/01/05 00:00:27 brian Exp $
+.\" @(#) $Id: mx_ioctl.4.man,v 0.9.2.4 2008-04-13 08:02:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008/01/05 00:00:27 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-13 08:02:47 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mx_ioctl.4.man,v $
+.\" Revision 0.9.2.4  2008-04-13 08:02:47  brian
+.\" - prepare for doc/papers
+.\"
 .\" Revision 0.9.2.3  2008/01/05 00:00:27  brian
 .\" - added/updated manual pages
 .\"
@@ -494,6 +497,223 @@ represents a CH or MX user object within the system.
 .\"
 .SH IOCTLS
 .PP
+All the Streams provided by the
+.B mx
+multiplexing driver support the set of management controls described here.
+These control require root privilegeds and permit the management of the MX
+configuration, routing, link devices, statistics and events.  This set of
+amangement controls are available on all Streams and sockets provided by the
+MX driver.
+.\"
+.\"
+.SS Options
+.PP
+.nf
+\f(CW\s-1\
+/*
+ * OPTIONS
+ */
+typedef struct mx_option {
+    ulong type;    /* object type */
+    ulong id;      /* object id */
+    /* followed by object-specific protocol options structure */
+} mx_option_t;
+\s+1\fP
+.fi
+.sp
+.TP
+.I type
+The object type, see
+.RI \(lq "Object Model" \(rq.
+.TP
+.I id
+The object identifier.
+.TP
+.I object-specific structure
+.TP
+.B MX_IOCGOPTION
+.TP
+.B MX_IOCSOPTION
+.\"
+.\"
+.SS Configuration
+.PP
+.nf
+\f(CW\s-1\
+/*
+ * CONFIGURATION
+ */
+typedef struct mx_config {
+    ulong type;    /* object type */
+    ulong id;      /* object id */
+    ulong cmd;     /* configuration command */
+    /* followed by object-specific configuration structure */
+} mx_config_t;
+\s+1\fP
+.fi
+.sp
+.TP
+.I type
+The object type, see
+.RI \(lq "Object Model" \(rq.
+.TP
+.I id
+The object identifier.
+.TP
+.I cmd
+.RS
+.TP
+.B MX_GET
+.TP
+.B MX_SET
+.TP
+.B MX_ADD
+.TP
+.B MX_DEL
+.RE
+.TP
+.I object-specific structure
+.TP
+.B MX_IOCGCONFIG
+.TP
+.B MX_IOCSCONFIG
+.TP
+.B MX_IOCTCONFIG
+.TP
+.B MX_IOCCCONFIG
+.\"
+.\"
+.SS State
+.PP
+.nf
+\f(CW\s-1\
+/*
+ * STATE
+ */
+typedef struct mx_statem {
+    ulong type;    /* object type */
+    ulong id;      /* object id */
+    ulong flags;   /* object flags */
+    ulong state;   /* object state */
+    /* followed by object-specific state structure */
+} mx_statem_t;
+\s+1\fP
+.fi
+.TP
+.I type
+The object type, see
+.RI \(lq "Object Model" \(rq.
+.TP
+.I id
+The object identifier
+.TP
+.I flags
+.TP
+.I state
+.TP
+.I object-specific structure
+.TP
+.B MX_IOCGSTATEM
+.TP
+.B MX_IOCCMRESET
+.\"
+.\"
+.SS Statistics
+.PP
+.nf
+\f(CW\s-1\
+/*
+ * STATISTICS
+ */
+typedef struct mx_stats {
+    ulong type;    /* object type */
+    ulong id;      /* object id */
+    ulong header;  /* object stats header */
+    /* followed by object-specific statistics structure */
+} mx_stats_t;
+\s+1\fP
+.fi
+.TP
+.I type
+The object type, see section
+.RI \(lq "Object Model" \(rq.
+.TP
+.I id
+The object identifier.
+.TP
+.I header
+.TP
+.I object-specific structure
+.TP
+.B MX_IOCGSTATS
+.TP
+.B MX_IOCSSTATS
+.TP
+.B MX_IOCGSTATSP
+.TP
+.B MX_IOCSSTATSP
+.\"
+.\"
+.SS Events
+.PP
+.nf
+\f(CW\s-1\
+/*
+ * EVENTS
+ */
+typedef struct mx_notify {
+    ulong type;    /* object type */
+    ulong id;      /* object id */
+    /* followed by object-specific notification structure */
+} mx_notify_t;
+\s+1\fP
+.fi
+.TP
+.I type
+The object type, see section
+.RI \(lq "Object Model" \(rq.
+.TP
+.I id
+The object identifier.
+.TP
+.I object-specific structure
+.TP
+.B MX_IOCGNOTIFY
+.TP
+.B MX_IOCSNOTIFY
+.TP
+.B MX_IOCCNOTIFY
+.\"
+.\"
+.SS Controls
+.PP
+.nf
+\f(CW\s-1\
+/*
+ * MANAGEMENT
+ */
+typedef struct mx_mgmt {
+    ulong type;    /* object type */
+    ulong id;      /* object id */
+    ulong cmd;     /* mgmt command */
+} mx_mgmt_t;
+\s+1\fP
+.fi
+.TP
+.I type
+The object type, see section
+.RI \(lq "Object Model" \(rq.
+.TP
+.I id
+The object identifier.
+.TP
+.I cmd
+.TP
+.I object-specific structure
+.TP
+.B MX_IOCCMGMT
+.TP
+.B MX_IOCCPASS
 .\"
 .\"
 .SH "SEE ALSO"

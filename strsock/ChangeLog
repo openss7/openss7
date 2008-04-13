@@ -1,3 +1,11 @@
+2008-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: provide doc/papers
+	* strsock.spec.in: provide doc/papers
+	* debian/rules.in: provide doc/papers
+	* doc/Makefile.am: provide doc/papers
+	* doc/papers/Makefile.am: provide doc/papers
+
 2008-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/Makefile.am: better paper handling

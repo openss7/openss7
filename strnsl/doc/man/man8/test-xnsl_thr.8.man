@@ -1,1 +1,1 @@
-.so test-xnsl.8.man
+.so man8/test-xnsl.8.man

@@ -1,3 +1,8 @@
+2008-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: prepare for doc/papers
+	* debian/rules.in: prepare for doc/papers
+
 2008-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/LiS.texi: remove deprectated Nexusware support

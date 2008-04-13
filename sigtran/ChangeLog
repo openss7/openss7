@@ -1,3 +1,10 @@
+2008-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* sigtran.spec.in: provide for doc/papers
+	* debian/rules.in: provide for doc/papers
+	* configure.ac: provide for doc/papers
+	* doc/Makefile.am: provide for doc/papers
+
 2008-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/Makefile.am: better paper handling

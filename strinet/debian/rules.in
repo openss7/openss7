@@ -2,11 +2,11 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-10 10:35:42 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-13 08:02:50 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:35:42 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 08:02:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -474,6 +474,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.30  2008-04-13 08:02:50  brian
+# - prepare for doc/papers
+#
 # Revision 0.9.2.29  2008-04-10 10:35:42  brian
 # - removed deprecated Nexusware support
 #

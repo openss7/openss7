@@ -1,11 +1,11 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.75 $) $Date: 2008-04-10 11:04:50 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.76 $) $Date: 2008-04-13 08:02:40 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 11:04:50 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 08:02:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1499,7 +1499,7 @@ fi
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
-#doc doc/specs doc/projects doc/drafts
+#doc doc/drafts doc/papers doc/projects doc/specs
 %{_infodir}/*
 %{manrefs}
 %{manmacros}
@@ -1514,7 +1514,7 @@ fi
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
-#doc doc/specs doc/projects doc/drafts
+#doc doc/drafts doc/papers doc/projects doc/specs
 %{_infodir}/*
 %{manrefs}
 %{manmacros}
@@ -1981,9 +1981,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.75  2008-04-10 11:04:50  brian
-# - removed deprecated Nexusware support
+# Revision 1.1.6.76  2008-04-13 08:02:40  brian
+# - prepare for doc/papers
 #
+
+* Thu Apr 10 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.75  2008-04-10 11:04:50  brian
+- removed deprecated Nexusware support
 
 * Tue Aug 14 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.74  2007/08/14 10:46:51  brian

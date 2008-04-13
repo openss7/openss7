@@ -1,0 +1,1822 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: mxmib.8.man,v 0.9.2.2 2008-04-13 08:02:47 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-04-13 08:02:47 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mxmib.8.man,v $
+.\" Revision 0.9.2.2  2008-04-13 08:02:47  brian
+.\" - prepare for doc/papers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.TH MXMIB 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B mxmib
+\- OPENSS7-MX-MIB SNMP Agent and AgentX Sub-agent
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.RS 0
+.hy 0
+.HP
+\fBexport PATH="/usr/sbin:$PATH"\fP
+.HP
+\fBmxmib\fP [\fIGENERAL\-OPTIONS\fP] [\fIOPTIONS\fP] [\fIARGUMENTS\fP]
+.ad l
+.HP
+\fBmxmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
+[{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+[{\fB\-V\fP|\fB\-\-verbose\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+.br
+[\fIOPTIONS\fP]\ [\fIARGUMENTS\fP]
+.ad b
+.ad l
+.HP
+\fBmxmib\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
+[{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+[{\fB\-V\fP|\fB\-\-verbose\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
+.br
+[{\fB\-f\fP|\fB\-\-dont\-fork\fP}]
+[{\fB\-D\fP|\fB\-\-debug\-tokens\fP[\fB=\fP]}[\ ][\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]]
+[{\fB\-M\fP|\fB\-\-master\fP}]
+[{\fB\-x\fP|\fB\-\-agentx\-socket\fP[\fB=\fP]}[\ ][\fISOCKET\fP]]
+[{\fB\-L\fP|\fB\-\-log\-console\fP}]
+[{\fB\-a\fP|\fB\-\-log\-addresses\fP}]
+[{\fB\-d\fP|\fB\-\-dump\fP}]
+[{\fB\-p\fP|\fB\-\-port\fP[\fB=\fP]}[\ ]\fIPORTNUM\fP]
+[{\fB\-X\fP|\fB\-\-agentx\fP}]
+[{\fB\-c\fP|\fB\-\-config\-file\fP[\fB=\fP]}[\ ]\fICONFIGFILE\fP]
+[{\fB\-C\fP|\fB\-\-config\-only\fP}]
+[{\fB\-s\fP|\fB\-\-syslog\fP}]
+[{\fB\-A\fP|\fB\-\-append\fP}]
+[{\fB\-r\fP|\fB\-\-noroot\fP}]
+[{\fB\-l\fP|\fB\-\-logfile\fP[\fB=\fP]}[\ ][\fILOGFILE\fP]}]
+[{\fB\-g\fP|\fB\-\-gid\fP|\fB\-\-groupid\fP[\fB=\fP]}[\ ]\fIGID\fP]
+[{\fB\-u\fP|\fB\-\-uid\fP|\fB\-\-userid\fP[\fB=\fP]}[\ ]\fIUID\fP]
+[{\fB\-T\fP|\fB\-\-transport\fP[\fB=\fP]}[\ ][{\fIUDP\fP|\fITCP\fP}]]
+[{\fB\-P\fP|\fB\-\-pidfile\fP[\fB=\fP]}[\ ]\fIPIDFILE\fP]
+[{\fB\-k\fP|\fB\-\-keep\-open\fP}]
+[{\fB\-S\fP|\fB\-\-sysctl\-file\fP[\fB=\fP]}[\ ]\fIFILENAME\fP]
+[{\fB\-t\fP|\fB\-\-agent\-alarms\fP}]
+.br
+[\fIARGUMENT\fP[\ \fIARGUMENT\fP]*]
+.ad b
+.HP
+\fBmxmib\fP\ {\fB\-H\fP|\fB\-\-help\-directives\fP}\ [\fI...\fP]
+.PD 0
+.HP
+\fBmxmib\fP\ {\fB\-h\fP|\fB\-\-help\fP}\ [\fI...\fP]
+.HP
+\fBmxmib\fP\ {\fB\-v\fP|\fB\-\-version\fP}\ [\fI...\fP]
+.HP
+\fBmxmib\fP\ {\fB\-y\fP|\fB\-\-copying\fP}\ [\fI...\fP]
+.PD
+.RE
+.\"
+.\"
+.SH OPTIONS
+.PP
+The options recognized by
+.B mxmib
+are summarized, alphabetically sorted by short option, as follows (see
+.RI \(lq DESCRIPTION ,\(rq
+below, for more detailed option descriptions):
+.TP \w'\fB-I\fP,\ \fB--initialize\fP\ [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]\(em'u
+\fB-a\fP, \fB--log-addresses\fP
+Log addresses connecting to agent.
+.PD 0
+.TP
+\fB-A\fP, \fB--append\fP
+Append to log files without truncating.
+.TP
+\fB-c\fP, \fB--config-file\fP \fICONFIGFILE\fP
+Use optional configuration file.
+.TP
+\fB-C\fP, \fB--config-only\fP
+Only use specified configuration files.
+.TP
+\fB-d\fP, \fB--dump\fP
+Dump sent and received PDUs in hexadecimal.
+.TP
+\fB-D\fP, \fB--debug\fP [\fILEVEL\fP]
+Set debugging level.
+.TP
+\fB-D\fP, \fB--debug-tokens\fP [\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]
+Set debugging tokens.
+.TP
+\fB-f\fP, \fB--dont-fork\fP
+Run in the foreground.
+.TP
+\fB-g\fP, \fB--gid\fP, \fB--groupid\fP \fIGID\fP
+Become group \fIGID\fP after listening on sockets.
+.TP
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
+Print usage information to
+.I stdout
+and exit.
+.TP
+\fB-H\fP, \fB--help-directives\fP
+List agent config directives and exit.
+.TP
+\fB-I\fP, \fB--initialize\fP [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]
+Specifies modules to initialize (or not).
+.TP
+\fB-k\fP, \fB--keep-open\fP
+Keep management files open between requests.
+.TP
+\fB-l\fP, \fB--logfile\fP [\fILOGFILE\fP]
+Log to file
+.IR LOGFILE .
+.TP
+\fB-L\fP, \fB--log-console\fP
+Log to the terminal (i.e.
+.IR stderr ).
+.TP
+\fB-M\fP, \fB--master\fP
+Run as SNMP master agent.
+.TP
+\fB-M\fP, \fB--mibdirs\fP \fIMIBDIRS\fP
+Read MIBs from directories in
+.IR MIBDIRS .
+.TP
+\fB-n\fP, \fB--nodaemon\fP
+Run in the foreground.
+.TP
+\fB-n\fP, \fB--name\fP \fINAME\fP
+Use name
+.I NAME
+when looking up config files.
+.TP
+\fB-p\fP, \fB--port\fP \fIPORTNUM\fP
+Listen on port number
+.IR PORTNUM .
+.TP
+\fB-p\fP, \fB--pidfile\fP \fIPIDFILE\fP
+Write daemon process identifier to
+.IR PIDFILE .
+.TP
+\fB-P\fP, \fB--pidfile\fP \fIPIDFILE\fP
+Write daemon process identifier to
+.IR PIDFILE .
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.
+.TP
+\fB-q\fP, \fB--quick\fP
+Abbrevaite output for machine readiblity.
+.TP
+\fB-r\fP, \fB--noroot\fP
+Run from non-root process.
+.TP
+\fB-s\fP, \fB--syslog\fP
+Log to the system logs.
+.TP
+\fB-S\fP, \fB--sysctl-file\fP \fIFILENAME\fP
+Use backing sysctl file,
+.IR FILENAME .
+.TP
+\fB-t\fP, \fB--agent-alarms\fP
+Agent blocks
+.RI { SIGALRM }.
+.TP
+\fB-T\fP, \fB--transport\fP [\fITRANSPORT\fP]
+Default transport (udp or tcp).
+.TP
+\fB-u\fP, \fB--uid\fP, \fB--userid\fP \fIUID\fP
+Become user \fIUID\fP after listening on sockets.
+.TP
+\fB-U\fP, \fB--dont-remove-pidfile\fP
+Do not remove
+.I PIDFILE
+when shutting down.
+.TP
+\fB-v\fP, \fB--version\fP
+Print version info on
+.I stdout
+and exit.
+.TP
+\fB-V\fP, \fB--verbose\fP [\fILEVEL\fP]
+Be verbose.
+.TP
+\fB-x\fP, \fB--agentx-socket\fP [\fISOCKET\fP]
+Attach to AgentX socket,
+.IR SOCKET .
+.TP
+\fB-X\fP, \fB--agentx\fP
+Run as AgentX agent instead of master.
+.TP
+\fB-y\fP, \fB--copyring\fP
+Print copying info to
+.I stdout
+and exit.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B mxmib
+provides a daemon or foreground executable which provides an AgentX
+.[
+AgentX
+.]
+sub-agent implementation of the
+.I OPENSS7-MX-MIB
+which provides a card-specific management information base for
+Tormenta II and III cards.
+The
+.I OPENSS7-MX-MIB
+provides management station access to the MX Multiplex driver configuration
+information and statistics as well as driver-specific tunables.
+.PP
+.B mxmib
+is implemented as a typical UCD-SNMP or NET-SNMP SNMP master agent or AgentX
+.[
+agentx
+.]
+sub-agent.  It is normally run as an AgentX sub-agent, with the NET-SNMP SNMP
+agent daemon,
+.BR snmpd (8),
+running as the master agent.  Running in this manner,
+.B mxmib
+running as an AgentX sub-agent takes most of its default configuration from
+the same configuration file as the master agent.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+Non-option arguments can be used to provide additional addresses on which an
+SNMP agent or AgentX sub-agent can listen for or register for requests.  In
+accordance with UCD-SNMP or NET-SNMP agent configuration.  Each address
+represents an address and port combination to be listened upon by an agent, or
+connected to by an AgentX subagent.
+.\"
+.\"
+.SH OPTIONS
+.PP
+When executed without any options,
+.B mxmib
+will fork twice; become its own session leader; close standard input, error
+and output; begin logging to system logs; writes its daemon process id to
+.BR /var/run/mxmib.pid ;
+and, runs as an AgentX sub-agent.
+.\"
+.SS UCD-SNMP and NET-SNMP Subagent Options
+.PP
+The following options are compatible with NET-SNMP automatically generated
+subagents.  Long options are MXMIB specific.
+.\"
+.TP
+\fB-D\fP, \fB--debug-tokens\fP [\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]
+Turns on debugging output for the specified
+.IR TOKEN s.
+Without any
+.IR TOKEN s
+specified, the default is to print all the tokens (which is also equivalent to
+the keyword
+.RI ' all ').
+You might want to try
+.RI ' all '
+for extremely verbose output.  Note: You cannot put a space between the
+.B -D
+and the
+.IR TOKEN s.
+This
+.B -D
+option is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.\"
+.TP
+\fB-f\fP, \fB--dont-fork\fP, \fB-n\fP, \fB--nodaemon\fP
+By default,
+.B mxmib
+will place itself in the background by forking twice, becoming its own session
+leader, redirecting standard error to a log file, and standard output to an
+output file, and close standard input.  This option causes
+.B mxmib
+to run in the foreground.  Errors are logged to standard error and output is
+generated to standard output.  This mode is primarily for testing and works
+well in conjunction with the debug and verbose options.
+The
+.B -f
+form of this option is provided for compatibility with
+.BR snmpd (8)
+and NET-SNMP autogenerated subagents.
+.\"
+.TP
+\fB-L\fP, \fB--log-console\fP
+Normally
+.B mxmib
+will open a log file to log errors and output, particularly when run as a
+daemon process.  This option suppresses the opening of a log file and causes
+both
+.I stderr
+and
+.I stdout
+to be sent to the controlling terminal (that is, they are not redirected).
+This
+.B -L
+option is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.IP ""
+Note that recent versions of NET-SNMP have a far more sophisticated
+.B -L
+option than was provided with UCD-SNMP.  Note that NET-SNMP autogenerated
+subagents use this simple version, while
+.BR snmpd (8)
+and other NET-SNMP utility commands use the more sophisticated version.
+.\"
+.TP
+\fB-M\fP, \fB--master\fP
+By default,
+.B mxmib
+will attempt to run as an AgentX sub-agent.  This option will cause
+.B mxmib
+to run as an SNMP master agent.
+Do not use this option.  Use a complete master agent and run
+.B mxmib
+as an AgentX sub-agent.
+This
+.B -M
+option is for compatiblity with NET-SNMP autogenerated subagents.
+.IP ""
+Note that recent NET-SNMP master agents,
+.BR snmpd (8),
+use this option to specify the directories which will be searched for MIBs in
+a fashion similar to the
+.B MIBDIRS
+environment variable.
+.\"
+.TP
+\fB-M\fP, \fB--mibdirs\fP \fIMIBDIRS\fP
+.\"
+.TP
+\fB-x\fP, \fB--agentx-socket\fP [\fISOCKET\fP]
+Specifies the AgentX socket,
+.IR  SOCKET ,
+to which the agent will attempt to connect as an AgentX sub-agent.  This option
+implies AgentX operation and overrides the
+.B -M
+switch.
+This
+.B -x
+switch is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.\"
+.SS UCD-SNMP and NET-SNMP Agent Options
+.PP
+The following options are compatible with NET-SNMP and UCD-SNMP agents, and in
+particular,
+.BR snmpd (8).
+.\"
+.TP
+\fB-a\fP, \fB--log-addresses\fP
+Log addresses accessing the SNMP agent.
+This
+.B -a
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-A\fP, \fB--append\fP
+Normally
+.B mxmib
+truncates existing log files when they are opened.  This option causes
+.B mxmib
+to append to existing log files instead of truncating them when opened.
+This
+.B -A
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-c\fR, \fB--config-file\fP \fICONFIGFILE\fP
+Normally
+.B mxmib
+reads the default configuration file provided for the agent (the default is
+.RB \(lq mxMIB.conf \(rq
+in the SNMP configuration directory (usually
+.RB \(lq /etc/snmp \(rq).
+This option causes the full pathname
+.I CONFIGFILE
+to be used as the configuration file instead.
+This
+.B -c
+option is provide for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-C\fP, \fB--config-only\fP
+Normally
+.B mxmib
+reads some files automatically when the SNMP library is configured.  This
+option causes
+.B mxmib
+to only read configuration files optionally specified with the
+.B -c
+option.  If no configuration file is specified with the
+.B -c
+option, no configuration files will be read when this option is specified.
+That is, all configuration values will be set to their default values.
+This
+.B -C
+option is provide for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-d\fP, \fB--dump\fP
+Dump send and received UDP SNMP packets.
+This
+.B -d
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-g\fP, \fB--gid\fP, \fB--groupid\fP \fIGID\fP
+Normally
+.B mxmib
+runs with the real user and group id of the invoking process unless the
+executable is setuid or setgid in the filesystem.  This option causes
+.BR mxmib ,
+after opening ports and files, to downgrade to group id,
+.IR GID .
+This option is effective both when
+.B mxmib
+is run in the foreground and as a daemon process.
+This
+.B -g
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-I\fP, \fB--initialize\fP [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]
+Specifies which moudles should or should not be initialized when the agent
+starts up.  If the comma-separated list of
+.IR MODULE s
+is preceded by a '-', the
+.IR MODULE s
+specified represent the modules that should not be initialized when the agent
+starts up; otherwise,
+the
+.IR MODULES s
+specified represent the modules that should be initialized when the agent
+starts up.
+Note that the use of this option is only necessary if
+.B mxmib
+runs as a master agent.
+This
+.B -I
+option is provided for compatibility with the UCD-SNMP and NET-SNMP master
+agent,
+.BR snmpd (8).
+.\"
+.TP
+\fB-l\fP, \fB--logfile\fP [\fILOGFILE\fP]
+Output warnings, errors and messages to the log file,
+.IR LOGFILE .
+By default,
+.I LOGFILE
+is
+.RB \(lq /var/log/snmpd.log \(rq.
+This
+.B -l
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-n\fP, \fB--name\fP \fINAME\fP
+Specifies an alternative application name (which will affect the configuration
+files and persistent data loaded).  By default this will be
+.IR mxmib ,
+regardless of the name of the actual binary executable or path to the
+executable (i.e. symbolic link).
+This
+.B -n
+option is provided for compatibility with the NET-SNMP master agent,
+.BR snmpd (8).
+This option should not be necessary.
+.\"
+.TP
+\fB-p\fP, \fB--port\fP \fIPORTNUM\fP
+Run on port number
+.I PORTNUM
+instead of the default,
+.BR 161 .
+This
+.B -p
+option is provided for compatibility with UCD-SNMP master agent,
+.BR snmpd (8).
+Note that recent NET-SNMP master agents use the
+.B -p
+option for specifying a
+.IR PIDFILE ;
+on these agents, the port is specified by encoding it into the address format
+instead of using a command line option.
+.IP ""
+For compatiblity with both UCD-SNMP and NET-SNMP master agents, if the
+argument to this option is a number from 1 to 16383, the argument will be
+interpreted as a port number,
+.IR PORTNUM .
+If the value is not a number and corresponds to a path to a file which can be
+created or written by the aget, the agent will interpret the argument as a
+process identifier file,
+.IR PIDFILE .
+.\"
+.TP
+\fB-P\fP, \fB--pidfile\fP \fIPIDFILE\fP
+When
+.B mxmib
+runs as a daemon (the default),
+.I PIDFILE
+is the full path to the file to which the daemon process id is written.  This
+assists System V initscripts by helping them locate running daemons to
+terminate when shutting down subsystems.   The default pidfile, unless
+overridden by this option, is
+.BR /var/run/mxmib.pid .
+This
+.B -P
+option is provided for compatibility with the UCD-SNMP master agent,
+.BR snmpd (8).
+Note that recent versions of the NET-SNMP master agent,
+.BR snmpd (8),
+use the
+.B -p
+option (lowercase instead of uppercase 'p') for this purpose.  UCD-SNMP master
+agents use the
+.B -p
+option to specify port numbers.  The recent NET-SNMP agents encode the port
+number into the address specification for command line option and non-option
+address arguments.
+.\"
+.TP
+\fB-r\fP, \fB--noroot\fP
+Normally
+.B mxmib
+expects to run with super-user privilege and will terminate if permission
+errors occur when opening sockets or files, even if proceding is possible.
+When this option is specified,
+.B mxmib
+does not expect to run with super-user privilege and will not terminate if
+permission errors occur when opening sockets or files, providing that the
+agent can still proceed and function.
+This
+.B -r
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-s\fP, \fB--syslog\fP
+Normally
+.B mxmib
+logs to
+.I stderr
+and lets the SNMP library decide from configuration where standard error is
+redirected.  This option causes
+.B mxmib
+to log warnnings, errors and messages to the system logs.
+This
+.B -s
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-T\fP, \fB--transport\fR [\fITRANSPORT\fP]
+Specifies or resets the default transport mapping for the AgentX sub-agent.
+When the
+.I TRANSPORT
+argument is not specified, the transport reverts to the default (UNIX
+transport).
+When specified,
+.I TRANSPORT
+must be one of the following transport names:
+.RS
+.TP
+.B unix
+UNIX domain socket of the SOCK_STREAM variety.
+.PD 0
+.TP
+.B tcp
+TCP socket of the SOCK_STREAM variety.
+.TP
+.B udp
+UDP socket of the SOCK_DGRAM variety.
+.PD
+.RE
+.IP ""
+This
+.B -T
+option is provided for compatibiltiy with
+.BR snmpd (8).
+.\"
+.TP
+\fB-u\fP, \fB--uid\fP, \fB--userid\fP \fIUID\fP
+Normally
+.B mxmib
+runs with the real user and group id of the invoking process unless th
+executable is setuid or setgid in the filesystem.  This option causes
+.BR mxmib ,
+after opening ports and files, to downgrade to user id,
+.IR UID .
+This option is effective both when
+.B mxmib
+is run in the foreground and as a daemon process.
+This
+.B -u
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-U\fP, \fB--dont-remove-pidfile\fP
+By default, when the daemon shuts down and a
+.I PIDFILE
+has been specified with the
+.B -p
+option, or a defualt
+.I PIDFILE
+is being used, the
+.I PIDFILE
+is removed before the daemon exits.
+This
+.B -U
+option specifies that the master agent or AgentX sub-agent is not to remove
+its
+.I PIDFILE
+when shutting down.
+This
+.B -U
+option is provided for compatibility wtih the NET-SNMP master agent,
+.BR snmpd (8).
+This option should not be necessary, and will often cause Linux System V init
+scripts to erroneously report that the daemon is dead but is pidfile exists as
+though the daemon exited abnormally.
+.\"
+.TP
+\fB-X\fP, \fB--agentx\fP
+Run as an AgentX sub-agent rather than an SNMP master agent.
+Note that the default behaviour of
+.I mxmib
+is to run as an AgentX sub-agent.  Therefore, this option has no effect unless
+the
+.B -M
+option is also specified on the same command line.
+This
+.B -X
+option is provided for compatibility with UCD-SNMP and NET-SNMP master agent,
+.BR snmpd (8).
+.\"
+.SS MXMIB Subagent Options
+.PP
+The following options are specific to the MXMIB sub-agent.
+.\"
+.TP
+\fB-k\fP, \fB--keep-open\fP
+By default,
+.B mxmib
+will close open files and Streams between requests, causing them to be
+reopened on then next request.  This is less intrusive on the STREAMS
+subsystem, but is also less efficient if many closely spaced requests are
+issued.  This option causes
+.B mxmib
+to keep Streams and files open between requests.
+Note that even with this option in effect,
+.B mxmib
+can be made to close Streams and files by sending it a
+.RI { SIGHUP }
+signal.
+.\"
+.TP
+\fB-S\fP, \fB--sysctl-file\fP \fIFILENAME\fP
+When system controls are altered by the agent in such a fashion that the new
+settings must persist between system reboots,
+.I FILENAME
+specifies the file to which the prevailing values of system controls will be
+written when the agent terminates.  Entries will be written to this file in
+a format suitable for use by
+.BR sysctl (8)
+with the
+.B -p
+option.
+The default is the system default system
+control configuration
+file,
+.BR "/etc/strchan.conf" .
+.\"
+.TP
+\fB-t\fP, \fB--agent-alarms\fP
+By default,
+.B mxmib
+allows the agent library to use and intercept
+.RI { SIGALRM }
+signals.  When this option is set, the agent informs the SNMP library that
+the agent will use and intercept
+.RI { SIGALRM }
+signals and that the SNMP library must use
+.BR select (2)
+timeouts to effect timers.
+Depending on the specific version and generation of SNMP library (whether
+ucd-snmp or net-snmp and the version), one or the other might work better.
+See
+.BR snmp_select_info (3)
+and
+.BR snmp_alarm (3)
+for more information.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\".TP
+.\"\fB-d\fP, \fB--directory\fP \fIDIRECTORY\fP
+.\"Specifies a directory to contain output and error logs.  The default is to
+.\"serach for
+.\".RB \(lq /var/adm/strchan \(rq
+.\"and then
+.\".RB \(lq /var/log/strchan .\(rq
+.\"
+.\".TP
+.\"\fB-b\fP, \fB--basename\fP \fIBASENAME\fP
+.\"Specifiy the log file basename.  The default is
+.\".RB \(lq mxmib .\(rq
+.\"
+.\".TP
+.\"\fB-o\fP, \fB--outfile\fP \fIOUTFILE\fP
+.\"Specify the log file output name.  When run as a daemon, the default is
+.\".RI \(lq base-name . mm-dd ,\(rq
+.\"where
+.\".I mm-dd
+.\"is the current month and day of month.  When run in the foreground, the
+.\"default is ignored and all output is to
+.\".IR stdout .
+.\"When specified, standard output is redirected to the specified file regardless
+.\"of whether
+.\".B mxmib
+.\"is being run in the foreground or as a daemon.
+.\"
+.\".TP
+.\"\fB-e\fP, \fB--errfile\fP \fIERRFILE\fP
+.\"Specify the error file output name.  When run as a daemon, the default is
+.\".RI \(lq /dev/null \(rq
+.\"and all errors are logged to
+.\".BR syslogd (8).
+.\"When run in the foreground, the default is ignored and all errors are logged
+.\"to
+.\".IR stderr .
+.\"When specified, standard error is redirected to the specified file regardless
+.\"of whether
+.\".B mxmib
+.\"is being run in the foreground or as a daemon.
+.\"
+.SS Command Options
+.PP
+Command options invoke alternate behaviour of the
+.B mxmib
+daemon, as a command, such as displaying information and exiting.  When the
+following command options are encountered during option processing,
+.B mxmib
+invokes the appropriate command function and then exits.  No further
+processing of options or arguments is performed and no agent actions are
+taken.  Note that all options specified following the comand option are
+ignored.
+.\"
+.TP
+\fB-H\fP, \fB--help-directives\fP
+When this option is encountered during option processing,
+.B mxmib
+outputs a list of configuration file directives that are understood by the
+agent and then exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+This
+.B -H
+option is provided for compatibility with
+.BR snmpd (8)
+and
+NET-SNMP autogenerated subagents.
+.\"
+.TP
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
+When this option is encountered during option processing,
+.B mxmib
+prints usage information to
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+.\"
+.TP
+\fB-v\fP, \fB--version\fP
+When this option is encountered during option processing,
+.B mxmib
+prints version information to
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+This
+.B -v
+option is provided for compatibility with
+.BR snmpd (8).
+(Normally for OpenSS7 programs, the
+.B -V
+short option is used for version, but this conflicts with the same option
+which provides verbose output for the
+.BR snmpd (8)
+daemon.)
+.\"
+.TP
+\fB-y\fP, \fB--copying\fP
+When this option is encountered during option processing,
+.B mxmib
+prints copying information to
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are
+taken.
+Note that all options specified following this option are ignored.
+(Normally for OpenSS7 programs, the
+.B -C
+short option is used for copying, but this conflicts with the same option
+which provides suppression of automatic configuration files for the
+.BR snmpd (8)
+daemon.)
+.\"
+.\"
+.SS General Options
+.PP
+General options applicable to all commands are as follows:
+.\"
+.TP
+\fB-q\fP, \fB--quiet\fP, \fB--quick\fP
+Specifies that the call is interested only in the return code and error
+diagnostics and that normal output should be suppressed.  The default
+verbosity level if this option is not specified is one
+.RB ( 1 ).
+This option is equivalent to
+.BR --verbose = 0 .
+This
+.B -q
+option is provided for compatibility with
+.BR snmpd (8).
+Under UCD-SNMP this option does not fully suppress normal output but
+abbreviates the output into a form more suitable for machine processing.
+.\"
+.TP
+\fB-d\fP, \fB--debug\fP [\fILEVEL\fP]
+This
+.B -d
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.TP
+\fB-V\fP, \fB--verbose\fP [\fILEVEL\fP]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.
+If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This
+option can be repeated.  The default verbosity level if this option is not
+specified is one
+.RB ( 1 ).
+For example,
+.B -VVVV
+is equivalent to
+.BR --verbose = 5 .
+This
+.B -V
+option is provided for compatibility with
+.BR snmpd (8).
+.\"
+.\"
+.SH "MIB FORMAT"
+.PP
+The
+.I OPENSS7-MX-MIB
+(1.3.6.1.4.1.29591.1.1.10)
+implements the following tables, rows and columns:
+.sp
+.nf
+\fC\s-1\
+ (1.3.6.1.4.1.29591.1.1.10) mxMIB
+ +--(1) mxObjects
+    +--(1) mxTables
+       |--(1) mxSync
+       |  +--(1) mxSyncTable
+       |     +--(1) mxSyncEntry
+       |        |--( 1) mxSyncGroup
+       |        |--( 2) mxSyncIndex
+       |        |--( 3) mxSyncSpanId
+       |        +--( 4) mxSyncRowStatus
+       |
+       +--(2) mxCard
+          +--(1) mxCardTable
+             +--(1) mxCardEntry
+                |--( 1) mxCardIndex
+                |--( 2) mxCardType
+                |--( 3) mxCardIdentifier
+                |--( 4) mxCardRevision
+                |--( 5) mxChipType
+                |--( 6) mxChipRevision
+                |--( 7) mxPciBus
+                |--( 8) mxPciSlot
+                |--( 9) mxPciIrq
+                |--(10) mxCardSpanType
+                |--(11) mxCardMode
+                |--(12) mxCardSyncMaster
+                |--(13) mxCardSyncSource
+                |--(14) mxCardSyncGroup
+                |--(15) mxCardAdministrativeState
+                |--(16) mxCardOperationalState
+                |--(17) mxCardUsageState
+                |--(18) mxCardAlarmStatus
+                |--(19) mxCardProceduralStatus
+                |--(20) mxCardAvailabilityStatus
+                |--(21) mxCardControlStatus
+                |--(22) mxCardUnknownStatus
+                |--(23) mxCardSyncSpanId
+                +--(24) mxCardSyncTransitions
+\s+1\fP
+.fi
+.\"
+.SS "mxSyncTable \fR.1.1.1.1.1"
+.PP
+This table identifies and defines the synchronization groups into which MX
+cards can be placed.
+.PP
+The MX synchronization table is a table of synchronization groups.
+Equipped MX cards that are configured for automatic synchronzation are
+assigned to a synchronization group.
+.PP
+Each entry in the synchronization table represents a synchronization source to
+be used for automatic synchronization within each group in the order of the
+index.  Rows may be created and deleted explicitly by management stations.
+Rows may be deleted implicitly as a part of system operation when a card is
+disassociated with a synchroniation group.
+.TP
+.BR mxSyncGroup " .1
+Provides an identification and index of the synchronization group defined by
+a group of conceptual rows.
+.sp
+Specifies the group number of the entry.  A synchronization group is a group
+of cards which share a common timing bus.  Membership in the group is the
+cards which have an synchronization group value equal to this index and a
+synchronization source setting of
+.IR syncAuto .
+.TP
+.BR mxSyncIndex " .2
+Provides an identification and index of each entry belonging to a
+synchronization group.  This is also the priority of the entry within the
+group.
+.sp
+Specifies the index of the entry and the priority at which the entry will be
+used for synchronization of the card.  Index value 1 is the highest priority
+and index value 8 is the lowest priority.
+.TP
+.BR mxSyncSpanId " .3
+Provides an identification of the MX card and span to which the entry
+applies.
+.sp
+Specifies the card and span to be used as a card synchronization source at the
+priority of the corresponding index.  Cards 1 through 16 and spans 1 through 4
+can be specified in accordance with the
+.B X400pSpanId
+textual convention.  However, the card number specified must belong to the
+same synchronization group as the indexed group.  That is, the card must have
+its synchronization group set to the index of this entry, and the card
+synchronization source must be set to
+.IR syncAuto .
+.TP
+.BR mxSyncRowStatus " .4
+Provides a mechanism whereby management stations may create or delete rows in
+this table.
+.sp
+Rows may be created or deleted explicitly by management stations or implicitly
+as a part of system oepration.  When a card is removed from a synchronization
+group (by having its sychronization group number changed or having its
+synchronization source set to other than
+.IR syncAuto ),
+the system may automatically delete rows from this table.
+.\"
+.SS "mxCardTable \fR.1.1.2.1.1"
+.PP
+This table identifiers and defines all of the management information
+associated with MX cards.
+.PP
+The MX Card Table provides an entry for each of the equipped MX cards in
+the system."
+.PP
+Rows are neither created nor deleted explicity by mangement stations but are
+present inherently as a part of system operation.  Each entry in the table
+corresponds to an existing and installed MX card.
+.TP
+.BR mxCardIndex " .1
+Provides an identification and index of the MX card defined by a conceptual
+row in the table.
+.TP
+.BR mxCardType " .2
+Provides the MX card type.  This can be one of:
+.RS
+.TP \w'\fIplxDevBrd\fP\(em'u
+.I none
+unknown or unspecified;
+.PD 0
+.TP
+.I plx9030
+ancient PLX 9030 prototype board;
+.TP
+.I plxDevBrd
+ancient PLX 9030 development board;
+.TP
+.I mx
+an old Digium X400P card (T1 or E1);
+.TP
+.I e400p
+an old Digium E400P card (E1 only);
+.TP
+.I t400p
+an old Digium T400P card (T1 only);
+.TP
+.I mx-ss7
+an old Digium X400P-SS7 card (T1 or E1);
+.TP
+.I e400p-ss7
+an old Digium E400P-SS7 card (E1 only);
+.TP
+.I t400p-ss7
+an old Digium T400P-SS7 card (T1 only);
+.TP
+.I v400p
+an older Varion V400PE/T card (E1 or T1);
+.TP
+.I v400pe
+an older Varion V400PE card (E1 only);
+.TP
+.I v400pt
+an older Varion V400PT card (T1 only);
+.TP
+.I v401pe
+a recent Varion V401PE card (E1 or T1);
+.TP
+.I v401pt
+a recent Varian V401PT card (E1 or T1).
+.PD
+.RE
+.TP
+.BR mxCardIdentifier " .3
+Provides the MX card identifier (stored in EEPROM).
+.TP
+.BR mxCardRevision " .4
+Provides the revision letter of the card.
+.TP
+.BR mxChipType " .5
+Provides the Dallas frame chip type.
+.RS
+.TP \w'\fIds21554\fP\(em'u
+.I none
+unknown or unspecified;
+.PD 0
+.TP
+.I ds2152
+4 x DS2152 T1 chips;
+.TP
+.I ds21352
+DS21352 T1 chip;
+.TP
+.I ds21552
+DS21552 T1 chip;
+.TP
+.I ds2154
+4 x DS2154 E1 chips;
+.TP
+.I ds21354
+DS21354 E1 chip;
+.TP
+.I ds21554
+DS21554 E1 chip;
+.TP
+.I ds2155
+4 x DS2155 E1/T1/J1 chip;
+.TP
+.I ds2156
+4 x DS2156 E1/T1/J1 chip.
+.PD
+.RE
+.TP
+.BR mxChipRevision " .6
+Provides the revision letter of the Dallas framer chip.
+.TP
+.BR mxPciBus " .7
+Provides the PCI bus in which the card is installed.
+.TP
+.BR mxPciSlot " .8
+Provides the PCI bus slot in which the card is installed.
+.TP
+.BR mxPciIrq " .9
+Provides the PCI IRQ assigned to the card.
+.TP
+.BR mxCardSpanType " .10
+Identifies the type of spans normally supported by the card.  Some cards can
+support multiple spans; some are dedicated to T1/J1 or E1.
+.RS
+.TP
+.I none
+unknown or unspecified;
+.PD 0
+.TP
+.I t1
+T1 chip and card;
+.TP
+.I e1
+E1 chip and card;
+.TP
+.I j1
+T1 chip and card in J1 mode.
+.PD
+.RE
+.TP
+.BR mxCardMode "  .11
+Specifies the loopback mode for the entire card.
+.RS
+.TP
+.I remoteLoopback
+RSER is looped back on TSER for all spans; that is, all received bits are
+looped back to the transmit between the elastic store and the system bus.
+This is equivalent to a per-span payload loopback, but is performed through
+the elastic store and on a card basis.
+.TP
+.I localLoopback
+RxBuf is driven by TxBuf; that is, all transmitted data bits are passed to the
+corresponding receive data bits between the elastic store and the system bus.
+.RE
+.TP
+.BR mxCardSyncMaster " .12
+Specifies whether the card is a slave or a master on the external timing bus.
+The value can be one of:
+.RS
+.TP
+.I slave
+The external timing bus may be used as a synchronization source for the card
+by setting the card synchronization source to
+.IR syncExtern .
+Spans that use the external timing source should have their span clocking set to
+.IR slave .
+.TP
+.I master
+The card drives the external timing bus and the synchronization source may not
+also be set to
+.IR syncExtern .
+.RE
+.TP
+.BR mxCardSyncSource " .13
+Specifies the synchronization source for the entire card (the synchronization
+applied to the TCLK pin on all spans).  The synchronization source may be one
+of:
+.RS
+.TP
+.I syncSelf
+The internal clock will be used as a synchronization source for the card.
+.TP
+.I sync1, sync2, sync3, sync4
+The corresponding span RCLK output will be used as the TCLK input for all spans on the card.
+.TP
+.I syncExtern
+The TCLK input for all spans will be taken from the external timing bus.
+.TP
+.I syncAuto
+The driver will use the spans specified in the
+.B mxSyncTable
+table for the card as synchronization sources.
+.RE
+.TP
+.BR mxCardSyncGroup " .14
+Specifies the synchronization group to which this card belongs.  This value is
+only significant when the synchronization source is set to
+.IR syncAuto .
+A synchronization group is a group of cards, including the current card in the
+set, that are connected together with a timing cable and therefore share the
+same timing bus.  The order of cards and spans that will be used for timing
+are specified against the synchronization group that has an group index of the
+same value as this column.
+.TP
+.BR mxCardAdministrativeState " .15
+Provides the administrative state of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B AdministrativeState
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardOperationalState " .16
+Provides the operational state of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B OperationalState
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardUsageState " .17
+Provides the usage state of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B UsageState
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardAlarmStatus " .18
+Provides the alarm status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B AlarmStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardProceduralStatus " .19
+Provides the procedural status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B ProceduralStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardAvailabilityStatus " .20
+Provides the availability status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B AvailabilityStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardControlStatus " .21
+Provides the control status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B ControlStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardUnknownStatus " .22
+Provides the unknown status of the card following TMN
+.[
+x.721
+.]
+conventions, and the 
+.B UnknownStatus
+textual convention of the
+.I OPENSS7-TMN-TC
+module.
+.TP
+.BR mxCardSyncSpanId " .23
+Indicates which card and span is being used as the current synchronization
+source for the indexed card.  When the synchronization source is set to
+.I syncSelf
+or
+.IR syncExtern ,
+this value will be the null octet string.  When
+the synchronization source is set to
+.IR sync1 ,
+.IR sync2 ,
+.IR sync3 ,
+or
+.IR sync4 ,
+the value will always ben the same as the identifier of span 1, 2, 3 or 4,
+respectively, for the indexed card.  When the synchronization source is set to
+.IR syncAuto ,
+the value reflectes the identifier of the span currently providing the
+synchronization source, or the null octet string if no span is providing the
+synchroniation source.
+.TP
+.BR mxCardSyncTransitions " .24
+Indicates the number of times since the last discontinuity that the
+synchronization span has transitioned.  .\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.RB ( 1 )
+indicates that an error occurred and a diagnostic message is printed to
+.I stderr
+or the log file if
+.I stderr
+is redirected to a log file; two
+.RB ( 2 )
+indicates that the option syntax was in error and a diagnostic message is
+printed to
+.IR stderr .
+.PP
+Errors may result form inadequate permissions, inability to open the
+.BR sad (4)
+driver or push the
+.BR sc (4)
+module.
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+The following environment variables have an effect on the behaviour of the
+.B mxmib
+agent:
+.TP
+.B SNMPCONFPATH
+When this environment variable is exported to
+.BR mxmib ,
+the
+.BR read_config_files ()
+function will look for configuration and persistent data files in the paths
+specified in the exported envirnoment variable (separated by colons).
+If this variable is not exported to
+.BR mxmib ,
+the
+.BR read_config_files ()
+function will look for configuration and persistent data in the default
+configuration and persistent data directories (in that order).
+Note that configuration and persistent data will not be read when the
+.B -C
+option is secified, unless the configuration data and persistent data files
+are also listed using the
+.B -c
+option.
+.TP
+.B SNMP_PERSISTENT_FILE
+When this environment variable is exported to
+.BR mxmib ,
+the
+.BR read_config ()
+functions will look for a peristent data file in the file specified in the
+value of the
+.B SNMP_PERSISTENT_FILE
+environment variable.  If this variable is not exported to
+.BR mxmib ,
+the
+.BR read_config ()
+functions will look for a persistent data in the file "mxMIB.conf" in the
+default persistent directory.
+Note that persistent data will not be read when the
+.B -C
+option is specified, unless the persistent data file is also listed using the
+.B -c
+option.
+.TP
+.B HOME
+When exported to
+.BR mxmib ,
+this environment variable specifies the home directory of the real user
+associated with the executing process.  When the "$HOME/snmp/mibs" directory
+exists, it will be added to the default MIB directories searched.
+If this variable is not exported, no such directory is added unless it is
+explicity included in the the
+.B MIBDIRS
+evironment variable.
+The
+.BR mxmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B MIBDIRS
+When exported to
+.BR mxmib ,
+this environment variable specifies the directories or directories in
+addition to the default directories (when prefixed with a '+'), that will be
+searched for MIBs.  If this variable is not exported to
+.BR mxmib ,
+only the default directories (or premib defined default directories) will be
+loaded.
+The
+.BR mxmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B MIBS
+When exported to
+.BR mxmib ,
+this environment variable specifies the MIBs or MIBs in addition to the
+default MIBs (when prefixed with a '+') or all MIBs (when "all" is specified),
+that will be loaded.  If this variable is not exported to
+.BR mxmib ,
+only the default MIBs (or premib defined default MIBs) will be loaded.
+The
+.BR mxmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B MIBFILES
+When exported to
+.BR mxmib ,
+this environment variable specifies MIB files or MIB files in addition to the
+default MIB files (when prefixed with a '+'), that will be loaded.  If this
+variable is not exported to
+.BR mxmib ,
+only the default MIB files will be loaded.
+The
+.BR mxmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B PREFIX
+When exported to
+.BR mxmib ,
+this environment varibale specifies an OID in numbers an dots notation that
+specifies the prefix of the MIB tree to be loaded.
+The
+.BR mxmib
+daemon does not require MIBs to be loaded, and for the most part this
+environment variable is ignored.
+.TP
+.B SUFFIX
+When exported to
+.BR mxmib ,
+regardless of its contents,
+this variable will cause only suffixes of OIDs to be output.  Otherwise, the
+default is to output complete OIDs.
+The
+.BR mxmib
+daemon does not print OIDs except for debugging, and for the most part this
+environment variable is ignored.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B mxmib
+AgentX sub-agent requires the
+.BR mx_mx (4)
+.I STREAMS
+driver.  If the driver is not available, the
+.B mxmib
+command will not be successful.  See
+.BR mx_mx (4)
+for more information.
+.PP
+.B mxmib
+is normally invoked from the
+.B /etc/init.d/strchan
+init script when the presence of an SNMP master agent providing an AgentX interface
+on
+.IR /var/agentx/master ,
+or
+.IR localhost : 705
+is detected.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B mxmib
+is implemented using a subset of the UCD-SNMP application programming
+interfaces which are also provided in recent NET-SNMP releases (called the
+old-API).  This implementation maintains compatibility across as many
+distributions of NET-SNMP as possible.  Where additional NET-SNMP capabilities
+are present, they are used in support of option compatibility with recent
+NET-SNMP master SNMP agents, such as
+.BR snmpd (8).
+Consult the NET-SNMP documentation on your specific distribution for more
+information.
+.PP
+.B mxmib
+is implemented and recommended to be run as an AgentX sub-agent to a running
+.BR snmpd (8)
+configured for master SNMP agent operation and supporting the AgentX
+.[
+agentx
+.]
+interface.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR mx_mx (4)
+.B mxmib
+uses the
+.BR mx_mx (4)
+driver to provide information and control of MX cards and synchronization
+groups.
+.\"
+.\"
+.\".SH MODULES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/mxmib
+contains the
+.B mxmib
+command.
+.PP
+The
+.B mxmib
+agent checks for the existence of and parses the following files:
+.TP
+.B /etc/snmp/snmp.conf
+Common configuration file for the agent and applications.  See
+.BR snmp.conf (5)
+for more information.
+.TP
+.BR /etc/snmp/mxMIB.conf ", " /etc/snmp/mxMIB.local.conf
+Provides the
+.B mxmib
+agent-specific configuration.  See
+.BR snmpd.conf (5)
+for more information.  These files are optional and may be used to configure
+access control, trap generation, subagent protocols and more.  Also, the agent
+will read any files with the names
+.IR mxMIB.conf " or " mxMIB.local.conf
+in a colon separated path specified in the
+.B SNMPCONFPATH
+environment variable.
+.TP
+.B /usr/share/snmp/mibs/
+The aggent will also load all files in this directory as MIBs.  It will not,
+however, load an file that beings with a '.' or descend into subdirectories.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR snmp (5),
+.BR snmpd (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B mxmib
+has no known bugs.  All bugs are unknown and have yet to be discovered.
+.PP
+THIS MANUAL PAGE NEEDS TO BE UDPATED.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B mxmib
+implements the
+.I OPENSS7-MX-MIB
+SNMPv2 management information base which provides SNMPv2c or SNMPv3 management
+of the MX Multiplex driver.  The
+.I OPENSS7-MX-MIB
+is an
+.B OpenSS7
+project specific MIB, but it is suitably generic to provide SNMP management of
+most MX driver implementations.
+.PP
+The
+.B mxmib
+executable is most suitable as an AgentX sub-agent.  The program uses the
+facilities of the UCD-SNMP or NET-SNMP packages and libraries found on almost
+Linux system distributions.
+.IP \(em \w'\(em\(em'u
+Although implemented using the UCD-SNMP application programming interfaces and
+UCD-SNMP or NET-SNMP libraries,
+.B mxmib
+is suitable as a standalone AgentX
+.[
+AgentX
+.]
+sub-agent, and does not require that the UCD-SNMP or NET-SNMP master SNMP agent
+be running (some other master agent listening on a suitable port or path
+supporting the AgentX
+.[
+AgentX
+.]
+protocol will suffice).
+.IP \(em
+The options
+.BR -D ,
+.BR -f ,
+.BR -H ,
+.BR -L ,
+.BR -M ,
+.BR -x ,
+are provided for compatibility with NET-SNMP autogenerated AgentX sub-agents.
+The long versions of these options are not documented for NET-SNMP
+autogenerated AgentX sub-agents.
+.IP \(em
+The options
+.BR -A ,
+.BR -a ,
+.BR -C ,
+.BR -c ,
+.BR -D ,
+.BR -d ,
+.BR -f ,
+.BR -g ,
+.BR -H ,
+.BR -h ,
+.BR -I ,
+.BR -L ,
+.BR -l ,
+.BR -M ,
+.BR -P ,
+.BR -p ,
+.BR -q ,
+.BR -r ,
+.BR -s ,
+.BR -T ,
+.BR -u ,
+.BR -V ,
+.BR -v ,
+.BR -X ,
+.BR -x ,
+are provided for compatibility with NET-SNMP and UCD-SNMP master SNMP agents,
+and in particular,
+.BR snmpd (8).
+The long versions of these options are not documented for NET-SNMP or UCD-SNMP
+master SNMP agents.
+.IP \(em
+The options
+.BR -A ,
+.BR -a ,
+.BR -C ,
+.BR -c ,
+.BR -D ,
+.BR -d ,
+.BR -f ,
+.BR -g ,
+.BR -H ,
+.BR -h ,
+.BR -I ,
+.BR -L ,
+.BR -l ,
+.BR -M ,
+.BR -m ,
+.BR -n ,
+.BR -p ,
+.BR -q ,
+.BR -r ,
+.BR -U ,
+.BR -u ,
+.BR -V ,
+.BR -v ,
+.BR -X ,
+.BR -x ,
+are provided for compatibility with NET-SNMP master SNMP agents,
+and in particular,
+.BR snmpd (8).
+The long version of these options, with the exception of
+.BR --help ,
+.BR --version ,
+are not documented for NET-SNMP master SNMP agents.
+.BR
+.IP \(em
+UCD-SNMP and NET-SNMP agents and autogenerated subagents do not normally
+provide long options.  All OpenSS7 agents provide long options for all short
+options.
+.IP \(em
+Options
+.B --help
+and
+.B --version
+are provided for compatibilty with GNU coding standards;
+.BR --copying  ,
+OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B mxmib
+conforms to SNMPv1, SNMPv2,
+.[
+rfc2578
+.]
+.[
+rfc2579
+.]
+.[
+rfc2580
+.]
+SNMPv2c, SNMPv3 and AgentX.
+.[
+agentx
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B mxmib
+is provided with the
+.I @PACKAGE_TITLE@
+package.
+.B mxmib
+was initially released in version
+.B 0.9.2.4
+of the
+.B @PACKAGE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

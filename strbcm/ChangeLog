@@ -1,3 +1,9 @@
+2008-04-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* strbcm.spec.in: prepare for doc/papers
+	* debian/rules.in: prepare for doc/papers
+	* am/bcm.am: make depdenencies depend on Makefile
+
 2008-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* THANKS: removed deprecated Nexusware support
