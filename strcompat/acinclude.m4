@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-04-12 10:06:45 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-04-13 00:05:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-12 10:06:45 $ by $Author: brian $
+# Last Modified $Date: 2008-04-13 00:05:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -324,7 +324,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	if test :$streams_cv_package = :LiS ; then
 	    enable_compat_lis='not required'
 	else
-	    if test :${enable_compat_lis:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    if test ":${enable_compat_lis:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 		enable_compat_lis='yes'
 	    fi
 	fi
@@ -333,7 +333,7 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
 	if test :$streams_cv_package = :LfS ; then
 	    enable_compat_lfs='not required'
 	else
-	    if test :${enable_compat_lfs:-module} = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    if test ":${enable_compat_lfs:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
 		enable_compat_lfs='yes'
 	    fi
 	fi
@@ -609,10 +609,10 @@ AC_DEFUN([_COMPAT_SETUP_COMPAT], [dnl
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_HPUX_MODULE], [test :${enable_compat_hpux:-module}	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX],	[test :${enable_compat_irix:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_IRIX_MODULE], [test :${enable_compat_irix:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test :${enable_compat_lis:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test :${enable_compat_lis:-module}	= :module])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test :${enable_compat_lfs:-module}	= :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test :${enable_compat_lfs:-module}	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS],		[test ":${enable_compat_lis:-module}"	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LIS_MODULE],	[test ":${enable_compat_lis:-module}"	= :module])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS],		[test ":${enable_compat_lfs:-module}"	= :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_LFS_MODULE],	[test ":${enable_compat_lfs:-module}"	= :module])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC],		[test :${enable_compat_mac:-module}	= :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_COMPAT_MAC_MODULE],	[test :${enable_compat_mac:-module}	= :module])
 ])# _COMPAT_SETUP_COMPAT
@@ -1190,6 +1190,9 @@ AC_DEFUN([_COMPAT_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.36  2008-04-13 00:05:45  brian
+# - some variables can contain spaces
+#
 # Revision 0.9.2.35  2008-04-12 10:06:45  brian
 # - updates for autoconf 2.62
 #
