@@ -160,12 +160,12 @@ or
 .RB [ DS_SUCCESS ].
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -174,8 +174,8 @@ or
 is implemented on top of the more complicated OSMIS 3.0 interface.
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH BUGS

@@ -1035,12 +1035,12 @@ based driver.  Note that a
 .I STREAMS
 pushable module that translates between an XTI-mOSI interface and an XAP
 interface is possible.  Because a Stream provides an XAP compatible service
-interface, does not mean that all classes services or primitives are supported.
+interface, does not mean that all classes of services or primitives are supported.
 For example, it is possible to use XAP
 .[
 xap c303
 .]
-as an inteface for TCAP.
+as an interface for TCAP.
 .[
 q771
 .]
@@ -1056,7 +1056,6 @@ xap c303
 .[
 xti/tli revision 1
 .]
-
 .\"
 .\"
 .[

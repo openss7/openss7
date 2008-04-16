@@ -78,11 +78,32 @@ sort-adjacent-labels
 .\"
 .\"
 .TH A_ABORT_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "ACSE/Presentation Library Interface (APLI)"
+.\"
+.\"
 .SH NAME
 .B A_ABORT_IND
 \- indicate an ACSE A-ABORT
+.\"
+.\"
 .SH SYNOPSIS
 .PP
+.B #include <xap.h>
+.HP
+.B int ap_rcv(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long *" sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t **" ubuf ,
+.br
+.BI "int *" flags ,
+.br
+.BI "unsigned long *" aperrno_p );
+.\"
+.\"
 .SH DESCRIPTION
 .PP
 The
@@ -90,7 +111,11 @@ The
 primitive is used in conjunction with
 .BR ap_rcv (3)
 and the APLI environment to indicate the abnormal release of an association, or the abnormal
-termination of either the A-ASSOCIATE or the A-RELEASE service.
+termination of either the
+.I A-ASSOCIATE
+or the
+.I A-RELEASE
+service.
 .PP
 To receive an abort indication, the pointer
 .I sptype
@@ -110,3 +135,229 @@ typedef struct {
 } a_abort_ind_cd_t;
 \s+1\fP
 .fi
+.PP
+When issuing the
+.BR ap_rcv (3),
+the arguments must be set as described in the manual page for
+.BR ap_rcv (3).
+Upon return, the
+.BR ap_rcv (3)
+arguments will be set as described below:
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+This argument, returned from a call to
+.BR ap_open (3),
+identifies the APLI or XAP Library instance being used.
+.TP
+.I sptype
+The
+.B unsinged long
+pointed to by this argument will be set to
+.BR AP_A_ABORT_IND .
+.TP
+.I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+long src;   /* source of abort */
+\s+1\fP
+.fi
+.PP
+.I cdata->src
+will be set to indicate the source of the abort request.  The possible values
+for
+.I cdata->src
+when the
+.RI \(lq Normal \(rq
+mode of operation is in effect are given below:
+.TP \w'\fBAP_ACSE_PROV\fP\(em'u
+.B AP_ACSE_USER
+The abort was requested by the ACSE user.
+.PD 0
+.TP
+.B AP_ACSE_PROV
+The abort was requested by the ACSE provider.
+.PD
+.PP
+If the
+.RI \(lq X.410-1984 \(rq
+mode
+.[
+x410 1984
+.]
+of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the
+.I cdata->src
+argument will be set to
+.B AP_SRC_NOVAL
+by the library.
+.RE
+.TP
+.I ubuf
+Use of the
+.I ubuf
+argument is described in the manual page for
+.BR ap_rcv (3).
+.TP
+.I flags
+The
+.I flags
+argument is used to control certain aspects of primitive processing as
+described in the manual page for
+.BR ap_rcv (3).
+.TP
+.I aperrno_p
+The location pointed to by the
+.I aperrno_p
+argument is set to an error code if failure has occurred.
+.\"
+.\"
+.SH MODES
+.PP
+This primitive is valid both in
+.RI \(lq Normal \(rq
+and
+.RI \(lq X.410-1984 \(rq
+mode.
+.[
+x410 1984
+.]
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is issued by the XAP interface service.
+.\"
+.\"
+.SH ATTRIBUTES
+.PP
+The following attributes may change as a result of receiving the A_ASSOC_IND
+primitive based on information contained in the received APDU associated with
+the indication:
+.BR AP_STATE .
+.\"
+.\"
+.SH STATE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_rcv (3),
+.BR APLI (3),
+.BR XAP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B A_ABORT_IND
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B A_ABORT_IND
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI and XAP, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR XAP (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B A_ABORT_IND
+first appeared in APLI.
+.[
+apli unix international
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI/XAP Library under the OpenSS7 Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

@@ -588,8 +588,8 @@ The specified attribute is not readable.
 In addition, operating system class errors are reported.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH IMPLEMENTATION

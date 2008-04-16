@@ -1,0 +1,277 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH MS_REGISTER 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ms_register
+\- modify various parameters held by the MTS regarding delivery of messages to the MS
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xms.h>
+.sp
+.HP
+.BI "MS_status ms_register(OM_private_object " session ", OM_object " register_argument ", MS_invoke_id *" invoke_id_return );
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMS
+.[
+XMS
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to make long-term modification to various parameters held
+by the MTS regarding the delivery of messages to the MS.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR session "\0\fBSession\fP(Object(Session))
+Specifies the MS session over which this function is performed.
+.TP
+.IR register_argument "\0\fBRegister-Argument\fP(Object(Register-Argument))
+Specifies how to modify (via the
+.BR ms_register ()
+function) various parameters held by the MTS regarding delivery of messages to
+the MS.  These parameters include the following:
+.RS
+.IP \(em \w'\(em\(em'u
+.B User-Name
+.br
+Specifies the OR-name of the MS (this corresponds to the OR-name of the UA), if
+the user-name is to be changed.
+.IP \(em
+.B User-Address
+.br
+Specifies the OR-address of the MS (this corresponds to the OR-name of the UA),
+if it is required by the MTS and if it is to be changed.
+.IP \(em
+.B Deliverable-Encoded-Information-Types
+.br
+Specifies the encoded-information-types that the MTS shall permit to appear in
+messages delivered to the MS, if they are to be changed.  The MTS shall reject
+as undeliverable any message for an MS for which the MS is not registered to
+accept delivery of all of the encoded-information-types of the message.  Note
+that the MS may register to receive the undefined encoded-information-type.
+This argument,
+.BR Deliverable-Encoded-Information-Types ,
+also indicates the possible encoded-information-types to which implicit
+conversion can be performed.
+.IP \(em
+.B Deliverable-Maximum-Content-Length
+.br
+Specifies the content-length, in octets, of the longest content message that
+the MTS shall permit to appear in messages being delivered to the MS, if it is
+to be changed.  The MTS shall reject as undeliverable any message for an MS for
+which the MS is not registered to accept delivery of messages of its size.
+.IP \(em
+.B Default-Delivery-Controls
+.br
+Specifies default delivery controls that are registered using the
+.BR ms_register ()
+function.  The default delivery control arguments shall not admit messages
+whose delivery are prohibited by the prevailing registered values of the
+.B Deliverable-Encoded-Information-Types
+argument, the
+.B Deliverable-Content-Types
+argument or the
+.B Delivery-Maximum-Content-Length
+argument.
+.IP \(em
+.B Delivery-Content-Types
+.br
+Specifies the content-types that the MTS shall permit to appear in messages
+delivered to the MS, if they are to be changed.  The MTS shall reject as
+undeliverable any message for an MS for which the MS is not registered to
+accept delivery of all of the content-types of the message.  Note that the MS
+may register to receive the
+.B undefined
+content-type.
+.IP \(em
+.B Labels-And-Redirections
+.br
+Specifies one or both of the following:
+.RS
+.IP \(em \w'\(em\(em'u
+the OR-name of an alternate recipient to which messages are to be redirected,
+if this is to be changed.
+.IP \(em
+the security-labels of the UA, if they are to be changed.
+.RE
+.RE
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.BR Status "(Status)
+Indicates whether the function succeeded or not, if use synchronously; or
+whether the function has been initiated, if used asynchronously.
+.TP
+.IR invoke_id_return "\0\fBInvoke-ID\fP(Integer)
+The invoke-ID of the asynchronous operation.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one of the following Library-Errors:
+bad-argument, bad-session, asynchrony-not-supported, feature-unavailable,
+feature-not-negotiated, no-workspace, out-of-memory, miscellaneous,
+too-many-operations.
+.PP
+The following Message Store errors may be returned:
+register-rejected.
+.PP
+This function can return a Communications-Error.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ms_register ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XMS (3),
+.BR XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XMS.
+.[
+XMS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XMS.
+.[
+XMS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xms (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ms_register ()
+was first part of the
+.BR XMS .
+.[
+XMS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

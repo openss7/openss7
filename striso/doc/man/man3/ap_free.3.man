@@ -191,6 +191,61 @@ identifier
 .I AP_BUFFERS
 for a chain of user data buffers.
 .PP
+When an XAP implementation supports further ASEs through XAP extensions,
+further
+.B #define
+identifiers may be used with
+.BR ap_free ()
+as follows:
+.IP \(bu \w'\(bu\(em'u
+.B #define
+identifiers associated with environment attributes, whose type is not
+.BR long ,
+which are particular to the ASE.  These are the names listed in the
+\(lqAttribute\(rq column of the environment attribute summary table within the
+extension specification.
+.IP \(bu
+.B #define
+identifiers of the data structures used to prepresent the values of
+environment attributes which are particular to the ASE.  These data structures
+are those listed in the Type/Value column of the environment attribute summary
+table within the extension specification.
+.IP \(bu
+.B #define
+identifiers associated with the ASEs
+.I cdata
+structure and dependent data structures.  For example, in the TP extension
+(XAP-TP)
+.[
+XAP-TP
+.]
+these are:
+.sp
+.TS
+tab(:);
+lblb
+lbli.
+C Data Structure:Identifier
+_
+ap_tp_cdata_t:AP_TP_CDATA_T
+ap_tp_dialog_env_t:AP_TP_DIALOG_ENV_T
+.TE
+.sp
+and in the ROSE extension (XAP-ROSE)
+.[
+XAP-ROSE
+.]
+these are:
+.sp
+.TS
+tab(:);
+lblb
+lbli.
+C Data STructure:Identifier
+_
+ap_ro_cdata_t:AP_RO_CDATA_T
+.TE
+.PP
 The argument
 .I val
 must be a pointer to a structure of the type indicated by

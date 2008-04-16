@@ -94,8 +94,12 @@ XAP-ROSE
 .SH DESCRIPTION
 .PP
 XAP-ROSE is used in conjunction with XAP to establish an association with a remote ROSE service user
-and then pass ROSE primitives between two ROSE service users.  An include file for the XAP-ROSE user
-containing structure definitions and constants is defined in \fB<xap_rose.h>\fP.
+and then pass ROSE primitives between two ROSE service users.
+.[
+x219
+.]
+An include file for the XAP-ROSE user containing structure definitions and
+constants is defined in \fB<xap_rose.h>\fP.
 .PP
 The XAP-ROSE API defines an additional structure,
 .BR ap_ro_cdata_t ,
@@ -125,7 +129,7 @@ typedef struct {
 	ap_octet_string_t act_id;
 	ap_octet_string_t old_act_id;
 	ap_old_conn_id_t *old_conn_id;
-
+	
 	long pci;
 	long priority;
 	long invoke_id_present;
@@ -148,7 +152,7 @@ where,
 presentation context identifier for user data,
 .TP
 .I priority
-prioity of the request (informative to provider),
+priority of the request (informative to provider),
 .TP
 .I invoke_id_present
 invoke identifier present flag,
@@ -181,7 +185,6 @@ structure elements
 .IR priority " and " op_class
 support an RTSE-based implementation of ROSE which is currently not within the scope of this API.
 They are defined by this specification for future use and are not currently used.
-
 .\"
 .\"
 .SH ENVIRONMENT
@@ -193,7 +196,7 @@ The AP_RO_FAC_AVAIL attribute is used to indicate the availability of facilities
 provider.
 The attribute type is \fBunsigned long\fP with bit values \fIAP_RO_BIND\fP.  The attribute is
 readable always and writable never.
-The attribute is bit significant, and the folllowing bit values are defined:
+The attribute is bit significant, and the following bit values are defined:
 .RS
 .TP
 .I AP_RO_BIND
@@ -249,7 +252,7 @@ XAP-ROSE
 .]
 provides the following functions in addition to those defined by the XAP specifications:
 .[
-XAP
+XAP c303
 .]
 .TP
 .BR ap_ro_init (3)
@@ -268,45 +271,765 @@ The
 .BR ap_ro_release (3)
 function releases an instance of the XAP-ROSE user environment from an established application
 association.
-
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.SS Implementing ROSE Bind and Unbind Operations
+.PP
+The ROSE service definition
+.[
+x219
+.]
+defines a
+.I bind
+operation that creates an association over which subsequent operation requests
+and replies are transferred.  The ROSE service definition
+.[
+x219
+.]
+also defines an
+.I unbind
+operation that destroys the association created by the
+.I bind
+operation.
+.PP
+Depending on the version of the ROSE specification implemented by the XAP-ROSE
+provider, the
+.IR bind " and " unbind
+operations may either by defined as a macros using the A-ASSOCIATE and
+A-RELEASE primitives, with the ROSE protocol encoded in the user information
+portion of these primitives, or as the separate ROSE primitives
+.BR BIND " and " UNBIND .
+.PP
+In the XAP-ROSE API, if the underlying ROSE implementation supports the
+.BR BIND " and " UNBIND
+primitives, the
+.BR AP_RO_BIND_XXX " and " AP_RO_UNBIND_XXX
+primitives can be used as described in
+.BR AP_RO_BIND_REQ (7),
+.BR AP_RO_BIND_IND (7),
+.BR AP_RO_BIND_RSP (7),
+.BR AP_RO_BIND_CNF (7),
+.BR AP_RO_UNBIND_REQ (7),
+.BR AP_RO_UNBIND_IND (7),
+.BR AP_RO_UNBIND_RSP (7),
+and
+.BR AP_RO_UNBIND_CNF (7).
+Their usage is similar to that of other ROSE primitives defines through
+XAP-ROSE.
+.PP
+In the case where the A-ASSOCIATE and A-RELEASE primitives are to be used, the
+XAP-ROSE AP user can implement the
+.I bind/unbind
+operation using the ACSE
+.[
+x217
+.]
+primitives defined by XAP.  The rules for encoding
+the operation arguments for these primitives are those defined by XAP for the
+relevant primitives, rather than the rules for these primitives in this
+specification for encoding other operation and reply arguments.
+.SS Bind and Unbind Encoding
+.PP
+When the
+.B AP_RO_BIND
+bit is set in the
+.B AP_RO_FAC_AVAIL
+XAP-ROSE environment attribute, the BIND/UNBIND primitives are available;
+otherwise, the BIND/UNBIND primitives are unavailable and the user must us the
+.BR A_ASSOC_REQ (7),
+.BR A_ASSOC_IND (7),
+.BR A_ASSOC_RSP (7),
+.BR A_ASSOC_CNF (7),
+.BR A_RELEASE_REQ (7),
+.BR A_RELEASE_IND (7),
+.BR A_RELEASE_RSP "(7) and
+.BR A_RELEASE_CNF (7)
+primitives directly.
+.PP
+The ROSE service specification, ISO 9072-1,
+.[
+iso 9072-1
+.]
+has macro definitions for the
+.IR bind " and " unbind
+operations.  These macros show the required tagging of the user information
+portion of the ACSE A-ASSOCIATE and A-RELEASE primitives
+.[
+x217
+.]
+when embedded in the Association-information EXTERNAL encoding.  For each of
+the
+.IR bind " and " unbind
+macros, an example encoding is shown below.  These encodings take precedence
+over the encoding shown on the
+.BR ap_snd (3)
+manual page of the XAP specification.
+.PP
+These examples use the value syntax defined by the ASN.1 specification with
+the addition (for the purposes of illustration only) of explicit tag
+information included within square brackets (for example: [INTEGER] - a
+universal tag, [0] - a context specific tag, and so on).
+.IP \(bu \w'\(bu\(em'u
+bind macro for the
+.BR A_ASSOC_REQ
+primitive:
+.sp
+ user-information [30] {
+   [EXTERNAL] { -- Association-information
+     direct-reference [OBJECT IDENTIFIER] { ... }
+     single-ASN1-type [0] { Argument-value [16] ... }
+   }
+ }
+.IP \(bu
+bind-accept macro for the
+.BR A_ASSOC_RSP (accept)
+primitive:
+.sp
+ user-information [30] {
+   [EXTERNAL] { -- Association-information
+     indirect-reference [INTEGER] { ... }
+     single-ASN1-type [0] { Result-value [17] ... }
+   }
+ }
+.IP \(bu
+bind-refuse macro for the
+.BR A_ASSOC_RSP (refuse)
+primitive:
+.sp
+ user-information [30] {
+   [EXTERNAL] { -- Association-information
+     direct-reference [OBJECT IDENTIFIER] { ... }
+     single-ASN1-type [0] { Error-value [18] ... }
+   }
+ }
+.IP \(bu
+unbind macro for the
+.BR A_RELEASE_REQ
+primitive:
+.sp
+ user-information [30] {
+   [EXTERNAL] { -- Association-information
+     indirect-reference [INTEGER] { ... }
+     single-ASN1-type [0] { Argument-value [19] ... }
+   }
+ }
+.IP \(bu
+unbind-accept macro for the
+.BR A_RELEASE_RSP (accept)
+primitive:
+.sp
+ user-information [30] {
+   [EXTERNAL] { -- Association-information
+     indirect-reference [INTEGER] { ... }
+     single-ASN1-type [0] { Result-value [20] ... }
+   }
+ }
+.IP \(bu
+unbind-refuse macro for the
+.BR A_RELEASE_RSP (refuse)
+primitive:
+.sp
+ user-information [30] {
+   [EXTERNAL] { -- Association-information
+     indirect-reference [INTEGER] { ... }
+     single-ASN1-type [0] { Error-value [21] ... }
+   }
+ }
+.PP
+The ASN.1 Basic Encoding Rules (BER)
+.[
+iso 8825-2
+.]
+must be used to encode the user-information with the exception of the contents
+of the single-ASN1-type which must be encoded in the transfer syntax
+identified by direct-reference or indirect-reference.  The presence of the
+direct-reference or indirect-reference is normally mandated by Application
+Profile.
+.\"
+.\"
 .SH PRIMITIVES
 .PP
-.TP
-.BR AP_RO_BIND_REQ (7)
-.TP
-.BR AP_RO_BIND_IND (7)
-.TP
-.BR AP_RO_BIND_RSP (7)
-.TP
-.BR AP_RO_BIND_CNF (7)
-.TP
-.BR AP_RO_INVOKE_REQ (7)
-.TP
-.BR AP_RO_INVOKE_IND (7)
-.TP
-.BR AP_RO_RESULT_REQ (7)
-.TP
-.BR AP_RO_RESULT_IND (7)
-.TP
-.BR AP_RO_ERROR_REQ (7)
-.TP
-.BR AP_RO_ERROR_IND (7)
-.TP
-.BR AP_RO_REJECTU_REQ (7)
-.TP
-.BR AP_RO_REJECTU_IND (7)
-.TP
-.BR AP_RO_REJECTP_IND (7)
-.TP
-.BR AP_RO_UNBIND_REQ (7)
-.TP
-.BR AP_RO_UNBIND_IND (7)
-.TP
-.BR AP_RO_UNBIND_RSP (7)
-.TP
-.BR AP_RO_UNBIND_CNF (7)
-
-
+The following list of Event make up the Valid set of XAP-ROSE events, which
+driver the XAP-ROSE and the associated ROPM (Remote Operations Protocol
+Machine).
+.PP
+.TS
+center box tab(:);
+cb|cb|cb
+l|c|c.
+XAP-ROSE Event:Send:Receive
+_
+\fBAP_RO_BIND_REQ\fP(7):Send:-
+\fBAP_RO_BIND_IND\fP(7):-:Receive
+\fBAP_RO_BIND_RSP\fP(7):Send:-
+\fBAP_RO_BIND_CNF\fP(7):-:Receive
+\fBAP_RO_INVOKE_REQ\fP(7):Send:-
+\fBAP_RO_INVOKE_IND\fP(7):-:Receive
+\fBAP_RO_RESULT_REQ\fP(7):Send:-
+\fBAP_RO_RESULT_IND\fP(7):-:Receive
+\fBAP_RO_ERROR_REQ\fP(7):Send:-
+\fBAP_RO_ERROR_IND\fP(7):-:Receive
+\fBAP_RO_REJECTU_REQ\fP(7):Send:-
+\fBAP_RO_REJECTU_IND\fP(7):-:Receive
+\fBAP_RO_REJECTP_IND\fP(7):-:Receive
+\fBAP_RO_UNBIND_REQ\fP(7):Send:-
+\fBAP_RO_UNBIND_IND\fP(7):-:Receive
+\fBAP_RO_UNBIND_RSP\fP(7):Send:-
+\fBAP_RO_UNBIND_CNF\fP(7):-:Receive
+.TE
+.SS Sending Primitives
+.PP
+An XAP-ROSE instance can be used to send
+.I Request
+and
+.I Response
+primitives defined both by this specification and by the XAP specification
+(subject to limitations imposed by the underlying ACSE
+.[
+x217
+.]
+or Presentation Layer
+.[
+x216
+.]
+service provider).
+.PP
+The XAP function
+.BR ap_snd (3)
+is used to send all outbound primitives.  The
+.I cdata
+argument for the
+.BR ap_snd (3)
+call points to a
+.IR "void *cdata"
+instead of
+.IR "ap_cdata_t *cdata" .
+This allows the use of XAP as well as XAP-ROSE primitives to be combined in
+one Library.  The
+.I cdata
+must point to an
+.B ap_ro_cdata_t
+structure if any ROSE-specific information is to be included with the
+primitive being sent.  For specific
+.B ap_ro_data_t
+usage, refer to the primitive manual pages in Section 7 of the manual as
+listed above.
+.PP
+When calling
+.BR ap_snd (3)
+to send a ROSE primitive, the service user must indicate the abstract syntax
+that defines the data values contained in the PDU (both the ROSE protocol
+control data and any element which is specific to the remote operation, such
+as operation-argument).  To do this, the service user sets the
+.I cdata.pci
+element to identify one of the abstract syntaxes that was defined as a ROSE
+abstract syntax using the
+.B AP_RO_PCI_LIST
+environment attribute.
+.PP
+The service provider performs the following steps to send a ROSE primitive:
+.IP \(bu \w'\(bu\(em'u
+encode the ROSE-defined parts of the PDU (using the transfer syntax negotiated
+for the indicated presentation context)
+.IP \(bu
+if required, append the data value that the user supplied in the
+.I ubuf
+parameter (this is specific to the remote operation, such as
+.IR operation-argument )
+.IP \(bu
+embed the resulting data value into a presentation data value (PDV) labelled
+with the relevant presentation context identifier
+.IP \(bu
+pass the resulting PDV to the P_DATA request primitive as the User Data
+parameter.
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+A data value passed to the service provider in the
+.I ubuf
+parameter is passed in encoded form.  Unlink XAP primitives, no ACSE or
+Presentation PDU tag information is encoded with the data value; the buffers
+passed contain only the encoding of the data value itself.  The reason for the
+deviation is that the ROSE service has to do the encoding of the full PDU.
+.SS Receiving Primitives
+.PP
+The XAP-ROSE instance can be use to receive
+.I Indication
+and
+.I Confirmation
+primitives defined both by this specification and by the XAP specification
+(subject to limitations imposed by the underlying ACSE or Presentation Layer
+service provider).
+.PP
+The XAP function
+.BR ap_rcv (3)
+is used to receive all incoming primitives.  The
+.I cdata
+argument for the
+.BR ap_rcv (3)
+call points to a
+.IR "void *cdata"
+instead of
+.IR "ap_cdata_t *cdata" .
+This allows the use of XAP as well as XAP-ROSE primitives to be combined in on
+Library.  The
+.I cdata
+must point to an
+.B ap_ro_cdata_t
+structure.  For specific
+.B ap_ro_cdata_t
+usage, refer to the primitive pages in Section 7 of the manual as listed
+above.
+.PP
+When receiving primitives, the ROSE service provider filters incoming
+primitives, using the list of abstract syntaxes defined by the environment
+attribute
+.BR AP_RO_PCI_LIST ,
+to detect incoming primitives that contain ROSE PDUs.
+.IP \(bu \w'\(bu\(em'u
+a TD PPDU (Transfer Data Presentation PDU) that contains a single data value
+from one of the abstract syntaxes defined by the
+.BR AP_RO_PCI_LIST
+environment attribute (where that data value is one of the defined ROSE PDU
+data types) is processed by the ROSE service provider and delivered to the
+service user as the appropriate ROSE primitive indication.
+.IP \(bu
+all other ACSE or Presentation PDUs are delivered to the service user as the
+appropriate ACSE or Presentation Layer indication or confirmation primitive.
+.PP
+Where the incoming TD PPDU does contain a ROSE PDU, the ROSE service provider
+performs the following steps to deliver the primitive to the service user:
+.IP \(bu \w'\(bu\(em'u
+extract the presentation context identifier from the received presentation
+data value (PDV) and use it to decode the ROSE-defined PDU parameters for
+return in the
+.I cdata
+parameter
+.IP \(bu
+set the
+.I cdata.pci
+element to indicate the presentation context to be used by the service user to
+decode any data value that is specific to the remote operation (such as
+.IR operation-argument )
+.IP \(bu
+set the
+.I ubuf
+parameter to return any data value that is specific to the remote operation
+(the encoded data value is returned)
+.IP \(bu
+return the relevant ROSE primitive indication.
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+A data value returned by the service provider in the
+.I ubuf
+parameter is passed in encoded form.  Unlike XAP primitives, no ACSE or
+Presentation PDU tag information is encoded with the data value, the buffers
+passed contain only the encoding of the data value itself.  The reason for the
+deviation is that the ROSE service has to do the encoding of the full PDU.
+.SS Encoding User Data for ROSE Primitives
+.PP
+The ROSE protocol specification, ISO 9072-2,
+.[
+iso 9072-2
+.]
+has ASN.1 definitions for the encodings of the ROSE operations.  It is the
+responsibility of the XAP-ROSE user to encode/decode the following structure
+members for the following primitives:
+.PP
+.TS
+box tab(:);
+lb|lb
+lb|li.
+primitive:member
+_
+AP_RO_INVOKE_REQ:operation-value, argument
+AP_RO_RESULT_REQ:operation-value, result
+AP_RO_ERROR_REQ:error-value, parameter
+.TE
+.PP
+The XAP-ROSE provider is responsible for the encoding/decoding of the
+remainder of all primitives.
+.PP
+In the case of the
+.I operation-value
+and
+.I error-value
+members, which are of the ASN.1 type OBJECT IDENTIFIER, when passed in the
+global element of
+.IR cdata->value ,
+the contents should be encoded using ASN.1 BER.
+.[
+iso 8825-2
+.]
+.PP
+During negotiation of Transfer Syntaxes, the XAP-ROSE provider only accepts
+Transfer Syntaxes supported by the implementation.  However, from a practical
+perspective, ASN.1 BER should be supported to allow interoperability between
+the two systems.  For the
+.IR Invoke ", " Result " and " Error
+operations, the user must provide data encoded using the negotiated transfer
+syntax selected for the given Presentation Context Identifier (PCI) when the
+ROSE primitive associated with the operation is sent, and must decode the user
+data portion when a ROSE primitive is received.
+.PP
+The following extract from ISO 9072-1
+.[
+iso 9072-1
+.]
+shows the operation ASN.1 structures and shows in bold print the portion for
+which the XAP-ROSE user is responsible.
+.IP \(bu \w'\(bu\(em'u
+.B AP_RO_INVOKE_REQ
+operation encoding
+.sp
+ [SEQUENCE] {
+  invoke-ID [INTEGER] { ... }
+  linked-ID [INTEGER] { ... }
+  operation-value [OBJECT IDENTIFIER] { ... }
+  -- operation-value global encoding choice
+  \fBargument { ... } -- ANY DEFINED BY operation-value\fP
+  -- argument is provided by the user
+ }
+.IP \(bu
+.B AP_RO_RESULT_REQ
+operation encoding
+.sp
+ [SEQUENCE] {
+   invoke-ID [INTEGER] { ... }
+   [SEQUENCE] {
+     operation-value [OBJECT IDENTIFIER] { ... }
+     -- operation-value global encoding choice
+     \fBresult { ... } -- ANY DEFINED BY operation-value\fP
+     -- result is provided by the user
+   } -- OPTIONAL
+ }
+.IP \(bu
+.B AP_RO_ERROR_REQ
+operation encoding
+.sp
+ [SEQUENCE] {
+   invoke-ID [INTEGER] { ... }
+   error-value [OBJECT IDENTIFIER] { ... }
+   -- error-value global encoding choice
+   \fBparameter { ... } -- ANY DEFINED BY error-value\fP
+   -- parameter is provided by the user
+ }
+.\"
+.\"
+.SH USAGE
+.PP
+.SS Establishing and Releasing an XAP-ROSE Instance
+.PP
+An XAP instance is established using the XAP function,
+.BR ap_open (3).
+The
+.I service provider
+argument to
+.BR ap_open (3)
+may be used to identify a service provider that supports ROSE.  The XAP
+environment attribute
+.BR AP_MODE_AVAIL
+for such an association has the
+.BR AP_ROSE_MODE
+flag set to indicate that this instance is capable of operating as an XAP-ROSE
+instance.
+.PP
+To use the instance as an XAP-ROSE instance, it is necessary to set the
+.B AP_ROSE_MODE
+flag in the XAP environment variable
+.BR AP_MODE_SEL ,
+at which point the functions, environment attributes and primitives defined by
+this specification become available to the application.  When the
+.BR AP_ROSE_MODE
+flag in
+.B AP_MODE_SEL 
+is set, the environment attributes defined by XAP-ROSE are initialized to
+their default state.
+.PP
+Clearing the
+.B AP_ROSE_MODE
+flag in
+.B AP_MODE_SEL
+causes the XAP-ROSE function, environment attributes and primitives to become
+unavailable.  Alternatively, the XAP-ROSE instance can be destroyed using the
+XAP
+.BR ap_close (3)
+function.  Any state held by the ROSE service provider for an instance is lost
+when the flag is cleared.  If the flag is set again for the instance at a
+later time, the ROSE service provider is set to its initial state and
+environment variables are reinitialized to their default values.
+.PP
+Currently, XAP-ROSE only supports service providers that implement the ROSE
+service using the services of the presentation layer directly as an unconfirmed
+transfer service.  A future version of this API may support Reliable Transfer
+(RTSE)
+.[
+x218
+.]
+.[
+x228
+.]
+service providers.
+.SS Specifying ROSE Abstract Syntaxes
+.PP
+For the ROSE service provider to detect incoming ROSE PDUs and indicate them
+to the service user, the ROPM must examine incoming
+.BR P_DATA_IND (7)
+primitives to determine if it contains a ROSE PDU.
+.PP
+As the abstract syntaxes that may contain ROSE PDUs are defined by the
+application as part of the specification of remote operations, the service
+user must inform the service provider which abstract syntaxes may contain ROSE
+PDUs.
+.PP
+To support this feature, XAP-ROSE defines an additional environment attribute,
+.BR AP_RO_PCI_LIST ,
+that allows the service user to register the list of abstract syntaxes to be
+examined.  The attribute consists of a list of object identifiers that are to
+be examined by the ROSE service provider.  This attribute may be set by calling
+the XAP function
+.BR ap_set_env (3)
+as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+ap_set_env(fd, AP_RO_PCI_LIST, val, aperrno_p);
+\s+1\fP
+.fi
+.RE
+.PP
+where
+.I val
+is a structure of type
+.BR ap_val_t ,
+and
+.I val.v
+contains a pointer to a structure of type
+.BR ap_ro_pci_list_t .
+.SS Controlling the ROSE Protocol Machine
+.PP
+Selecting
+.B AP_ROSE_MODE
+in the XAP environment attribute
+.BR AP_MODE_SEL
+for an XAP instance makes the XAP-ROSE functions, environment attributes and
+primitives available to the service user.  However, to enable the ROSE
+Protocol Machine (ROPM) and permit ROSE primitives to be sent and received,
+the service user must call the
+.BR ap_ro_init (3)
+function.  The user may call the
+.BR ap_ro_release (3)
+function to disable the ROPM.
+.PP
+For XAP-ROSE instances used only for supporting the transfer of ROSE
+Operations, the ROPM may be enabled when the XAP-ROSE instance is created, and
+left so for the lifetime of the instance.
+.PP
+The ROPM is disabled automatically when the XAP-ROSE instance is destroyed by
+calling
+.BR ap_close (3),
+so it is not necessary to call
+.BR ap_ro_release (3)
+for this mode of usage.
+.PP
+An XAP-ROSE instance may be used to support a sequence of associations.  It is
+not necessary to enable and disable the ROPM for each association.  Once
+enabled, it becomes active whenever an established association exists, and is
+dormant at other times.
+.PP
+It is possible to use a single XAP instance and/or association to transfer
+both ROSE PDUs and those of other application protocols.  Because examining
+incoming primitives which uses an XAP instance in this manner may use
+.BR ap_ro_init (3)
+and
+.BR ap_ro_release (3)
+to enable the ROPM only when required.
+.PP
+A call to
+.BR ap_ro_init (3)
+causes the list of ROSE abstract syntaxes identified by the PCI entries in the
+environment attribute
+.B AP_RO_PCI_LIST
+to be validated.
+.PP
+The service use should ensure that the set of PCIs available on the
+association has been defined before this call (either in
+.BR AP_DCS
+if the association is already established, or in
+.BR AP_PCDL / AP_PCDRL
+in a state where the defined context set is not available).  If this is not
+the case, the call to
+.BR ap_ro_init (3)
+returns the error
+.RB [ AP_RO_CNTX_NOT_PRES ]
+and the ROPM will not be enabled.
+.PP
+There are three different scenarios when
+.BR ap_ro_init (3)
+can be called, and each operates as follows:
+.IP \(bu \w'\(bu\(em'u
+For an initiator before connection establishment, the user sets
+.B AP_PCDL
+to contain the list of proposed presentation contexts, each PCI having an
+abstract syntax and one or more transfer syntaxes.  The user sets
+.B AP_RO_PCI_LIST
+to contain the list of PCIs that identify presentation contexts using the ROSE
+protocol.  The user then calls
+.BR ap_ro_init (3)
+and the following checks are performed:
+.RS
+.IP \(em \w'\(em\(em'u
+Each PCI in the
+.B AP_RO_PCI_LIST
+is checked against the
+.BR AP_PCDL .
+If the PCI is in the
+.BR AP_PCDL ,
+then each transfer syntax is checked to see if it is supported.  If not, the
+transfer syntax is removed from the
+.BR AP_PCDL .
+If no more transfer syntaxes remain in the presentation context, the PCI is
+removed from the
+.BR AP_PCDL .
+If there are no more PCIs in the
+.BR AP_PCDL ,
+an
+.RB [ AP_RO_CNTX_NOT_PRES ]
+error is returned.
+.sp
+Upon successful completion, the ROPM is enabled.  If an error is returned, the
+ROPM is not enabled and the user may examine/modify the resulting
+.BR AP_PCDL
+value before retrying.
+.RE
+.IP \(bu
+For an initiator or responder after connection establishment, the user sets
+.BR AP_PO_PCI_LIST
+to contain the list of PCIs that identify presentation contexts using the ROSE
+protocol.  The user then calls
+.BR ap_ro_init (3)
+and the following checks are performed:
+.RS
+.IP \(em \w'\(em\(em'u
+Each PCI in the
+.B AP_RO_PCI_LIST
+is checked against the PCIs in the
+.BR AP_DCS .
+If the PCI is not in the
+.BR AP_DCS
+an
+.RB [ AP_RO_BAD_PCI ]
+error is returned.  If the PCI is in the
+.BR AP_DCS ,
+then the transfer syntax in the
+.BR AP_DCS
+entry for this PCI is checked to see if it is supported.  If it is not
+supported, an
+.RB [ AP_RO_T_SYTX_NSUP ]
+error is returned.
+.sp
+Upon successful completion, the ROPM is enabled.  If an error is returned, the
+ROPM is not enabled and the user may examine/modify the
+.B AP_RO_PCI_LIST
+value before retrying.
+.RE
+.IP \(bu
+For a responder during inward connection establishment, the user sets
+.BR AP_PCDRL
+to accept or reject the proposed presentation contexts and transfer syntaxes.
+The user then sets
+.B AP_RO_PCI_LIST
+to contain the list of PCIs that identify presentation contexts using the ROSE
+protocol.  The user then calls
+.BR ap_ro_init (3)
+and the following checks are performed:
+.RS
+.IP \(em \w'\(em\(em'u
+Each PCI in the
+.B AP_RO_PCI_LIST
+is checked against the
+.BR AP_PCDL .
+If the PCI is not in the
+.BR AP_PCDL
+an
+.RB [ AP_RO_BAD_PCI ]
+error is returned.  If the PCI is in the
+.B AP_PCDL
+and the transfer syntax is not supported by the ROSE provider, the context is
+marked as rejected in the
+.BR AP_PCDRL .
+If no contexts with supported transfer syntaxes remain, an
+.RB [ AP_RO_CNTX_NOT_PRES ]
+error is returned.
+.sp
+Upon successful completion, the ROPM is enabled.  If an error is returned, the
+ROPM is not enabled and the user may examine or modify the
+.B AP_RO_PCI_LIST
+value before retrying.
+.RE
+.PP
+The
+.BR ap_ro_init (3)
+function may be called when ROPM is already enabled, to validate and install a
+modified list of ROSE abstract syntaxes.
+.PP
+XAP does not support the P-ALTER-CONTEXT service.  If it is necessary to change
+the value of
+.B AP_RO_PCI_LIST
+during the lifetime of an association, the list of abstract syntaxes
+negotiated when the association was created must be sufficient to support the
+new value of
+.BR AP_RO_PCI_LIST .
+.\"
+.SS Obtain an XAP-ROSE Instance
+.PP
+An XAP-ROSE instance must be obtained/initialized by issuing an
+.BR ap_open (3).
+.SS Initialize the XAP-ROSE Environment
+.PP
+The environment of the created instance is initialized by using either
+.BR ap_init_env (3)
+or
+.BR ap_restore (3)
+XAP functions.  The set of abstract syntaxes to be examined for incoming ROSE
+PDUs is defined by setting the
+.BR AP_RO_PCI_LIST
+environment attribute, using the XAP function
+.BR ap_set_env (3).
+.PP
+The ROSE service provider is activated by calling the
+.BR ap_ro_init (3)
+function, at which point the service provider will begin examining received
+.BR P_DATA_IND (7)
+primitives to identify incoming ROSE PDUs.
+.SS Bind the XAP-ROSE user to a local PSAP Address
+.PP
+The XAP-ROSE user must bind to a local PSAP address before attempting to issue
+any ROSE or ACSE service primitives.
+.SS Send or Receive AP_RO_BIND_XXX or A_ASSOC_XXX Event
+.PP
+After the XAP-ROSE user has initialized all relevant environment attributes,
+it is ready to establish an application association.  This may be done by
+either issuing an
+.BR AP_RO_BIND_REQ (7)/ A_ASSOC_REQ (7),
+or by receiving and processing an
+.BR AP_RO_BIND_IND (7)/ A_ASSOC_IND (7).
+.SS Transfering ROSE Primitives
+.PP
+Once the association has been established, the Application Entities may begin
+transferring information, either via the XAP-ROSE primitives, or by using the
+available XAP primitives, that is:
+.BR P_DATA_REQ ", " P_SYNCMINOR_REQ ", etc ..."
+.SS Releasing the Application Association
+.PP
+Upon confirmation of information transfer, the applications may release the
+association via the
+.BR AP_RO_UNBIND_REQ (7)/ AP_RELEASE_REQ (7)
+or the
+.BR AP_RO_UNBIND_IND (7)/ AP_RELEASE_IND (7)
+Services.
+.\"
+.\"
 .SH ERRORS
 .PP
 .TP
@@ -327,8 +1050,56 @@ The list size is not a positive value or list is greater than the size of the AP
 The transfer syntax in the AP_DCS entry for this PCI is not supported.
 .TP
 .RB [ AP_NOT_SUPPORTED ]
-The identified instancs is not an XAP-ROSE instance - that is, the service provider selected in the
+The identified instances is not an XAP-ROSE instance - that is, the service provider selected in the
 call to
 .BR ap_open (3)
 does not support a ROSE service provider, or the AP_ROSE_MODE flag has not been set in the
 AP_MODE_SEL environment attribute.
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that, unlike other OSI-based application interfaces, the XAP-ROSE
+.[
+xap-rose
+.]
+does not require abstract data manipulation using the XOM
+.[
+xom osi
+.]
+model or interfaces.
+It is, therefore, fairly easy to implement the A- and P- primitives directly
+using a
+.I STREAMS
+based driver.  Note that a
+.I STREAMS
+pushable module that translates between an XTI-mOSI interface and an XAP-ROSE
+interface is possible.  Because a Stream provides an XAP-ROSE compatible
+service interface, does not mean that all classes of services or primitives
+are supported.
+For example, it is possible to use XAP-ROSE
+.[
+xap-rose
+.]
+as an interface for TCAP.
+.[
+q771
+.]
+.\"
+.\"
+.XX
+.[
+xns99
+.]
+.[
+xap c303
+.]
+.[
+xti/tli revision 1
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

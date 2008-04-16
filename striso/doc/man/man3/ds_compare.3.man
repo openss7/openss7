@@ -171,12 +171,12 @@ This function can return the error constant
 .RB [ DS_NO_WORKSPACE ].
 .\"
 .\"
-.SH USAGE
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH IMPLEMENTATION
@@ -185,8 +185,8 @@ This function can return the error constant
 is implemented on top of the more complicated OSMIS 3.0 interface.
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH BUGS

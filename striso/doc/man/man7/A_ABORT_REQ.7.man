@@ -78,9 +78,13 @@ sort-adjacent-labels
 .\"
 .\"
 .TH A_ABORT_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "X/Open ASCE/Presentation (XAP)"
+.\"
+.\"
 .SH NAME
 .B A_ABORT_REQ
 \- used to abort an association
+.\"
+.\"
 .SH SYNOPSIS
 .PP
 .B #include <xap.h>
@@ -106,8 +110,8 @@ The
 .B A_ABORT_REQ
 primitive is used in conjunction with
 .BR ap_snd (3)
-and the XAP Library environment to request the abnormal release of an
-assocation.
+and the APLI/XAP Library environment to request the abnormal release of an
+association.
 .PP
 See
 .BR ap_snd (3)
@@ -122,13 +126,14 @@ primitive, the arguments to
 must be set as described below:
 .\"
 .\"
-.SH ARGMENTS
-.TP
+.SH ARGUMENTS
+.PP
+.TP \w'\fIaperrno_p\fP\(em'u
 .I fd
-This argument identifies the XAP Library instance being used.
+This argument identifies the APLI/XAP Library instance being used.
 .TP
 .I sptype
-This argumnet must be set to
+This argument must be set to
 .BR AP_A_ABORT_REQ .
 .TP
 .I cdata
@@ -136,11 +141,18 @@ The following members of
 .I cdata
 are used for this primitive:
 .RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long udata_length;  /* length of user information */
+\s+1\fP
+.fi
 .TP
 .I udata_length
 The length of user-information field of the APDU.
 .RE
-.sp
+.PP
 Where this primitive is to be sent using a series of calls to
 .BR ap_snd (3)
 with the
@@ -148,15 +160,16 @@ with the
 flag set,
 .I cdata->udata_length
 should be set to the total number of octets of encoded user data that will be
-sent with this primtimive.  If the total number of octets of encoded user data
-is not known this filed may be set to -1.  However, in some XAP
+sent with this primitive.  If the total number of octets of encoded user data
+is not known this filed may be set to -1.  However, in some APLI/XAP
 implementations setting this field to -1 may significantly degrade performance
 as it requires the implementation to buffer data until a complete SPDU can be
 transmitted.
-.sp
+.PP
 The total number of octets of encoded user data that can be sent with this
-primtiive may be subject to an implementation dependent restriction.  Any such
+primitive may be subject to an implementation dependent restriction.  Any such
 restriction will be stated in the CSQ for an implementation.
+.RE
 .TP
 .I ubuf
 Use of the
@@ -167,53 +180,146 @@ argument is described in the manual page for
 .I flags
 The
 .I flags
-arguemnt is used to control certain aspects of primitive processing as defined
+argument is used to control certain aspects of primitive processing as defined
 in the manual page for
 .BR ap_snd (3).
 .TP
 .I aperrno_p
-This must point to a location which iwill be set to an error code if a failure
+This must point to a location which will be set to an error code if a failure
 occurs.
 .\"
 .\"
-.SH RULES
+.SH MODES
 .PP
+This primitive is valid both in
+.RI \(lq Normal \(rq
+and
+.RI \(lq X.410-1984 \(rq
+mode.
+.[
+x410 1984
+.]
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is originated by the APLI/XAP interface client.
+.\"
+.\"
+.SH STATE
+.PP
+This primitive is valid in all states except
+.BR AP_UNBOUND " and
+.BR AP_IDLE .
+.PP
+The next state is
+.BR AP_IDLE .
 .\"
 .\"
 .SH RETURN
 .PP
 Refer to the manual page for
-.BR ap_snd (3).
+.BR ap_snd (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
 .\"
 .\"
 .SH ERRORS
 .PP
 Refer to the manual page for
-.BR ap_snd (3).
+.BR ap_snd (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
 .\"
 .\"
-.SH MODES
-.PP
-.\"
-.\"
-.SH ORIGINATOR
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR ap_snd (3),
+.BR APLI (3),
+.BR XAP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B A_ABORT_REQ
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B A_ABORT_REQ
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI and XAP, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR XAP (3)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.B A_ABORT_REQ
+first appeared in APLI.
+.[
+apli unix international
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI/XAP Library under the OpenSS7
+Project.
 .\"
 .\"
 .[

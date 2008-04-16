@@ -101,6 +101,10 @@ sort-adjacent-labels
 .B APLI
 is an ACSE/Presentation Layer Interface originally developed by UNIX Systems Laboratories and later
 standardized by X/Open, IEEE and ISO.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
 The ACSE/Presentation Layer Interface (APLI) provides a standard interface between an application
 entity (as defined by the OSI reference model) and the services provided by ACSE
 .[
@@ -112,10 +116,6 @@ Presentation Layer
 x216
 .]
 of the OSI protocol stack.
-.\"
-.\"
-.SH DESCRIPTION
-.PP
 .\"
 .\"
 .SH FUNCTIONS
@@ -433,20 +433,20 @@ the ACSE/Presentation service provider and used to attempt the transport connect
 OpenSS7 implements both the older-style APLI Library and the newer XAP Library.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
-.SH DRIVERS
-.PP
+.\".SH DRIVERS
+.\".PP
 .\"
 .\"
-.SH MODULES
-.PP
+.\".SH MODULES
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
 .SH BUGS
@@ -454,8 +454,8 @@ OpenSS7 implements both the older-style APLI Library and the newer XAP Library.
 The OpenSS7 APLI Library has no known bugs.
 .\"
 .\"
-.SH SEE ALSO
-.PP
+.\".SH SEE ALSO
+.\".PP
 .\"
 .\"
 .SH COMPATIBILITY
@@ -477,8 +477,8 @@ and
 functions.
 .\"
 .\"
-.SH CONFORMANCE
-.PP
+.\".SH CONFORMANCE
+.\".PP
 .\"
 .\"
 .SH HISTORY

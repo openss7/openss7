@@ -248,8 +248,14 @@ APLI UNIX International October 25, 1990
 .]
 and implementation based on APLI such as
 .IR "Solaris\(rg SunLink OSI" ,
+.[
+sunlink-apli
+.]
 .IR "Solaris\(rg Solstice OSI" ,
 .IR "HP OSI Transport Services/9000 (OTS/9000)" ,
+.[
+hpuxapli
+.]
 .IR "SVR 4.2 Open Network Services (ONS)" ,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u

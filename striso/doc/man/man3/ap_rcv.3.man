@@ -1,4 +1,87 @@
-
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.\"
+.\"
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_RCV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ap_rcv
+\- receive
 .\"
 .\"
 .SH INTERFACE
@@ -18,3 +101,520 @@ xap c303
 .PP
 .BR libapli (3),
 .BR libxap (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.BI "int ap_rcv(int " fd ", unsigned long *" sptype ", ap_cdata_t *" cdata ", ap_osi_vbuf_t **" ubuf ", int *" flags ", unsigned long *" aperrno_p );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+.TP
+.I sptype
+.TP
+.I cdata
+.TP
+.I ubuf
+.TP
+.I flags
+.TP
+.I aperrno_p
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to receive and indication or confirm primitive.
+.I fd
+identifies the XAP instance for which the user wishes to receive primitives.
+.PP
+When
+.BR ap_rcv ()
+is called,
+.I sptype
+must point to an
+.BR "unsinged long" ,
+and
+.I cdata
+must point to an
+.B ap_cdata_t
+structure.
+.PP
+Upon return, the value of the
+.B unsigned long
+pointed to by the
+.I sptype
+parameter will contain the symbolic constant defined in
+.RB < xap.h >
+that identifies the received primitive.  The symbolic constants are derived
+from the primitive anmes by prefixing the name with
+.BR AP_ .
+The table below lists the primitives that can be received using
+.BR ap_rcv ().
+The following information is provided in the table:
+.TP
+.B primitive
+The name of the primitive.
+.TP
+.B valid in states
+The states during which this primitive may be received (states are given as
+values of the
+.RB [ AP_STATE ]
+attribute).
+.TP
+.B must be set
+A list of XAP environment attributes that must be set to be able to receive
+this primitive (attributes marked with * have defaults).
+.sp
+Note that some attributes that had to be set to enter a state where this
+primitive is legal may not be listed.
+.TP
+.B may change
+A list of the attributes that may change as a result of receiving this
+primitive.
+.TP
+.B next state
+The state that will be entered upon receipt of this primitive (states are given
+as the value of the
+.RB [ AP_STATE ]
+attribute).
+.TS
+box center tab(:);
+cb|cb|cb.
+primitive:T{
+valid in states
+T}:T{
+next state
+T}
+_
+.T&
+l|l|l.
+A_ABORT_IND:T{
+.ad l
+.hy 0
+all except:
+AP_UNBOUND
+AP_IDLE
+T}:AP_IDLE
+_
+A_ASSOC_IND:AP_IDLE:AP_WASSOCrsp_ASSOCind
+_
+A_ASSOC_CNF:AP_WASSOCcnf_ASSOCreq:T{
+.ad l
+.hy 0
+(AP_IDLE, AP_DATA_XFER)
+T}
+_
+A_PABORT_IND:T{
+.ad l
+.hy 0
+all except: AP_UNBOUND, AP_IDLE
+T}:AP_IDLE
+_
+A_RELEASE_IND:AP_DATA_XFER:AP_WRELrsp_RELind
+:AP_WRELcnf_RELreq:T{
+.ad l
+.hy 0
+(AP_WRELrsp_RELind_init or AP_WRELcnf_RELreq_rsp)
+T}
+_
+A_RELEASE_CNF:AP_WRELcnf_RELreq:T{
+.ad l
+.hy 0
+(AP_IDLE or AP_DATA_XFER)
+T}
+:AP_WRELcnf_RELreq_rsp:AP_WRELrsp_RELind
+_
+P_ACTEND_IND:AP_DATA_XFER:AP_WACTErsp_ACTEind
+_
+P_ACTEND_CNF:AP_WACTEcnf_ACTEreq:AP_DATA_XFER
+_
+P_ACTDISCARD_IND:AP_WRESYNcnf_RESYNreq:AP_DATA_XFER
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+:AP_WRECOVERYind
+:AP_WRECOVERYreq
+:AP_DATA_XFER
+_
+P_ACTDISCARD_CNF:AP_WACTDcnf_ACTDreq:AP_DATA_XFER
+_
+P_ACTINTR_IND:AP_WRESYNcnf_RESYNreq:AP_WACTIrsp_ACTIind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+:AP_WRECOVERYind
+:AP_WRECOVERYreq
+:AP_DATA_XFER
+_
+P_ACTINTR_CNF:AP_WACTIcnf_ACTIreq:AP_DATA_XFER
+_
+P_ACTRESUME_IND:AP_DATA_XFER:no state change
+_
+P_ACTSTART_IND:AP_DATA_XFER:no state change
+_
+P_CDATA_IND:AP_DATA_XFER:AP_WCDATArsp_CDATAind
+_
+P_CDATA_CNF:AP_WCDATAcnf_CDATAreq:AP_DATA_XFER
+_
+P_CTRLGIVE_IND:AP_DATA_XFER:no state change
+_
+P_DATA_IND:AP_DATA_XFER:no state change
+:AP_WRELcnf_RELreq
+:AP_WSYNCMAcnf_SYNCMAreq
+:AP_WACTEcnf_ACTEreq
+_
+P_PXREPORT_IND:AP_WRELcnf_RELreq:AP_WRECOVERYreq
+:AP_WSYNCMAcnf_SYNCMAreq:T{
+.ad l
+.hy 0
+(AP_WRECOVERYreq or AP_DATA_XFER)
+T}
+:AP_WACTEcnf_ACTEreq:T{
+.ad l
+.hy 0
+(AP_WRECOVERYreq or AP_DATA_XFER)
+T}
+:AP_WRECOVERYind:no state change
+:AP_WCDATAcnf_CDATAreq:AP_WRECOVERYreq
+:AP_DATA_XFER:T{
+.ad l
+.hy 0
+(AP_WRECOVERYreq or AP_DATA_XFER)
+T}
+_
+P_RESYNC_IND:AP_DATA_XFER:AP_WRESYNrsp_RESYNind
+:AP_WRESYNcnf_RESYNreq
+:AP_WRELcnf_RELreq
+:AP_WSYNCMAcnf_SYNCMAreq
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTEcnf_ACTEreq
+:AP_WRECOVERYind
+:AP_WRECOVERYreq
+_
+P_RESYNC_CNF:AP_WRESYNcnf_RESYNreq:AP_DATA_XFER
+_
+P_SYNCMAJOR_IND:AP_DATA_XFER:AP_WSYNCMArsp_SYNCMAind
+_
+P_SYNCMAJOR_CNF:AP_WSYNCMAcnf_SYNCMAreq:AP_DATA_XFER
+_
+P_SYNCMINOR_IND:AP_DATA_XFER:no state change
+_
+P_SYNCMINOR_CNF:AP_DATA_XFER:no state change
+:AP_WRELcnf_RELreq
+:AP_WSYNCMAcnf_SYNCMAreq
+:AP_WACTEcnf_ACTEreq
+_
+P_TDATA_IND:AP_DATA_XFER:no state change
+:AP_WRELcnf_RELreq
+:AP_WSYNCMAcnf_SYNCMAreq
+:AP_WACTEcnf_ACTEreq
+_
+P_TOKENGIVE_IND:AP_DATA_XFER:no state change
+:AP_WSYNCMAcnf_SYNCMAreq:no state change
+:AP_WACTEcnf_ACTEreq:no state change
+:AP_WSYNCMArsp_SYNCMAind:no state change
+:AP_WACTErsp_ACTEind:no state change
+:AP_WRECOVERYind:T{
+.ad l
+.hy 0
+(no state change or AP_DATA_XFER)
+T}
+:AP_WRECOVERYreq:T{
+.ad l
+.hy 0
+(no state change or AP_DATA_XFER)
+T}
+:AP_WCDATAcnf_CDATAreq:no state change
+_
+P_TOKENPLEASE_IND:AP_DATA_XFER:T{
+.ad l
+.hy 0
+no state change
+T}
+:AP_WRELcnf_RELreq
+:AP_WSYNCMAcnf_SYNCMAreq
+:AP_WACTEcnf_ACTEreq
+:AP_WCDATAcnf_CDATAreq
+_
+P_UXREPORT_IND:AP_WRELcnf_RELreq:AP_WRECOVERYreq
+:AP_WSYNCMAcnf_SYNCMAreq:T{
+.ad l
+.hy 0
+(AP_WRECOVERYreq or AP_DATA_XFER)
+T}
+:AP_WACTEcnf_ACTEreq:T{
+.ad l
+.hy 0
+(AP_WRECOVERYreq or AP_DATA_XFER)
+T}
+:AP_WRECOVERYind:T{
+.ad l
+.hy 0
+no state change
+T}
+:AP_DATA_XFER:T{
+.ad l
+.hy 0
+(AP_WRECOVERYreq or AP_DATA_XFER)
+T}
+_
+P_XDATA_IND:AP_DATA_XFER:no state change
+:AP_WRELcnf_RELreq
+:AP_WSYNCMAcnf_SYNCMAreq
+:AP_WACTEcnf_ACTEreq
+.TE
+.TS
+box center tab(:);
+cb|cb|cb.
+primitive:T{
+must be set
+T}:T{
+may change
+T}
+_
+.T&
+l|l|l.
+A_ABORT_IND:none:AP_STATE
+_
+A_ASSOC_IND:T{
+.ad l
+.hy 0
+AP_BIND_PADDR
+AP_LIB_SEL
+T}:T{
+.ad l
+.hy 0
+AP_ACSE_SEL
+AP_CLD_AEID
+AP_CLD_AEQ
+AP_CLD_APID
+AP_CLD_APT
+AP_CLG_AEID
+AP_CLG_AEQ
+AP_CLG_APID
+AP_CLG_APT
+AP_CNTX_NAME
+AP_DCS
+AP_DPCN
+AP_INIT_SYNC_PT
+AP_INIT_TOKENS
+AP_LCL_PADDR
+AP_MODE_SEL
+AP_PCDL
+AP_PFU_SEL
+AP_PRES_SEL
+AP_QOS
+AP_REM_PADDR
+AP_ROLE_CURRENT
+AP_SESS_SEL
+AP_SFU_SEL
+AP_STATE
+AP_TOKENS_AVAIL
+AP_TOKENS_OWNED
+T}
+_
+A_ASSOC_CNF:none:T{
+.ad l
+.hy 0
+AP_ACSE_SEL
+AP_AFU_SEL
+AP_CNTX_NAME
+AP_DCS
+AP_INIT_SYNC_PT
+AP_INIT_TOKENS
+AP_PFU_SEL
+AP_PCDRL
+AP_PRES_SEL
+AP_QOS
+AP_REM_PADDR
+AP_SESS_SEL
+AP_SFU_SEL
+AP_STATE
+AP_TOKENS_AVAIL
+AP_TOKENS_OWNED
+T}
+_
+A_PABORT_IND:none:AP_STATE
+_
+A_RELEASE_IND:none:AP_STATE
+_
+A_RELEASE_CNF:none:AP_STATE
+_
+P_ACTEND_IND:none:AP_STATE
+_
+P_ACTEND_CNF:none:AP_STATE
+_
+P_ACTDISCARD_IND:none:AP_STATE
+_
+P_ACTDISCARD_CNF:none:AP_STATE
+::AP_TOKENS_OWNED
+_
+P_ACTINTR_IND:none:AP_STATE
+_
+P_ACTINTR_CNF:none:AP_STATE
+::AP_TOKENS_OWNED
+_
+P_ACTRESUME_IND:none:none
+_
+P_ACTSTART_IND:none:none
+_
+P_CDATA_IND:none:none
+_
+P_CDATA_CNF:none:none
+_
+P_CTRLGIVE_IND:none:AP_TOKENS_OWNED
+_
+P_DATA_IND:none:none
+_
+P_PXREPORT_IND:none:AP_STATE
+P_RESYNC_IND:none:AP_STATE
+_
+P_RESYNC_CNF:none:AP_STATE
+::AP_TOKENS_OWNED
+_
+P_SYNCMAJOR_IND:none:AP_STATE
+_
+P_SYNCMAJOR_CNF:none:AP_STATE
+_
+P_SYNCMINOR_IND:none:none
+_
+P_SYNCMINOR_CNF:none:none
+_
+P_TDATA_IND:none:none
+_
+P_TOKENGIVE_IND:none:AP_STATE
+::AP_TOKENS_OWNED
+_
+P_TOKENPLEASE_IND:none:none
+_
+P_UXREPORT_IND:none:AP_STATE
+_
+P_XDATA_IND:none:none
+.TE
+.PP
+Protocol information received with a primitive will be conveyed by the
+.B ap_cdata_t
+structure pointed to by
+.IR cdata .
+The value returned in
+.I sptype
+serves as the discriminant for what members of the
+.I cdata
+are affected.
+.PP
+User-data received with a primiitve will be returned to the user via the
+.I ubuf
+parameter.  The XAP interface supports a vectored buffering scheme for handling
+user data.  All data buffers are passed to XAP by the user in a chain of one or
+more
+.B ap_osi_vbuf_t
+and
+.B ap_osi_dbuf_t
+pairs.
+.I ubuf
+must point to a location holding a pointer to an
+.B ap_osi_vbuf_t
+structure, defined as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    unsigned char *db_base;    /* beginning of buffer */
+    unsigned char *db_lim;     /* last octet+1 of buffer */
+    unsigned char db_ref;      /* reference count */
+} ap_osi_dbuf_t;
+
+typedef struct ap_osi_vbuf {
+    ap_osi_vbuf_t *b_cont;     /* next message block */
+    unsigned char *b_rptr;     /* 1st octet of data */
+    unsigned char *b_wptr;     /* 1st free location */
+    ap_os_dbuf_t  *b_datap;    /* data block */
+} ap_osi_dbuf_t;
+\s+1\fP
+.fi
+.PP
+User-data associated with XAP primitives is returned in a linked list of
+message blocks.  Each message block is represented by an
+.B ap_osi_vbuf_t
+structure and is associatedw ith a datablock.  Data blocks, which are
+represented by
+.B ap_osi_dbuf_t
+structures, may be associated with more than one message block.  The
+.I db_ref
+field of the
+.B ap_osi_dbuf_t
+structure indicates the number of
+.B ap_osi_vbuf_t
+structure that reference a particular data block.  The
+.I db_base
+and
+.I db_lim
+files of the
+.B ap_osi_dbuf_t
+structure point to the beginning and end of the data block respectively.  The
+.I b_rptr
+and
+.I b_wptr
+fields of the referencing
+.B ap_osi_vbuf_t
+structures point to the first octet to be read and written within the data
+block respectively.  The
+.I b_cont
+field of the
+.B ap_osi_vbuf_t
+points to the next message block in the chain or is
+.B NULL
+if this is the end of the list.
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+.\"
+.\"
+.SH ERRORS
+.PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSIONS
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

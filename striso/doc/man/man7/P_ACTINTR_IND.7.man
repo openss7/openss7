@@ -1,0 +1,275 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH P_ACTINTR_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "ACSE/Presentation Library Interface (APLI)"
+.\"
+.\"
+.SH NAME
+.B P_ACTINTR_IND
+\- 
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap.h>
+.HP
+.B int ap_rcv(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long *" sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t **" ubuf ,
+.br
+.BI "int *" flags ,
+.br
+.BI "unsigned long *" aperrno_p );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+This argument, returned from a call to
+.BR ap_open (3),
+identifies the APLI or XAP Library instance being used.
+.TP
+.I sptype
+The
+.B unsinged long
+pointed to by this argument will be set to
+.BR AP_P_ACTINTR_IND .
+.TP
+.I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.TP
+.I ubuf
+Use of the
+.I ubuf
+argument is described in the manual page for
+.BR ap_rcv (3).
+.TP
+.I flags
+The
+.I flags
+argument is used to control certain aspects of primitive processing as
+described in the manual page for
+.BR ap_rcv (3).
+.TP
+.I aperrno_p
+The location pointed to by the
+.I aperrno_p
+argument is set to an error code if failure has occurred.
+.\"
+.\"
+.SH MODES
+.PP
+This primitive is valid both in
+.RI \(lq Normal \(rq
+and
+.RI \(lq X.410-1984 \(rq
+mode.
+.[
+x410 1984
+.]
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is issued by the XAP interface service.
+.\"
+.\"
+.SH STATE
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced APLI
+.[
+apli unix international
+.]
+or XAP
+.[
+xap c303
+.]
+specifications.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_rcv (3),
+.BR APLI (3),
+.BR XAP (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.B P_ACTINTR_IND
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B P_ACTINTR_IND
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI and XAP, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR XAP (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B P_ACTINTR_IND
+first appeared in APLI.
+.[
+apli unix international
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI/XAP Library under the OpenSS7 Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

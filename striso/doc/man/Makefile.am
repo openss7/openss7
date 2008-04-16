@@ -64,6 +64,18 @@ MANS_UNUSED = \
 	man5/striso.5
 
 man_MANS = \
+	man3/apli_close.3 \
+	man3/apli_env.3 \
+	man3/apli_errno.3 \
+	man3/apli_error.3 \
+	man3/apli_free.3 \
+	man3/apli_get_env.3 \
+	man3/apli_init_env.3 \
+	man3/apli_open.3 \
+	man3/apli_poll.3 \
+	man3/apli_rcv.3 \
+	man3/apli_set_env.3 \
+	man3/apli_snd.3 \
 	man3/ap_bind.3 \
 	man3/ap_close.3 \
 	man3/ap_error.3 \
@@ -100,7 +112,6 @@ man_MANS = \
 	man3/getnsapbyname.3 \
 	man3/gettselbyname.3 \
 	man3/mp_abandon.3 \
-	man3/mp_abort.3 \
 	man3/mp_abort_req.3 \
 	man3/mp_action_req.3 \
 	man3/mp_action_rsp.3 \
@@ -132,6 +143,9 @@ man_MANS = \
 	man3/mp_unbind.3 \
 	man3/mp_validate_object.3 \
 	man3/mp_wait.3 \
+	man3/MS_feature.3 \
+	man3/MS_invoke_id.3 \
+	man3/MS_status.3 \
 	man3/ms_bind.3 \
 	man3/ms_cancel_submission.3 \
 	man3/ms_check_alert.3 \
@@ -163,6 +177,7 @@ man_MANS = \
 	man3/tsap2net.3 \
 	man3/apli.3 \
 	man3/APLI.3 \
+	man3/libosi.3 \
 	man3/osi.3 \
 	man3/OSI.3 \
 	man3/XAP-ROSE.3 \
@@ -205,11 +220,179 @@ man_MANS = \
 	man4/xol.4 \
 	man4/xot.4 \
 	man5/striso.5 \
+	man7/A_ABORT_IND.7 \
+	man7/A_ABORT_REQ.7 \
+	man7/A_ASSOC_CNF.7 \
+	man7/A_ASSOC_IND.7 \
+	man7/A_ASSOC_REQ.7 \
+	man7/A_ASSOC_RSP.7 \
+	man7/ACSE.7 \
+	man7/A_PABORT_IND.7 \
+	man7/A_PABORT_REQ.7 \
+	man7/A_RELEASE_CNF.7 \
+	man7/A_RELEASE_IND.7 \
+	man7/A_RELEASE_REQ.7 \
+	man7/A_RELEASE_RSP.7 \
+	man7/dlpi_lapb.7 \
 	man7/npi_osi.7 \
+	man7/P_ACTDISCARD_CNF.7 \
+	man7/P_ACTDISCARD_IND.7 \
+	man7/P_ACTDISCARD_REQ.7 \
+	man7/P_ACTDISCARD_RSP.7 \
+	man7/P_ACTEND_CNF.7 \
+	man7/P_ACTEND_IND.7 \
+	man7/P_ACTEND_REQ.7 \
+	man7/P_ACTEND_RSP.7 \
+	man7/P_ACTINTR_CNF.7 \
+	man7/P_ACTINTR_IND.7 \
+	man7/P_ACTINTR_REQ.7 \
+	man7/P_ACTINTR_RSP.7 \
+	man7/P_ACTRESUME_IND.7 \
+	man7/P_ACTRESUME_REQ.7 \
+	man7/P_ACTSTART_IND.7 \
+	man7/P_ACTSTART_REQ.7 \
+	man7/P_CDATA_CNF.7 \
+	man7/P_CDATA_IND.7 \
+	man7/P_CDATA_REQ.7 \
+	man7/P_CDATA_RSP.7 \
+	man7/P_CTRLGIVE_IND.7 \
+	man7/P_CTRLGIVE_REQ.7 \
+	man7/P_DATA_IND.7 \
+	man7/P_DATA_REQ.7 \
+	man7/PPI.7 \
+	man7/P_PXREPORT_IND.7 \
+	man7/P_RESYNC_CNF.7 \
+	man7/P_RESYNC_IND.7 \
+	man7/P_RESYNC_REQ.7 \
+	man7/P_RESYNC_RSP.7 \
+	man7/P_SYNCMAJOR_CNF.7 \
+	man7/P_SYNCMAJOR_IND.7 \
+	man7/P_SYNCMAJOR_REQ.7 \
+	man7/P_SYNCMAJOR_RSP.7 \
+	man7/P_SYNCMINOR_CNF.7 \
+	man7/P_SYNCMINOR_IND.7 \
+	man7/P_SYNCMINOR_REQ.7 \
+	man7/P_SYNCMINOR_RSP.7 \
+	man7/P_TDATA_IND.7 \
+	man7/P_TDATA_REQ.7 \
+	man7/P_TOKENGIVE_IND.7 \
+	man7/P_TOKENGIVE_REQ.7 \
+	man7/P_TOKENPLEASE_IND.7 \
+	man7/P_TOKENPLEASE_REQ.7 \
+	man7/P_UXREPORT_IND.7 \
+	man7/P_UXREPORT_REQ.7 \
+	man7/P_XDATA_IND.7 \
+	man7/P_XDATA_REQ.7 \
+	man7/RO_BIND_CNF.7 \
+	man7/RO_BIND_IND.7 \
+	man7/RO_BIND_REQ.7 \
+	man7/RO_BIND_RSP.7 \
+	man7/RO_ERROR_IND.7 \
+	man7/RO_ERROR_REQ.7 \
+	man7/RO_INVOKE_IND.7 \
+	man7/RO_INVOKE_REQ.7 \
+	man7/RO_REJECTP_IND.7 \
+	man7/RO_REJECTU_IND.7 \
+	man7/RO_REJECTU_REQ.7 \
+	man7/RO_RESULT_IND.7 \
+	man7/RO_RESULT_REQ.7 \
+	man7/RO_UNBIND_CNF.7 \
+	man7/RO_UNBIND_IND.7 \
+	man7/RO_UNBIND_REQ.7 \
+	man7/RO_UNBIND_RSP.7 \
+	man7/AP_A_ABORT_IND.7 \
+	man7/AP_A_ABORT_REQ.7 \
+	man7/AP_A_ASSOC_CNF.7 \
+	man7/AP_A_ASSOC_IND.7 \
+	man7/AP_A_ASSOC_REQ.7 \
+	man7/AP_A_ASSOC_RSP.7 \
+	man7/AP_A_PABORT_IND.7 \
+	man7/AP_A_PABORT_REQ.7 \
+	man7/AP_A_RELEASE_CNF.7 \
+	man7/AP_A_RELEASE_IND.7 \
+	man7/AP_A_RELEASE_REQ.7 \
+	man7/AP_A_RELEASE_RSP.7 \
+	man7/AP_P_ACTDISCARD_CNF.7 \
+	man7/AP_P_ACTDISCARD_IND.7 \
+	man7/AP_P_ACTDISCARD_REQ.7 \
+	man7/AP_P_ACTDISCARD_RSP.7 \
+	man7/AP_P_ACTEND_CNF.7 \
+	man7/AP_P_ACTEND_IND.7 \
+	man7/AP_P_ACTEND_REQ.7 \
+	man7/AP_P_ACTEND_RSP.7 \
+	man7/AP_P_ACTINTR_CNF.7 \
+	man7/AP_P_ACTINTR_IND.7 \
+	man7/AP_P_ACTINTR_REQ.7 \
+	man7/AP_P_ACTINTR_RSP.7 \
+	man7/AP_P_ACTRESUME_IND.7 \
+	man7/AP_P_ACTRESUME_REQ.7 \
+	man7/AP_P_ACTSTART_IND.7 \
+	man7/AP_P_ACTSTART_REQ.7 \
+	man7/AP_P_CDATA_CNF.7 \
+	man7/AP_P_CDATA_IND.7 \
+	man7/AP_P_CDATA_REQ.7 \
+	man7/AP_P_CDATA_RSP.7 \
+	man7/AP_P_CTRLGIVE_IND.7 \
+	man7/AP_P_CTRLGIVE_REQ.7 \
+	man7/AP_P_DATA_IND.7 \
+	man7/AP_P_DATA_REQ.7 \
+	man7/AP_P_PXREPORT_IND.7 \
+	man7/AP_P_RESYNC_CNF.7 \
+	man7/AP_P_RESYNC_IND.7 \
+	man7/AP_P_RESYNC_REQ.7 \
+	man7/AP_P_RESYNC_RSP.7 \
+	man7/AP_P_SYNCMAJOR_CNF.7 \
+	man7/AP_P_SYNCMAJOR_IND.7 \
+	man7/AP_P_SYNCMAJOR_REQ.7 \
+	man7/AP_P_SYNCMAJOR_RSP.7 \
+	man7/AP_P_SYNCMINOR_CNF.7 \
+	man7/AP_P_SYNCMINOR_IND.7 \
+	man7/AP_P_SYNCMINOR_REQ.7 \
+	man7/AP_P_SYNCMINOR_RSP.7 \
+	man7/AP_P_TDATA_IND.7 \
+	man7/AP_P_TDATA_REQ.7 \
+	man7/AP_P_TOKENGIVE_IND.7 \
+	man7/AP_P_TOKENGIVE_REQ.7 \
+	man7/AP_P_TOKENPLEASE_IND.7 \
+	man7/AP_P_TOKENPLEASE_REQ.7 \
+	man7/AP_P_UXREPORT_IND.7 \
+	man7/AP_P_UXREPORT_REQ.7 \
+	man7/AP_P_XDATA_IND.7 \
+	man7/AP_P_XDATA_REQ.7 \
+	man7/AP_RO_BIND_CNF.7 \
+	man7/AP_RO_BIND_IND.7 \
+	man7/AP_RO_BIND_REQ.7 \
+	man7/AP_RO_BIND_RSP.7 \
+	man7/AP_RO_ERROR_IND.7 \
+	man7/AP_RO_ERROR_REQ.7 \
+	man7/AP_RO_INVOKE_IND.7 \
+	man7/AP_RO_INVOKE_REQ.7 \
+	man7/AP_RO_REJECTP_IND.7 \
+	man7/AP_RO_REJECTU_IND.7 \
+	man7/AP_RO_REJECTU_REQ.7 \
+	man7/AP_RO_RESULT_IND.7 \
+	man7/AP_RO_RESULT_REQ.7 \
+	man7/AP_RO_UNBIND_CNF.7 \
+	man7/AP_RO_UNBIND_IND.7 \
+	man7/AP_RO_UNBIND_REQ.7 \
+	man7/AP_RO_UNBIND_RSP.7 \
+	man7/ROSE.7 \
 	man8/gdmo.8 \
 	man8/striso_mknod.8
 
 dist_noinst_MANS = \
+	man3/apli_close.3.man \
+	man3/apli_env.3.man \
+	man3/apli_errno.3.man \
+	man3/apli_error.3.man \
+	man3/apli_free.3.man \
+	man3/apli_get_env.3.man \
+	man3/apli_init_env.3.man \
+	man3/apli_open.3.man \
+	man3/apli_poll.3.man \
+	man3/apli_rcv.3.man \
+	man3/apli_set_env.3.man \
+	man3/apli_snd.3.man \
 	man3/ap_bind.3.man \
 	man3/ap_close.3.man \
 	man3/ap_error.3.man \
@@ -246,7 +429,6 @@ dist_noinst_MANS = \
 	man3/getnsapbyname.3.man \
 	man3/gettselbyname.3.man \
 	man3/mp_abandon.3.man \
-	man3/mp_abort.3.man \
 	man3/mp_abort_req.3.man \
 	man3/mp_action_req.3.man \
 	man3/mp_action_rsp.3.man \
@@ -278,6 +460,9 @@ dist_noinst_MANS = \
 	man3/mp_unbind.3.man \
 	man3/mp_validate_object.3.man \
 	man3/mp_wait.3.man \
+	man3/MS_feature.3.man \
+	man3/MS_invoke_id.3.man \
+	man3/MS_status.3.man \
 	man3/ms_bind.3.man \
 	man3/ms_cancel_submission.3.man \
 	man3/ms_check_alert.3.man \
@@ -309,6 +494,7 @@ dist_noinst_MANS = \
 	man3/tsap2net.3.man \
 	man3/apli.3.man \
 	man3/APLI.3.man \
+	man3/libosi.3.man \
 	man3/osi.3.man \
 	man3/OSI.3.man \
 	man3/XAP-ROSE.3.man \
@@ -351,7 +537,163 @@ dist_noinst_MANS = \
 	man4/xol.4.man \
 	man4/xot.4.man \
 	man5/striso.5.man \
+	man7/A_ABORT_IND.7.man \
+	man7/A_ABORT_REQ.7.man \
+	man7/A_ASSOC_CNF.7.man \
+	man7/A_ASSOC_IND.7.man \
+	man7/A_ASSOC_REQ.7.man \
+	man7/A_ASSOC_RSP.7.man \
+	man7/ACSE.7.man \
+	man7/A_PABORT_IND.7.man \
+	man7/A_PABORT_REQ.7.man \
+	man7/A_RELEASE_CNF.7.man \
+	man7/A_RELEASE_IND.7.man \
+	man7/A_RELEASE_REQ.7.man \
+	man7/A_RELEASE_RSP.7.man \
+	man7/dlpi_lapb.7.man \
 	man7/npi_osi.7.man \
+	man7/P_ACTDISCARD_CNF.7.man \
+	man7/P_ACTDISCARD_IND.7.man \
+	man7/P_ACTDISCARD_REQ.7.man \
+	man7/P_ACTDISCARD_RSP.7.man \
+	man7/P_ACTEND_CNF.7.man \
+	man7/P_ACTEND_IND.7.man \
+	man7/P_ACTEND_REQ.7.man \
+	man7/P_ACTEND_RSP.7.man \
+	man7/P_ACTINTR_CNF.7.man \
+	man7/P_ACTINTR_IND.7.man \
+	man7/P_ACTINTR_REQ.7.man \
+	man7/P_ACTINTR_RSP.7.man \
+	man7/P_ACTRESUME_IND.7.man \
+	man7/P_ACTRESUME_REQ.7.man \
+	man7/P_ACTSTART_IND.7.man \
+	man7/P_ACTSTART_REQ.7.man \
+	man7/P_CDATA_CNF.7.man \
+	man7/P_CDATA_IND.7.man \
+	man7/P_CDATA_REQ.7.man \
+	man7/P_CDATA_RSP.7.man \
+	man7/P_CTRLGIVE_IND.7.man \
+	man7/P_CTRLGIVE_REQ.7.man \
+	man7/P_DATA_IND.7.man \
+	man7/P_DATA_REQ.7.man \
+	man7/PPI.7.man \
+	man7/P_PXREPORT_IND.7.man \
+	man7/P_RESYNC_CNF.7.man \
+	man7/P_RESYNC_IND.7.man \
+	man7/P_RESYNC_REQ.7.man \
+	man7/P_RESYNC_RSP.7.man \
+	man7/P_SYNCMAJOR_CNF.7.man \
+	man7/P_SYNCMAJOR_IND.7.man \
+	man7/P_SYNCMAJOR_REQ.7.man \
+	man7/P_SYNCMAJOR_RSP.7.man \
+	man7/P_SYNCMINOR_CNF.7.man \
+	man7/P_SYNCMINOR_IND.7.man \
+	man7/P_SYNCMINOR_REQ.7.man \
+	man7/P_SYNCMINOR_RSP.7.man \
+	man7/P_TDATA_IND.7.man \
+	man7/P_TDATA_REQ.7.man \
+	man7/P_TOKENGIVE_IND.7.man \
+	man7/P_TOKENGIVE_REQ.7.man \
+	man7/P_TOKENPLEASE_IND.7.man \
+	man7/P_TOKENPLEASE_REQ.7.man \
+	man7/P_UXREPORT_IND.7.man \
+	man7/P_UXREPORT_REQ.7.man \
+	man7/P_XDATA_IND.7.man \
+	man7/P_XDATA_REQ.7.man \
+	man7/RO_BIND_CNF.7.man \
+	man7/RO_BIND_IND.7.man \
+	man7/RO_BIND_REQ.7.man \
+	man7/RO_BIND_RSP.7.man \
+	man7/RO_ERROR_IND.7.man \
+	man7/RO_ERROR_REQ.7.man \
+	man7/RO_INVOKE_IND.7.man \
+	man7/RO_INVOKE_REQ.7.man \
+	man7/RO_REJECTP_IND.7.man \
+	man7/RO_REJECTU_IND.7.man \
+	man7/RO_REJECTU_REQ.7.man \
+	man7/RO_RESULT_IND.7.man \
+	man7/RO_RESULT_REQ.7.man \
+	man7/RO_UNBIND_CNF.7.man \
+	man7/RO_UNBIND_IND.7.man \
+	man7/RO_UNBIND_REQ.7.man \
+	man7/RO_UNBIND_RSP.7.man \
+	man7/AP_A_ABORT_IND.7.man \
+	man7/AP_A_ABORT_REQ.7.man \
+	man7/AP_A_ASSOC_CNF.7.man \
+	man7/AP_A_ASSOC_IND.7.man \
+	man7/AP_A_ASSOC_REQ.7.man \
+	man7/AP_A_ASSOC_RSP.7.man \
+	man7/AP_A_PABORT_IND.7.man \
+	man7/AP_A_PABORT_REQ.7.man \
+	man7/AP_A_RELEASE_CNF.7.man \
+	man7/AP_A_RELEASE_IND.7.man \
+	man7/AP_A_RELEASE_REQ.7.man \
+	man7/AP_A_RELEASE_RSP.7.man \
+	man7/AP_P_ACTDISCARD_CNF.7.man \
+	man7/AP_P_ACTDISCARD_IND.7.man \
+	man7/AP_P_ACTDISCARD_REQ.7.man \
+	man7/AP_P_ACTDISCARD_RSP.7.man \
+	man7/AP_P_ACTEND_CNF.7.man \
+	man7/AP_P_ACTEND_IND.7.man \
+	man7/AP_P_ACTEND_REQ.7.man \
+	man7/AP_P_ACTEND_RSP.7.man \
+	man7/AP_P_ACTINTR_CNF.7.man \
+	man7/AP_P_ACTINTR_IND.7.man \
+	man7/AP_P_ACTINTR_REQ.7.man \
+	man7/AP_P_ACTINTR_RSP.7.man \
+	man7/AP_P_ACTRESUME_IND.7.man \
+	man7/AP_P_ACTRESUME_REQ.7.man \
+	man7/AP_P_ACTSTART_IND.7.man \
+	man7/AP_P_ACTSTART_REQ.7.man \
+	man7/AP_P_CDATA_CNF.7.man \
+	man7/AP_P_CDATA_IND.7.man \
+	man7/AP_P_CDATA_REQ.7.man \
+	man7/AP_P_CDATA_RSP.7.man \
+	man7/AP_P_CTRLGIVE_IND.7.man \
+	man7/AP_P_CTRLGIVE_REQ.7.man \
+	man7/AP_P_DATA_IND.7.man \
+	man7/AP_P_DATA_REQ.7.man \
+	man7/AP_P_PXREPORT_IND.7.man \
+	man7/AP_P_RESYNC_CNF.7.man \
+	man7/AP_P_RESYNC_IND.7.man \
+	man7/AP_P_RESYNC_REQ.7.man \
+	man7/AP_P_RESYNC_RSP.7.man \
+	man7/AP_P_SYNCMAJOR_CNF.7.man \
+	man7/AP_P_SYNCMAJOR_IND.7.man \
+	man7/AP_P_SYNCMAJOR_REQ.7.man \
+	man7/AP_P_SYNCMAJOR_RSP.7.man \
+	man7/AP_P_SYNCMINOR_CNF.7.man \
+	man7/AP_P_SYNCMINOR_IND.7.man \
+	man7/AP_P_SYNCMINOR_REQ.7.man \
+	man7/AP_P_SYNCMINOR_RSP.7.man \
+	man7/AP_P_TDATA_IND.7.man \
+	man7/AP_P_TDATA_REQ.7.man \
+	man7/AP_P_TOKENGIVE_IND.7.man \
+	man7/AP_P_TOKENGIVE_REQ.7.man \
+	man7/AP_P_TOKENPLEASE_IND.7.man \
+	man7/AP_P_TOKENPLEASE_REQ.7.man \
+	man7/AP_P_UXREPORT_IND.7.man \
+	man7/AP_P_UXREPORT_REQ.7.man \
+	man7/AP_P_XDATA_IND.7.man \
+	man7/AP_P_XDATA_REQ.7.man \
+	man7/AP_RO_BIND_CNF.7.man \
+	man7/AP_RO_BIND_IND.7.man \
+	man7/AP_RO_BIND_REQ.7.man \
+	man7/AP_RO_BIND_RSP.7.man \
+	man7/AP_RO_ERROR_IND.7.man \
+	man7/AP_RO_ERROR_REQ.7.man \
+	man7/AP_RO_INVOKE_IND.7.man \
+	man7/AP_RO_INVOKE_REQ.7.man \
+	man7/AP_RO_REJECTP_IND.7.man \
+	man7/AP_RO_REJECTU_IND.7.man \
+	man7/AP_RO_REJECTU_REQ.7.man \
+	man7/AP_RO_RESULT_IND.7.man \
+	man7/AP_RO_RESULT_REQ.7.man \
+	man7/AP_RO_UNBIND_CNF.7.man \
+	man7/AP_RO_UNBIND_IND.7.man \
+	man7/AP_RO_UNBIND_REQ.7.man \
+	man7/AP_RO_UNBIND_RSP.7.man \
+	man7/ROSE.7.man \
 	man8/gdmo.8.man \
 	man8/striso_mknod.8.man
 
