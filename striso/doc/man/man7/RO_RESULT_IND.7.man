@@ -1,0 +1,368 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=0
+.\"
+.\" @(#) $Id: RO_RESULT_IND.7.man,v 1.1.2.1 2008/04/16 17:21:08 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008/04/16 17:21:08 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: RO_RESULT_IND.7.man,v $
+.\" Revision 1.1.2.1  2008/04/16 17:21:08  brian
+.\" - added new manual pages
+.\"
+.\" Revision 0.9.2.1  2007/11/06 11:43:21  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_RO_RESULT_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "ASCE/Presentation ROSE Interface (XAP-ROSE)"
+.SH NAME
+.B AP_RO_RESULT_IND
+\- show receipt of positive results from a requested operation invocation
+.\"
+.\"
+.SH INTERFACE
+.PP
+XAP,
+.[
+XAP c303
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap_rose.h>
+.HP
+.BI "int ap_rcv(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long *" sptype ,
+.br
+.BI "ap_ro_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t **" ubuf ,
+.br
+.BI "int *" flags ,
+.br
+.BI "unsigned long *" aperrno_p ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIapperno_p\fP\(em'u
+.I fd
+a file descriptor associated with the XAP-ROSE instance as returned from
+.BR ap_open (3).
+.PD 0
+.TP
+.I sptype
+always AP_RO_RESULT_IND for this primitive.
+.TP
+.I cdata
+a pointer to the control data structure for the primitive.
+.TP
+.I ubuf
+a pointer to the user information for the primitive.
+.TP
+.I flags
+flags for the primitive.
+.TP
+.I aperrno_p
+a pointer to a memory extent into which to receive the diagnostic error code.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B AP_RO_RESULT_IND
+primitive is used with
+.BR ap_rcv (3)
+and the XAP-ROSE
+.[
+xap-rose
+.]
+environment to show the successful result of a competed remote operation.
+.[
+x219
+.]
+.[
+x229
+.]
+.TP \w'\fIapperno_p\fP\(em'u
+.I fd
+This integer value refers to the descriptor returned from a previous
+.BR ap_open (3)
+call.  It identifies the library instance that supports the association.
+.TP
+.I sptype
+The value pointed to by this argument will be set to
+.BR AP_RO_RESULT_IND .
+.TP
+.I cdata
+The following members of the
+.I cdata
+structure are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long pci;               /* Presentation Context Id     */
+long invoke_id;         /* Invocation identifier       */
+long type;              /* local, global or no result  */
+union {
+  unsinged long local;  /* valid if type==AP_RO_LOCAL  */
+  ap_objid_t    global; /* valid if type==AP_RO_GLOBAL */
+} value;
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I cdata->pci
+argument will be set to the value of the presentation context identifier
+encoded within the presentation data value which contained the ROSE PDU.
+.PP
+The
+.I cdata->type
+argument shows the form in which the optional operation and result fields were
+received.  If
+.I type
+is set to
+.BR NO_RESULT ,
+no result was received, and the operation and result fields are undefined.  If
+.I type
+is set to
+.BR AP_RO_LOCAL ,
+the operation was received in local format and is contained in
+.IR value.local .
+If
+.I type
+is set to
+.BR AP_RO_GLOBAL ,
+the operation was received in global format.  In global format, the operation
+value will be contained in the
+.B ap_objid_t
+structure in
+.IR value.local .
+This global operation value should be used encoded according to ISO 8825, Basic
+Encoding Rules (BER), as an object identifier.
+.PP
+The structure
+.I cdata
+is defined in the
+header file,
+.RB < xap_rose.h >.
+.RE
+.TP
+.I ubuf
+This function argument is used to return a data value that represents the
+.I result
+parameter of the remote operation result.  The data value is in encoded form:
+.I cdata->pci
+identifies the presentation context used to encode it.  This presentation
+context idenfies both the abstract syntax (which defines the type of value
+encoded), and the transfer syntax (which defines how it was encoded).  Use of
+the
+.I ubuf
+argument is described in the
+.BR ap_rcv (3)
+manual page in the referenced XAP specification.
+.[
+xap c303
+.]
+.TP
+.I flags
+This argument is used to control certain aspects of primitive processing as
+described in the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.[
+xap c303
+.]
+.TP
+.I aperrno_p
+The location pointed to by the
+.I aperrno_p
+argument is set to an error code if a failure has occured.
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is issued by the XAP interface service.
+.\"
+.\"
+.SH STATE
+.PP
+.SS Valid States
+.PP
+.SS New State
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XAP-ROSE (3),
+.BR XAP (3),
+.BR ap_env (3),
+.BR ap_open (3),
+.BR ap_rcv (3),
+.BR A_DATA_IND (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B AP_RO_RESULT_IND
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B AP_RO_RESULT_IND
+is compatible with implementation based on XAP and XAP-ROSE, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR XAP-ROSE (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP,
+.[
+XAP c303
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B AP_RO_RESULT_IND
+first appeared in XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library under the OpenSS7
+Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4
