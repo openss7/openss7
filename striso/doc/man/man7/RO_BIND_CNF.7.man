@@ -1,0 +1,448 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: RO_BIND_CNF.7.man,v 1.1.2.1 2008/04/16 17:21:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008/04/16 17:21:06 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: RO_BIND_CNF.7.man,v $
+.\" Revision 1.1.2.1  2008/04/16 17:21:06  brian
+.\" - added new manual pages
+.\"
+.\" Revision 0.9.2.1  2007/11/06 11:43:20  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_RO_BIND_CNF 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "ASCE/Presentation ROSE Interface (XAP-ROSE)"
+.\"
+.\"
+.SH NAME
+.B AP_RO_BIND_CNF
+\- confirm an association request
+.\"
+.\"
+.SH INTERFACE
+.PP
+XAP,
+.[
+XAP c303
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap_rose.h>
+.HP
+.BI "int ap_rcv(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long *" sptype ,
+.br
+.BI "ap_ro_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t **" ubuf ,
+.br
+.BI "int *" flags ,
+.br
+.BI "unsigned long *" aperrno_p ");
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+a file descriptor associated with the XAP-ROSE instance as returned from
+.BR ap_open (3)
+and initialized with
+.BR ap_ro_init (3).
+.PD 0
+.TP
+.I sptype
+always
+.B AP_RO_BIND_IND
+for this primitive.
+.TP
+.I cdata
+a pointer to the control data structure for the primitive.
+.TP
+.I ubuf
+a pointer to a pointer to the user information returned for the primtive.
+.TP
+.I flags
+a pointer to flags returned for the primitive.
+.TP
+.I aperrno_p
+a pointer to a memory exent into which to received the diagnostic error code.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B AP_RO_BIND_CNF
+primitive is used with
+.BR ap_rcv (3)
+and the XAP-ROSE environment to confirm the establishment of an association
+between tow application entities wishing to use ROSE
+.[
+x219
+.]
+services.
+.PP
+The ROPM maps the
+.B AP_RO_BIND_CNF
+primitive from the
+.B A_ASSOC_CNF
+service directly.  The effects and restrictions of receiving the
+.B AP_RO_BIND_CNF
+primitive are identical to the
+.B A_ASSOC_CNF
+primitive.
+.PP
+Refer to the table on the
+.BR ap_rcv (3)
+manual page, under the
+.B A_ASSOC_CNF
+section, or the
+.BR A_ASSOC_CNF (7)
+manual page, for these effects and restrictions.
+.PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described on the
+.BR ap_rcv (3)
+manual page.  On return, the
+.BR ap_rcv (3)
+arguments will be set as described below:
+.TP \w'\fIaperrno_p\fP:\(em'u
+.IR fd :
+This integer value refers to the descriptor returned by a previous call to
+.BR ap_open (3).
+It identifies the library instance that supports the association.
+.TP
+.IR sptype :
+The value pointed to by this argument will be set to
+.BR AP_RO_BIND_CNF .
+.TP
+.IR cdata :
+The following members of the
+.I cdata
+structure are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long res;              /* result of assoc req          */
+long res_src;          /* source of result             */
+long diag;             /* reason (if rejected)         */
+long udata_length;     /* user-information length      */
+long pci;              /* Presentation Context Id      */
+ap_a_assoc_env_t *env; /* environment attribute values */
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I cdata->res
+argument will be set to indicate the result of the association request.  The
+possible values for
+.I res
+are:
+.IP \(bu \w'\(bu\(em'u
+.B AP_ACCEPT
+.br
+accept the association,
+.IP \(bu
+.B AP_REJ_PERM
+.br
+association permanently rejected.
+.PP
+The
+.I cdata->res_src
+argument indicates the source of the result.  The argument
+.I diag
+gives a diagnostic code.  Values for these arguments are exactly as defined for
+the
+.BR A_ASSOC_CNF (7)
+primitive.  Refer to
+.BR A_ASSOC_CNF (7)
+.I res_src
+and
+.I diag
+arguments for acceptable values.
+.PP
+The
+.I cdata->pci
+argument will be set to the value of the presentation context id encoded within
+the presentation data value which contained the ROSE PDU.
+.[
+x219
+.]
+.PP
+The
+.I cdata->env
+argument can be used to retrieve the values of the XAP environment attributes
+that correspond to parameters of the A-ASSOCIATE confirmation that carries the
+RO-BIND indication service.  If the
+.B AP_COPYENV
+attribute in the XAP environment is
+.BR false ,
+these values will not be returned in the
+.I cdata
+argument and
+.I cdata->env
+will be set to
+.B NULL
+when
+.BR ap_rcv (3)
+returns.  If
+.B AP_COPYENV
+is
+.BR true ,
+the XAP library will allocate an
+.B ap_a_assoc_env_t
+structure and any necessary substructures and return a pointer to it in
+.IR cdata->env .
+The caller can release the storage allocated for the
+.B ap_a_assoc_env_t
+structure and substrcutures by passing a pointer to
+.I cdata
+to
+.BR ap_free (3).
+The
+.BR A_ASSOC_CONF (7)
+manual page in the XAP specification details the elements of the
+.B ap_a_ssoc_env_t structure used for this primitive.
+.PP
+The
+.I cdata->type
+argument signals the type of encoding that has been used to encode the
+.BR AP_RO_BIND_CNF .
+If the
+.I cdata->type
+is set to
+.B AP_RO_DIRECT_REF
+the
+.I cdata->value.global
+will contain the object identifier that was used for the encoding.  If
+.I cdata->type
+is set to
+.B AP_RO_INDIRECT_REF
+then the
+.I cdata->pci
+value was used for the indirect-reference encoding.  If
+.I cdata->type
+is set to
+.B AP_RO_DIR_AND_INDIR
+then the
+.I cdata->value.global
+contains the transfer syntax that was used for the encoding and the
+.I cdata->pci
+is the indirect-reference.
+.PP
+The global element of the
+.I cdata->value
+element is an
+.B ap_objid_t
+structure containing the contents octets of the BER encoding of the OBJECT
+IDENTIFIER.  See the referenced XAP specification and ISO 8825-1, Basic
+Encoding Rulse (BER),
+.[
+iso 8825-2
+.]
+for details of how to use this structure.
+.RE
+.TP
+.IR ubuf :
+Use of the
+.I ubuf
+argument is described in the
+.BR ap_rcv (3)
+manual page.
+.TP
+.IR flags :
+This argument is used to control certain aspects of primitive processing as
+described in the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.[
+xap c303
+.]
+.TP
+.IR aperrno_p :
+The location pointed to by the
+.I aperrno_p
+argument is set to an error code if a faliure has occurred.
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is issued by the XAP interface service.
+.\"
+.\"
+.SH STATE
+.PP
+.SS Valid States
+.PP
+.SS New State
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XAP-ROSE (3),
+.BR XAP (3),
+.BR ap_env (3),
+.BR ap_open (3),
+.BR ap_rcv (3),
+.BR A_ASSOC_CNF (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B AP_RO_BIND_CNF
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B AP_RO_BIND_CNF
+is compatible with implementation based on XAP and XAP-ROSE, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR XAP-ROSE (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP,
+.[
+XAP c303
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B AP_RO_BIND_CNF
+first appeared in XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library under the OpenSS7
+Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4

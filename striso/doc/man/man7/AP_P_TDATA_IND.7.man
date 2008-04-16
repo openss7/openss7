@@ -1,0 +1,1 @@
+.so man7/P_TDATA_IND.7.man

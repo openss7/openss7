@@ -1,0 +1,380 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=0
+.\"
+.\" @(#) $Id: RO_REJECTU_IND.7.man,v 1.1.2.1 2008/04/16 17:21:07 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008/04/16 17:21:07 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: RO_REJECTU_IND.7.man,v $
+.\" Revision 1.1.2.1  2008/04/16 17:21:07  brian
+.\" - added new manual pages
+.\"
+.\" Revision 0.9.2.1  2007/11/06 11:43:20  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH AP_RO_REJECTU_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "ASCE/Presentation ROSE Interface (XAP-ROSE)"
+.SH NAME
+.B AP_RO_REJECTU_IND
+\- indicate a problem has been detected by the remote ROSE user
+.\"
+.\"
+.SH INTERFACE
+.PP
+XAP,
+.[
+XAP c303
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xap_rose.h>
+.HP
+.BI "int ap_snd(int " fd ", unsigned long " sptype ", ap_ro_cdata_t *" cdata ", ap_osi_vbuf_t *" ubuf ", int " flags ", unsigned long *" aperrno_p ");
+.\"
+.\"
+.SH ARGUMENTS
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+a file descriptor associated with the XAP-ROSE instance as returned from
+.BR ap_open (3)
+and initialized with
+.BR ap_ro_init (3).
+.PD 0
+.TP
+.I sptype
+always
+.B AP_RO_BIND_IND
+for this primitive.
+.TP
+.I cdata
+a pointer to the control data structure for the primitive.
+.TP
+.I ubuf
+a pointer to a pointer to the user information returned for the primtive.
+.TP
+.I flags
+a pointer to flags returned for the primitive.
+.TP
+.I aperrno_p
+a pointer to a memory exent into which to received the diagnostic error code.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B AP_RO_REJECTU_IND
+primitive is used with
+.BR ap_rcv (3)
+and the XAP-ROSE environment to indicate the remote ROSE
+.[
+x219
+.]
+.[
+x229
+.]
+user has detected a problem with the previously submitted request
+.RB ( AP_RO_INVOKE_REQ )
+or reply
+.RB ( AP_RO_RESULT_REQ ", " AP_RO_ERROR_REQ ).
+The request can also be identified by the returned invoke id.
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+This integer value refers to the descriptor returned from a previous
+.BR ap_open (3)
+call.  It identifies the library instance that supports the
+association.
+.TP
+.I sptype
+The value pointed to by this argument will be set to
+.BR AP_RO_REJECTU_IND .
+.TP
+.I cdata
+The following members of the cdata structure are used for this primitive:
+.RS
+.RS 4
+.nf
+\f(CW\s-1\
+long pci;
+long invoke_id_present;    /* TRUE or FALSE */
+long invoke_id;
+long type;
+long rsn;
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I cdata->pci
+argument will be set to the value of the presentation context id encoded within
+the presentation data value which contained the ROSE PDU.
+.PP
+A reject code will include two parts, a
+.IR type ,
+and a
+.IR rsn .
+.I type
+will be either
+.BR AP_RO_INVOKE_TYPE ", " AP_RO_RESULT_TYPE " or " AP_RO_ERROR_TYPE .
+Values for both
+.I type
+and the
+.I rsn
+that are valid for each
+.I type 
+are defined in the header file
+.RB < xap_rose.h >.
+.PP
+When
+.I type
+is
+.BR AP_RO_INVOKE_TYPE ,
+.I rsn
+can have one of the following values:
+.TP
+.BR AP_RO_IN_DUP_INVOCATION ,
+.PD 0
+.TP
+.BR AP_RO_IN_UNREC_OPERATION ,
+.TP
+.BR AP_RO_IN_MISTYPED_ARG ,
+.TP
+.BR AP_RO_IN_RESOURCE_LIMIT ,
+.TP
+.BR AP_RO_IN_RELEASE_IN_PROG ,
+.TP
+.BR AP_RO_IN_UNREC_LINKED_ID ,
+.TP
+.BR AP_RO_IN_LINKED_RESP_UNEXPECTED ,
+.TP
+.BR AP_RO_IN_UNEXPECTED_LINKED_OPER .
+.PD
+.PP
+When
+.I type
+is
+.BR AP_RO_RESULT_TYPE ,
+.I rsn
+can have one of the following values:
+.TP
+.BR AP_RO_RES_UNREC_INVOCATION ,
+.PD 0
+.TP
+.BR AP_RO_RES_RESULT_RESP_UNEXPECTED ,
+.TP
+.BR AP_RO_RES_MISTYPED_RESULT .
+.PD
+.PP
+When
+.I type
+is
+.BR AP_RO_ERROR_TYPE ,
+.I rsn
+can have one of the following values:
+.TP
+.BR AP_RO_ERR_UNREC_INVOCATION ,
+.PD 0
+.TP
+.BR AP_RO_ERR_ERROR_RESP_UNEXPECTED ,
+.TP
+.BR AP_RO_ERR_UNREC_ERROR ,
+.TP
+.BR AP_RO_ERR_UNEXPECTED_ERROR ,
+.TP
+.BR AP_RO_ERR_MISTYPED_PARAM .
+.PD
+.RE
+.TP
+.I ubuf
+No user data is defined for this primitive, therefore
+.I ubuf
+will remain unchanged.
+.TP
+.I flags
+No user data is defined for this primitive, therefore
+.I flags
+will remain unchanged.
+.TP
+.I aperrno_p
+The location pointed to by the
+.I aperrno_p
+argument is set to an error code if a failure has occurred.
+.\"
+.\"
+.SH ORIGINATOR
+.PP
+This primitive is issued by the XAP interface service.
+.\"
+.\"
+.SH STATE
+.PP
+.SS Valid States
+.PP
+.SS New State
+.PP
+.\"
+.\"
+.SH RETURN
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH ERRORS
+.PP
+Refer to the manual page for
+.BR ap_rcv (3)
+in the referenced XAP specification.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XAP-ROSE (3),
+.BR XAP (3),
+.BR ap_env (3),
+.BR ap_open (3),
+.BR ap_rcv (3),
+.BR P_DATA_IND (7).
+.\"
+.\"
+.SH BUGS
+.PP
+.B AP_RO_REJECTU_IND
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B AP_RO_REJECTU_IND
+is compatible with implementation based on XAP and XAP-ROSE, such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR XAP-ROSE (3)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP,
+.[
+XAP c303
+.]
+XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B AP_RO_REJECTU_IND
+first appeared in XAP-ROSE.
+.[
+XAP-ROSE
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XAP Library under the OpenSS7
+Project.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T4
