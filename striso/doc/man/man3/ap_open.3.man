@@ -115,29 +115,45 @@ xap c303
 .\"
 .SH SYNOPSIS
 .PP
+XAP
+.[
+xap c303
+.]
+version:
+.PP
 .B #include <xap.h>
 .HP
 .B typedef int (*ap_ualloc_t)(int, ap_osi_vbuf_t **, void **, int, int, ulong *);
 .HP
 .B typedef int (*ap_udealloc_t)(int, ap_osi_vbuf_t *, void *, int, ulong *);
 .HP
-.BI "int ap_open(const char *" provider ", int " oflags ", ap_ualloc_t " ap_user_alloc ", ap_udealloc_t " ap_user_dealloc ", ulong *" aperrno_p ");
+.BI "int ap_open(
+.br
+.BI "const char *" provider , 
+.br
+.BI "int " oflags , 
+.br
+.BI "ap_ualloc_t " ap_user_alloc , 
+.br
+.BI "ap_udealloc_t " ap_user_dealloc , 
+.br
+.BI "ulong *" aperrno_p );
+.PP
+APLI
+.[
+apli unix international
+.]
+version:
 .PP
 .B #include <ap_lib.h>
 .br
 .B #include <osi_lib.h>
 .HP
 .BI "int ap_open(
-.PD 0
-.RS
-.HP
+.br
 .BI "char *" pathname ,
-.HP
-.BI "int " oflags
-.RE
-.HP
-.BI );
-.PD
+.br
+.BI "int " oflags );
 .\"
 .\"
 .SH ARGUMENTS
@@ -147,7 +163,7 @@ xap c303
 An implementation-specific string that identifies an instance of a communications provider.
 .TP
 .I oflags
-Flags indicating syncrhonous or asyncrhonous operation and buffer allocation strategy.
+Flags indicating synchronous or asynchronous operation and buffer allocation strategy.
 .TP
 .I ap_user_alloc
 A user-supplied buffer allocation callback function.
@@ -157,13 +173,6 @@ A user-supplied buffer deallocation callback function.
 .TP
 .I aperrno_p
 A pointer a an error number into which to have returned diagnostic error numbers.
-.\"
-.\"
-.SH INTERFACE
-XAP.
-.[
-xap c303
-.]
 .\"
 .\"
 .SH DESCRIPTION
@@ -187,11 +196,11 @@ invocation is handled by XAP. Legal values for the
 argument are formed by OR'ing together zero or more of the flags described below.
 .TP
 .B AP_NDELAY
-This flag indicates the XAP instance opened is to operat in the non-blocking execution mode:
+This flag indicates the XAP instance opened is to operate in the non-blocking execution mode:
 .B AP_NDELAY
 will be set in the
 .B AP_FLAGS
-environent attribute.  If this flag is not present, the opened XAP instance will operate in blocking
+environment attribute.  If this flag is not present, the opened XAP instance will operate in blocking
 execution mode.
 .TP
 .B AP_BUFFERS_ONLY
@@ -238,7 +247,7 @@ indicates the
 number of octets of space requested. Notice that
 .I mem
 is not used in this case, and that a user
-allocation routine may return less or more bufferspace than requested. When
+allocation routine may return less or more buffer space than requested. When
 .B AP_MEMORY
 is
 specified, a block of memory is returned in
@@ -297,13 +306,18 @@ memory for environment attributes.
 .B Note:
 XAP users are advised that allowing
 .I ap_user_alloc
-to default to the XAP-supplied
-memory allocation mechanism means that the service will not perform dynamic
-allocation of user data buffers in order to receive incoming primitives. In this case the
-user must either pass sufficient buffers in the call to ap_rcv( ) to store the user data for
-the incoming primitive, or the user must call ap_rcv( ) multiple times to receive all the
-user data associated with the incoming primitive (see the discussion of the AP_MORE
-flag in the ap_rcv( ) manual page).
+to default to the XAP-supplied memory allocation mechanism means that the service will not perform
+dynamic allocation of user data buffers in order to receive incoming primitives. In this case the user
+must either pass sufficient buffers in the call to
+.BR ap_rcv (3)
+to store the user data for the incoming primitive, or the user must call
+.BR ap_rcv (3)
+multiple times to receive all the user data associated with the incoming primitive (see the discussion
+of the
+.B AP_MORE
+flag in the
+.BR ap_rcv (3)
+manual page).
 .PP
 .I aperrno_p
 must be set to point to a location which will be used to carry an error code back to the
@@ -320,8 +334,9 @@ the XAP instance in subsequent calls to XAP functions. Otherwise, a value of -1 
 the location pointed to by
 .I aperrno_p
 is set to indicate the error. (The XAP environment must be
-initialised using a call to ap_init_env( ) or ap_restore( ) before it can be used to send or receive
-primitives.)
+initialized using a call to
+.BR ap_init_env "(3) or " ap_restore (3)
+before it can be used to send or receive primitives.)
 .\"
 .\"
 .SH ERRORS
@@ -338,13 +353,19 @@ The specified combination of flags is invalid.
 In addition, operating system class errors are reported.
 .\"
 .\"
-.SH "SEE ALSO"
+.SH NOTICES
+.PP
+Similar to TLI and XTI, there is an older AT&T ASCE/Presentation Libary (APLI) and the newer X/Open
+ACSE/Presentation Library (XAP).  Note that the latter is also an IEEE and ISO standard.
+.\"
+.\"
+.SH SEE ALSO
 .PP
 .BR ap_open (3),
 .BR open (2s).
 .\"
 .\"
-.SH "BUGS"
+.SH BUGS
 .PP
 .BR ap_open ()
 has no known bugs.
@@ -353,26 +374,59 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR ap_open ()
-is compatible with XAP.
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI or XAP such as
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-apli
+.]
+and
+.IR "HP-UX OTS/9000" \(rg,
+.[
+hpuxapli
+.]
+with the following portability considerations:
+.IP \(bu \w'\(bu\(em'u
+.IP \(bu
+.PP
+See
+.BR APLI (3)
+and
+.BR XAP (3)
+for additional compatibility considerations.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+APLI,
+.[
+apli unix international
+.]
 XAP.
-.\"
-.\"
-.SH HISTORY
-.PP
-.BR ap_open ()
-first appeared in XAP.
 .[
 xap c303
 .]
 .\"
 .\"
+.SH HISTORY
+.PP
+.BR ap_open ()
+first appeared in APLI
+.[
+apli unix international
+.]
+.\"
+.\"
 .SH VERSIONS
 .PP
-This manual page was written for the OpenSS7 XAP Library.
+This manual page was written for the OpenSS7 APLI and XAP Library.
 .\"
 .\"
 .[

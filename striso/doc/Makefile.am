@@ -60,7 +60,8 @@ if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_decls
 TESTS_ENVIRONMENT	+= PKG_MANPATH='$(PKG_MANPATH)' \
-			   mandir='$(mandir)'
+			   mandir='$(mandir)' \
+			   WARN_EXCESS='yes'
 CLEANFILES		+= $(top_builddir)/check_decls.log
 DISTCLEANFILES		+= *.err *.out
 ## PERFORM_CHECKS

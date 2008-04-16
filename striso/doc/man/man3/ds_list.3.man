@@ -1,0 +1,240 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH DS_LIST 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ds_list
+\- enumerate the immediate subordinates of a particular directory entry
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xds.h>
+.HP
+.BI "DS_status ds_list(OM_private object " session ", OM_private_object " context ", OM_object " name ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.\"
+.\"
+.SH INTERFACE
+.PP
+XDS
+.[
+XDS
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is used to obtain a list of the immediate subordinates of the
+named entry.  The list may be incomplete in some circumstances.
+.PP
+The result of this operation can be abandonned.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR session "\0\fBSession\fP(Object(Session)).
+The directory session agains which this operation is performed.  This must be a
+private object.
+.TP
+.IR context "\0\fBContext\fP(Object(Context)).
+The directory context to be used for this operation.  This argument must be
+a private object or the constant
+.RB { DS_DEFAULT_CONTEXT }.
+.TP
+.IR name "\0\fBName\fP(Object(Name)).
+The name of the object entry whose immediate subordinates are to be listed.
+Any aliases in the name will be dereferenced unless prohibited by the relevant
+service control.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.BR Status "(Status)
+Takes the value
+.B success
+if the named object was located (even if there are no subordinates) and takes
+an error value if not, when the subroutine is used synchronously.  Reports
+whether the operation was initiated, if used asynchronously.
+.TP
+.BR Result "(Object(List-Result))
+Upon successful completion of a synchronous call, the result contains some
+information about the target object's immediate subordinates.  It also contains
+the distinguished name of the target object, if an alias was dereferenced to
+find it.  Aliases in the subordinate names are not dereferenced.  Also, there
+may be a partial outcome qualifier, which indicates that the result is
+incomplete.  It also explains why (for example, because the time limit expired)
+and contains information that may be helpful when attempting to complete it.
+.TP
+.BR Invoke-ID "(Integer)
+The
+.B Invoke-ID
+of an asynchronous directory operation.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one of the following Library-Errors:
+bad-argument, bad-class, bad-context, bad-name, bad-session, bad-workspace,
+miscellaneous, missing-type, too-many-operations.
+.PP
+The following Directory-Errors may be returned by the function (or by
+.BR ds_receive_result (3)
+when used asyncrhonously):
+Name-Error, Referral, Security-Error, Service-Error.
+.PP
+This function can return a Communications-Error.
+.PP
+This function can return the error constant
+.RB [ DS_NO_WORKSPACE ].
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR ds_list ()
+is implemented on top of the more complicated OSMIS 3.0 interface.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ds_list ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XDS (3),
+.BR XOM (3),
+.BR ds_abandon (3),
+.BR ds_receive_result (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XDS.
+.[
+XDS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XDS.
+.[
+XDS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xds (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ds_list ()
+was first part of the
+.BR XDS .
+.[
+XDS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

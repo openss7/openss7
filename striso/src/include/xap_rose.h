@@ -83,6 +83,10 @@
 #define AP_RO_LOCAL		1
 #define AP_RO_GLOBAL		2
 #define AP_RO_NO_RESULT		3
+/* added by U012F */
+#define AP_RO_DIRECT_REF	4
+#define AP_RO_INDIRECT_REF	5
+#define AP_RO_DIR_AND_INDIR	6
 /*
  * Flag for returned parameter information
  */
@@ -90,9 +94,41 @@
 /*
  * Reject code type values
  */
+#define AP_RO_GENERAL_TYPE	0
 #define AP_RO_INVOKE_TYPE	1
 #define AP_RO_RESULT_TYPE	2
 #define AP_RO_ERROR_TYPE	3
+/*
+ * Possible General problem types
+ */
+#define AP_RO_GEN_UNREC_PDU		0
+#define AP_RO_GEN_MISTYPED_PDU		1
+#define AP_RO_GEN_BAD_STRUCT_PDU	2
+/*
+ * Possible Invoke Problem types
+ */
+#define AP_RO_IN_DUP_INVOCATION			0
+#define AP_RO_IN_UNREC_OPERATION		1
+#define AP_RO_IN_MISTYPED_ARG			2
+#define AP_RO_IN_RESOURCE_LIMIT			3
+#define AP_RO_IN_RELEASE_IN_PROG		4
+#define AP_RO_IN_UNREC_LINKED_ID		5
+#define AP_RO_IN_LINKED_RESP_UNEXPECTED		6
+#define AP_RO_IN_UNEXPECTED_LINKED_OPER		7
+/*
+ * Possible Result problem types
+ */
+#define AP_RO_RES_UNREC_INVOCATION		0
+#define AP_RO_RES_RESULT_RESP_UNEXPECTED	1
+#define AP_RO_RES_MISTYPED_RESULT		2
+/*
+ * Possible Error problem types
+ */
+#define AP_RO_ER_UNREC_INVOCATION	0
+#define AP_RO_ER_ERROR_RESP_UNEXPECTED	1
+#define AP_RO_ER_UNREC_ERROR		2
+#define AP_RO_ER_UNEXPECTED_ERROR	3
+#define AP_RO_ER_MISTYPED_PARAM		4
 /*
  * Primitive types
  */
@@ -129,6 +165,7 @@
 #define AP_RO_CNTX_NOT_PRES	((AP_ROSE_ID<<16) | 0x16)
 #define AP_RO_BAD_PCI		((AP_ROSE_ID<<16) | 0X18)
 #define AP_RO_T_SYTX_NSUP	((AP_ROSE_ID<<16) | 0X19)
+#define AP_RO_BADCD_TYPE	((AP_ROSE_ID<<16) | 0x1A)
 /*
  * Attribute identifiers
  */

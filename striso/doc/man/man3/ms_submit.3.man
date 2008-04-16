@@ -1,0 +1,236 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH MS_SUBMIT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ms_submit
+\- submit a communique (message or probe)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xms.h>
+.sp
+.HP
+.BI "MS_status ms_submit(OM_private_object " session ", OM_object " communique ", OM_private_object *" submission_results_return ", MS_invoke_id *" invoke_id_return );
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMS
+.[
+XMS
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+After verifying the integrity of the communique, this function sumbits a
+communique (message or probe) by adding it to the submission queue to which the
+current session provides access.  A message may be submitted by requesting the
+forwarding of a delivered message identified by its sequence number.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR session "\0\fBSession\fP(Object(Session))
+Specifies the MS session over which this function is performed.
+.TP
+.IR communique "\0\fBCommunique\fP(Object(Submitted-Communique))
+Specifies the object (a message or probe) to be submitted.  Its purported
+originator shall be the user associated with the session.  If the communique is
+a private object, it is made inaccessible to the client; and is deleted at the
+discretion of the service.
+.sp
+Note: If the subclass,
+.BR Item-To-Forward ,
+were used for this argument, it is possible to request forwarding a delivered
+message identified by its MS sequence-number.  (The MS entry to be thus
+forwarded should be a delivered message entry.  Forwarding of entries that are
+not delivered messages is not defined in the XMS
+.[
+XMS
+.]
+specification).
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.BR Status "(Status)
+Indicates whether the function succeeded or not, if used synchronously; or
+whether the function has been initiated, if used asynchronously.
+.TP
+.IR submission_results_return "\0\fBResult\fP(Object(Submission-Results))
+On successful completion of a synchronous call, contains the results of the
+submission.  For details, refer to the X.400 API (see reference X.400).
+.[
+x400
+.]
+.TP
+.IR invoke_id_return "\0\fBInvoke-ID\fP(Integer)
+Specifies the Invoke-ID of the asynchronous operation.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one fo the following Library-Errors:
+bad-argument, bad-session, bad-class, no-such-class, asynchrony-not-supported,
+feature-unavailable, feature-not-negotiated, out-of-memory, miscellaneous,
+too-many-operations.
+.PP
+The following Message Store errors may be returned:
+sequence-number-error, submission-control-violated,
+element-of-service-not-subscribed, no-workspace, originator-invalid,
+recipient-improperly-specified, inconsistent-request, security-error,
+unsupported-critical-function, remote-bind-error.
+.PP
+This function can return a Communications-Error.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ms_submit ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ms_cancel_submission (3),
+.BR XMS (3),
+.BR XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XMS.
+.[
+XMS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XMS.
+.[
+XMS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xms (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ms_submit ()
+was first part of the
+.BR XMS .
+.[
+XMS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

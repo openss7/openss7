@@ -1,0 +1,281 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH MS_BIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ms_bind
+\- establish a session with the Message Store
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xms.h>
+.sp
+.HP
+.BI "MS_status ms_bind(OM_object " bind_argument ", OM_private_object *" bind_result_return ", OM_private_object *" bound_session_return );
+.\"
+.\"
+.SH INTERFACE
+.PP
+XMS
+.[
+XMS
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function establishes a session with the Message Store.  It must be called
+after
+.BR ms_initialize (3)
+and before any other Message Store interface functions are called.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR bind_argument "\0\fBBind-Argument\fP(Object(Bind-Argument))
+Specifies information for establishing a session with the Message Store service
+provider, together with details of the service required.  This comprises:
+.RS
+.IP \(em \w'\(em\(em'u
+.B Initiator
+.br
+Specifies the OR-name of the initiator (i.e., the UA) of this session (or
+association) with the MS.
+.IP \(em
+.B Initiator-Credentials
+.br
+Specifies the credentials of the initiator for authentication purposes.
+.IP \(em
+.B Security-Context
+.br
+Identifies the security context at chiwch the initiator proposes to operate.
+.IP \(em
+.B Fetch-Restrictions
+.br
+Specifies the restrictions on entries to be returned as result of a
+.BR ms_fetch (3)
+function.  These restrictions prevail until the
+.BR ms_unbind (3)
+function is invoked.
+.IP \(em
+.B MS-Configuration-Request
+.br
+If true, specifies the request to obtain information relating to which
+auto-actions and optional attributes for which the MS provides support.  If
+false, no such request is being made.
+.RE
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.IR status "\0\fBStatus\fR(Status)
+Indicates whether the function succeeded or not.
+.TP
+.IR bind_result_return "\0\fBBind-Result\fP(Object(Bind-Result))
+On successful completion, contains one or more of the following:
+.RS
+.IP \(em \w'\(em\(em'u
+.B Responder-Credentials
+.br
+Indicates the credentials of the MS.
+.IP \(em
+.B Available-Auto-Actions
+.br
+Indicates the set of all possible auto-actions that are supported by the MS
+(not just those requested by the client), if the MS-Configuration-Request was
+made for the
+.BR ms_bind ()
+function.
+.IP \(em
+.B Available-Attribute-Types
+.br
+Indicates the set of all optional MS attribute-types that are supported by the
+MS, if the MS-Configuration-Request was made for the
+.BR ms_bind ()
+function.
+.IP \(em
+.B Alert-Indication
+.br
+Indicates an alert condition has occurred since the last successful
+Alert-Indication.
+.IP \(em
+.B Content-Types-Supported
+.br
+Indicates a set of object-identifiers defining the content-types of which the
+MS has knowledge, if the MS-Configuration-Request was made for the
+.BR ms_bind ()
+function.
+.RE
+.TP
+.IR bound_session_return "\0\fBBound-Session\fP(Object(Session))
+Upon successful completion, contains an instance of the Session class
+describing an association between the client and the service.  This value is
+then used as an input argument,
+.B Session
+.RI ( session ),
+to other functions (e.g.
+.BR ms_fetch (3)).
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one of the following Library-Errors:
+bad-argument, too-many-sessions, miscellaneous.
+.PP
+The following Message Store errors may be returned:
+authenticaiton-error, no-workspace, unacceptable-security-context,
+unable-to-establish-association.
+.PP
+This function can return a Communications-Error.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ms_bind ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ms_initialize (3),
+.BR ms_fetch (3),
+.BR ms_unbind (3),
+.BR XMS (3),
+.BR XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XMS.
+.[
+XMS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XMS.
+.[
+XMS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xms (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ms_bind ()
+was first part of the
+.BR XMS .
+.[
+XMS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

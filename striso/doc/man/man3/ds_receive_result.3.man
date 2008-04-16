@@ -1,0 +1,313 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH DS_RECEIVE_RESULT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ds_receive_result
+\- retrieve the result of an asyncrhonous executed operation
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xds.h>
+.HP
+.BI "DS_status ds_receive_result(OM_private object " session ", OM_sint " invoke_id ", OM_uint *" completion_flag_return ", DS_status *" operation_status_return ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.\"
+.\"
+.SH INTERFACE
+.PP
+XDS
+.[
+XDS
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR ds_receive_result ()
+is used to retrieve the completed result of a previous asynchronous operation.
+.PP
+.BR ds_receive_result ()
+results include two status indications.  One, called
+.BR Status ,
+indicates that this function call itself was successful; it is always returned.
+The other, called
+.BR Operation-Status ,
+is used to return the status of the completed asynchronous operation, and is
+only returned if there is one.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR Session "\0\fBSession\fP(Object(Session)).
+The directory session against which this operation is performed.  This must be
+a private object.
+.TP
+.IR invoke_id "\0\fBInvoke-ID\fP(Integer).
+The invocation identifier of the asynchronous directory operation whose result
+is to be returned.
+.sp
+If the value of this argumnet is
+.RB { DS_ANY_OPERATION },
+then the service will return the result of any asynchronous directory operation
+that has completed.  The service will prioritize the retrieval of the completed
+directory operations in an implementation defined manner.
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.BR Status "(Status)
+Takes an error value of one of the errors listed below occurred during the
+execution of this function, and
+.B success
+otherise.
+.TP
+.BR completion_flag_return "Completion-Flag(Unsigned-Integer)
+On of the following values to indicate the status of the outstanding
+asynchronous directory operation(s) specified by the
+.I invoke_id
+input argument:
+.RS
+.IP \(bu \w'\(bu\(em'u
+.BR "completed-operation [" DS_COMPLETED_OPERATION ].
+The specified directory operation has completed and its result is made
+available or, if
+.B any-operation
+was specified, at least one outstanding directory operation has completed and
+its result is made available.
+.IP \(bu
+.BR "outstanding-operation [" DS_OUTSTANDING_OPERATIONS ].
+There are outstanding asynchronous directory operations but none have yet
+completed.
+.IP \(bu
+.BR "no-outstanding-operation [" DS_NO_OUTSTANDING_OPERATION ].
+There are no outstanding asynchronous directory operations.
+.IP \(bu
+.BR "other-completed-operations [" DS_OTHER_COMPLETED_OPERATIONS ].
+A particular directory operation was specified; that directory operation has
+not completed, but one or more other directory operations have completed.
+.RE
+.sp
+This results is validif the Status has the value
+.BR success .
+.sp
+Upon successful return with
+.I completion_flag_return
+having the value
+.BR completed-operaiton ,
+the status and invocation identifier of the completed directory operation are
+returned.
+.TP
+.IR operation_status_return "\0\fBOperation-Status\fP(Status)
+Takes an error value if an error occurred during the execution of the
+asynchronous directory operation, and
+.B success
+otherwise.  The possible error values are listed for each individual operation
+int he corresponding function description.
+.TP
+.IR result_return "\0\fBResult\fP(Object *)
+The result of the completed asynchronous operation.  Its value will be the
+constant
+.RB { DS_NULL_RESULT }
+if the operation was one that does not return as result (that is,
+.BR ds_add_entry (3),
+.BR ds_modify_entry (3),
+.BR ds_modify_rdn (3)
+or
+.BR ds_remove_entry (3)).
+Otherwise, the OM object's OM class is that of the result of the asynchronous
+operation, and can be determined by using the OM functions.
+.[
+XOM
+.]
+.PP
+This result is only valid if the
+.I status
+has the value
+.BR success ,
+.I completion_flag_return
+has the value
+.B completed-operation
+and
+.I operation_status_return
+has the value
+.BR success .
+.TP
+.IR invoke_id_return "\0\fBInvoke-ID\fP(Integer) 
+The
+.B Invoke-ID
+of the operation whose result is being returned.
+.PP
+This result is valid if the
+.I status
+has the value
+.B success
+and
+.I completion_flag_return
+has the value
+.BR completed-operation .
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one of the following Library-Errors:
+bad-session, bad-workspace, miscellaneous.
+.PP
+This function does not report any Directory-Errors, or a Communication-Error,
+in its Status result.  (Any such errors related to the completed asynchronous
+operation are reported in
+.IR operation_status_return ,
+as described above).
+.PP
+This function can return the error constant
+.RB [ DS_NO_WORKSPACE ].
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR ds_receive_result ()
+is implemented on top of the more complicated OSMIS 3.0 interface.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ds_receive_result ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XDS (3),
+.BR XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XDS.
+.[
+XDS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XDS.
+.[
+XDS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xds (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ds_receive_result ()
+was first part of the
+.BR XDS .
+.[
+XDS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA

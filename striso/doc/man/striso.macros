@@ -4,7 +4,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -186,7 +186,7 @@ Trademarks mentioned are the property of their owners.
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -248,7 +248,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -340,7 +340,7 @@ The OpenSS7 Project http://www.openss7.org/
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -359,7 +359,7 @@ All Rights Reserved.
 .PP
 \f(HRCopyright\ \(co\ 1992\ UNIX International, Inc.
 .br
-\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -378,7 +378,7 @@ All Rights Reserved.
 .PP
 \f(HRCopyright\ \(co\ 2000\ John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright\ \(co\ 2001-2007\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 2001-2008\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -395,7 +395,7 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
@@ -412,7 +412,7 @@ All Rights Reserved.
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2008\ OpenSS7 Corp.
 .br
 \f(HRCopyright\ \(co\ 1999-2004\ The Board of Trustees of the University of Illinois
 .if (\n[.l]u < 80n) \{\

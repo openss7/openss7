@@ -96,28 +96,30 @@ sort-adjacent-labels
 .B #include <xom.h>
 .\".HP
 .\".BI "OM_return_code om_copy(const OM_private_object " original ", const OM_workspace " workspace ", OM_private_object *" copy );
-.HP
-.B OM_return_code \fRom_copy(
+.PP
+.B OM_return_code
 .PD 0
-.RS
+.HP
+om_copy(
+.RS 4
 .PP
-.BI "const OM_private_object " original \fR,
+.BI "const OM_private_object " original ,
 .PP
-.BI "const OM_workspace " workspace \fR,
+.BI "const OM_workspace " workspace ,
 .PP
 .BI "OM_private_object *" copy
+.RE
 .PP
 .B \fR);
 .PD
-.RE
 .\"
 .\"
 .SH ARGUMENTS
-.TP \w'\fIworkspace\fR\(em'u
-.I original
+.TP
+.IR original "\0\fBOriginal\fP(Private Object)
 The original XOM object, which remains accessible.
 .TP
-.I workspace
+.IR workspace "\0\fBWorkspace\fP(Workspace)
 The workspace in which the copy is to be created.  The original's class shall
 be in a package associated with this workspace.
 .TP
@@ -136,7 +138,7 @@ The function is recursive in that copying the original also copies its
 subobjects.
 .\"
 .\"
-.SH "RETURN VALUE"
+.SH RETURN
 .PP
 Upon successful completion, the zero value of
 .RB [ OM_SUCCESS ]
@@ -152,49 +154,49 @@ is unaffected.
 When
 .BR om_copy ()
 fails, it returns a non-zero error code, as follows:
-.TP \w'[\fBOM_FUNCTION_INTERRUPTED\fR]\(em'u
+.TP
 .RB [ OM_FUNCTION_INTERRUPTED ]
-The function must block to perform its action and the wait was interrupted by
-a signal.
+The function was aborted by an external force (for example, a keystroke,
+designated for this purpose, at a user interface).
 .TP
 .RB [ OM_MEMORY_INSUFFICIENT ]
-Memory could not immediately be allocated.
+The service cannot allocate the main memory it needs to complete the function.
 .TP
 .RB [ OM_NETWORK_ERROR ]
-A communications facility is required to effect the copy and an unrecoverable
-communications error occurred on that facility.
+The service could not successfully employ the network upon which its
+implementation depends.
 .TP
 .RB [ OM_NO_SUCH_CLASS ]
-The object class of the private object,
-.IR original ,
-does not exist in the workspace,
-.IR workspace .
+A purported class identifier is undefined.
 .TP
 .RB [ OM_NO_SUCH_OBJECT ]
-The private object,
-.IR original ,
-does not exist.
+A purported object is nonexistent or the purported handle is invalid.
 .TP
 .RB [ OM_NO_SUCH_WORKSPACE ]
-The workspace,
-.IR workspace ,
-does not exist.
+A purported workspace is nonexistent.
 .TP
 .RB [ OM_NOT_PRIVATE ]
-The passed in object,
-.IR original ,
-is not a private object (i.e\&. it is either a server or client allocated
-public object: SPUB or CPUB; instead of a private object).
+An object is public, not private.
 .TP
 .RB [ OM_PERMANENT_ERROR ]
+The service encountered a permanent difficulty other than those denoted by
+other return codes.
 .TP
 .RB [ OM_POINTER_INVALID ]
+In the C inteface, an invalid pointer was supplied as a function argument or as
+the receptacle for a function result.
 .TP
 .RB [ OM_SYSTEM_ERROR ]
+The service could not successfully employ the operating system upon which its
+implementation depends.
 .TP
 .RB [ OM_TEMPORARY_ERROR ]
+The service encountered a temporary difficulty other than those denoted by
+other return codes.
 .TP
 .RB [ OM_TOO_MANY_VALUES ]
+AN implementation limit prevents the addiiton to an object of another attribute
+value.  This limit is undefined.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -211,10 +213,26 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR om_copy ()
-is compatible with XOM.
+is compatible with
+.IR "Solstice OSI 8.0 "  to " 9.0
+and implementations based on
+XOM,
 .[
 xom osi
 .]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Note that many add-on OSI packages for popular UNIX SVR 4.2 based releases
+provided the XOM interface and the associated set of X/Open, IEEE and ISO
+standard interfaces.
+.IP \(em
+The function is source compatible only.  Binary compatibility was not
+attempted.
+.IP \(em
+.PP
+See also,
+.BR XOM (3),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -243,6 +261,3 @@ This manual page was written for the OpenSS7 XOM Library.
 $LIST$
 .]
 .T4
-
-
-

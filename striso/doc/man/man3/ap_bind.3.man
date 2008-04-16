@@ -230,8 +230,8 @@ An ACSE/Presentation Module named
 .RB \*(lq apmod \*(rq.
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH IMPLEMENTATION

@@ -1,0 +1,289 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: om_decode,v 0.9.2.2 2007/11/10 19:40:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/11/10 19:40:50 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: om_decode,v $
+.\" Revision 0.9.2.2  2007/11/10 19:40:50  brian
+.\" - documentation updates
+.\"
+.\" Revision 0.9.2.1  2007/09/29 14:08:31  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH OM_DECODE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B om_decode
+\-  create a new private object that is an exact, but independent, copy of the object than an existing private object encodes
+.\"
+.\"
+.SH INTERFACE
+.PP
+XOM.
+.[
+xom osi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xom.h>
+.PP
+.B OM_return_code
+.PD 0
+.PP
+om_decode(
+.RS
+.HP
+.BI "const OM_private_object " encoding ,
+.HP
+.BI "OM_private_object *" original
+.RE
+.HP
+.RB );
+.PD
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR encoding "\0\fBEncoding\fP(Private Object)
+The encoding, which remains accessible.  It shall be an instance of class
+Encoding.
+.TP
+.IR object "\0\fBOriginal\fP(Private Object)
+The original, which is created in the encoding's workspace.  This result is
+present if, and only if, the Return Code is success
+.RB [ OM_SUCCESS ].
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR om_decode ()
+function creates a new private object, the original, that is an exact, but
+independent copy of the object than an existing private object, the encoding,
+encodes.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, the zero value of
+.RB [ OM_SUCCESS ]
+is returned. Otherwise, a non-zero diagnostic error value is returned.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.BR om_decode ()
+fails, it returns a non-zero error code, as follows:
+.TP
+.RB [ OM_ENCODING_INVALID ]
+The octets that constitute the value of an encoding's Object Encoding attribute
+are invalid.
+.TP
+.RB [ OM_FUNCTION_DECLINED ]
+The function does not apply to the object to which it is addressed.
+.TP
+.RB [ OM_FUNCTION_INTERRUPTED ]
+The function was aborted by an external force (for example, a keystroke,
+designated for this purpose, at a user interface).
+.TP
+.RB [ OM_MEMORY_INSUFFICIENT ]
+The service cannot allocate the main memory it needs to complete the function.
+.TP
+.RB [ OM_NETWORK_ERROR ]
+The service could not successfully employ the network upon which its
+implementation depends.
+.TP
+.RB [ OM_NO_SUCH_CLASS ]
+A purported class identifier is undefined.
+.TP
+.RB [ OM_NO_SUCH_OBJECT ]
+A purported object is nonexistent or the purported handle is invalid.
+.TP
+.RB [ OM_NO_SUCH_RULES ]
+A purported rules identifier is undefined.
+.TP
+.RB [ OM_NOT_AN_ENCODING ]
+An object is not an instance of the Encoding class.
+.TP
+.RB [ OM_NOT_PRIVATE ]
+An object is public, not private.
+.TP
+.RB [ OM_PERMANENT_ERROR ]
+The service encountered a permanent difficulty other than those denoted by
+other return codes.
+.TP
+.RB [ OM_POINTER_INVALID ]
+In the C inteface, an invalid pointer was supplied as a function argument or as
+the receptacle for a function result.
+.TP
+.RB [ OM_SYSTEM_ERROR ]
+The service could not successfully employ the operating system upon which its
+implementation depends.
+.TP
+.RB [ OM_TEMPORARY_ERROR ]
+The service encountered a temporary difficulty other than those denoted by
+other return codes.
+.TP
+.RB [ OM_TOO_MANY_VALUES ]
+AN implementation limit prevents the addiiton to an object of another attribute
+value.  This limit is undefined.
+.TP
+.RB [ OM_WRONG_VALUE_LENGTH ]
+An attribute has, or would have, a value that violates the value length
+constraints in force.
+.TP
+.RB [ OM_WRONG_VALUE_MAKEUP ]
+An attribute has, or would have, a value that violates a constraint of the
+value's syntax.
+.TP
+.RB [ OM_WRONG_VALUE_NUMBER ]
+An attribute has, or would have, a value that violates the value number
+constraints in force.
+.TP
+.RB [ OM_WRONG_VALUE_SYNTAX ]
+An attribute has, or would have, a value whose syntax is not permitted.
+.TP
+.RB [ OM_WRONG_VALUE_TYPE ]
+An object has, or would have, an attribute whose type is not permitted.
+.PP
+Other arguments passed to or returned by the function are unaffected.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR XOM (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.BR om_decode ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR om_decode ()
+is compatible with
+.IR "Solstice OSI 8.0 "  to " 9.0
+and implementations based on
+XOM,
+.[
+xom osi
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Note that many add-on OSI packages for popular UNIX SVR 4.2 based releases
+provided the XOM interface and the associated set of X/Open, IEEE and ISO
+standard interfaces.
+.IP \(em
+The function is source compatible only.  Binary compatibility was not
+attempted.
+.PP
+See also,
+.BR XOM (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM.
+.[
+xom osi
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR om_decode ()
+first appeared in XOM.
+.[
+xom osi
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the 
+.B @PACKAGE_TITLE@
+XOM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

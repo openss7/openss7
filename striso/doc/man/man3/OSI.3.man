@@ -105,7 +105,7 @@ DS
 T}:T{
 XDS
 .[
-XDS
+XDS c608
 .]
 T}
 T{
@@ -113,7 +113,7 @@ MS
 T}:T{
 XMS
 .[
-XMS
+XMS c305
 .]
 T}
 T{
@@ -121,7 +121,7 @@ MHS
 T}:T{
 XMHS
 .[
-XMHS
+XMHS c609
 .]
 T}
 T{
@@ -129,7 +129,7 @@ FTAM
 T}:T{
 XFTAM
 .[
-XFTAM
+XFTAM c415
 .]
 T}
 T{
@@ -137,7 +137,7 @@ TMN
 T}:T{
 XMP
 .[
-XMP
+XMP c306
 .]
 T}
 .TE
@@ -149,7 +149,7 @@ x680
 .]
 which is provided programatically using the XOM.
 .[
-XOM
+XOM c607
 .]
 .PP
 Underneath these we have ACSE

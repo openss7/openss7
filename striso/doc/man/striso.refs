@@ -3676,6 +3676,18 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x218
+%L X.218
+%A ITU
+%R ITU-T Recommendation X.218 [ISO/IEC 9066-1]
+%T Open Systems Interconnection \(em General Service Definitions \(em Reliable Transfer: Model and Service Definition
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K x219
 %L X.219
 %A ITU
@@ -3746,6 +3758,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K x228
+%L X.228
+%A ITU
+%R ITU-T Recommendation X.228 [ISO/IEC 9066-2]
+%T Open Systems Interconnection \(em PICS Proformas \(em Reliable Transfer: Protocol Specification
+%D n.d.
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%O (Extract from Blue Book)
 %U http://www.itu.int/
 
 %K x229
@@ -3827,6 +3852,30 @@ Part 1: Protocol Specification
 %C Geneva
 %D November 1993
 %T Transport Protocol Identification Mechanism
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K x410-1984
+%L X.410
+%A CCITT
+%R CCITT Recommendation X.410
+%C Geneva
+%D October 1984
+%T Information Technology \(em Message Handling Systems (MHS) \(em Remote Operations and Reliable Transfer Server
+%I CCITT Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Withdrawn on 25/11/1988)
+%U http://www.itu.int/
+
+%K x413
+%L X.413
+%A ITU
+%R ITU-T Recommendation X.413
+%C Geneva
+%D June 1999
+%T Information Technology \(em Message Handling Systems (MHS) \(em Message Store: Abstract Service Definition
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
@@ -4511,6 +4560,28 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs.hp.com/
 
+%L HPUXAPLI
+%R HP-UX\(rg OTS/9000
+%K hpuxapli
+%T ACSE/Presentation and ROSE Interface Programmer's Guide
+%G Pub. No: 32070-90032
+%D May 1997
+%Q Hewlett-Packard Company
+%I HP9000 Networking
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPUXOTS
+%R OTS/9000
+%K hpuxots
+%T HP OSI Transport Services/9000 Release Notes
+%G Pub. No: 32070-90049 thru 53
+%D 1997 thru 2004
+%Q Hewlett-Packard Company
+%I HP9000 Networking
+%C Palo Alto, California
+%U http://docs.hp.com/
+
 %L MACOTR
 %R Mac OS 9
 %K macotr
@@ -4549,6 +4620,99 @@ Part 1: Protocol Specification
 %T STREAMS Programming Guide
 %G Part No: 805-7478-05
 %D August 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLXOM
+%R Solaris\(rg Solstice\(tm XOM
+%K solxom
+%T Solstice\(tm XOM Programming Reference
+%G Part No: 802-1311-12
+%J Revision A
+%D February 1996
+%Q Sun Microsystems, Inc.
+%I SunSoft
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SOLXMP
+%R Solaris\(rg Solstice\(tm XMP
+%K solxmp
+%T Solstice\(tm XMP Programming Reference
+%G Part No: 802-1312-11
+%J Revision A
+%D April 1996
+%Q Sun Microsystems, Inc.
+%I SunSoft
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SOLX500
+%R Solaris\(rg
+%K solx500
+%T Solstice\(tm X.500 XDS Programming Reference
+%G Part No: 802-2130-10
+%D January 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX400
+%R Solaris\(rg
+%K solx400
+%T Solstice\(tm X.400 Client Toolkit 9.0 Administrator's Guide
+%G Part No: 802-5046-10
+%D February 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLCMIP
+%R Solaris\(rg
+%K solcmip
+%T Solstice\(tm CMIP 8.2 Programmer's Guide
+%G Part No: 802-5281-10
+%D April 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25
+%R Solaris\(rg 9
+%K solx25
+%T Solstice X.25 9.2 Administration Guide
+%G Part No: 806-1234-10
+%D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25
+%R Solaris\(rg 9
+%K solx25
+%T Solstice X.25 9.2 Developer's Guide
+%G Part No: 806-1235-10
+%D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25
+%R Solaris\(rg 9
+%K solx25
+%T Solstice X.25 9.2 PAD User's Guide
+%G Part No: 806-1236-10
+%D October 1999
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Palo Alto, California
@@ -4650,10 +4814,23 @@ Part 1: Protocol Specification
 %C Santa Clara, California
 %U http://docs.sun.com/
 
+%L SUNLINK-ADM
+%R Solaris\(rg SunLink OSI
+%K sunlink
+%T SunLink\(rg OSI 8.1 Communication Platform Administrator's Guide
+%G Part No: 801-4975-13
+%J Revision A
+%D March 1995
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Mountain View, California
+%U http://docs.sun.com/
+
 %L SUNLINK-TLI
 %R Solaris\(rg SunLink OSI
 %K sunlink
-%T SunLink OSI 8.1 TLI Programmer's Reference
+%T SunLink\(rg OSI 8.1 TLI Programmer's Reference
+%G Part No: 801-7170-12
 %J Revision A
 %D March 1995
 %Q Sun Microsystems, Inc.
@@ -4664,10 +4841,10 @@ Part 1: Protocol Specification
 %L SUNLINK-APLI
 %R Solaris\(rg SunLink OSI
 %K sunlink
-%T Sunlink OSI 8.1 APLI Programmer's Reference
+%T SunLink\(rg OSI 8.1 APLI Programmer's Reference
 %J Revision A
 %D March 1995
-%G Part No.: 802-2040-11
+%G Part No: 802-2040-11
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Mountain View, California

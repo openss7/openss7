@@ -1,0 +1,310 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id$
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date$ by $Author$
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log$
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH DS_SEARCH 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B ds_search
+\- find entries of interest in a portion of the directory information tree
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xds.h>
+.HP
+.BI "DS_status ds_search(OM_private object " session ", OM_private_object " context ", OM_object " name ", OM_sint " subset ", OM_object " filter ", OM_boolean " search_aliases ", OM_object " selection ", OM_private_object *" result_return ", OM_sint *" invoke_id_return );
+.\"
+.\"
+.SH INTERFACE
+.PP
+XDS
+.[
+XDS
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This function is sued to search a portion of the directory and return selected
+information from entries of interest.  The information may be incomplete in
+some circumstances.
+.PP
+The result of this operation can be abandoned.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.IR session "\0\fBSession\fP(Object(Session)).
+The directory session against which this operation is performed.  This must be
+a private object.
+.TP
+.IR context "\0\fBContext\fP(Object(Context)).
+The directory context to be used for this operation.  This argument must be
+a private object or the constant
+.RB { DS_DEFAULT_CONTEXT }.
+.TP
+.IR name "\0\fBName\fP(Object(Name)).
+The name of the object entry that forms the base of the search.  Any aliases in
+the name will be dereferenced unless prohibited by
+.B dont-Dereference-Aliases
+service control.
+.TP
+.IR subset "\0\fBSubset\fP(Integer).
+Specifies the portion of the directory information tree to be searched.  Its
+value must be one of:
+.RS
+.IP \(em \w'\(em\(em'u
+.BR "base-object " [ DS_BASE_OBJECT ].
+Search just the given object entry.
+.IP \(em
+.BR "one-level " [ DS_ONE_LEVEL ].
+Search just the immediate subordinates of the given object entry.
+.IP \(em
+.BR "whole-subtree " [ DS_WHOLE_SUBTREE ].
+Search the given object and all its subordinates.
+.RE
+.TP
+.IR filter "\0\fBFilter\fP(Object(Filter)).
+The filter is used to eliminate entries from the search that are not wanted.
+Information will only be returned on entries that satisfy the filter.  The
+constant
+.BR "No-Filter " [ DS_NO_FILTER ]
+may be used as the value of the argument if all entries should be searched, and
+non eliminated.  This corresponds to a filter with
+.B Filter-Type
+value of
+.BR and ,
+and no values of the OM attributes
+.BR Filters " or " Filter-Items.
+.TP
+.IR search_aliases "\0\fBSearch-Aliases\fP(Boolean)
+Any aliases in the subordinate entries being searched will be dereferenced if
+the value of this argument is
+.BR true ,
+and will not be dereferenced if the value of this argument is
+.BR true ,
+and will not be dereferenced if its value is
+.BR false .
+.TP
+.IR selection "\0\fBSelection\fP(Object(Entry-Information-Selection)).
+Specifies what information form the entry is requested.  Information about no
+attributes, all attributes or just for a named set can be chosen.  Attribute
+types are always returned, but the attribute values need not be.
+.sp
+The value of the argument is an instance of OM class
+.BR Entry-Information-Selection ,
+but one of the constants below can be used in simple cases:
+.RS
+.IP \(bu \w'\(bu\(em'u
+To verify the existence of an entry for the purported name, use the constant
+.B Select-No-Attributes
+.RB { DS_SELECT_NO_ATTRIBUTES }.
+.IP \(bu
+To return just the types of all attributes, use the constant
+.B Select-All-Types
+.RB { DS_SELECT_ALL_TYPES }.
+.IP \(bu
+To return the types and values of all attributes, use the constant
+.B Select-All-Types-And-Values
+.RB { DS_SELECT_ALL_TYPES_AND_VALUES }.
+.RE
+.\"
+.\"
+.SH RETURN
+.PP
+.TP
+.BR Status "(Status)
+Takes the value
+.B success
+if the named object was located and takes an error value if not, when the
+function is used synchronously.  Reports whether the operation was initiated,
+if used asynchronously.
+.TP
+.BR Result "(Object(Search-Result))
+Upon successful completion of a synchronous call, the result contains the
+requested information from each object in the search space that satisfied the
+filter.  The distinguished name of the target object is present if an alias was
+dereferenced.  Also, there may be a partial outcome qualifier, that indicates
+that the result is incomplete.  It also explanation why it is not complete and
+how it could be completed.
+.TP
+.BR Invoke-ID "(Integer)
+The
+.B Invoke-ID
+of an asynchronous directory operation.
+.\"
+.\"
+.SH ERRORS
+.PP
+This function can return a System-Error or one of the following Library-Errors:
+bad-argument, bad-class, bad-context, bad-name, bad-session, bad-workspace,
+miscellaneous, missing-type, too-many-operations.
+.PP
+The following Directory-Errors may be returned by the function (or by
+.BR ds_receive_result (3)
+when used asynchronously):
+Attribute-Error, Name-Error, Referral, Security-Error, Service-Error.
+.PP
+Note that an unfiltered search of just the base object succeeds even if none of
+the requested attributes are found, whilst
+.BR ds_read (3)
+fails with the same selected attributes.
+.PP
+A Security-Error (insufficient-access-rights) will only be reported where
+access rights preclude the reading of all requested attribute values.
+.PP
+This function can return a Communications-Error.
+.PP
+This function can return the error constant
+.RB [ DS_NO_WORKSPACE ].
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR ds_search ()
+is implemented on top of the more complicated OSMIS 3.0 interface.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ds_search ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XDS (3),
+.BR XOM (3),
+.BR ds_receive_result (3),
+.BR ds_abandon (3),
+.BR ds_read (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation is compatible with other implementations of the XDS.
+.[
+XDS
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XDS.
+.[
+XDS
+.]
+Conformance is validated using an
+.BR autotest (1)
+script and the
+.BR test-xds (8)
+test suite executable.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ds_search ()
+was first part of the
+.BR XDS .
+.[
+XDS
+.]
+.\"
+.\"
+.XX
+.[
+XOM
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA
