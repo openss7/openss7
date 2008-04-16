@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_PABORT_REQ.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: A_PABORT_REQ.7.man,v 0.9.2.3 2008-04-16 20:04:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_PABORT_REQ.7.man,v $
+.\" Revision 0.9.2.3  2008-04-16 20:04:22  brian
+.\" - updating APLI manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B A_PABORT_REQ
-\- 
+\-  initiate a Presentation provider abort
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,22 +109,198 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B A_PABORT_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to initiate a Presentation Layer provider abort.  This facility
+gives the user the option of aborting an association from the Presentation provider when an invalid
+PDU encoding is encountered.
+.PP
+Refer to the table in the manual page description for
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B A_PABORT_REQ
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+To send an
+.B A_PABORT_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below.
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
+This arugment identifies the XAP Library instance being used.
 .TP
 .I sptype
+This argument must be set to
+.BR AP_A_PABORT_REQ .
 .TP
 .I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long rsn;  /* reason for abort        */
+long evt;  /* event that caused abort */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->rsn
+must be set to indicate the reason for the abort.  The possible values for
+.I cdata->rsn
+are as follows:
+.TP \w'\fBAP_INVAL_PPDU_PARM\fP\(em'u
+.B AP_INVAL_PPDU_PARM
+Abort due to an invalid presentation protocol data unit parameter.
+.PD 0
+.TP
+.B AP_NSPEC
+The reason for abort is not specified.
+.TP
+.B AP_RSN_NOVAL
+No value was supplied for this optional parameter.
+.TP
+.B AP_UNEXPT_PPDU
+Abort due to an unexpected presentation protocol data unit.
+.TP
+.B AP_UNEXPT_SSPRIM
+Abort dues to an unexpected session service primitive.
+.TP
+.B AP_UNREC_PPDU
+Abort dues to an unrecognized presentation protocol data unit.
+.TP
+.B AP_UNREC_PPDU_PARM
+Abort dues to an unrecognized presentation protocol data unit parameter.
+.PD
+.PP
+The
+.I cdata->evt
+field indicates which PPDU or Session primitive which triggered the abort.  The possible values for
+.I cdata->evt
+are as follows:
+.TP \w'\fBAP_PEI_S_U_EXCEPT_REP_IND\fP\(em'u
+.B AP_EVT_NOVAL
+No value was supplied for this optional parameter.
+.PD 0
+.TP
+.B AP_PEI_AC
+Alter context PPDU.
+.TP
+.B AP_PEI_ACA
+Alter context acknowledge PPDU.
+.TP
+.B AP_PEI_ARP
+Abnormal release provider PPDU.
+.TP
+.B AP_PEI_ARU
+Abnormal release user PPDU.
+.TP
+.B AP_PEI_CP
+Connect presentation PPDU.
+.TP
+.B AP_PEI_CPA
+Connect presentation accept PPDU.
+.TP
+.B AP_PEI_CPR
+Connect presentation reject PPDU.
+.TP
+.B AP_PEI_RS
+Resynchronize PPDU.
+.TP
+.B AP_PEI_RSA
+Resynchronize acknowledge PPDU.
+.TP
+.B AP_PEI_S_ACT_START_IND
+Session activity start indication.
+.TP
+.B AP_PEI_S_ACT_RESUME_IND
+Session activity resume indication.
+.TP
+.B AP_PEI_S_ACT_INT_IND
+Session activity interrupt indication.
+.TP
+.B AP_PEI_S_ACT_INT_CNF
+Session activity interrupt confirmation.
+.TP
+.B AP_PEI_S_ACT_DISC_IND
+Session activity discard indication.
+.TP
+.B AP_PEI_S_ACT_DISC_CNF
+Session activity discard confirmation.
+.TP
+.B AP_PEI_S_ACT_END_IND
+Session activity end indication.
+.TP
+.B AP_PEI_S_ACT_END_CNF
+Session activity end confirmation.
+.TP
+.B AP_PEI_S_P_EXCEPT_REP_IND
+Session provider exception report indication.
+.TP
+.B AP_PEI_S_U_EXCEPT_REP_IND
+Session user exception report indication.
+.TP
+.B AP_PEI_S_RELEASE_IND
+Session release indication.
+.TP
+.B AP_PEI_S_RELEASE_CNF
+Session release confirmation.
+.TP
+.B AP_PEI_S_SYNCMAJOR_IND
+Session syncrhonize-major indication.
+.TP
+.B AP_PEI_S_SYNCMAJOR_CNF
+Session syncrhonize-major confirmation
+.TP
+.B AP_PEI_S_SYNCMINOR_IND
+Session syncrhonize-minor indication.
+.TP
+.B AP_PEI_S_SYNCMINOR_CNF
+Session syncrhonize-minor confirmation
+.TP
+.B AP_PEI_S_TOKENGIVE_IND
+Session token give indication.
+.TP
+.B AP_PEI_S_TOKENPLEASE_IND
+Session token please indication.
+.TP
+.B AP_PEI_TC
+Capability data PPDU.
+.TP
+.B AP_PEI_TCC
+Capability data acknowledge PPDU.
+.TP
+.B AP_PEI_TD
+Presentation data PPDU.
+.TP
+.B AP_PEI_TE
+Expedited data PPDU.
+.TP
+.B AP_PEI_TTD
+Presentation typed data PPDU.
+.PD
+.RE
 .TP
 .I ubuf
+Since no data is sent on an
+.BR A_PABORT_REQ ,
+this value must be
+.BR NULL .
 .TP
 .I flags
+Not used.
 .TP
 .I aperrno_p
+This must point to a location that will be set to an error code if a failure occurs.
 .\"
 .\"
 .SH ORIGINATOR
@@ -166,6 +345,20 @@ or XAP
 xap c303
 .]
 specifications.
+.PP
+In addition to those listed in the manual page for
+.BR ap_snd (3),
+the following error codes can be reported for this primitive:
+.TP \w'[\fBAP_BADCD_RSN\fP]\(em'u
+.RB [ AP_BADCD_EVT ]
+The value of
+.I cdata->evt
+is not valid.
+.TP
+.RB [ AP_BADCD_RSN ]
+The value of
+.I cdata->rsn
+is not valid.
 .\"
 .\"
 .\".SH NOTICES

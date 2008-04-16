@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_RELEASE_CNF.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: A_RELEASE_CNF.7.man,v 0.9.2.3 2008-04-16 20:04:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_RELEASE_CNF.7.man,v $
+.\" Revision 0.9.2.3  2008-04-16 20:04:22  brian
+.\" - updating APLI manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B A_RELEASE_CNF
-\- 
+\-  used to confirm an ACSE A-RELEASE request
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,10 +109,28 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B A_RELEASE_CNF
+primitive is used in conjunction with
+.BR ap_rcv (3)
+and the XAP Library environment to confirm the acceptance or rejection of a previously sent release
+request.
+.PP
+Refer to the table in the manual page for
+.BR ap_rcv (3)
+for information concerning the effects of receiving the
+.B A_RELEASE_CNF primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described in the manual page for
+.BR ap_rcv (3).
+Upon return, the
+.BR ap_rcv (3)
+arguments will be set as described below:
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument, returned from a call to
@@ -126,8 +147,75 @@ pointed to by this argument will be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long res;  /* result of the release request */
+long rsn;  /* reason for the result         */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->res
+will be set to indicate the result of the release request.  The possible values for
+.I cdata->res
+are as follows:
+.TP \w'\fBAP_REL_NOTFINISHED\fP\(em'u
+.B AP_REL_AFFIRM
+Indicates acceptance of the release request.
+.PD 0
+.TP
+.B AP_REL_NEGATIVE
+Indicates rejection of the release request.  Note that this value will only b set if the Session
+negotiated release functional unit is selected.
+.PD
+.PP
+The reason associated with the result will be indicated by
+.IR cdata->rsn.
+The possible values for
+.I cdata->rns
+are as follows:
+.TP \w'\fBAP_REL_NOTFINISHED\fP\(em'u
+.B AP_REL_NORMAL
+Indicates a normal release.
+.PD 0
+.TP
+.B AP_REL_NOTFINISHED
+Indicates the remote user was not finished.
+.TP
+.B AP_REL_USER_DEF
+Indicates a user defined reason.
+.TP
+.B AP_RSN_NOVAL
+No value was supplied for this optional parameter.
+.PD
+.PP
+Providing a reason for the response to the release request is optional.  If the remote user chose
+not to supply a reason,
+.I cdata->rsn
+will be set to
+.BR AP_RSN_NOVAL .
+.PP
+If
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the
+.I cdata->rsn
+argument will be set to
+.BR AP_RSN_NOVAL
+by the library.
+.RE
 .TP
 .I ubuf
+Use of the
+.I ubuf
+argument is described in the manual page for
+.BR ap_snd (3).
 .TP
 .I flags
 The

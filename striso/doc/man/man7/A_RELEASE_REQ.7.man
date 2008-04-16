@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_RELEASE_REQ.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: A_RELEASE_REQ.7.man,v 0.9.2.3 2008-04-16 20:04:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_RELEASE_REQ.7.man,v $
+.\" Revision 0.9.2.3  2008-04-16 20:04:22  brian
+.\" - updating APLI manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B A_RELEASE_REQ
-\- 
+\- release an ACSE association
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,22 +109,111 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B A_RELEASE_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to request the normal release of an association.
+.PP
+Refer to the table in the manual page description for
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B A_RELEASE_REQ
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+To send an
+.B A_RELEASE_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below.
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
+This argument identifies the XAP Library instance being used.
 .TP
 .I sptype
+This agument must be set to
+.BR AP_A_RELEASE_REQ .
 .TP
 .I cdata
+The following members of
+.I cdata
+are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long udata_length;  /* length of user-information */
+long rsn;           /* reason for release         */
+\s+1\fP
+.fi
+.RE
+.PP
+Where this primitive is to be sent using a series of calls to
+.BR ap_snd (3)
+with the
+.B AP_MORE
+flag set,
+.I cdata->udata_length
+should be set to the total number of octets of encoded user data that will be sent with this
+primitive.  If the total number of octets of encoded user data is not known this field may be set to
+minus one
+.RB ( -1 ).
+However, in some XAP implementations setting this field to minus one
+.RB ( -1 )
+may significantly degrade performance as it requires the implementation to buffer data until a
+complete SPDU can be transmitted.
+.PP
+The total number of octets of encoded user data that can be sent with this primitive may be subject
+to an implementation dependent resetriction.  Any such restriction will be stated in the CSQ for an
+implementation.
+.PP
+.I cdata->rsn
+conveys the reason for the release request.  The following values are allowed:
+.TP \w'\fBAP_REL_USER_DEF\fP\(em'u
+.B AP_REL_NORMAL
+Normal release request.
+.PD 0
+.TP
+.B AP_REL_URGENT
+Urgent release request.
+.TP
+.B AP_REL_USER_DEF
+A user defined release request.
+.TP
+.B AP_RSN_NOVAL
+No value was specified for this optional parameter.
+.PD
+.PP
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the
+.I cdata->rsn
+argument is not used and any value specified by the user will be ignored.
+.RE
 .TP
 .I ubuf
+Use fo the
+.I ubuf
+argument is described in the manual page for
+.BR ap_snd (3).
 .TP
 .I flags
+The
+.I flags
+argument is used to control certain aspects of primitive processing as described in the manual page
+for
+.BR ap_snd (3).
 .TP
 .I aperrno_p
+This must point to a location that will be set to an error code if a failure occurs.
 .\"
 .\"
 .SH ORIGINATOR
@@ -168,6 +260,15 @@ or XAP
 xap c303
 .]
 specifications.
+.PP
+In addition to those listed in the manual page for
+.BR ap_snd (3),
+the following error codes can be reported for this primitive:
+.TP \w'\fBAP_BADCD_RSN\fP]\(em'u
+.RB [ AP_BADCD_RSN ]
+The value of
+.I cdata->rsn
+is not valid.
 .\"
 .\"
 .\".SH NOTICES

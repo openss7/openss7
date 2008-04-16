@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_RELEASE_IND.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: A_RELEASE_IND.7.man,v 0.9.2.3 2008-04-16 20:04:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_RELEASE_IND.7.man,v $
+.\" Revision 0.9.2.3  2008-04-16 20:04:22  brian
+.\" - updating APLI manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B A_RELEASE_IND
-\- 
+\-  provide an ACSE A-RELEASE indication
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,10 +109,29 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B A_RELEASE_IND
+primitive is used in conjunction with
+.BR ap_rcv (3)
+and the XAP Library environment to indicate that the remote service user wishes to release the
+association.
+.PP
+Refer to the table in the manual page description for
+.BR ap_rcv (3)
+for information concerning the effects of receiving the
+.B A_RELEASE_IND
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described in the manual page for
+.BR ap_rcv (3).
+Upon return, the
+.BR ap_rcv (3)
+arguments will be set as described below.
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument, returned from a call to
@@ -126,8 +148,59 @@ pointed to by this argument will be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long rsn;    /* reason for release */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->rsn
+will indicate the reason for the release request.  The possible values for
+.I cdata->rsn
+are given below:
+.TP \w'\fBAP_REL_USER_DEF\fP\(em'u
+.B AP_REL_NORMAL
+Normal release request.
+.PD 0
+.TP
+.B AP_REL_URGENT
+Urgent release request.
+.TP
+.B AP_REL_USER_DEF
+A user defined release request.
+.TP
+.B AP_RSN_NORMAL
+No value was specified for this optional parameter.
+.PD
+.PP
+Providing a reason for the release request is optional.  If the release request did no contain a
+reason then
+.I cdata->rsn
+will be set to
+.BR AP_RSN_NOVAL .
+.PP
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effecte (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the
+.I cdata->rsn
+argument will be set to
+.BR AP_RSN_NOVAL
+by the library.
+.RE
 .TP
 .I ubuf
+Use of the
+.I ubuf
+argument is described in the manual page for
+.BR ap_rcv (3).
 .TP
 .I flags
 The
