@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ACSE.7.man,v 0.9.2.1 2007/11/06 11:43:20 brian Exp $
+.\" @(#) $Id: ACSE.7.man,v 0.9.2.2 2008-04-16 20:04:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/11/06 11:43:20 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ACSE.7.man,v $
+.\" Revision 0.9.2.2  2008-04-16 20:04:22  brian
+.\" - updating APLI manual pages
+.\"
 .\" Revision 0.9.2.1  2007/11/06 11:43:20  brian
 .\" - updated manual pages
 .\"
@@ -77,9 +80,26 @@ sort-adjacent-labels
 .so striso.macros
 .\"
 .\"
-.TH ACSE 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI)"
-
-
+.TH ACSE 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Association Control Service Element (ACSE)"
+.SH NAME
+.B ACSE
+\- Association Control Service Element (ACSE)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.PP
+.B #include <ap_lib.h>
+.br
+.B #include <osi_lib.h>
+.PP
+.B #include <xap.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
 .SH ACSE Functional Units
 .PP
 .TS
@@ -217,3 +237,20 @@ Authentication-mechanism Name:U:C(=):U:C(=)
 Authentication-value:U:C(=):U:C(=)
 User Information:U:C:U:C(=)
 .TE
+.\"
+.\"
+.XX
+.[
+x217
+.]
+.[
+x227
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.TI

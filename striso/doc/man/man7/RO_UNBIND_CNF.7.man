@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: RO_UNBIND_CNF.7.man,v 1.1.2.1 2008/04/16 17:21:08 brian Exp $
+.\" @(#) $Id: RO_UNBIND_CNF.7.man,v 0.9.2.2 2008-04-16 20:04:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008/04/16 17:21:08 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: RO_UNBIND_CNF.7.man,v $
+.\" Revision 0.9.2.2  2008-04-16 20:04:22  brian
+.\" - updating APLI manual pages
+.\"
 .\" Revision 1.1.2.1  2008/04/16 17:21:08  brian
 .\" - added new manual pages
 .\"
@@ -292,8 +295,8 @@ Refer to the manual page for
 .BR ap_rcv (3).
 .\"
 .\"
-.SH NOTICES
-.PP
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH SEE ALSO

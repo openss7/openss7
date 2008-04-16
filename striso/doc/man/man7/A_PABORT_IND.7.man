@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_PABORT_IND.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: A_PABORT_IND.7.man,v 0.9.2.3 2008-04-16 20:04:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_PABORT_IND.7.man,v $
+.\" Revision 0.9.2.3  2008-04-16 20:04:22  brian
+.\" - updating APLI manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -144,16 +147,16 @@ are used for this primitive:
 .PP
 .nf
 \f(CW\s-1\
-long rsn;   /* reason for abort */
+long rsn;   /* reason for abort       */
 long evt;   /* event that cause abort */
-long src;   /* source of abort */
+long src;   /* source of abort        */
 \s+1\fP
 .fi
 .PP
 .I cdata->src
 indicates the source of the abort.  Possible values for this field are as
 follows:
-.TP 24
+.TP \w'\fBAP_PEI_S_U_EXCEPT_REP_IND\fP\(em'u
 .B AP_PRES_SERV_PROV
 Presentation service provider.
 .PD 0
@@ -176,7 +179,7 @@ is set to
 .BR AP_PRES_SERV_PROV ,
 .I cdata->rsn
 will be set to one of the following:
-.TP 24
+.TP \w'\fBAP_PEI_S_U_EXCEPT_REP_IND\fP\(em'u
 .B AP_INVAL_PPDU_PARM
 Abort due to an invalid presentation protocol data unit parameter.
 .PD 0
@@ -209,7 +212,7 @@ is set to
 .BR AP_SESS_SERV_PROV ,
 .I cdata->rns
 will be set to one of the following:
-.TP 24
+.TP \w'\fBAP_PEI_S_U_EXCEPT_REP_IND\fP\(em'u
 .B AP_SESS_PERROR
 Abort due to session protocol errror.
 .PD 0
@@ -230,7 +233,7 @@ is set to
 .BR AP_TRAN_SERV_PROV ,
 .I cdata->rsn
 will be set to one of the following:
-.TP 24
+.TP \w'\fBAP_PEI_S_U_EXCEPT_REP_IND\fP\(em'u
 .B AP_CLD_TADDR_UNKN
 Address unknown.
 .PD 0
@@ -281,7 +284,7 @@ the PPDU or Session primitive that triggered the abort will be indicated by
 The possible values for
 .I cdata->evt
 are as follows:
-.TP 24
+.TP \w'\fBAP_PEI_S_U_EXCEPT_REP_IND\fP\(em'u
 .B AP_EVT_NOVAL
 No value was supplied for this optional parameter.
 .PD 0
