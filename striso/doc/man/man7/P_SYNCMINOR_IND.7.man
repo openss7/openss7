@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: P_SYNCMINOR_IND.7.man,v 0.9.2.2 2008-04-16 17:34:25 brian Exp $
+.\" @(#) $Id: P_SYNCMINOR_IND.7.man,v 0.9.2.3 2008-04-17 07:20:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:25 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-17 07:20:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: P_SYNCMINOR_IND.7.man,v $
+.\" Revision 0.9.2.3  2008-04-17 07:20:36  brian
+.\" - working up manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:25  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B P_SYNCMINOR_IND
-\- 
+\- indicate a request to set a minor synchronization point
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,10 +109,31 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B P_SYNCMINOR_IND
+primitive is used in conjunction with
+.BR ap_rcv (3)
+and the XAP Library environment to indicate that the remote service user has requested that a minor
+synchronization point be set.  Minor synchronization points are used to structure the exchange of
+informaiton within a dialogue unit.  A dialogue unit is a segment of communication that is logically
+separated form all communication before and after it.
+.PP
+Refer to the table in the manual page description for
+.BR ap_rcv (3)
+for information concerning the effects of receiving the
+.B P_SYNCMINOR_IND
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described in the manual page for
+.BR ap_rcv (3).
+Upon return, the
+.BR ap_rcv (3)
+arguments will be set as described below:
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument, returned from a call to
@@ -126,6 +150,35 @@ pointed to by this argument will be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long sync_type;         /* type of request                     */
+long sync_p_sn;         /* synchronization point serial number */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->sync_type
+is a bit mask that indicates whether confirmation is optional and whether data separation is
+required on this minor synchronization point.  Values for this field are formed by OR'ing together
+zero or more of the flags below.  When a bit is set, the specified indication was received:
+.TP \w'\fBAP_NO_CONFIRMATION\fP\(em'u
+.B AP_NO_CONFIRMATION
+No explicit confirmation is required.
+.TP
+.B AP_DATA_SEPARATION
+Data Separation is requested.
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+These are bit fields so none, one or both could be active; the absence of
+.B AP_NO_CONFIRMATION
+means that explicit confirmation is required.
+.PP
+.I cdata->sync_p_sn
+is the serial number of this synchronization point.
+.RE
 .TP
 .I ubuf
 Use of the
@@ -162,8 +215,8 @@ x410 1984
 This primitive is issued by the XAP interface service.
 .\"
 .\"
-.SH STATE
-.PP
+.\".SH STATE
+.\".PP
 .\"
 .\"
 .SH RETURN

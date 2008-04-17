@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: P_XDATA_REQ.7.man,v 0.9.2.2 2008-04-16 17:34:25 brian Exp $
+.\" @(#) $Id: P_XDATA_REQ.7.man,v 0.9.2.3 2008-04-17 07:20:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:25 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-17 07:20:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: P_XDATA_REQ.7.man,v $
+.\" Revision 0.9.2.3  2008-04-17 07:20:36  brian
+.\" - working up manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:25  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B P_XDATA_REQ
-\- 
+\- send expedited user data
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,9 +109,32 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B P_XDATA_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to send from one (1) to fourteen (14) octets of expedited data over
+an established association, in a single call to
+.BR ap_snd (3)
+(with the
+.B AP_MORE
+flag unset).  Expedited data is free from the token and flow constraints that apply to normal,
+typed, and capability data transfers.
+.PP
+Refer to the table in the manual page description for
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B P_XDATA_REQ
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
+.PP
+To send a
+.B P_XDATA_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below:
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument identifies the APLI/XAP Library instance being used.
@@ -121,6 +147,12 @@ This argument must be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+None.
+.RE
+.RE
 .TP
 .I ubuf
 Use of the
@@ -134,6 +166,12 @@ The
 argument is used to control certain aspects of primitive processing as defined
 in the manual page for
 .BR ap_snd (3).
+.RS
+.PP
+Note that the
+.B P_XDATA_REQ
+primitive may not be issued without one or more octets of user-data.
+.RE
 .TP
 .I aperrno_p
 This must point to a location which will be set to an error code if a failure
@@ -195,6 +233,13 @@ or XAP
 xap c303
 .]
 specifications.
+.PP
+In addition to those listed in the manual page for
+.BR ap_snd (3),
+the following error codes can be reported for this primitive:
+.TP \w'[\fBAP_BADCD_TOKENS\fP]\(em'u
+.RB [ AP_NODATA ]
+An attempt was made to send this primitive with no user-data.
 .\"
 .\"
 .\".SH NOTICES

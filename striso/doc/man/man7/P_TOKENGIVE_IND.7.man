@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: P_TOKENGIVE_IND.7.man,v 0.9.2.2 2008-04-16 17:34:25 brian Exp $
+.\" @(#) $Id: P_TOKENGIVE_IND.7.man,v 0.9.2.3 2008-04-17 07:20:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:25 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-17 07:20:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: P_TOKENGIVE_IND.7.man,v $
+.\" Revision 0.9.2.3  2008-04-17 07:20:36  brian
+.\" - working up manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:25  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B P_TOKENGIVE_IND
-\- 
+\- indicate the receipt of newly acquired tokens
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,10 +109,30 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B P_TOKENGIVE_IND
+primitive is used in conjunction with
+.BR ap_rcv (3)
+and the XAP Library environment to indicate the receipt of newly acquired tokens.  A token is an
+attribute of an association that is dynamically assigned to one user at a time.  The user that
+currently possesses a token has the exclusive use of the service it controls.
+.PP
+Refer to the table in the manual page description for
+.BR ap_rcv (3)
+for information concerning the effects of receiving the
+.B P_TOKENGIVE_IND
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described in the manual page for
+.BR ap_rcv (3).
+Upon return, the
+.BR ap_rcv (3)
+arguments will be set as described below:
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument, returned from a call to
@@ -126,6 +149,38 @@ pointed to by this argument will be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+unsigned long tokens;    /* tokens acquired */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->tokens
+identifies the token(s) that were received.  Tokens are identified by OR'ing together one or more of
+the following values:
+.TP \w'\fBAP_SYNCMINOR_TOK\fP\(em'u
+.B AP_DATA_TOK
+Data token.
+.PD 0
+.TP
+.B AP_MAJACT_TOK
+Synchronize-major/activity token.
+.TP
+.B AP_SYNCMINOR_TOK
+Synchronize-minor token.
+.TP
+.B AP_RELEASE_TOK
+Release token.
+.PD
+.PP
+In addition, the XAP Library enviroment attribute
+.B AP_TOKENS_OWNED
+will be updated to reflect the acquisition.
+.RE
 .TP
 .I ubuf
 Use of the
@@ -172,8 +227,8 @@ indication:
 This primitive is issued by the XAP interface service.
 .\"
 .\"
-.SH STATE
-.PP
+.\".SH STATE
+.\".PP
 .\"
 .\"
 .SH RETURN
