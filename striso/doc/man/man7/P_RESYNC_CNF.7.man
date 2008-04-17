@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: P_RESYNC_CNF.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: P_RESYNC_CNF.7.man,v 0.9.2.3 2008-04-17 07:20:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-17 07:20:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: P_RESYNC_CNF.7.man,v $
+.\" Revision 0.9.2.3  2008-04-17 07:20:36  brian
+.\" - working up manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B P_RESYNC_CNF
-\- 
+\-  confirm a resynchronization request
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,10 +109,28 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B P_RESYNC_CNF
+primitive is used in conjunction with
+.BR ap_rcv (3)
+and the XAP Library environment to confirm a request to set the association to a defined state.
+.PP
+Refer to the table in the manual page description for
+.BR ap_rcv (3)
+for information concerning the effects of receiving the
+.B P_RESYNC_CNF
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+When issuing
+.BR ap_rcv (3),
+the arguments must be set as described in the manual page for
+.BR ap_rcv (3).
+Upon return, the
+.BR ap_rcv (3)
+arguments will be set as described below:
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument, returned from a call to
@@ -126,6 +147,28 @@ pointed to by this argument will be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long sync_p_sn;                  /* synchroniation point serial number */
+unsigned long token_assignment;  /* token assignment                   */
+\s+1\fP
+.fi
+.RE
+.PP
+.I cdata->sync_p_sn
+will be a valid synchronization point serial number in the range 0 to 999,999.
+.PP
+.I cdata->token_assignment
+indicates the assignment of those tokens that were identified as
+.I acceptor's choice
+when the
+.BR P_RESYNC_REQ (7)
+primitive was sent; see the manual page for
+.BR P_RESYNC_RSP (7).
+.RE
 .TP
 .I ubuf
 Use of the
@@ -172,8 +215,8 @@ confirmation:
 This primitive is issued by the XAP interface service.
 .\"
 .\"
-.SH STATE
-.PP
+.\".SH STATE
+.\".PP
 .\"
 .\"
 .SH RETURN

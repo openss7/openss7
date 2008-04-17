@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: P_DATA_REQ.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: P_DATA_REQ.7.man,v 0.9.2.3 2008-04-17 07:20:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-17 07:20:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: P_DATA_REQ.7.man,v $
+.\" Revision 0.9.2.3  2008-04-17 07:20:36  brian
+.\" - working up manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B P_DATA_REQ
-\- 
+\- send normal data
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,9 +109,26 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B P_DATA_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to send user data over an established association.
+.PP
+Refer to the table in the manual page description for
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B P_DATA_REQ
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
+.PP
+To send a
+.B P_DATA_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below:
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument identifies the APLI/XAP Library instance being used.
@@ -121,6 +141,54 @@ This argument must be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long udata_length;     /* length of user-information field */
+unsigned long tokens;  /* surrendered tokens               */
+\s+1\fP
+.fi
+.RE
+.PP
+Where this primitive is to be sent using a series of calls to
+.BR ap_snd (3)
+with the
+.B AP_MORE
+flag set,
+.I cdata->udata_length
+should be set to the total number of octets of encoded user data that will be
+sent with this primitive.  If the total number of octets of encoded user-data
+is not known this field may be set to minus one
+.RB ( -1 ).
+However, in some XAP implementations, setting this field to minus one
+.RB ( -1 )
+may significantly degrade performance.
+Where the underlying session connection has negotiated an unlimited TSDU size for the outgoing
+direction, the user need not set the
+.I cdata->udata_length
+field, as XAP can begin to format and sent the appropriate session PDU without knowing how much user
+information is to follow.
+.PP
+.I cdata->tokens
+identifies the token(s) surrendered  Tokens are identified by OR'ing together one or more of the
+following values:
+.TP \w'\fBAP_SYNCMINOR_TOK\fP\(em'u
+.B AP_DATA_TOK
+Data token.
+.PD 0
+.TP
+.B AP_MAJACT_TOK
+Synchronize-major/activity token.
+.TP
+.B AP_SYNCMINOR_TOK
+Synchronize-minor token.
+.TP
+.B AP_RELEASE_TOK
+Release token.
+.PD
+.RE
 .TP
 .I ubuf
 Use of the
@@ -134,6 +202,12 @@ The
 argument is used to control certain aspects of primitive processing as defined
 in the manual page for
 .BR ap_snd (3).
+.RS
+.PP
+Note that
+.B P_DATA_REQ
+primitive may not be issued without one or more octets of user-data.
+.RE
 .TP
 .I aperrno_p
 This must point to a location which will be set to an error code if a failure
@@ -201,6 +275,18 @@ or XAP
 xap c303
 .]
 specifications.
+.PP
+In addition to those listed in the manual page for
+.BR ap_snd (3),
+the following error codes can be reported for this primitive:
+.TP \w'[\fBAP_BADCD_TOKENS\fP]\(em'u
+.RB [ AP_BADCD_TOKENS ]
+The value of
+.I cdata->tokens
+is not valid.
+.TP
+.RB [ AP_NODATA ]
+An attempt was made to send this primitive with no user-data.
 .\"
 .\"
 .\".SH NOTICES

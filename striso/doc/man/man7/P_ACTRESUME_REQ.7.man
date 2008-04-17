@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: P_ACTRESUME_REQ.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: P_ACTRESUME_REQ.7.man,v 0.9.2.3 2008-04-17 07:20:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-17 07:20:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: P_ACTRESUME_REQ.7.man,v $
+.\" Revision 0.9.2.3  2008-04-17 07:20:36  brian
+.\" - working up manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -82,7 +85,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B P_ACTRESUME_REQ
-\- 
+\- issue an S-ACTIVITY-RESUME request
 .\"
 .\"
 .SH SYNOPSIS
@@ -106,9 +109,32 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B P_ACTRESUME_REQ
+primitive is used in conjunction with
+.BR ap_snd (3)
+and the XAP Library environment to provide the user with access to the S-ACTIVITY-RESUME session
+service.
+.[
+x215
+.]
+The S-ACTIVITY-RESUME session service allows the user to indicate that a previously interrupted
+activity is resumed.
+.PP
+Refer to the table in the manual page description for
+.BR ap_snd (3)
+for information concerning the effects of sending the
+.B P_ACTRESUME_REQ
+primitive and restrictions on its use.
 .\"
 .\"
 .SH ARGUMENTS
+.PP
+To send a
+.B P_ACTRESUME_REQ
+primitive, the arguments to
+.BR ap_snd (3)
+must be set as described below:
 .TP \w'\fIaperrno_p\fP\(em'u
 .I fd
 This argument identifies the APLI/XAP Library instance being used.
@@ -121,6 +147,122 @@ This argument must be set to
 The following members of
 .I cdata
 are used for this primitive:
+.RS
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+long udata_length;             /* length of user-data field */
+ap_octet_string_t act_id;      /* activity identifier       */
+ap_octet_string_t old_act_id;  /* old activity identifier   */
+long sync_p_sn;                /* synchronization point     */
+ap_old_conn_id_t *old_conn_id; /* old session connection    */
+unsigned long tokens;          /* requested tokens          */
+\s+1\fP
+.fi
+.RE
+.PP
+Where this primitive is to be sent using a series of calls to
+.BR ap_snd (3)
+with the
+.B AP_MORE
+flag set,
+.I cdata->udata_length
+should be set to the total number of octets of encoded user data that will be
+sent with this primitive.  If the total number of octets of encoded user-data
+is not known this field may be set to minus one
+.RB ( -1 ).
+However, in some XAP implementations, setting this field to minus one
+.RB ( -1 )
+may significantly degrade performance as it requires the implementation to
+buffer data until a complete SPDU can be transmitted.
+.PP
+The total number of octets of encoded user-data that can be sent with this
+primitive may be subject to an implementation dependent restriction.  Any such
+restriction will be stated in the CSQ for an implementation.
+.PP
+.I cdata->act_id
+is an
+.B ap_octet_string_t
+structure.
+.I cdata->act_id.data
+points to a buffer that contains to six (6) octets of information used as the new identifier for
+this activity.
+.I cdata->act_id.length
+specifies the length of the octet string (must be less that or equal to six (6)).
+.PP
+.I cdata->old_act_id
+is also an
+.B ap_octet_string_t
+structure and is subject to the same restrictions described above.  This argument is the original
+identifier for the activity that is being resumed.
+.PP
+.I cdata->sync_p_sn
+must be an integer between zero (0) and 999,998.
+.PP
+.I cdata->old_conn_id
+is a pointer to an
+.B ap_old_conn_id_t
+structure which is defined as
+.RS 4
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+  ap_octet_string_t *clg_user_ref;  /* Calling SS-user reference */
+  ap_octet_string_t *cld_user_ref;  /* Called  SS-user reference */
+  ap_octet_string_t *comm_ref;      /* Common Reference          */
+  ap_octet_string_t *addtl_ref;     /* Additional Reference      */
+} ap_old_conn_id_t;
+\s+1\fP
+.fi
+.RE
+.PP
+This argument is used to identify the session connection in which the activity being resumed was
+originally started.  The four members of this structure correspond to the calling SS-user reference,
+called SS-user reference, common reference and additional refereence components of the old session
+connection identifier parameter of the S-ACTIVITY-RESUME request primitive.  If no session
+connection identifier is to be sent,
+.I cdata->old_conn_id
+must be set to
+.BR NULL .
+.PP
+Each of the members of the
+.B ap_old_conn_id_t
+structure are of type
+.B ap_octet_string_t
+(see above).  The
+.I clg_user_ref
+and the
+.I cld_user_ref
+members must be no longer than sixty-four (64) octets.  The
+.I comm_ref
+member must be no longer than sixty-four (64) octets.  The
+.I addtl_ref
+member must be no longer than route (4) octets.  The absence of a particular member of a connection
+identifier may be indicated either by setting the corresponding field to
+.BR NULL ,
+or by specifying a zero-length
+.BR ap_octet_string_t .
+.PP
+.I cdata->tokens
+identies the token(s) requested.  Tokens are identified by OR'ing together one or more of the
+following values:
+.TP \w'\fBAP_SYNCMINOR_TOK\fP\(em'u
+.B AP_DATA_TOK
+Data token.
+.PD 0
+.TP
+.B AP_MAJACT_TOK
+Synchronize-major/activity token.
+.TP
+.B AP_SYNCMINOR_TOK
+Synchronize-minor token.
+.TP
+.B AP_RELEASE_TOK
+Release token.
+.PD
+.RE
 .TP
 .I ubuf
 Use of the
@@ -134,6 +276,18 @@ The
 argument is used to control certain aspects of primitive processing as defined
 in the manual page for
 .BR ap_snd (3).
+.RS
+.PP
+When issuing the
+.B P_ACTRESUME_REQ
+primitive via multiple
+.BR ap_snd (3)
+calls (using the
+.B AP_MORE
+bit feature), one or more octets of data must be sent on the final
+.BR ap_snd (3)
+call of the sequence.
+.RE
 .TP
 .I aperrno_p
 This must point to a location which will be set to an error code if a failure
@@ -192,6 +346,30 @@ or XAP
 xap c303
 .]
 specifications.
+.PP
+In addition to those listed in the manual page for
+.BR ap_snd (3),
+the following error codes can be reported for this primitive:
+.TP \w'[\fBAP_BADCD_OLD_CONN_ID\fP]\(en'u
+.RB [ AP_BADCD_ACT_ID ]
+The value of
+.I cdata->act_id
+is not valid.
+.TP
+.RB [ AP_BADCD_OLD_ACT_ID ]
+The value of
+.I cdata->old_act_id
+is not valid.
+.TP
+.RB [ AP_BADCD_OLD_CONN_ID ]
+The value of
+.I cdata->old_conn_id
+is not valid.
+.TP
+.RB [ AP_BADCD_OLD_P_SN ]
+The value of
+.I cdata->sync_p_sn
+is not valid.
 .\"
 .\"
 .\".SH NOTICES
