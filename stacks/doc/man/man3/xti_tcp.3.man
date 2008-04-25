@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_tcp.3.man,v 0.9.2.7 2006/04/05 09:43:00 brian Exp $
+.\" @(#) $Id: xti_tcp.3.man,v 0.9.2.8 2008-04-25 08:58:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:00 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:58:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_tcp.3.man,v $
+.\" Revision 0.9.2.8  2008-04-25 08:58:50  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:00  brian
 .\" - moved .so line and updated headers
 .\"
@@ -173,7 +176,7 @@ are described below.
 .PP
 Options with this level are specific to the X/Open Transport Interface (XTI/TLI)
 .[
-xti
+xti revision 1.0
 .]
 and are common to all transport providers.  For more information see
 .BR xti (3).
@@ -478,7 +481,7 @@ structure.  This option is an
 .PP
 The following options are not described in XTI/TLI
 .[
-xti
+xti revision 1.0
 .]
 or XNS 5.2
 .[
@@ -1676,7 +1679,7 @@ driver is specific to the
 stack.
 This is an unofficial Corrigendum to XNS 5.2 Revision 2.
 .[
-xns
+xns99
 .]
 .\"
 .\"

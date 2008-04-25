@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: t_alloc.3.man,v 0.9.2.8 2006/09/18 01:26:03 brian Exp $
+.\" @(#) $Id: t_alloc.3.man,v 0.9.2.9 2008-04-25 08:59:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/18 01:26:03 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:59:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: t_alloc.3.man,v $
+.\" Revision 0.9.2.9  2008-04-25 08:59:00  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.8  2006/09/18 01:26:03  brian
 .\" - updated manpages and macros
 .\"
@@ -109,10 +112,10 @@ fields to populate and for which to allocate buffers.
 .BR t_alloc ()
 allocates the specified XTI/TLI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns 5.2
 .]
 structure
 .I type
@@ -134,10 +137,10 @@ structure from calls to
 .I type
 specifies the type of XTI/TLI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns 5.2
 .]
 structure to allocate, and may be one of the
 following:
@@ -354,7 +357,7 @@ svr42
 .]
 XNS 5.2,
 .[
-xns
+xns 5.2
 .]
 SUSv2.
 .[
@@ -374,7 +377,7 @@ test suite.
 .PP
 XTI/TLI,
 .[
-XTI
+xti revision 1.0
 .]
 TPI,
 .[
@@ -383,7 +386,7 @@ TPI Revision 2.0.0
 XPG5,
 XNS 5.2,
 .[
-xns
+xns 5.2
 .]
 SUSv2.
 .[

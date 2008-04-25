@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_sccp.3.man,v 0.9.2.8 2006/04/05 09:43:00 brian Exp $
+.\" @(#) $Id: xti_sccp.3.man,v 0.9.2.9 2008-04-25 08:58:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:00 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:58:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_sccp.3.man,v $
+.\" Revision 0.9.2.9  2008-04-25 08:58:50  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.8  2006/04/05 09:43:00  brian
 .\" - moved .so line and updated headers
 .\"
@@ -137,10 +140,10 @@ TALI
 and it defines the data structures and constants required for SCCP transport providers that are
 exposed through the XTI/TLI
 .[
-xti
+xti revision 1.0
 .]
 .[
-xns
+xns99
 .]
 .B <xti_sccp.h>
 header file.
@@ -153,10 +156,10 @@ The
 is an
 .I X/Open Transport Interface
 .[
-xti
+xti revision 1.0
 .]
 .[
-xns
+xns99
 .]
 based interface with specific support of the Signalling System Number 7,
 Signalling Connection Control Part
@@ -700,10 +703,10 @@ without change.
 .PP
 For connection-oriented service providers, this XTI/TLI
 .[
-XTI
+xti revision 1.0
 .]
 .[
-XNS
+xns99
 .]
 call associates the local SCCP endpoint wtih a remote SCCP endpoint to form a
 network connection.  For connectionless service providers, this XTI/TLI call will
@@ -1372,7 +1375,7 @@ driver is specific to the
 This is an unofficial Corrigendum to
 .IR "XNS 5.2 Revision 2" .
 .[
-xns
+xns99
 .]
 .\"
 .\"

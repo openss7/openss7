@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_ss7.3.man,v 0.9.2.9 2006/12/23 13:07:02 brian Exp $
+.\" @(#) $Id: xti_ss7.3.man,v 0.9.2.10 2008-04-25 08:58:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/23 13:07:02 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:58:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_ss7.3.man,v $
+.\" Revision 0.9.2.10  2008-04-25 08:58:50  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.9  2006/12/23 13:07:02  brian
 .\" - manual page and other package updates for release
 .\"
@@ -128,10 +131,10 @@ TALI
 and it defines the data structures and constants required for SS7 transport providers that are
 exposed through the XTI/TLI
 .[
-xti
+xti revision 1.0
 .]
 .[
-xns
+xns99
 .]
 .B <xti_ss7.h>
 header file.
@@ -144,10 +147,10 @@ The
 is an
 .I X/Open Transport Interface
 .[
-xti
+xti revision 1.0
 .]
 .[
-xns
+xns99
 .]
 based interface with specific support of the Signalling System Number 7 protocol.
 .[
@@ -691,7 +694,7 @@ driver is specific to the
 This is an unofficial Corrigendum to
 .IR "XNS 5.2 Revision 2" .
 .[
-xns
+xns99
 .]
 .\"
 .\"
