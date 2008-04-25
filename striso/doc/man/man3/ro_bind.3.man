@@ -1,0 +1,1 @@
+.so man3/ap_ro_bind.3.man
