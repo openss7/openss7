@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strvoip.texi,v 0.9.2.5 2007/08/12 06:45:16 brian Exp $
+% @(#) $Id: strvoip.texi,v 0.9.2.6 2008-04-25 11:50:56 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:45:16 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:56 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -291,6 +291,7 @@ Troubleshooting
 
 Licenses
 
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -329,7 +330,7 @@ Indices
 @cindex manual notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxrefman{GPL}).
+This package is released and distributed under the @cite{GNU Affero General Public License} (@pxrefman{AGPL}).
 Please note, however, that there are different licensing terms for the manual pages and some of the
 documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.} publications
 and other sources).  Consult the permission notices contained in the documentation for more
@@ -401,6 +402,9 @@ package.
 @smallexample
 
 $Log: strvoip.texi,v $
+Revision 0.9.2.6  2008-04-25 11:50:56  brian
+- updates to AGPLv3
+
 Revision 0.9.2.5  2007/08/12 06:45:16  brian
 - updated licenses in manuals
 
@@ -532,7 +536,7 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -721,11 +725,14 @@ This manual uses @cite{texinfo} typographic conventions.
 @cindex licenses
 
 @menu
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
 @end menu
 
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page

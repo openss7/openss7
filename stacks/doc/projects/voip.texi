@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: voip.texi,v 0.9.2.16 2008-04-11 16:58:29 brian Exp $
+% @(#) $Id: voip.texi,v 0.9.2.17 2008-04-25 11:50:47 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-11 16:58:29 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:47 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: voip.texi,v $
+% Revision 0.9.2.17  2008-04-25 11:50:47  brian
+% - updates to AGPLv3
+%
 % Revision 0.9.2.16  2008-04-11 16:58:29  brian
 % - removed deprecated NEXUSWARE support
 %
@@ -262,9 +265,9 @@ backbone networks to the PSTN using SS7.
 The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
 developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
 Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
-OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
+OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Affero General Public
 License.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
-software under terms less restrictive than the GPL.
+software under terms less restrictive than the AGPL.
 
 @subsubheading The OpenSS7 VoIP Switch
 
@@ -425,6 +428,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: voip.texi,v $
+Revision 0.9.2.17  2008-04-25 11:50:47  brian
+- updates to AGPLv3
+
 Revision 0.9.2.16  2008-04-11 16:58:29  brian
 - removed deprecated NEXUSWARE support
 

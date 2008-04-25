@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strnsl.texi,v 0.9.2.7 2007/08/12 06:44:52 brian Exp $
+% @(#) $Id: strnsl.texi,v 0.9.2.8 2008-04-25 11:50:53 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:44:52 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:53 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -301,6 +301,7 @@ Appendices
 
 Licenses
 
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -348,7 +349,7 @@ Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{Li
 need to also download and install the @samp{strxns} package from Tar Ball.
 
 @end ignore
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -420,6 +421,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strnsl.texi,v $
+Revision 0.9.2.8  2008-04-25 11:50:53  brian
+- updates to AGPLv3
+
 Revision 0.9.2.7  2007/08/12 06:44:52  brian
 - updated licenses in manuals
 
@@ -582,7 +586,7 @@ subsequent releases are intended to be loaded on top of an OpenSS7 release of @c
 Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{LiS}, you will now need to
 also download and install the @samp{strxns} package from Tar Ball.
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -1050,6 +1054,7 @@ The following manual pages are installed in Section 8 of the manual (in the subd
 
 @menu
 * Sun RPC License::			The TIRPCSRC license
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -1057,6 +1062,8 @@ The following manual pages are installed in Section 8 of the manual (in the subd
 
 @page
 @include texi/sunrpc.texi
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page

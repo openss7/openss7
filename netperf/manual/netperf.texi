@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: netperf.texi,v 0.9.2.16 2007/08/12 06:43:48 brian Exp $
+% @(#) $Id: netperf.texi,v 0.9.2.17 2008-04-25 11:50:43 brian Exp $
 %
 % =========================================================================
 %
@@ -55,7 +55,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:43:48 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:43 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -354,6 +354,7 @@ Appendices
 Licenses
 
 * Hewlett-Packard License::		The HP license
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -473,6 +474,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: netperf.texi,v $
+Revision 0.9.2.17  2008-04-25 11:50:43  brian
+- updates to AGPLv3
+
 Revision 0.9.2.16  2007/08/12 06:43:48  brian
 - updated licenses in manuals
 
@@ -2043,6 +2047,7 @@ receive.
 
 @menu
 * Hewlett-Packard License::		The HP license
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -2050,6 +2055,8 @@ receive.
 
 @page
 @include texi/hp.texi
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page

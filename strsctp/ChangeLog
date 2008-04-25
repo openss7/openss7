@@ -3,6 +3,10 @@
 	* doc/man/strsctp.refs: updated references
 	* doc/man/man3/xti_sctp.3.man: updated references
 
+	* doc/manual/news.texi: udpates to AGPLv3
+	* doc/manual/releases.texi: udpates to AGPLv3
+	* doc/manual/strsctp.texi: udpates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strsctp.spec.in: prepare for doc/papers

@@ -6,6 +6,10 @@
 	* doc/man/man3/xti_tcp.3.man: updated references
 	* doc/man/man3/xti_udp.3.man: updated references
 
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strinet.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strinet.spec.in: prepare for doc/papers

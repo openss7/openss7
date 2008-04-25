@@ -109,6 +109,11 @@
 	* src/modules/.indent.pro: working up libraries, modules and drivers
 	* src/modules/isot.c: working up libraries, modules and drivers
 
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/striso.texi: updates to AGPLv3
+	* src/modules/isot.c: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* striso.spec.in: prepare for doc/papers

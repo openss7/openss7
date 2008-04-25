@@ -2,6 +2,11 @@
 
 	* doc/man/strutil.refs: updated references
 
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strvoip.texi: updates to AGPLv3
+	* doc/projects/carrier/carrier.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strvoip.spec.in: prepare for doc/papers

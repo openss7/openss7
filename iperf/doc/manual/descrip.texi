@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.6 2007/08/14 21:03:48 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.7 2008-04-25 11:50:42 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/08/14 21:03:48 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-25 11:50:42 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -75,7 +75,7 @@ Transmission Protocol)}.  This @cite{OpenSS7} release of the package is based on
 @dfn{Iperf-2.0.0} release from the @cite{University of Illinois}.
 
 Modifications to the package are derived from the @cite{OpenSS7 SCTP} implementation and are
-released under the @cite{GNU General Public License (GPL) Version 3}.  The @dfn{Iperf} tool itself
+released under the @cite{GNU Affero General Public License (AGPL) Version 3}.  The @dfn{Iperf} tool itself
 is licensed under specific terms by the @cite{University of Illinois}.  Please see @file{LICENSES}
 for the @cite{University of Illinois} @dfn{Iperf} copyright notices and licensing restrictions.  The
 @dfn{Iperf} tool is:

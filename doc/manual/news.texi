@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.31 2007/10/18 18:23:15 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.32 2008-04-25 11:50:39 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/10/18 18:23:15 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-25 11:50:39 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -109,7 +109,7 @@ Documented @file{lib32gcc1} problem on Ubuntu.
 Noted problem running under XEN kernels.  XEN kernels are not yet supported.
 
 @item
-License upgrade to GPL v3.
+License upgrade to AGPL v3.
 
 @item
 Cross-compile fixes (strap out AC_FUNC_REALLOC macro when cross-compiling).
@@ -135,7 +135,7 @@ builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based
 distributions, and can be used on production kernels without patching or
 recompiling the kernel.
 
-This package is publicly released under the @cite{GNU General Public License
+This package is publicly released under the @cite{GNU Affero General Public License
 Version 3}.  The release is available as an @command{autoconf} tarball, SRPM,
 DSC, and set of binary RPMs and DEBs.  See the
 @uref{http://www.openss7.org/download.html,downloads page} for the

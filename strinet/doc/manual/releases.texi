@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 0.9.2.35 2007/02/28 06:31:02 brian Exp $
+@c @(#) $Id: releases.texi,v 0.9.2.36 2008-04-25 11:50:50 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/28 06:31:02 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-25 11:50:50 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -139,7 +139,8 @@ instead.
 
 The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux Fast-STREAMS
 (LfS)}.
-The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7 @b{streams-@value{VERSION_STREAMS}} release
+The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7
+@b{streams-@value{VERSION_STREAMS}} release
 that is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
 Page}.
 
@@ -278,8 +279,8 @@ stable that software in this category.
 defects might be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7
 Project} on this software.  The software might not even configure or compile.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software}. Use at your own risk.  Remember that
-there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
-License}.}
+there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of
+Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{pre-alpha} software.  As such, it will crash your kernel.  Installation of
 the software will irreparably mangle your header files or Linux distribution in such a way as to
@@ -296,7 +297,8 @@ be harmful.  No validation testing whatsoever has been performed by the @cite{Op
 this software.  The software might fail to configure or compile on some systems.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software for purposes other than develoment or
 evaluation, and then only with great care}. Use at your own risk.  Remember that there is @b{NO
-WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public License}.}
+WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of Liability} under
+@refman{GNU Affero General Public License}.}
 
 @b{This software is @i{alpha} software.  As such, it can likely crash your kernel.  Installation of
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
@@ -313,8 +315,8 @@ defects could be harmful.  Validation testing has been performed by the @cite{Op
 this software for only a restricted set of systems.  The software might fail to configure or compile
 on other systems.  The @cite{OpenSS7 Project} recommends that you @b{do not use this software for
 purposes other than validation testing and evaluation, and then only with care}. Use at your own
-risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU
-General Public License}.}
+risk.  Remember that there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and
+@b{Limitation of Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{beta} software.  As such, it might crash your kernel.  Installation of the
 software might mangle your header files or Linux distribution in such a way as to make it unusable.
@@ -325,7 +327,7 @@ unusable.  You might void the warranty on any system on which you run this softw
 WARNED.}
 @end ignore
 
-@c This is the defect notice for gammar release software
+@c This is the defect notice for gamma release software
 @ignore
 @dfn{@value{PACKAGE_TITLE}} could possibly contain unknown defects.  This is a @dfn{gamma} release.
 Some remaining unknown defects could possibly be harmful.  Validation testing has been performed by
@@ -333,8 +335,8 @@ the @cite{OpenSS7 Project} on this software for a set of systems and external va
 been performed on other systems.  Nevertheless, the software might still fail to configure or
 compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate this software
 for your target system with care before using this software}.  Use at your own risk.  Remember that
-there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
-License}.}
+there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of
+Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{gamma} software.  As such, it is quite stable but might still crash your
 kernel under some conditions.  Installation of the software on a non-validated distribution might
@@ -353,8 +355,8 @@ testing has been performed by the @cite{OpenSS7 Project} and external entities o
 the set of systems listed in the release notes.  Nevertheless, the software might still fail to
 configure or compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate
 this software for your target system before using this software}.  Use at your own risk.  Remember
-that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
-License}.}
+that there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of
+Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{production} software.  As such, it is stable on validated systems but might
 still crash your kernel in unique circumstances.  Installation of the software on a non-validated
@@ -371,8 +373,9 @@ software.  YOU HAVE BEEN WARNED.}
 Some defects could be harmful.  Validation testing has been performed by the @cite{OpenSS7 Project}
 on this software and it has revealed itself to be unstable and irreparable.  The software might not
 even configure or compile.  The @cite{OpenSS7 Project} recommends that you @b{do not use this
-software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section
-@b{NO WARRANTY} under @refman{GNU General Public License}.}
+software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See sections
+@b{Disclaimer of Warranty} and @b{Limitation of Liability} under @refman{GNU Affero General Public
+License}.}
 
 @b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.
 Installation of the software will irreparably mangle your header files or Linux distribution in such

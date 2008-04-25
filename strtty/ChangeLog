@@ -2,6 +2,10 @@
 
 	* doc/man/strtty.refs: updated references
 
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strtty.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strtty.spec.in: prepare for doc/papers

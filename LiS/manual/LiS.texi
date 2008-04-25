@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.25 2008-04-11 16:58:11 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.26 2008-04-25 11:50:42 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-11 16:58:11 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -293,6 +293,7 @@ Appendices
 
 Licenses
 
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -331,7 +332,7 @@ Indices
 @cindex manual notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -403,6 +404,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.26  2008-04-25 11:50:42  brian
+- updates to AGPLv3
+
 Revision 1.1.6.25  2008-04-11 16:58:11  brian
 - removed deprecated NEXUSWARE support
 
@@ -819,7 +823,7 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -881,7 +885,7 @@ port STREAMS based driver packages to Linux.
 @end ignore
 
 @strong{WARNING:} This autoconf/RPM release of Linux STREAMS is distributed
-under the terms of the GNU Public License (GPL) and @emph{not} the GNU Lesser
+under the terms of the GNU Affer Public License (AGPL) and @emph{not} the GNU Lesser
 Public License (LGPL).
 
 This means that you @emph{cannot} link proprietary STREAMS drivers with LiS and
@@ -5403,11 +5407,14 @@ For additional details,
 @cindex licenses
 
 @menu
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
 @end menu
 
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page

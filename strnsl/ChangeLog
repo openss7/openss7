@@ -2,6 +2,11 @@
 
 	* doc/man/strnsl.refs: updated references
 
+	* doc/manual/libxnsl.texi: updates to AGPLv3
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strnsl.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strnsl.spec.in: prepare for doc/papers

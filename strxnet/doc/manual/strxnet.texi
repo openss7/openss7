@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strxnet.texi,v 0.9.2.32 2007/08/12 06:45:21 brian Exp $
+% @(#) $Id: strxnet.texi,v 0.9.2.33 2008-04-25 11:50:58 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:45:21 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:58 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -301,6 +301,7 @@ Appendices
 
 Licenses
 
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -348,7 +349,7 @@ Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{Li
 need to also download and install the @samp{strxns} package from Tar Ball.
 
 @end ignore
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -420,6 +421,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strxnet.texi,v $
+Revision 0.9.2.33  2008-04-25 11:50:58  brian
+- updates to AGPLv3
+
 Revision 0.9.2.32  2007/08/12 06:45:21  brian
 - updated licenses in manuals
 
@@ -659,7 +663,7 @@ subsequent releases are intended to be loaded on top of an OpenSS7 release of @c
 Fast-STREAMS.  If you wish to use these packages over a GCOM release of @cite{LiS}, you will now need to
 also download and install the @samp{strxns} package from Tar Ball.
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -864,8 +868,8 @@ The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} mo
 
 @subsubheading Licensing
 
-The @manref{timod(4)} module is licensed under the @cite{GPL Version 3} (@pxrefman{GNU Generic
-Public License}).
+The @manref{timod(4)} module is licensed under the @cite{AGPL Version 3}
+(@pxrefman{GNU Affero General Public License}).
 Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
 
@@ -873,8 +877,8 @@ Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corp
 
 @subsubheading Licensing
 
-The @manref{tirdwr(4)} module is licensed under the @cite{GPL Version 3} (@pxrefman{GNU Generic
-Public License}).
+The @manref{tirdwr(4)} module is licensed under the @cite{AGPL Version 3}
+(@pxrefman{GNU Affero General Public License}).
 Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
 @c ----------------------------------------------------------------------------
@@ -994,8 +998,8 @@ specifying undefined symbols.  See @refman{Development}, for more information.
 
 @subsubheading Licensing
 
-The @manref{libxnet(3)} library is licensed under the @cite{LGPL Version 3} (@pxrefman{GNU Lesser
-Public License}).
+The @manref{libxnet(3)} library is licensed under the @cite{LGPL Version 3}
+(@pxrefman{GNU Lesser Public License}).
 Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
 @c ----------------------------------------------------------------------------
@@ -1660,6 +1664,7 @@ Nevertheless, the older TLI declarations are also provided in the @file{tiuser.h
 
 @menu
 * UNIX International TPI License::	The UII TPI license
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -1667,6 +1672,8 @@ Nevertheless, the older TLI declarations are also provided in the @file{tiuser.h
 
 @page
 @include texi/uitpi.texi
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page
