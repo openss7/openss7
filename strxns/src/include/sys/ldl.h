@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ldl.h,v 0.9.2.7 2007/08/14 03:31:14 brian Exp $
+ @(#) $Id: ldl.h,v 0.9.2.8 2008-04-25 11:39:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:14 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:39:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.h,v $
+ Revision 0.9.2.8  2008-04-25 11:39:32  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.7  2007/08/14 03:31:14  brian
  - GPLv3 header update
 
@@ -67,7 +70,7 @@
 #ifndef SYS_LDL_H
 #define SYS_LDL_H
 
-#ident "@(#) $RCSfile: ldl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ldl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

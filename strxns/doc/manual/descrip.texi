@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.8 2007/08/14 03:30:58 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.9 2008-04-25 11:39:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/08/14 03:30:58 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -98,7 +98,7 @@ The package currently includes the following @dfn{STREAMS} kernel modules and dr
 The @manpage{ldl(4)} driver attempts to provide a @cite{Data Link Provider (DLPI)} interface to an
 existing Ethernet driver under Linux.  This driver was originally written by Ole Husgaard and
 subsequently modified by Dave Grothe and later by Brian Bidulock of @uref{http://www.openss7.org/,
-The OpenSS7 Project}.  It is distributed under the terms of the @cite{GNU Public License (GPL)
+The OpenSS7 Project}.  It is distributed under the terms of the @cite{GNU Affero Public License (AGPL)
 Version 3}.
 
 @item ip2xnet(4)
@@ -108,7 +108,7 @@ multiplexing driver to make it available for use by the Linux IP subsystem.  The
 originally written by @cite{The Software Group Ltd.} and subsequently modified by Brian Bidulock of
 @uref{http://www.openss7.org/, The OpenSS7 Project}.  It was originally distributed under the terms
 of the @cite{LGPL}, but is distributed by @cite{The OpenSS7 Project} under the terms of the
-@cite{GNU Public License (GPL) Version 3}.
+@cite{GNU Affero Public License (AGPL) Version 3}.
 
 @item ip_strms(4)
 The @manpage{ip_strms(4)} module is similar to the @manpage{ip2xnet(4)} driver, however, this is a
@@ -118,7 +118,7 @@ the @manpage{ip2xnet(4)} driver.  Both have a similar effect.  The module was or
 Mikel Matthews and Dave Grothe and subsequently modified by Brian Bidulock of
 @uref{http://www.openss7.org/, The OpenSS7 Project}.  It was originally distributed under the terms
 of the @cite{LGPL}, but is distributed by @cite{The OpenSS7 Project} under the terms of the
-@cite{GNU Public License (GPL) Version 3}.
+@cite{GNU Affero Public License (AGPL) Version 3}.
 
 @item np_ip(4)
 The @manpage{np_ip(4)} driver provides a @dfn{Network Service Provider} using the @cite{Network

@@ -2,6 +2,52 @@
 
 	* doc/man/strxns.refs: updated references
 
+	* AUTHORS: updates to AGPLv3
+	* NEWS: updates to AGPLv3
+	* README: updates to AGPLv3
+	* README-cvs: updates to AGPLv3
+	* THANKS: updates to AGPLv3
+	* doc/manual/descrip.texi: updates to AGPLv3
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strxns.texi: updates to AGPLv3
+	* src/drivers/cd.c: updates to AGPLv3
+	* src/drivers/debug.h: updates to AGPLv3
+	* src/drivers/dl.c: updates to AGPLv3
+	* src/drivers/dl.h: updates to AGPLv3
+	* src/drivers/dl2.c: updates to AGPLv3
+	* src/drivers/dl_ip.c: updates to AGPLv3
+	* src/drivers/dlp.c: updates to AGPLv3
+	* src/drivers/hdlc.c: updates to AGPLv3
+	* src/drivers/ip.c: updates to AGPLv3
+	* src/drivers/ldl.c: updates to AGPLv3
+	* src/drivers/llc.c: updates to AGPLv3
+	* src/drivers/nf.c: updates to AGPLv3
+	* src/drivers/np.c: updates to AGPLv3
+	* src/drivers/np.h: updates to AGPLv3
+	* src/drivers/np_ip.c: updates to AGPLv3
+	* src/include/cdiapi.h: updates to AGPLv3
+	* src/include/dlpiapi.h: updates to AGPLv3
+	* src/include/npiapi.h: updates to AGPLv3
+	* src/include/sys/dl_x25.h: updates to AGPLv3
+	* src/include/sys/dlpi.h: updates to AGPLv3
+	* src/include/sys/ldl.h: updates to AGPLv3
+	* src/include/sys/llc.h: updates to AGPLv3
+	* src/include/sys/npi.h: updates to AGPLv3
+	* src/include/sys/npi_ip.h: updates to AGPLv3
+	* src/lib/cdiapi.c: updates to AGPLv3
+	* src/lib/dlpiapi.c: updates to AGPLv3
+	* src/lib/npiapi.c: updates to AGPLv3
+	* src/modules/cdi_conv.c: updates to AGPLv3
+	* src/modules/debug.h: updates to AGPLv3
+	* src/modules/dlpi_conv.c: updates to AGPLv3
+	* src/modules/ip_strm_mod.c: updates to AGPLv3
+	* src/modules/ip_strm_mod.h: updates to AGPLv3
+	* src/modules/npi_conv.c: updates to AGPLv3
+	* src/test/test-ip.c: updates to AGPLv3
+	* src/test/test-np_ip.c: updates to AGPLv3
+	* src/util/ldlconfig.c: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxns.spec.in: prepare for doc/papers

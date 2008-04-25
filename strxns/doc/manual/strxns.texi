@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strxns.texi,v 0.9.2.37 2007/08/12 06:45:25 brian Exp $
+% @(#) $Id: strxns.texi,v 0.9.2.38 2008-04-25 11:39:31 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:45:25 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -293,6 +293,7 @@ Appendices
 
 Licenses
 
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -338,7 +339,7 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code developed by other
 parties.
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -410,6 +411,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strxns.texi,v $
+Revision 0.9.2.38  2008-04-25 11:39:31  brian
+- updates to AGPLv3
+
 Revision 0.9.2.37  2007/08/12 06:45:25  brian
 - updated licenses in manuals
 
@@ -664,7 +668,7 @@ Installation and Reference Manual}.}.  In stark contrast to many other software 
 @uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code developed by other
 parties.
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and UNIX International.}
 publications and other sources).  Consult the permission notices contained in the documentation for
@@ -852,7 +856,7 @@ The LDL driver and the @command{ldltest} and @command{ldlconfig} programs were
 originally written by Ole Husgaard and is licensed under the GNU General
 Public License, @xrefman{GNU General Public License}.  This OpenSS7 release of the LDL driver also
 includes Hewlett-Packard proposed patches.
-An OpenSS7 GPL header has been added to the source code files to make this
+An OpenSS7 AGPL header has been added to the source code files to make this
 clear.
 
 @subsection DLPI to Linux IP Driver (ip_to_dlpi)
@@ -863,7 +867,7 @@ The ip_to_dlpi driver was originally written by @cite{The Software Group
 Limited} and in licensed under the GNU Lesser General Public License @xrefman{LGPL}.
 Nevertheless, this OpenSS7 release of the @file{ip_to_dlpi} driver is released
 under the GNU General Public License @xrefman{GNU General Public License}.
-An OpenSS7 GPL header has been added to the source code to make this clear.
+An OpenSS7 AGPL header has been added to the source code to make this clear.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -892,7 +896,7 @@ manual pages in Section 4 of the manual pages with the same name as the modules.
 
 The @file{ip_strm_mod} module was originally written by Mikel L. Mathews and is licensed under the
 GNU Lesser General Public License @xrefman{LGPL}.  However, this OpenSS7 release is distributed under
-the GNU General Public License @xrefman{GNU General Public License}.  An OpenSS7 GPL header has been added to the source code
+the GNU General Public License @xrefman{GNU General Public License}.  An OpenSS7 AGPL header has been added to the source code
 to make this clear.
 
 LiS includes two adaptor drivers to assist in interfacing STREAMS drivers to the Linux Kernel's
@@ -1180,6 +1184,7 @@ of manual pages installed totals several hundred manual pages.
 @menu
 * UNIX International DLPI License::	The UII DLPI license
 * UNIX International NPI License::	The UII NPI license
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -1189,6 +1194,8 @@ of manual pages installed totals several hundred manual pages.
 @include texi/uidlpi.texi
 @page
 @include texi/uinpi.texi
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 03:31:21 $
+ @(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-25 11:39:33 $
 
  -----------------------------------------------------------------------------
 
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 3, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ Affero General Public License (AGPL) Version 3, so long as the software is
+ distributed with, and only used for the testing of, OpenSS7 modules, drivers
+ and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:21 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:39:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-np_ip.c,v $
+ Revision 0.9.2.22  2008-04-25 11:39:33  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.21  2007/08/14 03:31:21  brian
  - GPLv3 header update
 
@@ -135,9 +138,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 03:31:21 $"
+#ident "@(#) $RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-25 11:39:33 $"
 
-static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 03:31:21 $";
+static char const ident[] = "$RCSfile: test-np_ip.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-25 11:39:33 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -12066,8 +12069,9 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 3,  so long as the  software is distributed\n\
-with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
+distributed with, and only used for the testing of, OpenSS7 modules, drivers and\n\
+libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
