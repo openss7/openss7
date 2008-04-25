@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: otk6.4.man,v 0.9.2.2 2007/12/15 20:20:28 brian Exp $
+.\" @(#) $Id: otk6.4.man,v 0.9.2.3 2008-04-25 08:38:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/12/15 20:20:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: otk6.4.man,v $
+.\" Revision 0.9.2.3  2008-04-25 08:38:28  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.2  2007/12/15 20:20:28  brian
 .\" - updates
 .\"
@@ -100,17 +103,134 @@ tpi revision 2.0.0
 .br
 .B #include <sys/xti_osi.h>
 .HP
-.BI "int " tp_stream " = open(" tp_device ", " oflag );
+.BI "int " rk6_stream " = open(" tp_device ", " oflag );
 .PD 0
 .HP
-.BI "int " tp_xtistr " = t_open(" tp_device ", " oflag );
+.BI "int " rk6_xtistr " = t_open(" tp_device ", " oflag );
 .HP
-.BI "int " tp_socket " = socket(" \fRPF_ISO\fP ", " socket_type ", " \fRISOPROTO_TP\fP );
+.BI "int " rk6_socket " = socket(" \fRPF_ISO\fP ", " socket_type ", " \fRISOPROTO_RK6\fP );
 .PD
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+.B OTK6
+is an implementation of ISO over TCP defined in RFC 1006
+.[
+rfc1006
+.]
+and RFC 2126.
+.[
+rfc2126
+.]
+It provides reliable, packet oriented, full duplex connection between two
+transport endpoints on top of
+.BR tcp (7).
+.B OTK6
+guarantees that the data arrives in order and retransmits lost packets.  It
+generates and checks a per-packet checksum to catch transmission errors.  It
+preserves record boundaries.
+.PP
+.B OTK6
+is implemented as a
+.IR STREAMS (4)
+multiplexing driver using the
+.BR OSI (4)
+.B striso
+package for
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+The
+.B striso
+package translates the
+.IR STREAMS -based
+.BR tcp (4)
+provided by the
+.BR INET (4)
+.B strinet
+package into TPI
+.[
+tpi revision 2.0.0
+.]
+streams suitable for use with XTI,
+.[
+xti revision 1.0
+.]
+.[
+xns 5.2
+.]
+see
+.BR xti "(3) and " xti_osi (3).
+.PP
+.B OTK6
+provides one TPI connection-oriented ISO Transport Protocol Class 0 or Class 2
+stream type with abortive release and optional expedited data.  To select the
+stream,
+.I rk6_device
+can be one of the following:
+.TP
+.IR /dev/otk6 " or " /dev/streams/otk6
+This device provides the ISO Transport Protocol
+.[
+x225
+.]
+services using the T-primitives of the Transport Provider Interface,
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+used for ISO Transport, as described in
+.BR tpi_osi (7).
+The
+.BR tpi (7)
+interface provided on a stream opening this device is suitable for use with
+the
+.BR xnet (3)
+or
+.BR xti (3)
+library and provides ISO Transport using XTI
+.[
+xti revision 1.0
+.]
+.[
+xns 5.2
+.]
+as described in
+.BR xti_osi (3).
+.PP
+.B OTK6
+provides one socket type for use by the
+.BR sockets (3)
+library
+.BR socket (7)
+calls.
+.B OTK6
+provides sockets in the protocol family
+.BR PF_ISO
+using the protocol number
+.BR IPPROTO_OSI .
+The
+.I socket_type
+argument can be one of the following:
+.TP
+.B SOCK_SEQPACKET
+.PP
+The following entries in /etc/protosw provides the information for
+.BR socksys (4)
+to use the device:
+.sp
+.nf
+\f(CW\s-1\
+PF_ISO       SOCK_SEQPACKET     ISOPROTO_RK6   /dev/otk6   tpi   cots
+\s+1\fP
+.fi
+.PP
+For additional information, see
+.BR socksys (4)
+and
+.BR protosw (5).
 .\"
 .\"
 .SH USAGE
@@ -158,6 +278,58 @@ x213
 .\"
 .SH ADDRESSES
 .PP
+OSI Transport addresses for RFC1006 are in an array of octets where the first
+octet is the length,
+.IR tsaplen ,
+of the TSAP, followed by
+.I tsaplen
+octets of TSAP, followed by an octet that is the length,
+.IR nsaplen ,
+of the NSAP, followed by
+.I nsaplen
+octets of NSAP.
+.PP
+The TSAP is coded according to OSI Transport conventions and is simply the
+T-Selector.  The NSAP is coded according to OSI NSAP conventions for IP
+addresses as described in RFC 1277, RFC 1888 and RFC 4548.
+.[
+rfc1277
+.]
+.[
+rfc1888
+.]
+.[
+rfc4548
+.]
+The NSAP, according to these documents, consists of an AFI of 34 or 35.  For
+AFI 35, the IDI is an ICP (Internet Code Point) which has the value 0000 for
+IPv6 or 0001 for IPv4.  The ICP is coded as 4 BCD digits in two octets.  For
+IPv5, the ICP is followed by 4 octets representing the binary IPv4 IP address,
+and optionally 2 further octets representing the binary port number.
+.PP
+When the
+.I tsaplen
+is encoded as zero (0), a null T-Selector is used.  Then the
+.I nsaplen
+is encoded as zero (0), the underlying NS-Provider is to assign an NSAP.  For
+responders, the port number will be 102 or 399 depending on whether ISO
+Transport Class 0 (TP0) or ISO Transport Class 2 (TP2) operation was requested.
+For initiators, the remove port number will be 102 or 399 depending upon
+whether ISO Transport Class 0 (TP0) or ISO Transport Class 2 (TP2) operation
+was requested.
+.PP
+.I Solaris SunLink\(rg
+.[
+sunlink-tli
+.]
+specifies that the NSAP address passed to
+.BR t_bind (3)
+is
+.RI \(lq rk6 \(rq,
+and the NSAP address passed to
+.BR t_connect (3)
+is a four-byte IP address (in network byte order).
+
 .\"
 .\"
 .SH OPTIONS
@@ -202,10 +374,45 @@ x213
 .\"
 .SH COMPATIBILITY
 .PP
+.B otk6
+is compatible with
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-tli
+.]
+and implementations based on 
+.IR "Solaris SunLink" \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+RFC 983,
+.[
+rfc983
+.]
+RFC 1006,
+.[
+rfc1006
+.]
+RFC 2126,
+.[
+rfc2126
+.]
+RFC 1277,
+.[
+rfc1277
+.]
+RFC 1888,
+.[
+rfc1888
+.]
+RFC 4548.
+.[
+rfc4548
+.]
 .\"
 .\"
 .SH HISTORY

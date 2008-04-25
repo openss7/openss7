@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: apli_env.3.man,v 0.9.2.1 2007/11/06 11:43:13 brian Exp $
+.\" @(#) $Id: apli_env.3.man,v 0.9.2.2 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/11/06 11:43:13 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: apli_env.3.man,v $
+.\" Revision 0.9.2.2  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.1  2007/11/06 11:43:13  brian
 .\" - updated manual pages
 .\"
@@ -893,3 +896,82 @@ Readable:
 Writable:
 _
 .TE
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ap_env ()
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_open (3),
+.BR APLI (3).
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+.BR ap_env ()
+is compatible with APLI,
+.[
+APLI UNIX International October 25, 1990
+.]
+and implementation based on APLI such as
+.IR "Solaris\(rg SunLink OSI" ,
+.[
+sunlink-apli
+.]
+.IR "Solaris\(rg Solstice OSI" ,
+.IR "HP OSI Transport Services/9000 (OTS/9000)" ,
+.[
+hpuxapli
+.]
+.IR "SVR 4.2 Open Network Services (ONS)" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+See
+.BR APLI (3)
+and
+.BR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ap_env ()
+first appeared in APLI.
+.[
+APLI UNIX International October 25, 1990
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 APLI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.\"
+.T2

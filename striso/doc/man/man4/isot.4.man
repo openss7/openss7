@@ -1,1 +1,663 @@
-.so man4/itot.4.man
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: isot.4.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: isot.4.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH ISOT 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B isot
+\- STD 35 (RFC 1006) ISO Transport over TCP (ISOT)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <stropts.h>
+.HP
+.IB tcp_stream " = open(" \(lq/dev/tcp\(rq ", O_RDWR);
+.PD 0
+.HP
+.BI ioctl( tcp_stream ", I_PUSH, " \(lqisot\(rq );
+.PD
+.HP
+.IB udp_stream " = open(" \(lq/dev/udp\(rq ", O_RDWR);
+.PD 0
+.HP
+.BI ioctl( udp_stream ", I_PUSH, " \(lqisot\(rq );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ISOT
+is an implementation of ISO Transport over TCP (ISOT) as described in RFC 983,
+.[
+rfc983
+.]
+superseded by RFC 1006.
+.[
+rfc1006
+.]
+This RFC describes the use of IS 8073
+.[
+ISO/IEC 8073 X.224
+.]
+ISO Transport Class 0 over TCP/IP (ISOT) by using TCP/IP as a
+Connection-oriented Network Service Provider instead of ISO CONS.
+.[
+ISO/IEC 8878 X.223
+.]
+It describes an adaptation of TCP to an ISO CONS
+.[
+ISO/IEC 8878 X.223
+.]
+network service provider through the use of a 4 byte header used to delimit
+NPDUs insed of the TCP stream.
+.PP
+RFC 983
+.[
+rfc983
+.]
+and RFC 1006
+.[
+rfc1006
+.]
+provided for ISO Transport Class 0 over TCP (or UDP under
+protest) (ISOT) on port number 102.
+RFC 1006
+.[
+rfc1006
+.]
+is a standard (STD 35).
+RFC 1006
+.[
+rfc1006
+.]
+has been updated by RFC 2126
+.[
+rfc2126
+.]
+but they both use the same port number 102 and are compatible in approach.
+Both RFC 2126
+.[
+rfc2126
+.]
+and RFC 1006
+.[
+rfc1006
+.]
+place their TP0 based service on TCP and UDP port
+number 102, and, therefore, RFC 2126
+.[
+rfc2126
+.]
+is necessarily backward compatible with
+RFC 1006.
+.[
+rfc1006
+.]
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+Unfortunately, RFC 1006 (STD 35)
+.[
+rfc1006
+.]
+saw fit to also modify the ISO Transport Class
+0 protocol to adapt it to TCP/IP.  In doing so, it became possible that an
+compliant ISO Transport Protocol Class 0 implementation would not necessarily
+interoperate (well) with a RFC 1006
+.[
+rfc1006
+.]
+implementation.
+Nevertheless, it is possible, using the
+.BR xti_osi (3)
+interface from
+.BR xti (3),
+.[
+xti revision 1.0
+.]
+.[
+xns 5.2
+.]
+to affect the operation of an ISO 8073
+.[
+ISO 8073 X.224
+.]
+conforming Transport implementation so that it may run directly over the ISO
+8878
+.[
+ISO 8878 X.223
+.]
+based network services emulation of RFC 1006
+.[
+rfc1006
+.]
+or RFC 2126.
+.[
+rfc2126
+.]
+.PP
+Therefore, it is possible to implement
+.B isot
+as a pushable module over a TCP or UDP Stream that converts the Stream to
+emulate a ISO 8878 (CONS)
+.[
+iso 8878 x.223
+.]
+network connection, and then push a
+.B tp0
+module over that Stream where the
+.B tp0
+module simply implements the ISO Transport Protocol Class 0 operation per ISO
+8073.
+.[
+iso 8073 x.224
+.]
+The
+.B isot
+module accepts a Transport Provider Interface (TPI) Revsion 2.0.0,
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+service interface at its lower service boundary, where the semantics of the TPI
+inteface are those of UDP or TCP as described in
+.BR xti_inet (3).
+The
+.B isot
+module provides a Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+service interface at its upper service boundary, where the semantics of the NPI
+interface are those of OSI CONS.
+.\"
+.\"
+.SH PRIMITIVES
+.SS Unsupported Primitives
+.PP
+The following primitives are not supported by the NS-Provider:
+.\"
+.TP
+.BR N_UNITDATA_REQ "(7), " N_UNITDATA_IND "(7), " N_UDERROR_IND (7)
+These primitives are not supported as this is a CONS provider.  If the NS-User
+issues a
+.BR N_UNITDATA_REQ (7)
+primitive, the NS-Provider will respond with an
+.BR N_ERROR_ACK (7)
+primitive with the NPI error code
+.RB [ NNOTSUPPORT ].
+.\"
+.TP
+.BR N_EXDATA_REQ "(7), " N_EXDATA_IND "(7), " N_DATACK_REQ "(7), " N_DATACK_IND "(7)
+These primitives are not supported by the NS-Provider as the NS-Provider does not
+support expedited data or receipt confirmation.  If the NS-User issues the
+.BR N_EXDATA_REQ "(7) or " N_DATACK_REQ (7)
+primitives the NS-Provider will respond with an
+.BR N_ERROR_ACK (7)
+primitive with the
+.RB [ NNOTSUPPORT ]
+NPI error code.
+.\"
+.TP
+.BR N_RESET_REQ "(7), " N_RESET_RES "(7), " N_RESET_IND "(7), " N_RESET_CON "(7)
+The NS-Provider does not support the reset service.  If the NS-Provider
+receives the
+.BR N_RESET_REQ (7)
+primitive, it will treat it the same as an
+.BR N_DISCON_REQ (7).
+.BR N_RESET_RES (7)
+primitive is not used as a
+.BR N_RESET_IND (7)
+will not be issued by the NS-Provider.
+The
+.BR N_RESET_IND "(7) and " N_RESET_CON (7)
+primitives will not be issued by the NS-Provider.
+.\"
+.SS Unchanged Primitives
+.PP
+The following primitives function unalatered:
+.\"
+.TP
+.BR N_OK_ACK "(7), " N_ERROR_ACK "(7), " N_UNBIND_REQ "(7), " N_INFO_REQ "(7), " N_DATA_REQ "(7), " N_DATA_IND "(7)
+These primitives are interpreted the same as for OSI NS-Providers.
+.\"
+.SS Modified Primitives
+.PP
+The following primitives are modified from their OSI NS-Provider behavior:
+.\"
+.TP
+.BR N_INFO_ACK "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.I NSDU_size
+Always returns
+.BR 65536 .
+.TP
+.I ENSDU_size
+Always returns zero
+.RB ( 0 ).
+Expedited data is not supported.
+.TP
+.I CDATA_size
+Always returns zero
+.RB ( 0 ).
+Transfer of user data with the N-CONNECT is not supported.
+.TP
+.I DDATA_size
+Always returns zero
+.RB ( 0 ).
+Transfer of user data with the N-DISCONNECT is not supported.
+.TP
+.I ADDR_size
+Always returns the maximum size of an OSI NSAP address
+.RB ( 20 ).
+.TP
+.IR ADDR_length ", " ADDR_offset
+Returns the local (bound) address or null.  This address will have an AFI of
+35 and a ICP of 1.
+.TP
+.IR QOS_length ", " QOS_offset
+Returns a
+.B N_qos_co_opt_sel_t
+structure with settings appropriate for TCP, or a
+.B N_qos_cl_sel_t
+structure with settings appropriate for UDP.
+.TP
+.IR QOS_range_length ", " QOS_range_offset
+Returns a
+.B N_qos_co_opt_range_t
+structure with settings appropriate for TCP, or a
+.B N_qos_cl_range_t
+structure with settings appropriate for UDP.
+.TP
+.I OPTIONS_flags
+Always set to zero
+.RB ( 0 ).
+.BR REC_CONF_OPT " and " DEFAULT_RC_SEL
+will not be set as receipt confirmation is not supported by RFC 1006
+.[
+rfc1006
+.]
+or RFC 2126.
+.[
+rfc2126
+.]
+.B EX_DATA_OPT
+will not be set as expedited data is not supported by RFC 1006
+.[
+rfc1006
+.]
+nor RFC 2126
+.[
+rfc2126
+.]
+TP0 operation.
+.TP
+.I NIDU_size
+Always set to
+.BR 4096 .
+.TP
+.I SERV_type
+Set to
+.B N_CONS
+for TCP and
+.B N_CLNS
+for UDP.
+.TP
+.I CURRENT_state
+Set to the current state of the interface.
+.TP
+.I PROVIDER_type
+Always set to
+.BR N_SNICFP .
+.TP
+.I NODU_size
+Always set to
+.BR 4096 .
+.TP
+.IR PROTOID_length ", " PROTOID_offset
+Always null.  The only protocol supported is the null protocol (i.e\&., OSI
+Transport protocol).
+.TP
+.I NPI_version
+Always set to
+.BR N_VERSION_2 .
+.RE
+.\"
+.TP
+.BR N_BIND_REQ "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.IR ADDR_length ", " ADDR_offset
+The address must be an AFI 35 ICP 1 address as specified in RFC 4548.
+.[
+rfc4548
+.]
+It will be converted directly into an IP address and optional port number.  If
+a port number is not specified and the number of connection indications is
+greater than zero, port 102 will be used as specified in RFC 1006 and RFC 2126.
+If the number of connection indications is zero, the underlying TCP or UDP
+transport provider will select a port number.
+.RS
+.PP
+Otherwise, these fields are interpreted as per an OSI NS-Provider.  In
+particular, the NS-User may not provide an address and the NS-Provider will
+select one.
+.RE
+.TP
+.I CONIND_number
+Interpreted the same as an OSI NS-Provider.
+.TP
+.I BIND_flags
+Only the
+.B TOKEN_REQUEST
+flag is valid.
+.TP
+.IR PROTOID_length ", " PROTOID_offset
+This must be null.  Only OSI Transport protocol is supported.
+.RE
+.\"
+.TP
+.BR N_BIND_ACK "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.IR ADDR_length ", " ADDR_offset
+Interpreted as an OSI NS-Provider.
+.TP
+.I CONIND_number
+Interpreted as an OSI NS-Provider.
+.TP
+.I TOKEN_value
+Interpreted as an OSI NS-Provider.  The token value is the same as the TCP
+token value and is passed through from TPI.
+.TP
+.IR PROTOID_length ", " PROTOID_offset
+Interpreted as an OSI NS-Provider.  This will always be null.
+.RE
+.\"
+.TP
+.BR N_CONN_REQ "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.IR DEST_length ", " DEST_offset
+Only OSI NSAP addresses that identify an IP address and port number are
+applicable here: that is, the generic string addresses of RFC 1278,
+.[
+rfc1278
+.]
+the IPv4
+address of RFC 1277
+.[
+rfc1277
+.]
+and RFC 4548,
+.[
+rfc4548
+.]
+and the IPv6 address of RFC 1888
+.[
+rfc1888
+.]
+and RFC 4548.
+.[
+rfc4548
+.]
+.TP
+.I CONN_flags
+The \fICONN_flags\fP field cannot contain any flags.  That is, the
+\fBREC_CONF_OPT\fP and \fBEX_DATA_OPT\fP options are not permitted.  TCP cannot
+support the concept of receipt confirmation, neither can UDP.  Also, expedited
+data transfer is not supported by UDP and is insufficient in TCP.  Neither
+option is supported or expected by RFC 1006,
+.[
+rfc1006
+.]
+nor RFC 2126.
+.[
+rfc2126
+.]
+If requested, the [\fBNBADFLAG\fP] error will be returned in an
+\fBN_ERROR_ACK\fP(7) primitive.
+.TP
+.IR QOS_length ", " QOS_offset
+Quality of Service parameters can be specified but will be translated to TCP/IP
+TOS values and other IP parameters.  Other QOS parameters will be ignored.
+.RE
+.\"
+.TP
+.BR N_CONN_RES "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.I TOKEN_value
+The token value will be passed through to TCP and must be the same as one
+passed from TCP.
+.TP
+.IR RES_length ", " RES_offset
+The responding address cannot be different from the
+.IR DEST_length ", " DEST_offset
+that was passed on the connection indication.  Otherwise, a
+.RB [ NBADADDR ]
+error will be returned in
+.BR N_ERROR_ACK (7).
+.TP
+.I SEQ_number
+The sequence number will be passed through to TCP and must be the same as one
+passed from TCP in the \fBN_CONN_IND\fP(7).
+.TP
+.I CONN_flags
+The \fICONN_flags\fP field cannot contain any flags.  That is, the
+\fBREC_CONF_OPT\fP and \fBEX_DATA_OPT\fP options are not permitted.  TCP cannot
+support the concept of receipt confirmation, neither can UDP.  Also, expedited
+data transfer is not supported by UDP and is insufficient in TCP.  Neither
+option is supported or expected by RFC 1006,
+.[
+rfc1006
+.]
+nor RFC 2126.
+.[
+rfc2126
+.]
+If requested, the [\fBNBADFLAG\fP] error will be returned in an
+\fBN_ERROR_ACK\fP(7) primitive.
+.TP
+.IR QOS_length ", " QOS_offset
+Quality of Service parameters can be specified but will be translated to TCP/IP
+TOS values and other IP parameters.  Other QOS parameters will be ignored.
+.RE
+.\"
+.TP
+.BR N_CONN_IND "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.IR DEST_length ", " DEST_offset
+This will always be the same as the bound address (i.e\&., the address returned
+by
+.BR N_INFO_ACK (7)
+and
+.BR N_BIND_ACK (7).
+.TP
+.IR SRC_length ", " SRC_offset
+This is the AFI 35, ICP 1, OSI NSAP address corresponding to the connecting TCP
+peer.  The address includes the TCP port number.
+.TP
+.I SEQ_number
+This value is passed through from the TCP TPI interface.
+.TP
+.I CONN_flags
+This value will always be zero and will not contain
+.BR REC_CONF_OPT " or " EX_DATA_OPT
+flags as the NS-Provider neither supports receipt confirmation nor expedited
+data.
+.TP
+.IR QOS_length ", " QOS_offset
+This may contain a
+.B N_qos_co_sel_t
+structure containing the QOS parameters suitable for TCP.
+.RE
+.\"
+.TP
+.BR N_CONN_CON "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.IR RES_length ", " RES_offset
+Where a port number was not specified in the AFI 35, ICP 1 OSI NSAP on the
+.BR N_CONN_REQ (7)
+primitive, this address may be present and may also contain the TCP port number
+of the peer to which the NS-User has connected.
+.TP
+.I CONN_flags
+.TP
+This value will always be zero and will not contain
+.BR REC_CONF_OPT " or " EX_DATA_OPT
+flags as the NS-Provider neither supports receipt confirmation nor expedited
+data.
+.TP
+.IR QOS_length ", " QOS_offset
+This may contain a
+.B N_qos_co_sel_t
+structure containing the QOS parameters suitable for TCP.
+.RE
+.\"
+.TP
+.BR N_DISCON_REQ "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.I DISCON_reason
+When this field value is
+.BR N_DISC_NORMAL ,
+and the connection has been formed,
+an orderly release will be initiated with TCP.  When this field value is other
+than
+.BR N_DISC_NORMAL ,
+or when the connection has not yet been formed, an abortive release will be
+initiated with TCP.
+.TP
+.IR RES_length ", " RES_offset
+These fields must specify a null address.
+.TP
+.I SEQ_number
+Interpreted as per a normal OSI NS-Provider.  This value is passed through from
+TCP.
+.RE
+.\"
+.TP
+.BR N_DISCON_IND "(7)
+This primitive is interpreted the same as for OSI NS-Providers with the
+following exceptions:
+.RS
+.TP
+.IR DISCON_orig ", " DISCON_reason
+In general, TCP has no idea of the reason for disconnect.  If TCP disconnected
+with an orderly release, we assume that the origin is the
+.B N_USER
+and the reason is
+.BR N_DISC_NORMAL .
+If TCP disconnected with an abortive disconnect, we assume that the origin is
+the
+.B N_PROVIDER
+and the reason is selected from those availble for the NS-Provider based on the
+disconnect reason given by TCP.
+.TP
+.IR RES_length ", " RES_offset
+These will always be null.
+.TP
+.I SEQ_number
+This is zero, or the sequence number of a previous
+.BR N_CONN_IND (7).
+The value is passed through from TCP.
+.RE

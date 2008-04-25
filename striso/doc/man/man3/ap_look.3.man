@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ap_look.3.man,v 0.9.2.3 2007/12/15 20:20:26 brian Exp $
+.\" @(#) $Id: ap_look.3.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/12/15 20:20:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ap_look.3.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2007/12/15 20:20:26  brian
 .\" - updates
 .\"
@@ -114,7 +117,19 @@ xap c303
 .PP
 .B #include <xap.h>
 .HP
-.BI "int ap_look(int " fd ", unsigned long *" sptype ", ap_cdata_t *" cdata ", ap_osi_vbuf_t **" ubuf ", int *" flags ", unsigned long *" aperrno_p );
+.BI "int ap_look(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long *" sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t **" ubuf ,
+.br
+.BI "int *" flags ,
+.br
+.BI "unsigned long *" aperrno_p );
 .\"
 .\"
 .SH ARGUMENTS
@@ -123,12 +138,20 @@ xap c303
 A file descriptor identifying the XAP instance.
 .TP
 .I sptype
+A pointer to an
+.B unsigned long
+into which to receive the service primitive symbolic constant.
 .TP
 .I cdata
+A pointer to a data structure into which to receive primary information
+concerning the primitive.
 .TP
 .I ubuf
+A pointer to a chain of buffers into which to received the user-data or
+user-information associated with the primitive.
 .TP
 .I flags
+A pointer to an integer into which to receive the provide and receive XAP flags.
 .TP
 .I aperrno_p
 A pointer to a memory extent into which to receive an error number.

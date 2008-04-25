@@ -1,3 +1,114 @@
+2008-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man3/ap_ro_bind.3.man: added manual page
+	* doc/man/man3/ap_ro_unbind.3.man: added manual page
+	* doc/man/man3/ro_bind.3.man: added manual page
+	* doc/man/man3/ro_unbind.3.man: added manual page
+	* doc/man/man3/xti_apli.3.man: added manual page
+
+	* src/drivers/otk6.c: added otk6 driver
+	* src/example/rfcclient.c: added Sun example files
+	* src/example/rfcserver.c: added Sun example files
+	* src/include/sys/apli.h: added library files
+	* src/lib/rose/xap_rose.VERSION: added library files
+	* src/lib/rose/xap_rose.c: added library files
+	* src/lib/xds/xds.VERSION: added library files
+	* src/lib/xds/xds.c: added library files
+	* src/lib/xftam/xftam.VERSION: added library files
+	* src/lib/xftam/xftam.c: added library files
+	* src/lib/xom/xom.VERSION: added library files
+	* src/lib/xom/xom.c: added library files
+	* src/modules/apmod.c: added module skeleton
+	* src/modules/momod.c: added module skeleton
+	* src/modules/tp0.c: added module skeleton
+
+	* doc/Makefile.am: updated manual pages
+	* doc/man/Makefile.am: updated manual pages
+	* doc/man/striso.refs: updated manual pages
+	* doc/man/man3/APLI.3.man: updated manual pages
+	* doc/man/man3/OSI.3.man: updated manual pages
+	* doc/man/man3/XAP-ROSE.3.man: updated manual pages
+	* doc/man/man3/XAP.3.man: updated manual pages
+	* doc/man/man3/XDS.3.man: updated manual pages
+	* doc/man/man3/XFTAM.3.man: updated manual pages
+	* doc/man/man3/XMS.3.man: updated manual pages
+	* doc/man/man3/XX25.3.man: updated manual pages
+	* doc/man/man3/ap_env.3.man: updated manual pages
+	* doc/man/man3/ap_look.3.man: updated manual pages
+	* doc/man/man3/ap_rcv.3.man: updated manual pages
+	* doc/man/man3/ap_snd.3.man: updated manual pages
+	* doc/man/man3/apli.3.man: updated manual pages
+	* doc/man/man3/apli_close.3.man: updated manual pages
+	* doc/man/man3/apli_env.3.man: updated manual pages
+	* doc/man/man3/libosi.3.man: updated manual pages
+	* doc/man/man3/xti_mosi.3.man: updated manual pages
+	* doc/man/man3/xti_osi.3.man: updated manual pages
+	* doc/man/man4/apmod.4.man: updated manual pages
+	* doc/man/man4/cmot.4.man: updated manual pages
+	* doc/man/man4/isot.4.man: updated manual pages
+	* doc/man/man4/itot.4.man: updated manual pages
+	* doc/man/man4/lpp.4.man: updated manual pages
+	* doc/man/man4/momod.4.man: updated manual pages
+	* doc/man/man4/oopi.4.man: updated manual pages
+	* doc/man/man4/otk6.4.man: updated manual pages
+	* doc/man/man7/A_ABORT_IND.7.man: updated manual pages
+	* doc/man/man7/A_ASSOC_CNF.7.man: updated manual pages
+	* doc/man/man7/A_ASSOC_IND.7.man: updated manual pages
+	* doc/man/man7/A_ASSOC_REQ.7.man: updated manual pages
+	* doc/man/man7/A_ASSOC_RSP.7.man: updated manual pages
+	* doc/man/man7/A_PABORT_IND.7.man: updated manual pages
+	* doc/man/man7/A_RELEASE_CNF.7.man: updated manual pages
+	* doc/man/man7/A_RELEASE_IND.7.man: updated manual pages
+	* doc/man/man7/PPI.7.man: updated manual pages
+	* doc/man/man7/P_ACTDISCARD_CNF.7.man: updated manual pages
+	* doc/man/man7/P_ACTDISCARD_IND.7.man: updated manual pages
+	* doc/man/man7/P_ACTDISCARD_RSP.7.man: updated manual pages
+	* doc/man/man7/P_ACTEND_CNF.7.man: updated manual pages
+	* doc/man/man7/P_ACTEND_IND.7.man: updated manual pages
+	* doc/man/man7/P_ACTEND_REQ.7.man: updated manual pages
+	* doc/man/man7/P_ACTINTR_CNF.7.man: updated manual pages
+	* doc/man/man7/P_ACTINTR_IND.7.man: updated manual pages
+	* doc/man/man7/P_ACTINTR_RSP.7.man: updated manual pages
+	* doc/man/man7/P_ACTRESUME_IND.7.man: updated manual pages
+	* doc/man/man7/P_ACTSTART_IND.7.man: updated manual pages
+	* doc/man/man7/P_ACTSTART_REQ.7.man: updated manual pages
+	* doc/man/man7/P_CDATA_CNF.7.man: updated manual pages
+	* doc/man/man7/P_CDATA_IND.7.man: updated manual pages
+	* doc/man/man7/P_CTRLGIVE_IND.7.man: updated manual pages
+	* doc/man/man7/P_CTRLGIVE_REQ.7.man: updated manual pages
+	* doc/man/man7/P_DATA_IND.7.man: updated manual pages
+	* doc/man/man7/P_DATA_REQ.7.man: updated manual pages
+	* doc/man/man7/P_PXREPORT_IND.7.man: updated manual pages
+	* doc/man/man7/P_RESYNC_CNF.7.man: updated manual pages
+	* doc/man/man7/P_RESYNC_IND.7.man: updated manual pages
+	* doc/man/man7/P_RESYNC_RSP.7.man: updated manual pages
+	* doc/man/man7/P_SYNCMAJOR_CNF.7.man: updated manual pages
+	* doc/man/man7/P_SYNCMAJOR_IND.7.man: updated manual pages
+	* doc/man/man7/P_SYNCMAJOR_REQ.7.man: updated manual pages
+	* doc/man/man7/P_SYNCMINOR_CNF.7.man: updated manual pages
+	* doc/man/man7/P_SYNCMINOR_IND.7.man: updated manual pages
+	* doc/man/man7/P_SYNCMINOR_REQ.7.man: updated manual pages
+	* doc/man/man7/P_TDATA_IND.7.man: updated manual pages
+	* doc/man/man7/P_TOKENGIVE_IND.7.man: updated manual pages
+	* doc/man/man7/P_TOKENGIVE_REQ.7.man: updated manual pages
+	* doc/man/man7/P_TOKENPLEASE_IND.7.man: updated manual pages
+	* doc/man/man7/P_UXREPORT_IND.7.man: updated manual pages
+	* doc/man/man7/P_XDATA_IND.7.man: updated manual pages
+
+	* src/drivers/.indent.pro: working up libraries, modules and drivers
+	* src/drivers/tp.c: working up libraries, modules and drivers
+	* src/include/xap.h: working up libraries, modules and drivers
+	* src/include/xap_rose.h: working up libraries, modules and drivers
+	* src/include/xmp_cmis.h: working up libraries, modules and drivers
+	* src/include/xmp_snmp.h: working up libraries, modules and drivers
+	* src/include/sys/xti_apli.h: working up libraries, modules and drivers
+	* src/include/sys/xti_mosi.h: working up libraries, modules and drivers
+	* src/lib/pthread.c: working up libraries, modules and drivers
+	* src/lib/apli/apli.c: working up libraries, modules and drivers
+	* src/lib/xap/xap.c: working up libraries, modules and drivers
+	* src/modules/.indent.pro: working up libraries, modules and drivers
+	* src/modules/isot.c: working up libraries, modules and drivers
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* striso.spec.in: prepare for doc/papers

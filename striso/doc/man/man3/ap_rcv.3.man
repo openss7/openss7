@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ap_rcv.3.man,v 0.9.2.3 2008-04-16 17:34:22 brian Exp $
+.\" @(#) $Id: ap_rcv.3.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:22 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ap_rcv.3.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2008-04-16 17:34:22  brian
 .\" - working up manual pages
 .\"
@@ -80,11 +83,9 @@ sort-adjacent-labels
 .\"
 .\"
 .TH AP_RCV 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
-.\"
-.\"
 .SH NAME
 .B ap_rcv
-\- receive
+\- receive ACSE/Presentation primitive from an association
 .\"
 .\"
 .SH INTERFACE
@@ -110,23 +111,51 @@ xap c303
 .PP
 .B #include <xap.h>
 .HP
-.BI "int ap_rcv(int " fd ", unsigned long *" sptype ", ap_cdata_t *" cdata ", ap_osi_vbuf_t **" ubuf ", int *" flags ", unsigned long *" aperrno_p );
+.BI "int ap_rcv(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long *" sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t **" ubuf ,
+.br
+.BI "int *" flags ,
+.br
+.BI "unsigned long *" aperrno_p );
 .\"
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'\fIaperrno_p\fP\(em'u
 .I fd
+Identifies the XAP Library instance as returned by
+.BR ap_open (3).
 .TP
 .I sptype
+Upon successful return, indicates the primitive received.
 .TP
 .I cdata
+Points to a
+.B ap_cdata_t
+structure that will receive primary information from the received primitive.
 .TP
 .I ubuf
+Points to a
+.B ap_osi_vbuf_t
+buffer chain that, upon successful return, will receive the data associated with
+the received primitive.
 .TP
 .I flags
+Points to an integer that may contain the
+.B AP_ALLOC
+flag on call and may contain the
+.B AP_MORE
+flag on successful or unsuccessful return.
 .TP
 .I aperrno_p
+Points to an area into which to receive an error code upon failure.
 .\"
 .\"
 .SH DESCRIPTION
@@ -268,6 +297,7 @@ P_DATA_IND:AP_DATA_XFER:no state change
 :AP_WRELcnf_RELreq
 :AP_WSYNCMAcnf_SYNCMAreq
 :AP_WACTEcnf_ACTEreq
+:AP_WRESYNcnf_RESYNreq
 _
 P_PXREPORT_IND:AP_WRELcnf_RELreq:AP_WRECOVERYreq
 :AP_WSYNCMAcnf_SYNCMAreq:T{
@@ -473,6 +503,7 @@ _
 P_DATA_IND:none:none
 _
 P_PXREPORT_IND:none:AP_STATE
+_
 P_RESYNC_IND:none:AP_STATE
 _
 P_RESYNC_CNF:none:AP_STATE
@@ -571,50 +602,433 @@ field of the
 points to the next message block in the chain or is
 .B NULL
 if this is the end of the list.
+.PP
+The user allocation routine is responsible for setting up all fields of the
+.BR ap_osi_vbuf_t " and " ap_osi_dbuf_t
+structures when allocating buffers.  If buffers are allocated by another
+mechanism, the user must ensure that the fields of each
+.BR ap_osi_vbuf_t " and " ap_osi_dbuf_t
+pair in the chain are set up prior to calling
+.BR ap_rcv ().
+.PP
+.BR ap_rcv ()
+places data into any buffer where write space is available
+.RI ( "b_wptr < db_lib" )
+and updates
+.I b_wptr
+\(em no other fields in the
+.BR ap_osi_vbuf_t " or " ap_osi_dbuf_t
+structures are updated (with the exception of
+.I b_cont
+that is updated when adding further
+.BR ap_osi_vbuf_t " and " ap_osi_dbuf_t
+pairs to the chain).
+.PP
+The user may pass full, partially full and empty receive buffers to
+.BR ap_rcv ().
+The user is responsible for ensuring that it is valid for the XAP Library to
+fill any of the supplied buffers from
+.IR b_wptr " to " db_lim .
+.PP
+If the user wishes all the buffers for
+.BR ap_rcv ()
+to be allocated using the user allocation routine, then the
+.I ubuf
+pointer will point to a
+.B NULL
+.B ap_osi_vbuf_t
+pointer.
+.PP
+The XAP user is responsible for decoding the user data received in the
+.I ubuf
+parameter.  The general rules for decoding user data are stated here, please see
+individual manual pages in Section 7 for specific exceptions to these rules.
+.IP \(bu \w'\(bu\(em'u
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the contents of
+.I ubuf
+buffer(s) are mapped directly from the SS-user data parameter of the equivalent
+session service primitive.  Refer to the ISO Presentation Layer Protocol
+Specification (see reference ISO 8823)
+.[
+iso 8823
+.]
+for further information concerning the encoding of these values.  (The primary
+exception to this rule is the A-ASSOCIATE primitives:
+.BR A_ASSOC_REQ (7),
+.BR A_ASSOC_IND (7),
+.BR A_ASSOC_RSP (7),
+.BR A_ASSOC_CNF (7).)
+.IP \(bu
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is not in effect and the primitive received is an ACSE
+primitive, the data received in the
+.I ubuf
+buffer(s) must be decoded according to the definition specified in the ACSE
+Protocol Specification (reference ISO 8650)
+.[
+iso 8650-1
+.]
+as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+[30] IMPLICIT SEQUENCE OF EXTERNAL
+\s+1\fP
+.fi
+.RE
+.IP \(bu
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is not in effect and the primitive received is a Presentation
+primitive, the data received in the
+.I ubuf
+buffer(s) must be decoded according to the User-data definition specified in the
+Presentation Protocol Specification (reference ISO 8823)
+.[
+iso 8823
+.]
+as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+CHOICE {
+    [APPLICATION 0] IMPLICIT OCTET STRING,
+    [APPLICATION 1] IMPLICIT SEQUENCE OF PDV-list
+}
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I flags
+argument is a bit mask used to control certain aspects of XAP processing.
+Values for this field are formed by OR'ing together zero or more of the
+following flags:
+.TP
+.B AP_ALLOC
+If
+.B AP_ALLOC
+is set and the user did not specify an allocation routine on
+.BR ap_open (3)
+(or
+.BR ap_restore (3))
+then minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_BADFLAGS ]
+error code.
+.RS
+.PP
+If no space is available in the supplied buffer chain (or the location pointed
+to by
+.I ubuf
+contains
+.BR NULL )
+and either
+.B AP_ALLOC
+is not set or
+.B AP_ALLOC
+is set but the user allocation routine refuses to supply any buffers, then the
+call to
+.BR ap_rcv ()
+fails, minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_NOBUF ]
+error code.
+.PP
+Regardless of the setting of
+.BR AP_ALLOC ,
+the user must have set the location pointed to by
+.I ubuf
+either to
+.B NULL
+or to point to a chain of one or more buffers.  The
+.B AP_ALLOC
+flag setting only takes effect when any supplied buffers have been filled and
+more data remains to be returned to the user:
+.IP \(bu \w'\(bu\(em'u
+If the
+.B AP_ALLOC
+flag is set and space was available in the supplied buffer chain, the user
+allocation routine is called to supply further buffers as they are needed.  If
+the user allocation routine refuses to supply further buffers then the
+.B AP_MORE
+flag is set and the call to
+.BR ap_rcv ()
+completes; zero
+.RB ( 0 )
+is returned.  The user must free any buffers allocated by the user allocation
+routine either by calling the
+.BR ap_free (3)
+function or by calling the
+.BR ap_user_dalloc ()
+function directly.
+.IP \(bu
+If
+.B AP_ALLOC
+is not set and space was available in the supplied buffers, then the
+.B AP_MORE
+flag is set and zero
+.RB ( 0 )
+is returned.
+.RE
+.TP
+.B AP_MORE
+This flag is ignored by XAP when
+.BR ap_rcv ()
+is called.  Upon return, if all data associated with a primitive has not been
+received, the
+.B AP_MORE
+bit of the
+.I flags
+argument will be set, and the error code
+.RB [ AP_AGAIN ]
+or
+.RB [ AP_NOBUF ]
+is returned.  This indicates to the user that further
+.BR ap_rcv ()
+calls are required to receive the remainder of the data.  If the
+.B AP_MORE
+bit is not set, all data associated with the primitive has been received.
+.RS
+.PP
+A primitive that is received in multiple parts may be interrupted by an incoming
+unsequenced primitive
+.RB ( P_XDATA_IND "(7), " A_ABORT_IND "(7) or " A_PABORT_IND (7)).
+See the discussion below for information on how this is indicated by the service
+and how the reception of the current primitive is resumed if appropriate.
+.PP
+Note it is possible for
+.BR ap_rcv ()
+to return with the
+.B AP_MORE
+flag set even when the
+.B AP_ALLOC
+flag is set, if non-blocking execution mode is being used or an expedited data
+primitive arrives at the XAP instance (see below).
+.RE
+.PP
+If XAP is being used in blocking execution mode
+.RB ( AP_NDELAY
+bit of the
+.B AP_FLAGS
+environment attribute is not set),
+.BR ap_rcv ()
+blocks until either an entire primitive is received, or XAP fills the buffer(s)
+pointed to by
+.IR ubuf .
+.PP
+If XAP is being used in non-blocking execution mode
+.RB ( AP_NDELAY
+bit is set) and it runs out of data before receiving an entire primitive and it
+has not filled the
+.I ubuf
+buffer(s),
+.BR ap_rcv ()
+returns a value of minus one
+.RB ( -1 )
+and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_AGAIN ]
+error code.
+.PP
+If an unsequenced primitive (such as expedited data or an abort primitive)
+arrives while another primitive is being processed,
+.BR ap_rcv ()
+returns minus one
+.RB ( -1 )
+and sets the location pointed to by
+.I aperrno_p
+to the
+.RB [ AP_LOOK ]
+error code.
+.\"The
+.\".B AP_MORE
+.\"bit of the flags argument is set.
+This indicates to the user that XAP has suspended processing of the current
+primitive.  The user must use the
+.BR ap_rcv ()
+function to retrieve the unsequenced primitive.
+.PP
+For
+.BR P_XDATA_IND (7),
+XAP resume receiving data associated with the suspended primitive once the
+expedited data has been successfully received.  If an abort primitive is
+received, the rest of the in-progress primitive is lost and is not returned by
+the service in subsequent
+.BR ap_rcv ()
+calls.
+.PP
+Note that it is possible for the processing of a single primitive to be
+interrupted more than once due to the arrival of unsequenced indications.
+.PP
+.I aperrno_p
+must be set to point to a location that will be used to carry an error code back
+to the user.
 .\"
 .\"
 .SH ENVIRONMENT
 .PP
+See
+.BR ap_env (3).
 .\"
 .\"
-.SH "RETURN VALUE"
+.SH RETURN
 .PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned.  Otherwise, a value of minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
 .\"
 .\"
 .SH ERRORS
 .PP
-.\"
-.\"
-.SH IMPLEMENTATION
+.TP \w'[\fBAP_BADLSTATE\fP]\(em'u
+.RB [ AP_AGAIN ]
+XAP was unable to complete the requested action.  Try again.
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+parameter does not identify an XAP instance.
+.TP
+.RB [ AP_BADFLAGS ]
+.B AP_ALLOC
+was set but a user-specified buffer allocation routine was not specified on
+.BR ap_open "(3) or " ap_restore (3).
+.TP
+.RB [ AP_BADLSTATE ]
+XAP is in a state where
+.BR ap_rcv ()
+is not allowed (i.e.,
+.BR AP_UNBOUND ).
+.TP
+.RB [ AP_BADUBUF ]
+Either the buffers pointed to by
+.I ubuf
+are invalid, or the pointer is
+.B NULL
+and yet
+.B AP_ALLOC
+is not set.
+.TP
+.RB [ AP_LOOK ]
+An event is pending.
+.TP
+.RB [ AP_NOBUF ]
+The supplied user data buffers contained no unused buffer space and, if
+.B AP_ALLOC
+was set, then no more buffers could be obtained.
+.TP
+.RB [ AP_NOENV ]
+There is no XAP environment associated with
+.IR fd .
+.TP
+.RB [ AP_NOMEM ]
+Out of memory.
+.TP
+.RB [ AP_PDUREJ ]
+XAP rejected the received PDU.
 .PP
+In addition, operating system and asn.1 class errors are reported.
 .\"
 .\"
-.\".SH NOTICES
+.\".SH IMPLEMENTATION
 .\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+It is notworthy that the
+.BR ap_osi_vbuf_t " and " ap_osi_dbuf_t
+mirrors the
+.BR mblk_t "(9) and " dblk_t (9)
+of
+.IR STREAMS (4).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ap_open (3),
+.BR close (2),
+.BR APLI (3),
+.BR XAP (3).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR ap_rcv ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR ap_rcv ()
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI or XAP, such as
+.IR "Solstice OSI 9.0" ,
+.IR "HP-UX OTS/9000" ,
+.IR "AIX OSI/6000" ,
+.IR "SVR 4.2 ONP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only source compatibility is attempted.  Binary compatibility will fail due to
+the lack of published and standard symbolic constants.
+.IP \(em
+.PP
+See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR ap_rcv ()
+first appeared in APLI.
+.[
+apli unix international
+.]
 .\"
 .\"
 .SH VERSIONS
 .PP
+This manual page was written for the OpenSS7 XAP Library.
 .\"
 .\"
 .[

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_osi.3.man,v 0.9.2.1 2007/11/06 11:43:16 brian Exp $
+.\" @(#) $Id: xti_osi.3.man,v 0.9.2.2 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/11/06 11:43:16 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_osi.3.man,v $
+.\" Revision 0.9.2.2  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.1  2007/11/06 11:43:16  brian
 .\" - updated manual pages
 .\"
@@ -80,11 +83,137 @@ sort-adjacent-labels
 .TH XTI_OSI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
 .B xti_osi
-\- OSI Transport
+\- X/Open Transport Interface \- Corrigendum for OSI Transport (OSI) Conformance
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <xti.h>
+.br
+.B #include <xti_ip.h>
+.br
+.B #include <xti_tcp.h>
+.br
+.B #include <xti_osi.h>
+.HP
+.BI "int " osi_xtistr " = t_open(" \fR/dev/ork6\fP ", " flags );
+.PD 0
+.HP
+.BI "int " osi_xtistr " = t_open(" \fR/dev/otpi\fP ", " flags );
+.HP
+.BI "int " osi_xtistr " = t_open(" \fR/dev/oclt\fP ", " flags );
+.PD
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This manual page describes the XTI interface for OSI Transport in accordance
+with XNS 5.2.
+.[
+xns 5.2
+.]
+.PP
+The X/Open Transport Interface
+.[
+xti revision 1.0
+.]
+specifies addressing and options for OSI Transport Providers (OSI-TP).
+.[
+x.214
+.]
+.[
+x.224
+.]
+.[
+rfc1006
+.]
+.[
+rfc2126
+.]
+Although this interface is always exposed by including the
+.RB < xti.h >
+header file, it is provided by the
+.RB < xti_osi.h >
+header file included by the former.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manual section describes the protocol-specific information that is
+relevant for ISO transport providers.  This section also describes the
+protocol-specific information that is relevant when ISO transport services are
+provided over a TCP network.
+.PP
+The mapping for ISO-over-TCP that is referred to in this manual section is
+that defined by RFC 1006.
+.[
+rfc1006
+.]
+The relevant sections are 4.6.2 (Implementation of OSI Services over IPS) and
+4.6.3 (Comments).
+.PP
+In general, this manual section describes the characteristics that the ISO and
+ISO-over-TCP transport providers have in common, with notes indicating where
+they differ.
+.TP
+.B Notes:
+.RS
+.IP 1. \w'0.\(em'u
+In an ISO environment, the protocol address is the transport address.
+.IP 2.
+Sending data of zero octets:
+.RS
+.PP
+The transport service definition, both in connection-mode and in
+connectionless mode, does not permit sending a TSDU of zero octets.  So, n
+connectionless mode, if the
+.I len
+parameter is set to zero, the
+.BR t_sndudata (3)
+call will always return unsuccessfully with minus one
+.RB ( -1 )
+and
+.BR t_errno (3)
+set to
+.RB [ TBADDATA ].
+In connection-mode, if the
+.I nbytes
+parameter is set to zero, the
+.BR t_snd (3)
+call will return with minus one
+.RB ( -1 )
+and
+.BR t_errno (3)
+set to
+.RB [ TBADDATA ]
+if either the
+.B T_MORE
+flag is set, or the
+.B T_MORE
+flag is not set and the preceding
+.BR t_snd (3)
+call completed a TSDU or ETSDU (that is, the call has requested sending a zero
+byte TSDU or ETSDU).
+.RE
+.IP 3.
+An ISO-over-TCP transport provider does not provide the connectionless mode.
+.RE
+.PP
+This manual section also defines the data structures and constants required
+for ISO and ISO-over-TCP transport providers that are exposed through the
+.RB < xti_osi.h >
+header file.
+Applications written to compilation environments earlier that those required by
+XNS 5.2,
+.[
+xns 5.2
+.]
+and defining
+.B _XOPEN_SOURCE
+to be less than
+.BR 500 ,
+will have the data structure and constants exposed through the inclusion of
+.RB < xti.h >.
 .\"
 .\"
 .SH ADDRESSING
@@ -120,7 +249,7 @@ the address is preceded by a 1 octet NSAP length.
 .\"
 .SS RFC1006 Addressing
 .PP
-Addessing for RFC 1006
+Addressing for RFC 1006
 .[
 rfc1006
 .]
@@ -135,19 +264,738 @@ function, the NSAP takes the value \*(lq\fBrk6\fP\*(rq.
 .SS CLNS Addressing
 .PP
 The NSAP, which identifies the network provider, can be coded in hexadecimal
-or as a characeter stirng.  An NSAP is formed from the NSAP preceved by a 1
+or as a character string.  An NSAP is formed from the NSAP preceded by a 1
 octet NSAP length.
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An OSI transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a privileged read-only
+mode.  An ISO-over-TCP
+.[
+rfc1006
+.]
+provider supports a subset of the options defined here.
+.PP
+Options can be
+.IR "absolute requirements"
+and can also be of
+.IR "end-to-end significance" ,
+as follows:
+.TP
+.I Absolute Requirements
+Options that are
+.IR "absolute requirements" ,
+mean that when the option is negotiated with the transport service provider it
+is not permitted to negotiate the option to a value with differing quality of
+service.  Either the proposed value is accepted or it is rejected.  Options
+that are not
+.IR "absolute requirements" ,
+can be negotiated by the transport provider to a different quality of service
+level and it is the responsibility of the transport service user to determine
+whether the negotiated value is sufficient.
+.TP
+.I End-to-End Significance
+Options that are of
+.I end-to-end significance
+are options that require negotiate with, or are communicated to, the peer
+transport provider or user.  For example, options that are requested in a
+connection request,
+.BR T_CONN_REQ (7),
+primitive will be indicated at the peer in a connection indication,
+.BR T_CONN_IND (7),
+primitive.  Options that are not of
+.I end-to-end significance
+are of local significance only and can be negotiated directly between the
+local transport service user and the local transport service provider.
+.PP
+See, for example,
+.RI \(lq OPTIONS ,\(rq
+in
+.BR t_connect (3),
+for more information.
+.PP
+An OSI Transport provider supports two levels of options.  These two levels
+are described below:
+.\"
+.\"
+.SS "XTI_GENERIC"
+.PP
+Options with this level are specific to the X/Open Transport Interface (XTI/TLI)
+.[
+xti revision 1.0
+.]
+and are common to all transport providers.  For more information see
+.BR xti (3).
+.PP
+The options defined with the option level
+.B XTI_GENERIC
+are as follows:
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the stream.
+This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_LINGER
+Sets whether, and the amount of time if, the stream will linger waiting for
+unsent data to be delivered.
+This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.PP
+.nf
+\fC\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;   /* option on/off */
+    t_scalar_t l_linger;  /* linger time */
+};
+\s+1\fP
+.fi
+.TP \w'l_linger\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.
+Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.PP
+For more information, see
+.BR xti (3).
+.RE
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the receive buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.
+This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information, see
+.BR xti (3).
+.\"
+.\"
+.SS T_ISO_TP
+.PP
+.B Connection-mode Service
+.PP
+The protocol level of all subsequent options is
+.BR T_ISO_TP .
+All options are association-related, that is, they are options with end-to-end
+significance: see
+.BR xti (3).
+They may be negotiated in the XTI states
+.BR T_IDLE " and " T_INCON ,
+and are read-only in all other states except
+.BR T_UNINIT .
+.PP
+.B Options for Quality of Service and Expedited Data.
+These options are defined in the ISO 8072:1986
+.[
+x214
+.]
+transport service definition.  The definitions are not repeated here.
+.TS
+center box tab(:);
+cb|cb|cb|cb
+cb|cb|cb|cb
+lb|l|l|l.
+Option Name:Type of Option:Legal:Meaning
+:Value:Option Value:
+_
+T_TCO_THROUGHPUT:struct thrpt:octets per second:throughput
+T_TCO_TRANSDEL:struct transdel:time in milliseconds:transit delay
+T_TCO_RESERRORRATE:struct rate:OPT_RATIO:residual error rate
+T_TCO_TRANSFFAILPROB:struct rate:OPT_RATIO:transfer failure
+:::probability
+T_TCO_ESTFAILPROB:struct rate:OPT_RATIO:connection establ.
+:::failure probability
+T_TCO_RELFAILPROB:struct rate:OPT_RATIO:connection release
+:::failure probability
+T_TCO_ESTDELAY:struct rate:time in milliseconds:connection establ.
+:::delay
+T_TCO_RELDELAY:struct rate:time in milliseconds:connection release
+:::delay
+T_TCO_CONNRESIL:struct rate:OPT_RATIO:connection resilience
+T_TCO_PROTECTION:t_uscalar_t:see text:protection
+T_TCO_PRIORITY:t_uscalar_t:see text:priority
+T_TCO_EXPD:t_uscalar_t:T_YES/T_NO:expedited data
+.TE
+.sp
+.ce 1
+.I Options for Quality of Service and Expedited Data
+.PP
+.B OPT_RATIO
+is defined as
+.IR "OPT_RATIO = -log\*<10\*>(ratio)" .
+The
+.I ratio
+is dependent on the parameter, but is always composed of a number of failures
+divided by a total number of samples.  This may be, for example, the number of
+TSDUs transferred in error divided by the total number of TSDU transfers
+.RB ( T_TSO_RESERRORRATE ).
+.PP
+.B Absolute Requirements
+.PP
+For these options, the transport user can indicate whether the request is an
+absolute requirements or whether a degraded value is acceptable.  For the QOS
+options based on
+.B struct rate
+an absolute requirement is specified via the field
+.IR minacceptvalue ,
+if that field is given a value different from
+.BR T_UNSPEC .
+The value specified for
+.B T_TCO_PROTECTION
+is an absolute requirement if the
+.B T_ABSREQ
+flag is set.  The values specified for
+.B T_TCO_EXPD
+and
+.B T_TCO_PRIORITY
+are never absolute requirements.
+.PP
+A detailed description of the options for Quality of Service can be found in
+the ISO 8072:1996 specification.
+.[
+x214
+.]
+The field elements of the structures in use for the option values are
+self-explanatory.  Only the following details remain to be explained:
+.IP \(bu \w'\(bu\(em'u
+If these options are returned with
+.BR t_listen (3),
+their values are related to the incoming connection and not to the transport
+endpoint where
+.BR t_listen (3)
+was issued.  To give an example, the value of
+.B T_TCO_PROTECTION
+is the value sent by the calling transport user, and not the value currently
+effective for the endpoint (that could be retrieved by
+.BR t_optmgmt (3)
+with the flag
+.B T_CURRENT
+set).  The option is not returned at all if the calling user did not specify
+it.  An analogous procedure applies for the other options.  See also
+.BR xti (3).
+.IP \(bu
+If, in a call to
+.BR t_accept (3),
+the called transport user tries to negotiate an option of higher quality than
+proposed, the option is rejected and the connection establishment fails.
+.IP \(bu
+The values of the QOS options
+.BR T_TCO_THROUGHPUT ,
+.BR T_TCO_TRANSDEL ,
+.BR T_TCO_RESERRORRATE ,
+.BR T_TCO_TRANSFFAILPROB ,
+.BR T_TCO_ESTFAILPROB ,
+.BR T_TCO_RELFAILPROB ,
+.BR T_TCO_ESTDELAY ,
+.BR T_TCO_RELDELAY " and
+.BR T_TCO_CONNRESIL
+have a structure format.  A user requesting one of these options might leave a
+field of the structure unspecified by setting it to
+.BR T_UNSPEC .
+The transport provider is then free to select an appropriate value for this
+field.  The transport provider may return
+.B T_UNSPEC
+in a filed of the structure to the user to indicate that it has not yet
+decided on a definite value for this field.
+.IP ""
+.B T_UNSPEC
+is not a legal value for
+.BR T_TCO_PROTECTION ,
+.BR T_TCO_PRIORITY " and
+.BR T_TCO_EXPD .
+.IP \(bu
+.BR T_TCO_TRHOUGHPUT " and " T_TCO_TRANSDEL
+.br
+If
+.I avgthrpt
+(average throughput) is not defined (both fields are set to
+.BR T_UNSPEC ),
+the transport provider considers that the average throughput has the same
+values as the maximum throughput
+.RI ( maxthrpt ).
+An analogous procedure applies to
+.BR T_TCO_TRANSDEL .
+.IP \(bu
+The ISO specification ISO 8072:1996
+.[
+x214
+.]
+does not differentiate between average and maximum transit delay.  Transport
+providers that support this option adopt the values of the maximum delay as
+input for the CR-TPDU.
+.IP \(bu
+.B T_TCO_PROTECTION
+.br
+This option defines the general level of protection.  The symbolic constants
+in the following list are used to specify the required level of protection:
+.RS
+.TP \w'\fBT_PASSIVEPROTECT\fP\(em'u
+.B T_NOPROTECT
+No protection feature.
+.PD 0
+.TP
+.B T_PASSIVEPROTECT
+Protection against passive monitoring.
+.TP
+.B T_ACTIVEPROTECT
+Protection against modification, replay, addition or deletion.
+.PD
+.PP
+Both flags
+.BR T_PASSIVEPROTECT " and " T_ACTIVEPROTECT
+may be set simultaneously but are exclusive with
+.BR T_NOPROTECT .
+If the
+.BR T_ACTIVEPROTECT " or " T_PASSIVEPROTECT
+flags are set, the user may indicate that this is an absolute requirement by
+also setting the
+.BR T_ABSREQ
+flag.
+.RE
+.IP \(bu
+.B T_TCO_PRIORITY
+.br
+Five priority levels are defined by XTI:
+.RS
+.TP \w'\fBT_PASSIVEPROTECT\fP\(em'u
+.B T_PRIDFLT
+Lower level.
+.PD 0
+.TP
+.B T_PRILOW
+Low level.
+.TP
+.B T_PRIMID
+Medium level.
+.TP
+.B T_PRIHIGH
+High level.
+.TP
+.B T_PRITOP
+Higher level.
+.PD
+.RE
+.IP \(bu
+It is recommended that transport users avoid expedited data with ISO-over-TCP
+transport provider, since the RFC 1006
+.[
+rfc1006
+.]
+treatment of expedited data does not meet the data reordering requirements
+specified in ISO 8072:1996,
+.[
+x214
+.]
+and may not be supported by the provider.
+.PP
+The number of priority levels is not defined by
+ISO 8072:1996.
+.[
+x214
+.]
+The parameter only has meaning in the context of some management entity or
+structure able to judge relative importance.
+.PP
+.B Management Options.
+These options are parameters of an ISO transport protocol according to ISO
+8073:1986.
+.[
+x224
+.]
+They are not included in the ISO transport service definition ISO 8072:1996,
+.[
+x214
+.]
+but are additionally offered by XTI.  Transport users wishing to be truly
+ISO-compliant should thus not adhere to them.
+.B T_TCO_LTPDU
+is the only management option supported by an ISO-over-TCP transport provider.
+.PP
+Avoid specifying both QOS parameters and management options at the same time.
+.TS
+center box tab(:);
+cb|cb|cb|cb
+cb|cb|cb|cb
+lb|l|l|l.
+Option Name:Type of Option:Legal:Meaning
+:Value:Option Value:
+_
+T_TCO_LTPDU:t_uscalar_t:length in octets:maximum length of TPDU
+T_TCO_ACKTIME:t_uscalar_t:time in milliseconds:acknowledge time
+T_TCO_REASTIME:t_uscalar_t:time in seconds:reassignment time
+T_TCO_PREFCLASS:t_uscalar_t:see text:preferred class
+T_TCO_ALTCLASS1:t_uscalar_t:see text:1st alternative class
+T_TCO_ALTCLASS2:t_uscalar_t:see text:2nd alternative class
+T_TCO_ALTCLASS3:t_uscalar_t:see text:3rd alternative class
+T_TCO_ALTCLASS4:t_uscalar_t:see text:4th alternative class
+T_TCO_EXTFORM:t_uscalar_t:T_YES/T_NO/T_UNSPEC:extended format
+T_TCO_FLOWCTRL:t_uscalar_t:T_YES/T_NO/T_UNSPEC:flow ctrl
+T_TCO_CHECKSUM:t_uscalar_t:T_YES/T_NO/T_UNSPEC:checksum
+T_TCO_NETEXP:t_uscalar_t:T_YES/T_NO/T_UNSPEC:network expedited data
+T_TCO_NETRECPTCF:t_uscalar_t:T_YES/T_NO/T_UNSPEC:user of network
+:::receipt confirmation
+.TE
+.sp
+.ce 1
+.I Management Options
+.PP
+.B Absolute Requirements
+.PP
+A request for any of these options is considered an absolute requirement.
+.IP \(bu \w'\(bu\(em'u
+If these options are returned with
+.BR t_listen (3),
+their value are related to the incoming connection and not to the transport
+endpoint where
+.BR t_listen (3)
+was issued.  That means that
+.BR t_optmgmt (3)
+with the flag
+.B T_CURRENT
+set would usually yield a different result; see
+.BR xti (3).
+.IP \(bu
+For management options that are subject to peer-to-peer negotiation, the
+following holds: if, in a call to
+.BR t_accept (3),
+the called transport user tries to negotiate an option of higher quality than
+proposed, the option is rejected and the connection establishment fails; see
+.BR xti (3).
+.IP \(bu
+A connection-mode transport provider may allow the transport user to select
+more than one alternative class.  The transport user may use the options
+.BR T_ALTCLASS1 ", " T_ALTCLASS2 ", etc.
+to denot alternatives.  A transport provider only supports an
+implementation-dependent limit of alternatives and ignores the rest.
+.IP \(bu
+The value
+.B T_UNSPEC
+is legal for all management options.  It may be set by the user to indicate
+that the transport provider is free to choose any appropriate value.  If
+returned by the transport provider, it indicates that the transport provider
+has not yet decided on a specific value.
+.IP \(bu
+Legal values for
+.BR T_PREFCLASS ",
+.BR T_ALTCLASS1 ",
+.BR T_ALTCLASS2 ",
+.BR T_ALTCLASS3 " and
+.BR T_ALTCLASS4 ",
+are
+.BR T_CLASS0 ",
+.BR T_CLASS1 ",
+.BR T_CLASS2 ",
+.BR T_CLASS3 ",
+.BR T_CLASS4 ", and
+.BR T_UNSPEC .
+.IP \(bu
+If a connection has been established,
+.BR T_TCO_PREFCLASS
+will be set to the selected value, and
+.BR T_ALTCLASS1 " through " T_ALTCLASS4
+will be set to
+.BR T_UNSPEC ,
+if these options are supported.
+.IP \(bu
+.I Warning on the use of
+.BR T_TCO_LTPDU :
+Sensible use of this option requires that the application programmer knows
+about system internals.  Careless setting of either a lower or a higher value
+than the implementation-dependent default may degrade performance.
+.IP ""
+Legal values for an ISO transport provider are
+.B T_UNSPEC
+and multiples of 128 up to 128*(2^32 - 1) or the largest multiple of 128 that
+will fit in a
+.BR t_uscalar_t .
+Values other than powers of 2 between 2^7 and 2^13 are only supported by
+transport providers that conform to the 1992 update to ISO 8073.
+.[
+x224
+.]
+.IP ""
+Legal values for ISO-over-TCP provider are
+.B T_UNSPEC
+and any power of 2 between 2^7 and 2^11 (65531).
+.IP ""
+The action taken by a transport provider is implementation-dependent if a
+value is specified that is not exactly as defined in ISO 8073:1986
+.[
+x224
+.]
+or its addenda.
+.IP \(bu
+The management options are not independent of one another, and not independent
+of the options defined for QOS, above.  A transport user must take care not to
+request conflicting values.  If conflicts are detected at negotiation time,
+the negotiation fails according to the rules for absolute requirements; see
+.BR xti (3).
+Conflicts that cannot be detected at negotiation time will lead to
+unpredictable results in the course of communication.  Usually, conflicts are
+detected at the time the connection is established.
+.PP
+Some relations that must be obeyed are:
+.IP \(bu \w'\(bu\(em'u
+If
+.B T_TCO_EXP
+is set to
+.BR T_YES " and " T_TCO_PREFCLASS
+s set to
+.BR T_CLASS2 ,
+.B T_TCO_FLOWCTRL
+must also be set to
+.BR T_YES .
+.IP \(bu
+If
+.B T_TCO_PREFCLASS
+is set to
+.BR T_CLASS0 ,
+.B T_TCO_EXP
+must be set to
+.BR T_NO .
+.IP \(bu
+The value in
+.B T_TCO_PREFCLASS
+must not be lower than the value in 
+.BR T_TCO_ALTCLASS1 ", " T_TCO_ALTCLASS2 ", and
+so on.
+.IP \(bu
+Depending on the chosen QOS options, further value conflicts might occur.
+.\"
+.\"
+.PP
+.B Connectionless-mode Service
+.PP
+The protocol level of all subsequent options is
+.BR T_ISO_TP .
+All options are association-related, that is, they are options with end-to-end
+significance; see
+.BR xti (3).
+They may be negotiated in all XTI states except
+.BR T_UNINIT .
+.PP
+.I Options for Quality of Service.
+These options are all defined in the ISO 8072/Add.1:1986 transport service
+definition.
+.[
+x214
+.]
+The definitions are not repeated here.  None of these options are supported by
+an ISO-over-TCP transport provider, since it does not support
+connectionless-mode.
+.TS
+center box tab(:);
+cb|cb|cb|cb
+cb|cb|cb|cb
+lb|l|l|l.
+Option Name:Type of Option:Legal:Meaning
+:Value:Option Value:
+_
+T_TCL_TRANSDEL:struct rate:time in milliseconds:transit delay
+T_TCL_RESERRORRATE:struct rate:OPT_RATIO:residual error rate
+T_TCL_PROTECTION:t_uscalar_t:see text:protection
+T_TCL_PRIORITY:t_uscalar_t:see text:priority
+.TE
+.sp
+.ce 1
+.I Options for Quality of Service
+.PP
+.B Absolute Requirements
+.PP
+A request for any of these options is an absolute requirement.
+.PP
+A detailed description of the options for Quality of Service can be found in
+ISO 8072/Add.1:1986.
+.[
+x234
+.]
+The field elements of the structures in use for the option values are
+self-explanatory.  Only the following details remain to be explained:
+.IP \(bu \w'\(bu\(em'u
+These options are negotiated only between the local user and the local
+transport provider.
+.IP \(bu
+The meaning, type of option value, and the range of legal option values are
+identical for
+.BR T_TCO_RESERRORRATE " and " T_TCL_RESERRORRATE ",
+.BR T_TCO_PRIORITY " and " T_TCL_PRIORITY ",
+.BR T_TCO_PROTECTION " and " T_TCL_PROTECTION ";
+see
+.BR xti (3).
+.IP \(bu
+.BR T_TCL_TRANSDEL " and " T_TCO_TRANSDEL
+are different.
+.B T_TCL_TRANSDEL
+specifies the maximum transit delay expected during a datagram transmission,.
+Note that the type of option value is a
+.B struct rate
+contrary to the
+.B struct transdel
+of
+.BR T_TCO_TRANSDEL .
+The range of legal option values for each field of
+.B struct rate
+is the same as that of
+.BR T_TCO_TRANSDEL .
+.IP \(bu
+If these options are returned with
+.BR t_rcvudata (3)
+their values are related to the received datagram and not the transport
+endpoint where
+.BR t_rcvudata (3)
+was issued.  On the other hand,
+.BR t_optmgmt (3)
+with the flag
+.BR T_CURRENT
+set returns the values that are currently effective for outgoing datagrams.
+.IP \(bu
+The function
+.BR t_rcvuderr (3)
+returns the option value of the data unit previously sent that produced the
+error.
+.PP
+.I Management Options.
+This option is a parameter of an ISO transport protocol, according to ISO
+8602.  It is not included in the ISO transport service definition ISO
+8072/Add.1:1986, but is an additional offer by XTI.  Transport users wishing
+to be truly ISO-compliant should thus not adhere to it.
+.PP
+Avoid specifying both QOS parameters and this management option at the same
+time.
+.TS
+center box tab(:);
+cb|cb|cb|cb
+cb|cb|cb|cb
+lb|l|l|l.
+Option Name:Type of Option:Legal:Meaning
+:Value:Option Value:
+_
+T_TCL_CHECKSUM:t_uscalar_t:T_YES/T_NO:checksum computation
+.TE
+.sp
+.ce 1
+.I Management Option
+.sp
+.PP
+.B Absolute Requirements
+.PP
+A request for this option is an absolute requirement.
+.TP
+.B T_TCP_CHECKSUM
+This option allows disabling/enabling of the checksum computation.  The legal
+values are
+.B T_YES
+(checksum enabled) and
+.B T_NO
+(checksum disabled).
+If this option is returned with
+.BR t_rcvudata (3),
+its value indicates whether or not a checksum was present in the received
+datagram.  The advisability of turning off the checksum check is
+controversial.
 .\"
 .\"
 .SH FUNCTIONS
 .\"
+.SS t_accept\fR(3)
+.PP
+The parameter
+.I call->udata.len
+must be in the range from 0 to 32.  The user may send up to 32 octets of data
+when accepting the connection.
+.PP
+If
+.I fd
+is not equal to
+.IR resfd ,
+.I resfd
+should be in state
+.BR T_UNBND
+or be in state
+.BR T_IDLE
+and be bound to the same address as
+.I fd
+with the
+.I qlen
+parameter set to 0.
+.PP
+A process can listen for an incoming indication on a given
+.I fd
+and then accept the connection on another endpoint
+.I resfd
+that has been bound to the same or a different protocol address with the
+.I qlen
+parameter (of the
+.BR t_bind (3)
+function) set to 0.  The protocol address bound to the new accepting endpoint
+.RI ( resfd )
+should in general be the same as the listening endpoint
+.RI ( fd ),
+because at the present time, the ISO transport service definition (ISO
+8072:1986) does not authorise different from the called address, except under
+certain conditions (see ISO 8072:1986 paragraph 12.2.4, Responding Address),
+but it also states that it may be changed in the future.
+.\"
 .SS t_bind\fR(3)
+.PP
+The
+.I addr
+field of the
+.BR t_bind (3)
+structure represents the local TSAP.
+.\" Additional stuff:
 .PP
 .I req->addr
 specifies the TSAP address.  The format of the TSAP address is described above
 under
 .RI \*(lq ADDRESSING .\*(rq
-Note that hwne interfacing to RFC1006,
+Note that when interfacing to RFC1006,
 .[
 rfc1006
 .]
@@ -155,13 +1003,48 @@ the value for the NSAP field is \*(lq\fBrk6\fP\*(rq.
 .PP
 OSI supports both connection-oriented and connectionless mode protocols.
 As each uses a different NSAP, the TSAP address for connection and
-connectionless networks are different.  Therefore, the trasnport class (TC 0,
+connectionless networks are different.  Therefore, the transport class (TC 0,
 1, 2, 3 and 4 over CONS, and TC 4 over CLNS) is selected after the endpoint
 has been bound.
+.\"
 .SS t_close\fR(3)
 .PP
-No OSI provider-specific considerations.
+The
+.BR t_close (3)
+call will cause a
+.BR close (2s)
+call to be made on the describtor of this XTI communications endpoint.  If
+there are no other descriptors in this process, or any other process that
+references this communications endpoint, the
+.BR close (2s)
+call will perform an abortive release on any connection associated wtih this
+endpoint.
+.\"
 .SS t_connect\fR(3)
+.PP
+The
+.I sndcall->addr
+structure specifies the remote called TSAP.  In the present version, the
+returned address set in
+.I rcvcall->addr
+will have the same value.
+.PP
+The setting of
+.I sndcall->udata
+is optional for ISO connections, but with no daa, the
+.I len
+field of
+.I udata
+must be set to zero (0).  The
+.I maxlen
+and
+.I buf
+fields of the
+.B netbuf
+structure, pointed to by
+.IR rcvcall->addr " and " rcvcall->opt ,
+must be set before the call.
+.\" Additional stuff:
 .PP
 .I sndcall->addr
 specifies the TSAP address of the destination transport user.  Note that if
@@ -172,26 +1055,145 @@ rfc1006
 the NSAP is replaced by a 4 octet IP address.  Refer to
 .RI \*(lq ADDRESSING ,\*(rq
 above.
-.SS t_error\fR(3)
-.PP
-No OSI provider-specific considerations.
-.SS t_free\fR(3)
-.PP
-No OSI provider-specific considerations.
+.\"
 .SS t_getinfo\fR(3)
 .PP
-No OSI provider-specific considerations.
-.SS t_getstate\fR(3)
+The information returned by
+.BR t_getinfo\fR(3)
+reflects the characteristics of the transport connection or, if no connection
+is established, the maximum characteristics a transport connection could take
+on using the underlying transport provider.  In all possible states except
+.BR T_DATAXFER ,
+the function
+.BR t_getinfo (3)
+returns in the parameter
+.I info
+the same information as was returned by
+.BR t_open (3).
+In
+.BR T_DATAXFER ,
+however, the information returned may differ from that returned by
+.BR t_open (3),
+depending on:
+.IP \(em \w'\(em\(em'u
+the transport class negotiated during connection establishment (ISO transport
+provider only)
+.IP \(em
+the negotiation of expedited data transfer for this connection.
 .PP
-No OSI provider-specific considerations.
+In
+.B T_DATAXFER
+the
+.I etsdu
+field in the
+.B t_info
+structure is set to
+.BR T_INVALID "(-2)
+if no expedited data transfer was negotiated, and to 16 otherwise.  The
+remaining fields are set according to the characteristics of the transport
+protocol class in use for this connection, as defined in the following table:
+.TS
+box tab(:);
+cb|cb|cbsss
+cb|cb|cbsss
+cb|cb|cb|cb|cb|cb
+cb|cb|cb|cb|cb|cb
+li|c|c|c|c|c.
+Parameters:Before Call:After Call
+::_
+::Connection:Connection:Connectionless:ISO-over-TCP
+::Class 0:Class 1-4::
+_
+fd:x:/:/:/:/
+info->addr::x:x:x:x
+info->options:/:x(1):x(1):x(1):x(1)
+info->tsdu:/:x(2):x(2):0->63488:x(2)
+info->etsdu:/:T_INVALID:16/T_INVALID(3):T_INVALID:16/T_INVALID(3)
+info->connect:/:T_INVALID:32:T_INVALID:32/T_INVALID
+info->discon:/:T_INVALID:64:T_INVALID:64/T_INVALID
+info->servtype:/:T_COTS:T_COTS:T_CLTS:T_COTS
+info->flags:/:0:0:0:0
+.TE
+.IP (1)
+\'x' equals T_INVALID(-2) or an integer number greater than zero.
+.PD 0
+.IP (2)
+\'x' equals T_INFINITE(-1) or an integer number greater than zero.
+.IP (3)
+Depending on the negotiation of expedited data transfer.  For RFC 1006 (ISO
+over TCP) support, the value of info->etsdu depends on the negotiation of
+expdited data transfer.
+.PD
+.\"
 .SS t_listen\fR(3)
 .PP
+The
 .I call->addr
-returns the TSAP of the calling transport user.
-.SS t_look\fR(3)
+structure contains the remote calling TSAP.  Since, at most, 32 octets of data
+will be returned with the connection indication,
+.I call->udata.maxlen
+should be set to 32 before the call to
+.BR t_listen (3).
 .PP
-No OSI provider-specific considerations.
+If the user has set
+.I qlen
+greater than 1 (on the call to
+.BR t_bind (3)),
+the user may queue up several connection indications before responding to any
+of them.  The user should be forewarned that the ISO transport provider may
+start a timer to be sure queues of obtaining a response to the connection
+request in a finite time.  So, if the user queues the connection indications
+for too long before responding to them, the transport provider initiating the
+connection will disconnect it.
+.\"
 .SS t_open\fR(3)
+.PP
+The function
+.BR t_open (3)
+is called as the firts step in the initialization of a transport endpoint.
+This function returns various default characteristics associated with the
+different classes.  According to ISO 8073:1986, an OSI transport provider
+supports one or several out of five different transport protocols, class 0
+through class 4.  The default characteristics returned in the parameter
+.I info
+are those of the highest-numbered protocol class the transport provider is
+able to support.  If, for example, a transport provider supports classes 2 and
+0, the characteristics returned are those of class 2.  If the transport
+provider is limited to class 0, the characteristics returned are those of
+class 0.
+.PP
+The following table gives the characteristics associated with the different
+classes:
+.TS
+box tab(:);
+cb|cb|cbsss
+cb|cb|cbsss
+cb|cb|cb|cb|cb|cb
+cb|cb|cb|cb|cb|cb
+li|c|c|c|c|c.
+Parameters:Before Call:After Call
+::_
+::Connection:Connection:Connectionless:ISO-over-TCP
+::Class 0:Class 1-4::
+_
+name:x:/:/:/:/
+oflag:x:/:/:/:/
+info->addr:/:x:x:x:x
+info->options:/:x(1):x(1):x(1):x(1)
+info->tsdu:/:x(2):x(2):0->63488:x(2)
+info->etsdu:/:T_INVALID:16:T_INVALID:16/T_INVALID
+info->connect:/:T_INVALID:32:T_INVALID:32/T_INVALID
+info->discon:/:T_INVALID:64:T_INVALID:64/T_INVALID
+info->servtype:/:T_COTS:T_COTS:T_CLTS:T_COTS
+info->flags:/:0:0:0:0
+.TE
+.IP (1)
+\'x' equals T_INVALID(-2) or an integral number greater than zero.
+.PD 0
+.IP (2)
+\'x' equals T_INFINITE(-1) or an integral number greater than zero.
+.PD
+.\" Additional stuff:
 .PP
 .I path
 can be one of the following:
@@ -241,4 +1243,322 @@ run directly over CLNP.
 .[
 x233
 .]
-
+.\"
+.SS t_rcv\fR(3)
+.PP
+If expedited data arrives after part of a TSDU has been retrieved, receipt of
+the remainder of the TSDU will be suspended until the ETSDU has been
+processed.  Only after the full ETSDU has been retrieved
+.RB ( T_MORE
+not set), will the remainder of the TSDU be available to the user.
+.\"
+.SS t_rcvconnect\fR(3)
+.PP
+On return, the
+.I call->addr
+structure contains the remote calling TSAP.  Since, at most, 32 octets of data
+will be returned to the user,
+.I call->udata.maxlen
+should be set to 32 before the call to
+.BR t_rcvconnect (3).
+.\"
+.SS t_rcvdis\fR(3)
+.PP
+Since, at most, 64 octets of data will be returned to the user,
+.I discon->udata.maxlen
+should be set to 64 before the call to
+.BR t_rcvdis (3).
+.\"
+.SS t_rcvudata\fR(3)
+.PP
+The
+.I unitdata->addr
+structure specifies the remote TSAP.  If the
+.B T_MORE
+flag is set, an additional
+.BR t_rcvudata (3)
+call is needed to retrieve the entire TSDU.  Only normal data isreturned via
+the
+.BR t_rcvudata (3)
+call.  This function is not supported by an ISO-over-TCP transport provider.
+.\"
+.SS t_rcvuderr\fR(3)
+.PP
+The
+.I uderr->addr
+structure contains the remote TSAP.
+.\"
+.SS t_snd\fR(3)
+.PP
+Zero byte TSDUs are not supported.  The
+.B T_EXPEDITED
+flag is not a legal flag unless expedited data has been negotiated for this
+connection.
+.\"
+.SS t_snddis\fR(3)
+.PP
+Since, at most 64 octets of data may be sent with the disconnect,
+.I call->udata.len
+will have a value less than or equal to 64.
+.\"
+.SS t_sndudata\fR(3)
+.PP
+The
+.I unitdata->addr
+structure specifies the remote TSAP.
+The ISO connectionless-mode transport service does not support the sending of
+expedited data.  This function is not supported by an ISO-over-TCP transport
+provider.
+.\"
+.\"
+.SH BUGS
+.PP
+.BR XTI-OSI
+has no known bugs.
+The
+.BR OSI (4)
+implementation of
+.B XTI-OSI
+has been conformance tested and validated using the
+.BR test-osi_otk6 "(8),
+.BR test-osi_otpi "(8) and
+.BR test-osi_oclt "(9)
+test case executables and the
+.B @PACKAGE@ autotest
+conformance and validation test suite.
+.\"
+.\"
+.SH NOTICES
+.\".PP
+.\"In support of the
+.\".BR sockets (3)
+.\"library for
+.\".BR tpi (7)
+.\"transport providers, the options described here have been made compatible with
+.\"the socket options described in
+.\".BR osi (7).
+.\"As a result, depending on the release of
+.\".BR INET (4),
+.\"the XTI/TLI options described might not be compatible with the options described
+.\"here.
+.\".PP
+.\"The
+.\".B Linux
+.\"socket version of OSI described in
+.\".BR osi (7),
+.\"accessed using the TPI interface of the
+.\".B @PACKAGE@
+.\"package described in
+.\".BR INET (4),
+.\"supports all of the options described here.
+.PP
+Earlier versions of the
+.BR otk6 (4)
+driver did not support wildcard binds.  If an attempt was made to bind to a
+wildcard address or port number, the bind would fail with
+.RB [ TNOADDR ].
+While this is correct behavior, it was not consistent with other
+.B XTI-OSI
+implementations.  Recent versions of the
+.BR otk6 (4)
+driver include the ability to bind to wildcards or to request that the
+transport service provider asign a suitable address.
+.PP
+Including the
+.RB < xti.h >
+header file may include the
+.RB < xti_inet.h "> and <" xti_osi.h >
+header files.
+Including the
+.RB < xti_inet.h >
+header file may include the
+.RB < xti_ip.h >
+and
+.RB < xti_tcp.h >
+header file.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR OSI (4),
+.BR otk6 (4),
+.BR osi (4),
+.BR osi (7),
+.BR INET (4),
+.BR read (2),
+.BR readv (2),
+.BR tcp (4),
+.BR tcp (7),
+.BR sockets (3),
+.BR t_accept (3),
+.BR t_connect (3),
+.BR T_CONN_REQ (7),
+.BR t_errno (3),
+.BR t_getinfo (3),
+.BR timod (4),
+.BR tirdwr (4),
+.BR t_listen (3),
+.BR T_OPTDATA_IND (7),
+.BR t_optmgmt (3),
+.BR t_rcvconnect (3),
+.BR t_snddis (3),
+.BR write (2),
+.BR writev (2),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ip (3),
+.BR xti_udp (3),
+.BR xti_tcp (3),
+.BR xti_osi (3),
+.BR test-osi_otk6 (8),
+.BR test-osi_otpi (8),
+.BR test-osi_oclt (8).
+.\"
+.\"
+.SH DEVICES
+.PP
+There are a number of OSI devices providing the Transport Provider Interface
+that provide OSI conforming TPI devices as follows:
+.TP
+.IR /dev/tcp ", " /dev/inet/tcp
+For more information on this TPI TCP device, see
+.BR tcp (4).
+.TP
+.IR /dev/otk6 ", " /dev/streams/otk6 ", " /dev/streams/clone/otk6
+These devices provide the RFC 1006 ISO-over-TCP implementation.
+For more information on this OSI device, see
+.BR otk6 (4).
+.TP
+.IR /dev/tp0 ", " /dev/streams/otpi/tp0
+These devices provide ISO Transport protocol class 0 operation.
+For more information on this OSI device, see
+.BR otpi (4).
+.TP
+.IR /dev/tp1 ", " /dev/streams/otpi/tp1
+These devices provide ISO Transport protocol class 0 operation.
+For more information on this OSI device, see
+.BR otpi (4).
+.TP
+.IR /dev/tp2 ", " /dev/streams/otpi/tp2
+These devices provide ISO Transport protocol class 0 operation.
+For more information on this OSI device, see
+.BR otpi (4).
+.TP
+.IR /dev/tp3 ", " /dev/streams/otpi/tp3
+These devices provide ISO Transport protocol class 0 operation.
+For more information on this OSI device, see
+.BR otpi (4).
+.TP
+.IR /dev/tp4 ", " /dev/streams/otpi/tp4
+These devices provide ISO Transport protocol class 0 operation.
+For more information on this OSI device, see
+.BR otpi (4).
+.TP
+.IR /dev/tp4_cots ", " /dev/streams/otpi/tp4_cots
+These devices provide ISO Transport protocol class 0 operation.
+For more information on this OSI device, see
+.BR otpi (4).
+.TP
+.IR /dev/oclt ", " /dev/streams/oclt ", " /dev/streams/clone/oclt
+These devices provide the ISO Transport Connectionless service.
+For more information on this OSI device, see
+.BR oclt (4).
+.PP
+These devices are provided by the
+.BR @PACKAGE_TITLE@ ( @PACKAGE@-@VERSION@ )
+package.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This interface is compatible with
+.IR "XNS 5.2" ,
+.[
+xns99
+.]
+and implementations based on
+.IR "XNS 5.2" ,
+such as
+.IR "Solaris\(rg SunLink" ,
+.[
+sunlink-tli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Internet Protocol (IP) options were not standardized until XPG4.
+.[
+xpg
+.]
+.IP \(em
+The format of options for the Transport Provider Interface (TPI) differ from
+those for the AT&T Transport Layer Interface (TLI).  This interface follows
+the TPI.
+.IP \(em
+The precise values of some options and formats of primitives may differ from
+implementation to implementation.  Binary compatibility is not guaranteed.
+Any binary compatiblity currently achieved is a bug and is scheduled to be
+removed in the next release.
+.PP
+See
+.BR xti (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The OpenGroup XNS Issue 5.2,
+.[
+xns99
+.]
+.I Solaris\(rg SunLink
+documentation.
+.[
+sunlink-tli
+.]
+Conformance is validated using the
+.BR test-osi_otk6 "(8)
+.BR test-osi_otpi "(8) and
+.BR test-osi_oclt "(9)
+test case executables and the
+.B @PACKAGE@ autotest
+validation test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.I Transport Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+was first created by AT&T as the
+.I Transport Layer Interface (TLI)
+and was subsequently standardized by
+.B UNIX International
+and later
+by
+.B The OpenGroup
+in XPG4
+.[
+xpg
+.]
+and XNS 5.2.
+.[
+xns99
+.]
+.PP
+The
+.B OSI-TPI
+driver is specific to the
+.B OpenSS7
+stack.
+This is an unofficial Corrigendum to XNS 5.2 Revision 2.
+.[
+xns99
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

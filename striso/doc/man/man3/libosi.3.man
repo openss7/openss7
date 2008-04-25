@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: libosi.3.man,v 0.9.2.1 2006/10/10 10:12:33 brian Exp $
+.\" @(#) $Id: libosi.3.man,v 0.9.2.2 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:12:33 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: libosi.3.man,v $
+.\" Revision 0.9.2.2  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.1  2006/10/10 10:12:33  brian
 .\" - added losts of striso files
 .\"
@@ -176,4 +179,76 @@ to the linker stage (i.e,
 .BR gcc (1)
 or
 .BR ld (1)).
-
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /etc/net/oclt/host
+configuration file for host name to NSAP conversion.
+.TP
+.B /etc/net/oclt/services
+configuration file for Service Name to TSEL conversion.
+.TP
+.BR /usr/lib/libosi.a ", " /usr/lib/libosi.so
+the OSI library containing the
+.B libosi
+functions.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B libosi
+is compatible with
+.I SunLink OSI
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+This function is a
+.IR Solaris \(rg-specific
+function that is implemented by
+.B @PACKAGE_TITLE@
+to assist with porting
+.I SunLink OSI
+applications programs to
+.BR "@PACKAGE_TITLE@" .
+.IP ""
+.B libosi
+will not be used by portable programs.
+.IP \(em
+Although not POSIX, the Sun TI-RPC function
+.BR netdir_getbyname (3)
+with an address of
+.B HOST_SELF_BIND
+is probably more portable.
+.IP ""
+.BR getmyclnsnsap ()
+will not be used by portable programs.
+.PP
+See
+.BR libosi (3),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.I SunLink OSI
+documentation.
+.[
+sunlink-tli
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B libosi
+first appeared in
+.IR "SunLink OSI" .
+.[
+sunlink-tli
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -3592,6 +3592,18 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x207
+%L X.207
+%A ITU
+%R ITU-T Recommendation X.207 [ISO/IEC 9545 : 1993]
+%T Information Technology \(em Open Ssytems Interconnection \(em Application Layer Structure
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K x208
 %L X.208
 %A ITU
@@ -3930,7 +3942,7 @@ Part 1: Protocol Specification
 %K x637
 %L X.637
 %A ITU
-%R ITU-T Recommendation X.637
+%R ITU-T Recommendation X.637 [ISO/IEC ISP 11188-1]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Common Upper Layer Requirements
@@ -3942,7 +3954,7 @@ Part 1: Protocol Specification
 %K x638
 %L X.638
 %A ITU
-%R ITU-T Recommendation X.638
+%R ITU-T Recommendation X.638 [ISO/IEC ISP 11188-3]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Minimal OSI Facilities to Support Basic Communications Applications
@@ -3954,7 +3966,7 @@ Part 1: Protocol Specification
 %K x639
 %L X.639
 %A ITU
-%R ITU-T Recommendation X.639
+%R ITU-T Recommendation X.639 [ISO/IEC ISP 11188-2]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Requirements for ROSE-based Profiles
@@ -5440,6 +5452,17 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1637.txt
 
+%K rfc1698
+%L RFC1698
+%R RFC 1698
+%A Peter Furniss
+%T Octet Sequences for Upper-Layer OSI to Support Basic Communications Applications
+%D October 1994
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1698.txt
+
 %K rfc1706
 %L RFC1706
 %R RFC 1706
@@ -5942,6 +5965,7 @@ Part 1: Protocol Specification
 %T ISO Transport Class 2 Non-use of Explicit Flow Control over TCP RFC 1006 Extension
 %R RFC 1859
 %D October 1995
+%O (Status: INFORMATIONAL) (Obsoleted by RFC 2126)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1859.txt

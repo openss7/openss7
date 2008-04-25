@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_PABORT_IND.7.man,v 0.9.2.3 2008-04-16 20:04:22 brian Exp $
+.\" @(#) $Id: A_PABORT_IND.7.man,v 0.9.2.4 2008-04-25 08:38:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_PABORT_IND.7.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:28  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2008-04-16 20:04:22  brian
 .\" - updating APLI manual pages
 .\"
@@ -447,9 +450,10 @@ x410 1984
 This primitive is issued by the XAP interface service.
 .\"
 .\"
-.SH ATTRIBUTES
+.SH ENVIRONMENT
 .PP
-The following attributes may change as a result of receiving the A_PABORT_IND
+The following attributes may change as a result of receiving the
+.B A_PABORT_IND
 primitive:
 .BR AP_STATE .
 .\"
@@ -461,7 +465,7 @@ The
 primitive is issued by the AP provider in any state other than
 .BR AP_UNBOUND " and " AP_IDLE .
 .PP
-The new state is
+The new state of the XAP instance is
 .BR AP_IDLE .
 .\"
 .\"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_apli.h,v 0.9.2.1 2007/12/15 20:16:48 brian Exp $
+ @(#) $Id: xti_apli.h,v 0.9.2.2 2008-04-25 08:38:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:16:48 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 08:38:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_apli.h,v $
+ Revision 0.9.2.2  2008-04-25 08:38:31  brian
+ - working up libraries modules and drivers
+
  Revision 0.9.2.1  2007/12/15 20:16:48  brian
  - added new mib files
 
@@ -58,7 +61,7 @@
 #ifndef _SYS_XTI_APLI_H
 #define _SYS_XTI_APLI_H
 
-#ident "@(#) $RCSfile: xti_apli.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_apli.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -224,6 +227,45 @@
 					have more data to send or receive. */
 #	define T_AP_SNDMORE		(1<<0)
 #	define T_AP_RCVMORE		(1<<1)
+
+/* T_AP_DIAGNOSTIC */
+typedef struct {
+	t_scalar_t rsn;
+	t_scalar_t evt;
+	t_scalar_t src;
+	/* followed by error text string */
+	char error[0];
+} t_diag_t;
+
+/* t_diag_t.src values */
+#define T_AP_ACSE_SERV_PROV	(FIXME)
+#define T_AP_PRES_SERV_PROV	(FIXME)
+#define T_AP_SESS_SERV_PROV	(FIXME)
+#define T_AP_TRAN_SERV_PROV	(FIXME)
+
+/* t_diag_t.rsn values: */
+/* t_diag_t.src == T_AP_ACSE_SERV_PROV */
+#define T_AP_NSPEC		(FIXME)
+#define T_AP_UNREC_APDU		(FIXME)
+#define T_AP_UNEXPT_APDU	(FIXME)
+#define T_AP_UNREC_APDU_PARM	(FIXME)
+#define T_AP_UNEXPT_APDU_PARM	(FIXME)
+#define T_AP_INVAL_APDU_PARM	(FIXME)
+/* t_diag_t.src == T_AP_TRAN_SERV_PROV */
+#define T_AP_TRAN_DISCONNECT	(FIXME)
+
+/* t_diag_t.evt values: */
+/* t_diag_t.src == T_AP_ACSE_SERV_PROV */
+#define T_AP_AEI_AARQ		(FIXME)	/**< Associate request APDU. */
+#define T_AP_AEI_AARE		(FIXME)	/**< Associate response APDU. */
+#define T_AP_AEI_RLRQ		(FIXME)	/**< Associate release request APDU. */
+#define T_AP_AEI_RLRE		(FIXME)	/**< Associate release response APDU. */
+#define T_AP_AEI_ABRT		(FIXME)	/**< Associate abort APDU. */
+
+/* If the src field is set to T_AP_TRAN_SERV_PROV and the rsn field is set to
+ * T_AP_TRAN_DISCONNECT, the evt field will be set to an implementation-defined
+ * diagnostic value such as that returned by the XTI t_rcvdis(3) call. */
+
 
 
 /** @} */

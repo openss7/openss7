@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: cmot.4.man,v 0.9.2.3 2006/10/10 10:44:02 brian Exp $
+.\" @(#) $Id: cmot.4.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:44:02 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cmot.4.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2006/10/10 10:44:02  brian
 .\" - updates for release, lots of additions and workup
 .\"
@@ -156,7 +159,7 @@ tpi revision 2.0.0
 .BR tpi (7),
 with the minimal OSI extensions described in XNS 5.2.
 .[
-xns
+xns 5.2
 .]
 .\"
 .\"
@@ -170,6 +173,48 @@ and superseded by RFC 1069.
 .[
 rfc1069
 .]
+.\"
+.\"
+.SH OIDS
+.PP
+The following values for Application Context Name are registered for CMOT and
+CMIP:
+.PP
+This OBJECT IDENTIFIER value is for use with legacy or backward compatible CMOT
+.[
+rfc1095
+.]
+operation.
+.HP
+.RB \(lq \ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex1 \(rq
+.br
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) cmot1095(1)}
+.PP
+These OBJECT IDENTIFIER values are for use with CMIP
+.[
+rfc1189
+.]
+operation:
+.HP
+.RB \(lq \ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex2 \(rq
+.br
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-event-association(2)}
+.HP
+.RB \(lq \ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex3 \(rq
+.br
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-event-monitor-association(3)}
+.HP
+.RB \(lq \ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex4 \(rq
+.br
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-monitor-control-association(4)}
+.HP
+.RB \(lq \ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex5 \(rq
+.br
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-full-association(5)}
+.HP
+.RB \(lq \ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex6 \(rq
+.br
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) agent-event-association(6)}
 .\"
 .\"
 .SH OPTIONS
@@ -269,7 +314,10 @@ implemented as a user-space library that simply uses the LPP (tpi-mosi)
 Stream.
 Note that CMISE
 .[
-cmip
+x710
+.]
+.[
+x711
 .]
 uses ACSE and could easily be represented using the TPI-mOSI
 in the same fashion as is done for SS7 TCAP.

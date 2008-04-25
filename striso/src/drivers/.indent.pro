@@ -109,3 +109,4 @@
 -Tdl_long
 -Tdl_ulong
 -Tdl_ushort
+-Tuint

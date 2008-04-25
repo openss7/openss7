@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: oopi.4.man,v 0.9.2.3 2007/12/15 20:20:28 brian Exp $
+.\" @(#) $Id: oopi.4.man,v 0.9.2.4 2008-04-25 08:38:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/12/15 20:20:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: oopi.4.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:28  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2007/12/15 20:20:28  brian
 .\" - updates
 .\"
@@ -133,7 +136,7 @@ xap c303
 .]
 .BR xap (3).
 ROSE services may be provided optionally using the ACSE/Presentation ROSE Interface (APRI) or the
-X/Open ACSE/Presentation Library Inteface for ROSE (XAP-ROSE).
+X/Open ACSE/Presentation Library Interface for ROSE (XAP-ROSE).
 .[
 xap-rose
 .]
@@ -153,11 +156,11 @@ xms
 .]
 XDS,
 .[
-xds
+xds c608
 .]
 XMP.
 .[
-xmp
+xmp c306
 .]
 These library interfaces, based on XOM,
 .[
@@ -212,7 +215,7 @@ library interfaces should be used.
 A daemon,
 .BR osinetd (8),
 is used to configure the multiplexing driver at system initialization time.
-The daemon opens and permanently links wildcarded network address and
+The daemon opens and permanently links wild-carded network address and
 transport selector listening Streams for each NSAP type available on the
 system.  These permanently linked Streams are bound in a listening mode only,
 and may be shared by processes that open an upper multiplex Stream.
@@ -240,9 +243,9 @@ To avoid the necessity of temporarily linking an appropriate transport
 provider Stream, the
 .B oopi
 driver can also be implemented as a generic transport provider Stream that
-autopushes a presentation module.  In this case, the opening and temporarily
+auto-pushes a presentation module.  In this case, the opening and temporarily
 linking of the transport Stream becomes a matter of simply opening the
-autopush transport entry.
+auto-push transport entry.
 .\"
 .\"
 .SH INTERFACE
@@ -336,7 +339,7 @@ and other implementations based on AT&T SVR 4.2, with the following compatibilit
 .IP \(em \w'\(em\(em'u
 Some distributions of
 .IR UNIX \(rg
-have different inplementations of drivers, and different device paths, to support the APLI and XAP
+have different implementations of drivers, and different device paths, to support the APLI and XAP
 libraries.  The
 .B oopi
 driver is named after the
@@ -347,18 +350,23 @@ libraries on
 and the
 .B oopi
 device is not mentioned in readily available documentation.  Therefore, any similarity between the
-OpenSS7 implemetnation of a service interface for
+OpenSS7 implementation of a service interface for
 .B oopi
 and that of
 .IR Solaris \(rg
 is purely coincidental.
-The only portability and compatibility that is acheived as a result is via the APLI and XAP
+The only portability and compatibility that is achieved as a result is via the APLI and XAP
 libraries, whose interfaces are better documented.
 .IP \(em
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+This
+.IR STREAMS (4)
+module is not subject to any specific conformance,
+see section,
+.RI \(lq COMPATIBILITY \(rq.
 .\"
 .\"
 .SH HISTORY
