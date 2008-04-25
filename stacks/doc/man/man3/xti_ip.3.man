@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_ip.3.man,v 0.9.2.7 2006/04/05 09:43:00 brian Exp $
+.\" @(#) $Id: xti_ip.3.man,v 0.9.2.8 2008-04-25 08:58:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:00 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:58:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_ip.3.man,v $
+.\" Revision 0.9.2.8  2008-04-25 08:58:50  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:00  brian
 .\" - moved .so line and updated headers
 .\"
@@ -360,7 +363,7 @@ package.
 .PP
 The Open Group XNS Issue 5.2.
 .[
-xns
+xns99
 .]
 .\"
 .\"

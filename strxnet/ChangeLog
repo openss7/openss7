@@ -1,3 +1,67 @@
+2008-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strxnet.refs: updated references
+	* doc/man/man3/accept.3.man: updated references
+	* doc/man/man3/bind.3.man: updated references
+	* doc/man/man3/connect.3.man: updated references
+	* doc/man/man3/getpeername.3.man: updated references
+	* doc/man/man3/getsockname.3.man: updated references
+	* doc/man/man3/getsockopt.3.man: updated references
+	* doc/man/man3/listen.3.man: updated references
+	* doc/man/man3/netbuf.3.man: updated references
+	* doc/man/man3/recv.3.man: updated references
+	* doc/man/man3/recvfrom.3.man: updated references
+	* doc/man/man3/recvmsg.3.man: updated references
+	* doc/man/man3/send.3.man: updated references
+	* doc/man/man3/sendmsg.3.man: updated references
+	* doc/man/man3/sendto.3.man: updated references
+	* doc/man/man3/setsockopt.3.man: updated references
+	* doc/man/man3/shutdown.3.man: updated references
+	* doc/man/man3/socket.3.man: updated references
+	* doc/man/man3/socketpair.3.man: updated references
+	* doc/man/man3/sockets.3.man: updated references
+	* doc/man/man3/t_accept.3.man: updated references
+	* doc/man/man3/t_addleaf.3.man: updated references
+	* doc/man/man3/t_alloc.3.man: updated references
+	* doc/man/man3/t_bind.3.man: updated references
+	* doc/man/man3/t_close.3.man: updated references
+	* doc/man/man3/t_connect.3.man: updated references
+	* doc/man/man3/t_errno.3.man: updated references
+	* doc/man/man3/t_error.3.man: updated references
+	* doc/man/man3/t_free.3.man: updated references
+	* doc/man/man3/t_getinfo.3.man: updated references
+	* doc/man/man3/t_getprotaddr.3.man: updated references
+	* doc/man/man3/t_getstate.3.man: updated references
+	* doc/man/man3/t_listen.3.man: updated references
+	* doc/man/man3/t_look.3.man: updated references
+	* doc/man/man3/t_open.3.man: updated references
+	* doc/man/man3/t_optmgmt.3.man: updated references
+	* doc/man/man3/t_rcv.3.man: updated references
+	* doc/man/man3/t_rcvconnect.3.man: updated references
+	* doc/man/man3/t_rcvdis.3.man: updated references
+	* doc/man/man3/t_rcvleafchange.3.man: updated references
+	* doc/man/man3/t_rcvrel.3.man: updated references
+	* doc/man/man3/t_rcvreldata.3.man: updated references
+	* doc/man/man3/t_rcvudata.3.man: updated references
+	* doc/man/man3/t_rcvuderr.3.man: updated references
+	* doc/man/man3/t_rcvv.3.man: updated references
+	* doc/man/man3/t_rcvvudata.3.man: updated references
+	* doc/man/man3/t_removeleaf.3.man: updated references
+	* doc/man/man3/t_snd.3.man: updated references
+	* doc/man/man3/t_snddis.3.man: updated references
+	* doc/man/man3/t_sndopt.3.man: updated references
+	* doc/man/man3/t_sndrel.3.man: updated references
+	* doc/man/man3/t_sndreldata.3.man: updated references
+	* doc/man/man3/t_sndudata.3.man: updated references
+	* doc/man/man3/t_sndv.3.man: updated references
+	* doc/man/man3/t_sndvopt.3.man: updated references
+	* doc/man/man3/t_sndvudata.3.man: updated references
+	* doc/man/man3/t_strerror.3.man: updated references
+	* doc/man/man3/t_sync.3.man: updated references
+	* doc/man/man3/t_sysconf.3.man: updated references
+	* doc/man/man3/t_unbind.3.man: updated references
+	* doc/man/man3/xti.3.man: updated references
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxnet.spec.in: prepare for doc/papers

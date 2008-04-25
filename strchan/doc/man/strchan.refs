@@ -151,6 +151,17 @@
 %U http://www.opengroup.org/onlinepubs/
 %S X/Open CAE Specification
 
+%L XGDMO
+%A X/Open
+%R C502 (XGDMO)
+%T GDMO\ to\ XOM Translation Algorithm
+%D October 1995
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-126-8
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
 %L TCI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
@@ -3455,6 +3466,28 @@ Part 1: Protocol Specification
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso10038
+%L ISO/IEC 10038
+%A ISO
+%R ISO/IEC 10038 : 1993
+%T Information technlology \(em Telecommunications and information exchange between systems \(em Local area networks Media access control (MAC) bridges
+%D 1993
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaced by ISO/IEC 15802-3:1988.  Also IEEE 802.1D 1993.
+
+%K iso1580203
+%L ISO/IEC 15802-3
+%A ISO
+%R ISO/IEC 15802-3 : 1998
+%T Information technlology \(em Telecommunications and information exchange between systems \(em Local and metropolitan area networks Common specifications \(em Part 3: Media Access Contrl (MAC) Bridges
+%D 1998
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaces ISO/IEC 10038.  Also IEEE 802.1D 1998.
+
 %K iso10589
 %L ISO/IEC 10589
 %A ISO
@@ -3559,6 +3592,18 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x207
+%L X.207
+%A ITU
+%R ITU-T Recommendation X.207 [ISO/IEC 9545 : 1993]
+%T Information Technology \(em Open Ssytems Interconnection \(em Application Layer Structure
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K x208
 %L X.208
 %A ITU
@@ -3643,6 +3688,18 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x218
+%L X.218
+%A ITU
+%R ITU-T Recommendation X.218 [ISO/IEC 9066-1]
+%T Open Systems Interconnection \(em General Service Definitions \(em Reliable Transfer: Model and Service Definition
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K x219
 %L X.219
 %A ITU
@@ -3713,6 +3770,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K x228
+%L X.228
+%A ITU
+%R ITU-T Recommendation X.228 [ISO/IEC 9066-2]
+%T Open Systems Interconnection \(em PICS Proformas \(em Reliable Transfer: Protocol Specification
+%D n.d.
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%O (Extract from Blue Book)
 %U http://www.itu.int/
 
 %K x229
@@ -3799,6 +3869,30 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x410-1984
+%L X.410
+%A CCITT
+%R CCITT Recommendation X.410
+%C Geneva
+%D October 1984
+%T Information Technology \(em Message Handling Systems (MHS) \(em Remote Operations and Reliable Transfer Server
+%I CCITT Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Withdrawn on 25/11/1988)
+%U http://www.itu.int/
+
+%K x413
+%L X.413
+%A ITU
+%R ITU-T Recommendation X.413
+%C Geneva
+%D June 1999
+%T Information Technology \(em Message Handling Systems (MHS) \(em Message Store: Abstract Service Definition
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K iso8473_2
 %L ISO 8473-2
 %R ISO/IEC 8473-2 : 1994
@@ -3848,7 +3942,7 @@ Part 1: Protocol Specification
 %K x637
 %L X.637
 %A ITU
-%R ITU-T Recommendation X.637
+%R ITU-T Recommendation X.637 [ISO/IEC ISP 11188-1]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Common Upper Layer Requirements
@@ -3860,7 +3954,7 @@ Part 1: Protocol Specification
 %K x638
 %L X.638
 %A ITU
-%R ITU-T Recommendation X.638
+%R ITU-T Recommendation X.638 [ISO/IEC ISP 11188-3]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Minimal OSI Facilities to Support Basic Communications Applications
@@ -3872,7 +3966,7 @@ Part 1: Protocol Specification
 %K x639
 %L X.639
 %A ITU
-%R ITU-T Recommendation X.639
+%R ITU-T Recommendation X.639 [ISO/IEC ISP 11188-2]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Requirements for ROSE-based Profiles
@@ -3917,16 +4011,16 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
-%K x721
-%L X.721
+%K x722
+%K GDMO
+%L X.722
 %A ITU
-%R ITU-T Recommendation X.721
+%R ITU-T Recommendation X.722 [ISO/IEC 10165-4 : 1992]
 %C Geneva
-%D February 10, 1992
-%T Information Technology \- Open Systems Interconnection \- Structure of Management Information: Definition of Management Information
-%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%D January 1992
+%T Information Technology \(em Open Systems Interconnection \(em Structure of Management %Information: Guidelines for the Definition of Managed Objects
 %Q International Telecommunication Union
-%O (Previously "CCITT Recommendation") [ISO/IEC 10165-2:1992]
+%O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
 %K h225.0
@@ -4117,6 +4211,156 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification \(em Amendment 1: Filestore Management
 %D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118301
+%L ISO/IEC 11183-1
+%R ISO/IEC ISP 11183-1:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 1: Specification of ACSE \(em Presentation and session protocols for use by ROSE and CMISE
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118302
+%L ISO/IEC 11183-2
+%R ISO/IEC ISP 11183-2:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 3: CMISE/ROSE for AOM11 \(em Basic Management Communications
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118303
+%L ISO/IEC 11183-3
+%R ISO/IEC ISP 11183-3:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 2: CMISE/ROSE for AOM12 \(em Enhanced Management Communications
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14360
+%L ISO/IEC 14360
+%R ISO/IEC 14360:1996
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14361
+%L ISO/IEC 14361
+%R ISO/IEC 14361:1996
+%A ISO/IEC
+%T Information Technology \(em MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14362
+%L ISO/IEC 14362
+%R ISO/IEC 14362:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformace to Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14363
+%L ISO/IEC 14363
+%R ISO/IEC 14363:1996
+%A ISO/IEC
+%D 1996
+%T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14364
+%L ISO/IEC 14364
+%R ISO/IEC 14364:1996
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Bindings for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14365
+%L ISO/IEC 14365
+%R ISO/IEC 14365:1996
+%A ISO/IEC
+%T Information Technology \(em MHS-Based Electronic Messagin C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14366
+%L ISO/IEC 14366
+%R ISO/IEC 14366:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14367
+%L ISO/IEC 14367
+%R ISO/IEC 14367:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14392
+%L ISO/IEC 14392
+%R ISO/IEC 14392:1996
+%A ISO/IEC
+%T Information Technology \(em Directory Services \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14393
+%L ISO/IEC 14393
+%R ISO/IEC 14393:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformace to Directory Services \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14394
+%L ISO/IEC 14394
+%R ISO/IEC 14394:1996
+%A ISO/IEC
+%T Information Technology \(em Directory Services C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14395
+%L ISO/IEC 14395
+%R ISO/IEC 14395:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to Directory Services C Language Interface \(em Binding for Application Program Interface (API)
+%D 1996
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4328,6 +4572,28 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs.hp.com/
 
+%L HPUXAPLI
+%R HP-UX\(rg OTS/9000
+%K hpuxapli
+%T ACSE/Presentation and ROSE Interface Programmer's Guide
+%G Pub. No: 32070-90032
+%D May 1997
+%Q Hewlett-Packard Company
+%I HP9000 Networking
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPUXOTS
+%R OTS/9000
+%K hpuxots
+%T HP OSI Transport Services/9000 Release Notes
+%G Pub. No: 32070-90049 thru 53
+%D 1997 thru 2004
+%Q Hewlett-Packard Company
+%I HP9000 Networking
+%C Palo Alto, California
+%U http://docs.hp.com/
+
 %L MACOTR
 %R Mac OS 9
 %K macotr
@@ -4366,6 +4632,99 @@ Part 1: Protocol Specification
 %T STREAMS Programming Guide
 %G Part No: 805-7478-05
 %D August 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLXOM
+%R Solaris\(rg Solstice\(tm XOM
+%K solxom
+%T Solstice\(tm XOM Programming Reference
+%G Part No: 802-1311-12
+%J Revision A
+%D February 1996
+%Q Sun Microsystems, Inc.
+%I SunSoft
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SOLXMP
+%R Solaris\(rg Solstice\(tm XMP
+%K solxmp
+%T Solstice\(tm XMP Programming Reference
+%G Part No: 802-1312-11
+%J Revision A
+%D April 1996
+%Q Sun Microsystems, Inc.
+%I SunSoft
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SOLX500
+%R Solaris\(rg
+%K solx500
+%T Solstice\(tm X.500 XDS Programming Reference
+%G Part No: 802-2130-10
+%D January 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX400
+%R Solaris\(rg
+%K solx400
+%T Solstice\(tm X.400 Client Toolkit 9.0 Administrator's Guide
+%G Part No: 802-5046-10
+%D February 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLCMIP
+%R Solaris\(rg
+%K solcmip
+%T Solstice\(tm CMIP 8.2 Programmer's Guide
+%G Part No: 802-5281-10
+%D April 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25
+%R Solaris\(rg 9
+%K solx25
+%T Solstice X.25 9.2 Administration Guide
+%G Part No: 806-1234-10
+%D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25
+%R Solaris\(rg 9
+%K solx25
+%T Solstice X.25 9.2 Developer's Guide
+%G Part No: 806-1235-10
+%D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25
+%R Solaris\(rg 9
+%K solx25
+%T Solstice X.25 9.2 PAD User's Guide
+%G Part No: 806-1236-10
+%D October 1999
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Palo Alto, California
@@ -4467,10 +4826,23 @@ Part 1: Protocol Specification
 %C Santa Clara, California
 %U http://docs.sun.com/
 
+%L SUNLINK-ADM
+%R Solaris\(rg SunLink OSI
+%K sunlink
+%T SunLink\(rg OSI 8.1 Communication Platform Administrator's Guide
+%G Part No: 801-4975-13
+%J Revision A
+%D March 1995
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Mountain View, California
+%U http://docs.sun.com/
+
 %L SUNLINK-TLI
 %R Solaris\(rg SunLink OSI
 %K sunlink
-%T SunLink OSI 8.1 TLI Programmer's Reference
+%T SunLink\(rg OSI 8.1 TLI Programmer's Reference
+%G Part No: 801-7170-12
 %J Revision A
 %D March 1995
 %Q Sun Microsystems, Inc.
@@ -4481,10 +4853,10 @@ Part 1: Protocol Specification
 %L SUNLINK-APLI
 %R Solaris\(rg SunLink OSI
 %K sunlink
-%T Sunlink OSI 8.1 APLI Programmer's Reference
+%T SunLink\(rg OSI 8.1 APLI Programmer's Reference
 %J Revision A
 %D March 1995
-%G Part No.: 802-2040-11
+%G Part No: 802-2040-11
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Mountain View, California
@@ -5080,6 +5452,17 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1637.txt
 
+%K rfc1698
+%L RFC1698
+%R RFC 1698
+%A Peter Furniss
+%T Octet Sequences for Upper-Layer OSI to Support Basic Communications Applications
+%D October 1994
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1698.txt
+
 %K rfc1706
 %L RFC1706
 %R RFC 1706
@@ -5582,6 +5965,7 @@ Part 1: Protocol Specification
 %T ISO Transport Class 2 Non-use of Explicit Flow Control over TCP RFC 1006 Extension
 %R RFC 1859
 %D October 1995
+%O (Status: INFORMATIONAL) (Obsoleted by RFC 2126)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1859.txt

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: t_sndv.3.man,v 0.9.2.8 2006/09/18 01:26:04 brian Exp $
+.\" @(#) $Id: t_sndv.3.man,v 0.9.2.9 2008-04-25 08:59:01 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/18 01:26:04 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:59:01 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: t_sndv.3.man,v $
+.\" Revision 0.9.2.9  2008-04-25 08:59:01  brian
+.\" - updated references
+.\"
 .\" Revision 0.9.2.8  2006/09/18 01:26:04  brian
 .\" - updated manpages and macros
 .\"
@@ -300,7 +303,7 @@ svr42
 .]
 XNS 5.2,
 .[
-xns
+xns 5.2
 .]
 SUSv2.
 .[
@@ -320,7 +323,7 @@ test suite.
 .PP
 XTI/TLI,
 .[
-XTI
+xti revision 1.0
 .]
 TPI,
 .[
@@ -329,7 +332,7 @@ TPI Revision 2.0.0
 XPG5,
 XNS 5.2,
 .[
-xns
+xns 5.2
 .]
 SUSv2.
 .[

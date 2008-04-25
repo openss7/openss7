@@ -1,3 +1,17 @@
+2008-04-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strss7.refs: updated references
+	* doc/man/man3/xti.3.man: updated references
+	* doc/man/man3/xti_ip.3.man: updated references
+	* doc/man/man3/xti_mtp.3.man: updated references
+	* doc/man/man3/xti_sccp.3.man: updated references
+	* doc/man/man3/xti_sctp.3.man: updated references
+	* doc/man/man3/xti_ss7.3.man: updated references
+	* doc/man/man3/xti_sscop.3.man: updated references
+	* doc/man/man3/xti_tcap.3.man: updated references
+	* doc/man/man3/xti_tcp.3.man: updated references
+	* doc/man/man3/xti_udp.3.man: updated references
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.spec.in: prepare for doc/papers
