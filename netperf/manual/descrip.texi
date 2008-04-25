@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.6 2007/11/06 10:16:38 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.7 2008-04-25 11:50:43 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/11/06 10:16:38 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-25 11:50:43 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -77,8 +77,8 @@ This is a fork of the @cite{Netperf} package released by @cite{Hewlett-Packard} 
 based on the @file{Netperf-2.3} release from @cite{Hewlett-Packard}.
 
 Modifications to the package are derived from the @cite{OpenSS7 STREAMS XNS}, @cite{XTI/TLI},
-@cite{INET} and @cite{SCTP} implementations and are released under the @cite{GNU General Public
-License (GPL) Version 3}.  The @dfn{Netperf} tool itself is licensed under specific terms by
+@cite{INET} and @cite{SCTP} implementations and are released under the @cite{GNU Affer General Public
+License (AGPL) Version 3}.  The @dfn{Netperf} tool itself is licensed under specific terms by
 @cite{Hewlett-Packard}.  Please see file @file{LICENSES} for the @cite{Hewlett-Packard}
 @dfn{Netperf} copyright notices and licensing restrictions.  The @dfn{Netperf} tool is
 

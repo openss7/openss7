@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.18 2008/01/01 14:40:24 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.19 2008-04-25 11:50:39 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008/01/01 14:40:24 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:39 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -299,6 +299,7 @@ Licenses
 * University of Illinois License::	The UI license
 * Hewlett-Packard License::		The HP license
 * BSD/USL Combined License::		The BSD license
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -337,7 +338,7 @@ Indices
 @cindex manual notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for some of the
 sub-packages included in this master package.  Consult the permission notices contained in the
 documentation of each sub-package for more information.
@@ -405,6 +406,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.19  2008-04-25 11:50:39  brian
+- updates to AGPLv3
+
 Revision 0.9.2.18  2008/01/01 14:40:24  brian
 - updated release files
 
@@ -602,7 +606,7 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @cindex notice
 @cindex licensing
 
-This package is released and distributed under the @cite{GPL} (@pxrefman{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for some of the
 sub-packages included in this master package.  Consult the permission notices contained in the
 documentation of each sub-package for more information.
@@ -3262,6 +3266,7 @@ For additional details,
 * UNIX International DLPI License::	The DLPI license
 * UNIX International NPI License::	The NPI license
 * UNIX International TPI License::	The TPI license
+* GNU Affero General Public License::	The AGPL license
 * GNU General Public License::		The GPL license
 * GNU Lesser General Public License::	The LGPL license
 * GNU Free Documentation License::	The FDL license
@@ -3281,6 +3286,8 @@ For additional details,
 @include texi/uinpi.texi
 @page
 @include texi/uitpi.texi
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page

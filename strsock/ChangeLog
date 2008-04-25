@@ -2,6 +2,12 @@
 
 	* doc/man/strsock.refs: udpated references
 
+	* doc/manual/libsocket.texi: updates to AGPLv3
+	* doc/manual/libsocklib.texi: updates to AGPLv3
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strsock.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: provide doc/papers

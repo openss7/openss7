@@ -2,6 +2,11 @@
 
 	* doc/man/strchan.refs: updated references
 
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strchan.texi: updates to AGPLv3
+	* doc/projects/mg/mg.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strchan.spec.in: prepare for doc/papers

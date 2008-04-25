@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 0.9.2.15 2007/06/22 00:19:18 brian Exp $
+% @(#) $Id: libxnet.texi,v 0.9.2.16 2008-04-25 11:50:57 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/22 00:19:18 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:57 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -579,7 +579,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.15 $); $Date: 2007/06/22 00:19:18 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.16 $); $Date: 2008-04-25 11:50:57 $.
 
 @subsubheading AUTHOR
 @format
@@ -742,7 +742,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.15 $); $Date: 2007/06/22 00:19:18 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.16 $); $Date: 2008-04-25 11:50:57 $.
 @end flushleft
 @end format
 
@@ -1062,7 +1062,7 @@ trouble, troubleshooting.
 
 @node Public License, Documentation License, Bugs, Top
 @appendix Public License
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 
 @node Documentation License, Concept Index, Public License, Top
 @appendix Dcoumentation License

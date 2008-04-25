@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 08:38:32 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-25 11:50:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:38:32 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:50:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 0.9.2.5  2008-04-25 11:50:52  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.4  2008-04-25 08:38:32  brian
  - working up libraries modules and drivers
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 08:38:32 $"
+#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-25 11:50:52 $"
 
 static char const ident[] =
-    "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 08:38:32 $";
+    "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-25 11:50:52 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -84,6 +87,7 @@ static char const ident[] =
  *  Protocol Class 0 (TP0).
  */
 
+#if 0
 #include <sys/os7/compat.h>
 
 #if defined HAVE_TIHDR_H
@@ -96,7 +100,7 @@ static char const ident[] =
 
 #define ISOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ISOT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 08:38:32 $"
+#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-25 11:50:52 $"
 #define ISOT_DEVICE	"SVR 4.2 STREAMS ISOT Module for RFC 1006 and RFC 2126"
 #define ISOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISOT_LICENSE	"GPL"
@@ -3398,3 +3402,4 @@ module_init(isot_modinit);
 module_exit(isot_modexit);
 
 #endif				/* LINUX */
+#endif /* 0 */

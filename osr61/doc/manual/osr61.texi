@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: osr61.texi,v 0.9.2.7 2007/08/15 05:10:22 brian Exp $
+% @(#) $Id: osr61.texi,v 0.9.2.8 2008-04-25 11:50:44 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/15 05:10:22 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:44 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -294,6 +294,7 @@ Appendices
 
 Licenses
 
+* GNU Affero General Public License::		The AGPL license
 * GNU General Public License::			The GPL license
 * GNU Lesser General Public License::		The LGPL license
 * GNU General Public License Version 2::	The GPL v2 license
@@ -337,8 +338,8 @@ This version of @command{@value{PACKAGE_TARNAME}} is a version of the Dialogic@r
 Open System Release 6.1 GPL drivers, modified by @uref{http://www.openss7.org/, The OpenSS7 Project}
 to support the package using @cite{Linux Fast-STREAMS} instead of the deprecated @cite{LiS}.
 
-This package is released and distributed under the @cite{GNU General Public License} (@pxref{GNU
-General Public License}).  Please note, however, that there are different licensing terms for the
+This package is released and distributed under the @cite{GNU Affero General Public License} (@pxref{GNU
+Affero General Public License}).  Please note, however, that there are different licensing terms for the
 manual pages and some of the documentation (derived from publications and other sources).  Consult
 the permission notices contained in the documentation for more information.
 
@@ -408,6 +409,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: osr61.texi,v $
+Revision 0.9.2.8  2008-04-25 11:50:44  brian
+- updates to AGPLv3
+
 Revision 0.9.2.7  2007/08/15 05:10:22  brian
 - GPLv3 updates
 
@@ -553,7 +557,7 @@ This version of @command{@value{PACKAGE_TARNAME}} is a version of the Dialogic@r
 Open System Release 6.1 GPL drivers, modified by @uref{http://www.openss7.org/, The OpenSS7 Project}
 to support the package using @cite{Linux Fast-STREAMS} instead of the deprecated @cite{LiS}.
 
-This package is released and distributed under the @cite{GPL} (@pxref{GNU General Public
+This package is released and distributed under the @cite{AGPL} (@pxref{GNU Affero General Public
 License}).  Please note, however, that there are different licensing terms for the manual pages and
 some of the documentation (derived from publications and other sources).  Consult the permission
 notices contained in the documentation for more information.
@@ -652,7 +656,7 @@ drivers can be ported to the production @cite{Linux Fast-STREAMS}.  The entire p
 completed package was performed in under 5 days.
 
 The only component for the @cite{@value{PACKAGE_TITLE}} release that is released by
-@url{http://www.opensystemrelease.com/, Dialogic} under the GPL (@pxref{GNU General Public License})
+@url{http://www.opensystemrelease.com/, Dialogic} under the AGPL (@pxref{GNU Affero General Public License})
 are the core drivers for the release under Linux.  The original driver package can be obtained from
 the @file{osr61_239_GPLdrivers.tgz} tarball from the @url{http://www.opensystemrelease.com/,
 Dialogic Website}.  The runtime libraries that make the drivers useful are released under far more
@@ -1169,12 +1173,15 @@ subsystem be tested using the @manref{test-tty(8)} test case executable and the 
 @cindex licenses
 
 @menu
+* GNU Affero General Public License::		The AGPL license
 * GNU General Public License::			The GPL license
 * GNU Lesser General Public License::		The LGPL license
 * GNU General Public License Version 2::	The GPL v2 license
 * GNU Free Documentation License::		The FDL license
 @end menu
 
+@page
+@include texi/agpl3.texi
 @page
 @include texi/gpl3.texi
 @page

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnsl.texi,v 0.9.2.4 2007/08/14 04:56:45 brian Exp $
+% @(#) $Id: libxnsl.texi,v 0.9.2.5 2008-04-25 11:50:53 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/14 04:56:45 $ by $Author: brian $
+% Last Modified $Date: 2008-04-25 11:50:53 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -2041,7 +2041,7 @@ trouble, troubleshooting.
 
 @node Public License
 @appendix Public License
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 
 @node Documentation License
 @appendix Dcoumentation License

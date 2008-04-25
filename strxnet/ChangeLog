@@ -62,6 +62,11 @@
 	* doc/man/man3/t_unbind.3.man: updated references
 	* doc/man/man3/xti.3.man: updated references
 
+	* doc/manual/libxnet.texi: updates to AGPLv3
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strxnet.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxnet.spec.in: prepare for doc/papers

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: releases.texi,v 1.1.4.28 2007/02/28 06:30:14 brian Exp $
+@c @(#) $Id: releases.texi,v 1.1.4.29 2008-04-25 11:50:42 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
 @c All Rights Reserved.
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/28 06:30:14 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-25 11:50:42 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -87,7 +87,7 @@ drivers, as well as Linux kernel compatibility.
 @include prerequisites.texi
 
 If you need to rebuild the package from sources with modifications, you will need a larger GNU
-toolchain as described in @xrefman{Downloading from CVS}.
+tool chain as described in @xrefman{Downloading from CVS}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -418,7 +418,7 @@ execute the contained code.
 @node Alpha Releases
 @subsection Alpha Releases
 
-@dfn{Alpha} release are releases that have received little to no testing, or that have been tested
+@dfn{Alpha} releases are releases that have received little to no testing, or that have been tested
 and contains known bugs or defects that make the package unsuitable even for testing.  The purpose
 for an @dfn{alpha} release are the same as for the pre-alpha release, with the additional purpose
 that it is an early release of partially functional code that has problems that an external
@@ -444,7 +444,7 @@ user of the software.
 @node Gamma Releases
 @subsection Gamma Releases
 
-@dfn{Gamma} release are releases that have received exhaustive testing within the project, but
+@dfn{Gamma} releases are releases that have received exhaustive testing within the project, but
 external testing has been minimal.  @dfn{Gamma} release packages do not ship with known defects.  As
 exhaustive internal testing has been performed, unknown defects should be few.  Please remember that
 there is NO WARRANTY on public release packages.
@@ -503,30 +503,31 @@ stable that software in this category.
 defects might be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7
 Project} on this software.  The software might not even configure or compile.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software}. Use at your own risk.  Remember that
-there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
-License}.}
+there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of
+Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{pre-alpha} software.  As such, it will crash your kernel.  Installation of
 the software will irreparably mangle your header files or Linux distribution in such a way as to
 make it unusable.  Crashes will lock your system and rebooting the system will not repair the
-problem.  You will loose all the data on your system.  Because this software will crash your kernel,
+problem.  You will lose all the data on your system.  Because this software will crash your kernel,
 the resulting unstable system can destroy computer hardware or peripherals making them unusable.
 You will void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
 
 @c This is the defect notice for alpha release software
 @ignore
-@dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is a @dfn{alpha} release.  Some defects could
+@dfn{@value{PACKAGE_TITLE}} has unknown defects.  This is an @dfn{alpha} release.  Some defects could
 be harmful.  No validation testing whatsoever has been performed by the @cite{OpenSS7 Project} on
 this software.  The software might fail to configure or compile on some systems.  The @cite{OpenSS7
 Project} recommends that you @b{do not use this software for purposes other than develoment or
 evaluation, and then only with great care}. Use at your own risk.  Remember that there is @b{NO
-WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public License}.}
+WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of Liability} under
+@refman{GNU Affero General Public License}.}
 
 @b{This software is @i{alpha} software.  As such, it can likely crash your kernel.  Installation of
 the software can irreparably mangle your header files or Linux distribution in such a way as to make
 it unusable.  Crashes could lock your system and rebooting the system might not repair the problem.
-You can possibly loose all the data on your system.  Because this software can crash your kernel,
+You can possibly lose all the data on your system.  Because this software can crash your kernel,
 the resulting unstable system could destroy computer hardware or peripherals making them unusable.
 You could void the warranty on any system on which you run this software.  YOU HAVE BEEN WARNED.}
 @end ignore
@@ -538,19 +539,19 @@ defects could be harmful.  Validation testing has been performed by the @cite{Op
 this software for only a restricted set of systems.  The software might fail to configure or compile
 on other systems.  The @cite{OpenSS7 Project} recommends that you @b{do not use this software for
 purposes other than validation testing and evaluation, and then only with care}. Use at your own
-risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU
-General Public License}.}
+risk.  Remember that there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and
+@b{Limitation of Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{beta} software.  As such, it might crash your kernel.  Installation of the
 software might mangle your header files or Linux distribution in such a way as to make it unusable.
 Crashes could lock your system and rebooting the system might not repair the problem.  You can
-possibly loose all the data on your system.  Because this software might crash your kernel, the
+possibly lose all the data on your system.  Because this software might crash your kernel, the
 resulting unstable system could possibly destroy computer hardware or peripherals making them
 unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
 @end ignore
 
-@c This is the defect notice for gammar release software
+@c This is the defect notice for gamma release software
 @ignore
 @dfn{@value{PACKAGE_TITLE}} could possibly contain unknown defects.  This is a @dfn{gamma} release.
 Some remaining unknown defects could possibly be harmful.  Validation testing has been performed by
@@ -558,14 +559,14 @@ the @cite{OpenSS7 Project} on this software for a set of systems and external va
 been performed on other systems.  Nevertheless, the software might still fail to configure or
 compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate this software
 for your target system with care before using this software}.  Use at your own risk.  Remember that
-there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
-License}.}
+there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of
+Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{gamma} software.  As such, it is quite stable but might still crash your
 kernel under some conditions.  Installation of the software on a non-validated distribution might
 mangle your header files or Linux distribution in such a way as to make it unusable.  Crashes could
 possibly lock your system and rebooting the system might not repair the problem.  You can possibly
-loose all the data on your system.  Because this software stands a chance of crashing your kernel,
+lose all the data on your system.  Because this software stands a chance of crashing your kernel,
 the resulting unstable system could possibly destroy computer hardware or peripherals making them
 unusable.  You might void the warranty on any system on which you run this software.  YOU HAVE BEEN
 WARNED.}
@@ -579,14 +580,14 @@ testing has been performed by the @cite{OpenSS7 Project} and external entities o
 the set of systems listed in the release notes.  Nevertheless, the software might still fail to
 configure or compile on other systems.  The @cite{OpenSS7 Project} recommends that you @b{validate
 this software for your target system before using this software}.  Use at your own risk.  Remember
-that there is @b{NO WARRANTY}.@footnote{See section @b{NO WARRANTY} under @refman{GNU General Public
-License}.}
+that there is @b{NO WARRANTY}.@footnote{See sections @b{Disclaimer of Warranty} and @b{Limitation of
+Liability} under @refman{GNU Affero General Public License}.}
 
 @b{This software is @i{production} software.  As such, it is stable on validated systems but might
 still crash your kernel in unique circumstances.  Installation of the software on a non-validated
 distribution might mangle your header files or Linux distribution in such a way as to make it
 unusable.  Crashes could possibly lock your system and rebooting the system might not repair the
-problem.  You can possibly loose all the data on your system.  Because this software stands a chance
+problem.  You can possibly lose all the data on your system.  Because this software stands a chance
 of crashing your kernel, the resulting unstable system could possibly destroy computer hardware or
 peripherals making them unusable.  You might void the warranty on any system on which you run this
 software.  YOU HAVE BEEN WARNED.}
@@ -597,20 +598,21 @@ software.  YOU HAVE BEEN WARNED.}
 Some defects could be harmful.  Validation testing has been performed by the @cite{OpenSS7 Project}
 on this software and it has revealed itself to be unstable and irreparable.  The software might not
 even configure or compile.  The @cite{OpenSS7 Project} recommends that you @b{do not use this
-software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See section
-@b{NO WARRANTY} under @refman{GNU General Public License}.}
+software}.  Use at your own risk.  Remember that there is @b{NO WARRANTY}.@footnote{See sections
+@b{Disclaimer of Warranty} and @b{Limitation of Liability} under @refman{GNU Affero General Public
+License}.}
 
 @dfn{@value{PACKAGE_TITLE}}, both releases from @cite{OpenSS7} and @cite{GCOM}, contain many known
 bugs. These are unstable releases.  Although there are no bugs known directly to be harmful, the
 @cite{OpenSS7 Project} has tested the release and found defects that cause the kernel to lock or
 crash. Use at your own risk.  Remember that there is @b{NO WARRANTY}@footnote{See section @b{NO
-WARRANTY} under @refman{GNU General Public License}.} and that the package is no longer actively
+WARRANTY} under @refman{GNU Affero General Public License}.} and that the package is no longer actively
 maintained.
 
 @b{This software is @i{unstable} software.  As such, it will lock or crash your kernel.
 Installation of the software will irreparably mangle your header files or Linux distribution in such
 a way as to make it unusable.  Crashes will lock your system and rebooting the system will not
-repair the problem.  You will loose all the data on your system.  Because this software has tested
+repair the problem.  You will lose all the data on your system.  Because this software has tested
 unstable in a number of test cases, simply running the validation test cases can cause locks or
 crashes.  Because this software will lock or crash your kernel, the resulting unstable system can
 destroy computer hardware or You will void the warranty on any system on which you run this

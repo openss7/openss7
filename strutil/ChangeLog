@@ -2,6 +2,10 @@
 
 	* doc/man/strutil.refs: updated references
 
+	* doc/manual/news.texi: updates to AGPLv3
+	* doc/manual/releases.texi: updates to AGPLv3
+	* doc/manual/strutil.texi: updates to AGPLv3
+
 2008-04-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* strutil.spec.in: prepare for doc/papers
