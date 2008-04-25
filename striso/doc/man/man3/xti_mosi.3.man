@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: xti_mosi.3.man,v 0.9.2.3 2007/12/15 20:20:27 brian Exp $
+.\" @(#) $Id: xti_mosi.3.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/12/15 20:20:27 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_mosi.3.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2007/12/15 20:20:27  brian
 .\" - updates
 .\"
@@ -85,112 +88,102 @@ sort-adjacent-labels
 .\"
 .TH XTI_MOSI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
-.B mOSI, xti_mosi
+.B XTI-mOSI, mOSI, xti_mosi
 \- Minimum OSI Functionality (CAE Specification)
 .\"
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <xti.h>
+.br
+.B #include <xti_mosi.h>
+.HP
+.BI "int " mosi_xtistr " = t_open(" \fR/dev/mosi\fP ", " flags );
 .\"
 .\"
-.SH OPTIONS
+.SH OVERVIEW
 .PP
-.IP \(bu \w'\(bu\(em'u
-Application Context Name
-.sp
-An application context name identifies a set of tasks to be performed by an
-application.  It is exchanged during association establishment with the
-purpose
-of conveying a common
-understanding of the work to be done.
-.sp
-This parameter is exposed to offer some negotiation capabilities to the
-application and to
-increase the chances of interoperability.
-.sp
-When receiving a non suitable or unknown value from a peer application, the
-application
-may propose an alternate value or decide to terminate prematurely the
-association.
-.sp
-A default value (in the form of an Object Identifier) is provided, identifying
-a generic XTI-mOSI
-application. Its value can be found in XNS
+This manual page describes the XTI interface for \fBXTI-mOSI\fP in accordance with XNS.
 .[
 xns99
 .]
-Section H.5 on page 313, or in X.638 Annex F.
+.PP
+The X/Open Transport Interface
 .[
-x638
+xti revision 1.0
 .]
-.IP \(bu
-Presentation Contexts
-.sp
-A presentation context is the association of an abstract syntax with a
-transfer syntax. The presentation context is used by the application to
-identify how the data is structured and by the OSI Application Layer to
-identify how the data should be encoded/decoded.
-.sp
-A generic presentation context is defined for a stream-oriented, unstructured,
-data transfer service with
-.I null
-encoding:
+specifies addressing and options for \fBXTI-mOSI\fP.
+.[
+iso 11188-3
+.]
+Although this interface may be exposed by including the
+.RB < xti.h >
+header file, it is provided by the
+.BR < xti_mosi.h >
+header file possibly included by the former.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manual section describes the protocol-specific information that is relevant for
+\fBXTI-mOSI\fP transport,
+presentation, session and ACSE service providers.  This section also described the protocol-specific
+information that is relevant when \fBXTI-mOSI\fP services are provided over an IP network using Lightweight
+Presentation Protocol (LPP).
 .[
 rfc1085
 .]
-.sp
-.IR abstract\0syntax :
-The single data type of this abstract syntax is a sequence of octets that are
-defined in the application protocol specification as being consecutive octets
-on a stream-oriented transport mechanism, without regard for any semantic or
-other boundaries.
-.sp
-.IR transfer\0syntax :
-The data value shall be represented as an octet-aligned presentation data
-value. If two or more data values are concatenated together they are
-considered to be a single (longer) data value. (This is the
-.I null
-encoding rule).
-.sp
-The value of the Object Identifiers for this generic presentation context can
-be found in XNS
-.[
-xns99
-.]
-Section H.5 on page 313, or in X.638 Annex F.
-.[
-x638
-.]
-.IP \(bu
-Presentation Context Definition and Result List, Defined Context Set
-.sp
-As negotiation occurs between the peer OSI Application layers, the
-presentation context(s) proposed by the application may not be accepted.
-.sp
-The Presentation Context Definition and Result List indicates, for each of the
-proposed presentation context, if it is accepted or, if not, provides a reason
-code; the application may choose to terminate the association prematurely if
-it does not suit its requirements.
+.PP
+This section also defines the data structures and constants required for \fBXTI-mOSI\fP transport
+providers that are exposed through the
+.RB < xti_mosi.h >
+header file.
 .\"
 .\"
-.SH ADDRESS
+.SH OBJECT IDENTIFIERS
+.PP
+.HP
+.RB \(lq \ex28\exB4\ex57\ex3\ex1\ex1 \(rq
+.br
+.I {iso(1) standard(0) curl(11188) mosi(3) default-abstract-syntax(1) version(1)}
+.[
+iso 11188-3
+.]
+.HP
+.RB \(lq \ex28\exB4\ex57\ex3\ex2\ex1 \(rq
+.br
+.I {iso(1) standard(0) curl(11188) mosi(3) default-transfer-syntax(2) version(1)}
+.[
+iso 11188-3
+.]
+.HP
+.RB \(lq \ex28\exB4\ex57\ex3\ex3 \(rq
+.br
+.I {iso(1) standard(0) curl(11188) mosi(3) default-application-context(3)}
+.[
+iso 11188-3
+.]
+.\"
+.\"
+.SH ADDRESS FORMAT
 .PP
 The \fBaddr\fP structure (used in \fBt_bind\fP(3), \fBt_connect\fP(3), \fBt_accept\fP(3)) is a
 combined naming and addressing data type, identifying one end or the other of the association.
 The address part is a Presentation Address.  The calling and called addresses are required
 parameters, while the use of a responding address is optional.
 .PP
-The name part (AP Title, AE Qualifier and the AP and AE invocation-identifiers) are always optional.
-ISO Directory facilities, when available, can relate the name parts (identifying specific
-applications) to the addresses of the real locations where they can be accessed.
+The name part (AP Title, AE Qualifier and the AP and AE invocation-identifiers) are always
+optional.  ISO Directory facilities, when available, can relate the name parts (identifying
+specific applications) to the addresses of the real locations where they can be accessed.
 .PP
-The general format of the \fBaddr\fP structure is described below, while its precise structure, and,
-in particular, the contents of the Presentation Address, is implementation dependent.
+The general format of the \fBaddr\fP structure is described below, while its precise structure,
+and, in particular, the contents of the Presentation Address, is implementation dependent.
 .PP
 The \fIbuf\fP part of the \fBaddr\fP structure is a \fBmodiaddr\fP structure defined as follows:
 .sp
 .RS
-\fC\s-2\
+.nf
+\f(CW\s-1\
 struct t_mosiaddr {
     t_uscalar_t flags;
     t_scalar_t osi_ap_inv_id;
@@ -200,7 +193,8 @@ struct t_mosiaddr {
     unsigned int osi_paddr_len;
     unsigned char osi_addr[T_AP_MAX_ADDR];
 };
-\s+2\fP
+\s+1\fP
+.fi
 .RE
 .sp
 where:
@@ -219,38 +213,130 @@ When set, the contents of the \fIosi_ae_inv_id\fP field is valid.
 Unused bits in the \fIflags\fP field must be set to zero by the user when creating a
 \fBt_modiaddr\fP structure for sending, and should be ignored by the user on receipt.
 .PP
-In a \fBt_mosiaddr\fP structure, a bit set in \fIflags\fP indicates the present of the corresponding
-invocation identifier in the PDU.  Similarly a bit not set indicates the absense of the
-corresponding invocation identifier in the PDU.
+In a \fBt_mosiaddr\fP structure, a bit set in \fIflags\fP indicates the present of the
+corresponding invocation identifier in the PDU.  Similarly a bit not set indicates the absence of
+the corresponding invocation identifier in the PDU.
 .RE
 .TP
 .I osi_apt_len
-The AP Title starts at \fIosi_addr[0]\fP and ends at \fIosi_addr[osi_apt_len-1]\fP.
-The application is responsible for encoding/decoding the contents of the AP Title (where the
+The AP Title starts at \fIosi_addr[0]\fP and ends at \fIosi_addr[osi_apt_len-1]\fP.  The
+application is responsible for encoding/decoding the contents of the AP Title (where the
 contents does not include the enveloping tag and length).
 .TP
 .I osi_aeq_len
 The AE Qualifier starts at \fIosi_addr[T_ALIGN(osi_apt_len)]\fP and ends at
-\fIosi_addr[T_ALIGN(osi_apt_len)+osi_aeq_len-1]\fP.
-The application is responsible for encoding/decoding the contents of the AE Qualifier (where the
-contents does not include the enveloping tag and length).
+\fIosi_addr[T_ALIGN(osi_apt_len)+osi_aeq_len-1]\fP.  The application is responsible for
+encoding/decoding the contents of the AE Qualifier (where the contents does not include the
+enveloping tag and length).
 .TP
 .I osi_paddr_len
-The Presentation Address starts at \fIosi_addr[T_ALIGN(osi_apt_len)+T_ALIGN(os_aeq_len)]\fP and ends
-at \fIosi_addr[T_ALIGN(osi_apt_len)+T_ALIGN(osi_aeq_len)+osi_paddr_len-1]\fP.
-The application is responsible for encoding/decoding the contents of the AP Title (where the
-contents does not include the enveloping tag and length).
+The Presentation Address starts at \fIosi_addr[T_ALIGN(osi_apt_len)+T_ALIGN(os_aeq_len)]\fP and
+ends at \fIosi_addr[T_ALIGN(osi_apt_len)+T_ALIGN(osi_aeq_len)+osi_paddr_len-1]\fP.  The
+application is responsible for encoding/decoding the contents of the AP Title (where the contents
+does not include the enveloping tag and length).
 .\"
 .\"
 .SH OPTIONS
 .PP
-Options are formatted according to the \fBt_opthdr\fP structure as described in \fBt_optmgmt\fP(3).
-An OSI provider compliant to this XTI-mOSI specification supports all, none or a subset of the
-options defined in ACSE/Presentation Connection-mode Service.  An implementation may restrict the
-use of any of the options by offering them in privileged or read-only mode.
+Options are formatted according to the \fBt_opthdr\fP structure as described in
+\fBt_optmgmt\fP(3).  An OSI provider compliant to this \fBXTI-mOSI\fP specification supports all, none
+or a subset of the options defined in ACSE/Presentation Connection-mode Service.  An
+implementation may restrict the use of any of the options by offering them in privileged or
+read-only mode.
 .PP
-For the default abstract syntax, transfer syntax and application context, XTI-mOSI uses object
-identifiers which are specified in the profile (ISO/IEC ISP 11188-3).
+Options can be \fIabsolute\0requirments\fP and can also be of \fIend-to-end\0significance\fP as
+follows:
+.TP
+.I Absolute\0Requirements
+Options that are \fIabsolute\0requirements\fP, mean that when the option is negotiated with the
+transport service provider, the transport service provider is not permitted to negotiate the
+option to a value with differing quality of service.  Either the proposed value is accepted or it
+is rejected.  Options that are not \fIabsolute\0requirements\fP, can be negotiated by the
+transport provider to a different quality of service level and it is the responsibility of the
+transport service user to determine whether the negotiated value is sufficient.
+.TP
+.I End-to-End\0Significance
+Options that are of \fIend-to-end\0significance\fP are options that require negotiation with, or
+are communicated to, the peer transport provider or user.  For example, options that are
+requested in a connect request, \fBT_CONN_REQ\fP(7), primitive will be indicated at the peer in a
+connection indication, \fBT_CONN_IND\fP(7), primitive.  Options that are not of
+\fIend-to-end\0significance\fP are of local significance only and can be negotiated directly
+between the local transport service user and the local transport service provider.
+.PP
+A \fBXTI-mOSI\fP transport provider supports at least six levels of options.  These six levels are
+described below.
+.\"
+.SS XTI_GENERIC
+.PP
+Options with this level are specific to the X/Open Transport Interface (XTI/TLI)
+.[
+xti revision 1.0
+.]
+and are common to all transport providers.  For information see
+.BR xti (3).
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the Stream.  This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Sets whether, and the amount of time, if, the Stream will linger waiting for unsent data to be
+delivered.  This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;
+    t_scalar_t l_linger;
+};\s+1\fP
+.fi
+.TP \w'\fIl_linger\fR\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.PD 0
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.  Legal values are \fBT_INFINITE\fP,
+\fBT_UNSPEC\fP and all positive numbers including zero.
+.PD
+.PP
+For more information, see \fBxti\fP(3).
+.RE
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the received buffer.  This option is formated as a
+\fBt_uscalar_t\fP.  Legal values are all positive, non-zero numbers.  For more information, see
+\fBxti\fP(3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and delivered to the
+user.  This option is formatted as a \fBt_uscalar_t\fP.  Legal values are all positive numbers,
+non-zero numbers.  For more information, see \fBxti\fP(3).
+.TP
+.B XIT_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.  This option is formatted as a
+\fBt_uscalar_t\fP.  Legal values are all positive, non-zero numbers.  For more information, see
+\fBxti\fP(3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to the peer.  This
+option is formatted as a \fBt_uscalar_t\fP.  Legal values are all positive, non-zero numbers.
+For more information, see \fBxti\fP(3).
+.\"
+.SS ACSE/Presentation Layer
+.PP
+For the default abstract syntax, transfer syntax and application context, \fBXTI-mOSI\fP uses
+object identifiers which are specified in the profile (ISO/IEC ISP 11188-3).
 .[
 x638
 .]
@@ -258,155 +344,210 @@ x638
 .B T_AP_CNTX_NAME
 Application Context Name.
 An application context name identifies a set of tasks to be performed by an application.  It is
-exchanged during the association establishment with the purpose of conveying a common understanding
-of the work to be done.  This parameter is expesed to offer some negotiation capabilities to the
-application and increase the chances of interoperability.  When receiving a non-suitable or unknown
-value from a peer application, the application may propose an alternate value or decide to terminate
-prematurely the association.  A default value (in the form of an Object Identifier) is provided,
-identifying a generic XTI-mOSI application.
-The default Application Context for mOSI is the OBJECT IDENTIFIER:
-.IR "{ iso(1) standard(0) curl(11188) mosi(3) default-application-context(3) }"
-or
-.BR "28 B4 57 03 03" .
+exchanged during the association establishment with the purpose of conveying a common
+understanding of the work to be done.  This parameter is exposed to offer some negotiation
+capabilities to the application and increase the chances of interoperability.  When receiving a
+non-suitable or unknown value from a peer application, the application may propose an alternate
+value or decide to terminate prematurely the association.  A default value (in the form of an
+Object Identifier) is provided, identifying a generic \fBXTI-mOSI\fP application.  Its value can be
+found in XNS
+.[
+xns99
+.]
+Section H.5 on page 313, or in X.638 Annex F.
 .[
 x638
 .]
-This application context supports the execution of any application using the default abstract syntax
-for mOSI.
+.sp
+The default Application Context for \fBXTI-mOSI\fP is the OBJECT IDENTIFIER:
+.IR "{ iso(1) standard(0) curl(11188) mosi(3) default-application-context(3) }"
+or
+.BR "28 B4 57 03 03" ,
+.[
+x638
+.]
+which can be coded as \(lq\ex28\exB4\ex57\ex3\ex3\(rq, as it is in the symbolic constant
+\fBT_AP_CNTX_NAME_DEFAULT\fP.  This application context supports
+the execution of any application using the default abstract syntax for \fBXTI-mOSI\fP.
 .TP
 .B T_AP_PCL
 Presentation Context Definition and Result List.
 .RS
 .PP
-Presentation Contexts.
+.B Presentation Contexts.
 A presentation context is the association of an abstract syntax with a transfer syntax.  The
 presentation context is used by the application to identify how the data is structured and by the
 OSI Application Layer to identify how the data should be encoded/decoded.  A generic presentation
-context is defined for a stream-oriented, unstructured, data transfer service with null encoding:
-.PP
-Abstract Syntax: the single data type of this abstract syntax is a sequence of octets that are
-defined in the application protocol specification as being consecutive octets on a stream-oriented
-transport mechanism, without regard for any semantic or other boundaries.
-The default Abstract Syntax for mOSI is the OBJECT IDENTIFIER:
-.IR "{ iso(1) standard(0) curl(11188) mosi(3) default-abstract-syntax(1) version(1) }"
-or
-.BR "28 B4 57 03 01 01" .
+context is defined for a stream-oriented, unstructured, data transfer service with null encoding.
+The value of the Object Identifiers for this generic presentation context can be found in XNS
+.[
+xns99
+.]
+Section H.5 on page 313, or in X.638 Annex F.
 .[
 x638
 .]
 .PP
-Transfer Syntax: the data value shall be represented as an octet-aligned presentation data value.
-If two or more data values are concatenated together, they are considered to be a single (longer)
-data value.  (This is the null encoding rule.)  The default trasnfer syntax and the abstract syntax
-are identical, the OBJECT IDENTIFIER for the default abstract syntax is used.  If they are not
+.IR "Abstract Syntax" :
+the single data type of this abstract syntax is a sequence of octets that are defined in the
+application protocol specification as being consecutive octets on a stream-oriented transport
+mechanism, without regard for any semantic or other boundaries.
+.PP
+The default Abstract Syntax for
+\fBXTI-mOSI\fP is the OBJECT IDENTIFIER:
+.IR "{ iso(1) standard(0) curl(11188) mosi(3) default-abstract-syntax(1) version(1) }"
+or
+.BR "28 B4 57 03 01 01" ,
+.[
+x638
+.]
+which can be coded as \(lq\ex28\exB4\ex57\ex3\ex1\ex1\(rq, as it is in the symbolic constant
+\fBT_AP_ABST_SNTX_DEFAULT\fP.
+This object identifier can be used as the abstract syntax when the application protocol (above
+ACSE) can be treated as single presentation data values (PDVs).  Each PDV is a sequence of
+consecutive octets without regard for semantic or other boundaries.  The object identifier may
+also be used when, for pragmatic reasons, the actual abstract syntax of the application is not
+identified in Presentation Layer neogiation.
+.IP \fBNotes:\fP \w'\fBNotes:\fP\(em'u
+.RS
+.IP 1. \w'0.\(em'u
+Applications specified using ASN.1 should not use the default abstract syntax.
+.IP 2.
+As this object identifier is used by all applications using the default abstract syntax for
+\fBXIT-mOSI\fP, it cannot be used to differentiate between applications.  One of the ACSE
+parameters; for example, AE Title or Presentation address, may be use to differentiate between
+applications.
+.RE
+.PP
+.IR "Transfer Syntax" :
+the data value shall be represented as an octet-aligned presentation data value.  If two or more
+data values are concatenated together, they are considered to be a single (longer) data value.
+(This is the null encoding rule.)
+.PP
+The default transfer syntax and the abstract syntax are
+identical, the OBJECT IDENTIFIER for the default abstract syntax is used.  If they are not
 identical, the OBJECT IDENTIFIER for the default transfer syntax is:
 .IR "{ iso(1) standard(0) curl(11188) mosi(3) default-transfer-syntax(2) version(1) }"
 or
-.BR "28 B4 57 03 02 01" .
+.BR "28 B4 57 03 02 01" ,
 .[
 x638
 .]
-Note: in the
-presentation data value of the PDV list of Presentation Protocol or in the encoding of User
-Information of ACSE Protocol, only octet-aligned or arbitrary can be used for default trasnfer
-syntax for mOSI.  Single-ASN1-type cannot be used for default transfer syntax for mOSI.
+which can be coded as \(lq\ex28\exB4\ex57\ex3\ex2\ex1\(rq, as it is in the symbolic constant
+\fBT_AP_TRAN_SNTX_DEFAULT\fP.
+If the default transfer syntax and the abstract syntax are identical, the OBJECT IDENTIFIER for
+the default abstract syntax is used.  If they are not identical, the OBJECT IDENTIFIER for the
+default transfer syntax is used.
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+In the presentation data value of the PDV list of Presentation Protocol or in the encoding of
+User Information of ACSE Protocol, only \fIoctet-aligned\fP or \fIarbitrary\fP can be used for
+default transfer syntax for \fBXTI-mOSI\fP.  \fISingle-ASN1-type\fP cannot be used for default
+transfer syntax for \fBXTI-mOSI\fP.
+.PP
 .PP
 The value of the Object Identifiers for this generic presentation context are described.
 .PP
 Presentation Context Definition and Result List, Defined Context Set.
-As negotiation occurs between the peer OSI Application layers, the presentation context(s) proposed
-by the application may not be accepted.  The Presentation Context Definition and Result List
-indicates, for each of the proposed presentation contexts, it if is accepted or, if not, provides a
-reason code; the application may choose to terminate the association prematurely if it does not suit
-its requirements.
+As negotiation occurs between the peer OSI Application layers, the presentation context(s)
+proposed by the application may not be accepted.  The Presentation Context Definition and Result
+List indicates, for each of the proposed presentation contexts, it if is accepted or, if not,
+provides a reason code; the application may choose to terminate the association prematurely if it
+does not suit its requirements.
 .RE
 .\"
-.SS Connection Mode
+.SS T_ISP_APCO
 .TP
 .B T_AP_CNTX_NAME
 Application Context Name.
-A default value (for a generic XTI-mOSI application) is provided.  The application may choose to
-propose, through this option, a value different from the default one.  The application may also use
-this option to check the value returned by the peer application and decide if the association should
-be kept or terminated.
+A default value (for a generic \fBXTI-mOSI\fP application) is provided.  The application may
+choose to propose, through this option, a value different from the default one.  The application
+may also use this option to check the value returned by the peer application and decide if the
+association should be kept or terminated.
 .sp
-This option is of end-to-end significance.
-It may be negotiated in the XTI states T_IDLE and T_INCON, and are read-only in all other states
-except T_UNINT.
+This option is of end-to-end significance.  It may be negotiated in the XTI states T_IDLE and
+T_INCON, and are read-only in all other states except T_UNINT.
 .TP
 .B T_AP_PCL
-Presentation Context Definition and Result List.
+.B Presentation Context Definition and Result List.
 A default is provided: a list with one presentation context (the stream-oriented, unstructured, data
 transfer service with null encoding).  The abstract syntax is the default abstract syntax and the
 transfer syntax is the default transfer syntax.  The codes for the result of negotiation and reason
 for rejection are defined.  The responding application, after reading this option, may choose to
 continue or terminate the association.  Only a single abstract syntax and transfer syntax can be
-used by XTI-mOSI.  On \fBt_accept\fP(3), this is assumed to be the first usable abstract syntax and
-the first transfer syntax for that abstract syntax.
+used by \fBXTI-mOSI\fP.  On \fBt_accept\fP(3), this is assumed to be the first usable abstract
+syntax and the first transfer syntax for that abstract syntax.
 .sp
-When intiating a connection, the application proposes one or more presentation contexts, each
+When initiating a connection, the application proposes one or more presentation contexts, each
 comprising an abstract syntax and one or more transfer syntaxes in the Presentation Control
 Definition and Result List option (or omits this option to select the CULR-3
 .[
 x638
 .]
-defaults), and issues a
-\fBt_connect\fP(3).  If the connection is accepted, the Presentation Context Definition and Result
-List is updated to reflect the results of negotiation of each eleemnt of the context list, and a
-single presentation context is selected.  Note: if the responder accepts multiple presentation
-contexts, the XTI-mOSI provider aborts the connection on receipt of the A-ASSOCIATE confirm.  When
-responding to a remote connect, the application can specifically mark presentation contexts as
-rejected using the \fIres\fP field, and can re-order the syntax array to select a single transfer
-syntax.  On calling \fBt_accept\fP(3), the first presentation context marked as accepted is
-selected, and all other contexts omitted or not marked rejected-user are makred by the provider as
-rejected (T_PCL_PREJ_LMT_DCS_EXCEED).  In an accepted context, the provider will accept the first (r
-only remaining) transfer syntax.  Note: on return to the application from \fBt_listen\fP(), all
+defaults), and issues a \fBt_connect\fP(3).  If the connection is accepted, the Presentation
+Context Definition and Result List is updated to reflect the results of negotiation of each
+element of the context list, and a single presentation context is selected.  Note: if the
+responder accepts multiple presentation contexts, the \fBXTI-mOSI\fP provider aborts the
+connection on receipt of the A-ASSOCIATE confirm.  When responding to a remote connect, the
+application can specifically mark presentation contexts as rejected using the \fIres\fP field,
+and can re-order the syntax array to select a single transfer syntax.  On calling
+\fBt_accept\fP(3), the first presentation context marked as accepted is selected, and all other
+contexts omitted or not marked rejected-user are marked by the provider as rejected
+(T_PCL_PREJ_LMT_DCS_EXCEED).  In an accepted context, the provider will accept the first (r only
+remaining) transfer syntax.  Note: on return to the application from \fBt_listen\fP(), all
 supportable presentation context are marked as accepted in the \fBT_AP_PCL\fP option, and all
-unsupportable contexts are marked as rejected-provider.  This permits the application to return the
-same option value on \fBt_accept\fP(3) (or leave it unchanged) to select the first available
+unsupportable contexts are marked as rejected-provider.  This permits the application to return
+the same option value on \fBt_accept\fP(3) (or leave it unchanged) to select the first available
 abstract syntax and transfer syntax.
 .sp
 This option is of end-to-end significance.
 It may be negotiated in the XTI states T_IDLE and T_INCON, and are read-only in all other states
 except T_UNINT.
 .\"
-.SS Connectionless Mode
+.SS T_ISO_APCL
 .PP
 .TP
 .B T_AP_CNTX_NAME
-Application Context Name.
-A default value (for a generic XTI-mOSI application) is provided.
-The application may choose to propose, through this option, a value different from the default one.
-The application may alos use this option to check the value returned by the peer application and
-decide if the datagram should be kept or discarded.
+.B Application Context Name.
+A default value (for a generic \fBXTI-mOSI\fP application) is provided.  The application may
+choose to propose, through this option, a value different from the default one.  The application
+may also use this option to check the value returned by the peer application and decide if the
+datagram should be kept or discarded.
 .sp
-This option is of end-to-end significance.
-It may be negotiated in all XTI states except T_UNINIT.
+This option is of end-to-end significance.  It may be negotiated in all XTI states except
+T_UNINIT.
 .TP
 .B T_AP_PCL
-Presentation Context Definition and Result List.
-In the connectionless mode, the transfer syntaxes are not negotiated.  Their use is determined by
+Presentation Context Definition and Result List, Defined Context Set As negotiation occurs
+between the peer OSI Application layers, the presentation context(s) proposed by the application
+may not be accepted.
+.sp
+The Presentation Context Definition and Result List indicates, for each of the proposed
+presentation context, if it is accepted or, if not, provides a reason code; the application may
+choose to terminate the association prematurely if it does not suit its requirements.
+.sp
+In the connection-less mode, the transfer syntaxes are not negotiated.  Their use is determined by
 the sending application entity, and must be acceptable by the receiving application entity.  A
 default value is provided by XTI: a list with one element, the generic presentation context (the
 stream-oriented, unstructured, data transfer service with null encoding).  The corresponding
 abstract and transfer syntaxes are specified.
 .sp
-Only a single abstract syntax and transfer syntax can be used by connectionless-mode XTI-mOSI.  If
-more than one presentation context is present in the options list for \fBt_sndudata\fP(3), the first
-is used.
+Only a single abstract syntax and transfer syntax can be used by connectionless-mode
+\fBXTI-mOSI\fP.  If more than one presentation context is present in the options list for
+\fBt_sndudata\fP(3), the first is used.
 .sp
 This option is of end-to-end significance.
 It may be negotiated in all XTI states except T_UNINIT.
 .\"
-.SS Transport Options
+.SS T_ISO_TP
 .PP
 Some of the options defined for the XTI ISO Transport Connection-mode Service or Transport
-Connectionless-mode Service may be made available to mOSI users: e.g\&. the options for Quality of
-service.  The quality of service parameters are passed directly by the OSI Upper Layers to the
-Transport Layer.  These options can thus be used to specify OSI Upper Layers quality of service
-parameters via XTI.  This facility is implementation dependent and an attempt to specify an
-unsupported option will return with the status field set to \fBT_NOTSUPPORT\fP.  None of these
-options are available with an ISO-over-TCP (RFC 1006)
+Connectionless-mode Service may be made available to \fBXTI-mOSI\fP users: e.g\&., the options
+for Quality of service.  The quality of service parameters are passed directly by the OSI Upper
+Layers to the Transport Layer.  These options can thus be used to specify OSI Upper Layers
+quality of service parameters via XTI.  XTI ISO Transport Service options are registered at level
+\fBT_ISO_TP\fP, see \fBxti_osi\fP(3).  This facility is implementation dependent and an attempt
+to specify an unsupported option will return with the status field set to \fBT_NOTSUPPORT\fP.
+None of these options are available with an ISO-over-TCP (RFC 1006)
 .[
 rfc1006
 .]
@@ -416,24 +557,112 @@ rfc2126
 transport provider.
 .\"
 .\"
-.SH SYNOPSIS
+.SH STRUCTURES
 .PP
+The Presentation Context Definition and Result List option is used to propose a presentation
+context, giving its abstract and transfer syntax, and to hold the result of negotiation of a
+presentation context.
+.\"
+.SS Presentation Context Structure
+.PP
+The presentation context definition and result list option is a variable size option consisting
+of a \fBt_scalar_t\fP given the number of presentation contexts followed by an array of that
+number of presentation context item offset elements.  Each element is defined as:
+.sp
+.nf
+\f(CW\s-1\
+struct t_ap_pco_el {
+    t_scalar_t count;
+    t_scalar_t offset;
+};
+\s+1\fP
+.fi
+.PP
+Each presentation context items offset element gives: the \fIcount\fP of syntax entries in the
+presentation context item (including the abstract syntax entry) and the \fIoffset\fP of the
+presentation context item from the beginning of the Presentation Context Definition and Result
+List option value.
+.\"
+.SS Presentation Context Item Header
+.PP
+Each presentation context item consists of a header followed by an array.  The header is defined
+as:
+.sp
+.nf
+\f(CW\s-1\
+struct t_ap_pc_item {
+    t_scalar_t pci;    /* Unique odd integer. */
+    t_scalar_t res;    /* Result of negotiation. */
+};
+\s+1\fP
+.fi
+.sp
+where \fIpci\fP is a unique odd integer (if this is zero in the \fIsndcall\fP argument of
+\fBt_connect\fP(3), the provider will substitute an appropriate value), and \fIres\fP is the
+result of negotiation.
+.TP
+.I res
+The \fIres\fP member contains the results associated with a Presentation Context list item and
+can assume on of the following values:
+.RS
+.TP
+.B T_PCL_ACCEPT
+Presentation context accepted.
+.PD 0
+.TP
+.B T_PCL_USER_REJ
+Presentation context rejected by peer application.
+.TP
+.B T_PCL_PREJ_RSN_NSPEC
+Provider reject: no reason specified.
+.TP
+.B T_PCL_PREJ_A_SYTX_NSUP
+Provider reject: abstract syntax not supported.
+.TP
+.B T_PCL_PREJ_T_SYTX_NSUP
+Provider reject: transfer syntax not supported.
+.TP
+.B T_PCL_PREJ_LMT_DCS_EXCEED
+Provider reject: local limit on DCS exceeded.
+.PD
+.RE
+.\"
+.SS Presentation Context Item Element
+.PP
+The array of syntax offset elements immediately follows the header.  Each element is defined as:
+.sp
+.nf
+\f(CW\s-1\
+struct t_ap_syn_off {
+    t_scalar_t size;   /* Length of syntax object identifier contents. */
+    t_scalar_t offset; /* Offset of object identifier for the syntax. */
+};
+\s+1\fP
+.fi
+.sp
+where \fIsize\fP is the length of the syntax object identifier contents, and \fIoffset\fP is the
+offset of the object identifier for the syntax from the beginning of the Presentation Context
+Definition and Result List option value.
+.PP
+The first element in the array of syntax offset elements refers to the abstract syntax the second
+to the first transfer syntax, and so on.
 .\"
 .\"
 .SH FUNCTIONS
 .PP
-Functions rcvreldata() (see t_rcvreldata) and sndreldata() (see t_sndreldata) were introducted as
-part of this XTI-mOSI functionality.  The rationale for this is that for ISO ACSE providing an
-orderly release mechanism, user data is a parameter of the release service, so when mapping XTI
-primitives to ACSE/Presentation (XTI-mOSI), disconnection user data may be received from peer
-applications.  Although abortive release primitives (t_snddis, t_rcvdis) permit sending and
-receiving user data, orderly release primitives (t_sndrel, t_rcvrel) do not.  Therefore, new
-functions having a user data parameter t_rcvreldata() and t_sndreldata() were added to provide the
-necessary support to handle this user data.
+Functions \fIrcvreldata\fP() (see \fBt_rcvreldata\fP(3)) and \fIsndreldata\fP() (see
+\fBt_sndreldata\fP(3)) were introduced as part of this \fBXTI-mOSI\fP functionality.  The
+rationale for this is that for ISO ACSE providing an orderly release mechanism, user data is a
+parameter of the release service, so when mapping XTI primitives to ACSE/Presentation
+(\fBXTI-mOSI\fP), disconnection user data may be received from peer applications.  Although
+abortive release primitives (\fBt_snddis\fP(3), \fBt_rcvdis\fP(3)) permit sending and receiving
+user data, orderly release primitives (\fBt_sndrel\fP(3), \fBt_rcvrel\fP(3)) do not.  Therefore,
+new functions having a user data parameter \fBt_rcvreldata\fP(3) and \fBt_sndreldata\fP(3) were
+added to provide the necessary support to handle this user data.
 .TP
 .BR t_accept (3)
-If \fIfd\fP is not equal to \fIresfd\fP, \fIresfd\fP should either be in state \fBT_UNBND\fP or be
-in state \fBT_IDLE\fP with the \fIqlen\fP parameter set to zero (0).
+If \fIfd\fP is not equal to \fIresfd\fP, \fIresfd\fP should either be in state \fBT_UNBND\fP or
+be in state \fBT_IDLE\fP with the \fIqlen\fP parameter set to zero (\fB0\fP).
 .sp
 The \fIaddr\fP parameter passed to/returned from \fBt_bind\fP(3) when \fIresfd\fP is bound may be
 different from the \fIaddr\fP parameter corresponding to \fIfd\fP.
@@ -441,7 +670,7 @@ different from the \fIaddr\fP parameter corresponding to \fIfd\fP.
 The \fIopt\fP parameter may be used to change the Application Context Name received.
 .TP
 .BR t_alloc (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
 .TP
 .BR t_bind (3)
 The \fIaddr\fP field of the \fBt_bind\fP structure represents the local presentation address and
@@ -450,34 +679,34 @@ optionally the local AP Title, AE Qualifier, AP and AE invocation-identifiers (s
 .sp
 This local \fIaddr\fP field is used, depending on the XTI primitive, as the calling, called or
 responding address, the called address being different from the responding address only when two
-different file descriptors (\fIfd\fP, \fIresfd\fP), bound to different addressess, are used.
+different file descriptors (\fIfd\fP, \fIresfd\fP), bound to different addresses, are used.
 .TP
 .BR t_close (3)
 Any connections that are still active at the endpoint are abnormally terminated.  The peer
 applications will be informed of the disconnection by a
 .RB [ T_DISCONNECT ]
-event.  The value of the disconnection reason will be \fBT_AC_ABRT_NSPEC\fP.
+event.  The value of the disconnection reason will be \fBT_AC_P_ABRT_NSPEC\fP.
 .TP
 .BR t_connect (3)
 The \fIsndcall->addr\fP structure specifies the Called Presentation Address.  The
-\fIrcvcall->addr\fP structure specifies the Responsing Presentation Address.  The structure may also
-be used to assign values for the Called AP Title, Called AE Qualifier, Called AP
+\fIrcvcall->addr\fP structure specifies the Responding Presentation Address.  The structure may
+also be used to assign values for the Called AP Title, Called AE Qualifier, Called AP
 invocation-identifier and Called AE invocation-identifier.
 .sp
-Before the call, the \fIsndcall->opt\fP structure may be used to request an Application Context Name
-or Presentation Context different from the default value.
+Before the call, the \fIsndcall->opt\fP structure may be used to request an Application Context
+Name or Presentation Context different from the default value.
 .TP
 .BR t_error (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
 .TP
 .BR t_free (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
 .TP
 .BR t_getinfo (3)
 The information supported by \fBt_getinfo\fP(3) reflects the characteristics of the transport
 connection, or if no connection is established, the default characteristics of the underlying OSI
-layers.  In all possible states except \fBT_DATAXFER\fP, the function \fBt_getinfo\fP(3) returns in
-the parameter \fIinfo\fP the same information as was returned by \fBt_open\fP(3).  In state
+layers.  In all possible states except \fBT_DATAXFER\fP, the function \fBt_getinfo\fP(3) returns
+in the parameter \fIinfo\fP the same information as was returned by \fBt_open\fP(3).  In state
 \fBT_DATAXFER\fP, however, the information returned in \fIinfo->connect\fP and \fIinfo->discon\fP
 may differ.
 .sp
@@ -494,28 +723,20 @@ Parameters:Before:After\0Call\0(mode)
 ::Connection:Connectionless
 _
 fd:x:/:/
-_
 info->addr:/:x:x
-_
 info->options:/:x:x
-_
 info->tsdu:/:T_INFINITE(-1):T_INFINITE(-1)
-_
 info->etsdu:/:T_INVALID(-2):T_INVALID(-2)
-_
 info->connect:/:x:T_INVALID(-2)
-_
 info->discon:/:x:T_INVALID(-2)
-_
 info->servtype:/:T_COTS_ORD:T_CLTS
-_
 info->flags:/:0:0
 .TE
 .sp
 \fBx\fP equals an integral number greater than 0.
 .sp
 The values of the parameters in the \fBt_info\fP structure for the \fBt_getinfo\fP(3) function
-reflect the mOSI provider particularities.
+reflect the \fBXTI-mOSI\fP provider particularities.
 .sp
 .RS
 .IP \(bu \w'\(bu\(em'u
@@ -528,7 +749,7 @@ of value may be indicated by the provider, but is of little use to the applicati
 .IP \(bu
 .I flags
 .sp
-mOSI does not support the sending of TSDUs of zero length, so this value equals zero (0).
+\fBXTI-mOSI\fP does not support the sending of TSDUs of zero length, so this value equals zero (0).
 .RE
 .TP
 .BR t_getprotaddr (3)
@@ -536,7 +757,7 @@ The protocol addresses are naming and addressing parameters as defined in \*(lq\
 Data Types and Structures\fP\*(rq.
 .TP
 .BR t_getstate (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
 .TP
 .BR t_listen (3)
 The \fIcall->addr\fP structure contains the remote Calling Presentation Address and the remote
@@ -546,7 +767,7 @@ Incoming user data encoded as multiple presentation data values will cause the \
 to be returned.
 .TP
 .BR t_look (3)
-Since expedited data is not supported for a mOSI provider, \fBT_EXDATA\fP and \fBT_GOEXDATA\fP
+Since expedited data is not supported for a \fBXTI-mOSI\fP provider, \fBT_EXDATA\fP and \fBT_GOEXDATA\fP
 events cannot occur.
 .TP
 .BR t_open (3)
@@ -567,56 +788,48 @@ Parameters:Before:After\0Call\0(mode)
 ::Connection:Connectionless
 _
 name:x:/:/
-_
 oflag::/:/
-_
 info->addr:/:x:x
-_
 info->options:/:x:x
-_
 info->tsdu:/:T_INFINITE(-1):T_INFINITE(-1)
-_
 info->etsdu:/:T_INVALID(-2):T_INVALID(-2)
-_
 info->connect:/:x:T_INVALID(-2)
-_
 info->discon:/:x:T_INVALID(-2)
-_
 info->servtype:/:T_COTS_ORD:T_CLTS
-_
 info->flags:/:0:0
 .TE
 .sp
 \fBx\fP equals an integral number greater than zero (0).
 .sp
-The values of the parameters in the \fBt_info\fP structure reflect mOSI limitations as follows:
+The values of the parameters in the \fBt_info\fP structure reflect \fBXTI-mOSI\fP limitations as follows:
 .RS
 .IP \(bu \w'\(bu\(em'u
 .IR connect ", " discon
 .sp
-These values are limited by the version of the session supported by the mOSI provider, and are
+These values are limited by the version of the session supported by the \fBXTI-mOSI\fP provider, and are
 generally much larger than those supported by an ISO Transport or TCP provider.
 .IP \(bu
 .I flags
 .sp
-mOSI does not supoprt sending TSDU of zero length, so this value equals 0.
+\fBXTI-mOSI\fP does not support sending TSDU of zero length, so this value equals 0.
 .sp
 .TP \w'\fBNote:\fP\(em'u
 .B Note:
 The \fIname\fP (device file) parameter passed to\fBt_open\fP(3) will differ when the application
-accesses an mOSI provider or an ISO Transport provider.
+accesses an \fBXTI-mOSI\fP provider or an ISO Transport provider.
 .RE
 .TP
 .BR t_optmgmt (3)
-The options available with mOSI providers are described in the section \*(lq\fIOptions\fP.\*(rq
+The options available with \fBXTI-mOSI\fP providers are described in the section
+\*(lq\fIOptions\fP.\*(rq
 .TP
 .BR t_rcv (3)
 The \fIflags\fP parameter will never be set to [\fBT_EXPEDITED\fP], as expedited data transfer is
 not supported.
 .TP
 .BR t_rcvconnect (3)
-The \fIcall->addr\fP structure specifies the remote Responding Presentation Address, and the remote
-responding AP Title, AE Qualifier, and AP and AE invocation identifiers if received.
+The \fIcall->addr\fP structure specifies the remote Responding Presentation Address, and the
+remote responding AP Title, AE Qualifier, and AP and AE invocation identifiers if received.
 .sp
 The \fIcall->opt\fP structure may also contain an Application Context Name and/or Presentation
 Context Definition Result List.
@@ -626,40 +839,113 @@ Possible values for disconnect reason codes are specified in \*(lq\fIOption Data
 Structures\fP.\*(rq
 .TP
 .BR t_rcvrel (3)
-With this primitive, user data cannot be received on normal release: any user data in the received
-flow is discarded (see \fBt_rcvreldata\fP(3)).
+With this primitive, user data cannot be received on normal release: any user data in the
+received flow is discarded (see \fBt_rcvreldata\fP(3)).
 .TP
 .BR t_rcvudata (3)
 The \fIunitdata->addr\fP structure specifies the remote Presentation Address, and optionally the
-remote AP Title, AE Qualifier, AP and AE invocation-identifiers.  If the \fBT_MORE\fP flag is set,
-an additional \fBt_rcvudata\fP(3) call is needed to retrieve the entire A-UNIT-DATA service unit.
-Only normal data is returned via the \fBt_rcvudata\fP(3) call.
+remote AP Title, AE Qualifier, AP and AE invocation-identifiers.  If the \fBT_MORE\fP flag is
+set, an additional \fBt_rcvudata\fP(3) call is needed to retrieve the entire A-UNIT-DATA service
+unit.  Only normal data is returned via the \fBt_rcvudata\fP(3) call.
 .TP
 .BR t_rcvuderr (3)
-This function is not supported by a mOSI provider since badly formed A-UNIT-DATA APDUs are
-discarded.
+This function is not supported by a \fBXTI-mOSI\fP provider since badly formed A-UNIT-DATA APDUs
+are discarded.
 .TP
 .BR t_snd (3)
 Zero-length TSDUs are not supported.
 .sp
-Since expedited data transfer is not supported for a mOSI provider, the parameter flags shall not
-have [\fBT_EXPEDITED\fP] set.
+Since expedited data transfer is not supported for a \fBXTI-mOSI\fP provider, the parameter flags
+shall not have [\fBT_EXPEDITED\fP] set.
 .TP
 .BR t_snddis (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
 .TP
 .BR t_sndrel (3)
-With this primitive, user data cannot be sent on normal release (see
-\fBt_sndreldata\fP(3)).
+With this primitive, user data cannot be sent on normal release (see \fBt_sndreldata\fP(3)).
 .TP
 .BR t_strerror (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
 .TP
 .BR t_sync (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
 .TP
 .BR t_unbind (3)
-No special considerations for mOSI providers.
+No special considerations for \fBXTI-mOSI\fP providers.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.SS Layering for mOSI implementations
+.PP
+The services and protocols for the upper three layers of OSI are specified
+separately.  However, considerable efficiency cna be gained if all thre
+protocol machines are combined as one module and not as three separate modules
+requiring the definition of formal interfaces between them.  This is
+especially tru if operating system context switches occur when transferrring
+between different modules.
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+Currently there are not formally defined interfaces for session and
+presentation.
+.PP
+Combining layer protocol machines applies not only to mOSI implementations,
+but also to all OSI upper layer implementations.
+.PP
+However, combining layers precludes testing them individually.  Individual
+layer testing is not recommended.  The three upper layer protocols provide an
+integerated set of services; these services are not useful individually.
+.SS PDU generation for mOSI implementations
+.PP
+mOSI supports uncomplicated application protocols; i.e\&. byte stream or
+simple record oriented data transfer (that probably consitutes 95 to 99% of
+user application protocols).  Therefore, the encoding of embedded PDU headers
+(PCI) for all three protocols is uniform.  Using pre-defined protocol headers
+allows significant gains in protocol machine efficiency.  This is especially
+true for data PDUs\(emthe PDUs that generally constitute the majority of PDUs
+exchanged.
+.PP
+The Internet RFC 1698 on \(lqOctet Sequences for Upper-Layer OSI to support
+Basic COmmunications Applications\(rq
+.[
+rfc1698
+.]
+is an example of explicit pre-defined PDU encodings for mOSI implementations.
+The RFC contains a full description of this technieque including BER encodings
+of PDUs.
+.SS Parsing incoming protocol for mOSI
+.PP
+An upper layer protoocl machine that only supports the facilities defined in
+mOSI need only recognize a very limited subset of all potential OSI-PDU
+sequences.  In particular, they need not recognize any non-mOSI protocol
+sequences and these may be treated as unrecognized PDUs.  The receipt of an
+unrecognized PDU results in a protocol error and in the release of the
+association.  This does not lessen the utility of the implementation but it
+does reduce the amount of code needed for error handling.
+.PP
+Note: It is always legal for an OSI protocol to abort an association.
+.SS Interfaces for mOSI implementations
+.PP
+Portability for an mOSI implementation can be significantly enhanced through
+the use of X/Open's XTI interfaces.  XTI provides a generic interface for
+connect/disconnec and send/receive.  The XTI inteface is explicitly for BCA.
+The XTI for mOSI interface
+.[
+xti revision 1.0
+.]
+.[
+xns 5.2
+.]
+provides a common interface for networked applications.  It simplifies
+migration of networked applications from one open networking environment to
+another.
+.PP
+The standard XTI can be used to provide transport services to an mOSI
+implementation, thus making an mOSI implementation easily portable to any
+network transport supporting XTI, e.g\&. Internet, NetBIOS, and a number of
+proprietary networks.  Thus XTI can be used both to interface mOSI to a
+network transport service and to provide mOSI services to networked
+applications.
+
 .\"
 .\"
 .SH NOTICES
@@ -680,9 +966,10 @@ Kernel, Normal Mode.
 .I ACSE:
 Kernel.
 .PP
-If invalid (non-negotiable) options are requested by the peer and detected by the provider once the
-association is already established (such as the ACSE presentation context missing in the Defined
-Context Set), the association is rejected via a A-(P)-ABORT generated by the implementation.
+If invalid (non-negotiable) options are requested by the peer and detected by the provider once
+the association is already established (such as the ACSE presentation context missing in the
+Defined Context Set), the association is rejected via a A-(P)-ABORT generated by the
+implementation.
 .\"
 .SS Mandatory and Optional Parameters
 .PP
@@ -690,12 +977,12 @@ Context Set), the association is rejected via a A-(P)-ABORT generated by the imp
 If the Local Presentation Address is not passed to \fBt_bind\fP(3) in \fIreq->addr\fP, then it is
 returned in \fIret->addr\fP.
 .IP \(bu
-The remove (called) Presentation Address (in \fBt_connect\fP(3), \fIsndcall->addr\fP) parameter must
-be explicity set by the application.
+The remove (called) Presentation Address (in \fBt_connect\fP(3), \fIsndcall->addr\fP) parameter
+must be explicitly set by the application.
 .IP \(bu
 The following parameters are mandatory for the protocol machine, but default values are provided.
-If the application does not wish to set the corresponding parameter, the default value will be used.
-The default value may be changed through \fBt_optmgmt\fP(3) (see \*(lq\fIOptions\fP\*(rq):
+If the application does not wish to set the corresponding parameter, the default value will be
+used.  The default value may be changed through \fBt_optmgmt\fP(3) (see \*(lq\fIOptions\fP\*(rq):
 .RS
 .IP \(bu \w'\(bu\(em'u
 Application Context Name (\fIopt\fP parameter).
@@ -705,13 +992,14 @@ Presentation Context List (\fIopt\fP parameter).
 The presentation context of ACSE is required and used.  The user should not request it as the
 implementation will insert it automatically in the context list.
 .sp
-If the user does not specifically request an Application Context Name via the \fIopt\fP parameter of
-\fBt_accept\fP(3) (that is, for the A-ASSOCIATE.response), the implementation uses the Application
-Context Name that was received in the A-ASSOCIATE.indication.
+If the user does not specifically request an Application Context Name via the \fIopt\fP parameter
+of \fBt_accept\fP(3) (that is, for the A-ASSOCIATE.response), the implementation uses the
+Application Context Name that was received in the A-ASSOCIATE.indication.
 .RE
 .IP \(bu
-The following parameters are optional for the protocol and default values of null are defined.  If
-the application does not set them otherwise, they are ommitted from the outgoing protocol stream.
+The following parameters are optional for the protocol and default values of null are defined.
+If the application does not set them otherwise, they are omitted from the outgoing protocol
+stream.
 .RS
 .IP \(bu \w'\(bu\(em'u
 local AP-title (in \fBt_bind\fP(3), \fIreq->addr\fP)
@@ -725,15 +1013,15 @@ local AE-qualifier (in \fBt_bind\fP(3),  \fIreq->addr\fP)
 .IP \(bu
 called AE-qualifier (in \fBt_connect\fP(3), \fIsndcall->addr\fP)
 .IP \(bu
-responding AE-qualifier (if \fBt_accept\fP(3) specifies a new accepting endpoint \fIresfd\fP, in the
-protocol address bound to \fIresfd\fP)
+responding AE-qualifier (if \fBt_accept\fP(3) specifies a new accepting endpoint \fIresfd\fP, in
+the protocol address bound to \fIresfd\fP)
 .IP \(bu
 local AP and AE invocation-identifiers (in \fBt_bind\fP(3), \fIreq->addr\fP)
 .IP \(bu
 called AP and AE invocation-identifiers (in \fBt_connect\fP(3), \fIsndcall->addr\fP)
 .IP \(bu
-responding AP and AE invocation-identifiers (if \fBt_accept\fP(3) specifies a new accepting endpoing
-\fIresfd\fP, in the protocol address bound to \fIresfd\fP)
+responding AP and AE invocation-identifiers (if \fBt_accept\fP(3) specifies a new accepting
+endpoint \fIresfd\fP, in the protocol address bound to \fIresfd\fP)
 .RE
 .IP \(bu
 The following parameters are optional for the protocol machine and not supported through the XTI
@@ -749,19 +1037,19 @@ ACSE Implementation Information.
 .IP \(bu
 Session connection identifiers.
 .PP
-During association establishment (that is, before the XTI-mOSI provider negotiates acceptance of a
-single abstract syntax/transfer syntax pair), an XTI-mOSI application initiating the association
-will only send a single presentation data value in the user information parameter.  The XTI-mOSI
-provider will insure that the first abstract syntax and transfer syntax pari being negotiated is the
-one required for its encoding.
+During association establishment (that is, before the \fBXTI-mOSI\fP provider negotiates
+acceptance of a single abstract syntax/transfer syntax pair), an \fBXTI-mOSI\fP application
+initiating the association will only send a single presentation data value in the user
+information parameter.  The \fBXTI-mOSI\fP provider will insure that the first abstract syntax
+and transfer syntax pair being negotiated is the one required for its encoding.
 .RE
 .\"
 .SS Mapping XTI Functions to ACSE/Presentation Services
 .PP
-In the following tables, the definition of which parameters are mandatory and which are optional can
-be found in ISO/IEC ISP 11183 - Common Upper Layers Requirements, part 3 (see CULR).
+In the following tables, the definition of which parameters are mandatory and which are optional
+can be found in ISO/IEC ISP 11188 - Common Upper Layers Requirements, part 3 (see CULR).
 .[
-x638
+iso isp 11188-3
 .]
 .PP
 .B Connection-mode Services
@@ -875,10 +1163,10 @@ t_rcv:P-DATA ind
 .PP
 .B Association Release (orderly, abortive)
 .PP
-This table makes the assumption that the XTI-mOSI provider supports the orderly release facility
+This table makes the assumption that the \fBXTI-mOSI\fP provider supports the orderly release facility
 with user data
 .RB ( t_sndreldata "(3) and " t_rcvreldata (3)).
-WHen this is not the case, User Information is not sent, Reason is supplied via an internal
+When this is not the case, User Information is not sent, Reason is supplied via an internal
 mechanism with A-RELEASE request and response, User Information and Reason received in A-RELEASE
 indication and confirmation are discarded.
 .PP
@@ -972,9 +1260,79 @@ with ACSE context removed from the list passed to user
 .\"
 .\"
 .SH USAGE
+.SS Rationale for using XTI-mOSI
 .PP
-XTI-mOSI is particularly well-suited to migration of OSI upper layers to non-OSI lower layers
-supporting a minimual presetation and session layer such as LPP.
+This specification uses the concept of a minimum set of OSI upper layer facilities that support
+basic communication applications.  A Basic Communication Application simply requires the ability to
+open and close comunications with a peer and to send and receive messages with a peer.
+.PP
+\fBXTI-mOSI\fP is designed specifically for Basic Comunication Applications that are in one of these
+catiegories:
+.IP \(bu \w'\(bu\(em'u
+applications that are to be migrated from the Internet world (TCP or UDP) or from a NetBIOS
+enviroment to OSI;
+.IP \(bu
+applications accessing the OSI transport service that wish to migrate to an OSI seven-layer,
+conformant environment; or,
+.IP \(bu
+applications that require a simple octet-stream connection between peer processes.  The benefit of
+\fBXTI-mOSI\fP to these applications is that it extends the family of \fItransport services\fP that
+are available via a single, protocol independent API.
+.SS Migrant Applications
+For the first kind of applications (those migrating to OSI or intended to work over a variety of
+\fItransport\fP mechanisms), the migration effort will be greatly simplified if they were already
+using \fBXTI\fP \(em \fBXTI-mOSI\fP offset several new options, but, as described lated in this section,
+default values are generally provided.
+.sp
+In addition to application already using \fBXTI\fP, the X Window System (X) and Internel Protocol
+Suite applications (in general) are examples of potential Migrant applications.
+.SS OSI Functionality
+\fBXTI-mOSI\fP is suited to applications that require only the Minimum Upper Layer facilties which
+are described in the protocol ISO/EIC DISP 11188-3 \(em Common Upper Layer Requirements, part 3:
+Minimal OSI uppser layer faciltiies, expected to reach International Standard Profile (ISP) status in
+the first half of 1995.  These are:
+.IP \(bu \w'\(bu\(em'u
+ACSE Kernel functional unit
+.IP \(bu
+Presentation Kernel functional unit
+.IP \(bu
+Session Kernel and Full Duplex functional units
+.PP
+The \fBXTI-mOSI\fP interface provides access to OSI ACSE and Presentation services.  With
+\fBXTI-mOSI\fP, the optional parameters available to the application have been selected with the
+intent of facilitating interoperability and diagnostic of problems.  They are described later in
+this section.
+.PP
+Most applications only need the Kernel functionality.  This is even true for most of the OSI
+standard applications: Remote Database Access (RDA), Directory (X.500), FTAM without recovery, OSI
+Distributed Transaction Processing (TP) without 2-phase commitment, OSI Management.
+.SS XTI-mOSI API versus XAP
+.PP
+X/Open has developed the XAP
+.[
+xap c303
+.]
+interface (ACSE/Presentation API), see \fBXAP\fP(3), to provide access to ACSE and Presentation
+functionality.  It provides an interface that spans from implementations of minimal OSI through to
+full ACSE/Presentation/Session with all functional units.  \fBXTI-mOSI\fP has been developed to
+support migrant transport applications, and also applications that require a simple octet stream
+connection between peers.  Application designers should consider which API is most apporpriate to
+their needs.  Applications that are being ported from other transport providers, or require a simple
+octet string connection, should use \fBXTI-mOSI\fP.  Applications that require session functional
+units outside kernel, or which require multiple presentation contexts, or which may required
+additional session/presentation by \fBXTI-mOSI\fP in the future, should us \fBXAP\fP(3).
+.[
+xap c303
+.]
+When only minimal OSI support is required, the user should consider the availability of
+\fBXTI-mOSI\fP and \fBXAP\fP
+.[
+xap c303
+.]
+on target hardware platforms when selecting an interface.
+.PP
+\fBXTI-mOSI\fP is particularly well-suited to migration of OSI upper layers to non-OSI lower
+layers supporting a minimal Presentation and Session layer such as LPP.
 .[
 rfc1085
 .]
@@ -983,42 +1341,152 @@ rfc1278
 .]
 .\"
 .\"
-.SH SYNOPSIS
+.SH DEVICES
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+There are a number of TCP devices providing the Transport Provider Interface that provides
+\fBXTI-mOSI\fP conforming TPI devices as follows:
 .PP
+These devices are provided by the \fB@PACKAGE_TITLE@ (@PACKAGE@-@VERSION@)\fP package.  For more
+information see the \fBXTI-mOSI\fP module, see \fBmosi\fP(4).
 .\"
 .\"
-.SH SYNOPSIS
+.SH MODULES
 .PP
+The \fB@PACKAGE_TITLE@\fP package provides a module that cooperates with a transport provider
+conforming to the Transport Provider Interface (TPI).
+.[
+tpi revision 2.0.0
+.]
+The \fImosi\fP(4) module is pushed over such a TPI Stream and provides the \fBXTI-mOSI\fP
+interface described here.  In general, the system may be configured so that particular device
+names correspond to particular TPI drivers with the \fImosi\fP(4) module automatically pushed
+over the Stream upon open, as in \fBautopush\fP(8).
 .\"
 .\"
-.SH SYNOPSIS
+.SH BUGS
 .PP
+\fBmOSI\fP has no known bugs.  The \fBMOSI\fP(4) implementation of \fBXI-MOSI\fP has been
+conformance tested and validated using the \fBtest-mosi\fP(8) test case executable and the
+\fB@PACKAGE@\0autotest\fP conformance and validation test suite.
 .\"
 .\"
-.SH SYNOPSIS
+.SH NOTICES
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+In support of the \fBsockets\fP(3) library for \fBtpi\fP(7) transport providers, the options
+described here have been made compatible with the socket options described in \fBx25\fP(7).  As a
+result, depending on the release of \fBMOSI\fP(4), the XTI/TLI options described might not be
+compatible with options described here.
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+The \fBLinux\fP socket version of X.25 described in \fBx25\fP(7), accessed using the TPI
+interface of the \fBstrinet\fP package described in \fBstrinet\fP(5), supports all of the options
+described here.
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+Earlier versions of the \fBMOSI\fP(4) driver did not support wild-card binds.  If an attempt was
+made to bind to a wild-card address or port number, the bind would fail with [\fBTNOADDR\fP].
+While this is correct behavior, it was not consistent with other \fBmOSI\fP implementations.
+Recent version of the \fBMOSI\fP(4) driver include the ability to bind to wild-cards or to request
+that the transport service provider assign a suitable address.
 .PP
+Including the <\fBxti.h\fP> head file may include the <\fBxti_mosi.h\fP> header file. Including
+the <\fBxti_mosi.h\fP> header file may include the <\fBxti_osi.h\fP> header file.
 .\"
 .\"
-.SH SYNOPSIS
+.SH SEE ALSO
 .PP
+.BR MOSI (4),
+.BR read (2s),
+.BR readv (2s),
+.BR x25 (4),
+.BR sockets (3),
+.BR t_accept (3),
+.BR t_connect (3),
+.BR T_CONN_REQ (7),
+.BR t_errno (3),
+.BR t_getinfo (3),
+.BR timod (4),
+.BR tirdwr (4),
+.BR t_listen (3),
+.BR T_OPTDATA_IND (7),
+.BR t_optmgmt (3),
+.BR t_rcvconnect (3),
+.BR t_snddis (3),
+.BR write (2s),
+.BR writev (2s),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_osi (3),
+.BR test-mosi (8).
 .\"
 .\"
-.SH SYNOPSIS
+.SH COMPATIBILITY
 .PP
-
+This interface is compatible with
+.IR "XNS 5.2" ,
+.[
+xns99
+.]
+and implementations based on
+.IR "XNS 5.2" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Internet Protocol (IP) options were not standardized until XPG4.
+.[
+xpg
+.]
+.IP \(em
+The format of options for the Transport Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+differ from those for the AT&T Transport Layer Interface (TLI).  This interface follows the TPI.
+.[
+tpi revision 2.0.0
+.]
+.IP \(em
+The precise values of some options and format of primitives may differ from implementation to
+implementation.  Binary compatibility is not guaranteed.
+.PP
+See \fBtpi\fP(7), \fBxti\fP(3) and \fISTREAMS\fP(4), for additional compatibility information.
+See also, \fBapli\fP(7) and \fBxap\fP(3), for competing approaches.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The OpenGroup XNS Issue 5.2.
+.[
+xns99
+.]
+Conformance is validated using the \fBtest-mosi\fP8) test case executable and the
+\fB@PACAKAGE@\0autotest\fP validation test suite.
+.\"
+.\"
+.SH HISTORY
+.PP
+The \fITransport\0Provider\0Interface\0(TPI)\fP
+.[
+tpi revision 2.0.0
+.]
+was first created by AT&T as the \fITransport\0Layer\0Interface\0(TLI)\fP and was subsequently
+standardized by \fBUNIX\0International\P and later by \fBThe\0OpenGroup\fP in XPG4
+.[
+xpg
+.]
+and XNS 5.2.
+.[
+xns99
+.]
+.\"
+.\"
+.XX
+.[
+xns99
+.]
+.[
+x638
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

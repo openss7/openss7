@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xap_rose.h,v 0.9.2.1 2007/09/29 14:08:34 brian Exp $
+ @(#) $Id: xap_rose.h,v 0.9.2.2 2008-04-25 08:38:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/29 14:08:34 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 08:38:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xap_rose.h,v $
+ Revision 0.9.2.2  2008-04-25 08:38:30  brian
+ - working up libraries modules and drivers
+
  Revision 0.9.2.1  2007/09/29 14:08:34  brian
  - added new files
 
@@ -58,7 +61,7 @@
 #ifndef __XAP_ROSE_H__
 #define __XAP_ROSE_H__
 
-#ident "@(#) $RCSfile: xap_rose.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xap_rose.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  * xap_rose.h

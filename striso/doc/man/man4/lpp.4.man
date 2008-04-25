@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lpp.4.man,v 0.9.2.4 2006/10/12 20:25:15 brian Exp $
+.\" @(#) $Id: lpp.4.man,v 0.9.2.5 2008-04-25 08:38:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/12 20:25:15 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lpp.4.man,v $
+.\" Revision 0.9.2.5  2008-04-25 08:38:28  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.4  2006/10/12 20:25:15  brian
 .\" - manual page fixups for release
 .\"
@@ -183,6 +186,83 @@ as described in the XNS 5.2.
 .[
 xns
 .]
+.\"
+.\"
+.SH OBJECT IDENTIFIERS
+.PP
+The following OBJECT IDENTIFIER value is defined in RFC 1095:
+.[
+rfc1095
+.]
+.ad l
+.HP
+CMOT
+.[
+rfc1095
+.]
+backward compatible Application Context Name:
+.br
+1.3.6.1.2.1.9.1.1
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) cmot1095(1)}
+.B \(lq\ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex1\(rq
+.ad b
+.PP
+The following OBJECT IDENTIFIER values are defined in RFC 1189:
+.[
+rfc1189
+.]
+.ad l
+.HP
+CMIP
+.[
+rfc1189
+.]
+manager event Application Context Name:
+.br
+1.3.6.1.2.1.9.1.2
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-event-association(2)}
+.B \(lq\ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex2\(rq
+.HP
+CMIP
+.[
+rfc1189
+.]
+manager event monitor Application Context Name:
+.br
+1.3.6.1.2.1.9.1.3
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-event-monitor-association(3)}
+.B \(lq\ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex3\(rq
+.HP
+CMIP
+.[
+rfc1189
+.]
+manager monitor control Application Context Name:
+.br
+1.3.6.1.2.1.9.1.4
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-monitor-control-association(4)}
+.B \(lq\ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex4\(rq
+.HP
+CMIP
+.[
+rfc1189
+.]
+manager full Application Context Name:
+.br
+1.3.6.1.2.1.9.1.5
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) manager-full-association(5)}
+.B \(lq\ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex5\(rq
+.HP
+CMIP
+.[
+rfc1189
+.]
+agent event Application Context Name:
+.br
+1.3.6.1.2.1.9.1.6
+.I {iso(1) identified-organization(3) dod(6) internet(1) mgmt(2) mib(1) oim(9) acn(1) agent-event-association(6)}
+.B \(lq\ex2b\ex6\ex1\ex2\ex1\ex9\ex1\ex6\(rq
+.ad b
 .\"
 .\"
 .SH ADDRESSES

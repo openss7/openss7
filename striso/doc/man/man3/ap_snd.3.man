@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ap_snd.3.man,v 0.9.2.3 2008-04-16 17:34:22 brian Exp $
+.\" @(#) $Id: ap_snd.3.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:22 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ap_snd.3.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2008-04-16 17:34:22  brian
 .\" - working up manual pages
 .\"
@@ -80,11 +83,9 @@ sort-adjacent-labels
 .\"
 .\"
 .TH AP_SND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
-.\"
-.\"
 .SH NAME
 .B ap_snd
-\- send
+\- send and ACSE/Presentation primitive over an association
 .\"
 .\"
 .SH INTERFACE
@@ -108,58 +109,830 @@ xap c303
 .\"
 .SH SYNOPSIS
 .PP
+.B #include <xap.h>
+.HP
+.B int ap_snd(
+.br
+.BI "int " fd ,
+.br
+.BI "unsigned long " sptype ,
+.br
+.BI "ap_cdata_t *" cdata ,
+.br
+.BI "ap_osi_vbuf_t *" ubuf ,
+.br
+.BI "int " flags ,
+.br
+.BI "unsigned long *" aperrno_p );
 .\"
 .\"
 .SH ARGUMENTS
 .PP
+.TP \w'\fIaperrno_p\fP\(em'u
+.I fd
+Identifies the XAP Library instance as returned by
+.BR ap_open (3).
+.TP
+.I sptype
+Specifies the primitive to send.
+.TP
+.I cdata
+Points to a
+.B ap_cdata_t
+structure that contains primary information for the sent primitive.
+.TP
+.I ubuf
+Points to a
+.B ap_osi_vbuf_t
+buffer chain that, form which the data associated with the primitive will be
+sent.
+.TP
+.I flags
+Option flags that contain a bit mask that controls certain aspects of how the
+.BR ap_snd ()
+invocation is handled by XAP.
+.TP
+.I aperrno_p
+Points to an area into which to receive an error code upon failure.
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+This function is used to sent a request or response primitive.
+.I fd
+identifies the XAP instance for which the primitive is to be sent.  The
+.I sptype
+parameter contains the symbolic constant defined in
+.RB < xap.h >
+that identifies the primitive to be sent.  They symbolic constants are derived
+from the primitive names by prefixing the name with
+.BR AP_ .
+The table below lists the primitives that can be sent using
+.BR ap_snd (),
+and the associated states.  The following information is provided in the table:
+.TP
+.B primitive
+The name of the primitive.
+.TP
+.B valid in states
+The states during which this primitive may be sent (states are given as values
+of the
+.B AP_STATE
+attribute).
+.TP
+.B next state
+The state that will be entered upon successfully issuing this primitive (states
+are given as the value of the
+.B AP_STATE
+attribute).
+.PP
+.TS
+center box tab(:);
+cbss.
+Primitive/State Relationships
+_
+.T&
+cb|cb|cb
+l|l|l.
+primitive:valid in states:next state
+_
+A_ABORT_REQ:all except:AP_IDLE
+:AP_UNBOUND:
+:AP_IDLE:
+_
+A_ASSOC_REQ:AP_IDLE:AP_WASSOCcnf_ASSOCreq
+_
+A_ASSOC_RSP:AP_WASSOCrsp_ASSOCind:(AP_IDLE, AP_DATA_XFER)
+_
+A_PABORT_REQ:all except:AP_IDLE
+:AP_UNBOUND:
+:AP_IDLE:
+_
+A_RELEASE_REQ:AP_DATA_XFER:AP_WRELcnf_RELreq
+:AP_WRELrsp_RELind:
+_
+A_RELEASE_RSP:AP_WRELrsp_RELind:(AP_IDLE, AP_DATA_XFER)
+:AP_WRELrsp_RELind_init:AP_WRELcnf_RELreq
+_
+P_ACTDISCARD_REQ:AP_WSYNCMAcnf_SYNCMAreq:AP_WACTDcnf_ACTDreq
+:AP_WACTEcnf_ACTEreq:
+:AP_WRESYNrsp_RESYNind:
+:AP_WRECOVERYreq:
+:AP_DATA_XFER:
+_
+P_ACTDISCARD_RSP:AP_WACTDrsp_ACTDind:AP_DATA_XFER
+_
+P_ACTEND_REQ:AP_DATA_XFER:AP_WACTEcnf_ACTEreq
+_
+P_ACTEND_RSP:AP_WACTErsp_ACTEind:AP_DATA_XFER
+_
+P_ACTINTR_REQ:AP_WSYNCMAcnf_SYNCMAreq:AP_WACTIcnf_ACTIreq
+:AP_WACTEcnf_ACTEreq
+:AP_WRESYNrsp_RESYNind
+:AP_WRECOVERYreq
+:AP_DATA_XFER
+:AP_WCDATAcnf_CDATAreq
+:(if an only if no QOS
+:extended control parameter
+:has been selected for the
+:association)
+_
+P_ACTINTR_RSP:AP_WACTIrsp_ACTIind:AP_DATA_XFER
+_
+P_ACTRESUME_REQ:AP_DATA_XFER:no state change
+_
+P_ACTSTART_REQ:AP_DATA_XFER:no state change
+_
+P_CDATA_REQ:AP_DATA_XFER:AP_WCDATAcnf_CDATAreq
+_
+P_CDATA_RSP:AP_WCDATArsp_CDATAind:AP_DATA_XFER
+_
+P_CTRLGIVE_REQ:AP_DATA_XFER:no state change
+_
+P_DATA_REQ:AP_DATA_XFER:no state change
+:AP_WRELrsp_RELind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+_
+P_RESYNC_REQ:AP_DATA_XFER:AP_WRESYNcnf_RESYNreq
+:AP_WSYNCMAcnf_SYNCMAreq
+:AP_WRELrsp_RELind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+:AP_WRESYNrsp_RESYNind
+:AP_WRECOVERYreq
+_
+P_RESYNC_RSP:AP_WRESYNrsp_RESYNind:AP_DATA_XFER
+_
+P_SYNCMAJOR_REQ:AP_DATA_XFER:AP_SYNCMAcnf_SYNCMAreq
+_
+P_SYNCMAJOR_RSP:AP_SYNCMArsp_SYNCMAind:AP_DATA_XFER
+_
+P_SYNCMINOR_REQ:AP_DATA_XFER:no state change
+_
+P_SYNCMINOR_RSP:AP_DATA_XFER:no state change
+:AP_WRELrsp_RELind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+_
+P_TDATA_REQ:AP_DATA_XFER:no state change
+:AP_WRELrsp_RELind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+_
+P_TOKENGIVE_REQ:AP_DATA_XFER:no state change
+:AP_WSYNCMAcnf_SYNCMAreq:no state change
+:AP_WACTEcnf_ACTEreq:no state change
+:AP_WSYNCMArsp_SYNCMAind:no state change
+:AP_WACTErsp_ACTEind:no state change
+:AP_WRECOVERYreq:(no state change or
+::AP_DATA_XFER)
+_
+P_TOKENPLEASE_REQ:AP_DATA_XFER:no state change
+:AP_WRELrsp_RELind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+:AP_WCDATArsp_CDATAind
+_
+P_UXREPORT_REQ:AP_WRELrsp_RELind:AP_WRECOVERYind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+:AP_DATA_XFER
+_
+P_XDATA_REQ:AP_DATA_XFER:no state change
+:AP_WRELrsp_RELind
+:AP_WSYNCMArsp_SYNCMAind
+:AP_WACTErsp_ACTEind
+.TE
+.PP
+The following table lists the environment attributes associated with each
+primitive.  The following information is provided in the table:
+.TP
+.B primitive
+The name of the primitive.
+.TP
+.B must be set
+The list of XAP environment attributes that must be set prior to issuing the
+primitive.
+.sp
+Note that some attribute that had to be set to enter a state where this
+primitive is legal may not be listed.  Attributes other than those listed may be
+required by the remote application entity.
+.TP
+.B may be used
+A list of XAP environment attribute may be set prior to sending this primitive
+and the values which will have an affect on the primitive.
+.TP
+.B may change
+A list of the attribtues that may change as a result of sending this primitive.
+.PP
+.TS
+center box tab(:);
+cbsss.
+Primitive/Attribute Relationship
+_
+.T&
+cb|cb|cb|cb
+l|l|l|l.
+primitive:must be set:may be used:may change
+_
+A_ABORT_REQ:none:none:AP_STATE
+_
+A_ASSOC_REQ:AP_BIND_PADDR:AP_ASCE_SEL:AP_ROLE_CURRENT
+:AP_CNTX_NAME:AP_CLD_AEID:AP_STATE
+:AP_LCL_PADDR:AP_CLD_AEQ
+:AP_REM_PADDR:AP_CLD_APID
+:AP_LIB_SEL:AP_CLD_APT
+::AP_CLG_AEID
+::AP_CLG_AEQ
+::AP_CLG_APID
+::AP_CLG_APT
+::AP_CLG_CONN_ID
+::AP_DPCN
+::AP_INIT_SYNC_PT
+::AP_INIT_TOKENS
+::AP_MODE_SEL
+::AP_PCDL
+::AP_PFU_SEL
+::AP_PRES_SEL
+::AP_QOS
+::AP_ROLE_ALLOWED
+::AP_SESS_SEL
+::AP_SFU_SEL
+_
+A_ASSOC_RSP:none:AP_BIND_PADDR:AP_DCS
+::AP_CLD_CONN_ID:AP_STATE
+::AP_CNTX_NAME:AP_TOKENS_OWNED
+::AP_DPCR
+::AP_INIT_SYNC_PT
+::AP_INIT_TOKENS
+::AP_PCDRL
+::AP_PRES_SEL
+::AP_QOS
+::AP_RSP_AEID
+::AP_RSP_AEQ
+::AP_RSP_APID
+::AP_RSP_APT
+::AP_SFU_SEL
+_
+A_PABORT_REQ:none:none:AP_STATE
+_
+A_RELEASE_REQ:none:none:AP_STATE
+_
+A_RELEASE_RSP:none:none:AP_STATE
+_
+P_ACTDISCARD_REQ:none:none:AP_STATE
+_
+P_ACTDISCARD_RSP:none:none:AP_STATE
+:::AP_TOKENS_OWNED
+_
+P_ACTEND_REQ:none:none:AP_STATE
+:::AP_TOKENS_OWNED
+_
+P_ACTEND_RSP:none:none:AP_STATE
+_
+P_ACTINTR_REQ:none:none:AP_STATE
+_
+P_ACTINTR_RSP:none:none:AP_STATE
+:::AP_TOKENS_OWNED
+_
+P_ACTRESUME_REQ:none:none:none
+_
+P_ACTRESUME_RSP:none:none:AP_TOKENS_OWNED
+_
+P_CDATA_REQ:none:none:none
+_
+P_CDATA_RSP:none:none:none
+_
+P_CTRLGIVE_REQ:none:none:AP_TOKENS_OWNED
+_
+P_DATA_REQ:none:none:AP_TOKENS_OWNED
+_
+P_RESYNC_REQ:none:none:AP_STATE
+_
+P_RESYNC_RSP:none:none:AP_STATE
+:::AP_TOKENS_OWNED
+_
+P_SYNCMAJOR_REQ:none:none:AP_STATE
+:::AP_TOKENS_OWNED
+_
+P_SYNCMAJOR_RSP:none:none:AP_STATE
+_
+P_SYNCMINOR_REQ:none:none:AP_TOKENS_OWNED
+_
+P_SYNCMINOR_RSP:none:none:none
+_
+P_TDATA_REQ:none:none:none
+_
+P_TOKENGIVE_REQ:none:none:AP_STATE
+:::AP_TOKENS_OWNED
+_
+P_TOKENPLEASE_REQ:none:none:none
+_
+P_UXREPORT_REQ:none:none:AP_STATE
+_
+P_XDATA_REQ:none:none:none
+.TE
+.PP
+.BR ap_snd ()
+returns
+.RB [ AP_BADLSTATE ]
+when
+.I sptype
+indicates a primitive that is not valid in the current state of the XAP
+instance.  This error indicates a program logic error.  Thus the XAP-user must
+keep track of the state of the instance.
+.PP
+.BR ap_snd ()
+returns
+.RB [ AP_LOOK ]
+when:
+.IP 1. \w'0.\(em'u
+The primitive specified in
+.I sptype
+is made invalid by an incoming event that has been processed by the underlying
+service provider but has not yet been received by the XAP-user, or,
+.IP 2.
+expedited data is available for the XAP-user to receive.
+.PP
+The
+.RB [ AP_LOOK ]
+return code does not indicate a program logic error.  It only indicates that the
+XAP-user should issue
+.BR ap_rcv (3)
+calls to process one or more outstanding incoming events and then take action
+appropriate to the current state of the instance.  For example, since receiving
+expedited data does not result in a state change, the
+.BR ap_snd ()
+which returned
+.RB [ AP_LOOK ]
+could be reissued.  This includes an
+.BR ap_snd ()
+that is part of an in-progress send discussed below.
+.PP
+As another example, suppose XAP receives a P-RESYNC indication primitive in
+state
+.BR AP_DATA_XFER .
+The XAP state is inconsistent with that of the presentatoin service provider.
+If the XAP-user issues
+.BR ap_snd ()
+to send
+.BR P_DATA_REQ (7)
+primitive, XAP returns
+.RB [ AP_LOOK ]
+forcing the user to call
+.BR ap_rcv (3)
+to receive the
+.BR P_RESYNC_IND (7)
+primitive.  This causes the XAP instance's state to become
+.BR AP_WRESYNrsp_RESYNind.
+The XAP-user should send a
+.BR P_RESYNC_RSP (7)
+primitive to return to state
+.BR AP_DATA_XFER .
+A
+.BR P_RESYNC_IND (7)
+primitive has the effect of terminating any send in progress at that point.  An
+XAP-user, after getting
+.RB [ AP_LOOK ]
+and receiving
+.BR P_RESYNC_IND (7),
+should assume any in-progress send was terminated by XAP.
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+.RB [ AP_LOOK ]
+implies that the XAP implementation includes some mechanism which permits a
+delay between a primitive being processed by the service provider and that
+primitive being passed to the API user.  Thus, some implementations of XAP may
+not be capable of generating this return code.
+.PP
+If the primitive being sent is to be accompanied by protocol information, that
+information must be contained in an
+.B ap_cdata_t
+structure pointed to by
+.IR cdata .
+The manual pages in Section 7 describe the use of the
+.I cdata
+arugment with each XAP primitive.  If no additional protocol information is to
+be sent with an XAP primitive,
+.I cdata
+may be
+.BR NULL .
+.PP
+User-data can be sent with many XAP primitives.  If no user-data is to be sent
+with a primitive,
+.I ubuf
+may be set to
+.BR NULL .
+To send data,
+.I ubuf->buf
+must point to a linked list of
+.B ap_osi_vbuf_t
+structures.  These structures allow data stored in several different buffers to
+be sent with a single
+.BR ap_snd ()
+invocation.  The
+.B ap_osi_vbuf_t
+structure is defined as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    unsigned char *db_base;
+    unsigned char *db_lim;
+    unsigned char *db_ref;
+} ap_osi_dbuf_t;
+\s+1\fP
+.fi
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    ap_osi_vbuf_t *b_cont;
+    unsigned char *b_rptr;
+    unsigned char *b_wptr;
+    ap_osi_dbuf_t *b_datap;
+} ap_osi_vbuf_t;
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I b_cont
+field of the
+.B ap_osi_vbuf_t
+structure points to the next buffer in the chain or is
+.B NULL
+if this is the end of the list.  The
+.I b_datap
+element points to a data block that contains encoded user data.  The
+.I b_rptr
+element points to the beginning of the user-data within the data block while
+.I b_wptr
+references the location following the last octet of data in the buffer.
+.PP
+Each data block is represented by an
+.B ap_osi_dbuf_t
+structure.  The
+.I db_ref
+element of the
+.B ap_osi_dbuf_t
+structure indicates the number of
+.B ap_osi_vbuf_t
+structures that reference this data block.  The
+.I db_base
+element points to the beginning of a buffer and
+.I db_lim
+indicates the end of that buffer (buffer size ==
+.IR db_lim " - " db_base ).
+.PP
+The XAP user is responsible for encoding the user data passed to XAP in the
+.I ubuf
+parameter.  The general rules for decoding user data are stated here, please see
+individual manual pages in Section 7 for specific exceptions to these rules.
+.IP \(bu \w'\(bu\(em'u
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is in effect (i.e., the
+.B AP_X410_MODE
+bit of
+.B AP_MODE_SEL
+is set), the contents of
+.I ubuf
+buffer(s) are mapped directly from the SS-user data parameter of the equivalent
+session service primitive.  Refer to the ISO Presentation Layer Protocol
+Specification (see reference ISO 8823)
+.[
+iso 8823
+.]
+for further information concerning the encoding of these values.  (The primary
+exception to this rule is the A-ASSOCIATE primitives:
+.BR A_ASSOC_REQ (7),
+.BR A_ASSOC_IND (7),
+.BR A_ASSOC_RSP (7),
+.BR A_ASSOC_CNF (7).)
+.IP \(bu
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is not in effect and the primitive received is an ACSE
+primitive, the data received in the
+.I ubuf
+buffer(s) must be decoded according to the definition specified in the ACSE
+Protocol Specification (reference ISO 8650)
+.[
+iso 8650-1
+.]
+as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+[30] IMPLICIT SEQUENCE OF EXTERNAL
+\s+1\fP
+.fi
+.RE
+.IP \(bu
+If the
+.RI \(lq X.410-1984 \(rq
+mode of operation is not in effect and the primitive received is a Presentation
+primitive, the data received in the
+.I ubuf
+buffer(s) must be decoded according to the User-data definition specified in the
+Presentation Protocol Specification (reference ISO 8823)
+.[
+iso 8823
+.]
+as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+CHOICE {
+    [APPLICATION 0] IMPLICIT OCTET STRING,
+    [APPLICATION 1] IMPLICIT SEQUENCE OF PDV-list
+}
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.I flags
+argument is a bit mask that can be used to control certain aspects of how the
+.BR ap_snd ()
+invocation is handled by XAP.  Legal values for the
+.I flags
+argument are formed by OR'ing together zero or more of the flags described
+below:
+.TP
+.B AP_MORE
+This flag indicates that data ssociated with the specified primitive will be
+sent with multiple
+.BR ap_snd ()
+calls.  Each
+.BR ap_snd ()
+call with the
+.B AP_MORE
+bit set indicates that another
+.BR ap_snd ()
+will follow with additional data associated with the specified primitive.  The
+value of the
+.I sptype
+argument must be the same for all
+.BR ap_snd ()
+calls used to send a single primitive.  Calling
+.BR ap_snd ()
+with the
+.B AP_MORE
+bit reset signals that the primitive is complete.
+.TP
+.B AP_QUERY_DATA_PENDING
+This flag indicates to XAP that a check shall be made for the availability of
+incoming data on the connection and that if data is available, this shall be
+indicated by returning a result of minus one
+.RB ( -1 )
+and setting
+.I aperrno_p
+as indicated below.
+.PP
+If XAP is being used in blocking execution mode (i.e., the
+.B AP_NDELAY
+bit of the
+.B AP_FLAGS
+attribute is not set),
+.BR ap_snd ()
+blocks until sufficient resources are available to permit all of the data in the
+.I ubuf
+buffer(s) to be sent.  If XAP is being used in non-blocking execution mode
+(i.e., the
+.B AP_NDELAY
+bit of the
+.B AP_FLAGS
+attribute is set),
+.BR ap_snd ()
+may return after having sent only a portion of the data to the A/P-Provider.  If
+all data is not sent,
+.BR ap_snd ()
+will return a value of minus one
+.RB ( -1 )
+and the location pointed to by
+.I aperrno_p
+is set to the
+.RB [ AP_AGAIN ]
+error code.  The user must continue to call
+.BR ap_snd ()
+with exactly the same arguments until the function completes successfully (i.e.,
+returns a value of zero
+.RB ( 0 )).
+.PP
+If
+.B AP_MORE
+is set by the user or if
+.RB [ AP_AGAIN ]
+is returned by XAP, sending a primitive requires multiple invocations of
+.BR ap_snd ().
+In general,
+.BR ap_snd ()
+is issued repeatedly with the same primitive until:
+.IP 1. \w'0.\(em'u
+The user resets the
+.B AP_MORE
+flag, and
+.IP 2.
+XAP returns success, i.e., does not return
+.RB [ AP_AGAIN ]
+error code, or,
+.IP 3.
+XAP returns the
+.RB [ AP_LOOK "] or [" AP_HANGUP ]
+error codes.
+.PP
+An association can be aborted by the user even if a send is in progress, i.e.,
+conditions 1 and 2 have not been met.  An
+.BR ap_snd ()
+specifying
+.BR A_ABORT_REQ "(7) or " A_PABORT_REQ (7)
+will cause the in-progress send and the association to be aborted.  An
+.BR ap_close (3)
+will also have this effect.
+.PP
+It is not permissible to issue
+.BR ap_snd ()
+specifying any primitive other than
+.BR A_ABORT_REQ "(7) or " A_PABORT_REQ (7)
+while there is a send in progress.  If this is attempted, XAP returns the
+.RB [ AP_BADLSTATE ]
+error code.
+.PP
+The XAP user must not prematurely terminate an in-progress send by resetting
+.B AP_MORE
+as this will result in a partial APDU being sent to the remote system that, in
+turn, may cause the remote system to abort the application association.
+.PP
+.I aperrno_p
+must be set to point to a location that will be used to carry an error code back
+to the user.
 .\"
 .\"
 .SH ENVIRONMENT
 .PP
+See
+.BR ap_env (3).
 .\"
 .\"
-.SH "RETURN VALUE"
+.SH RETURN
 .PP
+Upon successful completion, a value of zero
+.RB ( 0 )
+is returned.  Otherwise, a value of minus one
+.RB ( -1 )
+is returned and the location pointed to by
+.I aperrno_p
+is set to indicate the error.
 .\"
 .\"
 .SH ERRORS
 .PP
-.\"
-.\"
-.SH IMPLEMENTATION
+.TP \w'[\fBAP_SUCCESS_DATA_PENDING\fP]\(em'u
+.RB [ AP_ACCES ]
+The user is not authorized to use the address specified for
+.BR AP_BIND_PADDR .
+.TP
+.RB [ AP_AGAIN ]
+XAP was unable to complete the requested action.  Try again.
+.TP
+.RB [ AP_AGAIN_DATA_PENDING ]
+XAP was unable to complete the requested action.  Try again.  There is an event
+available for the user to receive.
+.TP
+.RB [ AP_BADDATA ]
+User data not allowed on this service.
+.TP
+.RB [ AP_BADENV ]
+A mandatory environment attribute is not set.
+.TP
+.RB [ AP_BADF ]
+The
+.I fd
+parameter does not identify an XAP instance.
+.TP
+.RB [ AP_BADFLAGS ]
+The specified combination of flags is invalid.
+.TP
+.RB [ AP_BADLSTATE ]
+The specified primitive cannot be issued in current state.
+.TP
+.RB [ AP_BADPRIM ]
+The specified primitive is not valid (i.e., unknown type, or known type but
+corresponds to an unavaialble service).
+.TP
+.RB [ AP_BADUBUF ]
+The length given for user data does not match what was sent; or the
+.B AP_MORE
+bit was reset but no data was given for a primitive that is not associated with
+either an ACSE or Presentation PDU.
+.TP
+.RB [ AP_DATA_OVERFLOW ]
+User data and presentation service pci exceeds 512 bytes on session V1 or the
+length of the user data exceeds a locally defined limit, as state in the CSQ.
+.TP
+.RB [ AP_HANGUP ]
+The association has been aborted.  Use
+.BR ap_rcv ()
+to read the abort indication.
+.TP
+.RB [ AP_LOOK ]
+A pending event requires attention.
+.TP
+.RB [ AP_NOENV ]
+There is no XAP environment associated with
+.IR fd .
+.TP
+.RB [ AP_SUCCESS_DATA_PENDING ]
+The requested action was completed successfully.  There is an event available
+for the user to receive.
 .PP
+In addition, operating system, asn.1, acse, presentation, session and transport
+class errors are reported.
 .\"
 .\"
-.\".SH NOTICES
+.\".SH IMPLEMENTATION
 .\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+It is notworthy that the
+.BR ap_osi_vbuf_t " and " ap_osi_dbuf_t
+mirrors the
+.BR mblk_t "(9) and " dblk_t (9)
+of
+.IR STREAMS (4).
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
+.BR ap_open (3),
+.BR close (2),
+.BR APLI (3),
+.BR XAP (3).
 .\"
 .\"
 .SH BUGS
 .PP
+.BR ap_snd ()
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.BR ap_snd ()
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI or XAP, such as
+.IR "Solstice OSI 9.0" ,
+.IR "HP-UX OTS/9000" ,
+.IR "AIX OSI/6000" ,
+.IR "SVR 4.2 ONP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only source compatibility is attempted.  Binary compatibility will fail due to
+the lack of published and standard symbolic constants.
+.IP \(em
+.PP
+See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+APLI,
+.[
+apli unix international
+.]
+XAP.
+.[
+xap c303
+.]
 .\"
 .\"
 .SH HISTORY
 .PP
+.BR ap_snd ()
+first appeared in APLI.
+.[
+apli unix international
+.]
 .\"
 .\"
 .SH VERSIONS
 .PP
+This manual page was written for the OpenSS7 XAP Library.
 .\"
 .\"
 .[

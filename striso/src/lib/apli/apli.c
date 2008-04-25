@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:20:32 $
+ @(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 08:38:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:32 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 08:38:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: apli.c,v $
+ Revision 0.9.2.3  2008-04-25 08:38:32  brian
+ - working up libraries modules and drivers
+
  Revision 0.9.2.2  2007/12/15 20:20:32  brian
  - updates
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:20:32 $"
+#ident "@(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 08:38:32 $"
 
-static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/15 20:20:32 $";
+static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 08:38:32 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -68,51 +71,59 @@ static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.2 $
   * @defgroup libapli OpenSS7 APLI Library
   * @brief OpenSS7 APLI Library
   *
-  * This manual contains documentation of the OpenSS7 ACSE/Presentation Library Interface (APLI)
-  * Library functions that are generated automatically from the source code with doxygen(1).  This
-  * documentation is intended to be used for maintainers of the OpenSS7 APLI library and is not
-  * intended for users of the library.  Users should consult the documentation found in the user
+  * This manual contains documentation of the OpenSS7 ACSE/Presentation Library
+  * Interface (APLI) Library functions that are generated automatically from
+  * the source code with doxygen(1).  This documentation is intended to be used
+  * for maintainers of the OpenSS7 APLI library and is not intended for users
+  * of the library.  Users should consult the documentation found in the user
   * manual pages beginning with apli(3).
   *
   * <h2>Thread Safety</h2>
-  * The OpenSS7 APLI library is designed to be thread-safe.  This is accomplished in a number of
-  * ways.  Thread-safety depends on the use of glibc2 and the pthreads library.
+  * The OpenSS7 APLI library is designed to be thread-safe.  This is
+  * accomplished in a number of ways.  Thread-safety depends on the use of
+  * glibc2 and the pthreads library.
   *
-  * Glibc2 provides lightweight thread-specific data for errno and h_errno.  The OpenSS7 APLI
-  * library takes a similar approach but uses weak aliased pthread thread-specific functions
-  * instead.
+  * Glibc2 provides lightweight thread-specific data for errno and h_errno.
+  * The OpenSS7 APLI library takes a similar approach but uses weak aliased
+  * pthread thread-specific functions instead.
   *
-  * Glibc2 also provides some weak undefined aliases for POSIX thread function to perform its own
-  * thread-safety.  When the pthread library (libpthread) is linked with glibc2, these functions
-  * call libpthread functions instead of internal dummy routines.  The same approach is taken for
-  * the OpenSS7 APLI library.  The library uses weak defined and undefined aliases that
-  * automaticlaly invoke libpthread functions when libpthread is (dynamically) linked and uses dummy
-  * functions when it is not.  This maintains maximum efficiency when libpthread is not dynamically
-  * linked, but provides full thread safety when it is.
+  * Glibc2 also provides some weak undefined aliases for POSIX thread function
+  * to perform its own thread-safety.  When the pthread library (libpthread) is
+  * linked with glibc2, these functions call libpthread functions instead of
+  * internal dummy routines.  The same approach is taken for the OpenSS7 APLI
+  * library.  The library uses weak defined and undefined aliases that
+  * automaticlaly invoke libpthread functions when libpthread is (dynamically)
+  * linked and uses dummy functions when it is not.  This maintains maximum
+  * efficiency when libpthread is not dynamically linked, but provides full
+  * thread safety when it is.
   *
-  * Libpthread behaves in some strange ways with regards to thread cancellation.  Because libpthread
-  * uses Linux clone processes for threads, cancellation of a thread is accomplished by sending a
-  * signal to the thread process.  This does not directly result in cancellation, but will result in
-  * the failure of a system call with the EINTR error code.  It is necessary to test for
-  * cancellation upon error return from system calls to perform the actual cancellation of the
-  * thread.
+  * Libpthread behaves in some strange ways with regards to thread
+  * cancellation.  Because libpthread uses Linux clone processes for threads,
+  * cancellation of a thread is accomplished by sending a signal to the thread
+  * process.  This does not directly result in cancellation, but will result in
+  * the failure of a system call with the EINTR error code.  It is necessary to
+  * test for cancellation upon error return from system calls to perform the
+  * actual cancellation of the thread.
   *
-  * The APLI specification and XAP specification (OpenGroup XAP) lists no functions in this group as
-  * containing thread cancellation points.  Many of the apli function are, however, permitted to
-  * contain thread cancellation points.  All APLI functions are permitted to contain thread
-  * cancellation points and deferral is not required.
+  * The APLI specification and XAP specification (OpenGroup XAP) lists no
+  * functions in this group as containing thread cancellation points.  Many of
+  * the apli function are, however, permitted to contain thread cancellation
+  * points.  All APLI functions are permitted to contain thread cancellation
+  * points and deferral is not required.
   *
   * Locks and asyncrhonous thread cancellation presents challenges:
   *
-  * Functions that act as thread cancellation points must push routines onto the function stack
-  * executed at exit of the thread to release the locks helod by the function.  These are performed
-  * with weak definitions of POSIX thread library functions.
+  * Functions that act as thread cancellation points must push routines onto
+  * the function stack executed at exit of the thread to release the locks
+  * helod by the function.  These are performed with weak definitions of POSIX
+  * thread library functions.
   *
-  * Functions that do not act as thread cancellation points must defer thread cancellation before
-  * taking locks and then release locks before thread cancellation is restored.
+  * Functions that do not act as thread cancellation points must defer thread
+  * cancellation before taking locks and then release locks before thread
+  * cancellation is restored.
   *
-  * The above are the tehcniques used by glibc2 for the same purpose and is the same technique that
-  * is used by the OpenSS7 APLI library.
+  * The above are the tehcniques used by glibc2 for the same purpose and is the
+  * same technique that is used by the OpenSS7 APLI library.
   *
   * @{
   */
@@ -414,9 +425,9 @@ __apli__ap_errno(void)
   * @par Alias:
   * This symbol is a strong alias of __apli__ap_errno().
   *
-  * This function provides the location of the integer that contains the APLI library error number
-  * returned by the last APLI function that failed.  This is normally used to provide #ap_errno in a
-  * thread-safe way as follows:
+  * This function provides the location of the integer that contains the APLI
+  * library error number returned by the last APLI function that failed.  This
+  * is normally used to provide #ap_errno in a thread-safe way as follows:
   *
   * @code
   * #define ap_errno (*(_ap_errno()))
@@ -488,10 +499,12 @@ __apli_user_unlock(struct _ap_user *user)
 
 /** @internal
   * @brief Release a locked APLI user instance structure.
-  * @param arg a pointer to the integer file descriptor of the library user structure.
+  * @param arg a pointer to the integer file descriptor of the library user
+  *	structure.
   *
-  * This function release a locked library user structure.  The @arg argument is a void pointer so
-  * that this function can be used as a cancel deferral function.
+  * This function release a locked library user structure.  The @arg argument is
+  * a void pointer so that this function can be used as a cancel deferral
+  * function.
   */
 static void
 __apli_ap_putuser(void *arg)
@@ -508,9 +521,9 @@ __apli_ap_putuser(void *arg)
   * @brief Get a locked APLI user instance structure.
   * @param fd the file descriptor for which to get the associated endpoint.
   *
-  * This is a range-checked array lookup of the library user structure associated with the specified
-  * file descriptor.  In addition, this functino takes the necessary locks for thread-safe
-  * operation.
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  In addition, this functino
+  * takes the necessary locks for thread-safe operation.
   */
 static __hot struct _ap_user *void
 __apli_ap_getuser(int fd)
@@ -563,7 +576,8 @@ __apli_ap_open(const char *pathname, int oflags)
 	if (ioctl(fd, I_PUSH, "apmod") != 0)
 		goto badioctl;
 	/* need to pick up all the capabilities from the stream */
-	pthread_rwlock_init(&user->lock, NULL);	/* destroyed for existing structure */
+	pthread_rwlock_init(&user->lock, NULL);
+	/* destroyed for existing structure */
 	_ap_fds[fd] = user;
 	return (fd);
       badioctl:
@@ -592,12 +606,13 @@ __apli_ap_open(const char *pathname, int oflags)
   * @par Alias:
   * This symbol is an implementation of ap_open().
   *
-  * This is a little different than most of the _r wrappers: we take a write lock on the _ap_fds
-  * list so that we are able to add the new file descriptor to the list.  This will block most other
-  * threads from performing functions on the list, also, we must wait for a quiet period until all
-  * other functions that read lock the list are not being used.  If you are sure that the open will
-  * only be performed by one thread and that no other thread will act on the file descriptor until
-  * open returns, use the non-recursive version.
+  * This is a little different than most of the _r wrappers: we take a write
+  * lock on the _ap_fds list so that we are able to add the new file descriptor
+  * to the list.  This will block most other threads from performing functions
+  * on the list, also, we must wait for a quiet period until all other functions
+  * that read lock the list are not being used.  If you are sure that the open
+  * will only be performed by one thread and that no other thread will act on
+  * the file descriptor until open returns, use the non-recursive version.
   */
 int
 __apli_ap_open_r(const char *pathname, int oflags)
@@ -627,17 +642,18 @@ __asm__(".symver __apli_ap_open_r,ap_open@@APLI_1.0");
 
 /** @internal
   * @brief initialize the environment of an APLI instance.
-  * @param user APLI instance.
+  * @param user	    APLI instance.
   * @param env_file pathname of environment file.
-  * @param flags unsed.
+  * @param flags    unsed.
   * @verion APLI_1.0
   * @par Alias:
   * This symbol is an implementation of ap_close().
   *
   * This function performs the following actions:
   *
-  * 1. If there is no structure already allocated, an environment structure is callocated and filled
-  *    out with default values.  If one already exists, nothing is done in this step.
+  * 1. If there is no structure already allocated, an environment structure is
+  *    allocated and filled out with default values.  If one already exists,
+  *    nothing is done in this step.
   *
   * 2. Values from env_file are filled out against the environment structure.
   */
@@ -1725,12 +1741,13 @@ __asm__(".symver __apli_ap_poll,ap_poll@@APLI_1.0");
 /* *INDENT-OFF* */
 const char *__apli_ap_errlist[] = {
 /*
-TRANS AP_NOERROR - No error is indicated in the ap_errno variable.  The last operation was a
-TRANS success.  ap_errno will not be set to this value (zero) by the library, the user must set
-TRANS ap_errno to zero before the APLI library call and when the call is successful, the ap_errno
-TRANS value will be unaffected.  There is no requirement that this value be set after a successful
-TRANS call, and calls are event permitted to change ap_errno to some other value, when the call is
-TRANS actually successful.
+TRANS AP_NOERROR - No error is indicated in the ap_errno variable.  The last
+TRANS operation was a success.  ap_errno will not be set to this value (zero) by
+TRANS the library, the user must set ap_errno to zero before the APLI library
+TRANS call and when the call is successful, the ap_errno value will be
+TRANS unaffected.  There is no requirement that this value be set after a
+TRANS successful call, and calls are event permitted to change ap_errno to some
+TRANS other value, when the call is actually successful.
 */
 	gettext_noop("no error");
 /*
@@ -1746,144 +1763,168 @@ TRANS AP_BADATTRVAL -
 */
 	gettext_noop("bad value for environment attribute");
 /*
-TRANS AP_BADCD_ACT_ID - Roughly equivalent to UNIX system error EINVAL. The member, act_id, of the
-TRANS cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was not
-TRANS valid in the current state or context.
+TRANS AP_BADCD_ACT_ID - Roughly equivalent to UNIX system error EINVAL. The
+TRANS member, act_id, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: act_id");
 /*
-TRANS AP_BADCD_DIAG - Roughly equivalent to UNIX system error EINVAL. The member, diag, of the cdata
-TRANS (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was not valid
-TRANS in the current state or context.
+TRANS AP_BADCD_DIAG - Roughly equivalent to UNIX system error EINVAL. The
+TRANS member, diag, of the cdata (ap_cdata_t) structure passed to the ap_snd(3)
+TRANS function contained a value that was not valid in the current state or
+TRANS context.
 */
 	gettext_noop("cdata field value invalid: diag");
 /*
-TRANS AP_BADCD_EVT - Roughly equivalent to UNIX system error EINVAL.  The member, event, of the
-TRANS cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was not
-TRANS valid in the current state or context.
+TRANS AP_BADCD_EVT - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, event, of the cdata (ap_cdata_t) structure passed to the ap_snd(3)
+TRANS function contained a value that was not valid in the current state or
+TRANS context.
 */
 	gettext_noop("cdata field value invalid: event");
 /*
-TRANS AP_BADCD_OLD_ACT_ID - Roughly equivalent to UNIX system error EINVAL.  The member, old_act_id,
-TRANS of the cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that
-TRANS was not valid in the current state or context.
+TRANS AP_BADCD_OLD_ACT_ID - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, old_act_id, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: old_act_id");
 /*
-TRANS AP_BADCD_OLD_CONN_ID - Roughly equivalent to UNIX system error EINVAL.  The member,
-TRANS old_conn_id, of the cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a
-TRANS value that was not valid in the current state or context.
+TRANS AP_BADCD_OLD_CONN_ID - Roughly equivalent to UNIX system error EINVAL.
+TRANS The member, old_conn_id, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: old_conn_id");
 /*
-TRANS AP_BADCD_PABORT_IND - Roughly equivalent to UNIX system error EINVAL.  The member, pabort_ind,
-TRANS of the cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that
-TRANS was not valid in the current state or context.
+TRANS AP_BADCD_PABORT_IND - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, pabort_ind, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: pabort_ind");
 /*
-TRANS AP_BADCD_RES - Roughly equivalent to UNIX system error EINVAL.  The member, res, of the cdata
-TRANS (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was not valid
-TRANS in the current state or context.
+TRANS AP_BADCD_RES - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, res, of the cdata (ap_cdata_t) structure passed to the ap_snd(3)
+TRANS function contained a value that was not valid in the current state or
+TRANS context.
 */
 	gettext_noop("cdata field value invalid: res");
 /*
-TRANS AP_BADCD_RES_SRC - Roughly equivalent to UNIX system error EINVAL.  The member, res_src, of
-TRANS the cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was
-TRANS not valid in the current state or context.
+TRANS AP_BADCD_RES_SRC - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, res_src, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: res_src");
 /*
-TRANS AP_BADCD_RESYNC_TYPE - Roughly equivalent to UNIX system error EINVAL.  The member,
-TRANS resync_type, of the cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a
-TRANS value that was not valid in the current state or context.
+TRANS AP_BADCD_RESYNC_TYPE - Roughly equivalent to UNIX system error EINVAL.
+TRANS The member, resync_type, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: resync_type");
 /*
-TRANS AP_BADCD_RSN - Roughly equivalent to UNIX system error EINVAL.  The member, rsn, of the cdata
-TRANS (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was not valid
-TRANS in the current state or context.
+TRANS AP_BADCD_RSN - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, rsn, of the cdata (ap_cdata_t) structure passed to the ap_snd(3)
+TRANS function contained a value that was not valid in the current state or
+TRANS context.
 */
 	gettext_noop("cdata field value invalid: rsn");
 /*
-TRANS AP_BADCD_SRC - Roughly equivalent to UNIX system error EINVAL.  The member, src, of the cdata
-TRANS (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was not valid
-TRANS in the current state or context.
+TRANS AP_BADCD_SRC - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, src, of the cdata (ap_cdata_t) structure passed to the ap_snd(3)
+TRANS function contained a value that was not valid in the current state or
+TRANS context.
 */
 	gettext_noop("cdata field value invalid: src");
 /*
-TRANS AP_BADCD_SYNC_P_SN - Roughly equivalent to UNIX system error EINVAL.  The member, sync_p_sn,
-TRANS of the cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that
-TRANS was not valid in the current state or context.
+TRANS AP_BADCD_SYNC_P_SN - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, sync_p_sn, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: sync_p_sn");
 /*
-TRANS AP_BADCD_SYNC_TYPE - Roughly equivalent to UNIX system error EINVAL.  The member, sync_type,
-TRANS of the cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that
-TRANS was not valid in the current state or context.
+TRANS AP_BADCD_SYNC_TYPE - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, sync_type, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: sync_type");
 /*
-TRANS AP_BADCD_TOKENS - Roughly equivalent to UNIX system error EINVAL.  The member, tokens, of the
-TRANS cdata (ap_cdata_t) structure passed to the ap_snd(3) function contained a value that was not
-TRANS valid in the current state or context.
+TRANS AP_BADCD_TOKENS - Roughly equivalent to UNIX system error EINVAL.  The
+TRANS member, tokens, of the cdata (ap_cdata_t) structure passed to the
+TRANS ap_snd(3) function contained a value that was not valid in the current
+TRANS state or context.
 */
 	gettext_noop("cdata field value invalid: tokens");
 /*
-TRANS AP_BADENC - When the user passes data to the ap_snd(3) function, it must be encoded in the
-TRANS appropriate encoding for the abstract/transfer syntax negotiated for the presentation layer.
-TRANS The ap_snd(3) function has determined that the choice of encoding for the envelope of the user
-TRANS data was incorrect.
+TRANS AP_BADENC - When the user passes data to the ap_snd(3) function, it must
+TRANS be encoded in the appropriate encoding for the abstract/transfer syntax
+TRANS negotiated for the presentation layer.  The ap_snd(3) function has
+TRANS determined that the choice of encoding for the envelope of the user data
+TRANS was incorrect.
 */
 	gettext_noop("bad encoding chosen in enveloping function");
 /*
-TRANS AP_BADENV - A mandatory ALPI environment attribute, settable with the ap_set_env(3) and
-TRANS gettable with the ap_get_env(3) functions, was not set at the time of the call to ap_snd(3),
-TRANS but the service primitive invoked by the function requires that the attribute be set by the
-TRANS caller to a specific value.  Therefore, the call to ap_snd(3) has failed because a mandatory
-TRANS attribute is not set.
+TRANS AP_BADENV - A mandatory ALPI environment attribute, settable with the
+TRANS ap_set_env(3) and gettable with the ap_get_env(3) functions, was not set
+TRANS at the time of the call to ap_snd(3), but the service primitive invoked by
+TRANS the function requires that the attribute be set by the caller to a
+TRANS specific value.  Therefore, the call to ap_snd(3) has failed because a
+TRANS mandatory attribute is not set.
 */
 	gettext_noop("a mandatory attribute is not set");
 /*
-TRANS AP_BADF - Most APLI library functions have a file descriptor, fd, passed as the first argument
-TRANS of the function.  This file descriptor is both a handle to the APLI instance that the user
-TRANS wishes to control as well as being a character special file, pipe or named FIFO, representing
-TRANS a presentation service provider.  The APLI library tracks which of the process' file
-TRANS descriptors are associated with presentation service providers, and thus represent APLI
-TRANS instances.  Those that do not, such as standard input, standard output or standard error,
-TRANS cannot have their file descriptors passed to APLI library functions without generating this
-TRANS error.  This error indicates that the passed in file descriptor, fd, did not correspond to a
-TRANS presentation service endpoint, and so does not correspond to an APLI instances and therefore
-TRANS cannot be acted upon by the APLI library function.
+TRANS AP_BADF - Most APLI library functions have a file descriptor, fd, passed
+TRANS as the first argument of the function.  This file descriptor is both a
+TRANS handle to the APLI instance that the user wishes to control as well as
+TRANS being a character special file, pipe or named FIFO, representing a
+TRANS presentation service provider.  The APLI library tracks which of the
+TRANS process' file descriptors are associated with presentation service
+TRANS providers, and thus represent APLI instances.  Those that do not, such as
+TRANS standard input, standard output or standard error, cannot have their file
+TRANS descriptors passed to APLI library functions without generating this
+TRANS error.  This error indicates that the passed in file descriptor, fd, did
+TRANS not correspond to a presentation service endpoint, and so does not
+TRANS correspond to an APLI instances and therefore cannot be acted upon by the
+TRANS APLI library function.
 */
 	gettext_noop("not a presentation service endpoint");
 /*
-TRANS AP_BADFLAGS -  For some combinations of flags passed to APLI library functions as arguments,
-TRANS the combinations do not follow a strict choice of unrestricted logical OR combination.  Some
-TRANS flag combinations are not permitted or are invalid or are unspecified or unsupported.  This
-TRANS error indicates that a combination of flags passed by the user was invalid per the
-TRANS specification of the flags.
+TRANS AP_BADFLAGS -  For some combinations of flags passed to APLI library
+TRANS functions as arguments, the combinations do not follow a strict choice of
+TRANS unrestricted logical OR combination.  Some flag combinations are not
+TRANS permitted or are invalid or are unspecified or unsupported.  This error
+TRANS indicates that a combination of flags passed by the user was invalid per
+TRANS the specification of the flags.
 */
 	gettext_noop("combination of flags is invalid");
 /*
-TRANS AP_BADFREE - When the ap_free(3) function is called, it attempts to free, using the free(3) C
-TRANS library call, all of the allocated structures internal to the passed in structure pointer.
-TRANS The only internal structures the may be freed with ap_free(3) are the structures that were
-TRANS allocated by the APLI library and passed to the user in response to a command.  As such, when
-TRANS these same internal structures are passed to the ap_free(3) function, the APLI library may be
-TRANS able to verify whether the structures were indeed allocated by the library.  If this can be
-TRANS detected and it is determined that an internal structure was not allocated by the APLI
-TRANS library, the ap_free(3) function will not free the structure with the free(3) C library call,
-TRANS and will, instead, return this error indicating that it could not free structure members.
+TRANS AP_BADFREE - When the ap_free(3) function is called, it attempts to free,
+TRANS using the free(3) C library call, all of the allocated structures internal
+TRANS to the passed in structure pointer.  The only internal structures the may
+TRANS be freed with ap_free(3) are the structures that were allocated by the
+TRANS APLI library and passed to the user in response to a command.  As such,
+TRANS when these same internal structures are passed to the ap_free(3) function,
+TRANS the APLI library may be able to verify whether the structures were indeed
+TRANS allocated by the library.  If this can be detected and it is determined
+TRANS that an internal structure was not allocated by the APLI library, the
+TRANS ap_free(3) function will not free the structure with the free(3) C library
+TRANS call, and will, instead, return this error indicating that it could not
+TRANS free structure members.
 */
 	gettext_noop("could not free structure members");
 /*
-TRANS AP_BADKIND - The ap_free(3) function is called with a 'kind' argument that indicates to which
-TRANS type of structure the call applies.  The value of this argument may correspond to a struct
-TRANS type (in all capitals) symbolic constant, or a service primitive type symbolic constant, or an
-TRANS environment attribute symbolic constant.  When the 'kind' argument value passed does not
-TRANS correspond to any of these symbolic constants, then the structure type is unknown and this
-TRANS error generated.
+TRANS AP_BADKIND - The ap_free(3) function is called with a 'kind' argument that
+TRANS indicates to which type of structure the call applies.  The value of this
+TRANS argument may correspond to a struct type (in all capitals) symbolic
+TRANS constant, or a service primitive type symbolic constant, or an environment
+TRANS attribute symbolic constant.  When the 'kind' argument value passed does
+TRANS not correspond to any of these symbolic constants, then the structure type
+TRANS is unknown and this error generated.
 */
 	gettext_noop("unknown structure type");
 /*
@@ -1895,46 +1936,52 @@ TRANS AP_BADPARSE -
 */
 	gettext_noop("attribute parse failed");
 /*
-TRANS AP_BADPRIM - When calling the ap_snd(3) function, an 'sptype' argument is passed which
-TRANS specifies the 'Service Primitive TYPE' for the call.  The service primitive type identifies
-TRANS the protocol service primitive to be passed to the presentation service provider.  When this
-TRANS error is generated, it means that the user has passed a service primitive type, sptype, does
-TRANS not correspond to a symbolic constant know to the APLI library.
+TRANS AP_BADPRIM - When calling the ap_snd(3) function, an 'sptype' argument is
+TRANS passed which specifies the 'Service Primitive TYPE' for the call.  The
+TRANS service primitive type identifies the protocol service primitive to be
+TRANS passed to the presentation service provider.  When this error is
+TRANS generated, it means that the user has passed a service primitive type,
+TRANS sptype, does not correspond to a symbolic constant know to the APLI
+TRANS library.
 */
 	gettext_noop("unrecognized primitive from user");
 /*
-TRANS AP_BADRESTR - The ap_restore(3) function can be used to set APLI environment attributes
-TRANS associated with an APLI instance.  When data is sent in multiple segments, the AP_MORE bit is
-TRANS used in the flags argument to ap_snd(3) for all calls except the last.  Attributes are not
-TRANS permitted to change after calls to ap_snd(3) in which the AP_MORE bit has been set, until a
-TRANS call to ap_snd(3) has been made with the AP_MORE bit clear.  This error indicates that
-TRANS ap_restore(3) was called while the AP_MORE bit was set (i.e. a call has been made to ap_snd(3)
-TRANS with the AP_MORE bit set in the flags argument and no subsequent call to ap_snd(3) without the
-TRANS AP_MORE bit set has been sent).
+TRANS AP_BADRESTR - The ap_restore(3) function can be used to set APLI
+TRANS environment attributes associated with an APLI instance.  When data is
+TRANS sent in multiple segments, the AP_MORE bit is used in the flags argument
+TRANS to ap_snd(3) for all calls except the last.  Attributes are not permitted
+TRANS to change after calls to ap_snd(3) in which the AP_MORE bit has been set,
+TRANS until a call to ap_snd(3) has been made with the AP_MORE bit clear.  This
+TRANS error indicates that ap_restore(3) was called while the AP_MORE bit was
+TRANS set (i.e. a call has been made to ap_snd(3) with the AP_MORE bit set in
+TRANS the flags argument and no subsequent call to ap_snd(3) without the AP_MORE
+TRANS bit set has been sent).
 */
 	gettext_noop("not restored due to more bit on (AP_MORE set)");
 /*
-TRANS AP_BADROLE - The APLI library user has attempted to call a function, typically ap_snd(3) for
-TRANS an environment attribute or service primitive type which is not applicable to the roles
-TRANS (intiiator or responder) for which the APLI instance is allowed (as per environment attribute
-TRANS ROLE_ALLOWED).
+TRANS AP_BADROLE - The APLI library user has attempted to call a function,
+TRANS typically ap_snd(3) for an environment attribute or service primitive type
+TRANS which is not applicable to the roles (intiiator or responder) for which
+TRANS the APLI instance is allowed (as per environment attribute ROLE_ALLOWED).
 */
 	gettext_noop("request invalid due to value of AP_ROLE");
 /*
-TRANS AP_BADSAVE - The ap_save(3) function can be used to store APLI environment attribtues
-TRANS associated with an APLI instance in a file.  When data is sent in multiple segments, the
-TRANS AP_MORE bit is used in the flags argument to ap_snd(3) for all calls except the last.
-TRANS Attributes are not permitted to change after calls to ap_snd(3) in which the AP_MORE bit has
-TRANS been set, untila call to ap_snd(3) has been made with the AP_MORE bit clear.  The AP_MORE bit
-TRANS is set in the environment during this period.  Because an attribute value including the
-TRANS AP_MORE bit should not be saved, the ap_save(3) function will fail while the AP_MORE bit is
-TRANS set, with this error code.
+TRANS AP_BADSAVE - The ap_save(3) function can be used to store APLI environment
+TRANS attribtues associated with an APLI instance in a file.  When data is sent
+TRANS in multiple segments, the AP_MORE bit is used in the flags argument to
+TRANS ap_snd(3) for all calls except the last.  Attributes are not permitted to
+TRANS change after calls to ap_snd(3) in which the AP_MORE bit has been set,
+TRANS untila call to ap_snd(3) has been made with the AP_MORE bit clear.  The
+TRANS AP_MORE bit is set in the environment during this period.  Because an
+TRANS attribute value including the AP_MORE bit should not be saved, the
+TRANS ap_save(3) function will fail while the AP_MORE bit is set, with this
+TRANS error code.
 */
 	gettext_noop("not save due to more bit on (AP_MORE set)");
 /*
-TRANS AP_BADSAVEF - The FILE pointer argument, savef, passed to ap_save(3) and ap_restore(3) is not
-TRANS a valid file pointer.  It may be NULL or does not represent a valid file stream open for
-TRANS writing.
+TRANS AP_BADSAVEF - The FILE pointer argument, savef, passed to ap_save(3) and
+TRANS ap_restore(3) is not a valid file pointer.  It may be NULL or does not
+TRANS represent a valid file stream open for writing.
 */
 	gettext_noop("invalid FILE pointer");
 /*
@@ -2081,4 +2128,4 @@ __apli_ap_close_r(int fd)
   */
 __asm__(".symver __apli_ap_close,ap_close@@APLI_1.0");
 
-// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS fo+=tcqlornb

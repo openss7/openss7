@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xap.h,v 0.9.2.4 2007/12/15 20:20:30 brian Exp $
+ @(#) $Id: xap.h,v 0.9.2.5 2008-04-25 08:38:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:30 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 08:38:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xap.h,v $
+ Revision 0.9.2.5  2008-04-25 08:38:30  brian
+ - working up libraries modules and drivers
+
  Revision 0.9.2.4  2007/12/15 20:20:30  brian
  - updates
 
@@ -67,7 +70,7 @@
 #ifndef __XAP_H__
 #define __XAP_H__
 
-#ident "@(#) $RCSfile: xap.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xap.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -122,16 +125,19 @@ typedef union {
 /** @type ap_objid_t
   * @brief Used to convey OBJECT IDENTIFIER values.
   *
-  * The ap_objid_t structure is used to convey OBJECT IDENTIFIER values.  OBJECT IDENTIFIER values
-  * are stored as the contents octets of their encoded form (without the tag or length octets), in a
-  * similar fashion to XOM.  If the number of contents octets is greater than MXOBJBUF, the contents
-  * octets are stored beginning at the memory location pointed to by long_buf.  Otherwise, the
-  * contents octets are stored in the short_buf array.  In both cases, length gives the number of
-  * contents octets in the OBJECT IDENTIFIER encoding.  The absense of an OBJECT IDENTIFIER
-  * parameter is indicated by setting the length field to 0.
+  * The ap_objid_t structure is used to convey OBJECT IDENTIFIER values.
+  * OBJECT IDENTIFIER values are stored as the contents octets of their encoded
+  * form (without the tag or length octets), in a similar fashion to XOM.  If
+  * the number of contents octets is greater than MXOBJBUF, the contents octets
+  * are stored beginning at the memory location pointed to by long_buf.
+  * Otherwise, the contents octets are stored in the short_buf array.  In both
+  * cases, length gives the number of contents octets in the OBJECT IDENTIFIER
+  * encoding.  The absense of an OBJECT IDENTIFIER parameter is indicated by
+  * setting the length field to 0.
   *
-  * Routines to create and operat on objects of this type may be provided as part of an
-  * Encode/Decode Library, but such routines are not part of the XAP specification.
+  * Routines to create and operate on objects of this type may be provided as
+  * part of an Encode/Decode Library, but such routines are not part of the XAP
+  * specification.
   */
 typedef struct {
 	long length;
@@ -228,9 +234,10 @@ typedef struct {
 /** @type ap_octet_string_t
   * @brief Octet-String
   *
-  * The length member of this structure indicates the number of octets in the octet string pointed
-  * to by the data member.  To specify a null octet string value, the length field of the
-  * ap_octet_string_t structure is set to zero (0).
+  * The length member of this structure indicates the number of octets in the
+  * octet string pointed to by the data member.  To specify a null octet string
+  * value, the length field of the ap_octet_string_t structure is set to zero
+  * (0).
   */
 typedef struct {
 	long length;			/**< Number of octets. */

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_ABORT_IND.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: A_ABORT_IND.7.man,v 0.9.2.3 2008-04-25 08:38:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_ABORT_IND.7.man,v $
+.\" Revision 0.9.2.3  2008-04-25 08:38:28  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -226,6 +229,15 @@ The location pointed to by the
 argument is set to an error code if failure has occurred.
 .\"
 .\"
+.SH ENVIRONMENT
+.PP
+The following attributes may change as a result of receiving the
+.B A_ASSOC_IND
+primitive based on information contained in the received APDU associated with
+the indication:
+.BR AP_STATE .
+.\"
+.\"
 .SH MODES
 .PP
 This primitive is valid both in
@@ -243,16 +255,15 @@ x410 1984
 This primitive is issued by the XAP interface service.
 .\"
 .\"
-.SH ATTRIBUTES
-.PP
-The following attributes may change as a result of receiving the A_ASSOC_IND
-primitive based on information contained in the received APDU associated with
-the indication:
-.BR AP_STATE .
-.\"
-.\"
 .SH STATE
 .PP
+The
+.B A_ABORT_IND
+primitive is only issued by the AP provider in states other than
+.BR AP_UNBOUND " and " AP_IDLE .
+.PP
+The new state of the XAP instance is
+.BR AP_IDLE .
 .\"
 .\"
 .SH RETURN

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ap_env.3.man,v 0.9.2.2 2007/12/15 20:20:26 brian Exp $
+.\" @(#) $Id: ap_env.3.man,v 0.9.2.3 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/12/15 20:20:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ap_env.3.man,v $
+.\" Revision 0.9.2.3  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.2  2007/12/15 20:20:26  brian
 .\" - updates
 .\"
@@ -124,6 +127,58 @@ xap c303
 .PP
 .SH STRUCTURES
 .PP
+.SS ap_objid_t
+.PP
+The \fBap_objid_t\fP structure is used to convey OBJECT IDENTIFIER values.
+OBJECT IDENTIFIER values are stored as the contents octets of their encoded
+form (without the tag or length octets), in a similar fashion to XOM.
+.[
+xom c607
+.]
+If the number of contents octets is greater than \fBAP_MAXOBJBUF\fP, the
+contents octets are stored beginning at the memory location pointed to by
+\fIlong_buf\fP.  Otherwise, the contents octets are stored in the
+\fIshort_buf\fP array.  In both cases, \fIlength\fP gives the number of
+contents octets in the OBJECT IDENTIFIER encoding.  The absense of an OBJECT
+IDENTIFIER parameter is indicated by setting the \fIlength\fP field to zero
+(\fB0\fP).
+.PP
+Routines to create and operate on objects of this type may be provided as
+part of an Encode/Decode Library, but such routines are not part of the XAP
+specification.
+.[
+xap c303
+.]
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    long length;
+    union {
+        unsigned char short_buf[AP_MAXOBJBUF];
+        unsigned char *long_buf;
+    } b;
+} ap_objid_t;
+\s+1\fP
+.fi
+.SS ap_octet_string_t
+.PP
+The \fBap_octet_string_t\fP structure is used to convey OCTET STRING values.
+OCTET STRING values are stored as the contents octets of their encoded form
+(without the tag or length octets), in a similar fashion to XOM.
+The \fIlength\fP member of this structure indicates the number of octets in the
+OCTET STRING pointed to by the \fIdata\fP member.  To specify a null octet
+string value, the length field of the \fBap_octet_string_t\fP structure is set
+to zero (\fB0\fP).
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    long length;            /* Number of octets. */
+    unsigned char *data;    /* Octets. */
+} ap_octet_string_t;
+\s+1\fP
+.fi
 .SS ap_apt_t
 .PP
 The \fBap_apt_t\fP structure is used to represent AP-title parameters.  AP-titles can be coded in
@@ -133,10 +188,10 @@ one of three forms:
 3) PrintableString.
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_apt_t;
 \s+1\fP
 .fi
@@ -149,10 +204,10 @@ coded in one of three forms:
 3) PrintableString.
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_aeq_t;
 \s+1\fP
 .fi
@@ -162,23 +217,115 @@ The \fBap_aei_api_id_t\fP structure is used to represent AP-invocation-identifie
 AE-invocation-identifiers.  These identifiers are INTEGER.
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_aei_api_id_t;
 \s+1\fP
 .fi
+.SS ap_diag_t
+.PP
+The \fBap_diag_t\fP structure is used to specify diagnostic characteristics.  It is defined as:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    long rsn;          /* reason for the abort */
+    long evt;          /* event that caused abort */
+    long src;          /* source of abort */
+    char *error;       /* textual message */
+} ap_diag_t;
+\s+1\fP
+.fi
+.TP
+.I src
+Can have one of the following values:
+.RS
+.TP \w'\fBAP_UNEXPT_APDU_PARM\fP\(em'u
+.B AP_ACSE_SERV_PROV
+ACSE service provider.
+.PD 0
+.TP
+.B AP_PRES_SERV_PROV
+Presentation service provider.
+.TP
+.B AP_SESS_SERV_PROV
+Session service provider.
+.TP
+.B AP_TRAN_SERV_PROV
+Transport service provider.
+.PD
+.RE
+.TP
+.I rsn
+When \fIsrc\fP has the value \fBAP_ACSE_SERV_PROV\fP, \fIrsn\fP can have onf of
+the following values:
+.RS
+.TP \w'\fBAP_UNEXPT_APDU_PARM\fP\(em'u
+.B AP_NSPEC
+Not specified.
+.PD 0
+.TP
+.B AP_UNREC_APDU
+Unrecognized APDU.
+.TP
+.B AP_UNEXPT_APDU
+Unexpected APDU.
+.TP
+.B AP_UNREC_APDU_PARM
+Unrecognized APDU parameter.
+.TP
+.B AP_UNEXPT_APDU_PARM
+Unexpected APDU parameter.
+.TP
+.B AP_INVAL_APDU_PARM
+Invalid APDU parameter.
+.PD
+.PP
+When \fIsrc\fP has the value \fBAP_TRAN_SERV_PROV\fP, \fIrsn\fP can have onf o
+the following values:
+.TP \w'\fBAP_UNEXPT_APDU_PARM\fP\(em'u
+.B AP_TRAN_DISCONNECT
+Transport provider disconnect.
+.PD 0
+.PD
+.RE
+.TP
+.I evt
+When \fIsrc\fP has the value \fBAP_ACSE_SERV_PROV\fP, \fIevt\fP can have on of
+the following values:
+.RS
+.TP \w'\fBAP_UNEXPT_APDU_PARM\fP\(em'u
+.B AP_AEI_AARQ
+APDU was AARQ.
+.PD 0
+.TP
+.B AP_AEI_AARE
+APDU was AARE.
+.TP
+.B AP_AEI_RLRQ
+APDU was RLRQ.
+.TP
+.B AP_AEI_RLRE
+APDU was RLRE.
+.TP
+.B AP_AEI_ABRT
+APDU was ABRT.
+.PD
+.RE
+.TP
+.I error
 .SS ap_ro_pci_list_t
 .PP
 The \fBap_ro_pci_list_t\fP structure is used to specify a list of abstract syntaxes that the ROPM is
 to examine to identify incoming ROSE PDUs.  It is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size_pcil;
-	int *pci_list;
+    int size_pcil;
+    int *pci_list;
 } ap_ro_pci_list_t;
 \s+1\fP
 .fi
@@ -189,10 +336,10 @@ ATOMIC-ACTION-IDENTIFIER
 and is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_aaid_t;
 \s+1\fP
 .fi
@@ -207,10 +354,10 @@ BRANCH-IDENTIFIER
 and is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_brid_t;
 \s+1\fP
 .fi
@@ -225,10 +372,10 @@ control identifier values,
 and is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_cid_t;
 \s+1\fP
 .fi
@@ -243,10 +390,10 @@ Dialog Tree Node Identifiers
 and is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_dtnid_t;
 \s+1\fP
 .fi
@@ -261,10 +408,10 @@ bound,
 and is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_urch_t;
 \s+1\fP
 .fi
@@ -278,14 +425,14 @@ the user-assigned recovery context handle;
 allowable set of TPSUTs for a responder.  It is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	ap_apt_t apt;
-	ap_aei_api_id_t apid;
-	ap_aeq_t aeq;
-	ap_aei_api_id_t aeid;
-	long n_tpsuts;
-	ap_tpsut_t *tpsuts;
+    ap_apt_t apt;
+    ap_aei_api_id_t apid;
+    ap_aeq_t aeq;
+    ap_aei_api_id_t aeid;
+    long n_tpsuts;
+    ap_tpsut_t *tpsuts;
 } ap_tpaddr_t;
 \s+1\fP
 .fi
@@ -305,10 +452,10 @@ TPSU-title
 and is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_tpsut_t;
 \s+1\fP
 .fi
@@ -330,10 +477,10 @@ locally-defined Transaction Tree Node Identifiers
 and is defined as:
 .PP
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
-	int size;
-	unsigned char *udata;
+    int size;
+    unsigned char *udata;
 } ap_ttnid_t;
 \s+1\fP
 .fi

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: A_ASSOC_IND.7.man,v 0.9.2.2 2008-04-16 17:34:24 brian Exp $
+.\" @(#) $Id: A_ASSOC_IND.7.man,v 0.9.2.3 2008-04-25 08:38:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: A_ASSOC_IND.7.man,v $
+.\" Revision 0.9.2.3  2008-04-25 08:38:28  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.2  2008-04-16 17:34:24  brian
 .\" - working up manual pages
 .\"
@@ -303,20 +306,45 @@ The location pointed to by the
 argument is set to an error code if failure has occurred.
 .\"
 .\"
-.SH ATTRIBUTES
+.SH ENVIRONMENT
 .PP
-The following attributes must be set before receiving the A_ASSOC_IND primitive:
+The following attributes must be set before receiving the
+.B A_ASSOC_IND
+primitive:
 .BR AP_BIND_PADDR ,
 .BR AP_LIB_SEL .
 .PP
-The following attributes may change as a result of receiving the A_ASSOC_IND
+The following attributes may change as a result of receiving the
+.B A_ASSOC_IND
 primitive based on information contained in the received APDU associated with
 the indication:
-AP_ACSE_SEL, AP_CLD_AEID, AP_CLD_AEQ, AP_CLD_APID, AP_CLD_APT, AP_CLG_AEID,
-AP_CLG_AEQ, AP_CLG_APID, AP_CLG_APT, AP_CNTX_NAME, AP_DCS, AP_DPCN,
-AP_INIT_SYNC_PT, AP_INIT_TOKENS, AP_LCL_PADDR, AP_MODE_SEL, AP_PCDL,
-AP_PFU_SEL, AP_PRES_SEL, AP_QOS, AP_REM_PADDR, AP_ROLE_CURRENT, AP_SESS_SEL,
-AP_SFU_SEL, AP_STATE, AP_TOKENS_AVAIL, AP_TOKENS_OWNED.
+.BR AP_ACSE_SEL ,
+.BR AP_CLD_AEID ,
+.BR AP_CLD_AEQ ,
+.BR AP_CLD_APID ,
+.BR AP_CLD_APT ,
+.BR AP_CLG_AEID ,
+.BR AP_CLG_AEQ ,
+.BR AP_CLG_APID ,
+.BR AP_CLG_APT ,
+.BR AP_CNTX_NAME ,
+.BR AP_DCS ,
+.BR AP_DPCN ,
+.BR AP_INIT_SYNC_PT ,
+.BR AP_INIT_TOKENS ,
+.BR AP_LCL_PADDR ,
+.BR AP_MODE_SEL ,
+.BR AP_PCDL ,
+.BR AP_PFU_SEL ,
+.BR AP_PRES_SEL ,
+.BR AP_QOS ,
+.BR AP_REM_PADDR ,
+.BR AP_ROLE_CURRENT ,
+.BR AP_SESS_SEL ,
+.BR AP_SFU_SEL ,
+.BR AP_STATE ,
+.BR AP_TOKENS_AVAIL ,
+.BR AP_TOKENS_OWNED .
 .\"
 .\"
 .SH MODES

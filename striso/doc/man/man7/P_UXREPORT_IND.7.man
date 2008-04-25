@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: P_UXREPORT_IND.7.man,v 0.9.2.3 2008-04-17 07:20:36 brian Exp $
+.\" @(#) $Id: P_UXREPORT_IND.7.man,v 0.9.2.4 2008-04-25 08:38:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-17 07:20:36 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: P_UXREPORT_IND.7.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:30  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2008-04-17 07:20:36  brian
 .\" - working up manual pages
 .\"
@@ -199,6 +202,15 @@ The location pointed to by the
 argument is set to an error code if failure has occurred.
 .\"
 .\"
+.SH ENVIRONMENT
+.PP
+The following attributes may change as a result of receiving the
+.B P_UXREPORT_IND
+primitive based on information contained in the PPDU associated with the
+indication:
+.BR AP_STATE .
+.\"
+.\"
 .SH MODES
 .PP
 This primitive is valid both in
@@ -216,8 +228,37 @@ x410 1984
 This primitive is issued by the XAP interface service.
 .\"
 .\"
-.\".SH STATE
-.\".PP
+.SH STATE
+.PP
+The
+.B P_UXREPORT_IND
+primitive is only issued by the AP provider in the
+.BR AP_WRELcnf_RELreq ,
+.BR AP_WSYNCMAcnf_SYNCMAreq ,
+.BR AP_WACTEcnf_ACTEreq ,
+.BR AP_WRECOVERYind " and
+.BR AP_DATA_XFER " states.
+.PP
+The next state of the XAP instance depends on the previous state as follows:
+.TP
+.B AP_WRELcnf_RELreq
+The next state of the XAP instance is
+.BR AP_WRECOVERYind .
+.TP
+.B AP_WSYNCMAcnf_SYNCMAreq
+The next state of the XAP instance is
+.BR AP_WRECOVERYreq " or " AP_DATA_XFER .
+.TP
+.B AP_WACTEcnf_ACTEreq
+The next state of the XAP instance is
+.BR AP_WRECOVERYreq " or " AP_DATA_XFER .
+.TP
+.B AP_WRECOVERYind
+The next state of the XAP instance is unchanged.
+.TP
+.B AP_DATA_XFER
+The next state of the XAP instance is
+.BR AP_WRECOVERYreq " or " AP_DATA_XFER .
 .\"
 .\"
 .SH RETURN

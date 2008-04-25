@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xmp_cmis.h,v 0.9.2.2 2007/11/10 19:40:52 brian Exp $
+ @(#) $Id: xmp_cmis.h,v 0.9.2.3 2008-04-25 08:38:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/11/10 19:40:52 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 08:38:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xmp_cmis.h,v $
+ Revision 0.9.2.3  2008-04-25 08:38:30  brian
+ - working up libraries modules and drivers
+
  Revision 0.9.2.2  2007/11/10 19:40:52  brian
  - documentation updates
 
@@ -61,7 +64,7 @@
 #ifndef __XMP_CMIS_H__
 #define __XMP_CMIS_H__
 
-#ident "@(#) $RCSfile: xmp_cmis.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xmp_cmis.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  * The <xmp_cmis.h> header declares the interface functions, the structures passed to and from those
@@ -77,6 +80,8 @@
  * represent the Object Identifier of the CMIS Management Service package:
  */
 #define OMP_O_MP_CMIS_PKG "\x2a\x86\x3a\x00\x88\x1a\x06\x02"
+// {iso(1) member-national-body(2) bsi(826) disc(0) xopen(1050) xmp-cae(6) cmis(2)}
+
 
 /* Defined constants */
 /* Intermediate object identifier macro */

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: XAP.3.man,v 0.9.2.3 2008-04-16 17:34:22 brian Exp $
+.\" @(#) $Id: XAP.3.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 17:34:22 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: XAP.3.man,v $
+.\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.3  2008-04-16 17:34:22  brian
 .\" - working up manual pages
 .\"
@@ -83,18 +86,97 @@ sort-adjacent-labels
 .so striso.macros
 .\"
 .\"
-.TH XAP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.TH LIBXAP 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
-.B XAP
+.B libxap, xap, XAP
 \- ACSE/Presentation Services API (XAP)
+.\"
+.\"
 .SH SYNOPSIS
 .PP
+.B #include <xap.h>
+.ad l
+.hy 0
+.HP
+.BI "int ap_bind(int " fd ", unsigned long *" aperrno_p );
+.HP
+.BI "int ap_close(int " fd  ", unsigned long *" apperno_p );
+.HP
+.BI "const char *ap_error(unsigned long " aperrno );
+.HP
+.BI "int ap_free(int " fd ", unsigned long " kind ", void *" val ", unsigned long *" apperno_p );
+.HP
+.BI "int ap_get_env(int " fd ", unsigned long " attr ", void *" val ", unsigned long *" aperrno_p );
+.HP
+.BI "int ap_init_env(int " fd ", const char *" env_file ", int " flags ", unsigned long *" apperno_p );
+.HP
+.BI "int ap_ioctl(int " fd ", int " request ", ap_val_t " argument ", unsigned long *" apperno_p );
+.HP
+.BI "int ap_look(int " fd ", unsigned long *" sptype ", ap_cdata_t *" cdata ", ap_osi_vbuf_t **" ubuf ", int *" flags ", unsigned long *" apperno_p );
+.HP
+.BI "int ap_open(const char *" provider ", int " oflags ", ap_ualloc_t " ap_user_alloc ", ap_udealloc_t " ap_user_dealloc ", unsigned long *" aperrno_p );
+.HP
+.BI "int ap_poll(ap_pollfd_t " fds "[], int " nfds ", int " timeout ", unsigned long *" apperno_p );
+.HP
+.BI "int ap_rcv(int " fd ", unsigned long *" sptype ", ap_cdata_t *" cdata ", ap_osi_vbuf_t **" ubuf ", int *" flags ", unsigned long *" aperrno_p );
+.HP
+.BI "int ap_restore(int " fd ", FILE *" savef ", int " oflags ", ap_ualloc_t " ap_user_alloc ", ap_udealloc_t " ap_user_dealloc ", unsigned long *" aperrno_p );
+.HP
+.BI "int ap_save(int " fd ", FILE *" savef ", unsigned long *" apperno_p );
+.HP
+.BI "int ap_set_env(int " fd ", unsigned long " attr ", ap_val_t " val ", unsigned long *" apperno_p );
+.HP
+.BI "int ap_snd(int " fd ", unsigned long " sptype ", ap_cdata_t *" cdata ", ap_osi_vbuf_t *" ubuf ", int " flags ", unsigned long *" aperrno_p );
+.ad b
+.hy 6
+.\"
+.\"
+.SH FUNCTIONS
+.HP
+.BR ap_bind "(3)\ \-\ bind a presentation address to an XAP instance
+.PD 0
+.HP
+.BR ap_close "(3)\ \-\ close an XAP instance
+.HP
+.BR ap_error "(3)\ \-\ return an XAP error message
+.HP
+.BR ap_free "(3)\ \-\ free user memory associated with XAP data structures
+.HP
+.BR ap_get_env "(3)\ \-\ get the value of an XAP environment variable
+.HP
+.BR ap_init_env "(3)\ \-\ establish an instance of XAP and initialize XAP enviroment
+.HP
+.BR ap_ioctl "(3)\ \-\ control the generation of software interrupts
+.HP
+.BR ap_look "(3)\ \-\ examine next XAP primitive from the association
+.HP
+.BR ap_open "(3)\ \-\ create an instance of XAP
+.HP
+.BR ap_poll "(3)\ \-\ input-output multiplexing
+.HP
+.BR ap_rcv "(3)\ \-\ receive XAP primitive from an association
+.HP
+.BR ap_restore "(3)\ \-\ restore an XAP instance
+.HP
+.BR ap_save "(3)\ \-\ save the XAP environment to a file
+.HP
+.BR ap_set_env "(3)\ \-\ set the value of an XAP environment attribute
+.HP
+.BR ap_snd "(3)\ \-\ send an XAP primitive over an association
+.PD
+.\"
+.\"
 .SH INTERFACE
 .PP
 XAP.
 .[
 xap c303
 .]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libxap (3).
 .\"
 .\"
 .SH DESCRIPTION
@@ -166,11 +248,23 @@ is passed the attribute type as specified in the environment call that
 allocated the structures.
 .SS Sending and Receiving XAP Service Primitives
 .PP
-The services offered by the ACSE Presentation Layer service provider are made
+The services offered by the ACSE Presentation Layer
+.[
+x217
+.]
+service provider are made
 available to the service user through a collection of XAP service primitives
 that are sent and received using the
 .BR ap_snd "(3) and " ap_rcv (3)
-functions. The ACSE and Presentation Layer services available through this
+functions. The ACSE
+.[
+x217
+.]
+and Presentation Layer
+.[
+x216
+.]
+services available through this
 version of the XAP Interface are shown below, together with the related XAP
 service primitives.
 .PP
@@ -178,25 +272,25 @@ service primitives.
 center tab(:);
 lbw(2.0i)lbw(1.5i)lbw(1.5i)
 lbw(2.0i)lbw(1.5i)lbw(1.5i)
-lll.
+lllb.
 ACSE:Generic:Specific
 Service:Primitive:Primitive
 _
-A-ASSOCIATE:Request:A_ASSOC_REQ
-:Response:A_ASSOC_RSP
-:Indication:A_ASSOC_IND
-:Confirmation:A_ASSOC_CNF
+A-ASSOCIATE:Request:A_ASSOC_REQ\fR(7)
+:Response:A_ASSOC_RSP\fR(7)
+:Indication:A_ASSOC_IND\fR(7)
+:Confirmation:A_ASSOC_CNF\fR(7)
 
-A-RELEASE:Request:A_RELEASE_REQ
-:Response:A_RELEASE_RSP
-:Indication:A_RELEASE_IND
-:Confirmation:A_RELEASE_CNF
+A-RELEASE:Request:A_RELEASE_REQ\fR(7)
+:Response:A_RELEASE_RSP\fR(7)
+:Indication:A_RELEASE_IND\fR(7)
+:Confirmation:A_RELEASE_CNF\fR(7)
 
-A-ABORT:Request:A_ABORT_REQ
-:Indication:A_ABORT_IND
+A-ABORT:Request:A_ABORT_REQ\fR(7)
+:Indication:A_ABORT_IND\fR(7)
 
-A-P-ABORT:Request:A_PABORT_REQ
-:Indication:A_PABORT_IND
+A-P-ABORT:Request:A_PABORT_REQ\fR(7)
+:Indication:A_PABORT_IND\fR(7)
 _
 .TE
 .PP
@@ -204,73 +298,73 @@ _
 center tab(:);
 lbw(2.0i)lbw(1.5i)lbw(1.5i)
 lbw(2.0i)lbw(1.5i)lbw(1.5i)
-lll.
+lllb.
 Presentation:Generic:Specific
 Service:Primitive:Primitive
 _
-P-DATA:Request:P_DATA_REQ
-:Indication:P_DATA_IND
+P-DATA:Request:P_DATA_REQ\fR(7)
+:Indication:P_DATA_IND\fR(7)
 
-P-CAPABILITY-DATA:Request:P_CDATA_REQ
-:Response:P_CDATA_RSP
-:Indication:P_CDATA_IND
-:Confirmation:P_CDATA_CNF
+P-CAPABILITY-DATA:Request:P_CDATA_REQ\fR(7)
+:Response:P_CDATA_RSP\fR(7)
+:Indication:P_CDATA_IND\fR(7)
+:Confirmation:P_CDATA_CNF\fR(7)
 
-P-TYPED-DATA:Request:P_TDATA_REQ
-:Indication:P_TDATA_IND
+P-TYPED-DATA:Request:P_TDATA_REQ\fR(7)
+:Indication:P_TDATA_IND\fR(7)
 
-P-EXPEDITED-DATA:Request:P_XDATA_REQ
-:Indication:P_XDATA_IND
+P-EXPEDITED-DATA:Request:P_XDATA_REQ\fR(7)
+:Indication:P_XDATA_IND\fR(7)
 
-P-TOKEN-GIVE:Request:P_TOKENGIVE_REQ
-:Indication:P_TOKENGIVE_IND
+P-TOKEN-GIVE:Request:P_TOKENGIVE_REQ\fR(7)
+:Indication:P_TOKENGIVE_IND\fR(7)
 
-P-TOKEN-PLEASE:Request:P_TOKENPLEASE_REQ
-:Indication:P_TOKENPLEASE_IND
+P-TOKEN-PLEASE:Request:P_TOKENPLEASE_REQ\fR(7)
+:Indication:P_TOKENPLEASE_IND\fR(7)
 
-P-CONTROL-GIVE:Request:P_CTRLGIVE_REQ
-:Indication:P_CTRLGIVE_IND
+P-CONTROL-GIVE:Request:P_CTRLGIVE_REQ\fR(7)
+:Indication:P_CTRLGIVE_IND\fR(7)
 
-P-SYNC-MINOR:Request:P_SYNCMINOR_REQ
-:Response:P_SYNCMINOR_RSP
-:Indication:P_SYNCMINOR_IND
-:Confirmation:P_SYNCMINOR_CNF
+P-SYNC-MINOR:Request:P_SYNCMINOR_REQ\fR(7)
+:Response:P_SYNCMINOR_RSP\fR(7)
+:Indication:P_SYNCMINOR_IND\fR(7)
+:Confirmation:P_SYNCMINOR_CNF\fR(7)
 
-P-SYNC-MAJOR:Request:P_SYNCMAJOR_REQ
-:Response:P_SYNCMAJOR_RSP
-:Indication:P_SYNCMAJOR_IND
-:Confirmation:P_SYNCMAJOR_CNF
+P-SYNC-MAJOR:Request:P_SYNCMAJOR_REQ\fR(7)
+:Response:P_SYNCMAJOR_RSP\fR(7)
+:Indication:P_SYNCMAJOR_IND\fR(7)
+:Confirmation:P_SYNCMAJOR_CNF\fR(7)
 
-P-RESYNCHRONIZE:Request:P_RESYNC_REQ
-:Response:P_RESYNC_RSP
-:Indication:P_RESYNC_IND
-:Confirmation:P_RESYNC_CNF
+P-RESYNCHRONIZE:Request:P_RESYNC_REQ\fR(7)
+:Response:P_RESYNC_RSP\fR(7)
+:Indication:P_RESYNC_IND\fR(7)
+:Confirmation:P_RESYNC_CNF\fR(7)
 
-P-U-EXCEPTION-REPORT:Request:P_UXREPORT_REQ
-:Indication:P_UXREPORT_IND
+P-U-EXCEPTION-REPORT:Request:P_UXREPORT_REQ\fR(7)
+:Indication:P_UXREPORT_IND\fR(7)
 
-P-P-EXCEPTION-REPORT:Indication:P_PXREPORT_IND
+P-P-EXCEPTION-REPORT:Indication:P_PXREPORT_IND\fR(7)
 
-P-ACTIVITY-START:Request:P_ACTSTART_REQ
-:Indication:P_ACTSTART_IND
+P-ACTIVITY-START:Request:P_ACTSTART_REQ\fR(7)
+:Indication:P_ACTSTART_IND\fR(7)
 
-P-ACTIVITY-RESUME:Request:P_ACTRESUME_REQ
-:Indication:P_ACTRESUME_IND
+P-ACTIVITY-RESUME:Request:P_ACTRESUME_REQ\fR(7)
+:Indication:P_ACTRESUME_IND\fR(7)
 
-P-ACTIVITY-END:Request:P_ACTEND_REQ
-:Response:P_ACTEND_RSP
-:Indication:P_ACTEND_IND
-:Confirmation:P_ACTEND_CNF
+P-ACTIVITY-END:Request:P_ACTEND_REQ\fR(7)
+:Response:P_ACTEND_RSP\fR(7)
+:Indication:P_ACTEND_IND\fR(7)
+:Confirmation:P_ACTEND_CNF\fR(7)
 
-P-ACTIVITY-INTERRUPT:Request:P_ACTINTR_REQ
-:Response:P_ACTINTR_RSP
-:Indication:P_ACTINTR_IND
-:Confirmation:P_ACTINTR_CNF
+P-ACTIVITY-INTERRUPT:Request:P_ACTINTR_REQ\fR(7)
+:Response:P_ACTINTR_RSP\fR(7)
+:Indication:P_ACTINTR_IND\fR(7)
+:Confirmation:P_ACTINTR_CNF\fR(7)
 
-P-ACTIVITY-DISCARD:Request:P_ACTDISCARD_REQ
-:Response:P_ACTDISCARD_RSP
-:Indication:P_ACTDISCARD_IND
-:Confirmation:P_ACTDISCARD_CNF
+P-ACTIVITY-DISCARD:Request:P_ACTDISCARD_REQ\fR(7)
+:Response:P_ACTDISCARD_RSP\fR(7)
+:Indication:P_ACTDISCARD_IND\fR(7)
+:Confirmation:P_ACTDISCARD_CNF\fR(7)
 _
 .TE
 .PP
@@ -783,9 +877,13 @@ call in such a sequence, no error is reported if its value is subsequently
 modified.
 .PP
 Primitives that are not associated with either an ACSE or Presentation Layer
-PDU (for example, \fBP_DATA_REQ\fP(7), \fBP_SYNCMINOR_REQ\fP(7),
-\fBP_SYNCMINOR_RSP\fP(7), \fBP_TOKENGIVE_REQ\fP(7),
-\fBP_TOKENPLEASE_REQ\fP(7), etc.) cannot be terminated by a final
+PDU (for example,
+.BR P_DATA_REQ (7),
+.BR P_SYNCMINOR_REQ (7),
+.BR P_SYNCMINOR_RSP (7),
+.BR P_TOKENGIVE_REQ (7),
+.BR P_TOKENPLEASE_REQ (7),
+etc.) cannot be terminated by a final
 .BR ap_snd (3)
 invocation that does not carry any user data. Thus the final
 .BR ap_snd (3)
@@ -824,20 +922,19 @@ to
 .BR ap_snd (3)
 for inclusion in an A-ASSOCIATE request primitive.
 .PP
-.RS
+.RS 2
 .nf
-\fC\s-1\
+\f(CW\s-1\
 user-information [30] {
-    [EXTERNAL] { -- Association-information
-        direct-reference [OBJECT IDENTIFIER] { ... ftam-pci(1) }
-                        -- object id for the FTAM PDU abstract syntax
-        single-ASN1-type [0] {
-            f-initialise-request [0] {
-                protocol-version     [0] { version-1 } ,
-                implementation-info  [1] "ACME FTAM Initiator" ,
-                    .
-                    .
-                    .
+  [EXTERNAL] { -- Association-information
+    direct-reference [OBJECT IDENTIFIER] { ... ftam-pci(1) }
+               -- object id for the FTAM PDU abstract syntax
+    single-ASN1-type [0] {
+      f-initialise-request [0] {
+        protocol-version     [0] { version-1 } ,
+        implementation-info  [1] "ACME FTAM Initiator" ,
+                    :
+                    :
 } } } }\s+1\fP
 .fi
 .RE
@@ -849,29 +946,29 @@ ap_osi_vbuf_t structure and pass it to
 .BR ap_snd (3)
 for inclusion in a P-DATA request primitive.
 .PP
-.RS
+.RS 2
 .nf
-\fC\s-1\
+\f(CW\s-1\
 [APPLICATION 1] { -- fully encoded user data
-        [SEQUENCE] { -- first PDV-List
-            [INTEGER] <n> , -- Identifies the abstract syntax
-                            -- "FTAM unstructured text"
-                            -- in the defined context set
-            single-ASN1-type [0] {
-                [GraphicString] "To begin at the beginning:"
-                                        -- first string from file
-        } } ,
-        [SEQUENCE] { -- second PDV-List
-            [INTEGER] <n> , -- Identifies the abstract syntax
-                            -- "FTAM unstructured text"
-                            -- in the defined context set
-            single-ASN1-type [0] {
-                [GraphicString] "It is spring, moonless night in the
-                                    small town, starless and Bible-black. .."
-                                        -- second string from file
-        } } ,
-                .
-                .
+  [SEQUENCE] { -- first PDV-List
+    [INTEGER] <n> , -- Identifies the abstract syntax
+                    -- "FTAM unstructured text"
+                    -- in the defined context set
+    single-ASN1-type [0] {
+      [GraphicString] "To begin at the beginning:"
+                    -- first string from file
+    } } ,
+  [SEQUENCE] { -- second PDV-List
+    [INTEGER] <n> , -- Identifies the abstract syntax
+                    -- "FTAM unstructured text"
+                    -- in the defined context set
+    single-ASN1-type [0] {
+      [GraphicString] "It is spring, moonless night in the
+                       small town, starless and Bible-black. .."
+                    -- second string from file
+    } } ,
+                :
+                :
 }\s+1\fP
 .fi
 .RE
@@ -879,28 +976,49 @@ for inclusion in a P-DATA request primitive.
 .PP
 The following encoding is an alternative to that shown in example 2.
 .PP
-.RS
+.RS 2
 .nf
-\fC\s-1\
+\f(CW\s-1\
 [APPLICATION 1] { -- fully encoded user data
-        [SEQUENCE] { -- first PDV-List
-            [INTEGER] <n> , -- Identifies the abstract syntax
-                            -- "FTAM unstructured text"
-                            -- in the defined context set
-            octet-aligned [1] {
-                [GraphicString] "To begin at the beginning:"
-                                        -- first string from file
-                [GraphicString] "It is spring, moonless night in the
-                                    small town, starless and bible-black. .."
-                                        -- second string from file
-                    .
-                    .
+  [SEQUENCE] { -- first PDV-List
+    [INTEGER] <n> , -- Identifies the abstract syntax
+                    -- "FTAM unstructured text"
+                    -- in the defined context set
+      octet-aligned [1] {
+        [GraphicString] "To begin at the beginning:"
+                    -- first string from file
+        [GraphicString] "It is spring, moonless night in the
+                         small town, starless and bible-black. .."
+                    -- second string from file
+                    :
+                    :
 } } }\s+1\fP
 .fi
 .RE
 .\"
 .\"
 .SH USAGE
+.PP
+To use this library you must add
+.B -I@includedir@/@PACKAGE@
+to the
+.BR gcc (1)
+command line.  When using the shared library,
+.BR @libdir@/libxap.so ,
+you must also add
+.B -lxap
+to the
+.BR gcc (1)
+command line.  When using the static library,
+.BR @libdir@/libxap.a ,
+you must add
+.B -lxap -static
+to the
+.BR gcc (1)
+command line, or explicitly link the static library by adding
+.BR @libdir@/libxap.a
+to the linker stage (i.e,
+.BR gcc "(1) or " ld (1)).
 .PP
 Below is a summary of the steps required to establish an association with a
 remote application entity using XAP. The procedure presented is intended
@@ -910,14 +1028,14 @@ particular application. Moreover, it is assumed that the service user is
 familiar with the ACSE and Presentation Layer protocols and understands the
 role of the ACSE-serviceuser in establishing, using and terminating an
 association between two application entities.
-.SS Obtain an XAP Instance.
 .PP
+.B Obtain an XAP Instance.
 First, a XAP Instance is created. This is accomplished either by using
 .BR ap_open (3),
 or by acquiring an already established instance through some other
 implementation-specific mechanism.
-.SS Initialise the XAP Environment.
 .PP
+.B Initialise the XAP Environment.
 Next, the XAP Environment is initialised (or restored) using the
 .BR ap_init_env (3)
 .RB ( ap_restore (3))
@@ -926,8 +1044,8 @@ function.
 After the environment is initialised, the user may examine or alter the
 environment attributes, subject to the readability and writability
 restrictions discussed in Section 3.
-.SS Bind the XAP Instance to a Presentation Address.
 .PP
+.B Bind the XAP Instance to a Presentation Address.
 Before any service primitives can be sent or received, the XAP instance must
 be bound to a presentation address. This is accomplished by setting the
 AP_BIND_PADDR attribute to a value which the service user is authorised to
@@ -939,8 +1057,8 @@ function. Then the service provider is
 signalled to activate the XAP instance by using the
 .BR ap_bind (3)
 function.
-.SS Set Other Environment Attributes.
 .PP
+.B Set Other Environment Attributes.
 In addition to AP_BIND_PADDR, other environment variables must be set before
 an association is established - particularly if the service user is the
 association-initiator. For example, before issuing an A_ASSOC_REQ primitive,
@@ -951,73 +1069,75 @@ presentation contexts that are to be used for transferring user data.
 Refer to the manual pages in Section 3, and primitives descriptions in Section
 7, for further information about the XAP environment attributes and how they
 relate to sending and receiving individual primitives.
-.SS Send or Receive A_ASSOC Service Primitives.
 .PP
+.B Send or Receive A_ASSOC Service Primitives.
 Once the XAP environment has been properly initialised, the service user may
 attempt to establish an association with a remote application entity by using
 the A_ASSOC service primitives in conjunction with the
 .BR ap_snd "(3) and " ap_rcv (3)
 functions. Each of the A_ASSOC primitives is described in detail in Section 7.
-.SS Transfer Data.
 .PP
+.B Transfer Data.
 Once the association is established, information may be exchanged with the
 remote application entity by sending and receiving the appropriate XAP
 primitives (using
 .BR ap_snd "(3) and " ap_rcv (3)).
-.SS Releasing the Association.
 .PP
+.B Releasing the Association.
 An association may be released either normally (using the A_RELEASE
 primitives), or abnormally (by using either the A-ABORT or the A-PABORT
 primitives).
 .\"
 .\"
-.SH FUNCTIONS
-.PP
-.TP
-.BR ap_bind (3)
-\- associate a presentation address with an instance of XAP.
-.TP
-.BR ap_close (3)
-\- close an instance of XAP.
-.TP
-.BR ap_error (3)
-\- return an error message.
-.TP
-.BR ap_free (3)
-\- free memory for XAP data structures.
-.TP
-.BR ap_get_env (3)
-\- get the value of an XAP environment attribute.
-.TP
-.BR ap_init_env (3)
-\- initialize an instance of XAP.
-.TP
-.BR ap_ioctl (3)
-\- control the generation of software interrupts.
-.TP
-.BR ap_look (3)
-\- examine the next ACSE/Presentation primitive from the association/connection.
-.TP
-.BR ap_open (3)
-\- create an instance of XAP.
-.TP
-.BR ap_poll (3)
-\- input/output multiplexing.
-.TP
-.BR ap_save (3)
-\- save and instance of XAP.
-.TP
-.BR ap_set_env (3)
-\- set the value of an XAP environment attribute.
-.TP
-.BR ap_snd (3)
-\- send an ACSE/Presentation primitive over the association/connection.
-.TP
-.BR ap_rcv (3)
-\- receive an ACSE/Presentation primitive from the association/connection.
-.TP
-.BR ap_restore (3)
-\- restore an instance of XAP environment.
+.\".SH FUNCTIONS
+.\".PP
+.\".TP \w'\fBap_init_env\fP(3)\(en'u
+.\".BR ap_bind (3)
+.\"\-\0associate a presentation address with an instance of XAP.
+.\".PD 0
+.\".TP
+.\".BR ap_close (3)
+.\"\-\0close an instance of XAP.
+.\".TP
+.\".BR ap_error (3)
+.\"\-\0return an error message.
+.\".TP
+.\".BR ap_free (3)
+.\"\-\0free memory for XAP data structures.
+.\".TP
+.\".BR ap_get_env (3)
+.\"\-\0get the value of an XAP environment attribute.
+.\".TP
+.\".BR ap_init_env (3)
+.\"\-\0initialize an instance of XAP.
+.\".TP
+.\".BR ap_ioctl (3)
+.\"\-\0control the generation of software interrupts.
+.\".TP
+.\".BR ap_look (3)
+.\"\-\0examine the next ACSE/Presentation primitive from the association/connection.
+.\".TP
+.\".BR ap_open (3)
+.\"\-\0create an instance of XAP.
+.\".TP
+.\".BR ap_poll (3)
+.\"\-\0input/output multiplexing.
+.\".TP
+.\".BR ap_save (3)
+.\"\-\0save and instance of XAP.
+.\".TP
+.\".BR ap_set_env (3)
+.\"\-\0set the value of an XAP environment attribute.
+.\".TP
+.\".BR ap_snd (3)
+.\"\-\0send an ACSE/Presentation primitive over the association/connection.
+.\".TP
+.\".BR ap_rcv (3)
+.\"\-\0receive an ACSE/Presentation primitive from the association/connection.
+.\".TP
+.\".BR ap_restore (3)
+.\"\-\0restore an instance of XAP environment.
+.\".PD
 .\"
 .\"
 .SH NOTICES
@@ -1049,15 +1169,180 @@ q771
 .]
 .\"
 .\"
-.XX
-.[
-xns99
-.]
+.SH SEE ALSO
+.PP
+.BR ap_bind "(3),
+.BR ap_close "(3),
+.BR ap_error "(3),
+.BR ap_free "(3),
+.BR ap_get_env "(3),
+.BR ap_init_env "(3),
+.BR ap_ioctl "(3),
+.BR ap_look "(3),
+.BR ap_open "(3),
+.BR ap_poll "(3),
+.BR ap_rcv "(3),
+.BR ap_restore "(3),
+.BR ap_save "(3),
+.BR ap_set_env "(3),
+.BR ap_snd "(3),
+.BR A_ASSOC_REQ (7),
+.BR A_ASSOC_RSP (7),
+.BR A_ASSOC_IND (7),
+.BR A_ASSOC_CNF (7),
+.BR A_RELEASE_REQ (7),
+.BR A_RELEASE_RSP (7),
+.BR A_RELEASE_IND (7),
+.BR A_RELEASE_CNF (7),
+.BR A_ABORT_REQ (7),
+.BR A_ABORT_IND (7),
+.BR A_PABORT_REQ (7),
+.BR A_PABORT_IND (7),
+.BR P_DATA_REQ (7),
+.BR P_DATA_IND (7),
+.BR P_CDATA_REQ (7),
+.BR P_CDATA_RSP (7),
+.BR P_CDATA_IND (7),
+.BR P_CDATA_CNF (7),
+.BR P_TDATA_REQ (7),
+.BR P_TDATA_IND (7),
+.BR P_XDATA_REQ (7),
+.BR P_XDATA_IND (7),
+.BR P_TOKENGIVE_REQ (7),
+.BR P_TOKENGIVE_IND (7),
+.BR P_TOKENPLEASE_REQ (7),
+.BR P_TOKENPLEASE_IND (7),
+.BR P_CTRLGIVE_REQ (7),
+.BR P_CTRLGIVE_IND (7),
+.BR P_SYNCMINOR_REQ (7),
+.BR P_SYNCMINOR_RSP (7),
+.BR P_SYNCMINOR_IND (7),
+.BR P_SYNCMINOR_CNF (7),
+.BR P_SYNCMAJOR_REQ (7),
+.BR P_SYNCMAJOR_RSP (7),
+.BR P_SYNCMAJOR_IND (7),
+.BR P_SYNCMAJOR_CNF (7),
+.BR P_RESYNC_REQ (7),
+.BR P_RESYNC_RSP (7),
+.BR P_RESYNC_IND (7),
+.BR P_RESYNC_CNF (7),
+.BR P_UXREPORT_REQ (7),
+.BR P_UXREPORT_IND (7),
+.BR P_PXREPORT_IND (7),
+.BR P_ACTSTART_REQ (7),
+.BR P_ACTSTART_IND (7),
+.BR P_ACTRESUME_REQ (7),
+.BR P_ACTRESUME_IND (7),
+.BR P_ACTEND_REQ (7),
+.BR P_ACTEND_RSP (7),
+.BR P_ACTEND_IND (7),
+.BR P_ACTEND_CNF (7),
+.BR P_ACTINTR_REQ (7),
+.BR P_ACTINTR_RSP (7),
+.BR P_ACTINTR_IND (7),
+.BR P_ACTINTR_CNF (7),
+.BR P_ACTDISCARD_REQ (7),
+.BR P_ACTDISCARD_RSP (7),
+.BR P_ACTDISCARD_IND (7),
+.BR P_ACTDISCARD_CNF (7),
+.BR gcc (1),
+.BR ld (1),
+.BR APLI (3),
+.BR XAP-ROSE (3),
+.BR XAP-TP (3),
+.BR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B libxap
+is compatible with
+.BR XAP ,
 .[
 xap c303
 .]
+and implementations based on XAP, such as
+.IR "USL ONP\(rg" ,
+.IR "Solaris\(rg Solstice OSI" ,
 .[
-xti/tli revision 1
+sunlink-apli
+.]
+.IR "HP-UX\(rg OTS/9000" ,
+.[
+hpuxapli
+.]
+.IR "AIX\(rg OSI/6000" ,
+.IR "Digital\(rg DECnet/OSI" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+XAP
+.[
+xap c303
+.]
+is incompatible with earlier APLI
+.[
+apli unix international
+.]
+versions of the ACSE/Presentation Library.  See
+.BR libapli (3)
+for more information on using the legacy APLI library.
+.IP \(em
+Only source compatibility is supported.  Binary compatibility is not attempted: any exhibited binary
+compatibility is coincidental and is scheduled to be removed on the next release.
+.PP
+See also,
+.BR APLI (3)
+and
+.BR STREAMS (4),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B libxap
+appeared as XAP.
+.[
+xap c303
+.]
+.PP
+This library first appeared as APLI
+.[
+apli unix international
+.]
+as documented by
+.IR "Solaris\(rg SunLink"
+.[
+sunlink-apli
+.]
+and with ROSE
+.[
+x219
+.]
+extensions in
+.IR "HP-UX\(rg OTS/9000" ,
+.[
+hpuxapli
+.]
+and was later standardized by the OpenGroup as XAP,
+.[
+xap c303
+.]
+XAP-ROSE
+.[
+xap-rose
+.]
+and XAP-TP.
+.[
+xap-tp
 .]
 .\"
 .\"

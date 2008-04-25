@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: momod.4.man,v 0.9.2.1 2007/11/06 11:43:18 brian Exp $
+.\" @(#) $Id: momod.4.man,v 0.9.2.2 2008-04-25 08:38:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/11/06 11:43:18 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-25 08:38:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: momod.4.man,v $
+.\" Revision 0.9.2.2  2008-04-25 08:38:28  brian
+.\" - working up libraries modules and drivers
+.\"
 .\" Revision 0.9.2.1  2007/11/06 11:43:18  brian
 .\" - updated manual pages
 .\"
@@ -107,3 +110,98 @@ libraries.
 In particular, the
 .BR lpp (4)
 driver implements the Lightweight Presentation Protocol
+.SH USAGE
+.PP
+.SH INTERFACE
+.PP
+.SH ADDRESSES
+.PP
+.SH OPTIONS
+.PP
+.SH PRIMITIVES
+.PP
+.SH IOCTLS
+.PP
+.SH NOTICES
+.PP
+.SH IMPLEMENTATION
+.PP
+.SH FILES
+.PP
+.SH MODULES
+.PP
+.SH DEVICES
+.PP
+.SH SEE ALSO
+.PP
+.SH BUGS
+.PP
+.SH COMPATIBILITY
+.PP
+This
+.B @PACKAGE_TITLE@
+implementation of
+.B momod
+is compatible with
+XTI-mOSI,
+.[
+xns 5.2
+.]
+APLI,
+.[
+apli unix international
+.]
+XAP
+.[
+xap c303
+.]
+and descriptions for
+.IR HP-UX \(rg,
+.[
+hpuxapli
+.]
+.IR Solaris \(rg,
+.[
+sunlink-apli
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Other implementations do not document any cooperating module nor input-output controls.  Portable
+applications should never use input-output controls directly.
+.IP \(em
+Other implementations do not document primitive format between the library and any cooperating
+module.
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+See
+.BR xti_mosi "(3),
+.BR apli "(3),
+.BR xap "(3) and
+.BR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B momod
+module is new for OpenSS7
+.BR "striso version 0.9.2.4" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 \fBmomod\fP(4) module.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

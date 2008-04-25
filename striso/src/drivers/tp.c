@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:34:18 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 08:38:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.17  2008-04-25 08:38:30  brian
+ - working up libraries modules and drivers
+
  Revision 0.9.2.16  2007/08/15 05:34:18  brian
  - GPLv3 updates
 
@@ -107,10 +110,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -162,7 +165,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"
@@ -4035,7 +4038,7 @@ tp_recv_msg(queue_t *q, mblk_t *mp)
 	case _TP_MT_DT:	/* DT */
 		rtn = tp_recv_dt(q, p, e, mp);
 		break;
-	case _TP_MD_ED:	/* ED */
+	case _TP_MT_ED:	/* ED */
 		rtn = tp_recv_ed(q, p, e, mp);
 		break;
 	case _TP_MT_AK:	/* AK */
