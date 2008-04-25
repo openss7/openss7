@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:35:41 $
+ @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:41 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_ip.c,v $
+ Revision 0.9.2.9  2008-04-25 11:39:31  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.8  2007/08/15 05:35:41  brian
  - GPLv3 updates
 
@@ -76,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:35:41 $"
+#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $"
 
 static char const ident[] =
-    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:35:41 $";
+    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $";
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the
@@ -106,7 +110,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:35:41 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"

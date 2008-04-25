@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.34 2007/10/18 06:53:49 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.35 2008-04-25 11:39:31 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/10/18 06:53:49 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -104,7 +104,7 @@ Minor corrections to documentation.
 Added CDI interface specification texinfo (info, html, pdf) document.
 
 @item
-License upgrade to GPL Version 3.
+License upgrade to AGPL Version 3.
 
 @item
 Changes to support 2.6.22.5-49.fc6 kernel: new dev_base list and new sk_buff
@@ -128,7 +128,7 @@ builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based
 distributions, and can be used on production kernels without patching or
 recompiling the kernel.
 
-This package is publicly released under the @cite{GNU General Public License
+This package is publicly released under the @cite{GNU Affero General Public License
 Version 3}.  The release is available as an @command{autoconf} tarball, SRPM,
 DSC, and set of binary RPMs and DEBs.  See the
 @uref{http://www.openss7.org/download.html,downloads page} for the

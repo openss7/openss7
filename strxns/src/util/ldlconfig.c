@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:35:50 $
+ @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-25 11:39:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:50 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:39:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldlconfig.c,v $
+ Revision 0.9.2.11  2008-04-25 11:39:34  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.10  2007/08/15 05:35:50  brian
  - GPLv3 updates
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:35:50 $"
+#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-25 11:39:34 $"
 
 static char const ident[] =
-    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:35:50 $";
+    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-25 11:39:34 $";
 
 /*
  *  ldlconfig: A configuration helper for ldl clients

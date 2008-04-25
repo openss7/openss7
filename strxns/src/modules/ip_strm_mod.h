@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ip_strm_mod.h,v 0.9.2.5 2007/08/15 05:35:46 brian Exp $
+ @(#) $Id: ip_strm_mod.h,v 0.9.2.6 2008-04-25 11:39:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:46 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:39:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.h,v $
+ Revision 0.9.2.6  2008-04-25 11:39:33  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.5  2007/08/15 05:35:46  brian
  - GPLv3 updates
 
@@ -64,7 +67,7 @@
 #ifndef __LOCAL_IP_STRM_MOD_H__
 #define __LOCAL_IP_STRM_MOD_H__
 
-#ident "@(#) $RCSfile: ip_strm_mod.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ip_strm_mod.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #if defined(__KERNEL__)
 

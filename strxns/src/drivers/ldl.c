@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:26:09 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.42  2008-04-25 11:39:31  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.41  2007/10/15 17:26:09  brian
  - updates for 2.6.22.5-49.fc6 kernel
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -127,7 +130,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.41 $) $Date: 2007/10/15 17:26:09 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"

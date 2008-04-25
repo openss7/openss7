@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $
+ @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:46 $ by $Author: brian $
+ Last Modified $Date: 2008-04-25 11:39:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_conv.c,v $
+ Revision 0.9.2.6  2008-04-25 11:39:33  brian
+ - updates to AGPLv3
+
  Revision 0.9.2.5  2007/08/15 05:35:46  brian
  - GPLv3 updates
 
@@ -67,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $"
+#ident "@(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $"
 
 static char const ident[] =
-    "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $";
+    "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $";
 
 /*
  *  NPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -84,7 +88,7 @@ static char const ident[] =
 
 #define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $"
+#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_CONV_LICENSE	"GPL"
