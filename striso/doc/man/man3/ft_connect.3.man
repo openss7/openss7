@@ -1,0 +1,317 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ft_connect.3.man,v 0.9.2.2 2008-04-26 11:11:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-04-26 11:11:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ft_connect.3.man,v $
+.\" Revision 0.9.2.2  2008-04-26 11:11:54  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH FT_CONNECT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ft_connect
+\- establish an association with an FTAM file-store
+.\"
+.\"
+.SH INTERFACE
+.PP
+FTAM High-Level API, XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libftam (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xftam.h>
+.HP
+.B FT_return_code ft_connect(
+.br
+.BI "OM_private_object " session ,
+.br
+.BI "OM_Object " p_address ,
+.br
+.BI "OM_Object " ftam_in ,
+.br
+.BI "OM_Object " api_in ,
+.br
+.BI "OM_uint32 *" association_id ,
+.br
+.BI "OM_private_object *" ftam_out ,
+.br
+.BI "OM_private_object *" api_out );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR ft_connect ()
+function creates an association with an FTAM file-store identified by
+.I p_address
+and establishes an FTAM regime.
+.PP
+The function returns
+.I association_id
+as an integer that is used to identify the new association to other XFTAM
+functions that will operate within the context of the association created.
+.PP
+.BR ft_connect ()
+must be invoked first for context-sensitive operations to operate on any
+association.  It may be invoked multiple times within a single XFTAM instance
+and may be to the same
+.I p_address
+as each call creates a separate association.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.BI session " (Private Object (Session))
+This parameter is a handle for a private object of the class
+.B session
+that identifies the particular XFTAM instance within which the association is
+to be created.
+.TP
+.BI p_address " (Object (Presentation-Address))
+This parameter is a handle for an object of the class
+.BR "Presentation-Address" .
+It is a mandatory parameter that identifies the FTAM responder that serves the
+remote filestore.
+.TP
+.BI ftam_in " (Object(FTAM-Input-Parameters))
+This parameter is a handle for an object class
+.IR FTAM-Input-Parameters ,
+specifying general FTAM parameters for use in this function.  The parameter is
+optional.  However, failure to specify some of its OM attributes may result in
+the remote responder rejecting the association request.  The
+.BR ft_connect ()
+function has the following specific requirements for the input object:
+.RS
+.IP \(bu \w'\(bu\(em'u
+.B Initiator-Identity.
+.br
+This is provided to identify the FTAM initiator to the responder.
+.IP \(bu
+.B Filestore-Password.
+.br
+This password is provided to authenticate the initiator to the FTAM responder.
+.IP \(bu
+.B Account.
+.br
+The account given is charged for all costs incurred by the FTAM regime.  This
+may be overridden by providing an account parameter for subsequent FTAM
+operations on the association.
+.IP \(bu
+.B FQoS.
+.br
+The FTAM quality of service parameter is used to indicate the level of error
+recovery available at the FTAM initiator.
+.RE
+.TP
+.BI association_id " (OM_uint32)
+Upon successful completion, this parameter is used to return an integer that
+identifies the XFTAM association created.  This value may be passed to other
+XFTAM functions to identify the association to be used for a context-sensitive
+request.
+.TP
+.BI ftam_out " (Object(FTAM-Output-Parameters))
+This parameter is a handle for a private object of class
+.IR FTAM-Output-Parameters ,
+and is returned only if there are relevant FTAM output parameters to be
+returned as a result of the FTAM actions performed.
+.TP
+.BI api_out " (Private Object(API-Output-Parameters))
+This parameter is always returned and is a handle for a private object of class
+.IR API-Output-Parameters .
+It returns API-specific output parameters for this function call.
+.\"
+.\"
+.SH RETURN
+.PP
+.BR ft_connect ()
+returns either
+.RB [ FTE_SUCCESS ]
+or one of the values listed in
+.RI \(lq ERRORS .\(rq
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP
+FTAM Error Codes
+.B FTE_FTAM_CANCEL
+.br
+.B FTE_FTAM_PERMANENT
+.br
+.B FTE_PROVIDER_ABORT
+.br
+.B FTE_USER_ABORT
+.br
+.B FTE_FQOS_NOT_NEGOTIATED
+.TP
+Operation Error Code
+.B FTE_ATTR_GRP_NOT_NEGOTIATED
+.TP
+API Error Codes
+.B FTE_NO_RESOURCES
+.br
+.B FTE_VENDOR
+.br
+.B FTE_INV_PADDRESS
+.br
+.B FTE_SESSION
+.br
+.B FTE_TOO_MANY_ASSOC
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR XFTAM (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ft_connect ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ft_connect ()
+is compatible with XFTAM
+.[
+xftam c415
+.]
+and implementations based on XFTAM, such as
+.IR "Solstice OSI 9.0" ,
+.IR "HP-UX OTS/9000" ,
+.IR "AIX OSI/6000" ,
+.IR "SVR 4.2 ONP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only source compatibility is attempted.  Binary compatibility will fail due to
+the lack of published and standard symbolic constants.  Any binary
+compatibility experienced is a bug and will be removed in the next release.
+.PP
+See \fBXFTAM\fP(3), \fBXOM\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom c607
+.]
+XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ft_connect ()
+first appeared in XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XFTAM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
+
+
+
+
+
