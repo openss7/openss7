@@ -1,0 +1,625 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ft_fsend.3.man,v 0.9.2.2 2008-04-26 11:11:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-04-26 11:11:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ft_fsend.3.man,v $
+.\" Revision 0.9.2.2  2008-04-26 11:11:54  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH FT_FSEND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ft_fsend
+\- send a file to an FTAM filestore
+.\"
+.\"
+.SH INTERFACE
+.PP
+FTAM High-Level API, XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libftam (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xftam.h>
+.HP
+.B FT_return_code ft_fsend(
+.br
+.BI "OM_private_object " session ,
+.br
+.BI "OM_string *" src_filename ,
+.br
+.BI "OM_enum " src_effect ,
+.br
+.BI "OM_object " p_address ,
+.br
+.BI "OM_string *" dest_filename ,
+.br
+.BI "OM_enum " dest_effect ,
+.br
+.BI "OM_object " initial_attributes ,
+.br
+.BI "OM_object " ftam_in ,
+.br
+.BI "OM_object " api_in ,
+.br
+.BI "OM_private_object *" return_attributes ,
+.br
+.BI "OM_private_object *" ftam_out ,
+.br
+.BI "OM_private_object *" api_out );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The \fBft_fsend\fP() function copies the local \fIsrc_filename\fP to
+\fIdest_filename\fP on the FTAM filestore identified by \fIp_address\fP.  If
+\fIdest_filename\fP is NULL, the function attempts to use the source filename
+as the name of the destination file.  The transfer fails if the source filename
+is not compatible with the destination filestore.
+.PP
+Whether it is derived from \fIsrc_filename\fP or \fIdest_filename\fP, the
+actual filename created in the remote filestore may be modified by the remote
+responder.
+.PP
+\fIdest_effect\fP specifies the action to be taken if the destination file
+already exists in the remote filestore.  The transfer fails if the destination
+file exists and one of the \fIdest_effect\fP options is chosen that is not
+permitted for the file or for which the API user does not supply the
+appropriate file passwords or concurrency locks.
+.PP
+The \fIinitial_attributes\fP input parameter allows the user to override the
+values of some of the FTAM file attributes in the file created.  If this
+parameter is not provided, some of the files FTAM attributes are determined
+by XFTAM and others by the receiving FTAM responder.  The
+\fIreturn_attributes\fP parameter returns the actual file attributes of the
+file created by the destination responder (including the actual filename
+created.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.BI session " (Private Object (Session))
+This parameter is a handle for a private object of class Session that
+identifies the particular XFTAM instance that is to perform the required XFTAM
+operation.  The session identifies the resources associated with the instance,
+including the XOM workspace that contains all private objects passed to or
+returned from this XFTAM function call.
+.TP
+.BI src_filename " (String(Graphic))
+The name of the local source file.  A mandatory parameter, given in the syntax
+used by the real filestore containing the file.
+.TP
+.BI src_effect " (Enum(Copy-Move))
+This parameter is an enumeration that specifies the effect of the file
+transfer upon the source file.  The value is one of:
+.RS
+.IP \(bu \w'\(bu\(em'u
+.IR FT_COPY_FILE ,
+meaning that the source file is to be left in place when the file transfer is
+complete (i.e\&. the transfer is a file copy).
+.IP \(bu
+.IR FT_MOVE_FILE ,
+meaning that the source file is to be deleted once the file transfer is
+complete (i.e\&. the transfer is a file move).  If an error occurs that means
+that the file transfer does not complete, source file is left in place.  If the
+user does not have permission to delete the source file, the file transfer
+succeeds but the function returns an error indicating that the source file has
+not been deleted.
+.RE
+.TP
+.BI p_address " (Object (Presentation-Address))
+This parameter is a handle for an object of class Presentation Address.  If
+present, the Association-Id attribute of API-Input-Parameters shall be absent
+as the operation is being carried out in context free mode.  When present, this
+attribute identifies the FTAM responder that serves the remote filestore.
+.RS
+.PP
+If not present, the Association-Id attribute of API-Input-Parameters shall be
+present as the operation is being carried out in context sensitive mode.
+.PP
+If both P-address and Association-Id are present, the function returns an
+error code
+.RB [ FT_CONTEXT_MISMATCH ].
+.RE
+.TP
+.BI dest_filename (String(Graphic))
+The name of the destination file.  Given in the syntax used by the real
+destination file system.  A NULL value indicates that \fIsrc_filename\fP should
+be used as the filename in the destination filestore.
+.RS
+.PP
+Whether it is derived from \fIsrc_filename\fP or \fIdest_filename\fP, the
+created filename may be modified by the responder to conform to the file
+naming conventions of the remote filestore.  The transfer fails if the
+filename is not compatible with these conventions.  The actual name of the
+file created is returned in the functions \fIreturn_attributes\fP output
+parameter.
+.RE
+.TP
+.BI dest_effect " (Enum (FTAM-Override))
+This parameter maps onto the FTAM override parameter to the F-CREATE request
+primitive and specifies the action to be taken by the responder in the case
+where dest_filename exists.  The parameter can take the following parameters:
+.RS
+.IP \(bu \w'\(bu\(em'u
+FT_CREATE_FAILURE - the file transfer fails.
+.IP \(bu
+FT_SELECT_OLD_FILE - the local file is appended to the existing file on the
+destination file store.  For FTAM-1 and FTAM-3 document types, this option uses
+the FTAM extend file action; for FTAM-2, it uses insert.
+.IP \(bu
+FT_DELETE_AND_CREATE_WITH_OLD_ATTRIBUTES - the local file overwrites the
+destination file, preserving the attributes of the destination.  This option
+uses the FTAM delete file action.  In addition, for FTAM-1 and FTAM-3 document
+types, this option uses the FTAM replace file action; for FTAM-2, it uses
+insert.
+.IP \(bu
+FT_DELETE_AND_CREATE_WITH_NEW_ATTRIBUTES - the local file overwrites the
+destination file, the new file as attributes are as specified by the FTAM
+Initial Attributes parameter.  This option uses the FTAM delete file action.
+In addition, for FTAM-1 and FTAM-3 document types, this option uses the FTAM
+replace file action; for FTAM-2, it uses insert.
+.RS
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+As the FTAM file attributes of the new file are established as part of the
+create operation, no password need be specified in the File-Passwords
+attribute of FTAM-Input-Parameters in order to perform the replace/insert
+action in this case.
+.RE
+.PP
+The transfer fails if one of the required file actions is not allowed by the
+file's permitted actions attribute, or if concurrency locks or file password is
+required for the action and are not correctly specified in the File-Passwords
+and Concurrency-Control OM attributes of the FTAM-Input-Parameters object.
+.RE
+.TP
+.BI initial-attributes " (Object (FTAM-Attributes))
+This optional parameter is a handle for an object of class FTAM-Attributes
+specifying the file attributes that are to be set for the destination file in
+the initial attributes FTAM parameter to the F-CREATE request primitive.  A
+value for an attribute specified here overrides any default value that the
+local XFTAM implementation may provide.  In turn, the receiving responder may
+modify certain attributes when creating the file, or set attributes other than
+those in the kernel group to no value available.  The user may specify the
+following FTAM file attributes in a call to the
+.BR ft_fsend ()
+function:
+.RS
+.RS
+.PP
+PERMITTED_ACTIONS
+.br
+CONTENTS_TYPE
+.br
+STORAGE_ACCOUNT,
+.br
+FILE_AVAILABILITY
+.br
+FUTURE_FILESIZE
+.br
+ACCESS_CONTROL
+.br
+LEGAL_QUAL
+.br
+PRIVATE_USE
+.RE
+.PP
+If the underlying FTAM service provider fails to negotiate the use of an FTAM
+attribute group required for one of the specified attributes, the function
+returns an error.  A request to specify an initial value for an attribute other
+than those listed here also results in an error.
+.PP
+The following specific points should be noted:
+.IP \(bu \w'\(bu\(em'u
+.B Filename
+.br
+This parameter is set by XFTAM from the src_filename and dest_filename
+function parameters as noted above.  The FTAM responder may modify the value of
+this attribute for the created file, the modified value is returned in the
+functions return_attributes output parameter.
+.IP \(bu
+.B Permitted actions
+.br
+The FTAM responder may modify the value of this attribute for the created
+file, the modified value is returned in the return_attributes function output
+parameter.
+.IP \(bu
+.B Contents type
+.br
+If the user does not specify a value for this FTAM attribute, XFTAM defaults
+it to the defined FTAM-1 set or optionally determines the file contents type
+by an implementation defined lookup service.  If the implementation defined
+service is unable to determine the file contents type, it defaults it to the
+FTAM-1 set.  The implementation of the lookup service is beyond the scope of
+this specification.
+.RS
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+When the user application is able to determine the contents type, it is
+recommended to specify a value for this FTAM attribute.  Relying on the setting
+of the default value may be inappropriate.  For example, transferring a binary
+file (FTAM-3) as a text file (FTAM-1) may fail due to new linear manipulation.
+.PP
+The FTAM-1 default contents type:
+.IP \(em \w'\(em\(em'u
+Document type = FTAM-1 (unstructured text)
+.IP \(em
+Universal class = General String (text may contain format effectors)
+.IP \(em
+Maximum string length = unlimited.
+.IP \(em
+String significance = non-significant (lines from the source file are
+delimited by the FTAM format effectors <CR> <LF>).
+.PP
+The source file is assumed to be an unstructured file, containing a stream of
+bytes.  If the file contains text such as screen or print images, the document
+type may be specified as FTAM-1 with additional parameters to specify the
+appropriate universal class number (for example IA5-String).
+.PP
+If the file to be transferred contains binary information, the API user may
+specify an alternative document type (FTAM-3), to avoid unwanted
+interpretation of the source file's contents.
+.PP
+If an implementation supports the optional FTAM-2 document type, the API user
+may specify that the file is to be transferred as a sequential text file.
+XFTAM supports the transfer of entire files only, no mechanism is provided for
+transferring individual records from such a file.  The default parameters for
+such a file are as for the FTAM-1 document type.  The mechanism by which the
+record boundaries of the FTAM-2 document are identified in the local filestore
+is outside of the scope of XFTAM.
+.PP
+The transfer may fail if a document type or parameter combination not
+supported by the local implementation is specified.
+.PP
+The minimum value for the maximum-string-length document type parameter that
+an XFTAM implementation must support is 134 characters for the FTAM-1 and
+FTAM-2 document types, and 512 octets for FTAM-3.  The [FTE_INV_STRING_LENGTH]
+error is returned if the user attempts to send a document that exceeds the
+maximum supported value for this parameter.
+.RE
+.RE
+.TP
+.BI ftam_in " (Object (FTAM-Input-Parameters))
+This parameter is a handle for an object of class FTAM-Input-Parameters,
+specifying general FTAM parameters for use in this function.  The parameter is
+optional.  However, failure to specify some of its OM attributes may result in
+the remote responder rejecting the requested file actions.  The
+.BR ft_fsend ()
+function has the following specific requirements for the input object:
+.RS
+.IP \(bu \w'\(bu\(em'u
+.B Account
+.br
+If context-sensitive processing mode is in use for this operation
+(Association-Id is present), this parameter is optional.
+.RS
+.PP
+When present, for the duration of this file transfer or file management
+function, it overrides the current identified account to which charges are
+made (as defined when
+.BR ft_connect (3)
+created the association).  In this case, charges for this operation are
+returned upon completion.
+.PP
+When not present, the account identified when
+.BR ft_connect (3)
+created the association is used for any charges, and no charging information
+is returned when this function completes, all charging information being
+returned when the association is destroyed by
+.BR ft_disconnect (3).
+.RE
+.IP \(bu
+.B Create-Password
+.br
+Some responders may require this FTAM attribute to be specified when a file is
+to be created in the destination filestore.
+.IP \(bu
+.B File-Passwords
+.br
+This parameter is used to specify file passwords for the FTAM file actions to
+be performed.  Set the password for the required action if \fIdest_filename\fP
+already exists and contains an access control element that specifies a
+password for this action.  (See the discussion of the \fIdest_effect\fP
+parameter above for a description of the FTAM file actions that this function
+may perform).
+.IP \(bu
+.B Concurrency-Control
+.br
+This parameter is used to specify concurrency locks for the FTAM file actions
+to be performed.  Set the concurrency key for the required action if
+\fIdest_filename\fP already exists and contains an access control element
+that specifies a lock for this action.  (See the discussion of the
+\fIdest_effect\fP parameter above for a description of the FTAM file actions
+that this function may perform).
+.PP
+If context-sensitive processing mode is in use for this function call
+(Association-Id is present), the following parameters should not be present as
+they have already been provided when the association was created.  In this
+case, if any of these are present, the function returns an error code
+.RB [ FT_CONTEXT_MISMATCH ].
+.IP \(em \w'\(em\(em'u
+Initiator-Identity
+.IP \(em
+Filestore-Password
+.IP \(em
+FQoS.
+.RE
+.TP
+.BI api_in " (Object (API-Input-Parameters))
+This optional parameter is the handle of an object of class
+API-Input-Parameters, that may contain API-specific parameters for use in
+this function call.
+.RS
+.PP
+If context-sensitive processing mode is in use, this parameter contains the
+Association-Id for an existing association.  If the Association-Id provided
+does not represent an active association within the FTAM instance identified
+by Session, the function returns an error code
+.RB [ FTE_INV_ASSOC ].
+.RE
+.TP
+.BI return_attributes " (Private Object (FTAM-Attributes))
+If successful, attribute values are returned for the actual filename of the
+file created, and its permitted actions, either of that may have been
+modified by the remote responder when creating the file in the virtual
+filestore.
+.TP
+.BI ftam_out " (Private Object (FTAM-Output-Parameters))
+This parameter is a handle for a private object of class
+FTAM-Output-Parameters, and is returned only if there are relevant FTAM output
+parameters to be returned as a result of the FTAM actions performed.
+.RS
+.PP
+If context-sensitive processing mode is in use, the following specific
+parameter use applies:
+.IP \(bu \w'\(bu\(em'u
+.B Charging-List
+.br
+If an override account was provided (in the account attribute within ftam_in),
+any charges returned are those for this function only and do not include
+connection changes.  The charges returned here are not included in the charges
+returned when the association is destroyed with
+.BR ft_disconnect (3).
+.RE
+.TP
+.BI api_out " (Private Object (API-Output-Parameters))
+This parameter is always returned and is a handle for a private object of
+class API-Output- Parameters.  It returns API-specific output parameters for
+this function call.
+.\"
+.\"
+.SH RETURN
+.SS Synchronous Calls
+.PP
+.BR ft_fsend (3)
+returns either
+.RB [ FTE_SUCCESS ]
+or one of the values listed below in ERRORS.  The function return code and the
+Return-Code OM attribute of the API-Output-parameters output object are
+identical for synchronous calls.
+.SS Asynchronous Calls
+.PP
+.BR ft_fsend ()
+returns either
+.RB [ FTE_SUCCESS ]
+or one of the values in the API Error Codes list of the ERRORS section below.
+If the call returns
+.RB [ FTE_SUCCESS ]
+the contents of
+.IR ftam_out ", " api_out
+and any other output parameters that this function returns are undefined
+(these parameters are returned by a subsequent call to
+.BR ft_rcv_result (3)).
+For return codes other than
+.RB [ FTE_SUCCESS ]
+the function return code and the Return-Code XOM attribute of the
+API-Output-Parameters output object are identical.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP
+FTAM Error Codes
+FTE_FTAM_CANCEL
+.br
+FTE_FTAM_PERMANENT
+.br
+FTE_PROVIDER_ABORT
+.br
+FTE_USER_ABORT
+.TP
+Operation Error Codes
+FTE_INV_ATTRIBUTE
+.br
+FTE_INV_DOC_SPEC
+.br
+FTE_INV_STRING_LENGTH
+.br
+FTE_LOCAL_FILE_ERROR
+.br
+FTE_LOCAL_PERMISSION
+.br
+FTE_NO_SRC_FILE
+.br
+FTE_ATTR_GRP_NOT_NEGOTIATED
+.br
+FTE_SERV_CLS_NOT_NEGOTIATED
+.br
+FTE_FUNCT_UNIT_NOT_NEGOTIATED
+.TP
+API Error Codes
+FTE_CANCEL
+.br
+FTE_NO_RESOURCES
+.br
+FTE_VENDOR
+.br
+FTE_NOTSUP_ASYNC
+.br
+FTE_NOTSUP_FQOS
+.br
+FTE_NOTSUP_FTAM2
+.br
+FTE_INV_PADDRESS
+.br
+FTE_SESSION
+.br
+FTE_TOO_MANY_OPS
+.br
+FTE_INV_ASSOC
+.br
+FTE_CONTEXT_MISMATCH
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ft_connect (3),
+.BR ft_disconnect (3),
+.BR ft_rcv_result (3),
+.BR XFTAM (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ft_fsend ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ft_fsend ()
+is compatible with XFTAM
+.[
+xftam c415
+.]
+and implementations based on XFTAM, such as
+.IR "Solstice OSI 9.0" ,
+.IR "HP-UX OTS/9000" ,
+.IR "AIX OSI/6000" ,
+.IR "SVR 4.2 ONP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only source compatibility is attempted.  Binary compatibility will fail due to
+the lack of published and standard symbolic constants.  Any binary
+compatibility experienced is a bug and will be removed in the next release.
+.PP
+See \fBXFTAM\fP(3), \fBXOM\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom c607
+.]
+XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ft_fsend ()
+first appeared in XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XFTAM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4

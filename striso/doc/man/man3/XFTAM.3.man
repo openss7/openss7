@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: XFTAM.3.man,v 0.9.2.2 2008-04-25 08:38:27 brian Exp $
+.\" @(#) $Id: XFTAM.3.man,v 0.9.2.3 2008-04-26 11:11:54 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-26 11:11:54 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: XFTAM.3.man,v $
+.\" Revision 0.9.2.3  2008-04-26 11:11:54  brian
+.\" - updated manual pages
+.\"
 .\" Revision 0.9.2.2  2008-04-25 08:38:27  brian
 .\" - working up libraries modules and drivers
 .\"
@@ -88,90 +91,772 @@ sort-adjacent-labels
 \- FTAM High-Level API (XFTAM) Version 2
 .\"
 .\"
+.SH INTERFACE
+.PP
+FTAM High-Level API, XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libftam (3).
+.\"
+.\"
 .SH SYNOPSIS
 .PP
+.ad l
+.hy 0
 .HP
-.BI "FT_status ft_abandon (3)
+.BI "FT_status ft_abandon(\c
+.BI "OM_private_object " session ,
+.BI "OM_sint " invoke_id ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_abort (3)
+.BI "FT_status ft_abort(\c
+.BI "OM_private_object " session ,
+.BI "OM_uint32 " association_id ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_close (3)
+.BI "FT_status ft_close(\c
+.BI "OM_private_object " session );
 .HP
-.BI "FT_status ft_connect (3)
+.BI "FT_status ft_connect(\c
+.BI "OM_private_object " session ,
+.BI "OM_Object " p_address ,
+.BI "OM_Object " ftam_in ,
+.BI "OM_Object " api_in ,
+.BI "OM_uint32 *" association_id ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_disconnect (3)
+.BI "FT_status ft_disconnect(\c
+.BI "OM_private_object " session ,
+.BI "OM_uint32 " association_id ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_fcattributes (3)
+.BI "FT_status ft_fcattributes(\c
+.BI "OM_private_object " session ,
+.BI "OM_object " p_address ,
+.BI "OM_string *" filename ,
+.BI "OM_object " new_attributes ,
+.BI "OM_object " ftam_in ,
+.BI "OM_object " api_in ,
+.BI "OM_private_object *" return_attributes ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_fdelete (3)
+.BI "FT_status ft_fdelete(\c
+.BI "OM_private_object " session ,
+.BI "OM_object " p_address ,
+.BI "OM_string *" filename ,
+.BI "OM_object " ftam_in ,
+.BI "OM_object " api_in ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_frattributes (3)
+.BI "FT_status ft_frattributes(\c
+.BI "OM_private_object " session ,
+.BI "OM_object " p_address ,
+.BI "OM_string *" filename ,
+.BI "OM_object " attribute_names ,
+.BI "OM_object " ftam_in ,
+.BI "OM_object " api_in ,
+.BI "OM_private_object *" return_atttributes ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_frdir (3)
+.BI "FT_status ft_frdir(\c
+.BI "OM_private_object " session ,
+.BI "OM_object " p_address ,
+.BI "OM_string *" pathname ,
+.BI "OM_object " attribute_names ,
+.BI "OM_object " ftam_in ,
+.BI "OM_object " api_in ,
+.BI "OM_private_object *" directory_list ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_freceive (3)
+.BI "FT_status ft_freceive(\c
+.BI "OM_private_object " session ,
+.BI "OM_object " p_address ,
+.BI "OM_string *" src_filename ,
+.BI "OM_enum " src_effect ,
+.BI "OM_string *" dest_filename ,
+.BI "OM_enum " dest_efect ,
+.BI "OM_object " src_attributes ,
+.BI "OM_object " ftam_in ,
+.BI "OM_object " api_in ,
+.BI "OM_private_object *" return_attribute ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_fsend (3)
+.BI "FT_status ft_fsend(\c
+.BI "OM_private_object " session ,
+.BI "OM_string *" src_filename ,
+.BI "OM_enum " src_effect ,
+.BI "OM_object " p_address ,
+.BI "OM_string *" dest_filename ,
+.BI "OM_enum " dest_effect ,
+.BI "OM_object " initial_attributes ,
+.BI "OM_object " ftam_in ,
+.BI "OM_object " api_in ,
+.BI "OM_private_object *" return_attributes ,
+.BI "OM_private_object *" ftam_out ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_gperror (3)
+.BI "FT_status ft_gperror(\c
+.BI "OM_private_object " api_out_in ,
+.BI "OM_string **" return_string ,
+.BI "OM_string **" vendor_string ,
+.BI "OM_private_object *" api_out );
 .HP
-.BI "FT_status ft_open (3)
+.BI "FT_status ft_open(\c
+.BI "FT_package_t " package_list[] ,
+.BI "OM_private_object *" session ,
+.BI "OM_workspace *" workspace );
 .HP
-.BI "FT_status ft_rcvresult (3)
-.\"
-.\"
-.SH DESCRIPTION
-.PP
+.BI "FT_status ft_rcvresult(\c
+.BI "OM_private_object " session ,
+.BI "OM_uint *" completion_flag ,
+.BI "OM_uint32 *" op_invoke_id ,
+.BI "OM_private_object *" op_api_out ,
+.BI "OM_private_object *" op_ftam_out ,
+.BI "OM_private_object *" op_result_object ,
+.BI "OM_private_object *" api_out );
+.ad b
+.hy 6
 .\"
 .\"
 .SH FUNCTIONS
 .PP
+.TP \w'\fBft_frattributes\fP(3)\ \-\(en'u
+.BR ft_abandon "(3) \-
+abandon an outstanding or interrupted operation
+.PD 0
 .TP
-.BR ft_abandon (3)
+.BR ft_abort "(3) \-
+abort an association and any outstanding operations using it
 .TP
-.BR ft_abort (3)
+.BR ft_close "(3) \-
+destroy an XFTAM instance and release associated resources
 .TP
-.BR ft_close (3)
+.BR ft_connect "(3) \-
+establish an association with an FTAM file-store
 .TP
-.BR ft_connect (3)
+.BR ft_disconnect "(3) \-
+disconnect an XFTAM association
 .TP
-.BR ft_disconnect (3)
+.BR ft_fcattributes "(3) \-
+change the file attributes of an FTAM file
 .TP
+.BR ft_fdelete "(3) \-
+delete an FTAM file
+.TP
+.BR ft_frattributes "(3) \-
+read the file attributes of an FTAM file
+.TP
+.BR ft_frdir "(3) \-
+read the contents of an FTAM file-store directory
+.TP
+.BR ft_freceive "(3) \-
+receive a file from an FTAM filestore
+.TP
+.BR ft_freceive "(3) \-
+delete the existing file and replace with the file received.  The transfer
+.TP
+.BR ft_freceive "(3) \-
+the remote file is appended to the existing local file.  The transfer fails
+.TP
+.BR ft_freceive "(3) \-
+the file transfer fails.
+.TP
+.BR ft_fsend "(3) \-
+send a file to an FTAM filestore
+.TP
+.BR ft_gperror "(3) \-
+translate an FTAM error to a printable string
+.TP
+.BR ft_open "(3) \-
+initialize a session with XFTAM and allocate a workspace
+.TP
+.BR ft_rcvresult "(3) \-
+receive result of an asynchronous operation
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B XFTAM
+API provides a set of functions to support FTAM file transfer and management
+operations.  That is, XFTAM allows an application to transfer complete files
+to and from a remote Virtual Filestore (VFS) and to perform management
+operations on those files (read attributes, change attributes, and delete
+files).  A functoin is provided to list the contents of a directory on a
+remote filestore (this function relies upon an optional feature of FTAM \- the
+NBS-9 document type \- which may not be supported by the underlying initiator
+or the responder that provides access to the remove filestore).
+.PP
+The XFTAM API provides the following functions and features:
+.PP
+.B API Support Functions
+.IP \(bu \w'\(bu\(em'u
+.IR ft_open "() \-
+create an XFTAM instance and allocate an XOM workspace for the associated
+package(s).
+.IP \(bu
+.IR ft_close "() \-
+destroy an XFTAM instance and free the associated workspace.
+.IP \(bu
+.IR ft_connect "() \-
+create an association to a remote FTAM responder within an existing XFTAM
+instance.
+.IP \(bu
+.IR ft_disconenct "() \-
+destroy an association established by
+.IR ft_connect ()
+.IP \(bu
+.IR ft_abort "() \-
+abort an association and any outstanding asynchronous operations.
+.IP \(bu
+.IR ft_abandon "() \-
+abandon an outstanding asyncrhonous operation.
+.IP \(bu
+.IR ft_rcvresult "() \-
+receive the results of an oustanding asynchronous operation.
+.IP \(bu
+.IR ft_gperror "() \-
+translate XFTAM return codes into a printable string.
+.PP
+.B File Transfer Functions
+.IP \(bu \w'\(bu\(em'u
+.IR ft_fsend "() \-
+send a file from the local filestore to a remote VFS.
+.IP \(bu
+.IR ft_freceive "() \-
+receive a file from a remote VFS into the local filestore.
+.PP
+.B File Management Functions
+.IP \(bu \w'\(bu\(em'u
+.IR ft_frattributes "() \-
+read the attributes of a file in a remote VFS.
+.IP \(bu
+.IR ft_fcattributes "() \-
+change the attributes of a file in a remote VFS.
+.IP \(bu
+.IR ft_fdelete "() \-
+delete a file in a remote VFS.
+.PP
+.B Miscellaneous FUnctions
+.IP \(bu \w'\(bu\(em'u
+.IR ft_frdir "() \-
+return a list of entries from a directory in a remote VFS.
+.PP
+.B Document Types
+.PP
+XFTAM supports the following document types as the source or destination for
+file transfers:
+.IP \(bu \w'\(bu\(em'u
+.B FTAM-1
+\- unstructured text.
+.IP \(bu
+.B FTAM-2
+\- sequential text.
+.IP \(bu
+.B FTAM-3
+\- unstructured binary.
+.PP
+Support for transfer of FTAM-2 document type is optional in the FTAM profile
+\- a paticular XFTAM implementation, or the responders with which it
+interacts, may not support it.  XFTAM does not support file access operations
+on individual parts of an FTAM-2 document.  XFTAM optionally supports the
+NBS-9 document type for listing contents of a directory on a remote filestore.
+.PP
+.B XFTRAM Base Package
+To facilitate the passing of control information between the API user and
+XFTAM, the services of the OSI-Abstract-Data Manipulation API (XOM) are used.
+An XOM package has been defined which contains object class definitions for
+the information to be passed.
+.PP
+.B Supporting APIs
+.PP
+XFTAM relies upon an implementation of the X/Open XOM API, as specified in the
+referenced XOM specification, to support the passing of control information
+between the API user and XFTAM.
+.PP
+Also, optionally an implementation of the X/Open XDS API (reference XDS) may
+be used to provide an interface to a directory service for the purposes of
+obtaining addressing information needed to locate a remote FTAM responder.
+.\"
+.\"
+.SH ERRORS
+.PP
+Folloiwng are the return codes defined by XFTAM and listed by the XFTAM
+functions.  Each entry includes a description of the meaning of the code.
+.\"
+.SS FTAM Error Codes
+.PP
+These codes indicate that the underlying FTAM implementation reported an
+error. The application must examine any FTAM diagnostics objects returned in
+order to obtain a detailed description for the failure.
+.TP
+.RB [ FTE_FTAM_CANCEL ]
+This error is returned when XFTAM receives an F-CANCEL indication primitive
+during data transfer, indicating that the remote responder cannot continue
+with the data transfer.  The responder may provide diagnostic structures to
+specify the reason for the abort. When XFTAM issues an F-CANCEL request to
+abandon a data transfer regime, the cause of the error is indicated by an
+alternative XFTAM return code.
+.TP
+.RB [ FTE_FTAM_PERMANENT ]
+This type of error will occur every time the user attempts the requested
+operation. This type of error would be reported when, for example, the create
+password specified does not match the one held by the responder.
+.TP
+.RB [ FTE_PROVIDER_ABORT ]
+This error is returned when XFTAM receives an F-P-ABORT indication primitive
+from the service provider. The primitive may have been initiated by either the
+initiating service provider (as a result of an state error or a communications
+error) or the responding service provider (as a result of a state error - of
+course communications errors detected by the responder cannot be reported to
+the initiator). The only way to determine which entity caused the abort is to
+examine the source parameters of any diagnostic structures associated with the
+abort primitive.
+.TP
+.RB [ FTE_USER_ABORT ]
+This error is returned when XFTAM receives an F-U-ABORT indication primitive
+from the service provider, as a result of the responder issuing an equivalent
+request.  The responder may provide diagnostic structures to specify the
+reason for the abort.
+.\"
+.SS Operation Error Codes
+.PP
+These error codes indicate operation-related errors detected by the XFTAM API.
+.TP
+.RB [ FTE_ATTR_GRP_NOT_NEGOTIATED ]
+Returned by a function when an optional FTAM attribute group, required by the
+requested operation, has not been negotiated by XFTAM for the FTAM regime
+(XFTAM always requests support of all attribute groups - this error occurs
+when the responder refuses to support one or more groups).
+.RS
+.PP
+For example, this error would be returned by
 .BR ft_fcattributes (3)
+when an attempt is made to modify an attribute from the storage attribute
+group but the responder declines to support that group. Another example is
+where the API user specifies an values for the FTAM access passwords parameter
+(via the Access-Passwords XOM attribute of the FTAM-Input-Parameters object
+class) but support of the security attribute group is refused by the remote
+responder.
+.RE
 .TP
-.BR ft_fdelete (3)
-.TP
-.BR ft_frattributes (3)
-.TP
-.BR ft_frdir (3)
-.TP
+.RB [ FTE_FILE_EXISTS ]
+This error is returned by
 .BR ft_freceive (3)
+when the destination file exists and the dest_effect function parameter is set
+to fail.
 .TP
+.RB [ FTE_FQOS_NOT_NEGOTIATED ]
+This error is returned when XFTAM is not able to negotiate the requested
+Quality of Service (specified in the FQoS attribute of the
+FTAM-Input-Parameters) for the the XFTAM operation. It indicates that the FTAM
+regime was established with a lower FQoS value than that requested, and the
+operation was terminated as a consequence. If the requested FQoS is not
+supported by the underlying FTAM intiator because of an XFTAM implementation
+restriction, [FTE_NOTSUP_FQOS] is returned instead.
+.TP
+.RB [ FTE_FUNCT_UNIT_NOT_NEGOTIATED ]
+Returned by a function when a functional unit, required by the requested
+operation, is not supported by the responder.
+.RS
+.PP
+For example, this error would be returned by
+.BR ft_fcattributes (3)
+when the responder does not support the enhanced file management functional
+unit.
+.RE
+.TP
+.RB [ FTE_INV_ATTRIBUTE ]
+Returned by 
+.BR ft_fcattributes (3)
+when an attempt is made to change an attribute that FTAM defines as
+non-modifiable. Returned by
 .BR ft_fsend (3)
+when an attempt is made to specify initial FTAM attributes that are not
+settable by the initiator.
+.RS
+.PP
+For example, this error would be returned if the user specified a value for
+the permitted actions FTAM attribute (only settable at file creation) in a
+call to
+.BR ft_fcattributes (3)
+or a value for date and time of creation (only settable by the responder) in a
+call to
+.BR ft_fsend (3).
+.RE
 .TP
+.RB [ FTE_INV_DOC_RCVD ]
+This error is returned by
+.BR ft_freceive (3)
+when the content type of the file being received is not supported by the
+initiator. It may be possible to transfer the file successfully by specifying
+a valid simplification or relaxation of the actual file content type (via the
+Content-Type XOM attribute of the Attributes object class).
+.RS
+.PP
+For example, this error is returned where the responder indicates that the
+file to be accessed is of type FTAM-2 and the local XFTAM implementation does
+not support that document type. Another example is the case where the document
+type is FTAM-1 (which must be supported) but the universal class document type
+parameter is specified to be TeletextString, which may not be supported by the
+local implementation.
+.RE
+.TP
+.RB [ FTE_INV_DOC_SPEC ]
+This error is returned by
+.BR ft_freceive "(3) and " ft_fsend (3)
+when the API user specifies a content type for the file to be transferred (via
+the Content-Type XOM attribute of the Attributes object class) which is not
+supported by the local XFTAM implementation. In the send case, the content
+type refers to the type of file to be created in the reponders filestore. In
+the receive case, it is the expected type of the file to be received. See
+[FTE_INV_DOC_RCVD] for examples.
+.TP
+.RB [ FTE_INV_RETURN_CODE ]
+Returned by
 .BR ft_gperror (3)
+when the Return-Code XOM attribute of the API-Output-Parameters object is not
+a valid error code as defined by this specification.
 .TP
+.RB [FTE_INV_STRING_LENGTH]
+The value of the maximum-string-length parameter for FTAM document types may
+be restricted by an implementation of XFTAM. This error is returned if the
+user attempts to send or receive a document which exceeds the maximum
+supported value for this parameter. The error may be returned even if a value
+is not specified for the parameter, as the default value is unbounded. The
+minimum value for the maximum-string-length that an XFTAM implementation must
+support is 134 characters for the FTAM-1 and FTAM-2 document types, and 512
+octets for FTAM-3.
+.TP
+.RB [ FTE_INV_VENDOR_CODE ]
+Returned by
+.BR ft_gperror (3)
+when the Vendor-Code XOM attribute of the API-Output-Parameters object is not
+a valid error code as defined by the particular implementation.
+.TP
+.RB [ FTE_LOCAL_FILE_ERROR ]
+Returned by
+.BR ft_freceive "(3) or " ft_fsend (3)
+when XFTAM is unable to perform the required action in the local filestore for
+a reason other than one for which a specific error code is defined.  The
+precise reason for the failure is indicated by the local operation system
+error reporting mechanism.
+.RS
+.PP
+For example, if this error is returned by a call to
+.BR ft_freceive (3)
+in a CAE-conformant system, the system error variable errno contains the
+CAE-defined error code which is set as a result of the attempt to create or
+overwrite the local destination file.
+.RE
+.TP
+.RB [ FTE_LOCAL_PERMISSION ]
+Returned by
+.BR ft_freceive "(3) or " ft_fsend (3)
+when XFTAM is unable to perform the required action in the local filestore for
+reasons of access control. In the send case, this may occur when the user
+specifies a src_effect of move-file (in which case XFTAM attempts to delete
+the local file once the transfer is complete - the error indicates that the
+local file deletion failed, though the transfer of the file has been completed
+successfully). In the receive case, the error is returned when the dest_effect
+parameter is set to delete-file (in which case XFTAM attempts to delete the
+local file if it already exists).
+.TP
+.RB [ FTE_NO_SRC_FILE ]
+This error is returned by
+.BR ft_send (3)
+when the local file does not exist.
+.TP
+.RB [ FTE_NO_SUCH_INVOKATION ]
+This error is returned when an attempt is made to abandon an XFTAM operation
+which is not outstanding, or to cancel a synchronous operation while no such
+operation has been interrupted.
+.TP
+.RB [ FTE_SERV_CLS_NOT_NEGOTIATED ]
+Returned by a function when a service class, required by the requested
+operation, is not supported by the responder.
+.RS
+.PP
+For example, this error would be returned by
+.BR ft_fcattributes (3)
+when the responder does not support the file management service class.
+.RE
+.\"
+.SS API Error Codes
+.PP
+These error codes indicate errors detected by the XFTAM API, other than those
+directly related to the operation being requested.
+.TP
+.RB [ FTE_CANCEL ]
+This error code is returned by a synchronously-invoked function when
+.BR ft_abandon (3)
+has been called from within an interrupt handler function to terminate the
+interrupted XFTAM operation.
+.TP
+.RB [ FTE_CONTEXT_MISMATCH ]
+The error code is returned when there is a mismatch in the use of connection
+related parameters, and includes the following conditions:
+.RS
+.IP \(em \w'\(em\(em'u
+When neither neither p_address or Association-Id is provided to identify the
+FTAM responder. p_address is used when context free operation is in use, and
+Association-Id identifies the FTAM association when context-sensitive
+operation is in use.
+.IP \(em
+When any connection related parameters are supplied in addition to
+Association-Id.  When Association-Id is provided, the operation is
+context-sensitive and these are not provided.
+.RE
+.TP
+.RB [ FTE_INV_ASSOC ]
+This error is returned when XFTAM is supplied with an Association-Id which
+does not represent an existing association within the XFTAM instance indicated
+by the session input parameter.
+.TP
+.RB [ FTE_INV_PADDRESS ]
+The Presentation-Address object passed to a file transfer or management
+function does not represent an valid address for the XFTAM operation. This
+error indicates that the object passed does not have a valid set of XOM
+attributes:
+.RS
+.RS
+.PP
+A valid instance of the Presentation-Address class must contain, as a minimum,
+one N-Addresses attribute and one of the attributes P-Selector, S-Selector or
+T-Selector.
+.RE
+.PP
+Alternatively, it indicates that none of the list of N-Addresses attributes
+contain a valid NSAP address. The NSAP address formats supported are a feature
+of the individual XFTAM implementation and the environment in which it is
+running.
+.RE
+.TP
+.RB [ FTE_NO_RESOURCES ]
+This error code is returned when a request to execute an XFTAM operation
+cannot be completed due to a lack of some resource required to perform it. An
+implementation may use the Vendor-Code attribute of the API-Output-Parameters
+object to provide a more specific indication of the resource required to
+execute the operation.
+.TP
+.RB [ FTE_NO_WORKSPACE ]
+Returned by
 .BR ft_open (3)
+if an XFTAM instance cannot be created because storage cannot be allocated for
+the associated XOM workspace.
 .TP
+.RB [ FTE_NOTSUP_ASYNC ]
+This error code is returned in the case where an implementation does not
+support asynchronous execution mode and the user attempts to invoke an XFTAM
+operation with the Asynchronous XOM attribute in API-Input-Parameters set to
+TRUE. If an implementation defines the value of the constant FT_MAX_ASYNC_OPS
+to be zero, asynchronous operations are not supported. If the constant
+FT_MAX_ASYNC_OPS is not defined to be zero, the support of asynchronous
+operations is mandatory for
+.BR ft_fsend "(3) and " ft_freceive (3)
+but remains optional for all other functions.
+.TP
+.RB [ FTE_NOTSUP_FQOS ]
+This error code indicates that the level of recovery requested using the FQoS
+XOM attribute is not supported by this implementation of XFTAM. Support for
+FQoS values other than No Recovery is optional.
+.TP
+.RB [ FTE_NOTSUP_FTAM2 ]
+This error indicates that the optional document type FTAM-2 is not supported
+by this implementation of XFTAM. It may be returned by
+.BR ft_freceive (3)
+if the specified source file in the remote filestore is of type FTAM-2, or by
+.BR ft_fsend (3)
+if the user requests that the file created in the remote filestore is to be of
+type FTAM-2.
+.TP
+.RB [ FTE_PENDING_OP ]
+The error is returned by XFTAM when an
+.BR ft_disconnect (3)
+function is attempted on an association which is currently carrying active
+functions.
+.BR ft_abandon (3)
+should be used to terminate the action, or
+.BR ft_abort (3)
+used to abort the association.
+.TP
+.RB [ FTE_SESSION ]
+The Session object passed to a function in the session parameter does not
+identify a valid XFTAM instance. A Session object is returned when an XFTAM
+instance is created by a call to
+.BR ft_open (3),
+and destroyed when the object is passed to
+.BR ft_close (3).
+.TP
+.RB [ FTE_SYSTEM_ERROR ]
+An error related to the OS has occurred. The user should examine the
+Vendor-Code XOM attribute of the API-Output-Parameters return object to
+determine the precise error.
+.TP
+.RB [ FTE_TOO_MANY_OPS ]
+This error is returned if the API user attempts to invoke too many
+simultaneous asynchronous operations. The constant FT_MAX_ASYNC_OPS indicates
+how many such operations may be outstanding at any one time. It is the users
+responsibility to keep track of asynchronous operations and check against this
+number. If this error is returned, the user must wait until one of the current
+operations to complete and use
 .BR ft_rcvresult (3)
+to return its results before further asynchronous operations may be invoked.
+.TP
+.RB [ FTE_VENDOR ]
+An error related to the specific implementation of XFTAM has occurred. The
+user should examine the Vendor-Code XOM attribute of the API-Output-Parameters
+return object to determine the precise error.
+.TP
+.RB [ FTE_XDS_ERROR ]
+An error related to the XDS has occurred. The user should examine the
+Vendor-Code XOM attribute of the API-Output-Parameters return object to
+determine the precise error.
+.RS
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+This is for XFTAM implementations that use the XDS bind( ) function to get a
+bound session.
+.RE
+.TP
+.RB [ FTE_XOM_ERROR ]
+An error related to the XOM has occurred. The user should examine the
+Vendor-Code XOM attribute of the API-Output-Parameters return object to
+determine the precise error.
+.\"
+.\"
+.SH USAGE
+.PP
+A public object is a descriptor list that contains all the XOM attribute
+values of an XOM object, including the XOM class.  Public objects are used to
+simplify application programs by enabling the use of static data structures
+instead of a sequence of XOM function calls.
+.PP
+The application can generally supply either a public object or a private
+object as an argument of the interface functions.  There are exceptions, such
+as where an argument must be a private object \- in the interests of
+efficiency for example.  The interface always retunrs private objects.  The
+application can convert these into public objects by a call to
+.BR om_get (3),
+if required.
+Note that public objects returned by
+.BR om_get (3)
+are read-only and must not be modified in any way.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ft_abandon (3),
+.BR ft_abort (3),
+.BR ft_close (3),
+.BR ft_connect (3),
+.BR ft_disconnect (3),
+.BR ft_fcattributes (3),
+.BR ft_fdelete (3),
+.BR ft_frattributes (3),
+.BR ft_frdir (3),
+.BR ft_freceive (3),
+.BR ft_fsend (3),
+.BR ft_gperror (3),
+.BR ft_open (3),
+.BR ft_rcvresult (3),
+.BR om_get (3),
+.RB XOM (3).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B XFTAM
+is compatible with XFTAM
+.[
+xftam c415
+.]
+and implementations based on XFTAM, such as
+.IR "Solaris Solstice OSI 9.0" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "SVR 4.2 ONP" \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.BR ft_abandon "(3) and " ft_rcvresult (3)
+functions, and the
+.IR Asynchronous " and " Invoke-Id
+XOM attributes, are not supported by all implementations, and they are not
+necessary for implementations not supporting asynchronous operation.
+.IP \(em
+Attribute
+.IR Document-Type-FTAM-2
+is only supported if the implementation supports the FTAM-2 document type. 
+.IP \(em
+Only source compatibility is attempted.  Binary compatibility will fail due to
+the lack of publichsed and standard symbolic constants.  Any binary
+compatibility experienced is a bug and is scheduled to be removed in the next
+release.
+.PP
+See
+.BR XOM (3)
+and
+.IR STREAMS (4)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM
+.[
+xom c607
+.]
+XFTAM
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B XFTAM
+first appeared in XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 FTAM Library.
 .\"
 .\"
 .XX
 .[
-XFTAM
+xftam c415
 .]
 .[
-XAP c303
-.]
-.[
-XX25
-.]
-.[
-XOM c607
+xom c607
 .]
 .\"
 .\"
 .[
 $LIST$
 .]
-.TI
+.T4

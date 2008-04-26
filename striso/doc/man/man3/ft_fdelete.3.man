@@ -1,0 +1,388 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ft_fdelete.3.man,v 0.9.2.2 2008-04-26 11:11:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-04-26 11:11:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ft_fdelete.3.man,v $
+.\" Revision 0.9.2.2  2008-04-26 11:11:54  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database striso.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so striso.macros
+.\"
+.\"
+.TH FT_FDELETE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B ft_fdelete
+\- delete an FTAM file
+.\"
+.\"
+.SH INTERFACE
+.PP
+FTAM High-Level API, XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libftam (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <xftam.h>
+.HP
+.B FT_return_code ft_delete(
+.br
+.BI "OM_private_object " session ,
+.br
+.BI "OM_object " p_address ,
+.br
+.BI "OM_string *" filename ,
+.br
+.BI "OM_object " ftam_in ,
+.br
+.BI "OM_object " api_in ,
+.br
+.BI "OM_private_object *" ftam_out ,
+.br
+.BI "OM_private_object *" api_out );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR ft_delete ()
+function removes
+.I filename
+from the filestore identified the
+.IR p_address .
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.BI session " (Object(Session))
+This parameter is a handle for a private object of class Session that
+identifies the particular XFTAM instance that is to perform the required FTAM
+operation.  The session identifies the resources associated with the instance,
+including the XOM workspace that contains all private objects passed to or
+returned from this XFTAM function call.
+.TP
+.BI p_address " (Object(Presentation-Address))
+This parameter is a handle for an object of class Presentation-Address.  If
+present, the Association-Id attribute of API-Input-Parameters shall be absent
+as the operation is being carried out in context free mode.  When present, this
+attribute identifies the FTAM responder that servers the remote filestore.
+.RS
+.PP
+If not present, the Association-Id attribute of API-Input-Parameters shall be
+present as the operation is being carried out in context-sensitive mode.
+.PP
+If both P-Address and Association-Id are present, the function returns an error
+code
+.RB [ FT_CONTEXT_MISMATCH ].
+.RE
+.TP
+.BI filename " (String(Graphic))
+The name file to be deleted.  A mandatory parameter, given in the syntax used
+by the real filestore containing the file.
+.TP
+.BI ftam_in " (Object(FTAM-Input-Parameters))
+This parameter is a handle for an object of class FTAM-Input-Parameters,
+specifying the general FTAM parameters for use in this function.  The parameter
+is optional.  However, failure to specify some of its OM attributes may result
+in the remote responder rejecting the requested file actions.  The
+.BR ft_delete ()
+function has the following specific requirements for these parameters:
+.RS
+.IP \(bu \w'\(bu\(em'u
+.B Account.
+.br
+If context-sensitive processing mode is in use for this operation
+(Association-Id is present), this parameter is optional.
+.RS
+.PP
+When present, for the duration of this file transfer or file management
+function, it overrides the current identified account to which charges are made
+(as defined when
+.BR ft_connect (3)
+created the association).  In this case, charges for this operation are
+returned upon completion.
+.PP
+When not present, the account identified when
+.BR ft_connect (3)
+created the association is used for any charges, and no charging information is
+returned when this function completes, all charging information being returned
+when the association is destroyed by
+.BR ft_disconnect (3).
+.RE
+.IP \(bu
+.B File-Passwords
+.br
+This parameter is sued to specify file passwords for the FTAM file actions to
+be performed.  Set the
+.I delete
+password if
+.I filename
+contains an access control element that specifies passwords for these actions.
+.IP \(bu
+.B Concurrency-Control.
+.br
+This parameter is used to specify concurrency locks for the FTAM file actions to
+be performed.  Set the
+.I delete
+concurrency key if
+.I filename
+contains an access control element that specifies locks for these actions.
+.PP
+If context-sensitive processing mode is in use for this function call
+(Association-Id is present), the following parameters should not be present as
+they have already been provided when the association was created.  In this
+case, if any of these are present, the function returns an error code
+.RB [ FT_CONTEXT_MISMATCH ].
+.RS
+.IP \(em \w'\(em\(em'u
+Initiator-Identity
+.IP \(em
+Filestore-Password
+.IP \(em
+FQoS
+.RE
+.RE
+.TP
+.BI api_in " (Object(API-Input-Parameters))
+.TP
+.BI ftam_out " (Private Object(FTAM-Output-Parameters))
+This parameter is a handle for a private object of class
+FTAM-Output-Parameters, and is returned only if there are relevant FTAM output
+parameters to be returned as a result of the FTAM actions performed.
+.RS
+.IP \(bu \w'\(bu\(em'u
+.B Charging-List.
+.br
+If an override account was provided (in the account attribute within
+.IR ftam_in ),
+any charges returned are those fo this function only and do not include
+connection charges.  The charges returned here are not included in the charges
+returned when the association is destroyed with
+.BR ft_disconnect (3).
+.RE
+.TP
+.BI api_out " (Private Object(API-Output-Parameters))
+This parameter is always returned and is a handle for a private object of class
+API-Output-Parameters.  It returns API-specific output parameters for this
+function call.
+.\"
+.\"
+.SH RETURN
+.PP
+.SS Synchronous Calls
+.PP
+.BR ft_fdelete ()
+returns either
+.RB [ FTE_SUCCESS ]
+or one of the values listed below in
+.RI \(lq ERRORS .\(rq
+THe function return code and the Return-Code OM attribute of the
+API-Output-Parameters output object are identical for synchronous calls.
+.SS Asynchronous Calls
+.BR ft_fdelete ()
+returns either
+.RB [ FTE_SUCCESS ]
+or one fo the values in the API Error Codes list of the
+.RI \(lq ERRORS \(rq
+section, below.  If the call returns
+.RB [ FTE_SUCCESS ]
+the contents of
+.IR ftam_out ", " api_out
+and any other output parameters that this function returns are undefined (these
+parameters are returned by a subsequent call to
+.BR ft_rcv_result (3)).
+For return codes other than
+.RB [ FTE_SUCCESS ]
+the function return code and the Return-Code XOM attribute of the
+API-Output-Parameters output object are identical.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP
+FTAM Error Codes
+.B FTE_FTAM_CANCEL
+.br
+.B FTE_FTAM_PERMANENT
+.br
+.B FTE_PROVIDER_ABORT
+.br
+.B FTE_USER_ABORT
+.TP
+Operation Error Codes
+.B FTE_ATTR_GRP_NOT_NEGOTIATED
+.br
+.B FTE_SERV_CLS_NOT_NEGOTIATED
+.br
+.B FTE_FUNCT_UNIT_NOT_NEGOTIATED
+.TP
+API Error Codes
+.B FTE_CANCEL
+.br
+.B FTE_NO_RESOURCES
+.br
+.B FTE_VENDOR
+.br
+.B FTE_NOTSUP_ASYNC
+.br
+.B FTE_INV_PADDRESS
+.br
+.B FTE_SESSION
+.br
+.B FTE_TOO_MANY_OPS
+.br
+.B FTE_INV_ASSOC
+.br
+.B FTE_CONTEXT_MISMATCH
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ft_connect (3),
+.BR ft_disconnect (3),
+.BR ft_rcv_result (3),
+.BR XFTAM (3).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR ft_fdelete ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR ft_fdelete ()
+is compatible with XFTAM
+.[
+xftam c415
+.]
+and implementations based on XFTAM, such as
+.IR "Solstice OSI 9.0" ,
+.IR "HP-UX OTS/9000" ,
+.IR "AIX OSI/6000" ,
+.IR "SVR 4.2 ONP" ,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only source compatibility is attempted.  Binary compatibility will fail due to
+the lack of published and standard symbolic constants.  Any binary
+compatibility experienced is a bug and will be removed in the next release.
+.PP
+See \fBXFTAM\fP(3), \fBXOM\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XOM,
+.[
+xom c607
+.]
+XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ft_fdelete ()
+first appeared in XFTAM.
+.[
+xftam c415
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 XFTAM Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T4
