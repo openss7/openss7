@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $
+ @(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/26 11:05:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-11 16:58:44 $ by $Author: brian $
+ Last Modified $Date: 2008/04/26 11:05:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: asnlex.l,v $
+ Revision 0.9.2.3  2008/04/26 11:05:37  brian
+ - support for flex 2.5.4 and 2.5.33
+
  Revision 0.9.2.2  2008-04-11 16:58:44  brian
  - removed deprecated NEXUSWARE support
 
@@ -62,9 +65,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $"
+#ident "@(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/26 11:05:37 $"
 
-static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-11 16:58:44 $";
+static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/26 11:05:37 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -74,6 +77,9 @@ static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2
 #include "asnyac.h"
 
 #define ECHO fputs(yytext, yyout)
+
+#define reject_used_but_not_detected
+#define FIND_RULE REJECT
 
 %}
 
@@ -99,69 +105,69 @@ static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.2
 
 %%
 
-BOOLEAN			return TOK_BOOLEAN;
-INTEGER			return TOK_INTEGER;
-BIT			return TOK_BIT;
-STRING			return TOK_STRING;
-OCTET			return TOK_OCTET;
-NULL			return TOK_NULL;
-SEQUENCE		return TOK_SEQUENCE;
-OF			return TOK_OF;
-SET			return TOK_SET;
-IMPLICIT		return TOK_IMPLICIT;
-CHOICE			return TOK_CHOICE;
-ANY			return TOK_ANY;
-EXTERNAL		return TOK_EXTERNAL;
-OBJECT			return TOK_OBJECT;
-IDENTIFIER		return TOK_IDENTIFIER;
-OPTIONAL		return TOK_OPTIONAL;
-DEFAULT			return TOK_DEFAULT;
-COMPONENTS		return TOK_COMPONENTS;
-UNIVERSAL		return TOK_UNIVERSAL;
-APPLICATION		return TOK_APPLICATION;
-PRIVATE			return TOK_PRIVATE;
-TRUE			return TOK_TRUE;
-FALSE			return TOK_FALSE;
-BEGIN			return TOK_BEGIN;
-END			return TOK_END;
-DEFINITIONS		return TOK_DEFINITIONS;
-EXPLICIT		return TOK_EXPLICIT;
-ENUMERATED		return TOK_ENUMERATED;
-EXPORTS			return TOK_EXPORTS;
-IMPORTS			return TOK_IMPORTS;
-REAL			return TOK_REAL;
-INCLUDES		return TOK_INCLUDES;
-MIN			return TOK_MIN;
-MAX			return TOK_MAX;
-SIZE			return TOK_SIZE;
-FROM			return TOK_FROM;
-WITH			return TOK_WITH;
-COMPONENT		return TOK_COMPONENT;
-PRESENT			return TOK_PRESENT;
-ABSENT			return TOK_ABSENT;
-DEFINED			return TOK_DEFINED;
-BY			return TOK_BY;
-PLUS[- ]INFINITY	return TOK_PLUS_INFINITY;
-MINUS[- ]INFINITY	return TOK_MINUS_INFINITY;
-TAGS			return TOK_TAGS;
-"::="			return TOK_ASSIGNMENT;
-"{"			return TOK_OPEN_BRACE;
-"}"			return TOK_CLOSE_BRACE;
-"<"			return TOK_LEFT_ANGLE;
-","			return TOK_COMMA;
-"."			return TOK_PERIOD;
-"("			return TOK_OPEN_PAREN;
-")"			return TOK_CLOSE_PAREN;
-"["			return TOK_OPEN_BRACKET;
-"]"			return TOK_CLOSE_BRACKET;
-"-"			return TOK_HYPHEN;
-";"			return TOK_SEMICOLON;
-'[01]*'B		return TOK_bstring;
-'[0-9a-fA-F]*'H		return TOK_hstring;
-\"([^\"]*|\\\"|\"\")*\"	return TOK_cstring;
-[A-Z][-a-zA-Z0-9]*	return TOK_identifier;
-[a-z][-a-zA-Z0-9]*	return TOK_reference;
-[1-9][0-9]*		return TOK_number;
+BOOLEAN			{ return TOK_BOOLEAN; FIND_RULE; }
+INTEGER			{ return TOK_INTEGER; }
+BIT			{ return TOK_BIT; }
+STRING			{ return TOK_STRING; }
+OCTET			{ return TOK_OCTET; }
+NULL			{ return TOK_NULL; }
+SEQUENCE		{ return TOK_SEQUENCE; }
+OF			{ return TOK_OF; }
+SET			{ return TOK_SET; }
+IMPLICIT		{ return TOK_IMPLICIT; }
+CHOICE			{ return TOK_CHOICE; }
+ANY			{ return TOK_ANY; }
+EXTERNAL		{ return TOK_EXTERNAL; }
+OBJECT			{ return TOK_OBJECT; }
+IDENTIFIER		{ return TOK_IDENTIFIER; }
+OPTIONAL		{ return TOK_OPTIONAL; }
+DEFAULT			{ return TOK_DEFAULT; }
+COMPONENTS		{ return TOK_COMPONENTS; }
+UNIVERSAL		{ return TOK_UNIVERSAL; }
+APPLICATION		{ return TOK_APPLICATION; }
+PRIVATE			{ return TOK_PRIVATE; }
+TRUE			{ return TOK_TRUE; }
+FALSE			{ return TOK_FALSE; }
+BEGIN			{ return TOK_BEGIN; }
+END			{ return TOK_END; }
+DEFINITIONS		{ return TOK_DEFINITIONS; }
+EXPLICIT		{ return TOK_EXPLICIT; }
+ENUMERATED		{ return TOK_ENUMERATED; }
+EXPORTS			{ return TOK_EXPORTS; }
+IMPORTS			{ return TOK_IMPORTS; }
+REAL			{ return TOK_REAL; }
+INCLUDES		{ return TOK_INCLUDES; }
+MIN			{ return TOK_MIN; }
+MAX			{ return TOK_MAX; }
+SIZE			{ return TOK_SIZE; }
+FROM			{ return TOK_FROM; }
+WITH			{ return TOK_WITH; }
+COMPONENT		{ return TOK_COMPONENT; }
+PRESENT			{ return TOK_PRESENT; }
+ABSENT			{ return TOK_ABSENT; }
+DEFINED			{ return TOK_DEFINED; }
+BY			{ return TOK_BY; }
+PLUS[- ]INFINITY	{ return TOK_PLUS_INFINITY; }
+MINUS[- ]INFINITY	{ return TOK_MINUS_INFINITY; }
+TAGS			{ return TOK_TAGS; }
+"::="			{ return TOK_ASSIGNMENT; }
+"{"			{ return TOK_OPEN_BRACE; }
+"}"			{ return TOK_CLOSE_BRACE; }
+"<"			{ return TOK_LEFT_ANGLE; }
+","			{ return TOK_COMMA; }
+"."			{ return TOK_PERIOD; }
+"("			{ return TOK_OPEN_PAREN; }
+")"			{ return TOK_CLOSE_PAREN; }
+"["			{ return TOK_OPEN_BRACKET; }
+"]"			{ return TOK_CLOSE_BRACKET; }
+"-"			{ return TOK_HYPHEN; }
+";"			{ return TOK_SEMICOLON; }
+'[01]*'B		{ return TOK_bstring; }
+'[0-9a-fA-F]*'H		{ return TOK_hstring; }
+\"([^\"]*|\\\"|\"\")*\"	{ return TOK_cstring; }
+[A-Z][-a-zA-Z0-9]*	{ return TOK_identifier; }
+[a-z][-a-zA-Z0-9]*	{ return TOK_reference; }
+[1-9][0-9]*		{ return TOK_number; }
 
 
 
