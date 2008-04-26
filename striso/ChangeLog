@@ -1,3 +1,8 @@
+2008-04-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/asnlex.l: support for flex 2.5.4 and 2.5.33
+	* src/util/gdmolex.l: support for flex 2.5.4 and 2.5.33
+
 2008-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man3/ap_ro_bind.3.man: added manual page

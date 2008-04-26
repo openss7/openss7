@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/10 09:13:21 $
+ @(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/04/26 11:05:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/04/10 09:13:21 $ by $Author: brian $
+ Last Modified $Date: 2008/04/26 11:05:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gdmolex.l,v $
+ Revision 0.9.2.4  2008/04/26 11:05:37  brian
+ - support for flex 2.5.4 and 2.5.33
+
  Revision 0.9.2.3  2008/04/10 09:13:21  brian
  - more corrections
 
@@ -65,9 +68,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/10 09:13:21 $"
+#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/04/26 11:05:37 $"
 
-static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/04/10 09:13:21 $";
+static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/04/26 11:05:37 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -86,6 +89,8 @@ extern int gdmo_level;
 extern int gdmo_column;
 extern int gdmo_incomment;
 
+#define reject_used_but_not_detected
+#define FIND_RULE REJECT
 
 %}
 
@@ -442,7 +447,7 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 <INITIAL,asn>{EXTERNREF}		{ return TOK_EXTERNREF				; }
 <INITIAL,asn>{NAMEANDNUMBER}		{ return TOK_NAME_AND_NUMBER			; }
 <INITIAL,asn>{IDLABEL}			{ return TOK_ID					; }
-<INITIAL,asn>{LABEL}			{ return TOK_LABEL				; }
+<INITIAL,asn>{LABEL}			{ return TOK_LABEL; FIND_RULE			; }
 <INITIAL,asn>{NUMBER}			{ return TOK_NUMBER				; }
 
 <INITIAL,asn>[a-z]			{ yy_push_state(label); yymore();		; }
