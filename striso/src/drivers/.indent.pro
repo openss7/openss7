@@ -8,7 +8,7 @@
 -bbo
 -ncdb
 -l100
--lc100
+-lc80
 -i8
 -ip8
 -cli0
@@ -109,4 +109,3 @@
 -Tdl_long
 -Tdl_ulong
 -Tdl_ushort
--Tuint

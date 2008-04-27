@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -442,10 +442,17 @@ implementations.
 The OpenSS7 APLI and XAP libraries implement the full range of \fBpoll\fP(2s)
 flags for both these functions.  Portable programs will only use those defined
 by the standard.
+.IP \(em
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
 .PP
-See also,
-.BR XAP (3),
-for additional compatibility considerations.
+See
+.BR XAP (3)
+and
+.IR STREAMS (4)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

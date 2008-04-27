@@ -4011,6 +4011,18 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K x721
+%L X.721
+%A ITU
+%R ITU-T Recommendation X.721 [ISO/IEC 10165-2:1992]
+%C Geneva
+%D February 10, 1992
+%T Information Technology \(em Open Systems Interconnection \(em Structure of Management Information: Definition of Management Information
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K x722
 %K GDMO
 %L X.722
@@ -4018,7 +4030,8 @@ Part 1: Protocol Specification
 %R ITU-T Recommendation X.722 [ISO/IEC 10165-4 : 1992]
 %C Geneva
 %D January 1992
-%T Information Technology \(em Open Systems Interconnection \(em Structure of Management %Information: Guidelines for the Definition of Managed Objects
+%T Information Technology \(em Open Systems Interconnection \(em Structure of Management Information: Guidelines for the Definition of Managed Objects
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/

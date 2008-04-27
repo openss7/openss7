@@ -2168,7 +2168,7 @@ lmi_rx_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	return lmi_error_reply(sl, q, mp, LMI_DETACH_REQ, err);
 }
 
-int lmi_passalong(struct sl *, queue_t *, mblk_t *);
+static noinline fastcall int sl_passalong_req(struct sl *sl, queue_t *q, mblk_t *mp);
 
 /**
  * lmi_rx_enable_req: - process an LMI_ENABLE_REQ primitive
@@ -2190,7 +2190,7 @@ lmi_rx_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if (!sl->oq)
 		goto initfailed;
-	return lmi_passalong(sl, q, mp);
+	return sl_passalong_req(sl, q, mp);
       initfailed:
 	err = LMI_INITFAILED;
 	goto error;
@@ -2225,7 +2225,7 @@ lmi_rx_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (!sl->oq)
 		goto fatalerror;
-	return lmi_passalong(sl, q, mp);
+	return sl_passalong_req(sl, q, mp);
       fatalerror:
 	err = LMI_FATALERR;
 	goto error;
@@ -2721,7 +2721,7 @@ sl_rx_pdu_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	return (1);
 }
 
-int sl_passalong(struct sl *, queue_t *, mblk_t *);
+static noinline fastcall int sl_passalong_ind(struct sl *sl, queue_t *q, mblk_t *mp);
 
 /**
  * sl_rx_link_congested_ind: - process an SL_LINK_CONGESTED_IND primitive
@@ -2743,7 +2743,7 @@ sl_rx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (p->sl_cong_status || p->sl_disc_status)
 		sl_or_l_flags(sl, SLF_LINK_CONGESTED);
 #endif
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
       badprim:
 	err = LMI_BADPRIM;
 	goto error;
@@ -2768,7 +2768,7 @@ sl_rx_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (!p->sl_cong_status && !p->sl_disc_status)
 		sl_nand_l_flags(sl, SLF_LINK_CONGESTED);
 #endif
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2788,7 +2788,7 @@ sl_rx_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			(SLF_LOC_PROC_OUT | SLF_REM_PROC_OUT | SLF_LEVEL_3_IND | SLF_LINK_CONGESTED
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2808,7 +2808,7 @@ sl_rx_retrieval_complete_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			(SLF_LOC_PROC_OUT | SLF_REM_PROC_OUT | SLF_LEVEL_3_IND | SLF_LINK_CONGESTED
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2828,7 +2828,7 @@ sl_rx_rb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			(SLF_LOC_PROC_OUT | SLF_REM_PROC_OUT | SLF_LEVEL_3_IND | SLF_LINK_CONGESTED
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2848,7 +2848,7 @@ sl_rx_bsnt_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			(SLF_LOC_PROC_OUT | SLF_REM_PROC_OUT | SLF_LEVEL_3_IND | SLF_LINK_CONGESTED
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2868,7 +2868,7 @@ sl_rx_in_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			(SLF_LOC_PROC_OUT | SLF_REM_PROC_OUT | SLF_LEVEL_3_IND | SLF_LINK_CONGESTED
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2889,7 +2889,7 @@ sl_rx_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2909,7 +2909,7 @@ sl_rx_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_nand_l_flags(sl, SLF_LEVEL_3_IND);
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2928,7 +2928,7 @@ sl_rx_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_nand_l_flags(sl, SLF_REM_PROC_OUT);
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2949,7 +2949,7 @@ sl_rx_rtb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2970,7 +2970,7 @@ sl_rx_retrieval_not_possible_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -2991,7 +2991,7 @@ sl_rx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			 | SLF_CONG_DISCARD | SLF_CONG_ACCEPT));
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -3006,7 +3006,7 @@ sl_rx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	lmi_optmgmt_ack_t *p = (typeof(p)) mp->b_rptr;
 
 	(void) p;
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -3021,7 +3021,7 @@ sl_rx_notify_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	lmi_event_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	(void) p;
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -3039,7 +3039,7 @@ sl_rx_local_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_or_l_flags(sl, (SLF_LOC_PROC_OUT));
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -3057,7 +3057,7 @@ sl_rx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_nand_l_flags(sl, (SLF_LOC_PROC_OUT));
 #endif
 
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -3072,7 +3072,7 @@ sl_rx_other_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_long *p = (typeof(p)) mp->b_rptr;
 
 	(void) p;
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /**
@@ -3084,7 +3084,7 @@ sl_rx_other_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 static fastcall int
 sl_rx_data_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	return sl_passalong(sl, q, mp);
+	return sl_passalong_ind(sl, q, mp);
 }
 
 /*

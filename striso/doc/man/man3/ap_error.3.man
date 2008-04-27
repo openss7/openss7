@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -313,7 +313,29 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR ap_error ()
-is compatible with XAP.
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI or XAP, such as
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
+.PP
+See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

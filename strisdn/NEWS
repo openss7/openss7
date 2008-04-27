@@ -1,4 +1,4 @@
-OpenSS7 STREAMS ISDN -- history of user visible changes.  2008-04-11
+OpenSS7 STREAMS ISDN -- history of user visible changes.  2008-04-12
 $Id: NEWS,v 0.9.2.27 2008-04-11 17:09:54 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -32,7 +32,7 @@ Major features since the last public release are as follows:
    - Kernel module license made explicit "GPL v2".  And then changed
      back to "GPL".
 
-   - License upgrade to GPL Version 3.
+   - License upgrade to AGPL Version 3.
 
    - Ability to strap out major documentation build and installation
      primarily for embedded targets.
@@ -51,9 +51,9 @@ installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
 RPM- and DPKG-based distributions, and can be used on production
 kernels without patching or recompiling the kernel.
 
-This package is publicly released under the `GNU General Public License
-Version 3'.  The release is available as an `autoconf' tarball, SRPM,
-DSC, and set of binary RPMs and DEBs.  See the downloads page
+This package is publicly released under the `GNU Affero General Public
+License Version 3'.  The release is available as an `autoconf' tarball,
+SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 (http://www.openss7.org/download.html) for the `autoconf' tarballs,
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the strisdn package page (http://www.openss7.org/strisdn_pkg.html).

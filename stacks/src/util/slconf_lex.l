@@ -88,6 +88,9 @@ static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9
 
 #define ECHO fputs(yytext, yyout)
 
+#define reject_used_but_not_detected
+#define FIND_RULE REJECT
+
 #if 0
 static int
 stdgrp_val(char *text)
@@ -318,7 +321,7 @@ OPTIONS		({OPTION})(","{OPTION})*
 
 "\\\n"			/* absorb continuation markers */
 
-"\n"			{ return TOK_EOL	; }
+"\n"			{ return TOK_EOL	; FIND_RULE; }
 
 "usage"|"u"		{ return TOK_USAGE	; }
 "help"|"h"|"?"		{ return TOK_HELP	; }
@@ -626,7 +629,7 @@ OPTIONS		({OPTION})(","{OPTION})*
       /* {OPTIONS}		{ yylval.val = opts_val(yytext);	return TOK_OPTIONS	; } */
       /* {DEVICETYPE}		{ yylval.val = dt_val(yytext,yyleng);	return TOK_DEVICETYPE	; } */
 
-[;]			{ return TOK_SEMICOLON	; }
+[;]			{ return TOK_SEMICOLON	; REJECT; }
 [:]			{ return TOK_COLON	; }
 [=]			{ return TOK_EQUAL	; }
 [,]			{ return TOK_COMMA	; }

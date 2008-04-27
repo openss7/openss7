@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -778,34 +778,36 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .B ap_errno
-is compatible with APLI,
+is compatible with APLI
 .[
-apli UNIX International
+apli unix international
 .]
-XAP,
+and XAP,
 .[
 xap c303
 .]
-and implementations based on APLI and XAP wuch as
-.IR Solaris \(rg " SunLink OSI" ,
-.IR Solaris \(rg " Solstice OSI",
-.IR HP \(rg " OSI Transport Services (OTS/9000)" ,
-.IR "SVR 4.2 Open Network Services (ONS)" ,
+and implementations based on APLI or XAP, such as
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-There are situations in which the error code produced by the APLI or XAP
-library is open to interpretation.  Therefore, portable APLI and XAP programs
-will not rely on the value of a specific error code in specific circumstances,
-but will, rather, rely only upon the success or failure of the library call.
+There are situations in which the error code produced by the APLI or XAP library is open to
+interpretation.  Therefore, portable APLI and XAP programs will not rely on the value of a specific
+error code in specific circumstances, but will, rather, rely only upon the success or failure of the
+library call.
 .IP \(em
-Implementations vary in the capitalization and terminal punctuation of error
-strings.  Portable APLI and XAP programs will compose error string printouts
-in such a format as to not rely on the capitalization of the first word of the
-error string, nor the existence of punctuation (period) at the end of the
-message.
+Implementations vary in the capitalization and terminal punctuation of error strings.  Portable APLI
+and XAP programs will compose error string printouts in such a format as to not rely on the
+capitalization of the first word of the error string, nor the existence of punctuation (period) at
+the end of the message.
 .IP \(em
-.IP \(em
-.IP \(em
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
 .PP
 See
 .BR APLI (3),

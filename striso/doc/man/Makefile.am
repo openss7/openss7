@@ -69,11 +69,59 @@ MANS_UNUSED = \
 	man3/apli_rcv.3 \
 	man3/apli_set_env.3 \
 	man3/apli_snd.3 \
+	man3/ap_env.3 \
+	man3/ap_ro_init.3 \
+	man3/ap_ro_bind.3 \
+	man3/ap_ro_unbind.3 \
+	man3/ap_ro_release.3 \
+	man3/ft_abandon.3 \
+	man3/ft_abort.3 \
+	man3/ft_close.3 \
+	man3/ft_connect.3 \
+	man3/ft_disconnect.3 \
+	man3/ft_fcattributes.3 \
+	man3/ft_fdelete.3 \
+	man3/ft_frattributes.3 \
+	man3/ft_frdir.3 \
+	man3/ft_freceive.3 \
+	man3/ft_fsend.3 \
+	man3/ft_gperror.3 \
+	man3/ft_open.3 \
+	man3/ft_rcvresult.3 \
+	man3/ro_bind.3 \
+	man3/ro_unbind.3 \
+	man3/libapli.3 \
+	man3/libxap.3 \
+	man3/libxds.3 \
+	man3/libxftam.3 \
+	man3/libxmp.3 \
+	man3/libxom.3 \
+	man3/OSI.3 \
+	man3/xftam.3 \
+	man3/XMS.3 \
+	man3/xti_x25.3 \
+	man4/apmod.4 \
+	man4/clnp.4 \
+	man4/clnstpi.4 \
+	man4/cons.4 \
+	man4/dl_lapb.4 \
+	man4/ISO.4 \
+	man4/momod.4 \
+	man4/oclt.4 \
+	man4/onpi.4 \
+	man4/oopi.4 \
+	man4/otk6.4 \
+	man4/otpi.4 \
+	man4/xapmod.4 \
+	man4/xos.4 \
+	man4/xx25.4 \
 	man4/iso-ip.4 \
 	man4/iso-udp.4 \
 	man4/isos.4 \
 	man4/xol.4 \
-	man5/striso.5
+	man5/striso.5 \
+	man8/asn1.8 \
+	man8/osinetd.8
 
 man_MANS = \
 	man3/ap_bind.3 \
@@ -153,7 +201,6 @@ man_MANS = \
 	man3/libxmp.3 \
 	man3/libxom.3 \
 	man3/mp_abandon.3 \
-	man3/mp_abort.3 \
 	man3/mp_abort_req.3 \
 	man3/mp_action_req.3 \
 	man3/mp_action_rsp.3 \
@@ -171,7 +218,6 @@ man_MANS = \
 	man3/mp_event_report_rsp.3 \
 	man3/mp_get_assoc_info.3 \
 	man3/mp_get_last_error.3 \
-	man3/mp_get_next.3 \
 	man3/mp_get_next_req.3 \
 	man3/mp_get_req.3 \
 	man3/mp_get_rsp.3 \
@@ -546,7 +592,6 @@ dist_noinst_MANS = \
 	man3/libxmp.3.man \
 	man3/libxom.3.man \
 	man3/mp_abandon.3.man \
-	man3/mp_abort.3.man \
 	man3/mp_abort_req.3.man \
 	man3/mp_action_req.3.man \
 	man3/mp_action_rsp.3.man \
@@ -564,7 +609,6 @@ dist_noinst_MANS = \
 	man3/mp_event_report_rsp.3.man \
 	man3/mp_get_assoc_info.3.man \
 	man3/mp_get_last_error.3.man \
-	man3/mp_get_next.3.man \
 	man3/mp_get_next_req.3.man \
 	man3/mp_get_req.3.man \
 	man3/mp_get_rsp.3.man \

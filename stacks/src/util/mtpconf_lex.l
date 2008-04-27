@@ -72,6 +72,9 @@ static char const ident[] = "$RCSfile: mtpconf_lex.l,v $ $Name:  $($Revision: 0.
 
 #define ECHO fputs(yytext, yyout)
 
+#define reject_used_but_not_detected
+#define FIND_RULE REJECT
+
 %}
 
 /* FLEX DECLARATIONS */
@@ -126,7 +129,7 @@ SLC		"slc"|"signal[l]?ing-link-code"
 
 %%
 
-"\n"			{ return TOK_EOL	; }
+"\n"			{ return TOK_EOL	; FIND_RULE; }
 
 "usage"|"u"		{ return TOK_USAGE	; }
 "help"|"h"|"?"		{ return TOK_HELP	; }

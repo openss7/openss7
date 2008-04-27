@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -410,7 +410,18 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR ap_ioctl ()
-is compatible with XAP.
+is compatible with
+XAP,
+.[
+xap c303
+.]
+and implementations based on XAP, such as
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
 This function is not supported by the APLI library.  For OpenSS7 APLI library
 applications, \fBI_SETSIG\fP(7) and \fBI_GETSIG\fP(7) should be used directly.
@@ -425,13 +436,14 @@ The OpenSS7 XAP library provides \fBAP_POLLPRI\fP, \fBAP_POLLMSG\fP,
 to support \fISTREAMS\fR(4) standard events described in \fII_SETSIG\fP(7).
 This is a rather obvious approach to these extensions and should be compatible
 with most \fISTREAMS\fP-based APLI and XAP implementations.
+.IP \(em
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
 .PP
-See
-.BR APLI (3),
-.BR XAP (3)
-and
-.BR STREAMS (4)
-for additional compatibility information.
+See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
