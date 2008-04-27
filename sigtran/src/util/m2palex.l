@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:01 $
+ @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-27 04:52:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:24:01 $ by $Author: brian $
+ Last Modified $Date: 2008-04-27 04:52:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2palex.l,v $
+ Revision 0.9.2.3  2008-04-27 04:52:58  brian
+ - changes for check target
+
  Revision 0.9.2.2  2007/08/19 11:24:01  brian
  - flex version nuances
 
@@ -62,15 +65,18 @@
 
 %{
 
-#ident "@(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:01 $"
+#ident "@(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-27 04:52:58 $"
 
-static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:01 $";
+static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-27 04:52:58 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
 #include "m2payac.h"
 
 #define ECHO fputs(yytext, yyout)
+
+#define reject_used_but_not_detected
+#define FIND_RULE REJECT
 
 %}
 
@@ -126,7 +132,7 @@ SLC		"slc"|"signal[l]?ing-link-code"
 
 %%
 
-"\n"			{ return TOK_EOL	; }
+"\n"			{ return TOK_EOL	; FIND_RULE; }
 
 "usage"|"u"		{ return TOK_USAGE	; }
 "help"|"h"|"?"		{ return TOK_HELP	; }
