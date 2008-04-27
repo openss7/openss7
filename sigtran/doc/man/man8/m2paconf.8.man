@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2paconf.8.man,v 0.9.2.2 2007/03/14 00:54:32 brian Exp $
+.\" @(#) $Id: m2paconf.8.man,v 0.9.2.3 2008-04-27 04:52:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/14 00:54:32 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-27 04:52:58 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2paconf.8.man,v $
+.\" Revision 0.9.2.3  2008-04-27 04:52:58  brian
+.\" - changes for check target
+.\"
 .\" Revision 0.9.2.2  2007/03/14 00:54:32  brian
 .\" - manpages for check maintenance target
 .\"
@@ -574,9 +577,11 @@ options suppresses the printing of diagnostic messages to
 .SH BUGS
 .PP
 .B m2paconf
-has not known bugs.
+has no known bugs.
 Report problems to
 .RI < bugs@openss7.org >.
+See
+.BR send-pr (1).
 .\"
 .\"
 .SH "SEE ALSO"

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-27 04:52:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 08:33:40 $ by $Author: brian $
+# Last Modified $Date: 2008-04-27 04:52:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -110,6 +110,7 @@ MANS_UNUSED = \
 	man8/iuaasconf.8 \
 	man8/m2pa.8 \
 	man8/m2paconf.8 \
+	man8/m2paconfig.8 \
 	man8/m2tp.8 \
 	man8/m2ua.8 \
 	man8/m2uaasconf.8 \
@@ -232,6 +233,7 @@ dist_noinst_MANS = \
 	man8/iuaasconf.8.man \
 	man8/m2pa.8.man \
 	man8/m2paconf.8.man \
+	man8/m2paconfig.8.man \
 	man8/m2tp.8.man \
 	man8/m2ua.8.man \
 	man8/m2uaasconf.8.man \
@@ -257,6 +259,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2008-04-27 04:52:57  brian
+# - changes for check target
+#
 # Revision 0.9.2.7  2007/08/14 08:33:40  brian
 # - GPLv3 header update
 #
