@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.h,v 0.9.2.10 2007/08/14 04:00:45 brian Exp $
+ @(#) $Id: timod.h,v 0.9.2.10 2007-08-14 04:00:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 04:00:45 $ by $Author: brian $
+ Last Modified $Date: 2007-08-14 04:00:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.h,v $
- Revision 0.9.2.10  2007/08/14 04:00:45  brian
+ Revision 0.9.2.10  2007-08-14 04:00:45  brian
  - GPLv3 header update
 
  Revision 0.9.2.9  2006/09/25 12:04:43  brian
@@ -86,7 +86,7 @@
 #ifndef _SYS_TIMOD_H
 #define _SYS_TIMOD_H
 
-#ident "@(#) $RCSfile: timod.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timod.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

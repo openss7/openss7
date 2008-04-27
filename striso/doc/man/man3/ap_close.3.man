@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -280,15 +280,17 @@ and XAP,
 xap c303
 .]
 and implementations based on APLI or XAP, such as
-.IR "Solstice OSI 9.0" ,
-.IR "HP-UX OTS/9000" ,
-.IR "AIX OSI/6000" ,
-.IR "SVR 4.2 ONP" ,
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Only source compatibility is attempted.  Binary compatibility will fail due to
-the lack of published and standard symbolic constants.
-.IP \(em
+Only source compatibility is attempted.
+Binary compatibility will fail due to the lack of published and standard symbolic constants.
+Any exhibited binary compatibility is coincidental and is scheduled to be removed on the next
+release.
 .PP
 See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
 compatibility information.

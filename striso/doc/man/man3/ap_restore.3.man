@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -440,22 +440,28 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .BR ap_restore ()
-is compatible with XAP,
+is compatible with
+XAP,
 .[
 xap c303
 .]
-and implementations based on XAP such as
-.IR Solaris \(rg,
-.IR HP-UX \(rg,
-and
-.IR OSF/1 \(rg,
-with the folowing compatibility considerations:
+and implementations based on XAP, such as
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
+with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
+Only source compatibility is attempted.
+Any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
 .PP
-See also
+See
 .BR XAP (3)
-for additional compatibility considerations.
+and
+.IR STREAMS (4)
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

@@ -5,7 +5,7 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -397,12 +397,16 @@ hpuxapli
 .]
 with the following portability considerations:
 .IP \(bu \w'\(bu\(em'u
-.IP \(bu
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
 .PP
 See
-.BR APLI (3)
-and
+.BR APLI (3),
 .BR XAP (3)
+and
+.IR STREAMS (4)
 for additional compatibility considerations.
 .\"
 .\"
@@ -411,6 +415,9 @@ for additional compatibility considerations.
 APLI,
 .[
 apli unix international
+.]
+.[
+sunlink-apli
 .]
 XAP.
 .[

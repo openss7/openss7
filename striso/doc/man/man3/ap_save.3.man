@@ -251,7 +251,10 @@ hpuxapli
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-.IP \(em
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
 See
 .BR APLI (3)
 and

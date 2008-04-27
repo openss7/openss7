@@ -1,0 +1,1 @@
+.so man4/sccp-mod.4.man

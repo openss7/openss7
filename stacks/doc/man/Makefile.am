@@ -91,6 +91,9 @@ ss7_man_MANS = \
 	man4/mtp-npi.4 \
 	man4/mtp_tpi.4 \
 	man4/mtp-tpi.4 \
+	man4/mtp_mod.4 \
+	man4/mtp-mod.4 \
+	man4/mtp_min.4 \
 	man4/mx_x400p.4 \
 	man4/OpenSS7.4 \
 	man4/pca200e.4 \
@@ -101,6 +104,8 @@ ss7_man_MANS = \
 	man4/sccp-npi.4 \
 	man4/sccp-sccpi.4 \
 	man4/sccp-tpi.4 \
+	man4/sccp_mod.4 \
+	man4/sccp-mod.4 \
 	man4/sdl.4 \
 	man4/sdl-acb56.4 \
 	man4/sdl_eth.4 \
@@ -112,6 +117,8 @@ ss7_man_MANS = \
 	man4/sdl-pmod.4 \
 	man4/sdl_rtp.4 \
 	man4/sdl_x400p.4 \
+	man4/sdlold.4 \
+	man4/sdl_ch.4 \
 	man4/sdt.4 \
 	man4/sdt-acb56.4 \
 	man4/sdt_ioctl.4 \
@@ -126,6 +133,8 @@ ss7_man_MANS = \
 	man4/sl_x100p.4 \
 	man4/sl_x400p.4 \
 	man4/slpmod.4 \
+	man4/sl_min.4 \
+	man4/sl-min.4 \
 	man4/sm_mod.4 \
 	man4/spm.4 \
 	man4/SS7.4 \
@@ -144,12 +153,18 @@ ss7_man_MANS = \
 	man4/sscop.4 \
 	man4/sscop_ioctl.4 \
 	man4/sscop_mce.4 \
+	man4/tc_mod.4 \
+	man4/tc-mod.4 \
 	man4/tcap.4 \
 	man4/tcap_ioctl.4 \
 	man4/tcap-mgmt.4 \
 	man4/tcap-tci.4 \
 	man4/tcap-tpi.4 \
 	man4/tcap-tri.4 \
+	man4/tcap_mod.4 \
+	man4/tcap-mod.4 \
+	man4/tr_mod.4 \
+	man4/tr-mod.4 \
 	man4/x100p.4 \
 	man4/x100p-ch.4 \
 	man4/x100p-mx.4 \
@@ -1725,6 +1740,9 @@ ss7_dist_noinst_MANS = \
 	man4/mtp-npi.4.man \
 	man4/mtp_tpi.4.man \
 	man4/mtp-tpi.4.man \
+	man4/mtp_mod.4.man \
+	man4/mtp-mod.4.man \
+	man4/mtp_min.4.man \
 	man4/mx.4.man \
 	man4/mx_ioctl.4.man \
 	man4/mx_x400p.4.man \
@@ -1737,6 +1755,8 @@ ss7_dist_noinst_MANS = \
 	man4/sccp-npi.4.man \
 	man4/sccp-sccpi.4.man \
 	man4/sccp-tpi.4.man \
+	man4/sccp_mod.4.man \
+	man4/sccp-mod.4.man \
 	man4/sdl.4.man \
 	man4/sdl-acb56.4.man \
 	man4/sdl_eth.4.man \
@@ -1752,6 +1772,8 @@ ss7_dist_noinst_MANS = \
 	man4/sdl_tcp.4.man \
 	man4/sdl_udp.4.man \
 	man4/sdl_x400p.4.man \
+	man4/sdlold.4.man \
+	man4/sdl_ch.4.man \
 	man4/sdt.4.man \
 	man4/sdt-acb56.4.man \
 	man4/sdt_ioctl.4.man \
@@ -1771,6 +1793,8 @@ ss7_dist_noinst_MANS = \
 	man4/sl_x100p.4.man \
 	man4/sl_x400p.4.man \
 	man4/slpmod.4.man \
+	man4/sl_min.4.man \
+	man4/sl-min.4.man \
 	man4/sm_mod.4.man \
 	man4/spm.4.man \
 	man4/SS7.4.man \
@@ -1801,12 +1825,18 @@ ss7_dist_noinst_MANS = \
 	man4/tali-isup.4.man \
 	man4/tali-mtp.4.man \
 	man4/tali-sccp.4.man \
+	man4/tc_mod.4.man \
+	man4/tc-mod.4.man \
 	man4/tcap.4.man \
 	man4/tcap_ioctl.4.man \
 	man4/tcap-mgmt.4.man \
 	man4/tcap-tci.4.man \
 	man4/tcap-tpi.4.man \
 	man4/tcap-tri.4.man \
+	man4/tcap_mod.4.man \
+	man4/tcap-mod.4.man \
+	man4/tr_mod.4.man \
+	man4/tr-mod.4.man \
 	man4/tua.4.man \
 	man4/tua_ioctl.4.man \
 	man4/ua_ioctl.4.man \

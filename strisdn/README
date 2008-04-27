@@ -1,4 +1,4 @@
-OpenSS7 STREAMS ISDN -- read me first file.  2008-04-11
+OpenSS7 STREAMS ISDN -- read me first file.  2008-04-12
 $Id: README,v 0.9.2.27 2008-04-11 17:09:54 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS ISDN
 =====================
 
-Package strisdn-0.9.2.4 was released under AGPLv3 2008-04-11.
+Package strisdn-0.9.2.4 was released under AGPLv3 2008-04-12.
 
 `OpenSS7 STREAMS ISDN' (strisdn) is an `OpenSS7 Project' implementation
 of a number of ISDN related components, including Q.920, Q.921, Q.931,
@@ -43,7 +43,7 @@ well.
  Release
 --------
 
-This is the `strisdn-0.9.2.4' package, released 2008-04-11.  This
+This is the `strisdn-0.9.2.4' package, released 2008-04-12.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -70,11 +70,11 @@ file (or see `Downloading from CVS', in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 3 of
-the `GNU Public License' which can be found in the file `COPYING'.
-Package specific licensing terms (if any) can be found in the file
-`LICENSES'.  Please respect these licensing arrangements.  If you are
-interested in different licensing terms, please contact the copyright
-holder, or OpenSS7 Corporation <sales@openss7.com>.
+the `GNU Affero Public License' which can be found in the file
+`COPYING'.  Package specific licensing terms (if any) can be found in
+the file `LICENSES'.  Please respect these licensing arrangements.  If
+you are interested in different licensing terms, please contact the
+copyright holder, or OpenSS7 Corporation <sales@openss7.com>.
 
 See `README-alpha' (if it exists) for alpha release information.
 
