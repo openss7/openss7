@@ -3,6 +3,30 @@
 	* streams.spec.in: updates for release
 	* doc/man/streams.refs: updates for release
 
+	* debian/mscript_header.in: updated headers for release
+	* debian/mscript_postinst.in: updated headers for release
+	* debian/mscript_postrm.in: updated headers for release
+	* debian/mscript_preinst.in: updated headers for release
+	* debian/mscript_prerm.in: updated headers for release
+	* debian/streams-core.postinst.in: updated headers for release
+	* debian/streams-core.postrm.in: updated headers for release
+	* debian/streams-core.preinst.in: updated headers for release
+	* debian/streams-core.prerm.in: updated headers for release
+	* debian/streams-dev.postinst.in: updated headers for release
+	* debian/streams-dev.preinst.in: updated headers for release
+	* debian/streams-dev.prerm.in: updated headers for release
+	* debian/streams-devel.preinst.in: updated headers for release
+	* debian/streams-doc.postinst.in: updated headers for release
+	* debian/streams-doc.preinst.in: updated headers for release
+	* debian/streams-doc.prerm.in: updated headers for release
+	* debian/streams-init.postinst.in: updated headers for release
+	* debian/streams-init.postrm.in: updated headers for release
+	* debian/streams-init.preinst.in: updated headers for release
+	* debian/streams-init.prerm.in: updated headers for release
+	* debian/streams-lib.preinst.in: updated headers for release
+	* debian/streams-source.preinst.in: updated headers for release
+	* debian/streams-util.preinst.in: updated headers for release
+
 2008-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/streams.refs: updated references
