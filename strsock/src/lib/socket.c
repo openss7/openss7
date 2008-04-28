@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $
+ @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 05:17:23 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 22:33:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socket.c,v $
+ Revision 0.9.2.5  2008-04-28 22:33:33  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2007/08/14 05:17:23  brian
  - GPLv3 header update
 
@@ -64,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $"
+#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $"
 
 static char const ident[] =
-    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $";
+    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -1313,10 +1317,10 @@ __asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.4 $).
+ * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.5 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.4 $)
- * @date \$Date: 2007/08/14 05:17:23 $
+ * @version \$Name:  $(\$Revision: 0.9.2.5 $)
+ * @date \$Date: 2008-04-28 22:33:33 $
  *
  * @}
  */

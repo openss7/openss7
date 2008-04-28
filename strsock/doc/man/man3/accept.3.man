@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: accept.3.man,v 0.9.2.2 2006/10/03 13:53:04 brian Exp $
+.\" @(#) $Id: accept.3.man,v 0.9.2.3 2008-04-28 22:33:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:53:04 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 22:33:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: accept.3.man,v $
+.\" Revision 0.9.2.3  2008-04-28 22:33:28  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.2  2006/10/03 13:53:04  brian
 .\" - changes to pass make check target
 .\" - added some package config.h files
