@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $
+ @(#) $Id: tirdwr.c,v 0.9.2.35 2008-04-28 18:38:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:34 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 18:38:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.35  2008-04-28 18:38:39  brian
+ - header updates for release
+
  Revision 0.9.2.34  2007/08/15 05:35:34  brian
  - GPLv3 updates
 
@@ -79,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-04-28 18:38:39 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-04-28 18:38:39 $";
 
 #include <sys/os7/compat.h>
 
@@ -99,8 +103,8 @@ static char const ident[] =
 // #define TIRDWR_TPI_PEDANTIC
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $"
+#define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-04-28 18:38:39 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"

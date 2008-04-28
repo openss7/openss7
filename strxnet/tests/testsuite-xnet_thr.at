@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-xnet_thr.at,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 04:01:37 $
+dnl @(#) $RCSfile: testsuite-xnet_thr.at,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-28 18:38:43 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -61,7 +61,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2007/08/14 04:01:37 $ by $Author: brian $
+dnl Last Modified $Date: 2008-04-28 18:38:43 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -1330,6 +1330,9 @@ AT_CLEANUP
 dnl ==========================================================================
 dnl
 dnl $Log: testsuite-xnet_thr.at,v $
+dnl Revision 0.9.2.17  2008-04-28 18:38:43  brian
+dnl - header updates for release
+dnl
 dnl Revision 0.9.2.16  2007/08/14 04:01:37  brian
 dnl - GPLv3 header update
 dnl
