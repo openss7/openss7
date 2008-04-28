@@ -1,3 +1,27 @@
+2008-04-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* striso.spec.in: updates for release
+	* doc/man/Makefile.am: updates for release
+	* doc/man/man3/ap_bind.3.man: updates for release
+	* doc/man/man3/ap_close.3.man: updates for release
+	* doc/man/man3/ap_env.3.man: updates for release
+	* doc/man/man3/ap_errno.3.man: updates for release
+	* doc/man/man3/ap_error.3.man: updates for release
+	* doc/man/man3/ap_free.3.man: updates for release
+	* doc/man/man3/ap_get_env.3.man: updates for release
+	* doc/man/man3/ap_init_env.3.man: updates for release
+	* doc/man/man3/ap_ioctl.3.man: updates for release
+	* doc/man/man3/ap_look.3.man: updates for release
+	* doc/man/man3/ap_open.3.man: updates for release
+	* doc/man/man3/ap_poll.3.man: updates for release
+	* doc/man/man3/ap_rcv.3.man: updates for release
+	* doc/man/man3/ap_restore.3.man: updates for release
+	* doc/man/man3/ap_ro_init.3.man: updates for release
+	* doc/man/man3/ap_ro_release.3.man: updates for release
+	* doc/man/man3/ap_save.3.man: updates for release
+	* doc/man/man3/ap_set_env.3.man: updates for release
+	* doc/man/man3/ap_xxx.3.man: updates for release
+
 2008-04-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/util/asnlex.l: support for flex 2.5.4 and 2.5.33
