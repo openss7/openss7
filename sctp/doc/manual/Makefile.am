@@ -70,7 +70,7 @@ sctp_TEXINFOS		= \
 			  sctp.7.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
-			  texi/agpl3.texi \
+			  texi/gpl.texi \
 			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/quick.texi \

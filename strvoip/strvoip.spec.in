@@ -462,6 +462,11 @@ BuildRequires:   strisdn-devel >=    @ISDN_VERSION@%{?extrarelease2}
 BuildRequires:    strss7-devel >=     @SS7_VERSION@%{?extrarelease2}
 BuildRequires:   sigtran-devel >= @SIGTRAN_VERSION@%{?extrarelease2}
 
+# when providing snmp agents, the following are required:
+BuildRequires: lm_sensors-devel
+BuildRequires: net-snmp-libs
+BuildRequires: net-snmp-devel
+
 # these are some needs of the configure script
 # to manipulate manual pages:
 BuildRequires:  /usr/bin/groff
@@ -1179,6 +1184,7 @@ Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
+Requires:       net-snmp-libs
 Obsoletes:      %{name}-%{_streams}-utils
 Obsoletes:      %{name}-utils
 %{?_conflict:Conflicts:      %{name}-%{_conflict}-util}
@@ -1915,9 +1921,10 @@ fi
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: strvoip.spec.in,v $
-# Revision 0.9.2.14  2008-04-13 08:02:57  brian
-# - prepare for doc/papers
-#
+
+* Sun Apr 13 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.14  2008-04-13 08:02:57  brian
+- prepare for doc/papers
 
 * Thu Apr 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.13  2008-04-10 11:05:02  brian

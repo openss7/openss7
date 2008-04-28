@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/10/17 20:00:28 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008/04/27 22:28:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/17 20:00:28 $ by $Author: brian $
+# Last Modified $Date: 2008/04/27 22:28:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -523,7 +523,7 @@ dnl
 dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
 dnl but no rpm database and therefore cannot build rpm packages.
 dnl
-    AM_CONDITIONAL([BUILD_RPMS], [test :"${ac_cv_path_DOXYGEN:-no}" != :no -a -d /var/lib/rpm])dnl
+    AM_CONDITIONAL([BUILD_RPMS], [test :"${ac_cv_path_RPMBUILD:-no}" != :no -a -d /var/lib/rpm])dnl
 ])# _RPM_SPEC_SETUP_BUILD
 # =============================================================================
 
@@ -553,6 +553,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.64  2008/04/27 22:28:39  brian
+# - fix conditional error
+#
 # Revision 0.9.2.63  2007/10/17 20:00:28  brian
 # - slightly different path checks
 #

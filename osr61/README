@@ -1,4 +1,4 @@
-Dialogic Open Systems Release 6.1 -- read me first file.  2008-04-12
+Dialogic Open Systems Release 6.1 -- read me first file.  2008-04-27
 $Id: README,v 0.9.2.23 2008-04-11 17:09:50 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  Dialogic Open Systems Release 6.1
 ==================================
 
-Package osr61-0.9.2.3.rc1 was released under AGPLv3 2008-04-12.
+Package osr61-0.9.2.3.rc1 was released under AGPLv3 2008-04-27.
 
 The `Dialogic Open Systems Release 6.1' package provides "STREAMS"
 modules and drivers, libraries, programs, init scripts, and daemons
@@ -150,7 +150,7 @@ well.
  Release
 --------
 
-This is the `osr61-0.9.2.3.rc1' package, released 2008-04-12.  This
+This is the `osr61-0.9.2.3.rc1' package, released 2008-04-27.  This
 `0.9.2.3.rc1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

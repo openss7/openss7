@@ -1981,9 +1981,10 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.76  2008-04-13 08:02:40  brian
-# - prepare for doc/papers
-#
+
+* Sun Apr 13 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.76  2008-04-13 08:02:40  brian
+- prepare for doc/papers
 
 * Thu Apr 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.75  2008-04-10 11:04:50  brian
