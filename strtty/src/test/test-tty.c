@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:34:53 $
+ @(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 17:46:04 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:34:53 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 17:46:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tty.c,v $
+ Revision 0.9.2.6  2008-04-28 17:46:04  brian
+ - updates for release
+
  Revision 0.9.2.5  2007/08/15 05:34:53  brian
  - GPLv3 updates
 
@@ -67,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:34:53 $"
+#ident "@(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 17:46:04 $"
 
 static char const ident[] =
-    "$RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:34:53 $";
+    "$RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 17:46:04 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2753,7 +2757,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -2779,8 +2783,9 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 3,  so long as the  software is distributed\n\
-with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+Afferfo General Public License  (AGPL)  Version 3,  so  long as the  software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -2808,9 +2813,9 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
