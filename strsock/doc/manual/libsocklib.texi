@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libsocklib.texi,v 0.9.2.5 2008-04-25 11:50:54 brian Exp $
+% @(#) $Id: libsocklib.texi,v 0.9.2.6 2008-04-28 22:33:30 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 %
 % All Rights Reserved.
 %
@@ -53,11 +53,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-25 11:50:54 $ by $Author: brian $
+% Last Modified $Date: 2008-04-28 22:33:30 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: libsocklib.texi,v $
+% Revision 0.9.2.6  2008-04-28 22:33:30  brian
+% - updated headers for release
+%
 % Revision 0.9.2.5  2008-04-25 11:50:54  brian
 % - updates to AGPLv3
 %
@@ -101,7 +104,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -148,7 +151,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -338,6 +341,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 
 @smallexample
 $Log: libsocklib.texi,v $
+Revision 0.9.2.6  2008-04-28 22:33:30  brian
+- updated headers for release
+
 Revision 0.9.2.5  2008-04-25 11:50:54  brian
 - updates to AGPLv3
 

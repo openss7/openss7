@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-13 08:02:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 22:33:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -18,10 +18,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-13 08:02:55 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 22:33:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,6 +84,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2008-04-28 22:33:30  brian
+# - updated headers for release
+#
 # Revision 0.9.2.7  2008-04-13 08:02:55  brian
 # - prepare for doc/papers
 #
