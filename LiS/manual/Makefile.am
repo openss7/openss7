@@ -71,6 +71,7 @@ LiS_TEXINFOS		= \
 			  tree.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
+			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/quick.texi \
 			  texi/install.texi \

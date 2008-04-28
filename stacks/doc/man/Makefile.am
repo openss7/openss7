@@ -595,6 +595,11 @@ ss7_man_MANS = \
 	man8/test-x400p-sdt.8 \
 	man8/test-x400p-sl.8 \
 	man8/ss7_undoc.8 \
+	man8/test-usage.8 \
+	man8/ss7statsd.8 \
+	man8/x400config.8 \
+	man8/mtpconfig.8 \
+	man8/slconfig.8 \
 	man9/mtp_n_uderror_ind.9 \
 	man9/mtp_n_unitdata_ind.9 \
 	man9/mtp_n_unitdata_req.9 \
@@ -2290,6 +2295,11 @@ ss7_dist_noinst_MANS = \
 	man8/tua.8.man \
 	man8/uaconfd.8.man \
 	man8/ss7_undoc.8.man \
+	man8/test-usage.8.man \
+	man8/ss7statsd.8.man \
+	man8/x400config.8.man \
+	man8/mtpconfig.8.man \
+	man8/slconfig.8.man \
 	man9/mtp_n_uderror_ind.9.man \
 	man9/mtp_n_unitdata_ind.9.man \
 	man9/mtp_n_unitdata_req.9.man \
