@@ -3,27 +3,41 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dummy2.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 06:47:51 $
+# @(#) $RCSfile: dummy2.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-28 23:40:02 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
+# 
+# Unauthorized distribution or duplication is prohibited.
+# 
+# This software and related documentation is protected by copyright and
+# distributed under licenses restricting its use, copying, distribution and
+# decompilation.  No part of this software or related documentation may be
+# reproduced in any form by any means without the prior written authorization
+# of the copyright holder, and licensors, if any.
+# 
+# The recipient of this document, by its retention and use, warrants that the
+# recipient will protect this information and keep it confidential, and will
+# not disclose the information contained in this document without the written
+# permission of its owner.
+# 
+# The author reserves the right to revise this software and documentation for
+# any reason, including but not limited to, conformity with standards
+# promulgated by various agencies, utilization of advances in the state of the
+# technical arts, or the reflection of changes in the design of any techniques,
+# or procedures embodied, described, or referred to herein.  The author is
+# under no obligation to provide any feature listed herein.
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# -----------------------------------------------------------------------------
+# 
+# As an exception to the above, this software may be distributed under the GNU
+# Affero General Public License (GPL) Version 3, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+# and libraries.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +62,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 06:47:51 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 23:40:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,6 +77,9 @@ AT_CLEANUP
 # =============================================================================
 #
 # $Log: dummy2.m4,v $
+# Revision 0.9.2.3  2008-04-28 23:40:02  brian
+# - updated headers for release
+#
 # Revision 0.9.2.2  2007/08/14 06:47:51  brian
 # - GPLv3 header update
 #
@@ -71,7 +88,7 @@ AT_CLEANUP
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $
+ @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:18:50 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 23:39:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_pmod.c,v $
+ Revision 0.9.2.7  2008-04-28 23:39:57  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2007/10/15 17:18:50  brian
  - fix for freezestr on 2.4 kernels
 
@@ -70,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $"
+#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $"
 
 static char const ident[] =
-    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $";
+    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $";
 
 /*
  *  This is CH-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -96,8 +100,8 @@ static char const ident[] =
 //#undef unfreezestr
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/10/15 17:18:50 $"
-#define CH_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
+#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $"
+#define CH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"
