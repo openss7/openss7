@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-11 16:58:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 23:13:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -18,10 +18,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-11 16:58:49 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 23:13:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,6 +126,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2008-04-28 23:13:22  brian
+# - updated headers for release
+#
 # Revision 0.9.2.7  2008-04-11 16:58:49  brian
 # - removed deprecated NEXUSWARE support
 #

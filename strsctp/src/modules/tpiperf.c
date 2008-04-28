@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:34:35 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:34:35 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 23:13:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.10  2008-04-28 23:13:28  brian
+ - updated headers for release
+
  Revision 0.9.2.9  2007/08/15 05:34:35  brian
  - GPLv3 updates
 
@@ -79,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:34:35 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $"
 
 static char const ident[] =
-    "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:34:35 $";
+    "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -101,8 +105,8 @@ static char const ident[] =
 #endif
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:34:35 $"
+#define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"

@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-etsi_t.8.man,v 0.9.2.2 2007/03/12 02:24:09 brian Exp $
+.\" @(#) $Id: test-etsi_t.8.man,v 0.9.2.3 2008-04-28 23:13:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/12 02:24:09 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 23:13:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-etsi_t.8.man,v $
+.\" Revision 0.9.2.3  2008-04-28 23:13:21  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.2  2007/03/12 02:24:09  brian
 .\" - updating tests
 .\"
