@@ -1,3 +1,9 @@
+2008-04-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: updates for release
+	* man/lis.refs: updates for release
+	* manual/Makefile.am: updates for release
+
 2008-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* man/lis.refs: updated references

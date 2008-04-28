@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $
+ @(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-28 07:41:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:24:03 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 07:41:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400lex.l,v $
+ Revision 0.9.2.3  2008-04-28 07:41:09  brian
+ - updates for release
+
  Revision 0.9.2.2  2007/08/19 11:24:03  brian
  - flex version nuances
 
@@ -62,9 +65,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $"
+#ident "@(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-28 07:41:09 $"
 
-static char const ident[] = "$RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $";
+static char const ident[] = "$RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-28 07:41:09 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 

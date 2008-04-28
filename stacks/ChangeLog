@@ -1,3 +1,35 @@
+2008-04-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* strss7.spec.in: updates for release
+	* doc/man/Makefile.am: updates for release
+	* doc/man/strss7.refs: updates for release
+	* src/modules/sl/sl_mux.c: updates for release
+	* src/util/mtpconf_lex.l: updates for release
+	* src/util/sdllex.l: updates for release
+	* src/util/slconf_lex.l: updates for release
+	* src/util/x400lex.l: updates for release
+
+	* doc/man/man4/mtp-mod.4.man: added manpage
+	* doc/man/man4/mtp_min.4.man: added manpage
+	* doc/man/man4/mtp_mod.4.man: added manpage
+	* doc/man/man4/sccp-mod.4.man: added manpage
+	* doc/man/man4/sccp_mod.4.man: added manpage
+	* doc/man/man4/sdl_ch.4.man: added manpage
+	* doc/man/man4/sdlold.4.man: added manpage
+	* doc/man/man4/sl-min.4.man: added manpage
+	* doc/man/man4/sl_min.4.man: added manpage
+	* doc/man/man4/tc-mod.4.man: added manpage
+	* doc/man/man4/tc_mod.4.man: added manpage
+	* doc/man/man4/tcap-mod.4.man: added manpage
+	* doc/man/man4/tcap_mod.4.man: added manpage
+	* doc/man/man4/tr-mod.4.man: added manpage
+	* doc/man/man4/tr_mod.4.man: added manpage
+	* doc/man/man8/mtpconfig.8.man: added manpage
+	* doc/man/man8/slconfig.8.man: added manpage
+	* doc/man/man8/ss7statsd.8.man: added manpage
+	* doc/man/man8/test-usage.8.man: added manpage
+	* doc/man/man8/x400config.8.man: added manpage
+
 2008-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strss7.refs: updated references

@@ -1,3 +1,7 @@
+2008-04-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* sigtran.spec.in: updates for release
+
 2008-04-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: corrections for make check target
