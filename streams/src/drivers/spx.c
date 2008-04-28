@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/12/15 20:19:54 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-04-28 12:54:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:54 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: spx.c,v $
+ Revision 0.9.2.48  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.47  2007/12/15 20:19:54  brian
  - updates
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/12/15 20:19:54 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-04-28 12:54:05 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/12/15 20:19:54 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-04-28 12:54:05 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -82,8 +85,8 @@ static char const ident[] =
 #include "src/kernel/strreg.h"
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SPX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/12/15 20:19:54 $"
+#define SPX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-04-28 12:54:05 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/12/15 20:20:20 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:20 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fdetach.c,v $
+ Revision 0.9.2.14  2008-04-28 12:54:10  brian
+ - update file headers for release
+
  Revision 0.9.2.13  2007/12/15 20:20:20  brian
  - updates
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/12/15 20:20:20 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:10 $"
 
 static char const ident[] =
-    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/12/15 20:20:20 $";
+    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:10 $";
 
 /* 
  *  SVR 4.2 Utility: fdetach(8)
@@ -99,8 +102,8 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 3, included here by reference.\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under AGPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -158,7 +161,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/12/15 20:19:55 $
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-28 12:54:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:55 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.c,v $
+ Revision 0.9.2.12  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.11  2007/12/15 20:19:55  brian
  - updates
 
@@ -90,10 +93,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/12/15 20:19:55 $"
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-28 12:54:05 $"
 
 static char const ident[] =
-    "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/12/15 20:19:55 $";
+    "$RCSfile: streams.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-28 12:54:05 $";
 
 /* can we just include these into one big compilation unit? */
 

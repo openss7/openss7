@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/12/15 20:19:54 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-04-28 12:54:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:54 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sfx.c,v $
+ Revision 0.9.2.41  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.40  2007/12/15 20:19:54  brian
  - updates
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/12/15 20:19:54 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-04-28 12:54:05 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/12/15 20:19:54 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-04-28 12:54:05 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -84,8 +87,8 @@ static char const ident[] =
 #include "src/drivers/fifo.h"	/* for fifo stuff */
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SFX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/12/15 20:19:54 $"
+#define SFX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-04-28 12:54:05 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SFX_LICENSE	"GPL"

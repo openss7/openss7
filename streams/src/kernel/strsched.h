@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strsched.h,v 0.9.2.37 2007/12/15 20:19:58 brian Exp $
+ @(#) $Id: strsched.h,v 0.9.2.38 2008-04-28 12:54:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:58 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.h,v $
+ Revision 0.9.2.38  2008-04-28 12:54:06  brian
+ - update file headers for release
+
  Revision 0.9.2.37  2007/12/15 20:19:58  brian
  - updates
 
@@ -80,7 +83,7 @@
 #ifndef __LOCAL_STRSCHED_H__
 #define __LOCAL_STRSCHED_H__
 
-#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.37 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.38 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __EXTERN
 #define __EXTERN extern

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/01/13 21:53:05 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.170 $) $Date: 2008-04-28 12:54:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/01/13 21:53:05 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.170  2008-04-28 12:54:06  brian
+ - update file headers for release
+
  Revision 0.9.2.169  2008/01/13 21:53:05  brian
  - dlmod SNMP agent build and installation
 
@@ -192,10 +195,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/01/13 21:53:05 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.170 $) $Date: 2008-04-28 12:54:06 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/01/13 21:53:05 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.170 $) $Date: 2008-04-28 12:54:06 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

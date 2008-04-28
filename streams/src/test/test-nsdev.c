@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/12/15 20:20:12 $
+ @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-28 12:54:09 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:12 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-nsdev.c,v $
+ Revision 0.9.2.27  2008-04-28 12:54:09  brian
+ - update file headers for release
+
  Revision 0.9.2.26  2007/12/15 20:20:12  brian
  - updates
 
@@ -153,9 +156,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/12/15 20:20:12 $"
+#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-28 12:54:09 $"
 
-static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/12/15 20:20:12 $";
+static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-28 12:54:09 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -3048,7 +3051,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -3104,7 +3107,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\

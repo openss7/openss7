@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/12/15 20:19:53 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-04-28 12:54:04 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:53 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.64  2008-04-28 12:54:04  brian
+ - update file headers for release
+
  Revision 0.9.2.63  2007/12/15 20:19:53  brian
  - updates
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/12/15 20:19:53 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-04-28 12:54:04 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/12/15 20:19:53 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-04-28 12:54:04 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -102,8 +105,8 @@ static char const ident[] =
 #include "clone.h"		/* extern verification */
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/12/15 20:19:53 $"
+#define CLONE_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-04-28 12:54:04 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"

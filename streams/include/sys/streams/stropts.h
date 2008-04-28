@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.33 2007/12/15 20:19:50 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.34 2008-04-28 12:54:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:50 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 0.9.2.34  2008-04-28 12:54:02  brian
+ - update file headers for release
+
  Revision 0.9.2.33  2007/12/15 20:19:50  brian
  - updates
 
@@ -89,7 +92,7 @@
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.33 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.34 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

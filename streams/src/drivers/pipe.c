@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:19:54 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:54 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipe.c,v $
+ Revision 0.9.2.42  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.41  2007/12/15 20:19:54  brian
  - updates
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:19:54 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:05 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:19:54 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:05 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -85,8 +88,8 @@ static char const ident[] =
 #include "pipe.h"		/* extern verification */
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPE_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:19:54 $"
+#define PIPE_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:05 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2007/12/15 20:19:58 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:58 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.84  2008-04-28 12:54:06  brian
+ - update file headers for release
+
  Revision 0.9.2.83  2007/12/15 20:19:58  brian
  - updates
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2007/12/15 20:19:58 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2007/12/15 20:19:58 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -130,8 +133,8 @@ static char const ident[] =
 #include "sys/config.h"
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2007/12/15 20:19:58 $"
+#define SPECFS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.23 2007/12/15 20:19:50 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.24 2008-04-28 12:54:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:50 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.24  2008-04-28 12:54:02  brian
+ - update file headers for release
+
  Revision 0.9.2.23  2007/12/15 20:19:50  brian
  - updates
 
@@ -77,7 +80,7 @@
 #ifndef __SYS_STREAMS_STRLOG_H__
 #define __SYS_STREAMS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.24 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

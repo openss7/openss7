@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/12/15 20:19:59 $
+ @(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-28 12:54:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:59 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsysctl.c,v $
+ Revision 0.9.2.46  2008-04-28 12:54:06  brian
+ - update file headers for release
+
  Revision 0.9.2.45  2007/12/15 20:19:59  brian
  - updates
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/12/15 20:19:59 $"
+#ident "@(#) $RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-28 12:54:06 $"
 
 static char const ident[] =
-    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/12/15 20:19:59 $";
+    "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-28 12:54:06 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

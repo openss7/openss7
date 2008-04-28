@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strreg.h,v 0.9.2.18 2007/12/15 20:19:56 brian Exp $
+ @(#) $Id: strreg.h,v 0.9.2.19 2008-04-28 12:54:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:56 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strreg.h,v $
+ Revision 0.9.2.19  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.18  2007/12/15 20:19:56  brian
  - updates
 
@@ -65,6 +68,6 @@
 #ifndef __LOCAL_STRREG_H__
 #define __LOCAL_STRREG_H__
 
-#ident "@(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strreg.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #endif				/* __LOCAL_STRREG_H__ */

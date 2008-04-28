@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.20 2006/11/06 08:26:03 brian Exp $
+.\" @(#) $Id: pullupmsg.9.man,v 0.9.2.21 2008-04-28 12:53:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/11/06 08:26:03 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 12:53:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: pullupmsg.9.man,v $
+.\" Revision 0.9.2.21  2008-04-28 12:53:53  brian
+.\" - update file headers for release
+.\"
 .\" Revision 0.9.2.20  2006/11/06 08:26:03  brian
 .\" - found msgpullup() bug
 .\"

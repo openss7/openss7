@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:20:02 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:02 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: connld.c,v $
+ Revision 0.9.2.42  2008-04-28 12:54:06  brian
+ - update file headers for release
+
  Revision 0.9.2.41  2007/12/15 20:20:02  brian
  - updates
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:20:02 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:20:02 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -85,8 +88,8 @@ static char const ident[] =
 #include "sys/config.h"
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CONNLD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/12/15 20:20:02 $"
+#define CONNLD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"

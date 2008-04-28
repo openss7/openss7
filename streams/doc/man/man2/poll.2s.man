@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: poll.2s.man,v 0.9.2.12 2006/10/05 12:16:51 brian Exp $
+.\" @(#) $Id: poll.2s.man,v 0.9.2.13 2008-04-28 12:53:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/05 12:16:51 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 12:53:39 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: poll.2s.man,v $
+.\" Revision 0.9.2.13  2008-04-28 12:53:39  brian
+.\" - update file headers for release
+.\"
 .\" Revision 0.9.2.12  2006/10/05 12:16:51  brian
 .\" - updates for release
 .\"

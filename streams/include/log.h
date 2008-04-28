@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: log.h,v 0.9.2.8 2007/12/15 20:19:47 brian Exp $
+ @(#) $Id: log.h,v 0.9.2.9 2008-04-28 12:54:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:47 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: log.h,v $
+ Revision 0.9.2.9  2008-04-28 12:54:01  brian
+ - update file headers for release
+
  Revision 0.9.2.8  2007/12/15 20:19:47  brian
  - updates
 
@@ -62,7 +65,7 @@
 #ifndef _LOG_H
 #define _LOG_H
 
-#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: log.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #include <sys/log.h>
 

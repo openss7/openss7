@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 0.9.2.15 2007/12/15 20:19:49 brian Exp $
+ @(#) $Id: cmn_err.h,v 0.9.2.16 2008-04-28 12:54:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:49 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cmn_err.h,v $
+ Revision 0.9.2.16  2008-04-28 12:54:02  brian
+ - update file headers for release
+
  Revision 0.9.2.15  2007/12/15 20:19:49  brian
  - updates
 
@@ -62,7 +65,7 @@
 #ifndef __SYS_STREAMS_CMN_ERR_H__
 #define __SYS_STREAMS_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_CMN_ERR_H__
 #warning "Do no include sys/streams/cmn_err.h directly, include sys/cmn_err.h instead."
