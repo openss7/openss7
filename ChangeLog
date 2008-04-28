@@ -3,6 +3,37 @@
 	* openss7.refs: updates for release
 	* openss7.spec.in: updates for release
 
+	* scripts/Doxyfile.in: updated headers for release
+	* scripts/cflagcheck: updated headers for release
+	* scripts/check_commands: updated headers for release
+	* scripts/check_decls: updated headers for release
+	* scripts/check_headers: updated headers for release
+	* scripts/check_libs: updated headers for release
+	* scripts/check_mans: updated headers for release
+	* scripts/check_modules: updated headers for release
+	* scripts/check_streams: updated headers for release
+	* scripts/check_version: updated headers for release
+	* scripts/chkconfig: updated headers for release
+	* scripts/inet_mkdev: updated headers for release
+	* scripts/inet_rmdev: updated headers for release
+	* scripts/install_initd: updated headers for release
+	* scripts/missing2: updated headers for release
+	* scripts/modpost.sh: updated headers for release
+	* scripts/modsyms.sh: updated headers for release
+	* scripts/remove_initd: updated headers for release
+	* scripts/send-pr: updated headers for release
+	* scripts/send-pr.config.in: updated headers for release
+	* scripts/strconf-sh: updated headers for release
+	* scripts/texinfo.cnf: updated headers for release
+	* scripts/texi/args.texi.in: updated headers for release
+	* scripts/texi/compat.texi: updated headers for release
+	* scripts/texi/funding.texi: updated headers for release
+	* scripts/texi/install.texi: updated headers for release
+	* scripts/texi/macros.texi: updated headers for release
+	* scripts/texi/mail.texi: updated headers for release
+	* scripts/texi/testsuite.texi: updated headers for release
+	* scripts/texi/versions.texi: updated headers for release
+
 2008-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: updated references

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: versions.texi,v 0.9.2.10 2007/06/25 19:35:49 brian Exp $
+@c @(#) $Id: versions.texi,v 0.9.2.11 2008-04-28 09:23:11 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/25 19:35:49 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-28 09:23:11 $ by $Author: brian $
 @c
 @c =========================================================================
 
