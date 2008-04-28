@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tcp.4.man,v 0.9.2.6 2006/10/10 10:42:53 brian Exp $
+.\" @(#) $Id: tcp.4.man,v 0.9.2.7 2008-04-28 22:52:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:42:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 22:52:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tcp.4.man,v $
+.\" Revision 0.9.2.7  2008-04-28 22:52:06  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.6  2006/10/10 10:42:53  brian
 .\" - updates for release
 .\"
