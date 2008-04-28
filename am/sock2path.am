@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/15 20:19:29 $
+# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 09:30:19 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/12/15 20:19:29 $ by $Author: brian $
+## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -110,6 +110,9 @@ EXTRA_DIST		+= src/util/sysconfig/sock2path
 ## =============================================================================
 ##
 ## $Log: sock2path.am,v $
+## Revision 0.9.2.5  2008-04-28 09:30:19  brian
+## - updated headers for release
+##
 ## Revision 0.9.2.4  2007/12/15 20:19:29  brian
 ## - updates
 ##
