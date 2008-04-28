@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 0.9.2.16 2008-04-25 11:50:57 brian Exp $
+% @(#) $Id: libxnet.texi,v 0.9.2.17 2008-04-28 18:38:34 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-25 11:50:57 $ by $Author: brian $
+% Last Modified $Date: 2008-04-28 18:38:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -84,7 +84,7 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -130,7 +130,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2005  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -579,7 +579,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.16 $); $Date: 2008-04-25 11:50:57 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 0.9.2.17 $); $Date: 2008-04-28 18:38:34 $.
 
 @subsubheading AUTHOR
 @format
@@ -592,7 +592,7 @@ The OpenSS7 Project @uref{http://www.openss7.org/}
 @subsubheading COPYRIGHT
 @format
 @flushleft
-Copyright @copyright{} 1997-2004 @uref{http://www.openss7.com/, OpenSS7 Corporation}.
+Copyright @copyright{} 1997-2008 @uref{http://www.openss7.com/, OpenSS7 Corporation}.
 All Rights Reserved.
 (See roff source for permission notice.)
 @end flushleft
@@ -742,7 +742,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.16 $); $Date: 2008-04-25 11:50:57 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 0.9.2.17 $); $Date: 2008-04-28 18:38:34 $.
 @end flushleft
 @end format
 
@@ -757,7 +757,7 @@ The OpenSS7 Project http://www.openss7.org/
 @subsubheading COPYRIGHT
 @format
 @flushleft
-Copyright (C) 1997-2004 OpenSS7 Corporation.
+Copyright (C) 1997-2008 OpenSS7 Corporation.
 All Rights Reserved.
 (See roff source for permission notice.)
 @end flushleft
