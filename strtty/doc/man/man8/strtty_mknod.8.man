@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strtty_mknod.8.man,v 0.9.2.1 2006/10/03 13:24:31 brian Exp $
+.\" @(#) $Id: strtty_mknod.8.man,v 0.9.2.2 2008-04-28 17:46:00 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/03 13:24:31 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 17:46:00 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strtty_mknod.8.man,v $
+.\" Revision 0.9.2.2  2008-04-28 17:46:00  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.1  2006/10/03 13:24:31  brian
 .\" - file additions and removals for make check target
 .\"
