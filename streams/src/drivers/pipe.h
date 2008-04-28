@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: pipe.h,v 0.9.2.5 2007/12/15 20:19:54 brian Exp $
+ @(#) $Id: pipe.h,v 0.9.2.6 2008-04-28 12:54:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:54 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipe.h,v $
+ Revision 0.9.2.6  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.5  2007/12/15 20:19:54  brian
  - updates
 
@@ -65,6 +68,6 @@
 #ifndef __LOCAL_PIPE_H__
 #define __LOCAL_PIPE_H__
 
-#ident "@(#) $RCSfile: pipe.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: pipe.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #endif				/* __LOCAL_PIPE_H__ */

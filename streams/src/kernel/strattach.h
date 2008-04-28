@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strattach.h,v 0.9.2.16 2007/12/15 20:19:55 brian Exp $
+ @(#) $Id: strattach.h,v 0.9.2.17 2008-04-28 12:54:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:55 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strattach.h,v $
+ Revision 0.9.2.17  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.16  2007/12/15 20:19:55  brian
  - updates
 
@@ -65,7 +68,7 @@
 #ifndef __LOCAL_STRATTACH_H__
 #define __LOCAL_STRATTACH_H__
 
-#ident "@(#) $RCSfile: strattach.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strattach.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifdef HAVE_KERNEL_FATTACH_SUPPORT
 streams_fastcall long do_fattach(const struct file *file, const char *file_name);

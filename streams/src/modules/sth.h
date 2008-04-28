@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sth.h,v 0.9.2.14 2007/12/15 20:20:07 brian Exp $
+ @(#) $Id: sth.h,v 0.9.2.15 2008-04-28 12:54:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:07 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.h,v $
+ Revision 0.9.2.15  2008-04-28 12:54:07  brian
+ - update file headers for release
+
  Revision 0.9.2.14  2007/12/15 20:20:07  brian
  - updates
 
@@ -65,7 +68,7 @@
 #ifndef __LOCAL_STH_H__
 #define __LOCAL_STH_H__
 
-#ident "@(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sth.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 extern struct smodule_info str_minfo;	/* for strsysctl.c */
 

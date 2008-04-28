@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/12/15 20:20:21 $
+ @(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 12:54:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:21 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strinfo.c,v $
+ Revision 0.9.2.18  2008-04-28 12:54:11  brian
+ - update file headers for release
+
  Revision 0.9.2.17  2007/12/15 20:20:21  brian
  - updates
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/12/15 20:20:21 $"
+#ident "@(#) $RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 12:54:11 $"
 
 static char const ident[] =
-    "$RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/12/15 20:20:21 $";
+    "$RCSfile: strinfo.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 12:54:11 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -94,8 +97,8 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 3, included here by reference.\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under AGPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -150,7 +153,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\

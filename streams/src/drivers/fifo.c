@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/12/15 20:19:53 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:53 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 0.9.2.52  2008-04-28 12:54:04  brian
+ - update file headers for release
+
  Revision 0.9.2.51  2007/12/15 20:19:53  brian
  - updates
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/12/15 20:19:53 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/12/15 20:19:53 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -90,8 +93,8 @@ static char const ident[] =
 #include "fifo.h"		/* extern verification */
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/12/15 20:19:53 $"
+#define FIFO_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"

@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-STREAMS-EXT-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/01/14 13:01:07 $
+-- @(#) $RCSfile: OPENSS7-STREAMS-EXT-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-28 12:54:08 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/01/14 13:01:07 $ by $Author: brian $
+-- Last Modified $Date: 2008-04-28 12:54:08 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-STREAMS-EXT-MIB.mib,v $
+-- Revision 0.9.2.3  2008-04-28 12:54:08  brian
+-- - update file headers for release
+--
 -- Revision 0.9.2.2  2008/01/14 13:01:07  brian
 -- - updated mibs
 --

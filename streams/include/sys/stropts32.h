@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: stropts32.h,v 0.9.2.4 2007/12/15 20:19:48 brian Exp $
+ @(#) $Id: stropts32.h,v 0.9.2.5 2008-04-28 12:54:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:48 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts32.h,v $
+ Revision 0.9.2.5  2008-04-28 12:54:02  brian
+ - update file headers for release
+
  Revision 0.9.2.4  2007/12/15 20:19:48  brian
  - updates
 
@@ -68,7 +71,7 @@
 #ifndef __SYS_STROPTS32_H__
 #define __SYS_STROPTS32_H__
 
-#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

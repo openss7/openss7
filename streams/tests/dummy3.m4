@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: dummy3.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/12/15 20:20:22 $
+# @(#) $RCSfile: dummy3.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 12:54:12 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -62,7 +62,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:20:22 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 12:54:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,6 +77,9 @@ AT_CLEANUP
 # =============================================================================
 #
 # $Log: dummy3.m4,v $
+# Revision 0.9.2.7  2008-04-28 12:54:12  brian
+# - update file headers for release
+#
 # Revision 0.9.2.6  2007/12/15 20:20:22  brian
 # - updates
 #
@@ -94,7 +97,7 @@ AT_CLEANUP
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

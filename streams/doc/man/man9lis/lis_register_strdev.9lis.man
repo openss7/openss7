@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lis_register_strdev.9lis.man,v 0.9.2.6 2006/04/05 10:05:06 brian Exp $
+.\" @(#) $Id: lis_register_strdev.9lis.man,v 0.9.2.7 2008-04-28 12:53:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 10:05:06 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 12:53:58 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lis_register_strdev.9lis.man,v $
+.\" Revision 0.9.2.7  2008-04-28 12:53:58  brian
+.\" - update file headers for release
+.\"
 .\" Revision 0.9.2.6  2006/04/05 10:05:06  brian
 .\" - get references in right place
 .\"

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:19 $
+ @(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-28 12:54:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:19 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testlog.c,v $
+ Revision 0.9.2.4  2008-04-28 12:54:10  brian
+ - update file headers for release
+
  Revision 0.9.2.3  2007/12/15 20:20:19  brian
  - updates
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:19 $"
+#ident "@(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-28 12:54:10 $"
 
 static char const ident[] =
-    "$RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/12/15 20:20:19 $";
+    "$RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-28 12:54:10 $";
 
 /*
  *  This is a little user space program to test the correctness of the formatting of the data blocks

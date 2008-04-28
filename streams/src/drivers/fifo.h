@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: fifo.h,v 0.9.2.5 2007/12/15 20:19:53 brian Exp $
+ @(#) $Id: fifo.h,v 0.9.2.6 2008-04-28 12:54:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:53 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.h,v $
+ Revision 0.9.2.6  2008-04-28 12:54:04  brian
+ - update file headers for release
+
  Revision 0.9.2.5  2007/12/15 20:19:53  brian
  - updates
 
@@ -65,6 +68,6 @@
 #ifndef __LOCAL_FIFO_H__
 #define __LOCAL_FIFO_H__
 
-#ident "@(#) $RCSfile: fifo.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: fifo.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #endif				/* __LOCAL_FIFO_H__ */

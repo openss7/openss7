@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: testmod.h,v 0.9.2.11 2007/12/15 20:19:50 brian Exp $
+ @(#) $Id: testmod.h,v 0.9.2.12 2008-04-28 12:54:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:50 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.h,v $
+ Revision 0.9.2.12  2008-04-28 12:54:03  brian
+ - update file headers for release
+
  Revision 0.9.2.11  2007/12/15 20:19:50  brian
  - updates
 
@@ -89,7 +92,7 @@
 #ifndef __SYS_STREAMS_TESTMOD_H__
 #define __SYS_STREAMS_TESTMOD_H__
 
-#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: testmod.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

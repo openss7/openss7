@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: strpipe.h,v 0.9.2.12 2007/12/15 20:19:56 brian Exp $
+ @(#) $Id: strpipe.h,v 0.9.2.13 2008-04-28 12:54:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:56 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.h,v $
+ Revision 0.9.2.13  2008-04-28 12:54:05  brian
+ - update file headers for release
+
  Revision 0.9.2.12  2007/12/15 20:19:56  brian
  - updates
 
@@ -65,7 +68,7 @@
 #ifndef __LOCAL_STRPIPE_H__
 #define __LOCAL_STRPIPE_H__
 
-#ident "@(#) $RCSfile: strpipe.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strpipe.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifdef HAVE_KERNEL_PIPE_SUPPORT
 streams_fastcall long do_spipe(int *fds);

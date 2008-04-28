@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/12/15 20:19:52 $
+ @(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 12:54:04 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:52 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 12:54:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.h,v $
+ Revision 0.9.2.16  2008-04-28 12:54:04  brian
+ - update file headers for release
+
  Revision 0.9.2.15  2007/12/15 20:19:52  brian
  - updates
 
@@ -65,7 +68,7 @@
 #ifndef __LOCAL_LISCOMPAT_H__
 #define __LOCAL_LISCOMPAT_H__
 
-#ident "@(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: liscompat.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #define LIS_MAXAPUSH	8
 #define LIS_FMNAMESZ	8

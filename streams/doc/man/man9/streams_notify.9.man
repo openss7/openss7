@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: streams_notify.9.man,v 0.9.2.2 2007/11/07 10:05:05 brian Exp $
+.\" @(#) $Id: streams_notify.9.man,v 0.9.2.3 2008-04-28 12:53:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/11/07 10:05:05 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 12:53:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: streams_notify.9.man,v $
+.\" Revision 0.9.2.3  2008-04-28 12:53:56  brian
+.\" - update file headers for release
+.\"
 .\" Revision 0.9.2.2  2007/11/07 10:05:05  brian
 .\" - updates to pass check target
 .\"

@@ -1,10 +1,10 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2007/12/15 20:19:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2008-04-28 12:53:38 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:19:32 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 12:53:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2525,6 +2525,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.92  2008-04-28 12:53:38  brian
+# - update file headers for release
+#
 # Revision 0.9.2.91  2007/12/15 20:19:32  brian
 # - updates
 #
