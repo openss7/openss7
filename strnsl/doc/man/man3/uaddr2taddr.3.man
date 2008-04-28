@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: uaddr2taddr.3.man,v 0.9.2.2 2006/09/26 00:51:21 brian Exp $
+.\" @(#) $Id: uaddr2taddr.3.man,v 0.9.2.3 2008-04-28 22:11:45 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/26 00:51:21 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 22:11:45 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: uaddr2taddr.3.man,v $
+.\" Revision 0.9.2.3  2008-04-28 22:11:45  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.2  2006/09/26 00:51:21  brian
 .\" - corrected macro file name, reordered includes
 .\"
