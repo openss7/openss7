@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-dev.prerm.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 10:30:21 $
+# @(#) $RCSfile: streams-dev.prerm.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 11:46:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 10:30:21 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -100,6 +100,9 @@ subpkg=dev
 # =============================================================================
 #
 # $Log: streams-dev.prerm.in,v $
+# Revision 0.9.2.8  2008-04-28 11:46:32  brian
+# - adjust headers for release
+#
 # Revision 0.9.2.7  2008-04-28 10:30:21  brian
 # - updated headers for release
 #
@@ -131,4 +134,4 @@ subpkg=dev
 # - better debian build
 #
 # =============================================================================
-# vim: ft=sh sw=4 noet
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

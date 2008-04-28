@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/15 20:19:26 $
+ @(#) $RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 11:46:31 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:19:26 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 11:46:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.dox.in,v $
+ Revision 0.9.2.5  2008-04-28 11:46:31  brian
+ - adjust headers for release
+
  Revision 0.9.2.4  2007/12/15 20:19:26  brian
  - updates
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/15 20:19:26 $"
+#ident "@(#) $RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 11:46:31 $"
 
-static char const ident[] = "$RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/15 20:19:26 $";
+static char const ident[] = "$RCSfile: streams.dox.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 11:46:31 $";
 
 /* This file can be processed with doxygen(1). */
 

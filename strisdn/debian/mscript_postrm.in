@@ -1,9 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # @configure_input@
-# @(#) $RCSfile: mscript_postrm.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 07:41:13 $
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# @(#) $RCSfile: mscript_postrm.in,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-28 11:46:33 $
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
 
 [ ":${subpkg+set}" = ":set" ] || subpkg=
 

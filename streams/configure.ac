@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/12/15 20:19:26 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-04-28 11:46:31 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/12/15 20:19:26 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 11:46:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([streams],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.60 $) $Date: 2007/12/15 20:19:26 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.61 $) $Date: 2008-04-28 11:46:31 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -187,6 +187,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.61  2008-04-28 11:46:31  brian
+# - adjust headers for release
+#
 # Revision 0.9.2.60  2007/12/15 20:19:26  brian
 # - updates
 #
@@ -219,7 +222,7 @@ AC_OUTPUT
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
