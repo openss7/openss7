@@ -1,15 +1,15 @@
 # vim: ft=config sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
-# BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
+# BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dummy2.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/13 23:51:44 $
+# @(#) $RCSfile: dummy2.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 16:47:15 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-# 
+#
 # All Rights Reserved.
 # 
 # Unauthorized distribution or duplication is prohibited.
@@ -35,25 +35,25 @@
 # -----------------------------------------------------------------------------
 # 
 # As an exception to the above, this software may be distributed under the GNU
-# General Public License (GPL) Version 3, so long as the software is distributed
-# with, and only used for the testing of, OpenSS7 modules, drivers, and
-# libraries.
+# Affero General Public License (GPL) Version 3, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+# and libraries.
 #
 # -----------------------------------------------------------------------------
 #
 # U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S.  Government ("Government"), the following provisions apply
+# behalf of the U.S. Government ("Government"), the following provisions apply
 # to you.  If the Software is supplied by the Department of Defense ("DoD"), it
 # is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or
-# any successor regulations) and the Government is acquiring only the license
-# rights granted herein (the license rights customarily provided to
-# non-Government users).  If the Software is supplied to any unit or agency of
-# the Government other than DoD, it is classified as "Restricted Computer
-# Software" and the Government's rights in the Software are defined in
-# paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any
-# successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of
-# the NASA Supplement to the FAR (or any successor regulations).
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
 #
 # -----------------------------------------------------------------------------
 #
@@ -62,7 +62,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 23:51:44 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 16:47:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,12 +77,15 @@ AT_CLEANUP
 # =============================================================================
 #
 # $Log: dummy2.m4,v $
+# Revision 0.9.2.5  2008-04-28 16:47:15  brian
+# - updates for release
+#
 # Revision 0.9.2.4  2007/08/13 23:51:44  brian
 # - updated to GPLv3 headers
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

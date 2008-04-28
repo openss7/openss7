@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dummy1.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:33:13 $
+# @(#) $RCSfile: dummy1.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 16:47:15 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -35,9 +35,9 @@
 # -----------------------------------------------------------------------------
 # 
 # As an exception to the above, this software may be distributed under the GNU
-# General Public License (GPL) Version 3, so long as the software is distributed
-# with, and only used for the testing of, OpenSS7 modules, drivers, and
-# libraries.
+# Affero General Public License (GPL) Version 3, so long as the software is
+# distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+# and libraries.
 #
 # -----------------------------------------------------------------------------
 #
@@ -62,7 +62,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/15 05:33:13 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 16:47:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -78,6 +78,9 @@ AT_CLEANUP
 # =============================================================================
 #
 # $Log: dummy1.m4,v $
+# Revision 0.9.2.6  2008-04-28 16:47:15  brian
+# - updates for release
+#
 # Revision 0.9.2.5  2007/08/15 05:33:13  brian
 # - GPLv3 updates
 #
@@ -86,7 +89,7 @@ AT_CLEANUP
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
