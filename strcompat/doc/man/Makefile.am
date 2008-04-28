@@ -1,26 +1,26 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:50:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-04-28 16:47:00 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,48 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 15:50:56 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.30  2007/08/12 15:50:56  brian
-# - header and extern updates, GPLv3, 3 new lock functions
-#
-# Revision 0.9.2.29  2007/08/03 13:35:54  brian
-# - manual updates, put ss7 modules in public release
-#
-# Revision 0.9.2.28  2007/05/18 21:17:56  brian
-# - updated manual pages for check target
-#
-# Revision 0.9.2.27  2007/03/30 15:15:38  brian
-# - added missing manpages
-#
-# Revision 0.9.2.26  2007/03/04 19:45:53  brian
-# - added missing manpages, removed duplicates
-#
-# Revision 0.9.2.25  2007/03/04 18:53:42  brian
-# - added manpage
-#
-# Revision 0.9.2.24  2007/03/04 17:58:34  brian
-# - add missing manpages
-#
-# Revision 0.9.2.23  2006/12/31 13:31:46  brian
-# - updated documentation for release
-#
-# Revision 0.9.2.22  2006/12/16 16:12:54  brian
-# - strapped out unused manpages and allow mi_timers to be placed back on queue
-#
-# Revision 0.9.2.21  2006/10/06 12:12:56  brian
-# - updated manual pages to pass make check and for release
-# - updated release files for release
-# - added missing MacOT OSF/1 and MPS compatibility functions
-#
-# Revision 0.9.2.20  2006/07/07 21:19:36  brian
-# - pass "make check" on LiS-only build
-#
-# Revision 0.9.2.19  2006/03/06 11:38:28  brian
-# - updated headers
+# Last Modified $Date: 2008-04-28 16:47:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2223,4 +2182,49 @@ endif
 
 include ../../am/man.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.31  2008-04-28 16:47:00  brian
+# - updates for release
+#
+# Revision 0.9.2.30  2007/08/12 15:50:56  brian
+# - header and extern updates, GPLv3, 3 new lock functions
+#
+# Revision 0.9.2.29  2007/08/03 13:35:54  brian
+# - manual updates, put ss7 modules in public release
+#
+# Revision 0.9.2.28  2007/05/18 21:17:56  brian
+# - updated manual pages for check target
+#
+# Revision 0.9.2.27  2007/03/30 15:15:38  brian
+# - added missing manpages
+#
+# Revision 0.9.2.26  2007/03/04 19:45:53  brian
+# - added missing manpages, removed duplicates
+#
+# Revision 0.9.2.25  2007/03/04 18:53:42  brian
+# - added manpage
+#
+# Revision 0.9.2.24  2007/03/04 17:58:34  brian
+# - add missing manpages
+#
+# Revision 0.9.2.23  2006/12/31 13:31:46  brian
+# - updated documentation for release
+#
+# Revision 0.9.2.22  2006/12/16 16:12:54  brian
+# - strapped out unused manpages and allow mi_timers to be placed back on queue
+#
+# Revision 0.9.2.21  2006/10/06 12:12:56  brian
+# - updated manual pages to pass make check and for release
+# - updated release files for release
+# - added missing MacOT OSF/1 and MPS compatibility functions
+#
+# Revision 0.9.2.20  2006/07/07 21:19:36  brian
+# - pass "make check" on LiS-only build
+#
+# Revision 0.9.2.19  2006/03/06 11:38:28  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:33:10 $
+ @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 16:47:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:33:10 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 16:47:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr3compat.c,v $
+ Revision 0.9.2.20  2008-04-28 16:47:13  brian
+ - updates for release
+
  Revision 0.9.2.19  2007/08/15 05:33:10  brian
  - GPLv3 updates
 
@@ -67,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:33:10 $"
+#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 16:47:13 $"
 
 static char const ident[] =
-    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:33:10 $";
+    "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 16:47:13 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -91,8 +95,8 @@ static char const ident[] =
 #include "sys/os7/compat.h"
 
 #define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SVR3COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:33:10 $"
+#define SVR3COMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 16:47:13 $"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR3COMP_LICENSE	"GPL"
