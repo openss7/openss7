@@ -34,6 +34,32 @@
 	* scripts/texi/testsuite.texi: updated headers for release
 	* scripts/texi/versions.texi: updated headers for release
 
+	* am/archive.am: updated headers for release
+	* am/autotest.am: updated headers for release
+	* am/bcm.am: updated headers for release
+	* am/deb.am: updated headers for release
+	* am/doxy.am: updated headers for release
+	* am/genksyms.am: updated headers for release
+	* am/help.am: updated headers for release
+	* am/info.am: updated headers for release
+	* am/init.am: updated headers for release
+	* am/kernel.am: updated headers for release
+	* am/libraries.am: updated headers for release
+	* am/lsm.am: updated headers for release
+	* am/man.am: updated headers for release
+	* am/netconfig.am: updated headers for release
+	* am/openss7.am: updated headers for release
+	* am/packages.am: updated headers for release
+	* am/papers.am: updated headers for release
+	* am/pr.am: updated headers for release
+	* am/release.am: updated headers for release
+	* am/rpm.am: updated headers for release
+	* am/sctp.am: updated headers for release
+	* am/snmp.am: updated headers for release
+	* am/sock2path.am: updated headers for release
+	* am/strconf.am: updated headers for release
+	* am/version.am: updated headers for release
+
 2008-04-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: updated references

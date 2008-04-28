@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: bcm.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-13 08:02:45 $
+# @(#) $RCSfile: bcm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-04-28 09:30:19 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-13 08:02:45 $ by $Author: brian $
+## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -156,6 +156,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: bcm.am,v $
+## Revision 0.9.2.5  2008-04-28 09:30:19  brian
+## - updated headers for release
+##
 ## Revision 0.9.2.4  2008-04-13 08:02:45  brian
 ## - prepare for doc/papers
 ##

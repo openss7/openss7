@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: release.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.16 $) $Date: 2008-04-10 10:30:18 $
+# @(#) $RCSfile: release.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2008-04-28 09:30:19 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-10 10:30:18 $ by $Author: brian $
+## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -250,6 +250,9 @@ EXTRA_DIST			+= AUTHORS \
 ## =============================================================================
 ##
 ## $Log: release.am,v $
+## Revision 0.9.2.17  2008-04-28 09:30:19  brian
+## - updated headers for release
+##
 ## Revision 0.9.2.16  2008-04-10 10:30:18  brian
 ## - remove deprecated Nexusware support
 ##
