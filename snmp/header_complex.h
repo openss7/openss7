@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: header_complex.h,v 0.9.2.3 2007/12/15 20:20:08 brian Exp $
+ @(#) $Id: header_complex.h,v 0.9.2.4 2008-04-28 09:47:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:20:08 $ by $Author: brian $
+ Last Modified $Date: 2008-04-28 09:47:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: header_complex.h,v $
+ Revision 0.9.2.4  2008-04-28 09:47:28  brian
+ - updated headers for release
+
  Revision 0.9.2.3  2007/12/15 20:20:08  brian
  - updates
 
@@ -65,7 +68,7 @@
 #ifndef __LOCAL_HEADER_COMPLEX_H__
 #define __LOCAL_HEADER_COMPLEX_H__
 
-#ident "@(#) $RCSfile: header_complex.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: header_complex.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  *  header_complex.h:  More complex storage and data sorting for mib modules
