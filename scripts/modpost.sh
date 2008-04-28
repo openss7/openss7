@@ -1,27 +1,27 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-10 18:00:50 $
+# @(#) $RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-28 09:23:10 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 18:00:50 $ by $Author: brian $
+# Last Modified $Date: 2008-04-28 09:23:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-10 18:00:50 $'
+ident='$RCSfile: modpost.sh,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-28 09:23:10 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -1121,6 +1121,9 @@ exit $retval
 # =============================================================================
 #
 # $Log: modpost.sh,v $
+# Revision 0.9.2.24  2008-04-28 09:23:10  brian
+# - updated script headers for release
+#
 # Revision 0.9.2.23  2008-04-10 18:00:50  brian
 # - handle new EXPORT_UNUSED_SYMBOL
 #
