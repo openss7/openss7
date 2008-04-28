@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strchan.macros,v 0.9.2.5 2008-04-13 08:02:47 brian Exp $
+.\" @(#) $Id: strchan.macros,v 0.9.2.6 2008-04-28 10:10:40 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,11 +52,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-13 08:02:47 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-28 10:10:40 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strchan.macros,v $
+.\" Revision 0.9.2.6  2008-04-28 10:10:40  brian
+.\" - updated release files
+.\"
 .\" Revision 0.9.2.5  2008-04-13 08:02:47  brian
 .\" - prepare for doc/papers
 .\"
@@ -75,8 +78,9 @@
 .\".PD
 .ad b
 .hy 6
-.PP
-Trademarks mentioned are the property of their owners.
+.\".PP
+.\"Trademarks mentioned are the property of their owners.
+.TM
 ..
 .de ]-
 .\".PD 0.4v
