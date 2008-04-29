@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $
+ @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:21:02 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zaptel.c,v $
+ Revision 0.9.2.5  2008-04-29 07:11:20  brian
+ - updating headers for release
+
  Revision 0.9.2.4  2007/08/15 05:21:02  brian
  - GPLv3 updates
 
@@ -64,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $"
+#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $"
 
 static char const ident[] =
-    "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $";
+    "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $";
 
 /*
  *  This module pushes over an OpenSS7 MX Stream and provides a zaptel drvier
@@ -100,8 +104,8 @@ static char const ident[] =
 #include <ss7/zap_ioctl.h>
 
 #define ZAP_MX_DESCRIP	"ZAPTEL MULTIPLEX (ZAP-MX) STREAMS MODULE."
-#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $"
-#define ZAP_MX_COPYRIGHT    "Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $"
+#define ZAP_MX_COPYRIGHT    "Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"
 #define ZAP_MX_LICENSE	"GPL"

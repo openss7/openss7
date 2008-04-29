@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: mapi.texi,v 0.9.2.9 2007/06/27 08:42:10 brian Exp $
+% @(#) $Id: mapi.texi,v 0.9.2.10 2008-04-29 07:10:38 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
 %
 % All Rights Reserved.
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/27 08:42:10 $ by $Author: brian $
+% Last Modified $Date: 2008-04-29 07:10:38 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -84,7 +84,7 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
 published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -132,7 +132,7 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2006  OpenSS7 Corporation
+@subtitle Copyright @copyright{} 2008  OpenSS7 Corporation
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -147,7 +147,7 @@ applicability of the @value{MANUAL_TITLE}.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 @noindent
@@ -327,6 +327,9 @@ Only the texinfo or roff source is controlled.  A printed (or postscript) versio
 @smallexample
 
 $Log: mapi.texi,v $
+Revision 0.9.2.10  2008-04-29 07:10:38  brian
+- updating headers for release
+
 Revision 0.9.2.9  2007/06/27 08:42:10  brian
 - added MTPI spec document
 

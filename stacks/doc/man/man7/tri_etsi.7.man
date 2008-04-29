@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tri_etsi.7.man,v 0.9.2.5 2006/12/27 16:36:01 brian Exp $
+.\" @(#) $Id: tri_etsi.7.man,v 0.9.2.6 2008-04-29 07:10:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/27 16:36:01 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:32 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tri_etsi.7.man,v $
+.\" Revision 0.9.2.6  2008-04-29 07:10:32  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.5  2006/12/27 16:36:01  brian
 .\" - added slpmod module and fixups for make check target
 .\"

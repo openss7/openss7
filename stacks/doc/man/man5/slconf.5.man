@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: slconf.5.man,v 0.9.2.1 2007/01/21 20:20:08 brian Exp $
+.\" @(#) $Id: slconf.5.man,v 0.9.2.2 2008-04-29 07:10:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/21 20:20:08 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: slconf.5.man,v $
+.\" Revision 0.9.2.2  2008-04-29 07:10:20  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.1  2007/01/21 20:20:08  brian
 .\" - added documetation
 .\"

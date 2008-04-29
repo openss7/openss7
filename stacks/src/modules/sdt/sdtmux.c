@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:20:15 $
+ @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:20:15 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdtmux.c,v $
+ Revision 0.9.2.12  2008-04-29 07:11:10  brian
+ - updating headers for release
+
  Revision 0.9.2.11  2007/08/15 05:20:15  brian
  - GPLv3 updates
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:20:15 $"
+#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:10 $"
 
 static char const ident[] =
-    "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:20:15 $";
+    "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:10 $";
 
 /*
  *  This is an SDT multiplexing driver for multiplexing SDT upper streams into
@@ -82,7 +86,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDTM_DESCRIP	"SIGNALLING DATA TERMINAL (SDT) STREAMS MULTIPLEXING DRIVER."
-#define SDTM_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
+#define SDTM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDTM_DEVICE	"Part of the OpenSS7 Stack for STREAMS."
 #define SDTM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDTM_LICENSE	"GPL"

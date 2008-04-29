@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/15 17:53:34 $
+ @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:33 $
 
  -----------------------------------------------------------------------------
 
@@ -15,7 +15,9 @@
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+ details.
+
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>, or
  write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
@@ -44,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/01/15 17:53:34 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: usage.c,v $
+ Revision 0.9.2.4  2008-04-29 07:11:33  brian
+ - updating headers for release
+
  Revision 0.9.2.3  2008/01/15 17:53:34  brian
  - add _GNU_SOURCE for independent compile
 
@@ -60,9 +65,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/15 17:53:34 $"
+#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:33 $"
 
-static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/01/15 17:53:34 $";
+static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:33 $";
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE

@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-04-28 07:41:08 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 07:41:08 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.29  2008-04-29 07:11:11  brian
+ - updating headers for release
+
  Revision 0.9.2.28  2008-04-28 07:41:08  brian
  - updates for release
 
@@ -76,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-04-28 07:41:08 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $"
 
 static char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-04-28 07:41:08 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -121,8 +125,8 @@ static char const ident[] =
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-04-28 07:41:08 $"
-#define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corportation.  All Rights Reserved."
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $"
+#define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corportation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_MUX_LICENSE		"GPL"

@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $
+ @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/10/15 17:17:17 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr_mod.c,v $
+ Revision 0.9.2.6  2008-04-29 07:11:16  brian
+ - updating headers for release
+
  Revision 0.9.2.5  2007/10/15 17:17:17  brian
  - updates for 2.6.22.5-49.fc6 kernel
 
@@ -67,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $"
+#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $"
 
 static char const ident[] =
-    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $";
+    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $";
 
 /*
  * This is TR-MOD.  It is a simplified Transaction Interface (TRI) module for TCAP that can be
@@ -115,8 +119,8 @@ static char const ident[] =
 #include <ss7/tcap_ioctl.h>
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
-#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/10/15 17:17:17 $"
-#define TR_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
+#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $"
+#define TR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TR_LICENSE	"GPL"

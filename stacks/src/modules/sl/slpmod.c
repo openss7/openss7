@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:55:54 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.10  2008-04-29 07:11:11  brian
+ - updating headers for release
+
  Revision 0.9.2.9  2007/08/19 11:55:54  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -79,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $"
 
 static char const ident[] =
-    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $";
+    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $";
 
 /*
  *  This is SLPMOD, an SL module that is pushed over a pipe end to form an internal
@@ -109,8 +113,8 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $"
-#define SL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
+#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $"
+#define SL_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_LICENSE	"GPL"

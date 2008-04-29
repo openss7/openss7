@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlb.4.man,v 0.9.2.6 2006/12/27 16:35:53 brian Exp $
+.\" @(#) $Id: dlb.4.man,v 0.9.2.7 2008-04-29 07:10:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/27 16:35:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlb.4.man,v $
+.\" Revision 0.9.2.7  2008-04-29 07:10:18  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.6  2006/12/27 16:35:53  brian
 .\" - added slpmod module and fixups for make check target
 .\"

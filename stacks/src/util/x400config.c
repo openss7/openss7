@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400config.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $
+ @(#) $RCSfile: x400config.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:33 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:57:41 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400config.c,v $
+ Revision 0.9.2.3  2008-04-29 07:11:33  brian
+ - updating headers for release
+
  Revision 0.9.2.2  2007/08/19 11:57:41  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -58,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400config.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $"
+#ident "@(#) $RCSfile: x400config.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:33 $"
 
-static char const ident[] = "$RCSfile: x400config.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $";
+static char const ident[] = "$RCSfile: x400config.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:33 $";
 
 
 /*
@@ -95,7 +99,7 @@ copying(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -121,8 +125,9 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 3,  so long as the  software is distributed\n\
-with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -150,14 +155,14 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation\n\
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
-Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
+Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", "x400conf", PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:41 $");
+", "x400conf", PACKAGE, VERSION, "$Revision: 0.9.2.3 $ $Date: 2008-04-29 07:11:33 $");
 }
 
 static void

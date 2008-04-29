@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npi_mtp.7.man,v 0.9.2.7 2007/02/17 02:49:09 brian Exp $
+.\" @(#) $Id: npi_mtp.7.man,v 0.9.2.8 2008-04-29 07:10:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/02/17 02:49:09 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_mtp.7.man,v $
+.\" Revision 0.9.2.8  2008-04-29 07:10:31  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.7  2007/02/17 02:49:09  brian
 .\" - first clean recompile of MTP modules on LFS
 .\"

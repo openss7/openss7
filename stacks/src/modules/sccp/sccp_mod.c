@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $
+ @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:23 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_mod.c,v $
+ Revision 0.9.2.3  2008-04-29 07:11:06  brian
+ - updating headers for release
+
  Revision 0.9.2.2  2007/08/14 12:18:23  brian
  - GPLv3 header updates
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $"
+#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $"
 
 static char const ident[] =
-    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $";
+    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $";
 
 /*
  * This is SCCP-MOD.  It is a simplified Signalling Connection Control Part (SCCPI) module for SCCP
@@ -101,8 +105,8 @@ static char const ident[] =
 #include <ss7/mtpi_ioctl.h>
 
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS MODULE."
-#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $"
-#define SC_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
+#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $"
+#define SC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"

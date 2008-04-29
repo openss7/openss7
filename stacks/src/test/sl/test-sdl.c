@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $
+ @(#) $RCSfile: test-sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 07:11:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 3, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ Affero General Public License (GPL) Version 3, so long as the software is
+ distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+ and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,19 +59,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/06 10:57:48 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sdl.c,v $
+ Revision 0.9.2.2  2008-04-29 07:11:30  brian
+ - updating headers for release
+
  Revision 0.9.2.1  2007/09/06 10:57:48  brian
  - added old zurich test files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $"
+#ident "@(#) $RCSfile: test-sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 07:11:30 $"
 
-static char const ident[] = "$RCSfile: test-sdl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $";
+static char const ident[] = "$RCSfile: test-sdl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 07:11:30 $";
 
 int card = 0;
 int span = 0;
@@ -126,7 +129,7 @@ copying(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -152,8 +155,9 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 3,  so long as the  software is distributed\n\
-with, and only used for management of, OpenSS7 modules, drivers, and libraries.\n\
+Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
