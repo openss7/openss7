@@ -1,26 +1,26 @@
 //  ==========================================================================
 //  
-//  @(#) $Id: sua_data.cpp,v 0.9.2.3 2007/08/14 08:33:54 brian Exp $
+//  @(#) $Id: sua_data.cpp,v 0.9.2.4 2008-04-29 01:52:21 brian Exp $
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+//  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 //  
 //  All Rights Reserved.
 //  
 //  This program is free software; you can redistribute it and/or modify it
-//  under the terms of the GNU General Public License as published by the Free
-//  Software Foundation; version 3 of the License.
+//  under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation; version 3 of the License.
 //  
 //  This program is distributed in the hope that it will be useful, but
 //  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-//  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-//  for more details.
+//  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
+//  License for more details.
 //  
-//  You should have received a copy of the GNU General Public License along
-//  with this program.  If not, see <http://www.gnu.org/licenses/>, or write
-//  to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
-//  USA.
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+//  write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+//  02139, USA.
 //  
 //  --------------------------------------------------------------------------
 //  
@@ -46,19 +46,22 @@
 //  
 //  --------------------------------------------------------------------------
 //  
-//  Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
+//  Last Modified $Date: 2008-04-29 01:52:21 $ by $Author: brian $
 //  
 //  --------------------------------------------------------------------------
 //  
 //  $Log: sua_data.cpp,v $
+//  Revision 0.9.2.4  2008-04-29 01:52:21  brian
+//  - updated headers for release
+//
 //  Revision 0.9.2.3  2007/08/14 08:33:54  brian
 //  - GPLv3 header update
 //
 //  ==========================================================================
 
-#ident "@(#) $RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $"
+#ident "@(#) $RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 01:52:21 $"
 
-static char const ident[] = "$RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $";
+static char const ident[] = "$RCSfile: sua_data.cpp,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 01:52:21 $";
 
 #pragma implementation
 #include "sua_data.hh"

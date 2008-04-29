@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: m2pa.4.man,v 0.9.2.3 2006/12/31 13:37:37 brian Exp $
+.\" @(#) $Id: m2pa.4.man,v 0.9.2.4 2008-04-29 01:52:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/31 13:37:37 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 01:52:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2pa.4.man,v $
+.\" Revision 0.9.2.4  2008-04-29 01:52:15  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.3  2006/12/31 13:37:37  brian
 .\" - documentation updates for release
 .\"
