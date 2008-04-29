@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:48:05 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 01:52:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.12  2008-04-29 01:52:19  brian
+ - updated headers for release
+
  Revision 0.9.2.11  2007/08/19 11:48:05  brian
  - move stdbool.h, bison changes
 
@@ -85,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -155,8 +159,8 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $"
-#define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $"
+#define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISUA_AS_LICENSE	"GPL"

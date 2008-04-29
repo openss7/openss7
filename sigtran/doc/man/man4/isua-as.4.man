@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: isua-as.4.man,v 0.9.2.1 2007/03/14 00:53:48 brian Exp $
+.\" @(#) $Id: isua-as.4.man,v 0.9.2.2 2008-04-29 01:52:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/14 00:53:48 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 01:52:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: isua-as.4.man,v $
+.\" Revision 0.9.2.2  2008-04-29 01:52:15  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.1  2007/03/14 00:53:48  brian
 .\" - added manual pages
 .\"
