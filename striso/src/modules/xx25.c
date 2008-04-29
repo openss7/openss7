@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:49 $
+ @(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/15 20:16:49 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xx25.c,v $
+ Revision 0.9.2.2  2008-04-29 00:02:05  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2007/12/15 20:16:49  brian
  - added new mib files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:49 $"
+#ident "@(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
 
-static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:49 $";
+static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $";
 
 /*
  * X25MOD - XX25 Module: This is an X.25 module that is pushed over a X.25-PLP stream supporting the
@@ -79,8 +83,8 @@ static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.1 $
 #include <sys/npi.h>
 
 #define XX25_DESCRIP	"UNIT SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define XX25_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
-#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/12/15 20:16:49 $"
+#define XX25_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
+#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
 #define XX25_DEVICE	"SVR 4.2 STREAMS XX25 Modle for X.25-PLP (X25MOD)"
 #define XX25_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XX25_LICENSE	"GPL"

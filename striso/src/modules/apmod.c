@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: apmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $
+ @(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:33:40 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: apmod.c,v $
+ Revision 0.9.2.2  2008-04-29 00:02:05  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2008-04-25 08:33:40  brian
  - added man pages and skeletons
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: apmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $"
+#ident "@(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
 
-static char const ident[] = "$RCSfile: apmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $";
+static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $";
 
 /*
  * ASCE/Presentation (A/P) Module
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: apmod.c,v $ $Name: OpenSS7-0_9_2 $($Revis
 
 #define APLI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define APLI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $"
+#define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
 #define APLI_DEVICE	"SVR 4.2 STREAMS APLI Module for APLI"
 #define APLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define APLI_LICENSE	"GPL"

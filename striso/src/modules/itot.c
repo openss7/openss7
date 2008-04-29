@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:20 $
+ @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:34:20 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itot.c,v $
+ Revision 0.9.2.8  2008-04-29 00:02:05  brian
+ - updated headers for release
+
  Revision 0.9.2.7  2007/08/15 05:34:20  brian
  - GPLv3 updates
 
@@ -76,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:20 $"
+#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $"
 
 static char const ident[] =
-    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:20 $";
+    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $";
 
 /*
  *  ISO Transport over TCP (ITOT)
@@ -101,8 +105,8 @@ static char const ident[] =
 #include <net/ip.h>
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ITOT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:20 $"
+#define ITOT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $"
 #define ITOT_DEVICE	"SVR 4.2 STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"

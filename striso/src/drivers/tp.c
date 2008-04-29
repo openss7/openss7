@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:38:30 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.18  2008-04-29 00:02:00  brian
+ - updated headers for release
+
  Revision 0.9.2.17  2008-04-25 08:38:30  brian
  - working up libraries modules and drivers
 
@@ -110,10 +114,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -164,8 +168,8 @@ typedef unsigned int socklen_t;
 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2008-04-25 08:38:30 $"
+#define TP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"

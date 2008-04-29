@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp0.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $
+ @(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:33:40 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp0.c,v $
+ Revision 0.9.2.2  2008-04-29 00:02:05  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2008-04-25 08:33:40  brian
  - added man pages and skeletons
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp0.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $"
+#ident "@(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
 
-static char const ident[] = "$RCSfile: tp0.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $";
+static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $";
 
 /*
  *  ISO Transport Class 0 over TCP/IP (TP0)
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: tp0.c,v $ $Name: OpenSS7-0_9_2 $($Revisio
 
 #define TP0_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP0_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:40 $"
+#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
 #define TP0_DEVICE	"SVR 4.2 STREAMS TP0 Module for RFC 1006 and RFC 2126"
 #define TP0_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP0_LICENSE	"GPL"

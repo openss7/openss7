@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xds.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:39 $
+ @(#) $RCSfile: xds.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:33:39 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xds.c,v $
+ Revision 0.9.2.2  2008-04-29 00:02:02  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2008-04-25 08:33:39  brian
  - added man pages and skeletons
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xds.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:39 $"
+#ident "@(#) $RCSfile: xds.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:02 $"
 
-static char const ident[] = "$RCSfile: xds.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:39 $";
+static char const ident[] = "$RCSfile: xds.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:02 $";
 
 /* This file can be processed with doxygen(1). */
 

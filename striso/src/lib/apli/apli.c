@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 08:38:32 $
+ @(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:01 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:38:32 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: apli.c,v $
+ Revision 0.9.2.4  2008-04-29 00:02:01  brian
+ - updated headers for release
+
  Revision 0.9.2.3  2008-04-25 08:38:32  brian
  - working up libraries modules and drivers
 
@@ -61,9 +65,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 08:38:32 $"
+#ident "@(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:01 $"
 
-static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 08:38:32 $";
+static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:01 $";
 
 /* This file can be processed with doxygen(1). */
 

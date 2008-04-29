@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:24 $
+ @(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:20:24 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:01:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns-ip.c,v $
+ Revision 0.9.2.2  2008-04-29 00:01:59  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2007/08/12 15:20:24  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:24 $"
+#ident "@(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $"
 
-static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:24 $";
+static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $";
 
 /*
  *  This is an X.233 CLNP driver.
@@ -121,8 +125,8 @@ static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI stack for Linux Fast-STREAMS"
-#define CLNS_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:24 $"
+#define CLNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI ISO-IP (RFC 1070) Network Provider"
 #define CNLS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CNLS_LICENSE	"GPL"
