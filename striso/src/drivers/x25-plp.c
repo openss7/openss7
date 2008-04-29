@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/12/16 03:53:07 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 0.9.2.5  2008-04-29 00:02:00  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2007/12/16 03:53:07  brian
  - updated release files
 
@@ -64,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $";
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the
@@ -87,8 +91,8 @@ static char const ident[] =
 
 #define PLP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
-#define PLP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/12/16 03:53:07 $"
+#define PLP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $"
 #define PLP_DEVICE	"SVR 4.2 STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"

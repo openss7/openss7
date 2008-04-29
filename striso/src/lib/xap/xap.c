@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 08:38:32 $
+ @(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:38:32 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xap.c,v $
+ Revision 0.9.2.5  2008-04-29 00:02:02  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2008-04-25 08:38:32  brian
  - working up libraries modules and drivers
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 08:38:32 $"
+#ident "@(#) $RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:02 $"
 
 static char const ident[] =
-    "$RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 08:38:32 $";
+    "$RCSfile: xap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:02 $";
 
 /* This file can be processed with doxygen(1). */
 

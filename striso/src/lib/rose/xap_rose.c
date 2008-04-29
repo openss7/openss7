@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xap_rose.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:39 $
+ @(#) $RCSfile: xap_rose.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 08:33:39 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 00:02:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xap_rose.c,v $
+ Revision 0.9.2.2  2008-04-29 00:02:01  brian
+ - updated headers for release
+
  Revision 0.9.2.1  2008-04-25 08:33:39  brian
  - added man pages and skeletons
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xap_rose.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:39 $"
+#ident "@(#) $RCSfile: xap_rose.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:01 $"
 
-static char const ident[] = "$RCSfile: xap_rose.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-04-25 08:33:39 $";
+static char const ident[] = "$RCSfile: xap_rose.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:01 $";
 
 /* This file can be processed with doxygen(1). */
 

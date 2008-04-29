@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=0
 .\"
-.\" @(#) $Id: RO_UNBIND_IND.7.man,v 0.9.2.2 2008-04-16 20:04:22 brian Exp $
+.\" @(#) $Id: RO_UNBIND_IND.7.man,v 0.9.2.3 2008-04-29 00:01:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-16 20:04:22 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 00:01:58 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: RO_UNBIND_IND.7.man,v $
+.\" Revision 0.9.2.3  2008-04-29 00:01:58  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.2  2008-04-16 20:04:22  brian
 .\" - updating APLI manual pages
 .\"
