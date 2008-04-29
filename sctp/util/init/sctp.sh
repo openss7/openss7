@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 09:42:47 $
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 08:49:54 $
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
@@ -216,27 +216,27 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 09:42:47 $
+# @(#) $RCSfile: sctp.sh,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 08:49:54 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -261,11 +261,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 09:42:47 $ by $Author: brian $
+# Last Modified $Date: 2008-04-29 08:49:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: sctp.sh,v $
+# Revision 0.9.2.8  2008-04-29 08:49:54  brian
+# - updated headers for Affero release
+#
 # Revision 0.9.2.7  2007/08/14 09:42:47  brian
 # - GPLv3 header update
 #
