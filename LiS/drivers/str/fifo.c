@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.13 $) $Date: 2007/08/15 04:57:58 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.14 $) $Date: 2008-04-29 08:33:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:57:58 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 1.1.1.2.4.14  2008-04-29 08:33:11  brian
+ - update headers for Affero release
+
  Revision 1.1.1.2.4.13  2007/08/15 04:57:58  brian
  - GPLv3 updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.13 $) $Date: 2007/08/15 04:57:58 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.14 $) $Date: 2008-04-29 08:33:11 $"
 
-static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.13 $) $Date: 2007/08/15 04:57:58 $";
+static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.14 $) $Date: 2008-04-29 08:33:11 $";
 
 /*
  *  fifo.c - FIFO pseudo-driver

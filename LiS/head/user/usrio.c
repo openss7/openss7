@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: usrio.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:05 $
+ @(#) $RCSfile: usrio.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2008-04-29 08:33:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:05 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: usrio.c,v $
+ Revision 1.1.1.1.12.5  2008-04-29 08:33:14  brian
+ - update headers for Affero release
+
  Revision 1.1.1.1.12.4  2007/08/14 10:47:05  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: usrio.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:05 $"
+#ident "@(#) $RCSfile: usrio.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2008-04-29 08:33:14 $"
 
-static char const ident[] = "$RCSfile: usrio.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:05 $";
+static char const ident[] = "$RCSfile: usrio.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2008-04-29 08:33:14 $";
 
 /************************************************************************
 *                         User I/O Routines                             *

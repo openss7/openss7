@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2007/08/14 10:47:00 $
+ @(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2008-04-29 08:33:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:00 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: buffcall.c,v $
+ Revision 1.1.1.3.4.8  2008-04-29 08:33:12  brian
+ - update headers for Affero release
+
  Revision 1.1.1.3.4.7  2007/08/14 10:47:00  brian
  - GPLv3 header update
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2007/08/14 10:47:00 $"
+#ident "@(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2008-04-29 08:33:12 $"
 
-static char const ident[] = "$RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2007/08/14 10:47:00 $";
+static char const ident[] = "$RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2008-04-29 08:33:12 $";
 
 /*                               -*- Mode: C -*- 
  * buffcall.c --- buffcall management
@@ -68,7 +71,7 @@ static char const ident[] = "$RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
  * Last Modified On: Fri Dec 27 09:48:15 CST 1996
- * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.7 2007/08/14 10:47:00 brian Exp $
+ * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.8 2008-04-29 08:33:12 brian Exp $
  * ----------------______________________________________________
  *
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros,

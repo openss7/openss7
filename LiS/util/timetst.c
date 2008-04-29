@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.8 $) $Date: 2007/08/14 10:47:31 $
+ @(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.9 $) $Date: 2008-04-29 08:33:27 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:31 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timetst.c,v $
+ Revision 1.1.1.2.4.9  2008-04-29 08:33:27  brian
+ - update headers for Affero release
+
  Revision 1.1.1.2.4.8  2007/08/14 10:47:31  brian
  - GPLv3 header update
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.8 $) $Date: 2007/08/14 10:47:31 $"
+#ident "@(#) $RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.9 $) $Date: 2008-04-29 08:33:27 $"
 
 static char const ident[] =
-    "$RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.8 $) $Date: 2007/08/14 10:47:31 $";
+    "$RCSfile: timetst.c,v $ $Name:  $($Revision: 1.1.1.2.4.9 $) $Date: 2008-04-29 08:33:27 $";
 
 /*
  * Copyright 1997 David Grothe, Gcom, Inc <dave@gcom.com>

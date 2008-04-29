@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 10:47:18 $
+ @(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:18 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mod_wrap.c,v $
+ Revision 0.9.2.5  2008-04-29 08:33:24  brian
+ - update headers for Affero release
+
  Revision 0.9.2.4  2007/08/14 10:47:18  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 10:47:18 $"
+#ident "@(#) $RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $"
 
 static char const ident[] =
-    "$RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 10:47:18 $";
+    "$RCSfile: mod_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -80,7 +83,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #define _XX_DESCRIP	"UNIX/SYSTEM V RELEASE 4 STREAMS FOR LINUX"
-#define _XX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define _XX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define _XX_DEVICE	"LiS Binary Compatibility Wrapper"	/* get more from config */
 #define _XX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define _XX_LICENSE	"Proprietary"

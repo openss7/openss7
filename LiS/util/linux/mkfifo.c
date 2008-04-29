@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/15 04:58:18 $
+ @(#) $RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.9 $) $Date: 2008-04-29 08:33:28 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:58:18 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mkfifo.c,v $
+ Revision 1.1.1.1.12.9  2008-04-29 08:33:28  brian
+ - update headers for Affero release
+
  Revision 1.1.1.1.12.8  2007/08/15 04:58:18  brian
  - GPLv3 updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/15 04:58:18 $"
+#ident "@(#) $RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.9 $) $Date: 2008-04-29 08:33:28 $"
 
 static char const ident[] =
-    "$RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/15 04:58:18 $";
+    "$RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.9 $) $Date: 2008-04-29 08:33:28 $";
 
 /* 
  *  mkfifo.c - a mkfifo for LiS FIFOs
@@ -100,7 +103,7 @@ copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
 \n\
 All Rights Reserved.\n\
@@ -142,7 +145,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2003-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
 \n\
     Distributed by OpenSS7 Corporation under GPL Version 3,\n\

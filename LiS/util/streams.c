@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/15 04:58:12 $
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:26 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:58:12 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.c,v $
+ Revision 1.1.1.6.4.9  2008-04-29 08:33:26  brian
+ - update headers for Affero release
+
  Revision 1.1.1.6.4.8  2007/08/15 04:58:12  brian
  - GPLv3 updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/15 04:58:12 $"
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:26 $"
 
 static char const ident[] =
-    "$RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/15 04:58:12 $";
+    "$RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:26 $";
 
 #include <sys/types.h>
 #undef GCOM_OPEN

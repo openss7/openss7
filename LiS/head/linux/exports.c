@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.22 $) $Date: 2007/08/14 10:47:04 $
+ @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.23 $) $Date: 2008-04-29 08:33:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:04 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: exports.c,v $
+ Revision 1.1.1.7.4.23  2008-04-29 08:33:13  brian
+ - update headers for Affero release
+
  Revision 1.1.1.7.4.22  2007/08/14 10:47:04  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.22 $) $Date: 2007/08/14 10:47:04 $"
+#ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.23 $) $Date: 2008-04-29 08:33:13 $"
 
-static char const ident[] = "$RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.22 $) $Date: 2007/08/14 10:47:04 $";
+static char const ident[] = "$RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.23 $) $Date: 2008-04-29 08:33:13 $";
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.17 $) $Date: 2007/08/15 04:58:06 $
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.18 $) $Date: 2008-04-29 08:33:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:58:06 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: head.c,v $
+ Revision 1.1.1.12.4.18  2008-04-29 08:33:12  brian
+ - update headers for Affero release
+
  Revision 1.1.1.12.4.17  2007/08/15 04:58:06  brian
  - GPLv3 updates
 
@@ -58,16 +61,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.17 $) $Date: 2007/08/15 04:58:06 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.18 $) $Date: 2008-04-29 08:33:12 $"
 
-static char const ident[] = "$RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.17 $) $Date: 2007/08/15 04:58:06 $";
+static char const ident[] = "$RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.18 $) $Date: 2008-04-29 08:33:12 $";
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.17 2007/08/15 04:58:06 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.18 2008-04-29 08:33:12 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *

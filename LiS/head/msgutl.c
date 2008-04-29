@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:01 $
+ @(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2008-04-29 08:33:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,26 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:01 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: msgutl.c,v $
+ Revision 1.1.1.5.4.7  2008-04-29 08:33:13  brian
+ - update headers for Affero release
+
  Revision 1.1.1.5.4.6  2007/08/14 10:47:01  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:01 $"
+#ident "@(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2008-04-29 08:33:13 $"
 
-static char const ident[] = "$RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:01 $";
+static char const ident[] = "$RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.7 $) $Date: 2008-04-29 08:33:13 $";
 
 /*                               -*- Mode: C -*- 
  * msgutl.c --- streams message utilities.
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msgutl.c,v 1.1.1.5.4.6 2007/08/14 10:47:01 brian Exp $
+ * RCS Id          : $Id: msgutl.c,v 1.1.1.5.4.7 2008-04-29 08:33:13 brian Exp $
  * Purpose         : here you have utilites to handle str messages.
  * ----------------______________________________________________
  *

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2007/08/14 10:47:02 $
+ @(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.8 $) $Date: 2008-04-29 08:33:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,26 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:02 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.c,v $
+ Revision 1.1.1.4.4.8  2008-04-29 08:33:13  brian
+ - update headers for Affero release
+
  Revision 1.1.1.4.4.7  2007/08/14 10:47:02  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2007/08/14 10:47:02 $"
+#ident "@(#) $RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.8 $) $Date: 2008-04-29 08:33:13 $"
 
-static char const ident[] = "$RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2007/08/14 10:47:02 $";
+static char const ident[] = "$RCSfile: stream.c,v $ $Name:  $($Revision: 1.1.1.4.4.8 $) $Date: 2008-04-29 08:33:13 $";
 
 /*                               -*- Mode: C -*- 
  * stream.c --- STREAMS entry points and main routines 
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: stream.c,v 1.1.1.4.4.7 2007/08/14 10:47:02 brian Exp $
+ * RCS Id          : $Id: stream.c,v 1.1.1.4.4.8 2008-04-29 08:33:13 brian Exp $
  * ----------------______________________________________________
  *
  *   Copyright (C) 1995  Francisco J. Ballesteros, Graham Wheeler,

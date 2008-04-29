@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.3 2007/08/14 10:47:10 brian Exp $
+ @(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 08:33:16 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.4  2008-04-29 08:33:16  brian
+ - update headers for Affero release
+
  Revision 0.9.2.3  2007/08/14 10:47:10  brian
  - GPLv3 header update
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2005 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* nothing here that is not in stream.h */
 

@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 1.1.1.3.4.5 2007/08/14 10:47:08 brian Exp $
+ @(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2008-04-29 08:33:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 1.1.1.3.4.6  2008-04-29 08:33:15  brian
+ - update headers for Affero release
+
  Revision 1.1.1.3.4.5  2007/08/14 10:47:08  brian
  - GPLv3 header update
 
@@ -58,7 +62,7 @@
 #ifndef __SYS_STREAM_H__
 #define __SYS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:08 $"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2008-04-29 08:33:15 $"
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

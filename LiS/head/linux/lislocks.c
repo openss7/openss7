@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/14 10:47:04 $
+ @(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:04 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lislocks.c,v $
+ Revision 1.1.1.6.4.9  2008-04-29 08:33:13  brian
+ - update headers for Affero release
+
  Revision 1.1.1.6.4.8  2007/08/14 10:47:04  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/14 10:47:04 $"
+#ident "@(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:13 $"
 
-static char const ident[] = "$RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/14 10:47:04 $";
+static char const ident[] = "$RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:13 $";
 
 /************************************************************************
 *                         LiS Locks                                     *

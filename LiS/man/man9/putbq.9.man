@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: putbq.9.man,v 1.1.4.5 2006/04/05 09:42:44 brian Exp $
+.\" @(#) $Id: putbq.9.man,v 1.1.4.6 2008-04-29 08:33:22 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:44 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 08:33:22 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: putbq.9.man,v $
+.\" Revision 1.1.4.6  2008-04-29 08:33:22  brian
+.\" - update headers for Affero release
+.\"
 .\" Revision 1.1.4.5  2006/04/05 09:42:44  brian
 .\" - moved .so line and updated headers
 .\"

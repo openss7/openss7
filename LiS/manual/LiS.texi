@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.26 2008-04-25 11:50:42 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.27 2008-04-29 08:33:23 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2008  OpenSS7 Corporation <www.openss7.com>
 % Copyright (C) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 %
 % All Rights Reserved.
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-25 11:50:42 $ by $Author: brian $
+% Last Modified $Date: 2008-04-29 08:33:23 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -82,7 +82,7 @@ This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of t
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -128,7 +128,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
 Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
 All Rights Reserved. @*
 
@@ -404,6 +404,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.27  2008-04-29 08:33:23  brian
+- update headers for Affero release
+
 Revision 1.1.6.26  2008-04-25 11:50:42  brian
 - updates to AGPLv3
 
