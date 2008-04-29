@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_namespace.h,v 0.9.2.5 2007/08/14 09:42:41 brian Exp $
+ @(#) $RCSfile: sctp_namespace.h,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 08:49:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 09:42:41 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:49:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_namespace.h,v $
+ Revision 0.9.2.6  2008-04-29 08:49:53  brian
+ - updated headers for Affero release
+
  Revision 0.9.2.5  2007/08/14 09:42:41  brian
  - GPLv3 header update
 
@@ -61,7 +65,7 @@
 #ifndef __OS7_OS7_NAMESPACE_H__
 #define __OS7_OS7_NAMESPACE_H__
 
-#ident "@(#) $RCSfile: sctp_namespace.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_namespace.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #undef NET_SCTP_ADAPTATION_LAYER_INFO
 #undef NET_SCTP_ASSOC_MAX_RETRANS
