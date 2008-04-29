@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: CC_PROGRESS_REQ.7.man,v 0.9.2.5 2006/04/05 09:43:11 brian Exp $
+.\" @(#) $Id: CC_PROGRESS_REQ.7.man,v 0.9.2.6 2008-04-29 07:10:21 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:11 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:21 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: CC_PROGRESS_REQ.7.man,v $
+.\" Revision 0.9.2.6  2008-04-29 07:10:21  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:11  brian
 .\" - moved .so line and updated headers
 .\"

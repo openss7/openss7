@@ -2,11 +2,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ch-sdl.4.man,v 0.9.2.2 2006/04/05 09:43:02 brian Exp $
+.\" @(#) $Id: ch-sdl.4.man,v 0.9.2.3 2008-04-29 07:10:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:02 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ch-sdl.4.man,v $
+.\" Revision 0.9.2.3  2008-04-29 07:10:18  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.2  2006/04/05 09:43:02  brian
 .\" - moved .so line and updated headers
 .\"

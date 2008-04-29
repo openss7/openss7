@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $
+ @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:20:18 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.new.c,v $
+ Revision 0.9.2.4  2008-04-29 07:11:11  brian
+ - updating headers for release
+
  Revision 0.9.2.3  2007/08/15 05:20:18  brian
  - GPLv3 updates
 
@@ -70,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $"
+#ident "@(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:11 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $";
+    "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:11 $";
 
 /*
  *  This is a Signalling Link (SL) multiplexor that provides a convenient way of organizing various
@@ -107,8 +111,8 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $"
-#define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:11 $"
+#define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_MUX_LICENSE		"GPL"

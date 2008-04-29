@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/19 11:55:56 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:55:56 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:11:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.23  2008-04-29 07:11:16  brian
+ - updating headers for release
+
  Revision 0.9.2.22  2007/08/19 11:55:56  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -79,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/19 11:55:56 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/19 11:55:56 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -132,8 +136,8 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2007/08/19 11:55:56 $"
-#define TCAP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $"
+#define TCAP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCAP_LICENSE	"GPL"

@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: OpenSS7.4.man,v 0.9.2.10 2006/12/27 16:35:53 brian Exp $
+.\" @(#) $Id: OpenSS7.4.man,v 0.9.2.11 2008-04-29 07:10:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/27 16:35:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: OpenSS7.4.man,v $
+.\" Revision 0.9.2.11  2008-04-29 07:10:17  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.10  2006/12/27 16:35:53  brian
 .\" - added slpmod module and fixups for make check target
 .\"

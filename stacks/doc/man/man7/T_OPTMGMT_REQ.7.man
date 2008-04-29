@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: T_OPTMGMT_REQ.7.man,v 0.9.2.5 2006/04/05 09:43:19 brian Exp $
+.\" @(#) $Id: T_OPTMGMT_REQ.7.man,v 0.9.2.6 2008-04-29 07:10:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:19 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: T_OPTMGMT_REQ.7.man,v $
+.\" Revision 0.9.2.6  2008-04-29 07:10:30  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:19  brian
 .\" - moved .so line and updated headers
 .\"

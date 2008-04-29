@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: SS7.4.man,v 0.9.2.7 2006/04/05 09:43:02 brian Exp $
+.\" @(#) $Id: SS7.4.man,v 0.9.2.8 2008-04-29 07:10:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:02 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: SS7.4.man,v $
+.\" Revision 0.9.2.8  2008-04-29 07:10:17  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:02  brian
 .\" - moved .so line and updated headers
 .\"
@@ -407,7 +410,7 @@ or
 .PP
 This manpage was written for
 .B strss7
-release $Name:  $($Revision: 0.9.2.7 $).
+release $Name:  $($Revision: 0.9.2.8 $).
 .\"
 .[
 $LIST$

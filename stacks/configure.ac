@@ -3,27 +3,27 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/10/16 06:04:26 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-04-29 07:10:16 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/16 06:04:26 $ by $Author: brian $
+# Last Modified $Date: 2008-04-29 07:10:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.49 $) $Date: 2007/10/16 06:04:26 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.50 $) $Date: 2008-04-29 07:10:16 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -219,6 +219,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.50  2008-04-29 07:10:16  brian
+# - updating headers for release
+#
 # Revision 0.9.2.49  2007/10/16 06:04:26  brian
 # - fix cross-compile bug
 #
@@ -257,7 +260,7 @@ AC_OUTPUT
 #
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

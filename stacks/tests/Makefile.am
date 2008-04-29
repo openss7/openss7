@@ -1,7 +1,7 @@
 # vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008/01/14 18:04:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:11:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -19,10 +19,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/01/14 18:04:47 $ by $Author: brian $
+# Last Modified $Date: 2008-04-29 07:11:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -130,6 +129,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.19  2008-04-29 07:11:34  brian
+## - updating headers for release
+##
 ## Revision 0.9.2.18  2008/01/14 18:04:47  brian
 ## - update tests and MIBS
 ##

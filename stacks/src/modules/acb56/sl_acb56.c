@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:17:19 $
+ @(#) $RCSfile: sl_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:10:49 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:19 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 07:10:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_acb56.c,v $
+ Revision 0.9.2.5  2008-04-29 07:10:49  brian
+ - updating headers for release
+
  Revision 0.9.2.4  2007/08/14 12:17:19  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:17:19 $"
+#ident "@(#) $RCSfile: sl_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:10:49 $"
 
 static char const ident[] =
-    "$RCSfile: sl_acb56.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:17:19 $";
+    "$RCSfile: sl_acb56.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:10:49 $";
 
 /*
  *  This is the re-invented ACB56 ISA driver.

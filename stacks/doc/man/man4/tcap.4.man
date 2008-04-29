@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tcap.4.man,v 0.9.2.8 2007/08/06 04:43:51 brian Exp $
+.\" @(#) $Id: tcap.4.man,v 0.9.2.9 2008-04-29 07:10:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/08/06 04:43:51 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 07:10:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tcap.4.man,v $
+.\" Revision 0.9.2.9  2008-04-29 07:10:20  brian
+.\" - updating headers for release
+.\"
 .\" Revision 0.9.2.8  2007/08/06 04:43:51  brian
 .\" - rework of pipe-based emulation modules
 .\"
