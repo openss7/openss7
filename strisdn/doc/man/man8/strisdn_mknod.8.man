@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strisdn_mknod.8.man,v 0.9.2.1 2006/12/23 13:03:56 brian Exp $
+.\" @(#) $Id: strisdn_mknod.8.man,v 0.9.2.2 2008-04-29 00:48:58 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/23 13:03:56 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 00:48:58 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strisdn_mknod.8.man,v $
+.\" Revision 0.9.2.2  2008-04-29 00:48:58  brian
+.\" - updated headers for release
+.\"
 .\" Revision 0.9.2.1  2006/12/23 13:03:56  brian
 .\" - added missing manpages
 .\"

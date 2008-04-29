@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: rpm.texi,v 0.9.2.1 2006/10/16 10:48:52 brian Exp $
+@c @(#) $Id: rpm.texi,v 0.9.2.2 2008-04-29 00:48:58 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c
 @c All Rights Reserved.
 @c
@@ -53,11 +53,14 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/10/16 10:48:52 $ by $Author: brian $
+@c Last Modified $Date: 2008-04-29 00:48:58 $ by $Author: brian $
 @c
 @c =========================================================================
 @c
 @c $Log: rpm.texi,v $
+@c Revision 0.9.2.2  2008-04-29 00:48:58  brian
+@c - updated headers for release
+@c
 @c Revision 0.9.2.1  2006/10/16 10:48:52  brian
 @c - added new package files
 @c
