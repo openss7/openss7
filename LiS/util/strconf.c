@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:24 $
+ @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2008-04-29 08:33:26 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:24 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.c,v $
+ Revision 1.1.1.3.4.6  2008-04-29 08:33:26  brian
+ - update headers for Affero release
+
  Revision 1.1.1.3.4.5  2007/08/14 10:47:24  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:24 $"
+#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2008-04-29 08:33:26 $"
 
-static char const ident[] = "$RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:24 $";
+static char const ident[] = "$RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2008-04-29 08:33:26 $";
 
 /************************************************************************
 *                       STREAMS Configuration                           *

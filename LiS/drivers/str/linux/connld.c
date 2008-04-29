@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.12 $) $Date: 2007/08/15 04:58:02 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2008-04-29 08:33:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:58:02 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: connld.c,v $
+ Revision 1.1.1.4.4.13  2008-04-29 08:33:12  brian
+ - update headers for Affero release
+
  Revision 1.1.1.4.4.12  2007/08/15 04:58:02  brian
  - GPLv3 updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.12 $) $Date: 2007/08/15 04:58:02 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2008-04-29 08:33:12 $"
 
 /*
  *  connld.c - unique pipe generator

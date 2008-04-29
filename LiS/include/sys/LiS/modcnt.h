@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: modcnt.h,v 1.1.1.1.4.5 2007/08/14 10:47:10 brian Exp $
+ @(#) $RCSfile: modcnt.h,v $ $Name:  $($Revision: 1.1.1.1.4.6 $) $Date: 2008-04-29 08:33:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: modcnt.h,v $
+ Revision 1.1.1.1.4.6  2008-04-29 08:33:15  brian
+ - update headers for Affero release
+
  Revision 1.1.1.1.4.5  2007/08/14 10:47:10  brian
  - GPLv3 header update
 
@@ -58,7 +61,7 @@
 #ifndef LIS_MODCNT_H
 #define LIS_MODCNT_H	1
 
-#ident "@(#) $RCSfile: modcnt.h,v $ $Name:  $($Revision: 1.1.1.1.4.5 $) $Date: 2007/08/14 10:47:10 $"
+#ident "@(#) $RCSfile: modcnt.h,v $ $Name:  $($Revision: 1.1.1.1.4.6 $) $Date: 2008-04-29 08:33:15 $"
 
 /*
  *  This file is intended to address the different situations for which

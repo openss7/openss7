@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:57:58 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.14  2008-04-29 08:33:11  brian
+ - update headers for Affero release
+
  Revision 0.9.2.13  2007/08/15 04:57:58  brian
  - GPLv3 updates
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -92,8 +96,8 @@ static char const ident[] =
 #endif
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $"
+#define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"

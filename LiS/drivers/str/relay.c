@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2007/08/15 04:57:59 $
+ @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2008-04-29 08:33:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,26 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:57:59 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: relay.c,v $
+ Revision 1.1.1.3.4.12  2008-04-29 08:33:11  brian
+ - update headers for Affero release
+
  Revision 1.1.1.3.4.11  2007/08/15 04:57:59  brian
  - GPLv3 updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2007/08/15 04:57:59 $"
+#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2008-04-29 08:33:11 $"
 
-static char const ident[] = "$RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2007/08/15 04:57:59 $";
+static char const ident[] = "$RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2008-04-29 08:33:11 $";
 
 /*                               -*- Mode: C -*- 
  * relay.c --- A simple relay pushable module
  * Author          : Dave Grothe
  * Created On      : Dec 30, 1995
  * Last Modified By: Dave Grothe
- * RCS Id          : $Id: relay.c,v 1.1.1.3.4.11 2007/08/15 04:57:59 brian Exp $
+ * RCS Id          : $Id: relay.c,v 1.1.1.3.4.12 2008-04-29 08:33:11 brian Exp $
  * Purpose         : relay messages just to test pushable modules
  * ----------------______________________________________________
  *

@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:59 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 04:57:59 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.14  2008-04-29 08:33:11  brian
+ - update headers for Affero release
+
  Revision 0.9.2.13  2007/08/15 04:57:59  brian
  - GPLv3 updates
 
@@ -109,10 +113,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:59 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:59 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -140,8 +144,8 @@ static char const ident[] =
 #endif
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:59 $"
+#define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"

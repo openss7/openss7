@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 10:47:18 $
+ @(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:18 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: drv_wrap.c,v $
+ Revision 0.9.2.5  2008-04-29 08:33:24  brian
+ - update headers for Affero release
+
  Revision 0.9.2.4  2007/08/14 10:47:18  brian
  - GPLv3 header update
 
@@ -64,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 10:47:18 $"
+#ident "@(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $"
 
 static char const ident[] =
-    "$RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 10:47:18 $";
+    "$RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -80,7 +84,7 @@ static char const ident[] =
 #include <sys/ddi.h>
 
 #define _XX_DESCRIP	"UNIX/SYSTEM V RELEASE 4 STREAMS FOR LINUX"
-#define _XX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
+#define _XX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define _XX_DEVICE	"LiS Binary Compatibility Wrapper"	/* get more from config */
 #define _XX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define _XX_LICENSE	"Proprietary"

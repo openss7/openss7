@@ -1,11 +1,11 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strms_down.8.man,v 1.1.4.4 2006/04/05 10:05:01 brian Exp $
+.\" @(#) $Id: strms_down.8.man,v 1.1.4.5 2008-04-29 08:33:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 10:05:01 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-29 08:33:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strms_down.8.man,v $
+.\" Revision 1.1.4.5  2008-04-29 08:33:20  brian
+.\" - update headers for Affero release
+.\"
 .\" Revision 1.1.4.4  2006/04/05 10:05:01  brian
 .\" - get references in right place
 .\"

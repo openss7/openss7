@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.10 $) $Date: 2007/08/14 10:46:56 $
+ @(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.11 $) $Date: 2008-04-29 08:33:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: printk.c,v $
+ Revision 1.1.1.2.4.11  2008-04-29 08:33:11  brian
+ - update headers for Affero release
+
  Revision 1.1.1.2.4.10  2007/08/14 10:46:56  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.10 $) $Date: 2007/08/14 10:46:56 $"
+#ident "@(#) $RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.11 $) $Date: 2008-04-29 08:33:11 $"
 
-static char const ident[] = "$RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.10 $) $Date: 2007/08/14 10:46:56 $";
+static char const ident[] = "$RCSfile: printk.c,v $ $Name:  $($Revision: 1.1.1.2.4.11 $) $Date: 2008-04-29 08:33:11 $";
 
 /************************************************************************
 *                          Printk Driver                                *
