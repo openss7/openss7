@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:35:23 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:23 $ by $Author: brian $
+ Last Modified $Date: 2008-04-29 02:07:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: h225.c,v $
+ Revision 0.9.2.8  2008-04-29 02:07:54  brian
+ - updated headers for release
+
  Revision 0.9.2.7  2007/08/15 05:35:23  brian
  - GPLv3 updates
 
@@ -79,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:35:23 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $"
 
 static char const ident[] =
-    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:35:23 $";
+    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -103,8 +107,8 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:35:23 $"
-#define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $"
+#define ISDN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISDN_LICENSE	"GPL"
