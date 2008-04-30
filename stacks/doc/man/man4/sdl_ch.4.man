@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sdl_ch.4.man,v 0.9.2.1 2008-04-28 07:39:45 brian Exp $
+.\" @(#) $Id: sdl_ch.4.man,v 0.9.2.2 2008-04-30 14:05:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,12 +53,189 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 07:39:45 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-30 14:05:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sdl_ch.4.man,v $
+.\" Revision 0.9.2.2  2008-04-30 14:05:05  brian
+.\" - updates to pass make check target
+.\"
 .\" Revision 0.9.2.1  2008-04-28 07:39:45  brian
 .\" - added missing manpages
 .\"
 .\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SDL_CH 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B sdl_ch
+\- Signalling Data Link (SDL) Channel (CH) Module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sdli.h>
+.br
+.B #include <ss7/sdli_ioctl.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This is the
+.B SDL-CH
+STREAMS pushable module.  Its purpose is to convert from a general purpose
+Channel Interface (CHI) Stream to an SS7-specific Signalling Data Link (SDL)
+Stream.  For the most part this is a one-to-one conversion as both interfaces
+are an abstraction of the same thing (a communications channel).
+.\"
+.\"
+.SH NOTICES
+.PP
+This is maybe not the most efficient way of going about doing things.  The
+conversion step might be costly (but then again it might not: in the main data
+flow it could be as little as the overhead of one function call to the module's
+put procedure).
+.PP
+Another more direct approach is to have an SDT module that pushes directly over
+a CH Stream instead of over an SDL Stream.  Nevertheless, this module can be
+useful for testing.
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH USAGE
+.PP
+.B SDL-CH
+modules are not normally pushed or accessed directly by user-level programs.
+The
+.B SDL-CH
+module is used directly by some test and monitoring programs.  The following
+steps are taken to establish this SDL facility:
+.IP 1. \w'0.\(em'u
+Open a CH Stream using the
+.BR open (2s)
+system call.
+.IP 2.
+Push the SDL-CH module using the
+.BR I_PUSH (7)
+STREAMS IO control.
+.IP 3.
+Attach the SDL Stream using the
+.BR LMI_ATTACH_REQ (7)
+primitive.
+.IP 4.
+Enable the SDL Stream using the
+.BR LMI_ENABLE_REQ (7),
+.BR SDL_DAEDR_START_REQ (7)
+and
+.BR SDL_DAEDT_START_REQ (7)
+primitives.
+.IP 5.
+Exchange data using the
+.BR SDL_DAEDT_TRANSMISSION_REQ (7)
+and
+.BR SDL_DAEDR_RECEIVED_BITS_IND (7)
+primitives.
+.IP 6.
+Disable the SDL Stream using the
+.BR LMI_DISABLE_REQ (7)
+primitive.
+.IP 7.
+Detach the SDL Stream using the
+.BR LMI_DETACH_REQ (7)
+primitive.
+.IP 8.
+Pop the SDL-CH module using the
+.BR I_POP (7)
+STREAMS IO control.
+.IP 9.
+Close the stream using the
+.BR close (2s)
+system call.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B SDL-CH
+module responses to Local Management Interface (LMI),
+.BR lmi_ioctl (4),
+IO controls as interpreted for
+.B SDL
+operation as described in
+.BR sdli_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.RB < ss7/lmi.h >,
+.RB < ss7/lmi_ioctl.h >,
+.RB < ss7/sdli >,
+.RB < ss7/sdli_ioctl.h >.
+.\"
+.\"
+.SH MODULES
+.TP
+.B streams-sdl_ch.o
+Implements the
+.B SDL-CH
+module named
+.RI \(lq sdl-ch \(rq.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR SS7 (4),
+.BR sdl (4),
+.BR ch (4),
+.BR sdli (7),
+.BR sdli_ioctl (4),
+.BR ss7confd (8).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B SDL-CH
+module conforms to the SDLI Specifiction, Revision 0.8.2.
+.[
+sdli
+.]
+.PP
+The
+.B SDL-CH
+module first appeared publicly in the
+.B @PACKAGE@
+release 0.9a.8.
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+SS7 Stack.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
+

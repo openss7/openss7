@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: test-usage.8.man,v 0.9.2.1 2008-04-28 07:39:46 brian Exp $
+.\" @(#) $Id: test-usage.8.man,v 0.9.2.2 2008-04-30 14:05:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 07:39:46 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-30 14:05:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: test-usage.8.man,v $
+.\" Revision 0.9.2.2  2008-04-30 14:05:06  brian
+.\" - updates to pass make check target
+.\"
 .\" Revision 0.9.2.1  2008-04-28 07:39:46  brian
 .\" - added missing manpages
 .\"
@@ -86,3 +89,370 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .HP
 \fBtest-usage\fP [\fIoptions\fP]
+[{\fB-H\fP|\fB--host\fP} \fIHOST\fP]
+[{\fB-p\fP|\fB--port\fP} \fIPORT\fP]
+.HP
+\fBtest-usage\fP [\fIoptions\fP] {\fB-d\fP|\fB--dump\fP}
+.HP
+\fBtest-usage\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBtest-usage\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBtest-usage\fP {\fB-C\fP|\fB--copying\fP}
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR test-usage
+is an example program used to demonstrate call detail record collection using
+SNMP and the \fIOPENSS7-CDR2-MIB\fP mib.  The collection program does not depend
+upon any given SNMP package and directly listens on a UDP port for incoming SNMP
+TRAPS or INFORM messages.  Each incoming message represents one of 5 different
+INFORM messages from the \fIOPENSS7-CDR2-MIB\fP that provide either single
+formatted CDR records or block formatted CDR records.
+.PP
+The program is a demonstration program in that it accepts the records, parses
+them, displays thier content and acknowledges them to the INFORM agent.  The
+program can be easily adapted to store the information in a local or remote
+database.
+.PP
+The
+.B test-usage
+program was developed to demonstrate the simplicity with which ASN.1 types
+embedded in SNMP TRAP/INFORM messages can be parsed directly without the need
+for the complexity and overhead of a general purpose ASN.1 compiler.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+.PP
+When no command option is specified, it is assumed that the program is to bind
+to the specified or default host and port and collect and display single or
+blocked CDR usage records.
+.TP
+\fB-D\fP, \fB--dump\fP
+Generates a listing of the VARBINDS and TRAPS to \fBstdout\fP that are
+recognized by the demonstration program, in accordance with the
+\fIOPENSS7-CDR2-MIB\fP, and exits.  See,
+.RI \(lq EXAMPLES \(rq,
+for sample output.
+.TP
+\fB-h\fP, \fB--help\fP, \fB-?\fP, \fB--?\fP
+When this option is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.\"
+.SS Collection Options
+.PP
+.TP
+\fB-H\fP, \fB--host\fP \fIHOST\fP
+Specifies the host or IP address upon which to listen for SNMP INFORM messages
+representing usage measurements (call records).  The default is to bind to all
+IP addresses (\fBINADDR_ANY\fP).
+.TP
+\fB-p\fP, \fB--port\fP \fIPORTNUM\fP
+Specifies the IP port number upon which to listen for SNMP INFORM messages
+representing usage measurements (call records).  The default is to use port
+number \fB162\fP, the port for listening for SNMP traps.  As this port is less
+than 1024, it may take privilege to bind to this port.
+.\"
+.SS General Options
+.PP
+The following general options applicable.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Specifies that the caller is interested only in the return code and error
+diagnostics and that normal output should be suppressed.  The default verbosity
+level if this option is not specified is
+.BR 1 .
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fP, \fB--verbose\fP [\fILEVEL\fP]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If
+the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This
+option can be repeated.  The default verbosity level if this option is not
+specified is
+.BR 1 .
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.TP
+\fB-d\fP, \fB--debug\fP [\fILEVEL\fP]
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.RB ( 1 )
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two
+.RB ( 2 )
+indicates that the option or argument syntax was in error and a diagnostic
+message is printed to
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B test-usage
+is simply a demonstration program.  Asside from providing a meager debugging
+mechanism for agents implementing the \fIOPENSS7-CDR2-MIB\fP, it serves little
+other purpose.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Following is an example of the output when the \fB--dump\fP command option is
+specified:
+.sp
+.nf
+\f(CW\s-2\
+$> ./usage --dump
+
+The following VARBINDS are recognizd by ./usage:
+
+  [  0] fileName            OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.1.1.0
+  [  0] reasonForOutput     INTEGER            1.3.6.1.4.1.29591.17.825.2.1.1.2.0
+  [  0] sequenceNumber      INTEGER            1.3.6.1.4.1.29591.17.825.2.1.1.3.0
+  [  0] callRecord          Opaque             1.3.6.1.4.1.29591.17.825.2.1.1.4.0
+  [  1] sequenceId          Counter64          1.3.6.1.4.1.29591.17.825.2.1.11.1.1.1.0
+  [  2] zoneId              Counter64          1.3.6.1.4.1.29591.17.825.2.1.11.1.1.2.0
+  [  3] recSeqId            Counter64          1.3.6.1.4.1.29591.17.825.2.1.11.1.1.3.0
+  [  4] fileSeqId           Counter64          1.3.6.1.4.1.29591.17.825.2.1.11.1.1.4.0
+  [  5] callId              OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.5.0
+  [  6] lastUpdate          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.6.0
+  [  7] eventOrder          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.7.0
+  [  8] status              INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.8.0
+  [  9] callType            INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.9.0
+  [ 10] clngPtyNbr          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.10.0
+  [ 11] chargeNbr           OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.11.0
+  [ 12] clldPtyNbr          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.12.0
+  [ 13] clldPtyNoa          INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.13.0
+  [ 14] origLnInfo          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.14.0
+  [ 15] ingLrn              OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.15.0
+  [ 16] ingCic              OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.16.0
+  [ 17] ingCsi              INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.17.0
+  [ 18] ingCceId            Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.18.0
+  [ 19] ingTgProt           INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.19.0
+  [ 20] ingTgType           INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.20.0
+  [ 21] ingTgId             Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.21.0
+  [ 22] ingCallStart        OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.22.0
+  [ 23] ingGateId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.23.0
+  [ 24] ingCardId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.24.0
+  [ 25] ingSpanId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.25.0
+  [ 26] ingChanId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.26.0
+  [ 27] ingIsdnDChan        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.27.0
+  [ 28] ingIsdnCrn          Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.28.0
+  [ 29] ingCreatConnCplt    OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.29.0
+  [ 30] ingAddrCplt         OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.30.0
+  [ 31] ingCallAns          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.31.0
+  [ 32] transNbr            OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.32.0
+  [ 33] termLrn             OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.33.0
+  [ 34] transCic            OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.34.0
+  [ 35] ingCallRls          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.35.0
+  [ 36] ingRlsCause         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.36.0
+  [ 37] egrCceId            Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.37.0
+  [ 38] egrTgProt           INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.38.0
+  [ 39] egrTgType           INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.39.0
+  [ 40] egrTgId             Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.40.0
+  [ 41] egrCallStart        OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.41.0
+  [ 42] egrGateId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.42.0
+  [ 43] egrCardId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.43.0
+  [ 44] egrSpanId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.44.0
+  [ 45] egrChanId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.45.0
+  [ 46] egrIsdnDChan        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.46.0
+  [ 47] egrIsdnCrn          Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.47.0
+  [ 48] egrCreatConnCplt    OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.48.0
+  [ 49] egrAddrCplt         OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.49.0
+  [ 50] egrCallAns          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.50.0
+  [ 51] egrCallRls          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.51.0
+  [ 52] egrRlsCause         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.52.0
+  [ 53] chkptFirst          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.53.0
+  [ 54] chkptLast           OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.54.0
+  [ 55] ingGateName         OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.55.0
+  [ 56] egrGateName         OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.56.0
+  [ 57] ingTgName           OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.57.0
+  [ 58] egrTgName           OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.58.0
+  [ 59] origGateIp          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.59.0
+  [ 60] termGateIp          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.60.0
+  [ 61] h323ConfId          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.61.0
+  [ 62] ingCardPort         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.62.0
+  [ 63] ingCardPath         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.63.0
+  [ 64] egrCardPort         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.64.0
+  [ 65] egrCardPath         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.65.0
+  [ 66] ingTg               Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.66.0
+  [ 67] egrTg               Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.67.0
+  [ 68] dialedNbr           OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.68.0
+  [ 69] dialedNoa           INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.69.0
+  [ 70] redirNbr            OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.70.0
+  [ 71] redirNoa            INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.71.0
+  [ 72] redirInd            INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.72.0
+  [ 73] redirRsn            INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.73.0
+  [ 74] calledNbr           OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.74.0
+  [ 75] calledNoa           INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.75.0
+  [ 76] redirRsnOrig        INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.76.0
+  [ 77] redirCntr           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.77.0
+  [ 78] redirPrsntnInd      INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.78.0
+  [ 79] ingJuris            OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.79.0
+  [ 80] egrJuris            OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.80.0
+  [ 81] ingTrunkBearCap     INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.81.0
+  [ 82] egrTrunkBearCap     INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.82.0
+  [ 83] transNetSelCarr     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.83.0
+  [ 84] clngPtyNoa          Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.84.0
+  [ 85] ingRlsCauseIntrnl   OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.85.0
+  [ 86] egrRlsCauseIntrnl   OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.86.0
+  [ 87] egrClldNbr          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.87.0
+  [ 88] egrClldNoa          INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.88.0
+  [ 89] egrCnndNbr          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.89.0
+  [ 90] egrCnndNoa          INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.90.0
+  [ 91] clngPtyPrsntnInd    INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.91.0
+  [ 92] ingIri              INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.92.0
+  [ 93] egrOri              INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.93.0
+  [ 94] ingCallidExtrnl     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.94.0
+  [ 95] egrCallidExtrnl     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.95.0
+  [ 96] ingChargeInfo       OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.96.0
+  [ 97] egrChargeInfo       OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.97.0
+  [ 98] ingPrtlInd          OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.98.0
+  [ 99] ingNatfwdCliblkInd  INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.99.0
+  [100] ingNatfwdNtaInd     INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.100.0
+  [101] ingLastDvrtLnDigs   OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.101.0
+  [102] ingLastDvrtLnNoa    INTEGER            1.3.6.1.4.1.29591.17.825.2.1.11.1.1.102.0
+  [103] j7IngAddlPtyCat     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.103.0
+  [104] j7IngChgAreaInfo    OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.104.0
+  [105] j7IngFwdCallInd     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.105.0
+  [106] j7EgrAddlPtyCat     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.106.0
+  [107] j7EgrChgAreaInfo    OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.107.0
+  [108] j7EgrBkwCallInd     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.108.0
+  [109] j7CarrInfoXfer      OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.109.0
+  [110] ingSs7GnrcParm      OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.110.0
+  [111] egrSs7GnrcParm      OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.111.0
+  [112] ingPktsSent         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.112.0
+  [113] ingPktsRcvd         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.113.0
+  [114] ingPktsLost         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.114.0
+  [115] ingPktsXfer         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.115.0
+  [116] ingJitter           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.116.0
+  [117] ingLtncy            Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.117.0
+  [118] egrPktsSent         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.118.0
+  [119] egrPktsRcvd         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.119.0
+  [120] egrPktsLost         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.120.0
+  [121] egrPktsXfer         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.121.0
+  [122] egrJitter           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.122.0
+  [123] egrLtncy            Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.123.0
+  [124] ingCrctId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.124.0
+  [125] egrCrctId           Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.125.0
+  [126] ingCodec            Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.126.0
+  [127] egrCodec            Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.127.0
+  [128] ingLocGateId        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.128.0
+  [129] egrLocGateId        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.129.0
+  [130] ingCasCrctSzr       OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.130.0
+  [131] egrCasCrctSzr       OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.131.0
+  [132] ingZz               OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.132.0
+  [133] egrZz               OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.133.0
+  [134] ingCtryAddrType     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.134.0
+  [135] egrCtryAddrType     OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.135.0
+  [136] ingPartition        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.136.0
+  [137] egrPartition        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.137.0
+  [138] ingClngPtyCat       Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.138.0
+  [139] ingRlsCauseLctn     Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.139.0
+  [140] egrRlsCauseLctn     Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.140.0
+  [141] clldPtyCat          Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.141.0
+  [142] callDuration        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.142.0
+  [143] ingRlsDrctn         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.143.0
+  [144] egrRlsDrctn         Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.128.0
+  [145] ingAnsLctim         OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.129.0
+  [146] egrAnsLctim         OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.130.0
+  [147] ingHlcChrsId        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.131.0
+  [148] egrHlcChrsId        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.132.0
+  [149] ingLlcXferCap       Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.133.0
+  [150] egrLlcXferCap       Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.134.0
+  [151] routeList           OCTET STRING       1.3.6.1.4.1.29591.17.825.2.1.11.1.1.135.0
+  [152] ingPointCode        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.136.0
+  [153] egrPointCode        Unsigned32         1.3.6.1.4.1.29591.17.825.2.1.11.1.1.137.0
+
+The following TRAPS are recognizd by ./usage:
+
+  [  1] blockRecordNotification        1.3.6.1.4.1.29591.17.825.2.0.1
+  [  2] callDetailRecordNotification   1.3.6.1.4.1.29591.17.825.2.0.2
+  [  3] fileCreationNotification       1.3.6.1.4.1.29591.17.825.2.0.3
+  [  4] blockRecordNotificationR2      1.3.6.1.4.1.29591.17.825.2.0.4
+  [  5] callDetailRecordNotificationR2 1.3.6.1.4.1.29591.17.825.2.0.5
+\s+1\fP
+.fi
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @libexecdir@/@PACKAGE@/test-usage
+contains the
+.B test-usage
+demonstration program.
+.PP
+\fIOPENSS7-CDR2-MIB\fP.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+\fIOPENSS7-CDR2-MIB\fP.
+.\"
+.\"
+.SH BUGS
+.PP
+.B test-usage
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B test-usage
+demonstration program is compatible with SNMPv1, SNMPv2, SNMPv2c and SNMPv3 and
+agents implementing the \fIOPENSS7-CDR2-MIB\fP.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B test-usage
+demonstrates conformance with the
+.IR OPENSS7-CDR2-MIB ,
+and SNMPv1, SNMPv2, SNMPv2c and SNMPv3.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B test-usage
+is provided with the
+.I @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -2556,6 +2556,18 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K q710
+%L Q.710
+%A ITU
+%R ITU-T Recommendation Q.710
+%T Simplified MTP Version for Small Systems
+%D November 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K q711
 %L Q.711
 %A ITU

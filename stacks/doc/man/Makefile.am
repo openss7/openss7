@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-29 07:10:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-04-30 14:05:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 07:10:16 $ by $Author: brian $
+# Last Modified $Date: 2008-04-30 14:05:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -117,7 +117,6 @@ ss7_man_MANS = \
 	man4/sdl-pmod.4 \
 	man4/sdl_rtp.4 \
 	man4/sdl_x400p.4 \
-	man4/sdlold.4 \
 	man4/sdl_ch.4 \
 	man4/sdt.4 \
 	man4/sdt-acb56.4 \
@@ -1777,7 +1776,6 @@ ss7_dist_noinst_MANS = \
 	man4/sdl_tcp.4.man \
 	man4/sdl_udp.4.man \
 	man4/sdl_x400p.4.man \
-	man4/sdlold.4.man \
 	man4/sdl_ch.4.man \
 	man4/sdt.4.man \
 	man4/sdt-acb56.4.man \
@@ -3512,6 +3510,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.47  2008-04-30 14:05:05  brian
+## - updates to pass make check target
+##
 ## Revision 0.9.2.46  2008-04-29 07:10:16  brian
 ## - updating headers for release
 ##

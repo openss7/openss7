@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sccp-mod.4.man,v 0.9.2.1 2008-04-28 07:39:45 brian Exp $
+.\" @(#) $Id: sccp-mod.4.man,v 0.9.2.2 2008-04-30 14:05:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,12 +53,200 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 07:39:45 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-30 14:05:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sccp-mod.4.man,v $
+.\" Revision 0.9.2.2  2008-04-30 14:05:05  brian
+.\" - updates to pass make check target
+.\"
 .\" Revision 0.9.2.1  2008-04-28 07:39:45  brian
 .\" - added missing manpages
 .\"
 .\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SCCP-MOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B sccp-mod
+\- Signalling Connection Control Part (SCCP) Module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sccpi.h>
+.br
+.B #include <ss7/sccpi_ioctl.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B SCCP-MOD
+is a simplified implementation of the Signalling Connection Control Part (SCCP)
+.[
+ansi t1.112
+.]
+.[
+q711
+.]
+.[
+q712
+.]
+.[
+q713
+.]
+.[
+q714
+.]
+.[
+q715
+.]
+.[
+q716
+.]
+.[
+etsi en 300 009-1
+.]
+as a STREAMS module that can be pushed on an MTP Stream.  Either the MTP Stream
+can be bound before pushing or after.  This is a simple case where all SCCP
+messages belonging to all subsystems for a signalling point are delivered to the
+same Stream.
+.PP
+.B SCCP-MOD
+presents a Signalling Connection Control Part (SCCP) Interface,
+.BR sccpi (7),
+to its user.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH USAGE
+.PP
+.B SCCP-MOD
+modules are not normally pushed or accessed directly by user-level programs.
+The
+.B SCCP-MOD
+module is used directly by some test and monitoring programs.  The following
+steps are taken to establish this minimal SCCP facility:
+.IP 1. \w'0.\(em'u
+Open an MTP Stream using the
+.BR open (2s)
+system call.
+.IP 2.
+Push the SCCP-MOD module using the
+.BR I_PUSH (7)
+STREAMS IO control.
+.IP 3.
+Bind the SCCP Stream using the
+.BR N_BIND_REQ (7)
+primitive.
+.IP 4.
+Exchange data on the SCCP Stream using the
+.BR N_DATA_REQ (7),
+.BR N_DATA_IND (7),
+.BR N_UNITDATA_REQ (7),
+and
+.BR N_UNITDATA_IND (7)
+primitives.
+.IP 5.
+Unbind the SCCP Stream using the
+.BR N_UNBIND_REQ (7)
+primitive.
+.IP 6.
+Pop the SCCP-MOD mdoule using the
+.BR I_POP (7)
+STREAMS IO control.
+.IP 7.
+Close the MTP Stream using the
+.BR close (2s)
+system call.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B SCCP-MOD
+module responds to Local Management Interface (LMI),
+.BR lmi_ioctl (4),
+IO controls as interprested for
+.B SCCP
+operation as described in
+.BR sccpi_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.RB < ss7/npi >,
+.RB < ss7/npi_sccp.h >.
+.\"
+.\"
+.SH MODULES
+.TP
+.B streams-sccp_mod.o
+Implements the
+.B SCCP-MOD
+module named
+.RI \(lq sccp-mod \(rq.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR SS7 (4),
+.BR mtp (4),
+.BR sccp (4),
+.BR npi (7),
+.BR sccpi_ioctl (4),
+.BR ss7confd (8).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B SCCP-MOD
+modules conforms to the NPI Specification, Revision 2.0.0,
+.[
+npi revision 2.0.0
+.]
+with extensions for SCCP.
+.PP
+The
+.B SCCP-MOD
+module first appeared publicly in the
+.B @PACKAGE@
+release 0.9a.8.
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+SS7 Stack.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
+

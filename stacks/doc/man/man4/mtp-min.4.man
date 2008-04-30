@@ -1,8 +1,7 @@
-.so man4/mtp.4.man
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mtp-min.4.man,v 0.9.2.3 2008-04-29 07:10:18 brian Exp $
+.\" @(#) $Id: mtp-min.4.man,v 0.9.2.4 2008-04-30 14:05:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 07:10:18 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-30 14:05:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mtp-min.4.man,v $
+.\" Revision 0.9.2.4  2008-04-30 14:05:05  brian
+.\" - updates to pass make check target
+.\"
 .\" Revision 0.9.2.3  2008-04-29 07:10:18  brian
 .\" - updating headers for release
 .\"
@@ -66,3 +68,294 @@
 .\" - moved .so line and updated headers
 .\"
 .\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH MTP-MIN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B mtp-min, mtp_min
+\- Signalling System No. 7 (SS7) Minimal Message Transfer Part (MTP)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/mtpi.h>
+.br
+.B #include <ss7/mtpi_ioctl.h>
+.HP
+.BI "int " mtp_stream " = open(" device ", " flags );
+.HP
+.BI "int " mtp_xtistr " = t_open(" device ", " flags );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B MTP-MIN
+is an implementation of the Signalling System No. 7
+.RB ( SS7 (4))
+Message Transfer Part
+.RB ( MTP )
+defined in
+.I ITU-T Recommendation Q.710.
+.[
+q710
+.]
+but also supports a subset of ANSI,
+.[
+ansi t1.111
+.]
+ETSI
+.[
+mtpv1
+.]
+and simplified forms of other national variants.
+.PP
+Whereas
+.BR mtp-mod (4)
+is implemented as a pushable STREAMS module,
+.B MTP-MIN
+is implemented as a STREAMS multiplexing driver and, as such,
+can accomodate a much wider range of applications (such as
+multiple signalling point codes per signalling link).  Streams
+providing the Signalling Link (SL) interface,
+.BR sli (7),
+are linked under the multiplexing driver using the
+.BR I_LINK "(7) or " I_PLINK (7)
+STREAMS input-output controls and configured using MTP
+input-output controls,
+.BR mtpi_ioctl (4).
+This forms a complete MTP protocol layer for SS7.
+.\"
+.\"
+.SH NOTICES
+.PP
+Normally, in SS7, the complete MTP layer is used.  See,
+.BR mtp (4).
+.B MTP-MIN
+has specific applications for minimalistic sinalling end point
+(SEP) applications such as those found in F-link only operation
+directly between signalling end points and more notably for
+GSM-A interface.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B MTP-MIN
+implements an
+.BR M_CTL "(9) and " M_PCCTL (9)
+based interface for both the upper and lower multiplex service
+interfaces for efficiency.  The
+.BR M_CTL "(9) and " M_PCCTL (9)
+interface is designed to work identical to the
+.BR M_PROTO "(9) and " M_PCPROTO (9)
+interfaces provided by the Stream head, with the exception that,
+because the Stream head cannot directly generate
+.BR M_CTL "(9) or " M_PCCTL (9)
+messages, they may be used for trusted inter-module messages
+with greater efficiency.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"The
+.\".B MTP-MIN
+.\"multiplexing driver is not normally configured or accessed
+.\"directly by user-level programs.  The
+.\".B MTP-MIN
+.\"multiplexing driver is used directly by some test and monitoring
+.\"programs.  The following steps are taken to establish this
+.\"minimal MTP facility:
+.\".IP 1. \w'0.\(em'u
+.\"Open a control stream on the
+.\".B MTP-MIN
+.\"multiplexing driver (by opening, for example,
+.\".BR /dev/streams/mtp-min/1 ).
+.\".IP 2.
+.\"Open and configure Signalling Link (SL) Streams for use by the
+.\".B MTP-MIN
+.\"multiplexing driver.  For each opened and configured Signalling
+.\"Link (SL) Stream, link the Stream beneath the
+.\".B MTP-MIN
+.\"multiplexing driver using the
+.\".BR I_LINK "(7) or " I_PLINK (7)
+.\"STREAMS input-output control.
+.\".IP 3.
+.\".IP 4.
+.\".IP 5.
+.\".IP 6.
+.\".IP 7.
+.\".IP 8.
+.\".IP 9.
+.\".IP 10.
+.\".IP 11.
+.\".IP 12.
+.\".IP 13.
+.\".IP 14.
+.\".IP 15.
+.\".IP 16.
+.\"
+.\"
+.SH INTERFACES
+.PP
+At the upper multiplex,
+.B MTP-MIN
+provides the Message Transfer Part Interface (MTPI),
+.[
+mtpi
+.]
+.BR mtpi (7),
+and the MTP input-output control interface,
+.BR mtpi_ioctl (4).
+This interface directly models the MTP Primitives
+.[
+q701
+.]
+as STREAMS messages in a similar fashion to the NPI.
+.[
+npi revision 2.0.0
+.]
+.PP
+At the lower multiplex,
+.B MTP-MIN
+provides the Signalling Link Interface (SLI),
+.[
+sli
+.]
+.BR sli (7).
+This interface models the Signalling Link signals
+.[
+q703
+.]
+as STREAMS messages in a similar fashion to the DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B MTP-MIN
+module response to Local Management Interface (LMI),
+.BR lmi_ioctl (4),
+input-output controls as interpreted for
+.B MTP
+operation as described in
+.BR mtpi_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.RB < ss7/lmi.h >,
+.RB < ss7/lmi_ioctl.h >,
+.RB < ss7/mtpi.h >,
+.RB < ss7/mtpi_ioctl.h >,
+.RB < ss7/npi.h >,
+.RB < ss7/npi_ss7.h >,
+.RB < ss7/npi_mtp >,
+.RB < ss7/tpi.h >,
+.RB < ss7/tpi_ss7.h >,
+.RB < ss7/tpi_mtp >,
+.RB < xti.h >,
+.RB < xti_mtp.h >.
+.\"
+.\"
+.SH DRIVERS
+.PP
+.TP
+.B streams-mtp_min.o
+Implements the
+.B MTP-MIN
+multiplexing driver named
+.RI \(lq mtp-min \(rq.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR SS7 (4),
+.BR sl (4),
+.BR mtp (4),
+.BR mtpi (7),
+.BR mtpi_ioctl (4),
+.BR npi_mtp (7),
+.BR tpi_mtp (7),
+.BR xti_mtp (3),
+.BR xnet (3),
+.BR ss7confd (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B MTP-MIN
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+SS7 application programming interfaces have not been subject to
+standardization; however, where the OSI APIs are directly
+applicable to protocol layers of the SS7 stacks, OpenSS7
+provides OSI compatible interfaces.  Thus,
+.B MTP-MIN
+is largely compatible with implementations providing the NPI
+interface
+.[
+npi revision 2.0.0
+.]
+for use with MTP,
+.BR npi_mtp (7).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SS7 does not have a traditional and standard implementation;
+however, the implementation standards from the OSI are in may
+cases directly applicable.
+.\"
+.\"
+.SH VERSIONS
+.PP
+The MTP Interface (MTPI) is specific to the
+.B OpenSS7 
+SS7 Stack.
+This is Version 2 of the interface.
+The
+.B MTP-MIN
+multiplexing driver conforms to the MTPI Specification, Revision 0.9.2.
+.[
+mtpi
+.]
+.PP
+The
+.B MTP-MIN
+multiplexing driver first appeared publicly in the
+.B @PACKAGE@
+release 0.9a.8.
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+SS7 Stack.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
+
