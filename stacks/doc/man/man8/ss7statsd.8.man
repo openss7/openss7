@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ss7statsd.8.man,v 0.9.2.1 2008-04-28 07:39:46 brian Exp $
+.\" @(#) $Id: ss7statsd.8.man,v 0.9.2.2 2008-04-30 14:05:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 07:39:46 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-30 14:05:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ss7statsd.8.man,v $
+.\" Revision 0.9.2.2  2008-04-30 14:05:06  brian
+.\" - updates to pass make check target
+.\"
 .\" Revision 0.9.2.1  2008-04-28 07:39:46  brian
 .\" - added missing manpages
 .\"
@@ -86,3 +89,285 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .HP
 \fBss7statsd\fP [\fIoptions\fP]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ss7statsd
+is a user-space C-language program that can be run in the background as a
+daemon process to periodically collect, tally and record operational
+measurement data.  But, see
+.RI \(lq NOTICES \(rq.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.\"
+.SS Command Options
+.PP
+The following command options determine the mode of the command and are
+mutually exclusive options:
+.TP
+\fB-n\fP, \fB--nodaemon\fP
+Specifies that the
+.B ss7statsd
+is to run in the foreground with output to standard out and errors to standard
+error (unless overridden by options).  This is the default when \fB--debug\fP
+is specified.  Otherwise,
+.B ss7statsd
+normally closes standard input, output and error and places itself in the
+background as a daemon process, reading configuraiton from the configuration
+file, sending output to the output file, and sending errors to the log file.
+.TP
+\fB-h\fP, \fB-?\fP, \fB--?\fP, \fB--help\fP
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.\"
+.SS Collection Options
+.PP
+The following options specify the device names from which to collect
+statistics and events.
+.TP
+\fB-L\fP, \fB--slmx\fP [\fIDEVNAME\fP[,\fIDEVNAME\fP]]
+Specifies the device names,
+.IR DEVNAME ,
+from which to collect signalling link statistics.  The default device name is
+.RI \(lq /dev/sl-stats \(rq.
+.TP
+\fB-M\fP, \fB--mtpx\fP [\fIDEVNAME\fP[,\fIDEVNAME\fP]]
+Specifies the device names,
+.IR DEVNAME ,
+from which to collect message transfer part statistics.  The default device name is
+.RI \(lq /dev/mtp-stats \(rq.
+.TP
+\fB-S\fP, \fB--sccp\fP [\fIDEVNAME\fP[,\fIDEVNAME\fP]]
+Specifies the device names,
+.IR DEVNAME ,
+from which to collect signalling connection control part statistics.  The
+default device name is
+.RI \(lq /dev/sccp-stats \(rq.
+.TP
+\fB-T\fP, \fB--tcap\fP [\fIDEVNAME\fP[,\fIDEVNAME\fP]]
+Specifies the device names,
+.IR DEVNAME ,
+from which to collect transaction capabilities application part statistics.  The
+default device name is
+.RI \(lq /dev/tcap-stats \(rq.
+.TP
+\fB-I\fP, \fB--isup\fP [\fIDEVNAME\fP[,\fIDEVNAME\fP]]
+Specifies the device names,
+.IR DEVNAME ,
+from which to collect integrated services digital network user part
+statistics.  The default device name is
+.RI \(lq /dev/isup-stats \(rq.
+.\"
+.SS Daemon Options
+.PP
+The following options are useful in daemon mode to redirect standard output to
+an output file and standard error to a log file.
+.TP
+\fB-i\fP, \fB--interval\fP \fIINTERVAL\fP
+.TP
+\fB-O\fP, \fB--outpdir\fP \fIDIRECTORY\fP
+When run in the daemon mode, specifies the directory,
+.IR DIRECTORY ,
+in which output and error files will be opened.  The default output directory is
+.IR \(lq /var/tmp/ss7statsd \(rq.
+.TP
+\fB-o\fP, \fB--outfile\fP \fIFILENAME\fP
+When run in daemon mode, specifies the output filename,
+.IR FILENAME .
+The default output filename is the process name concatenated with a
+.RB \(lq .out \(rq
+suffix.
+.TP
+\fB-l\fP, \fB--logfile\fP \fIFILENAME\fP
+When run in daemon mode, specifies the errors filename,
+.IR FILENAME .
+The default errors filename is the process name concatenated with a
+.RB \(lq .err \(rq
+suffix.
+.TP
+\fB-f\fP, \fB--cfgfile\fP \fIFILENAME\fP
+Not implemented.
+.\"
+.SS General Options
+The following are general options controlling the output of the utilily and
+can be applied to the command in any mode:
+.TP
+\fB-q\fP, \fB--quiet\fP
+Specifies that the caller is interested only  in the return code and that
+normal output should be suppressed.  This option is equivalent to
+.BR --verbose = 0 .
+.TP
+\fB-d\fP, \fB--debug\fP \fILEVEL\fP
+Increases or set the debugging level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the debugging level should be increased by one.  If the
+.I LEVEL
+argument is specified, the debuggin level is set to that integer value.  This option can be
+repeated.  For example,
+.B -ddddd
+is equivalent to
+.BR --debug = 5 .
+The default debugging level is zero
+.RB ( 0 ).
+.TP
+\fB-v\fP, \fB--verbose\fP \fILEVEL\fP
+Increases or sets the output verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the output verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.  For example,
+.B -vvvvv
+is equivalent to
+.BR --verbose = 5 .
+The default output verbosity is one
+.RB ( 1 ).
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B ss7statsd
+fails, a diagnostic message is printed on standard error and a non-zero exit
+status is returned.  If standard error has already been redirected to the log
+file, the log file will contain the diagnostic message.
+.PP
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.BR ( 1 )
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two
+.BR ( 2 )
+indicates that the option syntax was in error and a diagnostic message is
+printed on
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.IR stderr .
+.PP
+Also,
+.B ss7statsd
+logs notices, warnings and diagnostic error messages under facility
+.I daemon
+to the system log, regardless of whether it is running in the foreground or as
+a daemon.  See
+.BR syslog (2).
+.\"
+.\"
+.SH NOTICES
+.PP
+Use of a statistics daemon such as
+.BR ss7statsd
+to collect statistics from SS7 drivers and modules and then dump them to files
+in specialized formats is deprecated and no longer the preferred method for
+operational measurement data colllection on the OpenSS7 SS7 Stack and systems.
+A SNMP/CMIP agent that provides operational measurement data collection and
+management is now the preferred method.
+The
+.BR -f ", " --cfgfile = \fICFGFILE\fP
+option is not yet implemented.
+.\"
+.\"
+.SH BUGS
+.PP
+.B ss7statsd
+has no known bugs.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.I /var/sbin/ss7statsd
+contains the
+.B ss7statsd
+command.
+.TP
+.I /var/tmp/ss7statsd
+The default capture output directory.
+.TP
+.IB /var/tmp/ss7statsd/ss7statsd $$ .out
+The default capture output file, where
+.B $$
+is the process identification number of the creating process.
+.TP
+.IB /var/tmp/ss7statsd/ss7statsd $$ .err
+The default capture errors file, where
+.B $$
+is the process identification number of the creating process.
+.TP
+.I /etc/sysconfig/ss7/ss7statsd.conf
+The default configuration file.
+.TP
+.I /var/log/messages
+The system log file.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR x400p (4),
+.BR slmon (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B ss7statsd
+is backward compatible with previous versions of the utility.  The output
+format has not changed over the various version of the utility.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.PP
+SS7 statistics and event collection is not subject to standardization.  The
+.B ss7statsd
+utility conforms to the OpenSS7
+Local Management Interface (LMI),
+.BR lmi (7),
+version
+.B 0.9.2
+and the Signalling Link Interface (SLI),
+.BR sli (7),
+version
+.BR 0.9.2 .
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ss7statsd
+originally appeared in the OpenSS7
+.BR strss7
+package in version
+.BR 0.9a.8 .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,3 +1,25 @@
+2008-04-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: updates to pass make check target
+	* doc/man/strss7.refs: updates to pass make check target
+	* doc/man/man4/mtp-min.4.man: updates to pass make check target
+	* doc/man/man4/mtp-mod.4.man: updates to pass make check target
+	* doc/man/man4/mtp.4.man: updates to pass make check target
+	* doc/man/man4/mtp_min.4.man: updates to pass make check target
+	* doc/man/man4/mtp_tpi.4.man: updates to pass make check target
+	* doc/man/man4/sccp-mod.4.man: updates to pass make check target
+	* doc/man/man4/sccp.4.man: updates to pass make check target
+	* doc/man/man4/sdl_ch.4.man: updates to pass make check target
+	* doc/man/man4/sdlold.4.man: updates to pass make check target
+	* doc/man/man4/sl-min.4.man: updates to pass make check target
+	* doc/man/man4/tc-mod.4.man: updates to pass make check target
+	* doc/man/man4/tcap-mod.4.man: updates to pass make check target
+	* doc/man/man4/tr-mod.4.man: updates to pass make check target
+	* doc/man/man8/ss7statsd.8.man: updates to pass make check target
+	* doc/man/man8/test-usage.8.man: updates to pass make check target
+	* src/modules/sdl/lis.conf: updates to pass make check target
+	* src/util/usage.c: updates to pass make check target
+
 2008-04-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.spec.in: updates for release

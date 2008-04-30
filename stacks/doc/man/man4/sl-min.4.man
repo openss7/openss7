@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sl-min.4.man,v 0.9.2.1 2008-04-28 07:39:45 brian Exp $
+.\" @(#) $Id: sl-min.4.man,v 0.9.2.2 2008-04-30 14:05:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,12 +53,206 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 07:39:45 $ by $Author: brian $
+.\" Last Modified $Date: 2008-04-30 14:05:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sl-min.4.man,v $
+.\" Revision 0.9.2.2  2008-04-30 14:05:05  brian
+.\" - updates to pass make check target
+.\"
 .\" Revision 0.9.2.1  2008-04-28 07:39:45  brian
 .\" - added missing manpages
 .\"
 .\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SL-MIN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B sl-min
+\- Signalling Link (SL) Mimimal Multiplexer
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sli.h>
+.br
+.B #include <ss7/sli_ioctl.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B SL-MIN
+is a minimal Signalling Link (SL) multiplexer.  Its purpose is to handle signalling link functions
+that are normally performed at the MTP level so that a signalling link link can be used directly by
+user level test programs without the need for an MTP.  The primary function of the multiplexer is as
+follows:
+.IP \(bu \w'\(bu\(em'u
+To hold the signalling link active between opens and closes of applications programs.  This is
+accomplished by permanently linking a Signalling Link Stream beneath the multiplexing driver using
+the
+.BR I_PLINK (7)
+STREAMS input-output control.
+.IP \(bu
+Maintain activity of the signalling link without user-level program intervention.  This is
+accomplished by responding internally to SLTM request messages with SLTA messages.  Otherwise, the
+remote MTP layer would not place the link into service and might take the link out of service after
+a period of time.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B SL-MIN
+multiplexing driver is not intended for use with more than one signalling link at a time.  Also, the
+.B SL-MIN
+multiplexing driver is only intended for performing Signalling Link interoperability testing with a
+remote implemetnation containing a full MTP protocol layer: it is not intended for production use.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B SL-MIN
+is implemented as a very simple STREAMS multiplexing driver.
+.\"
+.\"
+.SH USAGE
+.PP
+To user the multiplexer, the application opens the device, opens the Signalling Link stream that is
+to be kept available, and the Signalling Link stream is linked beneath the driver using the
+.BR I_PLINK (7)
+STREAMS input-output control.  A sample program that does this is the
+.BR src/test/sl/test-sl-start.c
+program in the distribution directory.
+A sample program that stops the link is in the
+.BR src/test/sl/test-sl-stop.c
+program in the distribution directory.
+.\"
+.\"
+.SH IOCTLS
+.PP
+.B SL-MIN
+does not accept any input-output controls of its own but passes all input-output controls to the
+driver.
+.\"
+.\"
+.SH FILES
+.PP
+.RB < ss7/sli.h >,
+.RB < ss7/sli_ioctl.h >,
+.RB < ss7/sdti.h >,
+.RB < ss7/sdti_ioctl.h >,
+.RB < ss7/sdli.h >,
+.RB < ss7/sdli_ioctl.h >.
+.\"
+.\"
+.SH DRIVERS
+.TP
+.TP
+.B streams-sl_min.o
+Implements the
+.B SL-MIN
+multiplexing driver named
+.RI \(lq sl-min \(rq.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/sl-min
+This device provides access to the
+.B SL-MIN
+multiplexing driver.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR SS7 (4),
+.BR sl (4),
+.BR mtp (4),
+.BR mtpi (7),
+.BR mtpi_ioctl (4),
+.BR npi_mtp (7),
+.BR tpi_mtp (7),
+.BR xti_mtp (3),
+.BR xnet (3),
+.BR ss7confd (8).
+.\"
+.\"
+.SH BUGS
+.PP
+.B SL-MIN
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+SS7 application programming interfaces have not been subject to
+standardization; however, where the OSI APIs are direclty
+applicable to protocol layers of the SS7 stacks, OpenSS7
+provides OSI compatible interfaces.  Thus,
+.B MTP-MOD
+is largely compatible with implements providing the CDI
+interface.
+.[
+communications device interface cdi
+.]
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SS7 does not have a traditional and standard implementation;
+however, the implementation standards from the OSI are in many
+cases directly applicable.
+Test programs and drivers such as
+.B SL-MIN
+are not standardized and have no comparable OSI interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+The SL Interface (SLI) is specific to the
+.B OpenSS7 
+SS7 Stack.
+This is Version 2 of the interface.
+The
+.B SL-MIN
+module conforms to the SLI Specifiction, Revision 0.8.2.
+.[
+sli
+.]
+.PP
+The
+.B SL-MIN
+module first appeared publicly in the
+.B @PACKAGE@
+release 0.8.2.
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+SS7 Stack.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
+
