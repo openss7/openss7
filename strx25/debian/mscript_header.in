@@ -1,0 +1,77 @@
+#!/bin/bash
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile: mscript_header.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:35 $
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+
+set -e
+
+tmppath=/var/tmp
+
+base=@PACKAGE_LCNAME@
+name=@PACKAGE_LCNAME@
+
+rootdir="@rootdir@"
+kversion="@kversion@"
+krelease="@krelease@"
+kmoduledir="@kmoduledir@"
+
+prefix="@prefix@"
+exec_prefix="@exec_prefix@"
+bindir="@bindir@"
+sbindir="@sbindir@"
+sysconfdir="@sysconfdir@"
+datadir="@datadir@"
+includedir="@includedir@"
+libdir="@libdir@"
+libexecdir="@libexecdir@"
+localstatedir="@localstatedir@"
+sharedstatedir="@sharedstatedir@"
+mandir="@mandir@"
+infodir="@infodir@"
+oldincludedir="@oldincludedir@"
+
+datarootdir="@datarootdir@"
+docdir="@docdir@"
+htmldir="@htmldir@"
+dvidir="@dvidir@"
+pdfdir="@pdfdir@"
+psdir="@psdir@"
+localedir="@localedir@"
+
+configdir="@configdir@"
+initrddir="@initrddir@"
+modutildir="@modutildir@"
+
+pkgdatadir="@datadir@/@PACKAGE@"
+pkglibdir="@libdir@/@PACKAGE@"
+pkgincludedir="@includedir@/@PACKAGE@"
+pkglibexecdir="@libexecdir@/@PACKAGE@"
+
+KERNEL_MODCONF=@STRCONF_CONFMOD@
+# FIXME
+KERNEL_MODULES="streams-x224"
+KERNEL_PRELOADS=
+KERNEL_SUBDIR=@PACKAGE_LCNAME@
+KMODCONF_EXT=@PACKAGE_LCNAME@
+kmodext=@PACKAGE_LCNAME@
+ksubdir=@PACKAGE_LCNAME@
+
+STRCONF_CONFMOD=@STRCONF_CONFMOD@
+STRCONF_MAJBASE=@STRCONF_MAJBASE@
+
+# FIXME
+modules=
+preloads=
+libraries=
+tools="@PACKAGE_TARNAME@_mknod"
+infofiles="$name"
+# FIXME
+initfiles=
+
+# @configure_input@
+# =============================================================================
+# vim: ft=sh sw=4 noet
