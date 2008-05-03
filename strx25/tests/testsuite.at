@@ -1,0 +1,268 @@
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
+dnl ==========================================================================
+dnl 
+dnl @(#) $RCSfile: testsuite.at,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:40 $
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+dnl
+dnl All Rights Reserved.
+dnl
+dnl Unauthorized distribution or duplication is prohibited.
+dnl
+dnl This software and related documentation is protected by copyright and
+dnl distributed under licenses restricting its use, copying, distribution
+dnl and decompilation.  No part of this software or related documentation
+dnl may be reproduced in any form by any means without the prior written
+dnl authorization of the copyright holder, and licensors, if any.
+dnl
+dnl The recipient of this document, by its retention and use, warrants that
+dnl the recipient will protect this information and keep it confidential,
+dnl and will not disclose the information contained in this document
+dnl without the written permission of its owner.
+dnl
+dnl The author reserves the right to revise this software and documentation
+dnl for any reason, including but not limited to, conformity with standards
+dnl promulgated by various agencies, utilization of advances in the state
+dnl of the technical arts, or the reflection of changes in the design of any
+dnl techniques, or procedures embodied, described, or referred to herein.
+dnl The author is under no obligation to provide any feature listed herein.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl As an exception to the above, this software may be distributed under the
+dnl GNU Affero General Public License (GPL) Version 3, so long as the software
+dnl is distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+dnl behalf of the U.S. Government ("Government"), the following provisions
+dnl apply to you.  If the Software is supplied by the Department of Defense
+dnl ("DoD"), it is classified as "Commercial Computer Software" under
+dnl paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+dnl Regulations ("DFARS") (or any successor regulations) and the Government is
+dnl acquiring only the license rights granted herein (the license rights
+dnl customarily provided to non-Government users).  If the Software is
+dnl supplied to any unit or agency of the Government other than DoD, it is
+dnl classified as "Restricted Computer Software" and the Government's rights
+dnl in the Software are defined in paragraph 52.227-19 of the Federal
+dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+dnl (or any successor regulations).
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Commercial licensing and support of this software is available from OpenSS7
+dnl Corporation at a fee.  See http://www.openss7.com/
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl Last Modified $Date: 2008-05-03 10:46:40 $ by $Author: brian $
+dnl
+dnl ==========================================================================
+
+dnl AT_ARG_OPTION([dummy_option], AS_HELP_STRING([--dummy_option], [specify dummy option]))
+dnl AT_ARG_OPTION_ARG([dummy_optarg], AS_HELP_STRING([--dummy_optarg], [specify dummy optarg]))
+
+m4_divert_push([DEFAULTS])
+at_SMP=
+at_MP=
+function check_smp() {
+    case "$1" in
+    (LIS)
+	# LiS crashes on many tests regardless of SMP
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
+	then
+	    cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on all machine
+types and all kernel types.  The testsuite has detected an LiS
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+	    return 2
+	fi
+	;;
+    (SMP)
+	# LiS crashes on many tests under SMP
+	if test :${at_STRCONF_PACKAGE:-LfS} = :LiS
+	then
+	    if test :${at_SMP:-notset} = :notset
+	    then
+		# crashes on SMP machine
+		if (grep -q '^processor[[[:space:]]]*:[[[:space:]]]*[[1-9]]' /proc/cpuinfo >/dev/null 2>&1)
+		then
+		    at_SMP=yes
+		else
+		    # crahses on SMP kernel UP machine
+		    if (grep -q 'SMP' /proc/sys/kernel/version >/dev/null 2>&1)
+		    then
+			at_SMP=yes
+		    else
+			at_SMP=no
+		    fi
+		fi
+	    fi
+	    if test :$at_SMP = :yes
+	    then
+		cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on all machine
+types on SMP kernels.  The testsuite has detected an LiS SMP
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+		return 2
+	    fi
+	fi
+	;;
+    (MP)
+	# LiS crashes on more tests on a MP machine
+	if test :${at_STRCONF_PACKAGE:=LiS} = :LiS
+	then
+	    if test :${at_MP:-notset} = :notset
+	    then
+		# crashes on SMP machine
+		if (grep -q '^processor[[[:space:]]]*:[[[:space:]]]*[[1-9]]' /proc/cpuinfo >/dev/null 2>&1)
+		then
+		    at_MP=yes
+		else
+		    at_MP=no
+		fi
+	    fi
+	    if test :$at_MP = :yes
+	    then
+		cat <<ACEOF >&2
+***** WARNING *****
+This test causes LiS to hang or crash the kernel on MP machine
+types on SMP kernels.  The testsuite has detected an LiS MP
+system and, therefore, the test is skipped but assumed failed.
+
+LIS IS FULL OF BUGS AND IS DEPRECATED!  PLEASE USE THE OPENSS7
+LINUX FAST-STREAMS INSTEAD!  WHATEVER YOU DO, DO NOT REPORT THIS
+TEST CASE FAILURE AS A BUG!
+***** WARNING *****
+ACEOF
+		return 2
+	    fi
+	fi
+	;;
+    esac
+}
+function check_root() {
+    if test `id -u` -ne 0 ; then return 77 ; else return 0 ; fi
+}
+at_STOPPED=
+function stop_traceerr() {
+    if test :${at_STOPPED:-notset} = :notset
+    then
+	if check_root
+	then
+	    # try shutting down loggers
+	    [[ -x /etc/init.d/strace ]] && /etc/init.d/strace stop >/dev/null 2>&1
+	    [[ -x /etc/init.d/strerr ]] && /etc/init.d/strerr stop >/dev/null 2>&1
+	    at_STOPPED=yes
+	    return 0
+	else
+	    at_STOPPED=no
+	    return 1
+	fi
+    fi
+    return 1
+}
+at_LEAKS=
+function check_leaks() {
+    if test :${at_LEAKS:-notset} = :notset
+    then
+	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
+	then
+	    if stop_traceerr
+	    then
+		sleep 1
+		if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
+		then
+		    at_LEAKS=no
+		else
+		    at_LEAKS=yes
+		fi
+	    else
+		at_LEAKS=no
+	    fi
+	else
+	    at_LEAKS=yes
+	fi
+    fi
+    if test :${at_STRCONF_PACKAGE:-LfS} = :LfS -a :${at_LEAKS:-yes} != :no
+    then
+	# check for leaks
+	if (cat /proc/streams/strinfo | grep -v '000000000000') >/dev/null 2>&1
+	then
+	    sleep 1
+	    if (cat /proc/streams/strinfo | grep -v '000000000000') >&2
+	    then
+		return 1
+	    else
+		return 0
+	    fi
+	else
+	    return 0
+	fi
+    else
+	return 0
+    fi
+}
+at_OPTIONS=
+function build_options() {
+    local options=
+    if test :${at_OPTIONS:-notset} = :notset
+    then
+	if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
+	if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
+	if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
+	if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
+	if test $at_arg_given_sync = : ; then sync || : ; fi
+	at_OPTIONS="$options"
+    fi
+    echo "${at_OPTIONS}"
+}
+# first argument is test case executable, second argument is test case number,
+# third argment is SMP characteristic to check.
+function test_prog() {
+    local smp= prog= tc=
+    prog="$1" ; shift
+    tc="$1" ; shift
+    smp="$1" ; shift
+    check_smp $smp && check_leaks && $prog `build_options` -o $tc "$@" && check_leaks
+}
+function test_prog_root() {
+    check_root && test_prog "$@"
+}
+m4_divert_pop([DEFAULTS])
+
+m4_include([kernel.at])
+
+#m4_include([dummy1.m4])
+#m4_include([dummy2.m4])
+#m4_include([dummy3.m4])
+#m4_include([dummy4.m4])
+
+dnl ==========================================================================
+dnl
+dnl $Log: testsuite.at,v $
+dnl Revision 0.9.2.1  2008-05-03 10:46:40  brian
+dnl - added package files
+dnl
+dnl ==========================================================================
+dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

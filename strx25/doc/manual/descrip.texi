@@ -1,0 +1,137 @@
+@c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100
+@c =========================================================================
+@c
+@c @(#) $Id: descrip.texi,v 0.9.2.1 2008-05-03 10:46:37 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2008-05-03 10:46:37 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@cite{@value{PACKAGE_TITLE}} (@file{@value{PACKAGE}}) is an @cite{OpenSS7 Project} implementation of
+various X.25
+networking
+components for @cite{Linux Fast-STREAMS}.
+
+This release is the first separate release of the @cite{@value{PACKAGE_TITLE}} package.  Some of the
+components in this package were formerly present in the @file{strss7} package.  Various networking
+drivers are provided as well as CDI, DLPI, NPI, TPI and XTI header files for X.25 operation.  The
+package contains the necessary manual pages and other documentation for X.25 components in a
+separate autoconf tarball.
+
+The package uses the following standard @cite{Open Systems Interconnect (OSI)} conforming header
+files from the @file{strxns} package:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{<sys/cdi.h>} @cite{Communications Device Interface}
+@item @tab @minus{} @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Revision 2.0.0}
+@item @tab @minus{} @file{<sys/npi.h>} @cite{Network Provider Interface Revision 2.0.0}
+@end multitable
+
+The package uses the following standard @cite{Open Systems Interconnect (OSI)} conforming header
+files from the @file{strxnet} package:
+
+@multitable @columnfractions .05 .95
+@item @tab @minus{} @file{<sys/tihdr.h>} @cite{Transport Provider Interface Revision 2.0.0}
+@end multitable
+
+The package currently includes the following @dfn{STREAMS} kernel modules and drivers:
+
+@multitable @columnfractions .05 .30 .65
+@item @tab @minus{} @file{streams_x223.ko} @tab @file{/dev/cons}
+@item @tab @minus{} @file{streams_x233.ko} @tab @file{/dev/clns}
+@item @tab @minus{} @file{streams_x224.ko} @tab @file{/dev/tp0} @file{/dev/tp4}
+@item @tab @minus{} @file{streams_X234.ko} @tab @file{/dev/clts}
+@item @tab @minus{} @file{streams_isot.ko} @tab @file{module} @file{/dev/isot}
+@item @tab @minus{} @file{streams_lpp.ko} @tab @file{module} @file{/dev/lpp}
+@item @tab @minus{} @file{streams_cmot.ko} @tab @file{module} @file{/dev/cmot}
+@item @tab @minus{} @file{streams_itot.ko} @tab @file{module}
+@item @tab @minus{} @file{streams_itos.ko} @tab @file{module}
+@end multitable
+
+@itemize @bullet
+@item
+@manref{x223(4)} driver provides @dfn{CONS} and @dfn{CLNS} services in accordance with the
+@cite{ISO/OSI Network Protocol X.223};
+
+@item
+@manref{x224(4)} driver provides @dfn{OSI Transport Protocol} services in accordance with the
+@cite{ISO/OSI Transport Protocol X.224};
+
+@item
+@manref{isot(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in
+@cite{RFC 1006/STD 35};
+
+@item
+@manref{lpp(4)} driver and module provides @dfn{ISO Transport over TCP/IP} as specified in @cite{RFC
+1085};
+
+@item
+@manref{cmot(4)} driver and modules provides @dfn{ISO Common Management Information Protocol
+(CMIP) over TCP/IP} as specified in @cite{RFC 1095};
+
+@item
+@manref{itot(4)} module provides @dfn{ISO Transport over TCP} as specified in @cite{RFC 2126}; and,
+
+@item
+@manref{itos(4)} module provides @dfn{ISO Transport over SCTP}.
+@end itemize
+
+The @cite{@value{PACKAGE_TITLE}} package includes kernel modules, @cite{SVR 4.2} @dfn{STREAMS}
+drivers, modules, libraries, utilities, test programs, daemons, and development environment for the
+development and execution of @cite{X/Open Network Services (ISO)} protocol stack components and
+applications for the @cite{SVR 4.2} @dfn{STREAMS} environment.
+
+This distribution is only currently applicable to @cite{Linux} 2.4 and 2.6 kernels and was targeted
+at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and
+install for other architectures as well.
+

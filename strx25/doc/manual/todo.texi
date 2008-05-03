@@ -1,0 +1,165 @@
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
+@c =========================================================================
+@c
+@c @(#) $Id: todo.texi,v 0.9.2.1 2008-05-03 10:46:37 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one.
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2008-05-03 10:46:37 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@subsubheading Current Plan
+
+This package was initially started to provide managment interfaces to platforms using the OpenSS7
+protocol stacks (CMIP and CMOT interfaces) using SS7 GDMO and other GDMO.  It was considered pulling
+some of the old @file{isode} package into this package to provide some GDMO facilities.
+
+Since then, it was discovered that these ISO protocols are still very important to a number of
+industries on Linux and Linux Fast-STREAMS.  These industries are the Aviation and Financial
+industries.  Closer to the heard of telecommunications is the applications of aircraft to ground
+communications for the Aviation industry.
+
+While the OpenSS7 Project's focus over the Summer of 2007 is going to be soft-switch enabling
+protocols, that may change if the Aviation industry steps up to this package with some funding to
+complete the work or by contributing changes, improvements or development to this package.
+Otherwise, expect this package to receive only maintenance releases over the next 8 months or so.
+
+@subsubheading Things to Do
+
+@itemize @minus
+@item
+Important drivers and modules for the financial industry (POS, ATM, EFT) in support of POS to data
+center communications and data center to branch communications is as follows:
+
+@table @asis
+@item X.25
+@item @manpage{xot(4)}
+@c @item @manpage{isot(4)}
+@c @item @manpage{itot(4)}
+@end table
+
+@item
+Important drivers and modules for the aviation industry (ATN) in support of air-ground ground
+stations and Boundary Intermediate System and Intermediate System ground-ground stations are as
+follows:
+
+@table @asis
+@item ISO 8208 SNDCF
+@item ISO 8802 SNDCF
+@item Mobile 8208 SNDCF
+@item CIDIN SNDCF
+@item @manpage{clnp(4)}
+With security adaptations for the ATN network.
+@item @manpage{esis(4)}
+With subset for the ATN network.
+@item @manpage{isis(4)}
+With subset for the ATN network.
+@item @manpage{idrp(4)}
+With subset for the ATN network.
+@end table
+
+Additional drivers and modules in support of ground-to-ground Intermediate systems and End Systems:
+
+@table @asis
+@item @manpage{isot(4)}
+RFC 1006, ISO Transport over TCP.
+@item @manpage{itot(4)}
+RFC 2126, ISO Transport over TCP.
+@item @manpage{xot(4)}
+RFC 1613, Cisco X.25 over TCP.
+@end table
+
+Additional drivers and modules in support of ground end systems:
+
+@table @asis
+@item @manpage{tp(4)}
+@end table
+
+@item
+Testing.  This package is completely untested.
+
+@table @emph
+@item *todo*
+@end table
+
+@item
+Create @manpage{isot(4)}, @manpage{itot(4)}, @manpage{lpp(4)} and
+@manpage{cmot(4)} @dfn{STREAMS} modules and drivers.
+
+@table @emph
+@item *todo*
+@end table
+
+@item
+Move already written code from the @file{stacks} or @file{strss7} directories
+into the @file{src} directory.
+
+@table @emph
+@item *done*
+@end table
+
+@item
+Create a skeleton directory and manual and place @command{@value{PACKAGE}} as
+a subpackage in the @cite{OpenSS7 Master Package}.
+
+@table @emph
+@item *done*
+You are reading it.
+@end table
+
+@end itemize
+
+The purpose of the package was to move @dfn{STREAMS} ISO networking capabilities outside of the
+@file{strss7} release package.
+The @command{@value{PACKAGE}} package is currently incomplete.
+If you are interested in the completion of this add-on package, contact @email{info@@openss7.com}.
+

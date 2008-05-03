@@ -1,0 +1,51 @@
+#!/bin/bash
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile: mscript_postinst.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:35 $
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+
+[ ":${subpkg+set}" = ":set" ] || subpkg=
+
+echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+
+case "$1" in
+
+    (configure) : # postinstallation configuration
+	# configure-postinst configure [most-recently-configured-version]
+	eval "configure_${subpkg}_postinst"
+	;;
+
+    (abort-upgrade) :
+	# old-prerm upgrade new-version ... failed
+	# new-prerm failed-upgrade new-version ... failed
+	# old-posinst abort-upgrade new-version
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
+	;;
+
+    (abort-remove) :
+	# conflict-prerm remove in-favour package new-version ... failed
+	# conflict-postinst abort-remove in-favour package new-version
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
+	;;
+
+    (abort-deconfigure) :
+	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version .. failed
+	# deconfigure-postinst abort-deconfigurein-favour package-being-installed-but-failed version removing conflicting-package version
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
+	;;
+
+esac
+
+# =============================================================================
+#
+# The following are debhelper script fragments under separate copyright:
+#
+# =============================================================================
+
+#DEBHELPER#
+
+# =============================================================================
+# vim: ft=sh sw=4 noet
