@@ -1,0 +1,45 @@
+@c @setfilename isode.info
+
+@node ISODE License
+@section ISODE License
+@cindex license, ISODE
+@cindex license, The ISO Development Environment
+
+@sp 2
+@center ISODE License
+
+The ISODE is openly available but is @emph{NOT} in the public domain.  You are allowed and
+encoranged to take this software and build commercial products.  However, as a condition of use, you
+are required to "hold harmless" all contributors.
+
+Permission to use, copy, modify and distribute this software and its documentation for any purpose
+and without fee is hereby granted, provided that this notice and the reference to this notice
+appearing in each software module be retained unaltered, and that the name of any contributors shall
+not be used in advertising or publicity pertaning to distribution of the software without specific
+written prior permission.  No contributor makes any representations about the suitability of this
+software for any purpose.  It is provided "as is" without express or implied warranty.
+
+@b{All contributors disclaim all warranties with regard to this software, including implied
+warranties of merchantability and fitness.  In no event shall any contributor be liable for any
+special, indirect or consequential damages, or any damages whatsoever resulting from loss of use,
+data or profits, whether in action of contract, negligence or other tortious action, arising out of
+or in connection with, the use or performance of this software.}
+
+As used above, "contributor" includes, but is not limited to:
+
+@itemize @bullet
+@item The MITRE Corporation,
+@item The Northrop Corporation,
+@item NYSERENT, Inc.,
+@item Performance Systems International, Inc.,
+@item University of College London,
+@item The University of Nottingham,
+@item X-Tel Services Ltd.,
+@item The Wollongong Group, Inc.,
+@item Marshall T. Rose.
+@end itemize
+
+In particular, the Northrop Corporation provided the initial sponsorship for the ISODE, and the
+Wollongong Gorup, Inc., also supported this effort.  The ISODE received partial support from the
+U.S.@: Defence Advanced Research Projects Agency and the Rome Air Development Center of the U.S.@: Air
+Force Systems Command under contract number F30602-88-C-0016 to NYSERNet Inc.
