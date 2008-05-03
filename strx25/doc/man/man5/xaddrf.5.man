@@ -1,0 +1,374 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: xaddrf.5.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: xaddrf.5.man,v $
+.\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH XADDRF 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B xaddrf, x25addr
+\- X.25 Address Format Structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Network Layer Interface (NLI)" ,
+.IR STREAMS .
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <netx25/x25_proto.h>
+
+#define NSAPMAXSIZE 20
+
+#ifdef _SUN_SOURCE
+struct xaddrf {
+    uint32_t link_id;
+    unsigned char aflags;
+    struct lsapformat DTE_MAC;
+    unsigned char nsap_len;
+    unsigned char NSAP[NSAPMAXSIZE];
+};
+#else
+struct xaddrf {
+    unsigned long sn_id;
+    unsigned char aflags;
+    struct lsapformat DTE_MAC;
+    unsigned char nsap_len;
+    unsigned char NSAP[NSAPMAXSIZE];
+};
+#endif
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B xaddrf
+structure are as follows:
+.TP
+.I sn_id
+The subnetwork identifier, selected by the system administrator.  It
+identifies the subnetwork required for a conenction request, or on which a
+connection indication arrived.  The
+.I sn_id
+field holds a representation of the one to four byte string subnetwork
+identifier as an unsigned long integer.  The X.25 library routine
+.BR snidtox25 (3)
+can be used to convert the character subnetwork identifier to an unsigned long
+integer.
+.TP
+.I link_id
+Holds the link number as 32-bit unsigned integer.  By default
+.I link_id
+has a value of
+.BR 0xff .
+WHen
+.I link_id
+is
+.BR 0xff ,
+the X.25 provider attempts to match the called address with an entry in a
+routing configuration file.  If it cannot find a match, it routes the call
+over the lowest numbered WAN link.
+.TP
+.I aflags
+Specifies the options required (or used) by the subnetwork to encode and
+interpret addresses.
+When there is a valud in the
+.I NSAP
+field,
+.I aflags takes one of the three values listed below.  When the
+.I NSAP
+field is empty,
+.I aflags
+has the value zero
+.RB ( 0 ).
+.I aflags
+takes one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lblblbss
+lilblss.
+Symbol:Value:Meaning
+_
+NSAP_ADDR:0x00:T{
+NSAP field contains OSI-encoded NSAP address.
+T}
+EXT_ADDR:0x01:T{
+NSAP field contains non-OSI-encoded extended address.
+T}
+PVC_LCI:0x02:T{
+NSAP field contains a PVC number.
+T}
+_
+.TE
+.RE
+.TP
+.I DTE_MAC
+The DTE address, or LSAP as two BCD digits per byte, right justified, or the
+.B PVC_LCI
+as three BCD digits with two digits per byte, right justified.
+Holds the DTE address, the MAC plus SAP (Medium Access Control plus Service
+Access Point) address on the LCI.  This is binary.  The
+.BR lsapformat (5)
+structure is described separately.
+.TP
+.I nsap_len
+The length in semi-octets of the NSAP as two BCD digits per byte, right
+justified.
+.TP
+.I NSAP
+The NSAP or address extension (see
+.IR aflags )
+as two BCD digits per byte, right justified.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B xaddrf
+structure is the primary structure used for defining X.25 addresses for the
+Network Layer Interface (NLI),
+.BR nli (7).
+In call requests and responses, it is necessary to specify the X.25 address
+associated with the connection: the called, calling and responding addresses.
+The
+.B xaddrf
+structure is used for these addresses.  The addresing format used by this
+structure provides the following information:
+.IP \(bu \w'\(bu\(em'u
+The subnetwork on which outgoing connection requests are to be sent and on
+which connection indications arrive.
+.IP \(bu
+NSAP (Network Service Access Points) and SNPA (Subnetwork Point of
+Attachments), or DTE (Data Terminal Equipment) addresses and LSAP (Link
+Service Access Points).
+.IP \(bu
+Options in encoding of addresses (NSAP).
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MT-CONTEXT
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Network Layer Interface (NLI) is a proprietary interface without a formal
+standard.  Either the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+or the XTI-X25 interface,
+.[
+xx25
+.]
+.BR xti_x25 (3),
+should be used in its stead.
+.\"
+.\"
+.SH FILES
+.PP
+The
+.B xaddrf
+structure is defined in the
+.RB < netx25/x25_proto.h >
+file.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR stox25 (3),
+.BR x25tos (3),
+.BR lsapformat (5),
+.BR gethostent (3),
+.BR NLI (7),
+.IR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B xaddrf
+structure is compatible with NLI, and implementations based on NLI such as
+.BR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.BR "IRIX SX.25" ,
+.[
+sx25
+.]
+.BR "HP-UX X.25/9000" ,
+.BR "PT X.25" ,
+.[
+ptx25
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" \(rg
+.[
+solx25pg
+.]
+describes the first field as the
+.I link_id
+and it is a 32-bit unsigned integer.
+.IR "IRIX SX.25" \(rg
+.[
+sx25
+.]
+and
+.IR "PT X.25"
+.[
+ptx25
+.]
+describe the first field as the
+.I sn_id
+and it is an unsigned long integer (which is 32-bit on IL32 and 64-bit on
+LP64).
+To avoid performing data model conversion between user space and kernel
+modules,
+.IR OpenSS7 \(tm
+makes the first member of the
+.B xaddrf
+structure an 32-bit unsigned integer.
+.IP \(em
+.IR "IRIX SX.25" \(rg
+.[
+sx25
+.]
+and
+.IR "PT X.25"
+.[
+ptx25
+.]
+do not document symbolic constants for the values of the
+.I aflags
+member.
+.IP \(em
+NLI is an inherently low level and non-portable interface and should not be
+used by portable programs.  Portable programs should use the NPI or XX25
+interfaces in its stead.
+.IP \(em
+Binary compatibility is not attempted: only a rough source compatibility.  Any
+binary compatibility exhibited is a bug and is scheduled to be removed in the
+next release.
+.PP
+See
+.BR NLI (7),
+.IR STREAMS (4),
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NLI is not a formal standard.  The
+.IR OpenSS7 \(tm
+implementation of NLI conforms to documentation for Version 3 of the NLI.
+.\"
+.\"
+.SH HISTORY
+.PP
+The NLI is an interface originally developed by Spider Systems, Ltd. (now a
+division of Emmerson Power).  The NLI interface found its way into may
+mainstream UNIX implementations and UNIX-like RTOS sporting STREAMS such as
+Windriver's VxWorks.  The NLI was never standardized and remains an inherently
+non-portable interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,432 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: qosformat.5.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: qosformat.5.man,v $
+.\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH QOSFORMAT 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B qosformat
+\- X.25 Quality of Service format structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Network Layer Interface (NLI)" ,
+.IR STREAMS .
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <netx25/x25_proto.h>
+
+#define MAX_PROT 32
+
+struct qosformat {
+    unsigned char reqtclass;
+    unsigned char locthroughput;
+    unsigned char remthroughptut;
+    unsigned char reqminthruput;
+    unsigned char locminthru;
+    unsigned char remminthru;
+    unsigned char reqtransitdelay;
+    unsigned short transitdelay;
+    unsigned char reqmaxtransitdelay;
+    unsigned short acceptable;
+    unsigned char reqpriority;
+    unsigned char reqprtygain;
+    unsigned char reqprtykeep;
+    unsigned char reqlowprtydata;
+    unsigned char reqlowprtygain;
+    unsigned char reqlowprtykeep;
+    unsigned char lowprtydata;
+    unsigned char lowprtygain;
+    unsigned char lowprtykeep;
+    unsigned char protection_type;
+    unsigned char prot_len;
+    unsigned char lowprot_len;
+    unsigned char protection[MAX_PROT];
+    unsigned char lowprotection[MAX_PROT];
+    unsigned char reqexpedited;
+    unsigned char reqackservice;
+    struct extraformat xtras;
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The fields in this structure are defined as follows:
+.TP
+.IR reqtclass ", " locthroughput ", " remthroughptut
+Nonzero if the throughput negoitation parameter is selected.  The fields
+.IR locthroughput " and " remthroughput
+contain the four-bit throughput encoding for local-to-remote and
+remote-to-local, respectively.
+.TP
+.I reqminthruput ", " locminthru ", " remminthru
+.I reqminthruput
+is non-zero if the minimum throughput negotiation parameter is selected.  In
+this case, the fields
+.IR locminthru " and " remminthru
+contain the four-bit throughput encoding for the directions local-to-remote
+and remote-to-local, respectively.
+.TP
+.IR reqtransitdelay ", " transitdelay
+In connect requests and indications,
+.I reqtransitdelay
+is non-zero if the transit delay parameter is selected.  In this case,
+.I transitdelay
+contains the 16-bit value.  In a connect confirmation, the value of the
+selected transit delay is placed in the
+.I transitdelay
+field and is non-zero.
+.TP
+.IR reqmaxtransitdelay ", " acceptable
+If the calling NLI application specifies a maximum acceptable value for the
+transit delay parameter (lowest quality acceptable), the field
+.I reqmaxtransitdelay
+is nonzero and
+.I acceptable
+contains the 16-bit value of the maximum acceptable transit delay.
+.RS
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+Transit delay selection applies only to connect requests.  There is no transit
+delay QOS parameter in a connect response.  The corret response when the
+indicated QOS is unattainable is to make a disconnect request.  In a
+connection confirmation, the value of the selected transit delay is placed in
+the
+.I transitdelay
+field when such negotiation takes place.
+.RE
+.TP
+.IR reqpriority ", " reqprtygain ", " reqprtykeep ", " reqlowprtydata ", " reqlowprtygain ", " reqlowprtykeep ", " lowprtydata ", " lowprtygain ", " lowprtykeep
+The
+.I reqpriority
+field is used to requeset or indicate priority on a connection.  The mandatory
+field
+.I prty_data
+contains the 8-bit value for the priority of data on the connection.  The
+.IR reqprtygain " and " reqprtykeep
+fields can be optionally set to indicate that the fields
+.IR prty_gain " and " prty_keep
+contain the 8-bit values for the prioirty to gain and keep a connection.
+.RS
+.PP
+On N-CONNECT requests, the calling NS User can also specify a lowest
+acceptable value for prioirty.  The fields
+.IR reqloqprtydata ", " reqlowprtygain " and " reqlowprtykeep
+can be set to indicate that the fields
+.IR lowprtydata ", "  lowprtygain " and " lowprtykeep
+contain the 8-bit values for the lowest acceptable priority of data on
+connection, to gain a connection, and to keep a connection.
+.RE
+.TP
+.IR protection_type ", " prot_len ", " lowprot_len ", " protection ", " lowprotection
+If the protection negotiation parameter is selected, the
+.I protection_type
+is nonzero and indicates the type of protection required.  In this case the
+mandatory fields
+.IR prot_len " and " protection
+contain the length and value for the target protection.  On N-CONNECT
+requests, the calling NS User can optionally specify a lowest acceptable
+protection.  In this case, the fields
+.IR lowprot_len " and " lowprotection
+contain the length and value for the lowest acceptable protection.  Values for
+.I protection_type
+are as follows:
+.RS
+.PP
+.TS
+tab(:);
+lblblb
+llbl.
+Value:Name:Meaning
+_
+1:PRT_SRC:Source addresss specific.
+2:PRT_DST:Destination address specific.
+3:PRT_GLB:Globally unique
+_
+.TE
+.RE
+.TP
+.I reqexpedited
+If expedite data is required or selected, the field
+.I reqexpedited
+is non-zero.  For connect indications, a value of one
+.RB ( 1 )
+implies that the expedited data negotation facility was present in the
+incoming call packet, and that it use was requested.
+.RS
+.PP
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+Negotiation is a CONS procedure.  When the facility is present and indicates
+non-use, use cannot be negotiated by connect response.  For a description of
+the use of the
+.I CONS_call
+field in connect request and connect responses, see
+.BR N_CI "(7) and
+.BR N_CC "(7).
+.PP
+For incoming or outgoing non-CONS calls (denoted by the
+.I CONS_call
+flag set to zero
+.RB ( 0 )),
+expedited data negotiation is not reuiqred\(eminterrupt data is always
+available in X.25.  This means that this field is ignored on Connect Requests
+and Responses from non-CONS calls.
+.RE
+.TP
+.I reqackservice
+If the receipt acknowledgement service is to be used, the field
+.I reqackservice
+is non-zero.  Setting
+.I reqackservice
+to one
+.RB ( 1 )
+signifies receipt confirmation by the remote DTE.  Setting
+.I reqackservice
+to two
+.RB ( 2 )
+signifies receipt confirmation by the remote application.
+.RS
+.PP
+In the case of receipt confirmation by the remote DTE, no acknowledgements are
+expected or given over the X.25 interface.  In the case of receipt
+confirmation by the remote application, there is a one-to-one correspondence
+between D-bit data and acknowledgements, with one data acknowledgement being
+received or sent for each D-bit data packet sent or received over the X.25
+interface.
+.RE
+.TP
+.I xtras
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Negotiable X.25 facilities are supported by the PLP driver.  This section
+describes the request and negotiation of these facilities, and the data
+structures used by the NLI primitives.  The facility can be broken down into
+two groups: those required for Connection Oriented Network Service (CONS)
+support and those for non-OSI procedures (X.29, for example).
+.PP
+The CONS QOS parameters are describe in this manual page, and the non-OSI QOS
+parameters are described in the
+.BR extraformat (5)
+manual page.
+.PP
+The CONS quality of service (QOS) parameters support the following:
+.IP \(bu \w'\(bu\(em'u
+Throughput Class
+.IP \(bu
+Minimum Throughput Class
+.IP \(bu
+Target Transit Delay
+.IP \(bu
+Maximum Acceptable Transit Delay
+.IP \(bu
+Use of Expedited Data
+.IP \(bu
+Protection
+.IP \(bu
+Priority
+.IP \(bu
+Receipt Acknowledgement
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MT-CONTEXT
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Network Layer Interface (NLI) is a proprietary interface without a formal
+standard.  Either the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+or the XTI-X25 interface,
+.[
+xx25
+.]
+.BR xti_x25 (3),
+should be used in its stead.
+.\"
+.\"
+.SH FILES
+.PP
+The
+.B qosformat
+structure is defined in the
+.RB < netx25/x25_proto.h >
+file.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR extraformat (5),
+.BR NLI (7),
+.IR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B qosformat
+structure is compatible with NLI, and implementations based on NLI such as
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "HP-UX X.25/9000" ,
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B qosformat
+structure.
+.IP \(em
+NLI is an inherently low level and non-portable interface and should not be
+used by portable programs.  Portable programs should use the NPI or XX25
+interfaces in its stead.
+.IP \(em
+Binary compatibility is not attempted: only a rough source compatibility.  Any
+binary compatibility exhibited is a bug and is scheduled to be removed in the
+next release.
+.PP
+See
+.BR NLI (7),
+.IR STREAMS (4),
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NLI is not a formal standard.  The
+.IR OpenSS7 \(tm
+implementation of NLI conforms to documentation for Version 3 of the NLI.
+.\"
+.\"
+.SH HISTORY
+.PP
+The NLI is an interface originally developed by Spider Systems, Ltd. (now a
+division of Emmerson Power).  The NLI interface found its way into may
+mainstream UNIX implementations and UNIX-like RTOS sporting STREAMS such as
+Windriver's VxWorks.  The NLI was never standardized and remains an inherently
+non-portable interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
