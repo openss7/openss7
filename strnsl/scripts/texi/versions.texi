@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: versions.texi,v 0.9.2.11 2008-04-28 09:23:11 brian Exp $
+@c @(#) $Id: versions.texi,v 0.9.2.12 2008-05-03 10:49:41 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-28 09:23:11 $ by $Author: brian $
+@c Last Modified $Date: 2008-05-03 10:49:41 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -76,6 +76,7 @@
 @c @set VERSION_STRSOCK	0.9.2.1@value{VERSION_EXTRA}
 @c @set VERSION_STRINET	0.9.2.4@value{VERSION_EXTRA}
 @c @set VERSION_STRSCTP	0.9.2.6@value{VERSION_EXTRA}
+@c @set VERSION_STRX25	0.9.2.1@value{VERSION_EXTRA}
 @c @set VERSION_STRISO	0.9.2.1@value{VERSION_EXTRA}
 @c @set VERSION_STRCHAN	0.9.2.1@value{VERSION_EXTRA}
 @c @set VERSION_STRISDN	0.9.2.1@value{VERSION_EXTRA}
@@ -99,6 +100,7 @@
 @set VERSION_STRSOCK	0.9.2.4
 @set VERSION_STRINET	0.9.2.7
 @set VERSION_STRSCTP	0.9.2.9
+@set VERSION_STRX25	0.9.2.1
 @set VERSION_STRISO	0.9.2.4
 @set VERSION_STRCHAN	0.9.2.4
 @set VERSION_STRISDN	0.9.2.4

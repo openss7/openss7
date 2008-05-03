@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.19 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008/05/03 16:54:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/05/03 16:54:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -171,16 +171,16 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 		AC_MSG_CHECKING([for iso include directory... $iso_dir $iso_bld])
 		if test -r "$iso_dir/$iso_what" ; then
 		    iso_cv_includes="$iso_inc $iso_bld $iso_dir"
-		    iso_cv_ldadd= # "$os7_cv_master_builddir/striso/libiso.la"
-		    iso_cv_ldadd32= # "$os7_cv_master_builddir/striso/lib32/libiso.la"
+		    iso_cv_ldadd="$os7_cv_master_builddir/striso/libosi.la"
+		    iso_cv_ldadd32="$os7_cv_master_builddir/striso/lib32/libosi.la"
 		    iso_cv_modversions="$os7_cv_master_builddir/striso/include/sys/striso/modversions.h"
 		    iso_cv_modmap="$os7_cv_master_builddir/striso/Modules.map"
 		    iso_cv_symver="$os7_cv_master_builddir/striso/Module.symvers"
 		    iso_cv_manpath="$os7_cv_master_builddir/striso/doc/man"
 		    AC_MSG_RESULT([yes])
-		else
-		    AC_MSG_RESULT([no])
+		    break
 		fi
+		AC_MSG_RESULT([no])
 	    fi
 	    AC_MSG_CHECKING([for iso include directory])
 	fi
@@ -202,8 +202,8 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for iso include directory... $iso_dir $iso_bld])
 		    if test -d "$iso_bld" -a -r "$iso_dir/$iso_what" ; then
 			iso_cv_includes="$iso_inc $iso_bld $iso_dir"
-			iso_cv_ldadd= # `echo "$iso_bld/../../libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			iso_cv_ldadd32= # `echo "$iso_bld/../../lib32/libiso.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_ldadd=`echo "$iso_bld/../../libosi.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			iso_cv_ldadd32=`echo "$iso_bld/../../lib32/libosi.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_modversions=`echo "$iso_inc/sys/striso/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_modmap=`echo "$iso_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			iso_cv_symver=`echo "$iso_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -278,13 +278,34 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for iso ldadd native], [iso_cv_ldadd], [dnl
+	iso_what="libosi.la"
 	iso_cv_ldadd=
 	for iso_dir in $iso_cv_includes ; do
-	    if test -f "$iso_dir/../../libiso.la" ; then
-		iso_cv_ldadd=`echo "$iso_dir/../../libiso.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$iso_dir/../../$iso_what" ; then
+		iso_cv_ldadd=`echo "$iso_dir/../../$iso_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$iso_cv_ldadd" ; then
+	    eval "iso_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    iso_search_path=`echo "$iso_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g'`
+	    AC_MSG_RESULT([searching])
+	    for iso_dir in $iso_search_path ; do
+		if test -d "$iso_dir" ; then
+		    AC_MSG_CHECKING([for iso siso ldadd native... $iso_dir])
+		    if test -r "$iso_dir/$iso_what"; then
+			iso_cv_ldadd="$iso_dir/$iso_what"
+			iso_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for iso ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for iso ldflags], [iso_cv_ldflags], [dnl
 	iso_cv_ldflags=
@@ -295,13 +316,34 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for iso ldadd 32-bit], [iso_cv_ldadd32], [dnl
+	iso_what="libosi.la"
 	iso_cv_ldadd32=
 	for iso_dir in $iso_cv_includes ; do
-	    if test -f "$iso_dir/../../lib32/libiso.la" ; then
-		iso_cv_ldadd32=`echo "$iso_dir/../../lib32/libiso.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$iso_dir/../../lib32/$iso_what" ; then
+		iso_cv_ldadd32=`echo "$iso_dir/../../lib32/$iso_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$iso_cv_ldadd32" ; then
+	    eval "iso_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    iso_search_path=`echo "$iso_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g'`
+	    AC_MSG_RESULT([searching])
+	    for iso_dir in $iso_search_path ; do
+		if test -d "$iso_dir" ; then
+		    AC_MSG_CHECKING([for iso siso ldadd 32-bit... $iso_dir])
+		    if test -r "$iso_dir/$iso_what" ; then
+			iso_cv_ldadd32="$iso_dir/$iso_what"
+			iso_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for iso ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for iso ldflags 32-bit], [iso_cv_ldflags32], [dnl
 	iso_cv_ldflags32=
@@ -568,6 +610,9 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.20  2008/05/03 16:54:40  brian
+# - updates for libosi
+#
 # Revision 0.9.2.19  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

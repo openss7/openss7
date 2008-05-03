@@ -4,23 +4,24 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -139,7 +140,7 @@ static char const ident[] =
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2006/12/09 10:40:24 $"
-#define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
+#define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SL_X400P_LICENSE	"GPL"
