@@ -2,7 +2,7 @@
 # vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
 # =============================================================================
 # 
-# @(#) $RCSfile: send-pr,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 09:23:11 $
+# @(#) $RCSfile: send-pr,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2008-05-03 12:52:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:23:11 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 12:52:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,14 +84,14 @@ dir=`dirname $0`
 path=`(cd $dir ; pwd)`
 errors=0
 warnings=0
-revision='$Revision: 0.9.2.16 $'
+revision='$Revision: 0.9.2.17 $'
 
 exec 5>${top_builddir}${top_builddir+/}$me.log
 
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.16 $) $Date: 2008-04-28 09:23:11 $'
+ident='$RCSfile: send-pr,v $ $Nam$($Revision: 0.9.2.17 $) $Date: 2008-05-03 12:52:56 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -782,6 +782,9 @@ packages=( \
 	"iperf-2.0.3" \
 	"iperf-2.0.4" \
 	"iperf-2.0.5" \
+	"iperf-2.0.6" \
+	"iperf-2.0.7" \
+	"iperf-2.0.8" \
 	"linux-sctp" \
 	"linux-sctp-0.1" \
 	"linux-sctp-0.2" \
@@ -800,52 +803,94 @@ packages=( \
 	"LiS-2.18.2" \
 	"LiS-2.18.3" \
 	"LiS-2.18.4" \
+	"LiS-2.18.5" \
+	"LiS-2.18.6" \
+	"LiS-2.18.7" \
 	"netperf" \
 	"netperf-2.3.1" \
 	"netperf-2.3.2" \
 	"netperf-2.3.3" \
 	"netperf-2.3.4" \
+	"netperf-2.3.5" \
+	"netperf-2.3.6" \
+	"netperf-2.3.7" \
 	"openss7-0.7.2" \
 	"openss7-0.9.2.A" \
 	"openss7-0.9.2.B" \
 	"openss7-0.9.2.C" \
 	"openss7-0.9.2.D" \
+	"openss7-0.9.2.E" \
+	"openss7-0.9.2.F" \
+	"openss7-0.9.2.G" \
+	"osr61-0.9.2.1" \
+	"osr61-0.9.2.2" \
+	"osr61-0.9.2.3" \
 	"sigtran" \
 	"sigtran-0.9.2.1" \
+	"sigtran-0.9.2.2" \
+	"sigtran-0.9.2.3" \
+	"sigtran-0.9.2.4" \
 	"sctp" \
 	"sctp-0.2.21" \
 	"sctp-0.2.22" \
 	"sctp-0.2.23" \
 	"sctp-0.2.24" \
+	"sctp-0.2.25" \
+	"sctp-0.2.26" \
+	"sctp-0.2.27" \
 	"ss7codecs" \
 	"ss7codecs-0.1.0" \
 	"ss7codecs-0.1.0b" \
 	"strbcm" \
 	"strbcm-0.9.2.1" \
 	"strbcm-0.9.2.2" \
+	"strbcm-0.9.2.3" \
+	"strbcm-0.9.2.4" \
+	"strbcm-0.9.2.5" \
 	"strcompat" \
 	"strcompat-0.9.2.1" \
 	"strcompat-0.9.2.2" \
 	"strcompat-0.9.2.3" \
 	"strcompat-0.9.2.4" \
+	"strcompat-0.9.2.5" \
+	"strcompat-0.9.2.6" \
+	"strcompat-0.9.2.7" \
 	"streams-0.7a.3" \
 	"streams-0.7a.4" \
 	"streams-0.7a.5" \
 	"streams-0.7a.6" \
 	"streams-0.9.2.1" \
+	"streams-0.9.2.2" \
+	"streams-0.9.2.3" \
+	"streams-0.9.2.4" \
 	"strchan" \
 	"strchan-0.9.2.1" \
+	"strchan-0.9.2.2" \
+	"strchan-0.9.2.3" \
+	"strchan-0.9.2.4" \
 	"strinet" \
 	"strinet-0.9.2.1" \
 	"strinet-0.9.2.2" \
 	"strinet-0.9.2.3" \
 	"strinet-0.9.2.4" \
+	"strinet-0.9.2.5" \
+	"strinet-0.9.2.6" \
+	"strinet-0.9.2.7" \
 	"strisdn" \
 	"strisdn-0.9.2.1" \
+	"strisdn-0.9.2.2" \
+	"strisdn-0.9.2.3" \
+	"strisdn-0.9.2.4" \
 	"striso" \
 	"striso-0.9.2.1" \
+	"striso-0.9.2.2" \
+	"striso-0.9.2.3" \
+	"striso-0.9.2.4" \
 	"strnsl" \
 	"strnsl-0.9.2.1" \
+	"strnsl-0.9.2.2" \
+	"strnsl-0.9.2.3" \
+	"strnsl-0.9.2.4" \
 	"strsctp" \
 	"strsctp-0.7.6" \
 	"strsctp-0.7.8" \
@@ -854,8 +899,14 @@ packages=( \
 	"strsctp-0.9.2.4" \
 	"strsctp-0.9.2.5" \
 	"strsctp-0.9.2.6" \
+	"strsctp-0.9.2.7" \
+	"strsctp-0.9.2.8" \
+	"strsctp-0.9.2.9" \
 	"strsock" \
 	"strsock-0.9.2.1" \
+	"strsock-0.9.2.2" \
+	"strsock-0.9.2.3" \
+	"strsock-0.9.2.4" \
 	"strss7" \
 	"strss7-0.7.2" \
 	"strss7-0.7.4" \
@@ -864,15 +915,29 @@ packages=( \
 	"strss7-0.9a.3" \
 	"strss7-0.9a.4" \
 	"strss7-0.9a.5" \
+	"strss7-0.9a.6" \
+	"strss7-0.9a.7" \
+	"strss7-0.9a.8" \
 	"strtty" \
 	"strtty-0.9.2.1" \
+	"strtty-0.9.2.2" \
+	"strtty-0.9.2.3" \
+	"strtty-0.9.2.4" \
 	"strutil" \
 	"strutil-0.9.2.1" \
 	"strutil-0.9.2.2" \
 	"strutil-0.9.2.3" \
 	"strutil-0.9.2.4" \
+	"strutil-0.9.2.5" \
+	"strutil-0.9.2.6" \
+	"strutil-0.9.2.7" \
 	"strvoip" \
 	"strvoip-0.9.2.1" \
+	"strvoip-0.9.2.2" \
+	"strvoip-0.9.2.3" \
+	"strvoip-0.9.2.4" \
+	"strx25" \
+	"strx25-0.9.2.1" \
 	"strxnet" \
 	"strxnet-0.9.2-1" \
 	"strxnet-0.9.2-2" \
@@ -883,11 +948,17 @@ packages=( \
 	"strxnet-0.9.2.7" \
 	"strxnet-0.9.2.8" \
 	"strxnet-0.9.2.9" \
+	"strxnet-0.9.2.10" \
+	"strxnet-0.9.2.11" \
+	"strxnet-0.9.2.12" \
 	"strxns" \
 	"strxns-0.9.2.1" \
 	"strxns-0.9.2.2" \
 	"strxns-0.9.2.3" \
 	"strxns-0.9.2.4" \
+	"strxns-0.9.2.5" \
+	"strxns-0.9.2.6" \
+	"strxns-0.9.2.7" \
 	"other" \
     )
 
@@ -903,18 +974,30 @@ distributions=( \
 	"COS4.1" \
 	"COS4.2" \
 	"COS4.3" \
+	"COS4.92" \
+	"COS5.0" \
+	"COS5.1" \
 	"Debian3.0r1" \
 	"Debian3.0r2" \
 	"Debian3.1" \
+	"Debian4.0r1" \
 	"FC1" \
 	"FC2" \
 	"FC3" \
 	"FC4" \
 	"FC5" \
 	"FC6" \
+	"FC7" \
+	"FC8" \
 	"FreeBSD-4.5" \
+	"Gentoo2006.1" \
+	"Gentoo2007.1" \
 	"LE2005" \
+	"LE2006" \
+	"Lineox4.026" \
+	"Lineox4.053" \
 	"LynxOS" \
+	"MandrivaOne" \
 	"MDK9.2" \
 	"MDK10.0" \
 	"MDK10.1" \
@@ -930,8 +1013,10 @@ distributions=( \
 	"RHAS4" \
 	"RHEL3" \
 	"RHEL4" \
+	"RHEL5" \
 	"SLES8" \
 	"SLES9" \
+	"SLES10" \
 	"Solaris-10" \
 	"Solaris-2.5" \
 	"Solaris-2.7" \
@@ -942,6 +1027,13 @@ distributions=( \
 	"SuSE9.2" \
 	"SuSE10.0" \
 	"SuSE10.1" \
+	"SuSE10.2" \
+	"SuSE10.3" \
+	"Ubuntu5.10" \
+	"Ubuntu6.03" \
+	"Ubuntu6.10" \
+	"Ubuntu7.04" \
+	"Ubuntu7.10" \
 	"VxWorks" \
 	"WBEL3" \
 	"WBEL3.1" \
@@ -1624,6 +1716,9 @@ exit 0
 # =============================================================================
 #
 # $Log: send-pr,v $
+# Revision 0.9.2.17  2008-05-03 12:52:56  brian
+# - added new package versions
+#
 # Revision 0.9.2.16  2008-04-28 09:23:11  brian
 # - updated script headers for release
 #

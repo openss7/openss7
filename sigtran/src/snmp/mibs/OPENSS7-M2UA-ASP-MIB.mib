@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M2UA-ASP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/01/24 17:40:54 $
+-- @(#) $RCSfile: OPENSS7-M2UA-ASP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-04-29 01:52:24 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 --
 -- All Rights Reserved.
@@ -47,12 +47,15 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/01/24 17:40:54 $ by $Author: brian $
+-- Last Modified $Date: 2008-04-29 01:52:24 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M2UA-ASP-MIB.mib,v $
--- Revision 0.9.2.4  2008/01/24 17:40:54  brian
+-- Revision 0.9.2.5  2008-04-29 01:52:24  brian
+-- - updated headers for release
+--
+-- Revision 0.9.2.4  2008-01-24 17:40:54  brian
 -- - updated mibs
 --
 -- Revision 0.9.2.3  2007/12/15 20:19:11  brian
