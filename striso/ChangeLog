@@ -1,3 +1,26 @@
+2008-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: package updates
+	* configure.ac: package updates
+	* doc/man/Makefile.am: package updates
+	* doc/man/striso.refs: package updates
+	* doc/man/man4/ISO.4.man: package updates
+	* doc/man/man4/apmod.4.man: package updates
+	* doc/man/man4/isot.4.man: package updates
+	* doc/man/man4/lpp.4.man: package updates
+	* doc/man/man4/momod.4.man: package updates
+	* doc/man/man4/oopi.4.man: package updates
+	* doc/man/man4/otk6.4.man: package updates
+	* doc/man/man4/otpi.4.man: package updates
+	* doc/man/man4/plp.4.man: package updates
+	* doc/man/man4/xapmod.4.man: package updates
+	* doc/man/man4/xx25.4.man: package updates
+	* doc/man/man7/PPI.7.man: package updates
+	* doc/man/man8/osinetd.8.man: package updates
+	* doc/manual/prerequisites.texi: package updates
+	* src/include/sys/striso/config.h.in: package updates
+	* src/include/sys/striso/version.h.in: package updates
+
 2008-04-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* striso.spec.in: updates for release

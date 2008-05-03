@@ -1,3 +1,11 @@
+2008-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/prerequisites.texi: added strx25 sub-package
+	* tests/dummy1.m4: corrected headers
+	* tests/dummy2.m4: corrected headers
+	* tests/dummy3.m4: corrected headers
+	* tests/dummy4.m4: corrected headers
+
 2008-04-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams.spec.in: updates for release

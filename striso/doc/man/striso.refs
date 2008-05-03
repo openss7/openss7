@@ -4565,6 +4565,17 @@ Part 1: Protocol Specification
 %C Mountainview, California
 %U http://techpubs.sgi.com/
 
+%L SX25
+%R IRIX\(rg SX.25
+%K sx25pg
+%T SX.25 NLI Programming's Guide
+%G Doc. No: 007-2268-002
+%D 1994
+%Q Silicon Graphics, Inc.
+%I SGI Technical Publications
+%C Mountainview, California
+%U http://techpubs.sgi.com/
+
 %L HPUXDDI
 %R STREAMS/UX
 %K hpuxddi
@@ -4710,9 +4721,9 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs-pdf.sun.com/
 
-%L SOLX25
+%L SOLX25AG
 %R Solaris\(rg 9
-%K solx25
+%K solx25ag
 %T Solstice X.25 9.2 Administration Guide
 %G Part No: 806-1234-10
 %D October 1999
@@ -4721,9 +4732,9 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs-pdf.sun.com/
 
-%L SOLX25
+%L SOLX25DG
 %R Solaris\(rg 9
-%K solx25
+%K solx25dg
 %T Solstice X.25 9.2 Developer's Guide
 %G Part No: 806-1235-10
 %D October 1999
@@ -4732,12 +4743,23 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs-pdf.sun.com/
 
-%L SOLX25
+%L SOLX25UG
 %R Solaris\(rg 9
-%K solx25
+%K solx25ug
 %T Solstice X.25 9.2 PAD User's Guide
 %G Part No: 806-1236-10
 %D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25PG
+%R Solaris\(rg 9
+%K solx25pg
+%T Solstice\(rg X.25 9.2 Programming Guide
+%G Part No: 806-1235-10
+%D October 1999 
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Palo Alto, California
@@ -4785,6 +4807,15 @@ Part 1: Protocol Specification
 %T xSTRa Programmer's and Configuration Guide
 %G Document No. 106P08861
 %D 1998
+%Q Performance Technologies Inc.
+%I PT
+%C Rochester, New York
+
+%L PTX25
+%R PT X.25
+%K ptx25um
+%T X.25 Protocol User's Manual
+%D 2007
 %Q Performance Technologies Inc.
 %I PT
 %C Rochester, New York

@@ -1,3 +1,15 @@
+2008-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/prerequisites.texi: added strx25 sub-package
+	* osr61/tests/atlocal.in: header corrections
+	* osr61/tests/dummy1.m4: header corrections
+	* osr61/tests/dummy2.m4: header corrections
+	* osr61/tests/dummy3.m4: header corrections
+	* osr61/tests/dummy4.m4: header corrections
+	* osr61/tests/kernel.at: header corrections
+	* osr61/tests/local.at: header corrections
+	* osr61/tests/testsuite.at: header corrections
+
 2008-04-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* osr61.spec.in: updates for release

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: otk6.4.man,v 0.9.2.4 2008-04-29 00:01:56 brian Exp $
+.\" @(#) $Id: otk6.4.man,v 0.9.2.5 2008-05-03 13:23:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 00:01:56 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: otk6.4.man,v $
+.\" Revision 0.9.2.5  2008-05-03 13:23:34  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.4  2008-04-29 00:01:56  brian
 .\" - updated headers for release
 .\"
@@ -238,6 +241,16 @@ and
 .\"
 .SH USAGE
 .PP
+The primary use for this devices is a functional replacement for the
+.IR "Solaris Solstice OSI 9.2" \(rg,
+OSI Transport API.
+.[
+sunlink-tli
+.]
+This interface is used specifically by ISODE and some other upper-level OSI
+applications when running on
+.IR Solaris \(rg.
+This interface extends the same capabilities to Linux.
 .\"
 .\"
 .SH SERVICE INTERFACE
@@ -312,7 +325,7 @@ and optionally 2 further octets representing the binary port number.
 .PP
 When the
 .I tsaplen
-is encoded as zero (0), a null T-Selector is used.  Then the
+is encoded as zero (0), a null T-Selector is used.  When the
 .I nsaplen
 is encoded as zero (0), the underlying NS-Provider is to assign an NSAP.  For
 responders, the port number will be 102 or 399 depending on whether ISO
@@ -321,7 +334,7 @@ For initiators, the remove port number will be 102 or 399 depending upon
 whether ISO Transport Class 0 (TP0) or ISO Transport Class 2 (TP2) operation
 was requested.
 .PP
-.I Solaris SunLink\(rg
+.IR "Solaris SunLink" \(rg
 .[
 sunlink-tli
 .]
@@ -332,47 +345,174 @@ is
 and the NSAP address passed to
 .BR t_connect (3)
 is a four-byte IP address (in network byte order).
-
 .\"
 .\"
 .SH OPTIONS
 .PP
+Although the
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-tli
+.]
+documentation indicates that there are no XTI/TLI options for the
+.B otk6
+driver,
+.IR OpenSS7 \(tm
+implements both the full set of OSI XTI/TPI options as described in
+.BR xti_osi (3)
+as well as the full set of TCP and IP options as described in
+.BR xti_ip (3)
+and
+.BR xti_tcp (3).
+.PP
+When IP and TCP options are used, they are used to control the underlying
+TCP/IP network connection used by the
+.B otk6
+OSI Transport provider.  This allows the user the ability to control some of
+the more esoteric recommendations from RFC 1006 and RFC 2126, such as the
+setting of keep-alive on the TCP connection.
+.PP
+When OSI QoS options are used, they are used to negotiate QoS requirements
+with the remote OSI Transport provider and user in the same fashion as normal
+OSI Transport (e.g. over CONS or CLNS); when OSI management options are used,
+they are used to negotiate functional units and protocol options in the same
+fashion as described for normal OSI Transport (e.g. over CONS or CLNS): both as
+described in
+.BR xti_osi (3).
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+.B otk6
+does not implement any specialized primitives and implements the Transport
+Provider Interface (TPI) Revision 2.0.0
+.[
+tpi revision 2.0.0
+.]
+at both its upper and lower service interfaces.  At the upper service
+interface, the TPI is implemented as required for OSI Transport as described in
+.BR tpi_osi (7).
+At the lower service interface, the TPI is implemented as required for TCP/IP
+Transport as described in
+.BR tpi_tcp (7).
 .\"
 .\"
 .SH IOCTLS
 .PP
+The
+.B otk6
+driver does not yet support any input-output controls of its own.  The
+standards STREAMS input-output controls,
+.BR I_LINK "(7), " I_PLINK "(7), " I_UNLINK "(7), " I_PUNLINK (7)
+are used by management programs to provision and supply TCP/IP Streams to the
+lower multiplex of the driver.  This is accomplished using a control Stream, or
+any Stream on the upper multiplex provided that the user has sufficient
+privilege.
 .\"
 .\"
 .SH NOTICES
 .PP
+This driver does not support RFC 1006
+.[
+rfc1006
+.]
+operation over UDP.
+.PP
+This driver does not yet support RFC 2126
+.[
+rfc2126
+.]
+ISO Transport Class 2 operation.
 .\"
 .\"
 .SH IMPLEMENTATION
 .PP
+.B otk6
+provides an auxilliary
+.BR M_CTL "(9) and " M_PCCTL (9)
+interface at both the upper multiplex and the lower multiplex service
+interfaces.  The purpose of these messages is functionally the same as the
+.BR M_PROTO "(9) and " M_PCPROTO (9)
+messages, and they contain the same TPI service primitives.  The only
+difference is that, because the Stream head cannot directly generate a
+.BR M_CTL "(9) or " M_PCCTL (9)
+message, the receiver of the message is assured that the contents have been
+supplied or verified by the sending module.  This permits many checks that are
+required for user-supplied information (for security purposes) can bs skipped
+for these inter-module messages.
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH MODULES
-.PP
+.\".SH MODULES
+.\".PP
 .\"
 .\"
 .SH DEVICES
 .PP
+.TP
+.B /dev/otk6
+This device represents the traditional
+.IR SunLink \(rg
+.[
+sunlink-tli
+.]
+RFC 1006 OSI Transport device driver.  This device may be directly opened using
+.BR t_open (3).
+.TP
+.B /dev/streams/otk6
+When the shadow special file system,
+.BR specfs (5),
+is mounted, this is the point within the filesystem at which the
+.B otk6
+device appears.
+.TP
+.B /dev/streams/clone/otk6
+When the shadow special file system,
+.BR specfs (5),
+is mounted, this is the clone device for opening clone device Streams.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR INET (4),
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_PUNLINK (7),
+.BR I_UNLINK (7),
+.BR M_CTL (9),
+.BR M_PCCTL (9),
+.BR M_PCPROTO (9),
+.BR M_PROTO (9),
+.BR npi (7),
+.BR OSI (4),
+.BR protosw (5),
+.BR socket (7),
+.BR sockets (3),
+.BR socksys (4),
+.BR specfs (5),
+.BR t_bind (3),
+.BR t_connect (3),
+.BR tcp (4),
+.BR tcp (7),
+.BR t_open (3),
+.BR tpi (7),
+.BR tpi_osi (7),
+.BR tpi_tcp (7),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_ip (3),
+.BR xti_osi (3),
+.BR xti_tcp (3),
+.IR STREAMS (4).
 .\"
 .\"
 .SH BUGS
 .PP
+.B otk6
+has no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -387,7 +527,26 @@ and implementations based on
 .IR "Solaris SunLink" \(rg,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+.IR SunLink \(rg
+documents that there are no options associated with the
+.B otk6
+OSI Transport provider.
+.IR OpenSS7 \(tm
+.B otk6
+supports both the TCP/IP options to control the underlying TCP/IP network
+connection provider (CONS equivalent) as described in
+.BR xti_tcp (3)
+and
+.BR xti_ip (3),
+as well as OSI transport options to
+control both ISO Transport QoS and management options associated with OSI
+transport described in
+.BR xti_osi (3).
 .IP \(em
+Binary compatibility is not attempted: only source compatibility.  Any binary
+compatibility contained in the package is a bug and is scheduled to be removed
+on the next release.  If you want binary compatibility, go buy the
+\fISolaris Solstice\fP\(rg product!
 .\"
 .\"
 .SH CONFORMANCE
@@ -420,11 +579,24 @@ rfc4548
 .\"
 .SH HISTORY
 .PP
-Historically, RFC 1006 and other non-OSI transport drivers were provided separate from OSI transport
-drivers.  This was true for both the USL ONP and BSD ISODE approaches.  However, that separation
-made it difficult to provide initiators and responders that provided for both traditional OSI CONS
-and CLNS networks as well as RFC 1006 networks.  Therefore, both the USL ONP and BSD ISODE
-approaches integrated all networks into the same transport provider.
+Historically, RFC 1006 and other non-OSI transport drivers were provided
+separate from OSI transport drivers.  This was true for both the USL ONP and
+BSD ISODE approaches.  However, that separation made it difficult to provide
+initiators and responders that provided for both traditional OSI CONS and CLNS
+networks as well as RFC 1006 networks.  Therefore, both the USL ONP and BSD
+ISODE approaches integrated all networks into the same transport provider.
+.PP
+.B otk6
+for Linux Fast-STREAMS was first released publicly in
+.B @PACKAGE@
+release 0.9.2.4.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+OSI Stack.
 .\"
 .\"
 .[

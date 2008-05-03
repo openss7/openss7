@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lpp.4.man,v 0.9.2.6 2008-04-29 00:01:56 brian Exp $
+.\" @(#) $Id: lpp.4.man,v 0.9.2.7 2008-05-03 13:23:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 00:01:56 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lpp.4.man,v $
+.\" Revision 0.9.2.7  2008-05-03 13:23:33  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.6  2008-04-29 00:01:56  brian
 .\" - updated headers for release
 .\"
@@ -150,7 +153,7 @@ pushable module that is pushed over a TCP (tpi) stream.  The resulting Stream
 can still present a TPI interface, just a TPI-mOSI interface as described in
 XNS 5.2.
 .[
-xns
+xns 5.2
 .]
 .\"
 .\"
@@ -166,7 +169,7 @@ tpi revision 2.0.0
 to transform it into a Lightweight Presentation Protocol Stream.  Once pushed,
 the Stream presents the minimal-OSI interface (mOSI) described in XNS 5.2.
 .[
-xns
+xns 5.2
 .]
 .\"
 .\"
@@ -182,12 +185,12 @@ tpi revision 2.0.0
 This interface conforms to the XTI mOSI (minimal-OSI) interface using the
 X/Open Transport Interface (XTI),
 .[
-xti
+xti revision 1.0
 .]
 .BR xti (3),
 as described in the XNS 5.2.
 .[
-xns
+xns 5.2
 .]
 .\"
 .\"
@@ -280,7 +283,7 @@ rfc1278
 .PP
 Options are as provided in the XTI mOSI interface as described in XNS 5.2.
 .[
-xns
+xns 5.2
 .]
 .\"
 .\"
@@ -346,7 +349,7 @@ The
 .B LPP
 module is compatible with the XTI mOSI specification of XNS 5.2.
 .[
-xns
+xns 5.2
 .]
 .\"
 .\"

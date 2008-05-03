@@ -1,3 +1,8 @@
+2008-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/ss7statsd.8.man: added options
+	* doc/manual/prerequisites.texi: added strx25 sub-package
+
 2008-04-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: updates to pass make check target

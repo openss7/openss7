@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 0.9.2.10 2008-04-29 08:33:23 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 0.9.2.11 2008-05-03 13:23:25 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-29 08:33:23 $ by $Author: brian $
+@c Last Modified $Date: 2008-05-03 13:23:25 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -121,6 +121,10 @@ OpenSS7 STREAMS SCTP
 @item
 OpenSS7 STREAMS Channels
 (@uref{http://www.openss7.org/tarballs/strchan-@value{VERSION_STRCHAN}.tar.bz2,, strchan-@value{VERSION_STRCHAN}} or better)
+
+@item
+OpenSS7 STREAMS X.25
+(@uref{http://www.openss7.org/tarballs/strx25-@value{VERSION_STRX25}.tar.bz2,, strx25-@value{VERSION_STRX25}} or better)
 
 @item
 OpenSS7 STREAMS ISO
@@ -236,6 +240,10 @@ unsupported.}
 @item
 @cite{OpenSS7 STREAMS Channels},
 @uref{http://www.openss7.org/tarballs/strchan-@value{VERSION_STRCHAN}.tar.bz2, strchan-@value{VERSION_STRCHAN}}.
+
+@item
+@cite{OpenSS7 STREAMS X.25},
+@uref{http://www.openss7.org/tarballs/strx25-@value{VERSION_STRX25}.tar.bz2, strx25-@value{VERSION_STRX25}}.
 
 @item
 @cite{OpenSS7 STREAMS ISO},

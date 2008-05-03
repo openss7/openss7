@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: oopi.4.man,v 0.9.2.5 2008-04-29 00:01:56 brian Exp $
+.\" @(#) $Id: oopi.4.man,v 0.9.2.6 2008-05-03 13:23:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 00:01:56 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: oopi.4.man,v $
+.\" Revision 0.9.2.6  2008-05-03 13:23:34  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.5  2008-04-29 00:01:56  brian
 .\" - updated headers for release
 .\"
@@ -269,18 +272,78 @@ driver also provide a specialized management stream.
 .\"
 .SH ADDRESSES
 .PP
+OSI Transport addresses are in an array of octets where the first octet is the
+length,
+.IR tsaplen ,
+of the TSAP, followed by
+.I tsaplen
+octets of TSAP, followed by an octet that is the length,
+.IR nsaplen ,
+of the NSAP, followed by
+.I nsaplen
+octets of NSAP.
+.PP
+The TSAP is coded according to OSI Transport conventions and is simply the
+T-Selector.  The NSAP is coded according to OSI NSAP conventions.
+.PP
+When the
+.I tsaplen
+is encoded as zero (0), a null T-Selector is used.  When the
+.I nsaplen
+is ecoded as zero (0), the underlying NS-Provider is to assign an NSAP.
+.PP
+.IR "Solaris SunLink" \(rg
+.[
+sunlink-tli
+.]
+specifies that the NSAP address passed to
+.BR t_bind (3)
+and the NSAP address passed to
+.BR t_connect (3)
+is the X.233 NSAP address (in network byte order).
 .\"
 .\"
 .SH OPTIONS
 .PP
+.IR OpenSS7 \(tm
+implements the full set of OSI XTI/TPI options described in
+.BR xti_osi (3).
+.PP
+When OSI QoS options are used, they are used to negotiate QoS requirements with
+the remote OSI Transport provider and user in the fashion of normal OSI
+Transport; when OSI management options are used, they are used to negotiate
+functional units and protocol options in the normal manner described for OSI
+Transport; both as described in
+.BR xti_osi (3).
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+.B oopi
+does not implement any specialized primitives and implements the Transport
+Provider Interface (TPI) Revision 2.0.0
+.[
+tpi revision 2.0.0
+.]
+at both its upport and lower service interfaces.  At the upper service
+interface, TPI is implemented as required for OSI Transport as described in
+.BR tpi_osi (7).
+At the lower service interface, the NPI is implemented as required for CONS and
+CLNS as described in
+.BR npi_osi (7).
 .\"
 .\"
 .SH IOCTLS
 .PP
+The
+.B oopi
+driver does not yet support any input-output controls of its own.  The standard
+STREAMS input-output controls,
+.BR I_LINK "(7), " I_PLINK "(7), " I_UNLINK "(7), " I_PUNLINK (7)
+are used by management programs to provision and supply CONS and CLNS Streams to
+the lower multiplex of the driver.  This is accomplished using a control Stream,
+or any Stream on the upper multiplex provided that the user has sufficient
+privilege.
 .\"
 .\"
 .SH NOTICES
@@ -289,14 +352,14 @@ driver also provide a specialized management stream.
 .\"
 .SH IMPLEMENTATION
 .PP
-The OpenSS7 implementation of the service interface is OpenSS7 specific.  An resemblance to other
-vendor offerings is coincidental.
+The OpenSS7 implementation of the service interface is OpenSS7 specific.  An
+resemblance to other vendor offerings is coincidental.
 .PP
 OpenSS7 implements the
 .B oopi
-as a multiplexing STREAMS pseudo-device driver.  Streams opened on the upper multiplex provide a
-Presentation Provider Interface.   Streams under the lower multiplex must provide an OSI Transport
-Provider Interface (TPI),
+as a multiplexing STREAMS pseudo-device driver.  Streams opened on the upper
+multiplex provide a Presentation Provider Interface.   Streams under the lower
+multiplex must provide an OSI Transport Provider Interface (TPI),
 .[
 tpi revision 2.0.0
 .]
@@ -402,6 +465,8 @@ reflect the original UNIX documentation).
 .SH VERSIONS
 .PP
 This manual page was written for the OpenSS7 \fBoopi\fP(4) driver.
+.\"
+.\"
 .[
 $LIST$
 .]

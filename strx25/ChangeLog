@@ -1,5 +1,25 @@
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* debian/strx25-core.postinst.in: updates for build
+	* debian/strx25-core.postrm.in: updates for build
+	* debian/strx25-core.preinst.in: updates for build
+	* debian/strx25-core.prerm.in: updates for build
+	* debian/strx25-dev.postinst.in: updates for build
+	* debian/strx25-dev.preinst.in: updates for build
+	* debian/strx25-dev.prerm.in: updates for build
+	* debian/strx25-devel.preinst.in: updates for build
+	* debian/strx25-doc.postinst.in: updates for build
+	* debian/strx25-doc.preinst.in: updates for build
+	* debian/strx25-doc.prerm.in: updates for build
+	* debian/strx25-init.postinst.in: updates for build
+	* debian/strx25-init.postrm.in: updates for build
+	* debian/strx25-init.preinst.in: updates for build
+	* debian/strx25-init.prerm.in: updates for build
+	* debian/strx25-lib.preinst.in: updates for build
+	* debian/strx25-source.preinst.in: updates for build
+	* debian/strx25-util.preinst.in: updates for build
+	* doc/manual/prerequisites.texi: updates for build
+
 	* ANNOUNCE: added package file
 	* AUTHORS: added package file
 	* ChangeLog: added package file

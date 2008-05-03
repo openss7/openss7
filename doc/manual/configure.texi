@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: configure.texi,v 0.9.2.4 2007/06/22 00:18:20 brian Exp $
+@c @(#) $Id: configure.texi,v 0.9.2.5 2008-05-03 13:23:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:20 $ by $Author: brian $
+@c Last Modified $Date: 2008-05-03 13:23:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -186,6 +186,16 @@ can be built unless the @command{strchan} package was otherwise installed on the
 The default is to include the
 @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}})
 add-on package in the build.
+
+@item --with-STRX25
+@opindex STRX25
+
+When enabled, includes the @command{strx25-@value{VERSION_STRX25}} add-on package in the build.
+Because the @command{strx25} add-on package is not distributed by default, this option only has a
+use on development copies and CVS checkouts.
+The default is to exclude the
+@cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}})
+add-on package from the build.
 
 @item --with-STRISO
 @opindex STRISO
