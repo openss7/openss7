@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: setpadent.3.man,v 0.9.2.1 2008-05-03 11:42:27 brian Exp $
+.\" @(#) $Id: setpadent.3.man,v 0.9.2.2 2008-05-03 21:22:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:27 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 21:22:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: setpadent.3.man,v $
+.\" Revision 0.9.2.2  2008-05-03 21:22:36  brian
+.\" - updates for release
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:27  brian
 .\" - added manual pages
 .\"
@@ -78,6 +81,65 @@ sort-adjacent-labels
 .\"
 .\"
 .TH SETPADENT 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B xxx
+\-
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netx25/x25_proto.h>
+.br
+.B #include <netx25/xnetdb.h>
+.HP
+.BI "int xxx(int " arg );
+.\"
+.\"
+.SH INTERFACE
+.PP
+X.25 Network Layer Interface (NLI).
+.\"
+.\"
+.SH LIBRARY
+.PP
+X.25 Support Library,
+.BR libsx25 (3).
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.SH VERSION
+.PP
 .\"
 .\"
 .[

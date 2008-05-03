@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.3 2008-05-03 13:23:35 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.4 2008-05-03 21:22:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 13:23:35 $ by $Author: brian $
+ Last Modified $Date: 2008-05-03 21:22:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 0.9.2.4  2008-05-03 21:22:32  brian
+ - updates for release
+
  Revision 0.9.2.3  2008-05-03 13:23:35  brian
  - added strx25 sub-package and package updates
 
@@ -62,20 +65,20 @@
 
  *****************************************************************************/
 
-#ifndef __SYS_@PACKAGE_UCNAME@_CONFIG_H__
-#define __SYS_@PACKAGE_UCNAME@_CONFIG_H__
+#ifndef __SYS_STRISO_CONFIG_H__
+#define __SYS_STRISO_CONFIG_H__
 
-#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  * @configure_input@
  *
  * This file needs to include any autoconf definitions that are used by
  * installed header files.  This file will be installed in
- * /usr/include/@PACKAGE@/sys/@PACKAGE@/config.h to be included by header files
- * installed in /usr/include/@PACKAGE@/ with an include line something like:
+ * /usr/include/striso/sys/striso/config.h to be included by header files
+ * installed in /usr/include/striso/ with an include line something like:
  *
- * #include "sys/@PACKAGE@/config.h".
+ * #include "sys/striso/config.h".
  */
 
-#endif				/* __SYS_@PACKAGE_UCNAME@_CONFIG_H__ */
+#endif				/* __SYS_STRISO_CONFIG_H__ */

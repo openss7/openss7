@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25config.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $
+ @(#) $RCSfile: x25config.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 13:04:38 $ by $Author: brian $
+ Last Modified $Date: 2008-05-03 21:22:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25config.c,v $
+ Revision 0.9.2.2  2008-05-03 21:22:38  brian
+ - updates for release
+
  Revision 0.9.2.1  2008-05-03 13:04:38  brian
  - added support librarie files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25config.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $"
+#ident "@(#) $RCSfile: x25config.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $"
 
-static char const ident[] = "$RCSfile: x25config.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $";
+static char const ident[] = "$RCSfile: x25config.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $";
+
+struct link_data;
+struct config_ident;
+struct LINK_config_data;
+struct X25_config_data;
+struct MLP_config_data;
+struct LAPB_config_data;
+struct LLC2_config_data;
+struct WAN_config_data;
 
 /** @brief
   * @param lptr
@@ -69,6 +81,7 @@ static char const ident[] = "$RCSfile: x25config.c,v $ $Name: OpenSS7-0_9_2 $($R
 int
 __sx25_find_link_parameters(struct link_data **lptr)
 {
+	return (0);
 }
 
 /** @fn int x25_find_link_parameters(struct link_data **lptr)
@@ -103,6 +116,7 @@ __sx25_read_config_parameters(int linkid,
 			      struct LAPB_config_data *lbp,
 			      struct LLC2_config_data *l2p, struct WAN_config_data *wpt, int *flags)
 {
+	return (0);
 }
 
 /** @fn int x25_read_config_parameters(int linkid, struct config_ident *ipt, struct LINK_config_data *lpt, struct X25_config_data *xpt, struct MLP_config_data *mpt, struct LAPB_config_data *lbp, struct LLC2_config_data *l2p, struct WAN_config_data *wpt, int *flags)
@@ -146,6 +160,7 @@ __sx25_read_config_parameters_file(char *filename,
 				   struct LLC2_config_data *l2p,
 				   struct WAN_config_data *wpt, int *flags)
 {
+	return (0);
 }
 
 /** @fn int x25_read_config_parameters_file(char *filename, struct config_ident *ipt, struct LINK_config_data *lpt, struct X25_config_data *xpt, struct MLP_config_data *mpt, struct LAPB_config_data *lbp, struct LLC2_config_data *l2p, struct WAN_config_data *wpt, int *flags)
@@ -174,6 +189,7 @@ __asm__(".symver __sx25_read_config_parameters_file,x25_read_config_parameters_f
 int
 __sx25_save_link_parameters(struct link_data *linkid)
 {
+	return (0);
 }
 
 /** @fn int x25_save_link_parameters(struct link_data *linkid)
@@ -191,9 +207,9 @@ __asm__(".symver __sx25_save_link_parameters,x25_save_link_parameters@@SX25_1.0"
   * @par Alias:
   * This function is an implementation of x25_set_parse_error_function().
   */
-int (*) (char *)
-__sx25_set_parse_error_function(int (*)(char *) func)
+int (*__sx25_set_parse_error_function(int (*func)(char *))) (char *)
 {
+	return ((int (*)(char *))0);
 }
 
 /** @fn int (*) (char *) x25_set_parse_error_function(int (*) (char *) func)
@@ -227,6 +243,7 @@ __sx25_write_config_parameters(int linkid,
 			       struct LAPB_config_data *lbp,
 			       struct LLC2_config_data *l2p, struct WAN_config_data *wpt)
 {
+	return (0);
 }
 
 /** @fn int x25_write_config_parameters(int linkid, struct config_ident *ipt, struct LINK_config_data *lpt, struct X25_config_data *xpt, struct MLP_config_data *mpt, struct LAPB_config_data *lbp, struct LLC2_config_data *l2p, struct WAN_config_data *wpt)
@@ -267,6 +284,7 @@ __sx25_write_config_parameters_file(char *filename,
 				    struct LAPB_config_data *lbp,
 				    struct LLC2_config_data *l2p, struct WAN_config_data *wpt)
 {
+	return (0);
 }
 
 /** @fn int x25_write_config_parameters_file(char *filename, struct config_ident *ipt, struct LINK_config_data *lpt, struct X25_config_data *xpt, struct MLP_config_data *mpt, struct LAPB_config_data *lbp, struct LLC2_config_data *l2p, struct WAN_config_data *wpt)

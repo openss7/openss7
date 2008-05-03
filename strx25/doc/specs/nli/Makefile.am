@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 10:46:37 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,10 +58,10 @@ if DEVELOPMENT
 
 info_TEXINFOS		+= nli.texi
 
-nli_TEINFOS		= \
+nli_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
-			  $(top_srcdir)/scripts/texi/fdl.texi \
+			  $(top_srcdir)/scripts/texi/fdl.texi
 
 if MAINTAINER_MODE
 
@@ -93,6 +93,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-05-03 21:22:37  brian
+# - updates for release
+#
 # Revision 0.9.2.1  2008-05-03 10:46:37  brian
 # - added package files
 #

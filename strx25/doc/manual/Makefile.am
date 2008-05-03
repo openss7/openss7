@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 10:46:37 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 21:22:36 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,9 +57,9 @@ if DEVELOPMENT
 ## DEVELOPMENT
 
 ## this must be literal
-info_TEXINFOS		+= striso.texi
+info_TEXINFOS		+= strx25.texi
 
-striso_TEXINFOS		= \
+strx25_TEXINFOS		= \
 			  configure.texi \
 			  descrip.texi \
 			  news.texi \
@@ -83,14 +83,14 @@ striso_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 if MAINTAINER_MODE
-striso_TEXINFOS		+= \
+strx25_TEXINFOS		+= \
 			  texi/args.texi
 endif
 
 EXTRA_info_TEXINFOS	= \
 			  texi/args.texi \
 			  $(info_TEXINFOS) \
-			  $(striso_TEXINFOS)
+			  $(strx25_TEXINFOS)
 
 ## DEVELOPMENT
 endif
@@ -100,53 +100,11 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-05-03 21:22:36  brian
+# - updates for release
+#
 # Revision 0.9.2.1  2008-05-03 10:46:37  brian
 # - added package files
-#
-# Revision 0.9.2.14  2008-04-29 00:01:58  brian
-# - updated headers for release
-#
-# Revision 0.9.2.13  2008-04-10 23:24:15  brian
-# - distribute agpl3.texi
-#
-# Revision 0.9.2.12  2007/08/15 05:34:16  brian
-# - GPLv3 updates
-#
-# Revision 0.9.2.11  2007/08/14 07:04:57  brian
-# - GNUv3 header update
-#
-# Revision 0.9.2.10  2007/03/14 04:27:35  brian
-# - typo
-#
-# Revision 0.9.2.9  2007/03/14 04:23:05  brian
-# - do not depend on args.texi or discheck target fails
-#
-# Revision 0.9.2.8  2007/03/06 21:23:55  brian
-# - final updates and corrections to build process for release
-#
-# Revision 0.9.2.7  2006/09/18 01:18:40  brian
-# - updated documentation and include file makefiles
-#
-# Revision 0.9.2.6  2006/08/27 12:27:06  brian
-# - finalizing auto release files
-#
-# Revision 0.9.2.5  2006/08/26 14:46:41  brian
-# - update todo documentation
-#
-# Revision 0.9.2.4  2006/08/26 09:18:48  brian
-# - better release file generation
-#
-# Revision 0.9.2.3  2006/08/22 12:57:27  brian
-# - updated documentation
-#
-# Revision 0.9.2.2  2006/04/08 03:39:15  brian
-# - working up striso package
-#
-# Revision 0.9.2.1  2006/04/07 22:01:29  brian
-# - initial branch
-#
-# Revision 0.9  2006/04/07 21:56:41  brian
-# - initial addition of striso files
 #
 # =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

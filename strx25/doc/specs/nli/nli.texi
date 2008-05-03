@@ -1,0 +1,375 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% =========================================================================
+%
+% @(#) $Id: nli.texi,v 0.9.2.1 2008-05-03 21:22:37 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
+%
+% =========================================================================
+\input texinfo @c -*-texinfo-*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c %**start of header
+@setfilename nli.info
+@include texi/args.texi
+@set MANUAL_TITLE Network Layer Interface
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* NLI: (nli).			Network Layer Interface Specification
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE Network Layer Interface
+@set MANUAL_TYPE Specification
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the NCR Compten Communications Device Interface.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release
+@value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
+Corporation}.  This specification was originally published by NRC Compten.
+
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org,Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name OpenSS7
+Corporation not be use in advertising or publicity pertaining to distribution
+of the software without specific, written prior permission.  OpenSS7 Corporation
+makes no representations about the suitability of this documentation for any
+purpose.  It is provided ``as is'' without express or implied warranty.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical to
+this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE Network Layer Interface
+@set MANUAL_TYPE Specification
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TITLE} containing technical details concerning
+the implementation of the @value{MANUAL_TITLE} for OpenSS7.  It contains
+recommendations on software architecture as well as platform and system
+applicabiility of the @value{MANUAL_TITLE}.  It provides abstraction of the X.25
+Packet Layer Protocol (PLP) to these components as well as providing a basis for
+network layer control for other network protocols.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@ignore
+@noindent
+This software and related documentation is protected by copyright and
+distributed under licenses restricting its use, copying, distribution and
+decompilation.  No part of this software or related documentation may be
+reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
+
+@noindent
+The recipient of this document, by its retention and use, warrants that the
+recipient will protect this information and keep it confidential, and will not
+disclose the information contained in this document without the written
+permission of its owner.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation
+for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of the
+technical arts, or the reflection of changes in the design of any techniques, or
+procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
+under no obligation to provide any feature listed herein.
+@end ignore
+
+@noindent
+Permission to use, copy and distribute this documentation without modification,
+for any purpose and without fee or royalty is hereby granted, provided that both
+the above copyright notice and this permission notice appears in all copies and
+that the name of OpenSS7 Corporation not be used in advertising or publicity
+pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation
+about the suitability of this documentation for any purpose.  It is provided
+``as is'' without express or implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR
+OTHER RIGHTS..  IN NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT,
+INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
+FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF THIS
+DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation
+for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of the
+technical arts, or the reflection of changes in the design of any techniques, or
+procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
+under no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of manual pages.
+@defcodeindex mp
+
+@c syncodeindex pr cp
+@c syncodeindex pv cp
+@c syncodeindex st cp
+@c syncodeindex tp cp
+@c syncodeindex vr cp
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top Network Layer Interface
+@end ifnottex
+
+@menu
+* Introduction::
+* Model of the Network Layer::
+* NLI Services::
+* NLI Primitives::
+* Allowable Sequence of NLI Primitives::
+* Precedence of NPI Primitives::
+* Guidelines for Protocol Independent NS Users::
+* Required Information for NS Provider-Specific Addenda::
+* NLI Header Files::
+* Glossary of NLI Terms and Acronyms::
+* References::
+* Index::
+@end menu
+
+@node Introduction
+@chapter Introduction
+
+@node Model of the Network Layer
+@chapter Model of the Network Layer
+
+@node NLI Services
+@chapter NLI Services
+
+@node NLI Primitives
+@chapter NLI Primitives
+
+@node Allowable Sequence of NLI Primitives
+@chapter Allowable Sequence of NLI Primitives
+
+@node Precedence of NPI Primitives
+@chapter Precedence of NPI Primitives
+
+@node Guidelines for Protocol Independent NS Users
+@appendix Guidelines for Protocol Independent NS Users
+
+@node Required Information for NS Provider-Specific Addenda
+@appendix Required Information for NS Provider-Specific Addenda
+
+@node NLI Header Files
+@appendix NLI Header Files
+
+@node Glossary of NLI Terms and Acronyms
+@appendix Glossary of NLI Terms and Acronyms
+
+@node References
+@unnumbered References
+
+@node Index
+@unnumbered Index
+
+@menu
+* Concept Index::
+* Protocol State Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Manual Page Index::
+@end menu
+
+@node Concept Index
+@section Concept Index
+@printindex cp
+
+@page
+@node Protocol State Index
+@section Protocol State Index
+@printindex st
+
+@page
+@node Primitive Index
+@section Primitive Index
+@printindex pr
+
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
+
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
+@printindex vr
+
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
+
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
+@printindex pe
+
+@page
+@node Manual Page Index
+@section Manual Page Index
+@printindex mp
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+

@@ -1,5 +1,10 @@
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+
 	* doc/manual/prerequisites.texi: added strx25 sub-package
 	* osr61/tests/atlocal.in: header corrections
 	* osr61/tests/dummy1.m4: header corrections

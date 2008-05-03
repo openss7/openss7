@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: padent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $
+ @(#) $RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 13:04:38 $ by $Author: brian $
+ Last Modified $Date: 2008-05-03 21:22:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: padent.c,v $
+ Revision 0.9.2.2  2008-05-03 21:22:38  brian
+ - updates for release
+
  Revision 0.9.2.1  2008-05-03 13:04:38  brian
  - added support librarie files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: padent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $"
+#ident "@(#) $RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $"
 
-static char const ident[] = "$RCSfile: padent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $";
+static char const ident[] = "$RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $";
+
+#include <netx25/x25_proto.h>
+#include <netx25/xnetdb.h>
 
 /** @brief
   * @param p
@@ -70,6 +76,7 @@ static char const ident[] = "$RCSfile: padent.c,v $ $Name: OpenSS7-0_9_2 $($Revi
 int
 __sx25_padtos(struct padent *p, unsigned char *strp)
 {
+	return (0);
 }
 
 /** @fn int padtos(struct padent *p, unsigned char *strp)
@@ -91,6 +98,7 @@ __asm__(".symver __sx25_padtos,padtos@@SX25_1.0");
 unsigned long
 __sx25_linkidtox25(unsigned char *str_linkid)
 {
+	return (0);
 }
 
 /** @fn unsigned long linkidtox25(unsigned char *str_linkid)
@@ -112,6 +120,7 @@ __asm__(".symver __sx25_linkidtox25,linkidtox25@@SX25_1.0");
 int
 __sx25_x25tolinkid(unsigned long linkid, unsigned char *str_linkid)
 {
+	return (0);
 }
 
 /** @fn int x25tolinkid(unsigned long linkid, unsigned char *str_linkid)
@@ -133,6 +142,7 @@ __asm__(".symver __sx25_x25tolinkid,x25tolinkid@@SX25_1.0");
 int
 __sx25_getnettype(unsigned char *linkid)
 {
+	return (0);
 }
 
 /** @fn int getnettype(unsigned char *linkid)
@@ -173,6 +183,7 @@ __asm__(".symver __sx25_setpadent,setpadent@@SX25_1.0");
 struct padent *
 __sx25_getpadbyaddr(char *addr)
 {
+	return ((struct padent *)0);
 }
 
 /** @fn struct padent *getpadbyaddr(char *addr)
@@ -192,6 +203,7 @@ __asm__(".symver __sx25_getpadbyaddr,getpadbyaddr@@SX25_1.0");
 struct padent *
 __sx25_getpadent(void)
 {
+	return (0);
 }
 
 /** @fn struct padent * getpadent(void)

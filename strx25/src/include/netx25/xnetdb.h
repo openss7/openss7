@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xnetdb.h,v 0.9.2.1 2008-05-03 10:46:38 brian Exp $
+ @(#) $Id: xnetdb.h,v 0.9.2.2 2008-05-03 21:22:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 10:46:38 $ by $Author: brian $
+ Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnetdb.h,v $
+ Revision 0.9.2.2  2008-05-03 21:22:37  brian
+ - updates for release
+
  Revision 0.9.2.1  2008-05-03 10:46:38  brian
  - added package files
 
@@ -59,9 +62,12 @@
 #ifndef __NETX25_XNETDB_H__
 #define __NETX25_XNETDB_H__
 
-#ident "@(#) $RCSfile: xnetdb.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xnetdb.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed wtih doxygen(1). */
+
+#include <stdint.h>
+#include <sys/types.h>
 
 /** @weakgroup sx25
   * @{ */
@@ -71,30 +77,14 @@
   * This file contains declarations for the X.25 database library subroutines,
   * most of which utility the struct xhostent structure. */
 
-/* The padent structure is defined in netx25/xnetdb.h.  The structure contains
- * a single entry from the /etc/x25/padmapconf file.  This contains
- * information about facilities and so on to be used when making PAD calls to
- * a particular adress.  The members of the padent structure are:
- *
- * xaddr:	The host X.25 address.
- *
- * x29:		The X.29 version specified.  Possible values are:
- *
- *		0 - use the configured default X.29 address
- *		1 - use the yellow book (1980) X.29 address
- *		2 - use the red book (1984) X.29 address
- *		3 - use the blue book (1988) X.29 address
- *
- * xtras:	Any facilities and QOS parameters defined for this entry.
- *
- * cud:		Any Call User Data defined for this entry.
- */
-struct padent {
-	struct xaddrf xaddr;
-	unsigned char x29;
-	struct extraformat xtras;
-	unsigned char cud[MAxnetdb.hXCUDFSIZE + 1];
-};
+struct link_data;
+struct config_ident;
+struct LINK_config_data;
+struct X25_config_data;
+struct MLP_config_data;
+struct LAPB_config_data;
+struct LLC2_config_data;
+struct WAN_config_data;
 
 /* Addressing is defined by the xaddrf structure.  The members of the xaddrf
  * structure are:
@@ -133,22 +123,34 @@ struct xaddrf {
 	unsigned char NSAP[NSAPMAXSIZE];
 };
 
-/* The LSAP is defined by the lsapformat structure.  The members of the
- * lsapformat structure are:
+/* The padent structure is defined in netx25/xnetdb.h.  The structure contains
+ * a single entry from the /etc/x25/padmapconf file.  This contains
+ * information about facilities and so on to be used when making PAD calls to
+ * a particular adress.  The members of the padent structure are:
  *
- * lsap_len:	The length of the DTE address or LSAP as two BCD digits per
- *		byte, right justified.  An LSAP is always 14 digits long.  A
- *		DTE address can be up to 15 decimal digits unless X.25(88) and
- *		TOA/NPI addressing is used, in which case it can be up to 17
- *		decimal digits.  A PVC_LCI is 3 digits long.
+ * xaddr:	The host X.25 address.
  *
- * lsap_add:	The DTE address, LSAP or PVC_LCI as two BCD digtis per byte,
- *		right justified.
+ * x29:		The X.29 version specified.  Possible values are:
+ *
+ *		0 - use the configured default X.29 address
+ *		1 - use the yellow book (1980) X.29 address
+ *		2 - use the red book (1984) X.29 address
+ *		3 - use the blue book (1988) X.29 address
+ *
+ * xtras:	Any facilities and QOS parameters defined for this entry.
+ *
+ * cud:		Any Call User Data defined for this entry.
  */
-#define LSAPMAXSIZE 9
-struct lsapformat {
-	uint8_t lsap_len;
-	uint8_t lsap_add[LSAPMAXSIZE];
+#if 0
+#define MAX_HXCUDFSIZE MAxnetdb.hXCUDFSIZE
+#else
+#define MAX_HXCUDFSIZE 63
+#endif
+struct padent {
+	struct xaddrf xaddr;
+	unsigned char x29;
+	struct extraformat xtras;
+	unsigned char cud[MAX_HXCUDFSIZE + 1];
 };
 
 /* The xhostent structure is defined in the netx25/xnetdb.h file.  The
@@ -278,7 +280,7 @@ extern int x25_save_link_parameters(struct link_data *linkid);
 
 /**
   * a weak alias of __sx25_set_parse_error_function(). */
-extern int (*) (char *) x25_set_parse_error_function(int (*)(char *) func);
+extern int (*x25_set_parse_error_function(int (*func)(char *))) (char *) ;
 
 /**
   * a weak alias of __sx25_write_config_parameters(). */
@@ -343,7 +345,7 @@ extern int __sx25_read_config_parameters_file(char *filename,
 					      struct LLC2_config_data *l2p,
 					      struct WAN_config_data *wpt, int *flags);
 extern int __sx25_save_link_parameters(struct link_data *linkid);
-extern int (*) (char *) __sx25_set_parse_error_function(int (*)(char *) func);
+extern int (*__sx25_set_parse_error_function(int (*func)(char *))) (char *) ;
 extern int __sx25_write_config_parameters(int linkid,
 					  struct config_ident *ipt,
 					  struct LINK_config_data *lpt,

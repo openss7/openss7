@@ -1,5 +1,14 @@
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* acinclude.m4: corrections
+	* configure.ac: corrections
+	* src/include/sys/striso/config.h.in: corrections
+
 	* acinclude.m4: package updates
 	* configure.ac: package updates
 	* doc/man/Makefile.am: package updates
