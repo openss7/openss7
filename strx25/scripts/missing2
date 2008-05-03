@@ -1,0 +1,621 @@
+#!/bin/sh
+# =============================================================================
+# 
+# @(#) $RCSfile: missing2,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-04-28 09:23:10 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2008-04-28 09:23:10 $ by $Author: brian $
+#
+# =============================================================================
+
+# missing2 for more commands ala missing
+
+scriptversion=2007-10-17.01
+
+if test $# -eq 0; then
+    echo 1>&2 "Try \'$0 --help' for more information"
+    exit 1
+fi
+
+run=:
+sed_output='s/.* --output[ =]\([^ ]*\).*/\1/p'
+sed_minuso='s/.* -o \([^ ]*\).*/\1/p'
+
+msg="missing on your system"
+
+case $1 in
+    (--run)
+	# Try to run requested program, and just exit if it succeeds.
+	run=
+	shift
+	"$@" && exit 0
+	# Exit code 63 means version mismatch.  This often happens when the
+	# user tries to use an ancient version of a tool on a file that
+	# requires a minimum version.  In this case we should proceed as
+	# though the program has been absent, or as though --run had not been
+	# passed.
+	if test $? = 63 ; then
+	    run=:
+	    msg="probably too old"
+	fi
+	;;
+
+    (-h|--h|--he|--hel|--help)
+	cat <<EOF
+$0 [OPTION]... PROGRAM [ARGUMENT]...
+
+Handle \`PROGRAM [ARGUMENT]...' for when PROGRAM is missing, or return
+an error status if there is no known handling for PROGRAM.
+
+Options:
+  -h, --help	    display this help and exit
+  -v, --version	    output version information and exit
+  -c, --copying	    output copying information and exit
+  --run		    try to run PROGRAM, and emulate if it fails
+
+Supported PROGRAM values:
+  latex		    touch the output file
+  pslatex	    touch the output file
+  pdflatex	    touch the output file
+  bibtex	    touch the output file
+  latex2html	    touch the output file
+  dvips		    touch the output file
+  dvipdf	    touch the output file
+  gnuplot	    touch the output file
+  fig2dev	    touch the output file
+  convert	    touch the output file
+
+Send problem reports to <bugs@openss7.org>.
+EOF
+	exit $?
+	;;
+
+    (-v|--v|--ve|--ver|--vers|--versi|--versio|--version)
+	;;
+
+    (-c|--c|--co|--cop|--copy|--copyi|--copyin|--copying)
+	cat <<EOF
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have receive a copy of the GNU General Public License along
+with this program.  If not, see <http://www.gnu.org/licenses/>, or write
+to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA.
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+on behalf of the U.S. Government ("Government"), the following
+provisions apply to you.  If the Software is supplied by the Department
+of Defense ("DoD"), it is classified as "Commercial Computer Software"
+under paragraph 252.227-7014 of the DoD Supplement to the Federal
+Acquisition Regulations ("DFARS") (or any successor regulations) and the
+Government is acquiring only the license rights granted herein (the
+license rights customarily provided to non-Government users).  If the
+Software is supplied to any unit or agency of the Government other than
+DoD, it is classified as "Restricted Computer Software" and the
+Government's rights in the Software are defined in paragraph 52.227-19
+of the Federal Acquisition Regulations ("FAR") (or any successor
+regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+NASA Supplement to the FAR (or any successor regulations).
+
+Commercial licensing and support of this software is available from
+OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+EOF
+	;;
+    (-*)
+	echo 1>&2 "$0: Unknown \`$1' option"
+	echo 1>&2 "Try \`$0 --help' for more information"
+	exit 1
+	;;
+
+esac
+
+# Now exit if we have PROGRAM, but it failed.  Also exit now if we do not have
+# PROGRAM and --version, --help or --copyring was passed to PROGRAM (most likely
+# to detect the program).
+case $1 in
+    (dvipdf|gnuplot|fig2dev|convert)
+	# do not handle --version or --help
+	;;
+    (latex2html)
+	# handles --version but not --help (well)
+	if test -z "$run" && ($1 --version) >/dev/null 2>&1 ; then
+	    # it exists, but it failed.
+	    exit 1
+	elif test ":$2" = ":--version" ; then
+	    # Could not run --version.  This is probably someone
+	    # running `$TOOL --version' to check whether $TOOL
+	    # exists and not knowing $TOOL uses missing2.
+	    exit 1
+	fi
+	;;
+    (latex|pslatex|pdflatex|bibtex|dvips|*)
+	if test -z "$run" && ($1 --version) >/dev/null 2>&1 ; then
+	    # it exists, but it failed.
+	    exit 1
+	elif test ":$2" = ":--version" || test ":$2" = ":--help" ; then
+	    # Could not run --version or --help.  This is probably someone
+	    # running `$TOOL --version' or `$TOOL --help' to check whether $TOOL
+	    # exists and not knowing $TOOL uses missing2.
+	    exit 1
+	fi
+	;;
+esac
+
+# If PROGRAM does not exist, or fails to run (possibly an outdated version), try
+# to emulate PROGRAM.
+case $1 in
+    (latex)
+	# Calling latex on a file  with format %[.tex] should result in
+	# a file named %.dvi.  Therefore if the file %.dvi exists in the
+	# source directory then simply touch it.  Otherwise, create a
+	# default file in the build directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some LaTeX files that need to be converted to
+*** DVI files.  You may need the \`Latex' package to convert those LaTeX
+*** files to DVI files.  You can normally get \`Latex' as part of many
+*** popular Linux Distributions.  On recent RPM based systems, try \`yum
+*** install tetex-latex'.  On recent DEB based systems, try \`apt-get
+*** install tetex-base tetex-bin'.  \`Latex' has been available for many
+*** years: you can get \`Latex' from any CTAN site.
+***
+EOF
+	# Note that missing2 is being executed in the build directory.
+	if test $# -gt 1 ; then
+	    eval LASTARG="\${$#}"
+	    SRCFILE=`echo "$LASTARG" | sed 's,\.tex$,,;s,$,.tex,'`
+	    OUTFILE=
+	    if test -f "$SRCFILE" ; then
+		# if .dvi file exists in source directory, touch it
+		OUTFILE=`echo "$SRCFILE" | sed 's,\.tex$,.dvi,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		# if .dvi file exists in build directory, touch it
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (pslatex)
+	# Calling pslatex on a file with format %[.tex] should result in a file
+	# named %.dvi.  Therefore, if the file %.dvi exists in the source or
+	# build directory, then simply touch it.  Otherwise, create a default
+	# file in the build directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some LaTeX files that need to be converted to
+*** DVI format files with postscript fonts.  You may need the \`Latex'
+*** package to convert those LaTeX files to DVI files.  You can normally
+*** get \`Latex' as part of many popular Linux Distributions.  On recent
+*** RPM based systems, try \`yum install tetex-latex'.  On recent DEB
+*** based systems, try \`apt-get install tetex-base tetex-bin'.
+*** \`Latex' has been available for many years: you can get \`Latex'
+*** from any CTAN site.
+***
+EOF
+	# Note that missing2 is being executed in the build directory.
+	if test $# -gt 1 ; then
+	    eval LASTARG="\${$#}"
+	    SRCFILE=`echo "$LASTARG" | sed 's,\.tex$,,;s,$,.tex,'`
+	    OUTFILE=
+	    if test -f "$SRCFILE" ; then
+		# if .dvi file exists in source directory, touch it
+		OUTFILE=`echo "$SRCFILE" | sed 's,\.tex$,.dvi,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		# if .dvi file exists in build directory, touch it
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (pdflatex)
+	# Calling pdflatex on a file with format %[.tex] should result in a file
+	# named %.pdf.  Therefore, if the file %.pdf exists in the source
+	# director, then simply touch it.  Otherwise, create a default file in
+	# the build directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some LaTeX files that need to be converted to
+*** portable document format files.  You may need the \`tetex-latex'
+*** package to convert those LaTeX files to PDF files.  You can normally
+*** get \`tetex-latex' as part of many popular Linux Distributions.  On
+*** recent RPM based systems, try \`yum install tetex-latex'.  On recent
+*** DEB based systems, try \`apt-get install tetex-base tetex-bin'.
+*** \`Latex' has been available for many years: you can get \`Latex'
+*** from any CTAN site.
+***
+EOF
+	# Note that missing2 is being executed in the build directory.
+	if test $# -gt 1 ; then
+	    eval LASTARG="\${$#}"
+	    SRCFILE=`echo "$LASTARG" | sed 's,\.tex$,,;s,$,.tex,'`
+	    if test -f "$SRCFILE" ; then
+		# if .pdf file exists in source directory, touch it
+		OUTFILE=`echo "$SRCFILE" | sed 's,\.tex$,.pdf,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		# if .pdf file exists in build directory, touch it
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (bibtex)
+	# Calling bibtex on a file with format %[.tex] should result in a file
+	# named %.bib.  Therefore, if the file %.bib exists in the source
+	# directory, then simply touch it.  Otherwise, create a default file in
+	# the build directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some LaTeX files that need to be converted to
+*** bibliography files.  You may need the \`tetex' package to convert those
+*** LaTeX files to BIB files.  You can normally get \`tetex' as part of many
+*** popular Linux Distributions.  On recent RPM based systems, try \`yum install
+*** tetex'.  On recent DEB based systems, try \`apt-get install tetex-base
+*** tetex-bin'.  \`Bibtex' has been available for many years: you can get
+*** \`Bibtex' from any CTAN site.
+***
+EOF
+	# Note that missing2 is being executed in the build directory.
+	if test $# -gt 1 ; then
+	    eval LASTARG="\${$#}"
+	    SRCFILE=`echo "$LASTARG" | sed 's,\.tex$,,;s,$,.tex,'`
+	    if test -f "$SRCFILE" ; then
+		# if .bib file exists in source directory, touch it
+		OUTFILE=`echo "$SRCFILE" | sed 's,\.tex$,.bib,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		# if .bib file exists in build directory, touch it
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (latex2html)
+	# Calling bibtex on a file with format %[.tex] should result in a file
+	# named %.html (as long as -split 0 is given).  Therefore, if the file
+	# %.html exists in the source directory, then simply touch it.
+	# Otherwise, create a default file in the build directory and
+	# complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some LaTeX files that need to be converted to HTML
+*** files.  You may need the \`latex2html' package to convert those LaTeX
+*** files to HTML files.  You can normally get \`latex2html' as part of many
+*** popular Linux Distributions.  On recent RPM based systems, try \`yum
+*** install latex2html'.  On recent DEB based systems, try \`apt-get install
+*** latex2html'.  \`Latex2html' has been available for many years: you can get
+*** \`Latex2html' from any CTAN site.
+***
+EOF
+	# Note that missing2 is being executed in the build directory.
+	if test $# -gt 1 ; then
+	    eval LASTARG="\${$#}"
+	    SRCFILE=`echo "$LASTARG" | sed 's,\.tex$,,;s,$,.tex,'`
+	    if test -f "$SRCFILE" ; then
+		# if .html file exists in source directory, touch it
+		OUTFILE=`echo "$SRCFILE" | sed 's,\.tex$,.html,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		# if .html file exists in build directory, touch it
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (dvips)
+	# Calling dvips on a file with format %.dvi should result in a file
+	# named %.ps unless the -o flag is specified to use a different file
+	# name.  Therefore, if the output file (%.ps or that specified by -o)
+	# exists in the source or build directory, then simply touch it.
+	# Otherwise, create a default file in the build directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some DVI files that need to be converted to
+*** postscript files.  You may need the \`tetex-dvips' package to
+*** convert those DVI files to postscript files.  You can normally get
+*** \`tetex-dvips' as part of many popular Linux distributions.  On
+*** recent RPM based systems, try \`yum install tetex-dvips'.  On recent
+*** DEB based systems, try \`apt-get install tetex-base tetex-bin'.
+*** \`Dvips' has been available for many years: you can get \`Dvips' and
+*** \`Tetex' from any CTAN site.
+***
+EOF
+	if test $# -gt 1 ; then
+	    eval LASTARG="\${$#}"
+	    SRCFILE=`echo "$LASTARG" | sed 's,\.dvi$,,;s,$,.dvi,'`
+	    if test -f "$SRCFILE" ; then
+		# if output file exists as specified with -o, touch it
+		OUTFILE=`echo "$*" | sed -n "$sed_minuso"`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		# if .ps file exists in source directory, touch it
+		OUTFILE=`echo "$SRCFILE" | sed 's,\.dvi$,.ps,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		# if .ps file exists in build directory, touch it
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (dvipdf)
+	# Calling dvipdf on a file with format %.dvi should result in a file
+	# named %.pdf unless the output file is specified on the command line
+	# following the input file.  Therefore, if the output file (%.pdf or
+	# that specified by the command line) exists in the source or build
+	# directory, then simply touch it.  Otherwise, create a default file in
+	# the build directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some DVI files that need to be converted to
+*** portable document format files.  You may need the \`Ghostscript' and
+*** \`Dvips' packages to convert those DVI files to PDF file.  You can
+*** normally get \`Ghostscript' and \`Dvips' as part of many popular
+*** Linux distributions.  On recent RPM based systems, try \`yum install
+*** ghostscript tetex-dvips'.  On recent DEB based systems, try
+*** \`apt-get install gs tetex-base tetex-bin'.
+***
+EOF
+	# do not handle yet
+	exit 1
+	;;
+    (gnuplot)
+	# Calling gnuplot on an input file outputs to the file specified by the
+	# 'set output' command within the file.  Therefore, if the output file
+	# (as specified in the 'set output' command wtihin the file) exists in
+	# the source or build directory, then simply touch it.  Otherwise,
+	# create a default file in the build directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have altered some plot files that need to be converted to
+*** another format (typically fig format).  You may need the \`gnuplot'
+*** package to convert those files to another format.  You can normally
+*** get \`gnuplot' as part of many popular Linux distributions.  On
+*** recent RPM based systems, try \`yum install gnuplot'.  On recent DEB
+*** based systems, try \`apt-get install gnuplot'.   \`Gnuplot' has been
+*** available for many years: you can get \`Gnuplot' from any GNU
+*** archive site.
+***
+EOF
+	if test $# -gt 1 ; then
+	    eval LASTARG="\${$#}"
+	    SRCFILE="$LASTARG"
+	    if test -f "$SRCFILE" ; then
+		OUTFILE=`sed -n '
+		    /^set[ \t][ \t]*output/{
+		      s/^set[ \t][ \t]*output[ \t][ \t]*\([^ ]*\)[ \t]*$/\1/
+		      p
+		      q
+		    }' "$SRCFILE"`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		eval OUTFILE=$OUTFILE
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (fig2dev)
+	# Calling fig2dev with two filenames as non-option arguments specifies
+	# both the input file and the output file.  If the output file is
+	# specified on the command line and exists in the source directory, then
+	# simply touch it.  Otherwise, create a default file in the build
+	# directory and complain.  If the second argument is not present, the
+	# output file name could be guessed from the -L language and the root of
+	# the input file.  If the input file is not present, simply exit 0.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+***
+*** You may have modified some Fig files that need to be converted to
+*** another format.  You may need the \`transfig' package to convert
+*** those files to another format.  You can normally get \`transfig' as
+*** part of many popular Linux distributions.  On recent RPM based
+*** systems, try \`yum install transfig'.  On DEB based systems, try
+*** \`apt-get install transfig'.  Versions ranging from 3.2.3 through
+*** 3.2.4 are acceptable.  The \`transfig' package derives from xfig and
+*** has been available for many years and is availble on the web from
+*** many sources.
+***
+EOF
+	# only handle case where two args are provided (srcfile outfile)
+	if test $# -gt 2 ; then
+	    last=$#
+	    prev=`expr $# - 1`
+	    eval SRCFILE="\${$prev}"
+	    if test -f "$SRCFILE" ; then
+		eval OUTFILE="\${$last}"
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (convert)
+	# Calling convert with two or more filenames as non-option arguments
+	# specifies the input file(s) and the output file.  If the output file
+	# specified on the command line exists in the source directory, then
+	# simply touch it.  Otherwise, create a default file in the build
+	# directory and complain.
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+*** 
+*** You may have modified some graphics files that need to be converted
+*** to another format.  You may need the \`ImageMagick' package to
+*** convert those files to another format.  You can normally get
+*** \`ImageMagick' as part of many popular Linux distributions.  On
+*** recent RPM based systems, try \`yum install ImageMagick'.  On recent
+*** DEB based systems, try \`'apt-get install imagemagick'.  Versions
+*** ranging from 5.4.3 through 6.2.8 are acceptable.  The \`ImageMagick'
+*** package has been available for many years and is available on the
+*** web from many sources.
+***
+EOF
+	# only handle case where two args are provided (srcfile outfile)
+	if test $# -gt 2 ; then
+	    last=$#
+	    prev=`expr $# - 1`
+	    eval SRCFILE="\${$prev}"
+	    if test -f "$SRCFILE" ; then
+		eval OUTFILE="\${$last}"
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+		OUTFILE=`echo "$OUTFILE" | sed 's,.*/,,'`
+		if test -f "$OUTFILE" ; then
+		    touch "$OUTFILE"
+		    exit 0
+		fi
+	    fi
+	fi
+	exit 1
+	;;
+    (*)
+	cat 1>&2 <<EOF
+*** WARNING: \`$1' is needed, and is $msg.
+*** 
+*** You might have modified some files without having the proper tools
+*** for further handling them.  Check the \`README' file, it often tells
+*** you about the needed prerequisites for installing this package.  You
+*** may also peek at any GNU archive site, in case some other package
+*** would contain this missing \`$1' program.
+***
+EOF
+	exit 1
+	;;
+esac
+
+exit 0
+
+
+# =============================================================================
+#
+# $Log: missing2,v $
+# Revision 0.9.2.4  2008-04-28 09:23:10  brian
+# - updated script headers for release
+#
+# Revision 0.9.2.3  2007/10/17 18:00:10  brian
+# - added latex2html
+#
+# Revision 0.9.2.2  2007/10/17 17:43:04  brian
+# - build updates
+#
+# Revision 0.9.2.1  2007/10/17 07:26:48  brian
+# - added missing2: missing with other commands
+#
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn

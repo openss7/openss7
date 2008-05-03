@@ -1,0 +1,341 @@
+@c -*- texinfo -*- vim: ft=texinfo
+@c =========================================================================
+@c
+@c @(#) $Id: macros.texi,v 0.9.2.7 2008-04-28 09:23:11 brian Exp $
+@c
+@c =========================================================================
+@c
+@c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+@c
+@c All Rights Reserved.
+@c
+@c Permission is granted to make and distribute verbatim copies of this
+@c manual provided the copyright notice and this permission notice are
+@c preserved on all copies.
+@c
+@c Permission is granted to copy and distribute modified versions of this
+@c manual under the conditions for verbatim copying, provided that the
+@c entire resulting derived work is distributed under the terms of a
+@c permission notice identical to this one
+@c 
+@c Since the Linux kernel and libraries are constantly changing, this
+@c manual page may be incorrect or out-of-date.  The author(s) assume no
+@c responsibility for errors or omissions, or for damages resulting from
+@c the use of the information contained herein.  The author(s) may not
+@c have taken the same level of care in the production of this manual,
+@c which is licensed free of charge, as they might when working
+@c professionally.
+@c 
+@c Formatted or processed versions of this manual, if unaccompanied by
+@c the source, must acknowledge the copyright and authors of this work.
+@c
+@c -------------------------------------------------------------------------
+@c
+@c U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+@c on behalf of the U.S. Government ("Government"), the following
+@c provisions apply to you.  If the Software is supplied by the Department
+@c of Defense ("DoD"), it is classified as "Commercial Computer Software"
+@c under paragraph 252.227-7014 of the DoD Supplement to the Federal
+@c Acquisition Regulations ("DFARS") (or any successor regulations) and the
+@c Government is acquiring only the license rights granted herein (the
+@c license rights customarily provided to non-Government users).  If the
+@c Software is supplied to any unit or agency of the Government other than
+@c DoD, it is classified as "Restricted Computer Software" and the
+@c Government's rights in the Software are defined in paragraph 52.227-19
+@c of the Federal Acquisition Regulations ("FAR") (or any successor
+@c regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+@c NASA Supplement to the FAR (or any successor regulations).
+@c
+@c =========================================================================
+@c 
+@c Commercial licensing and support of this software is available from
+@c OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+@c 
+@c =========================================================================
+@c
+@c Last Modified $Date: 2008-04-28 09:23:11 $ by $Author: brian $
+@c
+@c =========================================================================
+
+@iftex
+
+@macro href {url, desc}
+\desc\@footnote{@url{\url\}}
+@end macro
+
+@macro tabfig {image, number, caption}
+@c @cartouche
+@float Table,Table \number\
+@center @image{\image\}
+@caption{@emph{\caption\}}
+@end float
+@c @end cartouche
+@end macro
+
+@macro tabfigsized {image, number, caption, size}
+@c @cartouche
+@float Table,Table \number\
+@center @image{\image\,\size\}
+@caption{@emph{\caption\}}
+@end float
+@c @end cartouche
+@end macro
+
+@macro figure {image, number, caption}
+@cartouche
+@float Figure,Figure \number\
+@center @image{\image\,,,\caption\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro figuresized {image, number, caption, size}
+@cartouche
+@float Figure,Figure \number\
+@center @image{\image\,\size\,,\caption\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro figureimage {image, number, caption, width, height, alttext, extension}
+@cartouche
+@float Figure,Figure \number\
+@center @image{\image\,\width\,\height\,\alttext\,\extension\}
+@caption{@emph{\caption\}}
+@end float
+@end cartouche
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@code{@uref{http://www.openss7.org/man2html?\name\,,\name\}}
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{\name\}
+@end macro
+
+@macro ioctlref {name}
+@findex \name\
+@code{\name\(7)}
+@end macro
+
+@end iftex
+
+@ifnottex
+
+@macro tabfig {image, number, caption}
+@center @image{\image\}
+@sp 1
+@anchor{Table \number\}
+@center @emph{Table \number\.@:  \caption\}
+@sp 1
+@end macro
+
+@macro tabfigsized {image, number, caption, size}
+@center @image{\image\,\size\}
+@sp 1
+@anchor{Table \number\}
+@center @emph{Table \number\.@:  \caption\}
+@sp 1
+@end macro
+
+@macro figure {image, number, caption}
+@center @image{\image\,,,\caption\}
+@sp 1
+@anchor{Figure \number\}
+@center @emph{Figure \number\.@:  \caption\}
+@sp 1
+@set fignum \number\
+@end macro
+
+@macro figuresized {image, number, caption, size}
+@center @image{\image\,\size\,,\caption\}
+@sp 1
+@anchor{Figure \number\}
+@center @emph{Figure \number\.@:  \caption\}
+@sp 1
+@set fignum \number\
+@end macro
+
+@macro figureimage {image, number, caption, width, height, alttext, extension}
+@center @image{\image\,\width\,\height\,\alttext\,\extension\}
+@sp 1
+@anchor{Figure \number\}
+@center @emph{Figure \number\.@:  \caption\}
+@sp 1
+@set fignum \number\
+@end macro
+
+@ifhtml
+
+@macro href {url, desc}
+@uref{\url\, \desc\}
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@code{@uref{/man2html?\name\,\name\}}
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{@uref{/man2html?\name\,\name\}}
+@end macro
+
+@macro ioctlref {name}
+@code{@uref{/man2html?7+\name\,\name\(7)} (see @uref{/man2html?7+streamio,streamio(7)})}
+@end macro
+
+@end ifhtml
+
+@ifplaintext
+
+@macro href {url, desc}
+\desc\ @* <\url\>
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@code{@uref{http://www.openss7.org/man2html?\name\,,\name\}}
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{\name\}
+@end macro
+
+@macro ioctlref {name}
+@findex \name\
+@code{\name\(7)}
+@end macro
+
+@end ifplaintext
+
+
+@ifnotplaintext
+@ifnothtml
+
+@macro href {url, desc}
+\desc\ @* <\url\>
+@end macro
+
+@macro manref {name}
+@mpindex \name\
+@command{\name\} (@inforef{\name\, , *manpages*})
+@end macro
+
+@macro mantype {name}
+@tindex \name\
+@code{\name\} (@inforef{\name\, , *manpages*})
+@end macro
+
+@macro ioctlref {name}
+@code{\name\} (@inforef{\name\(7), , *manpages*}; @inforef{streamio(7), , *manpages*})
+@end macro
+
+@end ifnothtml
+@end ifnotplaintext
+
+@end ifnottex
+
+@macro tabref {number}
+@ref{Table \number\}
+@end macro
+
+@macro figref {number}
+@ref{Figure \number\}
+@end macro
+
+@macro manpage {name}
+@mpindex \name\
+@uref{http://www.openss7.org/man2html?\name\,, @command{\name\}}
+@end macro
+
+@macro type {name}
+@tindex \name\
+@code{\name\}
+@end macro
+
+@macro member {name}
+@vindex \name\
+@var{\name\}
+@end macro
+
+@macro constant {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro signal {name}
+@vindex \name\
+@{@b{@code{\name\}}@}
+@end macro
+
+@macro errno {name}
+@vindex \name\
+[@b{@code{\name\}}]
+@end macro
+
+@macro stropt {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro streamio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro termio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro sockio {name}
+@findex \name\
+@code{\name\}
+@end macro
+
+@macro msg {name}
+@vindex \name\
+@code{\name\}
+@end macro
+
+@macro header {name}
+@pindex \name\
+@file{\name\}
+@end macro
+
+@c Simplify references that go into plaintext
+
+@ifplaintext
+@macro refman {arg1}
+@cite{\arg1\}, in the manual
+@end macro
+
+@macro xrefman {arg1}
+see @cite{\arg1\}, in the manual
+@end macro
+
+@macro pxrefman {arg1}
+see @cite{\arg1\}, in the manual
+@end macro
+@end ifplaintext
+
+@ifnotplaintext
+@macro refman {arg1}
+@ref{\arg1\}
+@end macro
+
+@macro xrefman {arg1}
+@xref{\arg1\}
+@end macro
+
+@macro pxrefman {arg1}
+@pxref{\arg1\}
+@end macro
+@end ifnotplaintext

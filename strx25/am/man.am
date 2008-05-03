@@ -1,0 +1,693 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: man.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.64 $) $Date: 2008-04-28 09:30:19 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+##
+## =============================================================================
+
+##
+#   Need to generate "cooked" man pages from the source man pages.  This is
+#   for systems (such as debian) that will not do not do grefer on man pages.
+##
+
+man_MACROS		= $(MANMACRO_PFX).macros $(MANMACRO_PFX).refs
+
+if DEVELOPMENT
+## DEVELOPMENT
+
+MAN_SUBST_STRING = s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g;s|\@PACKAGE_SHORTTITLE\@|$(PACKAGE_SHORTTITLE)|g;s|\@bindir\@|$(bindir)|g;s|\@datadir\@|$(datadir)|g;s|\@exec_prefix\@|$(exec_prefix)|g;s|\@includedir\@|$(includedir)|g;s|\@infodir\@|$(infodir)|g;s|\@kmoduledir\@|$(kmoduledir)|g;s|\@rootdir\@|$(rootdir)|g;s|\@ksysmap\@|$(ksysmap)|g;s|\@kversion\@|$(kversion)|g;s|\@libdir\@|$(libdir)|g;s|\@libexecdir\@|$(libexecdir)|g;s|\@localstatedir\@|$(localstatedir)|g;s|\@mandir\@|$(mandir)|g;s|\@oldincludedir\@|$(oldincludedir)|g;s|\@prefix\@|$(prefix)|g;s|\@sbindir\@|$(sbindir)|g;s|\@sharedstatedir\@|$(sharedstatedir)|g;s|\@sysconfdir\@|$(sysconfdir)|g;s|\@snmpmibdir\@|$(snmpmibdir)|g;s|\@snmpdlmoddir\@|$(snmpdlmoddir)|g;s|\@build\@|$(build)|g;s|\@build_alias\@|$(build_alias)|g;s|\@build_cpu\@|$(build_cpu)|g;s|\@build_os\@|$(build_os)|g;s|\@build_vendor\@|$(build_vendor)|g;s|\@host\@|$(host)|g;s|\@host_alias\@|$(host_alias)|g;s|\@host_cpu\@|$(host_cpu)|g;s|\@host_os\@|$(host_os)|g;s|\@host_vendor\@|$(host_vendor)|g;s|\@target\@|$(target)|g;s|\@target_alias\@|$(target_alias)|g;s|\@target_cpu\@|$(target_cpu)|g;s|\@target_os\@|$(target_os)|g;s|\@target_vendor\@|$(target_vendor)|g
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+if COOKED_MANPAGES
+## COOKED_MANPAGES
+
+man_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/\.man//;$(MAN_SUBST_STRING)'
+man1_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.1/;$(MAN_SUBST_STRING)'
+man2_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.2/;$(MAN_SUBST_STRING)'
+man3_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.3/;$(MAN_SUBST_STRING)'
+man4_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.4/;$(MAN_SUBST_STRING)'
+man5_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.5/;$(MAN_SUBST_STRING)'
+man6_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.6/;$(MAN_SUBST_STRING)'
+man7_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.7/;$(MAN_SUBST_STRING)'
+man8_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.8/;$(MAN_SUBST_STRING)'
+man9_SED_SCRIPT = '/^\.lf/d;/^\.\\"/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.9/;$(MAN_SUBST_STRING)'
+
+$(man_MANS):: %: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man_SED_SCRIPT) > $@ ;
+
+$(man1_MANS):: %.1: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man1_SED_SCRIPT) > $@ ;
+
+$(man2_MANS):: %.2: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man2_SED_SCRIPT) > $@ ;
+
+$(man3_MANS):: %.3: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man3_SED_SCRIPT) > $@ ;
+
+$(man4_MANS):: %.4: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man4_SED_SCRIPT) > $@ ;
+
+$(man5_MANS):: %.5: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man5_SED_SCRIPT) > $@ ;
+
+$(man6_MANS):: %.6: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man6_SED_SCRIPT) > $@ ;
+
+$(man7_MANS):: %.7: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man7_SED_SCRIPT) > $@ ;
+
+$(man8_MANS):: %.8: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man8_SED_SCRIPT) > $@ ;
+
+$(man9_MANS):: %.9: %.man $(man_MACROS)
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting (soelim, grefer) manpage $< to $@" ; \
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed -e $(man9_SED_SCRIPT) > $@ ;
+
+all-manmacros:
+
+install-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+
+uninstall-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+
+clean-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+
+distclean-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+
+maintainer-clean-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+
+## COOKED_MANPAGES
+else
+## ! COOKED_MANPAGES
+
+man_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/\.man//;$(MAN_SUBST_STRING)'
+man1_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.1/;$(MAN_SUBST_STRING)'
+man2_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.2/;$(MAN_SUBST_STRING)'
+man3_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.3/;$(MAN_SUBST_STRING)'
+man4_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.4/;$(MAN_SUBST_STRING)'
+man5_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.5/;$(MAN_SUBST_STRING)'
+man6_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.6/;$(MAN_SUBST_STRING)'
+man7_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.7/;$(MAN_SUBST_STRING)'
+man8_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.8/;$(MAN_SUBST_STRING)'
+man9_SED_SCRIPT = '/^\.lf/d;/^\.so.*\.man/s/^\(\.so man\([^\/]*\)\/.*\)\.man/\1.\2/;/^\.so.*\.man/s/\.man/\.9/;$(MAN_SUBST_STRING)'
+
+$(man_MANS): %: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man_SED_SCRIPT) > $@ ;
+
+$(man1_MANS): %.1: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man1_SED_SCRIPT) > $@ ;
+
+$(man2_MANS): %.2: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man2_SED_SCRIPT) > $@ ;
+
+$(man3_MANS): %.3: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man3_SED_SCRIPT) > $@ ;
+
+$(man4_MANS): %.4: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man4_SED_SCRIPT) > $@ ;
+
+$(man5_MANS): %.5: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man5_SED_SCRIPT) > $@ ;
+
+$(man6_MANS): %.6: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man6_SED_SCRIPT) > $@ ;
+
+$(man7_MANS): %.7: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man7_SED_SCRIPT) > $@ ;
+
+$(man8_MANS): %.8: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man8_SED_SCRIPT) > $@ ;
+
+$(man9_MANS): %.9: %.man
+	@p=`$(ECHO) $@ | sed -e 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
+	$(ECHO) "converting manpage $< to $@" ; \
+	cat $< | sed -e $(man9_SED_SCRIPT) > $@ ;
+
+##
+# When manpages are uncooked, we need macro files in the build directory for
+# tests.
+##
+all-manmacros:
+	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
+		if test ! -e $$macro -o $(srcdir)/$$macro -nt $$macro ; then \
+			$(ECHO) "cat $(srcdir)/$$macro | sed -e '\$$(MAN_SUBST_STRING)' > $$macro" ; \
+			cat $(srcdir)/$$macro | sed -e '$(MAN_SUBST_STRING)' > $$macro ; \
+		fi ; \
+	done
+
+##
+# When manpages are uncooked, we need to install the macros and references
+# file in the mandir to be referenced by the uncooked manual pages.
+##
+install-manmacros: $(man_MACROS)
+	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(mandir)
+	@list="$(man_MACROS)" ; for f in $$list ; do \
+		if test -e $$f ; then d=; else d=$(srcdir)/ ; fi ; \
+		$(ECHO) "$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir)" ; \
+		$(INSTALL_DATA) $$d$$f $(DESTDIR)$(mandir) ; \
+	done
+
+uninstall-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
+	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
+
+##
+# We only need to clean the manmacros files from the build directory when the
+# build directory is different from the source directory, so, we check whether
+# the srcdir and the builddir are different before removing.
+##
+clean-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+	@if test "`(cd $(srcdir); pwd)`" != "`pwd`" ; then \
+		macros='$(man_MACROS)' ; for macro in $$macros ; do \
+			$(ECHO) "rm -f -- $$macro" ;  \
+			rm -f -- $$macro ; \
+		done ; \
+	fi
+
+distclean-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+
+maintainer-clean-manmacros:
+	@$(ECHO) "Making $@ in `pwd`"
+
+## ! COOKED_MANPAGES
+endif
+
+all-manpages: $(man_MANS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) \
+	$(man5_MANS) $(man6_MANS) $(man7_MANS) $(man8_MANS) $(man8_MANS)
+
+##
+# This is handled by automake.
+##
+install-manpages: install-man
+	@$(ECHO) "Making $@ in `pwd`"
+
+##
+# This is handled by automake.
+##
+uninstall-manpages: uninstall-man
+	@$(ECHO) "Making $@ in `pwd`"
+
+clean-manpages:
+	@$(ECHO) "Making $@ in `pwd`"
+	@if test -n "$(man_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man_MANS)" ; \
+		rm -f -- $(man_MANS) ; \
+	fi ; \
+	if test -n "$(man1_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man1_MANS)" ; \
+		rm -f -- $(man1_MANS) ; \
+	fi ; \
+	if test -n "$(man2_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man2_MANS)" ; \
+		rm -f -- $(man2_MANS) ; \
+	fi ; \
+	if test -n "$(man3_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man3_MANS)" ; \
+		rm -f -- $(man3_MANS) ; \
+	fi ; \
+	if test -n "$(man4_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man4_MANS)" ; \
+		rm -f -- $(man4_MANS) ; \
+	fi ; \
+	if test -n "$(man5_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man5_MANS)" ; \
+		rm -f -- $(man5_MANS) ; \
+	fi ; \
+	if test -n "$(man6_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man6_MANS)" ; \
+		rm -f -- $(man6_MANS) ; \
+	fi ; \
+	if test -n "$(man7_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man7_MANS)" ; \
+		rm -f -- $(man7_MANS) ; \
+	fi ; \
+	if test -n "$(man8_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man8_MANS)" ; \
+		rm -f -- $(man8_MANS) ; \
+	fi ; \
+	if test -n "$(man9_MANS)" ; then \
+		$(ECHO) "rm -f -- $(man9_MANS)" ; \
+		rm -f -- $(man9_MANS) ; \
+	fi ;
+
+distclean-manpages:
+	@$(ECHO) "Making $@ in `pwd`"
+
+maintainer-clean-manpages:
+	@$(ECHO) "Making $@ in `pwd`"
+
+ALL_LOCAL		+= all-manmacros all-manpages
+
+INSTALL_DATA_LOCAL	+= install-manmacros install-manpages
+
+UNINSTALL_LOCAL		+= uninstall-manmacros uninstall-manpages
+
+CLEAN_LOCAL		+= clean-manmacros clean-manpages
+
+DISTCLEAN_LOCAL		+= distclean-manmacros distclean-manpages
+
+MAINTAINER_CLEAN_LOCAL	+= maintainer-clean-manmacros maintainer-clean-manpages
+
+if COMPRESS_MANPAGES
+## COMPRESS_MANPAGES
+
+##
+# If there are compressed files in the install directory for manpages, then we will compress our
+# manpages as well, unless it was specifically requested to configure that manpages not be
+# compressed.  Note that for an rpm install, we have installed into a sandbox directory that should
+# contain no compressed manpages and compress will be supressed.  rpm will do compression during the
+# rpm install process.
+##
+post-manpages:
+	@$(NORMAL_INSTALL)
+	@for ext in .gz .bz2 ; do \
+		case $$ext in \
+			(.gz)  COMPRESS='$(GZIP_CMD)'  ; COMPRESS_ENV="GZIP='$(GZIP)'" ;; \
+			(.bz2) COMPRESS='$(BZIP2_CMD)' ; COMPRESS_ENV="BZIP2='$(BZIP2)'" ;; \
+		esac ; \
+		if test -n "`find $(DESTDIR)$(mandir) -name \"*$$ext\" 2>/dev/null`" -o -n "$(INSTALL_STRIP_FLAG)" ; then \
+			if test -n "$$COMPRESS" -a -x "$$COMPRESS" ; then \
+				list="$(man_MANS)" ; for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man1_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man1/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man2_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man2/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man3_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man3/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man4_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man4/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man5_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man5/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man6_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man6/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man7_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man7/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man8_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man8/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
+					fi ; \
+				done ; \
+				list="$(man9_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man9/$$f ; then \
+						$(ECHO) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
+						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
+					fi ; \
+				done ; \
+			fi ; \
+		fi ; \
+	done ; \
+	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+		if test -n '$(mandir)' ; then \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$?; \
+		else \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$?; \
+		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
+	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
+
+##
+# When we comrpess manpages, we must remove the compressed versions after uninstall.
+##
+postun-manpages:
+	@$(NORMAL_UNINSTALL)
+	@for ext in .gz .bz2 ; do \
+		case $$ext in \
+			(.gz)  COMPRESS='$(GZIP_CMD)'  ; COMPRESS_ENV="GZIP='$(GZIP)'" ;; \
+			(.bz2) COMPRESS='$(BZIP2_CMD)' ; COMPRESS_ENV="BZIP2='$(BZIP2)'" ;; \
+		esac ; \
+		if test -n "`find $(DESTDIR)$(mandir) -name \"*$$ext\" 2>/dev/null`" ; then \
+			if test -n "$$COMPRESS" ; then \
+				list="$(man_MANS)" ; for f in $$list ; do \
+					if test -f $(DESTDIR)$(mandir)/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man1_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man1/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man1/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man1/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man2_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man2/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man2/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man2/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man3_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man3/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man3/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man3/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man4_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man4/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man4/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man4/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man5_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man5/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man5/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man5/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man6_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man6/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man6/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man6/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man7_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man7/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man7/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man7/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man8_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man8/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man8/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man8/$$f$$ext ; \
+					fi ; \
+				done ; \
+				list="$(man9_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
+					if test -f $(DESTDIR)$(mandir)/man9/$$f$$ext ; then \
+						$(ECHO) "rm -f -- $(DESTDIR)$(mandir)/man9/$$f$$ext" ; \
+						rm -f -- $(DESTDIR)$(mandir)/man9/$$f$$ext ; \
+					fi ; \
+				done ; \
+			fi ; \
+		fi ; \
+	done ; \
+	if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+		if test -n "$(mandir)" ; then \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$? ; \
+		else \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$? ; \
+		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
+	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
+
+## COMPRESS_MANPAGES
+else
+## ! COMPRESS_MANPAGES
+
+post-manpages:
+	@if test -z "$(DESTDIR)" -a -n "$(MAKEWHATIS)" -a -x "$(MAKEWHATIS)" ; then \
+		if test -n "$(mandir)" ; then \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(DESTDIR)$(mandir) || retval=$$? ; \
+		else \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$? ; \
+		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
+	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
+
+postun-manpages:
+	@if test -z '$(DESTDIR)' -a -n '$(MAKEWHATIS)' -a -x '$(MAKEWHATIS)' ; then \
+		if test -n '$(mandir)' ; then \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u $(mandir)" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u $(mandir) || retval=$$? ; \
+		else \
+			$(ECHO) "LANGUAGE= $(MAKEWHATIS) -v -u -w" ; \
+			LANGUAGE= $(MAKEWHATIS) -v -u -w || retval=$$? ; \
+		fi ; \
+		if test "$$retval" = 255 ; then exit 0 ; else exit $${retval:-0} ; fi ; \
+	fi
+
+##
+## Note: FC4 has a trap bug in makewhatis that makes it always return 255 and never 0
+##
+
+## ! COMPRESS_MANPAGES
+endif
+
+##
+# The install-data-hook target is run after the files have been installed.  It is essentially
+# equivalent to the rpm %post, but it is only executed when the install directory is fully
+# configured for compressed manpages.  (That is, this does not run when building an rpm, because the
+# manpages are installed in a temporary, unconfigured directory.)  This is for alien systems and
+# embedded targets that cannot build from packages.
+##
+POST_INSTALL_AM		+= post-manpages
+
+##
+# The uninstall-hook target is run after the files have been removed.  It is essentially equivalent
+# to the rpm %postun, but it is only executed when the uninstall directory is fully configured for
+# compressed manpages.  (That is, this does not run when building an rpm, because the mangpages are
+# installed in a temporary, unconfigured directory.)  This is for alien systems and embedded targets
+# that cannot build from packages.
+##
+POST_UNINSTALL_AM	+= postun-manpages
+
+MANS_AM			+= all-manmacros all-manpages
+
+INSTALL_MANS_AM		+= install-manmacros install-manpages post-manpages
+
+UNINSTALL_MANS_AM	+= uninstall-manpages uninstall-manmacros postun-manpages
+
+
+if PERFORM_CHECKS
+## PERFORM_CHECKS
+dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_mans
+TESTS_ENVIRONMENT	+= MANS='$(MANS)' \
+			   MANS_UNUSED='$(MANS_UNUSED)' \
+			   PKG_MANPATH='$(PKG_MANPATH)' \
+			   MANS_EXEMPT='$(MANS_EXEMPT) $(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT)' \
+		       	   mandir='$(mandir)'
+CLEANFILES		+= check_mans.log
+DISTCLEANFILES		+= *.err *.out
+## PERFORM_CHECKS
+endif
+
+MY_PHONY		+= all-manpages install-manpages uninstall-manpages \
+			   clean-manpages distclean-manpages \
+			   maintainer-clean-manpages all-manmacros \
+			   install-manmacros uninstall-manmacros \
+			   clean-manmacros distclean-manmacros \
+			   maintainer-clean-manmacros
+
+## PKG_BUILD_INDEP
+endif
+
+## DEVELOPMENT
+endif
+
+EXTRA_DIST		+= \
+			   $(man_MACROS) \
+			   $(dist_noinst_MANS)
+
+## =============================================================================
+##
+## $Log: man.am,v $
+## Revision 0.9.2.64  2008-04-28 09:30:19  brian
+## - updated headers for release
+##
+## Revision 0.9.2.63  2008/01/13 21:52:58  brian
+## - dlmod SNMP agent build and installation
+##
+## Revision 0.9.2.62  2007/12/16 03:52:52  brian
+## - updated release files
+##
+## Revision 0.9.2.61  2007/12/15 20:19:28  brian
+## - updates
+##
+## Revision 0.9.2.60  2007/08/12 17:31:06  brian
+## - updated headers
+##
+## Revision 0.9.2.59  2007/01/08 09:37:10  brian
+## - got manual pages building and instaling separately
+##
+## Revision 0.9.2.58  2007/01/08 09:13:03  brian
+## - really install manpages
+##
+## Revision 0.9.2.57  2007/01/08 09:01:59  brian
+## - try to get manpages rigth again
+##
+## Revision 0.9.2.56  2007/01/08 08:55:17  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.55  2007/01/08 08:52:26  brian
+## - try to get manpages installing separately
+##
+## Revision 0.9.2.54  2007/01/08 08:37:05  brian
+## - get manpages building on their own
+##
+## Revision 0.9.2.53  2007/01/08 08:30:50  brian
+## - move outside conditionals
+##
+## Revision 0.9.2.52  2007/01/08 08:28:47  brian
+## - added automake target for manpages
+##
+## Revision 0.9.2.51  2007/01/06 23:28:19  brian
+## - perambulations for netperf and its shallow man structure
+##
+## Revision 0.9.2.50  2006/12/29 05:31:54  brian
+## - used basename for specific section manpages
+##
+## Revision 0.9.2.49  2006/12/28 12:08:28  brian
+## - move EXTRA_DIST outside conditionals
+##
+## Revision 0.9.2.48  2006/09/18 00:43:43  brian
+## - add way to exempt init script manpages from required options
+##
+## Revision 0.9.2.47  2006/03/21 13:25:56  brian
+## - corrected .PHONY
+##
+## Revision 0.9.2.46  2006/03/20 12:54:32  brian
+## - move .PHONY outside ifs
+##
+## Revision 0.9.2.45  2006/03/20 11:52:11  brian
+## - add DEVELOPMENT check
+##
+## Revision 0.9.2.44  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
