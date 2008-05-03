@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ISO.4.man,v 0.9.2.4 2008-04-29 00:01:55 brian Exp $
+.\" @(#) $Id: ISO.4.man,v 0.9.2.5 2008-05-03 13:23:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 00:01:55 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ISO.4.man,v $
+.\" Revision 0.9.2.5  2008-05-03 13:23:33  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.4  2008-04-29 00:01:55  brian
 .\" - updated headers for release
 .\"
@@ -101,36 +104,620 @@ sort-adjacent-labels
 \- International Organization for Standardization (ISO), Open Systems Interconnect (OSI)
 .\"
 .\"
-.SH OVERVIEW
+.SH SYNOPSIS
 .PP
+.B #include <sys/stream.h>
+.HP
+.BI "int " iso_stream " = open(" iso_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" iso_stream ", " \fRI_PUSH\fP ", " iso_module );
+.\"
+.\"
+.\".SH OVERVIEW
+.\".PP
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B ISO
+related collection of drivers and modules provide OSI
+.[
+x200
+.]
+capabilities in a number of related forms, including protocol profile
+variants.
 .\"
-.\"
-.SH USAGE
+.SS DRIVERS
 .PP
+.B ISO
+provides the following
+.I STREAMS
+pseudo-device drivers:
+.TP
+.BR clnp "(4)
+.I Connectionless Network Protocol (CLNP)
+.[
+x233
+.]
+protocol layer that provides a Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+for ISO Connectionless Network operation,
+.BR npi_osi (7).
+.TP
+.BR clns "(4)
+.I Connectionless Network Service (CLNS)
+.[
+x213
+.]
+protocol layer that provides a Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+for ISO Connectionless Network operation,
+.BR npi_osi (7).
+What distinguishes this driver from the
+.BR clnp (4)
+driver is that
+.BR clnp (4)
+only implements X.233
+.[
+x233
+.]
+while this module also provides access to X.622,
+.[
+x622
+.]
+XOT
+.[
+rfc1613
+.]
+and others.
+.TP
+.BR clnstpi "(4)
+.I Connectionless Network Service (CLNS) TPI Interface protocol
+layer than proivdes a Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7)
+for ISO Connectionless Network operation in the fashion of
+.IR "Solaris SunLink OSI 9.0" \(rg.
+.[
+sunlink-tli
+.]
+.TP
+.BR cmot "(4)
+.I CMISE over TCP
+provides access to ISO Management over TCP, RFC 1095
+.[
+rfc1095
+.]
+and RFC 1189
+.[
+rfc1189
+.]
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+with XTI-mOSI extensions,
+.[
+xns 5.2
+.]
+.BR xti_mosi (3).
+.TP
+.BR cons "(4)
+.I Connection Oriented Network Service (CONS)
+.[
+x213
+.]
+.[
+x223
+.]
+protocol layer that provides a Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+for ISO Connection Oriented Network operation,
+.BR npi_osi (7).
+What distinguishes this driver from the
+.BR x25-plp (4)
+driver is that the
+.BR x25-plp (4)
+only implements X.223
+.[
+x223
+.]
+while this module also provides access to
+ISOT
+.[
+rfc1006
+.]
+ITOT
+.[
+rfc2126
+.]
+and others.
+Also, this module presents an NPI service interface, whereas the
+.BR x25-plp
+presents an NLI service interface.
+.TP
+.BR dl_lapb "(4)
+.I Link Access Protocol (Balanced) (LAPB) Data Link Provider Interface (DLPI)
+provides access to a LAPB link using the Data Link Provider Interface (DLPI)
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+.TP
+.BR iso-ip "(4)
+.I ISO Datagrams over IP
+provides a way for passing ISO Connectionless Network Protocol (CLNP)
+datagrams over Internet Protocol (IP).
+.TP
+.BR iso-lan "(4)
+.I ISO LAN
+provides a way for passing ISO Connectionless Network Protocol (CLNP)
+datagrams over ISO 8802 networks.
+.TP
+.BR iso-udp "(4)
+.I ISO Datagrams over UDP
+provides a way for passing ISO COnnectionless Network Protocol (CLNP)
+datagrams over User Datagram Protocol (UDP).
+.TP
+.BR lapb "(4)
+.I Link Access Protocol (Balanced) (LABB)
+proivdes access to an X.25 data link using the Communications Device Interface
+(CDI),
+.[
+cdi specification
+.]
+This is the same as the
+.BR x25_lapb (4)
+device.
+.BR cdi (7).
+.TP
+.BR ns-tcp "(4)
+.I Connection Oriented Network Service (CONS) over TCP
+provides a CONS
+.[
+x213
+.]
+service over TCP following RFC 1006
+.[
+rfc1006
+.]
+or RFC 2126
+.[
+rfc2126
+.]
+using the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+.TP
+.BR oclt "(4)
+.I ISO Connectionless Transport Protocol (CLTP)
+.[
+x234
+.]
+provides access to the ISO CLTP using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR onpi "(4)
+.I OSI Network Protocol Interface
+provides access to the ISO Network Services
+.[
+x213
+.]
+using various underlying connectionless and connection oriented protocols,
+using the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+.TP
+.BR oopi "(4)
+.I OSI Presetation Interface
+provides access to the ISO Presentation Services
+.[
+x216
+.]
+using varioius underlying presentation protocols, using the
+Presentation Provider Interface (PPI),
+.BR ppi (7).
+.TP
+.BR otk6 "(4)
+.I OSI Transport using RFC 1006
+provides 
+.TP
+.BR otpi "(4)
+.I OSI Transport Protocol Interface
+provides access to the ISO Transport Services
+.[
+x214
+.]
+using various underlying connectionless and connection oriented protocols,
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR plp "(4)
+.I Packet Layer Protocol (PLP)
+provides access to the X.25 Packet Layer Protocol (PLP),
+.[
+iso 8208
+.]
+using the Network Layer Interface (NLI),
+.[
+nli
+.]
+.BR nli (7).
+This is the same as the
+.BR x25-plp (4)
+device.
+.TP
+.BR tp0 "(4)
+.I ISO Transport Class 0
+provides access to the ISO Transport Protocol
+.[
+x224
+.]
+.[
+x234
+.]
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR tp1 "(4)
+.I ISO Transport Class 1
+provides access to the ISO Transport Protocol
+.[
+x224
+.]
+.[
+x234
+.]
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR tp2 "(4)
+.I ISO Transport Class 2
+provides access to the ISO Transport Protocol
+.[
+x224
+.]
+.[
+x234
+.]
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR tp3 "(4)
+.I ISO Transport Class 3
+provides access to the ISO Transport Protocol
+.[
+x224
+.]
+.[
+x234
+.]
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR tp4 "(4)
+.I ISO Transport Class 4
+provides access to the ISO Transport Protocol
+.[
+x224
+.]
+.[
+x234
+.]
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR tp "(4)
+.I ISO Transport
+provides access to the ISO Transport Protocol
+.[
+x224
+.]
+.[
+x234
+.]
+using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.TP
+.BR x25_lapb "(4)
+.I Link Access Protocol (Balanced) (LABB)
+proivdes access to an X.25 data link using the Communications Device Interface
+(CDI),
+.[
+cdi specification
+.]
+.BR cdi (7).
+This is the same as the
+.BR lapb (4)
+device.
+.TP
+.BR x25_plp "(4)
+.I X.25 Packet Layer Protocol (PLP)
+provides access to the X.25 Packet Layer Protocol (PLP),
+.[
+iso 8208
+.]
+using the Network Layer Interface (NLI),
+.[
+nli
+.]
+.BR nli (7).
+This is the same as the
+.BR plp (4)
+device.
+.TP
+.BR xol "(4)
+.I X.25 over LAN
+provides X.25 data links over IEEE 802 LLC2
+.[
+iso 8802
+.]
+using the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
 .\"
-.\"
-.SH INTERFACE
+.SS MODULES
 .PP
+.B ISO
+provides the following pushable
+.I STREAMS
+modules:
+.TP
+.BR apmod "(4)
+.I APLI Module
+provides a cooperating module that provides input-output controls for use by
+the APLI
+.[
+apli unix international
+.]
+Library,
+.BR apli (3).
+.TP
+.BR isos "(4)
+.I ISO over SCTP Module
+provides a module to push over an SCTP Stream to provide ISO over SCTP,
+similar to RFC 1006,
+.[
+rfc1006
+.]
+access using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR isot "(4)
+.I ISO over TCP Module
+provides a module to push over a TCP Stream to provide ISO over TCP,
+RFC 1006,
+.[
+rfc1006
+.]
+access using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR itos "(4)
+.I ISO Transport over SCTP Module
+provides a module to push over an SCTP Stream to provide ISO Transport over
+SCTP, similar to RFC 2126,
+.[
+rfc2126
+.]
+access using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR itot "(4)
+.I ISO Transport over TCP Module
+provides a module to push over a TCP Stream to provide ISO Transport over TCP,
+RFC 2126,
+.[
+rfc2126
+.]
+access using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR lpp "(4)
+.I Lightweight Presentation Protocol (LPP)
+provides a module to push over a TCP Stream to provide ISO Presentation
+services
+.[
+x216
+.]
+over TCP,
+RFC 1085,
+.[
+rfc1085
+.]
+access using the Presentation Provider Interface (PPI),
+.BR ppi (7).
+.TP
+.BR momod "(4)
+.I XTI-mOSI Module
+provides a cooperating module that provides XTI-mOSI
+.[
+xns 5.2
+.]
+interface using the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7).
+.TP
+.BR romod "(4)
+.I APRI or XAP-ROSE Module
+provides a cooperating module that provides input-output controls for use by
+the APRI or XAP-ROSE
+.[
+xap-rose
+.]
+Library,
+.BR xap_rose (3).
+.TP
+.BR tcpns "(4)
+.I TCP Network Services
+provides a module to push over a TCP Stream to provide ISO Connection Oriented
+Network Services
+.[
+x213
+.]
+over TCP,
+RFC 1006
+.[
+rfc1006
+.]
+and RFC 2126,
+.[
+rfc2126
+.]
+using the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+.TP
+.BR xapmod "(4)
+.I XAP Module
+provides a cooperating module that provides input-output controls for use by
+the XAP
+.[
+xap c303
+.]
+Library,
+.BR xap (3).
+.TP
+.BR xos "(4)
+.I X.25 over SCTP Module
+provides a module to push over an SCTP Stream to provide X.25
+.[
+iso 8208
+.]
+over SCTP
+.[
+rfc4460
+.]
+using the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+.TP
+.BR xot "(4)
+.I X.25 over TCP Module
+provides a module to push over a TCP Stream to provide X.25
+.[
+iso 8208
+.]
+over TCP,
+RFC 1613,
+.[
+rfc1613
+.]
+using the Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+.TP
+.BR xx25 "(4)
+.I XX25 Module
+provides a module to push over an X25-PLP Stream to provide X.25 access using
+the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+as intepreted for X.25.
+.[
+xx25
+.]
+.\"
+.SS DEVICES
+.B ISO
+provides the following
+.I STREAMS
+device drivers:
+.TP
+None.
+The
+.B @PACKAGE@
+package relies on device drivers provided by other packages (such as
+.BR strchan (5)
+and
+.BR strxns (5)).
 .\"
 .\"
-.SH ADDRESSES
-.PP
+.\".SH USAGE
+.\".PP
 .\"
 .\"
-.SH OPTIONS
-.PP
+.\".SH INTERFACE
+.\".PP
 .\"
 .\"
-.SH PRIMITIVES
-.PP
+.\".SH ADDRESSES
+.\".PP
 .\"
 .\"
-.SH IOCTLS
-.PP
+.\".SH OPTIONS
+.\".PP
+.\"
+.\"
+.\".SH PRIMITIVES
+.\".PP
+.\"
+.\"
+.\".SH IOCTLS
+.\".PP
 .\"
 .\"
 .SH NOTICES
@@ -141,20 +728,20 @@ See the OSI-FAQ at
 .RB < http://www.cl.cam.ac.uk/~mgk25/osi-faq.txt >.
 .\"
 .\"
-.SH IMPLEMENTATION
-.PP
+.\".SH IMPLEMENTATION
+.\".PP
 .\"
 .\"
-.SH FILES
-.PP
+.\".SH FILES
+.\".PP
 .\"
 .\"
-.SH MODULES
-.PP
+.\".SH MODULES
+.\".PP
 .\"
 .\"
-.SH DEVICES
-.PP
+.\".SH DEVICES
+.\".PP
 .\"
 .\"
 .SH "SEE ALSO"
@@ -169,20 +756,30 @@ See the OSI-FAQ at
 .IR ISO (4).
 .\"
 .\"
-.SH BUGS
+.\".SH BUGS
+.\".PP
+.\"
+.\"
+.\".SH COMPATIBILITY
+.\".PP
+.\"
+.\"
+.\".SH CONFORMANCE
+.\".PP
+.\"
+.\"
+.\".SH HISTORY
+.\".PP
+.\"
+.\"
+.SH VERSIONS
 .PP
-.\"
-.\"
-.SH COMPATIBILITY
-.PP
-.\"
-.\"
-.SH CONFORMANCE
-.PP
-.\"
-.\"
-.SH HISTORY
-.PP
+This manual page was updated @DATE@ for
+.B @PACKAGE@
+release
+.BR @VERSION@ .
+Most of the devices and modules listed here do not appear until
+.BR @PACKAGE@-0.9.2.4 .
 .\"
 .\"
 .[

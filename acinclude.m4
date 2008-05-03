@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-04-28 10:07:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-05-03 13:23:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 10:07:38 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 13:23:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,6 +75,7 @@ m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
 m4_include([m4/chan.m4])
+m4_include([m4/x25.m4])
 m4_include([m4/iso.m4])
 m4_include([m4/isdn.m4])
 m4_include([m4/ss7.m4])
@@ -605,6 +606,35 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 	    fi
 	fi
     fi
+    AC_ARG_WITH([STRX25],
+		AS_HELP_STRING([--with-STRX25],
+			       [include STRX25 in master pack @<:@detected@:>@]),
+		[with_STRX25="$withval"],
+		[with_STRX25='yes'])
+    AC_CACHE_CHECK([for sub-package strx25],[os7_cv_strx25_dir],[dnl
+	    os7_cv_strx25_dir=''
+	    for dir in $srcdir/strx25 $srcdir/strx25-* ; do
+		if test -d "$dir" -a -e "$dir/configure.ac" -a -r "$dir/configure.ac" ; then
+		    os7_cv_strx25_dir="$(basename $dir)"
+		fi
+	    done
+	])
+    if test :"${os7_cv_strx25_dir:-no}" = :no ; then
+	with_STRX25='no'
+    else
+	if test :"${os7_cv_strx25_dir:-no}" != :strx25 ; then
+	    if test -e $srcdir/strx25 ; then
+		if test -L $srcdir/strx25 ; then
+		    if test "$(readlink $srcdir/strx25)" != "$os7_cv_strx25_dir" ; then
+			rm -f $srcdir/strx25
+			( cd $srcdir ; ln -sf $os7_cv_strx25_dir strx25 )
+		    fi
+		fi
+	    else
+		( cd $srcdir ; ln -sf $os7_cv_strx25_dir strx25 )
+	    fi
+	fi
+    fi
     AC_ARG_WITH([STRISO],
 		AS_HELP_STRING([--with-STRISO],
 			       [include STRISO in master pack @<:@detected@:>@]),
@@ -951,6 +981,13 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-chan'"
 	ac_configure_args="$ac_configure_args --without-chan"
     fi
+    if test :"${with_STRX25:-yes}" != :no ; then
+	: _X25
+    else
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_x25 --without-x25\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-x25'"
+	ac_configure_args="$ac_configure_args --without-x25"
+    fi
     if test :"${with_STRISO:-yes}" != :no ; then
 	: _ISO
     else
@@ -1127,6 +1164,11 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
 	AC_CONFIG_SUBDIRS([strchan])
     fi
     AM_CONDITIONAL([WITH_STRCHAN], [test :${with_STRCHAN:-yes} = :yes -a :${os7_cv_strchan_dir:-no} != :no])dnl
+    if test :${with_STRX25:-yes} = :yes -a :${os7_cv_strx25_dir:-no} != :no ; then
+	_OS7_REQUIRE([strxnet], [0.9.2.12], [strx25])
+	AC_CONFIG_SUBDIRS([strx25])
+    fi
+    AM_CONDITIONAL([WITH_STRX25], [test :${with_STRX25:-yes} = :yes -a :${os7_cv_strx25_dir:-no} != :no])dnl
     if test :${with_STRISO:-yes} = :yes -a :${os7_cv_striso_dir:-no} != :no ; then
 	_OS7_REQUIRE([strxnet], [0.9.2.12], [striso])
 	AC_CONFIG_SUBDIRS([striso])
@@ -1136,6 +1178,7 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
 	_OS7_REQUIRE([strxnet], [0.9.2.12], [netperf])
 	_OS7_REQUIRE([strinet], [0.9.2.7], [netperf])
 	_OS7_REQUIRE([strsctp], [0.9.2.9], [netperf])
+	_OS7_REQUIRE([strx25], [0.9.2.1], [netperf])
 	_OS7_REQUIRE([striso], [0.9.2.4], [netperf])
 	AC_CONFIG_SUBDIRS([netperf])
     fi
@@ -1149,6 +1192,7 @@ AC_DEFUN([_OS7_OUTPUT], [dnl
 	_OS7_REQUIRE([strxnet], [0.9.2.12], [strss7])
 	_OS7_REQUIRE([strinet], [0.9.2.7], [strss7])
 	_OS7_REQUIRE([strsctp], [0.9.2.9], [strss7])
+	_OS7_REQUIRE([strx25], [0.9.2.1], [strss7])
 	_OS7_REQUIRE([striso], [0.9.2.4], [strss7])
 	_OS7_REQUIRE([strisdn], [0.9.2.4], [strss7])
 	AC_CONFIG_SUBDIRS([stacks])
@@ -1183,6 +1227,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.55  2008-05-03 13:23:24  brian
+# - added strx25 sub-package and package updates
+#
 # Revision 0.9.2.54  2008-04-28 10:07:38  brian
 # - updated headers for release
 #

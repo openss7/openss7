@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 0.9.2.7 2008/01/01 14:40:24 brian Exp $
+@c @(#) $Id: tree.texi,v 0.9.2.8 2008-05-03 13:23:24 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008/01/01 14:40:24 $ by $Author: brian $
+@c Last Modified $Date: 2008-05-03 13:23:24 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -81,6 +81,7 @@ describe some of the kernel modules installed by add-on packages in the @value{P
 * strinet Kernel Modules::
 * strsctp Kernel Modules::
 * strchan Kernel Modules::
+* strx25 Kernel Modules::
 * striso Kernel Modules::
 * strisdn Kernel Modules::
 * strss7 Kernel Modules::
@@ -570,6 +571,48 @@ release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS
 
 @end table
 
+@node strx25 Kernel Modules
+@subsubsection strx25
+
+The @command{strx25-@value{VERSION_STRX25}} add-on package provides a range of @dfn{STREAMS} drivers
+and modules as kernel modules.  The drivers and modules implement various protocol components in the
+@cite{International Standards Organization (ISO)} @cite{X.25} model, and a
+number of @cite{Internet Enginerring Task Force} related protocols.
+A number of these drivers and modules were formerly part of the commercial @command{strss7} package
+releases.
+
+Kernel modules installed by @command{strx25-@value{VERSION_STRX25}} are as follows:
+
+@table @file
+
+@item streams-xot
+
+This kernel modules provides the @dfn{STREAMS} @file{xot} module.
+This module provides a pushable module that implements @cite{RFC 1613} to provide
+@cite{X.25 over TCP (XOT)}.  It provides a @cite{Network Provider Interface (NPI)},
+@manpage{npi(7)}, for connectionless or connection-oriented service suitable for use with the
+@cite{OSI Transport} drivers.
+For more information, see @manref{xot(4)}.
+
+@item streams-x25-lapb
+
+This kernel modules provides the @dfn{STREAMS} @file{lapb} driver.
+This driver provides @cite{X.25 Link Access Protocol -- Balanced (LAPB)} data links.  It provides
+the @cite{Data Link Provider Interface (DLPI)}, @manpage{dlpi(7)}.
+For more information, see @manref{x25-lapb(4)}.
+
+@item streams-x25-plp
+
+This kernel modules provides the @dfn{STREAMS} @file{plp} driver.
+This driver provides @cite{X.25 Pakcet Layer Protocol (PLP)}.  It is able to link Streams that
+provide the @cite{Data Link Provider Interface (DLPI)}, @manpage{dlpi(7)} for LAPB and LLC2.  It
+provides the @cite{Network Provider Interface (NPI)}, @manpage{npi(7)}, for connection-oriented
+network service.
+For more information, see @manref{x25-plp(4)}.
+
+@end table
+
+
 @node striso Kernel Modules
 @subsubsection striso
 
@@ -623,15 +666,6 @@ It provides a @cite{Network Provider Interface (NPI)}, @manpage{npi(7)}, for con
 network service.
 For more information, see @manref{tcpns(4)}.
 
-@item streams-xot
-
-This kernel modules provides the @dfn{STREAMS} @file{xot} module.
-This module provides a pushable module that implements @cite{RFC 1613} to provide
-@cite{X.25 over TCP (XOT)}.  It provides a @cite{Network Provider Interface (NPI)},
-@manpage{npi(7)}, for connectionless or connection-oriented service suitable for use with the
-@cite{OSI Transport} drivers.
-For more information, see @manref{xot(4)}.
-
 @item streams-clns
 
 This kernel modules provides the @dfn{STREAMS} @file{clns} driver.
@@ -639,22 +673,6 @@ This driver provides @cite{X.213 Connectionless Network Service (CLNS)}.  It is 
 that provide the @cite{Network Provider Interface (NPI)}, @manpage{npi(7)}, for connectionless
 service.
 For more information, see @manref{clns(4)}.
-
-@item streams-x25-lapb
-
-This kernel modules provides the @dfn{STREAMS} @file{lapb} driver.
-This driver provides @cite{X.25 Link Access Protocol -- Balanced (LAPB)} data links.  It provides
-the @cite{Data Link Provider Interface (DLPI)}, @manpage{dlpi(7)}.
-For more information, see @manref{x25-lapb(4)}.
-
-@item streams-x25-plp
-
-This kernel modules provides the @dfn{STREAMS} @file{plp} driver.
-This driver provides @cite{X.25 Pakcet Layer Protocol (PLP)}.  It is able to link Streams that
-provide the @cite{Data Link Provider Interface (DLPI)}, @manpage{dlpi(7)} for LAPB and LLC2.  It
-provides the @cite{Network Provider Interface (NPI)}, @manpage{npi(7)}, for connection-oriented
-network service.
-For more information, see @manref{x25-plp(4)}.
 
 @end table
 

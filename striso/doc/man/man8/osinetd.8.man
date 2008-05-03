@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: osinetd.8.man,v 0.9.2.2 2008-04-29 00:01:58 brian Exp $
+.\" @(#) $Id: osinetd.8.man,v 0.9.2.3 2008-05-03 13:23:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 00:01:58 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: osinetd.8.man,v $
+.\" Revision 0.9.2.3  2008-05-03 13:23:34  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.2  2008-04-29 00:01:58  brian
 .\" - updated headers for release
 .\"
@@ -85,11 +88,126 @@ sort-adjacent-labels
 .\"
 .\"
 .SH SYNOPSIS
-.PP
+.HP
+.BI "osinetd [" options ]
+.HP
+\fBosinetd\fP {\fB-h\fP, \fB--help\fP}
+.HP
+\fBosinetd\fP {\fB-V\fP, \fB--version\fP}
+.HP
+\fBosinetd\fP {\fB-C\fP, \fB--copying\fP}
 .\"
 .\"
 .SH DESCRIPTION
 .PP
+The
+.B osinetd
+is a user-space C-language program that can be run in the background as a
+daemon process to establish, initialize, configure and collect statistics and
+events from
+.I @PACKAGE_TITLE@ .
+But, see
+.RI \(lq NOTICES \(rq.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+.PP
+The following command options determine the mode of the command and are
+mutually exclusive options:
+.TP
+\fB-n\fP, \fB--nodaemon\fP
+Specifies that the
+.B ss7statsd
+is to run in the foreground with output to standard out and errors to standard
+error (unless overridden by options).  This is the default when \fB--debug\fP
+is specified.  Otherwise,
+.B ss7statsd
+normally closes standard input, output and error and places itself in the
+background as a daemon process, reading configuraiton from the configuration
+file, sending output to the output file, and sending errors to the log file.
+.TP
+\fB-h\fP, \fB-?\fP, \fB--?\fP, \fB--help\fP
+When this option is encountered, print usage information to
+.I stdout
+and exit.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, print version information to
+.I stdout
+and exit.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, print copying information to
+.I stdout
+and exit.
+.SS Configuration Options
+.PP
+.SS Daemon Options
+.PP
+The following options are useful in daemon mode to redirect standard output to
+an output file and standard error to a log file.
+.TP
+\fB-i\fP, \fB--interval\fP \fIINTERVAL\fP
+.TP
+\fB-O\fP, \fB--outpdir\fP \fIDIRECTORY\fP
+When run in the daemon mode, specifies the directory,
+.IR DIRECTORY ,
+in which output and error files will be opened.  The default output directory is
+.IR \(lq /var/tmp/ss7statsd \(rq.
+.TP
+\fB-o\fP, \fB--outfile\fP \fIFILENAME\fP
+When run in daemon mode, specifies the output filename,
+.IR FILENAME .
+The default output filename is the process name concatenated with a
+.RB \(lq .out \(rq
+suffix.
+.TP
+\fB-l\fP, \fB--logfile\fP \fIFILENAME\fP
+When run in daemon mode, specifies the errors filename,
+.IR FILENAME .
+The default errors filename is the process name concatenated with a
+.RB \(lq .err \(rq
+suffix.
+.TP
+\fB-f\fP, \fB--cfgfile\fP \fIFILENAME\fP
+Not implemented.
+.SS General Options
+.PP
+The following are general options controlling the output of the utilily and
+can be applied to the command in any mode:
+.TP
+\fB-q\fP, \fB--quiet\fP
+Specifies that the caller is interested only  in the return code and that
+normal output should be suppressed.  This option is equivalent to
+.BR --verbose = 0 .
+.TP
+\fB-d\fP, \fB--debug\fP \fILEVEL\fP
+Increases or set the debugging level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the debugging level should be increased by one.  If the
+.I LEVEL
+argument is specified, the debuggin level is set to that integer value.  This option can be
+repeated.  For example,
+.B -ddddd
+is equivalent to
+.BR --debug = 5 .
+The default debugging level is zero
+.RB ( 0 ).
+.TP
+\fB-v\fP, \fB--verbose\fP \fILEVEL\fP
+Increases or sets the output verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the output verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.  For example,
+.B -vvvvv
+is equivalent to
+.BR --verbose = 5 .
+The default output verbosity is one
+.RB ( 1 ).
 .\"
 .\"
 .SH SYSCTLS
@@ -590,25 +708,133 @@ should not need to change this value, unless a large number of routes is
 required.
 .\"
 .\"
-.SH SYNOPSIS
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH DIAGNOSTICS
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+When
+.B osinetd
+fails, a diagnostic message is printed on standard error and a non-zero exit
+status is returned.  If standard error has already been redirected to the log
+file, the log file will contain the diagnostic message.
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+An exit status of zero
+.RB ( 0 )
+indicates that the command was successful; one
+.BR ( 1 )
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two
+.BR ( 2 )
+indicates that the option syntax was in error and a diagnostic message is
+printed on
+.IR stderr .
 .PP
-.\"
-.\"
-.SH SYNOPSIS
+The
+.B --quiet
+option suppresses the printing of diagnostic messages to
+.IR stderr .
 .PP
+Also,
+.B osinetd
+logs notices, warnings and diagnostic error messages under facility
+.I daemon
+to the system log, regardless of whether it is running in the foreground or as
+a daemon.  See
+.BR syslog (2).
 .\"
 .\"
-.SH SYNOPSIS
+.SH NOTICES
 .PP
+Use of a configuration daemon such as
+.BR osinetd
+that uses configuration files and collects statistics and events from OSI
+drivers and modules and then dumps the output to files in specialized formats
+is deprecated and no longer the preffered method for operational support of
+the OpenSS7 OSI Stack and systems.  An SNMP/CMIP agent that provides
+configuration maangement, operational measurement data collection and event
+reporting is now the preferred method.
 .\"
 .\"
-.SH SYNOPSIS
+.SH BUGS
 .PP
+.B osinetd
+has no known bugs.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR cons (4),
+.BR clns (4),
+.BR otpi (4),
+.BR otk6 (4),
+.BR OSI (4),
+.IR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B osinetd
+is backward compatibile with previous versions of the uility.  The output
+format has not changed over the various versions of the utility.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+OSI Stack configuration, statistics collection and event reporting are not
+subject to standardization (other than for CMIP applications).  The
+.B osinetd
+utility conforms to the OpenSS7
+Local Management Interface (LMI),
+.BR lmi (7),
+version
+.BR 0.9.2 ,
+the Transport Provider Interface (TPI),
+.BR tpi (7),
+version
+.BR 2.0.0 ,
+.[
+tpi revision 2.0.0
+.]
+and the Network Provider Interace (NPI),
+.BR npi (7),
+version
+.BR 2.0.0 .
+.[
+npi revision 2.0.0
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B osinetd
+originally appeared in the OpenSS7
+.BR striso
+package in version
+.BR 0.9.2 .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.I @PACKAGE_TITLE@
+package,
+.BR @PACKAGE@ ,
+in version
+.BR @VERSION@ .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

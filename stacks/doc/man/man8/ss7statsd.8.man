@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ss7statsd.8.man,v 0.9.2.2 2008-04-30 14:05:06 brian Exp $
+.\" @(#) $Id: ss7statsd.8.man,v 0.9.2.3 2008-05-03 13:23:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-30 14:05:06 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ss7statsd.8.man,v $
+.\" Revision 0.9.2.3  2008-05-03 13:23:28  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.2  2008-04-30 14:05:06  brian
 .\" - updates to pass make check target
 .\"
@@ -89,6 +92,12 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .HP
 \fBss7statsd\fP [\fIoptions\fP]
+.HP
+\fBss7statsd\fP {\fB-h\fP, \fB--help\fP}
+.HP
+\fBss7statsd\fP {\fB-V\fP, \fB--version\fP}
+.HP
+\fBss7statsd\fP {\fB-C\fP, \fB--copying\fP}
 .\"
 .\"
 .SH DESCRIPTION

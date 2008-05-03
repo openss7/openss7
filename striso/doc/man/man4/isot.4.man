@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: isot.4.man,v 0.9.2.4 2008-04-25 08:38:27 brian Exp $
+.\" @(#) $Id: isot.4.man,v 0.9.2.5 2008-05-03 13:23:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-25 08:38:27 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: isot.4.man,v $
+.\" Revision 0.9.2.5  2008-05-03 13:23:33  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.4  2008-04-25 08:38:27  brian
 .\" - working up libraries modules and drivers
 .\"
@@ -661,3 +664,84 @@ This is zero, or the sequence number of a previous
 .BR N_CONN_IND (7).
 The value is passed through from TCP.
 .RE
+.\"
+.\"
+.SH IOCTLS
+.PP
+ISOT does not support any input-output controls of its own.
+.\"
+.\"
+.SH NOTICES
+.PP
+This module is not implemented.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+This module is not implemented.
+.\"
+.\"
+.\".SH FILES
+.\".PP
+.\"
+.\"
+.SH MODULES
+.PP
+.TP
+.B isot
+the ISOT module is a
+.I STREAMS
+module named
+.RI \(lq isot \(rq.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/tcp
+The
+.B tcp (4)
+device opened onto which ISOT is pushed.
+.TP
+.B /dev/udp
+The
+.B udp (4)
+device opened onto which ISOT is pushed.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR itot (4),
+.IR ISO (4).
+.\"
+.\"
+.SH BUGS
+.PP
+This module is not implemented and so cannot have any bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+This implementation of ISOT is specific to
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+ISOT conforms to RFC 1006.
+.[
+rfc1006
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR ISOT
+is new for
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

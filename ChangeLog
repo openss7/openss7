@@ -1,3 +1,15 @@
+2008-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* .cvsignore: added ignore directories
+	* acinclude.m4: added strx25 sub-package
+	* doc/manual/configure.texi: added strx25 sub-package
+	* doc/manual/descrip.texi: added strx25 sub-package
+	* doc/manual/news.texi: added strx25 sub-package
+	* doc/manual/openss7.texi: added strx25 sub-package
+	* doc/manual/prerequisites.texi: added strx25 sub-package
+	* doc/manual/rpm.texi: added strx25 sub-package
+	* doc/manual/tree.texi: added strx25 sub-package
+
 2008-04-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: updates for release

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 00:01:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-03 13:23:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 00:01:53 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 13:23:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -112,6 +112,7 @@ MANS_UNUSED = \
 	man4/oopi.4 \
 	man4/otk6.4 \
 	man4/otpi.4 \
+	man4/romod.4 \
 	man4/xapmod.4 \
 	man4/xos.4 \
 	man4/xx25.4 \
@@ -330,6 +331,7 @@ man_MANS = \
 	man4/otk6.4 \
 	man4/otpi.4 \
 	man4/plp.4 \
+	man4/romod.4 \
 	man4/tcpns.4 \
 	man4/tp0.4 \
 	man4/tp1.4 \
@@ -468,6 +470,7 @@ man_MANS = \
 	man7/P_DATA_IND.7 \
 	man7/P_DATA_REQ.7 \
 	man7/PPI.7 \
+	man7/ppi.7 \
 	man7/P_PXREPORT_IND.7 \
 	man7/P_RESYNC_CNF.7 \
 	man7/P_RESYNC_IND.7 \
@@ -721,6 +724,7 @@ dist_noinst_MANS = \
 	man4/otk6.4.man \
 	man4/otpi.4.man \
 	man4/plp.4.man \
+	man4/romod.4.man \
 	man4/tcpns.4.man \
 	man4/tp0.4.man \
 	man4/tp1.4.man \
@@ -859,6 +863,7 @@ dist_noinst_MANS = \
 	man7/P_DATA_IND.7.man \
 	man7/P_DATA_REQ.7.man \
 	man7/PPI.7.man \
+	man7/ppi.7.man \
 	man7/P_PXREPORT_IND.7.man \
 	man7/P_RESYNC_CNF.7.man \
 	man7/P_RESYNC_IND.7.man \
@@ -913,6 +918,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.12  2008-05-03 13:23:33  brian
+# - added strx25 sub-package and package updates
+#
 # Revision 0.9.2.11  2008-04-29 00:01:53  brian
 # - updated headers for release
 #

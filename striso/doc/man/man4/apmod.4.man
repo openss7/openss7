@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: apmod.4.man,v 0.9.2.3 2008-04-29 00:01:55 brian Exp $
+.\" @(#) $Id: apmod.4.man,v 0.9.2.4 2008-05-03 13:23:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 00:01:55 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: apmod.4.man,v $
+.\" Revision 0.9.2.4  2008-05-03 13:23:33  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.3  2008-04-29 00:01:55  brian
 .\" - updated headers for release
 .\"
@@ -97,7 +100,7 @@ APLI UNIX International
 .]
 XAP.
 .[
-XAP
+xap c303
 .]
 .\"
 .\"
@@ -107,17 +110,18 @@ XAP
 .br
 .B #include <sys/apmod.h>
 .HP
-.IB t " = open(" /dev/tpdevice ", " 0 );
+.IB p " = open(" /dev/oopi ", " 0 );
 .HP
-.BI ioctl( t ", " I_PUSH ", " \*(lqapmod\*(rq );
+.BI ioctl( p ", " I_PUSH ", " \*(lqapmod\*(rq );
 .HP
-.BI ioctl( t ", " I_STR ", " &ic );
+.BI ioctl( p ", " I_STR ", " &ic );
 .\"
 .\"
 .SH DESCRIPTION
 .PP
 .B apmod
-is an APLI and XAP library compatibility mode for the STREAMS ACSE/Presentation Interfaces,
+is an APLI and XAP library cooperating module for the STREAMS ACSE/Presentation
+Interfaces,
 .BR APLI (3)
 and
 .BR XAP (3).
@@ -125,42 +129,274 @@ It translates a set of
 .BR ioctl (2)
 commands into APLI primitives.  These
 .BR ioctl (2)
-commands are intended to be used with the OpenSS7 APLI Library,
+commands are intended to be used with the
+.IR OpenSS7 \(tm
+APLI Library,
 .BR libapli (3),
-or the OpenSS7 XAP Library,
+or the
+.IR OpenSS7 \(tm
+XAP Library,
 .BR libxap (3).
-In the sense that it provides intput-output controls that accomplish most of the functionality
-required by the libraries, the
+In the sense that it provides input-output controls that accomplish most of the
+functionality required by the libraries, the
 .B apmod
-module is termed a \*(lqCooperating Module\*(rq to the libraries.  The resulting library consists
-largely of interface, and does not contain much behaviour, whereas, the module consists largely of
-behaviour with a direct and simple input-output control interface provided by STREAMS.
+module is termed a \*(lqCooperating Module\*(rq to the libraries.  The resulting
+library consists largely of interface, and does not contain much behaviour,
+whereas, the module consists largely of behaviour with a direct and simple
+input-output control interface provided by
+.IR STREAMS .
+.PP
+One of the major purposes of this apprach and the
+.B apmod
+module is to provide thread-safe operations in support of the APLI Library.
+.BR apmod
+does not alter any messages passed with
+.BR putmsg (2)
+or
+.BR putpmsg (2s),
+or received with
+.BR getmsg (2)
+or
+.BR getpmsg (2s).
+.BR romod
+simply intercepts responses to its own primitives sent downstream as a result
+of an
+.BR ioctl (2)
+command.
+.PP
+Unlike the
+.BR sockmod (4)
+module,
+.BR romod
+makes no adjustments to the Stream head for
+.BR read (2)
+options (See
+.BR I_SRDOPT (7)
+under
+.BR streamio (7)).
+.\"
+.\"
 .SH USAGE
 .PP
+The
+.B apmod
+STREAMS module is not normally pushed directly by XAP client programs, but is
+either pushed or autopushed as necessary, either by the OSI network
+configuration daemon,
+.BR osinetd (8),
+the autopush facility,
+.BR autopush (8),
+or the XAP Library itself (when
+.BR ap_init_evn (3)
+is called).
+Nevertheless, the module may be pushed in a non-portable way by clients of
+sufficient privilege to acheive specific effects, such as for testing.
+.\"
+.\"
 .SH INTERFACE
 .PP
+As it appears that other implementations of the APLI Library are
+solely contained in user-space libraries, using IPC for communication with
+clients, there is no evident standard upper level service interface for APLI.
+Therefore,
+.IR OpenSS7 \(tm
+has specified and implements an APLI service interface modelling the primitives
+consistent with the
+.BR ap_snd (3)
+and
+.BR ap_rcv (3)
+function descriptions and the ACSE service interface.
+.[
+x217
+.]
+.PP
+Again, there is no evident standard implementation of a lower level service
+interface.  It appears that some APLI Library implementations may use the
+Transport Provider Interface (TPI) or the XTI or XTI-mOSI interfaces directly.
+Therefore, again,
+.IR OpenSS7 \(tm
+has specified and implements a Presentation Provider Interface (PPI),
+.BR PPI (7),
+service interface modelling the presentation primitives consistent with the
+.BR ap_snd (3)
+and
+.BR ap_rcv (3)
+function descriptions and the Presentation service interface.
+.[
+x216
+.]
+.\"
+.\"
 .SH ADDRESSES
 .PP
+Addresses consist of an AP-Title, AE-Qualifier, and Presentation address.  The
+Presentation Address (PSAP) consists of a P-Selector and a TSAP.  The TSAP, in
+turn, consists of a T-Selector and an NSAP.  The NSAP is an OSI network address.
+.PP
+Addresses are formatted as described in
+.BR ap_env (3).
+.\"
+.\"
 .SH OPTIONS
 .PP
+Options and option lists are internally formatted as described for XTI in
+.BR t_optmgmt (3).
+Option names and values are as described in
+.BR ap_env (3).
+.\"
+.\"
 .SH PRIMITIVES
 .PP
+Primitives supported by the upper level service interface are modelled after
+the primitives described in
+.BR apli (3)
+and are as follows:
+.BR A_ASSOC_REQ "(7),
+.BR A_ASSOC_IND "(7),
+.BR A_ASSOC_RSP "(7),
+.BR A_ASSOC_CNF "(7),
+.BR A_ABORT_REQ "(7),
+.BR A_ABORT_IND "(7),
+.BR A_PABORT_REQ "(7),
+.BR A_PABORT_IND "(7),
+.BR A_RELEASE_REQ "(7),
+.BR A_RELEASE_IND "(7),
+.BR A_RELEASE_RSP "(7),
+.BR A_RELEASE_CNF "(7).
+.\"
+.\"
 .SH IOCTLS
 .PP
+.B xapmod
+implements a non-standard (non-traditional) set of input-output controls for
+cooperating with the
+.IR OpenSS7 \(tm
+XAP Library.  These input-output controls correspond to, and implement, the
+XAP functions,
+.BR xap (3).
+Because the STREAMS service interface is an inherently asynchronous interface,
+it is necessary to use input-output controls to implement synchronous (blocking)
+functions.  This can be achieved by using a cooperating module in the manner of
+.BR timod (4).
+.\"
+.\"
+.\".SH RETURN
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"
+.\"
 .SH NOTICES
 .PP
+Information on this manual page is specific to the
+.IR OpenSS7 \(tm
+implementation of the corresponding libraries and cooperating modules and will
+not be used directly by portable programs.
+.\"
+.\"
 .SH IMPLEMENTATION
 .PP
+It appears from descriptions of the APLI Library
+.[
+sunlink-apli
+.]
+that the library has been implemented on a number of OSI implementations as a
+user-space daemon library facility that uses IPC to communicate with library
+client programs.  Under this approach, the Library daemon process would be
+responsible for opening transport or presentation Streams and performing
+multiplexing and de-multiplexing between clients.
+.PP
+The
+.IR OpenSS7 \(tm
+implementation uses this
+.B apmod
+cooperating module and a regular shared Library that links into the client's
+address space to implement the library.  Also, the
+.BR oopi (4)
+or similar presentation devices are implemented as a STREAMS multiplexing
+driver.  It is the author's contention that a Linux Fast-STREAMS multiplexing
+driver is far faster than a single-threaded, full-blown user space process, and
+that the multiplexing driver exhibits better scheduling characteristics.
+.\"
+.\"
 .SH FILES
 .PP
+.TP
+.B /lib/modules/striso/streams-apmod.ko
+provides the
+.B apmod
+STREAMS pushable module named
+.RI \(lq apmod \(rq.
+.\"
+.\"
 .SH MODULES
 .PP
-.SH DEVICES
-.PP
+.RB \(lq apmod \(rq
+.I STREAMS
+module.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
 .SH SEE ALSO
 .PP
+.BR A_ABORT_IND "(7),
+.BR A_ABORT_REQ "(7),
+.BR A_ASSOC_CNF "(7),
+.BR A_ASSOC_IND "(7),
+.BR A_ASSOC_REQ "(7),
+.BR A_ASSOC_RSP "(7),
+.BR A_PABORT_IND "(7),
+.BR A_PABORT_REQ "(7),
+.BR ap_env "(3),
+.BR ap_init_evn "(3),
+.BR APLI "(3),
+.BR apli "(3),
+.BR ap_rcv "(3),
+.BR ap_snd "(3),
+.BR A_RELEASE_CNF "(7),
+.BR A_RELEASE_IND "(7),
+.BR A_RELEASE_REQ "(7),
+.BR A_RELEASE_RSP "(7),
+.BR autopush "(8),
+.BR getmsg "(2),
+.BR getpmsg "(2s),
+.BR ioctl "(2),
+.BR I_SRDOPT "(7),
+.BR libapli "(3),
+.BR libxap "(3),
+.BR oopi "(4),
+.BR osinetd "(8),
+.BR PPI "(7),
+.BR putmsg "(2),
+.BR putpmsg "(2s),
+.BR read "(2),
+.BR sockmod "(4),
+.BR streamio "(7),
+.BR STREAMS "(4),
+.BR test-apli "(8),
+.BR timod "(4),
+.BR t_optmgmt "(3),
+.BR XAP "(3),
+.BR xap "(3),
+.BR xapmod "(4),
+.BR xti_mosi "(3).
+.\"
+.\"
 .SH BUGS
 .PP
+.B apmod
+will be tested with the
+.BR test-apli (8)
+test case executable and autotest conformance test suite.
+.B apmod
+has no known bugs.
+.\"
+.\"
 .SH COMPATIBILITY
 .PP
 This
@@ -173,12 +409,12 @@ APLI UNIX International
 .]
 XAP
 .[
-XAP
+xap c303
 .]
 and descriptions for
 .IR HP-UX \(rg,
 .[
-OTS/9000
+hpuxapli
 .]
 .IR Solaris \(rg,
 .[
@@ -186,38 +422,61 @@ sunlink-apli
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Other implementations do not document any cooperating module nor input-output controls.  Portable
-applications should never use input-output controls directly.
+Other implementations do not document any cooperating module nor input-output
+controls.  Portable applications should never use input-output controls
+directly.
 .IP \(em
-Other implementations do not document primitive format between the library and any cooperating
-module.
+Other implementations do not document the primitive format between the library
+and any cooperating module.
 .IP \(em
-.IP \(em
-.IP \(em
+Binary compatibility is not attempted.  Binary compatibility is not possible due
+to the lack of standardized symbolic constants.  Any binary compatibility
+experienced is a bug and is scheduled to be removed on the next release.
 .PP
 See
+.BR xti_mosi "(3),
 .BR apli "(3),
-.BR xap "(3) and
-.BR STREAMS (4)
+.BR xap "(3),
+.BR oopi "(4),
+.BR xapmod "(4) and
+.BR STREAMS "(4)
 for additional compatibility information.
+.PP
+Compatibility will be tested using the
+.BR test-apli (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 None.
+.PP
+Conformance will be tested using the
+.BR test-apli (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY
 .PP
 The
 .B apmod
-module is new for OpenSS7
+module is new for
+.IR OpenSS7 \(tm
 .BR "striso version 0.9.2.4" .
 .\"
 .\"
 .SH VERSIONS
 .PP
-This manual page was written for the OpenSS7 \fBapmod\fP(4) module.
+This manual page was written for the
+.IR OpenSS7 \(tm
+.BR apmod (4)
+module.
 .\"
 .\"
 .[

@@ -1,3 +1,7 @@
+2008-05-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/prerequisites.texi: added strx25 sub-package
+
 2008-04-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strinet.spec.in: updates for release

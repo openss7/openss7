@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: momod.4.man,v 0.9.2.3 2008-04-29 00:01:56 brian Exp $
+.\" @(#) $Id: momod.4.man,v 0.9.2.4 2008-05-03 13:23:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-29 00:01:56 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-03 13:23:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: momod.4.man,v $
+.\" Revision 0.9.2.4  2008-05-03 13:23:34  brian
+.\" - added strx25 sub-package and package updates
+.\"
 .\" Revision 0.9.2.3  2008-04-29 00:01:56  brian
 .\" - updated headers for release
 .\"
@@ -113,32 +116,143 @@ libraries.
 In particular, the
 .BR lpp (4)
 driver implements the Lightweight Presentation Protocol
+.\"
+.\"
 .SH USAGE
 .PP
+The
+.B momod
+STREAMS module is not normally pushed directly by an XTI-mOSI
+client programs, but is either pushed or autopushed as
+necessary, either by the OSI network configuration daemon,
+.BR osinetd (8),
+or the autopush facility,
+.BR autopush (8).
+Nevertheless, the module may be pushed by clients of sufficient
+privilege to acheive specific effects, such as for testing.
+.\"
+.\"
 .SH INTERFACE
 .PP
+The upper service interface for the module is
+the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+as interpreted for XTI-mOSI
+.[
+xns 5.2
+.]
+operation,
+.BR xti_mosi (3).
+The lower service interface for the module is
+the Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+as interpreted for OSI
+.[
+xns 5.2
+.]
+operation,
+.BR xti_osi (3).
+.\"
+.\"
 .SH ADDRESSES
 .PP
+Addresses consist of an AP-Title,
+AE-Qualifier, and Presentation address.  The
+Presentation Address (PSAP) consists of a
+P-Selector and a TSAP.  The TSAP, in turn,
+consists of a T-Selector and an NSAP.  The
+NSAP is an OSI network address.
+.PP
+Addresses are formated as described in
+.BR xti_mosi (3).
+.\"
+.\"
 .SH OPTIONS
 .PP
+Options and option lists are internally
+formated as described for XTI in
+.BR t_optmgmt (3).
+Option name and values are as described in
+.BR xti_mosi (3).
+.\"
+.\"
 .SH PRIMITIVES
 .PP
+.\"
+.\"
 .SH IOCTLS
 .PP
+.B momod
+does not implement any input-output controls
+of its own an passes all received
+input-output controls downstream.
+.B momod
+is intended on being used with the
+.BR timod (4)
+module when used with the XTI Library,
+.[
+xti revision 1.0
+.]
+.BR xti (3).
+.\"
+.\"
+.\".SH RETURN
+.\".PP
+.\"
+.\"
+.\".SH ERRORS
+.\".PP
+.\"
+.\"
 .SH NOTICES
 .PP
+.\"
+.\"
 .SH IMPLEMENTATION
 .PP
+.\"
+.\"
 .SH FILES
 .PP
+.TP
+.B /lib/modules/striso/streams-momod.ko
+provides the
+.B momod
+STREAMS pushable module named
+.RI \(lq momod \(rq.
+.\"
+.\"
 .SH MODULES
 .PP
-.SH DEVICES
-.PP
+.RB \(lq momod \(rq
+.I STREAMS
+module.
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
 .SH SEE ALSO
 .PP
+.\"
+.\"
 .SH BUGS
 .PP
+.B xapmod
+will be tested with the
+.BR test-mosi (8)
+test case executable and autotest conformance test suite.
+.B momod
+has no known bugs.
+.\"
+.\"
 .SH COMPATIBILITY
 .PP
 This
@@ -169,26 +283,48 @@ sunlink-apli
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
-Other implementations do not document any cooperating module nor input-output controls.  Portable
-applications should never use input-output controls directly.
+Other implementations do not document any cooperating module nor
+input-output controls.  Portable applications should never use
+input-output controls directly.
 .IP \(em
-Other implementations do not document primitive format between the library and any cooperating
-module.
+Other implementations do not document primitive format between
+the library and any cooperating module.
 .IP \(em
+Binary compatibility is not attempted.  Binary compatibility is
+not possible due to the lack of standardized symbolic
+constants.  Any binary compatibility experienced is a bug and
+is scheduled to be removed on the next release.
 .IP \(em
 .IP \(em
 .PP
 See
 .BR xti_mosi "(3),
 .BR apli "(3),
-.BR xap "(3) and
+.BR xap "(3),
+.BR oopi "(4),
+.BR apmod "(4),
+.BR xapmod "(4) and
 .BR STREAMS (4)
 for additional compatibility information.
+.PP
+Compatibility will be tested using the
+.BR test-mosi (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
 None.
+.PP
+Conformance will be tested using the
+.BR test-mosi (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH HISTORY

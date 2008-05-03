@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.19 2008-04-25 11:50:39 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.20 2008-05-03 13:23:24 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-25 11:50:39 $ by $Author: brian $
+% Last Modified $Date: 2008-05-03 13:23:24 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -406,6 +406,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.20  2008-05-03 13:23:24  brian
+- added strx25 sub-package and package updates
+
 Revision 0.9.2.19  2008-04-25 11:50:39  brian
 - updates to AGPLv3
 
@@ -819,6 +822,7 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 * strinet::		STREAMS INET
 * strsctp::		STREAMS SCTP
 * strchan::		STREAMS Channels
+* strx25::		STREAMS X.25
 * striso::		STREAMS ISO
 * netperf::		Netperf
 * strisdn::		STREAMS ISDN Stacks
@@ -859,6 +863,8 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 @tab @ref{strsctp}.
 @item STREAMS Channels
 @tab @ref{strchan}.
+@item STREAMS X.25
+@tab @ref{strx25}.
 @item STREAMS ISO
 @tab @ref{striso}.
 @item Netperf
@@ -907,6 +913,8 @@ Following is a list of the sub-packages contained in the @dfn{@value{PACKAGE_TIT
 @tab @ref{strsctp}.
 @item STREAMS Channels
 @tab @ref{strchan}.
+@item STREAMS X.25
+@tab @ref{strx25}.
 @item STREAMS ISO
 @tab @ref{striso}.
 @item Netperf
@@ -1285,6 +1293,30 @@ distribution.
 See the installation and reference manual in the @file{strchan/doc} directory for more information
 on this sub-package.
 
+@node strx25
+@subsection strx25-@value{VERSION_STRX25}
+
+The @cite{STREAMS X.25} (@command{strx25-value{VERSION_STRX25}}) package provides pseudo-device
+drivers providing the Communications Datalink Interface (CDI) for X.21 PAD, Data Link Provider
+Interface (DLPI) for X.25 LP, Network Layer Interface (NLI) for X.25 PLP, Network Provider Interface
+(NPI) for X.25 OSI CONS, and Transport Provider Interface (TPI) for X.25.  It also supports Ethernet
+LAP over LLC2.  It is intended that this package support XOT and XOS.
+
+This package is incomplete and untested and neither forms part of the build, nor part of the
+distribution.  This package relies upon the presence of the following packages also included in the
+@value{PACKAGE_TITLE}:
+
+@enumerate
+@item @cite{Linux Fast-STREAMS} (@command{streams-@value{VERSION_STREAMS}}),
+@item @cite{STREAMS Compatibility Modules} (@command{strcompat-@value{VERSION_STRCOMPAT}}),
+@item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
+@item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}), and
+@item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}).
+@end enumerate
+
+This package is contained in the @file{strx25} subdirectory in the @value{PACKAGE_TITLE} source
+distribution.
+
 @node striso
 @subsection striso-@value{VERSION_STRISO}
 
@@ -1304,6 +1336,7 @@ distribution.  This package relies upon the presence of the following packages a
 @item @cite{STREAMS XNS} (@command{strxns-@value{VERSION_STRXNS}}),
 @item @cite{STREAMS XNET} (@command{strxnet-@value{VERSION_STRXNET}}), and
 @item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}).
+@item @cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}}).
 @end enumerate
 
 This package is contained in the @file{striso} subdirectory in the @value{PACKAGE_TITLE} source
@@ -1328,6 +1361,7 @@ packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
 @item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}}).
 @item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}).
 @end enumerate
 
@@ -1358,6 +1392,7 @@ the following packages also included, in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
 @item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}), and
+@item @cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}}).
 @item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}).
 @end enumerate
 
@@ -1389,6 +1424,7 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
 @item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}}),
 @item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}), and
 @item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}).
 @end enumerate
@@ -1419,6 +1455,7 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
 @item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}}),
 @item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}),
 @item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}), and
 @item @cite{STREAMS SS7} (@command{strisdn-@value{VERSION_STRSS7}}).
@@ -1444,6 +1481,7 @@ the following packages also included in the @value{PACKAGE_TITLE}:
 @item @cite{STREAMS INET} (@command{strinet-@value{VERSION_STRINET}}),
 @item @cite{STREAMS SCTP} (@command{strsctp-@value{VERSION_STRSCTP}}),
 @item @cite{STREAMS Channels} (@command{strchan-@value{VERSION_STRCHAN}}),
+@item @cite{STREAMS X.25} (@command{strx25-@value{VERSION_STRX25}}),
 @item @cite{STREAMS ISO} (@command{striso-@value{VERSION_STRISO}}),
 @item @cite{STREAMS ISDN} (@command{strisdn-@value{VERSION_STRISDN}}),
 @item @cite{STREAMS SS7} (@command{strisdn-@value{VERSION_STRSS7}}), and
@@ -1643,6 +1681,7 @@ the coordinated build and installation of the contained sub-packages.
 * strxnet Libraries::
 * strnsl Libraries::
 * strsock Libraries::
+* strx25 Libraries::
 * striso Libraries::
 * osr61 Libraries::
 * LiS Libraries::
@@ -1955,12 +1994,19 @@ For more information, see @manref{getsockpathent(3)}.
 For more information, see @manref{freesockpathent(3)}.
 @end multitable
 
+@node strx25 Libraries
+@subsection strx25
+
+@subsubsection libsx25 Library Routines
+
+In the future the @file{libsx25} libraries will provide the Solstice X.25 interface routines.
+
 @node striso Libraries
 @subsection striso
 
-@subsubsection libiso Library Routines
+@subsubsection libosi Library Routines
 
-In the future the @file{libiso} libraries will provide the SunLink X.25 interface routines.
+In the future the @file{libosi} libraries will provide the Solstice OSI interface routines.
 
 @node osr61 Libraries
 @subsection osr61
@@ -2080,6 +2126,7 @@ Header files are installed, typically, in the @file{/@-usr/@-include/@-@var{name
 where @var{name} is the name of the package.@footnote{That is, where @emph{name} is one of
 @file{sctp}, @file{iperf}, @file{streams}, @file{strcompat}, @file{strutil}, @file{strbcm},
 @file{strtty}, @file{strxns}, @file{strxnet}, @file{strnsl}, @file{strinet}, @file{strchan},
+@file{strx25},
 @file{striso}, @file{strsctp}, @file{netperf}, or @file{LiS}.} To use the header files from one of
 the packages, @samp{-I/@-usr/@-include/@-@var{name}/} must be included as a @command{gcc} compile
 option.  This is true regardless of whether user space or kernel programs are being compiled.
@@ -2094,6 +2141,7 @@ add-on packages are required, the order of these directives should be:
 @item @samp{-I/usr/include/strss7}
 @item @samp{-I/usr/include/strisdn}
 @item @samp{-I/usr/include/striso}
+@item @samp{-I/usr/include/strx25}
 @item @samp{-I/usr/include/strchan}
 @item @samp{-I/usr/include/strsctp}
 @item @samp{-I/usr/include/strinet}
@@ -2125,6 +2173,7 @@ add-on packages:
 * strinet Header Files::
 * strsctp Header Files::
 * strchan Header Files::
+* strx25 Header Files::
 * striso Header Files::
 * netperf Header Files::
 * strisdn Header Files::
@@ -2450,6 +2499,18 @@ header files in @file{/usr/include/strxns}:
 @tab system specific @cite{Network Provider Interface (NPI)} header file.
 @item @file{sys/npi_ip.h}
 @tab system specific @cite{NPI for Internet Protocol (IP)} header file.
+@end multitable
+
+@node strx25 Header Files
+@subsubsection strx25
+
+@multitable @columnfractions .25 .75
+@item @file{xti_xx25.h}
+@tab header for for the @cite{X/Open Transport Interface (XTI)}.
+@item @file{x25_proto.h}, @file{x25_control.h}
+@tab headers for the @cite{Network Layer Interface (NLI)}.
+@item @file{xnetdb.h}
+@tab headers for the @cite{X.25 Support Library (SX.25)}.
 @end multitable
 
 @node striso Header Files
