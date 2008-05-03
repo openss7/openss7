@@ -1,0 +1,281 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: padent.5.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: padent.5.man,v $
+.\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH PADENT 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B padent
+\- PAD database entry structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Network Layer Interface (NLI)" ,
+.IR STREAMS .
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <netx25/xnetdb.h>
+
+struct padent {
+    struct xaddrf xaddr;
+    unsigned char x29;
+    struct extraformat xtras;
+    unsigned char cud[MAxnetdb.hXCUDFSIZE + 1];
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B padent
+structure are:
+.TP
+.I xaddr
+The host's X.25 address.
+.TP
+.I x29
+The X.29 version specifier.  Possible values are:
+.RS
+.TP
+.B 0
+use the configured default X.29 address
+.PD 0
+.TP
+.B 1
+use X.29 (1980) yellow book
+.TP
+.B 2
+use X.29 (1984) red book
+.TP
+.B 3
+use X.29 (1988) blue book
+.PD
+.RE
+.TP
+.I xtras
+Any facilities and QOS parameters defined for this entry.  The 
+.B extraformat
+structure is defined on the
+.BR extraformat (5)
+manaul page.
+.TP
+.I cud
+Any Call User Data defined for this entry.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B padent
+structure contains a single entry from the
+.B /etc/x25/padmapconf
+file.  This contains information about facilities and so on to be used when
+making PAD calls to a particular address.
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+Functions that utilize the
+.B padent
+structure are as follows:
+.BR endpadent "(3),
+.BR getnettype "(3),
+.BR getpadbyaddr "(3),
+.BR getpadent "(3),
+.BR setpadent "(3),
+.BR padtos "(3).
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MT-CONTEXT
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Network Layer Interface (NLI) is a proprietary interface without a formal
+standard.  Either the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+or the XTI-X25 interface,
+.[
+xx25
+.]
+.BR xti_x25 (3),
+should be used in its stead.
+.\"
+.\"
+.SH FILES
+.PP
+The
+.B padent
+structure is defined in the
+.RB < netx25/xnetdb.h >
+file.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B padent
+structure is compatible with NLI, and implementations based on NLI such as
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "HP-UX X.25/9000" ,
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B padent
+structure.
+.IP \(em
+NLI is an inherently low level and non-portable interface and should not be
+used by portable programs.  Portable programs should use the NPI or XX25
+interfaces in its stead.
+.IP \(em
+Binary compatibility is not attempted: only a rough source compatibility.  Any
+binary compatibility exhibited is a bug and is scheduled to be removed in the
+next release.
+.PP
+See
+.BR NLI (7),
+.IR STREAMS (4),
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NLI is not a formal standard.  The
+.IR OpenSS7 \(tm
+implementation of NLI conforms to documentation for Version 3 of the NLI.
+.\"
+.\"
+.SH HISTORY
+.PP
+The NLI is an interface originally developed by Spider Systems, Ltd. (now a
+division of Emmerson Power).  The NLI interface found its way into may
+mainstream UNIX implementations and UNIX-like RTOS sporting STREAMS such as
+Windriver's VxWorks.  The NLI was never standardized and remains an inherently
+non-portable interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

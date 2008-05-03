@@ -1,0 +1,270 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: lsapformat.5.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: lsapformat.5.man,v $
+.\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH LSAPFORMAT 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B lsapformat
+\- Link Service Access Point (LSAP) address format
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Network Layer Interface (NLI)" ,
+.IR STREAMS .
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <netx25/x25_proto.h>
+
+#define LSAPMAXSIZE 9
+
+struct lsapformat {
+    unsigned char lsap_len;
+    unsigned char lsap_add[LSAPMAXSIZE];
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+.TP
+.I lsap_len
+Gives the length of the DTE address, the MAC plus SAP address or the LCI in
+semi-octets.  The SAP always follows the MAC address.  The DTE can be up to 15
+decimal digits unless blue book X.25 (1988) and TOA/NPI (Type of
+Address/Numbering Plan Identification) addressing is being used when it can be
+up to 17 decimal digits.  For an LCI the length is 3.
+.RS
+.PP
+The lengthof the DTE address or LSAP as two BCD digits per byte, right
+justified.  An LSAP is always 14 digits long.  A DTE address can be up to 15
+decimal digits unless blue book X.25 (1988) and TOA/NPI addressing is used, in
+which case it can be up to 17 decimal digits.  A PVC_LCI is 3 digits long.
+.RE
+.TP
+.I lsap_add
+Holds the DTE, MAC plus SAP, or LCI, when present, as indicated by
+.IR lsap_len .
+This is binary.
+.RS
+.PP
+The DTE address, LSAP or PVC_LCI as two BCD digits per byte, right justified.
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B lsapformat
+structure is used to contain a representation of a Link Service Access Point
+(LSAP) address for use in the X.25 address structure,
+.BR xaddrf (5).
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MT-CONTEXT
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Network Layer Interface (NLI) is a proprietary interface without a formal
+standard.  Either the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+or the XTI-X25 interface,
+.[
+xx25
+.]
+.BR xti_x25 (3),
+should be used in its stead.
+.PP
+In general it is a bad idea to define structures that are not a multiple of 64
+bits because, when combined with pointers, create holes through which security
+information may be exposed.  Care must be taken when using this structure on
+64-bit architectures.
+.\"
+.\"
+.SH FILES
+.PP
+The
+.B lsapformat
+structure is defined in the
+.RB < netx25/x25_proto.h >
+file.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR stox25 (3),
+.BR x25tos (3),
+.BR xaddrf (5),
+.BR gethostent (3),
+.BR NLI (7),
+.IR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B lsapformat
+structure is compatible with NLI, and implementations based on NLI such as
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "HP-UX X.25/9000" ,
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B lsapformat
+structure.
+.IP \(em
+NLI is an inherently low level and non-portable interface and should not be
+used by portable programs.  Portable programs should use the NPI or XX25
+interfaces in its stead.
+.IP \(em
+Binary compatibility is not attempted: only a rough source compatibility.  Any
+binary compatibility exhibited is a bug and is scheduled to be removed in the
+next release.
+.PP
+See
+.BR NLI (7),
+.IR STREAMS (4),
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NLI is not a formal standard.  The
+.IR OpenSS7 \(tm
+implementation of NLI conforms to documentation for Version 3 of the NLI.
+.\"
+.\"
+.SH HISTORY
+.PP
+The NLI is an interface originally developed by Spider Systems, Ltd. (now a
+division of Emmerson Power).  The NLI interface found its way into may
+mainstream UNIX implementations and UNIX-like RTOS sporting STREAMS such as
+Windriver's VxWorks.  The NLI was never standardized and remains an inherently
+non-portable interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

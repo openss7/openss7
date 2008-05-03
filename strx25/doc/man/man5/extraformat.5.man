@@ -1,0 +1,744 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: extraformat.5.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: extraformat.5.man,v $
+.\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH EXTRAFORMAT 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B extraformat
+\- Non-OSI Quality of Service parameter format structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Network Layer Interface (NLI)" ,
+.IR STREAMS .
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <netx25/x25_proto.h>
+
+#define MAX_NUI_LEN     64
+#define MAX_RPOA_LEN     8
+#define MAX_CUG_LEN      2
+#define MAX_FAC_LEN     32
+#define MAX_TARIFFS      4
+#define MAX_CD_LEN      MAX_TARRIFS * 4
+#define MAX_SC_LEN      MAX_TARRIFS * 8
+#define MAX_MU_LEN      16
+
+struct extraformat {
+    unsigned char fastselreq;
+    unsigned char restrictresponse;
+    unsigned char reversecharges;
+    unsigned char pwoptions;
+#define NEGOT_PKT   0x01 /* packet size negotiable */
+#define NEGOT_WIN   0x02 /* window size negotiable */
+#define ASSERT_HWM  0x04 /* concatentation limit assert */
+    unsigned char locpacket;
+    unsigned char rempacket;
+#define DEF_X25_PKT 7 /* the standard default packet size */
+    unsigned char locwsize;
+    unsigned char remwsize;
+#define DEF_X25_WIN 2 /* the standard default window size */
+    int nsdulimit;
+    unsigned char nui_len;
+    unsigned char nui_field[MAX_NUI_LEN];
+    unsigned char rpoa_len;
+    unsigned char rpoa_field[MAX_RPOA_LEN];
+    unsigned char cug_type;
+    unsigned char cug_field[MAX_CUG_LEN];
+    unsigned char reqcharging;
+    unsigned char chg_cd_len;
+    unsigned char chg_cd_field[MAX_CD_LEN];
+    unsigned char chg_sc_len;
+    unsigned char chg_sc_field[MAX_SC_LEN];
+    unsigned char chg_mu_len;
+    unsigned char chg_mu_field[MAX_MU_LEN];
+    unsigned char called_add_mod;
+    unsigned char call_redirect;
+    struct lsapformat called;
+    unsigned char call_deflect;
+    unsigned char x_fac_len;
+    unsigned char cq_fac_len;
+    unsigned char cd_fac_len;
+    unsigned char fac_field[MAX_FAC_LEN];
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+.PP
+The fields in this structure are:
+.\"
+.TP
+.IR fastselreq
+Applies only to non-OSI applications, for example X.29.  A non-zero value means
+the X.25 facility fast select is to be requested or indicated.  Note: For CONS,
+the use of fast select need not be requested.
+.\"
+.TP
+.IR restrictresponse
+Sets response to be a Clear Request.  If the response to a Connect Request or
+Indication is to be a Disconnect Indication, the filed
+.I restrictresponse
+is non-zero.
+.\"
+.TP
+.IR reversecharges
+A non-zero value means that reverse charging is requested or indicated for this
+connection.  Note: The configuration mode bit,
+.BR SUB_REVCHARGE ,
+has an impact on whether reverse charging is indicated, since it is possible to
+select a per-subnetwork-status for receipt of reverse charging.
+.\"
+.TP
+.IR pwoptions
+The
+.I pwoptions
+field is used to indicate per (virtual) circuit options.  The field is a bit
+map interpreted as shown below:
+.RS
+.PP
+.PP
+.TS
+tab(:);
+lblblblbs
+lllils.
+Bit:Value:Symbol:Meaning
+_
+bit 0:0:-:T{
+Packet size negotiation not permitted
+T}
+:1:NEGOT_PKT:T{
+Packet size negotiation permitted
+T}
+bit 1:0:-:T{
+Window size negotiation not permitted
+T}
+:1:NEGOT_WIN:T{
+Window size negotiation permitted
+T}
+bit 2:0:-:T{
+No concatentation limit asserted
+T}
+:1:ASSERT_HWM:T{
+Assert concatentation limit
+T}
+_
+.TE
+.PP
+This field is used for two reasons:
+.IP 1. \w'0.\(em'u
+The X.25 software always indicates the values of the window and packet sizes
+operating on the virtual circuit.  The field
+.I pwoptions
+for an incoming call indicates whether these values are negotiable.
+.IP 2.
+In Connect Requests and Connect Resposnes, the NLI user can set
+.IR nsdulimit ,
+the limit value for packet concatentation by the X.25 level, to a value
+different from the limit in the subnetwork configuration database.  It is not
+a negotiable option, so whatever the user requests is used.
+.RE
+.\"
+.TP
+.IR locpacket ", " rempacket
+If the fields
+.IR locpacket " and " rempacket
+are non-zero,
+.I locpacket
+contains indicated or negotiated encoded packet sizes for the direction
+local-to-remote and
+.I rempacket
+contains the indicated or negotiated encoded packet sizes for the direction
+remote-to-local.
+The actual packet size is 2 to the power of the value specified.
+The standard default packet size,
+.BR DEF_X25_PKT ,
+is
+.BR 7 ,
+(i.e.,
+.B 128
+octets).
+.\"
+.TP
+.IR locwsize ", " remwsize
+If the fields
+.IR locwsize " and " remwsize
+are non-zero, they contain indicated or negotiated window sizes for the
+directions local-to-remote and remote-to-local.  The standard default window
+size,
+.BR DEF_X25_WIN
+is
+.BR 2 .
+.\"
+.TP
+.I nsdulimit
+Specifies the packet concatenation limit.
+If the field
+.I nsdulimit
+is non-zero and the appropriate bit is set in the
+.I pwoptions
+field described above, the
+.I nsdulimit
+specified is ued as the concatentation limit.
+.\"
+.TP
+.IR nui_len
+The length of any Network User Identification used in Call Requests and
+Responses.
+.\"
+.TP
+.IR nui_field
+Network User Identification used in Call Requests and Responses.  This is not
+available on yellow book X.25 (1980) networks.
+.\"
+.TP
+.IR nui_len ", " nui_field
+The network user identification (NUI) is used in connect requests and
+responses.  It is not available on yellow book X.25 (1980) networks.  If the
+field
+.I nui_len
+is non-zero, the network user identification is supplied in the
+.I nui_field
+and is of length
+.I nui_len
+octets.
+.\"
+.TP
+.IR rpoa_len
+The length of any RPOA DNIC information used in Call Requests.  Valid values
+for
+.I rpoa_len
+are
+.BR 0 ", " 4 ", " 8 ", " 12 " and " 16 ".
+.\"
+.TP
+.IR rpoa_field
+Any Recognized Private Operating Agency (RPOA) DNIC information.  This is used
+in Call Requests only.  It is stored as two BCD digits per byte, right
+justified.
+.RS
+.PP
+On yellow book X.25 (1980) networks, this is restricted to one RPOA and 4 BCD
+digits.  Basic format encoding is used.
+.PP
+On red book X.25 (1984) and blue book X.25 (1988) networks, there can be one
+or more RPOA.  Extended format encoding is used if there is more than one RPOA.
+The maximum number of RPOA is 4.
+.RE
+.\"
+.TP
+.IR rpoa_len ", " rpoa_field
+Recognized primitive operating agency (RPOA), used in connect requests only.
+If the field
+.I rpoa_len
+is non-zero, the RPOA DNIC information is supplied in
+.I rpoa_field
+and is of length
+.I rpoa_len
+semi-octets.
+.RS
+.PP
+For a yellow book X.25 (1980) network, this is restricted to one RPOA of
+length 4 semi-octets.  The basic format encoding is used for the RPOA
+selected.
+.PP
+For a red or blue book X.25 (1984 or 1988) network, one or more RPOAs can be
+selected.  The extended format encoding is used only if the number of RPOAs
+selected is greater than 1.  The maximum number of RPOAs selected is
+restricted to 4.  Valid values for rpoa_len are 0, 4, 8, 12 and 16.
+.RE
+.\"
+.TP
+.IR cug_type
+Closed user group type.  Possible values are:
+.RS
+.TP
+.B CUG
+Closed user group.
+.PD 0
+.TP
+.B BCUG
+Bilateral CUG.
+.TP
+.B 0
+No CUG used.
+.PD
+.RE
+.\"
+.TP
+.IR cug_field
+Any applicable CUG information, stored as two BCD digits per byte, right
+justified.
+.RS
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+Incoming Close User Group facilities are assumed to have been validated by the
+network.  No further checking is performed.
+.RE
+.\"
+.TP
+.IR cug_type ", " cug_field
+This field is used in Connect Requests and Indications only.  If the field
+.I cug_type
+is non-zero, the CUG information is supplied right-justified in
+.IR cug_field .
+Values for
+.I cut_type
+are as follows:
+.RS
+.TP
+.B CUG
+Close user group, up to four semi-octets.
+.TP
+.B BGUG
+Bilateral CUG (two members only), four semi-octets.
+.IP \fBNote:\fP
+Incomfing CUG facilities are assumed to have been validated by the network.  No
+further checking is performed.
+.RE
+.\"
+.TP
+.IR reqcharging
+Requests call charging in a Call Request or Connect Accept.
+.\"
+.TP
+.IR chg_cd_len
+Gives the length of the
+.IR chg_cd_field .
+.\"
+.TP
+.IR chg_cd_field
+Specifies dureation of the call if call charging is in use.  Used in a
+Disconnect Indication or Confirmation.
+.\"
+.TP
+.IR chg_sc_len
+Give the length of the
+.IR chg_sc_field .
+.\"
+.TP
+.IR chg_sc_field
+Specifies segment count if call charging is in use.  Used in a Disconnect
+Indication or Confirmation.
+.\"
+.TP
+.IR chg_mu_len
+Gives the length of the
+.IR chg_mu_field .
+.\"
+.TP
+.IR chg_mu_field
+Specifies the monetary unit if call charging is in use.  Used in a Disconnect
+Indication or Confirmation.
+.\"
+.TP
+.IR reqcharging ", " chg_cd_len ", " chg_cd_field ", " chg_sc_len ", " chg_sc_field ", " chg_mu_len ", " chg_mu_field
+If the field
+.I reqcharging
+is non-zero in a Connect Request or Indication, Call Charging is requeseted.
+In a Disconnect Indication or Confirmation, the following fields give the
+charging information:
+.IR chg_cd_len " and " chg_cd_field
+give the length and value of the call duration;
+.IR chg_sc_len " and " chg_sc_field
+give the length and value of the segment count;
+.IR chg_mu_len " and " chg_mu_field
+give the length and value of the monetary unit.
+A zero length field means no charging informaion is supplied for the relevant
+charging category.
+.\"
+.TP
+.IR called_add_mod
+A one-byte field holding the reason for any address modification as defined in
+X.25 Recommendation,
+.[
+x25
+.]
+encoded as follows:
+.RS
+.TP \w'\fB00000000\fP\(em'u
+.B x0000001
+Called DTE busy.  Call redirected.
+.PD 0
+.TP
+.B x0000111
+Call distribution within hung group.
+.TP
+.B x0001001
+Called DTE out of order.  Call redirected.
+.TP
+.B x0001111
+Called DTE has requested systematic redirection.
+.TP
+.B 11000000
+Called DTE deflected call.
+.TP
+.B 11000001
+Called DTE busy.  Gateway redirected call.
+.TP
+.B 11001001
+Called DTE out of order.  Gateway redirected call.
+.TP
+.B 11001111
+Called DTE has requested systematic redirection. Gateway redirected call.
+.PD
+.PP
+Where
+.B x
+indicates that this bit is
+.B 0
+if the address modification occured in a public
+data network and
+.B 1
+if it occured ina private network.
+.RE
+.\"
+.TP
+.IR call_redirect
+A one-byte field holding the reason for a call redirection as defined in the
+X.25 Recommendation,
+.[
+x25
+.]
+encoded as follows:
+.RS
+.TP \w'\fB00000000\fP\(em'u
+.B 00000001
+Called DTE busy.  Call redirected.
+.PD 0
+.TP
+.B 00000111
+Call distribution within hunt group.
+.TP
+.B 00001001
+Called DTE out of order.  Call redirected.
+.TP
+.B 00001111
+Called DTE has requested systematic redirection.
+.TP
+.B 11000000
+Called DTE deflected call.
+.TP
+.B 11000001
+Called DTE busy.  Gateway redirected call.
+.TP
+.B 11001001
+Called DTE out of order.  Gateway redirected call.
+.TP
+.B 11001111
+Called DTE has requested systematic redirection.  Gateway redirected call.
+.PD
+.RE
+.\"
+.TP
+.IR called
+Supplies the originally-called DTE address.
+.\"
+.TP
+.IR call_deflect
+A one-byte field holding the reason for call deflection as defined in X.25
+Recommendation,
+.[
+x25
+.]
+encoded as follows:
+.RS
+.TP \w'\fB00000000\fP\(em'u
+.B 11000000
+Called DTE deflected call.
+.PD 0
+.TP
+.B 11000001
+Called DTE busy.  Gateway redirected call.
+.TP
+.B 11001001
+Called DTE out of order.  Gateway redirected call.
+.TP
+.B 11001111
+Called DTE has requested systematic redirection.  Gateway redirected call.
+.PD
+.RE
+.\"
+.TP
+.IR deflected
+In a Clear Request, contains the DTE address, and if required, the NSAP that a
+call is to be deflected to.
+.\"
+.TP
+.IR x_fac_len
+Indicates the length of a
+.I fac_field
+relating to X.25 facilities.
+.\"
+.TP
+.IR cq_fac_len
+Indicates the length of a
+.I fac_field
+relating to non-X.25 facilities for the calling network.
+.\"
+.TP
+.IR cd_fac_len
+Indicates the length of a
+.I fac_field
+relating to non-X.25 facilities for the called network.
+.\"
+.TP
+.IR fac_field
+This field is used in Call Requests and Connect Accepts only.  It allows for
+the passing of explicit facility encoded strings for X.25 facilities, and
+non-X25 facilities for calling and called networks.
+.RS
+.IP \fBNote:\fP \w'\fBNote:\fP\(em'u
+The contents of this field are not validated or acted upon by the code.  The
+X.25 facilities are inserted at the end of any other X.25 facilities which are
+passed in the Call Request/Accept (for example, packet/window sizes).  If any
+non-X.25 facilities are supplied the appropriate marker is inserted before the
+supplied facilities.  Take care not to duplicate any facilities.
+.RE
+.\"
+.TP
+.IR x_fac_len ", " cq_fac_len ", " cd_fac_len ", " fac_field
+These fields are used in Connect Requests and Indications only.  Provision is
+made for the passing of explicity facility encoded strings for X.25 facilities,
+and non-X.25 facilities for calling and called networks.  The fields
+.IR x_fac_len ", " cq_fac_len " and " cd_fac_len
+denote the lengths of the facilities in the field
+.IR fac_field
+relating to X.25 facilities, non-X.25 facilities for the calling network, and
+non-X.25 facilities for the called network.  If the length field is zero, this
+denotes that no facilities are supplied for the corresponding facility
+category.  Note: The contents of this field, if supplied, are not validated or
+acted upon by the code.  The X.25 facilities are inserted at the end of any
+other X.25 facilities that are passed in the Connect Request/Indication (for
+example, packet/window sizes).  If any non-X.25 facilities are supplied, the
+appropriate marker is inserted before the supplied facilities.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+For those NLI applications that require them, the non-OSI facilities supported
+are as follows:
+.IP \(bu \w'\(bu\(em'u
+non-OSI extended addressing;
+.IP \(bu
+X.25 fast select request/indication with no restriction on response;
+.IP \(bu
+X.25 fast select reqeust/indication with restriction on response;
+.IP \(bu
+X.25 reverse charging;
+.IP \(bu
+X.25 packet size negotiation;
+.IP \(bu
+X.25 window size negotiation;
+.IP \(bu
+X.25 network user identification;
+.IP \(bu
+X.25 recognized private operating agency selection;
+.IP \(bu
+X.25 closed user groups;
+.IP \(bu
+X.25 call deflection;
+.IP \(bu
+X.25 programmable facilities.
+.\"
+.\"
+.\".SH USAGE
+.\".PP
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MT-CONTEXT
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Network Layer Interface (NLI) is a proprietary interface without a formal
+standard.  Either the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+or the XTI-X25 interface,
+.[
+xx25
+.]
+.BR xti_x25 (3),
+should be used in its stead.
+.\"
+.\"
+.SH FILES
+.PP
+The
+.B extraformat
+structure is defined in the
+.RB < netx25/x25_proto.h >
+file.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR qosformat (3),
+.BR NLI (7),
+.IR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B extraformat
+structure is compatible with NLI, and implementations based on NLI such as
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "HP-UX X.25/9000" ,
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of the
+.B extraformat
+structure.
+.IP \(em
+NLI is an inherently low level and non-portable interface and should not be
+used by portable programs.  Portable programs should use the NPI or XX25
+interfaces in its stead.
+.IP \(em
+Binary compatibility is not attempted: only a rough source compatibility.  Any
+binary compatibility exhibited is a bug and is scheduled to be removed in the
+next release.
+.PP
+See
+.BR NLI (7),
+.IR STREAMS (4),
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NLI is not a formal standard.  The
+.IR OpenSS7 \(tm
+implementation of NLI conforms to documentation for Version 3 of the NLI.
+.\"
+.\"
+.SH HISTORY
+.PP
+The NLI is an interface originally developed by Spider Systems, Ltd. (now a
+division of Emmerson Power).  The NLI interface found its way into may
+mainstream UNIX implementations and UNIX-like RTOS sporting STREAMS such as
+Windriver's VxWorks.  The NLI was never standardized and remains an inherently
+non-portable interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
