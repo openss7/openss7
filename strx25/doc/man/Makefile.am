@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 11:46:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 10:46:36 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 11:46:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,9 +58,155 @@ if PKG_BUILD_INDEP
 
 MANS_UNUSED = 
 
-man_MANS = 
+man_MANS = \
+	man3/endpadent.3 \
+	man3/endxhostent.3 \
+	man3/equalx25.3 \
+	man3/getnettype.3 \
+	man3/getpadbyaddr.3 \
+	man3/getpadent.3 \
+	man3/getxhostbyaddr.3 \
+	man3/getxhostbyname.3 \
+	man3/getxhostent.3 \
+	man3/libx25.3 \
+	man3/linkidtox25.3 \
+	man3/padtos.3 \
+	man3/setpadent.3 \
+	man3/setxhostent.3 \
+	man3/stox25.3 \
+	man3/x25diags.3 \
+	man3/x25_find_link_parameters.3 \
+	man3/x25_read_config_parameters.3 \
+	man3/x25_read_config_parameters_file.3 \
+	man3/x25_save_link_parameters.3 \
+	man3/x25_set_parse_error_function.3 \
+	man3/x25tolinkid.3 \
+	man3/x25tos.3 \
+	man3/x25_write_config_parameters.3 \
+	man3/x25_write_config_parameters_file.3 \
+	man5/extraformat.5 \
+	man5/lsapformat.5 \
+	man5/padent.5 \
+	man5/qosformat.5 \
+	man5/x25_primitives.5 \
+	man5/xaddrf.5 \
+	man5/xhostent.5 \
+	man7/N_Abort.7 \
+	man7/N_CC.7 \
+	man7/N_CI.7 \
+	man7/N_DAck.7 \
+	man7/N_Data.7 \
+	man7/N_DC.7 \
+	man7/N_DI.7 \
+	man7/N_EAck.7 \
+	man7/N_EData.7 \
+	man7/N_getlinkstats.7 \
+	man7/N_getoneVCstats.7 \
+	man7/N_getpvcmap.7 \
+	man7/N_getstats.7 \
+	man7/N_getVCstats.7 \
+	man7/N_getVCstatus.7 \
+	man7/NLI.7 \
+	man7/nli.7 \
+	man7/N_linkconfig.7 \
+	man7/N_linkent.7 \
+	man7/N_linkmode.7 \
+	man7/N_linkread.7 \
+	man7/N_nuidel.7 \
+	man7/N_nuiget.7 \
+	man7/N_nuimget.7 \
+	man7/N_nuiput.7 \
+	man7/N_nuireset.7 \
+	man7/N_putpvcmap.7 \
+	man7/N_PVC_ATTACH.7 \
+	man7/N_PVC_DETACH.7 \
+	man7/N_RC.7 \
+	man7/N_RI.7 \
+	man7/N_traceoff.7 \
+	man7/N_traceon.7 \
+	man7/N_X25_ADD_ROUTE.7 \
+	man7/N_X25_FLUSH_ROUTE.7 \
+	man7/N_X25_GET_NEXT_ROUTE.7 \
+	man7/N_X25_GET_ROUTE.7 \
+	man7/N_X25_RM_ROUTE.7 \
+	man7/N_Xcanlis.7 \
+	man7/N_Xlisten.7 \
+	man7/N_zerostats.7
 
-dist_noinst_MANS = 
+dist_noinst_MANS = \
+	man3/endpadent.3.man \
+	man3/endxhostent.3.man \
+	man3/equalx25.3.man \
+	man3/getnettype.3.man \
+	man3/getpadbyaddr.3.man \
+	man3/getpadent.3.man \
+	man3/getxhostbyaddr.3.man \
+	man3/getxhostbyname.3.man \
+	man3/getxhostent.3.man \
+	man3/libx25.3.man \
+	man3/linkidtox25.3.man \
+	man3/padtos.3.man \
+	man3/setpadent.3.man \
+	man3/setxhostent.3.man \
+	man3/stox25.3.man \
+	man3/x25diags.3.man \
+	man3/x25_find_link_parameters.3.man \
+	man3/x25_read_config_parameters.3.man \
+	man3/x25_read_config_parameters_file.3.man \
+	man3/x25_save_link_parameters.3.man \
+	man3/x25_set_parse_error_function.3.man \
+	man3/x25tolinkid.3.man \
+	man3/x25tos.3.man \
+	man3/x25_write_config_parameters.3.man \
+	man3/x25_write_config_parameters_file.3.man \
+	man5/extraformat.5.man \
+	man5/lsapformat.5.man \
+	man5/padent.5.man \
+	man5/qosformat.5.man \
+	man5/x25_primitives.5.man \
+	man5/xaddrf.5.man \
+	man5/xhostent.5.man \
+	man7/N_Abort.7.man \
+	man7/N_CC.7.man \
+	man7/N_CI.7.man \
+	man7/N_DAck.7.man \
+	man7/N_Data.7.man \
+	man7/N_DC.7.man \
+	man7/N_DI.7.man \
+	man7/N_EAck.7.man \
+	man7/N_EData.7.man \
+	man7/N_getlinkstats.7.man \
+	man7/N_getoneVCstats.7.man \
+	man7/N_getpvcmap.7.man \
+	man7/N_getstats.7.man \
+	man7/N_getVCstats.7.man \
+	man7/N_getVCstatus.7.man \
+	man7/NLI.7.man \
+	man7/nli.7.man \
+	man7/N_linkconfig.7.man \
+	man7/N_linkent.7.man \
+	man7/N_linkmode.7.man \
+	man7/N_linkread.7.man \
+	man7/N_nuidel.7.man \
+	man7/N_nuiget.7.man \
+	man7/N_nuimget.7.man \
+	man7/N_nuiput.7.man \
+	man7/N_nuireset.7.man \
+	man7/N_putpvcmap.7.man \
+	man7/N_PVC_ATTACH.7.man \
+	man7/N_PVC_DETACH.7.man \
+	man7/N_RC.7.man \
+	man7/N_RI.7.man \
+	man7/N_traceoff.7.man \
+	man7/N_traceon.7.man \
+	man7/N_X25_ADD_ROUTE.7.man \
+	man7/N_X25_FLUSH_ROUTE.7.man \
+	man7/N_X25_GET_NEXT_ROUTE.7.man \
+	man7/N_X25_GET_ROUTE.7.man \
+	man7/N_X25_RM_ROUTE.7.man \
+	man7/N_Xcanlis.7.man \
+	man7/N_Xlisten.7.man \
+	man7/N_zerostats.7.man
 
 ## PKG_BUILD_INDEP
 endif
@@ -70,6 +216,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-05-03 11:46:47  brian
+# - added manual pages
+#
 # Revision 0.9.2.1  2008-05-03 10:46:36  brian
 # - added package files
 #
