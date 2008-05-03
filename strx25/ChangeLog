@@ -1,5 +1,61 @@
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man7/npi_x25.7.man: added file
+	* doc/specs/nli/nli.texi: added file
+	* lib32/Makefile.am: added file
+	* po/strx25.pot: added file
+	* src/drivers/lis.conf: added file
+	* src/drivers/x25-lapb.c: added file
+	* src/drivers/x25-llc2.c: added file
+	* src/drivers/x25-plp.c: added file
+	* src/drivers/xx25.c: added file
+	* src/include/sys/xti_xx25.h: added file
+	* src/modules/lis.conf: added file
+	* src/modules/xot.c: added file
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+
+	* configure.ac: corrections for release
+	* doc/man/man3/endpadent.3.man: corrections for release
+	* doc/man/man3/endxhostent.3.man: corrections for release
+	* doc/man/man3/equalx25.3.man: corrections for release
+	* doc/man/man3/getnettype.3.man: corrections for release
+	* doc/man/man3/getpadbyaddr.3.man: corrections for release
+	* doc/man/man3/getpadent.3.man: corrections for release
+	* doc/man/man3/getxhostbyaddr.3.man: corrections for release
+	* doc/man/man3/getxhostbyname.3.man: corrections for release
+	* doc/man/man3/getxhostent.3.man: corrections for release
+	* doc/man/man3/libx25.3.man: corrections for release
+	* doc/man/man3/linkidtox25.3.man: corrections for release
+	* doc/man/man3/padtos.3.man: corrections for release
+	* doc/man/man3/setpadent.3.man: corrections for release
+	* doc/man/man3/setxhostent.3.man: corrections for release
+	* doc/man/man3/stox25.3.man: corrections for release
+	* doc/man/man3/x25_find_link_parameters.3.man: corrections for release
+	* doc/man/man3/x25_read_config_parameters.3.man: corrections for release
+	* doc/man/man3/x25_read_config_parameters_file.3.man: corrections for release
+	* doc/man/man3/x25_save_link_parameters.3.man: corrections for release
+	* doc/man/man3/x25_set_parse_error_function.3.man: corrections for release
+	* doc/man/man3/x25_write_config_parameters.3.man: corrections for release
+	* doc/man/man3/x25_write_config_parameters_file.3.man: corrections for release
+	* doc/man/man3/x25diags.3.man: corrections for release
+	* doc/man/man3/x25tolinkid.3.man: corrections for release
+	* doc/man/man3/x25tos.3.man: corrections for release
+	* doc/manual/Makefile.am: corrections for release
+	* doc/specs/nli/Makefile.am: corrections for release
+	* po/LINGUAS: corrections for release
+	* po/POTFILES.in: corrections for release
+	* src/include/netx25/x25_proto.h: corrections for release
+	* src/include/netx25/xnetdb.h: corrections for release
+	* src/include/sys/strx25/config.h.in: corrections for release
+	* src/lib/sx25/padent.c: corrections for release
+	* src/lib/sx25/x25config.c: corrections for release
+	* src/lib/sx25/xhostent.c: corrections for release
+
 	* debian/strx25-core.postinst.in: updates for build
 	* debian/strx25-core.postrm.in: updates for build
 	* debian/strx25-core.preinst.in: updates for build

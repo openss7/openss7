@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x25_proto.h,v 0.9.2.1 2008-05-03 10:46:38 brian Exp $
+ @(#) $Id: x25_proto.h,v 0.9.2.2 2008-05-03 21:22:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 10:46:38 $ by $Author: brian $
+ Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25_proto.h,v $
+ Revision 0.9.2.2  2008-05-03 21:22:37  brian
+ - updates for release
+
  Revision 0.9.2.1  2008-05-03 10:46:38  brian
  - added package files
 
@@ -59,7 +62,107 @@
 #ifndef __NETX25_X25_PROTO_H__
 #define __NETX25_X25_PROTO_H__
 
-#ident "@(#) $RCSfile: x25_proto.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: x25_proto.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+#include <stdint.h>
+
+/* The LSAP is defined by the lsapformat structure.  The members of the
+ * lsapformat structure are:
+ *
+ * lsap_len:	The length of the DTE address or LSAP as two BCD digits per
+ *		byte, right justified.  An LSAP is always 14 digits long.  A
+ *		DTE address can be up to 15 decimal digits unless X.25(88) and
+ *		TOA/NPI addressing is used, in which case it can be up to 17
+ *		decimal digits.  A PVC_LCI is 3 digits long.
+ *
+ * lsap_add:	The DTE address, LSAP or PVC_LCI as two BCD digtis per byte,
+ *		right justified.
+ */
+#define LSAPMAXSIZE 9
+struct lsapformat {
+	uint8_t lsap_len;
+	uint8_t lsap_add[LSAPMAXSIZE];
+};
+
+#define MAX_NUI_LEN	64
+#define MAX_RPOA_LEN	 8
+#define MAX_CUG_LEN	 2
+#define MAX_FAC_LEN	32
+#define MAX_TARRIFS	 4
+#define MAX_CD_LEN	MAX_TARRIFS * 4
+#define MAX_SC_LEN	MAX_TARRIFS * 8
+#define MAX_MU_LEN	16
+
+#define NEGOT_PKT	0x01 /* packet size negotiable */
+#define NEGOT_WIN	0x02 /* window size negotiable */
+#define ASSERT_HWM	0x04 /* concatenation limit assert */
+
+#define DEF_X25_PKT	7 /* the standard default packet size */
+#define DEF_X25_WIN	2 /* the standard default window size */
+
+struct extraformat {
+	unsigned char fastselreq;
+	unsigned char restrictresponse;
+	unsigned char reversecharges;
+	unsigned char pwoptions;
+	unsigned char locpacket;
+	unsigned char rempacket;
+	unsigned char locwsize;
+	unsigned char remwsize;
+	int nsdulimit;
+	unsigned char nui_len;
+	unsigned char nui_field[MAX_NUI_LEN];
+	unsigned char rpoa_len;
+	unsigned char rpoa_field[MAX_RPOA_LEN];
+	unsigned char cug_type;
+	unsigned char cug_field[MAX_CUG_LEN];
+	unsigned char chg_cd_len;
+	unsigned char chg_cd_field[MAX_CD_LEN];
+	unsigned char chg_sc_len;
+	unsigned char chg_sc_field[MAX_SC_LEN];
+	unsigned char chg_mu_len;
+	unsigned char chg_mu_field[MAX_MU_LEN];
+	unsigned char called_add_mod;
+	unsigned char call_redirect;
+	struct lsapformat called;
+	unsigned char call_deflect;
+	unsigned char x_fac_len;
+	unsigned char cq_fac_len;
+	unsigned char cd_fac_len;
+	unsigned char fac_field[MAX_FAC_LEN];
+};
+
+#define MAX_PROT 32
+
+struct qosformat {
+	unsigned char reqtclass;
+	unsigned char locthroughput;
+	unsigned char remthroughput;
+	unsigned char reqminthruput;
+	unsigned char locminthru;
+	unsigned char remminthru;
+	unsigned char reqtransitdelay;
+	unsigned short transitdelay;
+	unsigned char reqmaxtransitdelay;
+	unsigned short acceptable;
+	unsigned char reqpriority;
+	unsigned char reqprtygain;
+	unsigned char reqprtykeep;
+	unsigned char reqlowprtydata;
+	unsigned char reqlowprtygain;
+	unsigned char reqlowprtykeep;
+	unsigned char lowprtydata;
+	unsigned char lowprtygain;
+	unsigned char lowprtykeep;
+	unsigned char protection_type;
+	unsigned char prot_len;
+	unsigned char lowprot_len;
+	unsigned char protection[MAX_PROT];
+	unsigned char lowprotection[MAX_PROT];
+	unsigned char reqexpedited;
+	unsigned char reqackservice;
+	struct extraformat xtras;
+};
 
 /* To identify the originator in N_RI and N_DI messages */
 #define NS_USER		1

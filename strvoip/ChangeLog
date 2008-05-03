@@ -1,5 +1,12 @@
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* acinclude.m4: correction
+
 	* doc/manual/prerequisites.texi: added strx25 sub-package
 
 2008-04-28  Brian Bidulock  <bidulock@openss7.org>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xhostent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $
+ @(#) $RCSfile: xhostent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 13:04:38 $ by $Author: brian $
+ Last Modified $Date: 2008-05-03 21:22:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xhostent.c,v $
+ Revision 0.9.2.2  2008-05-03 21:22:38  brian
+ - updates for release
+
  Revision 0.9.2.1  2008-05-03 13:04:38  brian
  - added support librarie files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xhostent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $"
+#ident "@(#) $RCSfile: xhostent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $"
 
-static char const ident[] = "$RCSfile: xhostent.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 13:04:38 $";
+static char const ident[] = "$RCSfile: xhostent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $";
+
+#include <netx25/x25_proto.h>
+#include <netx25/xnetdb.h>
+#include <string.h>
 
 /** @brief compare two X.25 addresses
   * @param		x1 a pointer to the structure containing the first X.25

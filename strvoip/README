@@ -1,5 +1,5 @@
-OpenSS7 STREAMS VOIP -- read me first file.  2008-04-27
-$Id: README,v 0.9.2.29 2008-04-28 10:10:48 brian Exp $
+OpenSS7 STREAMS VOIP -- read me first file.  2008-05-03
+$Id: README,v 0.9.2.30 2008-05-03 21:22:34 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS VOIP
 =====================
 
-Package strvoip-0.9.2.4 was released under AGPLv3 2008-04-27.
+Package strvoip-0.9.2.4 was released under AGPLv3 2008-05-03.
 
 The `OpenSS7 STREAMS VOIP' package includes kernel modules, `SVR 4.2'
 "STREAMS" drivers, modules, libraries, utilities, test programs,
@@ -28,7 +28,7 @@ well.
  Release
 --------
 
-This is the `strvoip-0.9.2.4' package, released 2008-04-27.  This
+This is the `strvoip-0.9.2.4' package, released 2008-05-03.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -122,16 +122,19 @@ by unpacking the master package.)
  10. `OpenSS7 STREAMS Channels', strchan-0.9.2.4
      (http://www.openss7.org/tarballs/strchan-0.9.2.4.tar.bz2).
 
- 11. `OpenSS7 STREAMS ISO', striso-0.9.2.4
+ 11. `OpenSS7 STREAMS X.25', strx25-0.9.2.1
+     (http://www.openss7.org/tarballs/strx25-0.9.2.1.tar.bz2).
+
+ 12. `OpenSS7 STREAMS ISO', striso-0.9.2.4
      (http://www.openss7.org/tarballs/striso-0.9.2.4.tar.bz2).
 
- 12. `OpenSS7 STREAMS ISDN', strisdn-0.9.2.4
+ 13. `OpenSS7 STREAMS ISDN', strisdn-0.9.2.4
      (http://www.openss7.org/tarballs/strisdn-0.9.2.4.tar.bz2).
 
- 13. `OpenSS7 STREAMS SS7', strss7-0.9a.8
+ 14. `OpenSS7 STREAMS SS7', strss7-0.9a.8
      (http://www.openss7.org/tarballs/strss7-0.9a.8.tar.bz2).
 
- 14. `OpenSS7 STREAMS SIGTRAN', sigtran-0.9.2.4
+ 15. `OpenSS7 STREAMS SIGTRAN', sigtran-0.9.2.4
      (http://www.openss7.org/tarballs/sigtran-0.9.2.4.tar.bz2).
 
 When configuring and building multiple `OpenSS7 Project' release

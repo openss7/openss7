@@ -1,5 +1,12 @@
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* acinclude.m4: updates for release
+
 	* doc/man/man8/ss7statsd.8.man: added options
 	* doc/manual/prerequisites.texi: added strx25 sub-package
 

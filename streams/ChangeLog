@@ -1,5 +1,11 @@
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+
 	* doc/manual/prerequisites.texi: added strx25 sub-package
 	* tests/dummy1.m4: corrected headers
 	* tests/dummy2.m4: corrected headers

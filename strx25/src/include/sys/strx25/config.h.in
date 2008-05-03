@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.1 2008-05-03 10:46:39 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.2 2008-05-03 21:22:37 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,33 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 10:46:39 $ by $Author: brian $
+ Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 0.9.2.2  2008-05-03 21:22:37  brian
+ - updates for release
+
  Revision 0.9.2.1  2008-05-03 10:46:39  brian
  - added package files
 
  *****************************************************************************/
 
-#ifndef __SYS_@PACKAGE_UCNAME@_CONFIG_H__
-#define __SYS_@PACKAGE_UCNAME@_CONFIG_H__
+#ifndef __SYS_STRX25_CONFIG_H__
+#define __SYS_STRX25_CONFIG_H__
 
-#ident "@(#) $RCSfile: config.h.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  * @configure_input@
  *
  * This file needs to include any autoconf definitions that are used by
  * installed header files.  This file will be installed in
- * /usr/include/@PACKAGE@/sys/@PACKAGE@/config.h to be included by header files
- * installed in /usr/include/@PACKAGE@/ with an include line something like:
+ * /usr/include/strx25/sys/strx25/config.h to be included by header files
+ * installed in /usr/include/strx25/ with an include line something like:
  *
- * #include "sys/@PACKAGE@/config.h".
+ * #include "sys/strx25/config.h".
  */
 
-#endif				/* __SYS_@PACKAGE_UCNAME@_CONFIG_H__ */
+#endif				/* __SYS_STRX25_CONFIG_H__ */

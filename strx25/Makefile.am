@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 10:46:35 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 21:22:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,23 +79,9 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
-				  @PACKAGE_TARNAME@_mknod \
-				  asn
+				  @PACKAGE_TARNAME@_mknod
 
-pkglibexec_PROGRAMS		= \
-				  gdmo
-
-asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l asnyac.h
-asn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-asn_LDADD			= 
-asn_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-asn_CFLAGS			= $(USER_CFLAGS)
-
-gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l gdmoyac.h
-gdmo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
-gdmo_LDADD			= 
-gdmo_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-gdmo_CFLAGS			= $(USER_CFLAGS)
+pkglibexec_PROGRAMS		= 
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -105,6 +91,24 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+libsx25_la_SOURCES		= src/lib/sx25/padent.c \
+				  src/lib/sx25/x25config.c \
+				  src/lib/sx25/xhostent.c \
+				  src/include/netx25/x25_control.h \
+				  src/include/netx25/x25_proto.h \
+				  src/include/netx25/xnetdb.h
+libsx25_la_DEPENDENCIES		= src/lib/sx25/sx25.VERSION
+libsx25_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sx25/sx25.VERSION \
+				  $(STREAMS_LDFLAGS)
+libsx25_la_CPPFLAGS		= -I$(top_srcdir)/src/lib/sx25 -I$(top_builddir)/src/lib/sx25 \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/src/include -I$(top_builddir)/src/include
+libsx25_la_CFLAGS		= $(USER_CFLAGS)
+libsx25_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libsx25.la
 
 ## RPM_BUILD_USER
 endif
@@ -120,19 +124,9 @@ noinst_LIBRARIES		= libX25mods.a libX25drvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libX25mods_a_SOURCES = \
-				  src/modules/cmot.c \
-				  src/modules/isot.c \
-				  src/modules/itot.c \
-				  src/modules/lpp.c \
-				  src/modules/tcpns.c \
 				  src/modules/xot.c
 
 dist_EXTRA_libX25mods_a_SOURCES = \
-				  src/modules/cmot.c \
-				  src/modules/isot.c \
-				  src/modules/itot.c \
-				  src/modules/lpp.c \
-				  src/modules/tcpns.c \
 				  src/modules/xot.c
 
 mods_source_FILES		= $(nodist_EXTRA_libX25mods_a_SOURCES)
@@ -144,15 +138,14 @@ libX25mods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $
 libX25mods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 nodist_EXTRA_libX25drvs_a_SOURCES = \
-				  src/drivers/clns.c \
-				  src/drivers/x25-lapb.c
-#				  src/drivers/x25-plp.c
+				  src/drivers/x25-llc2.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
 
 dist_EXTRA_libX25drvs_a_SOURCES = \
-				  src/drivers/clns.c \
-				  src/drivers/tp.c \
-				  src/drivers/x25-lapb.c
-#				  src/drivers/x25-plp.c
+				  src/drivers/x25-llc2.c \
+				  src/drivers/x25-lapb.c \
+				  src/drivers/x25-plp.c
 
 drvs_source_FILES		= $(nodist_EXTRA_libX25drvs_a_SOURCES)
 
@@ -219,9 +212,10 @@ endif
 ##
 ## Rules for building libraries
 ##
-##LIBRARY_VERSION_FILES		=
-##
-##include am/libraries.am
+LIBRARY_VERSION_FILES		= \
+				  src/lib/sx25/sx25.VERSION
+
+include am/libraries.am
 
 EXPORT_SRCFILES			=
 
@@ -244,6 +238,11 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 SUBDIRS = src
+
+if PKG_BUILD_ARCH
+SUBDIRS += intl po
+CLEANFILES += po/stamp-po
+endif
 
 SUBDIRS += .
 
@@ -361,6 +360,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-05-03 21:22:35  brian
+# - updates for release
+#
 # Revision 0.9.2.1  2008-05-03 10:46:35  brian
 # - added package files
 #

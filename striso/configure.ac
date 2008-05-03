@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-05-03 13:23:33 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-05-03 21:22:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 13:23:33 $ by $Author: brian $
+# Last Modified $Date: 2008-05-03 21:22:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([striso],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.17 $) $Date: 2008-05-03 13:23:33 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.18 $) $Date: 2008-05-03 21:22:31 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -123,10 +123,7 @@ AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_MAJOR
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h
-		  locale.h malloc.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h
-		  string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h
-		  values.h wchar.h])
+AC_CHECK_HEADERS([argz.h arpa/inet.h fcntl.h float.h inttypes.h langinfo.h libintl.h limits.h locale.h malloc.h netdb.h netinet/in.h stddef.h stdint.h stdio_ext.h stdlib.h string.h strings.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h unistd.h values.h wchar.h])
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -172,9 +169,7 @@ AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero getcwd gethostbyname
-		gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo setlocale socket stpcpy
-		strcasecmp strchr strcspn strdup strerror strstr strtol strtoul])
+AC_CHECK_FUNCS([__argz_count __argz_next __argz_stringify alarm bzero getcwd gethostbyname gettimeofday inet_ntoa mempcpy memset munmap nl_langinfo setlocale socket stpcpy strcasecmp strchr strcspn strdup strerror strstr strtol strtoul])
 
 AC_ISO
 
@@ -195,6 +190,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.18  2008-05-03 21:22:31  brian
+# - updates for release
+#
 # Revision 0.9.2.17  2008-05-03 13:23:33  brian
 # - added strx25 sub-package and package updates
 #
