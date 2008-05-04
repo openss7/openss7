@@ -1,5 +1,5 @@
-OpenSS7 NETPERF Utility -- read me CVS file.  2008-05-03
-$Id: README-cvs,v 0.9.2.39 2008-05-03 21:22:26 brian Exp $
+OpenSS7 NETPERF Utility -- read me CVS file.  2008-05-04
+$Id: README-cvs,v 0.9.2.40 2008-05-04 16:16:31 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -24,7 +24,7 @@ commands to check out a version from the archive:
      % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r netperf_2.3.7.rc1 netperf
+     % cvs co -r netperf_2.3.7 netperf
      % cvs logout
 
 It is, of course, possible to check out by date or by other criteria.

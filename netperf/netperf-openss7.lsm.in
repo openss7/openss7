@@ -27,6 +27,6 @@ Platforms:		Linux
 			strxnet @XTI_VERSION@,
 			strinet @INET_VERSION@,
 			strsctp @SCTP_VERSION@.
-Copying-policy:		GPL
+Copying-policy:		AGPL
 End
 

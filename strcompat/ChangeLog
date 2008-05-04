@@ -1,3 +1,23 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: updates for release
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* strcompat.lsm.in: updates for release
+	* strcompat.spec.in: updates for release
+	* debian/changelog: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+	* debian/strcompat-core.postinst.in: updates for release
+	* debian/strcompat-core.postrm.in: updates for release
+	* debian/strcompat-core.preinst.in: updates for release
+	* debian/strcompat-core.prerm.in: updates for release
+	* debian/strcompat-init.postinst.in: updates for release
+	* debian/strcompat-init.preinst.in: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

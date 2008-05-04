@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 11:46:32 $
+# @(#) $RCSfile: streams-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-05-04 16:16:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:42 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -76,13 +76,13 @@ function postrm_modconf() {
 }
 
 function postrm_preload() {
-    prel_old=$sysconfdir/$preload
+    prel_old="@preloads@"
     if [ -f $prel_old ] ; then
-	prel_new=$tmppath/$preload.new.$$
-	prel_tmp=$tmppath/$preload.tmp.$$
+	prel_new="$tmppath/modprobe.preload.new.$$"
+	prel_tmp="$tmppath/modprobe.preload.tmp.$$"
 	cp -f -- $prel_old $prel_new
-	for m in $KERNEL_PRELOADS ; do
-	    sed -e "/^$m\>/d" $prel_new > $prel_tmp
+	for m in $preloads ; do
+	    sed -e "/^[[:space:]]*$m\>/d" $prel_new > $prel_tmp
 	    mv -f -- $prel_new $prel_tmp
 	done
 	chmod --reference=$prel_old -- $prel_new
@@ -127,6 +127,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: streams-core.postrm.in,v $
+# Revision 0.9.2.9  2008-05-04 16:16:42  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.8  2008-04-28 11:46:32  brian
 # - adjust headers for release
 #

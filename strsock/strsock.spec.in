@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.spec.in,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-28 22:33:28 $
+# @(#) $RCSfile: strsock.spec.in,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-05-04 16:16:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 22:33:28 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -132,7 +132,7 @@
 %{!?_dvidir:          %{expand: %%global _dvidir          %%{_docdir}}}
 %{!?_pdfdir:          %{expand: %%global _pdfdir          %%{_docdir}}}
 %{!?_psdir:           %{expand: %%global _psdir           %%{_docdir}}}
-%{!?_localedir:       %{expand: %%global _localedir       %%{_docdir}}}
+%{!?_localedir:       %{expand: %%global _localedir       %%{_datadir}/locale}}
 %{!?_configdir:       %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
 %{!?_modutildir:      %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
 %{!?_kmoduledir:      %{expand: %%global _kmoduledir      /lib/modules/%%{kernel_version}}}
@@ -404,7 +404,7 @@ Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
 Release:        @PACKAGE_RPMRELEASE@
-License:        GPLv2
+License:        AGPLv3
 Group:          System Environment/Kernel
 %{?url:URL:            %{url}}
 %{?_xpm_icon:Icon:           %{_xpm_icon}}
@@ -1914,9 +1914,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsock.spec.in,v $
-# Revision 0.9.2.19  2008-04-28 22:33:28  brian
-# - updated headers for release
+# Revision 0.9.2.20  2008-05-04 16:16:52  brian
+# - changes and corrections for release
 #
+
+* Mon Apr 28 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.19  2008-04-28 22:33:28  brian
+- updated headers for release
 
 * Mon Apr 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.18  2008-04-28 07:41:19  brian

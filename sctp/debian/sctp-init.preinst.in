@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp-init.preinst.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 11:46:27 $
+# @(#) $RCSfile: sctp-init.preinst.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-04 16:16:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:27 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:34 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -82,7 +82,7 @@ function install_init_preinst() { :
 	[ -d $dir ] || continue
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
 	    b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'`
-	    case " $KERNEL_MODULES " in (*" $b "*) modl_mods="${modl_mods:+$modl_mods }$m" ;; (*) continue ;; esac
+	    case " $modules " in (*" $b "*) modl_mods="${modl_mods:+$modl_mods }$m" ;; (*) continue ;; esac
 	done
 	if [ -f $dir/modules.dep ] ; then
 	    #
@@ -111,7 +111,7 @@ function install_init_preinst() { :
 	    done < $dir/modules.dep
 	fi
     done
-    prel_fil="@preload@"
+    prel_fil="@preloads@"
     if [ -f $prel_fil ] ; then
 	prel_tmp=$tmppath/modprobe.preload.tmp.$$
 	prel_new=$tmppath/modprobe.preload.new.$$
@@ -137,7 +137,7 @@ function install_init_preinst() { :
     #
     if [ -n "$modl_mods" ] ; then
 	rm -f -- $modl_mods
-	for m in $KERNEL_MODULES ; do
+	for m in $modules ; do
 	    prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
 	    eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
 	    [ -n "$modl_deps" ] || continue
@@ -164,6 +164,9 @@ subpkg=init
 # =============================================================================
 #
 # $Log: sctp-init.preinst.in,v $
+# Revision 0.9.2.7  2008-05-04 16:16:34  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.6  2008-04-28 11:46:27  brian
 # - adjust headers for release
 #

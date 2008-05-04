@@ -1,3 +1,21 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* strtty.lsm.in: updates for release
+	* strtty.spec.in: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+	* debian/strtty-core.postinst.in: updates for release
+	* debian/strtty-core.postrm.in: updates for release
+	* debian/strtty-core.preinst.in: updates for release
+	* debian/strtty-core.prerm.in: updates for release
+	* debian/strtty-init.postinst.in: updates for release
+	* debian/strtty-init.preinst.in: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

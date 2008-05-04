@@ -2,4 +2,4 @@ strx25 (0.9.2.1-0) experimental; urgency=low
 
   * Initial stab at debian build system
 
- -- Brian Bidulock <bidulock@openss7.org> Fri, 02 May 2008 22:23:46 -0600
+ -- Brian Bidulock <bidulock@openss7.org>  Fri,  2 May 2008 22:23:46 -0600

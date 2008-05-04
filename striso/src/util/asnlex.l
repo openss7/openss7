@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: asnlex.l,v 0.9.2.4 2008-04-29 00:02:06 brian Exp $
+ @(#) $Id: asnlex.l,v 0.9.2.5 2008-05-04 16:16:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:06 $ by $Author: brian $
+ Last Modified $Date: 2008-05-04 16:16:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: asnlex.l,v $
+ Revision 0.9.2.5  2008-05-04 16:16:47  brian
+ - changes and corrections for release
+
  Revision 0.9.2.4  2008-04-29 00:02:06  brian
  - updated headers for release
 
@@ -69,9 +72,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:06 $"
+#ident "@(#) $RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:47 $"
 
-static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:06 $";
+static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:47 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -81,9 +84,6 @@ static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.4
 #include "asnyac.h"
 
 #define ECHO fputs(yytext, yyout)
-
-#define reject_used_but_not_detected
-#define FIND_RULE REJECT
 
 %}
 
@@ -109,7 +109,7 @@ static char const ident[] = "$RCSfile: asnlex.l,v $ $Name:  $($Revision: 0.9.2.4
 
 %%
 
-BOOLEAN			{ return TOK_BOOLEAN; FIND_RULE; }
+BOOLEAN			{ return TOK_BOOLEAN; }
 INTEGER			{ return TOK_INTEGER; }
 BIT			{ return TOK_BIT; }
 STRING			{ return TOK_STRING; }
@@ -182,7 +182,9 @@ TAGS			{ return TOK_TAGS; }
 static void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
+#ifndef YY_FLEX_SUBMINOR_VERSION
 	(void) yy_flex_realloc;
+#endif
 }
 
 // vim: com=sr0\:/**,mb\:*,ex\:*/,sr0\:/*,mb\:*,ex\:*/,b\:TRANS formatoptions+=tcqlor

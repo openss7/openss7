@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 11:46:41 $
+# @(#) $RCSfile: strxnet-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-04 16:16:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:41 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:59 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -60,7 +60,7 @@
 #
 function prerm_modules() {
     if [ ":$kversion" = ":`uname -r`" ] ; then
-	for m in $KERNEL_MODULES
+	for m in $modules
 	do
 	    if ( /sbin/lsmod | grep -q "^$m" ) ; then
 #		module running, kick the stack
@@ -96,13 +96,13 @@ function prerm_oldmods() {
 }
 
 function prerm_preload() {
-    prel_old=$sysconfdir/$preload
+    prel_old="@preloads@"
     if [ -f $prel_old ] ; then
-	prel_new="$tmppath/$preload.new.$$"
-	prel_tmp="$tmppath/$preload.tmp.$$"
+	prel_new="$tmppath/modprobe.preload.new.$$"
+	prel_tmp="$tmppath/modprobe.preload.tmp.$$"
 	cp -f -- $prel_old $prel_new
-	for m in $KERNEL_PRELOADS ; do
-	    sed -e "/^$m\>/d" $prel_new > $prel_tmp
+	for m in $preloads ; do
+	    sed -e "/^[[:space:]]*$m>/d" $prel_new > $prel_tmp
 	    mv -f -- $prel_tmp $prel_new
 	done
 	chmod --reference=$prel_old -- $prel_new
@@ -143,6 +143,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: strxnet-core.prerm.in,v $
+# Revision 0.9.2.7  2008-05-04 16:16:59  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.6  2008-04-28 11:46:41  brian
 # - adjust headers for release
 #

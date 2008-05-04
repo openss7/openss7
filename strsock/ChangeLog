@@ -1,3 +1,21 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* strsock.lsm.in: updates for release
+	* strsock.spec.in: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+	* debian/strsock-core.postinst.in: updates for release
+	* debian/strsock-core.postrm.in: updates for release
+	* debian/strsock-core.preinst.in: updates for release
+	* debian/strsock-core.prerm.in: updates for release
+	* debian/strsock-init.postinst.in: updates for release
+	* debian/strsock-init.preinst.in: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

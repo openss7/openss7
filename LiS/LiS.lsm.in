@@ -26,5 +26,5 @@ Original-site:	ftp.gcom.com /pub/linux/src/LiS
 		748K @PACKAGE@-2.18.0.tgz
 Platforms:	Linux
 		Requires: Linux kernel 2.4 or 2.6
-Copying-policy:	GPL
+Copying-policy:	AGPL
 End

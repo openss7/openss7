@@ -1,3 +1,22 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: updates for release
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* THANKS: updates for release
+	* osr61.lsm.in: updates for release
+	* osr61.spec.in: updates for release
+	* debian/changelog: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/osr61-core.postinst.in: updates for release
+	* debian/osr61-core.postrm.in: updates for release
+	* debian/osr61-core.preinst.in: updates for release
+	* debian/osr61-core.prerm.in: updates for release
+	* debian/osr61-init.postinst.in: updates for release
+	* debian/osr61-init.preinst.in: updates for release
+	* debian/rules.in: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

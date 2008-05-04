@@ -1,3 +1,15 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* iperf.lsm.in: updates for release
+	* iperf.spec.in: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/prerequisites.texi: added strx25 sub-package

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:33 $
+ @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:33 $ by $Author: brian $
+ Last Modified $Date: 2008-05-04 16:16:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconf_lex.l,v $
+ Revision 0.9.2.6  2008-05-04 16:16:37  brian
+ - changes and corrections for release
+
  Revision 0.9.2.5  2008-04-29 07:11:33  brian
  - updating headers for release
 
@@ -72,9 +75,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:33 $"
+#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:37 $"
 
-static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:33 $";
+static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:37 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -95,8 +98,11 @@ static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9
 
 #define ECHO fputs(yytext, yyout)
 
-#define reject_used_but_not_detected
-#define FIND_RULE REJECT
+#ifndef YY_FLEX_SUBMINOR_VERSION
+#define FIND_RULE goto find_rule
+#else
+#define FIND_RULE while (0) { }
+#endif
 
 #if 0
 static int
@@ -328,7 +334,7 @@ OPTIONS		({OPTION})(","{OPTION})*
 
 "\\\n"			/* absorb continuation markers */
 
-"\n"			{ return TOK_EOL	; FIND_RULE; }
+"\n"			{ return TOK_EOL	; }
 
 "usage"|"u"		{ return TOK_USAGE	; }
 "help"|"h"|"?"		{ return TOK_HELP	; }
@@ -636,7 +642,7 @@ OPTIONS		({OPTION})(","{OPTION})*
       /* {OPTIONS}		{ yylval.val = opts_val(yytext);	return TOK_OPTIONS	; } */
       /* {DEVICETYPE}		{ yylval.val = dt_val(yytext,yyleng);	return TOK_DEVICETYPE	; } */
 
-[;]			{ return TOK_SEMICOLON	; REJECT; }
+[;]			{ return TOK_SEMICOLON	; FIND_RULE; }
 [:]			{ return TOK_COLON	; }
 [=]			{ return TOK_EQUAL	; }
 [,]			{ return TOK_COMMA	; }
@@ -657,6 +663,9 @@ OPTIONS		({OPTION})(","{OPTION})*
 static void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
+#ifndef YY_FLEX_SUBMINOR_VERSION
+	(void) yy_flex_realloc;
+#endif
 }
 
 static YY_BUFFER_STATE buf = NULL;

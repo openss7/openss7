@@ -1,3 +1,16 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.lsm.in: updates for release
+	* LiS.spec.in: updates for release
+	* debian/lis-core.postinst.in: updates for release
+	* debian/lis-core.postrm.in: updates for release
+	* debian/lis-core.preinst.in: updates for release
+	* debian/lis-core.prerm.in: updates for release
+	* debian/lis-init.postinst.in: updates for release
+	* debian/lis-init.preinst.in: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/prerequisites.texi: added strx25 sub-package

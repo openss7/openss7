@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:33 $
+ @(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:33 $ by $Author: brian $
+ Last Modified $Date: 2008-05-04 16:16:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400lex.l,v $
+ Revision 0.9.2.5  2008-05-04 16:16:37  brian
+ - changes and corrections for release
+
  Revision 0.9.2.4  2008-04-29 07:11:33  brian
  - updating headers for release
 
@@ -69,9 +72,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:33 $"
+#ident "@(#) $RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:37 $"
 
-static char const ident[] = "$RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:33 $";
+static char const ident[] = "$RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:37 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -79,8 +82,6 @@ static char const ident[] = "$RCSfile: x400lex.l,v $ $Name:  $($Revision: 0.9.2.
 
 #define ECHO fputs(yytext, yyout)
 
-#define reject_used_but_not_detected
-#define FIND_RULE REJECT
 
 %}
 
@@ -136,7 +137,7 @@ SLC		"slc"|"signal[l]?ing-link-code"
 
 %%
 
-"\n"			{ return TOK_EOL	; FIND_RULE; }
+"\n"			{ return TOK_EOL	; }
 "="			{ return TOK_EQUALS	; }
 
 "usage"|"u"		{ return TOK_USAGE	; }
@@ -421,6 +422,9 @@ SLC		"slc"|"signal[l]?ing-link-code"
 static void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
+#ifndef YY_FLEX_SUBMINOR_VERSION
+	(void) yy_flex_realloc;
+#endif
 }
 
 /*

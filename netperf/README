@@ -1,5 +1,5 @@
-OpenSS7 NETPERF Utility -- read me first file.  2008-05-03
-$Id: README,v 1.1.1.43 2008-05-03 21:22:26 brian Exp $
+OpenSS7 NETPERF Utility -- read me first file.  2008-05-04
+$Id: README,v 1.1.1.44 2008-05-04 16:16:31 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 NETPERF Utility
 ========================
 
-Package netperf-2.3.7.rc1 was released under AGPLv3 2008-05-03.
+Package netperf-2.3.7 was released under AGPLv3 2008-05-04.
 
 `Netperf' is a general purpose tool for benchmarking bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
@@ -60,12 +60,12 @@ well.
  Release
 --------
 
-This is the `netperf-2.3.7.rc1' package, released 2008-05-03.  This
-`2.3.7.rc1' release, and the latest version, can be obtained from the
-download area (http://www.openss7.org/download.html) of The OpenSS7
-Project website using a command such as:
+This is the `netperf-2.3.7' package, released 2008-05-04.  This `2.3.7'
+release, and the latest version, can be obtained from the download area
+(http://www.openss7.org/download.html) of The OpenSS7 Project website
+using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.rc1.tar.bz2
+     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', or as a set of binary `rpm's or `deb's.  See the download page
@@ -183,7 +183,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../netperf-2.3.7.rc1/configure CC='gcc-3.4'
+     $> ../netperf-2.3.7/configure CC='gcc-3.4'
 
  Installation
 -------------
@@ -191,11 +191,11 @@ after `./configure', for example:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.rc1.tar.bz2
-     $> tar -xjvf netperf-2.3.7.rc1.tar.bz2
+     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.tar.bz2
+     $> tar -xjvf netperf-2.3.7.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../netperf-2.3.7.rc1/configure --enable-autotest
+     $> ../netperf-2.3.7/configure --enable-autotest
      $> make
      $> make check
      $> sudo make install
@@ -203,8 +203,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf netperf-2.3.7.rc1
-     $> rm -f netperf-2.3.7.rc1.tar.bz2
+     $> rm -rf netperf-2.3.7
+     $> rm -f netperf-2.3.7.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -212,11 +212,11 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(4) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.rc1.tar.bz2
-     $> tar -xjvf netperf-2.3.7.rc1.tar.bz2
+     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.tar.bz2
+     $> tar -xjvf netperf-2.3.7.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../netperf-2.3.7.rc1/configure --enable-autotest
+     $> ../netperf-2.3.7/configure --enable-autotest
      $> make compile.log
      $> make check.log
      $> sudo make install.log
@@ -224,8 +224,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf netperf-2.3.7.rc1
-     $> rm -f netperf-2.3.7.rc1.tar.bz2
+     $> rm -rf netperf-2.3.7
+     $> rm -f netperf-2.3.7.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
@@ -241,14 +241,14 @@ The OpenSS7 NETPERF Utility package is available from the downloads
 area of The OpenSS7 Project website
 (http://www.openss7.org/download.html) using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.rc1.tar.bz2
+     $> wget http://www.openss7.org/tarballs/netperf-2.3.7.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf netperf-2.3.7.rc1.tar.bz2
+     $> tar -xjvf netperf-2.3.7.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: netperf-2.3.7.rc1.
+package name: netperf-2.3.7.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -256,19 +256,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../netperf-2.3.7.rc1/configure
+     $> ../netperf-2.3.7/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../netperf-2.3.7.rc1/INSTALL
+     $> less ../netperf-2.3.7/INSTALL
 
 For specific options to the `configure' script, see the
 `INSTALL-netperf' file in the distribution, or simply execute the
 configure script with the `--help' option like so:
 
-     $> ../netperf-2.3.7.rc1/configure --help
+     $> ../netperf-2.3.7/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -308,8 +308,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf netperf-2.3.7.rc1
-     $> rm -f netperf-2.3.7.rc1.tar.bz2
+     $> rm -rf netperf-2.3.7
+     $> rm -f netperf-2.3.7.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
@@ -318,7 +318,7 @@ More detailed installation instructions can be found in the
 `Installation', in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../netperf-2.3.7.rc1
+     $> cd ../netperf-2.3.7
      $> less doc/manual/netperf.txt
      $> lynx doc/manual/netperf.html
      $> info doc/manual/netperf.info

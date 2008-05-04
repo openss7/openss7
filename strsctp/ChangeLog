@@ -1,3 +1,23 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: updates for release
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* strsctp.lsm.in: updates for release
+	* strsctp.spec.in: updates for release
+	* debian/changelog: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+	* debian/strsctp-core.postinst.in: updates for release
+	* debian/strsctp-core.postrm.in: updates for release
+	* debian/strsctp-core.preinst.in: updates for release
+	* debian/strsctp-core.prerm.in: updates for release
+	* debian/strsctp-init.postinst.in: updates for release
+	* debian/strsctp-init.preinst.in: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

@@ -21,5 +21,5 @@ Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4
-Copying-policy:		GPL
+Copying-policy:		AGPL
 End

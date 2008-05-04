@@ -27,11 +27,10 @@ Original-site:
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
 			streams @STREAMS_VERSION@ SVR 4.2 STREAMS,
-			strcompat @STRCOMP_VERSION@,
-			strxns @XNS_VERSION@,
-			strxnet @XTI_VERSION@,
-			strinet @INET_VERSION@,
-			strsctp @SCTP_VERSION@.
-Copying-policy:		GPL
+			strcompat @STRCOMP_VERSION@, strxns @XNS_VERSION@,
+			strxnet @XTI_VERSION@, strinet @INET_VERSION@,
+			strsctp @SCTP_VERSION@, strchan @CHAN_VERSION@,
+			strx25 @X25_VERSION@.
+Copying-policy:		AGPL
 End
 

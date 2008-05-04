@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-core.preinst.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 10:30:20 $
+# @(#) $RCSfile: streams-core.preinst.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-05-04 16:16:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,9 +48,10 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 10:30:20 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:42 $ by $Author: brian $
 #
 # =============================================================================
+
 @mscript_header@
 
 #
@@ -64,7 +65,7 @@ function install_core_preinst() {
 	test -d $d || continue
 	for m in `find $d \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
 	    b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?$||'`
-	    case " $KERNEL_MODULES " in (*" $b "*) rm -f -- $m ;; esac
+	    case " $modules " in (*" $b "*) rm -f -- $m ;; esac
 	done
     done
     return 0
@@ -83,7 +84,7 @@ function upgrade_core_preinst() {
 	# a non-deb version kicking around.  This scriplet kills any streams modules that are loaded
 	# and running.
 	#
-	for m in $KERNEL_MODULES
+	for m in $modules
 	do
 	    if ( /sbin/lsmod | grep -q "^$m" ) ; then
 		#
@@ -137,6 +138,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: streams-core.preinst.in,v $
+# Revision 0.9.2.8  2008-05-04 16:16:42  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.7  2008-04-28 10:30:20  brian
 # - updated headers for release
 #

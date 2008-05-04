@@ -1,3 +1,23 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* striso.lsm.in: updates for release
+	* striso.spec.in: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+	* debian/striso-core.postinst.in: updates for release
+	* debian/striso-core.postrm.in: updates for release
+	* debian/striso-core.preinst.in: updates for release
+	* debian/striso-core.prerm.in: updates for release
+	* debian/striso-init.postinst.in: updates for release
+	* debian/striso-init.preinst.in: updates for release
+	* src/util/asnlex.l: updates for release
+	* src/util/gdmolex.l: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
