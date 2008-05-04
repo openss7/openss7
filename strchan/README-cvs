@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Channels -- read me CVS file.  2008-05-03
-$Id: README-cvs,v 0.9.2.28 2008-05-03 21:22:28 brian Exp $
+OpenSS7 STREAMS Channels -- read me CVS file.  2008-05-04
+$Id: README-cvs,v 0.9.2.29 2008-05-04 16:16:39 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -24,7 +24,7 @@ commands to check out a version from the archive:
      % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r strchan_0.9.2.4.rc1 strchan
+     % cvs co -r strchan_0.9.2.4 strchan
      % cvs logout
 
 It is, of course, possible to check out by date or by other criteria.

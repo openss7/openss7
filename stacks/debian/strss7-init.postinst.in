@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7-init.postinst.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 11:46:28 $
+# @(#) $RCSfile: strss7-init.postinst.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:28 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:36 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -63,11 +63,11 @@ configure_modconf() { :
 	conf_new=$tmppath/modules.conf.new.$$
 	conf_tmp=$tmppath/modules.conf.tmp.$$
 	cp -f -- $conf_old $conf_new
-	sed -e '/^[[:space:]]*include[[:space:]][[:space:]]*'"$modutildir/$name"'[[:space:]]*$/d' $conf_new > $conf_tmp
+	sed -e '\|^[[:space:]]*include[[:space:]][[:space:]]*'"$modutildir/$name"'[[:space:]]*$|d' $conf_new > $conf_tmp
 	mv -f -- $conf_tmp $conf_new
 	echo "include $modutildir/$name" >> $conf_new
 	chmod --reference=$conf_old -- $conf_new
-	cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
+	cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
 	rm -f -- $conf_new
     fi
 }
@@ -77,20 +77,20 @@ configure_preloads() { :
     # For preloads we remove reference to any of our modules from the preloads file and then add
     # only our preloadable modules back to the file.
     #
-    prel_old="@preload@"
-    if [ -f $prel_old ] ; then
+    prel_fil="@preloads@"
+    if [ -f $prel_fil ] ; then
 	prel_tmp=$tmppath/modprobe.preload.tmp.$$
 	prel_new=$tmppath/modprobe.preload.new.$$
-	cp -f -- $prel_old $prel_new
+	cp -f -- $prel_fil $prel_new
 	for m in $modules ; do
-	    sed -e '/^[[:space:]]*'"$m"'[[:space:]]*$/d' $prel_new > $prel_tmp
+	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new > $prel_tmp
 	    mv -f -- $prel_tmp $prel_new
 	done
 	for p in $preloads ; do
 	    echo "$p" >> $prel_new
 	done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+        chmod --reference=$prel_fil -- $prel_new
+        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_fil
         rm -f -- $prel_new
     fi
 }
@@ -117,6 +117,9 @@ subpkg=init
 # =============================================================================
 #
 # $Log: strss7-init.postinst.in,v $
+# Revision 0.9.2.6  2008-05-04 16:16:36  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.5  2008-04-28 11:46:28  brian
 # - adjust headers for release
 #

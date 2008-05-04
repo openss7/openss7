@@ -21,6 +21,6 @@ Original-site:
 Platforms:		Linux
 			Requires: Linux kernel 2.4,
 			sctp-0.2.24
-Copying-policy:		GPL
+Copying-policy:		AGPL
 End
 

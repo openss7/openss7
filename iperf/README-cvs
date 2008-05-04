@@ -1,6 +1,6 @@
-OpenSS7 IPERF Utility -- read me CVS file.  2007-12-16
-$Id: README-cvs,v 0.9.2.22 2007/12/29 23:32:17 brian Exp $
-Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 IPERF Utility -- read me CVS file.  2008-05-04
+$Id: README-cvs,v 0.9.2.23 2008-05-04 16:16:30 brian Exp $
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 

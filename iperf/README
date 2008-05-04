@@ -1,13 +1,13 @@
-OpenSS7 IPERF Utility -- read me first file.  2007-12-16
-$Id: README,v 1.1.1.2.2.28 2007/12/29 23:32:17 brian Exp $
-Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 IPERF Utility -- read me first file.  2008-05-04
+$Id: README,v 1.1.1.2.2.29 2008-05-04 16:16:30 brian Exp $
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  OpenSS7 IPERF Utility
 ======================
 
-Package iperf-2.0.8 was released under AGPLv3 2007-12-16.
+Package iperf-2.0.8 was released under AGPLv3 2008-05-04.
 
 `Iperf' is a general purpose tool for measuring bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
@@ -31,11 +31,11 @@ use with `OpenSS7 SCTP (Stream Control Transmission Protocol)'.  This
 from the `University of Illinois'.
 
 Modifications to the package are derived from the `OpenSS7 SCTP'
-implementation and are released under the `GNU General Public License
-(GPL) Version 3'.  The "Iperf" tool itself is licensed under specific
-terms by the `University of Illinois'.  Please see `LICENSES' for the
-`University of Illinois' "Iperf" copyright notices and licensing
-restrictions.  The "Iperf" tool is:
+implementation and are released under the `GNU Affero General Public
+License (AGPL) Version 3'.  The "Iperf" tool itself is licensed under
+specific terms by the `University of Illinois'.  Please see `LICENSES'
+for the `University of Illinois' "Iperf" copyright notices and
+licensing restrictions.  The "Iperf" tool is:
 
      Copyright 1999, 2000, 2001, 2002, 2003, 2004
      The Board of Trustees of the University of Illinois
@@ -56,7 +56,7 @@ but should build and install for other architectures as well.
  Release
 --------
 
-This is the `iperf-2.0.8' package, released 2007-12-16.  This `2.0.8'
+This is the `iperf-2.0.8' package, released 2008-05-04.  This `2.0.8'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
@@ -83,11 +83,11 @@ file (or see `Downloading from CVS', in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 3 of
-the `GNU Public License' which can be found in the file `COPYING'.
-Package specific licensing terms (if any) can be found in the file
-`LICENSES'.  Please respect these licensing arrangements.  If you are
-interested in different licensing terms, please contact the copyright
-holder, or OpenSS7 Corporation <sales@openss7.com>.
+the `GNU Affero Public License' which can be found in the file
+`COPYING'.  Package specific licensing terms (if any) can be found in
+the file `LICENSES'.  Please respect these licensing arrangements.  If
+you are interested in different licensing terms, please contact the
+copyright holder, or OpenSS7 Corporation <sales@openss7.com>.
 
 See `README-alpha' (if it exists) for alpha release information.
 

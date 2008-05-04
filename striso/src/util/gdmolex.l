@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: gdmolex.l,v 0.9.2.5 2008-04-29 00:02:06 brian Exp $
+ @(#) $Id: gdmolex.l,v 0.9.2.6 2008-05-04 16:16:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:06 $ by $Author: brian $
+ Last Modified $Date: 2008-05-04 16:16:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gdmolex.l,v $
+ Revision 0.9.2.6  2008-05-04 16:16:47  brian
+ - changes and corrections for release
+
  Revision 0.9.2.5  2008-04-29 00:02:06  brian
  - updated headers for release
 
@@ -72,9 +75,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:06 $"
+#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:47 $"
 
-static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:06 $";
+static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:47 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -88,13 +91,16 @@ static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.
 		gdmo_column += fwrite(yytext, 1, yyleng, yyout); \
 	})
 
+#ifndef YY_FLEX_SUBMINOR_VERSION
+#define FIND_RULE goto find_rule
+#else
+#define FIND_RULE while (0) { }
+#endif
+
 extern void gdmo_newline(FILE *);
 extern int gdmo_level;
 extern int gdmo_column;
 extern int gdmo_incomment;
-
-#define reject_used_but_not_detected
-#define FIND_RULE REJECT
 
 %}
 
@@ -451,7 +457,7 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 <INITIAL,asn>{EXTERNREF}		{ return TOK_EXTERNREF				; }
 <INITIAL,asn>{NAMEANDNUMBER}		{ return TOK_NAME_AND_NUMBER			; }
 <INITIAL,asn>{IDLABEL}			{ return TOK_ID					; }
-<INITIAL,asn>{LABEL}			{ return TOK_LABEL; FIND_RULE			; }
+<INITIAL,asn>{LABEL}			{ return TOK_LABEL				; }
 <INITIAL,asn>{NUMBER}			{ return TOK_NUMBER				; }
 
 <INITIAL,asn>[a-z]			{ yy_push_state(label); yymore();		; }
@@ -480,7 +486,7 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 <ds1>{DELIMITED_STRING}			{ yy_pop_state(); return TOK_DELIMITED_STRING	; }
 <ds1>{TEXT_STRING1}			{ return TOK_TEXT_STRING			; }
 
-<ds2>{COMMA}				{ yy_pop_state(); return TOK_COMMA		; }
+<ds2>{COMMA}				{ yy_pop_state(); return TOK_COMMA		; FIND_RULE; }
 <ds2>{SEMICOLON}			{ yy_pop_state(); return TOK_SEMICOLON		; }
 <ds2>{DELIMITED_STRING}			{ yy_pop_state(); return TOK_DELIMITED_STRING	; }
 <ds2>{TEXT_STRING2}			{ return TOK_TEXT_STRING			; }
@@ -496,8 +502,11 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 static void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
-	(void) yy_push_state;
 	(void) yy_top_state;
+	(void) yy_push_state;
+#ifndef YY_FLEX_SUBMINOR_VERSION
+	(void) yy_flex_realloc;
+#endif
 }
 
 // vim: tw=100 com=sr0\:/**,mb\:*,ex\:*/,sr0\:/*,mb\:*,ex\:*/,b\:TRANS formatoptions+=tcqlor

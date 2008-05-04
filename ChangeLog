@@ -1,3 +1,11 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* openss7.lsm.in: updated for release
+	* openss7.spec.in: updated for release
+	* debian/mscript_header.in: updated for release
+	* debian/rules.in: updated for release
+	* scripts/texi/versions.texi: updated for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

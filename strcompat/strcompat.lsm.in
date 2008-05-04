@@ -29,5 +29,5 @@ Original-site:
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
 			streams @STREAMS_VERSION@ SVR 4.2 STREAMS
-Copying-policy:		GPL
+Copying-policy:		AGPL
 End

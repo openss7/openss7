@@ -1,3 +1,28 @@
+2008-05-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: updates for release
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* strss7.lsm.in: updates for release
+	* strss7.spec.in: updates for release
+	* debian/changelog: updates for release
+	* debian/mscript_header.in: updates for release
+	* debian/rules.in: updates for release
+	* debian/strss7-core.postinst.in: updates for release
+	* debian/strss7-core.postrm.in: updates for release
+	* debian/strss7-core.preinst.in: updates for release
+	* debian/strss7-core.prerm.in: updates for release
+	* debian/strss7-init.postinst.in: updates for release
+	* debian/strss7-init.preinst.in: updates for release
+	* po/de.po: updates for release
+	* src/util/mtpconf_lex.l: updates for release
+	* src/util/sdllex.l: updates for release
+	* src/util/slconf_lex.l: updates for release
+	* src/util/x400lex.l: updates for release
+
 2008-05-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

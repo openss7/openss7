@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-28 11:46:37 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-05-04 16:16:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:37 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -123,19 +123,8 @@ info_name = info-$(kernel_version)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
-modules = streams-sockmod streams-socksys
-preloads =
-libraries = socket socklib
-tools = @PACKAGE@_mknod
-infofiles = $(name)
-initfiles = 
-
 @WITH_KO_MODULES_TRUE@with_ko_modules = 1
 @WITH_KO_MODULES_FALSE@with_ko_modules = 0
-
-have_init_files = 0
-have_libraries = 0
-have_preloads = 0
 
 control =
 
@@ -198,7 +187,9 @@ control	+= debian/$(PACKAGE_LCNAME)-lis-lib.install
 
 debian/$(PACKAGE_LCNAME)-%-lib.install:
 	( [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
-	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ) \
+	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ; \
+	  [ ! -d $(debtmpdir)$(localedir) ] || \
+	    find $(debtmpdir)$(localedir) -type f -name '*.mo' ) \
 	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 control	+= debian/$(PACKAGE_LCNAME)-doc.docs
@@ -475,6 +466,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.16  2008-05-04 16:16:52  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.15  2008-04-28 11:46:37  brian
 # - adjust headers for release
 #

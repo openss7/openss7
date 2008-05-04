@@ -31,5 +31,5 @@ Platforms:		Linux
 			streams @STREAMS_VERSION@ SVR 4.2 STREAMS,
 			strcompat @STRCOMP_VERSION@, strxns @XNS_VERSION@
 			strxnet @XTI_VERSION@
-Copying-policy:		GPL
+Copying-policy:		AGPL
 End

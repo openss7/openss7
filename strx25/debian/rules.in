@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:35 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-04 16:16:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -20,9 +20,10 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License along
-# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+# 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 10:46:35 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -122,19 +123,8 @@ info_name = info-$(kernel_version)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
-modules = streams-x224
-preloads =
-libraries =
-tools = @PACKAGE_TARNAME@_mknod
-infofiles = $(name)
-initfiles = 
-
 @WITH_KO_MODULES_TRUE@with_ko_modules = 1
 @WITH_KO_MODULES_FALSE@with_ko_modules = 0
-
-have_init_files = 0
-have_libraries = 0
-have_preloads = 0
 
 control =
 
@@ -197,7 +187,9 @@ control	+= debian/$(PACKAGE_LCNAME)-lis-lib.install
 
 debian/$(PACKAGE_LCNAME)-%-lib.install:
 	( [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
-	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ) \
+	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ; \
+	  [ ! -d $(debtmpdir)$(localedir) ] || \
+	    find $(debtmpdir)$(localedir) -type f -name '*.mo' ) \
 	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 control	+= debian/$(PACKAGE_LCNAME)-doc.docs
@@ -394,7 +386,7 @@ binary-common:
 	dh_fixperms -v
 	dh_makeshlibs -v
 	dh_installdeb -v
-	dh_shlibdeps -v -X.ko -X.o
+	dh_shlibdeps -v -X.ko -X.o -L strx25-lib -l debian/strx25-lib/usr/lib
 	dh_gencontrol -v
 	dh_md5sums -v
 	dh_builddeb -v
@@ -474,6 +466,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.2  2008-05-04 16:16:57  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.1  2008-05-03 10:46:35  brian
 # - added package files
 #

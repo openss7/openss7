@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 11:46:25 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-05-04 16:16:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:25 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -123,19 +123,8 @@ info_name = info-$(kernel_version)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
-modules = streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-osfcompat streams-solcompat streams-suxcompat streams-sux compat streams-svr3compat streams-svr4compat streams-uw7compat streams-uxpcompat
-preloads =
-libraries =
-tools = strcompat_mknod
-infofiles = $(name)
-initfiles = 
-
 @WITH_KO_MODULES_TRUE@with_ko_modules = 1
 @WITH_KO_MODULES_FALSE@with_ko_modules = 0
-
-have_init_files = 0
-have_libraries = 0
-have_preloads = 0
 
 control =
 
@@ -292,6 +281,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.19  2008-05-04 16:16:29  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.18  2008-04-28 11:46:25  brian
 # - adjust headers for release
 #

@@ -1,5 +1,5 @@
-OpenSS7 SS7 Stack -- history of user visible changes.  2008-05-03
-$Id: NEWS,v 0.9.2.52 2008-05-03 21:22:27 brian Exp $
+OpenSS7 SS7 Stack -- history of user visible changes.  2008-05-04
+$Id: NEWS,v 0.9.2.53 2008-05-04 16:16:35 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,8 +7,8 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 SS7 Stack package.
 
- Major changes for release strss7-0.9a.8.rc1
---------------------------------------------
+ Major changes for release strss7-0.9a.8
+----------------------------------------
 
 The OpenSS7 SS7 Stack package contains a wide array of SS7 drivers and
 components for Linux Fast-STREAMS.  This is the public release package
@@ -86,10 +86,10 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the strss7 package page (http://www.openss7.org/strss7_pkg.html).
 
-See `http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/ChangeLog' and
-`http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/NEWS' in the
-release for more information.  Also, see the `strss7.pdf' manual in the
-release (also in html `http://www.openss7.org/strss7_manual.html').
+See `http://www.openss7.org/codefiles/strss7-0.9a.8/ChangeLog' and
+`http://www.openss7.org/codefiles/strss7-0.9a.8/NEWS' in the release
+for more information.  Also, see the `strss7.pdf' manual in the release
+(also in html `http://www.openss7.org/strss7_manual.html').
 
  Major changes for release strss7-0.9a.7
 ----------------------------------------
@@ -149,15 +149,15 @@ Major features since the last public release are as follows:
 
    - Corrected support for the DS2152/21352/21552/2154/21352/21555
      chips present in older V400P cards.  (See
-     `http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/BUGS' in the
+     `http://www.openss7.org/codefiles/strss7-0.9a.8/BUGS' in the
      release for more information.)
 
    - Support for the DS2156 chip present in recent V401PE cards.  (See
-     `http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/BUGS' in the
+     `http://www.openss7.org/codefiles/strss7-0.9a.8/BUGS' in the
      release for more information.)
 
    - Corrections for timer bugs in the X400P-SS7 driver.  (See
-     `http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/BUGS' in the
+     `http://www.openss7.org/codefiles/strss7-0.9a.8/BUGS' in the
      release for more information.)
 
    - Improvements to the common build environment with better support

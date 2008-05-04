@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 11:46:25 $
+# @(#) $RCSfile: lis-core.postrm.in,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-05-04 16:16:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,24 +48,45 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:25 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:30 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
 
+function postrm_modconf() {
+    local last_core_package='yes'
+    for file in /lib/modules/*/modules.$base ; do
+	if [ -f $file ] ; then
+	    last_core_package='no'
+	    break
+	fi
+    done
+    if [ ":$last_core_package" = ":no" ] ; then
+	return 0
+    fi
+    conf_old=$sysconfdir/modules.conf
+    if grep -q 'include[^#]*'$modutildir/$base $conf_old ; then
+	conf_tmp=$tmppath/modules.conf.tmp.$$
+	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
+	chmod --reference=$conf_old $conf_tmp
+	cp -fb --suffix=.old $conf_tmp $conf_old
+	rm -f $conf_tmp
+    fi
+    rm -f -- "$modutildir/$base"
+}
+
 function postrm_preload() {
-    @WITH_KO_MODULES_FALSE@prel_fil="${sysconfdir}/modules"
-    @WITH_KO_MODULES_TRUE@prel_fil="${sysconfdir}/modprobe.preload"
-    if [ -f $prel_fil ] ; then
-	prel_tmp="$tmppath/modules.tmp.$$"
-	prel_new="$tmppath/modules.new.$$"
-	cp -f -- $prel_fil $prel_new
-	for m in ${KERNEL_PRELOADS} ; do
-	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new > $prel_tmp
-	    mv -f -- $prel_tmp $tmp_new
+    prel_old="@preloads@"
+    if [ -f $prel_old ] ; then
+	prel_new="$tmppath/modprobe.preload.new.$$"
+	prel_tmp="$tmppath/modprobe.preload.tmp.$$"
+	cp -f -- $prel_old $prel_new
+	for m in $preloads ; do
+	    sed -e "/^[[:space:]]*$m\>/d" $prel_new > $prel_tmp
+	    mv -f -- $prel_new $prel_tmp
 	done
-	chmod --reference=$prel_fil -- $prel_new
-	cp -fb --suffix=.rpmsave -- $prel_new $prel_fil
+	chmod --reference=$prel_old -- $prel_new
+	cp -fb --suffix=.dpkg-save -- $prel_new $prel_old
 	rm -f -- $prel_new
     fi
 }
@@ -106,6 +127,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: lis-core.postrm.in,v $
+# Revision 0.9.2.8  2008-05-04 16:16:30  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.7  2008-04-28 11:46:25  brian
 # - adjust headers for release
 #

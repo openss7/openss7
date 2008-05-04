@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-13 08:02:49 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-05-04 16:16:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-13 08:02:49 $ by $Author: brian $
+# Last Modified $Date: 2008-05-04 16:16:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -123,19 +123,8 @@ info_name = info-$(kernel_version)
 majbase = @STRCONF_MAJBASE@
 makedev = @STRCONF_MAKEDEV@
 
-modules = streams-ip_strm_mod streams-ip_to_dlpi streams-ldl
-preloads =
-libraries =
-tools = strxns_mknod ldlconfig ldltest
-infofiles = STREAMS SPG2
-initfiles = 
-
 @WITH_KO_MODULES_TRUE@with_ko_modules = 1
 @WITH_KO_MODULES_FALSE@with_ko_modules = 0
-
-have_init_files = 0
-have_libraries = 0
-have_preloads = 0
 
 control =
 
@@ -146,7 +135,7 @@ debian/$(PACKAGE_LCNAME)-core.postrm \
 debian/$(PACKAGE_LCNAME)-lib.preinst:
 	$(MAKE) $@
 
-#debian/$(PACKAGE_LCNAME)-lib.preinst #
+debian/$(PACKAGE_LCNAME)-lib.preinst \
 debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
 debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
 debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
@@ -193,7 +182,9 @@ control	+= debian/$(PACKAGE_LCNAME)-lib.install
 
 debian/$(PACKAGE_LCNAME)-lib.install:
 	( [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
-	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ) \
+	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ; \
+	  [ ! -d $(debtmpdir)$(localedir) ] || \
+	    find $(debtmpdir)$(localedir) -type f -name '*.mo' ) \
 	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 control	+= debian/$(PACKAGE_LCNAME)-doc.docs
@@ -474,6 +465,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.34  2008-05-04 16:16:41  brian
+# - changes and corrections for release
+#
 # Revision 0.9.2.33  2008-04-13 08:02:49  brian
 # - prepare for doc/papers
 #
