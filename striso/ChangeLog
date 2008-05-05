@@ -1,3 +1,8 @@
+2008-05-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/otk6.c: be strict with MORE_flag
+	* src/modules/isot.c: be strict with MORE_flag
+
 2008-05-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

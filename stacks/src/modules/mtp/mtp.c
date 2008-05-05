@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-04-29 07:11:02 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:02 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.26  2008-05-05 15:34:52  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.25  2008-04-29 07:11:02  brian
  - updating headers for release
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-04-29 07:11:02 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-04-29 07:11:02 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -138,7 +141,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-04-29 07:11:02 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15950,7 +15953,7 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto outstate;
-	if (p->DATA_flag & T_ODF_EX || p->DATA_flag & T_ODF_MORE)
+	if ((p->DATA_flag & T_ODF_EX) || (p->DATA_flag & T_ODF_MORE))
 		goto notsupport;
 	else {
 		struct mtp_opts opts = { 0L, NULL, };

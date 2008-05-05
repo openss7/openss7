@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:04 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-05-05 15:34:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:04 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_tpi.c,v $
+ Revision 0.9.2.30  2008-05-05 15:34:53  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.29  2008-04-29 07:11:04  brian
  - updating headers for release
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:04 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-05-05 15:34:53 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:04 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-05-05 15:34:53 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message Transfer Part Interface)
@@ -124,7 +127,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:04 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-05-05 15:34:53 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2185,7 +2188,7 @@ t_optdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((1 << mtp_get_state(mtp)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto outstate;
-	if (p->DATA_flag & T_ODF_EX || p->DATA_flag & T_ODF_MORE)
+	if ((p->DATA_flag & T_ODF_EX) || (p->DATA_flag & T_ODF_MORE))
 		goto notsupport;
 	if (t_parse_opts(&opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 		goto badopt;

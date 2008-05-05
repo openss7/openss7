@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 11:46:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-05-05 15:35:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 11:46:47 $ by $Author: brian $
+# Last Modified $Date: 2008-05-05 15:35:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,6 +84,8 @@ man_MANS = \
 	man3/x25tos.3 \
 	man3/x25_write_config_parameters.3 \
 	man3/x25_write_config_parameters_file.3 \
+	man3/xti_x25.3 \
+	man3/XX25.3 \
 	man5/extraformat.5 \
 	man5/lsapformat.5 \
 	man5/padent.5 \
@@ -159,6 +161,8 @@ dist_noinst_MANS = \
 	man3/x25tos.3.man \
 	man3/x25_write_config_parameters.3.man \
 	man3/x25_write_config_parameters_file.3.man \
+	man3/xti_x25.3.man \
+	man3/XX25.3.man \
 	man5/extraformat.5.man \
 	man5/lsapformat.5.man \
 	man5/padent.5.man \
@@ -216,6 +220,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2008-05-05 15:35:02  brian
+# - be strict with MORE_data and DATA_flag
+#
 # Revision 0.9.2.2  2008-05-03 11:46:47  brian
 # - added manual pages
 #

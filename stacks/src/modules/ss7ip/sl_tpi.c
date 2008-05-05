@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-29 07:11:12 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:34:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:12 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.31  2008-05-05 15:34:55  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.30  2008-04-29 07:11:12  brian
  - updating headers for release
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-29 07:11:12 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:34:55 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-29 07:11:12 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:34:55 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -6315,11 +6318,11 @@ t_data_ind(queue_t *q, mblk_t *mp)
 		mblk_t *dp = mp->b_cont;
 		struct T_data_ind *p = (typeof(p)) mp->b_rptr;
 
-		if (!p->MORE_flag && !dp->b_cont) {
+		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			sl_recv_data(q, dp);
 			return (QR_TRIMMED);	/* absorbed data */
 		} else {
-			return t_data_ind_slow(q, mp, p->MORE_flag);
+			return t_data_ind_slow(q, mp, p->MORE_flag & T_MORE);
 		}
 	}
 	/* 
@@ -6399,11 +6402,11 @@ t_exdata_ind(queue_t *q, mblk_t *mp)
 		mblk_t *dp = mp->b_cont;
 		struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
 
-		if (!p->MORE_flag && !dp->b_cont) {
+		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			sl_recv_data(q, dp);
 			return (QR_TRIMMED);	/* absorbed data */
 		} else
-			return t_exdata_ind_slow(q, mp, p->MORE_flag);
+			return t_exdata_ind_slow(q, mp, p->MORE_flag & T_MORE);
 	}
 	/* 
 	   ignore data in other states */

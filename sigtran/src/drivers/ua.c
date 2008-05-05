@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:22 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:22 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.12  2008-05-05 15:34:49  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.11  2008-04-29 01:52:22  brian
  - updated headers for release
 
@@ -86,13 +89,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:22 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:22 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:22 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -16308,7 +16311,7 @@ xp_data_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 
 	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
 
-	if (p->MORE_flag) {
+	if (p->MORE_flag & T_MORE) {
 		mblk_t *rp;
 
 		for (rp = xp->nm_reassem; rp && *(t_uscalar_t *) rp->b_rptr != 0; rp = rp->b_next) ;
@@ -16348,7 +16351,7 @@ xp_exdata_ind(struct xp *xp, queue_t *q, mblk_t *mp)
 
 	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*p));
 
-	if (p->MORE_flag) {
+	if (p->MORE_flag & T_MORE) {
 		mblk_t *rp;
 
 		for (rp = xp->ex_reassem; rp && *(t_uscalar_t *) rp->b_rptr != 0; rp = rp->b_next) ;

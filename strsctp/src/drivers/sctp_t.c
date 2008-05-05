@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-28 23:13:25 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-05-05 15:35:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:25 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:35:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_t.c,v $
+ Revision 0.9.2.18  2008-05-05 15:35:01  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.17  2008-04-28 23:13:25  brian
  - updated headers for release
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-28 23:13:25 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-05-05 15:35:01 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-28 23:13:25 $";
+    "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-05-05 15:35:01 $";
 
 #define __NO_VERSION__
 
@@ -3251,7 +3254,7 @@ t_data_req(sctp_t * sp, mblk_t *mp)
 		ulong ppi = sp->ppi;
 		ulong sid = sp->sid;
 		ulong ord = 1;
-		ulong more = p->MORE_flag;
+		ulong more = p->MORE_flag & T_MORE;
 		ulong rcpt = 0;
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
@@ -3296,7 +3299,7 @@ t_exdata_req(sctp_t * sp, mblk_t *mp)
 		ulong ppi = sp->ppi;
 		ulong sid = sp->sid;
 		ulong ord = 0;
-		ulong more = p->MORE_flag;
+		ulong more = p->MORE_flag & T_MORE;
 		ulong rcpt = 0;
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))

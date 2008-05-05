@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:24 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:24 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_tpi.c,v $
+ Revision 0.9.2.12  2008-05-05 15:34:49  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.11  2008-04-29 01:52:24  brian
  - updated headers for release
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:24 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:24 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -107,7 +110,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 01:52:24 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -2464,13 +2467,13 @@ t_data_ind(queue_t *q, mblk_t *mp)
 	if (sdt->i_state == LMI_ENABLED && sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		mblk_t *dp = mp->b_cont;
 		struct T_data_ind *p = (typeof(p)) mp->b_rptr;
-		if (!p->MORE_flag && !dp->b_cont) {
+		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			int err;
 			if ((err = sdt_recv_data(q, dp)) != QR_ABSORBED)
 				return (err);
 			return (QR_TRIMMED);	/* absorbed data */
 		} else {
-			return t_data_ind_slow(q, sdt, mp, p->MORE_flag);
+			return t_data_ind_slow(q, sdt, mp, p->MORE_flag & T_MORE);
 		}
 	}
 	/* 
@@ -2531,13 +2534,13 @@ t_exdata_ind(queue_t *q, mblk_t *mp)
 	if (sdt->i_state == LMI_ENABLED && sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		mblk_t *dp = mp->b_cont;
 		struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
-		if (!p->MORE_flag && !dp->b_cont) {
+		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			int err;
 			if ((err = sdt_recv_data(q, dp)) != QR_ABSORBED)
 				return (err);
 			return (QR_TRIMMED);	/* absorbed data */
 		} else
-			return t_exdata_ind_slow(q, sdt, mp, p->MORE_flag);
+			return t_exdata_ind_slow(q, sdt, mp, p->MORE_flag & T_MORE);
 	}
 	/* 
 	   ignore data in other states */

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.36 2008-04-28 18:38:34 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.37 2008-05-05 15:35:02 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-28 18:38:34 $ by $Author: brian $
+@c Last Modified $Date: 2008-05-05 15:35:02 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -103,6 +103,10 @@ and tool chains.
 Major features since the last public release are as follows:
 
 @itemize -
+@item
+Added ability of XTI library to pass additional flags when sending and
+receiving data for XTI(XX25) implementation.
+
 @item
 Kernel module license made explicit "GPL v2".  And then changed back to "GPL".
 

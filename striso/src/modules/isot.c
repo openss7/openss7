@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 00:02:05 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 0.9.2.7  2008-05-05 15:34:58  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.6  2008-04-29 00:02:05  brian
  - updated headers for release
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 00:02:05 $"
+#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $"
 
 static char const ident[] =
-    "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 00:02:05 $";
+    "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -90,7 +93,8 @@ static char const ident[] =
  *  Protocol Class 0 (TP0).
  */
 
-#if 0
+#define NEVER 0
+#if NEVER
 #include <sys/os7/compat.h>
 
 #if defined HAVE_TIHDR_H
@@ -103,7 +107,7 @@ static char const ident[] =
 
 #define ISOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ISOT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 00:02:05 $"
+#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $"
 #define ISOT_DEVICE	"SVR 4.2 STREAMS ISOT Module for RFC 1006 and RFC 2126"
 #define ISOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISOT_LICENSE	"GPL"
@@ -1278,7 +1282,7 @@ tp_data_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp)
 		DB_TYPE(mp) = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_DATA_REQ;
-		p->MORE_flag = (more != 0) ? 1 : 0;
+		p->MORE_flag = (more != 0) ? T_MORE : 0;
 		mp->b_wptr += sizeof(*p);
 		mp->b_cont = dp;
 		if (msg && msg->b_cont == dp)
@@ -1311,7 +1315,7 @@ tp_exdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *d
 		mp->b_band = 1;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_EXDATA_REQ;
-		p->MORE_flag = (more != 0) ? 1 : 0;
+		p->MORE_flag = (more != 0) ? T_MORE : 0;
 		mp->b_wptr += sizeof(*p);
 		mp->b_cont = dp;
 		if (msg && msg->b_cont == dp)
