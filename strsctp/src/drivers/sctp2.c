@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-04-28 23:13:23 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:23 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.77  2008-05-05 15:34:59  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.76  2008-04-28 23:13:23  brian
  - updated headers for release
 
@@ -164,10 +167,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-04-28 23:13:23 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-04-28 23:13:23 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -185,7 +188,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-04-28 23:13:23 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -28054,7 +28057,7 @@ t_data_req(struct sctp *sp, mblk_t *mp)
 		t_uscalar_t ppi = sp->ppi;
 		t_uscalar_t sid = sp->sid;
 		t_uscalar_t ord = 1;
-		t_uscalar_t more = p->MORE_flag;
+		t_uscalar_t more = p->MORE_flag & T_MORE;
 		t_uscalar_t rcpt = 0;
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))
@@ -28114,7 +28117,7 @@ t_exdata_req(struct sctp *sp, mblk_t *mp)
 		t_uscalar_t ppi = sp->ppi;
 		t_uscalar_t sid = sp->sid;
 		t_uscalar_t ord = 0;
-		t_uscalar_t more = p->MORE_flag;
+		t_uscalar_t more = p->MORE_flag & T_MORE;
 		t_uscalar_t rcpt = 0;
 
 		if ((err = sctp_data_req(sp, ppi, sid, ord, more, rcpt, mp->b_cont)))

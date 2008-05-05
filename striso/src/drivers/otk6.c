@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:00 $
+ @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-05-05 15:34:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:00 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: otk6.c,v $
+ Revision 0.9.2.3  2008-05-05 15:34:58  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.2  2008-04-29 00:02:00  brian
  - updated headers for release
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:00 $"
+#ident "@(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-05-05 15:34:58 $"
 
-static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:00 $";
+static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-05-05 15:34:58 $";
 
 /*
  * This file provides a multiplexing driver for RFC 1006 (RFC 2126) OSI Transport over TCP.  The
@@ -121,7 +124,7 @@ static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.2 $
 #define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define OTK6_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:00 $"
+#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-05-05 15:34:58 $"
 #define OTK6_DEVICE	"SVR 4.2 STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define OTK6_LICENSE	"GPL"
@@ -12873,7 +12876,7 @@ tp_data_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		goto baddata;
 	if (mlen == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO))
 		goto baddata;
-	return tp_send_dt(tp, q, mp, p->MORE_flag, mp->b_cont);
+	return tp_send_dt(tp, q, mp, p->MORE_flag & T_MORE, mp->b_cont);
       baddata:
 	err = TBADDATA;
 	goto error;
@@ -12917,7 +12920,7 @@ tp_exdata_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		goto notsupport;
 	if (!(tp->addopts & _T_F_AO_EXPD))
 		goto notsupport;
-	if (p->MORE_flag)
+	if (p->MORE_flag & T_MORE)
 		goto badflag;
 	if (tp_get_state(tp) == TS_IDLE)
 		goto discard;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-04-28 22:52:10 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2008-05-05 15:34:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:52:10 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.91  2008-05-05 15:34:56  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.90  2008-04-28 22:52:10  brian
  - updated headers for release
 
@@ -149,10 +152,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-04-28 22:52:10 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2008-05-05 15:34:56 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-04-28 22:52:10 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2008-05-05 15:34:56 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -640,7 +643,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-04-28 22:52:10 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2008-05-05 15:34:56 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -13090,7 +13093,7 @@ t_data_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_DATA_IND;
-		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
+		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? T_MORE : 0;
 		mp->b_wptr += sizeof(*p);
 		dp->b_band = 0;	/* sometimes non-zero */
 		dp->b_flag &= ~MSGMARK;	/* sometimes marked */
@@ -13119,7 +13122,7 @@ t_exdata_ind(queue_t *q, struct msghdr *msg, mblk_t *dp)
 		mp->b_band = 1;	/* expedite */
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_EXDATA_IND;
-		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? 1 : 0;
+		p->MORE_flag = (msg->msg_flags & MSG_EOR) ? T_MORE : 0;
 		mp->b_wptr += sizeof(*p);
 		dp->b_band = 0;	/* sometimes non-zero */
 		dp->b_flag &= ~MSGMARK;	/* sometimes marked */
@@ -14587,7 +14590,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 	msg.msg_namelen = 0;
 	msg.msg_control = NULL;
 	msg.msg_controllen = 0;
-	msg.msg_flags = (ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0;
+	msg.msg_flags = (ss->p.prot.type == SOCK_SEQPACKET && !(p->MORE_flag & T_MORE)) ? MSG_EOR : 0;
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
 	ptrace(("%s: ERROR: message too large %ld > %ld\n", DRV_NAME, mlen, mmax));
@@ -14638,7 +14641,7 @@ t_exdata_req(queue_t *q, mblk_t *mp)
 	msg.msg_control = NULL;
 	msg.msg_controllen = 0;
 	msg.msg_flags =
-	    MSG_OOB | ((ss->p.prot.type == SOCK_SEQPACKET && !p->MORE_flag) ? MSG_EOR : 0);
+	    MSG_OOB | ((ss->p.prot.type == SOCK_SEQPACKET && !(p->MORE_flag & T_MORE)) ? MSG_EOR : 0);
 	return ss_sock_sendmsg(ss, mp, &msg);
       emsgsize:
 	ptrace(("%s: ERROR: message too large %ld > %ld\n", DRV_NAME, mlen, mmax));

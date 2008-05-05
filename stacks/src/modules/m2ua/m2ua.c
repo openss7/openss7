@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:10:59 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:59 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.23  2008-05-05 15:34:52  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.22  2008-04-29 07:10:59  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:10:59 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:10:59 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -101,7 +104,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:10:59 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -11587,7 +11590,7 @@ xp_data_ind(queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
-	if (p->MORE_flag) {
+	if (p->MORE_flag & T_MORE) {
 		mblk_t *rp;
 
 		for (rp = xp->nm_reassem; rp && *(ulong *) rp->b_rptr != 0; rp = rp->b_next) ;
@@ -11633,7 +11636,7 @@ xp_exdata_ind(queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
-	if (p->MORE_flag) {
+	if (p->MORE_flag & T_MORE) {
 		mblk_t *rp;
 
 		for (rp = xp->ex_reassem; rp && *(ulong *) rp->b_rptr != 0; rp = rp->b_next) ;

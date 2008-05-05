@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 18:38:38 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:35:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:38 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:35:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnet.c,v $
+ Revision 0.9.2.31  2008-05-05 15:35:03  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.30  2008-04-28 18:38:38  brian
  - header updates for release
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 18:38:38 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:35:03 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 18:38:38 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:35:03 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -339,6 +342,7 @@ struct _t_user {
 	u_int8_t moreexp;		/**< more data in T_EXDATA_IND/T_OPTDATA_IND */
 	u_int8_t moreedu;		/**< more etsdu */
 	u_int8_t moremsg;		/**< more data with dis/con/rel message */
+	u_int8_t dxflags;		/**< additional data xfer flags */
 	int ctlmax;			/**< maximum size of ctlbuf */
 	char *ctlbuf;			/**< ctrl part buffer */
 	int datmax;			/**< maximum size of datbuf */
@@ -552,9 +556,12 @@ __xnet_u_reset_event(struct _t_user *user)
 		user->moreexp = 0;
 		user->moreedu = 0;
 		user->moremsg = 0;
+		user->dxflags = 0;
 	} else {
-		/** When we are clearing an expedited data event, we must revert to an outstanding
-		   data event. */
+		/**
+		   When we are clearing an expedited data event, we must
+		   revert to an outstanding data event.
+		 */
 		user->prim = 0;
 		user->event = T_DATA;
 		user->ctrl.maxlen = user->ctlmax;
@@ -885,19 +892,21 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 		if (user->ctrl.len || user->data.len) {
 			if (user->event == 0 || user->ctrl.len > 0)
 				__xnet_u_setevent(user, user->ctrl.len ? p->type : -1, 0);
-			/* 
-			   There is a little extra handling for data indications */
+			/* There is a little extra handling for data
+			   indications */
 			switch (user->prim) {
 			case -1:	/* just data */
 				user->moredat = ((ret & MOREDATA) != 0);
 				break;
 			case T_DATA_IND:
-				user->moresdu = (p->data_ind.MORE_flag != 0);
+				user->moresdu = ((p->data_ind.MORE_flag & T_MORE) != 0);
 				user->moredat = ((ret & MOREDATA) != 0);
+				user->dxflags = p->data_ind.MORE_flag & ~(T_MORE | T_EXPEDITED);
 				break;
 			case T_EXDATA_IND:
-				user->moreedu = (p->exdata_ind.MORE_flag != 0);
+				user->moreedu = ((p->exdata_ind.MORE_flag & T_MORE) != 0);
 				user->moreexp = ((ret & MOREDATA) != 0);
+				user->dxflags = p->exdata_ind.MORE_flag & ~(T_MORE | T_EXPEDITED);
 				break;
 			case T_OPTDATA_IND:
 				if (p->optdata_ind.DATA_flag & T_ODF_EX) {
@@ -909,12 +918,14 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moredat = ((ret & MOREDATA) != 0);
 				}
+				user->dxflags = p->optdata_ind.DATA_flag & ~(T_ODF_MORE | T_ODF_EX);
 				break;
 			case T_UNITDATA_IND:
 				user->moresdu = 0;
 				user->moredat = ((ret & MOREDATA) != 0);
 				user->moreedu = 0;
 				user->moreexp = 0;
+				user->dxflags = 0;
 				break;
 			case T_CONN_IND:
 			case T_CONN_CON:
@@ -927,9 +938,9 @@ __xnet_t_getdata(int fd, struct strbuf *udata, int expect)
 			if ((user->event & expect))
 				user->data.len = 0;	/* consumed */
 			else {
-				/* 
-				   didn't get what we were expecting, so we need to move any data
-				   from the user buffer back to the look buffer */
+				/* didn't get what we were expecting, so we
+				   need to move any data from the user buffer
+				   back to the look buffer */
 				if (user->data.len > 0)
 					memcpy(user->datbuf, user->data.buf, user->data.len);
 				user->data.buf = user->datbuf;
@@ -987,8 +998,8 @@ __xnet_t_getevent(int fd)
 			goto tsync;
 		if (user->ctrl.len || user->data.len) {
 			__xnet_u_setevent(user, user->ctrl.len ? p->type : -1, 0);
-			/* 
-			   There is a little extra handling for data indications */
+			/* There is a little extra handling for data
+			   indications */
 			switch (user->prim) {
 			case -1:	/* just data */
 				user->moredat = ((ret & MOREDATA) != 0);
@@ -996,10 +1007,12 @@ __xnet_t_getevent(int fd)
 			case T_DATA_IND:
 				user->moresdu = (p->data_ind.MORE_flag != 0);
 				user->moredat = ((ret & MOREDATA) != 0);
+				user->dxflags = p->data_ind.MORE_flag & ~(T_MORE | T_EXPEDITED);
 				break;
 			case T_EXDATA_IND:
 				user->moreedu = (p->exdata_ind.MORE_flag != 0);
 				user->moreexp = ((ret & MOREDATA) != 0);
+				user->dxflags = p->exdata_ind.MORE_flag & ~(T_MORE | T_EXPEDITED);
 				break;
 			case T_OPTDATA_IND:
 				if (p->optdata_ind.DATA_flag & T_ODF_EX) {
@@ -1011,12 +1024,14 @@ __xnet_t_getevent(int fd)
 					    ((p->optdata_ind.DATA_flag & T_ODF_MORE) != 0);
 					user->moredat = ((ret & MOREDATA) != 0);
 				}
+				user->dxflags = p->optdata_ind.DATA_flag & ~(T_ODF_MORE | T_ODF_EX);
 				break;
 			case T_UNITDATA_IND:
 				user->moresdu = 0;
 				user->moredat = ((ret & MOREDATA) != 0);
 				user->moreedu = 0;
 				user->moreexp = 0;
+				user->dxflags = 0;
 				break;
 			case T_CONN_IND:
 			case T_CONN_CON:
@@ -1325,10 +1340,9 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 		goto tbadopt;
 	if (call && call->udata.len > __xnet_u_max_connect(user))
 		goto tbaddata;
-	/* 
-	   Check if we need to bind the responding stream to the responding address.  This also
-	   rules out the case where the listening stream and the responding stream are the same
-	   address. */
+	/* Check if we need to bind the responding stream to the responding
+	   address.  This also rules out the case where the listening stream
+	   and the responding stream are the same address. */
 	if (resuser->statef & TSF_UNBND) {
 		size_t add_len = (call && call->addr.len > 0) ? call->addr.len : 0;
 		struct {
@@ -1336,11 +1350,11 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			unsigned char addr[add_len];
 		} req;
 
-		/* 
-		   There is no way to pass the responding address to the stream as there is in the
-		   NPI, therefore, we must bind the stream to the proper responding address before
-		   accepting the connection indication. This sets the local name associated with
-		   the accepting stream. */
+		/* There is no way to pass the responding address to the stream 
+		   as there is in the NPI, therefore, we must bind the stream
+		   to the proper responding address before accepting the
+		   connection indication. This sets the local name associated
+		   with the accepting stream. */
 		req.prim.PRIM_type = T_BIND_REQ;
 		req.prim.ADDR_length = add_len;
 		req.prim.ADDR_offset = add_len ? sizeof(req.prim) : 0;
@@ -1351,9 +1365,9 @@ __xnet_t_accept(int fd, int resfd, const struct t_call *call)
 			goto error;
 		__xnet_u_setstate_const(resuser, TS_IDLE);
 	}
-	/* 
-	   XNS 5.2 says that if the responding stream is already bound that it must be bound to the 
-	   same address a specified in call->addr, so we don't check */
+	/* XNS 5.2 says that if the responding stream is already bound that it
+	   must be bound to the same address a specified in call->addr, so we
+	   don't check */
 	{
 		size_t opt_len = (call && call->opt.len > 0) ? call->opt.len : 0;
 		size_t dat_len = (call && call->udata.len > 0) ? call->udata.len : 0;
@@ -2465,11 +2479,10 @@ __xnet_t_getinfo(int fd, struct t_info *info)
 		user->info.discon = buf.ack.DDATA_size;
 		user->info.servtype = buf.ack.SERV_type;
 		user->info.flags = buf.ack.PROVIDER_flag;
-		/* 
-		   need a define around this one 'cause it doesn't exist in XNS 5.2 */
+		/* need a define around this one 'cause it doesn't exist in XNS 
+		   5.2 */
 		user->info.tidu = buf.ack.TIDU_size;
-		/* 
-		   ignore CURRENT_state */
+		/* ignore CURRENT_state */
 		if (info)
 			*info = user->info;
 		return (0);
@@ -2784,18 +2797,19 @@ __xnet_t_look(int fd)
 #endif
 		if ((ret = __xnet_t_getmsg(fd, &user->ctrl, &user->data, &flag)) < 0)
 			goto error;
-		if ((ret & MORECTL) || ((ret & MOREDATA) && user->data.maxlen > 0))	/* bad */
+		if ((ret & MORECTL) || ((ret & MOREDATA) && user->data.maxlen > 0))	/* bad 
+											 */
 			goto cleanup;
 		if (flag != 0 || flag == RS_HIPRI)
 			goto tsync;
 		switch (user->state) {
 		case T_UNINIT:
-			/* 
-			   cannot have any events - should have never gotten here */
+			/* cannot have any events - should have never gotten
+			   here */
 			goto tsync;
 		case T_UNBND:
-			/* 
-			   cannot have any events - should have never gotten here */
+			/* cannot have any events - should have never gotten
+			   here */
 			goto tsync;
 		case T_IDLE:
 #ifndef CONFIG_XTI_IS_TYPELESS
@@ -2804,12 +2818,11 @@ __xnet_t_look(int fd)
 			case T_COTS_ORD:
 				if (user->qlen > 0)
 					goto tincon;
-				/* 
-				   cannot have any events - should have never gotten here */
+				/* cannot have any events - should have never
+				   gotten here */
 				goto tsync;
 			case T_CLTS:
-				/* 
-				   T_UNITDATA_IND, T_UDERROR_IND */
+				/* T_UNITDATA_IND, T_UDERROR_IND */
 				if (user->ctrl.len == 0) {
 					if ((user->gflags = (ret & MOREDATA))) {
 						user->event = T_DATA;
@@ -2856,8 +2869,7 @@ __xnet_t_look(int fd)
 			return (user->event);
 #endif
 		case T_OUTCON:
-			/* 
-			   T_CONN_CON or T_DISCON_IND */
+			/* T_CONN_CON or T_DISCON_IND */
 			switch ((user->prim = p->type)) {
 			case T_CONN_CON:
 				user->event = T_CONNECT;
@@ -2871,8 +2883,7 @@ __xnet_t_look(int fd)
 			user->gflags = 0;
 			return (user->event);
 		case T_INCON:
-			/* 
-			   T_CONN_IND or T_DISCON_IND */
+			/* T_CONN_IND or T_DISCON_IND */
 		      tincon:
 			switch ((user->prim = p->type)) {
 			case T_CONN_IND:
@@ -2887,11 +2898,11 @@ __xnet_t_look(int fd)
 			user->gflags = 0;
 			return (user->event);
 		case T_DATAXFER:
-			/* 
-			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND */
+			/* T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND,
+			   T_ORDREL_IND, T_DISCON_IND */
 		case T_OUTREL:
-			/* 
-			   T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND, T_ORDREL_IND, T_DISCON_IND */
+			/* T_DATA_IND, T_EXDATA_IND, T_OPTDATA_IND,
+			   T_ORDREL_IND, T_DISCON_IND */
 			if (user->ctrl.len == 0) {
 				if ((user->gflags = (ret & MOREDATA))) {
 					user->event = T_DATA;
@@ -2946,8 +2957,7 @@ __xnet_t_look(int fd)
 			user->gflags = (ret & MOREDATA);
 			return (user->event);
 		case T_INREL:
-			/* 
-			   T_DISCON_IND */
+			/* T_DISCON_IND */
 			switch ((user->prim = p->type)) {
 			case T_DISCON_IND:
 				user->event = T_DISCONNECT;
@@ -3028,8 +3038,7 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 		goto badopen;
 	if (ioctl(fd, I_PUSH, "timod") != 0)
 		goto badioctl;
-	/* 
-	   need to pick up all the capabilities from the stream */
+	/* need to pick up all the capabilities from the stream */
 	{
 		int i;
 		union {
@@ -3081,7 +3090,8 @@ __xnet_t_open(const char *path, int oflag, struct t_info *info)
 		user->refs++;	/* one for new structure, see memset above */
 		if (user->flags & TUF_SYNC_REQUIRED)
 			__xnet_u_setstate(user, buf.ack.INFO_ack.CURRENT_state);
-		pthread_rwlock_init(&user->lock, NULL);	/* destroyed for existing structure */
+		pthread_rwlock_init(&user->lock, NULL);	/* destroyed for
+							   existing structure */
 		_t_fds[fd] = user;
 		user->flags &= ~TUF_SYNC_REQUIRED;
 		if (info)
@@ -3281,13 +3291,14 @@ __xnet_t_rcv(int fd, char *buf, unsigned int nbytes, int *flags)
 			case T_DATA:
 				if (event != T_DATA)
 					goto tlook;
-				flag = ((user->moresdu || user->moredat) ? T_MORE : 0);
+				flag = ((user->moresdu || user->moredat) ? T_MORE : 0) |
+				    user->dxflags;
 				break;
 			case T_EXDATA:
 				if (event != T_EXDATA)
 					goto tlook;
-				flag =
-				    ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
+				flag = ((user->moreedu || user->moreexp) ? T_MORE : 0) |
+				    user->dxflags | T_EXPEDITED;
 				break;
 			case 0:
 				goto tnodata;
@@ -3685,7 +3696,8 @@ __xnet_t_rcvrel(int fd)
 		if (user->state == T_DATAXFER)
 			__xnet_u_setstate_const(user, TS_WREQ_ORDREL);
 		if (user->state == T_OUTREL) {
-			/* Releasing endpoint might have been a listening endpoint. */
+			/* Releasing endpoint might have been a listening
+			   endpoint. */
 			if (user->ocnt)
 				__xnet_u_setstate_const(user, TS_WRES_CIND);
 			else
@@ -3756,7 +3768,8 @@ __xnet_t_rcvreldata(int fd, struct t_discon *discon)
 		if (user->state == T_DATAXFER)
 			__xnet_u_setstate_const(user, TS_WREQ_ORDREL);
 		if (user->state == T_OUTREL) {
-			/* Releaseing endpoint might have been a listening endpoint. */
+			/* Releaseing endpoint might have been a listening
+			   endpoint. */
 			if (user->ocnt)
 				__xnet_u_setstate_const(user, TS_WRES_CIND);
 			else
@@ -3875,8 +3888,8 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 				user->data.buf += optdata->udata.len;
 			}
 			if (flags)
-				*flags |= (user->moresdu || user->moredat
-					   || user->data.len > 0) ? T_MORE : 0;
+				*flags |= ((user->moresdu || user->moredat
+					    || user->data.len > 0) ? T_MORE : 0) | user->dxflags;
 			break;
 		case T_EXDATA_IND:
 			if (optdata->addr.maxlen >= 0)
@@ -3890,9 +3903,9 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 				user->data.buf += optdata->udata.len;
 			}
 			if (flags)
-				*flags |= (user->moreedu || user->moreexp
-					   || user->data.len >
-					   0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
+				*flags |= ((user->moreedu || user->moreexp
+					    || user->data.len > 0) ? T_MORE : 0) |
+				    user->dxflags | T_EXPEDITED;
 			break;
 		case T_OPTDATA_IND:
 			if (optdata->addr.maxlen >= 0)
@@ -3910,13 +3923,15 @@ __xnet_t_rcvopt(int fd, struct t_unitdata *optdata, int *flags)
 			}
 			if (p->optdata_ind.DATA_flag & T_ODF_EX) {
 				if (flags)
-					*flags |= (user->moreedu || user->moreexp
-						   || user->data.len >
-						   0) ? T_MORE | T_EXPEDITED : T_EXPEDITED;
+					*flags |= ((user->moreedu || user->moreexp
+						    || user->data.len > 0) ? T_MORE : 0) |
+					    user->dxflags | T_EXPEDITED;
 			} else {
-				if (flags)
-					*flags |= (user->moresdu || user->moredat
-						   || user->data.len > 0) ? T_MORE : 0;
+				if (flags) {
+					*flags |= ((user->moresdu || user->moredat
+						    || user->data.len > 0) ? T_MORE : 0) |
+					    user->dxflags;
+				}
 			}
 			break;
 		default:
@@ -4047,9 +4062,10 @@ __xnet_t_rcvudata(int fd, struct t_unitdata *unitdata, int *flags)
 			}
 		}
 		for (;;) {
-			if (likely(result == T_DATA))
-				flag = (user->moresdu || user->moredat) ? T_MORE : 0;
-			else if (result == 0)
+			if (likely(result == T_DATA)) {
+				flag = ((user->moresdu || user->moredat) ? T_MORE : 0) |
+				    user->dxflags;
+			} else if (result == 0)
 				goto tnodata;
 			else if (result == -1)
 				goto error;
@@ -4247,13 +4263,14 @@ __xnet_t_rcvv(int fd, struct t_iovec *iov, unsigned int iovcount, int *flags)
 			case T_DATA:
 				if (event != T_DATA)
 					goto tlook;
-				flag = ((user->moresdu || user->moredat) ? T_MORE : 0);
+				flag = ((user->moresdu || user->moredat) ? T_MORE : 0) |
+				    user->dxflags;
 				break;
 			case T_EXDATA:
 				if (event != T_EXDATA)
 					goto tlook;
-				flag =
-				    ((user->moreedu || user->moreexp) ? T_MORE : 0) | T_EXPEDITED;
+				flag = ((user->moreedu || user->moreexp) ? T_MORE : 0) |
+				    user->dxflags | T_EXPEDITED;
 				break;
 			case 0:
 				goto tnodata;
@@ -4399,7 +4416,8 @@ __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 		for (;;) {
 			switch (result) {
 			case T_DATA:
-				flag = (user->moresdu || user->moredat) ? T_MORE : 0;
+				flag = ((user->moresdu || user->moredat) ? T_MORE : 0) |
+				    user->dxflags;
 				break;
 			case 0:
 				goto tnodata;
@@ -4545,7 +4563,8 @@ __xnet_t_removeleaf(int fd, int leafid, int reason)
 			goto tproto;
 		if (opts.hdr.level != T_ATM_SIGNALLING || opts.hdr.name != T_ATM_DROP_LEAF)
 			goto tproto;
-		/** The t_addleaf function requires an operating-system specific blocking mechanism
+		/**
+		   The t_addleaf function requires an operating-system specific blocking mechanism
 		   to know when to check for the leaf status indication.  The most obvious approach 
 		   is to have the ATM transport service provider send a signal to the stream head
 		   when an indication has arrived.  What signal (SIGPOLL, SIGIO, SIGUSR) is a
@@ -4641,6 +4660,7 @@ __xnet_t_snd(int fd, char *buf, unsigned int nbytes, int flags)
 			data.len = min(__xnet_u_max_tidu(user), nbytes - written);
 			data.buf = buf + written;
 			prim.MORE_flag = (written + data.len < nbytes) || (flags & T_MORE);
+			prim.MORE_flag |= (flags & ~(T_MORE | T_EXPEDITED));
 			if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 				goto error;
 			written += data.len;
@@ -5003,8 +5023,7 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 		data.len = dat_len;
 		data.buf = optdata ? optdata->udata.buf : NULL;
 		req.prim.PRIM_type = T_OPTDATA_REQ;
-		req.prim.DATA_flag =
-		    ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
+		req.prim.DATA_flag = flags;
 		req.prim.OPT_length = opt_len;
 		req.prim.OPT_offset = opt_len ? sizeof(req.prim) : 0;
 		if (opt_len)
@@ -5012,9 +5031,7 @@ __xnet_t_sndopt(int fd, const struct t_unitdata *optdata, int flags)
 		while (written < dat_len) {
 			data.len = min(__xnet_u_max_tidu(user), dat_len - written);
 			data.buf = optdata->udata.buf + written;
-			req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0)
-			    | (((flags & T_MORE) || (written + data.len < dat_len)) ? T_ODF_MORE :
-			       0);
+			req.prim.DATA_flag = flags | ((written + data.len < dat_len) ? T_ODF_MORE : 0);
 			if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND))
 				goto error;
 			written += data.len;
@@ -5116,9 +5133,7 @@ __xnet_t_sndvopt(int fd, const struct t_unitdata *optdata, const struct t_iovec 
 			do {
 				data.len = min(__xnet_u_max_tidu(user), iov[n].iov_len - partial);
 				data.buf = iov[n].iov_base + partial;
-				req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0) |
-				    (((flags & T_MORE)
-				      || (written + data.len < nbytes)) ? T_ODF_MORE : 0);
+				req.prim.DATA_flag = flags | ((written + data.len < nbytes) ? T_ODF_MORE : 0);
 				if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 					goto error;
 				partial += data.len;
@@ -5350,6 +5365,7 @@ __xnet_t_sndv(int fd, const struct t_iovec *iov, unsigned int iovcount, int flag
 				data.len = min(__xnet_u_max_tidu(user), iov[n].iov_len - partial);
 				data.buf = iov[n].iov_base + partial;
 				prim.MORE_flag = (written + data.len < nbytes) || (flags & T_MORE);
+				prim.MORE_flag |= (flags & ~(T_MORE | T_EXPEDITED));
 				if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 					goto error;
 				partial += data.len;
@@ -5457,8 +5473,7 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
 		data.len = nbytes;
 		data.buf = NULL;
 		req.prim.PRIM_type = T_OPTDATA_REQ;
-		req.prim.DATA_flag =
-		    ((flags & T_EXPEDITED) ? T_ODF_EX : 0) | ((flags & T_MORE) ? T_ODF_MORE : 0);
+		req.prim.DATA_flag = flags;
 		req.prim.OPT_length = opt_len;
 		req.prim.OPT_offset = opt_len ? sizeof(req.prim) : 0;
 		if (opt_len)
@@ -5467,9 +5482,7 @@ __xnet_t_sndvopt(int fd, struct t_optmgmt *options, const struct t_iovec *iov,
 			do {
 				data.len = min(__xnet_u_max_tidu(user), iov[n].iov_len - partial);
 				data.buf = iov[n].iov_base + partial;
-				req.prim.DATA_flag = (((flags & T_EXPEDITED)) ? T_ODF_EX : 0)
-				    | (((flags & T_MORE) || (written + data.len < nbytes)) ?
-				       T_ODF_MORE : 0);
+				req.prim.DATA_flag = flags | ((written + data.len < nbytes) ? T_ODF_MORE : 0);
 				if (__xnet_t_putpmsg(fd, &ctrl, &data, band, MSG_BAND) == -1)
 					goto error;
 				partial += data.len;
@@ -5983,8 +5996,7 @@ __xnet_t_sync(int fd)
 				break;
 			}
 #if 0
-		/* 
-		   FIXME: get these with fcntl */
+		/* FIXME: get these with fcntl */
 		user->fflags = oflag;
 #endif
 		user->info.addr = buf.ack.INFO_ack.ADDR_size;
@@ -6000,9 +6012,10 @@ __xnet_t_sync(int fd)
 		user->refs++;	/* one for new structure, see memset above */
 		if (user->flags & TUF_SYNC_REQUIRED)
 			__xnet_u_setstate(user, buf.ack.INFO_ack.CURRENT_state);
-		pthread_rwlock_init(&user->lock, NULL);	/* destroyed for existing structure */
-		/* 
-		   FIXME: need to install pthread_atfork handlert o re-initialize read-write locks */
+		pthread_rwlock_init(&user->lock, NULL);	/* destroyed for
+							   existing structure */
+		/* FIXME: need to install pthread_atfork handler to
+		   re-initialize read-write locks */
 		_t_fds[fd] = user;
 		user->flags &= ~TUF_SYNC_REQUIRED;
 		return __xnet_t_getstate(fd);
@@ -6163,10 +6176,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.30 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.31 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.30 $)
-  * @date \$Date: 2008-04-28 18:38:38 $
+  * @version \$Name:  $(\$Revision: 0.9.2.31 $)
+  * @date \$Date: 2008-05-05 15:35:03 $
   */
 
 /** @} */

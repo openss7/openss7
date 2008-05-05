@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:11:16 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-05-05 15:34:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:16 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.21  2008-05-05 15:34:56  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.20  2008-04-29 07:11:16  brian
  - updating headers for release
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:11:16 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-05-05 15:34:56 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:11:16 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-05-05 15:34:56 $";
 
 #include <sys/os7/compat.h>
 
@@ -98,7 +101,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:11:16 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-05-05 15:34:56 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -462,7 +465,7 @@ tirdwr_rput(queue_t *q, mblk_t *mp)
 		case T_DATA_IND:
 			if ((bp = unlinkb(mp)) && bp->b_datap->db_type == M_DATA && bp->b_band == 0) {
 				if (msgdsize(bp) > 0) {
-					tirdwr_restore_delim(p->data_ind.MORE_flag, bp);
+					tirdwr_restore_delim(p->data_ind.MORE_flag & T_MORE, bp);
 					freeb(mp);
 					putnext(q, bp);
 				} else {

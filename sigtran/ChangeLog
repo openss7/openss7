@@ -1,3 +1,10 @@
+2008-05-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/m2ua.c: be strict with MORE_flag
+	* src/drivers/ua.c: be strict with MORE_flag
+	* src/modules/sdt_tpi.c: be strict with MORE_flag
+	* src/modules/sl_tpi.c: be strict with MORE_flag
+
 2008-05-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

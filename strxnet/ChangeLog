@@ -1,3 +1,10 @@
+2008-05-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/lib/xnet.c: added proper data transfer flag handling to pass flags
+	  from XX25 implementation.
+	* doc/manual/news.texi: noted it
+	* src/modules/tirdwr.c: be strict with MORE_flag
+
 2008-05-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:16 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.24  2008-05-05 15:34:55  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.23  2008-04-29 07:11:16  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -136,7 +139,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:16 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -8287,7 +8290,7 @@ tc_invoke_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	pcls = p->PROTOCOL_class;
 	oper = p->OPERATION;
-	more = p->MORE_flag;
+	more = (p->MORE_flag & T_MORE);
 	to = p->TIMEOUT;
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
@@ -8323,7 +8326,7 @@ tc_result_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	if (!(iv = iv_lookup(dg, p->INVOKE_id)))
 		goto badaddr;
 	oper = p->OPERATION;
-	more = p->MORE_flag;
+	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
@@ -8358,7 +8361,7 @@ tc_error_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	if (!(iv = iv_lookup(dg, p->INVOKE_id)))
 		goto badaddr;
 	ecode = p->ERROR_code;
-	more = p->MORE_flag;
+	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
@@ -9031,7 +9034,7 @@ t_data_req(struct tc *tc, queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
-	more = p->MORE_flag;
+	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badprim:
@@ -9055,7 +9058,7 @@ t_exdata_req(struct tc *tc, queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
-	more = p->MORE_flag;
+	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badprim:

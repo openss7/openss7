@@ -1,3 +1,21 @@
+2008-05-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/lib/libxnet/xnet.c: be strict with MORE_flag
+	* src/modules/inet/inet.c: be strict with MORE_flag
+	* src/modules/inet/rawip.c: be strict with MORE_flag
+	* src/modules/inet/tcp.c: be strict with MORE_flag
+	* src/modules/inet/udp.c: be strict with MORE_flag
+	* src/modules/m2ua/m2ua.c: be strict with MORE_flag
+	* src/modules/sctp/sctp2.c: be strict with MORE_flag
+	* src/modules/sctp/sctp_t.c: be strict with MORE_flag
+	* src/modules/ss7ip/sdt_tpi.c: be strict with MORE_flag
+	* src/modules/ss7ip/sl_tpi.c: be strict with MORE_flag
+	* src/modules/tcap/tcap.c: be strict with MORE_flag
+	* src/modules/ti/tirdwr.c: be strict with MORE_flag
+	* stacks/src/modules/mtp/mtp.c: be strict with DATA_flag
+	* stacks/src/modules/mtp/mtp_min.c: be strict with DATA_flag
+	* stacks/src/modules/mtp/mtp_tpi.c: be strict with DATA_flag
+
 2008-05-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: updates for release

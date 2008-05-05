@@ -1,3 +1,8 @@
+2008-05-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: be strict with MORE_flag
+	* src/drivers/sctp_t.c: be strict with MORE_flag
+
 2008-05-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: updates for release

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:25 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-05-05 15:34:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:25 $ by $Author: brian $
+ Last Modified $Date: 2008-05-05 15:34:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.13  2008-05-05 15:34:50  brian
+ - be strict with MORE_data and DATA_flag
+
  Revision 0.9.2.12  2008-04-29 01:52:25  brian
  - updated headers for release
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:25 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-05-05 15:34:50 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:25 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-05-05 15:34:50 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -6051,11 +6054,11 @@ t_data_ind(queue_t *q, mblk_t *mp)
 		 && sl->sdt.statem.daedr_state != SDT_STATE_IDLE))) {
 		mblk_t *dp = mp->b_cont;
 		struct T_data_ind *p = (typeof(p)) mp->b_rptr;
-		if (!p->MORE_flag && !dp->b_cont) {
+		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			sl_recv_data(q, dp);
 			return (QR_TRIMMED);	/* absorbed data */
 		} else {
-			return t_data_ind_slow(q, mp, p->MORE_flag);
+			return t_data_ind_slow(q, mp, p->MORE_flag & T_MORE);
 		}
 	}
 	/* 
@@ -6132,11 +6135,11 @@ t_exdata_ind(queue_t *q, mblk_t *mp)
 		 && sl->sdt.statem.daedr_state != SDT_STATE_IDLE))) {
 		mblk_t *dp = mp->b_cont;
 		struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
-		if (!p->MORE_flag && !dp->b_cont) {
+		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			sl_recv_data(q, dp);
 			return (QR_TRIMMED);	/* absorbed data */
 		} else
-			return t_exdata_ind_slow(q, mp, p->MORE_flag);
+			return t_exdata_ind_slow(q, mp, p->MORE_flag & T_MORE);
 	}
 	/* 
 	   ignore data in other states */
