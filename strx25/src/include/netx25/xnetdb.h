@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xnetdb.h,v 0.9.2.2 2008-05-03 21:22:37 brian Exp $
+ @(#) $Id: xnetdb.h,v 0.9.2.3 2008-05-07 16:01:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
+ Last Modified $Date: 2008-05-07 16:01:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnetdb.h,v $
+ Revision 0.9.2.3  2008-05-07 16:01:40  brian
+ - added NLI X.25-PLP CONS and XX25 implemetnation'
+ doc/man/man3/XX25.3.man
+ doc/man/man3/xti_x25.3.man
+ doc/man/man4/X25.4.man
+ doc/man/man5/strx25.5.man
+ doc/man/man7/dlpi_lapb.7.man
+ doc/man/man7/dlpi_llc2.7.man
+ doc/man/man7/dlpi_x25.7.man
+ src/drivers/npi.c
+ src/include/npi_x25.h
+ src/include/netx25/nli.h
+ src/include/sys/npi_x25.h
+ src/modules/dcc.h
+ src/modules/npi.c
+ src/modules/xx25.c
+
+
+ cvsfiles=
+
  Revision 0.9.2.2  2008-05-03 21:22:37  brian
  - updates for release
 
@@ -62,7 +82,7 @@
 #ifndef __NETX25_XNETDB_H__
 #define __NETX25_XNETDB_H__
 
-#ident "@(#) $RCSfile: xnetdb.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xnetdb.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed wtih doxygen(1). */
 
@@ -118,7 +138,10 @@ struct WAN_config_data;
 struct xaddrf {
 	uint32_t link_id;
 	unsigned char aflags;
-	struct lsapformat DTE_MAC;
+#define EXT_ADDR	0x00		/* X.121 subaddress */
+#define NSAP_ADDR	0x01		/* NSAP address */
+#define PVC_LCI		0x02		/* PVC LCI number 0-4095 3 semi-octets */
+	struct lsapformat DTE_MAC;	/* X.121 DTE address or IEEE 802 MAC */
 	unsigned char nsap_len;
 	unsigned char NSAP[NSAPMAXSIZE];
 };

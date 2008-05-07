@@ -1,3 +1,32 @@
+2008-05-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/info.am: updates
+	* doc/man/Makefile.am: updates
+	* doc/man/man7/npi_x25.7.man: updates
+	* doc/man/strx25.refs: updates
+	* doc/manual/strx25.info: updates
+	* doc/specs/nli/nli.info: updates
+	* scripts/texi/versions.texi: updates
+	* src/drivers/x25-plp.c: updates
+	* src/include/netx25/x25_proto.h: updates
+	* src/include/netx25/xnetdb.h: updates
+	* src/include/xti_xx25.h: updates
+
+	* doc/man/man3/XX25.3.man: added manpage
+	* doc/man/man3/xti_x25.3.man: added manpage
+	* doc/man/man4/X25.4.man: added manpage
+	* doc/man/man5/strx25.5.man: added manpage
+	* doc/man/man7/dlpi_lapb.7.man: added manpage
+	* doc/man/man7/dlpi_llc2.7.man: added manpage
+	* doc/man/man7/dlpi_x25.7.man: added manpage
+	* src/drivers/npi.c: added driver
+	* src/include/npi_x25.h: added include file
+	* src/include/netx25/nli.h: added NLI definition file
+	* src/include/sys/npi_x25.h: added header
+	* src/modules/dcc.h: added DCC definition header
+	* src/modules/npi.c: added module
+	* src/modules/xx25.c: added module
+
 2008-05-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: corrections for build
