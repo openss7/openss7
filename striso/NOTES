@@ -225,10 +225,60 @@ Addressing
 
 - X.121
 - E.164
+
 - RFC 1069 - IP NSAPs
+  47		    AFI (ICD Binary)
+  0006		    IDI/ICD (Internet ICD)
+  02		    DFI Version
+  00		    Global Area
+  00000000000000    Padding
+  AABBCCDD	    IPv4 address
+  00		    Nsel
+
+  Or 2/6/1 format:
+  47                AFI (ICD Binary)
+  0006              IDI/ICD (Internet ICD)
+  02                DFI Version
+  00                Global Area
+  XXXX		    Routing Domain
+  000000	    Padding
+  XX		    Area Code
+  AABBCCDDPPPP      IPv4 address and port
+  00                Nsel
+
+- RFC 1277 - RFC 1006 NSAPs
+
+  54		    AFI (F.69 Decimal)
+  00		    F.69 prefix
+  728722	    Hypotetical telex number
+  03		    Prefix (RFC1006)
+  AAABBBCCCDDD	    IPv4 Address (decimal)
+  PPPPP		    Port number (decimal)
+  TTTTT		    Transport selection mask (1 TCP, 2 UDP, how about 4 SCTP)
+
 - RFC 4548 - IP NSAPs
+
+  47		    AFI (IANA ICP Binary)
+  0001		    IPv4 (IPv6 is 0000)
+  AABBCCDD          IPv4 address
+  00...             13 octets of zeros
+
+
 - RFC 1768 - Multicast NSAPs for CLNS and (ES-IS/IS-IS) extensions
 
+- Typical trick: use
+
+  49                AFI (Local Binary)
+  --                IDI (NULL)
+  XXXX              Routing Domain/Area Code (Subnetwork)
+  HH:HH:HH:HH:HH:HH MAC Address
+  00                NSel
+
+Note that ES can automatically configure their addresses by observing
+the ISO 9542 IS-Hello packets and using the NET at the NSAP all the way
+through the Area Code and appending the 48-bit IEEE MAC address and the
+N-selector to form its own address.  This does not depend on the form of
+the AFI.
 
 Design Notes:
 =============
