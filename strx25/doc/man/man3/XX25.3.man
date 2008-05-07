@@ -1,0 +1,1734 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: XX25.3.man,v 0.9.2.1 2008-05-07 16:01:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-07 16:01:38 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: XX25.3.man,v $
+.\" Revision 0.9.2.1  2008-05-07 16:01:38  brian
+.\" - added NLI X.25-PLP CONS and XX25 implemetnation
+.\"
+.\" Revision 0.9.2.3  2008-04-29 00:01:54  brian
+.\" - updated headers for release
+.\"
+.\" Revision 0.9.2.2  2008-04-25 08:38:27  brian
+.\" - working up libraries modules and drivers
+.\"
+.\" Revision 0.9.2.1  2007/11/06 11:43:12  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH XTI_X25 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.SH NAME
+.B XX25
+\- X.25 Programming Interface using XTI (XX25)
+.SH SYNOPSIS
+.PP
+.B #include <xti.h>
+.br
+.B #include <xti_x25.h>
+.HP
+.BI "int " x25_xtistr " = t_open(" \fR/dev/x25\fP ", " flags );
+.\"
+.\"
+.SH OVERVIEW
+.PP
+This manual page describes the XTI interface for X25 in accordance with XX25.
+.[
+XX25
+.]
+.PP
+The X/Open Transport Interface
+.[
+XTI Revision 1
+.]
+specifies addressing and options for X.25.
+.[
+x25
+.]
+Although this interface may be exposed by including the
+.RB < xti.h >
+header file, it is provided by the
+.RB < xti_x25.h >
+header file possibly included by the former.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This manual section describes the protocol-specific information that is
+relevant for X.25 transport providers.  This section also describes the
+protocol-specific information that is relevant when X.25 services are provided
+over an IP network using XOT
+.[
+XOT
+.]
+or an ISO-TP0 bridge.
+.[
+ISO-TP0
+.]
+.PP
+This section also defines the data structures and constants required for X.25
+transport providers that are exposed through the
+.RB < xti_x25.h >
+header file.
+.\"
+.\"
+.SH ADDRESS FORMAT
+.PP
+For convenience and traditionally, the transport interface address used by XTI
+for protocols in the X.25 protocol family use
+.IR BSD -style
+addresses (also described in
+.B XNS 5.2
+.[
+xns99
+.]
+also) for addresses.
+.PP
+The socket address, defined in
+.RB < sys/socket.h >,
+is structures as follows:
+.sp
+.RS
+.nf
+\f(CW\s-1\
+struct sockaddr {
+    uint16_t sa_family;
+    char sa_data[14];
+};\s+1\fP
+.fi
+.RE
+.PP
+The X.25 Protocol Family socket address, defined in
+.RB < netx25/x25.h >,
+is structured as follows:
+.PP
+.RS
+.nf
+\f(CW\s-1\
+struct sockaddr_x25 {
+    sa_family_t x25_family;
+    unsigned short int X25_nsap;
+    /* padding */
+};\s+1\fP
+.fi
+.RE
+.PP
+The
+.B sockaddr_x25
+structure contains the following members:
+.TP
+.I x25_family
+.PD 0
+.TP
+.I x25_nsap
+.TP
+.I x25_addr
+.PD
+.PP
+The structure is padded to the size of a
+.BR sockaddr " or " sockaddr_storage
+structure.
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options are formatted according to the
+.B t_opthdr
+structure as described in
+.BR xti (3).
+An X.25 transport provider compliant to this specification supports none, all
+or any subset of the options defined here.  An implementation may restrict the
+use of any of these options by offering them only in a privileged read-only
+mode.
+.PP
+Options can be
+.I absolute requirements
+and can also be of
+.IR end-to-end\0significance ,
+as follows:
+.TP
+.I Absolute\0Requirements
+Options that are
+.IR absolute\0requirements ,
+mean that when the option is negotiated with the transport service provider,
+the transport service provider is not permitted to negotiate the option to a
+value with differing quality of service.  Either the proposed value is
+accepted or it is rejected.  Options that are not
+.IR absolute\0requirements ,
+can be negotiated by the transport provider to a different quality of service
+level and it is the responsibility of the transport service user to determine
+whether the negotiated value is sufficient.
+.TP
+.I End-to-End\0Significance
+Options that are of
+.I end-to-end\0significance
+are options that require negotiation with, or are communicated to, the peer
+transport provider or user.  For example, options that are requested in a
+connect request,
+.BR T_CONN_REQ (7),
+primitive will be indicated at the peer in a connection indication,
+.BR T_CONN_IND (7),
+primitive.  Options that are not of
+.I end-to-end\0significance
+are of local significance only and can be negotiated directly between the
+local transport service user and the local transport service provider.
+.PP
+An X.25 transport provider supports three levels of options.  These three
+levels are described below.
+.\"
+.SS XTI_GENERIC
+.PP
+Options with this level are specific to the X/Open Transport Interface
+(XTI/TLI)
+.[
+XTI Revision 1
+.]
+and are common to all transport providers.  For information see
+.BR xti (3).
+.TP
+.B XTI_DEBUG
+Sets debugging flags for the Stream.  This option is formatted as an array of
+.BR t_uscalar_t .
+Legal values are implementation defined.  For more information, see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Sets whether, and the amount of time, if, the Stream will linger waiting for
+unsent data to be delivered.  This option is formatted as a
+.B t_linger
+structure as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct t_linger {
+    t_scalar_t l_onoff;
+    t_scalar_t l_linger;
+};\s+1\fP
+.fi
+.TP \w'\fIl_linger\fR\(em'u
+.I l_onoff
+Specifies whether to linger
+.RB ( T_YES )
+or not
+.RB ( T_NO ).
+Legal values are
+.BR T_YES " and " T_NO .
+.PD 0
+.TP
+.I l_linger
+Specifies the amount of time (in seconds) to linger.  Legal values are
+.BR T_INFINITE ", " T_UNSPEC
+and all positive numbers including zero.
+.PD
+.PP
+For more information, see
+.BR xti (3).
+.RE
+.TP
+.B XTI_RCVBUF
+Specifies the size, in bytes, of the received buffer.  This option is formated
+as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.TP
+.B XTI_RCVLOWAT
+Specifies the low water mark above which received data will be indicated and
+delivered to the user.  This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive numbers, non-zero numbers.
+For more information see
+.BR xti (3).
+.TP
+.B XIT_SNDBUF
+Specifies the size, in bytes, of the transmit buffer.  This option is
+formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.TP
+.B XTI_SNDLOWAT
+Specifies the low water mark above which queued data will be transmitted to
+the peer.  This option is formatted as a
+.BR t_uscalar_t .
+Legal values are all positive, non-zero numbers.
+For more information see
+.BR xti (3).
+.\"
+.SS T_X25_NP
+.PP
+The functions
+.BR t_optmgmt "(3), " t_connect "(3), " t_listen "(3), " t_accept "(3), and " t_rcvconnect (3),
+all contain an opt argument of type
+.B struct netbuf
+as an input or output parameter. This argument is used to convey options, and
+in particular X.25 facilities, between the X.25 user and the X.25 provider.
+.PP
+Each option is formatted according to the structurer
+.BR t_opthdr ,
+possibly followed by the option value. In the structure
+.BR t_opthdr ,
+the name field specifies the mnemonic of the option. The level field specifies
+the protocol affected (here
+.BR T_X25_NP
+for all options of the XX25 API). The
+.I len
+field specifies the total length of the option (that is, the length of the
+option header
+.B t_opthdr
+plus the length of the option value, without the possible alignment
+characters).
+The status field of the returned options contains information about the
+success or failure of a negotiation. The structure
+.B t_opthdr
+is followed by the option value. The XX25 user has to ensure that each option
+starts at a long-word boundary.
+.PP
+A detailed description of the X.25 facilities can be found in ISO/IEC 8202
+.[
+ISO/IEC 8208
+.]
+and ITU-T Recommendation X.25.
+.[
+x25
+.]
+Most of the field elements of the structures specified below are
+self-explanatory.
+.\"
+.TP
+.B T_X25_RST_OPT
+Specifies whether the user supports resets.  The value type is
+.BR "unsigned long" .
+Legal values are
+.BR T_NO " and " T_YES .
+The default value is
+.BR T_NO .
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_connect (3),
+and
+.BR t_accept (3)
+library calls.
+Once negotiated during call setup, the value has effect for the duration of
+the connection.
+.\"
+.TP
+.B T_X25_D_OPT
+Specifies whether the D bit is supported. The value type is
+.BR "unsigned long" .
+Legal values are
+.BR T_NO " and " T_YES .
+The default value is
+implementation defined.
+This is a
+.B read-only
+option.
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_connect (3),
+.BR t_listen (3),
+and
+.BR t_accept (3)
+library calls.
+Once negotiated during call setup, the value has effect for the duration of
+the connection.
+.\"
+.TP
+.B T_X25_USER_DACK
+Specifies the explicit acknowledgement of data with delivery bit.  The value
+type is
+.BR "unsigned long" .
+Legal values are
+.BR T_NO " and " T_YES .
+The default value is
+.BR T_NO .
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_connect (3),
+.BR t_listen (3),
+.BR t_accept (3),
+and
+.BR t_rcvconnect (3)
+library calls.
+Once negotiated during call setup, the value has effect for the duration of
+the connection.
+.\"
+.TP
+.B T_X25_USER_EACK
+Specifies the explicit acknowledgement of expedited data bit.  The value type
+is
+.BR "unsigned long" .
+Legal values are
+.BR T_NO " and " T_YES .
+The default value is
+.BR T_NO .
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_connect (3),
+.BR t_listen (3),
+.BR t_accept (3),
+and
+.BR t_rcvconnect (3)
+library calls.
+Once negotiated during call setup, the value has effect for the duration of
+the connection.
+.\"
+.TP
+.B T_X25_VERSION
+Indicates the version of the ITU-T Recommendation X.25
+.[
+x25
+.]
+or ISO/IEC 8208
+.[
+ISO/IEC 8208
+.]
+supported by the provider (X.25-1980, X.25-1984, X.25-1988, and so on).  The
+value type is
+.BR "unsigned long" .
+Legal option values are
+.BR T_X25_1980 ,
+.BR T_X25_1984 ,
+.BR T_X25_1988 ,
+.BR T_X25_1993 ,
+and
+.BI T_X25_ yyyy\fR,
+where
+.I yyyy
+is the year of the X.25 Recommendation.  The value is implementation defined.
+This is a
+.B read-only
+option.
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_connect (3),
+.BR t_accept (3),
+and
+.BR t_rcvconnect (3),
+.BR t_optmgmt (3)
+before a call of
+.BR t_snddis (3),
+and
+.BR t_optmgmt (3)
+after a call of
+.BR t_rcvdis (3),
+library calls.
+When read during call setup, this option reflects the version that was
+negotiated between X.25 endpoints.  When examined after a call to
+.BR t_rcvdis (3),
+the value can reflect the reason that a connection was refused for
+insufficient version support.
+.\"
+.TP
+.B T_X25_DISCON_REASON
+Specifies or indicates the reason for connection release that includes the
+cause and the diagnostic.  This reason can be encoded using the
+.BR T_X25_SET_CAUSE_DIAG ()
+macro.  The value type is
+.BR "unsigned long" .
+Value values are those defined with the
+.BR T_X25_SET_CAUSE_DIAG ()
+macro.  The default value is
+.IR 0xf1 .
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_optmgmt (3)
+before a call of
+.BR t_snddis (3),
+and
+.BR t_optmgmt (3)
+after a call of
+.BR t_rcvdis (3),
+library calls.
+.\"
+.TP
+.B T_X25_DISCON_ADD
+Indicates the address of the user that released the connection.  The option
+value is a
+.B struct t_x25facaddr
+structure, formatted as described below.
+This is a
+.B read-only
+option.
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_optmgmt (3)
+after a call of
+.BR t_rcvdis (3),
+library calls.
+.\"
+.TP
+.B T_X25_CONN_DBIT
+Specifies or indicates the setting of the D-bit during the connection phase to
+negotiate the support of the D-bit during data transfer.  The option value
+type is
+.BR "unsigned long" .
+Legal values are
+.BR T_NO " and " T_YES .
+The default value is
+.BR T_NO .
+This option may be negotiated using the
+.BR t_optmgmt (3),
+.BR t_connect (3),
+.BR t_listen (3),
+and
+.BR t_accept (3)
+library calls.
+.\"
+.PP
+.B X.25 Facilities
+follow.  The legal option values for X.25 facilities are those specified in
+ITU-T Recommendation X.25
+.[
+x25
+.]
+or ISO/IEC 8208
+.[
+ISO/IEC 8208
+.]
+(see
+.BR T_X25_VERSION ).
+.\"
+.TP
+.B T_X25_PKTSIZE
+Specifies the maximum packet size for the connection.  The option value type is
+a
+.BR struct t_x25facval
+structure, described below.
+Legal values are the packet size in octets from 16 to 4096, or
+.BR T_UNSPEC ,
+for the default.
+.\"
+.TP
+.B T_X25_WINDOWSIZE
+Specifies the maximum window size for the connection.  The option value type
+is a
+.BR struct t_x25facval
+structure, described below.
+Legal values are the size from 1 to 7 or from 1 to 127 (in extended format),
+or
+.BR T_UNSPEC ,
+for the default.
+.\"
+.TP
+.B T_X25_TCN
+Specifies the Throughput Class Negotiation (TCN) for the connection.  The
+option value type is a
+.BR struct t_x25facval
+structure, described below.
+Legal values are a through in bits per second from 74 to 192000, or
+.BR T_UNSPEC ,
+for the default.
+.\"
+.TP
+.B T_X25_CUG
+Specifies the Closed User Group (CUG).  The option value is a
+.BR "unsigned long" .
+Legal values are a closed user group index from 0 to 9999, identifying the
+closed user group, or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_CUGOUT
+Specifies the Closed User Group (CUG) with Outgoing Access.  The option value
+is a
+.BR "unsigned long" .
+Legal values are a closed user group index from 0 to 9999, identifying the
+closed user group, or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_BCUG
+Specifies the Bilateral Closed User Group (Bilateral CUG).  The option value
+is a
+.BR "unsigned long" .
+Legal values are a close user group index from 0 to 9999, identifying the
+closed user group, or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_FASTSELECT
+Specifies the Fast Select option.  The option value type is a
+.BR "unsigned long" .
+Legal values are specified below.
+.\"
+.TP
+.B T_X25_RECVCHG
+Specifies the Reverse Charging option.  The
+option value is a
+.BR "unsigned long" .
+Legal values are
+.BR T_NO " and " T_YES .
+.\"
+.TP
+.B T_X25_NUI
+Specifies the Network User Identification (NUI).  The option value type is a
+.BR "string" .
+Legal values are any unique identifier.
+.\"
+.TP
+.B T_X25_CHGINFO_REQ
+Specifies Charging Information \- Service Request.  The option value type is a
+.BR "unsigned long" .
+Legal values are
+.BR T_NO " and " T_YES .
+.\"
+.TP
+.B T_X25_CHGINFO_MU
+Indicates the Charging Information \- Monetary Unit.  The option value type is
+a
+.BR "string" .
+Legal values are the name of any monetary unit (e.g\&. \*(lqdollars\*(rq).
+The default value is implementation defined.
+This is a
+.B read-only
+value.
+.\"
+.TP
+.B T_X25_CHGINFO_SC
+Indicates the Charging Information \- Segment Count.  The option value type is
+a
+.BR "struct t_x25facval"
+structure, described below.
+Value values are the number of octets.
+This is a
+.B read-only
+value.
+.\"
+.TP
+.B T_X25_CHGINFO_CD
+Indicates the Charging Information \- Call Duration.  The option value type
+is a
+.BR "struct x25facinfocd"
+structure, described below.
+This is a
+.B read-only
+value.
+.\"
+.TP
+.B T_X25_RPOA
+Specifies the RPOA (Recognized Private Operating Agency).
+The option value type is an
+.BR "array of unsigned longs" .
+Legal values for each array element is an index of an RPOA from zero (0) to
+9999, or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_CALLDEF
+Specifies the Call Deflection Selection.  The option value type is a
+.BR "struct t_x25facaddr"
+structure, described below.
+Legal values are also described below.
+.\"
+.TP
+.B T_X25_CALLRED
+Specifies the Call Redirection or Deflection Notification.  The option value
+type is a
+.BR "struct t_x25facaddr"
+structure, described below.
+Legal values are also described below.
+This is a
+.B read-only
+value.
+.\"
+.TP
+.B T_X25_CALLADDMOD
+Specifies the Called Line Address Modified Notification selection.
+The option value type is a
+.BR "unsigned long" .
+Legal values are described below.
+.\"
+.TP
+.B T_X25_TDSAI
+Specifies the Transit Delay Selection and Indication.
+The option value type is a
+.BR "unsigned long" .
+Legal values are transit delay in milliseconds from 0 to 65534, or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_CALLING_ADDEXT
+Specifies the Calling Address Extension.
+The option value type is a
+.BR "struct t_x25addext"
+structure, described below.
+Legal values are also described below.
+.\"
+.TP
+.B T_X25_CALLED_ADDEXT
+Specifies the Called Address Extension.
+The option value type is a
+.BR "struct t_x25addext"
+structure, described below.
+Legal values are also described below.
+.\"
+.TP
+.B T_X25_MTCN
+Specifies the Minimum Throughput Class Negotiation.
+The option value type is a
+.BR "struct t_x25facval"
+structure, described below.
+Legal values are throughput in bits per second from 75 to 64000 or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_EETDN
+Specifies the End-to-End Transit Delay Negotiation.
+The option value type is a
+.BR "struct t_x25faceetdn"
+structure, described below.
+Legal values are transit delay in milliseconds from 0 to 65534, or
+.BR T_UNSPEC .
+Legal values are provided in the text below.
+.\"
+.TP
+.B T_X25_PRIORITY
+Specifies the connection's priority.
+The option value type is a
+.BR "struct t_x25facpr"
+structure, described below.
+Legal values are also specified below, or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_PROTECTION
+Specifies the connection's protection.
+The option value type is a
+.BR "struct t_x25facpr"
+structure, described below.
+Legal values are also specified below, or
+.BR T_UNSPEC .
+.\"
+.TP
+.B T_X25_EDN
+Specifies the Expedited Data Negotiation.
+The option value type is a
+.BR "unsigned long" .
+Legal values are
+.BR T_NO ", " T_YES " or " T_UNSPEC .
+.\"
+.TP
+.B T_X25_LOC_NONX25
+Specifies the non-X.25 facilities provided by the local network.
+The option value type is a
+.BR "string" .
+Legal values are the raw non-X.25 options in network byte order.
+.\"
+.TP
+.B T_X25_REM_NONX25
+Specifies the non-X.25 facilities provided by the remote network.
+The option value type is a
+.BR "string" .
+Legal values are the raw non-X.25 options in network byte order.
+.\"
+.\"
+.SH STRUCTURES
+.PP
+.TP
+.B T_X25_PACKETSIZE
+.PD 0
+.TP
+.B T_X25_WINDOWSIZE
+.TP
+.B T_X25_TCN
+.TP
+.B T_X25_MTCN
+.PD
+These options use the
+.B t_x25facval
+structure, formatted as follows:
+.sp
+.RS
+.nf
+\f(CW\s-1\
+struct t_x25facval {
+    unsigned long remote;
+    unsigned long local;
+};\s+1\fP
+.fi
+.TP
+.I remote
+Provides the value for the direction of data transmission from the called DTE.
+.TP
+.I local
+Provides the value for the direction of data transmission from the calling
+DTE.
+.RE
+.TP
+.B T_X25_NUI
+.PD 0
+.TP
+.B T_X25_CHGINFO_MU
+.PD
+For these options of type string, the length of the option value is the total
+length of the option (specified in the
+.I len
+field of the
+.B t_opthdr
+structure) minus the length of the option header.
+.TP
+.B T_X25_FASTSELECT
+THe option value is in form of an
+.B unsigned long
+value.  The acceptable values are:
+.sp
+.RS
+.IP \(em \w'\(em\(em'u
+.B T_NO
+.br
+Fast Select is not requested.
+.IP \(em
+.B T_X25_FASTSEL_NOREST
+Fast Select requested with no restriction on response.
+.br
+.IP \(em
+.B T_X25_FASTSEL_REST
+Fast Select requested with restriction on response.
+.br
+.RE
+.TP
+.B T_X25_CHGINFO_SC
+The option value is in the form of one or many
+.B struct t_x25facval
+values.  There is one structure per tariff period managed by the network.
+.TP
+.B T_X25_CHGINFO_CD
+The option value is in the form of one or many
+.B struct t_x25facinfocd
+values.  There is one structure per tariff period managed by the network.
+This option uses the
+.B t_x25facinfocd
+structure, formatted as follows:
+.sp
+.RS
+.nf
+\f(CW\s-1\
+struct t_x25facinfocd {
+    unsigned char day;
+    unsigned char hour;
+    unsigned char min;
+    unsigned char sec;
+};\s+1\fP
+.fi
+.TP
+.I day
+The number of days for the call period.
+.TP
+.I hour
+The number of hours for the call period.
+.TP
+.I min
+The number of minutes for the call period.
+.TP
+.I sec
+The number of seconds for the call period.
+.RE
+.TP
+.B T_X25_RPOA
+The length of the option value determines how many RPOA transit networks are
+defined.  This length is the total length of the option (specified in the
+.I len
+field of the
+.B t_opthdr
+structure) minus the length of the option header.  As there is one entry in
+the array of unsigned longs per RPOA transit network, the number of defined
+RPOA transit networks is the total number of entries in the array.
+.TP
+.B T_X25_CALLDEF
+This option value uses the
+.B t_x25facaddr
+structure, formatted as follows:
+.sp
+.RS
+.nf
+\f(CW\s-1\
+struct t_x25facaddr {
+    unsigned char code;
+    unsigned char len;
+    unsigned char addr[8];
+};\s+1\fP
+.fi
+.TP
+.I code
+The code field representing the reason for the call deflection is defined as
+below:
+.sp
+.RS
+.IP \(em \w'\(em\(em'u
+.B T_X25_CLDEF1
+.br
+Call-deflection by the originally-called DTE.
+.IP \(em \w'\(em\(em'u
+.B T_X25_CLDEF2
+.br
+Call-deflection by gateway as a result of call redirection due to
+originally-called DTE busy.
+.IP \(em \w'\(em\(em'u
+.B T_X25_CLDEF3
+.br
+Call-deflection by gateway as a result of call redirection due to
+originally-called DTE out-of-order.
+.IP \(em \w'\(em\(em'u
+.B T_X25_CLDEF4
+.br
+Call-deflection by gateway as a result of call redirection due to prior
+request from orignalling-called DTE for systematic call redirection.
+.RE
+.TP
+.I len
+The length of the address in semi-octets.
+.TP
+.I addr
+The address.
+.RE
+.TP
+.B T_X25_CALLRED
+This option values is in the form of a
+.B struct t_x25facaddr
+described above.  The
+.I code
+field represents the reason for the call deflection or redirection.  In
+addition to the
+.BR T_X25_CLDEF1 ", " T_X25_CLDEF2 ", " T_X25_CLDEF3 " and " T_X25_CLDEF4 ,
+the
+.I code
+field can also have one of the following values:
+.sp
+.RS
+.IP \(em \w'\(em\(em'u
+.B T_X25_CLRED1
+.br
+Call-redirection due to orignally-called DTE busy.
+.IP \(em
+.B T_X25_CLRED2
+.br
+Call-distribution within a hunt group.
+.IP \(em
+.B T_X25_CLRED3
+.br
+Call-redirection due to originally called DTE out-of-order.
+.IP \(em
+.B T_X25_CLRED4
+.br
+Call-redirection due to prior request from originally-called DTE for
+systematic call redirection.
+.RE
+.TP
+.B T_X25_CALLADDMOD
+The value of the
+.B T_X25_CALLADDMOD
+option can take on on of the following values:
+.BR T_X25_CLDEF1 ,
+.BR T_X25_CLDEF2 ,
+.BR T_X25_CLDEF3 ,
+.BR T_X25_CLDEF4 ,
+.BR T_X25_CLRED1 ,
+.BR T_X25_CLRED2 ,
+.BR T_X25_CLRED3 ,
+.BR T_X25_CLRED4 .
+.TP
+.B T_X25_CALLING_ADDEXT
+.PD 0
+.TP
+.B T_X25_CALLED_ADDEXT
+.PD
+THese option values are in the form of a
+.B struct t_x25addext
+structure, formatted as follows:
+.sp
+.RS
+.nf
+\f(CW\s-1\
+struct t_x25addext {
+    unsigned char addr_type;
+    unsigned char len;
+    unsigned char addr[20];
+};\s+1\fP
+.fi
+.TP
+.I addr_type
+The
+.I addr_type
+field represents the type of the address extension, and can have valid values
+as follows:
+.sp
+.RS
+.IP \(em \w'\(em\(em'u
+.B T_X25_NSAPADDR
+.br
+Specifies an address defined according to ISO/IEC 8348.
+.[
+ISO/IEC 8348
+.]
+.IP \(em
+.B T_X25_OTHERADDR
+.br
+Specifies an address defined in another format.
+.RE
+.TP
+.I len
+The length of the extension address (in octets).
+.TP
+.I addr
+The extension address.
+.RE
+.TP
+.B T_X25_EETDN
+This option value is in the form of a
+.B struct t_x25faceetdn
+structure, formatted as follows:
+.sp
+.RS
+.nf
+\f(CW\s-1\
+struct t_x25faceetdn {
+    unsigned short cumuldel;
+    unsigned short targetdel;
+    unsigned short maxdel;
+};\s+1\fP
+.fi
+.TP
+.I cumuldel
+Specifies or indicates the cumulative end-to-end transit delay.
+For an outgoing call, if set to
+.BR T_UNSPEC ,
+the facility is omitted, otherwise, the value of the field is placed in the
+outgoing packet.
+For an incoming call, set to
+.B T_UNSPEC
+if the field is not present in the receive packet, otherwise set to the value
+present in the received packet.
+For an outgoing call accept, ignored if the facility was not present in the
+incoming call, otherwise the value of the field is placed in the outgoing
+packet.
+For an incoming call accept, set to
+.BR T_UNSPEC ,
+if the field is not present in the received packet, otherwise set to the value
+present in the received packet.
+.sp
+.RS
+.TP \w'\fBNote:\fR\(em'u
+.B Note:
+When the
+.I cumuldel
+field has been set by receipt of a call packet, options negotiation will not
+permit the value to be negotiated to a lower value or to be set to
+.BR T_UNSPEC .
+.RE
+.TP
+.I targetdel
+Specifies or indicates the target end-to-end transit delay.
+Ignored when
+.I cumuldel
+is
+.BR T_UNSPEC .
+For an outgoing call, if set to
+.BR T_UNSPEC ,
+the target and maximum values are omitted from the outgoing packet, otherwise,
+the target value is placed in the outgoing packet.
+For an incoming call, set to
+.B T_UNSPEC
+if the field is not present in the receive packet, otherwise set to the value
+present in the received packet.
+This field is ignored when performing a call accept.
+.TP
+.I maxdel
+Specifies or indicates the maximum end-to-end transit delay.
+Ignored when
+.IR cumuldel " or " targetdel
+is
+.BR T_UNSPEC .
+For an outgoing call, if set to
+.BR T_UNSPEC ,
+the maximum value is omitted from the outgoing packet, otherwise the maximum
+value is placed in the outgoing packet.
+For an incoming call, set to
+.B T_UNSPEC
+if the field is not present in the receive packet, otherwise set to the value
+present in the received packet.
+This field is ignored when performing a call accept.
+.RE
+.TP
+.B T_X25_PRIORITY
+This option value is in the form of a
+.B struct t_x25facpr
+structure, formatted as follows:
+.sp
+.RS
+.nf
+\f(CW\s-1\
+struct t_x24facpr {
+    unsigned char typeval;
+    unsigned char targetval;
+    unsigned char lowval;
+};\s+1\fP
+.fi
+.TP
+.I typeval
+The
+.I typeval
+field can have one of the following values:
+.sp
+.RS
+.IP \(em \w'\(em\(em'u
+.B T_X25_PRIDATA
+.br
+Priority on data on a connection.
+.IP \(em
+.B T_X25_PRIGAIN
+.br
+Priority to gain a connection.
+.IP \(em
+.B T_X25_PRIKEEP
+.br
+Priority to keep a connection.
+.RE
+.TP
+.I targetval
+The
+.I targetval
+field has the following values:
+.BR T_PRITOP ,
+.BR T_PRIHIGH ,
+.BR T_PRIMID ,
+.BR T_PRILOW ,
+.BR T_PRIDFLT ,
+.BR T_UNSPEC .
+.TP
+.I lowval
+The
+.I lowval
+field has the following values:
+.BR T_PRITOP ,
+.BR T_PRIHIGH ,
+.BR T_PRIMID ,
+.BR T_PRILOW ,
+.BR T_PRIDFLT ,
+.BR T_UNSPEC .
+.PP
+The length of the option value determines how many types of priority are
+defined.  The length of the option value is the total length of the option
+(specified in the
+.I len
+field of the
+.B t_opthdr
+structure) minus the length of the option header.  For each defined type, the
+target and the lowest acceptable values have to be given.  The value
+.B T_UNSPEC
+allows not specifying a value.
+.RE
+.TP
+.B T_X25_PROTECTION
+The option value is in the form of a
+.B struct t_x25facpr
+structure, described above.  The
+.I typeval
+field can take the following values:
+.sp
+.RS
+.IP \(em \w'\(em\(em'u
+.B T_X25_SRCPROTECT
+.br
+Source-address specific protection.
+.IP \(em
+.B T_X25_DESTPROTECT
+.br
+Destination-address specific protection.
+.IP \(em
+.B T_X25_GLBPROTECT
+.br
+Global protection.
+.PP
+The protection levels defined for the
+.I targetval
+and the
+.I lowval
+fields are:
+.sp
+.IP \(em \w'\(em\(em'u
+.B T_NOPROTECT
+.br
+No protection, the default value.
+.IP \(em
+.B T_PASSIVEPROTECT
+.br
+Protection from passive monitoring.
+.IP \(em
+.B T_ACTIVEPROTECT
+.br
+Protection from active monitoring.
+.RE
+.TP
+.B T_X25_LOC_NONX25
+This option contains all local non-X.25 facilities in raw form as encoded in
+the local non-X25 facilities part of the facilities field.  It may contain
+multiple local non-X.25 facilities.
+.sp
+.RS
+.TP \w'\fBNote:\fR\(em'u
+.B Note:
+As with all facilities markers, the marker itself is not present in the option
+buffer.
+.RE
+.TP
+.B T_X25_REM_NONX25
+This option contains all remote non-X.25 facilities in raw form as encoded in
+the remote non-X.25 facilities part of the facilities field.  It may contain
+multiple remote non-X.25 facilities.
+.sp
+.RS
+.TP \w'\fBNote:\fR\(em'u
+.B Note:
+As with all facilities markers, the marker itself is not present in the option
+buffer.
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.B XX25
+supports the XTI/TLI library functions as described in this section.  All
+connection-oriented XTI/TLI library calls are supported for X.25; however,
+some features of the connection-oriented XTI/TLI library calls are supported
+by the underlying transport provider and some are not.
+.\"
+.SS t_accept\fR(3)
+.PP
+No special consideration.
+.\"
+.SS t_bind\fR(3)
+.PP
+The address filed of the
+.BR t_bind (3)
+structure contains the matching requirements for routing incoming calls to the
+endpoint.  This may include (but is not limited to) representation of one or
+more of the following:
+.RS
+.IP \(bu \w'\(bu\(em'u
+a local SNPA identifier,
+.PD 0
+.IP \(bu
+a local X.25 address,
+.IP \(bu
+a local X.25 subaddress,
+.IP \(bu
+a local NSAP,
+.IP \(bu
+a call user data matching requirement, or,
+.IP \(bu
+a PVC number.
+.PD
+.RE
+.PP
+Where an incoming call cal be routed to multiple endpoints on the basis of
+their matching requirements, the actual endpoint selected will be
+implementation dependent.
+.PP
+If the application likes to initiate a connection, it can either bind itself
+to a
+.B NULL
+address (by setting
+.I req
+to
+.B NULL
+or
+.I req->addr.len
+to zero) or use any of the matching requirements defined above.  If a
+.B NULL
+address is used, the requirements have been defined, connections may be
+restricted to SVCs, a certain PVC, or a certain X.25 line, depending on the
+matching criteria.
+.PP
+It is not possible to receive connection indications on a
+.B NULL
+address.
+.PP
+.TP \w'\fBNote:\fP\(em'u
+.B Note:
+An implementation may choose not to provide support for a wildcard mechanism
+for address information, for example to route incoming calls whose call user
+data starts with a particular pattern.
+.\"
+.SH t_connect\fR(3)
+.PP
+The
+.I sndcall->addr
+is used to select either an SVR or a PVC.
+.PP
+For an SVC the
+.I sndcall->addr
+structure contains a representation of the addressing information necessary to
+reach the destination, it may contain (but is not limited to) one or more of
+the following:
+.RS
+.IP \(bu \w'\(bu\(em'u
+SNPA identifier,
+.PD 0
+.IP \(bu
+destination X.25 address, or
+.IP \(bu
+destination NSAP.
+.PD
+.RE
+.PP
+When the connection has been established, the
+.I rcvcall->addr
+structure represents the address on which the call has been accepted.
+.PP
+For a PVC, the
+.I sndcall->addr
+structure represents the PVC to be used.  If it is already in use, the error
+.RB [ TADDRBUSY ]
+is returned.  On successful return:
+.IP \(bu \w'\(bu\(em'u
+In synchronous mode, the PVC will be in state
+.BR T_DATAXFER .
+.IP \(bu
+In asynchronous mode, the PVC will be in state
+.B T_OUTCON
+and a
+.B T_CONNECT
+event will be outstanding.
+.PP
+When the connection has been established, the
+.I rcvcall->addr
+structure represents the actual PVC allocated.
+.\"
+.SS t_getinfo\fR(3)
+.PP
+The information returned by
+.BR t_getinfo (3)
+reflects the characteristics of the X.25 connection or, if no connection is
+established, the maximum characteristics an X.25 connection could take on
+using the underlying X.25 provider.
+.PP
+The parameters of the
+.BR t_getinfo (3)
+function for the different versions of the X.25 protocol (X.25-1980, X.25-1984,
+X.25-1988, X.25-1993, and so on) are presented in the table below:
+.TS
+box center tab(:);
+cb|cb|cbs.
+Parameters:Before Call:After Call
+::_
+.T&
+cb|cb|cb|cb.
+::X.25-1988:X.25-1980
+::X.25-1984:
+::X.25-1993:
+_
+.T&
+li|c|c|c.
+fd:x:/:/
+info->addr:/:x:x
+info->options:/:x:x
+info->tsdu:/:x (1):x (1)
+info->etsdu:/:-2/ 32 (2):-2/ 1 (2)
+info->connect:/:16/128 (4):16/128 (4)
+info->discon:/:0/128 (5):0/128 (5)
+info->servtype:/:T_COTS:T_COTS
+info->flags:/:T_SENDZERO:T_SENDZERO
+.TE
+.RS
+.IP (1) \w'(0)\(em'u
+Minus one (-1) or an integral number greater than zero.
+.IP (2)
+Minus two (-2) if no expedited data transfer can be exchanged, and 32 otherwise.
+.IP (3)
+Minus two (-2) if no expedited data transfer can be exchanged, and 1
+otherwise.
+.IP (4)
+16 in basic format or 128 in extended format (if the X.25 facility
+.I Fast Select
+has been negotiated).
+.IP (5)
+0 in basic format or 128 in extended format (if the X.25 facility
+.I Fast Select
+has been negotiated).
+.RE
+.\"
+.SS t_look\fR(3)
+.PP
+No special consideration.
+.\"
+.SS t_listen\fR(3)
+.PP
+No special consideration.
+.\"
+.SS t_open\fR(3)
+.PP
+The function,
+.BR t_open (3),
+is called at the first step in the initialization of an X.25 endpoint.  This
+function returns various default characteristics associated with the different
+versions of X.25 that are supported.  If, for example, an X.25 provider
+supports X.25-1984 and X.25-1988, the characteristics returned are those of
+X.25-1988.  If the X.25 provider is limited to X.25-1980, the characteristics
+returned are those of X.25-1980.
+.PP
+The parameters of the
+.BR t_open (3)
+function, for the different version of the X.25 protocol (X.25-1980,
+X.25-1984, X.24-1988, X.25-1993, and so on) are presented in the table below.
+.TS
+box center tab(:);
+cb|cb|cbs.
+Parameters:Before Call:After Call
+::_
+.T&
+cb|cb|cb|cb.
+::X.25-1988:X.25-1980
+::X.25-1984:
+::X.25-1993:
+_
+.T&
+li|c|c|c.
+fd:x:/:/
+info->addr::x:x
+info->optoins::x:x
+info->tsdu::x (1):x (1)
+info->etsdu::32:1
+info->connect::128:128
+info->discon::128:128
+info->servtype::T_COTS:T_COTS
+info->flags::T_SENDZERO:T_SENDZERO
+.TE
+.RS
+.IP (1) \w'(0)\(em'u
+Minus one (-1) or an integral number greater than zero.
+.RE
+.\"
+.SS t_optmgmt\fR(3)
+.PP
+The function,
+.BR t_optmgmt (3),
+uses specific options to support the X.25 zervice.  The options are described
+above under
+.RI \*(lq OPTIONS .\*(rq
+.\"
+.SS t_rcv\fR(3)
+.PP
+The behavior of the function,
+.BR t_rcv (3),
+remains unchanged.  The function can operate in synchronous and asynchronous
+modes.  It follows the current flow control rules.
+.PP
+The default behavior is to acknowledge, in an automatic way, data sent with
+the Delivery Confirmation bit and expedited data.
+.PP
+The optional \*(lqexplicit acknowledgement\*(rq is selected in the functions
+.BR t_optmgmt (3),
+.BR t_connect (3),
+.BR t_accept (3)
+either with the
+.B T_X25_USER_DACK
+option, for the acknowledgement of data sent with the D bit, or with the
+.B T_X25_USER_EACK
+option, for the acknowlegment of expedited data.
+.PP
+If expedited data arrives after part of a TSDU has been retrieved, receipt of
+the remainder of the TSDU is suspended until the ETSDU has been processed.
+Only after the full ETSDU has been received (the
+.B T_MORE
+flag not set), the remainder of the TSDU is made available to the user.
+.PP
+Also, flags additional to the
+.B T_EXPEDITED " and " T_MORE
+flags can be set in the argument
+.IR flags :
+.IP \(bu \w'\(bu\(em'u
+On return from the call, if
+.B T_X25_D
+is set in
+.IR flags ,
+this indicates that the data returned was sent with D bit, and the
+.B T_X25_USER_DACK
+option is set.  This data has to be acknowledged explicitly by the receiver.
+.IP \(bu
+On return from the call, if
+.B T_X25_DACK
+is set in
+.IR flags ,
+the previously send expedited data has been acknowledged.
+.RS
+.TP \w'\fBNote:\fR\(em'u
+.B Note:
+If either
+.BR T_X25_DACK " or " T_X25_EACK
+is set in
+.IR flags ,
+then no other flags are set and no user data is returned to the user.
+.RE
+.IP \(bu
+On return from the call, fi
+.B T_X25_Q
+is set in
+.IR flags ,
+the data returned are qualified.
+.IP \(bu
+On return from the fall, if
+.B T_X25_RST
+is set in
+.IR flags ,
+this indicates that a reset indication occurred.
+.PP
+When
+.B T_X25_RST
+is returned, the argument
+.I buf
+contains the cause and diagnostic of the reset.  Each one is coded int one
+octet.  The cause is encoded in the first octet, and the diagnostic in the
+second octet.  If the user's buffer is less than two bytes long then the
+diagnostic value is disregarded, and if the length is zero the cause is also
+discarded.
+.\"
+.SS t_rcvconnect\fR(3)
+.PP
+No special consideration.
+.\"
+.SS t_rcvdis\fR(3)
+.PP
+This function is used to retrieve and indication of a connection release.
+.PP
+The field
+.I discon->reason
+contains the X.25 cause and diagnostic of the connection release.  The cause
+and the diagnostic are both encoded in an octet and can be retrieved by using
+respectively the
+.BR T_X25_GET_CAUSE ()
+and macro and the
+.BR T_X25_GET_DIAG ()
+macro.
+.PP
+This function allows operations in accordance with XTI,
+.[
+XTI Revision 1
+.]
+but cannot be used to retrieve charging information or the address of the user
+that released the connection.  For these purposes, the use has to call the
+function
+.BR t_optmgmt (3)
+and retrieve the meaningful options.
+.PP
+For further details about the management of options, see above under
+.RI \*(lq OPTIONS .\*(rq
+.\"
+.SS t_snd\fR(3)
+.PP
+The behavior of the function,
+.BR t_snd (3),
+remains unchanged.  The function can operate in synchronous and asynchronous
+modes.
+.PP
+In addition to the
+.BR T_EXPEDITED " and " T_MORE
+flags, the following flags can be set in the argument
+.IR flags :
+.IP \(bu \w'\(bu\(em'u
+.B T_X25_D
+.br
+If set in
+.IR flags ,
+the data is sent with the D bit set.  This data has to be acknowledged by the
+peer.
+.IP ""
+As with normal
+.BR t_snd (3)
+requests, the user may issue multiple
+.BR t_snd (3)
+requests with the D-bit set which will be queued by the provider.  A separate
+acknowledgement is generated for each one.  The normal flow control mechanism
+applies; if a
+.BR t_snd (3)
+cannot be accepted, the
+.RB [ TFLOW ]
+code is returned.
+.RS
+.TP \w'\fBNote:\fR\(em'u
+.B Note:
+As a D-bit send requires end-to-end acknowledgement, it can considerable delay
+the transmission of further packets.
+.RE
+.IP \(bu
+.B T_X25_Q
+.br
+If set in
+.IR flags ,
+the data is sent as normal qualified data.
+.IP \(bu
+.B T_X25_RST
+.br
+If set in
+.IR flags ,
+this indicates to the underlying provider that a request or a confirmation of
+reset is required.
+.PP
+The
+.BR t_snd (3)
+function returns immediately.  If further
+.BR t_snd (3)
+calls are accepted while the reset request is being performed the send data
+will remain pending until the X.25 provider receives the confirmation of
+reset.  This confirmation of reset is not returned to the user.  The normal
+flow control mechanisms may result in a subsequent
+.BR t_snd (3)
+in synchronous mode blocking, or a
+.BR t_snd (3)
+call in asynchronous mode returning the
+.RB [ TFLOW ]
+error.
+.PP
+The cause and diagnostic of a reset request are encoded in the two first
+octets of the buf argument. The cause is in the first octet and the diagnostic
+in the second octet. If the buf argument is NULL or the nbytes is 0, then a
+cause of 0 and a diagnostic of 0xFA (that means user resynchronization)
+are used. If nbytes is 1, the diagnostic is set to 0.
+.PP
+Any cause and diagnostic passed in the t_snd( ) call are ignored by the X.25
+provider when sending a reset confirmation.
+.PP
+Data received after a successful
+.BR t_snd (3)
+call requesting a reset is data transmitted by the peer after completion of
+the reset.
+.IP \(bu \w'\(bu\(em'u
+.B T_X25_DACK
+If set in flags, this indicates that an explicit acknowledgement of data with
+the D bit is sent.
+.IP \(bu
+.B T_X25_EACK
+If set in flags, this indicates that an explicit acknowledgement of expedited
+data is sent.
+.RS
+.TP \w'\fBNote:\fR\(em'u
+.B Note:
+When either the T_X25_DACK or the T_X25_EACK flag is set, no other flags can
+be set, and there must be no user data present on the
+.BR t_snd (3)
+call.
+.RE
+.PP
+If T_X25_DACK or T_X25_EACK is set, although no (expedited) data need be
+acknowledged, the
+.BR t_snd (3)
+call either fails with t_errno set to
+.RB [ TBADDATA ],
+or
+a subsequent call fails with
+.BR t_errno (3)
+set to
+.RB [ TSYSERR "] or [" TPROTO ].
+.\"
+.SS t_snddis\fR(3)
+.PP
+The function is used to send a request of a connection release.
+.PP
+The function induces a state transfer to
+.B T_IDLE
+and returns at the receipt of the confirmation of the connection release.
+.PP
+In case of PVC-connection mode,
+.BR t_snddis (3)
+dissociates the user from the PVC and normally resets the PVC.
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.\"
+.XX
+.[
+XNS99
+.]
+.[
+XX25
+.]
+.[
+XTI Revision 1
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TA
