@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-05-05 15:35:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-05-07 16:01:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-05 15:35:02 $ by $Author: brian $
+# Last Modified $Date: 2008-05-07 16:01:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -86,6 +86,8 @@ man_MANS = \
 	man3/x25_write_config_parameters_file.3 \
 	man3/xti_x25.3 \
 	man3/XX25.3 \
+	man4/X25.4 \
+	man5/strx25.5 \
 	man5/extraformat.5 \
 	man5/lsapformat.5 \
 	man5/padent.5 \
@@ -133,7 +135,8 @@ man_MANS = \
 	man7/N_X25_RM_ROUTE.7 \
 	man7/N_Xcanlis.7 \
 	man7/N_Xlisten.7 \
-	man7/N_zerostats.7
+	man7/N_zerostats.7 \
+	man7/npi_x25.7
 
 dist_noinst_MANS = \
 	man3/endpadent.3.man \
@@ -163,6 +166,8 @@ dist_noinst_MANS = \
 	man3/x25_write_config_parameters_file.3.man \
 	man3/xti_x25.3.man \
 	man3/XX25.3.man \
+	man4/X25.4.man \
+	man5/strx25.5.man \
 	man5/extraformat.5.man \
 	man5/lsapformat.5.man \
 	man5/padent.5.man \
@@ -210,7 +215,8 @@ dist_noinst_MANS = \
 	man7/N_X25_RM_ROUTE.7.man \
 	man7/N_Xcanlis.7.man \
 	man7/N_Xlisten.7.man \
-	man7/N_zerostats.7.man
+	man7/N_zerostats.7.man \
+	man7/npi_x25.7.man
 
 ## PKG_BUILD_INDEP
 endif
@@ -220,6 +226,26 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2008-05-07 16:01:37  brian
+# - added NLI X.25-PLP CONS and XX25 implemetnation'
+# doc/man/man3/XX25.3.man
+# doc/man/man3/xti_x25.3.man
+# doc/man/man4/X25.4.man
+# doc/man/man5/strx25.5.man
+# doc/man/man7/dlpi_lapb.7.man
+# doc/man/man7/dlpi_llc2.7.man
+# doc/man/man7/dlpi_x25.7.man
+# src/drivers/npi.c
+# src/include/npi_x25.h
+# src/include/netx25/nli.h
+# src/include/sys/npi_x25.h
+# src/modules/dcc.h
+# src/modules/npi.c
+# src/modules/xx25.c
+#
+#
+# cvsfiles=
+#
 # Revision 0.9.2.3  2008-05-05 15:35:02  brian
 # - be strict with MORE_data and DATA_flag
 #

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npi_x25.7.man,v 0.9.2.1 2008-05-03 21:22:39 brian Exp $
+.\" @(#) $Id: npi_x25.7.man,v 0.9.2.2 2008-05-07 16:01:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,31 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 21:22:39 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-07 16:01:39 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_x25.7.man,v $
+.\" Revision 0.9.2.2  2008-05-07 16:01:39  brian
+.\" - added NLI X.25-PLP CONS and XX25 implemetnation'
+.\" doc/man/man3/XX25.3.man
+.\" doc/man/man3/xti_x25.3.man
+.\" doc/man/man4/X25.4.man
+.\" doc/man/man5/strx25.5.man
+.\" doc/man/man7/dlpi_lapb.7.man
+.\" doc/man/man7/dlpi_llc2.7.man
+.\" doc/man/man7/dlpi_x25.7.man
+.\" src/drivers/npi.c
+.\" src/include/npi_x25.h
+.\" src/include/netx25/nli.h
+.\" src/include/sys/npi_x25.h
+.\" src/modules/dcc.h
+.\" src/modules/npi.c
+.\" src/modules/xx25.c
+.\"
+.\"
+.\" cvsfiles=
+.\"
 .\" Revision 0.9.2.1  2008-05-03 21:22:39  brian
 .\" - updates for release
 .\"
@@ -75,7 +95,190 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so strx25.macros
-.TH NPI-X25 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Provider Interface (NPI) X.25"
+.TH NPI-X25 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "NPI Correigendum for X.25"
 .SH NAME
 .B NPI-X25, npi_x25
-\- Network Provider Interface (NPI) - Corrigendum for X.25 Operation
+\- Network Provider Interface (NPI) \(em Corrigendum for X.25 Conformance
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/npi.h>
+.br
+.B #include <sys/npi_x25.h>
+.HP
+.BI int " x25_stream " = open(" \(lq/dev/x25-npi\(rq ", " oflags ");
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B NPI-X25
+provides a Stream support the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+to the X.25 Packet Layer Protocol (X25-PLP),
+.[
+x25
+.]
+.[
+iso 8208
+.]
+driver,
+.BR x25-plp (4).
+.\"
+.SH INTERFACE
+.PP
+This
+.IR STREAMS (4)
+interface provides the
+.BR x25 (4)
+protocol service interface using the N-primitves of the
+.BR npi (7).
+THis interface is intended solely for use by user programs or protocol modules
+requiring the common
+.BR npi (7)
+service interface.  In particular, the
+.BR npi (7)
+interface to
+.BR x25 (4)
+is often used by CONS
+.[
+x223
+.]
+and other telecommunications protocols such as XOT internal to the kernel.
+This is because the
+.B NPI-X25
+interface provides some richer control that is not available in the
+.BR tpi_x25 (7)
+interface or the
+.BR xti_x25 (3)
+library.
+.\"
+.SH ADDRESS FORMATS
+.PP
+The X.25 address format is structured as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct {
+};
+\s+1\fP
+.fi
+.PP
+The
+.B struct
+structure contains the following members:
+.PP
+The address formats are as follows:
+.RS
+.PP
+The SVC address format is as follows:
+.PP
+.TS
+tab(:);
+lblblbcb
+lllc.
+Byte #:Represents:Value:Format
+_
+1:line number:0-255:Binary
+2:address prefix:0 for X.121:ASCII
+3-on:address itself:X.121 address:ASCII
+_
+.TE
+.PP
+The PVC address format is as follows:
+.TS
+tab(:);
+lblblbcb
+lllc.
+Byte #:Represents:Value:Format
+_
+1:line number:0-255:Binary
+2:address prefix:P:ASCII
+3-on:logical channel #:0-4095:ASCII
+_
+.TE
+.RE
+.SH OPTIONS
+.PP
+Quality of Service parameters are formatted according to the format defined
+for each network provider.
+.PP
+.nf
+\f(CW\s-1\
+typedef union N_qos_x25 {
+    np_ulong               n_qos_type;
+    N_qos_co_range_t       n_qos_co_range;
+    N_qos_co_sel_t         n_qos_co_sel;
+    N_qos_co_opt_range_t   n_qos_co_opt_range;
+    N_qos_co_opt_sel_t     n_qos_co_opt_sel;
+    N_qos_x25_range_t      n_qos_x25_range;
+    N_qos_x25_sel_t        n_qos_x25_sel;
+    N_qos_x25_opt_range_t  n_qos_x25_opt_range;
+    N_qos_x25_opt_sel_t    n_qos_x25_opt_sel;
+} N_qos_x25_t;
+\s+1\fP
+.fi
+.PP
+NPI defines the following standard CONS Quality of Service parameter formats
+that are also applicable to X.25:
+.SS N_QOS_CO_RANGE
+.PP
+Used with \fBN_CONN_REQ\fP(7) and \fBN_CONN_IND\fP(7), the structure indicates
+the range of Quality of Service parameters from which the NS User is permitted
+to select.
+.SS N_QOS_CO_SEL
+.PP
+Used with \fBN_CONN_RES\fP(7) and \fBN_CONN_CON\fP(7), the structure indicates
+the Quality of Service parameters selected by the peer NS User and NS
+Provider.
+.SS N_QOS_CO_OPT_RANGE
+.PP
+Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the range of
+Quality of Service parameters acceptable to the NS User.
+.SS N_QOS_CO_OPT_SEL
+.PP
+Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the Quality
+of Service parameters selected for the connection.
+.PP
+NPI defines the following X.25 and non-X.25 Quality of Service and Facilities
+parameter formats that are applicable to X.25:
+.SS N_QOS_X25_RANGE
+.PP
+Used with \fBN_CONN_REQ\fP(7) and \fBN_CONN_IND\fP(7), the structure indicates
+the range of Quality of Service parameters from which the NS User is permitted
+to select.
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+	np_ulong n_qos_type; /* always N_QOS_X25_RANGE */
+} N_qos_x25_range_t;
+\s+1\fP
+.fi
+.SS N_QOS_X25_SEL
+.PP
+Used with \fBN_CONN_RES\fP(7) and \fBN_CONN_CON\fP(7), the structure indicates
+the Quality of Service parameters selected by the peer NS User and NS
+Provider.
+.SS N_QOS_X25_OPT_RANGE
+.PP
+Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the range of
+Quality of Service parameters acceptable to the NS User.
+.SS N_QOS_X25_OPT_SEL
+.PP
+Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the Quality
+of Service parameters selected for the connection.
+
+
+.SS N_BIND_REQ\fR(7)
+.PP
+.TP
+.I ADDR_length ", " ADDR_offset
+Specifies the length and offset from the beginning of the
+.BR M_PROTO (9)
+message block of the network address to be bound to the Stream.
+.TP
+.I PROTOID_length ", " PROTOID_offset

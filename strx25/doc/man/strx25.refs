@@ -4830,6 +4830,18 @@ Part 1: Protocol Specification
 %C Boulder, Colorado
 %U http://publibn.boulder.ibm.com/
 
+%L AIXX25
+%R AIXlink/X.25
+%K aixx25
+%T AIXlink/X.25 Version 2.1 for AIX: Guide and Reference
+%D September 2005
+%G SC23-2520-07
+%J Eigth Edition
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
 %L HPUXDOC
 %R HP-UX\(rg 11i v2
 %K hpuxdoc

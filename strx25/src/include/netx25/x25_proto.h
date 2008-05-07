@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x25_proto.h,v 0.9.2.2 2008-05-03 21:22:37 brian Exp $
+ @(#) $Id: x25_proto.h,v 0.9.2.3 2008-05-07 16:01:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,31 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
+ Last Modified $Date: 2008-05-07 16:01:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25_proto.h,v $
+ Revision 0.9.2.3  2008-05-07 16:01:40  brian
+ - added NLI X.25-PLP CONS and XX25 implemetnation'
+ doc/man/man3/XX25.3.man
+ doc/man/man3/xti_x25.3.man
+ doc/man/man4/X25.4.man
+ doc/man/man5/strx25.5.man
+ doc/man/man7/dlpi_lapb.7.man
+ doc/man/man7/dlpi_llc2.7.man
+ doc/man/man7/dlpi_x25.7.man
+ src/drivers/npi.c
+ src/include/npi_x25.h
+ src/include/netx25/nli.h
+ src/include/sys/npi_x25.h
+ src/modules/dcc.h
+ src/modules/npi.c
+ src/modules/xx25.c
+
+
+ cvsfiles=
+
  Revision 0.9.2.2  2008-05-03 21:22:37  brian
  - updates for release
 
@@ -62,7 +82,7 @@
 #ifndef __NETX25_X25_PROTO_H__
 #define __NETX25_X25_PROTO_H__
 
-#ident "@(#) $RCSfile: x25_proto.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: x25_proto.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #include <stdint.h>
 
@@ -73,7 +93,32 @@
  *		byte, right justified.  An LSAP is always 14 digits long.  A
  *		DTE address can be up to 15 decimal digits unless X.25(88) and
  *		TOA/NPI addressing is used, in which case it can be up to 17
- *		decimal digits.  A PVC_LCI is 3 digits long.
+ *		decimal digits.  A PVC_LCI is 3 digits long (hexadecimal,
+ *		0-4095).  For TOA/NPI the TOA is:
+ *
+ *		0000 0 Network-dependent number or unknown
+ *		0001 1 International number
+ *		0010 2 National number
+ *		0011 3 Network specific number (for use in private networks)
+ *		0100 4 Complementary address without main address.
+ *		0101 5 Alernative address.
+ *
+ *		NPI for other than Alternative Address is:
+ *
+ *		0000 0 Network-dependent number or unknown
+ *		0001 1 Rec. E.164 (digital)
+ *		0010 2 Rec. E.164 (analog)
+ *		0011 3 Rec. X.121
+ *		0100 4 Rec. F.69 (telex numbering plan)
+ *		0101 5 Private numbering plan (for private use only)
+ *
+ *		NPI when TOA is Alternative Address is:
+ *
+ *		0000 0 Character string coding to ISO/IEC 646.
+ *		0001 1 OSI NSAP address coded per X.213/ISO 8348.
+ *		0010 2 MAC address per IEEE 802.
+ *		0011 3 Internet Address per RFC 1166. (i.e. an IPv4 address)
+ *
  *
  * lsap_add:	The DTE address, LSAP or PVC_LCI as two BCD digtis per byte,
  *		right justified.
@@ -93,12 +138,12 @@ struct lsapformat {
 #define MAX_SC_LEN	MAX_TARRIFS * 8
 #define MAX_MU_LEN	16
 
-#define NEGOT_PKT	0x01 /* packet size negotiable */
-#define NEGOT_WIN	0x02 /* window size negotiable */
-#define ASSERT_HWM	0x04 /* concatenation limit assert */
+#define NEGOT_PKT	0x01	/* packet size negotiable */
+#define NEGOT_WIN	0x02	/* window size negotiable */
+#define ASSERT_HWM	0x04	/* concatenation limit assert */
 
-#define DEF_X25_PKT	7 /* the standard default packet size */
-#define DEF_X25_WIN	2 /* the standard default window size */
+#define DEF_X25_PKT	7	/* the standard default packet size */
+#define DEF_X25_WIN	2	/* the standard default window size */
 
 struct extraformat {
 	unsigned char fastselreq;
@@ -199,6 +244,235 @@ struct qosformat {
 /* To specify the reason when the originator is NS User in N_RI messages */
 #define NU_RESYNC		0xfa
 
+union x25_primitives {
+	struct xcallf xcall;		/* connect request/indication */
+	struct xccnff xccnf;		/* connect confirm/response */
+	struct xdataf xdata;		/* normal, q-bit or d-bit data */
+	struct xdatacf xdatac;		/* data ack */
+	struct xedataf xedata;		/* expedited data */
+	struct xedatacf xedatac;	/* expedited data ack */
+	struct xrstf xrst;		/* reset request/indication */
+#if 0
+	struct xrscf xrsc;		/* reset confirm/response */
+#else
+	struct xrscf xrscf;		/* reset confirm/response */
+#endif
+	struct xdiscf xdisc;		/* disconnect request/indication */
+	struct xdcnff xdcnf;		/* disconnect confirm */
+#if 0
+	struct xabortf xabort;		/* abort indication */
+#else
+	struct xabortf abort;		/* abort indication */
+#endif
+	struct xlistenf xlisten;	/* listen command/response */
+	struct xcanlisf xcanlis;	/* cancel command/response */
+	struct pvcattf pvcatt;		/* PVC attach */
+	struct pvcdetf pvcdet;		/* PVC detach */
+};
+
+typedef struct xhdrf {
+	unsigned char xl_type;		/* XL_CTL/XL_DAT */
+	unsigned char xl_command;	/* Command */
+} S_X25_HDR;
+
+#define XL_CTL	    0
+#define XL_DAT	    1
+
+#define N_CI	    0
+
+struct xcallf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_CI */
+	int conn_id;			/* The connection id returned in Connection Response or
+					   Disconnect */
+	unsigned char CONS_call;	/* When set, indicates a CONS call */
+	unsigned char negotiate_qos;	/* When set, negotiate facilities, etc., or else use
+					   defaults */
+	struct xaddrf calledaddr;	/* called address */
+	struct xaddrf callingaddr;	/* calling address */
+	struct qosformat qos;		/* facilities and CONS qos: if negotiate qos is set */
+	/* Note the data part of the message contains the Call User Data (CUD), if any. */
+};
+
+#define N_CC	    1
+
+struct xccnff {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_CC */
+	int conn_id;			/* The connection id from the associated indication. */
+	unsigned char CONS_call;	/* When set, indicate CONS call */
+	unsigned char negotiate_qos;	/* When set, negotiate facilities, etc., else use indicated 
+					   values. */
+	struct xaddrf responder;	/* responding address */
+	struct qosformat rqos;		/* Facilities and CONS qos if negotiate_qos is set. */
+	/* Note the data part of the message contains the CUD, if any. */
+};
+
+#define N_Data	    2
+
+struct xdataf {
+	unsigned char xl_type;		/* always XL_DAT */
+	unsigned char xl_command;	/* always N_Data */
+	unsigned char More;		/* set when more data is required to complete the nsdu */
+	unsigned char setDbit;		/* set when data carries X.25 D-bit */
+	unsigned char setQbit;		/* set when data carries X.25 Q-bit */
+	/* Note the data part of the message contains user data */
+};
+
+#define N_DAck	    3
+
+struct xdatacf {
+	unsigned char xl_type;		/* always XL_DAT */
+	unsigned char xl_command;	/* always N_DAck */
+	/* No data part */
+};
+
+#define N_EData	    4
+
+struct xedataf {
+	unsigned char xl_type;		/* always XL_DAT */
+	unsigned char xl_command;	/* always N_EData */
+	/* Note the data part of the message contains user data */
+};
+
+#define N_EAck	    5
+
+struct xedatacf {
+	unsigned char xl_type;		/* always XL_DAT */
+	unsigned char xl_command;	/* always N_EAck */
+	/* No data part */
+};
+
+#define N_RI	    6
+
+struct xrstf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_RI */
+	unsigned char originator;	/* originator and reason mapped */
+	unsigned char reason;		/* from X.25 cause/diag in indications */
+	unsigned char cause;		/* X.25 cause byte */
+	unsigned char diag;		/* X.25 diagnostic byte */
+	/* No data part */
+};
+
+#define N_RC	    7
+
+struct xrscf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_RC */
+	/* No data part */
+};
+
+#define N_DI	    8
+
+struct xdiscf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_DI */
+	unsigned char originator;	/* originator and reason mapped */
+	unsigned char reason;		/* from X.25 cause/diag in indications */
+	unsigned char cause;		/* X.25 cause byte */
+	unsigned char diag;		/* X.25 diagnostic byte */
+	int conn_id;			/* the connection id (for reject only) */
+	unsigned char indicated_qos;	/* when set, facilities indicated */
+	struct xaddrf responder;	/* CONS responder address */
+	struct xaddrf deflected;	/* deflected address */
+	struct qosformat qos;		/* if indicated_qos is set, holds facilities and CONS qos */
+	/* The data part of the message contains the clear user data, if any. */
+};
+
+#define N_DC	    9
+
+struct xdcnff {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_DC */
+	unsigned char indicated_qos;	/* when set, facilities indicated */
+	struct qosformat qos;		/* if indicated_qos is set, holds facilities and CONS qos */
+	/* No data part */
+};
+
+#define N_Abort	    10
+
+struct xabortf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_Abort */
+	/* No data part */
+};
+
+#define N_Xlisten   11
+
+struct xlistenf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_Xlisten */
+	int lmax;			/* maximum number of CI's at a time */
+	int l_result;			/* result flag */
+	/* Data part contains called user data. */
+};
+
+#define X25_DONTCARE	0	/* The listener ignores the CUD of Address, l_culength and
+				   l_cubytes, or l_type, l_length and l_add are ommited. */
+#define X25_IDENTITY	1	/* The listener match is made only if all bytes of the CUD or
+				   Address field are the same as the supplied l_cubytes or l_add */
+#define X25_STARTSWITH	2	/* The listener match is made only if the leading bytes of the CUD
+				   or Address field are the same as the supplied l_cubytes or l_add 
+				 */
+struct l_cu {
+	unsigned char l_cumode;		/* CUD mode as above. */
+	unsigned char l_culength;	/* This is the length of the CUD in octets for a field
+					   match.  If l_culength is zero, l_cubytes is omitted.
+					   Currently, the range for l_culength is zero to 16
+					   inclusive.  The application still has to check the full
+					   CUD field. */
+	unsigned char l_cubytes[0];	/* Of length l_culength, this is the string of bytes sought 
+					   in the CUD field when a matching mode is specified. */
+};
+struct l_add {
+	unsigned char l_mode;		/* Address mode as above. */
+	unsigned char l_type;		/* This is the type of the address entry, and it can have
+					   to values. */
+#define X25_DTE		0
+#define X25_NSAP	1
+	unsigned char l_length;		/* This is the length of the address l_add in
+					   semi-octets--the common format for X.25 DTE addresses
+					   and NSAPs.  If l_length is zero, then l_add is omitted.
+					   The maximum values for l_length are 15 for X25_DTE and
+					   40 for X25_NSAP. */
+	unsigned char l_add[0];		/* Of length l_length, this contains the address in
+					   semi-octets. */
+};
+
+#define N_Xcanlis   12
+
+struct xcanlisf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_Xcanlis */
+	int c_result;			/* result flag */
+	/* No data part */
+};
+
+#define N_PVC_ATTACH	13
+
+struct pvcattf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_PVC_ATTACH */
+	unsigned short lci;		/* logical channel */
+#if 0
+	unsigned long sn_id;		/* subnetwork identifier */
+#else
+	unsigned int sn_id;		/* subnetwork identifier */
+#endif
+	unsigned char reqackservice;	/* receipt acknowledgement 0 for next parameter implies use 
+					   of default */
+	unsigned char reqnsdulimit;
+	int nsdulimit;
+	int result_code;		/* Nonzero - error */
+};
+
+#define N_PVC_DETACH	14
+
+struct pvcdetf {
+	unsigned char xl_type;		/* always XL_CTL */
+	unsigned char xl_command;	/* always N_PVC_DETACH */
+	int reason_code;		/* reports why */
+};
 
 #endif				/* __NETX25_X25_PROTO_H__ */
-
