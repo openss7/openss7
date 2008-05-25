@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ldl.4.man,v 0.9.2.5 2006/10/10 10:50:28 brian Exp $
+.\" @(#) $Id: ldl.4.man,v 0.9.2.6 2008-05-25 12:49:25 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:50:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:25 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ldl.4.man,v $
+.\" Revision 0.9.2.6  2008-05-25 12:49:25  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.5  2006/10/10 10:50:28  brian
 .\" - updates for release
 .\"
@@ -110,7 +113,7 @@ driver provides an interface between
 drivers and Linux network drivers.  It registers itself as a client of a Linux
 network driver and then presents a DLPI Provider interface
 .[
-dlpi
+dlpi revision 2.0.0
 .]
 to
 .I STREAMS
@@ -487,7 +490,7 @@ release.
 .PP
 DLPI.
 .[
-dlpi
+dlpi revision 2.0.0
 .]
 .\"
 .\"

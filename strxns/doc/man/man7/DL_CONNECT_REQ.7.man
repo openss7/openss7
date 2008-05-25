@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_CONNECT_REQ.7.man,v 0.9.2.7 2006/10/10 10:50:29 brian Exp $
+.\" @(#) $Id: DL_CONNECT_REQ.7.man,v 0.9.2.8 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:50:29 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_CONNECT_REQ.7.man,v $
+.\" Revision 0.9.2.8  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.7  2006/10/10 10:50:29  brian
 .\" - updates for release
 .\"
@@ -85,12 +88,15 @@ sort-adjacent-labels
 .B DL_CONNECT_REQ (dl_connect_req_t)
 \- requests the DLS provider establish a data link connection with a
 remote DLS user.
-.SH DESCRIPTION
-.B DL_CONNECT_REQ
-requests the DLS provider establish a data link connection with a remote DLS
-user.  The request contains the DLSAP address of the remote (called) DLS user
-and quality of service parameters to be negotiated during connection
-establishment.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PROTO
@@ -108,6 +114,16 @@ typedef struct {
 } dl_connect_req_t;
 \fR\s+1
 .fi
+.\"
+.\"
+.SH DESCRIPTION
+.B DL_CONNECT_REQ
+requests the DLS provider establish a data link connection with a remote DLS
+user.  The request contains the DLSAP address of the remote (called) DLS user
+and quality of service parameters to be negotiated during connection
+establishment.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -146,12 +162,18 @@ message block where the quality of service parameters begin.
 .I dl_growth
 defines a growth field for future enhancements to this primitive.  Its
 value must be set to zero.
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_IDLE .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is
 .BR DL_OUTCON_PENDING .
+.\"
+.\"
 .SH RESPONSE
 There is no immediate response to the connect request.  However, if the
 connect request is accepted by the called DLS user,
@@ -167,6 +189,8 @@ is sent to the calling DLS user, resulting in state
 If the request is erroneous, message
 .BR DL_ERROR_ACK (7)
 is returned and the resulting state is unchanged.
+.\"
+.\"
 .SH ERRORS
 .TP 12
 .B DL_ACCESS
@@ -190,18 +214,28 @@ The primitive was issued from an invalid state.
 A system error has occurred and the Linux system error is indicated in
 the
 .BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+and the OSI Data Link Service Definition.
+.[
+x212
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

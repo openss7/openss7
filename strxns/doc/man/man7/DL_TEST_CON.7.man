@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_TEST_CON.7.man,v 0.9.2.6 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_TEST_CON.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_TEST_CON.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -83,6 +86,16 @@ sort-adjacent-labels
 \- conveys the TEST response DLSDU from the DLS Provider to the DLS User in
 response to a
 .BR DL_TEST_REQ (7).
+.\"
+.\"
+.SH INTERFACE
+.PP
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PROTO
@@ -103,11 +116,15 @@ typedef struct {
 } dl_test_con_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_TEST_CON
 conveys the TEST response DLSDU from the DLS Provider to the DLS User in
 response to a
 .BR DL_TEST_REQ (7).
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -142,25 +159,39 @@ implemented using DLPI, this address is the full DLSAP address returned on the
 conveys the offset from the beginning of the
 .B M_PROTO
 message block where the source DLSAP address begins.
+.\"
+.\"
 .SH STATE
 The message is valid in states
 .B DL_IDLE
 and
 .BR DL_DATAXFER .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is unchanged.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+and the OSI Data Link Service Definition.
+.[
+x212
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

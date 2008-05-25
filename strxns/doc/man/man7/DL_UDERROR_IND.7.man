@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_UDERROR_IND.7.man,v 0.9.2.6 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_UDERROR_IND.7.man,v 0.9.2.7 2008-05-25 12:49:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_UDERROR_IND.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:27  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -85,6 +88,16 @@ sort-adjacent-labels
 produced an error or could not be delivered.  The primitive indicates the
 destination DLSAP address associated with the failed request, and conveys an
 error value that specifies the reason for failure.
+.\"
+.\"
+.SH INTERFACE
+.PP
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of either one
 .B M_PROTO
@@ -103,6 +116,8 @@ typedef struct {
 } dl_uderror_ind_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_UDERROR_IND
 informs the DLS user that a previously sent
@@ -110,6 +125,8 @@ informs the DLS user that a previously sent
 produced an error or could not be delivered.  The primitive indicates the
 destination DLSAP address associated with the failed request, and conveys an
 error value that specifies the reason for failure.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -145,23 +162,37 @@ could not deliver the data unit (for example, due to lack of sufficient local
 buffering to store the data unit).  There is, however, no guarantee that such
 an error report will be generated for all undeliverable data units, since
 connectionless data transfer is not a confirmed service.
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_IDLE .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is unchanged.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+and the OSI Data Link Service Definition.
+.[
+x212
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

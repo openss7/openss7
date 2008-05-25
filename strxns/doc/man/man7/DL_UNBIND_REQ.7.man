@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_UNBIND_REQ.7.man,v 0.9.2.6 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_UNBIND_REQ.7.man,v 0.9.2.7 2008-05-25 12:49:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_UNBIND_REQ.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:27  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -80,24 +83,17 @@ sort-adjacent-labels
 .TH DL_UNBIND_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_UNBIND_REQ (dl_unbind_req_t)
-\- requests the DLS provider to unbind the DLSAP that had been bound by a
-previous
-.BR DL_BIND_REQ (7)
-from this stream.  If one or more DLSAPs were bound to the
-stream using a
-.BR DL_SUBS_BIND_REQ (7),
-and have not been unbound using
-a
-.BR DL_SUBS_UNBIND_REQ(7),
-the
-.BR DL_UNBIND_REQ (7)
-will unbind all the subesquent DLSAPs for that stream along with the DLSAP
-bound using the previous
-.BR DL_BIND_REQ (7).
+\- requests the DLS provider to unbind the DLSAP from a Stream.
+.\"
+.\"
+.SH INTERFACE
 .PP
-At the successful completion of the request, the DLS user may issue a new
-.BR DL_BIND_REQ (7)
-for a potentially new DLSAP.
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PROTO
@@ -110,6 +106,8 @@ typedef struct {
 } dl_unbind_req_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_UNBIND_REQ
 requests the DLS provider to unbind the DLSAP that had been bound by a
@@ -130,17 +128,25 @@ bound using the previous
 At the successful completion of the request, the DLS user may issue a new
 .BR DL_BIND_REQ (7)
 for a potentially new DLSAP.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
 conveys
 .BR DL_UNBIND_REQ .
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_IDLE .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is
 .BR DL_UNBIND_PENDING .
+.\"
+.\"
 .SH RESPONSE
 If the unbind request is successful,
 .BR DL_OK_ACK (7)
@@ -149,6 +155,8 @@ is sent to the DLS user resulting in state
 If the request fails, message
 .BR DL_ERROR_ACK (7)
 is returned and the resulting state is unchanged.
+.\"
+.\"
 .SH ERRORS
 .TP
 .B DL_OUTSTATE
@@ -158,18 +166,24 @@ The primitive was issued from an invalid state.
 A system error has occurred and the Linux system error is indicated in
 the
 .BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

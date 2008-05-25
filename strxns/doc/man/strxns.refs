@@ -2556,6 +2556,18 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
 
+%K q710
+%L Q.710
+%A ITU
+%R ITU-T Recommendation Q.710
+%T Simplified MTP Version for Small Systems
+%D November 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
 %K q711
 %L Q.711
 %A ITU
@@ -3429,9 +3441,10 @@ Part 1: Protocol Specification
 %K iso8208
 %L ISO/IEC 8208
 %A ISO
-%R ISO/IEC 8208 : 1995
+%R ISO/IEC 8208 : 2000
 %T Information Technology \- Data Communications \- X.25 Packet Layer Protocol For Data Terminal Equipment
-%D 1995
+%J Fourth Edition
+%D November 1, 2000
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3456,6 +3469,26 @@ Part 1: Protocol Specification
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso10028
+%L ISO/IEC 10028
+%A ISO
+%R ISO/IEC 10028 : 1993
+%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Definition of the Relaying Functions of a Network Layer Intermeidate System
+%D 1993
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso10177
+%L ISO/IEC 10177
+%A ISO
+%R ISO/IEC 10177 : 1993
+%T Information technlology \(em Telecommunications and information excahnge between systems \(em Provision of the connection-mode Network internal layer service by intermediate systems using ISO/IEC 8208, the X.25 Packet Layer Protocol
+%D 1993
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
 %K iso10030
 %L ISO/IEC 10030
 %A ISO
@@ -3470,12 +3503,23 @@ Part 1: Protocol Specification
 %L ISO/IEC 10038
 %A ISO
 %R ISO/IEC 10038 : 1993
-%T Information technlology \(em Telecommunications and information exchange between systems \(em Local area networks Media access control (MAC) bridges
+%T Information Technlology \(em Telecommunications and information exchange between systems \(em Local area networks Media access control (MAC) bridges
 %D 1993
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
 %O Replaced by ISO/IEC 15802-3:1988.  Also IEEE 802.1D 1993.
+
+%K iso10039
+%L ISO/IEC 10039
+%A ISO
+%R ISO/IEC 10039 : 1991
+%T Information technology \(em Telecommunications and information exchange between systems \(em Local area networks \(em Medium Access Control (MAC) service definition
+%D 1991
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaced by ISO/IEC 15802-1:1988.  Also IEEE 802.2 1993.
 
 %K iso1580203
 %L ISO/IEC 15802-3
@@ -3622,6 +3666,18 @@ Part 1: Protocol Specification
 %R ITU-T Recommendation X.210 [ISO/IEC 10731 : 1994]
 %T Information Technology \(em Open Systems Interconnection \(em Basic reference model: Conventions for the definition of OSI services
 %D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K x212
+%L X.212
+%A ITU
+%R ITU-Recommendation X.212 [ISO/IEC 8886 : 1995]
+%T Information Technology \(em Open Systems Interconnection \(em Data Link Service Definition
+%D November 1995
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
@@ -4073,7 +4129,7 @@ Part 1: Protocol Specification
 %Q International Telecommunication Union
 %U http://www.itu.int/
 
-%k h323
+%K h323
 %L H.323
 %A ITU
 %Q International Telecommunication Union
@@ -4158,6 +4214,16 @@ Part 1: Protocol Specification
 %Q International Organization for Standardization
 %T Data Communication \(em High-Level Data Link Control Procedures \(em Consolidation of Elements of Procedures
 %D 1988
+%I International Organization for Standardization
+
+%K iso7776
+%L ISO 7776
+%R ISO/IEC 7776:1995
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information technology \(em Telecommunications and information exchange between systems \(em High-level data link control procedures \(em Description of the X.25 LAPB-compatible DTE data link procedures
+%D July 1, 1995
+%J Second Edition
 %I International Organization for Standardization
 
 %K iso8649
@@ -4521,7 +4587,7 @@ Part 1: Protocol Specification
 
 %L SVR3SPG
 %R SVR 3
-%k svr3spg
+%K svr3spg
 %T UNIX\(rg System V Release 3 STREAMS Programmer's Guide
 %Q AT&T UNIX System Laboratories, Inc.
 %I Prentice Hall
@@ -4529,7 +4595,7 @@ Part 1: Protocol Specification
 
 %L svr3sp
 %R SVR 3
-%k svr3sp
+%K svr3sp
 %T UNIX\(rg System V Release 3 STREAMS Primer
 %Q AT&T UNIX System Laboratories, Inc.
 %I Prentice Hall
@@ -4560,6 +4626,17 @@ Part 1: Protocol Specification
 %K irixspg
 %T IRIX\(rg Device Driver Programmer's Guide
 %D 2001
+%Q Silicon Graphics, Inc.
+%I SGI Technical Publications
+%C Mountainview, California
+%U http://techpubs.sgi.com/
+
+%L SX25
+%R IRIX\(rg SX.25
+%K sx25pg
+%T SX.25 NLI Programming's Guide
+%G Doc. No: 007-2268-002
+%D 1994
 %Q Silicon Graphics, Inc.
 %I SGI Technical Publications
 %C Mountainview, California
@@ -4604,6 +4681,17 @@ Part 1: Protocol Specification
 %D 1997 thru 2004
 %Q Hewlett-Packard Company
 %I HP9000 Networking
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPDLPI
+%R HP-UX DLPI
+%K hpuxdlpi
+%T HP DLPI Programmer's Guide -- HP-UX 11i v3
+%G Part No: 5991-7498
+%D February 2007
+%Q Hewlett-Packard Development Company L.P.
+%I HP
 %C Palo Alto, California
 %U http://docs.hp.com/
 
@@ -4710,9 +4798,9 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs-pdf.sun.com/
 
-%L SOLX25
+%L SOLX25AG
 %R Solaris\(rg 9
-%K solx25
+%K solx25ag
 %T Solstice X.25 9.2 Administration Guide
 %G Part No: 806-1234-10
 %D October 1999
@@ -4721,9 +4809,9 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs-pdf.sun.com/
 
-%L SOLX25
+%L SOLX25DG
 %R Solaris\(rg 9
-%K solx25
+%K solx25dg
 %T Solstice X.25 9.2 Developer's Guide
 %G Part No: 806-1235-10
 %D October 1999
@@ -4732,12 +4820,23 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://docs-pdf.sun.com/
 
-%L SOLX25
+%L SOLX25UG
 %R Solaris\(rg 9
-%K solx25
+%K solx25ug
 %T Solstice X.25 9.2 PAD User's Guide
 %G Part No: 806-1236-10
 %D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25PG
+%R Solaris\(rg 9
+%K solx25pg
+%T Solstice\(rg X.25 9.2 Programming Guide
+%G Part No: 806-1235-10
+%D October 1999 
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Palo Alto, California
@@ -4789,11 +4888,44 @@ Part 1: Protocol Specification
 %I PT
 %C Rochester, New York
 
+%L PTX25
+%R PT X.25
+%K ptx25um
+%T X.25 Protocol User's Manual
+%D 2007
+%Q Performance Technologies Inc.
+%I PT
+%C Rochester, New York
+
 %L AIXDOC
 %R AIX\(rg 5L Version 5.1
 %K aixdoc
 %T AIX 5L Version 5.1 Documentation
 %D 2001
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
+%L AIXX25
+%R AIXlink/X.25
+%K aixx25
+%T AIXlink/X.25 Version 2.1 for AIX: Guide and Reference
+%D September 2005
+%G SC23-2520-07
+%J Eigth Edition
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
+%L AIXDLPI
+%R AIX Version 6.1
+%K aixdlpi
+%T AIX Version 6.1 \(em Communications Programming Concepts
+%D November 2007
+%G SC23-5258-00
+%J First Edition
 %Q Internatonal Business Machines Corp.
 %I IBM
 %C Boulder, Colorado
@@ -4834,6 +4966,26 @@ Part 1: Protocol Specification
 %K soldoc
 %T Solaris 8 Docmentation
 %D 2001
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Santa Clara, California
+%U http://docs.sun.com/
+
+%L SOLDOC10
+%R Solaris\(rg 10
+%K soldoc10
+%T Solaris 10 Docmentation
+%D 2007
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Santa Clara, California
+%U http://docs.sun.com/
+
+%L SOLDOC11
+%R Solaris\(rg 11
+%K soldoc11
+%T Solaris 11 Docmentation
+%D 2008
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Santa Clara, California
@@ -6493,11 +6645,11 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Stream Control Transmission Protocol (SCTP)
 %D October 2000
-%O (Updated by RFC 3309) (Status: PROPOSED STANDARD)
+%O (Obsoleted by RFC 4960) (Updated by RFC 3309) (Status: PROPOSED STANDARD)
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2960.txt
 
-%k rfc3309
+%K rfc3309
 %L SCTPCRC
 %R RFC 3309
 %A Jonathan Stone
@@ -6506,10 +6658,21 @@ Part 1: Protocol Specification
 %E Jonathan Stone
 %T Stream Control Transmission Protocol (SCTP) Checksum Change
 %D September 2002
-%O (Updates RFC 2960) (Status: PROPOSED STANDARD)
+%O (Obsoleted by RFC 4960) (Updates RFC 2960) (Status: PROPOSED STANDARD)
 %Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3309.txt
+
+%K rfc4960
+%L SCTP
+%R RFC 4960
+%E Randall R. Stewart (ed)
+%Q Internet Engineering Task Force
+%T Stream Control Transmission Protocol (SCTP)
+%D September 2007
+%O (Obsoletes RFC 2960, RFC 3309) (Status: PROPOSED STANDARD)
+%I The IETF Trust
+%U http://www.ietf.org/rfc/rfc4960.txt
 
 %K ETSISCTP
 %L TS 102 144
@@ -7247,7 +7410,7 @@ Part 1: Protocol Specification
 %K rfc3554
 %L RFC3554
 %R RFC 3554
-%T On the Use of Stream Control Transmission Protocol (SCTP) wih IPsec
+%T On the Use of Stream Control Transmission Protocol (SCTP) with IPsec
 %A S. Bellovin
 %A J. Ioannidis
 %A A. Keromytis
@@ -7291,7 +7454,7 @@ Part 1: Protocol Specification
 %K rfc3708
 %L RFC3708
 %R RFC 3708
-%T Using TCP Duplicate Selective Acknowledgement (DSACKs) and Stream Control Transmission Protocol (SCTP) Duplicat Transmission Sequence Numbers (TSNs) to Detect Spurious Retransmissions
+%T Using TCP Duplicate Selective Acknowledgement (DSACKs) and Stream Control Transmission Protocol (SCTP) Duplicate Transmission Sequence Numbers (TSNs) to Detect Spurious Retransmissions
 %A E. Blanton
 %A M. Allman
 %D February 2004

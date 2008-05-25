@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_INFO_ACK.7.man,v 0.9.2.6 2006/04/05 09:44:53 brian Exp $
+.\" @(#) $Id: DL_INFO_ACK.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_INFO_ACK.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:53  brian
 .\" - moved .so line and updated headers
 .\"
@@ -83,6 +86,15 @@ sort-adjacent-labels
 \- this message is sent in response to
 .BR DL_INFO_REQ (7);
 it conveys information about the DLPI stream to the DLS user.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PCPROTO
@@ -113,12 +125,16 @@ typedef struct {
 } dl_info_ack_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 The
 .B DL_INFO_ACK
 message is sent in response to
 .BR DL_INFO_REQ (7);
 it conveys information about the DLPI stream to the DLS user.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -136,8 +152,10 @@ value is never less than one.
 .TP
 .I dl_addr_length
 conveys the length, in bytes, of the provider's DLSAP address.  In the case
-of ahierarchical subsequent bind, the length returned is the total
-length, that is, Physical address + SAP +subsequent address length.
+of a hierarchical subsequent bind, the length returned is the total
+length, that is, Physical address, plus SAP, plus subsequent address length.
+When the DLP Provider Stream has not yet been bound to a DLSAP, the value of
+this field will be zero (0).
 .TP
 .I dl_mac_type
 conveys the type of medium supported by this DLPI stream.  Possible
@@ -249,9 +267,9 @@ provides the length of the SAP component within the DLSAP address.
 .I dl_service_mode
 if returned before the
 .BR DL_BIND_REQ (7)
-is processed, this conveys which service modes (
-connection-mode,connectionless-mode or acknowledged connectionless-mode, or
-any comibination of these modes) the DLS provider can support.  It contains a
+is processed, this conveys which service modes (connection-mode,
+connectionless-mode, acknowledged connectionless-mode, or raw data mode, or
+any combination of these modes) the DLS provider can support.  It contains a
 bit-mask specifying one or more than one of the following values:
 .RS
 .TP 12
@@ -263,9 +281,15 @@ connectionless data link service
 .TP
 .B DL_ACLDLS
 acknowledged connectionless data link service.
+.TP
+.B DL_HP_RAWDLS
+raw-mode service.
 .PP
-Once a specific service mode has been bound to the stream, this field returns
-that specific service mode.
+When the Stream is in an unattached state, the value reflects the values that
+can be supported by the DLS Provider on any PPA.  When the Stream is in an
+unbound state, the values reflects the values that can be supported by the DLS
+Provider for the attached PPA.  Once a specific service mode has been bound to
+the stream, this field returns that specific service mode.
 .RE
 .TP
 .I dl_qos_length
@@ -359,7 +383,9 @@ will be 0 and consequently indicate that there has been no address bound.
 indicates the current version of the dlpi that is supported.
 .TP
 .I dl_brdcst_addr_length
-indicates the length of the physical broadcast address.
+indicates the length of the physical broadcast address.  When the Stream is
+unattached, or when the PPA does not support broadcast, this field will be set
+to zero (0).
 .TP
 .I dl_brdcst_addr_offset
 indicates the offset of the physical broadcast address from the beginning of
@@ -369,29 +395,110 @@ block.
 .TP
 .I dl_growth
 conveys a growth field for future use.  The value of this field will be zero.
+.\"
+.\"
 .SH STATE
 The message is valid in any state in response to a
 .BR DL_INFO_REQ .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is unchanged.
+.\"
+.\"
 .SH NOTES
 Readers should note that the list of data links supported by the interface
 may be augmented and is published on the World-Wide Web in U019 at
 http://www.xopen.org (under Sales and Ordering).  This Corrigendum will
 contain relevant additional information such as recognised
 implementors' agreements/guidelines for common data link providers.
+.\"
+.\"
+.SH COMPATIBILITY
+.B DL_INFO_ACK
+is compatible with DLPI
+.[
+dlpi revision 2.0.0
+.]
+and implementations based on DLPI, including
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+and
+.IR Solaris \(rg,
+.[
+soldlpi
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field is
+.IR HP-UX \(rg-specific,
+.[
+hpuxdlpi
+.]
+and will be ignored by portable DLS Users.
+.IP \(em
+When indicated, the
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field indicates that either the DLS Provider can support this
+.IR HP-UX \(rg-specific
+mode of operation, or that the raw mode of operation has been selected.  See
+also,
+.BR DL_HP_RAWDATA_REQ "(7) and " DL_HP_RAWDATA_IND (7).
+.IP \(em
+The behaviour of the
+.I dl_service_mode
+field for
+.B @PACKAGE_TITLE@
+when the Stream is unattached or unbound is clarified above.  This
+behaviour may vary from implementation to implementation.
+.IP \(em
+.B DL_HP_RAWDLS
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR HP-UX \(rg,
+and for porting DLS Providers and Users from
+.IR HP-UX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+For additional compatibility information, see
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

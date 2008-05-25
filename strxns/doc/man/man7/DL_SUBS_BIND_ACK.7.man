@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_SUBS_BIND_ACK.7.man,v 0.9.2.6 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_SUBS_BIND_ACK.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_SUBS_BIND_ACK.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -84,6 +87,16 @@ sort-adjacent-labels
 returns the bound DLSAP address to the DLS user.  This primitive is generated
 in response to a
 .BR DL_SUBS_BIND_REQ (7).
+.\"
+.\"
+.SH INTERFACE
+.PP
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PCPROTO
@@ -98,12 +111,16 @@ typedef struct {
 } dl_subs_bind_ack_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_SUBS_BIND_ACK
 reports the succesful bind of a subsequent DLSAP to a stream, and
 returns the bound DLSAP address to the DLS user.  This primitive is generated
 in response to a
 .BR DL_SUBS_BIND_REQ (7).
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -117,24 +134,34 @@ block.
 .TP
 .I dl_subs_sap_length
 conveys the length of the specified DLSAP.
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_SUBS_BIND_PND .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is
 .BR DL_IDLE .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

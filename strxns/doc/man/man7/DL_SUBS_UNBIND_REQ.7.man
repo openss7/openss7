@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_SUBS_UNBIND_REQ.7.man,v 0.9.2.6 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_SUBS_UNBIND_REQ.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_SUBS_UNBIND_REQ.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -84,6 +87,16 @@ sort-adjacent-labels
 by aprevious
 .BR DL_SUBS_BIND_REQ (7)
 from this stream.
+.\"
+.\"
+.SH INTERFACE
+.PP
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PROTO
@@ -98,12 +111,16 @@ typedef struct {
 } dl_subs_unbind_req_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_SUBS_UNBIND_REQ
 requests the DLS Provider to unbind the DLSAP that had been bound
 by aprevious
 .BR DL_SUBS_BIND_REQ (7)
 from this stream.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -117,12 +134,18 @@ block.
 .TP
 .I dl_subs_sap_length
 conveys the length of the specified DLSAP.
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_IDLE .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is
 .BR DL_SUBS_UNBIND_PND .
+.\"
+.\"
 .SH RESPONSE
 If the unbind request is successful, a
 .BR DL_OK_ACK (7)
@@ -131,6 +154,8 @@ is sent to the DLS User.  The resulting state is
 If the request fails, message
 .BR DL_ERROR_ACK (7)
 is returned and the resulting state is unchanged.
+.\"
+.\"
 .SH ERRORS
 .TP
 .B DL_BADADDR
@@ -143,18 +168,24 @@ The primitive was issued from an invalid state
 .B DL_SYSERR
 A system error has occurred and the Linux system error is indicated in the
 .BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_PROMISCON_REQ.7.man,v 0.9.2.5 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_PROMISCON_REQ.7.man,v 0.9.2.6 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_PROMISCON_REQ.7.man,v $
+.\" Revision 0.9.2.6  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,18 +85,18 @@ sort-adjacent-labels
 .B DL_PROMISCON_REQ (dl_promiscon_req_t)
 \- this primitive requests the DLS Provider to enable promiscuous mode on
 a per Stream basis, either at the physical level or at the SAP level.
-.SH DESCRIPTION
-This primitive requests the DLS Provider to enable promiscuous mode on a
-per Stream basis, either at the physical level or at the SAP level.
+.\"
+.\"
+.SH INTERFACE
 .PP
-The DL Provider will route all received messages on the media to the DLS
-User until either a
-.BR DL_DETACH_REQ (7)
-or a
-.BR DL_PROMISCOFF_REQ (7)
-is received or the
-Stream is closed.
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
+.PP
 The message consists of one
 .B M_PROTO
 message block, which contains the following structure.
@@ -106,6 +109,22 @@ typedef struct {
 } dl_promiscon_req_t;
 \fR\s+1
 .fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+This primitive requests the DLS Provider to enable promiscuous mode on a
+per Stream basis, either at the physical level or at the SAP level.
+.PP
+The DL Provider will route all received messages on the media to the DLS
+User until either a
+.BR DL_DETACH_REQ (7)
+or a
+.BR DL_PROMISCOFF_REQ (7)
+is received or the
+Stream is closed.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -125,17 +144,28 @@ indicates promiscuous mode at the SAP level
 .B DL_PROMISC_MULTI
 indicates promiscuous mode for all multicast addresses.
 .RE
+.\"
+.\"
 .SH STATE
+.PP
 The message is valid in any state when there is no pending
 acknowledgement.
+.\"
+.\"
 .SH "NEW STATE"
+.PP
 The resulting state is unchanged.
+.\"
+.\"
 .SH RESPONSE
+.PP
 If enabling of promiscuous mode is successful, a
 .BR DL_OK_ACK (7)
 is returned.  Otherwise, a
 .BR DL_ERROR_ACK (7)
 is returned.
+.\"
+.\"
 .SH ERRORS
 .TP
 .B DL_NOTSUPPORTED
@@ -151,18 +181,104 @@ the
 .TP
 .B DL_UNSUPPORTED
 Requested service is not supplied by the provider.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DL_PROMISCOFF_REQ (7),
+.BR DL_OK_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.B DL_PROMISCON_REQ
+is compatible with DLPI
+.[
+dlpi revision 2.0.0
+.]
+and implementations based on DLPI, including
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+and
+.IR Solaris \(rg,
+.[
+soldlpi
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+HP-UX documentation
+.[
+hpuxdlpi
+.]
+indicates that if
+.B DL_PROMISC_PHYS
+is enabled before the Stream has been bound with
+.BR DL_BIND_REQ (7),
+the DLS user will receive all traffic on the wire regardless of SAP or address.
+If enabled after the Stream has been bound, the DLS user receives all traffic
+on the wire that matches the protocol(s) to which the DLS user has been bound.
+This includes protocols bound with the
+.BR DL_SUBS_BIND_REQ (7)
+primitive.
+.RS
+.PP
+If
+.B DL_PROMISC_SAP
+is enabled before the Stream has been bound with
+.BR DL_BIND_REQ (7),
+the DLS user receives all traffic destined for this interface (physical
+address, broadcast addresses or bound mulitcast addresses) that matches any SAP
+enable on that interface.  If enabled after the Stream has been bound, the DLS
+user receives only those packets originally destined for the interface that
+match one of the protocol(s) bound on the promiscuous Stream.
+.PP
+If
+.B DL_PROMISC_MULTI
+is enabled before the Stream has been bound with
+.BR DL_BIND_REQ (7),
+the DLS user receives all multicast packets on the wire regardless of the SAP.
+After the Stream has been bound, the DLS user receives all multicast packets
+that match one of the protocol(s) bound on the promiscuous Stream.
+.PP
+.B @PACKAGE_TITLE@
+also exhibits this behaviour for compatibility with porting
+.IR HP-UX \(rg
+DLPI applications to
+.BR "Linux Fast-STREAMS" .
+.RE
+.PP
+For additional compatibility information, see
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic
