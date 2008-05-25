@@ -1,0 +1,421 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: DL_HP_INFO_ACK.7.man,v 1.1.2.1 2008-05-25 12:46:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_HP_INFO_ACK.7.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:54  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DL_HP_INFO_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_HP_INFO_ACK (dl_hp_info_ack_t)
+\- acknowledge connection information request.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI,
+.[
+dlpi revision 2.0.0
+.]
+.IR HP-UX \(rg-specific.
+.[
+hpuxdlpi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The message consists of one
+.BR M_PCPROTO (9)
+message block, that contains the following structure:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_mem_fails;
+    t_uscalar_t dl_queue_fails;
+    t_uscalar_t dl_ack_to;
+    t_uscalar_t dl_p_to;
+    t_uscalar_t dl_rej_to;
+    t_uscalar_t dl_busy_to;
+    t_uscalar_t dl_send_ack_to;
+    t_uscalar_t dl_ack_to_cnt;
+    t_uscalar_t dl_p_to_cnt;
+    t_uscalar_t dl_rej_to_cnt;
+    t_uscalar_t dl_busy_to_cnt;
+    t_uscalar_t dl_local_win;
+    t_uscalar_t dl_remote_win;
+    t_uscalar_t dl_i_pkts_in;
+    t_uscalar_t dl_i_pkts_oos;
+    t_uscalar_t dl_i_pkts_in_drop;
+    t_uscalar_t dl_i_pkts_out;
+    t_uscalar_t dl_i_pkts_retrans;
+    t_uscalar_t dl_s_pkts_in;
+    t_uscalar_t dl_s_pkts_out;
+    t_uscalar_t dl_u_pkts_in;
+    t_uscalar_t dl_u_pkts_out;
+    t_uscalar_t dl_bad_pkts;
+    t_uscalar_t dl_retry_cnt;
+    t_uscalar_t dl_max_retry_cnt;
+    t_uscalar_t dl_max_retries;
+    t_uscalar_t dl_ack_thres;
+    t_uscalar_t dl_remote_busy_cnt;
+    t_uscalar_t dl_hw_req_fails;
+} dl_hp_info_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B DL_HP_INFO_ACK
+primitive is issued by the DLS Provider in response to a
+.BR DL_HP_INFO_REQ (7)
+primitive from the DLS User.  It conveys information on the state of the
+connection on a DLPI Stream.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+.TP
+.I dl_primitive
+conveys
+.BR DL_HP_INFO_ACK .
+.TP
+.I dl_mem_fails
+number of memory allocations that failed.
+.TP
+.I dl_queue_fails
+number of times that the DLS provider was unable to forward a message because
+the outbound queue was full.
+.TP
+.I dl_ack_to
+length of the ACK timeout in tenths of a second.  The ACK timeout determines
+the length of time that LLC Type 2 will ait for an acknowledgement of any
+outstanding I PDUs or for a response to a U PDU before attempting to force a
+response.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_p_to
+length of the P timeout in tenths of a second.  The P timeout determines the
+length of time that LLC Type 2, after sending a command with the P bit set to
+1, will wait for a response with the F bit set to 1 before attempting to force
+a response.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_rej_to
+length fo the REJ timeout in tenths of a second.  The REJ timeout determines
+the length of the time that LLC Type 2 will wait for a response to a REJ PDU
+before attempting to force a response.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_busy_to
+length of the BUSY timeout in tenths of a second.  The BUSY timeout determines
+the length of time that LLC Type 2 will wait for an indication that a remote
+busy condition has been cleared before attempting to force a response.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_send_ack_to
+length of the SEND_ACK timeout in tenths of a second.  The SEND_ACK timeout
+determines the maximum length of time that LLC Type 2 will delay
+acknowledgement of I PDUs if it has not received
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.I dl_send_ack_threshold
+I PDUs.
+.TP
+.I dl_ack_to_cnt
+a count of the number of time that the ACK timer has expired.
+.TP
+.I dl_p_to_cnt
+a count of the number of times that the P timer has expired.
+.TP
+.I dl_rej_to_cnt
+a count of the number of times that the REJ timer has expired.
+.TP
+.I dl_busy_to_cnt
+a count of the number of times that the BUSY timer has expired.
+.TP
+.I dl_local_win
+the size of the local receive window in packets.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_remote_win
+the size of the remote receive window in packets.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_i_pkts_in;
+a count of the number of I PDUs received correctly.
+.TP
+.I dl_i_pkts_oos;
+a count of the number of I PDUs received out of sequence.
+.TP
+.I dl_i_pkts_in_drop;
+a count of the number of I PDUs received correctly, but dropped due to lack of
+resources.
+.TP
+.I dl_i_pkts_out;
+a count of the number of I PDUs acknowledged by the remote system.
+.TP
+.I dl_i_pkts_retrans;
+a count of the number of I PDUs re-transmitted.
+.TP
+.I dl_s_pkts_in
+a count of the number of S PDUs received.
+.TP
+.I dl_s_pkts_out
+a count of the number of S PDUs transmitted.
+.TP
+.I dl_u_pkts_in
+a count of the number of U PDUs received.
+.TP
+.I dl_u_pkts_out
+a count of the number of U PDUs transmitted.
+.TP
+.I dl_bad_pkts
+a count of the number of PDUs received with bad control fields.
+.TP
+.I dl_retry_cnt
+a count of the most recent number of times that LLC TYpe 2 has attempted for
+force a response from the remote due to a timer expiration.  This value is
+reset to zero (0) when a response is received.
+.TP
+.I dl_max_retry_cnt
+a high water mark of the count
+.IR dl_retry_cnt ,
+representing the highest count that
+.I dl_retry_cnt
+has acheived.
+.TP
+.I dl_max_retries
+the maximum allowed number of retries before resetting the connection.  This
+is sometimes known as the N2 variable.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_ack_thres
+maximum number of I PDUs that can be received before an acknowledgement is
+sent.  If this threshold is reached, an acknowledgement is sent and the
+SEND_ACK timer is restarted.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.TP
+.I dl_remote_busy_cnt
+a count of the number of times that the remote system has reported that it was
+busy.
+.TP
+.I dl_hw_req_fails
+a count of the number of times that LLC Type 2 has been unable to transmit due
+to congestion in the interface device driver or interface card.
+.\"
+.\"
+.SH STATE
+.PP
+The message is valid in response to a
+.BR DL_HP_INFO_REQ (7)
+and when another local acknowledgement is not pending.
+.\"
+.\"
+.SH "NEW STATE"
+.PP
+The resulting state remains the same.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B DL_HP_INFO_ACK
+is a
+.IR HP-UX \(rg-specific
+primitive.  It might be necessary to define C preprocessor symbol
+.BR _HPUX_SOURCE
+before including the
+.RB < sys/dlpi.h >
+header file to expose the definitions and structures associated with this
+primitive.  Also, it might be necessary to include the
+.RB < sys/dlpi_ext.h >
+header file to expose the definitions and structures associated with this
+primitive.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B DL_HP_INFO_ACK
+is compatibible with
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DL_HP_INFO_ACK
+is a
+.IR HP-UX \(rg-specific
+pirmitive that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+.B DL_HP_INFO_ACK
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR HP-UX \(rg,
+and for porting DLS Providers and Users from
+.IR HP-UX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+See
+.IR STREAMS (9),
+.BR dlpi (7),
+and
+.BR dlpi_ioctl (4),
+for additional compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface
+.[
+dlpi revision 2.0.0
+.]
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+.B DL_HP_INFO_ACK
+was first documented in
+.IR HP-UX \(rg .
+.[
+hpuxdlpi
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

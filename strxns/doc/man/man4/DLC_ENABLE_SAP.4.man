@@ -1,0 +1,482 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: DLC_ENABLE_SAP.4.man,v 1.1.2.1 2008-05-25 12:46:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DLC_ENABLE_SAP.4.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:53  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLC_ENABLE_SAP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B DLC_ENABLE_SAP
+\- add a functional address
+.\"
+.\"
+.SH INTERFACE
+Generic Data Link Control (GLDC),
+.IR AIX \(rg-specific.
+.[
+aixdlpi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/dlpi_ioctl.h>
+.HP
+.BI "int " retval " = ioctl(" dlpi_stream ", " cmd ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B DLC_ENABLE_SAP
+input-output control enables a service access point (SAP).
+.PP
+A service access point (SAP) identifies a particular user service that sends
+and receives a specific class of data.  This user service allows different
+classes of data to be routed separately to their corresponding service
+handlers.  Those DLCs that support multiple concurrent SAPs have addresses
+known as destination SAP and source SAP embedded in thier packet headers.  DLCs
+that can only support a single SAP do not need or user SAP addressing, but
+still have the concept of enabling the one SAP.  In general, a SAP is enabled
+for each DLC on each port.
+.PP
+Most SAP address values are defined by IEEE standardized network-management
+entities or user-defined values are specified.  Some of the common SAP
+addresses are:
+.TP
+.B null SAP (0x00)
+Provides some ability to response to remote nodes even when no SAP has been
+enabled.  This SAP supports only conenctionless service and responds only to
+exchange identification (XID) and test (TEST) PDUs.
+.TP
+.B SNA path control (0x04)
+Denotes the default individual SAP address used by Systems Network Architecture
+(SNA) nodes.
+.TP
+.B PC network NETBIOS (0xf0)
+Used for all DLC communication that is driven by Network Basic I/O System
+(NETBIOS) emulation.
+.TP
+.B discovery SAP (0xfc)
+Used by the local area network (LAN) name-discovery services.
+.TP
+.B global SAP (0xff)
+Identifies all active SAPs.
+.PP
+The argument to the
+.B DLC_ADDR_FUNC_ADDR
+input-output control is a pointer to a
+.B dlc_esap_arg
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define DLC_MAX_NAME  20
+#define DLC_MAX_ADDR   8
+#define DLC_MAX_GSAPS  7
+
+#define DLC_ESAP_NTWK (1UL<<30)
+#define DLC_ESAP_LINK (1UL<<29)
+#define DLC_ESAP_PHYC (1UL<<28)
+#define DLC_ESAP_ANSW (1UL<<27)
+#define DLC_ESAP_ADDR (1UL<<26)
+
+struct dlc_esap_arg {
+    uint32_t gldc_sap_corr;
+    uint32_t user_sap_corr;
+    uint32_t len_func_addr_mask;
+    uint8_t func_addr_mask[DLC_MAX_ADDR];
+    uint32_t leng_grp_addr;
+    uint8_t grp_addr[DLC_MAX_ADDR];
+    uint32_t max_ls;
+    uint32_t flags;
+    uint32_t len_laddr_name;
+    uint8_t laddr_name[DLC_MAX_NAME];
+    uint8_t num_grp_saps;
+    uint8_t grp_sap[DLC_MAX_GSAPS];
+    uint8_t res1[3];
+    uint8_t local_sap;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B dlc_esap_arg
+structure contains the following members:
+.TP
+.I gdlc_sap_corr
+Contains the generic data link control (GDLC) service access point (SAP)
+correlator.  This correlation must accompany all subsequent commands
+associated with this SAP.
+.TP
+.I user_sap_corr
+Specifies an identifier or correlator the user wishes to have returned on all
+SAP results from GDLC.  It allows theuser of multiple SAPs to choose a
+correlator to reout the SAP-specific results.
+.TP
+.I len_func_addr_mask
+Specifies the byte length of the following functional address mask.  This
+field must be set to zero (0) if no functional address is required.  Length
+values of zero (0) through
+.B DLC_MAX_ADDR
+are supported.
+.TP
+.I func_addr_mask
+Specifies the functional address mask to be ORed with the functional address
+of the adapter.  This address mask allows packets that are destined for
+specific functions to be received by the local adapter.  See individual DLC
+interface documentation to determine the format and length of this field.
+.RS
+.IP \fBNote:\fP
+GDLC does not distinguish whether a received packet was accepted by the
+adapter due to a pre-set network, group or functional address.  If the SAP
+address matches and the packet is otherwise valid (no protocol errors, for
+instance), the received packet is passed to the user.
+.RE
+.TP
+.I leng_grp_addr
+Specifies the byte length of the following group address.  This field must be
+set to zero (0) if no group address is required.  Length values of zero (0)
+through
+.B DLC_MAX_ADDR
+are supported.
+.TP
+.I grp_addr
+Specifies the group address value to be written to the adapter.  It allows
+packets that are destined for a specific group to be received by the local
+adapter.
+.RS
+.IP \fBNote:\fP
+Most adapters allows only one group address to be active at a time.  If this
+field is nonzero and the adapter rejects the group address because it is
+already in use, the enable SAP call fails with an appropriate error code.
+.RE
+.TP
+.I max_ls
+Specifies the maximum number of link stations (LS) allowed to operate
+concurrently on a particular SAP.  The protocol used determines the values for
+this field.
+.TP
+.I flags
+Supports the following flags of the input-output control operation:
+.RS
+.TP
+.B DLC_ESAP_NTWK
+The teleprocessing network type.  When this flag is set, it indicates that
+the network type is leased line; when clear, the network type is switched.
+The default network type is switched.
+.TP
+.B DLC_ESAP_LINK
+The teleprocessing link type.  When this flag is set, it indicates that
+the link type is multipoint; when clear, the link type is point-to-point. The
+default link type is point-to-point.
+.TP
+.B DLC_ESAP_PHYC
+The physical network call (teleprocessing).  When this flag is set, it
+indicates that the SAP is an initiator of calls; when clear, a responder to
+calls.
+.TP
+.B DLC_ESAP_ADDR
+The local address or name indicator specifies whether the local address or
+name field contains an address or a name.  When this flag is set, it indicates
+that the field contains a local address; when clear, a local name.  The
+default is a local name.
+.TP
+.B DLC_ESAP_ANSW
+The teleprocessing autocall or autoanswer.  When this flag is set, it
+indicates that automatic calls and answers are performed; when clear, that
+manual call and answer is required.  The default is manual call and answer.
+.RE
+.TP
+.I len_laddr_name
+Specifies the byte length of the following local address or name.  Length
+values of one (1) through
+.B DL_MAX_ADDR
+are supported.
+.TP
+.I laddr_name
+Specifies the unique network name or address of the user local SAP as
+indicated by the
+.B DLC_ESAP_ADDR
+flag.  Some protocols allow the local SAP to be identified by name (for
+example, Name-Discovery Services) and others by address (for example, Address
+Resolve Procedures).  Other protocols such as Synchronous Data Link Control
+(SDLC) do not identify the local SAP.  Check the individual DLC's usage of
+this field for the operational protocol.
+.TP
+.I num_grp_saps
+Specifies the number of group SAPs to which the user's local SAP responds.  If
+no group SAPs are needed, this field must contain zero (0).  Up to
+.B DL_MAX_GSAPS
+SAPs can be specified.
+.TP
+.I grp_sap
+Specifies the specific group SAP values to which the user local SAP responds
+.RB ( DL_MAX_GSAPS
+maximum).
+.TP
+.I res1
+Reserved field, set to zero (0).
+.TP
+.I local_sap
+Specifies the local SAP address opened.  Received packets with this LSAP value
+indicated in the destination LSAP field are routed to the link stations (LS)
+opened under this particular SAP.
+.PP
+The protocol-specific data area allows parameters to be defined by the
+specific GDLC device manager, such as X.21 call-progress signals or Smartmodem
+call-establishment data.  This optional data area must directly follow (or
+append to) the end of the
+.B dlc_esap_arg
+structure.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success, the input-output control returns zero (0).  Upon failure, the
+input-output control returnes minus one (-1) and sets
+.BR errno (3)
+to an appropriate error code.
+.\"
+.\"
+.SH ERRORS
+.PP
+When the input-output control fails, it returns minus one (-1) and set the
+.BR errno (3)
+to an appropriate error code.  In addition to the reasons given in
+.BR ioctl (2s),
+this input-output control can fail because of the following:
+.TP \w'[\fBEDEADLK\fP]\(em'u
+.RB [ EINVAL ]
+A parameter of the input-output control is invalid.
+.TP
+.RB [ EFAULT ]
+A memory extent exceeds the callers valid address space.
+.TP
+.RB [ EPROTO ]
+A rule of the interface protocol was violated.
+.TP
+.RB [ EAGAIN ]
+The operation could not be immediately processed.
+.TP
+.RB [ ENOBUFS ]
+There were insufficient message buffers to complete the operation.
+.TP
+.RB [ ENOSR ]
+There were insufficient STREAMS resources to complete the operation.
+.TP
+.RB [ ENOMEM ]
+There was insufficient memory to complete the operation.
+.TP
+.RB [ EDEADLK ]
+A deadlock condition was detected and avoided.
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that
+.IR AIX \(rg
+terminology for GDLC conflict with that of LLC
+.[
+iso/iec 8802-2 : 1998
+.]
+and LAPB.
+.[
+iso7776
+.]
+Under IEEE terminology, a link station is associated with the MAC entity or a
+point-to-point data link endpoint, and one or more service access points (SAP)
+are associated with the one link station.  LLC Type 2 supporting link stations
+can have associated with them zero or more connections that represent a
+connection between a local MAC address and a remote MAC address, a local SAP
+and a remote SAP.  LAPB link stations can have associated with them 1
+connection that represents a connection between the local and remote stations.
+LAPD
+.[
+q921
+.]
+link stations can have associated with them one or more connections that
+represent a connection associated with a local and remote SAP (TEI).
+LAPF
+.[
+q922
+.]
+link stations can have associated with them one or more connections that
+represent a connection associated with a local and remote SAP (DLCI).
+.PP
+.IR AIX \(rg
+terminology in the GDLC documentation refers to this latter connection,
+confusingly, as a link station (LS).
+The
+.IR AIX \(rg
+GDLC service access point (SAP) is really a Physical Point of Attachment (PPA) and
+DLSAP combination under the DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and the
+.IR AIX \(rg
+GDLC link station (LS) is really a connection identifier.
+It may be helpful to think of a GDLC link station (LS) as an identifier of a
+local and remote link station combination for a given DLSAP.
+.PP
+.B DLC_ENABLE_SAP
+is an
+.IR AIX \(rg-specific
+input-output control.
+It might be necessary to define C preprocessor symbol
+.B _AIX_SOURCE
+before including the
+.RB < sys/dlpi.h >,
+.RB < sys/dlpi_ext.h >,
+or
+.RB < sys/dlpi_ioctl.h >
+header files to expose the definitions, structures and declarations associated
+with the input-output control.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DLC_DISABLE_SAP (4),
+.BR dlpi_ioctl (4),
+.BR dlpi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DLC_ENABLE_SAP
+input-output control is compatible with
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+and implementations based on
+.IR AIX \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DLC_ENABLE_SAP
+is an
+.IR AIX \(rg-specific
+input-output control that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+.B DLC_ENABLE_SAP
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR AIX \(rg,
+and for porting DLS Providers and Users from
+.IR AIX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced
+may be removed from a future release.
+.PP
+See
+.BR dlpi_ioctl (4),
+.BR dlpi (7),
+.BR STREAMS (9),
+for additional compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The GDLC input-output controls are specific to
+.IR AIX \(rg.
+.[
+aixdlpi
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

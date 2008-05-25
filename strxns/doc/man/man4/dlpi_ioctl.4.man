@@ -1,0 +1,1734 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpi_ioctl.4.man,v 1.1.2.1 2008-05-25 12:46:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi_ioctl.4.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:53  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPI-IOCTL 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B dlpi_ioctl
+\- common IO controls for DLPI devices
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/dlpi_ioctl.h>
+.HP
+.BI "int " retval " = ioctl(" dlpi_stream ", " cmd ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+The following are
+.IR Solaris \(rg-specific
+input-output controls:
+.[
+soldoc11
+.]
+.SS DLIOCRAW
+.PP
+The
+.B DLIOCRAW
+input-output control is used by some DLPI applications, such as
+.BR snoop (8).
+The
+.B DLIOCRAW
+command puts the stream into a raw mode, which, upon receive, causes the full
+MAC-level packet to be sent upstream in an
+.BR M_DATA (9)
+message instead of it being transformed into the
+.BR DL_UNITDATA_IND (7)
+form normally used for reporting incoming packets in accordance with the DLPI
+specification.
+.[
+dlpi revision 2.0.0
+.]
+Packet SAP filtering is still performed on Streams that are in raw mode.  If a
+Stream user wants to receive all incoming packets it must also select the
+appropriate promiscuous modes using the
+.BR DL_PROMISCON_REQ (7)
+DLPI primitive.  After successfully selecting raw mode, the application is also
+allowed to send fully formatted packets to the driver as
+.BR M_DATA (9)
+messages for transmission.
+.B DLIOCRAW
+takes no arguments.  Once enabled, the Stream remains in this mode until
+closed.
+.\"
+.SS DLIOCNATIVE
+.PP
+Some DLPI providers may be able to represent their link layer using more than
+on link-layer format.  In this case, the default link-layer format may minimize
+impact to applications, but may not allow truly "native" link-layer headers to
+be sent or received.  DLS users who wish to use the native link-layer format
+can use
+.B DLIOCNATIVE
+to transition the Stream.
+.B DLIOCNATIVE
+takes no arguments and returns the DLPI MAC type associated with the new
+link-layer format upon success.  Once enabled, the Stream remains in this mode
+until closed.  Note that
+.B DLIOCNATIVE
+does not enable transition between dissimilar DLPI MAC types and (aside from
+the link-layer format), the new DLPI MAC type is guaranteed to be semantically
+identical.  In particular, the SAP space and addressing format are not affected
+and the effect of
+.B DLIOCNATIVE
+is only visible when in raw mode, though any subsequent
+.BR DL_INFO_REQ (7)
+requests generate response with
+.I dl_mac_type
+set to the native DLPI type.
+.\"
+.SS DLIOCMARGININFO
+.PP
+The
+.B DLIOCMARGININFO
+input-output control takes a 32-bit integer (pointer) argument that is used for
+each DLS provider to return the margin size it supports.  For example, if an
+Ethernet DLS provider cannot handle packets whose payload section are greater
+than 1522 bytes, and the maximum SDU size it reports through
+.BR DL_INFO_ACK (7)
+is 1500, then the margin size of this DLPI provider is 22 (1522-1500), and the
+maximum packet size it can handle is 1536 (1522+14, where 14 is the Ethernet
+header).
+.\"
+.SS DLIOCHDRINFO
+.PP
+.B DLIOCHDRINFO
+is used by DLS users that wish to cache link-layer headers for "fast path"
+operation.
+.PP
+The IP module uses a fast-path mechanism that caches link-layer headers for use
+with each on-link neighbor.  Link-layer interfaces can use the
+.BR DL_NOTIFY_IND (7)
+pirmitive with the
+.B DL_NOTE_FASTPATH_FLUSH
+mechanism to notify the IP module that the link-layer header has been modified,
+and for IP to flush its cached headers.  This should cause the module to
+request new headers form the DLS provider using the
+.B DLIOCHDRINFO
+ioctl.
+.PP
+Note that this input-output control cannot be issued by user-space DLS users.
+.PP
+The argument to the input-output control is a pointer to an extent that, on
+call, contains a
+.BR dl_unitdata_req_t (7)
+structure with the
+.I dl_primitive
+field properly set to
+.BR DL_UNITDATA_REQ ,
+and the link-layer address of the neighbor contained in the
+.IR dl_dest_addr_offset " and " dl_dest_addr_length
+fields.
+On successful returns, the DLS provider will return in the memory extent the
+link-layer header including MAC addresses, LSAP, and any additional headers
+such as SNAP or VLAN headers necessary to address packets to the destination.
+The upper layer can use this information for sending messages in raw mode to
+the upper layer peer.
+.PP
+Issuing this input-output control also places the DLS provider into fast-path
+mode, if it was not already in fast-path mode.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The following are
+.IR HP-UX \(rg
+input-output controls:
+.[
+hpuxdlpi
+.]
+.\"
+.SS DL_IOC_DRIVER_OPTIONS
+.PP
+This input-output control negotiates options between the DLS Provider and DLS
+User.
+.PP
+The input-output contorl is valid for in-kernel STREAMS DLPI users
+only.
+.PP
+The DLS user sets bits to enquire about features.  The DLS provider compares
+the DLS user's request with the DLS provider's capabilties and clears bits
+corresponding to features requested by the DLS user that the DLS provider
+cannot support.
+.PP
+The DLS user that negotiates the and header template feature must also reqeust
+link event notifications using the
+.BR DL_HP_NOTIFY_EVENT_REQ (7)
+primitive.
+.PP
+The agument to the input-output control is a pointer to a
+.B driver_ops_t
+structure, defined as follows:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    uint32_t driver_ops_type;
+    uint32_t driver_ops_type_1;
+    uint32_t driver_ops_type_2;
+} driver_ops_t;
+\s+1\fP
+.fi
+.sp
+where the members are defined as follows:
+.TP
+.I driver_ops_type
+This member contains features supported by XPORT.  The features are bit-wise
+flags defined as follows:
+.RS
+.TP
+.B DRIVER_CKO_IN
+Driver support for checksum offload on incoming packets.
+.TP
+.B DRIVER_CKO_OUT
+Driver support for checksum offload on outgoing packets.
+.TP
+.B DRIVER_CKO_OUT_DF
+Driver support for checksum offload on outgoing fragmented packets.
+.TP
+.B DRIVER_COW
+Driver support for copy-on-write.
+.TP
+.B DRIVER_LFP
+Not supported.
+.TP
+.B DRIVER_LNP
+Not supported.
+.TP
+.B DRIVER_PRI
+Reserved for future use.
+.TP
+.B DRIVER_TRAIN
+Driver support for packet trains.
+.TP
+.B DRIVER_LLC
+Reserved for future use.
+.TP
+.B DRIVER_FASTPATH_IN
+Driver support for inbound fastpath.
+.RE
+.TP
+.I driver_ops_type_1
+This member is reserved.  It must be set to zero (0).
+.TP
+.I driver_ops_type_2
+This member is reserved.  It must be set to zero (0).
+.PP
+.B ERRORS
+.PP
+Any of the following errors can be returned by this specific intput-output
+control in addition to those errors listed in the
+.BR ioctl (2s)
+and
+.BR streamio (7)
+manual pages:
+.TP
+.RB [ EBUSY ]
+This input-output control is only valid in the
+.BR DL_IDLE " or " DL_UNBOUND
+states.  If the message is not in either of these states, the input-output
+control returns minus one (-1) and sets
+.IR errno (3)
+to
+.RB [ EBUSY ].
+.TP
+.RB [ EOPNOTSUPP ]
+If the drivers does not support any of the options requested by the transport
+layer, this error code is returned.
+.TP
+.RB [ EINVAL ]
+If the associated information is invalid, this error code is returned.
+.\"
+.SS DL_IOC_HDR_INFO
+.PP
+This input-output control permits the transportlayer (like TCP/IP) to request
+a link layer header template from the DLS provider on a per-stream basis, thus
+avoiding the construction of a header every time that a packet is issued for
+transmission.
+.PP
+This input-output control is valid only for the in-kernel STREAMS DLS users
+only.
+.PP
+The header template enables the transport layer to add the link layer header
+before sending the packet to the DLS provider.
+.PP
+After receiving the DL_IOC_HDR_INFO input-output control, the DLS provider
+constructs the MAC plus LLC header template with out-of-packet (OOP) data
+template.  The OOP data template can be used by the transport layer to
+communicate additiona information to the DLS provider.
+.PP
+In response to the input-output control, the DLS provider returns the OOP
+header and link layer header template.  The
+.BR mblk_t (9)
+containing the MAC plus LLC and OOP header is the last (third)
+.BR mblk_t (9)
+in the
+.BR M_IOCACK (9)
+response.
+.PP
+The DLS user must renegotiate the feature and request the DLS provider to
+build a new header template when it receives a
+.BR DL_HP_LINK_UP_IND (7)
+from the DLS provider, because the link state changes may be due to the driver
+feature changes.  These changes can impact the header template.
+.PP
+Note: The Stream must register fr receiving link event notifications in
+addition, the stream must rebuild the MAC plus LLC link layer header templates
+on every
+.BR DL_HP_LINK_UP_IND (7)
+event.
+.PP
+The
+.BR M_IOCTL
+message block that contains
+.B DL_IOCL_HDR_INFO
+is followed by one
+.BR M_PROTO
+message block containing the following structure:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_dest_addr_length;
+    t_uscalar_t dl_dest_addr_offset;
+    t_uscalar_t dl_priority;
+} dl_unitdata_req_t;
+\s+1\fP
+.fi
+.sp
+which contains the following members:
+.TP
+.I dl_primitive
+always set to
+.BR DL_UNITDATA_REQ .
+.TP
+.I dl_dest_addr_lenth
+specifies the length of the DLSAP address of the destination DLS user.  If the
+destination user is implemented using DLPI, this address is the full DLSAP
+address returned on the
+.BR DL_BIND_ACK (7)
+primitive.
+.TP
+.I dl_dest_addr_offset
+specifies the offset from the beginning of the
+.BR M_PROTO (9)
+message block where the destination DLSAP address begins.
+.TP
+.I dl_priority
+specifies the pririty value with the supported range for the specified DLSDU.
+.PP
+This input-output control is valid in the
+.BR DL_IDLE " or " DL_UNBOUND
+state.
+.PP
+.B ERRORS
+.PP
+If the driver does not support fastpath,
+.RB [ EINVAL ]
+is returned.
+.PP
+If the
+.BR dl_unitdata_req_t (7)
+structure in the
+.I b_cont
+of the
+.BR M_IOCTL (9)
+message block is invalid (e.g.
+.I b_cont
+is
+.BR NULL ),
+.RB [ EINVAL ]
+is returned.
+.\"
+.SS DL_HP_SET_DRV_PARAM_IOCTL
+.PP
+This input-output control is a DLPI defined transparent input-output contorl.
+It can be use to set the driver parameters.  This input-output control
+provides an interface to set Speed, Duplex mode, auto-negotiation/auto-sense,
+and Maximum Transfer Unit (MTU).  Also, it may be used to reset the MTU of an
+interface.
+.PP
+Notes:
+.IP \(bu \w'\(bu\(em'u
+DLPI does not interpret the request of this input-output control: the request
+is used between the driver's user-space application and the driver.
+.IP \(bu
+The driver user space application can request DLPI to serialize this requires
+by setting the
+.B DL_HP_SERIALIZE
+bit in the
+.I dl_request
+element, if another
+.BR DL_HP_SET_DRV_PARAM_IOCTL
+input-output control on the same interface is in progress.
+.IP \(bu
+The drivers can define their own
+.I dl_request
+by using other bits that are not defined by DLPI.
+.IP \(bu
+If the input-output contol fails, DLPI fress the
+.I b_cont
+.BR mblk_t (9)
+that contains the data associated with the input-output control.
+.sp
+The input-output control argument is a pointer to a structure, formatted as
+follows:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct dl_hp_set_drv_param_ioctl {
+    uint32_t dl_request;
+    uint32_t dl_speed;
+    uint32_t dl_duplex;
+    uint32_t dl_autoneg;
+    uint32_t dl_mtu;
+    uint64_t dl_value1;
+    uint64_t dl_value2;
+    uint64_t dl_value3;
+    uint32_t dl_reserved1[2];
+    uint32_t dl_reserved2[2];
+} dl_hp_set_drv_param_ioctl_t;
+\s+1\fP
+.fi
+.sp
+where the structure contains the following members:
+.TP
+.I dl_request
+The request type.  The value can be one of the following values:
+.RS
+.TP \w'\fBDL_HP_DRV_RESET_MTU\fP\(em'u
+.B DL_HP_DRV_SPEED
+The
+.I dl_speed
+value is valid.
+.PD 0
+.TP
+.B DL_HP_DRV_DUPLEX
+The
+.I dl_duplex
+value is valid.
+.TP
+.B DL_HP_DRV_AUTONEG
+The
+.I dl_autoneg
+value is valid.
+.TP
+.B DL_HP_DRV_MTU
+The
+.I dl_mtu
+value is valid.
+.TP
+.B DL_HP_DRV_RESET_MTU
+Resets the MTU.
+.TP
+.B DL_HP_VALUE1
+The
+.I dl_value1
+value is valid.
+.TP
+.B DL_HP_VALUE2
+The
+.I dl_value2
+value is valid.
+.TP
+.B DL_HP_VALUE3
+The
+.I dl_value3
+value is valid.
+.TP
+.B DL_HP_RESERVED1
+The
+.I dl_reserved1[0]
+value is valid.
+.TP
+.B DL_HP_RESERVED2
+The
+.I dl_reserved1[1]
+value is valid.
+.TP
+.B DL_HP_RESERVED3
+The
+.I dl_reserved2[0]
+value is valid.
+.TP
+.B DL_HP_RESERVED4
+The
+.I dl_reserved2[1]
+value is valid.
+.TP
+.B DL_HP_SERIALIZE
+Requests DLPI to serialize requests.
+.PD
+.RE
+.TP
+.I dl_speed
+The speed of the underlying link in Mbits/sec.
+.TP
+.I dl_duplex
+The duplex mode (full or half).  This can be one of the following values:
+.RS
+.TP \w'\fBDL_HP_HALF_DUPLEX\fP\(em'u
+.B DL_HP_HALF_DUPLEX
+The driver is half-duplex.
+.PD 0
+.TP
+.B DL_HP_FULL_DUPLEX
+The driver is full-duplex.
+.PD
+.RE
+.TP
+.I dl_autoneg
+The auto-negotiation/auto-sense state.  This can be one of the following
+values:
+.RS
+.TP \w'\fBDL_HP_AUTONEG_SENSE_OFF\fP\(em'u
+.B DL_HP_AUTONEG_SENSE_ON
+Auto-negotiation/auto-sense is on.
+.PD 0
+.TP
+.B DL_HP_AUTONEG_SENSE_OFF
+Auto-negotiation/auto-sense is off.
+.PD
+.RE
+.TP
+.I dl_mtu
+The MTU of the interface (in octets).
+.TP
+.I dl_value1
+A 64-bit value for driver extension.
+.TP
+.I dl_value2
+A 64-bit value for driver extension.
+.TP
+.I dl_value3
+A 64-bit value for driver extension.
+.TP
+.I dl_reserved1
+Two 32-bit values for driver extension.
+.TP
+.I dl_reserved2
+Two 32-bit values for driver extension.
+.PP
+This input-output control can only be issued in the
+.BR DL_IDLE " or " DL_UNBOUND
+state.
+.\"
+.SS DL_HP_GET_DRV_PARAM_IOCTL
+.PP
+This input-output control is a DLPI defined transparent input-output control
+that retrieves the driver parameters.
+.PP
+Note:
+.IP \(bu \w'\(bu\(em'u
+DLPI does not interpret the request of this input-output control.  You must
+pass this request between the driver's user-space application and the driver.
+.IP \(bu
+The
+.B DL_HP_SERIALIZE
+bit is ignored for this input-output control.
+.IP \(bu
+The driver can define its own
+.I dl_request
+by using other bits that are not defined by DLPI.
+.PP
+The input-output control argument is a pointer to a structure, formatted as
+follows:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct dl_hp_get_drv_param_ioctl {
+    uint32_t dl_request;
+    uint32_t dl_speed;
+    uint32_t dl_duplex;
+    uint32_t dl_autoneg;
+    uint32_t dl_mtu;
+    uint64_t dl_value1;
+    uint64_t dl_value2;
+    uint64_t dl_value3;
+    uint32_t dl_reserved1[2];
+    uint32_t dl_reserved2[2];
+} dl_hp_get_drv_param_ioctl_t;
+\s+1\fP
+.fi
+.sp
+where the structure contains the following members:
+.TP
+.I dl_request
+The request type.  This can be an of the values for the corresponding field
+in the
+.B dl_hp_set_drv_param_ioctl
+defined in the previous section.
+.TP
+.I dl_speed
+The speed of the underlying link in Mbits/sec.
+.TP
+.I dl_duplex
+Duplex mode (full or half).  The value is the same as the corresponding field
+in the
+.B dl_hp_set_drv_param_ioctl
+defined in the previous section.
+.TP
+.I dl_autoneg
+Auto-negotiation/auto-sense.  The value is the same as the corresponding field
+in the
+.B dl_hp_set_drv_param_ioctl
+defined in the previous section.
+.TP
+.I dl_mtu
+The MTU of the interface in octets.
+.TP
+.I dl_value1
+A 64-bit value for driver extension.
+.TP
+.I dl_value2
+A 64-bit value for driver extension.
+.TP
+.I dl_value3
+A 64-bit value for driver extension.
+.TP
+.I dl_reserved1
+Two 32-bit values for driver extension.
+.TP
+.I dl_reserved2
+Two 32-bit values for driver extension.
+.PP
+This input-output control may be invoked while the DLS provider is in the
+.BR DL_IDLE " or " DL_UNBOUND
+states.
+.\"
+.SS DLPI_SET_NOLOOPBACK
+.PP
+This input-ouput control contains an
+.BR M_IOCTL (9)
+message block with
+.I ioc_cmd
+set to
+.BR DLPI_SET_NOLOOPBACK ,
+and the
+.I b_cont
+of the
+.BR M_IOCTL (9)
+message block contains a
+.B uint32_t
+value.
+.PP
+When the
+.B uint32_t
+value is set to one (1), the DLS provider does not loopback multicast and
+broadcast packets for this stream.  When the
+.B uint32_t
+value is set to zero (0), the input-output control enables loopback multicast
+and broadcast packets.
+.\"
+.\"
+.SH IOCTLS
+.PP
+These are additional
+.IR Solaris \(rg-specific
+input-output controls for use with LLC2 and LAPB.  These input-output controls
+are specific to X.25 LAPB
+.[
+iso8208
+.]
+and LLC2.
+.[
+iso/iec 8802-2 : 1998
+.]
+These input-output controls are documented in the Solstic X.25 9.2 Developer's
+Guide.
+.[
+solx25dg
+.]
+.\"
+.SS L_SETTUNE, L_GETTUNE
+.PP
+The
+.B L_SETTUNE
+input-output control sets the tunable parameters for a PPA,
+and is appliable both to LAPB and LLC2.
+The
+.B L_GETTUNE
+input-output control retrieves the tunable parameters for a PPA,
+and is appliable both to LAPB and LLC2.
+.PP
+Both the
+.BR L_SETTUNE " and " L_GETTUNE
+input-output controls take an argument that is a pointer to a input-output
+control tuning structure.  For LLC2 PPAs, the
+.B llc2_tnioc
+structure is used.  For LAPB PPAs, the
+.B lapb_tnioc
+structure is used.  These structures are detailed as follows:
+.PP
+The
+.B llc2_tnioc
+tuning table structure for LLC2 is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct llc2_tnioc {
+    uchar lli_type;
+    uchar lli_spare[3];
+    uint lli_ppa;
+    llc2tune_t llc2_tune;
+};
+\s+1\fP
+.fi
+.PP
+The members of the
+.B llc2_tnioc
+structure are as follows:
+.TP
+.I lli_type
+specifies the type of the structure: always
+.BR LI_LLC2TUNE .
+.TP
+.I lli_spare
+provides spare bytes for alignment.
+.TP
+.I lli_ppa
+specifies the Physical Point of Attachment (PPA).  The value,
+.BR 0xff ,
+specifies all PPAs.
+.TP
+.I llc2_tune
+a table of tuning values.
+.PP
+The
+.B ll2tune
+tuning value structure for LLC2 is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct llc2tune {
+    ushort N2;
+    ushort T1;
+    ushort Tpf;
+    ushort Trej;
+    ushort Tbusy;
+    ushort Tidle;
+    ushort ack_delay;
+    ushort notack_max;
+    ushort tx_window;
+    ushort tx_probe;
+    ushort max_I_len;
+    ushort xid_window;
+    ushort xid_Ndup;
+    ushort xid_Tdup;
+} llc2tune_t;
+\s+1\fP
+.fi
+.PP
+The members of the
+.B llc2tune
+structure are as follows:
+.TP
+.I N2
+specifies the maximum number of retries.  This is the value \*(lqN2\*(rq from
+ISO/IEC 8802-2.
+.[
+iso/iec 8802-2 : 1998
+.]
+.TP
+.I T1
+specifies the acknowlegement timeout in tenths of a second.
+.TP
+.I Tpf
+specifies the P/F-bit cycle retry timeout in tenths of a second.
+.TP
+.I Trej
+specifies the reject retry timeout in tenths of a second.
+.TP
+.I Tbusy
+specifies the remote busy check time in tenths of a second.
+.TP
+.I Tidle
+specifies the idle P/F-bit cycle timeout in tenths of a second.
+.TP
+.I ack_delay
+specifies the RR delay timeout in tenths of a second.
+.TP
+.I notack_max
+specifies the maximum number of unacknowledged received I-frames.
+.TP
+.I tx_window
+specifies the transmit window (remote receive window) if no XID frame is
+received containing the remote receive window.
+.TP
+.I tx_probe
+specifies the F-bit position before the end of the transmit window.
+.TP
+.I max_I_len
+specifies the maximum I-frame length in octets.
+.TP
+.I xid_window
+specifies the XID window size (receive window).
+.TP
+.I xid_Ndup
+specifies the duplicate MAC XID count (zero (0) implies no test).
+.TP
+.I xid_Tdup
+specifies the duplicate MAC XID timeout in tenths of a second.
+.PP
+The
+.B lapb_tnioc
+tunig table structure for LAPB is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct lapb_tnioc {
+    uchar lli_type;
+    uchar lli_spare[3];
+    uint lli_ppa;
+    lapbtune_t lapb_tune;
+};
+\s+1\fP
+.fi
+.PP
+The members of the
+.B lapb_tnioc
+structure are as follows:
+.TP
+.I lli_type
+specifies the type of the structure: always
+.BR LI_LLAPBTUNE .
+.TP
+.I lli_spare
+provides spare bytes for alignment.
+.TP
+.I lli_ppa
+specifies the Physical Point of Attachment (PPA).  The value,
+.BR 0xff ,
+specifies all PPAs.
+.TP
+.I lapb_tune
+a table of tuning values.
+.PP
+The
+.B lapb_tune
+tuning value structure for LAPB is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct lapb_tune {
+    ushort N2;
+    ushort T1;
+    ushort Tpf;
+    ushort Trej;
+    ushort Tbusy;
+    ushort Tidle;
+    ushort ack_delay;
+    ushort notack_max;
+    ushort tx_window;
+    ushort tx_probe;
+    ushort max_I_len;
+    ushort llconform;
+};
+\s+1\fP
+.fi
+.PP
+The members of the
+.B lapb_tune
+structure are as follows:
+.TP
+.I N2
+specifies the maximum number of retries.
+This is the value \*(lqN2\*(rq from ISO/IEC 8208.
+.[
+iso8208
+.]
+.TP
+.I T1
+specifies the acknowlegement timeout in tenths of a second.
+.TP
+.I Tpf
+specifies the P/F-bit cycle retry timeout in tenths of a second.
+.TP
+.I Trej
+specifies the reject retry timeout in tenths of a second.
+.TP
+.I Tbusy
+specifies the remote busy check time in tenths of a second.
+.TP
+.I Tidle
+specifies the idle P/F-bit cycle timeout in tenths of a second.
+.TP
+.I ack_delay
+specifies the RR delay timeout in tenths of a second.
+.TP
+.I notack_max
+specifies the maximum number of unacknowledged received I-frames.
+.TP
+.I tx_window
+specifies the transmit window (remote receive window) if no XID frame is
+received containing the remote receive window.
+.TP
+.I tx_probe
+specifies the F-bit position before the end of the transmit window.
+.TP
+.I max_I_len
+specifies the maximum I-frame length in octets.
+.TP
+.I llconform
+specifies LAPB conformance.
+.\"
+.SS L_GETGSTATS
+.PP
+This input-output control reads the global layer two statistics for the LAPB
+driver, and is only applicable to LAPB.  The input-output control argument is
+a pointer to a
+.B lapb_gstioc
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define frames_tx    0
+#define frames_rx    1
+#define sabme_tx     2
+#define sabme_rx     3
+#define bytes_tx     4
+#define bytes_rx     5
+#define globstatmax  6
+
+struct lapb_gstioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lapbgstats[globstatmax];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B lapb_gstioc
+structure contains the following members:
+.TP
+.I lli_type
+the type of the structure: always
+.BR LI_GSTATS .
+.TP
+.I lli_spare
+spare bytes for alignment.
+.TP
+.I lapbgstats
+a global statistics array of
+.I globstatmax
+.B uint32_t
+elements.  These elements are defined as follows:
+.RS
+.TP \w'\fBframes_rx\fP\(em'u
+.B frames_tx
+contains a count of the number of frames transmitted.
+.TP
+.B frames_rx
+contains a count of the number of frames received.
+.TP
+.B sabme_tx
+contains a count of the number of SABM/SABME/SM frames transmitted.
+.TP
+.B sabme_rx
+contains a count of the number of SABM/SABME/SM frames received.
+.TP
+.B bytes_tx
+contains a count of the number of bytes (octets) transmitted.
+.TP
+.B bytes_rx
+contains a count of the number of bytes (octets) received.
+.RE
+.\"
+.SS L_GETSTATS
+.PP
+This input-output control reads the per-link statistics,
+and is only applicable to LAPB.  The input-output control takes an argument
+that is a pointer to a
+.B lapb_stioc
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct lapb_stioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_ppa;
+    lapbstats_t lli_stats;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B lapb_stioc
+structure contains the following members:
+.TP
+.I lli_type
+specifies the type of the structure: always
+.BR LI_STATS .
+.TP
+.I lli_spare
+specifies spare bytes for alignment.
+.TP
+.I lli_ppa
+specifies the Physical Point of Attachment (PPA) to which the statistics
+apply.
+.TP
+.I lli_stats
+specifies a table of statistics.
+.PP
+The
+.I lli_stats
+member contains a
+.B lapb2_stats
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define lapbstatmax    49
+
+typedef struct lapb2_stats {
+    uint32_t lapbmonarray[lapbstatmax];
+} lapbstats_t;
+
+#define tx_ign          0
+#define rx_badlen       1
+#define rx_unknown      2
+#define t1_exp          3
+#define t4_exp          4
+#define t4_n2_exp       5
+#define RR_rx_cmd       6
+#define RR_rx_rsp       7
+#define RR_tx_cmd       8
+#define RR_tx_rsp       9
+#define RR_tx_cmd_p    10
+#define RNR_rx_cmd     11
+#define RNR_rx_rsp     12
+#define RNR_tx_cmd     13
+#define RNR_tx_rsp     14
+#define RNR_tx_cmd_p   15
+#define REJ_rx_cmd     16
+#define REJ_rx_rsp     17
+#define REJ_tx_cmd     18
+#define REJ_tx_rsp     19
+#define REJ_tx_cmd_p   20
+#define SABME_rx_cmd   21
+#define SABME_tx_cmd   22
+#define DISC_rx_cmd    23
+#define DISC_tx_cmd    24
+#define UA_rx_rsp      25
+#define UA_tx_rsp      26
+#define DM_rx_rsp      27
+#define DM_tx_rsp      28
+#define I_rx_cmd       29
+#define I_tx_cmd       30
+#define FRMR_rx_rsp    31
+#define FRMR_tx_rsp    32
+#define tx_rtr         33
+#define rx_bad         34
+#define rx_dud         35
+#define rx_ign         36
+#define I_rx_rsp       37
+#define I_tx_rsp       38
+#define UI_rx_cmd      39
+#define UI_tx_cmd      40
+#define XID_rx_cmd     41
+#define XID_rx_rsp     42
+#define XID_tx_cmd     43
+#define XID_tx_rsp     44
+#define TEXT_rx_cmd    45
+#define TEXT_rx_rsp    46
+#define TEXT_tx_cmd    47
+#define TEXT_tx_rsp    48
+\s+1\fP
+.fi
+.PP
+The
+.B lapb2_stats
+structure contains an array with the following elements, each of which
+contains a count of the associated event:
+.TP \w'\fBSABME_rx_cmd\fP\(em'u
+.B tx_ign
+tranmissions ignored and not set.
+.PD 0
+.TP
+.B rx_badlen
+bad length frames received.
+.TP
+.B rx_unknown
+unknown frames received.
+.TP
+.B t1_exp
+expirations of the T1 timer.
+.TP
+.B t4_exp
+expirations of the T4 timer.
+.TP
+.B t4_n2_exp
+expirations of the T4 timer after N2 retries.
+.TP
+.B RR_rx_cmd
+RR commands received.
+.TP
+.B RR_rx_rsp
+RR responses received.
+.TP
+.B RR_tx_cmd
+RR commands transmitted.
+.TP
+.B RR_tx_rsp
+RR responses transmitted.
+.TP
+.B RR_tx_cmd_p
+RR commands with the P-bit set transmitted.
+.TP
+.B RNR_rx_cmd
+RNR command S-frames received.
+.TP
+.B RNR_rx_rsp
+RNR response S-frames received.
+.TP
+.B RNR_tx_cmd
+RNR command S-frames transmitted.
+.TP
+.B RNR_tx_rsp
+RNR response S-frames transmitted.
+.TP
+.B RNR_tx_cmd_p
+RNR command S-frames with the P-bit set transmitted.
+.TP
+.B REJ_rx_cmd
+REJ command S-frames received.
+.TP
+.B REJ_rx_rsp
+REJ response S-frames received.
+.TP
+.B REJ_tx_cmd
+REJ command S-frames transmitted.
+.TP
+.B REJ_tx_rsp
+REJ response S-frames transmitted.
+.TP
+.B REJ_tx_cmd_p
+REJ command S-frames with the P-bit set transmitted.
+.TP
+.B SABME_rx_cmd
+SABM/SABME/SM command U-frames received.
+.TP
+.B SABME_tx_cmd
+SABM/SABME/SM command U-frames transmitted.
+.TP
+.B DISC_rx_cmd
+DISC command frames received.
+.TP
+.B DISC_tx_cmd
+DISC command frames transmitted.
+.TP
+.B UA_rx_rsp
+UA response frames received.
+.TP
+.B UA_tx_rsp
+UA response frames transmitted.
+.TP
+.B DM_rx_rsp
+DM response frames received.
+.TP
+.B DM_tx_rsp
+DM response frames transmitted.
+.TP
+.B I_rx_cmd
+command I-frames received.
+.TP
+.B I_tx_cmd
+command I-frames transmitted.
+.TP
+.B FRMR_rx_rsp
+FRMR response frames received.
+.TP
+.B FRMR_tx_rsp
+FRMR response frames transmitted.
+.TP
+.B tx_rtr
+retransmitted frames.
+.TP
+.B rx_bad
+erroneous frames received.
+.TP
+.B rx_dud
+frames received and discarded.
+.TP
+.B rx_ign
+frames received and ignored.
+.TP
+.B I_rx_rsp
+response I-frames received.
+.TP
+.B I_tx_rsp
+command I-frames received.
+.TP
+.B UI_rx_cmd
+command U-frames received.
+.TP
+.B UI_tx_cmd
+command U-frames transmitted.
+.TP
+.B XID_rx_cmd
+command XID frames received.
+.TP
+.B XID_rx_rsp
+response XID frames received.
+.TP
+.B XID_tx_cmd
+command XID frames transmitted.
+.TP
+.B XID_tx_rsp
+response XID frames transmitted.
+.TP
+.B TEXT_rx_cmd
+command TEST frames received.
+.TP
+.B TEXT_rx_rsp
+response TEST frames received.
+.TP
+.B TEXT_tx_cmd
+command TEST frames transmitted.
+.TP
+.B TEXT_tx_rsp
+response TEST frames transmitted.
+.PD
+.\"
+.SS L_ZEROSTATS
+.PP
+This input-output control zeros the per-link statistics,
+and is only applicable to LAPB.  The argument to the input-output control is a
+pointer to a
+.B ll_hdioc
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ll_hdioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_ppa;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ll_hdioc
+structure contains the following members:
+.TP
+.I lli_type
+specifies the structure type: always
+.BR LI_PLAIN .
+.TP
+.I lli_spare
+specifies spare bytes for alignment.
+.TP
+.I lli_ppa
+specifies the Physical Point of Attachment (PPA) of the link for which to
+reset (zero) statistics.  When specified as
+.BR 0xff ,
+it specifies that all PPAs are to have their statistics reset (zeroed).
+.\"
+.SS L_GETPPA, L_SETPPA
+.PP
+The
+.B L_SETPPA
+input-output control sets the PPA information associated with the indexed
+linked Stream, and is only applicable to LAPB.
+The
+.B L_GETPPA
+input-output control retrieves the PPA information associated with the indexed
+linked Stream, and is only applicable to LAPB.
+.PP
+These input-output controls are used to initialize
+.RB ( L_SETPPA )
+and interrogate
+.RB ( L_GETPPA )
+the configuration of Streams linked beneath the multiplexing driver.  Once a
+Stream has been linked beneath the multiplexing driver using the
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+STREAMS input-output controls, the linked Stream is assigned a default link
+class, SLP priority, and PPA.  If the management program linking the Stream
+wishes to assign a non-default link class, SLP priority, or PPA, the
+.BR L_SETPPA
+input-output control must be issued.
+.PP
+The argument to either input-output control is a pointer to a
+.B ll_snioc
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ll_snioc {
+    uint8_t lli_type;
+    uint8_t lli_class;
+    uint16_t lli_slp_pri;
+    uint32_t lli_ppa;
+    uint32_t lli_index;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ll_snioc
+structure contains the following members:
+.TP
+.I lli_type
+specifies the type of the structure: always
+.BR LI_SPPA .
+.TP
+.I lli_class
+specifies the class of the PPA, that is, the type of the link.  This can be
+LAPB-DTE, LAPB-DCE or Extended (LLC2).  This field can have one of the
+following values:
+.RS
+.TP
+.B LC_LLC2
+specifies that the link is an LLC2 link.
+.TP
+.B LC_LAPBDTE
+specifies that the link is a LAPB-DTE link.
+.TP
+.B LC_LAPBDCE
+specifies that the link is a LAPB-DCE link.
+.RE
+.TP
+.I lli_slp_pri
+specifies the SLP priority.  This the priority of this SLP link within a MLP
+aggregate.
+.TP
+.I lli_ppa
+specifies the Physical Point of Attachment (PPA) or the subnetwork
+identification character.
+.TP
+.I lli_index
+specifies the link index.  This is the multiplexor identification (muxid)
+returned from the
+.BR I_LINK (7)
+or
+.BR I_PLINK (7)
+input-output control when the serial driver was linked beneath the DLPI
+multiplexing driver.
+.PP
+When this input-ouput control is attempted on a device that is not in an
+attached state (e.g.
+.BR DL_UNATTACHED ),
+the input-output control will indicate the error code
+.RB [ ENODEV ].
+.PP
+When the PPA specified in a
+.B L_SETPPA
+input-output control is already in use by another device, the input-output
+control will indicate the error code
+.RB [ EBUSY ].
+.PP
+When the index specified
+in a
+.B L_SETPPA
+input-output control is not asociated with a linked Stream, the input-output
+control will indicate the error code,
+.RB [ ENODEV ].
+.PP
+It may require privilege to set or retrieve the PPA information
+associated with a Stream other than the one for which the input-output control
+was issued (that is, the lower multiplex Stream attached to the open upper
+multiplex Stream).  When the caller does not have sufficient priviledge to
+perform the operation,
+.RB [ EPERM ]
+is returned.
+.\"
+.SS W_SETTUNE
+.PP
+This input-output control sets wanmod tunable parameters for a PPA,
+and is only applicable to specific WAN hardware devices.  The argument to the
+input-output control is a pointer to a
+.B wan_tnioc
+structure formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_tnioc {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+    wantune_t wan_tune;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B wan_tnioc
+structure contains the following members:
+.TP
+.I w_type
+specifies the structure type: always
+.BR WAN_TUNE .
+.TP
+.I w_spare
+specifies spare bytes for alignment.
+.TP
+.I w_snid
+specifies the single character subnetwork identifier.  The character
+\*(lq*\*(rq indicates all subnetworks.
+.TP
+.I wan_tune
+specifies a table of tuning values.
+.PP
+The
+.I wan_tune
+member is a table of tuning values.  It comprises a
+.BR wantune
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_hddef {
+    uint16_t WAN_maxframe;
+    int32_t WAN_baud;
+    uint16_t WAN_interface;
+};
+
+typedef struct wantune {
+    uint16_t WAN_options;
+    struct WAN_hddef WAN_hd;
+} wantune_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH IOCTLS
+.PP
+These are generic Data Link control (GDLC) input-output controls from AIX.
+.[
+aixdlpi
+.]
+.\"
+.SS DLC_ENABLE_SAP
+.PP
+This input-output control enables a service access point (SAP).
+.\"
+.SS DLC_DISABLE_SAP
+.PP
+This input-output control disables a service access point (SAP).
+.PP
+A service access point (SAP) identifies a particular user service that sends
+and receives a specific class of data.  This user service allows different
+classes of data to be routed separately to their corresponding service
+handlers.  Those DLCs that support multiple concurrent SAPs have addresses
+knowns as detination SAP and source SAP embedded in thier packet headers.
+DLCs that can only support a single SAP do no need or use SAP addressing, but
+still have the concept of enabling the one SAP.  In general, SAP is enabled
+for each DLC on each port.
+.PP
+Most SAP address values are defined by IEEE standardized network-management
+etitites or user-defined values are specified.  Some of the common SAP
+addresses are:
+.TP
+.B null SAP (0x00)
+Provides some ability to respond to remote nodes even when no SAP has been
+enabled.  This SAP supports only connectionless service and response only to
+exchange identification (XID) and TEST PDUs.
+.TP
+.B SNAP path control (0x04)
+Denotes the default individual SAP address used by Systems Network
+Architecutre (SNA) nodes.
+.TP
+.B PC network NETBIOS (0xF0)
+Used for all DLC communication that is driven by Network Basic I/O System
+(NETBIOS) emulation.
+.TP
+.B discovery SAP (0xFC)
+Use dby the local area network (LAN) name-discovery services.
+.TP
+.B global SAP  (0xFF)
+Identifies all active SAPs.
+.\"
+.SS DLC_START_LS
+.PP
+This input-output control starts a link station (LS) on a particular SAP as a
+initiator or responder.
+.PP
+A link station (LS) identifies an attachment between two nodes for a
+particular SAP pair.  This attachment can operate as a connectionless service
+(datagram) or connection-oriented service (fully sequenced data transfer with
+error recovery).  In general, one LS is started for each remote attachment.
+.\"
+.SS DLC_HALT_LS
+.PP
+This input-output control halts a link station (LS) for a particular SAP.
+.\"
+.SS DLC_TRACE
+.PP
+This input-output control traces a link station's activity for short or long
+activities.
+.PP
+To trace a link, line data and special events (such as station activation,
+termination, and timeouts) can be logged in the generic trace facility for
+each LS.  This function helps determine the cause of certain communications
+attachment problems.  The GDLC user can select either short or long entries to
+be traced.
+.PP
+Short entries consist of up to 80 bytes of line data, while long entries allow
+full packets of data to be traced.
+.PP
+Tracing can be activated with an LS is started, or it can be dynamically
+activated or terminated at any time afterward.
+.\"
+.SS DLC_TEST
+.PP
+This input-output control contacts a remote station for a particular local
+link station.
+.PP
+To test an attachment between two stations, instruct an LS to send a test
+packet from the local station.  This packet is echoed back from the remote
+station if the attachment is operating correctly.
+.PP
+Some data links are limited in their support of this function due to protool
+constraints.  Synchronous data link contrl (SDLC), for example, only generates
+the test packet from the host or primary station.  Most other protocols,
+however, allow test packets to be initiated from either station.
+.\"
+.SS DLC_ALTER
+.PP
+This input-output control alters a link station's configuration parameters.
+.\"
+.SS DLC_QUERY_SAP
+.PP
+This input-output control queries statistics associated with a particular SAP.
+.PP
+Both SAP and LS statistics can be queried by a GDLC user.  The statistics for
+a SAP consist of the current SAP state and information about the device
+handler.
+.\"
+.SS DLC_QUERY_LS
+.PP
+This input-output control queries statistics associated with a particular LS.
+.PP
+Both SAP and LS statistics can be queried by a GDLC user.  LS statistics
+consist of the current station states and various reliability, availability,
+and servicability counters that monitor the activity of the station from the
+time it is started.
+.\"
+.SS DLC_ENTER_LBUSY
+.PP
+This input-output control causes the link station to enter the local busy mode.
+.PP
+When an LS operates in a connection-oriented mode, it needs to stop the remote
+station's sending of information packets for reasons such as resource outgage.
+Notification can then be sent to the remote station to cause the local
+ststaion to enter local-busy mode.  This is performed with an RNR Supervisory
+Frame under LAPB,
+.[
+iso8208
+.]
+LLC2,
+.[
+iso/iec 8802-2 : 1998
+.]
+LAPD,
+.[
+q921
+.]
+and LAPF.
+.[
+q922
+.]
+Only sequence information packets (Information Frames) are halted with
+local-busy mode.  All other types of data (e.g. Unnumbered Information Frames)
+are unaffected.
+.\"
+.SS DLC_EXIT_LBUSY
+.PP
+This input-output control causes the link station to exit the local busy
+mode.
+.PP
+Once resources become available, the local station notifies the remote that it
+is no longer busy and that information packets can flow again.  This is
+performed with an RR Supervisory
+Frame under LAPB,
+.[
+iso8208
+.]
+LLC2,
+.[
+iso/iec 8802-2 : 1998
+.]
+LAPD,
+.[
+q921
+.]
+and LAPF.
+.[
+q922
+.]
+Only sequence information packets (Information Frames) are halted with
+local-busy mode.  All other types of data (e.g. Unnumbered Information Frames)
+are unaffected.
+.\"
+.SS DLC_ENTER_SHOLD
+.PP
+This input-output control enters short hold mode on a particular link station.
+.PP
+User the short-hold mode of operation when operating over data networks with
+the following characteristics:
+.IP \(bu \w'\(bu\(em'u
+short call setup times; and,
+.IP \(bu
+tariff structure that specifies a relatively small fee for the call setup
+compared to the charge for connect time.
+.PP
+During short-hold mode, an attachment between two stations is maintained only
+to transfer data available between the two stations.  When no data is sent,
+the attchment is cleared after a specified time-out period and is only
+reestablished to trasnfer new data.
+.\"
+.SS DLC_EXIT_SHOLD
+.PP
+This input-output control exits short hold mode on a particular link station.
+.\"
+.SS DLC_GET_EXCP
+.PP
+This input-output control returns asyncrhonous exception notifications to the
+application user.  Note: This input-output control subroutine operation is not
+used by the kernel user since all exception conditions are passed to the
+kenrel user by way of their exception handler.
+.\"
+.SS DLC_ADD_GRP
+.PP
+This input-output control adds a group or multicast receive address to a
+port.
+.\"
+.SS DLC_ADD_FUNC_ADDR
+.PP
+This input-output control adds a group or multicast receive functional address
+to a port.
+.\"
+.SS DLC_DEL_FUNC_ADDR
+.PP
+This input-output control removes a group or multicast receive function
+address from a port.
+.\"
+.SS DLC_DEL_GRP
+.PP
+This input-output control removes a group or multicast address from a port.
+.\"
+.SS IOCINFO
+.PP
+This input-output control returns a structure that describes the GDLC device
+manager.
+.\"
+.\"
+.SH BUGS
+.PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.IP \(em
+Megatbits per second was an etremely bad choice for the units of the
+.I dl_speed
+field.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.\"
+.\"
+.SH HISTORY
+.PP
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI

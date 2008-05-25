@@ -1,0 +1,224 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: DL_HP_LINK_DOWN_IND.7.man,v 1.1.2.1 2008-05-25 12:46:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_HP_LINK_DOWN_IND.7.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:54  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DL_HP_LINK_DOWN_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_HP_LINK_DOWN_IND (dl_hp_link_down_ind_t)
+\- link down indication.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI,
+.[
+dlpi revision 2.0.0
+.]
+.IR HP-UX \(rg-specific.
+.[
+hpuxdlpi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The message consists of one
+.BR M_PCPROTO (9)
+message block, that contains the following structure:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t dl_primitive;
+} dl_hp_link_down_ind_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B DL_HP_LINK_DOWN_IND
+primitive is issued by the DLS Provider to indicate that the link is now in the
+down state for DLS Users that have requested link state notification using the
+.BR DL_HP_NOTIFY_EVENT_REQ (7)
+primitive.  The receipt of this primitive indicates to the DLS User that
+the link has entered the down state.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+.TP
+.I dl_primitive
+conveys
+.BR DL_HP_LINK_DOWN_IND .
+.\"
+.\"
+.SH STATE
+.PP
+The message is valid in any state in which a local acknowledgement is not
+pending.
+.\"
+.\"
+.SH "NEW STATE"
+.PP
+The resulting state remains the same.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B DL_HP_LINK_DOWN_IND
+is a
+.IR HP-UX \(rg-specific
+primitive.  It might be necessary to define C preprocessor symbol
+.BR _HPUX_SOURCE
+before including the
+.RB < sys/dlpi.h >
+header file to expose the definitions and structures associated with this
+primitive.  Also, it might be necessary to include the
+.RB < sys/dlpi_ext.h >
+header file to expose the definitions and structures associated with this
+primitive.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B DL_HP_LINK_DOWN_IND
+is compatibible with
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DL_HP_LINK_DOWN_IND
+is a
+.IR HP-UX \(rg-specific
+pirmitive that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+.B DL_HP_LINK_DOWN_IND
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR HP-UX \(rg,
+and for porting DLS Providers and Users from
+.IR HP-UX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+See
+.IR STREAMS (9),
+.BR dlpi (7),
+and
+.BR dlpi_ioctl (4),
+for additional compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface
+.[
+dlpi revision 2.0.0
+.]
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+.B DL_HP_LINK_DOWN_IND
+was first documented in
+.IR HP-UX \(rg .
+.[
+hpuxdlpi
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2
