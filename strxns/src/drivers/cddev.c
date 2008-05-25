@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $
+ @(#) $RCSfile: cddev.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $
 
  -----------------------------------------------------------------------------
 
@@ -51,14 +51,14 @@
  -----------------------------------------------------------------------------
 
  $Log: cddev.c,v $
- Revision 1.1.2.1  2008-05-25 12:46:56  brian
+ Revision 0.9.2.1  2008-05-25 12:46:56  brian
  - added manual pages, libraries, utilities and drivers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $"
+#ident "@(#) $RCSfile: cddev.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $"
 
-static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $";
+static char const ident[] = "$RCSfile: cddev.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $";
 
 /*
  * This is a multiplexing driver used for providing access to devices that
@@ -82,7 +82,7 @@ static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 
 #define CDDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CDDEV_EXTRA	"Part of the OpenSS7 X/Open Networking Serivces for Linux Fast-STREAMS"
 #define CDDEV_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $"
+#define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $"
 #define CDDEV_DEVICE	"SVR 4.2 STREAMS CDI Communication Device Interface Provider"
 #define CDDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDDEV_LICENSE	"GPL"

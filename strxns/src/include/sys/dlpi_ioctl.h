@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi_ioctl.h,v 1.1.2.1 2008-05-25 12:46:56 brian Exp $
+ @(#) $Id: dlpi_ioctl.h,v 0.9.2.1 2008-05-25 12:46:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@
  -----------------------------------------------------------------------------
 
  $Log: dlpi_ioctl.h,v $
- Revision 1.1.2.1  2008-05-25 12:46:56  brian
+ Revision 0.9.2.1  2008-05-25 12:46:56  brian
  - added manual pages, libraries, utilities and drivers
 
  *****************************************************************************/
@@ -59,7 +59,7 @@
 #ifndef __SYS_DLPI_IOCTL_H__
 #define __SYS_DLPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: dlpi_ioctl.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi_ioctl.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifdef _SUN_SOURCE
 

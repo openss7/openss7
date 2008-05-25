@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlrcv.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:57 $
+ @(#) $RCSfile: dlrcv.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:57 $
 
  -----------------------------------------------------------------------------
 
@@ -51,14 +51,14 @@
  -----------------------------------------------------------------------------
 
  $Log: dlrcv.c,v $
- Revision 1.1.2.1  2008-05-25 12:46:57  brian
+ Revision 0.9.2.1  2008-05-25 12:46:57  brian
  - added manual pages, libraries, utilities and drivers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlrcv.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:57 $"
+#ident "@(#) $RCSfile: dlrcv.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:57 $"
 
-static char const ident[] = "$RCSfile: dlrcv.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:57 $";
+static char const ident[] = "$RCSfile: dlrcv.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:57 $";
 
 /*
  * NAME

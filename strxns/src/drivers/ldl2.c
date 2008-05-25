@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $
+ @(#) $RCSfile: ldl2.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $
 
  -----------------------------------------------------------------------------
 
@@ -51,14 +51,14 @@
  -----------------------------------------------------------------------------
 
  $Log: ldl2.c,v $
- Revision 1.1.2.1  2008-05-25 12:46:56  brian
+ Revision 0.9.2.1  2008-05-25 12:46:56  brian
  - added manual pages, libraries, utilities and drivers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $"
+#ident "@(#) $RCSfile: ldl2.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $"
 
-static char const ident[] = "$RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $";
+static char const ident[] = "$RCSfile: ldl2.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $";
 
 /*
  * This is a complete rewrite (reimplementation) of the Linux Data Link driver.  There are a
@@ -88,7 +88,7 @@ static char const ident[] = "$RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.1 $
 #define LDL_DESCRIP	"SVR 4.2 DATA LINK DRIVER FOR LINUX FAST-STREAMS"
 #define LDL_EXTRA	"Part of the OpenSS7 X/Open Network Services for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define LDL_REVISION	"OpenSS7 $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-05-25 12:46:56 $"
+#define LDL_REVISION	"OpenSS7 $RCSfile: ldl2.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-25 12:46:56 $"
 #define LDL_DEVICE	"SVR 4.2MP Data Link Driver (DL) for Linux Fast-STREAMS"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
