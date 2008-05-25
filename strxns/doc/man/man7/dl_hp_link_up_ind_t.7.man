@@ -1,0 +1,1 @@
+.so man7/DL_HP_LINK_UP_IND.7.man

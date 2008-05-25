@@ -1,0 +1,224 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: DL_AGGR_IND.7.man,v 1.1.2.1 2008-05-25 12:46:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_AGGR_IND.7.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:53  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" Revision 0.9.2.6  2006/10/10 10:50:29  brian
+.\" - updates for release
+.\"
+.\" Revision 0.9.2.5  2006/04/05 09:44:53  brian
+.\" - moved .so line and updated headers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DL_ATTACH_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_ATTACH_REQ (dl_attach_req_t)
+\- requests the DLS provider associate a physical point of
+attachment (PPA) with astream.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI,
+.[
+dlpi revision 2.0.0
+.]
+.IR Solaris \(rg-specific.
+.[
+soldlpi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one M_PROTO message block, which contains the
+following structure.
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    t_uscalar_t  dl_primitive;
+    t_uscalar_t  dl_ppa;
+} dl_attach_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.B DL_ATTACH_REQ
+is needed for style 2 DLS providers to identify the physical
+medium over which communication will transpire.  The request may not be
+issued to a style 1 DLS provider; doing so may cause errors.
+.PP
+The DLS provider may initialize the physical line on receipt of this
+primitive or the
+.BR DL_BIND_REQ (7).
+Otherwise, the line must be initialized
+through some management mechanism before this request is issued by the DLS
+user.  Either way, the physical link must be initialized and ready for use
+on successful completion of the
+.BR DL_BIND_REQ (7).
+.\"
+.\"
+.SH PARAMETERS
+.TP
+.I dl_primitive
+conveys
+.BR DL_ATTACH_REQ .
+.TP
+.I dl_ppa
+conveys the identifier of the physical point of attachment to be associated
+with the stream.  The format of the identifier is provider-specific, and it
+must contain sufficient information to distinguish the desired PPA from
+all possible PPAs on a system.  At a minimum, this must include
+identification of the physical medium over which communication will
+transpire.  For media that multiplex multiple channels over a single physical
+medium, this identifier should also specify a specific channel to be used
+for communication (where each channel on a physical medium is associated with
+a separate PPA).
+
+Because of the provider-specific nature of this value, DLS user software that
+is to be protocol independent should avoid hard-coding the PPA
+identifier.  The DLS user should retrieve the necessary PPA identifier from
+some other entity (such as a management entity) and insert it without
+inspection into the
+.BR DL_ATTACH_REQ .
+.\"
+.\"
+.SH STATE
+The message is valid in state
+.B DL_UNATTACHED .
+.\"
+.\"
+.SH "NEW STATE"
+The resulting state is
+.B DL_ATTACH_PENDING .
+.\"
+.\"
+.SH RESPONSE
+If the attach request is successful,
+.BR DL_OK_ACK (7)
+is sent to the DLS user
+resulting in state
+.BR DL_UNBOUND .
+If the request fails, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting state is unchanged.
+.\"
+.\"
+.SH ERRORS
+.TP 16
+.B DL_ACCESS
+The DLS user did not have proper permission to use the requested PPA.
+.TP
+.B DL_BADPPA
+The specified PPA is invalid.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in
+the
+.BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+.\"
+.\"
+.XX
+.[
+magic
+.]
+.[
+advprog
+.]
+.[
+$LIST$
+.]
+.T2
+

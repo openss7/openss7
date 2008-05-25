@@ -1,0 +1,407 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: DL_NOTIFY_IND.7.man,v 1.1.2.1 2008-05-25 12:46:55 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:55 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_NOTIFY_IND.7.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:55  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DL_NOTIFY_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_NOTIFY_IND (dl_notify_ind_t)
+\- indicate event notification
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI,
+.[
+dlpi revision 2.0.0
+.]
+.IR Solaris \(rg-specific.
+.[
+soldlpi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+The message consists of one
+.BR M_PROTO (9)
+message block, that contains the following structure:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_notification;
+    t_uscalar_t dl_data;
+    t_uscalar_t dl_addr_length;
+    t_uscalar_t dl_addr_offset;
+} dl_notify_ind_t;
+
+#define DL_NOTE_PHYS_ADDR         (1UL<< 0)
+#define DL_NOTE_PROMISC_ON_PHYS   (1UL<< 1)
+#define DL_NOTE_PROMISC_OFF_PHYS  (1UL<< 2)
+#define DL_NOTE_LINK_DOWN         (1UL<< 3)
+#define DL_NOTE_LINK_UP           (1UL<< 4)
+#define DL_NOTE_AGGR_AVAIL        (1UL<< 5)
+#define DL_NOTE_AGGR_UNAVAIL      (1UL<< 6)
+#define DL_NOTE_SDU_SIZE          (1UL<< 7)
+#define DL_NOTE_SPEED             (1UL<< 8)
+#define DL_NOTE_FASTPATH_FLUSH    (1UL<< 9)
+#define DL_NOTE_CAPAB_RENEG       (1UL<<10)
+\fR\s+1
+.fi
+.\"
+.\"
+.SH PARAMETERS
+.PP
+.TP
+.I dl_primitive
+conveys
+.BR DL_NOTIFY_IND .
+.TP
+.I dl_notification
+indicates the event that prompted the notification.  Only a single event type
+can be indicated, and contains one of the following values:
+.RS
+.TP
+.B DL_NOTE_PHYS_ADDR
+the physical address
+associated with the physical point of attachment (PPA) changed;
+.TP
+.B DL_NOTE_PROMISC_ON_PHYS
+physical promiscious mode was
+set on the physical point of attachment (PPA);
+.TP
+.B DL_NOTE_PROMISC_OFF_PHYS
+physical promiscuous mode was
+cleared on the physical point of attachment (PPA);
+.TP
+.B DL_NOTE_LINK_DOWN
+the physical link associated
+with the physical point of attachment (PPA) went down;
+.TP
+.B DL_NOTE_LINK_UP
+the physical link associated
+with the physical point of attachment (PPA) came up;
+.TP
+.B DL_NOTE_AGGR_AVAIL
+link aggregation became
+available for the physical point of attachment (PPA), see
+.RI \*(lq COMPATIBILITY \*(rq;
+.TP
+.B DL_NOTE_AGGR_UNAVAIL
+link aggregation became
+unavailable for the physical point of attachment (PPA), see
+.RI \*(lq COMPATIBILITY \*(rq;
+.TP
+.B DL_NOTE_SDU_SIZE
+the maximum SDU size, either
+globally or per address, changed on the physical point of attachment (PPA);
+.TP
+.B DL_NOTE_SPEED
+the link speed changed, or
+becomes available for the physical point of attachment (PPA);
+.TP
+.B DL_NOTE_FASTPATH_FLUSH
+the fast path information
+changed for the physical point of attachment (PPA), see
+.RI \*(lq COMPATIBILITY \*(rq;
+.TP
+.B DL_NOTE_CAPAB_RENEG
+capabilities associated with
+the physical point of attachment (PPA) are being renegotiated, see
+.RI \*(lq COMPATIBILITY \*(rq.
+.RE
+.TP
+.I dl_data
+indicates data associated with the event indicate in the
+.I dl_notification
+field, as follows:
+.RS
+.TP
+.B DL_NOTE_SPEED
+.I dl_data
+contains the speed of the interface in kilobits per second.
+.TP
+.B DL_NOTE_PHYS_ADDR
+.I dl_data
+is set to
+.BR DL_CURR_PHYS_ADDR .
+.TP
+.B DL_NOTE_SDU_SIZE
+.I dl_data
+is set to the current MTU in octets.
+.PP
+Otherwise,
+.I dl_data
+is set to zero (0) by the DLS provider.
+.RE
+.TP
+.I dl_addr_length
+conveys the length of the physical address when the
+.I dl_notification
+field is set to
+.BR DL_NOTE_PHYS_ADDR ,
+and zero (0) otherwise.
+.TP
+.I dl_addr_offset
+conveys the offset of the phsyical address from the beginning of the
+.BR M_PROTO (9)
+message block when the
+.I dl_notification
+field is set to
+.BR DL_NOTE_PHYS_ADDR ,
+and zero (0) otherwise.
+.\"
+.\"
+.SH RULES
+.PP
+The DLS provider issues
+.B DL_NOTIFY_IND
+primitives in accordance with the following rules:
+.IP 1. \w'0.\(em'u
+The DLS provider must issue a
+.B DL_NOTIFY_IND
+message indicating the state of the interface immediately following issuing a
+.BR DL_NOTIFY_ACK (7)
+primitive acknowledging both the request and support of the corresponding
+event.  So, for example, if the link is down when a
+.B DL_NOTE_LINK_DOWN
+event was requested and supported, after issuing the
+.BR DL_NOTIFY_ACK (7)
+primitive, the DLS provider must issue a
+.B DL_NOTIFY_IND
+primitive indicating the
+.B DL_NOTE_LINK_DOWN
+event.
+(Note that the DLS provider should not issue
+.B DL_NOTE_LINK_DOWN
+indications while the link is initializing.)
+.IP 2.
+After this initial
+.B DL_NOTIFY_IND
+primitive, the DLS provider must continue to issue
+.B DL_NOTIFY_IND
+primitives whenever the corresponding event occurs until it receives a new
+.BR DL_NOTIFY_REQ (7)
+message with the corresponding event clear in the requested events, or until
+the DLS provider Stream is detached with the
+.BR DL_DETACH_REQ (7)
+primitive, or the Stream is closed with
+.BR close (2s).
+.IP 3.
+When events have been registered with
+.BR DL_NOTIFY_REQ (7)
+and a subsequent
+.BR DL_DETACH_REQ (7)
+primitive detaches a Style 2 DLS provider, the driver must retain the
+registration of events must treat a
+.BR DL_ATTACH_REQ (7)
+primitive as reregistering the previously registered events as though a
+.BR DL_NOTIFY_REQ (7)
+primitive registering the same events had been issued immediately following the
+successful completion of the
+.BR DL_ATTACH_REQ (7)
+primitive.  The
+.B DL_NOTIFY_IND
+primitives described in rule (1), above, must also be generated following this
+reattaching
+.BR DL_ATTACH_REQ (7)
+primitive.
+.\"
+.\"
+.SH STATE
+.PP
+The
+.B DL_NOTIFY_IND
+primitive is only issued by the DLS provider in an attached state and when no
+local acknowledgement is pending.
+.\"
+.\"
+.SH "NEW STATE"
+.PP
+The state remains unchanged.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B DL_NOTIFY_IND
+is a
+.IR Solaris \(rg-specific
+primitive.  It might be necessary to define C preprocessor symbol
+.BR _SUN_SOURCE
+before including the
+.RB < sys/dlpi.h >
+header file to expose the declarations and structures associated with this primitive.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR DL_\%NOTIFY_\%REQ (7),
+.BR DL_\%NOTIFY_\%ACK (7),
+.BR DL_\%ERROR_\%ACK (7),
+.BR dlpi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B DL_NOTIFY_IND
+is compatibible with
+.IR Solaris \(rg,
+.[
+soldoc10
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DL_NOTIFY_IND
+is a
+.IR Solaris \(rg-specific
+primitive that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+Before attempting to use the features of the
+.BR DL_NOTIFY_REQ (7)
+primitive, the DLS user should issue a
+.BR DL_NOTIFY_REQ (7)
+primitive with the
+.I dl_notifications
+field set to zero.  If the DLS provider responds with a
+.BR DL_ERROR_ACK (7)
+primitive with either the
+.BR DL_\%BADPRIM " or " DL_\%NOTSUPPORTED
+error number, the DLS provider does not recognize, or support, the primitive.
+.IP \(em
+.IR Solaris \(rg
+does not document values of the
+.I dl_notifications
+field:
+.BR DL_\%NOTE_\%AGGR_\%AVAIL ", " DL_\%NOTE_\%AGGR_\%UNAVAIL ", " DL_\%NOTE_\%FASTPATH_\%FLUSH " and " DL_\%NOTE_\%CAPAB_\%RENEG .
+These values should not be used even by
+.IR Solaris \(rg
+programs.  Link aggregation and IP fast path are not supported by
+.B @PACKAGE_TITLE@
+drivers, modules, libraries and programs.
+.IP \(em
+.B DL_NOTIFY_IND
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR Solaris \(rg,
+and for porting DLS Providers and Users from
+.IR Solaris \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+See
+.IR STREAMS (9)
+and
+.BR dlpi (7),
+for additional compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface
+.[
+dlpi revision 2.0.0
+.]
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+.B DL_NOTIFY_IND
+was first documented in
+.IR Solaris \(rg .
+.[
+soldoc10
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

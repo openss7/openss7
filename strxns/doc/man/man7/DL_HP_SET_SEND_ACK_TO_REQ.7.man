@@ -1,0 +1,284 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: DL_HP_SET_SEND_ACK_TO_REQ.7.man,v 1.1.2.1 2008-05-25 12:46:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DL_HP_SET_SEND_ACK_TO_REQ.7.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:54  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DL_HP_SET_SEND_ACK_TO_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
+.SH NAME
+.B DL_HP_SET_SEND_ACK_TO_REQ (dl_hp_set_send_ack_to_req_t)
+\- set SEND-ACK timeout value.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI,
+.[
+dlpi revision 2.0.0
+.]
+.IR HP-UX \(rg-specific.
+.[
+hpuxdlpi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The message consists of one
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+message block, that contains the following structure:
+.sp
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_send_ack_to;
+} dl_hp_set_send_ack_to_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B DL_HP_SET_SEND_ACK_TO_REQ
+primitive request the DLS Provider set the SEND-ACK timeout to the value
+specified in tenths of a second.
+.\"
+.\"
+.SH PARAMETERS
+.PP
+.TP
+.I dl_primitive
+conveys
+.BR DL_HP_SET_SEND_ACK_TO_REQ .
+.TP
+.I dl_send_ack_to
+specifies the new value of the SEND-ACK timeout in tenths of a second.  The
+SEND-ACK timeout determiens the maximum lengtho f time that LLC TYpe 2 will
+delay acknowledgement of I PDUs if it has not received
+.I dl_send_ack_threshold
+I PDUs.
+.[
+iso/iec 8802-2 : 1998
+.]
+.[
+iso8208
+.]
+.\"
+.\"
+.SH STATE
+.PP
+The message is valid in state
+.BR DL_IDLE ,
+.BR DL_DATAXFER ,
+.BR DL_OUTCON_PENDING ,
+.BR DL_INCON_PENDING ,
+.BR DL_USER_RESET_PENDING ,
+.BR DL_PROV_RESET_PENDING ,
+and when a local acknowledgement is not pending.
+.\"
+.\"
+.SH "NEW STATE"
+.PP
+The resulting state remains the same.
+.\"
+.\"
+.SH RESPONSE
+.PP
+If the request is successful,
+.BR DL_OK_ACK (7)
+is issued to the DLS user.
+If the request fails, message
+.BR DL_ERROR_ACK (7)
+is returned and the resulting state is unchanged.
+.\"
+.\"
+.SH ERRORS
+.PP
+.TP 16
+.B DL_ACCESS
+The DLS user did not have proper permission to make the request.
+.TP
+.B DL_OUTSTATE
+The primitive was issued from an invalid state.
+.TP
+.B DL_SYSERR
+A system error has occurred and the Linux system error is indicated in the
+.BR DL_ERROR_ACK (7).
+.TP
+.B DL_BADPRIM
+The DLS provider does not recognize the
+.B DL_HP_SET_SEND_ACK_TO_REQ
+primitive.
+.TP
+.B DL_NOTSUPPORTED
+The DLS provider recognizes the
+.B DL_HP_SET_SEND_ACK_TO_REQ
+primitive, but does not support the primitive.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B DL_HP_SET_SEND_ACK_TO_REQ
+is a
+.IR HP-UX \(rg-specific
+primitive.  It might be necessary to define C preprocessor symbol
+.BR _HPUX_SOURCE
+before including the
+.RB < sys/dlpi.h >
+header file to expose the definitions and structures associated with this
+primitive.  Also, it might be necessary to include the
+.RB < sys/dlpi_ext.h >
+header file to expose the definitions and structures associated with this
+primitive.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B DL_HP_SET_SEND_ACK_TO_REQ
+is compatibible with
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DL_HP_SET_SEND_ACK_TO_REQ
+is a
+.IR HP-UX \(rg-specific
+pirmitive that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+.B DL_HP_SET_SEND_ACK_TO_REQ
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR HP-UX \(rg,
+and for porting DLS Providers and Users from
+.IR HP-UX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+See
+.IR STREAMS (9),
+.BR dlpi (7),
+and
+.BR dlpi_ioctl (4),
+for additional compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The timeout value conforms to ISO/IEC 8802
+.[
+iso/iec 8802-2 : 1998
+.]
+and ISO/IEC 8208.
+.[
+iso8208
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface
+.[
+dlpi revision 2.0.0
+.]
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+.B DL_HP_SET_SEND_ACK_TO_REQ
+was first documented in
+.IR HP-UX \(rg .
+.[
+hpuxdlpi
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

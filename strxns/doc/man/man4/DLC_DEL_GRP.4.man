@@ -1,0 +1,325 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: DLC_DEL_GRP.4.man,v 1.1.2.1 2008-05-25 12:46:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: DLC_DEL_GRP.4.man,v $
+.\" Revision 1.1.2.1  2008-05-25 12:46:53  brian
+.\" - added manual pages, libraries, utilities and drivers
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DL_DEL_GRP 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B DL_DEL_GRP
+\- add a functional address
+.\"
+.\"
+.SH INTERFACE
+Generic Data Link Control (GLDC),
+.IR AIX \(rg-specific.
+.[
+aixdlpi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/dlpi_ioctl.h>
+.HP
+.BI "int " retval " = ioctl(" dlpi_stream ", " cmd ", " arg );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B DL_DEL_GRP
+input-output control removes a previously defined group or multicast address.
+.PP
+The argument to the
+.B DLC_ADDR_FUNC_ADDR
+input-output control is a pointer to a
+.B dlc_add_grp
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define DLC_MAX_ADDR 8
+
+struct dlc_add_grp {
+    uint32_t gdlc_sap_corr;
+    uint32_t grp_addr_len;
+    uint8_t grp_addr[DLC_MAX_ADDR];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B dlc_add_grp
+structure contains the following members:
+.TP
+.I gdlc_sap_corr
+Specifies the generic data link control (GDLC) service access point (SAP)
+correlator being requested to remote a group or multicast address from a port.
+.TP
+.I grp_addr_len
+Specifies the group or multicast address length in octets.
+.TP
+.I grp_addr
+Specifies the group or multicast address to be removed.
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success, the input-output control returns zero (0).  Upon failure, the
+input-output control returnes minus one (-1) and sets
+.BR errno (3)
+to an appropriate error code.
+.\"
+.\"
+.SH ERRORS
+.PP
+When the input-output control fails, it returns minus one (-1) and set the
+.BR errno (3)
+to an appropriate error code.  In addition to the reasons given in
+.BR ioctl (2s),
+this input-output control can fail because of the following:
+.TP \w'[\fBEDEADLK\fP]\(em'u
+.RB [ EINVAL ]
+A parameter of the input-output control is invalid.
+.TP
+.RB [ EFAULT ]
+A memory extent exceeds the callers valid address space.
+.TP
+.RB [ EPROTO ]
+A rule of the interface protocol was violated.
+.TP
+.RB [ EAGAIN ]
+The operation could not be immediately processed.
+.TP
+.RB [ ENOBUFS ]
+There were insufficient message buffers to complete the operation.
+.TP
+.RB [ ENOSR ]
+There were insufficient STREAMS resources to complete the operation.
+.TP
+.RB [ ENOMEM ]
+There was insufficient memory to complete the operation.
+.TP
+.RB [ EDEADLK ]
+A deadlock condition was detected and avoided.
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that
+.IR AIX \(rg
+terminology for GDLC conflict with that of LLC
+.[
+iso/iec 8802-2 : 1998
+.]
+and LAPB.
+.[
+iso7776
+.]
+Under IEEE terminology, a link station is associated with the MAC entity or a
+point-to-point data link endpoint, and one or more service access points (SAP)
+are associated with the one link station.  LLC Type 2 supporting link stations
+can have associated with them zero or more connections that represent a
+connection between a local MAC address and a remote MAC address, a local SAP
+and a remote SAP.  LAPB link stations can have associated with them 1
+connection that represents a connection between the local and remote stations.
+LAPD
+.[
+q921
+.]
+link stations can have associated with them one or more connections that
+represent a connection associated with a local and remote SAP (TEI).
+LAPF
+.[
+q922
+.]
+link stations can have associated with them one or more connections that
+represent a connection associated with a local and remote SAP (DLCI).
+.PP
+.IR AIX \(rg
+terminology in the GDLC documentation refers to this latter connection,
+confusingly, as a link station (LS).
+The
+.IR AIX \(rg
+GDLC service access point (SAP) is really a Physical Point of Attachment (PPA) and
+DLSAP combination under the DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and the
+.IR AIX \(rg
+GDLC link station (LS) is really a connection identifier.
+It may be helpful to think of a GDLC link station (LS) as an identifier of a
+local and remote link station combination for a given DLSAP.
+.PP
+.B DL_DEL_GRP
+is an
+.IR AIX \(rg-specific
+input-output control.
+It might be necessary to define C preprocessor symbol
+.B _AIX_SOURCE
+before including the
+.RB < sys/dlpi.h >,
+.RB < sys/dlpi_ext.h >,
+or
+.RB < sys/dlpi_ioctl.h >
+header files to expose the definitions, structures and declarations associated
+with the input-output control.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DLC_ADD_GRP (4),
+.BR dlpi_ioctl (4),
+.BR dlpi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_DEL_GRP
+input-output control is compatible with
+.IR AIX \(rg,
+.[
+aixdoc
+.]
+and implementations based on
+.IR AIX \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B DL_DEL_GRP
+is an
+.IR AIX \(rg-specific
+input-output control that is not part of the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+It should not be used by portable DLPI programs.
+.IP \(em
+The utility of this input-output control is questionable.  When the last
+.BR DL_DISABMULTI_REQ (7)
+successfully completes for a given multicast address for a given PPA, the
+multicast address can be automatically deleted from the interface.  There is no
+need for the user to explicitly remove these with this input-output control.
+The same is true for peer unbinding from group LSAPs.  Once the last
+.BR DL_SUBS_UNBIND_REQ (7)
+successfully completes for a gvien group address for a given PPA, the group
+address can be automatically deleted from the interface.
+.IP \(em
+.B DL_DEL_GRP
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR AIX \(rg,
+and for porting DLS Providers and Users from
+.IR AIX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced
+may be removed from a future release.
+.PP
+See
+.BR dlpi_ioctl (4),
+.BR dlpi (7),
+.BR STREAMS (9),
+for additional compatiblity information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The GDLC input-output controls are specific to
+.IR AIX \(rg.
+.[
+aixdlpi
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
