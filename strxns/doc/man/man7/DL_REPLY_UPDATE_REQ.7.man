@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_REPLY_UPDATE_REQ.7.man,v 0.9.2.6 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_REPLY_UPDATE_REQ.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_REPLY_UPDATE_REQ.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -83,6 +86,16 @@ sort-adjacent-labels
 \- conveys a DLSDU to the DLS Provider from the DLS User to be held by the
 DLS Provider and sent out at a later time when requested to do so by the
 peer DLS Provider.
+.\"
+.\"
+.SH INTERFACE
+.PP
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 Consists of one 
 .B M_PROTO
@@ -100,11 +113,15 @@ typedef struct {
 } dl_reply_update_req_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_REPLY_UPDATE_REQ
 conveys a DLSDU to the DLS Provider from the DLS User to be held by the
 DLS Provider and sent out at a later time when requested to do so by the
 peer DLS Provider.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -124,11 +141,17 @@ conveys the length of the DLSAP address of the source DLS User.
 conveys the offset from the beginning of the
 .B M_PROTO
 message block where the source DLSAP address begins.
+.\"
+.\"
 .SH STATE
 This primitive is valid in state
 .BR DL_IDLE .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is unchanged.
+.\"
+.\"
 .SH RESPONSE
 If the request is erroneous, a
 .BR DL_ERROR_ACK (7)
@@ -136,6 +159,8 @@ is returned with the appropriate error code.  Otherwise, a
 .BR DL_REPLY_UPDATE_STATUS_IND (7)
 is returned, which indicates the success or failure of the
 .BR DL_REPLY_UPDATE_REQ .
+.\"
+.\"
 .SH ERRORS
 .TP
 .B DL_BADDATA
@@ -146,18 +171,28 @@ Primitive is known, but not supported.
 .TP
 .B DL_OUTSTATE
 The primitive was issued from an invalid state.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+and the LLC Data Link Service Definition.
+.[
+iso/iec 8802-2 : 1998
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

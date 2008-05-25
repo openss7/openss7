@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_ENABMULTI_REQ.7.man,v 0.9.2.5 2006/04/05 09:44:53 brian Exp $
+.\" @(#) $Id: DL_ENABMULTI_REQ.7.man,v 0.9.2.6 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_ENABMULTI_REQ.7.man,v $
+.\" Revision 0.9.2.6  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:53  brian
 .\" - moved .so line and updated headers
 .\"
@@ -82,6 +85,15 @@ sort-adjacent-labels
 .B DL_ENABMULTI_REQ (dl_enabmulti_req_t)
 \- requests the DLS Provider to enable specific multicast addresses on a per
 Stream basis.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PROTO
@@ -96,12 +108,16 @@ typedef struct {
 } dl_enabmulti_req_t;
 \fR\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_ENABMULTI_REQ
 requests the DLS Provider to enable specific multicast addresses on a per
 Stream basis.  It is invalid for a DLS Provider to pass upstream
 messages that are destined for any address other than those explicitly
 enabled on that Stream by the DLS User.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -115,18 +131,26 @@ conveys the length of the multicast address
 conveys the offset from the beginning of the
 .B M_PROTO
 message block where the multicast address begins
+.\"
+.\"
 .SH STATE
 This message is valid in any state in which a local acknowledgement is not
 pending with the exception of
 .BR DL_UNATTACH .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is unchanged.
+.\"
+.\"
 .SH RESPONSE
 If the enable request is successful, a
 .BR DL_OK_ACK (7)
 is sent to the DLS user.  If the request fails, message
 .BR DL_ERROR_ACK (7)
 is returned and the resulting state is unchanged.
+.\"
+.\"
 .SH ERRORS
 .TP
 .B DL_BADADDR
@@ -140,18 +164,24 @@ The primitive was issued from an invalid state
 .TP
 .B DL_TOOMANY
 Too many multicast address enable attempts.  Limit exceeded.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

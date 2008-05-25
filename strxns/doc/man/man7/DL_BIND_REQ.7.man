@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_BIND_REQ.7.man,v 0.9.2.6 2006/04/05 09:44:53 brian Exp $
+.\" @(#) $Id: DL_BIND_REQ.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_BIND_REQ.7.man,v $
+.\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:44:53  brian
 .\" - moved .so line and updated headers
 .\"
@@ -81,6 +84,15 @@ sort-adjacent-labels
 .SH NAME
 .B DL_BIND_REQ (dl_bind_req_t)
 \- requests the DLS provider bind a DLSAP to the stream.
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of one
 .B M_PROTO
@@ -98,6 +110,8 @@ typedef struct {
 } dl_bind_req_t;
 \fC\s+1
 .fi
+.\"
+.\"
 .SH DESCRIPTION
 .B DL_BIND_REQ
 requests the DLS provider bind a DLSAP to the stream.  The DLS user must
@@ -127,6 +141,8 @@ Connection Management Stream
 In this case, the
 .I dl_sap
 will be ignored.
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -264,6 +280,9 @@ connectionless data link service
 .TP
 .B DL_ACLDLS
 acknowledged connectionless data link service.
+.TP
+.B DL_HP_RAWDLS
+raw-mode service.
 .PP
 If the DLS provider does not support the requested service mode, a
 .BR DL_ERROR_ACK (7)
@@ -325,12 +344,18 @@ automatically respond to XID commands
 .B DL_AUTO_TEST
 automatically respond to TEST commands.
 .RE
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_UNBOUND .
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is
 .BR DL_BIND_PENDING .
+.\"
+.\"
 .SH RESPONSE
 If the bind request is successful,
 .BR DL_BIND_ACK (7)
@@ -342,6 +367,8 @@ If the request fails, message
 .BR DL_ERROR_ACK (7)
 is returned and the resulting
 state is unchanged.
+.\"
+.\"
 .SH ERRORS
 .TP 16
 .B DL_ACCESS
@@ -379,22 +406,126 @@ Automatic handling of XID response not supported.
 .B DL_OUTSTATE
 The primitive was issued from an invalid state.
 .TP
-.B DL_SYSERR, DL_UNSUPPORTED
+.B DL_SYSERR
 The DLS provider does not support requested service mode on this stream.
+.TP
+.B DL_SYSERR
 A system error has occurred and the Linux system error is indicated in the
 .BR DL_ERROR_ACK (7).
+.PP
+The Linux system error may be one of the following:
+.TP 16
+.B EPERM
+Permission for the control request is incorrect.
+.TP
+.B ENXIO
+Invalid device.
+.TP
+.B ENOMEM
+Insufficient memory.
+.TP
+.B EBUSY
+Control information is already enabled (multicast, VLAN IDs, and so on), or
+the driver is unable to handle the request.
+.TP
+.B EINVAL
+One of the parameters has an invalid value.
+.TP
+.B ENOBUFS
+Inadequate buffers were available.
+.TP
+.B ENOTSUP
+Unspported request, event or call.
+.TP
+.B ENOLINK
+The interface is not connected.
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that Linux system errors are not specified in the DLPI standard.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH COMPATIBILITY
+.B DL_BIND_REQ
+is compatible with DLPI
+.[
+dlpi revision 2.0.0
+.]
+and implementations based on DLPI, including
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+and
+.IR Solaris \(rg,
+.[
+soldlpi
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field is
+.IR HP-UX \(rg-specific,
+.[
+hpuxdlpi
+.]
+and will be ignored by portable DLS Users.
+.IP \(em
+When specified, the
+.B DL_HP_RAWDLS
+value for the
+.I dl_service_mode
+field requests that the DLS Provider place the Stream in a raw mode of
+operation.
+See also,
+.BR DL_HP_RAWDATA_REQ "(7) and " DL_HP_RAWDATA_IND (7).
+.IP \(em
+.B DL_HP_RAWDLS
+is provided by
+.B @PACKAGE_TITLE@
+for source compatibility with DLS Providers and Users written for use with
+.IR HP-UX \(rg,
+and for porting DLS Providers and Users from
+.IR HP-UX \(rg
+to
+.IR Linux \(rg.
+Binary compatibility is not attempted.  Any binary compatibility experienced may be
+removed from the next release.
+.PP
+For additional compatibility information, see
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 03:30:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-05-25 12:49:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 03:30:56 $ by $Author: brian $
+# Last Modified $Date: 2008-05-25 12:49:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,26 @@ man_MANS = \
 	man4/ip_to_dlpi.4 \
 	man4/ldl.4 \
 	man4/link_driver.4 \
+	man4/dlpi_ioctl.4 \
+	man4/DLC_ADD_FUNC_ADDR.4 \
+	man4/DLC_ADD_GRP.4 \
+	man4/DLC_ALTER.4 \
+	man4/DLC_CONTACT.4 \
+	man4/DLC_DEL_FUNC_ADDR.4 \
+	man4/DLC_DEL_GRP.4 \
+	man4/DLC_DISABLE_SAP.4 \
+	man4/DLC_ENABLE_SAP.4 \
+	man4/DLC_ENTER_LBUSY.4 \
+	man4/DLC_ENTER_SHOLD.4 \
+	man4/DLC_EXIT_LBUSY.4 \
+	man4/DLC_EXIT_SHOLD.4 \
+	man4/DLC_GET_EXCEP.4 \
+	man4/DLC_HALT_LS.4 \
+	man4/DLC_QUERY_LS.4 \
+	man4/DLC_QUERY_SAP.4 \
+	man4/DLC_START_LS.4 \
+	man4/DLC_TEST.4 \
+	man4/DLC_TRACE.4 \
 	man5/strxns.5 \
 	man7/CD_ABORT_OUTPUT_REQ.7 \
 	man7/cd_abort_output_req_t.7 \
@@ -229,6 +249,84 @@ man_MANS = \
 	man7/dl_xid_req_t.7 \
 	man7/DL_XID_RES.7 \
 	man7/dl_xid_res_t.7 \
+	man7/DL_AGGR_IND.7 \
+	man7/dl_aggr_ind_t.7 \
+	man7/DL_AGGR_REQ.7 \
+	man7/dl_aggr_req_t.7 \
+	man7/DL_CAPABILITY_ACK.7 \
+	man7/dl_capability_ack_t.7 \
+	man7/DL_CAPABILITY_REQ.7 \
+	man7/dl_capability_req_t.7 \
+	man7/DL_CONTROL_ACK.7 \
+	man7/dl_control_ack_t.7 \
+	man7/DL_CONTROL_REQ.7 \
+	man7/dl_control_req_t.7 \
+	man7/DL_INTR_MODE_REQ.7 \
+	man7/dl_intr_mode_req_t.7 \
+	man7/DL_NOTIFY_ACK.7 \
+	man7/dl_notify_ack_t.7 \
+	man7/DL_NOTIFY_IND.7 \
+	man7/dl_notify_ind_t.7 \
+	man7/DL_NOTIFY_REQ.7 \
+	man7/dl_notify_req_t.7 \
+	man7/DL_PASSIVE_REQ.7 \
+	man7/dl_passive_req_t.7 \
+	man7/DL_UNAGGR_REQ.7 \
+	man7/dl_unaggr_req_t.7 \
+	man7/DL_HP_CLEAR_LOCAL_BUSY_REQ.7 \
+	man7/dl_hp_clear_local_busy_req_t.7 \
+	man7/DL_HP_CLEAR_STATS_REQ.7 \
+	man7/dl_hp_clear_stats_req_t.7 \
+	man7/DL_HP_HW_RESET_REQ.7 \
+	man7/dl_hp_hw_reset_req_t.7 \
+	man7/DL_HP_INFO_ACK.7 \
+	man7/dl_hp_info_ack_t.7 \
+	man7/DL_HP_INFO_REQ.7 \
+	man7/dl_hp_info_req_t.7 \
+	man7/DL_HP_MULTICAST_LIST_ACK.7 \
+	man7/dl_hp_multicast_list_ack_t.7 \
+	man7/DL_HP_MULTICAST_LIST_REQ.7 \
+	man7/dl_hp_multicast_list_req_t.7 \
+	man7/DL_HP_PPA_ACK.7 \
+	man7/dl_hp_ppa_ack_t.7 \
+	man7/DL_HP_PPA_REQ.7 \
+	man7/dl_hp_ppa_req_t.7 \
+	man7/DL_HP_RAWDATA_IND.7 \
+	man7/dl_hp_rawdata_ind_t.7 \
+	man7/DL_HP_RAWDATA_REQ.7 \
+	man7/dl_hp_rawdata_req_t.7 \
+	man7/DL_HP_SET_ACK_THRESHOLD_REQ.7 \
+	man7/dl_hp_set_ack_threshold_req_t.7 \
+	man7/DL_HP_SET_ACK_TO_REQ.7 \
+	man7/dl_hp_set_ack_to_req_t.7 \
+	man7/DL_HP_SET_BUSY_TO_REQ.7 \
+	man7/dl_hp_set_busy_to_req_t.7 \
+	man7/DL_HP_SET_LOCAL_BUSY_REQ.7 \
+	man7/dl_hp_set_local_busy_req_t.7 \
+	man7/DL_HP_SET_LOCAL_WIN_REQ.7 \
+	man7/dl_hp_set_local_win_req_t.7 \
+	man7/DL_HP_SET_MAX_RETRIES_REQ.7 \
+	man7/dl_hp_set_max_retries_req_t.7 \
+	man7/DL_HP_SET_P_TO_REQ.7 \
+	man7/dl_hp_set_p_to_req_t.7 \
+	man7/DL_HP_SET_REJ_TO_REQ.7 \
+	man7/dl_hp_set_rej_to_req_t.7 \
+	man7/DL_HP_SET_REMOTE_WIN_REQ.7 \
+	man7/dl_hp_set_remote_win_req_t.7 \
+	man7/DL_HP_SET_SEND_ACK_TO_REQ.7 \
+	man7/dl_hp_set_send_ack_to_req_t.7 \
+	man7/DL_HP_NOTIFY_EVENT_REQ.7 \
+	man7/dl_hp_notify_event_req_t.7 \
+	man7/DL_HP_LINK_DOWN_IND.7 \
+	man7/dl_hp_link_down_ind_t.7 \
+	man7/DL_HP_LINK_UP_IND.7 \
+	man7/dl_hp_reset_stats_req_t.7 \
+	man7/DL_HP_RESET_STATS_REQ.7 \
+	man7/dl_hp_link_up_ind_t.7 \
+	man7/DL_HP_GET_64BIT_STATS_REQ.7 \
+	man7/dl_hp_get_64bit_stats_req_t.7 \
+	man7/DL_HP_GET_64BIT_STATS_ACK.7 \
+	man7/dl_hp_get_64bit_stats_ack_t.7 \
 	man7/N_BIND_ACK.7 \
 	man7/N_bind_ack_t.7 \
 	man7/N_BIND_REQ.7 \
@@ -304,6 +402,26 @@ dist_noinst_MANS = \
 	man4/ip_to_dlpi.4.man \
 	man4/ldl.4.man \
 	man4/link_driver.4.man \
+	man4/dlpi_ioctl.4.man \
+	man4/DLC_ADD_FUNC_ADDR.4.man \
+	man4/DLC_ADD_GRP.4.man \
+	man4/DLC_ALTER.4.man \
+	man4/DLC_CONTACT.4.man \
+	man4/DLC_DEL_FUNC_ADDR.4.man \
+	man4/DLC_DEL_GRP.4.man \
+	man4/DLC_DISABLE_SAP.4.man \
+	man4/DLC_ENABLE_SAP.4.man \
+	man4/DLC_ENTER_LBUSY.4.man \
+	man4/DLC_ENTER_SHOLD.4.man \
+	man4/DLC_EXIT_LBUSY.4.man \
+	man4/DLC_EXIT_SHOLD.4.man \
+	man4/DLC_GET_EXCEP.4.man \
+	man4/DLC_HALT_LS.4.man \
+	man4/DLC_QUERY_LS.4.man \
+	man4/DLC_QUERY_SAP.4.man \
+	man4/DLC_START_LS.4.man \
+	man4/DLC_TEST.4.man \
+	man4/DLC_TRACE.4.man \
 	man5/strxns.5.man \
 	man7/CD_ABORT_OUTPUT_REQ.7.man \
 	man7/cd_abort_output_req_t.7.man \
@@ -463,6 +581,84 @@ dist_noinst_MANS = \
 	man7/dl_xid_req_t.7.man \
 	man7/DL_XID_RES.7.man \
 	man7/dl_xid_res_t.7.man \
+	man7/DL_AGGR_IND.7.man \
+	man7/dl_aggr_ind_t.7.man \
+	man7/DL_AGGR_REQ.7.man \
+	man7/dl_aggr_req_t.7.man \
+	man7/DL_CAPABILITY_ACK.7.man \
+	man7/dl_capability_ack_t.7.man \
+	man7/DL_CAPABILITY_REQ.7.man \
+	man7/dl_capability_req_t.7.man \
+	man7/DL_CONTROL_ACK.7.man \
+	man7/dl_control_ack_t.7.man \
+	man7/DL_CONTROL_REQ.7.man \
+	man7/dl_control_req_t.7.man \
+	man7/DL_INTR_MODE_REQ.7.man \
+	man7/dl_intr_mode_req_t.7.man \
+	man7/DL_NOTIFY_ACK.7.man \
+	man7/dl_notify_ack_t.7.man \
+	man7/DL_NOTIFY_IND.7.man \
+	man7/dl_notify_ind_t.7.man \
+	man7/DL_NOTIFY_REQ.7.man \
+	man7/dl_notify_req_t.7.man \
+	man7/DL_PASSIVE_REQ.7.man \
+	man7/dl_passive_req_t.7.man \
+	man7/DL_UNAGGR_REQ.7.man \
+	man7/dl_unaggr_req_t.7.man \
+	man7/DL_HP_CLEAR_LOCAL_BUSY_REQ.7.man \
+	man7/dl_hp_clear_local_busy_req_t.7.man \
+	man7/DL_HP_CLEAR_STATS_REQ.7.man \
+	man7/dl_hp_clear_stats_req_t.7.man \
+	man7/DL_HP_HW_RESET_REQ.7.man \
+	man7/dl_hp_hw_reset_req_t.7.man \
+	man7/DL_HP_INFO_ACK.7.man \
+	man7/dl_hp_info_ack_t.7.man \
+	man7/DL_HP_INFO_REQ.7.man \
+	man7/dl_hp_info_req_t.7.man \
+	man7/DL_HP_MULTICAST_LIST_ACK.7.man \
+	man7/dl_hp_multicast_list_ack_t.7.man \
+	man7/DL_HP_MULTICAST_LIST_REQ.7.man \
+	man7/dl_hp_multicast_list_req_t.7.man \
+	man7/DL_HP_PPA_ACK.7.man \
+	man7/dl_hp_ppa_ack_t.7.man \
+	man7/DL_HP_PPA_REQ.7.man \
+	man7/dl_hp_ppa_req_t.7.man \
+	man7/DL_HP_RAWDATA_IND.7.man \
+	man7/dl_hp_rawdata_ind_t.7.man \
+	man7/DL_HP_RAWDATA_REQ.7.man \
+	man7/dl_hp_rawdata_req_t.7.man \
+	man7/DL_HP_SET_ACK_THRESHOLD_REQ.7.man \
+	man7/dl_hp_set_ack_threshold_req_t.7.man \
+	man7/DL_HP_SET_ACK_TO_REQ.7.man \
+	man7/dl_hp_set_ack_to_req_t.7.man \
+	man7/DL_HP_SET_BUSY_TO_REQ.7.man \
+	man7/dl_hp_set_busy_to_req_t.7.man \
+	man7/DL_HP_SET_LOCAL_BUSY_REQ.7.man \
+	man7/dl_hp_set_local_busy_req_t.7.man \
+	man7/DL_HP_SET_LOCAL_WIN_REQ.7.man \
+	man7/dl_hp_set_local_win_req_t.7.man \
+	man7/DL_HP_SET_MAX_RETRIES_REQ.7.man \
+	man7/dl_hp_set_max_retries_req_t.7.man \
+	man7/DL_HP_SET_P_TO_REQ.7.man \
+	man7/dl_hp_set_p_to_req_t.7.man \
+	man7/DL_HP_SET_REJ_TO_REQ.7.man \
+	man7/dl_hp_set_rej_to_req_t.7.man \
+	man7/DL_HP_SET_REMOTE_WIN_REQ.7.man \
+	man7/dl_hp_set_remote_win_req_t.7.man \
+	man7/DL_HP_SET_SEND_ACK_TO_REQ.7.man \
+	man7/dl_hp_set_send_ack_to_req_t.7.man \
+	man7/DL_HP_NOTIFY_EVENT_REQ.7.man \
+	man7/dl_hp_notify_event_req_t.7.man \
+	man7/DL_HP_LINK_DOWN_IND.7.man \
+	man7/dl_hp_link_down_ind_t.7.man \
+	man7/DL_HP_LINK_UP_IND.7.man \
+	man7/dl_hp_reset_stats_req_t.7.man \
+	man7/DL_HP_RESET_STATS_REQ.7.man \
+	man7/dl_hp_link_up_ind_t.7.man \
+	man7/DL_HP_GET_64BIT_STATS_REQ.7.man \
+	man7/dl_hp_get_64bit_stats_req_t.7.man \
+	man7/DL_HP_GET_64BIT_STATS_ACK.7.man \
+	man7/dl_hp_get_64bit_stats_ack_t.7.man \
 	man7/N_BIND_ACK.7.man \
 	man7/N_bind_ack_t.7.man \
 	man7/N_BIND_REQ.7.man \
@@ -535,6 +731,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.21  2008-05-25 12:49:25  brian
+# - updated manual pages and DLPI header
+#
 # Revision 0.9.2.20  2007/08/14 03:30:56  brian
 # - GPLv3 header update
 #

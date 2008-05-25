@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_PHYS_ADDR_ACK.7.man,v 0.9.2.5 2006/04/05 09:44:54 brian Exp $
+.\" @(#) $Id: DL_PHYS_ADDR_ACK.7.man,v 0.9.2.6 2008-05-25 12:49:26 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:44:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_PHYS_ADDR_ACK.7.man,v $
+.\" Revision 0.9.2.6  2008-05-25 12:49:26  brian
+.\" - updated manual pages and DLPI header
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:44:54  brian
 .\" - moved .so line and updated headers
 .\"
@@ -83,10 +86,15 @@ sort-adjacent-labels
 \- this primitive returns the value for the physical address to the link
 user in response to a
 .BR DL_PHYS_ADDR_REQ (7).
-.SH DESCRIPTION
-THis primitive returns the value for the physical address to the link user
-in response to a
-.BR DL_PHYS_ADDR_REQ (7).
+.\"
+.\"
+.SH INTERFACE
+Data Link Provider Interface, DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH SYNOPSIS
 The message consists of
 .B M_PCPROTO
@@ -101,6 +109,14 @@ typedef struct {
 } dl_phys_addr_ack_t;
 \fR\s+1
 .fi
+.\"
+.\"
+.SH DESCRIPTION
+THis primitive returns the value for the physical address to the link user
+in response to a
+.BR DL_PHYS_ADDR_REQ (7).
+.\"
+.\"
 .SH PARAMETERS
 .TP
 .I dl_primitive
@@ -114,23 +130,33 @@ conveys length of the physical address.
 conveys the offset from the beginning of the
 .B M_PCPROTO
 message block.
+.\"
+.\"
 .SH STATE
 The message is valid in any state in response to a
 .BR DL_PHYS_ADDR_REQ (7).
+.\"
+.\"
 .SH "NEW STATE"
 The resulting state is unchanged.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms to DLPI Revision 2.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
 .SH HISTORY
 .PP
 The Data Link Provider Interface first appeared in SVR 4.
 .[
 svr4
 .]
-.SH CONFORMANCE
-.PP
-This interface conforms to DLPI Revision 2.
-.[
-dlpi
-.]
+.\"
+.\"
 .XX
 .[
 magic
