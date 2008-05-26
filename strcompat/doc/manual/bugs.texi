@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.5 2008-04-28 16:47:06 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.6 2008-05-26 14:16:30 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,19 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-28 16:47:06 $ by $Author: brian $
+@c Last Modified $Date: 2008-05-26 14:16:30 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 005.  2008-05-26T14:06:22+0000
+
+lis_register_strdev() was failing whenever nminor was greater than zero or
+not an even multiple of 256.  This was due to an error in the logic checking
+for multiple majors.  (Thanks to Omer Tunali for reporting this bug.)
+
+@emph{*fixed*} in @command{strcompat-0.9.2.7}.
+
 @item 004.  2007-07-21T17:26:01-0600
 
 It was reported that, even with the fix below, validation test suites for XEN
