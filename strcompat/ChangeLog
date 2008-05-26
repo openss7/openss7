@@ -1,3 +1,9 @@
+2008-05-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strcompat.refs: update references
+	* src/kernel/liscompat.c: fixed bug in lis_register_strdev().
+	* src/manual/bugs.texi: documented bug
+
 2008-05-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: updates for release

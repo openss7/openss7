@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-04-28 16:47:13 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:13 $ by $Author: brian $
+ Last Modified $Date: 2008-05-26 14:16:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.54  2008-05-26 14:16:30  brian
+ - little bug fix in lis_register_strdev
+
  Revision 0.9.2.53  2008-04-28 16:47:13  brian
  - updates for release
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-04-28 16:47:13 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-04-28 16:47:13 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -121,7 +124,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-04-28 16:47:13 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2749,7 +2752,7 @@ lis_register_strdev(major_t major, struct streamtab *strtab, int nminor, const c
 	struct cdevsw *cdev;
 	int err;
 
-	if (nminor & MINORMASK)
+	if (nminor & ~(MINORMASK))
 		return (-EINVAL);	/* handle multiple majors later */
 	if ((cdev = kmem_zalloc(sizeof(*cdev), KM_NOSLEEP)) == NULL)
 		return (-ENOMEM);
