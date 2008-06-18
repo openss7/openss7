@@ -1,0 +1,1625 @@
+
+
+
+Network Working Group                                        B. Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+Intended Status: INFORMATIONAL                               May 7, 2008
+
+Expires in November 2008
+
+
+
+                          X.25 over SCTP (XOS)
+                               Version: 1
+                   <draft-bidulock-tsvwg-xos-00.txt>
+
+
+Status of this Memo
+
+    By submitting this Internet-Draft, each author represents that any
+  applicable patent or other IPR claims of which he or she is aware have
+  been or will be disclosed, and any of which he or she becomes aware
+  will be disclosed, in accordance with Section 6 of BCP 79.
+
+    Internet-Drafts are working documents of the Internet Engineering
+  Task Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as "work in progress".
+
+    The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt.
+
+    The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+    This Internet-Draft will expire in November 2008.
+
+Copyright
+
+    Copyright (C) The IETF Trust (2008).
+
+Abstract
+
+    This document is a revision to RFC 1613 [RFC1613] written by James
+  R. Forster, Greg Satz, Gilbert Glick and Bob Day.  Since the release
+  of RFC 1613 in May 1994, a new IP transport protocol, Stream Control
+  Transmission Protocol (SCTP) [SCTP], has been released as a Proposed
+  Standard that provides superior services to TCP in some respects,
+  particularly related to OSI or Signalling protocols.
+
+    This memo describes the mechanism to allow X.25-PLP to run directly
+  over SCTP over IPv4 or IPv6.  It also defines a number of new features
+
+
+B. Bidulock                    Version 0.0                        Page 1
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+  that were not provided in RFC 1613, but are now possible due to the
+  superior capabilities provided by SCTP.
+
+    The goal of this version is to minimize the number of changes to RFC
+  1613 as well as ITU-T Rec. X.25 [X.25] or ISO/IEC 8208 [ISO/IEC 8208]
+  while maximizing performance, extending its applicability and
+  protecting the installed base of RFC 1613 users.
+
+1.  Introduction
+
+    It is sometimes desirable to transport X.25 over IP internets.  The
+  X.25 Packet Level requires a reliable link level below it and normally
+  uses LAPB [ISO 7776], [X.222] or LLC2 [802.2].  XOT [RFC1613]
+  describes a method for using a TCP/IP connection as a data link over
+  which X.25 PLP (Packet Layer Protocol) [ISO/IEC 8208] packets can be
+  sent.  This memo documents a method of sending X.25 PLP packets over
+  IP internets by encapsulating the X.25 Packet Level in SCTP [SCTP]
+  packets.
+
+    SCTP provides a set of reliable sequenced or un-sequenced packets in
+  independent streams.  X.25 requires that the layer beneath it provide
+  message semantics, in particular the boundary between packets.  SCTP
+  preserves message boundaries and with no need for additional headers.
+  Also, the SCTP PPI field provides a way to identify the version of the
+  protocol.
+
+    In contrast, the TCP approach with XOT [RFC1613] does not preserve
+  message boundaries directly, and requires a header field, both to
+  preserve message boundaries as well as to provide a protocol version
+  number.
+
+    In general, the normal X.25 protocol packet formats and state
+  transition rules apply to the X.25 layer in XOS.  Exceptions to this
+  are noted.
+
+1.1.  Scope
+
+1.1.1.  Advantages of XOS over XOT
+
+    XOS has a number of unique advantages over XOT [RFC1613], as
+  itemized below:
+
+   (1)   SCTP preserves message boundaries without additional protocol
+         elements (such as the header required by TCP in XOT to recover
+         record boundaries).
+
+   (2)   SCTP can identify the transported protocol using the Payload
+         Protocol Identifier.
+
+   (3)   SCTP provides a heartbeat mechanism that detects failure faster
+         than TCP is able.  Thus, SCTP associations can be established
+         and left idle awaiting call setups.  This, again permits faster
+         call setup.
+
+B. Bidulock                    Version 0.0                        Page 2
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+   (4)   SCTP detects lost associations and has a quick restart
+         procedure for reestablishing them.  TCP can take minutes to
+         reestablish a connection and when confronted with
+         reestablishing 4095 connections, temporary network conditions
+         can be disastrous.
+
+   (5)   SCTP provides a measure of the quality of service experienced
+         by the SCTP association (smoothed round trip time) that can be
+         used to support X.25 and CONS quality of service parameters and
+         data link resource allocations.
+
+   (6)   XOS only requires one association for per data link and
+         utilizes streams within the SCTP association to provide for
+         independence of flow for individual virtual channels.  XOT, on
+         the other hand, requires one TCP connection per virtual
+         channel.  Therefore, XOS uses less resources per virtual
+         channel and scales better.  Also, XOS avoids the additional
+         call setup delay associated with establishing a TCP connection.
+
+    These and the additional capabilities of SCTP make XOS a superior
+  replacement to XOT.
+
+1.1.2.  Relationship of XOS to XOT
+
+    The XOS protocol described in this memo is not intended as a
+  replacement for XOT [RFC1613], but XOS is intended, where available,
+  as a superior alternative to XOT.
+
+    The XOT specification [RFC1613], was used as a template for the
+  initial drafts of this memo.  However, RFC 1613 provides sections that
+  are not applicable to XOS, as follows:
+
+   (1)   The XOT specification [RFC1613], went to some length to
+         describe the interactions between an XOT interface and an X.25
+         interface on a given host to provide an network relay function.
+         This function, however, has since been standardized as ISO/IEC
+         10028 [ISO/IEC 10028] and ISO/IEC 10177 [ISO/IEC 10177], and,
+         therefore, does not need to be discussed here.  Also, because
+         the X.25 PLP and CONS relay function is a purely nodal
+         function, it has no impact on protocol design.
+
+         Those sections of the XOT specification that spoke to network
+         layer relays and interworking units have been removed from XOS.
+         The procedures of ISO 10177 [ISO/IEC 10028], [ISO/IEC 10177]
+         are as applicable to XOS as they are to LAPB [ISO 7776],
+         [X.222], [ISO 3309], [ISO 4335] or LLC [ISO 8881], [802.2], and
+         the reader is referred to those documents [ISO/IEC 10028],
+         [ISO/IEC 10177].
+
+   (2)   The XOT specification went to some trouble to remove the
+         distinction between DTE, DCE and DXE as provided for in X.25
+         and ISO 8208.  This was possible because the TCP connection
+         only supported one anonymous virtual channel and Logical
+
+B. Bidulock                    Version 0.0                        Page 3
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+         Channel Identifier assignment became trivial.  Unfortunately,
+         this resulted in modifications to the X.25 engine: removal of
+         the distinction between DTE, DCE and DXE, and the removal of
+         the restart procedures and all messages sent to the null
+         reference.
+
+         XOS reinstates the traditional role of DTE, DCE and DXE as
+         described in X.25 and ISO 8208 and provides for the restart
+         procedure and other procedures on the null reference.  XOS in
+         this way provides an identical service interface to that of the
+         LAPB or LLC2 data links and does not require any X.25 PLP
+         protocol or procedural modifications whatsoever.  Therefore,
+         the passages on the loss of distinction between the role of
+         DTE, DCE and DXE, and the loss of the restart and LCI
+         assignment procedures from the X.25 PLP have been removed.
+
+   (3)   The XOT specification, because only one virtual channel was
+         supported per TCP connection, and because the LCI assignment
+         procedures were removed, had to specify a non-standard message
+         for use in specifying or establishing Permanent Virtual
+         Circuits.  This again required modifications to the X.25 PLP
+         protocol and procedures to support PVCs on XOT.
+
+         XOS reinstates the normal static assignment of LCI for PVCs and
+         does not require additional non-standard messages to support
+         PVCs.  PVC Setup is, once again, a matter for management
+         systems and the corresponding section from RFC 1613, "PVC
+         Setup", has been removed from this Memo.
+
+1.2.  Terminology
+
+    This memo uses the following extended terminology:
+
+  Virtual Channel -- A virtual channel over which an X.25 connection is
+      established using X.25 call setup procedures.
+
+  Permanent Virtual Channel -- A virtual channel over which an X.25
+      connection is permanently established without the need for the use
+      of call setup procedures.
+
+1.3.  Abbreviations
+
+    The following abbreviations are used throughout this memo:
+
+      CC      -- Call Confirm (X.25 message)
+      DC      -- Disconnect Confirm (X.25 message)
+      DCE     -- Data Control Equipment
+      DLC     -- Data Link Connection
+      DL      -- Data Link
+      DLS     -- Data Link Service
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 4
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+      DTE     -- Data Terminal Equipment
+      DXE     -- DTE/DCE
+      ICMP    -- Internet Control Managment Protocol
+      IEC     -- Inernational Engineering Consortia
+      IETF    -- Internet Engineering Task Force
+      IP      -- Internet Protocol
+      ISO     -- International Organization for Standardization
+      ITU     -- International Telecommunications Union
+      ITU-T   -- ITU (Telecom Sector)
+      LAPB    -- Link Access Protocol (Balanced)
+      LCI     -- Logical Channel Identifier
+      LLC1    -- LLC Class 1
+      LLC2    -- LLC Class 2
+      LLC     -- Logical Link Control
+      OOTB    -- Out Of The Blue
+      OSI     -- Open Systems Interconnect
+      PLP     -- Packet Layer Protocol
+      PVC     -- Permanent Virtual Channel
+      QOS     -- Quality of Service
+      REJ     -- Reject (X.25 message)
+      RFC     -- Request for Comments
+      RNR     -- Receiver Not Ready (X.25 message)
+      RR      -- Receiver Ready (X.25 message)
+      SCTP    -- Stream Control Transmission Protocol
+      TCP     -- Transmission Control Protocol
+      VC      -- Virtual Channel
+      XOS     -- X.25 over SCTP
+      XOT     -- X.25 over TCP
+
+
+2.  Conventions
+
+    The following language conventions are used in the items of
+  specification in this document:
+
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
+
+3.  Overview
+
+3.1.  Relationship Between XOS and X.25
+
+    When a networking device (a host, router, etc.) has an X.25 engine
+  (i.e., an X.25 PLP [ISO/IEC 8208] protocol implementation), that
+  engine may be connected to interface(s) running LAPB [ISO 7776],
+  [X.222], [ISO 3309], [ISO 4335], and/or to logical interface(s)
+  running LLC [ISO 8881], [802.2], XOT/TCP/IP [RFC1613] or XOS/SCTP/IP.
+  In general, the XOS layer itself is not at all sensitive to what kind
+  of packets the X.25 engine passes to it.  However, to improve
+  interoperability between separate implementations, this document in
+  some cases does specify behaviour for the X.25 engine.
+
+
+B. Bidulock                    Version 0.0                        Page 5
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+    While this document primarily discusses XOS from the perspective of
+  providing X.25 connectivity using XOS, this should not prevent a host
+  from switching X.25 traffic (i.e, connecting an X.25 Virtual Circuit
+  between the local X.25 interfaces of two networking devices).  In
+  general, the X.25 PLP is unaware that the data link services are being
+  provided by XOS/SCTP/IP and therefore the standards applicable to
+  network internal layer services [ISO/IEC 10028] and network layer
+  relay and protocol interworking [ISO/IEC 10177] are as applicable to
+  X.25 PLP using XOS and LAPB as they are to X.25 PLP using LLC2 and
+  LAPB.
+
+3.2.  Overall Packet Format
+
+    The entire encapsulated packet has the format illustrated in
+  Figure 1.
+
+    RFC convention is that a packet format is represented graphically
+  with the data sent first above the data sent later.  This convention
+  is followed in this document, and therefore, while we refer to X.25
+  being transported over SCTP, we draw the packet format with the X.25
+  portion of the packet lower on the page than the SCTP portion.
+
+    X.25 PLP frames are simply encapsulated in SCTP DATA Chunks in the
+  same manner as normal SCTP user data.
+
+3.3.  SCTP Association, Port Number, and Logical Channel Identifiers
+
+    A single SCTP stream MUST be used for each X.25 virtual circuit.  A
+  separate SCTP stream SHOULD be used for each X.25 virtual circuit.
+  Each Virtual Circuit (VC) relating to the same Data Link, however, is
+  carried by a stream within a single SCTP association.  All connections
+  MUST be made to SCTP port number 1998.  This port number is an IANA
+  Registered Port Number registered by cisco Systems; cisco has
+  designated it for use by XOT for TCP.  This memo recommends the use of
+  the same port number, 1998, for use by XOS for SCTP.  See Section 9,
+  "IANA Considerations for more information on port number.
+
+    The SCTP association MUST be created before the virtual circuit can
+  be established.  The SCTP association MAY be maintained after the last
+  virtual circuit associated with the SCTP association has been cleared
+  or make be released in accordance with X.25 and ISO 8208 data link
+  procedures.  Note that the SCTP association corresponds to the LAPB
+  [ISO 7776], [X.222], [ISO 3309], [ISO 4335] or LLC2 [ISO 8881],
+  [802.2] link for X.25, and each SCTP stream corresponds to an
+  individual Virtual Circuit (VC) and Logical Channel Identifier (LCI)
+  for X.25 LAPB.  The Logical Channel Identifier (LCI) field in the X.25
+  header maps to the SCTP stream upon which the message is sent.
+
+    X.25 and ISO 8208 support the assignment of virtual circuits (VC)
+  and permanent virtual circuits (PVC) to logical channel identifiers in
+  the range from 1-4095 inclusive.  Logical channel identifier zero (0)
+  is reserved for data link related messages (e.g., RESTART REQUEST).
+  SCTP provides support for multiple quasi-independent streams of
+
+B. Bidulock                    Version 0.0                        Page 6
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+
+
+                   Figure 1.  Overall XOS Packet Format
+       0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                                                               |
+    \                                                               \
+    /                           IP Header                           /
+    \                                                               \
+    |                                                               |
+    +---------------------------------------------------------------+
+    |                                                               |
+    \                                                               \
+    /                          SCTP Header                          /
+    \                                                               \
+    |                                                               |
+    +---------------------------------------------------------------+
+    |                                                               |
+    \                                                               \
+    /                        DATA Chunk Header                      /
+    \                                                               \
+    |                                                               |
+    +- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+    |                                                               |
+    \                                                               \
+    /                     X.25 DATA Chunk Payload                   /
+    \                                                               \
+    |                                                               |
+    +---------------------------------------------------------------+
+    |                                                               |
+    \                                                               \
+    /                        DATA Chunk Header                      /
+    \                                                               \
+    |                                                               |
+    +- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -+
+    |                                                               |
+    \                                                               \
+    /                     X.25 DATA Chunk Payload                   /
+    \                                                               \
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+  sequenced data records and can negotiate the number of outbound
+  streams (between 1 and 65536) during association establishment.  In
+  general, streams in SCTP are used to establish an ordered relationship
+  between packets (all packets transmitted on the same stream with
+  sequenced delivery will be delivered in order), an the stream id is
+  not intended to be used to identifying virtual circuits of any kind.
+  For example, there is no requirement on SCTP peers to negotiation the
+  same number of inbound streams as the number of outbound streams; and,
+
+B. Bidulock                    Version 0.0                        Page 7
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+  there is no requirement to deliver the stream id as part of the
+  information associated with received data.
+
+    Therefore, the mapping between LCI and SCTP stream number is not an
+  identity relationship (for all but LCI zero (0)).  Once a virtual
+  circuit is assigned to an outbound SCTP stream, however, it SHOULD
+  remain assigned to that stream for the lifetime of the connection,
+  otherwise, ordered message sequencing will be at risk on the VC.  The
+  XOS layer should provide the ability to distribute active VCs over the
+  available outbound streams in as efficient a manner as possible,
+  however, the precise algorithm for doing so is a local matter.  One
+  way of accomplishing this is, indeed, by negotiating 4096 outbound
+  streams with the SCTP peer and providing an identity mapping between
+  LCI and SCTP stream number; however, this is not the only (nor most
+  efficient) arrangement possible.
+
+    Logical Channel Identifier zero (0), that is the "NULL" virtual
+  circuit, refers to the data link and all contained VC and PVC, and is
+  special in that messages sent on this LCI MUST be sent on SCTP stream
+  number zero (0).  Messages sent on LCI zero (0) (and SCTP stream zero
+  (0)) MAY be sent unordered.  No other messages (i.e. messages for LCI
+  other than zero (0)) will be sent on SCTP stream zero (0), unless
+  there is only one outbound stream negotiated (in which case all
+  messages must be sent on stream zero (0)).  Which of the other
+  available outbound streams is used for a particular LCI is a local
+  matter; therefore, an XOS receiver MUST NOT use the inbound SCTP
+  stream number to discriminate virtual circuits, but MUST use the LCI
+  contained in the X.25 header (as is the case for normal X.25 and ISO
+  8208 operation).
+
+3.4.  Service Interfaces
+
+    The upper layer service interface to XOS protocol functions is
+  provided by the Data Link Provider service interface described in the
+  ITU-T OSI Data Link Service Definition [X.212], and that described for
+  IEEE 802.2 LLC operation [802.2].  The service primitives defined for
+  the data link service are listed in Table 1.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 8
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+                 Table 1. Data Link Service Primitives
+
+   Mode             Service Primitive                      Standard
+   -------------------------------------------------------------------
+   Connectionless   DL-UNIT-DATA request                   X.212
+                    DL-UNIT-DATA indication                X.212
+   -------------------------------------------------------------------
+   Connection       DL-CONNECT request                     X.212
+   Oriented         DL-CONNECT indication                  X.212
+                    DL-CONNECT response                    X.212
+                    DL-CONNECT confirm                     X.212
+                    DL-DATA request                        X.212
+                    DL-DATA indication                     X.212
+                    DL-RESET request                       X.212
+                    DL-RESET indication                    X.212
+                    DL-RESET response                      X.212
+                    DL-RESET confirm                       X.212
+                    DL-DISCONNECT request                  X.212
+                    DL-DISCONNECT indication               X.212
+                    DL-CONNECTION-FLOWCONTROL request      ISO 8802-2
+                    DL-CONNECTION-FLOWCONTROL indication   ISO 8802-2
+   -------------------------------------------------------------------
+   Acknowledged     DL-DATA-ACK request                    ISO 8802-2
+   Connectionless   DL-DATA-ACK indication                 ISO 8802-2
+                    DL-DATA-ACK-STATUS indication          ISO 8802-2
+                    DL-REPLY request                       ISO 8802-2
+                    DL-REPLY indication                    ISO 8802-2
+                    DL-REPLY-STATUS indication             ISO 8802-2
+                    DL-REPLY-UPDATE request                ISO 8802-2
+                    DL-REPLY-UPDATE-STATUS indication      ISO 8802-2
+   -------------------------------------------------------------------
+
+
+    XOS is primarily concerned with the Connection-Oriented mode service
+  primitives and mapping them onto the SCTP transport interface.
+
+    The lower layer service interface providing services to XOS protocol
+  function is provided by the SCTP (see Section 10 of RFC 4960) [SCTP].
+  This service interface can be roughly modelled with the ITU-T OSI
+  Transport Service Definition [X.214], as listed in Table 2.
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 9
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+                        Table 2. SCTP Primitives
+
+        SCTP Function     Transport Service Primitive   Standard
+        ---------------------------------------------------------
+        SCTP-INITIALIZE   -                             -
+        SCTP-ASSOCIATE    T-CONNECT request             X.214
+                          T-CONNECT indication          X.214
+                          T-CONNECT response            X.214
+                          T-CONNECT confirm             X.214
+        SCTP-SEND         T-DATA request                X.214
+                          T-EXDATA request              X.214
+                          T-UNIT-DATA request           X.214
+        SCTP-RECEIVE      T-DATA indication             X.214
+                          T-EXDATA indication           X.214
+                          T-UNIT-DATA indication        X.214
+        SCTP-ABORT        T-DISCONNECT request          X.214
+                          T-DISCONNECT indication       X.214
+        SCTP-SHUTDOWN     T-RELEASE request             -
+                          T-RELEASE indication          -
+        SCTP-RELEASE      -                             -
+        ---------------------------------------------------------
+
+
+4.  XOS Service Definition
+
+    The mapping of Data Link Service Definition service primitives to
+  SCTP primitives is straightforward, is listed  in Table 3, and is
+  detailed in the subsections that follow.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                       Page 10
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+                 Table 3. Mapping of Service Primitives
+
+  DLS Primitive                   SCTP Primitive
+  --------------------------------------------------------------------
+  DL-CONNECT Request         ->   SCTP-INITIALIZE
+                             ->   SCTP-ASSOCIATE connect
+  DL-CONNECT Indication      <-   SCTP-ASSOCIATE listen
+  DL-CONNECT Response        ->   SCTP-ASSOCIATE accept
+  DL-CONNECT Confirm         ->   SCTP-ASSOCIATE completes
+  --------------------------------------------------------------------
+  DL-DATA Request            ->   SCTP-SEND
+  DL-DATA Indication         <-   SCTP-RECEIVE
+  --------------------------------------------------------------------
+  DL-RESET Request           ->   SCTP-ABORT
+                             ->   SCTP-ASSOCIATE connect
+  DL-RESET Indication        <-   SCTP-RESTART-INDICATION
+  DL-RESET Response          ->   SCTP-RESTART completes
+  DL-RESET Confirm           <-   SCTP-ASSOCIATE completes
+  --------------------------------------------------------------------
+  DL-DISCONNECT Request      ->   SCTP-ABORT
+  DL-DISCONNECT Indication   <-   SCTP-ABORT or
+                             <-   SCTP-COMMUNICATIONS-LOST-INDICATION
+  --------------------------------------------------------------------
+
+
+4.1.  DL-CONNECT
+
+    Upon receipt of an DL-CONNECT Request from the X.25 PLP, XOS will
+  generate an SCTP-INITIALIZE and SCTP-ASSOCIATE primitive to SCTP.  The
+  source address parameter from the DL-CONNECT Request will be used as
+  the local port and local eligible address list in the SCTP-INITIALIZE
+  primitive and the destination address parameter from the DL-CONNECT
+  Request will be used as the destination address in the SCTP-ASSOCIATE
+  primitive.  The priority parameter from the DL-CONNECT Request is
+  ignored.  Once the SCTP ASSOCIATION has formed, XOS will issue a DL-
+  CONNECT Confirm primitive to the X.25 PLP with the source address and
+  destination address parameter corresponding to the SCTP source
+  transport address and SCTP destination transport address.
+
+    Upon receipt of an SCTP-ASSOCIATE primitive from SCTP, XOS will
+  issue a DL-CONNECT Indication primitive to the X.25 PLP containing as
+  the source and destination address parameters, the SCTP source and
+  destination transport addresses.  Upon receipt of the DL-CONNECT
+  Response primitive from the X.25 PLP, XOS will confirm the SCTP-
+  ASSOCIATE primitive.  Upon receipt, the priority parameter is ignored,
+  and when issued, the priority parameter is set to zero.  Note that
+  normal LLC [802.2] procedures use the 48-bit MAC address for
+  addresses, however, these 48 bits are normally opaque to the X.25 PLP
+  implementation.  Conveniently, an IPv4 Address and Port number is also
+  48 bits.  IPv6 addresses, on the other hand, are much longer.
+
+
+
+B. Bidulock                    Version 0.0                       Page 11
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+4.2.  DL-DATA
+
+    Upon receipt of a DL-DATA Request primitive from the X.25 PLP, XOS
+  will generate an SCTP-SEND primitive with the same data parameter.
+  The "stream id" and "unordered flag" parameter of the SCTP-SEND
+  primitive is determined according to the rules described in the next
+  section of this memo.
+
+    Upon receipt of a SCTP-RECEIVE primitive from SCTP, XOS will issue a
+  DL-DATA Indication primitive to the X.25 PLP containing the same data
+  parameter.  The source and destination address parameters are derived
+  from the SCTP association to which the SCTP-RECEIVE primitive applies.
+
+4.3.  DL-RESET
+
+    Upon receipt of an SCTP-RESTART-INDICATION, XOS will issue to the
+  X.25 PLP a DL-RESET Indication primitive and expect a DL-RESET
+  Response form the X.25 PLP.  Upon receive of the DL-RESET Response,
+  the SCTP Restart procedure will be completed by XOS.
+
+    Upon receipt of a DL-RESET Request primitive from the X.25 PLP, XOS
+  will issue an SCTP-ABORT primitive to SCTP followed immediately by an
+  SCTP-ASSOCIATE primitive for the same pairing of source transport
+  address and destination transport address.  XOS should request that
+  SCTP discard all data that has not been delivered at the time of the
+  reset.  Once the procedure is complete, XOS will issue the DL-RESET
+  Confirm primitive to the X.25 PLP.
+
+4.4.  DL-DISCONNECT
+
+    Upon receipt of a DL-DISCONNECT Request from the X.25 PLP, XOS will
+  generate an SCTP-ABORT primitive to SCTP.  Upon receipt of an SCTP-
+  ABORT primitive or any of the disconnection indications from SCTP
+  (e.g., SCTP-COMMUNICATIONS-LOST), XOS will issue to the X.25 PLP a DL-
+  DISCONNECT Indication primitive.  The reason parameter will be derived
+  from the primitive or indication from SCTP.
+
+5.  XOS Packets
+
+    For each X.25 packet received from the SCTP connection to be sent
+  out a local interface, an XOS implementation MUST set the packet's
+  logical channel number to that used on the outgoing interface.  For
+  the purposes of this RFC, a logical channel number is the 12 bit field
+  confusingly defined by the X.25 Recommendations [X.25] as the high-
+  order 4-bit "logical channel group number" and low-order 8-bit
+  "logical channel number", where the latter phrase is used to refer to
+  both the aggregated 12 bits and the low-order 8 bits.
+
+    An XOS implementation SHOULD NOT modify the X.25 packet header
+  information received on a local interface to be transmitted over the
+  SCTP association.
+
+
+
+B. Bidulock                    Version 0.0                       Page 12
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+    An XOS implementation MUST modify the X.25 packet header information
+  as required for proper X.25 protocol operation for packets received on
+  an SCTP association to be transmitted over a local interface.
+
+    An XOS implementation MAY support connection between interfaces that
+  use different flow control modulos.  If this feature is supported, XOS
+  MUST modify the packet General Format Identifier on all packets
+  received over the SCTP connection to set the proper modulus
+  identifier.
+
+5.1.  Transmission of XOS Packets
+
+    The XOS layer receives service primitives requires for transmission
+  in the same manner as the data link provider [X.212], [DLPI] for LAPB
+  [ISO 7776], [X.222] or LLC2 [802.2].  The X.25 PLP (DXE) is
+  responsible for resolving LCI assignment conflicts and completing the
+  LCI field of the X.25 header for packets.  The packets are then
+  delivered to the XOS layer using the DL-DATA Request primitive.  The
+  XOS layer may examine the packet for the content of the LCI
+  assignment, and uses a table to map the LCI from the X.25 header in
+  the message to an SCTP stream number.  When the packet is a CC packet
+  establishing a connection, the entry in the mapping table for LCI to
+  SCTP stream is first populated.  Once a DC is packet is received, the
+  associated entry in the mapping table for the released virtual circuit
+  may be released (i.e. deleted).
+
+    Messages that are for the NULL reference (i.e. that contain zero (0)
+  in the LCI) are always sent on SCTP stream zero (0).  Messages with a
+  non-zero LCI are always sent on an SCTP stream other than zero (0),
+  unless stream zero (0) is the only available outbound stream because
+  the maximum number of outbound streams negotiated on association
+  initialization is one (1), or the message is an INTERRUPT or INTERRUPT
+  CONFIRM message.  When the message is an INTERRUPT or INTERRUPT
+  CONFIRM message, the XOS layer should select a stream id not used by
+  other messages, or may transmit the message on stream zero (0).
+
+    Note: X.25 expects that the flow control restrictions appropriate
+  for expedited data and normal data, for example, CONS mapped onto X.25
+  in accordance with X.233 [X.233], provide that the expedited data be
+  subject to different flow control restrictions than is normal data.
+  This can be accomplished in SCTP in several ways:
+
+   (1)   The packets can be sent with the unordered flag set: meaning
+         that INTERRUPT and INTERRUPT CONFIRM packets are permitted to
+         be delivered to the peer user, even when some other packets are
+         missing and ordered packets can not currently be delivered.
+
+   (2)   The packets can be sent in a separate stream from the stream in
+         which normal data is delivered.
+
+    One or both of these procedures can be applied at the same time.
+
+
+
+B. Bidulock                    Version 0.0                       Page 13
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+    Once the mapping has been performed for a particular message, the
+  message is issued to the SCTP layer with SEND primitive (see RFC 4960,
+  Section 10) the indexed "stream id," the "unordered flag" clear for
+  all non-zero LCI messages with the exception of INTERRUPT and
+  INTERRUPT CONFIRM packets.
+
+5.2.  Reception of XOS Packets
+
+    Upon receiving data from the SCTP Association using the RECEIVE
+  primitive (see RFC 4960, Section 10), the XOS layer examines the
+  contained X.25 message, extracts the LCI and delivers the message to
+  the indicated X.25 PLP DXE as normal (that is, using the DL-DATA
+  Indication service primitive) [X.212].  The X.25 PLP processes this
+  data no differently that if it were received from LAPB [ISO/IEC 8208],
+  [ISO 7776], [X.222] or LLC2 [ISO 8881], [802.2].
+
+6.  XOS Procedures
+
+    XOS procedures are modeled after the procedures of the LAPB Data
+  Link [ISO 7776], [X.222].  X.25 PLP procedures are the same as
+  expounded in X.25 and ISO 8208 and are not altered by this memo,
+  except where noted.
+
+6.1.  SCTP Association Setup and Clearing
+
+    For XOS, each SCTP Association corresponds to a data link.
+  Therefore, the SCTP Association follows the same rules for
+  establishment and closing that the LAPB or LLC2 data link exhibits.
+  When the X.25-PLP layer requests that a data link be established, the
+  SCTP-INITIALIZE and SCTP-ASSOCIATE procedures are invoked as described
+  under "DL-CONNECT," above.  When the X.25-PLP layer or XOS determines
+  that the data link is no longer in use (by virtual circuits), the
+  X.25-PLP requests that the data link be closed with a DL-DISCONNECT
+  Request primitive that results in the SCTP-ABORT or SCTP-SHUTDOWN
+  operation as described under "DL-DISCONNECT," above.
+
+6.2.  Virtual Circuit Setup and Clearing
+
+    Once an SCTP association has been established, the restart
+  procedures described in ISO/IEC 8208 [ISO/IEC 8208] section 4.5
+  (Determining "DTE" or "DCE" characteristics), are used to determine
+  whether the local DTE acts in DTE or DCE mode for the purpose of
+  logical channel number assignment.  This is accomplished using the
+  restart procedure described in that section.  This does not preclude
+  and is compatible with a given SCTP peer acting in DCE-only mode (i.e.
+  as a data link entity associated with a private or public packet
+  switched data network).
+
+    When establishing virtual and permanent virtual circuits, the normal
+  ITU-T Recommendation X.25 or ISO/IEC 8208 procedures as regards LCI
+  are used by the X.25 PLP layer associated with the XOS peers.  Normal
+  message formats and state transitions are used.
+
+
+B. Bidulock                    Version 0.0                       Page 14
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+    To simplify end-to-end flow control, the packet size and window size
+  SHOULD always be explicitly sent as facilities in the Call packet, in
+  the fashion of ISO 8208.  When included in the Call packet, the packet
+  MUST contain both Packet Size and Window Size facilities.  The Call
+  Confirm packet MAY contain these facilities.  The handling of a Call
+  received over an SCTP association that does not encode one or both of
+  the flow control facilities is a local matter--if the XOS accepts such
+  a call, it MUST encode the missing flow control facility values that
+  apply to the connection in the returned Call Confirm packet.
+
+    Note that the X.25 interface normally have a concept of network
+  default values for packet size and window size.  It was thought that
+  when connecting diverse sites over an SCTP/IP network this concept
+  would be difficult to achieve in practise.  If there is no network
+  default, then each call must state the packet size and window size.
+  This is the reason for requiring the packet size and window size
+  facilities.  It is expected that this can be achieved either by the
+  XOS layer itself, or by configuring the X.25 engine such that there is
+  no network default on the interface.
+
+    After receiving or sending a Clear Confirm packet for the last
+  virtual circuit supported by an SCTP association, the SCTP association
+  MAY be closed, in accordance with the same procedures for data links
+  as described in ITU-T Recommendation X.25 [X.25] and ISO/IEC 8208
+  [ISO/IEC 8208].
+
+    A packet with an invalid X.25 Packet Type Identifier (PTI) received
+  over the SCTP connection before a Call has been received (i.e., while
+  in the P1 state) MUST be silently discarded.
+
+6.3.  Interrupt, and Reset Packets
+
+    Interrupt, Interrupt Confirm, Reset and Reset Confirm packets are
+  sent over the SCTP association using normal X.25 packet formats and
+  state transitions.
+
+    Reset and Reset Confirm packets are sent with the same SCTP stream
+  id as other data packets associated with the VC or PVC by Local
+  Channel Identifier.
+
+    Interrupt and Interrupt Confirm packets, on the other hand, are used
+  to implement network expedited data and SHOULD be sent either with an
+  SCTP stream id separate from any normal data stream, or on stream id
+  zero (0).  Also, Interrupt and Interrupt Confirm packets MAY be sent
+  unordered (i.e., with the U bit set ni the SCTP Data Chunk Header).
+
+6.4.  Restart, DTE Reject, Diagnostics, and Registration
+
+    X.25 packets that have only a local DTE/DXE interface significance
+  (Restart, Restart Confirm, DTE Reject, Diagnostic, Registration
+  Request and Registration Confirmation) MUST be sent over the SCTP
+  outbound stream zero (0), and MAY be sent unordered (i.e. with the U
+  bit set in the SCTP Data Chunk Header).
+
+B. Bidulock                    Version 0.0                       Page 15
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+7.  Reason Codes
+
+    This section describes the mapping of specific SCTP error conditions
+  to Data Link Service Definition reset reasons and disconnect reasons.
+
+7.1.  Connection Rejection Reasons
+
+    As a result of receiving a DL-CONNECT Request from the X.25 PLP, XOS
+  issues an SCTP-INITIALIZE and SCTP-ASSOCIATE primitive to SCTP.  When
+  the formation of an SCTP associations fails, SCTP may indicate an
+  error to XOS.  This error indication can either be as a result of an
+  SCTP error, or an ICMP error.  XOS indicates this connection rejection
+  to X.25 PLP using the DL-DISCONNECT Indication service primitive.
+
+    The DL-DISCONNECT Indication primitive, when used for connection
+  rejection, contains a reason parameter that indicates the reason for
+  connection rejection.  The connection rejection reason may be one of
+  the following:
+
+   + Connection Rejection -- Destination Unknown
+   + Connection Rejection -- Destination Unreachable (Permanent)
+   + Connection Rejection -- Destination Unreachable (Transient)
+   + Connection Rejection -- QOS Unavailable (Permanent)
+   + Connection Rejection -- QOS Unavailable (Transient)
+   + Connection Rejection -- Permanent Condition (Permanent)
+   + Connection Rejection -- Transient Condition (Transient)
+   + Connection Rejection -- Unspecified
+
+  The RECOMMENDED mapping of SCTP and ICMP error codes to Connection
+  Rejection reasons is listed in Table 4.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                       Page 16
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+      Table 4. SCTP Error mapping to Connection Rejection Reasons
+
+     +---------------------+--------------------------------------+
+     |                     |       DL-DISCONNECT Indication       |
+     |  SCTP/ICMP Error    +------------+-------+-----------------+
+     |                     |   Origin   |  P/T  |     Reason      |
+     +---------------------+------------+-------+-----------------+
+     |ICMP Error: no route | Provider   |   -   | destination     |
+     |to host, redirect.   |            |       | unknown         |
+     +---------------------+            +-------+-----------------+
+     |ICMP Error: protocol |            |   P   | destination     |
+     |unreachable.         |            |       | unreachable     |
+     +---------------------+            +-------+                 |
+     |ICMP Error: network  |            |   T   |                 |
+     |unreachable, host    |            |       |                 |
+     |unreachable, port    |            |       |                 |
+     |unreachable.         |            |       |                 |
+     +---------------------+            +-------+-----------------+
+     |NO_RESOURCE.         |            |   P   | QOS unavailable |
+     +---------------------+            +-------+                 |
+     |RES_SHORTAGE.        |            |   T   |                 |
+     +---------------------+            +-------+-----------------+
+     |MISSING_PARM,        |            |   -   | unspecified     |
+     |BAD_CHUNK_TYPE,      |            |       |                 |
+     |INVALID_PARM,        |            |       |                 |
+     |BAD_PARM,            |            |       |                 |
+     |PROTOCOL_VIOLATION,  |            |       |                 |
+     |STALE_COOKIE,        |            |       |                 |
+     |BAD_ADDRESS,         |            |       |                 |
+     |NO_DATA, NEW_ADDR,   |            |       |                 |
+     |LAST_ADDR,           |            |       |                 |
+     |ILLEGAL_ASCONF.      |            |       |                 |
+     +---------------------+------------+-------+-----------------+
+     |USER_INITIATED.      | User       |   P   | permanent       |
+     |                     |            |       | condition       |
+     +---------------------+            +-------+-----------------+
+     |SHUTDOWN.            |            |   T   | transient       |
+     |                     |            |       | condition       |
+     +---------------------+            +-------+-----------------+
+     |                     |            |   -   | unspecified     |
+     +---------------------+------------+-------+-----------------+
+     |SCTP-ABORT, OOTB.    | Undefined  |   -   | unspecified     |
+     +---------------------+------------+-------+-----------------+
+
+7.2.  Disconnect Reasons
+
+    Once the data link is in the data transfer state and the SCTP
+  association fails, SCTP may indicate an error to XOS.  This error
+  indication can either be as a result of an SCTP error, or an ICMP
+  error.  XOS indicates this disconnect to X.25 PLP using the DL-
+  DISCONNECT Indication primitive.
+
+
+B. Bidulock                    Version 0.0                       Page 17
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+    The DL-DISCONNECT Indication primitive, when used for disconnection,
+  contains a reason parameter that indicates the reason for
+  disconnection.  The disconnection reason may be one of the following:
+
+   + Disconnect -- Permanent Condition
+   + Disconnect -- Transient Condition
+   + Disconnect -- Abnormal Condition
+   + Disconnect -- Normal Condition
+   + Disconnect -- Unspecified
+
+  The RECOMMENDED mapping of SCTP and ICMP error codes to Disconnect
+  reasons is listed in Table 5.
+
+
+
+           Table 5. SCTP Error mapping to Disconnect Reasons
+
+     +---------------------+--------------------------------------+
+     |                     |       DL-DISCONNECT Indication       |
+     |  SCTP/ICMP Error    +------------+-------+-----------------+
+     |                     |   Origin   |  P/T  |     Reason      |
+     +---------------------+------------+-------+-----------------+
+     |MISSING_PARM,        | Provider   |   P   | permanent       |
+     |BAD_CHUNK_TYPE,      |            |       | condition       |
+     |INVALID_PARM,        |            |       |                 |
+     |BAD_PARM,            |            |       |                 |
+     |PROTOCOL_VIOLATION,  |            |       |                 |
+     |ICMP (Fatal).        |            |       |                 |
+     +---------------------+            +-------+-----------------+
+     |INVALID_STR,         |            |   T   | transient       |
+     |STALE_COOKIE,        |            |       | condition       |
+     |NO_RESOURCE,         |            |       |                 |
+     |BAD_ADDRESS,         |            |       |                 |
+     |NO_DATA, NEW_ADDR,   |            |       |                 |
+     |LAST_ADDR,           |            |       |                 |
+     |RES_SHORTAGE,        |            |       |                 |
+     |ILLEGAL_ASCONF, ICMP |            |       |                 |
+     |(Non-Fatal).         |            |       |                 |
+     +---------------------+            +-------+-----------------+
+     |SCTP-ABORT, OOTB.    |            |   -   | unspecified     |
+     +---------------------+------------+-------+-----------------+
+     |SHUTDOWN.            | User       |   -   | normal          |
+     |                     |            |       | condition       |
+     +---------------------+            |       +-----------------+
+     |                     |            |       | abnormal        |
+     |                     |            |       | condition       |
+     +---------------------+            |       +-----------------+
+     |USER_ORIGINATED.     |            |       | unspecified     |
+     +---------------------+------------+       |                 |
+     |                     | Undefined  |       |                 |
+     +---------------------+------------+-------+-----------------+
+
+
+
+B. Bidulock                    Version 0.0                       Page 18
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+7.3.  Reset Reasons
+
+    Once the data link is in the data transfer state and the SCTP
+  association restarts, SCTP may indicate an error to XOS.  This error
+  indication can either be as a result of an SCTP error, or an ICMP
+  error.  XOS indicates this reset to X.25 PLP using the DL-RESET
+  Indication service primitive.
+
+    The DL-RESET Indication primitive, when used for reset, contains a
+  reason parameter that indicates the reason for reset.  The reset
+  reason may be one of the following:
+
+   + Reset -- Flow Control
+   + Reset -- Link Error
+   + Reset -- User Resynchronization
+   + Reset -- Unspecified
+
+  The RECOMMENDED mapping of SCTP and ICMP error codes to Reset reasons
+  is listed in Table 6.
+
+
+
+
+
+
+
+
+
+
+
+
+              Table 6. SCTP Error mapping to Reset Reasons
+
+     +---------------------+--------------------------------------+
+     |                     |         DL-RESET Indication          |
+     |     SCTP Error      +------------+-------------------------+
+     |                     |   Origin   |         Reason          |
+     +---------------------+------------+-------------------------+
+     |SCTP_ECN             | Provider   | flow control            |
+     |ICMP Source Quench   |            |                         |
+     +---------------------+            +-------------------------+
+     |BAD_CHUNK_TYPE       |            | link error              |
+     |INVALID_STR          |            |                         |
+     |NO_DATA              |            |                         |
+     |ILLEGAL_ASCONF       |            |                         |
+     +---------------------+------------+-------------------------+
+     |USER_INITIATED and   | User       | resynchronization       |
+     |then RESTART         |            |                         |
+     +---------------------+------------+-------------------------+
+     |RESTART              | Undefined  | unspecified<1>          |
+     +---------------------+------------+-------------------------+
+
+
+
+B. Bidulock                    Version 0.0                       Page 19
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+Notes for Section 7
+
+  <1>  Note that SCTP does not provide a source of an SCTP restart
+       indication.  The source could be either the peer SCTP provider
+       or the peer SCTP User.  Therfore, the origin is considered to
+       be undefined.
+
+8.  Quality of Service
+
+    The Data Link Service Definition [X.212] states:
+
+      There are three QOS parameters: throughput, protection, and
+      priority ..., which are of the type that may be selected
+      during DLC establishment.  ...  Once the DLC is estblished,
+      throughout the lifetime of the DLC, the agreed QOS values are
+      not reselected at any point, and there is no guarantee that
+      the original values will be maintained.  The DLS users should
+      also be aware that changes in QOS on a DLC as not explicitly
+      signalled by the DLS provider [X.212].
+
+
+    X.25 LAPB [X.25], ISO Data Link Protocol [ISO 7776], [X.222], and
+  LLC [802.2], all provide for Quality of Service parameters to be
+  determined at the time of establishment of the data link.  XOT
+  [RFC1613] (and TCP beneath it) provides no mechanism for Quality of
+  Service.  For XOS, on the other hand, SCTP provides several mechanisms
+  to enforce grade of service on an association, as follows:
+
+   (1)   SCTP protocol parameters provide for the maximum number of path
+         retransmissions, and maximum number of association
+         retransmissions, as well as the maximum retransmission timeout.
+         These parameters can be adjusted to accommodate the maximum
+         transit delay.
+
+   (2)   The SCTP protocol provides for a maximum lifetime before
+         acknowledgement of data messages submitted for transmission.
+         The lifetime can be affected on an association basis or a per-
+         message basis.  This protocol mechanism can also be adjusted to
+         accommodate maximum transit delay.
+
+   (3)   The SCTP protocol extension for Partial Reliability can be used
+         to adjust the residual error rate for the SCTP association.
+
+    Another approach to the management of QOS in the IP network surfaced
+  after the advent of XOT [RFC1613] as the protocol RSVP [].  With RSVP,
+  (the procedures of which are also applicable to XOT), a reservation is
+  performed against an RSVP server responsible for admission control of
+  SCTP flows for the attached networks.  The RSVP reservation would be
+  made by XOS prior to the establishment of the SCTP association to
+  which the QOS applies.
+
+
+
+B. Bidulock                    Version 0.0                       Page 20
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+    The following QOS parameters may be supported:
+
+  Throughput:-
+       This is a per-connection value.
+
+  Transit Delay:-
+
+  Residual Error Rate:-
+       For SCTP, unless the Partial Reliability extension to SCTP is
+       used, the residual error rate will always be zero (0).<1>
+
+  Resilience:-
+
+  Protection:-
+       This is a per-connection value.  The protection supported by the
+       SCTP association is a matter for the DLS Provider to determine.
+       When IPSec or TLS is used, the protection value can include
+       passive monitoring and active attacks.  Whether all three values
+       of protection are available when IPSec or TLS is not may depend
+       upon the network providing the SCTP association.
+
+  Priority:-
+       This is a per-connection value.  The priority supported by the
+       SCTP association is a matter for the DLS Provider to determine.
+
+Notes for Section 8
+
+  <1>  Note that without the Partial Reliability extention, SCTP is
+       always a reliable transport service and the association will
+       fail if SCTP is unable to transport packets to the peer and
+       deliver them in order or out of order within a reasonable (and
+       configurable) time period.  This is referred to in the IETF as
+       a "reliable" transport.
+
+9.  Security
+
+    As with ISO 8208 and ITU-T Rec. X.25 applications, security is not
+  integrated at the data link and network level, but rather, is
+  integrated at layers above the transport layer.  Therefore, XOS has no
+  more Security exposure issues that X.25 itself.
+
+    On the other hand, by transporting X.25 PLP packets over SCTP over a
+  public internet, their contents are exposed to a much greater degree
+  than if they were transport over a private line service using ISO
+  8208.  It is therefore RECOMMENDED that the SCTP implementation used
+  on public internets be capable of operating with IPSec or TLS to
+  protect the payload of the SCTP transport, in this case, the X.25 PLP
+  packets, to at least reduce exposure to the levels of private line
+  service.
+
+
+
+
+
+B. Bidulock                    Version 0.0                       Page 21
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+10.  IANA Considerations
+
+    The following IANA considerations are made:
+
+10.1.  SCTP Payload Protocol ID
+
+    This memo assigns an XOS value for the Payload Protocol Identifier
+  in the SCTP DATA chunk.  The following SCTP Payload Protocol
+  Identifier will be registered: XOS "YY"
+
+    The SCTP Payload Protocol Identifier value "YY"<1> SHOULD be
+  included in each SCTP DATA chunk, to indicates that the SCTP is
+  carrying the XOS protocol.  The value zero "0" (unspecified) is also
+  allows but any other values MUST NOT be used. This Payload Protocol
+  Identifier is not directly used by SCTP but MAY bse used by certain
+  network entities to identify the type of information carried in the
+  DATA chunk.
+
+    The User Adaptation peer MAY use the Payload Protocol Identifier as
+  a way of determining additional information about the data being
+  presented to it by SCTP.  A request will be made to IANA to assign
+  SCTP Payload Protocol IDs.
+
+10.2.  SCTP Port Number
+
+    IANA has registered TCP Port Number "1998"<2> for XOT [RFC1613].  It
+  is recommended that XOS hosts use this TCP port number also for SCTP
+  for listening for new connections.  XOS hosts MAY also use statically
+  configured SCTP port numbers instead.
+
+Notes for Section 10
+
+  <1>  EDITOR'S NOTE:- The value shown as "YY" is to be assigned by
+       IANA and may change in future versions of this document.
+
+  <2>  EDITOR'S NOTE:- The value shown as "1998" is to be assigned by
+       IANA and may change in future versions of this document.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                       Page 22
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+0.  Change History
+
+    This section provides historical information on the changes made to
+  this draft.  This section will be removed from the document when the
+  document is finalized for publication as an RFC.
+
+0.1.  Initial Version 0.0
+
+   o
+   o
+
+Change Log
+
+    $Log: draft-bidulock-tsvwg-xos-00.me,v $
+    Revision 0.9.2.1  2008-05-09 13:45:20  brian
+    - initial version of draft
+
+
+
+
+Normative References
+
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+       Requirement Levels," BCP 14/RFC 2119, The Internet Society (March
+       1997).  <http://www.ietf.org/rfc/rfc2119.txt>
+
+  [RFC1613]  "Cisco Systems X.25 over TCP (XOT)," RFC 1613, The Internet
+       Society (May 1994).  (Status: INFORMATIONAL) (Defines TCP port
+       number 1998.)  <http://www.ietf.org/rfc/rfc1613.txt>
+
+  [SCTP]  "Stream Control Transmission Protocol (SCTP)," RFC 4960, The
+       IETF Trust (September 2007).  (Obsoletes RFC 2960, RFC 3309)
+       (Status: PROPOSED STANDARD) <http://www.ietf.org/rfc/rfc4960.txt>
+
+  [X.25]  ITU, "Interface between Data Terminal Equipment (DTE) and Data
+       Circuit-terminating Equipment (DCE) for terminals operating in
+       the packet mode and connected to the public data networks by
+       dedicated circuit," ITU-T Recommendation X.25, ITU-T
+       Telecommunication Standardization Sector of ITU, Geneva (October
+       1996).  (Previously "CCITT Recommendation") <http://www.itu.int/>
+
+  [ISO/IEC 8208]  ISO, "Information Technology - Data Communications -
+       X.25 Packet Layer Protocol For Data Terminal Equipment," ISO/IEC
+       8208 : 2000, International Organization for Standardization
+       (November 1, 2000).  <http://www.iso.org/>
+
+  [ISO 8881]  ISO/IEC, "Information Processing Systems -- Data
+       Communications -- Use of the X.25 Packet Level Protocol in Local
+       Area Networks," ISO/IEC 8881:1989, International Organization for
+       Standardization (1989).  <http://www.iso.org/>
+
+  [X.212]  ITU, "Information Technology -- Open Systems Interconnection
+
+B. Bidulock                    Version 0.0                       Page 23
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+       -- Data Link Service Definition," ITU-Recommendation X.212
+       [ISO/IEC 8886 : 1995], ITU-T Telecommunication Standardization
+       Sector of ITU, International Organization for Standardization,
+       Geneva (November 1995).  (Previously "CCITT Recommendation")
+       <http://www.itu.int/>
+
+Informative References
+
+  [ISO 7776]  ISO/IEC, "Information technology -- Telecommunications and
+       information exchange between systems -- High-level data link
+       control procedures -- Description of the X.25 LAPB-compatible DTE
+       data link procedures," ISO/IEC 7776:1995, International
+       Organization for Standardization (July 1, 1995).
+
+  [X.222]  ITU, "Use of X.25 LAPB Compatible Data Link Procedures to
+       Provide the OSI Connection-Mode Data Link Service," ITU-T
+       Recommendation X.222, ITU-T Telecommunication Standardization
+       Sector of ITU, Geneva (April 1995).  (Previously "CCITT
+       Recommendation") <http://www.itu.int/>
+
+  [802.2]  ANSI/IEEE, "IEEE Standard for Information Technology --
+       Telecommunications and Information Exchange Between Systems --
+       Local and Metropolitan Area Networks -- Specific Requirements --
+       Part 2: Logical Link Control," ANSI/IEEE Std. 802.2-1998 [ISO/IEC
+       8802-2 : 1998] [ISBN 1-55937-959-6], IEEE Computer Society, New
+       York (May 7, 1998).
+
+  [ISO/IEC 10028]  ISO, "Information Processing Systems -
+       Telecommunications and Information Exchange between Systems -
+       Definition of the Relaying Functions of a Network Layer
+       Intermeidate System," ISO/IEC 10028 : 1993, International
+       Organization for Standardization (1993).  <http://www.iso.org/>
+
+  [ISO/IEC 10177]  ISO, "Information technlology -- Telecommunications
+       and information excahnge between systems -- Provision of the
+       connection-mode Network internal layer service by intermediate
+       systems using ISO/IEC 8208, the X.25 Packet Layer Protocol,"
+       ISO/IEC 10177 : 1993, International Organization for
+       Standardization (1993).  <http://www.iso.org/>
+
+  [ISO 3309]  ISO/IEC, "Data Communication -- High-Level Data Link
+       Control Procedures -- Frame Structure," ISO/IEC 3309:1988,
+       International Organization for Standardization (1988).
+
+  [ISO 4335]  ISO/IEC, "Data Communication -- High-Level Data Link
+       Control Procedures -- Consolidation of Elements of Procedures,"
+       ISO/IEC 4335:1988, International Organization for Standardization
+       (1988).
+
+  [X.214]  ITU, "Information Technology -- Open Systems Interconnection
+       -- Transport service definition," ITU-T Recommendation X.214
+       [ISO/IEC 8072 : 1996], ITU-T Telecommunication Standardization
+       Sector of ITU, International Organization for Standardization,
+
+B. Bidulock                    Version 0.0                       Page 24
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+       Geneva (November 1995).  (Previously "CCITT Recommendation")
+       <http://www.itu.int/>
+
+  [DLPI]  International, UNIX., Inc., "Data Link Provider Interface
+       (DLPI) Specification," DLPI, UNIX International Press,
+       Parsippany, New Jersey (August 20, 1991).
+       <http://www.openss7.org/doc/dlpi.pdf>
+
+  [X.233]  ITU, "Data Communication Networks -- Information Technology
+       -- Protocol for Providing the Connectionless-mode Network
+       Service: Protocol Specification," ITU-T Recommendation X.233
+       [ISO/IEC 8473-1 : 1993], ITU-T Telecommunication Standardization
+       Sector of ITU, International Organization for Standarization,
+       Geneva (November 1993).  (Previously "CCITT Recommendation")
+       <http://www.itu.int/>
+
+
+Acknowledgements
+
+  The authors would like to thank Greg Satz for leading the way.
+
+Author's Addresses
+
+  Brian Bidulock
+  OpenSS7 Corporation
+  1469 Jeffreys Crescent
+  Edmonton, AB  T6L 6T1
+  Canada
+
+  Phone: +1-780-490-1141
+  Email: bidulock@openss7.org
+  URL: http//www.openss7.org/
+
+
+
+
+  This draft expires November 2008.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                       Page 25
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+
+                            List of Tables
+
+  Table 1. Data Link Service Primitives ...........................    9
+  Table 2. SCTP Primitives ........................................   10
+  Table 3. Mapping of Service Primitives ..........................   11
+  Table 4. SCTP Error mapping to Connection Rejection Reasons .....   17
+  Table 5. SCTP Error mapping to Disconnect Reasons ...............   18
+  Table 6. SCTP Error mapping to Reset Reasons ....................   19
+
+                        List of Illustrations
+
+  Figure 1. Overall XOS Packet Format .............................    7
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  1 Introduction ..................................................    2
+  1.1 Scope .......................................................    2
+  1.1.1 Advantages of XOS over XOT ................................    2
+  1.1.2 Relationship of XOS to XOT ................................    3
+  1.2 Terminology .................................................    4
+  1.3 Abbreviations ...............................................    4
+  2 Conventions ...................................................    5
+  3 Overview ......................................................    5
+  3.1 Relationship Between XOS and X.25 ...........................    5
+  3.2 Overall Packet Format .......................................    6
+  3.3 SCTP Association, Port Number, and Logical Channel
+    Identifiers ...................................................    6
+  3.4 Service Interfaces ..........................................    8
+  4 XOS Service Definition ........................................   10
+  4.1 DL-CONNECT ..................................................   11
+  4.2 DL-DATA .....................................................   12
+  4.3 DL-RESET ....................................................   12
+  4.4 DL-DISCONNECT ...............................................   12
+  5 XOS Packets ...................................................   12
+  5.1 Transmission of XOS Packets .................................   13
+  5.2 Reception of XOS Packets ....................................   14
+  6 XOS Procedures ................................................   14
+  6.1 SCTP Association Setup and Clearing .........................   14
+  6.2 Virtual Circuit Setup and Clearing ..........................   14
+  6.3 Interrupt, and Reset Packets ................................   15
+  6.4 Restart, DTE Reject, Diagnostics, and Registration ..........   15
+  7 Reason Codes ..................................................   16
+  7.1 Connection Rejection Reasons ................................   16
+  7.2 Disconnect Reasons ..........................................   17
+  7.3 Reset Reasons ...............................................   19
+  Notes for Section 7 .............................................   20
+  8 Quality of Service ............................................   20
+  Notes for Section 8 .............................................   21
+  9 Security ......................................................   21
+
+B. Bidulock                    Version 0.0                       Page 26
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+  10 IANA Considerations ..........................................   22
+  10.1 SCTP Payload Protocol ID ...................................   22
+  10.2 SCTP Port Number ...........................................   22
+  Notes for Section 10 ............................................   22
+  0 Change History ................................................   23
+  0.1 Initial Version 0.0 .........................................   23
+  Change Log ......................................................   23
+  Normative References ............................................   23
+  Informative References ..........................................   24
+  Acknowledgements ................................................   25
+  Author's Addresses ..............................................   25
+  List of Tables ..................................................   26
+  List of Illustrations ...........................................   26
+  Table of Contents ...............................................   26
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                       Page 27
+
+Internet Draft            X.25 over SCTP (XOS)               May 7, 2008
+
+Intellectual Property
+
+  The IETF takes no position regarding the validity or scope of any
+  Intellectual Property Rights or other rights that might be claimed to
+  pertain to the implementation or use of the technology described in
+  this document or the extent to which any license under such rights
+  might or might not be available; nor does it represent that it has
+  made any independent effort to identify any such rights.  Information
+  on the procedures with respect to rights in RFC documents can be found
+  in BCP 78 and BCP 79.
+
+  Copies of IPR disclosures made to the IETF Secretariat and any
+  assurances of licenses to be made available, or the result of an
+  attempt made to obtain a general license or permission for the use of
+  such proprietary rights by implementers or users of this specification
+  can be obtained from the IETF on-line IPR repository at
+  http://www.ietf.org/ipr.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights that may cover technology that may be required to implement
+  this standard.  Please address the information to the IETF at ietf-
+  ipr@ietf.org.
+
+Disclaimer of Validity
+
+  This document and the information contained herein are provided on an
+  "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+  OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+  THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+  OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+  THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Full Copyright Statement
+
+  Copyright (C) The IETF Trust (2008).  This document is subject to the
+  rights, licenses and restrictions contained in BCP 78, and except as
+  set forth therein, the authors retain all their rights.
+
+Acknowledgement
+
+  Funding for the RFC Editor function is currently provided by the
+  Internet Society.
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                       Page 28
+

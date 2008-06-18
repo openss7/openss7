@@ -1,0 +1,347 @@
+
+
+Format Command Response Encoding
+  I    I       -        0 N(S)  P  N(R)                1-byte
+
+  S    RR      RR       1 0 0 0 PF N(R)                1-byte
+  S    RNR     RNR      1 0 1 0 PF N(R)                1-byte
+  S    REJ     REJ      1 0 0 1 PF N(R)                1-byte
+
+  I    I       -        0 N(S)          P   N(R)       2-byte
+  S    RR      RR       1 0 0 0 0 0 0 0 P/F N(R)       2-byte
+  S    RNR     RNR      1 0 1 0 0 0 0 0 P/F N(R)       2-byte
+  S    REJ     REJ      1 0 0 1 0 0 0 0 P/F N(R)       2-byte
+
+  I    I       -        0 N(S)               P   N(R)  4-byte
+
+  S    RR      RR       1 0 0 0 0 0 0 0 0... P/F N(R)  4-byte
+  S    RNR     RNR      1 0 1 0 0 0 0 0 0... P/F N(R)  4-byte
+  S    REJ     REJ      1 0 0 1 0 0 0 0 0... P/F N(R)  4-byte
+
+  U    SABM    -        1 1 1 1 P 1 0 0                1-byte
+  U    SABME   -        1 1 1 1 P 1 1 0                1-byte
+  U    SM      -        1 1 0 0 P 0 1 1                1-byte
+  U    DISC    -        1 1 0 0 P 0 1 0                1-byte
+  U    -       FRMR     1 1 1 0 F 0 0 1                1-byte
+  U    -       UA       1 1 0 0 F 1 1 0                1-byte
+  U    -       DM       1 1 1 1 F 0 0 0                1-byte
+
+
+
+2.4.4  Procedures for link set-up and disconnection
+
+2.4.4.1  Link set-up
+
+The STE will indicate that it is able to set up the link by transmitting
+contiguous flags (active channel state).
+
+Either STE may initialize the link by sending SABM/SABME/SM (modulo 8/modulo
+128/modulo 32768) and starting timer T1 in order (sic) to determine when too
+much time has elapsed waiting for a reply.  The opposite STE upon receiving
+SABM/SABME/SM correctly, sends UA and resets both its state variables to 0.
+If UA is received correctly, then the link is set up and the initiating STE
+resets both its state variables to 0 and stops Timer T1.
+
+If, upon receipt of SABM/SABME/SM correctly, the STE determines that it cannot
+enter the indicated phase, it sends the DM response.
+
+When receiving the DM response, the STE which has transmitted an SABM/SABME/SM
+stops its Timer T1 and does not enter the information transfer phase.
+
+The STE sending SABM/SABME/SM will ignore and discard any frames except
+SABM/SABME/SM, DISC, UA and DM from the other STE.
+
+Frames other than UA and DM ins response to a received SABM/SABME/SM will be
+sent only after the link is set up and if no outstanding SABM/SABME/SM exits.
+
+If an SABM/SABME/SM or DISC command, UA or DM response is not received
+correctly, the result will be that the Timer T1 will run out in the STE that
+originally send the SABM/SABME/SM and that the STE may resend SABM/SABME/SM
+and restart Timer T1.
+
+After transmission of SABM/SABME/SM N2 times by the STE, appropriate action
+will be initiated.
+
+The value of N2 is defined in 2.4.9.4.
+
+
+2.4.4.2  Information transfer phase
+
+After having transmitted the UA response to the SABM/SABME/SM command or
+having received the UA response to a transmitted SABM/SABME/SM command, the
+STE will accept and transmit I and supervisory frames according tot he
+procedures described in 2.4.5.
+
+When receiving an SABM/SABME/SM (modulo 8/modulo 128/modulo 32768) command
+while in the information transfer phase, the STE will conform to the resetting
+procedure described in 2.4.8.
+
+
+2.4.4.3  Link disconnection
+
+During the infromation transfer phase, either STE shall indicate a request for
+disconnecting the link by transmitting a DISC command, and it shall start
+Timer T1 (see 2.4.9.1).
+
+The STE, on correctly receiving a DISC command, will send a UA response and
+enter the disconnected phase.  The STE on receiving a UA or DM response to a
+sent DISC command, stops its timer, and enteres the disconnected phase.  If a
+UA or DM response is not received correctly, this will result in the
+expiration of the Timer T1 in the STE that originally send the DISC command.
+If Timer T1 runs out, this STE will retransmit a DSIC command and restart
+Timer T1.  This action will continue until a UA response or a DM response is
+correctly received or until recovery takes place at a higher layer after
+transmission of a DISC N2 timers.  The value of N2 is defined in 2.4.9.4.
+
+
+2.4.4.4  Disconnected phase
+
+2.4.4.4.1  After having received a DISC command and returned a UA reponse, or
+having received the UA response to a transmitted DISC command, the STE will
+enter the disconnected phase.
+
+In the disconnected phase, the STE may initiate link set-up.  In the
+disconnected phase, the STE will react to the receipt of an SABM/SABME/SM
+commect as described in 2.4.4.1, will react to the receipt of an unsolicited
+DM response in accordance with 2.3.4.9 and will transmit a DM response in
+answer to a received DISC command.
+
+When receiving any other command frame (defined, or undefined or not
+implemented), with the P bit set to 1, the STE will transmit a DM response
+with the F bit set to 1.  Other frames received in the disconnected phase will
+be ignored.
+
+2.4.4.4.2  After recovery from an internal malfunction, the STE may either
+initiate a resetting procedure (see 2.4.8) or disconnect the link (see
+2.4.4.3) prior to a link set-up procedure (see 2.4.4.1).
+
+
+2.4.4.5  Collision of unnumbered commands
+
+Collision situations shall be resolved in the following way.
+
+2.4.4.5.1  If the send and received unnumbered commands are the same, each STE
+shall send the UA response at the earliest possible opportunity.  Each STE
+shall enter the indicated phase after receiveing a UA response.
+
+2.4.4.5.2  If the send and received unnumbered commands are different, each
+STE shall enter the disconencted phase and issue a DM response at the earliest
+possible opportunity.
+
+
+2.4.5  Procedures for information transfer when not using multi-selective
+reject option
+
+The procedures that apply to the transmission of I frames in each direction
+during the information transfer phase are described below.
+
+In the following, "number one higher" is in reference to a continuously
+repeated sequence series, i.e. 7 is 1 higher than 7 and 0 is 1 higher than 7
+for modulo 8 series, and 127 is 1 higher than 126 and 0 is 1 higher than 127
+for modulo 128 series, and 32767 is 1 higher than 32766 and 0 is 1 higher than
+32767 for modulo 32768 series.
+
+
+2.4.5.1  Sending I Frames
+
+When the STE has an I frame to transmit (i.e. an I frame not already
+transmitted, or having to be retransmitted as described in 2.4.5.6), it will
+transmit it with an N(S) equal to its current send state variable V(S), and an
+N(R) equal to its current receive state variable V(R).  At the end of the
+transmission of the I frame, it will increment its send state variable V(S) by
+1.
+
+If the Timer T1 is not running at the time of transmission of an I frame, it
+will be started.
+
+If the send state variable V(S) is equal to the last value of N(R) received
+plus 'k' (where 'k' is the maximum number of outstanding I frames, see
+2.4.9.6) the STE will not transmit any new I frames, but may retransmit an I
+frame as described in 2.4.5.6 or 2.4.5.9.
+
+When the STE is in a busy condition, it may still transmit I frames provided
+that the other STE is not busy.  When in the frame rejection condition, the
+STE will stop transmitting I frames.
+
+
+2.4.5.2  Receving an I frame
+
+2.4.5.2.1  When the STE is not in a busy condition and received a valid I
+frame whose send sequence number N(S) is equal to the STE receive state
+variable V(R), the STE will accept the information field of this frame,
+increment by one its received state variable V(R), and act as follows:
+
+	a)  If the STE is still not in a busy condition:
+
+	    i)   If an I frame is available for transmission by the STE, it
+	         may act as in 2.4.5.1 and acknowledge the received I frame by
+		 setting N(R) in the control field of the next transmitted I
+		 frame to the value of the STE received state variable V(R).
+		 The STE may also acknowledge the received I frame by
+		 transmitting an RR with the N(R) equal to the value of the
+		 STE receive state variable V(R).
+
+	    ii)  If no I frame is available for transmission by the STE, it
+	         will transmit an RR with the N(R) equal to the value of the
+		 STE receive state variable V(R).
+
+	b)  If the STE is now in a busy condition, it will transmit an RNR
+	    frame with N(R) equal to the value of the STE receive state
+	    variable V(R) (see 2.4.5.8).
+
+2.4.5.2.2  When the STE is in a busy condition, it may ignore the information
+field contained in a received I frame.
+
+
+2.4.5.3  Reception of invalid frames
+
+When the STE receives an invalid frame (see 2.3.5.3), this frame will be
+discarded.
+
+
+2.4.5.4  Receiption of out-of-sequence I frames
+
+When the STE receives a valid I frame whose send sequence number is incorrect,
+i.e., not equal to the current STE receive state variable V(R), it will
+discard the information field of the frame and transmit an REJ frame with the
+N(R) set to one higher than the NS() of the last correctly received I frame.
+The REJ frame will be a command frame with the P bit set to 1 if an
+acknowledged transfer of the restransmission request is required; otherwise
+the REJ frame may be either a command or a response frame.  The STE will then
+discard the information field of all I frames received until the expected I
+frame is correctly received.  WHen receiving the expected I frame, the STE
+will then acknowledge the I frame as described in 2.4.5.2.  The STE will use
+the N(R) and P bit information in the discard I frames, as described in
+2.3.5.2.
+
+
+2.4.5.5  Receving acknowledgement
+
+When correctly receiving an I frame or a supervisory frame (RR, RNR, REJ),
+even in the busy condition except in the frame rejection condition, the STE
+will consider the N(R) contained in this frame as an acknowledgement fro all I
+frames it has transmitted with an N(S) up to and including the receive N(R) -
+1.  The STE will stop Timer T1 when it correctly receives an I frame or a
+supervisory frame with the N(R) higher than the last received N(R) (actually
+acknowledging some I frames), or an REJ frame with an N(R) equal to the last
+received N(R).
+
+If Timer T1 has been reset and if there are outstanding I frames still
+unacknowledged, Timer T1 will be restarted.  If Timer T1 then runs out, the
+STE will follow the retransmission procedure (in 2.4.5.9) with respect to the
+unacknowledged I frames.
+
+
+2.4.5.6  Receiving an REJ frame
+
+When receiving an REJ frame, the STE will set its send state variable V(S) to
+the N(R) received in the REJ control field.  It will transmit the
+corresponding I frame as soon as it is available or retransmit it in
+accordance with the procedures described in 2.4.5.1. (Re)transmission will
+conform to the following procedure:
+
+	i)   If the STE is transmitting a supervisory command or response when
+	     it receives the REJ frame, it willc omplete that transmission
+	     before commencing transmission of the requested I frame.
+
+	ii)  If the STE is transmitting an unnumbered command or response when
+	     it receives the REJ frame, it will ignore the request for
+	     retransmission.
+
+	iii) If the STE is transmitting an I frame when the REJ frame is
+	     received, it may abort the I frame and commence transmission of
+	     the requested I frame immediately after abortion.
+
+	iv)  If the STE is not transmitting any frame when the REJ frame is
+	     received, it will commence transmission of the requested I frame
+	     immediately.
+
+In all cases, it other unacknowle3dged I frames have already been transmitted
+following the one indicated in the REJ frame, then those I frames will be
+retransmitted by the STE following the retransmission of the requested I
+frame.  Other I frames not yet transmitted may be transmitted following the
+restransmitted I frames.
+
+If the REJ frame was received from the other STE as a command with the P bit
+set to 1, the STE will retransmit an RR, RNR or REJ response with the F bit
+set to 1 before transmitting or retransmitting the corresponding I frame.
+
+
+2.4.5.7  Receiving an RNR frame
+
+After receiving an RNR frame whose N(R) acknowledges all frames previously
+transmitted, the STE will stop Timer T1 and may then transmit an I frame, with
+the P bit set to 0, whose send sequence number is equal to the N(R) indicated
+in the RNR frame, resarting the Timer T1 as it does.  After receiving an RNR
+frame whose N(R) indicates a previously transitted frame, the STE will not
+transmit or retransmit any I frame, Timer T1 being already running.  In
+neither case, if the Timer T1 runs out before receipt of a busy clearance
+indicaiton, the STE will follow the procedures described in 2.4.5.9.  In any
+case, the STE will not transmit any other I frames before receiving an RR or
+REJ frame or before the completion of a link resetting procedure.
+
+
+2.4.5.8  STE busy condition
+
+WHen the STE enters a busy condition, it will transmit an RNR frame at the
+earliest opportunity.  The RNR frame will be a command frame with the P bit
+set to 1 if an acknowledged trasnfer of the busy condition indication is
+required; otherwise the RNR frame may be either a command or response frame.
+While in the busy condition, the STE will accept and process supervisory
+frames, will accept and process the contents of the N(R) fields of I frames,
+and will return an RNR response with the F bit set to 1 if it receives a
+supervisory command or I command frame with the P bit set to 1.  To clear the
+busy condition, the STE will transmit either a REJ frame or an RR frame, with
+N(R) set to the current receive variable V(R), depending on whether or not it
+dsicarded information fields of correctly received I frames.  The REJ frame or
+the RR frame will be a command frame with the P bit set to 1 if an acknowedged
+transfer of the busy-to-non-busy transition is required, otherwise, the REJ
+frame or the RR frame may be either a command or a response frame.
+
+
+2.4.5.9  Waiting acknowledgement
+
+If Timer T1 runs out waiting for the acknowlegement from the other STE for an
+I frame trasnmitted, the STE will enter the timer recovery condition, add one
+to its tranmission attempt variable and set an internal variable "x" to the
+current value of its send state variable V(S).  The STE will then restart
+Timer T1, set it send state vairable to the last value of N(R) received from
+the other STE and retransmit the corresponding I frame with the P bit set to
+1, or transmit an appropriate supervisory command frame (RR, RNR or REJ) with
+the P bit set to 1, or transmit an appropriate supervisory command frame (RR,
+RNR or REJ) with the P bit set to 1.
+
+The timer recovery condition is clread when the STE received a valid
+supervisory farme with the F bit set to 1.
+
+If, while in the timer recovery condition, the STE correctly receives a
+supervisory frame with the F bit set to 1 and with the N(R) within the range
+from its current send state variable V(S) to "x" including, it will clear the
+timer recovery condition (including stopping Timer T1) and set its state
+variable V(S) to the value of the received N(R), and may then resume with I
+frame transmission or retransmissions, as appropriate.
+
+If, while in the timer recovery condition, the STE correctly receives an I
+frame or a supervisory frame with the P/F bit set to 0 and with a valid N(R)
+(see 2.3.4.9) within the range from it current send state variable V(S) to "x"
+included, it will not clear the timer recovery condition.  The value of the
+received N(R) may be used to update the send state variable V(S).  However,
+the STE may decide to keep the last transmitted I frame in store (even if it
+is acknowledged) in order to be able to retransmit it with the P bit set to 1
+when Timer T1 runs out at a later time.
+
+If Timer T1 runs out in the timer recovery conditoin, the STE will add one to
+its transmission attempt variable, restart Timer T1, and either retransmit the
+I frame sent with the P bit set to 1 or transmit an appropriate supervisory
+command with the P bit set to 1.
+
+If teh transmission attempt variable is equal to N2, the STE will initiate a
+link resetting procedure as described in 2.4..2  N2 is a system parameter (see
+2.4.9.4).
+
+
+2.4.6  Procedures for information transfer when using the multi-selective
+reject option
+
+The procedures
+

@@ -1,0 +1,274 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ifrdlciconf.5.man,v 0.9.2.1 2008-06-13 06:43:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ifrdlciconf.5.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:53  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH IFRTEMPLATE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B ifrdlciconf
+\- Frame Relay DLCI File Format
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ifrdlciconf
+describes the file format for input to the
+.BR ifrdlci (8)
+command for IP over Frame Relay.
+The file format consists of a number of parameter values, one per line,
+formated as described below.  Each parameter value is described using its line
+number in the file, a parameter name, and a description of the format of the
+value.  Only the value appears in the file, each value on a line by itself, one
+value per line.
+.PP
+Each of the IP over Frame Relay configuration parameters corresponds to the
+member and values of the
+.B ifr_dlci
+structure, that is carried in the
+.BR IFR_ADD ", " IFR_GET ", " IFR_DEL
+input-output controls.
+.PP
+These protocol parameters, and the default values that exist when tuning has
+not been applied to a newly created Frame Relay subnetwork VC, correspond
+directly to the protocol parameters and defaults in
+Q.922
+.[
+q922
+.]
+and Q.933.
+.[
+q933
+.]
+.\"
+.\"
+.SH FORMAT
+.PP
+The IFR template consists of 6 or more lines containing the following configuration
+information:
+.IP 1. \w'00.\(em'u
+.B CIR
+(Committed Information Rate)
+is the committed rate at which Frame Relay transfers information to the remote under normal
+conditions, averaged over the interval \*(lq\fBT\fP\*(rq, where
+\*(lq\fBT\fP\*(rq is calculated as the quotient of \fBBc\fP and \fBCIR\fP.  The value is a decimal
+number in units of bits per second.
+.IP 2.
+.B Bc
+(Committed Burst Size)
+is the maximum burst of committed data that Frame Relay transfers to the remote under normal conditions,
+during time interval \*(lq\fBT\fP\*(rq, where
+\*(lq\fBT\fP\*(rq is calculated as the quotient of \fBBc\fP and \fBCIR\fP.  The value is a decimal
+number in units of bits.
+.IP 3.
+.B Be
+(Excess Burst Size)
+is the maximum burst of uncommitted data, in excess of \fBBc\fP, that Frame Relay attempts to
+tranfer under exceptional conditions, during time interval \*(lq\fBT\fP\*(rq, where
+\*(lq\fBT\fP\*(rq is calculated as the quotient of \fBBc\fP and \fBCIR\fP.  The value is a decimal
+number in units of bits.
+.IP 4.
+.B DELAY
+(End-to-End Transit Delay)
+is the on-way transit delay for Frame Relay information transfers, including the processing time at
+both local and remote stations, under normal conditions.  The value is an integral decimal number in
+units of milliseconds.
+.IP 5.
+.B STEPCOUNT
+is a value used by IFR when transmitting frames to increase or reduce the CIR.  When IFR receives
+this number of consecutive frames with the BECN bit set, it reduces the CIR to the next step rate
+below the current offered rate.  When it receives half this number of consecutive frames with the
+BECN bit clear, it increases its CIR.  The value is a decimal number in units of frames, with a
+minimum of two (2) frames.  The default value is eigth (8) frames.
+.IP 6.
+.B FLOWSTYLE
+specifies the type of congestion control used by IFR.  This can be one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+c1c1l.
+0x01:\-:FECN
+0x02:\-:BECN
+0x04:\-:CLLM
+.TE
+.RE
+.\"
+.\"
+.SH FILES
+.PP
+Files following this format are normally kept in the
+.B @configdir@/@PACKAGE@/template/
+directory.
+.PP
+(Note that this directory varies depending on whether the build was on a
+.BR dpkg (1)-based
+or
+.BR rpm (1)-based
+system.)
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ifrdlci (8),
+.BR ifr (4),
+.BR x25netd (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ifrdlciconf
+file format is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+For additional compatibiltiy information see,
+.BR ifrdlci (8),
+.BR ifr (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B ifrdlciconf
+file format first appeared in
+.IR "Spider Frame Relay" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

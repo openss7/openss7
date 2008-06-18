@@ -1,0 +1,799 @@
+
+5.4.1.1.2  Exchange Identification (XID) command
+
+The XID command PDU shall be used to convey the types of LLC services
+supported (for all LLC services) and the receive window size of a per data
+link connection basis to the destination LLC, and to cause the destination LLC
+to respond with the XID response PDU (see 5.4.1.2.1) at the earliest
+opportunity.  The XID command PDU shall have either an individual, group,
+global, or null address as the destination DSAP address and a null address or
+the originator's individual address as the SSAP address.
+
+The informatoin field of an XID LLC basic format command PUD shall consist of
+an 8-bit XID format identifier field plus a 16-bit parameter field, as shown
+in figure 11.  The parameter field is encoded to identify the LLC services
+supported plus the XID sender's receive window size (RW).
+
+The XID receiver should set its transmit window, 'k', to a value less than or
+equal to the receive window of the XID sender, to avoid overrunning the XID
+sender.
+
+NOTE -- Other uses of the XID PDU are for further study.  In particular, the
+use of an unsolicited XID response PDU to announce the presence of a new LLC
+will be examined.
+
+
+5.4.1.1.3  Test (TEST) command
+
+The TEST command PDU shall be used to cause the destination LLC to respond
+with the TEST response PDU (see 5.4.1.2.2) at the earliest opportunity, thus
+performing a basic test of the LLC to LLC transmission path.  An information
+field is optional with the TEST command PDU.  If present, however, the
+received information field shall be returned, if possible, by the addressed
+LLC in the TEST response PDU.  The TEST command PDU shall have no effect on
+any mode or sequence numbers maintained by the remote LLC and may be used with
+an individual, group, gobal, or null DSAP address with an individual or null
+SSAP adress, and with an individual group, or global DA address.
+
+
+5.4.1.2  Type 1 operation responses
+
+The U-format PDU response encodings for Type 1 operation are liseted in figure
+12.
+
+
+    Least significant bit of control field delivered to/received from the
+    | MAC sublayer
+    |
+    1 2 3 4 5 6 7 8
+
+    1 1 1 1 F 1 1 1   XID response
+    1 1 0 0 F 1 1 1   TEST response
+
+    Figure 12--Type 1 operation response control field bit assigments
+
+5.4.1.2.1  Exchange Identification (XID) response
+
+The XID response PDU shall be used to reply to an XID command PDU at the
+earliest opportunity.  The XID reponse PDU shall identify the responding LLC
+and shall include an information field like that defined for the XID command
+PDU (see 5.4.1.1.2), regardless of what information is present in the the
+information field of the received XID command PDU.  The XID response PDU shall
+use an individual or null DSAP address and shall use an individual or null
+SSAP address.  The XID response PDU shall have its F bit set to the state of
+the P bit in the XID command PDU.
+
+5.4.1.2.2  Test (TEST) response
+
+The TEST response PDU shall be used to reply to the TEST command PDU.  The
+TEST response PDU sahll have its F bit set to the value of the P bit in the
+TEST command PDU.  An information field, if present in the TEST command PDU,
+shall be returned in the corresponding TEST response PDU.  If the LLC cannot
+accept an information field (e.g., buffering limitation), a TEST response PDU
+without an information filed may be returned.  Refer to 6.7 for specific
+details on TEST response usage.  The LLC sends a TEST response PDU, using the
+SSAP address of the TEST command PDU as the DSAP address of the TEST response
+PDU, and with an individual or null SSAP address selected by the DSAP address
+of the TEST command PDU.
+
+
+6  LLC description of the Type 1 procedures
+
+6.1  Mode of operation
+
+In Type 1 operation, no modes of operation are defined.  An LLC sublayer using
+Type 1 procedures shall support the entire procedure set whenever it is
+operational on the local area network.
+
+6.2  Procedures for addressing
+
+The address fields shall be used to indicate the source (SSAP) and destination
+(DSAP) of the LLC PDU.  The least significant bit in the source address field
+(SSAP) shall be used to identify whether a command or a response is contained
+in the PDU.  Individual, group, global, and null addressing shall be supported
+for destination DSAP addresses.  The source address field (SSAP) shall contain
+either an individual or null source address (see 3.3.1.2).
+
+6.3  Procedure for the use of the P/F bit
+
+A UI command PDU shall only be sent with the P bit set to "0".  If a UI
+command PDU is received with the P bit set to "1", the LLC sublayer shall
+optionally discard it or pass it to the higher layer with a flag identifying
+that the P bit was set to "1".  Since a UI PDU shall not be sent as a response
+PDU, procedure regarding the use of the F bit do not apply.
+
+An XID command PDU shall have the P bit set to either "0" or "1".  Upon
+receipt of an XID command PDU, the receiving LLC sublayer shall return an XID
+response PDU that has the F bit set equal to the value of the P bit contains
+in the incoming command PDU.
+
+A TEST command PDU shall have the P bit set to either "0" or "1".  Upon
+receipt of a TEST command PDU, the receiving LLC sublayer shall return a TEST
+response PDU that has the F bit set equal to the value of the P bit contained
+in the incoming command PDU.
+
+6.4  Procedures for logical data link setup and disconnection
+
+Type 1 operation does not require any prior data link connection establishment
+(setup), and hence no data link disconnection.  Once the service access point
+has been enabled within the LLC sublayer, presumably by layer maangeemnt's
+request, information may be sent to, or received from, a remote LLC sublayer
+SAP that is also participating in Type 1 operation.
+
+6.5  Procedures for information transfer
+
+6.5.1  Sending UI PDUs
+
+Information transfer shall be accomplished by sending the UI command PDU with
+the P bit set to "0".  Sending UP PDUs with the P bit set to "1" or as a
+response PDU is prohibited.  It shall be possible to send the UI command PDU
+at any time.
+
+6.5.2  Receiving UI PDUs
+
+Reception of the UI command PDU shall not be acknowledged or sequence number
+verified by the logical data link procedures; therefore, the UI PDU may be
+lost if a logical data link exception occurs during the sending of the command
+PDU.  It shall be possible to receive a UI command PDU at any time.  However,
+local conditions at the receiver may result in the discarding of valid UI
+command PDUs by the receiving LLC.  UI command PDUs that are received with the
+P bit set to "1" shall optionally be discarded or passed to the higher layer
+with a flag identifying that the P bit as set to "1".
+
+UI PDUs that are response PDUs are invalid transmissions and shall be
+discarded by the receiving LLC.
+
+
+6.6  Uses of the XID command PDU and response PDU
+
+While the response to an XID command PDU shall be mandatory, the origination
+of an XID command PDU shall be optional.  It shall be possible for the XID
+capabilities to be used as part of some network control functions.  As such,
+an XID command PDU may be sent on direction from a higher layer function, an
+administration function having access to the data link layer, or an automatic
+start-up function.  However, it shall also be possible for a more capable
+implementation of LLC to incorporate the use of the XID function directly to
+make more efficient use of the protocol.
+
+Some possible uses of the XID capabilities include:
+
+    1)	The XID command PDU with a null DSAP and a null SSAP is a way to
+	solict a response from any station (i.e., any DA).  As such it
+	represents a basic "Are You There?" test capability.
+
+    2)	The XID command PDU with a group DA or group DSAP address can be used
+	to determine the group membership.  In particular, the XID command PDU
+	with a global DA address can identify all active stateions.
+
+    3)	A duplicate address check can be made (see table 1).
+
+    4)	For Class II LLCs in ABM, an XID echange can be used to identify the
+	receive windosw size at each LLC for that data link.
+
+	NOTE -- The use of an XID exchange for this purpose is not valid in
+		the asynchronous disconnected mode (ADM) state.
+
+    5)  An XID exchange with a null DSAP and a null SSAP can identify the
+	class of each LLC.
+
+    6)	An XID exchange with  a specific DSAP and a specific SSAP can identify
+	the service types supported by those service access points.
+
+    7)	An LLC can announce its presence with a global DA address in an XID
+	PDU.
+
+
+6.7  Uses of the TEST command PDU and response PDU
+
+The TEST function provides a facility to conduct loopback tests of the LLC to
+LLC transmission path.  The initiation of the TEST function may be caused by
+an administration or management entity within the data link laeyer.
+Successful completion of the test consists of sending a TEST command PDU with
+a particular information field provided by this adminstration or management
+entity to the designated destination LLC address and receiving, in return, the
+identical information field in a TEST response PDU.  Implementation of the
+TEST command PDU is optional but every LLC must be able to response to a
+received TEST command PDU with a TEST response PDU.  The length of the
+information field is variable from 0 to the largest size specified  that each
+LLC on this local area network must support for normal data transfer.
+
+It shall also be possible to send even larger information fields with the
+following interpretations.  If the receiving LLC can successfully receive and
+return the larger information field, it will do so.  If it cannot receive the
+entire information field but the MAC can detect a satisfactory FCS, the LLC
+shall discard the portion of the information field received, and may return a
+TEST response PDU with no information field.  If the MAC cannot properly
+compute the FCS for the overlength information fields, the LLC shall discard
+the portion of the information field received, and shall give no response.
+Any TEST command PDU received in error shall be discarded and no response PDU
+sent.  In the event of failure, it shall be the responsibility of the
+adminstration or managemetn entity that ininitated the TEST function to
+determine any future actions.
+
+6.8 List of logical data link parameters
+
+A number of logical data link parameters are defined, the range of values for
+which are determined on a system-by-system basis by the user at the time that
+the local area network is established.
+
+The logical data link parameters for Type 1 operation shall be as follows:
+
+6.8.1  Maximum number of octets in a UI PDU
+
+Refer to the appropriate MAC protocol specification for any limitation on the
+maximum number of octets in a UI PDU.  No restrictions are imposed by the LLC
+sublayer.  However, in the intererest of having a valud that all users of Type
+1 LLC may depend upon, all MACs must at least be capable of accomodating UI
+PDUs with information fields up to and including 128 octets in length.
+
+6.8.2  Minimum number of octets in a PDU
+
+The minimum length valid PDU shall contain exactly two service access point
+address fields and one control field in that order.  Thus the minimum number
+of octets in a valid Type 1 PDU shall be 3.
+
+
+
+
+
+
+
+
+
+
+7.4  Procedures for data link setup and disconnection
+
+7.4.1  Data link connection phase
+
+Either LLC may be able to initialize the data link connection.
+
+When the LLC wishes to intitialize the link, it shall send the SABME command
+PDU and start the acknowledgement timer (see 7.8.1 below).  Upon reception of
+the UA response PDU, the LLC shall have reset both its send and receive state
+variables V(S) and V(R) to 0 for the corresponding data link connection, shall
+stop its acknowelgement timer, and shall enter the information transfer phase.
+
+When receiving the DM response PDU, the LLC that originated the SABME command
+PDU shall stop its acknowledgement timer, shall not enter the information
+transfer pahse, and shall report to the higher layer for appropriate acktion.
+
+For a description of the actions to be followed upon receipt of a SABME or
+DISC command PDU, see 7.4.5.  Other Type2 PDUs received (commands and
+responses) while attempting to connect shall be ignored by the LLC.
+
+Should the acknowelgement timer run out before reception of the UA or DM
+response PDU, the LLC shall resend the SABME command PDU and restart the
+acknowledgement timer.  After resending the SABME to the higher layer for the
+appropriate error recovery action to intitiate.  The value of N2 is defined in
+7.8.2 below.
+
+When receiving a SABME command PDU, the LLC shall pass the indicaiton to the
+newtork layer to indicate that an establishment of the data link conection is
+being requested from the remote LLC.
+
+Thereafter, if the LLC receives a notification from the network layer to
+accept the connection, it shall reutrn a UA response PDU to the remote LLC and
+set both its send and receive state variables V(S) and V(R) to 0 for the
+corresponding data link connection and enter the information transfer phase.
+The return of the UA response PDU shall take precedence over any other
+response PDU for the same data link connection that may be pending at the LLC.
+It shall be possible to follow the UA response PDU with additional LLC PDUs,
+if pending.
+
+If the LLC receives a notificaiton from the network layer not to enter the
+indicated phase, it shall return a DM response PDU to the remote LLC and
+remain in the link disconnected mode.
+
+7.4.2  Information transfer phase
+
+After having sent the UA response PDU to a SABME command PDU or having
+received the UA reponse PDU to a sent SABME command PDU, the LLC shall be able
+to accept or send, or both, I-format and S-format PDUs according to the
+procedures described in 7.5 below.
+
+When receiving a SABME command PDU whil in the informaion transfer phase, the
+LLC shall conform to the restting procedure described in 7.6.
+
+7.4.3  Data link disconnection phase
+
+During the information transfer phase, either LLC shall be able to initiate
+disconnecting of the data link connection by sending a DISC command PDU.
+
+When the LLC wishes to disconnect the data link ocnnection, it shall send the
+DISC command PDU and start the acknoweldgement timer (see 7.8.1).  Upon
+receiption of the UA or DM response PDU from the remote LLC, the LLC shall
+stop its acknowledgement timer and enter the link disconnected mode.
+
+Should the acknowledgement timer run out before reception of the UA or DM
+response PDU, the LLC shall resend the DISC command PDU and restart the
+acknowledgment timer.  After sending the DISC command PDU N2 times, the
+sending LLC shall stop sending the DISC command PDU, shall enter the data link
+disconnected phase, and shall report to the higher layer for the appropriate
+error recovery action to initiate.  The value of N2 is defined in 7.8.2.
+
+When receiving a DISC command PDU, the LLC shall return a UA response PDU and
+enter the data link disconnected phase.  The return of the UA response PDU
+shall take precedence over any other response PDU for the same data link
+connection that may be pending at the LLC.
+
+
+7.4.4  Data link disconnected phase
+
+After having received a DISC command PDU from the remote LLC and returned a UA
+response PDU, or having received the UA response PDU to a sent DISC command
+PDU, the LLC shall enter the data link disconnected phase.
+
+In the disconnected phase, the LLC shall be able to initiate data link
+connectoin.  In the disconnected phase, the LLC shall react to the receipt of
+a SABME command PDU as described in 7.4.1 above and shall send a DM response
+PDU in answer to a received DISC command PDU.
+
+When receiving any other Type 2 command PDU with the P bit set to "1" in the
+disconnected phase, the LLC sahll send a DM response PDU with the F bit set to
+"1".  Other Type 2 PDUs received in the disconnected phase shall be ignored by
+the LLC.
+
+
+7.4.5  Contention of unnumbred mode setting command PDUs
+
+A contention situation in an LLC shall be resolved in the following way.
+
+If the send and received mode setting command PDUs are the same, each LLC
+shall send the UA reponse PDU at the earliest opportunity.  Each LLC shall
+enter the indicated phase either after receiving the UA respones PDU, or after
+its acknowledgement timer expires.
+
+If the send and received mode setting command PDUs are different, each LLC
+shall enter the data link disconnected phase and shall issue a DM response DPU
+at the earliest opportunity.
+
+
+7.5  Procedures for information transfer
+
+The procedrues that apply to the transfer of I PDUs in each direction on a
+data link connection during the information transfer phase are described
+below.
+
+In the following, "number one higher" is in reference to a continuously
+repeated sequence series, i.e., 127 is one higher than 126 and 0 is one higher
+than 127 for modulo 128 series.
+
+
+7.5.1  Sending I PDUs
+
+When the LLC has an I frame to send (i.e., and (sic) I PDU not already sent,
+or having to be resent as described in 7.5.5 below), it shall send the I PDU
+with an N(S) equal to its current send state variable V(S), and an N(R) equal
+to its current received state variable V(R) for that data link connection.  At
+the end of sending the I PDU, the LLC shall increment its send state variable
+V(S) by one.
+
+If the acknowledgement timer is not running at the time that an I PDU is sent,
+the acknowledgement timer shall be started.
+
+If the data link connection send state variable V(S) is equal to the last
+value of N(R) received plus 'k' (where 'k' is the maximum number of oustanding
+I PDUS, see 7.8.4) the LLC shall not send any new I PDUs on that data link
+connection, but shall be able to resend an I PDU as described in 7.5.6 or
+7.5.9.
+
+When a local LLC data link connection is in the busy condition, the LLC shall
+still be able to send I PDUs provided that the remote LLC on this data link
+connection is not busy itself.  When the LLC for a particular data link
+connection is in the FRMR exception condition, it shall stop transmitting I
+PDUs on that data link connection.
+
+
+7.5.2  Receiving an I PDU
+
+When the LLC data link connection is not in a busy condition and receives an I
+PDU whose send sequence number is equal to the receive state variable V(R),
+the LLC shall accept the information field of this PDU, increment by one it
+receives tstate variable V(R), and act as follows:
+
+    1)  If an I PDU is available to be sent, the LLC shall be able to act as
+	in 7.5.1 above and acknowlege the received I PDU by setting N(R) in
+	the control field of the next sent I PDU to the value of the receive
+	state variable V(R).  The LLC shall also be able to acknowledge the
+	received I PDU by sending an RR PDU with the N(R) equal to the value
+	of the receive state variable V(R).
+
+    2)  If no I PDU is available to be sent by the LLC, then the LLC shall
+        either
+
+	a)  Send an RR PDU with the N(R) equal to the value of the receive
+	    state variable V(R) at the earliest opportunity; or
+
+	b)  If the received PDU was not a command PDU with the P bit set to
+	    "1", wait for some period of time bounded by the probability of
+	    the remote acknowledgement timer expiry, for either an I PDU to
+	    become available to send, or to accumulate additional I PDUs to be
+	    acknowledged in a single RR PDU, subject to window size
+	    constraints.
+
+    3)  If receipt of the I PDU cause the LLC to go into the busy condition
+        with regard to any subsequent I PDUs, the LLC shall send an RNR PDU
+	with the N(R) equal to the value of the receive state variable V(R).
+	If an I PDU(s) is available to send, the LLC shall be able to end them
+	as in 7.5.1 above prior to or following the sending of the RNR PDU.
+
+
+When the LLC associated with a particular data link connection is in a busy
+condition, and receives an in-sequence I PDU, the LLC shall be able to ignore
+the information field contained in any received I PDU on that data link
+connection (see 7.5.8).
+
+
+7.5.3  Receiption of incorrect PDUs
+
+When the LLC recives an invalid PDU (see 3.3.5) or a PDU with an incorrect
+DSAP or SSAP address, this PDU shall be discarded entirely.
+
+
+7.5.4  Receiption of out-of-sequence PDUs
+
+When the LLC receives an I PDU whose send sequence number is not in sequence,
+i.e., not equal to the current receive state variable V(R) but is within the
+receive window, the LLC sahll discard the information field of the I PDU and
+send an REJ PDU with the N(R) set to the value of V(R).  The LLC shall then
+dsicard the information field of all I PDUs unitl the expected I PDU is
+correctly received.  When receiving the expected I PDU, the LLC shall
+ackwnoeldge the PDU as described in 7.5.2 abvoe.  The LLC shall use the N(R)
+and P bit indications in the discarded PDUs.
+
+On a given data link connection, only one "sent REJ" exception condition froma
+given LLC to another given LLC shall be established at a time.  A "sent REJ"
+condition shall be cleared when the requested I PDU is received.  The "sent
+REJ" condition shall be able to be reset when a reject timer time-out function
+runs out.  When the LLC perceives by reject timer time-out that the requested
+I PDU will not be received, because either the requested I PDU or the REJ PDU
+was in error or lost, the LLC shall be able to repeat the REJ PDU in order to
+re-establish the "sent REJ" condition up to N2 timers.  The value of N2 is
+defined in 7.8.2.
+
+
+7.5.5  Receving acknowledgement
+
+When correctly receiving an I-format or S-format PDU, even in the busy
+condition (see 7.5.8), the receiving LLC sahll consider the N(R) contained in
+this PDU as an acknowledgement for all the I PDUs it has sent on this data
+link connection with an N(S) up to and including the received N(R) minus one.
+The LLC shall reset the acknowledgement timer when it correctly receives an
+I-format or S-format PDU with the N(R) higher than the last received N(R)
+(actually acknoweldging some I PDUs).
+
+If the timer has been reset and there are outstanding I PDUs still
+unacknowledged on this data link connection, the LLC shall restart the
+acknowledgement timer.  If the timer then runs out, the LLC shall follow the
+procedures in 7.5.9 with respect to the unacknowledged I PDUs.
+
+
+7.5.6  Receving an REJ PDU
+
+When receiving an REJ PDU, the LLC shall set it send state variable V(S) to
+the value of the N(R) receive din the REJ PDU control field.  The LLC shall
+(re)send the corresponding I PDU a soon as it is available.  If other
+unacknowledged I PDUs had already been sent on that data link connection
+following the one indicated in the REJ PDU, then those I PDUs sahll be resent
+by the LLC following the resending of the requested I PDU.
+
+If retransmission beginning with a particular PDU occurs due to P/F bit=1
+exchange (see 7.5.9) and an REJ PDU is received that would also start
+retransmission with the same particular I PDU (as identified by the N(R) in
+the REJ PDU), the retransmission resulting from the REJ PDU shall be
+inhibited.
+
+
+7.5.7  Receiving an RNR PDU
+
+An LLC receiving an RNR PDU shall stop sending I PDUs on the indicated data
+link connection at the earliest possible time, and shall start the busy-state
+timer, if not already running.  When the busy-state timer runs out, the LLC
+shall follows the procedure described in 7.5.9.  In any case, the LLC shall
+not send any other I PDUs on that data link connection before receiving an RR
+or REJ PDU, or before receiving an I response PDU with the F bit set to "1",
+or before the completion of a resetting procedure on that data link
+connection.
+
+
+7.5.8  LLC busy condition
+
+An LLC shall enter the busy condition on a data link connection when it is
+temporarily unable to receive or continue to receive I PDUs due to internal
+constraints; for example, receive buffering limitations.  When the LLC enters
+the busy condition, it shall send an RNR PDU at the earliest opportunity.  It
+shall be possible to send I PDUs awaiting to be sent on that data link
+connection priori to or following the sending of the RNR PDU.  While in the
+busy condition, the LCL shall accept and process supervisory PDUs and return
+an RNR response PDU with the F bit set to "1" if it receive a supervisory or I
+command PDU with the P set to "1" on the affected data link connection.
+
+To indicate the clearance of a busy condition on a data link connection, the
+LLC shall send either an I PDU with the F bit set to "1" if a P bit set to "1"
+is outsatanding, an REJ PDU, or an RR PDU on the data link connection with the
+N(R) set to the current receive state variable V(R), depending on whether or
+not the LLC discarded information fields of correctly received I PDUs.
+Additionally, the sending of a SABME command PDU or a UA response PDU shall
+indicate the clearance of a busy condition at the sending LLC on a data link
+connection.
+
+
+7.5.9  Waiting acknowledgement
+
+The LLC maintains an internal retransmission count variable for each data link
+connection that shall be set to "0" when the LLC receives or sends a UA
+response PDU to an SABME command PDU, or when a remote busy condition is
+cleared, or when the LLC correctly receives an I-format or S-format PDU with
+the N(R) higher than the last received N(R) (actually acknowledging some
+oustanding I PDUs).
+
+If the acknowledgement timer, busy-state timer, or, optionally P-bit timer
+runs out, the LLC on this data link connection shall enter the timer recovery
+condition and add one to its retransmission count variable.
+
+The LLC shall then start the P-bit timer and send an S-format command PDU with
+the P bit set to "1".
+
+The timer recovery condition shall be cleared on the data link connection
+when the LLC receives a valid I-format or S-format PDU from the remote LLC,
+with the F bit set to "1".
+
+If, while in the timer recovery condition, the LLC correctly receives a valid
+I-format or S-format PDU with the F bit set to "1" and with the N(R) within
+the range from the last value of N(R) receives to the current send state
+variable inclusive, the LLC shall celar the timer recovery condition, set its
+send state variable to the received N(R), stop the P-bit timer, and resend any
+unacknowledged PDUs.
+
+If, while in the timer recovery condition, the LLC correctly receives a valid
+I-format or S-format PDU with the P/F bit set to "0" and with a N(R) within
+the range from the last value of N(R) received to the current send state
+variable inclusive, the LLC shall not clear the timer recovery condition but
+shall treat the N(R) valud received as an acknowledgement for the indicated
+previously transmitted I PDUs (see 7.5.5).
+
+If the P-bit timer runs out in the timer recovery condition, the LLC shall add
+one to its retransmission count variable.  If the retransmission count
+variable is not equal to N2, the LLC shall reset an S-format PDU with the P
+bit set to "1" and restart the P-bit timer.
+
+If the retransmission count variable is equal to N2, the LLC shal pass a
+DL-RESET indication primitive to the newtork layer to indicate the need for a
+link reset, as described in 7.6 below.  N2 is a system parameter (see 7.8.2).
+
+
+7.5.10  Reception of duplicate I PDUs
+
+When an LLC receives an I PDU whose send sequence number, N(S), is not in the
+receive window, the PDU may, optionally, be recognized as a duplicate if the
+N(S) indicates that it is a copy of an I PDU previously received.  In that
+case, the LLC shall discard the information field but use the N(R) and P bit
+indications in the duplicate PDU.  If the LLC does not recognize a duplicate,
+the N(S) is invalid, and the PDU shall be handled according to 7.7.
+
+Figures 26 and 27 provide graphical representations of teh relationships
+between the valid receive window, the optional duplicate range, and the
+invalid range for instances where 1) the receive window (RW) is less than
+half the modulus value, and 2) the receive window (RW) is equal to or greater
+than half the modulus value.
+
+As depicted in figure 26, in those instances where the receive window is less
+than on-half the modulus value, the receive window, the invalid range, and the
+optional duplicate range relative to L(R) shall be defined as follows:
+
+ -- The receive window RW contains the sequence numbers L(R) to L(R)+RW-1
+    inclusive;
+ -- The invalid range contains the sequence numbers L(R)+RW to L(R)-RW-1
+    inclusive;
+ -- The optional duplicate range contains the sequence numbers L(R)-RW to
+    L(R)-1 inclusive;
+
+where L(R) is equal to the value of the last sent N(R).  If the duplicate
+feature is not used, the invalid range shall contain the sequence numbers
+L(R)+RW to L(R)-1 inclusive.
+
+As depicted in figure 27, in those instances where the receive window is equal
+to or greater than on half the modulus value, the receive window and the
+optional duplicate range relative to L(R) shall be defined as follows:
+
+ -- The receive window RW contains the sequence numbers L(R) to L(R)+RW-1
+    inclusive;
+ -- The optional duplicate range contains the sequence numebrs L(R)+RW to
+    L(R)-1 inclusive;
+
+where L(R) is equal to the value of the last sent N(R).  If the duplicate
+fature is not cused, the optional duplicate range becomes the invalid range.
+
+
+7.6  Procedure for resetting
+
+The resetting phase is used to initialize both directions of information
+transfer according to the procedure described below.  The resetting phase
+shall only apply during the asyncrhonous balanced mode ABM.
+
+Either LLC shall be able to initiated a resetting of both directions by
+sending a SABME command PDU and starting its acknowledgement timer.
+
+After receiving a SABME command PDU, the LLC shall return, at the earliest
+opportunity,
+
+    1)	A UA response PDU and reset its send and receive state variables V(S)
+	and V(R) to 0 to reset the data link connection, or
+
+    2)	A DM response PDU if the data link connection is to be terminated.
+
+The return of the UA or DM response PDU shall take precedence over any other
+response PDU for the same data link connection that may be pending at the LLC.
+it shall be possible to follow the UA PDU with additional LLC PDUs, if
+pending.  If the UA PDU is received correctly by the intiiating LLC, it shall
+reset its send and receive state variables V(S) and V(R) to 0 and stop its
+acknowledgement timer.  This shall also clear all exception conditions that
+might be present at either of the LLCs involved in the reset.  This exchange
+shall also indicate clearance of any busy conditions that may have been
+present at either LLC involved in the reset.
+
+If a DM response PDU is received, the LLC shall enter the data link
+disconnected phase, shall stop its acknowledgement timer and shall report to
+the higher layer for appropriate action.  If the acknowledgement timer runs
+out before a UA or DM response PDU is received, the SABME command PDU shall be
+resent adn the acknowledgement timer shall be restarted.  After the timer runs
+out N2 times, the sending LLC sahll stop sending the SABME command PDU, shall
+report to the higher layer for the appropriate error recovery actions to
+initiate, and shall enter the asynchronous disconnected mode.  The value of N2
+is defined in 7.8.2.
+
+Other Type 2 PDUs (with the exception of teh SABME and DISC command PDUs) that
+are received by the LLC before completion of the reset procedure shall be
+discarded.
+
+Under certain FRMR exception conditions listed in 7.7, it shall be possible
+for the LLC to ask the remote LLC to reset the data link connection by sending
+an FRMR response PDU.
+
+Upon reception of an FRMR response DPU (even during an FRMR exception
+condition) the LLC shall initiate a resetting procedure by passing a DL-RESET
+indication primitive to the network layer.
+
+After sending an FRMR response PDU, the LLC shall enter the FRMR exception
+condtion.  The FRMR exception condition shall be cleared when the LLC receives
+or sends an SABME or DISC command PDU or DM respone PDU.  Any other Type 2
+command PDU received while in the FRMR exception condition shall cause the LLC
+to resend the FRMR response PDU with the same information field as originally
+sent.
+
+
+If the FRMR exception condition, additiona I PDUs shall not be sent, and
+received I-format PDUs and S-format PDUs shall be discarded by the LLC.
+
+It shall be possible for the LLC to start its acknowledgement timer on the
+sending of the FRMR response PDU.  If the timer runs out before the reception
+of an SABME or DISC command PDU from the remote LLC, it shall be possible for
+the LLC to resent the FRMR response PDU and restart its acknowledgement timer.
+After the acknowledgement timer has run out N2 times, the LLC shall pass a
+DL-RESET indication primitive to the network layer.  The value N2 is defined
+in 7.8.2.
+
+When an additional FRMR response PDU is sent while the acknowlegement tiemr is
+running, the timer shall not be reset or restarted.
+
+
+7.7  FRMR exception conditions
+
+The LLC shall request a resetting procedure (by sending an FRMR respones PDU)
+as described in 7.6, when receiving, during the information transfer phase, a
+PDU with one of the conditions identified in 5.4.2.3.5.  The coding of the
+information field of the FRMR response PDU that is sent is given in 5.4.2.3.5.
+
+The LLC shall initiate a resetting procedure (by passing a DL-RESET indication
+primitive to the network layer) as described in 7.6  when receiving an FRMR
+response PDU during the information transfer phase.
+
+
+7.8  List of data link connection parameters
+
+A number of data link connection parameters are defined, the range of values
+which are determined on a system-by-system basis by the user at the imte that
+the local area network is established.
+
+The data link connection parameters for Type 2 operation shall be as follows:
+
+
+7.8.1  Timer functions
+
+In Type 2 operation it is possible for a number of independent events to be
+taking place on a data link connection that could each employ a timing
+function.  These timing functions are defined beloew, as identified in the
+text that describes Type 2 operation.  It is understood that these timing
+functions can be realized by using a number of individual timers, or by using
+a single timer.  If a single timing ufnction is employed, it will be necessary
+for the designer to determine on an instance-by-instance basis when to reset
+and restart the timer and when to let it continue running based on the
+priority assigned to the individual actions that are in progress.
+
+The periods of the timer functions shall take into account whether the timers
+are started at the beginning or the end of the event that initiated the timer
+(e.g., sending of a PDU by the LLC), adn any delay introduced by the MAC
+sublayer.
+
+The proper operation of the procedure sahll require that the value of the
+timing functions be greater than the maximum time between the normal network
+operation for Type 2 PDUs and the reception of the corresponding Type 2 PDU
+returned as an answer to the initiating Type 2 PDU.
+
+
+7.8.1.1  Acknowledgement timer
+
+The acknowledgement timer is a data lnik connection parameter that shall
+define the time interval during which the LLC shall expect to receive an
+acknowledgement to one or more outstanding I PDUs or an expected response PDU
+to a sent unnumbered command PDU.
+
+7.8.1.2  P-bit timer
+
+The P-bit timer is a data link connection parameter that shall define the time
+interval during which the LLC shall expect to receive a PDU with the F bit set
+to "1" in response to a sent Type 2 command with the P bit set to "1".
+
+7.8.1.3  Reject timer
+
+The reject timer is a data link connection parameter that shall define the
+time interval during which the LLC shall expect to receive a reply to a sent
+REJ PDU.
+
+7.8.1.4  Busy-state timer
+
+The busy-state timer is a data link conenction parameter that shall define the
+timer interval during which the LLC shall wait for an indication of the
+clearance of a busy condition at the other LLC.
+
+
+7.8.2  Maximum number of transmissions, N2
+
+N2 is a data link connection parameter that indicates the maximum number of
+times that a PDU is sent following the running out of the acknowledgement
+timer, the P-bit timer, the reject timer, or the busy-state timer.
+
+
+7.8.3  Maximum number of octets in an I PDU, N1
+
+N1 is a data link connection paraemter that denotes the maximum number of
+octets in an I PDU.  Refer to the variable MAC descriptions to determine the
+preceise value fo N1 for a given medium access method.  LLC itself places no
+restrictions on the value of N1.  However, in the interest of having a valud
+of N1 that all users of Type 2 LLC may depend on, all MACs must at least be
+capable of accomodating I PDUs with information fields up to and including 128
+octets in length.
+
+
+7.8.4  Transmit window size, k
+
+The transmit window size (k) shall be a data link connection paraemter that
+can never exceed 127.  It shall denote the maximum number of sequentially
+numbered I PDUs that the sending LLC may have outstanding (i.e.
+unacknowledged).  The value k is the maximum number by which the sending LLC
+send state variable V(S) can exceed the N(R) of the last received I PDU.
+
+
+7.8.5  Minimum number of octets in a PDU
+
+A minimal valid data link connection PDU shall contain exactly two address
+fields and one control field in that order.  Thus the minimum number of octets
+in a valid data link connection PDU shall be 3 or , depending on whether the
+PDU is a U-format PDU, or an I-format or S-format PDU, respectively.
+
+
+7.8.6  Receive window size, RW
+
+The receive window size (RW) shall be a data link connection parameter that
+can never exceed 127.  It shall denote the maximum number of unacknowledged
+sequentially numbered I PDUs that the local LLC allows the remote LLC to have
+outstanding.  It is tranmitted in the information field XID (see 5.4.1.1.2)
+and applies to the XID sender.  The XID receiver shall set its transmit window
+(k) to a value less than or equal to the receive window of the XID sender to
+avoid overrunning the XID sender.
+
+
+
+
+
+

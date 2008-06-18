@@ -1,0 +1,267 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ifrtemplate.5.man,v 0.9.2.1 2008-06-13 06:43:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ifrtemplate.5.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:53  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH IFRTEMPLATE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B ifrtemplate
+\- Internet Protocol over Frame Relay File Format
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ifrtemplate
+describes the file format for input to the
+.BR ifrtune (8)
+command for IP over Frame Relay.
+The file format consists of a number of parameter values, one per line,
+formated as described below.  Each parameter value is described using its line
+number in the file, a parameter name, and a description of the format of the
+value.  Only the value appears in the file, each value on a line by itself, one
+value per line.
+.PP
+Each of the IP over Frame Relay configuration parameters corresponds to the
+member and values of the
+.B ifr_tune
+structure, that is carried in a
+.B ifr_tnioc
+structure by the
+.B IFR_TUNE
+input-output control.
+.PP
+These protocol parameters, and the default values that exist when tuning has
+not been applied to a newly created IP over Frame Relay subnetwork, correspond
+directly to the protocol parameters and defaults in
+RFC 2427,
+.[
+rfc2427
+.]
+RFC 2590,
+.[
+rfc2590
+.]
+and managed by
+RFC 2115,
+.[
+rfc2115
+.]
+RFC 2954,
+.[
+rfc2954
+.]
+RFC 2955,
+.[
+rfc2955
+.]
+RFC 3020,
+.[
+rfc3020
+.]
+.\"
+.\"
+.SH FORMAT
+.PP
+The IFR template consists of 11 lines containing the following configuration
+information:
+.IP 1. \w'00.\(em'u
+.B DTE/DCE
+.IP 2.
+.B DLCILENGTH
+.IP 3.
+.B LMI DLCI
+.IP 4.
+.B T391
+.IP 5.
+.B T392
+.IP 6.
+.B N391
+.IP 7.
+.B N392
+.IP 8.
+.B N393
+.IP 9.
+.B MAXFRAMESIZE
+.IP 10.
+.B ACCESSRATE
+.IP 11.
+.B STANDARD
+.\"
+.\"
+.SH FILES
+.PP
+Files following this format are normally kept in the
+.B @configdir@/@PACKAGE@/template/
+directory.
+.PP
+(Note that this directory varies depending on whether the build was on a
+.BR dpkg (1)-based
+or
+.BR rpm (1)-based
+system.)
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ifrtune (8),
+.BR ifr (4),
+.BR x25netd (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ifrtemplate
+file format is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+For additional compatibiltiy information see,
+.BR ifr (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B ifrtemplate
+file format first appeared in
+.IR "Spider Frame Relay" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

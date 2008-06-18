@@ -1,0 +1,349 @@
+
+
+
+Network Working Group                                        B. Bidulock
+INTERNET-DRAFT                                       OpenSS7 Corporation
+Intended Status: INFORMATIONAL                               May 7, 2008
+
+Expires in November 2008
+
+
+
+                  OSI CONS SNARE over UDP (SNARE-UDP)
+                               Version: 1
+                  <draft-bidulock-tsvwg-snare-00.txt>
+
+
+Status of this Memo
+
+    By submitting this Internet-Draft, each author represents that any
+  applicable patent or other IPR claims of which he or she is aware have
+  been or will be disclosed, and any of which he or she becomes aware
+  will be disclosed, in accordance with Section 6 of BCP 79.
+
+    Internet-Drafts are working documents of the Internet Engineering
+  Task Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+    Internet-Drafts are draft documents valid for a maximum of six
+  months and may be updated, replaced, or obsoleted by other documents
+  at any time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as "work in progress".
+
+    The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt.
+
+    The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+    This Internet-Draft will expire in November 2008.
+
+Copyright
+
+    Copyright (C) The IETF Trust (2008).
+
+Abstract
+
+    This memo provides a mechanism for providing for a SNARE [ISO/IEC
+  10030], [X.223] capability over UDP for providing a subnetwork address
+  resolution entity that can provide X.25 CONS address discovery for the
+  XOT [RFC1613] and XOS protocols.
+
+Contents
+
+    A complete table of contents, list of illustrations, list of tables
+  and change history for this memo appears at the end of the memo.
+
+
+B. Bidulock                    Version 0.0                        Page 1
+
+Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+
+1.  Introduction
+
+1.1.  Scope
+
+1.2.  Terminology
+
+    This memo uses the following extended terminology:
+
+  Subnetwork Address Resolution Entity (SNARE) -- A subnetwork address
+      resolution entity is an entity that can provide address routing
+      configuration and redirect information in accordance with the ISO
+      CONS SNARE definintion [ISO/IEC 10030].
+
+1.3.  Abbreviations
+
+      CONS    -- Connection Oriented Network Service
+      ES      -- End System
+      IS      -- Intermediate System
+      OSI     -- Open Systems Interconnect
+      SNARE   -- Subnetwork Address Resolution Entity
+
+
+1.4.  Conventions
+
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in [RFC2119].
+
+2.  Security
+
+3.  IANA Considerations
+
+    This memo requests the assignment of one UDP well-known port number
+  and two IP Multicast Addresses.
+
+3.1.  IPv4 Multicast Addresses
+
+    Two IP multicast addresses are to be assigned for this protocol:
+
+  All CONS End System Address
+      This address is used for sending multicast UDP datagrams to all
+      CONS end systems on an IP subnetwork.
+
+  All CONS SNARES Address
+      This address is used for sending multicast UDP datagrams to all
+      CONS SNAREs on an IP subnetwork.
+
+3.2.  Port Number
+
+    This memo allocates a well-known port number for use in listening
+  for UDP datagrams on multicast addresses and for exchanging SNARE
+  messages between a CONS End System and a SNARE Intermediate System.
+
+
+B. Bidulock                    Version 0.0                        Page 2
+
+Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+
+
+0.  Change History
+
+    This  section provides historical information on the changes made to
+  this draft.  This section will be removed from the document  when  the
+  document is finalized for publication as an RFC.
+
+0.1.  Initial Version 0.0
+
+   o
+   o
+
+Change Log
+
+    $Log$
+
+
+
+  [ISO/IEC 10030]  ISO, "Information Processing Systems -
+      Telecommunications and Information Exchange between Systems - End
+      System Routeing Information Exchange Protocol for use in
+      conjunction with ISO/IEC 8878," ISO/IEC 10030 : 1995,
+      International Organization for Standardization (1995).
+      <http://www.iso.org/>
+
+  [X.223]  ITU, "Use of X.25 to Provide the OSI Connection-mode Network
+      Service for ITU-T Applications," ITU-T Recommendation X.223
+      [ISO/IEC 8878], ITU-T Telecommunication Standardization Sector of
+      ITU, Geneva (November 1993).  (Previously "CCITT Recommendation")
+      <http://www.itu.int/>
+
+  [RFC1613]  "Cisco Systems X.25 over TCP (XOT)," RFC 1613, The Internet
+      Society (May 1994).  (Status: INFORMATIONAL) (Defines TCP port
+      number 1998.)  <http://www.ietf.org/rfc/rfc1613.txt>
+
+Normative References
+
+  [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+      Requirement Levels," BCP 14/RFC 2119, The Internet Society (March
+      1997).  <http://www.ietf.org/rfc/rfc2119.txt>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 3
+
+Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+
+
+Acknowledgements
+
+  The authors would like to thank Greg Satz for leading the way.
+
+Author's Addresses
+
+  Brian Bidulock
+  OpenSS7 Corporation
+  1469 Jeffreys Crescent
+  Edmonton, AB  T6L 6T1
+  Canada
+
+  Phone: +1-780-490-1141
+  Email: bidulock@openss7.org
+  URL: http//www.openss7.org/
+
+
+
+
+  This draft expires November 2008.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 4
+
+Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+
+
+                          Table of Contents
+
+  Status of this Memo .............................................    1
+  Copyright .......................................................    1
+  Abstract ........................................................    1
+  Contents ........................................................    1
+  1 Introduction ..................................................    2
+  1.1 Scope .......................................................    2
+  1.2 Terminology .................................................    2
+  1.3 Abbreviations ...............................................    2
+  1.4 Conventions .................................................    2
+  2 Security ......................................................    2
+  3 IANA Considerations ...........................................    2
+  3.1 IPv4 Multicast Addresses ....................................    2
+  3.2 Port Number .................................................    2
+  0 Change History ................................................    3
+  0.1 Initial Version 0.0 .........................................    3
+  Change Log ......................................................    3
+  Normative References ............................................    3
+  Acknowledgements ................................................    4
+  Author's Addresses ..............................................    4
+  Table of Contents ...............................................    5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 5
+
+Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+
+Intellectual Property
+
+  The IETF takes no position regarding the validity or scope of any
+  Intellectual Property Rights or other rights that might be claimed to
+  pertain to the implementation or use of the technology described in
+  this document or the extent to which any license under such rights
+  might or might not be available; nor does it represent that it has
+  made any independent effort to identify any such rights.  Information
+  on the procedures with respect to rights in RFC documents can be found
+  in BCP 78 and BCP 79.
+
+  Copies of IPR disclosures made to the IETF Secretariat and any
+  assurances of licenses to be made available, or the result of an
+  attempt made to obtain a general license or permission for the use of
+  such proprietary rights by implementers or users of this specification
+  can be obtained from the IETF on-line IPR repository at
+  http://www.ietf.org/ipr.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights that may cover technology that may be required to implement
+  this standard.  Please address the information to the IETF at ietf-
+  ipr@ietf.org.
+
+Disclaimer of Validity
+
+  This document and the information contained herein are provided on an
+  "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+  OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+  THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+  OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+  THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Full Copyright Statement
+
+  Copyright (C) The IETF Trust (2008).  This document is subject to the
+  rights, licenses and restrictions contained in BCP 78, and except as
+  set forth therein, the authors retain all their rights.
+
+Acknowledgement
+
+  Funding for the RFC Editor function is currently provided by the
+  Internet Society.
+
+
+
+
+
+
+
+
+
+
+B. Bidulock                    Version 0.0                        Page 6
+

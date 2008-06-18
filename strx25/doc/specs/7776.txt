@@ -1,0 +1,1513 @@
+INTERNATIONAL STANDARD
+ISO/IEC 7776
+Second Edition
+1995-07-01
+
+Information technology --
+Telecommunications and information exchange between systems --
+High-level data link control procedures --
+Description of the X.25 LAPB-compatible DTE data link procedures
+
+
+Foreword
+
+ISO (the International Organization for Standardization) and the IEC (the
+International Electrotechnical Commission) form the specialized system for
+worldwide develoment of International STandards through technical committees
+established by the respective organization to deal with particular fields of
+technical activiey.  ISO and IEC technical committees collaborate in fields of
+mutual intereste.  Other international organizations, governmental and
+non-governmental, in liason with ISO and IEC, also take part in the work.
+
+In the field of information technology, ISO and IEC have established a joint
+technical committee, ISO/IEC JTC 1.  Draft International Standards adopted by
+the joint technical committee are circulated to national bodies for voting.
+Publication as an Internatoinal Standard requires approval by at least 75% of
+the national bodies casting a vote.
+
+International Standard ISO/IEC 7776 was prepared by Joint Technical Committee
+ISO/IEC JTC 1, Information technology.
+
+This second edition cancels and replaces the frist edition (ISO 7776:1986),
+and consolidates Ammendment 1:1992, as well as Technical Corrigenda 1, 2 and
+3.
+
+Annex A forms an integral part of this International Standard.  Annex B is for
+information only.
+
+
+Introduction
+
+This document provides the ISO/IEC description of the ITU-T Recommendation
+X.25 LAPB interface operation as viewed by the DTE.  It is the DTE counterpart
+of the X.25 LAPB DCE description.
+
+This document also provides the ISO/IEC description of how DTEs are capable fo
+communicating directly with one another at the Data Link layer using the X.25
+LAPB procedures without an intervening public data network.
+
+The Data Link layer provides the DTE with three basic functions:
+
+    a)  link initialization necessary for the DTE to begin communication in a
+	known state;
+
+    b)  flow controls control the flow of frmes between the DTE and the other
+	station (DCE or DTE) to ensure that they are not sent more quickly
+	than they can be received; and
+
+    c)  error control provided in two forms:
+
+	1)  a cyclic redundancy check (CRC) using a 16-bit polynomial to
+	    detect mutilated frames, and
+
+	2)  use of sequence numbers to ensure against losing entire frames.
+
+	(The Data Link layer endeavours to ensure correct receipt of all
+	 frames by retransmission mutilated or missing frames.)
+
+This International Standard repeats requirements of other International
+Standards.  Annex B contains a list of these repeated requirements and
+references the corresponding International Standards.
+
+To evaluate conformance of a particular implementation, it is necessary to
+have a statemnt of which capabilities and options have been implemented.  Such
+a statement is called a "Protocol Implementation Conformance Statement"
+(PICS) as defined in ISO/IEC 9646-1.  This International Standard provides
+such a  PCIS proforma in compliance with the relevant requirements, and in
+accordance with the relevant guidance, given in ISO/IEC 9646-2.
+
+
+1 Scope
+
+This Internationa Standard defines an application of the following HDLC
+standards: ISO/IEC 3309, ISO/IEC 4335, ISO 7478, and ISO/IEC 7809.  Where
+there is difficulty in the interpretation of a reworded requirement from one
+of the other International Standards, the original requirement of ISO/IEC
+3309, ISO/IEC 4335, ISO 7478 or ISO/IEC 7809 is definitive.  It also defines
+the structure, elements and procedures for the operation of a DTE using the
+X.25 LAPB protocol as specified in ITU-T Recommendation X.25. [1]  The
+proceudres are applicable to the data interchange between a DTE and a DCE, or
+between two DTEs.  The procedures are defined for use on duplex links, using
+synchronous transmission or start/stop transmission.
+
+--------
+[1]  Future revision of this International Standard will be made in accordance
+     with  revisions of ITU-T Recommendation X.25.  The present version is
+     based on the 1993 ITU-T Recommendation X.25.
+
+Clause 3 describes two frame structures: one for basic (modulo 8) operation
+and one for extended (modulo 128) operation.  Basic (modulo 8) operation is
+the ISO/IEC balance asynchrnous class of procedure with optional functions 2
+and 8 (BAC 2,8).  Extended (modulo 128) operation is the ISO/IEC balanced
+asyncrhonous class of procedure with optional functions 2, 8 and 10
+(BAC,2,8,10).  For those DTE/DCE connections that support both basic (modulo
+8) operation and extended (modulo 128) operation, the choice is made at
+subscription-time only.  For those DTE/remote DTE connections that support
+both baseic (modulo 8) operation and extended (modulo 128) operation, the
+choice is made by bilateral agreement.
+
+NOTE -- The procedure herein described as basic (modulo 8) operation is the
+only one available in all public data networks.
+
+Clause 3 also describes two methods for encoding the frames, as sequences of
+bits when synchronous transmission is used, and as sequences of octets when
+start/stop transmission is used.  The start/stop encoding sepcifies optional
+mechanisms, for use in environments that are sensitive to transmission of
+octets with valude that could be interpreted as ISO/IEC 646 control
+characters, and/or in environments that support transfer of only seven data
+bits per start/stop character.  The choice of encoding is made by bilateral
+agreement, or other suitable means, to suit the data transmission
+characteristics of the environment.
+
+Clause 4 describes the elements of procedures.  Some aspects are only operable
+for the basic (modulo 8) operation and some for the extended (modulo 128)
+oepration.
+
+Claues 5 and 6 describe the single link procedures (SLP) which is derived from
+the frame structure and the elements of proceudres, and an optional multilink
+procedure (MLP), respectively.  The SLP is used for data interchange over a
+single data link and the MLP is used for data interchange over a multiple of
+parallel SLPs.  An MLP is required if the effects of individual SLP failures
+are not to disrupt the higher layer interchange over a multiple of parallel
+SLPs.  An MLP is required if the effects of individual SLP failures are not to
+disrupt the higher layer operation.  An MLP can also be used over a single SLP
+by prior bilateral agreement.  For DTE/DCE connections the choice of an MLP
+operation or not is made at subscription-time only.  For DTE/remote DTE
+connections, the choice is made by bilateral agreement.
+
+Where choices amoung alternative actions are indicated in the procedures, a
+recommended choice is usually indicated.  Unless specifically stated
+otherwise, the choice of action does not affect interoperability with other
+implementations of this International Standard although efficiency of
+operation may be affected.  Where such choices do affect interoperability, the
+procedures explicitly state that prior bilateral agreement on the choice of
+procedure with the remote end is needed.  An attempt has been made to minimize
+such choices consistent with the need to satsify a broad range of
+applications.  A basic requirement for all implementations of this
+International Standard is that they be capable of responding, as specified, to
+any actions taken at the remote end that are permitted by this International
+Standard (except possibly for those procedures whose use involves prior
+bilateral agreement).
+
+Clause 7 covers the Static Conformance requirements, the Dynamic Conformance
+requirements, and the Protocol Implemetnation Conformance Statement (PICS).
+
+
+2 Normative References
+
+The following standard contain provisions which, through reference in this
+text, consitute provisions of this International Standard.  At the time of
+publication, the editions indicated were valid.  All standards are subject to
+revision, and parties to agreements based on this International Standard are
+encouraged to investigate the possibility of applying the most recent editions
+of the standards listed below.  Members of IEC and ISO maintain registries of
+currently valid International Standards.
+
+ISO/IEC 646:1991, Information technology -- ISO 7-bit coded characeter set for
+information interchange.
+
+ISO/IEC 3309:1993, Information technology -- Telecommunications and
+information exchange between systems -- High-level data link control (HDLC)
+procedures -- Frame structure.
+
+ISO/IEC 4335:1993, Information technology -- Telecommunications and
+information exchange between systems -- High-level data link control (HDLC)
+procedures -- Elements of procedure
+
+ISO 7478:1987, Information processing systems -- Data communication --
+Multilink procedures.
+
+ISO/IEC 7809:1993, Information technology -- Telecommunications and
+information exchange between systems -- High-level data link control
+procedrues (HDLC) -- Classes of procedure
+
+ISO/IEC 9646-1:1994, Information technology -- Open Systems Interconnection --
+Conformance testing methodology and framework -- Part 1: General concepts.
+
+ISO/IEC 964602:1994, Information technology -- Open Systems Interconnection --
+Conformance testing methodology and framework -- Part 2: Abstract Test Suite
+specification.
+
+ITU-T Recommendation X.25, Interface between data terminal equipment (DTE) and
+data circuit-terminating equipment (DCE) for terminals operating in the packet
+mode and connected to public data networks by dedicated circuit.
+
+
+3 Frame Structure
+
+All transmissions on a SLP are in frames conforming to one of the formats of
+table 1 for basic (modulo 8) operation, or alternatively one of the formates
+of table 2 for extended (modulo 128) operation.  The flag preceding the
+address field is defined as the opening flag.  The flag following the FCS
+field is defined as the closing flag.
+
+All transmissions from the DCE/remote DTE are expected to use this frame
+structure.
+
+                                                                                
+            Table 1 -- Frame formats -- Basic (modulo 8) operation              
+                                                                                
+                  12345678 12345678 12345678 16 to 1  12345678                  
+                 ,________,________,________,________,________,                 
+                 |  Flag  |Address | Control|  FCS   |  Flag  |                 
+                 |________|________|________|________|________|                 
+                 |   F    |   A    |   C    |  FCS   |   F    |                 
+                 |01111110| 8-bits | 8-bits | 16-bits|01111110|                 
+                 |________|________|________|________|________|                 
+                 FCS=Frame Check Sequence                                       
+                                                                                
+             12345678 12345678 12345678          16 to 1  12345678              
+            ,________,________,________,________,________,________,             
+            |  Flag  |Address | Control|Informa |  FCS   |  Flag  |             
+            |________|________|________|________|________|________|             
+            |   F    |   A    |   C    |   I    |  FCS   |   F    |             
+            |01111110| 8-bits | 8-bits | N-bits | 16-bits|01111110|             
+            |________|________|________|________|________|________|             
+            FCS=Frame Check Sequence                                            
+                                                                                
+
+                                                                                
+          Table 2 -- Frame formats -- Extended (modulo 128) operation           
+                                                                                
+                  12345678 12345678  1 to *  16 to 1  12345678                  
+                 ,________,________,________,________,________,                 
+                 |  Flag  |Address | Control|  FCS   |  Flag  |                 
+                 |________|________|________|________|________|                 
+                 |   F    |   A    |   C    |  FCS   |   F    |                 
+                 |01111110| 8-bits | *-bits | 16-bits|01111110|                 
+                 |________|________|________|________|________|                 
+                 FCS=Frame Check Sequence                                       
+                                                                                
+             12345678 12345678 12345678          16 to 1  12345678              
+            ,________,________,________,________,________,________,             
+            |  Flag  |Address | Control|Informa |  FCS   |  Flag  |             
+            |________|________|________|________|________|________|             
+            |   F    |   A    |   C    |   I    |  FCS   |   F    |             
+            |01111110| 8-bits | 8-bits | N-bits | 16-bits|01111110|             
+            |________|________|________|________|________|________|             
+            FCS=Frame Check Sequence                                            
+                                                                                
+            *  16 for frames formats that contain sequence numbers;             
+               8 for frame formats that do not contain sequence numbers.        
+                                                                                
+
+3.1  Flag sequence
+
+All frames shall start and end with the flag sequence consisting of one "0"
+bit followed by six contiguous "1" bits and one "0" bit.  The DTE numbts
+continuously for this sequence on a bit-by-bit basis, and thus uses the flag
+sequence for frame synchronization.  The DTE/DCE/remote DTE may sent one or
+more complete flag sequences between frames.  The DTE shall only send complete
+eight-bit flag sequences when sending multiple flags sequences (see 3.10).  A
+single flag may be used as both the closing flag of one frame and the opening
+flag for the next frame.
+
+
+3.2  Address field
+
+The address field shal consist of one octet.  The address field identifies the
+intended receiver of a command frame and the transmittter of a response frame.
+The coding of the address field is described in 5.1.
+
+
+3.3  Control field
+
+For basic (modulo 8) operation, the control field consists of one octet.  For
+extended (module 128) operation, the control field shall consist of two octets
+for frame formats that contain sequence numbers, and one octet for frame
+formats that do not contain sequence numbers.  The content of this field is
+described in 4.1.
+
+
+3.4  Information field
+
+The information field of a frame, when present, follows the control field (see
+3.3) and preceds the frame check sequence (see 3.6).  (See 4.3.9 and 6.2 for
+the various codings and groupdings of bits in the information field that are
+defined for use in this International Standard.)  The coding and grouping of
+bits received from a higher level layer are unrestricted, except for
+requirements that are imposed by the higher layer itself.
+
+For start/stop transmission there shall be eight (8) information bits between
+the start element and the stop element: the information field is therefore
+constrained to be octet-aligned.
+
+See 4.3.9 and 5.7.3 with regard to the maximum information field length.
+
+
+3.5  Transparency
+
+3.5.1  Synchronous transmission
+
+A DTE, when transmitting, shall examin the frame content between the to flag
+sequences including the address, control, information and FCS fields and shall
+insert a "0" bit after all sequences of five contiguous "1" bits (including
+the last five bits of the FCS) to ensure that a flag sequence is not
+simulated.  A DTE, when receiving, shall examine the frame content and shall
+discard an "0" bit which directly follows five contiguous "1" bits.
+
+
+3.5.2  Start/stop transmission
+
+Two principal levels of transparency processing are specified for use with
+start/stop transmission.  These are seven-bit data path transparency (SBDPT),
+specified in 3.5.2.1, and controls escape transparency, sepcified in 3.5.2.2.
+Control-escape transparency shall always be performed.  SBDPT is an option,
+use or non-use of which is selected for a given data link by means outside the
+scope of this International Standard (for example, a priori knowledge,
+bilateral agreement, heuristic implementation techniques).  The control-escape
+transparency processing may optionally be extended in it application in one of
+the two ways specified in 3.5.2.3; use or non-use of either of these for a
+given data link is again selected by means outside the scope of this
+International Standard.
+
+3.5.2.1  Seven-bit data transparency
+
+When SBDPT is selected, the content of each frame -- from Address field to FCS
+field inclusive -- shall be transferred between sender and receiver as a
+frame-image derived from the original frame as follows:
+
+The sequence of octets making up the frame content is considered as divided
+into a sequence of contiguous seven-octet segments, with possibly a final
+segment having length between one and six octets inclusive.  These segments
+are referred to as original segments.
+
+The frame-image consists of a sequence of image segments defined, in
+one-to-one correspondence with the original segments, as follows:
+
+    a)  image segments occur in the same order as the corresponding original
+	segments;
+
+    b)	each image segment is one octet longer than its original segment;
+
+    c)	the first part of each image segment is a copy of its original
+	segment, but with the most significant bit (MSB) or each octet set to
+	zero;
+
+    d)	the remaining, final, octet of each image segment has its least
+	significant bit set to the value of the MSB of the last octet of the
+	original segment, its next to least significant bit set to the value
+	of the MSB of the next to last octet (if any) of the original segment,
+	and so on;
+
+    e)	in the final octet of each image segment, all higher order bits for
+	which no corresponding octet exists in the original segment are set to
+	zero.
+
+NOTES
+
+1	At the transmitter, the final octet of each image segment can be
+	generated by shifting left the MSB of each octet in the original
+	segment, in sequence, into an initially zero octet: this acheives the
+	correct bit-positioning both for complete seven-octet segments and for
+	any short segment at the end of a frame.
+
+2	The MSB of each image-segment octet is defined as zero only for
+	uniqueness of the mapping: because its value is known and plays no
+	part in the reconstruction of the original segment at the receiver, it
+	need not actually be transmitted as a zero bit value.  This allows
+	image segments to be transferred across data paths that, for example,
+	force parity setting of the MSB of each octet.
+
+3.5.2.2  Control-escape transparency
+
+The following tranparency mechanism shall be applied to each frame-image: a
+frame-image is as defined in 3.5.2.1 when SBDPT is selected, and otherwise is
+identical to the frame content from Address field to FCS field inclusive.
+
+The control escape octet identifies an octet occuring within a frame-image to
+which the following transparency procedure is applied.  The encoding of the
+control escape octet is:
+
+	1 2 3 4 5 6 7 8  Bit position in octet
+
+	1 0 1 1 1 1 1 0
+	|
+	+------------ Low order bit, first bit transmitted/received.
+
+The transmitter shall examine each octet of the frame-imange between the two
+flag octets and shall:
+
+    a)	upon the occurrence of the flag sequence or a control escape octet,
+	complement the sixth bit of the octet, and
+
+    b)	insert a control escape octet immediately preceding the octet
+	resulting from the above, prior to transmission.
+
+The receiver shall examine the frame-image between the two flag octets and
+shall, upon receipt of a control escape octet and prior to FCS calculation:
+
+    a)	discard the control escape octet, and
+
+    b)	restore the immediately following octet by complementing the sixth
+	bit.
+
+3.5.2.3  Extended transparency
+
+The transmitter may apply the above control-escape transparency procedure
+(3.5.2.2) to octets in the groups defined below, in addition to the flag and
+control escape octets.
+
+3.5.2.3.1  Flow-control transparency
+
+The flow-control transparency option provide transparency processing for the
+DC1/XON and DC3/XOFF control characters defined in ISO/IEC 646: that is, for
+octet values 1000100x and 1100100x, respectively, where the 8th bit "x"
+represents either "0" or "1".  This has the effect of assuring that the octet
+stream does not contain values that could be interpreted by intermediate
+equipment as flow control characters (regardless of parity).
+
+3.5.2.3.2  Control-character octet transparency
+
+The control-character octet transparency option provides transparency
+processing for all octets in which both the 6th and 7th bit are "0" (i.e.,
+xxxxx00x, where each "x" represents either "0" or "1"), and for the DELETE
+character octet (i.e., 1111111x, where "x" represents "0" or "1").  This has
+the effect of assuring that the octet stream does not contain values that
+could be interprented by intermediate equipment as the control characters or
+DELETE character defined by ISO/IEC 646 (regardless of parity).
+
+
+3.6.  Frame check sequence (FCS) field
+
+The FCS field shall be a 16-bit sequence.  It shall be the ones complement of
+the sum (modulo 2) of
+
+    a)	the remainder of
+
+	Xk(X15+X14+X13+X12+X11+X10+x9+x8+x7+x6+x5+x4+x3+x2+x+1)
+
+	divided (modulo 2) by the generator polynomial
+
+	X16+X12+X5+1,
+
+	where k is the number of bits in the frame existing between, but not
+	including, the final bit of the opening flag and the first bit of the
+	FCS, excluding start and stop elements (start/stop transmission) and
+	bits (synchronous transmission) or octets (start/stop transmission)
+	inserted for transparency, and
+
+    b)	the remainder of the division (modulo 2) by the generator polynomial
+
+	X16+X12+X5+1
+
+	of the product of X16 by the contentof the frame existing between, but
+	not including, the final bit of the opening flag and the first bit of
+	the FCS, excluding start and stop elements (start/stop tranmission)
+	and bits (synchronous transmission) or octets (start/stop tranmission)
+	inserted for transparency.
+
+As a typical implementation, at the transmitter, the initial content of the
+register of the device computing the remainder of the division is preset to
+all ones and is then modified by division by the generator polynomial (as
+described above) of the address, control and ifnormation fields; the ones
+complement of the resulting remainder is transmitted as the 16-bit FCS.
+
+At the receiver, the initial content of the register of the device computing
+the remainder is preset to all ones.  The final remainder after multiplication
+by X16 and then division (modulo 2) by the generator polynomial
+
+	X16+X12+X5+1
+
+of the serial incoming protected bits and the FCS will be
+
+	0001110100001111 (X15 through X6, respectively)
+
+in the absence of tranmission errors.
+
+
+3.7  Transmission considerations
+
+3.7.1  Order of bit transmission
+
+Addresses, commands, responses and sequence numbers shall be transmitted with
+the low-order bit first (for example, the first bit of the sequence number
+that is transmitted shall have the weight 2^0).
+
+The order of transmitting bits within the information field is specified for
+specific information field formats as defined elsewhere in this International
+Standard.
+
+The FCS shall be transmitted to the line commencing with the coefficient of
+the highest term, which is found in bit position 16 of the FCS field (see
+tables 1 and 2).
+
+NOTE -- The low order bit is defined as bit 1, as depicted in tables 1 to 8.
+
+3.7.2  Start/stop transmission
+
+For start/stop transmission, each octet is delimited by a start element and a
+stop element.  Mark-hold (continous logical "1" state) is used for inter-octet
+time fill if required.  Typical octet transmission is as shown in Figure 1.
+
+
+ ,_,_,_,_,_,_,_,_,            ,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
+ | | | | | | | | |            | | | | | | | | | | | | | | | | |
+ |0|b|b|b|b|b|b|1|<-----+---->|0|b|b|b|b|b|b|1|0|b|b|b|b|b|b|1|
+ |_|_|_|_|_|_|_|_|      |     |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
+  | -----+------|       |        |
+  |      |      |       |        +--- Octet data bit (0 or 1)
+  |      |      |       +------------ Mark-hold (continuous mark)
+  |      |      +-------------------- Stop element (logical 1: mark)
+  |      +--------------------------- Data bits (low order first)
+  +---------------------------------- Start element (logical 0: space)
+
+3.8  Invalid frames
+
+3.8.1  Synchronous transmission
+
+An invalid frame is defined as one which
+
+    a)	is not properly bounded by two flags;
+
+    b)	contains fewer than 32 bits between flags;
+
+    c)	contains a Frame Check Sequence (FCS) error; or
+
+    d)	contains an address field encoding other than defined in 5.1.
+
+NOTE -- For those DTEs and DCEs that are octet-aligned, a detection of
+non-octet alignment may be made at the Data Link layer or in the higher layer.
+Detection at the Data Link layer, while not required, is accomplished by
+adding a frame validity check that requires the number of bits between the
+opening flag and the closing flag, excluding bits inserted for transparency,
+to be an integral number of octets in length, or the frame is considered
+invalid.
+
+3.8.2  Start/stop transmission
+
+An invalid frame is one:
+
+    a)	containing fewer than four octets between flags, excluding octets
+	inserted for tranparency;
+
+    b)	in which octet framing is violated (i.e., a "0" bit occurs where a
+	stop element is expected); or
+
+    c)	ending with a control escape -- closing flag sequence.
+
+
+3.9  Frame abortion
+
+3.9.1  Synchronous transmission
+
+Aborting a frame is performed by transmitting at least seven contiguous "1"
+bits (with no inserted "0" bits).
+
+3.9.2  Start/stop transmission
+
+Aborting a frame is performed by transmitting the two-octet sequence
+"control-escape -- closing flag".
+
+
+3.10  Interframe time fill
+
+3.10.1  Synchronous transmission
+
+Interframe fill is accomplished by transmitting contiguous flags between
+frames (i.e., multiple 8-bit flag sequences).
+
+3.10.2  Start/stop transmission
+
+Interframe time fill is accomplished by transmitting either successive flags
+(with mark-hold for inter octet time fill if required) or a continuous mark
+condition (logical "1" state) between frames.
+
+
+3.11  Data link channel states
+
+3.11.1  Synchronous transmission
+
+3.11.1.1  Active channel state
+
+The DTE outgoing channel state is in active condition when the DTE is actively
+transmitting a frame, an abortion sequence or interframe time fill.  The DTE
+incoming channle is defined to be in an active condition when the DTE is
+actively receiving a frame, an abortion sequence or interframe time fill.
+
+3.11.1.2  Idle channel state
+
+The DTE outgoing channel is in an idle condition when the DTE causes a
+continuous "1" state that persists for at least 15 bit times.  The DTE
+incoming channel is defined to be in an idle condition when the DTE detects a
+continuous "1" state has persisted for at least 15 bit times.
+
+The action to be taken by a DCE upon detection of the idle channel state is
+not defined at this time.  The DTE, upon detection of the idle channel state,
+may interpret the idle condition as an indication that the DCE is not able to
+support set up of the data link.
+
+NOTE -- Upon detection of the idle channel state for at least T3, the DTE
+	should consider the data link to be in the disconnected state.  T3 is
+	as defined in 5.7.1.3.
+
+3.11.2  Start/stop transmission
+
+3.11.2.1  Active channel state
+
+The DTE outgoing channel is in active condition when the DTE is actively
+transmitting a frame, an abortion sequence, or interframe time fill consisting
+of flag octets separated by inter-octet time fill not greater than the timeout
+value for idle channel state (see 3.11.2.2).  The DTE incoming channle is
+defined to be in an active condition when the DTE is actively receiving a
+frame, an abortion sequence, or interframe time fill as just specified for the
+outgoing channel.
+
+
+3.11.2.2  Idle channel state
+
+The DTE outgoing channel is in the idle condition when the DTE causes a
+continous "1" state that persists for a period of time determined by the
+timeout value T5 at the DTE/remote DTE.  The DTE incoming channel is defined
+to be in the idle condition when the DTE detects that a continuous "1" state
+has persisted for a period of time exceeding the DTE timeout value T5.  T5 is
+as defined in 5.7.1.5.
+
+The action to be taken by a DCE upon detection of the idle channel state is
+not defined at this time.  The DTE, upon detection of the idle channel state,
+may interpret the idle condition as an indication that the DCE is not able to
+support set up of the data link.
+
+NOTE -- Upon detection of the idle condition for at least T3, the DTE should
+	consider the data link to be in the disconnected state.  T3 is as
+	defined in 5.7.1.3.
+
+
+4  Elements of procedures
+
+The elements of procedures are defined in terms of actions that occur at the
+DTE on receipt of commands from the DCE/remote DTE.
+
+The elements of procedures specified below contain a selection of commands and
+responses relevant to the data link and system configuration described in
+clause 1.
+
+4.1  Control field formats and state variables
+
+4.1.1  Control field formats
+
+The control field indicates the type of commands or responses, and contains
+sequence numbers where applicable.
+
+Three type of control field are used to perform numbered information transfer
+(I format), number supervisory functions (S format) and unnumbered control
+functions (U format).  The control field formats for basic (modulo 8)
+operation are depicted in table 3 and the control field formats for extended
+(modulo 128) operation are depicted in table 4.
+
+ .
+ .
+ .
+ .
+ .
+ .
+
+4.4  Exception condition reporting and recovery
+
+The error recovery procedrues which are available to effect recovery following
+the detection/occurrence of an exception condition at the link layer are
+described below.  The exception conditions described are those situations
+which may occur as the result of transmission errors, station malfunction or
+operational situations.
+
+4.4.1  Busy condition
+
+The busy condition shall result when the DTE is temporarily unable to continue
+to receive I frames due to internal constraints, for example, receive
+buffering limitations.  In this case, an RNR frame shall be transmitted by the
+DTE.  I frames pending transmission may be transmitted by the DTE prior to or
+following the RNR frame.  An indication that the busy condition has cleared
+shall be communicated by the transmission of a UA (only in response to a
+SABM/SABME command), RR, REJ or SABM/SABME frame.
+
+Upon receipt of an RNR frame from the DCE/remote DTE, the DTE shall termiante
+any tranmission of I frames in progress and wait for an indication from the
+DCE/remote DTE that the busy condition has been cleared.  If the DTE has I
+frames to send, it shall start a time-out function (Timer T1) when it receives
+the RNR frame, or if I frames become available to send while in the busy
+condition, the DTE shall start Timer T1 when the first I frame becomes
+available.  If Timer T1 runs out before an indication of busy clearance is
+received, the DTE shall send a supervisory command frame with the P bit set to
+"1" to solicit the status of the DCE/remote DTE.  The response received with
+the F-bit set to "1" shall report the busy/non-busy status of the DCE/remote
+DTE.  The DTE shall repeatedly solicit status in this manner until either a
+non-busy response is received or it is determined that the data link layer
+should return information regarding the status of the information frames to
+the higher layer for subsequent disposition.
+
+4.4.2  N(S) sequence error
+
+The information field of all I frames received by the DTE whose N(S) does not
+equal the DTE receive state variable V(R) shall be discarded.
+
+An N(S) sequence exception condition occurs in the DTE when an I frame
+received contains an N(S) that is not equal to the DTE receive state variable.
+The DTE shall not acknowledge (i.e., increment its receive state variable) the
+I frame causing the sequence error, or any I frames which may follow, unitl an
+I frame with the correct N(S) is received.
+
+A DTE which receives one or more I frames having sequence errors or subsequent
+supervisory frames (RR, RNR or REJ) shall accept the control information
+contained in the N(R) field and the P or F bit to perform link control
+functions: for example, to receive acknowledgement for I frames previously
+transmitted by the DTE and to response (P bit set to "1").
+
+The means specified in 4.4.2.1 to 4.4.2.3 shall be available for initiating
+the retransmission of lost or errored I frames following the occurrence of an
+N(S) sequence error condition.
+
+4.4.2.1  Checkpoint recovery
+
+Checkpoint recovery shall be based on a checkpoint cycle.  For the DTE, a
+checkpoint cycle shall being with the tranmission of a command frame with the
+P bit set to "1" and end either
+
+    a)	with the receipt of a response frame with an F bit set to "1", or
+
+    b)	when the reply time-out function (Timer T1) runs out.
+
+When the DTE receives the supervisory response frame with the F bit set to
+"1", after having transmitted an I, RR, RNR or REJ command frame with the P
+bit set to "1", it shall initiate retransmission of all unacknowledged I
+frames with sequence numbers less than the value of the send state variable
+V(S) at the time the command frame with the P bit set to "1" was transmitted.
+(In the case where the supervisory frame received is an RNR response, the DTE
+shall first wait for an indicaition of clearance of the busy condition at the
+DCE/remote DTE before initiating possible retransmission.)  Retransmission
+shall start with the lowest numbered unacknowledged I frame.  I frames shall
+be retransmitted sequentially.  New I frames may be transmitted by the DTE if
+they become available.  Such retransmission of I frames is known as checkpoint
+retransmission.
+
+When the DTE detects the necessity for checkpoint retransmission, the
+retransmission shall be started either before or concurrent with transmission
+of the next command frame with the P bit set to "1".
+
+NOTE -- The DTE and the DCE/remote DTE may each initiate a checkpointing cycle
+	independently of the other by the transmission of a command frame with
+	the P bit set to "1".  Therefore, since two independent checkpointing
+	cycles may be in process simultaneously, the DTE will not initiate
+	checkpoint retransmission upon the receipt of a command frame with the
+	P bit set to "1", but only upon the receipt of a response frame with
+	the F bit set to "1", that is the response to a command frame sent by
+	the DTE with the P bit set to "1".
+
+To prevent duplicate retransmissions, checkpoint retransmissions of a specific
+I frame (same N(R) in the same numbering cycle) shall be inhibited for the
+current checkpoint cycle, if during the checkpoint cycle, the DTE had
+previously received and actioned a REJ frame with the P bit set to "0" or "1",
+or an F bit set to "0".
+
+Checkpoint retranmission shall also be inhibited if, after sending a command
+frame with the P bit set to "1", the DTE receives an acknowledgement for that
+frame before the next checkpoint occurs.
+
+
+4.4.2.2  REJ recovery
+
+The REJ frame shall be used by a receiving DTE to initiate a recovery
+(retranmission) following the detection of an N(S) sequence error, earlier
+than might be possible with checkpointing.
+
+Only on "sent REJ" exception condition from the DTE shall be established at a
+time.  A "sent REJ" exception condition shall be cleared when the requested I
+frame is received.  A REJ frame may be retransmitted (up to N2 transmissions)
+if the REJ exception condition is not cleared within time-out T1 following
+transmission of a REJ frame.
+
+The DTE receiving a REJ frame from the DCE/remote DTE shall initiate
+sequential (re-)transmission of I frames starting with the I frame indicated
+by the N(R) contained in the REJ frame.  The retransmitted frames may contain
+a N(R) and a P bit that are updated from, and therefore different from, the
+ones contained in the originally transmitted I frames.  The DTE shall start
+the retransmission before or concurrent with transmission of the next ocmmand
+frame with the P bit set to "1".
+
+If
+
+    a)	DTE retransmission beginning at a particular frame occurs due to
+	checkpointing (see 4.4.2.1), and
+
+    b)	a REJ frame is received from the DCE before completion of the next
+	checkpoint cycle which would also start retransmission with the same
+	particular farme (as identified by the N(R) in the REJ frame),
+
+the retransmission resulting from the REJ frame shall be inhibited by the DTE.
+
+
+4.4.2.3  Time-out recovery
+
+If the DCE/remote DTE, due to a transmission error, does not receive (or
+recevies and discards) a signle I frame or the last I frame in a sequence of I
+frames, it will not detect an N(S) sequence error condition and, therefore,
+will not transmit a REJ frame.  The DTE which transmitted the unacknowledged I
+frame(s) shall, following the completion of a system specified time-out period
+(see 5.7.1.1), take appropriate recovery action to determine at which I frame
+retransmission shall begin.  The retransmitted I frames may contain an N(R)
+and a P bit that are updated from, and therefore different from, the ones
+contained in the originally transmitted I frames.
+
+4.4.3  Invalid frame condtions
+
+Any frame received from the DCE/remote DTE which is invalid (see 3.8) shall be
+discarded by the DTE and no action shall be taken as a result of that frame.
+
+4.4.4  Frame rejection condition
+
+A frame rejection condition shall be established at the DTE upon the receipto
+fo an error-free frame with one of the conditions liseted in 4.3.9.
+
+This frame rejection exception condition shall be reported by the DTE by a
+FRMR response frame for appropriate action by the DCE/remote DTE.  ONce the
+DTE has established such an exception condition, no additional I frames shall
+be accepted until the condition is reset by the DCE/remote DTE.  The FRMR
+response may be repeated by the DTE at each opportunity, as specified in
+5.6.2, until recovery is effected by the DCE/remote DTE and the data link is
+reset, or until the local DTE initiates its own recovery.
+
+
+5  Description of the procedure
+
+5.1  Procedure for addressing
+
+The address filed identifies a frame as either a command or a response.  A
+command frame contains the address of the station to which the command is
+being sent.  A response frame contains the address of the station sending the
+frame.
+
+In order to allow differentiation between single link operation and the
+optional multilink operation for diagnostic and/or maintenance reasons,
+different address pair encodings shall be assigned to data links operating
+with multilink procedure compared to data links operating with the single link
+procedure.
+
+Frames containing commands transferred from the DCE to the DTE shall contain
+the address A for the single link operation and address C for the mulitlink
+operation.
+
+Frames containing reponses fromt he DCE to the DTE shall contain the address B
+for the single link operation and address D for the multilink operation.
+
+Frames containing commands transferred from the DTE to the DCE shall contain
+the address B for the single link operation and address D for the multilink
+operation.
+
+Frames contianing responses transferred from the DTE to the DCE shall contain
+the address A for the single link operation and address C for the multlink
+operation.
+
+These addresses are coded as follows:
+
+                                 Address         Bits
+                                            1 2 3 4 5 6 7 8
+
+        Single link operation       A       1 1 0 0 0 0 0 0
+                                    B       1 0 0 0 0 0 0 0
+
+        Multilink operation         C       1 1 1 1 0 0 0 0
+                                    D       1 1 1 0 0 0 0 0
+
+The DTE shall discard all frames received with an address other than A or B
+(single link operation), or C or D (multilink operation).
+
+For DTE/DTE use (point-to-point non-switched applications), the assignment of
+A/B (single link operation) or C/D (multilink operation) addresses shall be
+made prior to initialization and should be capable of being fixed at ssytem
+generation time.
+
+NOTE -- The mechanism for ascertaining DTE address allocation in the case of
+	point-to-point switched applications for both DTE/DCE cases and
+	DTE/DTE cases is not covered by this International Standard.
+
+
+5.2  Procedures for us of the P/F bit
+
+The DTE receiveing a SABM/SABME, DISC, supervisory command or I frame with the
+P bit set to "1" shall set the F bit to "1" in the next response frame it
+transmits.
+
+The response frame returned by the DTE to a SABM/SABME or DISC comamdn with
+the P bit set to "1" shall be a UA or DM response with the P bit set to "1".
+The response frame returned by the DTE to an I frame with the P bit set to
+"1", received during the information transfer phase, shall be an RR, REJ, RNR
+or FRMR response with the F bit set to "1".  The response frame returned by
+the DTE to a supervisory command frame with the P bit set to "1", received
+during the information transfer phase, shall be a RR, REJ, RNR or FRMR
+response with the F bit set to "1". The response frame returned by the DTE to
+supervisory command or I command frame with the P bit set to "1", received
+during the disconnected phase shall ba  DM response with the F bit set to "1".
+
+The P bit shall be used in conjunction with the timer recovery conditions (see
+5.4.9).  The P bit may also be used by the DTE to initiate a checkpoint
+mechanism (see 4.4.2.1) at any time.
+
+
+5.3  Procedures for link set-up and disconnection
+
+5.3.1  Link set-up
+
+A DCE shall indicate that it is able to set up the link by transmitting
+contiguous flags (active channel state) to the DTE.
+
+Either the DTE or a DCE/remote DTE may initiate link set-up.  Prior to
+intitiation of the link set-up, either the DTE or the DCE/remote DTE may
+intiate link disconnection for the purpose of ensuring that the DTE and the
+DCE/remote DTE are in the same phase.  The DTE may also transmit an
+unsolicited DM response to request the DCE/remote DTE to initiate link set-up.
+
+The DCE/remote DTE shall initialize the link by transmitting a SABM/SABME
+command to the DTE.  If, on receiving correctly the SABM/SABME command, the
+DTE can etner the information transfer phase, it shall return a UA response,
+set its send and receive state variables, V(S) and V(R), to "0", and consider
+the link set up.  If, on receiving correctly the SABM/SABME command, the DTE
+cannot enter the information transfer phase, it shall return a DM response as
+a denial to the link set-up initialization and consider the link not set-up.
+
+The DTE shall initiate link set-up by transmitting a SABM/SABME command to the
+DCE/remote DTE and starting Timer T1 in ordere to determine when too much time
+has elapsed waiting for a reply (see 5.7.1.1).  If the DCE/remote DTE can
+enter the information transfer phase, it shall return a UA response, reset its
+send and receive state variables, V(S) and V(R), to "0", and consider the link
+set up.  The DTE, on receiving correctly a UA response, shall stop Timer T1,
+have its send and receive state variables, V(S) and V(R), set to zero, and
+consider the link set up.  If the DCE/remote DTE cannot enter the information
+transfer phase, it shall return a DM response as a denial to the link set-up
+initialization.  The DTE, on receiving correctly a DM response, shall stop
+Timer T1 and consider the link not set up.  In order to avoid
+misinterpretation of a DM respone received during link set-up, the DTE shall
+always send its SABM/SABME command with the P bit set to "1".  It will then be
+possible to differentiate a DM response from the DCE/remote DTE intended as a
+denial to link set-up (F bit set to "1") from a DM response from the
+DCE/remote DTE that was issued in an unsolicited sense (F bit set to "0") as a
+request for a mode-setting command (as described in 5.5).  The DTE may decide
+to re-initiate link set-up at any time.
+
+The DTE, having sent a SABM/SABME command, shall ignore and discard any frames
+except a SABM/SABME, DISC, UA or DM frame received from the DCE/remote DTE.
+The receipt of a SABM/SABME or DISC frame from the DCE/remote DTE will result
+in a collision istuation that is resolved per 5.3.5.  Frames from the DTE
+other than the UA frame and the DM frame sent in response to a received
+SABM/SABME or DISC frame from the DCE/remote DTE shall be sent only after the
+link is set up and no outstanding SABM/SABME exits.
+
+After the DTE sends the SABM/SABME command, if a UA or DM response is not
+received correctly, Timer T1 will run out in the DTE.  The DTE shall then
+resend the SABM/SABME command and resetart Timer T1.  After N2 attempts to set
+up the link, the DTE shall initiate appropriate higher layer recovery action.
+The value of N2 is defined in 5.7.2.
+
+5.3.2  Information transfer phase
+
+After having transmitted the UA response to a SABM/SABME command or having
+received the UA respone to a transmitted SABM/SABME command, the DTE shall
+accept and transmit I frames and supervisory frames according to the
+procedures described in 5.4.
+
+During the information transfer phase, whenever there has been no activity on
+the data link for a period of time T4, it is strongly recommended that the DTE
+transmit an appropriate supervisory command frame with the P bit set to "1" to
+query the status of the DCE/remote DTE.  Receipt of a response with the F bit
+set to "1" will indicate both the existence of a working physical link and the
+logical status of the responding DCE/remote DTE.
+
+When receiving a SABM/SABME comamnd while in the information transfer phase,
+the DTE shall conform to the link resetting procedure described in 5.6.
+
+While in the information transfer phase, either the DTE or the DCE/remote DTE
+may initiate a disconnect of the data link according to the procedures
+described in 5.3.3.
+
+5.3.3  Link disconnection
+
+The DCE/remote DTE shall initiate a disconnect of the data link by
+transmitting a DISC command to the DTE.  The DTE, on receiving correctly a
+DISC command in the information transfer phase, shall send a UA response and
+shall enter the disconnected phase.  The DTE, on receiving correctly a DISC
+command in the disconnected phase, shall send a DM response and remain in the
+disconnected phase.
+
+The DTE shall initiate a disconnect of the data link by transmitting a DISC
+command to the DCE/remote DTE and starting Timer T1.  Upon reception of a UA
+response form the DCE/remote DTE, the DTE shall stop Timer T1 and enter the
+disconnected pahse.  Upon reception of a DM response from the DCE/remote DTE
+as an indication that the DCE/remote DTE was already in the disconnected
+phase, the DTE shall stop Timer T1 and enter the disconnected pahse.  In order
+to avoid misinterprentation of a DM response received during link siconnect,
+the DTE shall always send its DISC command with the P bit set to "1".  It will
+then be possible to differentiate a DM response from the DCE/remote DTE
+intended as an indication that the DCE/remote DTE was already in the
+disconnected pahse (F bit set to "1") from a DM response from the DCE/remote
+DTE that was issued in an unsolicited sense (F bit set to "0") as a request to
+a mode-setting command (as described in 5.5).
+
+The DTE, having sent a DISC command, shall ignore and discard any frames
+except a SABM/SABME, DISC, UA or DM frame received from the DCE/remote DTE.
+The receipt of a SABM/SABME or DISC command from the DCE/remote DTE will
+result in a collision situation that is resolved per 5.3.5.
+
+After the DTE sends a DISC command, if a UA or DM response is not received
+correctly, Timer T1 will run out in the DTE.  The DTE shall then resend the
+DISC command and restart Timer T1.  After N2 attempts to disconnect the data
+link, the DTE shall initiated appropriate higher layer recovery action.
+
+5.3.4  Disconnected phase
+
+After having received a DISC command and returned a UA response or having
+received a UA response to a transmitted DISC command, the DTE shall enter the
+disconnected phase.
+
+In the disconnected pahse, either the DTE or the DCE/remote DTE may initiate
+link set-up.
+
+In the disconnected phase, the DTE shall react to the receipt of a SABM/SABME
+command as described in 5.3.1, and shall transmit a DM response in answer to a
+received DISC command.  WHen receiving any other command frame with the P bit
+set to "1", the DTE shall transmit a DM response with the F bit set to "1".
+In the disconnected pahse, the DTE shall react to the receipt of an
+unsolicited DM response by initiating a link set-up procedure in accordance
+with 5.3.1, provided that it is able to set up the link.  Other frames
+received in the disconnected phase shall be ignored.
+
+When the DTE enters the disconnected phase after detecting error conditions
+as listed in 5.5, or after an internal malfunction, it may indicate this by
+sending a DM response rather than a DISC command.  In these cases, the DTE
+shall transmit the DM response and start Timer T1.  If Timer T1 runs out
+before the reception of a SABM/SABME or DISC command, the DTE may retransmit
+the DM response and restart Timer T1.  After transmission of the DM response
+N2 times, the DTE may remain in the disconnected phase and appropriate
+recovery action shall be initiated by a higher layer.  Alternatively, after an
+internal malfunction, the DTE may either initiate a link resetting procedure
+(see 5.6) or disconnect the data link (see 5.3.3) prior to initiating a link
+set-up procedure (see 5.3.1).
+
+5.3.5  Collision of unnumbered commands
+
+Collision situations shall be resolved in the following way:
+
+If the sent and received unnumbered commands are the same, the DTE and the
+DCE/remote DTE shall each send the UA reponse at the earliest opporunity.  The
+DTE shall enter the indicated phase either
+
+    a)	after receiving the UA response;
+
+    b)	after sending the UA response; or
+
+    c)	after timing out waiting for the UA response having sent a UA
+	response.
+
+In the case of (b), the DTE shall accept a subsequent UA response to the
+unnumbered command it issued without considering it an unsolicited UA response
+if received within the time-out interval.
+
+If the sent and received unnumbered commands are different, the DTE and the
+DCE/remote DTE shall each enter the disconnected phase an issue a DM response
+at the earliest possible opporunity.
+
+5.3.6  Collision of DM response with SABM/SABME or DISC command
+
+When a DM response is issued by the DCE/remote DTE as an unsolicited response
+to request the DTE to issue a mode-setting command as described in 5.3.4, a
+collision between a SABM/SABME or DISC command transmitted by the DTE and the
+unsolicited DM response may occur.  In order to avoid misintrepretation of the
+DM response received, the DTE shall always send its SABM/SABME or DISC command
+with the P bit set to "1".
+
+5.3.7  Collision of DM responses
+
+A contention situation may occur when both the DTE and the DCE/remote DTE
+issue a DM response to request a mode-setting command.  In this case, the DTE
+shall issue a SABM/SABME command to resolve the contention situation.
+
+
+5.4  Procedures for information transfer
+
+The procedures which apply to the transmission of I frames in each direction
+during the information transfer pahse are described below.
+
+In the following, "number one higher" is in reference to a continuously
+repeated sequence series, i.e., 7 is one higher than 6 and 0 is one higher
+than 7 for modulo 8 series, and 127 is one higher than 126 and 0 is one higher
+than 127 for modulo 128 series.
+
+5.4.1  Sending I frames
+
+When the DTE has an I frame to transmit (i.e., an I frame not already
+transmitted, or an I frame that has to be retransmitted as described in
+5.4.6), it shall transmit it with an N(S) equal to its current send state
+variable V(S), and an N(R) equal to its current receive state variable V(R).
+At the end of the transmission of the I frame, it shall increment its send
+state variable V(S) by one.
+
+The DTE Timer T1, if not running at the time of transmission of an I frame,
+shall be started.
+
+If the DTE send state variable V(S) is equal to the last value of N(R)
+received plus 'k' (where 'k' is the maximum number of outstanding I frames;
+see 5.7.4) the DTE shall not transmit any new I frame, but may retransmit old
+I frames as described in 5.4.6 or 5.4.9.
+
+In order to ensure security of information transfer, the DTE shall not
+transmit any I frame if its send state variable V(S) is equal to the last
+value of N(R) it has received from the DCE/remote DTE plus 7 in basic (modulo
+8) operation or 127 in extended (modulo 128) operation.
+
+When the DTE is in the busy condition, it may still transmit I frames,
+provdied that the DCE/remote DTE is not busy.  When in the frame rejection
+condition, it shall stop transmitting I frames.
+
+5.4.2  Receiving an I frame
+
+When the DTE is not in a busy condition and receives a valid I frame whose
+send sequence number is equal to the DTE receive state variable V(S), the DTE
+shall accept the information field of this frame, increment by one its receive
+state variable V(R), and take one of the following actions:
+
+    a)	if the DTE is still not in a busy condition:
+
+	1)  if an I frame is available for transmission, the DTE shall act as
+	    described in 5.4.1 and acknowledge the received I frame by setting
+	    N(R) in the control field of the next transmittted I frame to the
+	    value of the DTE receive state variable V(R), or the DTE shall
+	    acknowledge the received I frame by transmitting an RR frame with
+	    the N(R) equal to the value fo the DTE receive state variable
+	    V(R);
+
+	2)  if no I frame is available for transmission, the DTE shall
+	    transmit an RR frame with the N(R) equal to the value of the DTE
+	    receive state variable V(R).
+
+    b)	if the DTE is now in the busy condition, it shall transmit an RNR
+	frame with N(R) equal to the value of the DTE receive state variable
+	V(R) (see 5.4.8).
+
+When the DTE is in a busy condition, it may ignore the information field
+contained in any received I frame.
+
+5.4.3  Reception of invalid frames
+
+When the DTE receives an invalid frame (see 3.8), this frame shall be
+discarded.
+
+5.4.4  Reception of out-of-sequence frames
+
+When the DTE receives a valid I frame whose send sequence number is incorrect,
+i.e., not equal to the current DTE receive state variable V(R), it shall
+discard the information field of the frame and transmit a REJ frame with the
+N(R) set to one higher than the N(S) of the last correctly received I frame.
+The REJ frame shall be a command frame with the P bit set to "1" if an
+acknowledged transfer of the retransmission request is required; otherwise,
+the REJ frame may be either a command or a response frame.  The DTE shall then
+discard the information field of all I frames received until the expected I
+frame is received correctly.  When receiving the expected I frame, the DTE
+shall then acknowledge the I frame as described in 5.4.2.  The DTE shall use
+the N(R) and P bit information in the discarded I frames as described in
+4.4.2.
+
+5.4.5  Receving acknowledgement
+
+When correctly receiving an I frame or a supervisory frame (RR, RNR or REJ),
+even in the busy condition, the DTE shall consider the N(R) contained in this
+frame as an acknowledgement for all I frames it has trasnmitted with an N(S)
+up to and including the received N(R)-1.  The DTE shall stop the Timer T1 when
+it correctly receives an I frame or a supervisory frame with the N(R) higher
+thatn the last received N(R) (actually acknowledging some I frames), or a REJ
+frame with an N(R) equal to the last received N(R).
+
+If Timer T1 has been stopped by the receipt of an I, RR or RNR frame, and if
+there are outstanding I frames still unacknolwedged, the DTE shall start Timer
+T1.  If Timer T1 then runs out, the DTE shall follow the recovery procedure
+(see 5.4.9) with respect to the unacknolwedged I frames.  If Timer T1 has been
+reset by the receipt of a REJ frame, the DTE shall follow the retranmission
+procedures in 5.4.6.
+
+5.4.6  Receiving a REJ frame
+
+When receiving a REJ frame, the DTE shall set its send state variable V(S) to
+the N(R) received in the REJ frame control field.  It shall transmit the
+corresponding I frame a soon as it is available or retransmit it, in
+accordance with the procedure described in 5.4.1.  (Re)transmission shall
+conform to the following:
+
+    a)	If the DTE is tranmitting a supervisory command or response when it
+	receives the REJ frame, it shall complete that transmission before
+	commencing transmission of the requested I frame.
+
+    b)	If the DTE is transmitting an unnumbered command or response when it
+	receives the REJ frame, it shall ignore the request for
+	retransmission.
+
+    c)	If the DTE is transmitting an I frame when it receives the REJ frame,
+	it may abort the I frame and commence transmission of the requested I
+	frame immediately after aborting the frame.
+
+    d)	If the DTE is not transmitting any frame when it receives the REJ
+	frame, it shall commence transmission of the requested I frame
+	immediately.
+
+In all cases, if other unacknowledged I frames have already been transmitted
+following the one indicated in the REJ frame, then those I frames shall be
+retransmittted by the DTE following the retransmission of the requested I
+frame.
+
+If the REJ frame was received from the DCE/remote DTE as a command with the P
+bit set to "1", the DTE shall transmit an RR, RNR or REJ response, as
+appropriate, with the F bit set to "1" before transmitting or retransmitting
+the corresponding I frame.
+
+Other I frames not yet transmittted may be transmitted folowing the
+retransmittted I frame.
+
+
+5.4.7  Receiving an RNR frame
+
+After receiving an RNR frame, the DTE shall stop transmission or
+retransmission of I frames until an RR or REJ frame is received, or unitl
+Timer T1 runs out, see 4.4.1.  When Timer T1 runs out before receipt of a busy
+clearance indication, the DTE shall follow the procedure described below.  In
+any case, the DTE shall not transmit any other I frames before receiving an RR
+or REJ frame, or before completion of a link resetting procedure.
+
+After Timer T1 runs out, the DTE shall transmit a supervisory command frame
+(RR, RNR or REJ) with the P bit set to "1" and shall restart Timer T1, in
+order to determine if there is any change in the receive status of the
+DCE/remote DTE.  The DCE/remote DTE shall respond to the P bit set to "1" with
+a supervisory response frame (RR, RNR or REJ) with the F bit set to "1"
+indicating either continuance of the busy condition (RNR frame) or clearance
+of the busy condition (RR or REJ frame).  Upon receipt of the DCE/remote DTE
+response, Timer T1 shall be stopped.
+
+    a)	If the response is an RR or REJ frame, the busy condition shall be
+	assumed to be cleared and the DTE may transmit I frames beginning with
+	the I frame identified by the N(R) in the receive response frame.
+
+    b)	If the response is still an RNR frame, the busy condition shall be
+	assumed to still exist, and the DTE after a period of time (for
+	example, the length of Timer T1) shall repeat the enquiry of the
+	DCE/remote DTE receive status.
+
+If Timer T1 runs out before a status response is received, the enquiry process
+above shall be repeated.  If N2 attempts to get a status response fail, the
+DTE shall initiate a link resetting procedure as described in 5.6.
+
+If, at any time during the enquiry process, an unsolicited RR or REJ frame is
+received from the DCE/remote DTE, it shall be considered to be an indication
+of clearance of the busy condition.  Should the unsolicited RR or REJ frame be
+a command frame with the P bit set to "1", the appropriate response frame with
+the F bit set to "1" shall be trasnmitted before the DTE may resume
+transmission of I frames.  If Timer T1 is running, the DTE shall wait for the
+non-busy response with the F bit set to "1", or wait for Timer T1 to run out,
+and then resume transmission of I frames beginning with the I frame identified
+by the N(R) in the received RR or REJ frame.
+
+5.4.8  DTE busy condition
+
+When the DTE enters a busy condition, it shall transmit an RNR frame at the
+earliest opportunity.  The RNR frame shall be a command frame with the P bit
+set to "1" if an acknowledged trasnfer of the busy condition indication is
+required; otherwise, the RNR frame may be either a commadn or a response
+frame.
+
+While in the busy condition, the DTE shall accept and process supervisory
+frames, accept and process the contents of the N(R) field of I frames, and
+return an RNR response with the F bit set to "1" if it receives a supervisory
+command or I command frame with the P bit set to "1".
+
+To clear the busy condition, the DTE shall transmit either a REJ frame or an
+RR frame, with N(R) set to the current receive state variable V(R) (for
+example, the choice of frame depends on whether or not the DTE discarded
+information fields of correctly received I frames).  The REJ frame or the RR
+frame shall be a command frame with the P bit set to "1" if an acknowleged
+transfer of the busy-to-non-busy transition is required; otherwise, the REJ
+frame or RR frame may be either a command or a response frame.
+
+5.4.9  Waiting acknowledgement
+
+If Timer T1 runs out waiting for the acknowledgement from the DCE/remote DTE
+for an I frame transmitted, the DTE shall restart Timer T1 and transmit an
+appropriate supervisory command frame (RR, RNR or REJ) with the P bit set to
+"1".  If the DTE recevies correctly a supervisory response frame with the F
+bit set to "1" and with an N(R) within the range from the last N(R) recevied
+to the last N(S) sent plus one, the DTE shall reset Timer T1 and set it send
+state variable V(S) to the recevied N(R) and then resume with I frame
+transmisison or retransmission, as appropriate.  If, on the other hand, the
+DTE receives correctly a supervisory response frame with the F bit set to "0",
+or an I frame or supervisory command frame with the P bit set to "0" or "1",
+and with an N(R) within the range from the last N(R) recevied to the last N(S)
+sent plus one, the DTE shall not reset Timer T1, but use the received N(R) as
+an indication of acknoweldgement of transmitted frames up to and including I
+frames numbered N(R)-1.
+
+If Timer T1 runs out before a supervisory response frame with the F bit set to
+"1" is received, the DTE shall retransmit an appropriate supervisory command
+frame (RR, RNR or REJ) with the P bit set to "1" and restart Timer T1.  After
+N2 expirations of Timer T1 following retransmission of an I frame, without a
+supervisory response frame with the F bit set to "1" having been received from
+the DCE/remote DTE, the DTE shall initiate a link resetting procedure as
+described in 5.6.
+
+5.5  Conditions for link resetting or link re-initialization (link set-up)
+
+When the DTE receives, during the information transfer phase, a frame which
+isnot invalid (see 3.8) with one of the conditions listed in 4.3.9, it shall
+report the error condition and request the DCE/remote DTE to initiate a link
+resetting procedure by transmitting an FRMR response (see 5.6.2).
+
+When the DTE receives, during the information transfer phase, an FRMR
+response, it shall either initiate a link resetting procedure (see 5.6.1) or
+return a DM response to ask the DCE/remore DTE to initiate the link set-up
+(initialization) procedure.  After transmitting a DM response, the DTE shall
+enter the disconnected phase.
+
+When the DTE receives, druing the information transfer phase, a UA response,
+or an unsolicited response with the F bit set to "1", it may either initiate
+the link resetting procedures or return a DM response to ask the DCE/remote
+DTE to initiate the link set-up (initialization) procedure.  After
+tranmitting a DM response, the DTE shall enter the disconnected phase.
+
+WHen the DTE receives, during the information transfer phase, a DM response,
+the DTE shall either initiate the link set-up (initialization) procedures or
+return a DM response to ask the DCE/remote DTE to intiate the link set-up
+procedures.  After transmitting a DM response, the DTE shall enter the
+disconnected phase.
+
+5.6  Procedure for link resetting
+
+5.6.1  Link reset
+
+The link resetting procedure shall be used to intialize both direction of
+information transfer according to the procedure described below.  The link
+resetting procedure only applies during the information transfer phase.
+
+Either the DTE or the DCE/remote DTE may initiate the link resetting
+procedure.  The link resetting procedure shall indicate a clearance of the DTE
+and/or the DCE/remote DTE busy condition, if present.
+
+The DCE/remote DTE shall initiate a link resetting by transmitting a
+SABM/SABME command to the DTE.  If, on correct receipt of the SABM/SABME
+command, the DTE determines that it can continue in the information transfer
+phase, it shall return a UA response to the DCE/remote DTE, reset its send and
+receive state variables, V(S) and V(R) to "0", and remain in the information
+transfer phase.  If, on correct receipt of the SABM/SABME command, the DTE
+determines that it cannot remain in the information trasnfer phase, it shall
+return a DM response as a denial to the resetting request and enter the
+disconnected phase.
+
+The DTE shall initiate a link resetting by transmitting a SABM/SABME command
+to the DCE/remote DTE and starting its Timer T1.  The DTE, on receiving a UA
+response from the DCE/remote DTE, shall reset its send and receive variables,
+V(S) and V(R), to "0", stop its Timer T1, and remain in the information
+transfer phase.  The DTE, on receiving a DM response from the DCE/remote DTE
+as a denial to the link resetting request, shall stop its Timer T1 and enter
+the disconnected phase.
+
+The DTE, having sent a SABM/SABME command, shall ingore and discard any frames
+except a SABM/SABME or DISC command or a UA or DM response received from the
+DCE/remote DTE.  The receipt of a SABM/SABME or DISC command from the
+DCE/remote DTE shall result ina collision situation that is resolved as in
+5.3.5.  Frames other than the UA or DM response sent in response to a received
+SABM/SABME or DISC command shall be setn only after the data link is reset and
+no outstanding SABM/SABME command exists.
+
+After the DTE sends the SABM/SABME command, if a UA or DM response is not
+received correctly, Timer T1 will run out in the DTE.  The DTE shall then send
+the SABM/SABME command again and start Timer T1.  After N2 attempts to reset
+the link, the DTE shall intiiate appropriate higher layer recovery action and
+enter the disconnected phase.
+
+
+5.6.2  Request for link reset
+
+The DTE may ask the DCE/remote DTE to reset the data link by transmitting an
+FRMR response (see 5.5).
+
+After transmitting an FRMR response, the DTE shall enter the frame rejection
+condition.  The frame rejection condition shall be cleared when the DTE
+receives or transmits SABM/SABME or DISC command or a DM response.  Any other
+command received while in the frame rejection condition shall cause the DTE to
+retransmit the FRMR response with the same information field as originally
+trasnmitted.
+
+The DTE may start Timer T1 on transmission of the FRMR response.  If Timer T1
+runs out before the reception of a SABM/SABME or DISC command or a DM response
+from the DCE/remote DTE, the DTE shall retransmit the FRMR response and start
+Timer T1.  After N2 attempts to get the DCE/remote DTE to reset the link, the
+DTE shal reset the link itself as described in 5.6.1.
+
+In the frame rejection condition, I frames and supervisory frames shall not be
+transmitted by the DTE.  Also, the DTE shall ignore and discard the N(S) and
+information fields of any received I frames, and the N(R) fields of any
+received I frames or supervisory frames.  When an aditional FRMR response has
+to be transmittted by the DTE as a result of the receipt of a command frame
+while Timer T1 is running, Timer T1 shall continue to run.  The DTE on
+receiving an FRMR response (even during a frame rejection condition) shall
+intiate a resetting procedrue by trasnmitting a SABM/SABME command as
+described in 5.6.1, or shall transmit a DM response to ask the DCE/remote DTE
+to initate the link set-up procedure as described in 5.3.1 and enter the
+disconnected phase.
+
+5.7  List of system parameters
+
+5.7.1  Timers
+
+5.7.1.1  Timer T1
+
+The value fo the DTE Timer T1 system parameter may be different from the value
+fo the DCE/remote DTE Timer T1 system paraemeter.  These values shall be made
+known to both the DTE and the DCE/remote DTE and agreed to for a designated
+period of time.
+
+The proper operation of the procedure requires that the transmitter's (DTE or
+DCE/remote DTE) Timer T1 be greater than the maximum time between transmission
+of frames (SABM/SABME, DM, DISC, FRMR, I, supervisory commands or REJ
+response) and the reception of the corresponding frame returned as an answer
+to this frame (UA, DM or acknowledging frame).  Therefore, the receiver (DTE
+or DCE/remote DTE) should not delay the response or acknowledging frame
+returned to the above frames by more than a value T2, where T2 is a system
+parameter (see 5.7.1.2).
+
+5.7.1.2  Parameter T2
+
+The value of DTE parameter T2 may be different from the value of the
+DCE/remote DTE parameter T2.
+
+T2 is the amount of time available at the DTE or DCE/remote DTE before the
+acknowleging frame must be initiated in order to ensure its receipt by the
+DCE/remote DTE or DTE, respectively, prior to Timer T1 running out at the
+DCE/remote DTE or DTE.  T2 is strictly less than T1.
+
+5.7.1.3  Timer T3
+
+The period f optional Timer T3 shall provide an adequate interval of time to
+justify considering the data link to be in a disconencted (out of service)
+state.  T3 is much larger than T4.
+
+5.7.1.4  Parameter T4
+
+The parameter T4 is a system parameter which represents the maximum time a DTE
+will allow without frames being exchanged on the data link.  The value of T4
+should be greater than T1 and may be very large for applications which are not
+concerned with early detection of faulty data link or phsyical link
+conditions.  T4 is much larger than T1.
+
+5.7.1.5  Parameter T5
+
+The optional parameter T5 applies only to operation in a start/stop
+environment.  The value of DTE parameter T5 may be different from the value of
+the DCE/remote DTE parameter T5.
+
+T5 is the length of time for which the DTE or DCE/remote DTE will receive a
+continuous mark condition (logical "1"state) without condiering its incoming
+channle to be in the idle channel state (see 3.11.2.2).
+
+5.7.2  Maximum number of retransmissions N2
+
+The value of the DTE N2 system parameter may be different from the value of
+the DCE/remote DTE N2 system parameter.  These values shall be made known to
+both the DTE and the DCE/remote DTE and agreed to for a designated period of
+time.
+
+The value of N2 shall indicate the maximum number of attempts that shall be
+made by the DTE or DCE/remote DTE to complete the successful retransmission of
+a frame to the DCE/remote DTE, respectively.
+
+
+5.7.3  Maximum numberof bits in an I frame N1
+
+The value of the DTE N1 system parameter may be different from the value of
+the DCE/remote DTE N1 system parameter.  These values shall be known to both
+the DTE and the DCE/remote DTE.
+
+The value of N1 shall indicate the maximum number of bits in an I frame
+(excluding flags and "0" bits inserted for transparency) that the DTE or
+DCE/remote DTE is willing to accept from the DCE/remote DTE, respectively.
+
+In order to support universal DCE operation, a DTE shall support a value of
+DTE N1 which is not less thatn 1080 bits (135 octets).  DCEs shall offer to
+DTEs that require it a value of DCE N1 which is greater than or equal to the
+maximum length of agreed to call set-up and clearing packets plus the length
+of the address, control and FCS filed at the DTE/DCE interface, and greater
+than or equal to the maximum length of the data packets which may cross the
+DTE/DCE interface plush the length of the address, control and FCS fields at
+the DTE/DCE interface.
+
+5.7.4  Maximum number of outstanding I frames k
+
+In the case of DTE/DCE oepration, the value of the DTE k system parameter
+shall be the same as the value fo the DCE k system parameter.  This value
+shall be agreed to for a designated period of time by both the DTE and the
+DCE.  IN the case of DTE/remote DTE operation, the value of the DTE k system
+parameter may be different from the value of the remote DTE k system
+parameter.  These values shall be agreed to for a designated period of time by
+both the DTE and the remote DTE.
+
+The DTE value of k shall indicate the maixmum number of sequentially numbered
+I frames that the DTE may have outstanding (i.e., unacknolwedged) at any given
+time.  The value of k shall never exceed 7 for modulo 8 operation, or 127 for
+modulo 128 operation.
+
+NOTE -- All DCEs will support a value of seven.  Other values (less than and
+greater than seven) may also be supported by DCEs.
+
+
+6  Multlink procedure (MLP)
+

@@ -1,0 +1,995 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ixe.4.man,v 0.9.2.1 2008-06-13 06:43:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ixe.4.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:53  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH IXE 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B ixe
+\- Internet Protocol over X.25 Encapsulation (IXE) Driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stream.h>
+.HP
+.BI "int " x25_stream " = open(" x25_device ", " flags );
+.HP
+.BI "int " ixe_stream " = open(" ixe_device ", " flags );
+.HP
+.BI "int " retval " = ioctl(" ixe_stream ", " \fRI_LINK\fP ", " x25_stream );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Internet Protocol over X.25 Encapsulation,
+.BR IXE ,
+is a
+.I STREAMS
+multiplexing driver that provides support for Internet Protocol over X.25 WAN
+connections, in accordance with
+X.37,
+.[
+x37
+.]
+RFC 877
+.[
+rfc877
+.]
+and RFC 1356.
+.[
+rfc1356
+.]
+.PP
+The IXE driver may also utilize the services of a SNARE
+.[
+iso10030
+.]
+or ARE,
+.[
+x116
+.]
+to map Internet Protocol (IP) addresses onto X.121 or E.164 addresses.
+.\"
+.\"
+.SH USAGE
+.PP
+During system initialization, an IXE daemon agent opens the
+.B IXE
+driver and links a number of (currently one) X.25 NLI Streams beneath the
+multiplexing driver using the
+.BR I_LINK (7)
+.I STREAMS
+input-output control from
+.BR streamio (7).
+Linking X.25 Streams in this fashion associates X.25 VC or PVC Streams
+for use by the
+.B IXE
+driver Stream.
+.PP
+The linked X.25 Streams are then configured using the
+.B IXE_SNREG
+input-output control, described below under
+.RI \(lq "IOCTLS" \(rq.
+.PP
+The agent then pusshes the
+.BR ipx25 (4)
+module on the open
+.B DL_IPX25
+DLPI Streams.
+.PP
+Each Stream configured in this fashion provides an additional IP
+interface (virtual NIC) in the native
+.B Linux
+TCP/IP networking subsystem.
+.PP
+Subsequent actions and use of the Streams are then placed under the control of
+the native
+.B Linux
+TCP/IP networking.  When the interface is moved to the UP state, X.25 VC or PVC
+will be connected or attached, and IP packets will begin to flow across the
+interface.  When the interface is moved to the DOWN state, X.25 VC or PVC will
+be disconnected or detached, and IP packets will cease to flow across the
+inteface.
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B IXE
+multiplexing driver defines the input-output controls detailed in the
+subsections that follow.
+.\"
+.SS IXE_SNREG
+.PP
+Register and configure a subnetwork.
+This input-output control is used by the
+.BR ixetune (8)
+utility.
+.PP
+The argument of this input-output control is a pointer to an
+.B ixe_snreg
+structure.
+.PP
+The
+.B ixe_snreg
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_snreg {
+    char prim_class;
+    char op;
+    uint32_t my_inaddr;
+    struct ixe_sninfo sn_info;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ix_snreg
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_SNREG .
+.TP
+.I my_inaddr
+Contains the IP Version 4 address in network byte order.
+.TP
+.I sn_info
+Contains a complete
+.B ixe_sninfo
+structure.
+.PP
+The
+.B ixe_sninfo
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_sninfo {
+    uint nsdu_hwm;
+    uint idle_ticks;
+    uint durn_ticks;
+    uint hold_down;
+    uchar conform84;
+    uchar addr_ddn;
+    uchar allow_no_addr;
+    uchar rst_action;
+    uchar exp_action;
+    struct xaddrf my_xaddr;
+    ushort lpc;
+    ushort hpc;
+};
+.fi
+.TP
+.I nsdu_hwm
+The NSDU high water mark.  This value specifies the maximum size, in octets,
+of outgoing datagrams to IXE before fragmenting them, and of incoming X.25
+packet sequences (an NSDU) that X.25 may pass up to IXE as a single datagram.
+.TP
+.I idle_ticks
+Connection idle timeout.  When the connection has been idle for this period of
+time, the connection is dropped.  This specifies the maximum period of time,
+in milliseconds, that this connection may be idle before being closed.
+.TP
+.I durn_ticks
+Minimum connection duration.  The connection will not be dropped for this
+duration after it is formed, regardless of whether the connection idle timeout
+has occured.  This specifies the maximum period of time, in milliseconds, that
+this connection may be idle before being closed.
+.TP
+.I hold_down
+Hold down timer.  When the connection has been dropped, it will be held down
+for this period of time before another connection attempt is made.
+.TP
+.I conform84
+When non-zero, conformance to X.25 (1984) is required.  In general,
+.B @PACAKGE_TITLE@
+uses the ISO 8208 X.25 PLP which is backward compatible with all versions of
+ISO 8208 and X.25.
+.TP
+.I addr_ddn
+When non-zero, use DDN addressing instead of ITU-T addressing.  Defense Data
+Network (DDN) addressing is described in RFC 1236,
+.[
+rfc1236
+.]
+and provides a mechanism for automatically deriving the X.121 DTE address from
+the IP Version 4 address.  In this case, mapping of IP Version 4 address to
+X.25 address within the IXE is not necessary.  See
+.BR ixemap (8).
+.TP
+.I allow_no_addr
+When non-zero, allow temporary ent on ITU-T.  This permits a temporary entry
+to be created that has no associated IP address for routing outgoing IP
+datagrams.  Incoming calls and IP datagrams will always be permitted.  Note
+that when DDN addressing is used this is not necessary.
+.TP
+.I rst_action
+Action to take on reset.  This may be one of the following values:
+.RS
+.PP
+.TP \w'\fBDO_RESET\fP\(em'u
+.B DO_ACK
+Acknowledge the reset with a
+.BR N_RC (7)
+message primitive.
+.PD 0
+.TP
+.B DO_DISC
+Disconnect the virtual circuit.
+.PD
+.RE
+.TP
+.I exp_action
+Action to take when expedited data is received.  This may be one of the
+following values:
+.RS
+.PP
+.TP \w'\fBDO_RESET\fP\(em'u
+.B DO_ACK
+Acknowledge the expedite data with a
+.BR N_EAck (7)
+message primitive, and discard the expedited data.
+.PD 0
+.TP
+.B DO_DISC
+Disconnect the virtual circuit.
+.TP
+.B DO_RESET
+Reset the virtual circuit.
+.PD
+.RE
+.TP
+.I my_xaddr
+The X.25 address for the local station.  This address is used as the calling
+address for X.25 VCs and as the subnetwork address and PVC LCI for PVCs.
+See
+.BR nli (7)
+for a description of the format of the
+.B xaddrf
+structure.
+.TP
+.I lpc
+The lower value of the PVC range.  This field, in combination with the next
+field,
+.IR hpc ,
+defines a range of logical channel identifiers that IXE will use for
+connection over X.25 PVCs.
+.TP
+.I hpc
+The upper value of the PVC range.  This field, in combination with the
+previous field,
+.IR lpc ,
+defines a range of logical channel identifiers that IXE will use for
+connections over X.25 PVCs.
+.\"
+.SS IXE_ENT
+.PP
+Add an entry into the IXE mapping table.
+This input-output control is used by the
+.BR ixemap (8)
+utility when the \fB-P\fP option is specified to that command.
+.PP
+The argument of this input-output control is a pointer to an
+.B ixe_ent
+structure.
+.PP
+The
+.B ixe_ent
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_ent {
+    char prim_class;
+    char op;
+    uint32_t in_addr;
+    struct xaddrf x_addr;
+    uchar nsap_flag;
+    uchar pkt_siz;
+    uchar win_siz;
+    uchar num_vcs;
+    uchar cug_type;
+    uchar cug_field[MAX_CUG_LEN];
+    uchar sub_rev_chrg;
+    uchar bar_rev_chrg;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_ent
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_ENT .
+.TP
+.I in_addr
+Contains the IP Version 4 address in network byte order.
+.TP
+.I x_addr
+X.25 address, including the subnetwork identifier.
+See
+.BR nli (7)
+for a description of the format of the
+.B xaddrf
+structure.
+.TP
+.I nsap_flag
+How to interpret the X.25 address.  This field can have one of the following
+values:
+.RS
+.TP \w'\fBTHIS_NSAP\fP\(em'u
+.B THIS_NSAP
+Use the NSAP given.
+.PD 0
+.TP
+.B IP_NSAP
+Use the IP address encoded as an NSAP value.
+.PD
+.RE
+.TP
+.I pkt_siz
+When non-zero, specifies the X.25 packet size.  When zero, the system default
+.BR ( 128 )
+will be used.
+.TP
+.I win_siz
+When non-zero, specifies the X.25 window size.  When zero, the system default
+.RB ( 2 )
+will be used.
+.TP
+.I num_vcs
+The number of Virtual Circuits to open.  Must be set to one (1), or zero (0)
+to use the system default.
+.TP
+.I cug_type
+Specifies the Closed User Group Type.  This field can have on of the following
+values:
+.RS
+.TP
+.B 0
+No closed user group.
+.TP
+.B CUG
+Closed user group.  The
+.I cug_field
+may contain zero (0) to four (4) octets.
+.TP
+.B BCUG
+Bilateral Closed User Group.  The
+.I cug_field
+contains four (4) octets.
+.RE
+.TP
+.I cug_field
+When
+.I cug_type
+is non-zero, contains zero (0) to four (4) octets identifying the Closed User
+Group.
+.TP
+.I sub_rev_chrg
+When non-zero, specifies subscription to reverse charging.
+.TP
+.I bar_rev_chrg
+When non-zero, specifies subscription to incoming reverse charging barred.
+.\"
+.SS IXE_DEL
+.PP
+Delete an entry from the IXE mapping table.
+This input-output control is used by the
+.BR ixemap (8)
+utility when the \fB-D\fP option is specified to that command.
+.PP
+The argument of this input-output control is a pointer to an
+.B ixe_del
+structure.
+.PP
+The
+.B ixe_del
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_del {
+    char prim_class;
+    char op;
+    uint32_t in_addr;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_del
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_DEL .
+.TP
+.I in_addr
+Contains the IP Version 4 address in network byte order.
+.\"
+.SS IXE_GET
+.PP
+Get an entry from the IXE mapping table.
+This input-output control is used by the
+.BR ixemap (8)
+utility when the \fB-G\fP option is specified to that command.
+The argument of this input-output control is a pointer to an
+.B ixe_get
+structure.
+.PP
+The
+.B ixe_get
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_get {
+    char prim_class;
+    char op;
+    uint32_t in_addr;
+    struct xaddrf x_addr;
+    uchar nsap_flag;
+    uchar pkt_siz;
+    uchar win_siz;
+    uchar num_vcs;
+    uchar cug_type;
+    uchar cug_field[MAX_CUG_LEN];
+    uchar sub_rev_chrg;
+    uchar bar_rev_chrg;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_get
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_GET .
+.TP
+.I in_addr
+Contains the IP Version 4 address in network byte order.
+.TP
+.I x_addr
+X.25 address, including the subnetwork identifier.
+See
+.BR nli (7)
+for a description of the format of the
+.B xaddrf
+structure.
+.TP
+.I nsap_flag
+How to interpret the X.25 address.  This field can have one of the following
+values:
+.RS
+.TP
+.B THIS_NSAP
+Use the NSAP given.
+.TP
+.B IP_NSAP
+Use the IP address encoded as an NSAP value.
+.RE
+.TP
+.I pkt_siz
+When non-zero, specifies the X.25 packet size.  When zero, the system default
+.BR ( 128 )
+will be used.
+.TP
+.I win_siz
+When non-zero, specifies the X.25 window size.  When zero, the system default
+.RB ( 2 )
+will be used.
+.TP
+.I num_vcs
+The number of Virtual Circuits to open.  Must be set to one (1), or zero (0)
+to use the system default.
+.TP
+.I cug_type
+Specifies the Closed User Group Type.  This field can have on of the following
+values:
+.RS
+.TP
+.B 0
+No closed user group.
+.TP
+.B CUG
+Closed user group.  The
+.I cug_field
+may contain zero (0) to four (4) octets.
+.TP
+.B BCUG
+Bilateral Closed User Group.  The
+.I cug_field
+contains four (4) octets.
+.RE
+.TP
+.I cug_field
+When
+.I cug_type
+is non-zero, contains zero (0) to four (4) octets identifying the Closed User
+Group.
+.TP
+.I sub_rev_chrg
+When non-zero, specifies subscription to reverse charging.
+.TP
+.I bar_rev_chrg
+When non-zero, specifies subscription to incoming reverse charging barred.
+.\"
+.SS IXE_MGET
+.PP
+Get all IXE mapping table entries.
+This input-output control is used by the
+.BR ixemap (8)
+utility when the \fB-M\fP option is specified to that command.
+The argument of this input-output control is a pointer to an
+.B ixe_mget
+structure.
+.PP
+The
+.B ixe_mget
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_mget {
+    char prim_class;
+    char op;
+    uint first_ent;
+    uint last_ent;
+    uint num_ent;
+    char buf[MGET_BUFSIZE];
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_mget
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_MGET .
+.TP
+.I first_ent
+The first entry required.
+.TP
+.I last_ent
+The last entry required.
+.TP
+.I num_ent
+The number of entries required.
+.TP
+.I buf
+A buffer to contain the retrieved entries.
+.\"
+.SS IXE_RESET
+.PP
+Reset the address table.
+This input-output control is used by the
+.BR ixemap (8)
+utility when the \fB-Z\fP option is specified to that command.
+The argument of this input-output control is a pointer to an
+.B ixe_reset
+structure.
+.PP
+The
+.B ixe_reset
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_reset {
+    char prim_class;
+    char op;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_reset
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_RESET .
+.\"
+.SS IXE_STATS
+.PP
+Get statistics.
+The argument of this input-output control is a pointer to an
+.B ixe_stats
+structure.
+.PP
+The
+.B ixe_stats
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_stats {
+    char prim_class;
+    char op;
+    uint ixcons_active;
+    uint32_t dgs_out;
+    uint32_t dgs_in;
+    uint32_t nsdus_in;
+    uint32_t nsdus_out;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_stats
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_STATS .
+.TP
+.I ixcons_active
+The current number of IXE connections open (this value cannot be reset).
+.TP
+.I dgs_out
+A count of the number of datagrams passed down by the IP module.
+.TP
+.I dgs_in
+A count of the number of datagrams passed up to the IP module.
+.TP
+.I nsdus_in
+A count of the number of NSDUs passed up from the X.25 PLP driver.
+.TP
+.I nsdus_out
+A count of the number of NSDUs passed down to the X.25 PLP driver.
+.\"
+.SS IXE_STATINIT
+.PP
+Reset statistics counters.
+The argument of this input-output control is a pointer to an
+.B ixe_statinit
+structure.
+.PP
+The
+.B ixe_statinit
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_statinit {
+    char prim_class;
+    char op;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_statinit
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_STATINIT .
+.\"
+.SS IXE_SNUNREG
+.PP
+Unregister a subnetwork.
+The argument of this input-output control is a pointer to an
+.B ixe_snunreg
+structure.
+.PP
+The
+.B ixe_snunreg
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ixe_snunreg {
+    char prim_class;
+    char op;
+    uint32_t my_inaddr;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B ixe_snunreg
+structure contains the following members:
+.TP
+.I prim_class
+Always
+.BR IXE_MSG .
+.TP
+.I op
+Always
+.BR IXE_SNUNREG .
+.TP
+.I my_inaddr
+Contains the IP Version 4 address in network byte order.
+.\"
+.\"
+.SH DEVICES
+.PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B IXE
+multiplexing driver is compatible with the NLI,
+.[
+nli Revision 0.9.2
+.]
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and implementations based on Spider X.25, including
+.IR AIXlink/X.25 ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS X.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25pg
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+and others, with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.IR Solaris \(rg,
+the configuration agent daemon is called
+.BR x25netd (8).
+.IP \(em
+Under
+.IR IRIX \(rg,
+the configuration agent is called
+.BR ixemap (8).
+.IP \(em
+.IR Solaris \(rg
+pushes IP as a module instead of linking the IXE Stream beneath an IP
+multiplexing driver.  This approach is also possible, see the
+.BR ipx25 (4)
+driver (that can also be pushed as a module).
+.IP \(em
+It appears that the fields
+.IR idle_ticks ", " durn_ticks ", and " hold_down
+were specified in system clock ticks by the original Spider X.25.
+.B @PACKAGE_TITLE@
+uses the system clock agnostic value of milliseconds for these fields instead.
+Management software, such as
+.BR ixetune (8),
+specify these value in seconds.
+.IP \(em
+.IP \(em
+.PP
+See
+.BR nli (7),
+.BR x25-plp (4),
+.BR dlpi (7),
+.BR ipx25 (4),
+.BR ixemap (8),
+.BR ixetune (8),
+and
+.BR STREAMS (9),
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+None.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.BR
+.\"
+.\"
+.SH VERSIONS
+.PP
+.\"
+.\"
+.XX
+.[
+npi revision 2.0.0
+.]
+.[
+aixx25
+.]
+.[
+sx25
+.]
+.[
+solx25pg
+.]
+.[
+ptx25
+.]
+.[
+x25
+.]
+.[
+x223
+.]
+.[
+x622
+.]
+.[
+iso7776
+.]
+.[
+iso8208
+.]
+.[
+iso8881
+.]
+.[
+iso10177
+.]
+.[
+rfc877
+.]
+.[
+rfc1086
+.]
+.[
+rfc1356
+.]
+.[
+rfc1381
+.]
+.[
+rfc1382
+.]
+.[
+rfc1461
+.]
+.[
+rfc1598
+.]
+.[
+rfc1613
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+

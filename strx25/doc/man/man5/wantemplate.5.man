@@ -1,0 +1,231 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: wantemplate.5.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: wantemplate.5.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH WANTEMPLATE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B wantemplate
+\- Wide Area Network File Format
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B lapbtemplate
+describes the file format for input to the
+.BR lltune (8)
+command for LAPB class subnetworks.
+The file format consists of a number of parameter values, one per line,
+formated as described below.  Each parameter value is described using its line
+number in the file, a parameter name, and a description of the format of the
+value.  Only the value appears in the file, each value on a line by itself, one
+value per line.
+.PP
+Each of the LAPB configuration parameters corresponds to the member and values
+of the
+.B lapb_tune
+structure, that is carried in a
+.B lapb_tnioc
+structure by the
+.B L_LAPBTUNE
+input-output control.
+.PP
+These protocol parameters, and the default values that exist when tuning has
+not been applied to a newly created LAPB subnetwork, correspond directly to the
+protocol parameters and defaults in ISO/IEC 7776,
+.[
+iso7776
+.]
+X.25
+.[
+x25
+.]
+and X.75.
+.[
+x75
+.]
+.\"
+.\"
+.SH FORMAT
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+Files following this format are normally kept in the
+.B @configdir@/@PACKAGE@/template/
+directory.
+.PP
+(Note that this directory varies depending on whether the build was on a
+.BR dpkg (1)-based
+or
+.BR rpm (1)-based
+system.)
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR wantune (8),
+.BR wan (4),
+.BR x25netd (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B wantemplate
+file format is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.PP
+For additional compatibiltiy information see,
+.BR wan (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B wantemplate
+file format first appeared in
+.IR "Spider X.25" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+
+
