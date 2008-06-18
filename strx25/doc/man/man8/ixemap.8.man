@@ -1,0 +1,701 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ixemap.8.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ixemap.8.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH IXEMAP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Admin Commands"
+.SH NAME
+.B ixemap
+\- configure X.25 address and IP address mapping
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.hy 0
+.HP \w'\fBixemap\fP\ 'u
+\fBixemap\fP [\fIoptions\fP]
+{\fB-D\fP|\fB--delete\fP}
+{\fB-a\fP|\fB--address\fP[\fB=\fP]}\fIip_address\fP
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+.PD 0
+.HP
+\fBixemap\fP [\fIoptions\fP]
+{\fB-G\fP|\fB--get\fP}
+{\fB-a\fP|\fB--address\fP[\fB=\fP]}\fIip_address\fP
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+.HP
+\fBixemap\fP [\fIoptions\fP]
+{\fB-M\fP|\fB--list\fP}
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+.HP
+\fBixemap\fP [\fIoptions\fP]
+{\fB-P\fP|\fB--load\fP}
+[{\fB-f\fP|\fB--file\fP[\fB=\fP]}\fIfilename\fP]
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+.HP
+\fBixemap\fP [\fIoptions\fP]
+[{\fB-Z\fP|\fB--zero\fP}]
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+.HP
+\fBixemap\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fBixemap\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fBixemap\fP
+{\fB-C\fP|\fB--copying\fP}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\".PP
+.\"There are a number of automatic translation schemes for translating IP
+.\"addresses into OSI NSAPs.
+.\".TP
+.\".B RFC 1069
+.\".[
+.\"rfc1069
+.\".]
+.\".RS
+.\".TS
+.\"tab(:);
+.\"lw(14n)l.
+.\"47:AFI (ICD Binary)
+.\"0006:IDI/ICD (Internet ICD)
+.\"02:DFI Version
+.\"00:Global Area
+.\"00000000000000:Padding
+.\"AABBCCDD:IPv4 address
+.\"00:Nsel
+.\".TE
+.\".PP
+.\".nf
+.\"470006020000000000000000AABBCCDD00
+.\".fi
+.\".PP
+.\"Or, in 2/6/1 format:
+.\".TS
+.\"tab(:);
+.\"lw(14n)l.
+.\"47:AFI (ICD Binary)
+.\"0006:IDI/ICD (Internet ICD)
+.\"02:DFI Version
+.\"00:Global Area
+.\"XXXX:Routing Domain
+.\"000000:Padding
+.\"XX:Area Code
+.\"AABBCCDDPPPP:IPv4 address and Port
+.\"00:Nsel
+.\".TE
+.\".PP
+.\".nf
+.\"4700060200XXXX000000XXAABBCCDDPPPP00
+.\".fi
+.\".RE
+.\".TP
+.\".B RFC 1236
+.\".[
+.\"rfc1236
+.\".]
+.\".TP
+.\".B RFC 1277
+.\".[
+.\"rfc1277
+.\".]
+.\"These are RFC 1006
+.\".[
+.\"rfc1006
+.\".]
+.\"NSAPs.
+.\".RS
+.\".TS
+.\"tab(:);
+.\"lw(14n)l.
+.\"54:AFI (F.69 Decimal)
+.\"00:F.69 prefix
+.\"728722:Hypothetical telex number
+.\"03:Prefix (RFC1006)
+.\"AAABBBCCCDDD:IPv4 address (decimal)
+.\"PPPPP:Port number (decimal)
+.\"TTTTT:Transport selection mask (1 TCP, 2 UDP, 4 SCTP)
+.\".TE
+.\".PP
+.\".nf
+.\"540072872203AAABBBCCCDDDPPPPPTTTTT
+.\".fi
+.\".RE
+.\".TP
+.\".B RFC 4548
+.\".[
+.\"rfc4548
+.\".]
+.\".RS
+.\".TS
+.\"tab(:);
+.\"lw(14n)l.
+.\"47:AFI (IANA ICP Binary)
+.\"0001:IPv4 (IPv6 is 0000)
+.\"AABBCCDD:IPv4 address (binary)
+.\"PPPP:Port number (set to zero)
+.\"000000000000000000000000:Padding
+.\".TE
+.\".PP
+.\".nf
+.\"470001AABBCCDDPPPP000000000000000000000000
+.\".fi
+.\".RE
+.\".TP
+.\".B ISO/IEC 8802-2
+.\".[
+.\"iso/iec 8802-2 : 1998
+.\".]
+.\"Typical trick for specifying a local NSAP for LLC operation:
+.\".RS
+.\".TS
+.\"tab(:);
+.\"lw(14n)l.
+.\"49:AFI (Local Binary)
+.\"--:IDI (NULL)
+.\"XXXX:Routing Domain/Area Code (Subnetwork)
+.\"HHHHHHHHHHHH:MAC Address
+.\"00:NSel
+.\".TE
+.\".PP
+.\".nf
+.\"49XXXXHHHHHHHHHHHH00
+.\".fi
+.\".RE
+.\".TP
+.\".B ISO/IEC 10030
+.\".[
+.\"iso/iec 10030 : 1995
+.\".]
+.\"An End System (ES) can request that an NSAP (NET) be assigned to it from an
+.\"Intermediate System (IS) or SNARE.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.SS Command Options
+.PP
+The following command options are mutually exclusive: only one command option
+should be present on the command line at a time.  The exceptions are the
+\fB-h\fP, \fB-V\fP and \fB-C\fP options that can be specified alone, or with
+any other option.
+.TP
+\fB-D\fP, \fB--delete\fP
+Delete the address mapping identified by the \fIip_address\fP argument to the
+\fB-a\fP option.  The \fB-a\fP option must be specified.
+.TP
+\fB-G\fP, \fB--get\fP
+Display the address mapping identified by the \fIip_address\fP argument to the
+\fB-a\fP option.  The \fB-a\fP option must be specified.
+.TP
+\fB-M\fP, \fB--list\fP
+List all of the address mappings for the IXE device.
+.TP
+\fB-P\fP, \fB--load\fP
+Load the address mappings in the file specified by the \fIfilename\fP argument
+to the \fB-f\fP option.  The \fB-f\fP option may be specified, or allowed to
+default.
+.TP
+\fB-Z\fP, \fB--zero\fP
+Zero the address mappings (that is, remove all address mappings) from the IXE
+device.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, display usage information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, display version information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, display copying information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.\"
+.SS Common Options
+.PP
+The following common options can be specified together along with a command
+option.  It is not an error to specify options that are not necessary for the
+command option with which they are specified.
+.TP
+\fB-a\fP, \fB--address\fP \fIip_address\fP
+Specify the IPv4 address, \fIip_address\fP, for which to delete or retrieve an
+address mapping.  The address mapping is deleted when the \fB-D\fP command
+option is specified; retrieved for the \fB-G\fP option.  This option must be
+specified whenever the \fB-D\fP or \fB-G\fP option is specified.
+.TP
+\fB-d\fP, \fB--device\fP \fIdevicename\fP
+Specify the device name upon which to operate.  When this option is not
+specified, or \fIdevicename\fP is not given, the default is
+.BR /dev/ixe " or " /dev/streams/ixe ,
+whichever opens successfully first.
+.TP
+\fB-f\fP, \fB--file\fP \fIfilename\fP
+Specify the configuration file that holds mapping information to apply to the
+device when the \fB-P\fP command option is also specified.  When this option
+is not specified, or the \fIfilename\fP is not given, the default is
+.BR @configdir@/ixemapconf .
+For the format of this file, see \*(lq\fIFILE FORMAT\fP\*(rq, below.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.  Only the return code of the command is of interest.
+This has the same effect as \fB--verbose=0\fP.
+.TP
+\fB--debug\fP [\fIlevel\fP]
+Specify or increase the debugging verbosity.  Sets the debugging verbosity to
+\fIlevel\fP, when given, or simply increases the debug verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Specify or increase the output verbosity.  Sets the output verbosity to
+\fIlevel\fP, when given, or simply increases the output verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The
+.I ixemap
+command takes no non-option arguments.
+.\"
+.\"
+.SH FILE FORMAT
+.PP
+The
+.B ixemap
+configuration file contains information regarding the mapping between the
+Internet address of network hosts and the underlying X.25 addresses.  It is
+loaded into the IXE driver using
+.BR ixemap .
+.PP
+For a Defense Data Network (DDN), X.25 addresses are directly linked to their
+corresponding Internet address,
+.[
+rfc1236
+.]
+and this mapping is not used for IXE subnetworks marked for DDN addressing.
+See
+.BR ixetune (8)
+for DDN address settings.
+.PP
+The default packet and window sizes from X.25 are used and therefore
+.B ixemap
+configuration file entries are temporary entries lasting for the duration of
+the call.  These entries are added and removed automatically.
+.PP
+The format of the
+.B @configdir@/ixemapconf
+file is as follows:
+.RS
+.PP
+.RB < in_addr >
+.RB < x_addr >
+.RB < pkt_siz >
+.RB < win_siz >
+.RB < num_vcs >
+.RE
+.PP
+Where the fields have the following syntax:
+.TP
+.RB < in_addr >
+Specifies the IP Version 4 Address to map to an X.25 address.  This may be
+specified in standard numbers-and-dots notation, or a hostname that can be
+resolved to an IP address may be specified instead.
+.TP
+.RB < x_addr >
+Specifies the X.25 address.  This is the local X.25 address for the local station.  The X.25 address
+is formatted as follows:
+.RS
+.PP
+\fIsn_id\fP\fB.\fP[\fIDTE\fP|\fILSAP\fP|\fILCI\fP]\fB.\fP[\fBN\fP|\fBX\fP|\fBP\fP]\fB.\fP[\fINSAP\fP|\fIEXT\fP]
+.PP
+Where the four fields of the address are as follows:
+.TP
+.I sn_id
+Specifies the subnetwork identifier.  For most SpiderX.25 based implementations this is a single
+alphabetical characeter where the first subnetwork is given the character `A', the second subnetwork
+the character `B', and so on.  For
+.IR "Solstice X.25" ,
+The first field is a link identifier.  The link identifier can be any number with a 32-bit unsigned
+integer range.
+.B @PACKAGE_TITLE@
+accepts both forms.
+.TP
+.IR DTE | LSAP | LCI
+For a subnetwork connection that consists of a LAN (LLC2) interface, only the LSAP is permitted.
+For a subnetwork that consists of a WAN (LAPB) interface, only the DTE or LCI or neither (no DTE or
+LCI) is permitted.
+.RS
+.TP \w'\fILSAP\fP\(em'u
+.I DTE
+Specifies a DTE address.  This field can be 0 to 15 digits in length when TOA/NPI addressing is not
+used and 2 to 17 digits in length when TOA/NPI addressing is used.  TOA/NPI addressing cannot be
+used for X.25(80) networks.  This field is only interpreted as a DTE address when the subnetwork
+type is WAN and the following field is not \*(lq\fBP\fP\*(rq.
+.TP
+.I LSAP
+Specifies an LSAP which is always 14 hexadecimal digits in length, 12 hexadecimal digits for the MAC
+address, and 2 hexadecimal digits for the SAP.  Hexadecimal digit pairs may optionally be separated
+by colons (\*(lq\fB:\fP\*(rq).  This field is only intepreted as an LSAP address when the subnetwrok
+type is LAN.
+.TP
+.I LCI
+Specifies the LCI which is 0 to 4 decimal digits in the range from 0 to 4095.  This number
+identifies the logical channel belonging to a PVC.  This field is only interpreted as an LCI when
+the following field has the value \*(lq\fBP\fP\*(rq.
+.RE
+.TP
+.BR N | X | P
+When present, this field contains one alphabetical character,
+\*(lq\fBN\fP\*(rq,
+\*(lq\fBX\fP\*(rq, or
+\*(lq\fBP\fP\*(rq,
+that determines the form of the address.
+.RS
+.TP \w'\fBX\fP\(em'u
+.B N
+Specifies that the following field is an \fINSAP\fP.  This is the default.
+This value can only be set for LAN or for X.25(84+) networks.
+.TP
+.B X
+Specifies that the following field is an \fIEXT\fP.
+This value can only be set for LAN or for X.25(84+) networks.
+.TP
+.B P
+Specifies that the preceding field is an \fILCI\fP, and that there is no following field.
+.PP
+If this field is absent, and the following field is present, the following field is an \fINSAP\fP.
+The intervening \*(lq.\&\*(rq is optional in this case.
+.RE
+.TP
+.IR NSAP | EXT
+This field provides the NSAP address or Address Extension. 
+This field can only be present for LAN or for X.25(84+) networks.
+.RS
+.TP
+.I NSAP
+This is a maximum 20-byte NSAP address, represented by 0 to 40 hexadecimal digits.  A colon,
+\*(lq\fB:\fP\*(rq, can optionally be placed between any pairs of hexadecimal digits.
+This field is only interpreted as an NSAP when the preceding field is absent or contains the value
+\*(lq\fBN\fP\*(rq.
+.TP
+.I EXT
+This is a maximum 20-byte Address Extension, represented by 0 to 40 hexadecimal digits.  A colon,
+\*(lq\fB:\fP\*(rq, can optionally be placed between any pairs of hexadecimal digits.
+This field is only interpreted as an Address Extension when the preceding field contains the value
+\*(lq\fBE\fP\*(rq.
+.RE
+.PP
+The range of X.25 addresses is limited by the underlying subnetwork type.  For each subnetwork type,
+possible X.25 addresses are as follows:
+.TP
+.B LAN
+.nf
+sn_id.LSAP
+sn_id.LSAP.N.NSAP
+sn_id.LSAP.X.EXT
+.\"sn_id.LSAP.NSAP
+.\"sn_id.LSAP..NSAP
+.fi
+.TP
+.B WAN (1980)
+.nf
+sn_id
+sn_id.DTE
+sn_id.LCI.P
+.fi
+.TP
+.B WAN (1984+)
+.nf
+sn_id
+sn_id.DTE
+sn_id.DTE.N.NSAP
+sn_id.DTE.X.EXT
+sn_id..N.NSAP
+sn_id..X.EXT
+.\"sn_id.DTE.NSAP
+.\"sn_id.DTE..NSAP
+sn_id.LCI.P
+.fi
+.RE
+.TP
+.RB < pkt_siz >
+Specifies the packet size, in bytes,  used to reach the X.25 destination.
+This can be one of the following values:
+.BR 16 ", " 32 ", " 64 ", " 128 ", " 256 ", " 512 ", " 1024 ", " 2048 ", "
+4096 .
+.RS
+.PP
+When specified as a single dash, \*(lq\fB-\fP\*(rq, the default packet size
+(128) will be used.
+.RE
+.TP
+.RB < win_siz >
+Specifies the window size, in NSDUs, use with the X.25 destination.  Normally
+for LAN operation, this can be 1 through 127.  For LAPB, this can be 1 through
+7 for modulo 8 operation, 1 though 127 for modulo 128 operation, 1 through
+32767 for modulo 32768 operation, and 1 through 2147483647 for modulo
+2147483648 operation.
+.RS
+.PP
+When specified as a single dash, \*(lq\fB-\fP\*(rq, the default window size
+(2) will be used.
+.RE
+.TP
+.RB < num_vcs >
+Specifies the number of virtual circuits maximum that are permitted toward the
+host.  This value is currently fixed at one (1).
+.RS
+.PP
+When specified as a single dash, \*(lq\fB-\fP\*(rq, the default maximum number
+of virtual circuits (1) will be used.
+.RE
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Sample output from the \fB-G\fP command option is as follows:
+.PP
+.nf
+\f(CW\s-1\
+IP Address      Pktsz   Window  VCs      X25 Address
+14.1.7.3        1024    7       1        C.02CF1F7009427E
+\s+1\fP
+.fi
+.PP
+Sample output from the \fB-M\fP command option is as follows:
+.PP
+.nf
+\f(CW\s-1\
+IP Address      Pktsz   Window  VCs      X25 Address
+14.0.7.1        256     7       1        A.23423130014265
+14.1.7.1        1024    7       1        C.02CF1F70065370
+14.0.7.3        256     7       1        A.23423130014261
+14.1.7.3        1024    7       1        C.02CF1F7009427E
+\s+1\fP
+.fi
+.PP
+A sample configuration file for use with the \fB-P\fP option, corresponding to
+the \fB-M\fP option output given above, is as follows:
+.PP
+.nf
+\f(CW\s-1\
+#----------------------------------------------------------
+#IP Address     X25 Address             Pktsz   Window  VCs
+#----------------------------------------------------------
+14.0.7.1        A.23423130014265        256     7       1
+14.1.7.1        C.02CF1F70065370        1024    7       1
+14.0.7.3        A.23423130014261        256     7       1
+14.1.7.3        C.02CF1F7009427E        1024    7       1
+#----------------------------------------------------------
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the optoin or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/ixe ", " /dev/streams/ixe
+The default IXE device.  See
+.BR ixe (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @configdir@/ixemapconf
+The default configuration file for the IXE device.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ixe (4),
+.BR ixetune (8),
+.BR ipx25 (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ixemap
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B ixemap
+is compatible with
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
+options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B ixemap
+and should not be used by portable command scripts.
+.IP \(em
+No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
+and \fB-C\fP options.  They should not be used by portable command scripts.
+.IP \(em
+Options \fB--help\fP and \fB--version\fP are provided for compatibility with
+GNU coding standards; \fB--copying\fP, OpenSS7 coding standards.
+.IP \(em
+Other implementations document 127 as the maximum window size.
+.B @PACKAGE_TITLE@
+permits window sizes up to 32767.
+.PP
+For additional compatibility considerations, see
+.BR ixe (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+and
+.IR "HP-UX"
+.[
+hpuxdoc
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.I ixemap
+first appeared in
+.IR "Spider X.25" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

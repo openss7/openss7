@@ -1,0 +1,1 @@
+.so man4/xx25.4.man

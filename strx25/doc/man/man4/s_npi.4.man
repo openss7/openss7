@@ -1,0 +1,1 @@
+.so man4/npi.4.man

@@ -1,0 +1,219 @@
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: draft-bidulock-tsvwg-snare-00.me,v 0.9.2.1 2008-06-13 06:43:52 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\"
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\"
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\"
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:52 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: draft-bidulock-tsvwg-snare-00.me,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:52  brian
+.\" - added files
+.\"
+.\" Revision 0.9.2.1  2008-05-09 13:45:20  brian
+.\" - initial version of draft
+.\"
+.\" =========================================================================
+.ds version Version\ 0.0
+.ds year 2008
+.ds date May\ 7,\ 2008
+.ds expiry November\ 2008
+.nr levels 0
+.so ../draft4.me
+.bp
+.sz \n(tp
+.he 'Internet Draft'SNARE over UDP (SNARE-UDP)'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;B. Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+Intended Status: INFORMATIONAL;;\*[date]
+.bl
+Expires in \*[expiry]
+.bl
+.TE
+.(l C
+.sz \n(tp
+\fB\
+OSI CONS SNARE over UDP (SNARE-UDP)
+Version: 1
+<draft-bidulock-tsvwg-snare-00.\*(|x>
+.)l
+.rr |x
+.ne 4
+.#S \*[year] \*[expiry]
+.uh "Abstract"
+.pp
+This memo provides a mechanism for providing for a SNARE
+.[
+iso 10030
+.]
+.[
+x223
+.]
+capability over UDP for providing a subnetwork address resolution entity that
+can provide X.25 CONS address discovery for the XOT
+.[
+xot
+.]
+and XOS protocols.
+.\"
+.\"
+.uh "Contents"
+.pp
+A complete table of contents, list of illustrations, list of tables and change
+history for this memo appears at the end of the memo.
+.\"
+.\"
+.sh 1 "Introduction"
+.pp
+.sh 2 "Scope"
+.pp
+.sh 2 "Terminology"
+.pp
+This memo uses the following extended terminology:
+.lp
+\fBSubnetwork Address Resolution Entity (SNARE)\fR \(em
+.ix +\n(iiu
+A subnetwork address resolution entity is an entity that can provide address
+routing configuration and redirect information in accordance with the ISO CONS
+SNARE definintion.
+.[
+iso 10030
+.]
+.sh 2 Abbreviations
+.pp
+.TS
+tab(:);
+llil.
+:CONS:\*- Connection Oriented Network Service
+:ES:\*- End System
+:IS:\*- Intermediate System
+:OSI:\*- Open Systems Interconnect
+:SNARE:\*- Subnetwork Address Resolution Entity
+.TE
+.sh 2 Conventions
+.#C
+.\"
+.\"
+.sh 1 Security
+.pp
+.\"
+.\"
+.sh 1 "IANA Considerations"
+.pp
+This memo requests the assignment of one UDP well-known port number and two IP
+Multicast Addresses.
+.sh 2 "IPv4 Multicast Addresses"
+.pp
+Two IP multicast addresses are to be assigned for this protocol:
+.ip "\fB\)All CONS End System Address\fP"
+This address is used for sending multicast UDP datagrams to all CONS end
+systems on an IP subnetwork.
+.ip "\fB\)All CONS SNARES Address\fP"
+This address is used for sending multicast UDP datagrams to all CONS SNAREs on
+an IP subnetwork.
+.sh 2 "Port Number"
+.pp
+This memo allocates a well-known port number for use in listening for UDP
+datagrams on multicast addresses and for exchanging SNARE messages between a
+CONS End System and a SNARE Intermediate System.
+.#e
+.\"
+.\"
+.(b M
+.sh 1 "Change History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+finalized for publication as an RFC.
+.\".sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.\".bu
+.\".bu
+.sh 2 "Initial Version 0.0" 0 1
+.bu
+.bu
+.uh "Change Log"
+.lp
+.(l I
+.nf
+\fC\s-3
+$Log: draft-bidulock-tsvwg-snare-00.me,v $
+Revision 0.9.2.1  2008-06-13 06:43:52  brian
+- added files
+
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.[
+$LIST$
+.]
+.)b
+.\"
+.\"
+.(b M
+.uh "Acknowledgements"
+.lp
+The authors would like to thank
+Greg Satz
+for leading the way.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T \*[year]

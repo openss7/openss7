@@ -1,0 +1,1040 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: x25template.5.man,v 0.9.2.2 2008-06-18 16:45:24 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-18 16:45:24 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: x25template.5.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:24  brian
+.\" - widespread updates
+.\"
+.\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH X25TEMPLATE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B x25template
+\- X.25 Subnetwork File Format
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B x25template
+describes the file format for input to the
+.BR x25tune (8)
+command for X.25 subnetworks.
+The file format consists of a number of parameter values, one per line,
+formated as described below.  Each parameter value is described using its line
+number in the file, a parameter name, and a description of the format of the
+value.  Only the value appears in the file, each value on a line by itself, one
+value per line.
+.PP
+Each of the X.25 configuration parameters corresponds to the member and values
+of the
+.B wlcfg
+structure by the
+.B N_snconfig
+and
+.B N_snread
+input-output control.
+.PP
+These protocol parameters, and the default values that exist when tuning has
+not been applied to a newly created X.25 subnetwork, correspond directly to the
+protocol parameters and defaults in ISO/IEC 8208,
+.[
+iso8208
+.]
+X.25
+.[
+x25
+.]
+and X.75.
+.[
+x75
+.]
+.\"
+.\"
+.SH FORMAT
+.PP
+The X.25 subnetwork template consists of 76 or more lines containing the
+following configuration information:
+.IP \ 1. \w'00.\(em'u
+.B NET_MODE
+determines the various characteristics of the network protocol.  Valid values
+are integers, as specified below, that refers to the networks listed:
+.RS
+.PP
+.TS
+tab(:);
+n1c1ln1c1ln1c1l.
+1:\-:X25_LLC:10:\-:TRANSPAC:19:\-:DCS
+2:\-:X25_88:11:\-:TYMNET:20:\-:TELEPAC
+3:\-:X25_84:12:\-:DATEX_P:21:\-:F_DATAPAC
+4:\-:X25_80:13:\-:DDX_P:22:\-:FINPAC
+5:\-:PSS:14:\-:VENUS_P:23:\-:PACNET
+6:\-:AUSTPAC:15:\-:ACCUNET:24:\-:LUXPAC
+7:\-:DATAPAC:16:\-:ITAPAC:25:\-:X25_CIRCUIT
+8:\-:DDN:17:\-:DATAPAK
+9:\-:TELENET:18:\-:DATANET
+.TE
+.RE
+.IP \ 2.
+.B X25_VERSION
+determines the version of the X.25 protocol that is being used over the
+network.  Valid values are integers, as specified below.  Note that a
+.B NET_MODE
+of
+.I X25_LLC
+will override any value in this field to 1984 (or later).
+.RS
+.PP
+.TS
+tab(:);
+n1c1l.
+80:\-:indicates 1980
+84:\-:indicates 1984
+88:\-:indicates 1988
+1980:\-:indicates 1980
+1984:\-:indicates 1984
+1988:\-:indicates 1988
+1992:\-:indicates 1992
+1996:\-:indicates 1996
+2000:\-:indicates 2000
+2004:\-:indicates 2004
+\fIYYYY\fP:\-:indicates \fIYYYY\fP
+.TE
+.RE
+.IP \ 3.
+.B L3PLPMODE
+indicates the DTE/DCE nature of the link.  Valid value are integers, as
+specified below.  Note that DXE operation is per ISO 8208.
+.[
+iso8208
+.]
+.RS
+.PP
+.TS
+tab(:);
+n1c1l.
+0:\-:indicates DCE
+1:\-:indicates DTE
+2:\-:indicates DXE
+.TE
+.RE
+.IP \ 4.
+.B LPC
+is the lowest LCI for Permanent Virtual Circuits (PVC).
+\fBLPC\fP and \fBHPC\fP define the range of LCI that are assigned to PVC.
+This range cannot overlap with the other defined ranges.
+Setting this value to zero and \fBHPC\fP to zero specifies that there are no PVC.
+Valid values contain 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP \ 5.
+.B HPC
+is the highest LCI for PVC.
+\fBLPC\fP and \fBHPC\fP define the range of LCI that are assigned to PVC.
+This range cannot overlap with the other defined ranges.
+\fBLPC\fP and \fBHPC\fP set to zero means no PVC.
+Valid values contain 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP \ 6.
+.B LIC
+is the lowest incoming (IC) VC.
+\fBLIC\fP and \fBHIC\fP define the range of LCI that are assigned to incoming call circuits.
+This range cannot overlap with the other defined ranges.
+\fBLIC\fP and \fBHIC\fP zero means no IC VC.
+Use 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP \ 7.
+.B HIC
+is the highest IC VC.
+\fBLIC\fP and \fBHIC\fP define the range of LCI that are assigned to incoming call circuits.
+This range cannot overlap.
+\fBLIC\fP and \fBHIC\fP zero means no IC VC.
+Use 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP \ 8.
+.B LTC
+is the lowest two-way (TW) VC.
+\fBLTC\fP and \fBHTC\fP define the LCI that are assigned to two-way call circuits.
+This range cannot overlap.
+\fBLTC\fP and \fBHTC\fP zero means no TW VC.
+Use 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP \ 9.
+.B HTC
+is the highest TW VC.
+\fBLTC\fP and \fBHTC\fP define the LCI that are assigned to two-way call circuits.
+This range cannot overlap.
+\fBLTC\fP and \fBHTC\fP zero means no TW VC.
+Use 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP 10.
+.B LOC
+is the lowest outgoing (OG) VC.
+\fBLOC\fP and \fBHOC\fP define the range assigned to outgoing call circuits.
+This range cannot overlap.
+\fBLOC\fP and \fBHOC\fP zero means no OG VC.
+Use 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP 11.
+.B HOC
+is the highest OG VC.
+\fBLOC\fP and \fBHOC\fP define the range assigned to outgoing call circuits.
+This range cannot overlap.
+\fBLOC\fP and \fBHOC\fP zero means no OG VC.
+Use 3 hexadecimal digits (\*(lq\fB000\fP\*(rq through \*(lq\fBFFF\fP\*(rq).
+Leading zeros are optional.
+.IP 12.
+.B THISGFI
+indicates which Modulo operates on the network.  It can have one of three
+integer values.
+.RS
+.PP
+.TS
+tab(:);
+n1c1ll.
+8:\-:Modulo 8:\ 3 bits
+128:\-:Modulo 128:\ 7 bits
+32768:\-:Modulo 32768:15 bits
+.\"2147483648:\-:Modulo 2147483648:31 bits
+.TE
+.RE
+.IP 13.
+.B LOCMAXPKTSIZE
+is the maximum acceptable packet size for sent packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The default value is 7 (or 128 octets).
+The local maximum packet size and remote maximum packet size should be the
+same.
+The value should be less than the maximum LAPB I-frame size, N2, see
+.BR lltune (8).
+.IP 14.
+.B REMMAXPKTSIZE
+is the maximum acceptable packet size for received packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The default value is 7 (or 128 octets).
+The local maximum packet size and remote maximum packet size should be the
+same.
+The value should be less than the maximum LAPB I-frame size, N2, see
+.BR lltune (8).
+.IP 15.
+.B LOCDEFPKTSIZE
+is the default packet size for sent packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The local default packet size and remote maximum packet size should be the
+same.
+The default value is 7 (or 128 octets).
+When specified as 7 (128 octets), negotiation of the non-standard default
+packet size facility will neither be initiated nor rejected.
+.IP 16.
+.B REMDEFPKTSIZE
+is the default packet size for received packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The local default packet size and remote maximum packet size should be the
+same.
+The default value is 7 (or 128 octets).
+When specified as 7 (128 octets), negotiation of the non-standard default
+packet size facility will neither be initiated nor rejected.
+.IP 17.
+.B LOCMAXWSIZE
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+.IP 18.
+.B REMMAXWSIZE
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+.IP 19.
+.B LOCDEFWSIZE
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+When specified as 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768, the
+non-standard default window size facility will neither be initiated nor
+rejected.
+.IP 20.
+.B REMDEFWSIZE
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+When specified as 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768, the
+non-standard default window size facility will neither be initiated nor
+rejected.
+.IP 21.
+.B MAXNSDULEN
+.IP 22.
+.B ACKDELAY
+.IP 23.
+.B T20VALUE
+(Restart Request Response Timer)
+is the time period that the DTE will await a restart confirmation or restart
+indication following issuing a request request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.RS
+.PP
+.B T10VALUE
+(Restart Indication Response Timer)
+is the equivalient timer for the DCE, and defines the time period that the DCE
+will wait for a restart confirmation or restart request after having issued a
+restart indication.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+.RE
+.IP 24.
+.B T21VALUE
+(Call Request Response Timer)
+is the time period that the DTE will await a call connected or clear
+indication having issued a call request.
+The timeout value should not be less than 200 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+200 seconds is specified as 2000 (deciseconds).
+.RS
+.PP
+.B T11VALUE
+(Incoming Call Response Timer)
+is the equivalent timer for the DCE, and defines the time period that the DCE
+will wait for a call accepted, clear request or call request after having
+issued an incoming call.  The timeout value is a minimum of 180 seconds.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.RE
+.IP 25.
+.B T22VALUE
+(Reset Request Response Timer)
+is the time period that the DTE will await a reset confirmation or reset
+indication having issued a reset request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.RS
+.PP
+.B T12VALUE
+(Reset Indication Response Timer)
+is the equivalent timer for the DCE, and defines the time period that the DCE
+will wait for a reset confirmation or request request after having issued a
+reset indication.  The timeout value is a minimum of 60 seconds.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+.RE
+.IP 26.
+.B T23VALUE
+(Clear Request Response Timer)
+is the time period that the DTE will await a clear confirmation or clear
+indication having issued a clear request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.RS
+.PP
+.B T13VALUE
+(Clear Indication Response Timer)
+is the equivalent timer for the DCE, and defines the time period that the DCE
+will wait for a clear confirmation or clear request following issuing a clear
+indication.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+.RE
+.IP 27.
+.B TVALUE
+.IP 28.
+.B T25VALUE
+(Window Rotation Timer)
+is the time period that the DTE will await acknowledgement of all outstanding
+data packets having trasnmitted the last available data packet or the window
+is rotated.
+The timeout value should not be less than 200 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+200 seconds is specified as 2000 (deciseconds).
+.RS
+.PP
+Note that this T25 timer is only needed if the associated procedure (ISO/IEC
+8208:2000 Section 11.2.1) is used.
+.RE
+.IP 29.
+.B T26VALUE
+(Interrupt Response Timer)
+is the time period that the DTE will await an interrupt confirmation having
+issued an interrupt.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.IP 30.
+.B IDLEVALUE
+.IP 31.
+.B CONNECTVALUE
+.IP 32.
+.B R20VALUE
+(Restart Request Retransmission Count) is the number of times that a restart
+request will be re-issued, and T20 restarted, upon expiry of timer T20.
+This value has a default of 1 and a minimum of 1.
+.IP 33.
+.B R22VALUE
+(Reset Request Retransmission Count) is the number of times that a reset
+request will be re-issued, and T22 restarted, upon expiry of timer T22.
+This value has a default of 1 and a minimum of 1.
+.IP 34.
+.B R23VALUE
+(Clear Request Retransmission Count) is the number of times that a clear
+request will be re-issued, and T23 retstarted, upon expiry of timer T23.
+This value has a default of 1 and a minimum of 1.
+.IP 35.
+.B LOCALDELAY
+.IP 36.
+.B ACCESSDELAY
+.IP 37.
+.B LOCMAXTHCLASS
+is the local maximum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.IP 38.
+.B REMMAXTHCLASS
+is the remote maximum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.IP 39.
+.B LOCDEFTHCLASS
+is the local default throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.IP 40.
+.B REMDEFTHCLASS
+is the remote default throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.IP 41.
+.B LOCMINTHCLASS
+is the local minimum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.IP 42.
+.B REMMINTHCLASS
+is the remote minimum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.IP 43.
+.B SUB_CUG
+(Closed User Group)
+is the index to the closed user group selected for the virtual
+call in the form of two to four decimal digits.  Indexes to the close user
+group at different DXE interfaces may be different.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 44.
+.B SUB_PREF
+(Preferential Closed User Group).  When the DTE belongs to more than one
+closed user group, a preferential closed user group must be specified.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 45.
+.B SUB_CUGOA
+(Closed User Group with Outgoing Access)
+is the index to the closed user group selected for the virtual call in the
+form of two to four decimal digits.  Indexes to the close user group at
+different DXE interfaces may be different.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 46.
+.B SUB_CUGIA
+(Closed User Group with Incoming Access)
+is the index to the closed user group selected for the virtual call in the
+form of two to four decimal digits.  Indexes to the close user group at
+different DXE interfaces may be different.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 47.
+.B CUG_FORMAT
+(Number of Closed User Groups Subscribed) defines the maximum number of closed
+user groups to which the DTE is subscribed.  The value is in the range 0 to
+100 for basic and in the range 101 to 10000 for extended.
+The value is \*(lq\fB0\fP\*(rq for basic and \*(lq\fB1\fP\*(rq for extended.
+.IP 48.
+.B BAR_CUG_IN
+(Closed User Group Incoming Calls Barred) is a user option that bars incoming
+calls containing the closed user group facility.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 49.
+.B SUB_EXTENDED
+(Extended Call Packets)
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 50.
+.B BAR_EXTENDED
+(Extended Call Packets Barred) is a user option that bars incoming calls
+containing flow control negotiation facilities.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 51.
+.B SUB_FSELECT
+(Fast Select Acceptance) is an optional user facility agreed for a period of
+time.  This user facility, if subscribed to, authorizes the DCE to transmit to
+the DTE incoming calls that request the fast select facility.  In the absence
+of this facility, the DCE will not transmit to the DTE incoming calls that
+request the fast select facility.  This parameter defines whether the DTE
+accepts calls with a fast select facility requesting no restriction on
+response.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 52.
+.B SUB_FSRRESP
+(Fast Select Acceptance) is an optional user facility agreed for a period of
+time.  This user facility, if subscribed to, authorizes the DCE to transmit to
+the DTE incoming calls that request the fast select facility.  In the absence
+of this facility, the DCE will not transmit to the DTE incoming calls that
+request the fast select facility.  This parameter defines whether the DTE
+accepts calls with a fast select facility requesting restriction on
+response.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 53.
+.B SUB_REVCHARGE
+(Reverse Charging Acceptance) is an optional user facility agree for a period
+of time for virtual calls.  This user facility, if subscribed to, authorizes
+the DCE to transmit to the DTE incoming calls that request the reverse
+charging facility.  In the absence of this facility, the DCE will not transmit
+to the DTE incoming calls that request the reverse charging facility.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 54.
+.B SUB_LOC_CHG_PREV
+(Local Charging Prevention)
+is an optional user faciltiy agreed for a period of time for virtual calls.
+This user facility, if subscribed to, authorizes the DCE to prevent the
+establishment of virtual calls that the suscriber must pay for by: a) not
+transmitting to the DTE incoming calls that request the reverse charging
+facility; and, b) ensuring that the charges are made to another party whether
+a call is requested by the DTE.  When the party to be changed has not been
+established for a call request, the DCE that receives the call request packet
+will apply reverse charging to this call.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 55.
+.B BAR_INCALL
+(Incoming Calls Barred) determines whether the optional user facility is
+agreed for a period of time.  This facility applies to all logical channels
+used at the DTE/DCE interface for virtual calls.  This user facility, if
+subscribed to, prevents incoming virtual calls from being presented to the
+DTE.  The DTE may originate outgoing virtual calls.  Logical chanels used for
+virtual calls retain their full duplex capability.  Some administratoins may
+provide a capability that allows a virtual call to be presented to the DTE
+only in cases where the called DTE address is the address of the calling DTE.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 56.
+.B BAR_OUTCALL
+(Outgoing Calls Barred) determines whether the optional user facilty is agreed
+for a period of time.  This facility applies to all logical channels used at
+the DTE/DCE interface for virtual calls.  This user facility, if subscribed
+to, prevents the DCE from accepting outgoing virtual calls from the DTE.  The
+DTE may receive incoming virtual calls.  Logical channels used for virtual
+calls retain their full duplex capability.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 57.
+.B SUB_TOA_NPI_FMT
+(TOA/NPI Address) is an optional user facility agreed for a period of time for
+virtual calls.  When this facility is subscribed to, the DCE and DTE shall
+transmit call set-up and clearing packets only using the TOA/NPI address
+format.  In this case, addresses in facilities are also in TOA/NPI format.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 58.
+.B BAR_TOA_NPI_FMT
+(TOA/NPI Address Incoming Calls Barred) is a user option that bars incoming
+calls containing TOA/NPI addresses.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 59.
+.B SUB_NUI_OVERRIDE
+(NUI Override) is an optional user facility agreed for a period of time for
+virtual calls.  When this facility is subscribed to, one or more network user
+identifiers are also agreed for a period of time.  Associated with each
+network user identifier is a set of subscription-time optional user
+facilities.  When one of these network user identifiers is provdied in a call
+request packet by means of the NUI selection facility, the set of
+subscription-time optional user facilities associated with it overrides the
+facilities that apply to the interface.  This override does not apply to other
+existing calls or subsequent calls on the interface.  It remains in effect for
+the duration of the particular call to which it applies.
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 60.
+.B ACC_NODIAG
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 61.
+.B USE_DIAG
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 62.
+.B CCITT_CLEAR_LEN
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 63.
+.B BAR_DIAG
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 64.
+.B DISC_NS_DIAG
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 65.
+.B ACC_HEX_ADD
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 66.
+.B BAR_NONPRIV_LISTEN
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 67.
+.B INTL_ADDR_REGION
+.IP 68.
+.B INTL_PRIORITISED
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 69.
+.B DNIC
+The value is 4 hexadecimal digits.
+.IP 70.
+.B PRTY_ENCODE_CONTROL
+The value is an integer decimal number.
+.IP 71.
+.B PRTY_PKT_FORCED_VAL
+The value is an integer decimal number.
+.IP 72.
+.B SRC_ADDR_CONTROL
+The value is an integer decimal number.
+.IP 73.
+.B DBIT_ACCEPT_IND
+.RS
+.PP
+.TS
+tab(:);
+n1c1l.
+0:\-:leave the D-bit set and pass the packet on,
+1:\-:zero the D-bit and pass the packet on, and,
+2:\-:reset the call.
+.TE
+.RE
+.IP 74.
+.B DBIT_ACCEPT_OUT
+.RS
+.PP
+.TS
+tab(:);
+n1c1l.
+0:\-:leave the D-bit set and pass the packet on,
+1:\-:zero the D-bit and pass the packet on, and,
+2:\-:reset the call.
+.TE
+.RE
+.IP 75.
+.B DBIT_DATA_IN
+.RS
+.PP
+.TS
+tab(:);
+n1c1l.
+0:\-:leave the D-bit set and pass the packet on,
+1:\-:zero the D-bit and pass the packet on, and,
+2:\-:reset the call.
+.TE
+.RE
+.IP 76.
+.B DBIT_DATA_OUT
+defines the action to taken when the local user sends a data packet with the
+D-bit set, but the remote party has not indicated D-bit support.  It can have
+one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+n1c1l.
+0:\-:leave the D-bit set and pass the packet on,
+1:\-:zero the D-bit and pass the packet on, and,
+2:\-:reset the call.
+.TE
+.RE
+.IP 77.
+.B THCLASS_NEG_TO_DEF
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.IP 78.
+.B THCLASS_TYPE
+The value is an integer decimal number.
+.IP 79.
+.B TH_WMAP
+The value is 16 decimal numbers, 0 to 255, separated by \*(lq\fB.\fP\*(rq.
+.IP 80.
+.B TH_PMAP
+The value is 16 decimal numbers, 0 to 255, separated by \*(lq\fB.\fP\*(rq.
+.\"
+.SS Extensions
+.PP
+Extensions parameters can be enabled using the \fB-e\fP flag to
+.BR x25tune (8),
+and specifying additional lines in the template.
+.B @PACKAGE_TITLE@
+defines extension parameters primarily to support facilities of ISO/IEC
+8208:2000
+.[
+iso8208
+.]
+not provided for according to the documentation of other, older implementations.
+.PP
+The following parameters, therefore, are the extensions specific to the
+.B @PACKAGE_TITLE@
+implementation:
+.IP 81. \w'00.\(em'u
+.B T24VALUE
+(Window Status Transmission Timer)
+is the time period that the DTE will wait without sending a window status
+packet (a packet with a P(R): RR, RNR, DATA or REJECT).
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.RS
+.PP
+Note that this T24 timer is only needed if the associated procedure (ISO/IEC
+8208:2000 Section 11.2.2) is used.
+.RE
+.IP 82.
+.B T27VALUE
+(Reject Response Timer)
+is the time period that the DTE will await a data retransmission after
+issuing a reject.
+The timeout value should not be less than 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+.RS
+.PP
+Note that this T27 timer is only needed if the associated procedure (ISO/IEC
+8208:2000 Section 13.4) is used.
+.RE
+.IP 83.
+.B T28VALUE
+(Registration Request Response Timer)
+is the time period that the DTE will await a registration confirmation or
+diagnostic packet having issued a registration request.
+The timeout value should not be less than 300 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+300 seconds is specified as 3000 (deciseconds).
+.RS
+.PP
+Note that this T28 timer is only needed if the associated procedure (ISO/IEC
+8208:2000 Section 13.1) is used.
+.RE
+.IP 84.
+.B R25VALUE
+(Data Packet Retransmission Count) is the number of times that a data packet
+will be retransmitted, and T25 restarted, upon expiry of T25.
+This value has a default of 0.
+A value of zero (0) conveys that no retransmission will be performed.
+.RS
+.PP
+Note that R25 is only needed if the associated procedure (ISO/IEC 8208:2000
+Section 11.2.1) is used.
+.RE
+.IP 85.
+.B R27VALUE
+(Reject Retransmission Count) is the number of times that a reject is
+reissued, and T27 restarted, upon expiry of T27.
+This value has a default of 0.
+A value of zero (0) conveys that no reissuing will be performed.
+.RS
+.PP
+Note that R27 is only needed if the associated procedure (ISO/IEC 8208:2000
+Section 13.4) is used.
+.RE
+.IP 86.
+.B R28VALUE
+(Registration Request Retransmission Count) is the number of times a
+registration request will be reissued, and T28 restarted, upon expiry of T28.
+This value has a default of 1.
+A value of zero (0) conveys that no reissuing will be performed.
+.RS
+.PP
+Note that R28 is only needed if the associated procedure (ISO/IEC 8208:2000
+Section 13.1) is used.
+.RE
+.\"
+.\"
+.SH FILES
+.PP
+Files following this format are normally kept in the
+.B @configdir@/@PACKAGE@/template/
+directory.
+.PP
+(Note that this directory varies depending on whether the build was on a
+.BR dpkg (1)-based
+or
+.BR rpm (1)-based
+system.)
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR x25tune (8),
+.BR x25 (4),
+.BR x25netd (8).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B x25template
+file format is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+fairly much ignores the setting of the
+.BR NET_MODE " and " X25_VERSION
+parameters.
+The
+.B @PACKAGE_TITLE@
+implementation of X.25 is based on ISO/IEC 8208:2000 (Edition 4),
+.[
+iso8208
+.]
+which is compatible with ITU-T Recommendation X.25 of 1996,
+.[
+x25
+.]
+(the lastest current release of the standard) and is backward compatible with
+ISO/IEC 8208 editions 1, 2 and 3; as well as ITU-T Recommendation X.25 for
+1993, 1988, 1984 and 1980.
+.IP \(em
+No other implementation documents support for Module 32768.
+.B @PACKAGE_TITLE@
+supports Module 32768 per ISO/IEC 8208,
+.[
+iso8208
+.]
+X.25
+.[
+x25
+.]
+and X.75.
+.[
+x75
+.]
+.IP \(em
+No other implementation documents support for a true T24 timer.
+.B @PACKAGE_TITLE@
+supports this as an extension (line 81).  If this line is not present,
+the default (180 seconds) will be assumed.
+.IP \(em
+No other implementation documents support for the retransmission of reject
+messages and the associated T27 and R27 parameter values.
+.B @PACKAGE_TITLE@
+supports these as extensions (line 82 and line 85).  If these lines are not
+present, defaults (60 seconds and 0 retransmission) will be assumed.
+.IP \(em
+Most implementations do not document support for the On-Line Registration
+facilities, and the associated T28 and R28 parameter values.
+.B @PACKAGE_TITLE@
+supports these as extensions (line 83 and line 86).  If these lines are not
+present, defaults (300 seconds and 1 retransmission) will be assumed.
+.IP \(em
+All implementations document support for a T25 timer, but no other
+implementation documents support the R25 parameter value.
+.B @PACKAGE_TITLE@
+supports this as an extension (line 84).  If this line is not present,
+the default (zero (0) retransmissions) will be assumed.
+.IP \(em
+No implementations documents support throughput classes above 48,000 bits per
+second (index 3 to 12).
+.B @PACKAGE_TITLE@
+support basic throughput classes to 192,000 bits per second (index 3 to 16),
+and extended throughput classes up to 2,048,000 bits per second (index 17 to 44).
+.PP
+For additional compatibiltiy information see,
+.BR x25tune (8),
+.BR x25 (4),
+.BR X25netd (8),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B x25template
+file format first appeared in
+.IR "Spider X.25" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
+
+

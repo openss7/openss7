@@ -1,0 +1,48 @@
+
+U-Frame Control field in HDLC
+1  1  X  X P/F X  X  X      Command    Response
+      :  :     :  :  :
+      0  0     0  0  0      UI         UI
+      0  0     0  0  1      SRNM
+      0  0     0  1  0      DISC       RD
+      0  0     0  1  1      SM         -
+      0  0     1  0  0      UP
+      0  0     1  1  0      -          UA
+      0  0     1  1  1      TEST       TEST
+      1  0     0  0  0      SIM        RIM
+      1  0     0  0  1      -          FRMR
+      1  1     0  0  0      SARM       DM
+      1  1     0  0  1      RSET
+      1  1     0  1  0      SARME
+      1  1     0  1  1      SRNME
+      1  1     1  0  0      SABM       DM
+      1  1     1  0  1      XID        XID
+      1  1     1  1  0      SABME
+
+
+
+S-Frame Control field in HDLC
+1  0  X  X P/F R  R  R      Command    Response
+      :  :
+      0  0                  RR         RR
+      0  1                  REJ        REJ
+      1  0                  RNR        RNR
+      1  1                  SREJ       SREJ
+
+
+SNRM	Set normal response mode
+SNRME	Set normal response mode (extended)
+SABM	Set asynchronous balanced mode
+SABME	Set asynchronous balanced mode (extended)
+UP	Unnumbered poll
+UI	Unnumbered information
+UA	Unnumbered acknowledgement
+RD	Request disconnect
+DISC	Disconnect
+DM	Disconnect mode
+RIM	Request information mode
+SIM	Set initialization mode
+RSET	Reset
+XID	Exchange ID
+FRMR	Frame reject
+SM	Set Mode

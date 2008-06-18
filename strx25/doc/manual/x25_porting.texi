@@ -1,0 +1,2118 @@
+% -*- texinfo -*- vim: ft=texinfo
+% =========================================================================
+%
+% @(#) $Id: x25_porting.texi,v 0.9.2.1 2008-06-13 06:43:55 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2008-06-13 06:43:55 $ by $Author: brian $
+%
+% =========================================================================
+%
+% $Log: x25_porting.texi,v $
+% Revision 0.9.2.1  2008-06-13 06:43:55  brian
+% - added files
+%
+% =========================================================================
+
+\input texinfo
+@setfilename x25_porting.info
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE X.25 Porting Guide
+@settitle @value{MANUAL_TITLE}
+
+@dircategory STREAMS
+@direntry
+* X.25 Porting: (x25_porting).			An X.25 Porting Guide.
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE X.25 Porting Guide
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file provides the @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of
+the @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} Release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed manual carries copying permission notice identical to this
+one except for the removal of this paragraph (this paragraph not being relevant
+to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting derived
+work is distributed under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE @value{PACKAGE_TITLE}
+@set MANUAL_TYPE X.25 Porting Guide
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Package @value{PACKAGE}-@value{VERSION}
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2008  OpenSS7 Corporation <@uref{http://www.openss7.com/}> @*
+Copyright @copyright{} 1997-2000  Brian F. G. Bidulock <@email{bidulock@@openss7.org}> @*
+All Rights Reserved. @*
+
+@noindent
+Published by OpenSS7 Corporation @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+This is texinfo edition @value{PACKAGE_RELEASE} of the @value{MANUAL_TITLE}
+manual, and is consistent with @value{PACKAGE_NAME} @value{PACKAGE_VERSION}.
+This manual was developed under the @uref{http://www.openss7.org/, OpenSS7
+Project} and was funded in part by @uref{http://www.openss7.com/, OpenSS7
+Corporation}.
+
+@noindent
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@noindent
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided that the entire resulting
+derived work is distributed under the terms of a permission notice identical to
+this one.
+
+@noindent
+Permission is granted to copy and distribute translations of this manual into
+another language, under the same conditions as for modified versions.
+
+@vskip 0pt
+@end titlepage
+@page
+
+@c Define an index of authors.
+@c @defindex au
+
+@c Define an index of makefile targets
+@c @defcodeindex mk
+
+@c Define an index of configure output variables.
+@c @defcodeindex ov
+
+@c Define an index of configure variables.
+@c @defcodeindex cv
+
+@c Define an index of options.
+@c @defcodeindex op
+
+@c Define an index of targets.
+@c @defcodeindex tr
+
+@c Define an index of commands.
+@c @defcodeindex cm
+
+@c Put the macros and variables into their own index.
+@c @syncodeindex fn cp
+@c @syncodeindex ov vr
+@c @syncodeindex cv vr
+@c @syncodeindex fn vr
+
+@c Put everything else into one index (arbitrarily chosen to be the concept index).
+@c @syncodeindex op cp
+@c @syncodeindex tr cp
+@c @syncodeindex cm cp
+
+@c An index of manual pages
+@defcodeindex mp
+
+@c Define an index of primitives.
+@defcodeindex pr
+@c Define an index of primitive values.
+@defcodeindex pv
+@c Define an index of protocol states.
+@defcodeindex st
+@c Define an index of protocol errors.
+@defcodeindex pe
+@c Define an index of input-output controls.
+@defcodeindex ci
+
+@synindex tp cp
+@synindex fn cp
+@syncodeindex vr cp
+@synindex pg cp
+
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex st cp
+@syncodeindex pe cp
+@syncodeindex ci cp
+
+@synindex mp cp
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@iftex
+
+@macro prim {name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval {name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr {name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta {name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm {name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro dlioc {name}
+@code{\name\}@ciindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+
+@macro prim {name}
+@code{\name\}
+@end macro
+
+@macro pval {name}
+@code{\name\}
+@end macro
+
+@macro perr {name}
+@code{\name\}
+@end macro
+
+@macro psta {name}
+@code{\name\}
+@end macro
+
+@macro parm {name}
+@code{\name\}
+@end macro
+
+@macro dlioc {name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
+@ifnottex
+@node Top
+@top @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@unnumbered About This Manual
+This is Edition @value{PACKAGE_RELEASE}, last updated @value{PACKAGE_DATE}, of
+@cite{The @value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version
+@value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} of the
+@value{PACKAGE_TITLE} package.
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* Porting::
+* Porting from AIX::
+* Porting from IRIX::
+* Porting from NexusWare::
+* Porting from PowerMAX::
+* Porting from Solaris::
+* Developing on OpenSS7::
+* Licenses::
+* Index::
+@end menu
+
+@c --------------------------------------------------------------------------
+
+@node Preface
+@unnumbered Preface
+
+@menu
+* Notice::			Notices for this manual
+* Abstract::			Abstract for this manual
+* Revisions::			Revisions for this manual
+* Disclaimer::			IPR Disclaimers for this manual
+* Acknowledgements::		Sponsors and Contributors
+@end menu
+
+@node Notice
+@unnumberedsec Notice
+@cindex manual notice
+@cindex licensing
+
+This version of  @command{@value{PACKAGE_TARNAME}} is a version modified by
+@uref{http://www.openss7.org/, The OpenSS7 Project} that contains drivers and
+modules previously part of @cite{Linux STREAMS}@footnote{@xref{Top, Top, About
+This Manual, LiS, Linux STREAMS (LiS) Installation and Reference Manual}.}.  In
+stark contrast to many other software packages released by
+@uref{http://www.openss7.org/, The OpenSS7 Project}, this package contains code
+developed by other parties.
+
+This package is released and distributed under the @cite{AGPL} (@pxrefman{GNU
+Affero General Public License}).  Please note, however, that there are different
+licensing terms for the manual pages and some of the documentation (derived from
+OpenGroup@footnote{Formerly X/Open and UNIX International.} publications and
+other sources).  Consult the permission notices contained in the documentation
+for more information.
+
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation
+License}) with no invariant sections.
+
+@node Abstract
+@unnumberedsec Abstract
+@cindex manual abstract
+
+This manual provides a @cite{@value{MANUAL_TYPE}} for
+@cite{@value{PACKAGE_TITLE}}.
+
+@unnumberedsubsec Objective
+@cindex manual objective
+
+The objective of this manual is to provide a porting guide for the @dfn{STREAMS}
+and @dfn{X.25} programmer when porting @dfn{STREAMS} drivers, modules and
+applications to @cite{@value{PACKAGE_TITLE}} from other major implementations of
+@dfn{X.25}, such as @cite{AIX}, @cite{AIXlink/X.25}, @cite{Digital UNIX},
+@cite{HP-UX}, @cite{IRIX}, @cite{OSF}, @cite{PowerMAX}, @cite{Solaris}, @cite{Solstice X.25},
+@cite{SVR4.2}, @cite{Tru64 UNIX}, @cite{UnixWare}, and others.
+
+This guide provides information to developers on the use of the @dfn{X.25}
+interfaces and drivers at the user and kernel levels as well as the difference
+between the OpenSS7 implementation of X.25 drivers and those of these other
+systems.
+
+@unnumberedsubsec Intent
+@cindex manual intent
+
+The intent of this manual is to act as a guide to porting @dfn{X.25}
+@dfn{STREAMS} modules, drivers and applications programs from other @dfn{UNIX}
+implementations of @dfn{X.25} to @cite{Linux Fast-STREAMS}@footnote{@xref{Top,
+Linux Fast-STREAMS, About This Manual, STREAMS, Linux Fast-STREAMS (LfS)
+Reference Manual}.}.  It is intended to be read alone and is not intended to
+replace or supplement the @cite{@value{PACKAGE_TITLE}} manual pages.  For a
+reference for writing code, the manual pages (see @manref{x25(7)}) provide a
+better reference to the programmer.  Although this describes the features of the
+@cite{@value{PACKAGE_TITLE}} package, @uref{http://www.openss7.com/,OpenSS7
+Corporation} is under no obligation to provide any software, system or features
+listed herein.
+
+@unnumberedsubsec Audience
+@cindex manual audience
+
+This manual is intended for a highly technical audience.  The reader should
+already be familiar with @cite{Linux} kernel and user application programming,
+the @cite{Linux} file system, character devices, driver input and output,
+interrupts, software interrupt handling, scheduling, process contexts,
+multiprocessor locks, thread programming, POSIX porgramming, etc.
+
+This guide is intended for network and systems programmers, who use the
+@dfn{STREAMS} and @dfn{X.25} mechanism at user and kernel levels for
+@cite{Linux} and @cite{UNIX} system communications services.  Readers of the
+guide are expected to possess prior knowledge of the @cite{Linux} and
+@cite{UNIX} system, programming, networking, and data communication.
+
+To derive maximum use from this porting guide, it is intended that the reader
+also be familiar with the user of @dfn{STREAMS} and @dfn{X.25} under @cite{UNIX}
+and @cite{POSIX} systems implementing @dfn{X.25} drivers and applications
+libraries.  The reader should certainly be familiar with the @dfn{X.25}
+implementations on the @cite{UNIX} or @cite{POSIX} system from which
+@dfn{STREAMS} drivers, modules or applications are being ported.
+
+@node Revisions
+@unnumberedsec Revisions
+@cindex manual revisions
+
+Take care that you are working with a current version of this manual: you will
+not be notified of updates.  To ensure that you are working with a current
+version, contact the @uref{mailto:bidulock@@openss7.org,Author}, or check
+@uref{http://www.openss7.org/,The OpenSS7 Project} website for a current
+version.
+
+A current version of this manual is normally distributed with the
+@cite{@value{PACKAGE_TITLE}} package,
+@command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2}}
+
+@unnumberedsubsec Version Control
+
+@smallexample
+$Log: x25_porting.texi,v $
+Revision 0.9.2.1  2008-06-13 06:43:55  brian
+- added files
+
+@end smallexample
+
+@unnumberedsubsec ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this manual is controlled.  An
+opaque (printed, postscript or portable document format) version of this manual
+is an @strong{UNCONTROLLED VERSION}.
+
+@node Disclaimer
+@unnumberedsec Disclaimer
+@cindex manual disclaimer
+
+@noindent
+@cite{OpenSS7 Corporation} disclaims all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a
+particular purpose, non-infringement, or title; that the contents of the manual
+are suitable for any purpose, or that the implementation of such contents will
+not infringe on any third party patents, copyrights, trademarks or other rights.
+In no event shall @cite{OpenSS7 Corporation} be liable for any direct, indirect,
+special or consequential damages or any damages whatsoever resulting from loss
+of use, data or profits, whether in an action of contract, negligence or other
+tortious action, arising out of or in connection with any use of this manual or
+the performance or implementation of the contents thereof.
+
+@noindent
+@cite{OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with
+standards promulgated by various agencies, utilization of advances in the state
+of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.
+@cite{OpenSS7 Corporation} is under no obligation to provide any feature listed
+herein.
+
+@unnumberedsubsec U.S. Government Restricted Rights
+
+If you are licensing this Software on behalf of the U.S. Government
+("Government"), the following provisions apply to you.  If the Software is
+supplied by the Department of Defense ("DoD"), it is classified as "Commercial
+Computer Software" under paragraph 252.227-7014 of the DoD Supplement to the
+Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the
+Government is acquiring only the license rights granted herein (the license
+rights customarily provided to non-Government users).  If the Software is
+supplied to any unit or agency of the Government other than DoD, it is
+classified as "Restricted Computer Software" and the Government's rights in the
+Software are defined in paragraph 52.227-19 of the Federal Acquisition
+Regulations ("FAR") (or any successor regulations) or, in the cases of NASA, in
+paragraph 18.52.227-86 of the NASA Supplement to the FAR (or any successor
+regulations).
+
+@c ----------------------------------------------------------------------------
+
+@node Acknowledgements
+@unnumberedsec Acknowledgements
+@cindex credits
+
+@include texi/funding.texi
+
+@c ----------------------------------------------------------------------------
+
+@node Introduction
+@chapter Introduction
+@cindex introduction
+
+This guide documents the porting of @dfn{X.25} @dfn{STREAMS} modules, drivers
+and applications programs from various @dfn{UNIX} implementations to @cite{Linux
+Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual,
+STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+
+@menu
+* Overview::			Overview
+* Organization::		Organization
+* Conventions::			Conventions
+* Concepts::			Concepts
+@end menu
+
+@c ----------------------------------------------------------------------------
+
+@node Overview
+@section Overview
+@cindex guide overview
+
+This guide documents the porting of @dfn{X.25} drivers, modules and applications
+programs from various @dfn{UNIX} implementations of @dfn{X.25} to @cite{Linux
+Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual,
+STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.  It details some of the
+differences between other implementations of @dfn{X.25} and that of @cite{Linux
+Fast-STREAMS}@footnote{@xref{Top, Linux Fast-STREAMS, About This Manual,
+STREAMS, Linux Fast-STREAMS (LfS) Reference Manual}.}.
+
+@noindent
+In addition, it provides documentation on @dfn{STREAMS} drivers and modules for
+@dfn{X.25} including:
+
+@itemize
+@item Linux X.25 Driver (@file{streams-dl.o}),
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Organization
+@section Organization
+@cindex guide organization
+
+This manual is organized (loosely) into several sections as follows:
+
+@c ----------------------------------------------------------------------------
+
+@node Conventions
+@section Conventions
+@cindex guide conventions
+
+This manual uses @cite{texinfo} typographic conventions.
+
+@c ----------------------------------------------------------------------------
+
+@node Concepts
+@section Concepts
+@cindex concepts
+
+@node Porting
+@chapter Porting
+@cindex porting
+
+@menu
+* Porting Organization::
+@end menu
+
+This guide is largely focused on porting @dfn{STREAMS} drivers, modules and
+applications programs that act in the capacity of an X.25 User.  Whereas other
+documents tend to focus on simply porting drivers for specific interface cards,
+that topic is adequately addressed elsewhere for the @cite{Linux} kernel.
+Whenever a network device driver has been written for a device under
+@cite{Linux}, using @cite{Linux} paradigms and procedures, it can automatically
+work with @dfn{X.25}.  Therefore, this guide focusses on the differences between
+the @dfn{X.25} interfaces that would be experienced by the X.25 User:
+@dfn{STREAMS} modules that push over X.25 Streams; @dfn{STREAMS} drivers under
+which X.25 Streams are linked; and applications programs that access the X.25
+interface directly as a user-space program.
+
+@cite{Linux Fast-STREAMS} and each of its add-on packages, including
+@cite{@value{PACKAGE_TITLE}}, ship with a wide assortment of manual pages.  Most
+manual pages contain a section entitled ``@cite{COMPATIBILITY}'' that provides
+compatibility and porting information for various mainstream @cite{UNIX}
+implementations.  For information on the minor differences in the @dfn{STREAMS}
+environment, see the @cite{Linux Fast-STREAMS} package,
+@command{streams-@value{VERSION_STREAMS}}.
+
+There are hundreds of manual pages in the @cite{@value{PACKAGE_TITLE}} package
+for @dfn{X.25}.  These manual pages can be explored best by starting with the
+@manref{x25(7)} manual page.  The manual pages document both X.25 Revision
+2.0.0 standard behaviour, as well as the @cite{@value{PACKAGE_TITLE}}
+implementations of extension primitives, input-output controls, and features
+documented for other operating systems including @cite{AIX}, @cite{HP-UX},
+@cite{IRIX}, @cite{OSF}, @cite{PowerMAX}, @cite{Solaris}, @cite{SVR 4},
+@cite{SVR 4.2MP}, @cite{UnixWare 7}.  Although each of the @dfn{X.25} related
+manual pages of supported functions, primitives and structures provide
+compatibilty and porting information, this document attempts to gather together
+pertinent information concerning porting @dfn{X.25} modules, drivers and
+applications programs from various @dfn{UNIX} operating systems supporting
+@dfn{STREAMS} and @dfn{X.25} to @cite{@value{PACKAGE_TITLE}}.
+
+Where there is discrepencies between this documentation and the manual pages
+that ship with the package, the manual pages are controlling.  This is because
+this guide is updated less frequently that the documented functionality in the
+manual pages.
+
+@node Porting Organization
+@section Porting Organization
+
+The porting information in this guide is organized by the flavor of operating
+system from which porting is being attempted.  Note that, aside from
+configuration details, any system not listed here that is based on @cite{SVR 4},
+@cite{SVR 4.2MP}, or on another of the implementations, should start with that
+implementation's portability information.  Porting information is included for
+porting from implementations based on a strict interpretation of the @dfn{X.25}
+standards, the @cite{AIX} operating system and the @cite{AIXlink/X.25} package,
+the @cite{HP-UX} operating system, the @cite{IRIX} operating system, the the
+@cite{OSF}, @cite{Digital UNIX}, or @cite{Tru64 UNIX} operating system, the
+@cite{PowerMAX} operating system, the @cite{Solaris} operating system and the
+@cite{Solstice X.25} or @cite{SunLink X.25} packages, the @cite{SVR 4} and
+@cite{SVR 4.2MP} operating system, and the @cite{UnixWare 7} operating system.
+
+Note that additional porting information with regard to porting @dfn{X.25}
+applications from various implementations to @cite{Linux Fast-STREAMS} is
+detailed in the @cite{X.25 Porting Guide} which is part of the @cite{OpenSS7
+X.25} package (@file{strx25}).
+
+Porting information is organized into sections as follows:
+
+@ifnottex
+@menu
+* General Porting Considerations::
+* Porting from AIX::
+* Porting from HP-UX::
+* Porting from IRIX::
+* Porting from OSF::
+* Porting from PowerMAX::
+* Porting from Solaris::
+* Porting from SVR4.2::
+* Porting from UnixWare::
+* Developing on OpenSS7::
+@end menu
+@end ifnottex
+@ifnotinfo
+@multitable @columnfractions .50 .50
+@item @ref{Porting from AIX}
+@tab Porting AIX DLPI applications.
+@item @ref{Porting from HP-UX}
+@tab Porting HP-UX DLPI applications.
+@item @ref{Porting from IRIX}
+@tab Porting IRIX DLPI applications.
+@item @ref{Porting from OSF}
+@tab Porting OSF DLPI applications.
+@item @ref{Porting from PowerMAX}
+@tab Porting PowerMAX DLPI applications.
+@item @ref{Porting from Solaris}
+@tab Porting Solaris DLPI applications.
+@item @ref{Porting from SVR4.2}
+@tab Porting SVR4.2 DLPI applications.
+@item @ref{Porting from UnixWare}
+@tab Porting UnixWare DLPI applications.
+@item @ref{Developing on OpenSS7}
+@tab Developing DLPI applications on OpenSS7.
+@end multitable
+@end ifnotinfo
+@ifplaintext
+@multitable @columnfractions .50 .50
+@item @cite{Porting from AIX}
+@tab Porting AIX DLPI applications.
+@item @cite{Porting from HP-UX}
+@tab Porting HP-UX DLPI applications.
+@item @cite{Porting from IRIX}
+@tab Porting IRIX DLPI applications.
+@item @cite{Porting from OSF}
+@tab Porting OSF DLPI applications.
+@item @cite{Porting from PowerMAX}
+@tab Porting PowerMAX DLPI applications.
+@item @cite{Porting from Solaris}
+@tab Porting Solaris DLPI applications.
+@item @cite{Porting from SVR4.2}
+@tab Porting SVR4.2 DLPI applications.
+@item @cite{Porting from UnixWare}
+@tab Porting UnixWare DLPI applications.
+@item @cite{Developing on OpenSS7}
+@tab Developing DLPI applications on OpenSS7.
+@end multitable
+@end ifplaintext
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node General Porting Considerations
+@chapter General Porting Considerations
+@cindex general porting considerations
+
+@section Interfaces
+@anchor{Interfaces}
+
+There are four (4) @dfn{STREAMS} service primitive interfaces normally provided
+by the X.25 implementations.  These are:
+
+@table @cite
+@item Data Link Provider Interface (DLPI)
+
+The Data Link Provider Interface (DLPI) is an UNIX International standard
+interface maintained by the OpenGroup that is in Revision 2.0.0 with corrigenda.
+For X.25, DLPI normallly provide direct access to the X.25 LAPB protocol or
+ISO/IEC 8802 LAPB.
+
+It is specified by ``@cite{Open Group CAE Specification: Data Link Provider
+Interface (DLPI) Sepcification, Revision 2.0.0, Draft 2, August 20, 1991,
+(Parsippany, New Jersey), UNIX International, Inc., UNIX International
+Press.},'' available from @uref{http://www.openss7.org/docs/dlpi.pdf,The OpenSS7
+Project}.@footnote{@file{dlpi.pdf} is distributed with this package.}
+
+@item Network Layer Interface (NLI)
+
+The Network Layer Interface (NLI) is an non-standard interface developed by
+Spider, that provides access to the remnants of their X.25, XOL, XOT
+implemetnations.  This interface is prevelant in @cite{Solaris}, @cite{HP-UX},
+@cite{IRIX}, and other systems.
+
+@item Network Provider Interface (NPI)
+
+The Network Provider Interface (NPI) is a UNIX International standard interface
+maintained by the OpenGroup that is in Revision 2.0.0 with corrigenda.  For
+X.25, NPI normally provides OSI CONS over X.25, but some implementations use it
+for direct access to X.25 (@cite{AIX} does this).
+
+It is specified by ``@cite{Open Group CAE Specification: Network Provider
+Interface (NPI) Specification, Revision 2.0.0, Draft 2, August 17, 1992,
+(Parsippany, New Jersey), UNIX International, Inc., UNIX International Press.},''
+available from @url{http://www.openss7.org/docs/npi.pdf,The OpenSS7
+Project}.@footnote{@file{npi.pdf} is distributed with this package.}
+
+@item X/Open X.25 Interface (XX25)
+
+The X/Open X.25 Interface (XX25) is an standard interface developed by X/Open
+and maintained by the OpenGroup.
+
+It is specified by ``@cite{Open Group CAE Specification: X.25 Programming Interface
+using XTI (XX25), Document No: C411, November 1995, (Berkshire, UK), X/Open,
+Open Group Publication. [ISBN: 1-85912-136-5]}'' available from
+@url{http://www.opengroup.org/onlinepubs/, The Open Group}.
+
+@end table
+
+@section Aspects
+
+There are several aspects of porting from the various environments to
+@cite{Linux Fast-STREAMS} that can be categorized roughly by the functional
+interface to which the aspect corresponds.  These aspects are:
+
+@itemize
+@item @cite{Addressing} --
+The Addressing aspect is the aspect of associating an address with the local
+endpoint and addresses associated with remote endpoints.
+
+@item @cite{Modes} --
+The Modes aspect is the aspect of major operating modes of enpoints.
+
+@item @cite{Primitives} --
+The Primitives aspect is the aspect of implementing service primitives accross
+the service primitive interface.
+
+@item @cite{Input-Output Controls} --
+The Input-Output control aspec is the aspect of providing
+impelementation-specific input-output control for the control of major aspect
+modes, replacement for primtives, or management and administration of the
+interface.
+
+@item @cite{Drivers and Modules} --
+The Drivers and Modules aspect is the naming, enumeration, and linkage of driver
+and modules into protocol stacks.
+
+@item @cite{Libraries and Utilities} --
+The Libraries and Utilities aspect is the aspect of C-language programs and
+shared object libraries the provide access to the interfaces or permit in the
+control of modes, protocol actions, management and adminstration, or protocl
+stakc construction and maintenance.
+
+@item @cite{Management} --
+The Management aspect is, of course, the aspect of management of the interface
+and protocol stack implemetnation using standard SNMP MIBs or CMIP GDMOs.
+
+@end itemize
+
+The aspects can be applied to each of four (4) interfaces offered to X.25 LAPB
+and PLP users, described under @ref{Interfaces}.
+
+The sections that following provide an overview of each of these aspects.  Also,
+each specific porting section has sub-sections that detail each of these aspects
+of a specific porting scenario.
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from AIX
+@chapter Porting from AIX
+@cindex Porting from AIX
+
+This section provides an overview of porting from the @cite{AIX} environment,
+and in particular from the @cite{AIXlink/X.25} package.  Most of the
+information concerning the @cite{AIXlink/X.25} implementation of X.25 is
+contained in the IBM document: ``@cite{AIXlink/X.25 Vesion 2.1 for AIX: Guide
+and Reference, No: SC23-2520-07, Eigth Edition, September 2006, (Bolder, CO),
+International Business Machines Corp., IBM}'', available from the
+@uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.
+
+@menu
+* AIX Data Link Provider Interface::
+* AIX Network Layer Interface::
+* AIX Network Provider Interface::
+@end menu
+
+@node AIX Data Link Provider Interface
+@section AIX Data Link Provider Interface
+
+The specific Data Link Provider Interface (DLPI) is described in the
+AIXlink/X.25 documentation.@footnote{``@cite{AIXlink/X.25 Vesion 2.1 for AIX:
+Guide and Reference, No: SC23-2520-07, Eigth Edition, September 2006, (Bolder,
+CO), International Business Machines Corp., IBM}'', available from the
+@uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.}
+
+Note that @cite{AIXlink/X.25} only documents the ability to use the DLPI
+interface for specific LAPB links for which the link is specified as DLPI and
+does not provide X.25 packet layer support for such data links.
+
+@menu
+* AIX DLPI Addressing::
+* AIX DLPI Modes::
+* AIX DLPI Primitives::
+* AIX DLPI Input-Output Controls::
+* AIX DLPI Drivers and Modules::
+* AIX DLPI Libraries and Utilities::
+* AIX DLPI Management::
+@end menu
+
+@node AIX DLPI Addressing
+@subsection AIX DLPI Addressing
+
+@node AIX DLPI Modes
+@subsection AIX DLPI Modes
+
+@node AIX DLPI Primitives
+@subsection AIX DLPI Primitives
+
+@node AIX DLPI Input-Output Controls
+@subsection AIX DLPI Input-Output Controls
+
+@node AIX DLPI Drivers and Modules
+@subsection AIX DLPI Drivers and Modules
+
+@node AIX DLPI Libraries and Utilities
+@subsection AIX DLPI Libraries and Utilities
+
+@node AIX DLPI Management
+@subsection AIX DLPI Management
+
+
+@node AIX Network Layer Interface
+@section AIX Network Layer Interface
+
+@c @menu
+@c * AIX NLI Addressing::
+@c * AIX NLI Modes::
+@c * AIX NLI Primitives::
+@c * AIX NLI Input-Output Controls::
+@c * AIX NLI Drivers and Modules::
+@c * AIX NLI Libraries and Utilities::
+@c * AIX NLI Management::
+@c @end menu
+
+@cite{AIX} does not document a @cite{Network Layer Interface (NLI)}.  It only
+documents a @cite{Network Provider Interface (NPI)} in support of X.25
+applications.  Nevertheless, it appears that the NPI provided by
+@cite{AIXlink/X.25} is merely an ``@file{npi}'' module pushed over an NLI
+Stream opened on an X.25 packet layer protocol driver.  So, although it is not
+documented, it appears that the X.25 packet layer protocol driver provided by
+@cite{AIXlink/X.25} is indeed a Spider NLI driver.
+
+@c @node AIX NLI Addressing
+@c @subsection AIX NLI Addressing
+@c 
+@c @node AIX NLI Modes
+@c @subsection AIX NLI Modes
+@c 
+@c @node AIX NLI Primitives
+@c @subsection AIX NLI Primitives
+@c 
+@c @node AIX NLI Input-Output Controls
+@c @subsection AIX NLI Input-Output Controls
+@c 
+@c @node AIX NLI Drivers and Modules
+@c @subsection AIX NLI Drivers and Modules
+@c 
+@c @node AIX NLI Libraries and Utilities
+@c @subsection AIX NLI Libraries and Utilities
+@c 
+@c @node AIX NLI Management
+@c @subsection AIX NLI Management
+@c 
+
+@cite{@value{PACKAGE_TITLE}}, on the other hand, provides both NLI and NPI
+interface for X.25 drivers, modules and applications.
+
+@node AIX Network Provider Interface
+@section AIX Network Provider Interface
+
+@menu
+* AIX NPI Addressing::
+* AIX NPI Modes::
+* AIX NPI Primitives::
+* AIX NPI Input-Output Controls::
+* AIX NPI Drivers and Modules::
+* AIX NPI Libraries and Utilities::
+* AIX NPI Management::
+@end menu
+
+@node AIX NPI Addressing
+@subsection AIX NPI Addressing
+
+@subsubsection AIX NPI Driver Naming
+
+For an application to use NPI, it would typically follow these steps:
+
+@enumerate
+@item Open a Stream to the packet driver.
+@item Pushe the NPI module.
+@item Bind the application to the NPI module.
+@item Submit a connection request to establish a connection between the local
+and remote X.25 systems.
+@item Once the connection becomes established, transfer the required data.
+@item Disconnect the two systems.
+@end enumerate
+
+The example @cite{AIXlink/X.25} gives is:
+
+@smallexample
+dev = open("/dev/x25pkt", O_RDWR);
+/* assumes good return value */
+ioctl(dev, I_PUSH, "npi"); /* uses the streams library push ioctl */
+@end smallexample
+
+@node AIX NPI Modes
+@subsection AIX NPI Modes
+
+@node AIX NPI Primitives
+@subsection AIX NPI Primitives
+
+@subsubsection AIX NPI Supported Primitives
+
+The following local management primitives are supported by
+@cite{AIXlink/X.25}:
+
+@multitable @columnfractions 0.35 0.65
+@item @prim{N_INFO_REQ} -- @tab specifies a network information request.
+@item @prim{N_INFO_ACK} -- @tab indicates a network information acknowledgement.
+@item @prim{N_BIND_REQ} -- @tab specifies a bind protocol address request.
+@item @prim{N_BIND_ACK} -- @tab indicates a bind protocol address acknowlegement.
+@item @prim{N_UNBIND_REQ} -- @tab specifies an unbind protocol address request.
+@item @prim{N_ERROR_ACK} -- @tab provides error acknowledgement.
+@item @prim{N_OK_ACK} -- @tab provides successful receipt acknowledgement.
+@end multitable
+
+The following connection-oriented mode primitives are supported by
+@cite{AIXlink/X.25}:
+
+@multitable @columnfractions 0.35 0.65
+@item @prim{N_CONN_REQ} -- @tab specifies a network connection request.
+@item @prim{N_CONN_IND} -- @tab provides a network connection indication.
+@item @prim{N_CONN_RES} -- @tab specifies a network connection response.
+@item @prim{N_CONN_CON} -- @tab provides a network connection confirmation.
+@item @prim{N_DATA_REQ} -- @tab specifies a normal data transfer request.
+@item @prim{N_DATA_IND} -- @tab provides a normal data transfer indication.
+@item @prim{N_DATACK_REQ} -- @tab specifies a data acknowledgement request.
+@item @prim{N_DATACK_IND} -- @tab provides a data acknowledgemeent indication.
+@item @prim{N_EXDATA_REQ} -- @tab specifies an expedited data transfer request. 
+@item @prim{N_EXDATA_IND} -- @tab provides an expedited data transfer indication.
+@item @prim{N_RESET_REQ} -- @tab specifies a reset request.
+@item @prim{N_RESET_IND} -- @tab provides a reset indication.
+@item @prim{N_RESET_RES} -- @tab specifies a reset response.
+@item @prim{N_RESET_CON} -- @tab provides a reset confirmation.
+@item @prim{N_DISCON_REQ} -- @tab initiates a disconnect request.
+@item @prim{N_DISCON_IND} -- @tab proivdes a disconnect indication.
+@end multitable
+
+@subsubsection AIX NPI Unsupported Primitives
+
+@subsubsection AIX NPI Modified Primitives
+
+@cite{AIXlinx/X.25} modifies the following primitives and their associated
+structures:
+
+@itemize
+@item @prim{N_BIND_REQ}
+
+Adds the @pval{TRANSPAC_OPT} flag to the @parm{BIND_flags} field.  Modifies
+the form of the address to be @cite{AIXlink/X.25}-specific.  Modifies the form
+of the protocol identifiers field to be @cite{AIXlink/X.25}-specific.
+
+@item @prim{N_INFO_ACK}
+
+@cite{AIXlink/X.25} documents the following fields having value
+@pval{QOS_UNKNOWN}, which is inconsistent with NPI: @parm{ADDR_length},
+@parm{ADDR_offset}, @parm{QOS_length}, @parm{QOS_offset},
+@parm{QOS_range_length}, @parm{QOS_range_offset}, @parm{OPTIONS_flags},
+@parm{CURRENT_state}, @parm{PROVIDER_type}, @parm{NODU_size},
+@parm{NPI_version}.
+
+@item @prim{N_RESET_REQ}
+
+Form of the primitive adjusted to include CCITT cause and diagnostic values.
+
+
+@item @prim{N_RESET_IND}
+
+Form of the primitive adjusted to include CCITT cause and diagnostic values.
+
+
+@item @prim{N_DISCON_REQ}
+
+Form of the primitive adjusted to include CCITT cause and diagnostic values.
+
+
+@item @prim{N_DISCON_IND}
+
+Form of the primitive adjusted to include CCITT cause and diagnostic values.
+
+
+@end itemize
+
+@node AIX NPI Input-Output Controls
+@subsection AIX NPI Input-Output Controls
+
+@node AIX NPI Drivers and Modules
+@subsection AIX NPI Drivers and Modules
+
+@cite{AIXlink/X.25} provides the @file{/dev/x25pkct} device driver that
+appears to be a Spider NLI device driver and documents pushing the
+``@file{npi}'' module onto a Stream opened on this device to provide an NPI
+interface to the X.25 driver.
+
+@node AIX NPI Libraries and Utilities
+@subsection AIX NPI Libraries and Utilities
+
+@node AIX NPI Management
+@subsection AIX NPI Management
+
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from HP-UX
+@chapter Porting from HP-UX
+@cindex Porting from HP-UX
+
+This chapter is applicable to porting X.25 drivers, modules and applications
+from @cite{HP-UX}, and in particular the @cite{HP X.25/9000} STREAMS drivers,
+to @cite{Linux Fast-STREAMS}.
+
+@menu
+* HP-UX Data Link Provider Interface::
+* HP-UX Network Layer Interface::
+* HP-UX Network Provider Interface::
+@end menu
+
+@node HP-UX Data Link Provider Interface
+@section HP-UX Data Link Provider Interface
+
+@menu
+* HP-UX DLPI Addressing::
+* HP-UX DLPI Modes::
+* HP-UX DLPI Primitives::
+* HP-UX DLPI Input-Output Controls::
+* HP-UX DLPI Drivers and Modules::
+* HP-UX DLPI Libraries and Utilities::
+* HP-UX DLPI Management::
+@end menu
+
+@node HP-UX DLPI Addressing
+@subsection HP-UX DLPI Addressing
+
+@node HP-UX DLPI Modes
+@subsection HP-UX DLPI Modes
+
+@node HP-UX DLPI Primitives
+@subsection HP-UX DLPI Primitives
+
+@node HP-UX DLPI Input-Output Controls
+@subsection HP-UX DLPI Input-Output Controls
+
+@node HP-UX DLPI Drivers and Modules
+@subsection HP-UX DLPI Drivers and Modules
+
+@node HP-UX DLPI Libraries and Utilities
+@subsection HP-UX DLPI Libraries and Utilities
+
+@node HP-UX DLPI Management
+@subsection HP-UX DLPI Management
+
+
+@node HP-UX Network Layer Interface
+@section HP-UX Network Layer Interface
+
+@menu
+* HP-UX NLI Addressing::
+* HP-UX NLI Modes::
+* HP-UX NLI Primitives::
+* HP-UX NLI Input-Output Controls::
+* HP-UX NLI Drivers and Modules::
+* HP-UX NLI Libraries and Utilities::
+* HP-UX NLI Management::
+@end menu
+
+@node HP-UX NLI Addressing
+@subsection HP-UX NLI Addressing
+
+@node HP-UX NLI Modes
+@subsection HP-UX NLI Modes
+
+@node HP-UX NLI Primitives
+@subsection HP-UX NLI Primitives
+
+@node HP-UX NLI Input-Output Controls
+@subsection HP-UX NLI Input-Output Controls
+
+@node HP-UX NLI Drivers and Modules
+@subsection HP-UX NLI Drivers and Modules
+
+@node HP-UX NLI Libraries and Utilities
+@subsection HP-UX NLI Libraries and Utilities
+
+@node HP-UX NLI Management
+@subsection HP-UX NLI Management
+
+
+@node HP-UX Network Provider Interface
+@section HP-UX Network Provider Interface
+
+@menu
+* HP-UX NPI Addressing::
+* HP-UX NPI Modes::
+* HP-UX NPI Primitives::
+* HP-UX NPI Input-Output Controls::
+* HP-UX NPI Drivers and Modules::
+* HP-UX NPI Libraries and Utilities::
+* HP-UX NPI Management::
+@end menu
+
+@node HP-UX NPI Addressing
+@subsection HP-UX NPI Addressing
+
+@node HP-UX NPI Modes
+@subsection HP-UX NPI Modes
+
+@node HP-UX NPI Primitives
+@subsection HP-UX NPI Primitives
+
+@node HP-UX NPI Input-Output Controls
+@subsection HP-UX NPI Input-Output Controls
+
+@node HP-UX NPI Drivers and Modules
+@subsection HP-UX NPI Drivers and Modules
+
+@node HP-UX NPI Libraries and Utilities
+@subsection HP-UX NPI Libraries and Utilities
+
+@node HP-UX NPI Management
+@subsection HP-UX NPI Management
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from IRIX
+@chapter Porting from IRIX
+@cindex Porting from IRIX
+
+This chapter is applicable to porting STREAMS X.25 drivers, modules and
+applications from the @cite{IRIX} operating system to @cite{Linux
+Fast-STREAMS}.
+
+@cite{IRIX} obviously provides direct support for a Spider NLI X.25
+implementation as documented in ``@cite{SX.25 NLI Programmer's Guide, No.
+007-2268-002, 1994, (), Silicon Graphisc, Inc., SGI Technical Publications},''
+available from @uref{http://techpubs.sgi.com/,SGI Technical Publications}.
+
+The Network Layer Interface (NLI) to the X.25 Packet Layer Protocol (PLP) was
+developed by Spider Systems, Ltd., and is widely available on many platforms.
+
+@menu
+* IRIX Data Link Provider Interface::
+* IRIX Network Layer Interface::
+* IRIX Network Provider Interface::
+@end menu
+
+@node IRIX Data Link Provider Interface
+@section IRIX Data Link Provider Interface
+
+@menu
+* IRIX DLPI Addressing::
+* IRIX DLPI Modes::
+* IRIX DLPI Primitives::
+* IRIX DLPI Input-Output Controls::
+* IRIX DLPI Drivers and Modules::
+* IRIX DLPI Libraries and Utilities::
+* IRIX DLPI Management::
+@end menu
+
+@node IRIX DLPI Addressing
+@subsection IRIX DLPI Addressing
+
+@node IRIX DLPI Modes
+@subsection IRIX DLPI Modes
+
+@node IRIX DLPI Primitives
+@subsection IRIX DLPI Primitives
+
+@node IRIX DLPI Input-Output Controls
+@subsection IRIX DLPI Input-Output Controls
+
+@node IRIX DLPI Drivers and Modules
+@subsection IRIX DLPI Drivers and Modules
+
+@node IRIX DLPI Libraries and Utilities
+@subsection IRIX DLPI Libraries and Utilities
+
+@node IRIX DLPI Management
+@subsection IRIX DLPI Management
+
+
+@node IRIX Network Layer Interface
+@section IRIX Network Layer Interface
+
+@menu
+* IRIX NLI Addressing::
+* IRIX NLI Modes::
+* IRIX NLI Primitives::
+* IRIX NLI Input-Output Controls::
+* IRIX NLI Drivers and Modules::
+* IRIX NLI Libraries and Utilities::
+* IRIX NLI Management::
+@end menu
+
+@node IRIX NLI Addressing
+@subsection IRIX NLI Addressing
+
+@node IRIX NLI Modes
+@subsection IRIX NLI Modes
+
+@node IRIX NLI Primitives
+@subsection IRIX NLI Primitives
+
+@node IRIX NLI Input-Output Controls
+@subsection IRIX NLI Input-Output Controls
+
+@cite{IRIX} documents the following input-output controls:
+
+@itemize
+@item @dlioc{N_getnliversion} -- gets the NLI interface version.
+@end itemize
+
+@itemize
+@item @dlioc{N_snident} --
+@item @dlioc{N_snmode} --
+@item @dlioc{N_snconfig} --
+@item @dlioc{N_snread} --
+@item @dlioc{N_getstats} --
+@item @dlioc{N_zerostats} --
+@item @dlioc{N_putpvcmap} --
+@item @dlioc{N_getpvcmap} --
+@item @dlioc{N_getVCstatus} --
+@item @dlioc{N_getnliversion} --
+@item @dlioc{N_traceon} --
+@item @dlioc{N_traceoff} --
+@item @dlioc{N_nuimsg} --
+@item @dlioc{N_nuiput} --
+@item @dlioc{N_nuidel} --
+@item @dlioc{N_nuiget} --
+@item @dlioc{N_nuimget} --
+@item @dlioc{N_nuireset} --
+@item @dlioc{N_zeroVCstats} --
+@item @dlioc{N_putx32map} --
+@item @dlioc{N_getx32map} --
+@item @dlioc{N_getSNIDstats} --
+@item @dlioc{N_zeroSNIDstats} --
+@item @dlioc{N_setQOSDATPRI} --
+@item @dlioc{N_resetQOSDATPRI} --
+@end itemize
+
+@node IRIX NLI Drivers and Modules
+@subsection IRIX NLI Drivers and Modules
+
+@cite{IRIX} provides the NLI driver, but also provides an NLI conversion
+module that permits older NLI version applications to run unaltered over the
+newer NLI driver.
+
+Under @cite{IRIX}, the device driver name is @file{/dev/x25}.
+
+Under @cite{IRIX}, the name of the vesion conversion module is
+``@file{s_nli3}''.
+
+@node IRIX NLI Libraries and Utilities
+@subsection IRIX NLI Libraries and Utilities
+
+The @file{libsx25.a} library provides some potentially useful functions.
+
+@node IRIX NLI Management
+@subsection IRIX NLI Management
+
+
+@node IRIX Network Provider Interface
+@section IRIX Network Provider Interface
+
+@menu
+* IRIX NPI Addressing::
+* IRIX NPI Modes::
+* IRIX NPI Primitives::
+* IRIX NPI Input-Output Controls::
+* IRIX NPI Drivers and Modules::
+* IRIX NPI Libraries and Utilities::
+* IRIX NPI Management::
+@end menu
+
+@node IRIX NPI Addressing
+@subsection IRIX NPI Addressing
+
+@node IRIX NPI Modes
+@subsection IRIX NPI Modes
+
+@node IRIX NPI Primitives
+@subsection IRIX NPI Primitives
+
+@node IRIX NPI Input-Output Controls
+@subsection IRIX NPI Input-Output Controls
+
+@node IRIX NPI Drivers and Modules
+@subsection IRIX NPI Drivers and Modules
+
+@node IRIX NPI Libraries and Utilities
+@subsection IRIX NPI Libraries and Utilities
+
+@node IRIX NPI Management
+@subsection IRIX NPI Management
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from OSF
+@chapter Porting from OSF
+@cindex Porting from OSF
+
+@menu
+* OSF Data Link Provider Interface::
+* OSF Network Layer Interface::
+* OSF Network Provider Interface::
+@end menu
+
+@node OSF Data Link Provider Interface
+@section OSF Data Link Provider Interface
+
+@menu
+* OSF DLPI Addressing::
+* OSF DLPI Modes::
+* OSF DLPI Primitives::
+* OSF DLPI Input-Output Controls::
+* OSF DLPI Drivers and Modules::
+* OSF DLPI Libraries and Utilities::
+* OSF DLPI Management::
+@end menu
+
+@node OSF DLPI Addressing
+@subsection OSF DLPI Addressing
+
+@node OSF DLPI Modes
+@subsection OSF DLPI Modes
+
+@node OSF DLPI Primitives
+@subsection OSF DLPI Primitives
+
+@node OSF DLPI Input-Output Controls
+@subsection OSF DLPI Input-Output Controls
+
+@node OSF DLPI Drivers and Modules
+@subsection OSF DLPI Drivers and Modules
+
+@node OSF DLPI Libraries and Utilities
+@subsection OSF DLPI Libraries and Utilities
+
+@node OSF DLPI Management
+@subsection OSF DLPI Management
+
+
+@node OSF Network Layer Interface
+@section OSF Network Layer Interface
+
+@menu
+* OSF NLI Addressing::
+* OSF NLI Modes::
+* OSF NLI Primitives::
+* OSF NLI Input-Output Controls::
+* OSF NLI Drivers and Modules::
+* OSF NLI Libraries and Utilities::
+* OSF NLI Management::
+@end menu
+
+@node OSF NLI Addressing
+@subsection OSF NLI Addressing
+
+@node OSF NLI Modes
+@subsection OSF NLI Modes
+
+@node OSF NLI Primitives
+@subsection OSF NLI Primitives
+
+@node OSF NLI Input-Output Controls
+@subsection OSF NLI Input-Output Controls
+
+@node OSF NLI Drivers and Modules
+@subsection OSF NLI Drivers and Modules
+
+@node OSF NLI Libraries and Utilities
+@subsection OSF NLI Libraries and Utilities
+
+@node OSF NLI Management
+@subsection OSF NLI Management
+
+
+@node OSF Network Provider Interface
+@section OSF Network Provider Interface
+
+@menu
+* OSF NPI Addressing::
+* OSF NPI Modes::
+* OSF NPI Primitives::
+* OSF NPI Input-Output Controls::
+* OSF NPI Drivers and Modules::
+* OSF NPI Libraries and Utilities::
+* OSF NPI Management::
+@end menu
+
+@node OSF NPI Addressing
+@subsection OSF NPI Addressing
+
+@node OSF NPI Modes
+@subsection OSF NPI Modes
+
+@node OSF NPI Primitives
+@subsection OSF NPI Primitives
+
+@node OSF NPI Input-Output Controls
+@subsection OSF NPI Input-Output Controls
+
+@node OSF NPI Drivers and Modules
+@subsection OSF NPI Drivers and Modules
+
+@node OSF NPI Libraries and Utilities
+@subsection OSF NPI Libraries and Utilities
+
+@node OSF NPI Management
+@subsection OSF NPI Management
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from PowerMAX
+@chapter Porting from PowerMAX
+@cindex Porting from PowerMAX
+
+@menu
+* PowerMAX Data Link Provider Interface::
+* PowerMAX Network Layer Interface::
+* PowerMAX Network Provider Interface::
+@end menu
+
+@node PowerMAX Data Link Provider Interface
+@section PowerMAX Data Link Provider Interface
+
+@menu
+* PowerMAX DLPI Addressing::
+* PowerMAX DLPI Modes::
+* PowerMAX DLPI Primitives::
+* PowerMAX DLPI Input-Output Controls::
+* PowerMAX DLPI Drivers and Modules::
+* PowerMAX DLPI Libraries and Utilities::
+* PowerMAX DLPI Management::
+@end menu
+
+@node PowerMAX DLPI Addressing
+@subsection PowerMAX DLPI Addressing
+
+@node PowerMAX DLPI Modes
+@subsection PowerMAX DLPI Modes
+
+@node PowerMAX DLPI Primitives
+@subsection PowerMAX DLPI Primitives
+
+@node PowerMAX DLPI Input-Output Controls
+@subsection PowerMAX DLPI Input-Output Controls
+
+@node PowerMAX DLPI Drivers and Modules
+@subsection PowerMAX DLPI Drivers and Modules
+
+@node PowerMAX DLPI Libraries and Utilities
+@subsection PowerMAX DLPI Libraries and Utilities
+
+@node PowerMAX DLPI Management
+@subsection PowerMAX DLPI Management
+
+
+@node PowerMAX Network Layer Interface
+@section PowerMAX Network Layer Interface
+
+@menu
+* PowerMAX NLI Addressing::
+* PowerMAX NLI Modes::
+* PowerMAX NLI Primitives::
+* PowerMAX NLI Input-Output Controls::
+* PowerMAX NLI Drivers and Modules::
+* PowerMAX NLI Libraries and Utilities::
+* PowerMAX NLI Management::
+@end menu
+
+@node PowerMAX NLI Addressing
+@subsection PowerMAX NLI Addressing
+
+@node PowerMAX NLI Modes
+@subsection PowerMAX NLI Modes
+
+@node PowerMAX NLI Primitives
+@subsection PowerMAX NLI Primitives
+
+@node PowerMAX NLI Input-Output Controls
+@subsection PowerMAX NLI Input-Output Controls
+
+@node PowerMAX NLI Drivers and Modules
+@subsection PowerMAX NLI Drivers and Modules
+
+@node PowerMAX NLI Libraries and Utilities
+@subsection PowerMAX NLI Libraries and Utilities
+
+@node PowerMAX NLI Management
+@subsection PowerMAX NLI Management
+
+
+@node PowerMAX Network Provider Interface
+@section PowerMAX Network Provider Interface
+
+@menu
+* PowerMAX NPI Addressing::
+* PowerMAX NPI Modes::
+* PowerMAX NPI Primitives::
+* PowerMAX NPI Input-Output Controls::
+* PowerMAX NPI Drivers and Modules::
+* PowerMAX NPI Libraries and Utilities::
+* PowerMAX NPI Management::
+@end menu
+
+@node PowerMAX NPI Addressing
+@subsection PowerMAX NPI Addressing
+
+@node PowerMAX NPI Modes
+@subsection PowerMAX NPI Modes
+
+@node PowerMAX NPI Primitives
+@subsection PowerMAX NPI Primitives
+
+@node PowerMAX NPI Input-Output Controls
+@subsection PowerMAX NPI Input-Output Controls
+
+@node PowerMAX NPI Drivers and Modules
+@subsection PowerMAX NPI Drivers and Modules
+
+@node PowerMAX NPI Libraries and Utilities
+@subsection PowerMAX NPI Libraries and Utilities
+
+@node PowerMAX NPI Management
+@subsection PowerMAX NPI Management
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from Solaris
+@chapter Porting from Solaris
+@cindex Porting from Solaris
+
+@menu
+* Solaris Data Link Provider Interface::
+* Solaris Network Layer Interface::
+* Solaris Network Provider Interface::
+@end menu
+
+@node Solaris Data Link Provider Interface
+@section Solaris Data Link Provider Interface
+
+@menu
+* Solaris DLPI Addressing::
+* Solaris DLPI Modes::
+* Solaris DLPI Primitives::
+* Solaris DLPI Input-Output Controls::
+* Solaris DLPI Drivers and Modules::
+* Solaris DLPI Libraries and Utilities::
+* Solaris DLPI Management::
+@end menu
+
+@node Solaris DLPI Addressing
+@subsection Solaris DLPI Addressing
+
+@node Solaris DLPI Modes
+@subsection Solaris DLPI Modes
+
+@node Solaris DLPI Primitives
+@subsection Solaris DLPI Primitives
+
+@node Solaris DLPI Input-Output Controls
+@subsection Solaris DLPI Input-Output Controls
+
+@node Solaris DLPI Drivers and Modules
+@subsection Solaris DLPI Drivers and Modules
+
+@node Solaris DLPI Libraries and Utilities
+@subsection Solaris DLPI Libraries and Utilities
+
+@node Solaris DLPI Management
+@subsection Solaris DLPI Management
+
+
+@node Solaris Network Layer Interface
+@section Solaris Network Layer Interface
+
+@menu
+* Solaris NLI Addressing::
+* Solaris NLI Modes::
+* Solaris NLI Primitives::
+* Solaris NLI Input-Output Controls::
+* Solaris NLI Drivers and Modules::
+* Solaris NLI Libraries and Utilities::
+* Solaris NLI Management::
+@end menu
+
+@node Solaris NLI Addressing
+@subsection Solaris NLI Addressing
+
+@node Solaris NLI Modes
+@subsection Solaris NLI Modes
+
+@node Solaris NLI Primitives
+@subsection Solaris NLI Primitives
+
+@node Solaris NLI Input-Output Controls
+@subsection Solaris NLI Input-Output Controls
+
+@node Solaris NLI Drivers and Modules
+@subsection Solaris NLI Drivers and Modules
+
+@node Solaris NLI Libraries and Utilities
+@subsection Solaris NLI Libraries and Utilities
+
+@node Solaris NLI Management
+@subsection Solaris NLI Management
+
+
+@node Solaris Network Provider Interface
+@section Solaris Network Provider Interface
+
+@menu
+* Solaris NPI Addressing::
+* Solaris NPI Modes::
+* Solaris NPI Primitives::
+* Solaris NPI Input-Output Controls::
+* Solaris NPI Drivers and Modules::
+* Solaris NPI Libraries and Utilities::
+* Solaris NPI Management::
+@end menu
+
+@node Solaris NPI Addressing
+@subsection Solaris NPI Addressing
+
+@node Solaris NPI Modes
+@subsection Solaris NPI Modes
+
+@node Solaris NPI Primitives
+@subsection Solaris NPI Primitives
+
+@node Solaris NPI Input-Output Controls
+@subsection Solaris NPI Input-Output Controls
+
+@node Solaris NPI Drivers and Modules
+@subsection Solaris NPI Drivers and Modules
+
+@node Solaris NPI Libraries and Utilities
+@subsection Solaris NPI Libraries and Utilities
+
+@node Solaris NPI Management
+@subsection Solaris NPI Management
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from SVR4.2
+@chapter Porting from SVR4.2
+@cindex Porting from SVR4.2
+
+@menu
+* SVR4.2 Data Link Provider Interface::
+* SVR4.2 Network Layer Interface::
+* SVR4.2 Network Provider Interface::
+@end menu
+
+@node SVR4.2 Data Link Provider Interface
+@section SVR4.2 Data Link Provider Interface
+
+@menu
+* SVR4.2 DLPI Addressing::
+* SVR4.2 DLPI Modes::
+* SVR4.2 DLPI Primitives::
+* SVR4.2 DLPI Input-Output Controls::
+* SVR4.2 DLPI Drivers and Modules::
+* SVR4.2 DLPI Libraries and Utilities::
+* SVR4.2 DLPI Management::
+@end menu
+
+@node SVR4.2 DLPI Addressing
+@subsection SVR4.2 DLPI Addressing
+
+@node SVR4.2 DLPI Modes
+@subsection SVR4.2 DLPI Modes
+
+@node SVR4.2 DLPI Primitives
+@subsection SVR4.2 DLPI Primitives
+
+@node SVR4.2 DLPI Input-Output Controls
+@subsection SVR4.2 DLPI Input-Output Controls
+
+@node SVR4.2 DLPI Drivers and Modules
+@subsection SVR4.2 DLPI Drivers and Modules
+
+@node SVR4.2 DLPI Libraries and Utilities
+@subsection SVR4.2 DLPI Libraries and Utilities
+
+@node SVR4.2 DLPI Management
+@subsection SVR4.2 DLPI Management
+
+
+@node SVR4.2 Network Layer Interface
+@section SVR4.2 Network Layer Interface
+
+@menu
+* SVR4.2 NLI Addressing::
+* SVR4.2 NLI Modes::
+* SVR4.2 NLI Primitives::
+* SVR4.2 NLI Input-Output Controls::
+* SVR4.2 NLI Drivers and Modules::
+* SVR4.2 NLI Libraries and Utilities::
+* SVR4.2 NLI Management::
+@end menu
+
+@node SVR4.2 NLI Addressing
+@subsection SVR4.2 NLI Addressing
+
+@node SVR4.2 NLI Modes
+@subsection SVR4.2 NLI Modes
+
+@node SVR4.2 NLI Primitives
+@subsection SVR4.2 NLI Primitives
+
+@node SVR4.2 NLI Input-Output Controls
+@subsection SVR4.2 NLI Input-Output Controls
+
+@node SVR4.2 NLI Drivers and Modules
+@subsection SVR4.2 NLI Drivers and Modules
+
+@node SVR4.2 NLI Libraries and Utilities
+@subsection SVR4.2 NLI Libraries and Utilities
+
+@node SVR4.2 NLI Management
+@subsection SVR4.2 NLI Management
+
+
+@node SVR4.2 Network Provider Interface
+@section SVR4.2 Network Provider Interface
+
+@menu
+* SVR4.2 NPI Addressing::
+* SVR4.2 NPI Modes::
+* SVR4.2 NPI Primitives::
+* SVR4.2 NPI Input-Output Controls::
+* SVR4.2 NPI Drivers and Modules::
+* SVR4.2 NPI Libraries and Utilities::
+* SVR4.2 NPI Management::
+@end menu
+
+@node SVR4.2 NPI Addressing
+@subsection SVR4.2 NPI Addressing
+
+@node SVR4.2 NPI Modes
+@subsection SVR4.2 NPI Modes
+
+@node SVR4.2 NPI Primitives
+@subsection SVR4.2 NPI Primitives
+
+@node SVR4.2 NPI Input-Output Controls
+@subsection SVR4.2 NPI Input-Output Controls
+
+@node SVR4.2 NPI Drivers and Modules
+@subsection SVR4.2 NPI Drivers and Modules
+
+@node SVR4.2 NPI Libraries and Utilities
+@subsection SVR4.2 NPI Libraries and Utilities
+
+@node SVR4.2 NPI Management
+@subsection SVR4.2 NPI Management
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Porting from UnixWare
+@chapter Porting from UnixWare
+@cindex Porting from UnixWare
+
+@menu
+* UnixWare Data Link Provider Interface::
+* UnixWare Network Layer Interface::
+* UnixWare Network Provider Interface::
+@end menu
+
+@node UnixWare Data Link Provider Interface
+@section UnixWare Data Link Provider Interface
+
+@menu
+* UnixWare DLPI Addressing::
+* UnixWare DLPI Modes::
+* UnixWare DLPI Primitives::
+* UnixWare DLPI Input-Output Controls::
+* UnixWare DLPI Drivers and Modules::
+* UnixWare DLPI Libraries and Utilities::
+* UnixWare DLPI Management::
+@end menu
+
+@node UnixWare DLPI Addressing
+@subsection UnixWare DLPI Addressing
+
+@node UnixWare DLPI Modes
+@subsection UnixWare DLPI Modes
+
+@node UnixWare DLPI Primitives
+@subsection UnixWare DLPI Primitives
+
+@node UnixWare DLPI Input-Output Controls
+@subsection UnixWare DLPI Input-Output Controls
+
+@node UnixWare DLPI Drivers and Modules
+@subsection UnixWare DLPI Drivers and Modules
+
+@node UnixWare DLPI Libraries and Utilities
+@subsection UnixWare DLPI Libraries and Utilities
+
+@node UnixWare DLPI Management
+@subsection UnixWare DLPI Management
+
+
+@node UnixWare Network Layer Interface
+@section UnixWare Network Layer Interface
+
+@menu
+* UnixWare NLI Addressing::
+* UnixWare NLI Modes::
+* UnixWare NLI Primitives::
+* UnixWare NLI Input-Output Controls::
+* UnixWare NLI Drivers and Modules::
+* UnixWare NLI Libraries and Utilities::
+* UnixWare NLI Management::
+@end menu
+
+@node UnixWare NLI Addressing
+@subsection UnixWare NLI Addressing
+
+@node UnixWare NLI Modes
+@subsection UnixWare NLI Modes
+
+@node UnixWare NLI Primitives
+@subsection UnixWare NLI Primitives
+
+@node UnixWare NLI Input-Output Controls
+@subsection UnixWare NLI Input-Output Controls
+
+@node UnixWare NLI Drivers and Modules
+@subsection UnixWare NLI Drivers and Modules
+
+@node UnixWare NLI Libraries and Utilities
+@subsection UnixWare NLI Libraries and Utilities
+
+@node UnixWare NLI Management
+@subsection UnixWare NLI Management
+
+
+@node UnixWare Network Provider Interface
+@section UnixWare Network Provider Interface
+
+@menu
+* UnixWare NPI Addressing::
+* UnixWare NPI Modes::
+* UnixWare NPI Primitives::
+* UnixWare NPI Input-Output Controls::
+* UnixWare NPI Drivers and Modules::
+* UnixWare NPI Libraries and Utilities::
+* UnixWare NPI Management::
+@end menu
+
+@node UnixWare NPI Addressing
+@subsection UnixWare NPI Addressing
+
+@node UnixWare NPI Modes
+@subsection UnixWare NPI Modes
+
+@node UnixWare NPI Primitives
+@subsection UnixWare NPI Primitives
+
+@node UnixWare NPI Input-Output Controls
+@subsection UnixWare NPI Input-Output Controls
+
+@node UnixWare NPI Drivers and Modules
+@subsection UnixWare NPI Drivers and Modules
+
+@node UnixWare NPI Libraries and Utilities
+@subsection UnixWare NPI Libraries and Utilities
+
+@node UnixWare NPI Management
+@subsection UnixWare NPI Management
+
+@c ----------------------------------------------------------------------------
+
+@page
+@node Developing on OpenSS7
+@chapter Developing on OpenSS7
+@cindex Developing on OpenSS7
+
+@menu
+* OpenSS7 Data Link Provider Interface::
+* OpenSS7 Network Layer Interface::
+* OpenSS7 Network Provider Interface::
+* OpenSS7 XX25 Interface::
+@end menu
+
+@node OpenSS7 Data Link Provider Interface
+@section OpenSS7 Data Link Provider Interface
+
+@menu
+* OpenSS7 DLPI Addressing::
+* OpenSS7 DLPI Modes::
+* OpenSS7 DLPI Primitives::
+* OpenSS7 DLPI Input-Output Controls::
+* OpenSS7 DLPI Drivers and Modules::
+* OpenSS7 DLPI Libraries and Utilities::
+* OpenSS7 DLPI Management::
+@end menu
+
+@node OpenSS7 DLPI Addressing
+@subsection OpenSS7 DLPI Addressing
+
+@node OpenSS7 DLPI Modes
+@subsection OpenSS7 DLPI Modes
+
+@node OpenSS7 DLPI Primitives
+@subsection OpenSS7 DLPI Primitives
+
+@node OpenSS7 DLPI Input-Output Controls
+@subsection OpenSS7 DLPI Input-Output Controls
+
+@node OpenSS7 DLPI Drivers and Modules
+@subsection OpenSS7 DLPI Drivers and Modules
+
+@node OpenSS7 DLPI Libraries and Utilities
+@subsection OpenSS7 DLPI Libraries and Utilities
+
+@node OpenSS7 DLPI Management
+@subsection OpenSS7 DLPI Management
+
+
+@node OpenSS7 Network Layer Interface
+@section OpenSS7 Network Layer Interface
+
+@menu
+* OpenSS7 NLI Addressing::
+* OpenSS7 NLI Modes::
+* OpenSS7 NLI Primitives::
+* OpenSS7 NLI Input-Output Controls::
+* OpenSS7 NLI Drivers and Modules::
+* OpenSS7 NLI Libraries and Utilities::
+* OpenSS7 NLI Management::
+@end menu
+
+@node OpenSS7 NLI Addressing
+@subsection OpenSS7 NLI Addressing
+
+@node OpenSS7 NLI Modes
+@subsection OpenSS7 NLI Modes
+
+@node OpenSS7 NLI Primitives
+@subsection OpenSS7 NLI Primitives
+
+@node OpenSS7 NLI Input-Output Controls
+@subsection OpenSS7 NLI Input-Output Controls
+
+@node OpenSS7 NLI Drivers and Modules
+@subsection OpenSS7 NLI Drivers and Modules
+
+@node OpenSS7 NLI Libraries and Utilities
+@subsection OpenSS7 NLI Libraries and Utilities
+
+@node OpenSS7 NLI Management
+@subsection OpenSS7 NLI Management
+
+
+@node OpenSS7 Network Provider Interface
+@section OpenSS7 Network Provider Interface
+
+@menu
+* OpenSS7 NPI Addressing::
+* OpenSS7 NPI Modes::
+* OpenSS7 NPI Primitives::
+* OpenSS7 NPI Input-Output Controls::
+* OpenSS7 NPI Drivers and Modules::
+* OpenSS7 NPI Libraries and Utilities::
+* OpenSS7 NPI Management::
+@end menu
+
+@node OpenSS7 NPI Addressing
+@subsection OpenSS7 NPI Addressing
+
+@node OpenSS7 NPI Modes
+@subsection OpenSS7 NPI Modes
+
+@node OpenSS7 NPI Primitives
+@subsection OpenSS7 NPI Primitives
+
+@node OpenSS7 NPI Input-Output Controls
+@subsection OpenSS7 NPI Input-Output Controls
+
+@node OpenSS7 NPI Drivers and Modules
+@subsection OpenSS7 NPI Drivers and Modules
+
+@node OpenSS7 NPI Libraries and Utilities
+@subsection OpenSS7 NPI Libraries and Utilities
+
+@node OpenSS7 NPI Management
+@subsection OpenSS7 NPI Management
+
+@node OpenSS7 XX25 Interface
+@section OpenSS7 XX25 Interface
+
+@menu
+* OpenSS7 XX25 Addressing::
+* OpenSS7 XX25 Modes::
+* OpenSS7 XX25 Primitives::
+* OpenSS7 XX25 Input-Output Controls::
+* OpenSS7 XX25 Drivers and Modules::
+* OpenSS7 XX25 Libraries and Utilities::
+* OpenSS7 XX25 Management::
+@end menu
+
+@node OpenSS7 XX25 Addressing
+@subsection OpenSS7 XX25 Addressing
+
+@node OpenSS7 XX25 Modes
+@subsection OpenSS7 XX25 Modes
+
+@node OpenSS7 XX25 Primitives
+@subsection OpenSS7 XX25 Primitives
+
+@node OpenSS7 XX25 Input-Output Controls
+@subsection OpenSS7 XX25 Input-Output Controls
+
+@node OpenSS7 XX25 Drivers and Modules
+@subsection OpenSS7 XX25 Drivers and Modules
+
+@node OpenSS7 XX25 Libraries and Utilities
+@subsection OpenSS7 XX25 Libraries and Utilities
+
+@node OpenSS7 XX25 Management
+@subsection OpenSS7 XX25 Management
+
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Licenses
+@unnumbered Licenses
+@cindex licenses
+
+@menu
+* UNIX International DLPI License::	The UII DLPI license
+* UNIX International NPI License::	The UII NPI license
+* GNU Affero General Public License::	The AGPL license
+* GNU General Public License::		The GPL license
+* GNU Lesser General Public License::	The LGPL license
+* GNU Free Documentation License::	The FDL license
+@end menu
+
+@page
+@include texi/uidlpi.texi
+@page
+@include texi/uinpi.texi
+@page
+@include texi/agpl3.texi
+@page
+@include texi/gpl3.texi
+@page
+@include texi/lgpl3.texi
+@page
+@include texi/fdl12.texi
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Index
+@unnumbered Index
+@cindex index
+@printindex cp
+
+@c ----------------------------------------------------------------------------
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
+@c ============================================================================

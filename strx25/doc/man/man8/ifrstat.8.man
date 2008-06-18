@@ -1,0 +1,481 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ifrstat.8.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ifrstat.8.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH IFRSTAT 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Admin Commands"
+.SH NAME
+.B ifrstat
+\- display Frame Relay statistics
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fBifrstat\fP\ 'u
+\fBifrstat\fP [\fB-d\fP] \fB-s\fP\ \fIsubnet\fP [\fB-c\fP\ \fIcircuit\fP|\fB-S\fP] [\fB-i\fP|\fB-m\fP|\fB-w\fP] [\fB-d\fP\ \fIdevice\fP] [\fIoptions\fP]
+.PD 0
+.HP
+\fBifrstat\fP \fB-z\fP \fB-s\fP\ \fIsubnet\fP [\fB-c\fP\ \fIcircuit\fP|\fB-S\fP] [\fB-i\fP|\fB-m\fP|\fB-w\fP] [\fB-d\fP\ \fIdevice\fP] [\fIoptions\fP]
+.HP
+\fBifrstat\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBifrstat\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBifrstat\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ifrstat
+is a command for obtaining statistics and status of the various components of
+the Frame Relay stack.  The \fB-w\fP option is used to obtain subnet
+information about a WAN communications interface (Raw HDLC), from the
+.BR wan (4),
+or equivalent, driver.  The \fB-m\fP option is used to obtain subnet
+information about a MFE communications interface and DLCI (Multiprotocol over
+Frame Relay Encapsulation), from the
+.BR mfe (4),
+or equivalent, driver.  The \fB-i\fP option (or no driver type option) is used
+to obtain subnet information about an IFR communications interface and DLCI
+(Frame Relay), from the
+.BR ifr (4),
+or equivalent, driver.
+The \fB-S\fP option is used to obtain subnet status, for each VC active on the
+subnet, from the
+.BR ifr (4),
+or equivalent, driver.
+.PP
+Statistics and status information is displayed on \fIstdout\fP.
+.B ifrstat
+also has the ability to clear the given statistics using the \fB-z\fP option.
+.\"
+.\"
+.SH OPTIONS
+.PP
+The following options are supported by the
+.B ifrstat
+command:
+.SS Command Options
+.PP
+The following are the mutually exclusive command options that determine major
+operating modes for the command:  (When no command option is given \fB-d\fP is
+assumed.)
+.TP
+\fB-d\fP, \fB--display\fP
+Display statistics.  If neither \fB-d\fP nor \fB-z\fP are given, \fB-d\fP is
+assumed.
+.TP
+\fB-z\fP, \fB--zero\fP
+Also zero the statistics that would have been displayed.  Use of this option
+might require superuser privilege or similar permissions.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, usage information is printed to \fIstdout\fP,
+option processing stops, and the program exits successfully without taking any
+further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, version information is printed to \fIstdout\fP,
+option processing stops, and the program exits successfully without taking any
+further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, copyring permissions is printed to
+\fIstdout\fP, option processing stops, and the program exits successfully
+without taking any further action.
+.\"
+.SS Non-Command Options
+.PP
+The following options determine for which elements statistics are displayed:
+.TP
+\fB-s\fP, \fB--subnet\fP \fIsubnet\fP
+Specifies the \fIsubnet\fP (or Physical Point of Attachment (PPA)) for which
+statistics are to be displayed.  When neither the \fB-c\fP nor \fB-S\fP flags
+are given, only statistics corresponding to the interface will be displayed.
+This option is mandatory unless \fB-h\fP, \fB-V\fP, or \fB-C\fP are specified.
+.TP
+\fB-c\fP, \fB--circuit\fP \fIcircuit\fP
+Specifies the \fIcircuit\fP (or Data Link Circuit Identifier (DLCI)) for which
+statitics are to be displayed.  This option is mutually exclusive with the
+\fB-S\fP option.
+.TP
+\fB-S\fP, \fB--status\fP
+Display status for the entire subnet (i.e. all virtual circuits associated
+with the subnet).  This option is mutually exclusive with the \fB-c\fP and
+\fB-z\fP options.
+.PP
+The following options determine for which device driver statistics are
+displayed:
+.TP
+\fB-i\fP, \fB--ifr\fP
+Specifies that Frame Relay driver,
+.BR ifr (4),
+statistics are to be displayed for the specified subnetwork and virtual circuit(s).
+Only one of \fB-i\fP, \fB-m\fP, \fB-w\fP need be specified.  If none are
+specified, \fB-i\fP is assumed.
+.TP
+\fB-m\fP, \fB--mfe\fP
+Specifies that Multiprotocol over Frame Relay Encapsulation driver,
+.BR mfe (4),
+statistics are to be displayed for the specified subnetwork and virtual circuit(s).
+Only one of \fB-i\fP, \fB-m\fP, \fB-w\fP need be specified.  If none are
+specified, \fB-i\fP is assumed.
+.TP
+\fB-w\fP, \fB--wan\fP
+Specifies that WAN (Raw HDLC) driver,
+.BR wan (4),
+statistics are to be displayed for the specified subnetwork and virtual circuit(s).
+Only one of \fB-i\fP, \fB-m\fP, \fB-w\fP need be specified.  If none are
+specified, \fB-i\fP is assumed.
+.TP
+\fB-d\fP, \fB--device\fP \fIdevice\fP
+Use the specified \fIdevice\fP name as the device to open.  When not given,
+the default is \fB/dev/ifr\fP for \fB--ifr\fP, \fB/dev/mfe\fP for \fB--mfe\fP,
+and \fB/dev/wan\fP for \fB--wan\fP.  See also \*(lq\fIDEVICES\fP,\*(rq below.
+.\"
+.SS Common Options
+.PP
+The following are common options that tune the output:
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppresses normal output.  This is the same as \fB--verbose\fP=\fB0\fP.
+.TP
+\fB-D\fP, \fB--debug\fP [\fIlevel\fP]
+Increase or specify the debug verbosity \fIlevel\fP.  The default debug
+\fIlevel\fP is zero (0).  This option may be repeated.  Level zero (0)
+corresponds to no debugging output.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Increase or specify the output verbosity \fIlevel\fP.  The default output
+\fIlevel\fP is one (1).  This option may be repeated.  Level zero (0)
+corresponds to no normal output.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of normal output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH OUTPUT FORMAT
+.PP
+IFR DLCI statistics (no \fB-c\fP option) output is of the following form:
+.PP
+.nf
+\f(CW\s-1\
+########################################################################
+#                         Statistics for PPA A                         #
+########################################################################
+
+PPA txpkts rxpkts txbytes rxbytes wanflows    date-cleared
+  A    184    184    2576    2886        0 May 11 14:12:43
+
+rxtoobig rxinvDLCI runaDLCI txstops txnobuffs txinvrq rxdrops rxinvrq
+       0         0        0       0         0       0       0       0
+
+LMItxpoll LMIwnflow rxfull rxseqonly rxasynch rxCLLM rxLMIerr LMItimout
+      184         0     31       153        0      0        0         0
+
+LMIrxpoll txfull tseqonly txasynch txCLLM rxpoller
+        0      0        0        0      0        0
+\s+1
+.fi
+.PP
+IFR statistics (\fB-c\fP option) output is of the following form:
+.PP
+.nf
+\f(CW\s-1\
+########################################################################
+#                    Statistics for PPA A, DLCI 32                     #
+########################################################################
+
+txpkts rxpkts txbytes rxbytes txstp rxstp FECN BECN status date-cleared
+   184    184    2576    2886     0     0    0    0    102 May 11 14:12
+
+cirlowat 32000  cirhiat 32000
+\s+1
+.fi
+.PP
+IFR subnet status (\fB-S\fP option) output is of the following form:
+.PP
+.nf
+\f(CW\s-1\
+########################################################################
+#                      Status Report for PPA A                         #
+########################################################################
+Network status (LMI):ALL OK
+
+DLCIs :
+       40 :    ACTIVE
+       32 :    ACTIVE
+\s+1
+.fi
+.PP
+MFE statistics (\fB-m\fP option) output is of the following form:
+.PP
+.nf
+\f(CW\s-1\
+########################################################################
+#                 MFE Statistics for PPA A, DLCI 32                    #
+########################################################################
+3       VC state (3 = working)
+0       PDUs succesfully sent
+0       Outgoing PDUs fragmented
+0       Fragmentation errors
+0       Fragments successfully sent
+0       Outgoing PDUs discarded
+0       Transmission flow controlled
+0       PDUs successfully received
+0       Fragmented PDUs received
+0       Fragments received
+0       Missing fragment(s) detected
+0       Incoming PDUs too large
+0       Incoming PDUs/fragments discarded
+\s+1
+.fi
+.PP
+WAN statistics (\fB-w\fP option) output is of the following form:
+.PP
+.nf
+\f(CW\s-1\
+########################################################################
+#                      WAN Statistics for PPA A                        #
+########################################################################
+6       good frames transmitted
+0       transmit underruns
+6       good frames received
+0       receive overruns
+0       receive CRC/Framing errors
+0       Rx frames with no buffer
+0       Rx frames with no flow control
+0       receive buffer overflows
+0       receive aborts
+\s+1
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ifr (4),
+.BR mfe (4),
+.BR wan (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ifrstats
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ifrstats
+command is compatible with
+.IR "Spider Frame Relay" ,
+and implementations based on
+.IR "Spider Frame Relay" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+A version of this command is provided by
+.B @PACKAGE_TITLE@
+for compatibility with systems that require it.  Neither this command nor the
+.BR x25netd (8)
+are recommended for configuration of the
+.B @PACKAGE_TITLE@
+subsystems.  Use the SNMP agent instead.
+.IP \(em
+Options
+.BR -e ", " -n ", " -q ", " -v ", " -h ", " -V ", " -C ,
+and all long options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.BR ifrstats
+and will not be used by portable command scripts.
+.IP \(em
+No other implementation documents printing the output to a file when a
+.I filename
+is specified with the
+.B -G
+command option.  This is an enhancement of this implementation.
+.IP \(em
+No other implementation documents the
+.BR -e ", " -n ", " -q ", " -v ", " -h ", " -V " and " -C
+options.  They will not be used by portable command scripts. 
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards (GNITS);
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+.B ifrstats
+attempts to be source (and script) compatible with historical implementations
+based on
+.IR "Spider Frame Relay" ,
+however, binary compatibility is not attempted.  Any binary compatability
+acheived is likely to be removed in a subsequent release.
+.PP
+For additional compatibility considerations, see
+.BR ifr (4),
+.BR mfe (4),
+.BR wan (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ifrstats
+first appeared in
+.IR "Spider Frame Relay" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

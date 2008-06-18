@@ -1,0 +1,441 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ixetune.8.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ixetune.8.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH IXETUNE 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Admin Commands"
+.SH NAME
+.B ixetune
+\- tune the parameters of the IXE driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.hy 0
+.HP \w'\fBixetune\fP\ 'u
+\fBixetune\fP [\fIoptions\fP]
+[{\fB-f\fP|\fB--file\fP[=]}\fIfilename\fP]
+[{\fB-d\fP|\fB--device\fP[=]}\fIdevice\fP]
+.PD 0
+.HP
+\fBixetune\fP {\fB-h\fR|\fB--help\fP}
+.HP
+\fBixetune\fP {\fB-V\fR|\fB--version\fP}
+.HP
+\fBixetune\fP {\fB-C\fR|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ixetune
+adminstrative command tunes the IXE driver,
+.BR ixe (4),
+from a configuration file containing configuration information.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-f\fP, \fB--file\fP [\fIfilename\fP]
+Specifies the \fIfilename\fP from which to read IXE tuning information.  See \*(lq\fIFILE
+FORMAT\fP\*(rq, below, for the format of the file.  The default \fIfilename\fP if this option or
+\fIfilename\fP is not specified is
+.BR @configdir@/ixetuneconf .
+.TP
+\fB-d\fP, \fB--device\fP [\fIdevicename\fP]
+Specifies the \fIdevicename\fP to open to access the IXE driver,
+.BR ixe (4),
+to tune.  The default device name if this option or \fIdevicename\fP is not specified is
+.BR /dev/ixe .
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppresses normal output.  This option is equivalent to
+.BR --verbose = 0 .
+.TP
+\fB-D\fP, \fB--debug\fP [\fIlevel\fP]
+Increase or specify the debug output
+.IR level .
+When a debug
+.I level
+has been specified,
+.B ixetune
+will log to
+.IR stdout ,
+print debug messages to
+.IR stderr .
+This option may be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Increase of specify the verbosity
+.I level
+of the output.  This option may be repeated.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered,
+.B ixetune
+displays usage information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered,
+.B ixetune
+displays version information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered,
+.B ixetune
+displays copying and copyright information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.B ixetune
+does not accept any non-option arguments.
+.\"
+.\"
+.SH "FILE FORMAT"
+.PP
+The file has the following format:
+.PP
+.RB < in_addr >
+.RB < x_addr >
+.RB < nsdu_hwm >
+.RB < idle_ticks >
+.RB < durn_ticks >
+.RB < conform84 >
+.RB < addr_ddn >
+.RB < rst_action >
+.RB < exp_action >
+.RB < lpc > - < hpc >
+.RB < listen_info >
+.PP
+Where the fields are formatted as follows:
+.TP
+.RB < in_addr >
+Specifies the Internet Protocol Version 4 address of the local virtual NIC.  This IPv4 address is
+used by other machines on the network to identify this node.  This address should be in
+numbers-and-dots notation or may contain a hostname that can be resolved to an IP address.
+.TP
+.RB < x_addr >
+Specifies the X.25 address.  This is the local X.25 address for the local station.  The X.25 address
+is formatted as follows:
+.RS
+.PP
+\fIsn_id\fP\fB.\fP[\fIDTE\fP|\fILSAP\fP|\fILCI\fP]\fB.\fP[\fBN\fP|\fBX\fP|\fBP\fP]\fB.\fP[\fINSAP\fP|\fIEXT\fP]
+.PP
+Where the four fields of the address are as follows:
+.TP
+.I sn_id
+Specifies the subnetwork identifier.  For most SpiderX.25 based implementations this is a single
+alphabetical characeter where the first subnetwork is given the character `A', the second subnetwork
+the character `B', and so on.  For
+.IR "Solstice X.25" ,
+The first field is a link identifier.  The link identifier can be any number with a 32-bit unsigned
+integer range.
+.B @PACKAGE_TITLE@
+accepts both forms.
+.TP
+.IR DTE | LSAP | LCI
+For a subnetwork connection that consists of a LAN (LLC2) interface, only the LSAP is permitted.
+For a subnetwork that consists of a WAN (LAPB) interface, only the DTE or LCI or neither (no DTE or
+LCI) is permitted.
+.RS
+.TP \w'\fILSAP\fP\(em'u
+.I DTE
+Specifies a DTE address.  This field can be 0 to 15 digits in length when TOA/NPI addressing is not
+used and 2 to 17 digits in length when TOA/NPI addressing is used.  TOA/NPI addressing cannot be
+used for X.25(80) networks.  This field is only interpreted as a DTE address when the subnetwork
+type is WAN and the following field is not \*(lq\fBP\fP\*(rq.
+.TP
+.I LSAP
+Specifies an LSAP which is always 14 hexadecimal digits in length, 12 hexadecimal digits for the MAC
+address, and 2 hexadecimal digits for the SAP.  Hexadecimal digit pairs may optionally be separated
+by colons (\*(lq\fB:\fP\*(rq).  This field is only intepreted as an LSAP address when the subnetwrok
+type is LAN.
+.TP
+.I LCI
+Specifies the LCI which is 0 to 4 decimal digits in the range from 0 to 4095.  This number
+identifies the logical channel belonging to a PVC.  This field is only interpreted as an LCI when
+the following field has the value \*(lq\fBP\fP\*(rq.
+.RE
+.TP
+.BR N | X | P
+When present, this field contains one alphabetical character,
+\*(lq\fBN\fP\*(rq,
+\*(lq\fBX\fP\*(rq, or
+\*(lq\fBP\fP\*(rq,
+that determines the form of the address.
+.RS
+.TP \w'\fBX\fP\(em'u
+.B N
+Specifies that the following field is an \fINSAP\fP.  This is the default.
+This value can only be set for LAN or for X.25(84+) networks.
+.TP
+.B X
+Specifies that the following field is an \fIEXT\fP.
+This value can only be set for LAN or for X.25(84+) networks.
+.TP
+.B P
+Specifies that the preceding field is an \fILCI\fP, and that there is no following field.
+.PP
+If this field is absent, and the following field is present, the following field is an \fINSAP\fP.
+The intervening \*(lq.\&\*(rq is optional in this case.
+.RE
+.TP
+.IR NSAP | EXT
+This field provides the NSAP address or Address Extension. 
+This field can only be present for LAN or for X.25(84+) networks.
+.RS
+.TP
+.I NSAP
+This is a maximum 20-byte NSAP address, represented by 0 to 40 hexadecimal digits.  A colon,
+\*(lq\fB:\fP\*(rq, can optionally be placed between any pairs of hexadecimal digits.
+This field is only interpreted as an NSAP when the preceding field is absent or contains the value
+\*(lq\fBN\fP\*(rq.
+.TP
+.I EXT
+This is a maximum 20-byte Address Extension, represented by 0 to 40 hexadecimal digits.  A colon,
+\*(lq\fB:\fP\*(rq, can optionally be placed between any pairs of hexadecimal digits.
+This field is only interpreted as an Address Extension when the preceding field contains the value
+\*(lq\fBE\fP\*(rq.
+.RE
+.PP
+The range of X.25 addresses is limited by the underlying subnetwork type.  For each subnetwork type,
+possible X.25 addresses are as follows:
+.TP
+.B LAN
+.nf
+sn_id.LSAP
+sn_id.LSAP.N.NSAP
+sn_id.LSAP.X.EXT
+.\"sn_id.LSAP.NSAP
+.\"sn_id.LSAP..NSAP
+.fi
+.TP
+.B WAN (1980)
+.nf
+sn_id
+sn_id.DTE
+sn_id.LCI.P
+.fi
+.TP
+.B WAN (1984+)
+.nf
+sn_id
+sn_id.DTE
+sn_id.DTE.N.NSAP
+sn_id.DTE.X.EXT
+sn_id..N.NSAP
+sn_id..X.EXT
+.\"sn_id.DTE.NSAP
+.\"sn_id.DTE..NSAP
+sn_id.LCI.P
+.fi
+.RE
+.TP
+.RB < nsdu_hwm >
+The NSDU High Water Mark.  This value is a decimal number, that specifies the maximum size, in
+octets, of outgoing datagrams to IXE before fragmenting them, and of incoming X.25 packet sequences
+(an NSDU) that X.25 may pass up to IXE as a single datagram.
+.TP
+.RB < idle_ticks >
+The maximum idle time.  This value is a decimal number, that specifies the maximum period of time,
+in seconds, that this connection may be idle before being closed.
+.TP
+.RB < durn_ticks >
+The minimum connection time.  This value is a decimal number, that specified the minimum time, in
+seconds, that a connection will be held open.
+.TP
+.RB < conform84 >
+The X.25 Mode.  This value specifies whether to use X.25 1980, 1984 or 1988.  The values are the
+character strings:
+\*(lq\fB80\fP\*(rq,
+\*(lq\fB84\fP\*(rq,
+\*(lq\fB88\fP\*(rq, or
+\*(lq\fB88+\fP\*(rq.
+.TP
+.RB < addr_ddn >
+The ISO/ITU/DDN mode.  This mode determines whether to use the ISO/IEC 8208 or ITU-T X.25 standard
+(value \*(lq\fB0\fP\*(rq), or DDN (value \*(lq\fB1\fP\*(rq).  In the DDN (Defense Data Network)
+mode, DDN and BFE facilities are interpreted.  See also RFC 1236.
+.[
+rfc1236
+.]
+.TP
+.RB < rst_action >
+The Reset Action.  This field determines the action to take upon receiving a reset.  This action can
+be either to acknowledge the reset (value \*(lq\fBACK\fP\*(rq), or
+be to disconnect the VC (value \*(lq\fBDISC\fP\*(rq).
+.TP
+.RB < exp_action >
+The Expedited Data Action.  This field determines the action to take upon receiving expedited data
+(an X.25 Interrupt Packet).  This action may be to acknolwedge the expedited data but discard it
+(value \*(lq\fBACK\fP\*(rq), to disconnect the virtual circuit (value \*(lq\fBDISC\fP\*(rq), or to
+reset the virtual circuit (value \*(lq\fBRESET\fP\*(rq).
+.TP
+.RB < lpc > - < hpc >
+The PVC Channel Range.  This field contains logical channel ranges that IXE will use a connections
+over X.25 PVCs.  A number of channel ranges may be specifies for each subnetwork (provided the
+ranges are mutually exclusive), and also for different subnetworks.  The format of this field is:
+.RS
+.PP
+.RB < lpc > - < hpc >
+.PP
+Where
+.I lpc
+and
+.I hpc
+both consist of 3 hexadecimal digits.  The
+.IR lpc ,
+which represents the lowest PVC channel number of the range, must be less than or equal to
+.IR hpc ,
+which represents the highest PVC channel number of the range.
+.PP
+Alternatively, a single dash, \*(lq\fB-\fP\*(rq, may be specified for the range indicating that no
+PVC channels are configured.
+.RE
+.TP
+.RB < listen_info >
+The Listen Information.  This field specifies the called addresses and call user data fields that
+the IXE should be willing to receive connect indications for on this virtual network interface.  The
+format of this field is as follows:
+.RS
+.PP
+.nf
+{\fIcud\fP\fB,\fP \fIcalled_address\fP \fB;\fP}
+or
+{<[(\fBI\fP|\fBS\fP) [\fIbytes\fP]] | \fBX\fP> , <[(\fBI\fP|\fBS\fP) (\fBD\fP|\fBN\fP) [\fIsemi-octets\fP]] | \fBX\fP> \fB;\fP}
+.fi
+.PP
+Where \*(lq\fBI\fP\*(rq means \*(lqmatch this field exactly\*(rq, \*(lq\fBS\fP\*(rq means \*(lqmatch
+this field staring with\*(rq, \*(lq\fBX\fP\*(rq means \*(lqdon't care about this field\*(rq.
+\*(lq\fBD\fP\*(rq means \*(rqthis field refers to an X.25 DTE\*(lq,
+\*(lq\fBN\fP\*(rq means \*(rqthis field refers to an X.25 NSAP/Extended address\*(lq.  The
+semi-colon, \*(lq\fB;\fP\*(rq, at the end of each example means that multiples listens, each of the
+same format, can be initiated.
+.PP
+Alternatively, a single dash, \*(lq\fB-\fP\*(rq, may be specified for the field indicating null
+lisetn information.
+.RE
+.\"
+.\"
+.SS EXAMPLES
+.PP
+Following is an example file:
+.PP
+.nf
+\f(CW\s-1\
+14.0.7.9    A  576  30  20  84  0  ACK  ACK  -        SCC,SD2342;
+15.0.25.11  B  576  30  20  80  0  ACK  ACK  005-005  SCC,SD2342;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @configdir@/ixetuneconf
+The default IXE tuning configuration file.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/ixe
+The default IXE device driver to tune.
+.\"
+.\"
+.XX
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

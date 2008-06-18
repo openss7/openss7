@@ -1,0 +1,401 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ifrtune.8.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ifrtune.8.man,v $
+.\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH IFRTUNE 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Admin Commands"
+.SH NAME
+.B ifrtune
+\- tune Frame Relay subnetwork parameters
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fBifrtune\fP\ 'u
+\fBifrtune\fP [\fB-G\fP] \fB-s\fP\ \fIsubnet\fP [\fB-d\fP\ \fIdevice\fP] [\fIfilename\fP]
+.PD 0
+.HP
+\fBifrtune\fP \fB-P\fP \fB-s\fP\ \fIsubnet\fP [\fB-d\fP\ \fIdevice\fP] [\fIfilename\fP]
+.HP
+\fBifrtune\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBifrtune\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBifrtune\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B ifrtune
+is a configuration command intended on being executed from system configuration
+scripts, and, in particular, the
+.BR ifrnetd (8)
+configuration daemon.  Its purpose is to alter or interrogate the tunable
+parameters of an Frame Relay
+.[
+q922
+.]
+subnetwork connection.
+.\"
+.\"
+.SH OPTIONS
+.PP
+The
+.B ifrtune
+command accepts the following options:
+.\"
+.SS Command Options
+The following command options are mutually exclusive (except for \fB-h\fP,
+\fB-V\fP and \fB-C\fP which never cause an error when specified with another
+command topion).  If no command option is given, \fB-G\fP is assumed.
+.TP
+\fB-G\fP, \fB--get\fP
+Retrieve configuration information for the specified \fIsubnet\fP, from the
+default or specified \fIdevice\fP, and write the output to \fIstdout\fP (or
+\fIfilename\fP, when given).  This option can be used to create a properly
+frmatted configuration file from an existing system configuration.
+.TP
+\fB-P\fP, \fB--put\fP
+Load configuration information for the specified \fIsubnet\fP, to the default or
+specified \fIdevice\fP, getting the confirmation input from \fIstdin\fP (or
+\fIfilename\fP, when given).  This option can be use to tune current system
+configuration.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, usage information is printed to \fIstdout\fP,
+option processing stops, and the program exits successfully without taking any
+further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, version information is printed to \fIstdout\fP,
+option processing stops, and the program exits successfully without taking any
+further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, copyring permissions is printed to
+\fIstdout\fP, option processing stops, and the program exits successfully
+without taking any further action.
+.\"
+.SS Non-Command Option
+The following non-command options can be combined together and with any command
+option.  Non-command options that are not necessary for the specified command
+option do not generate an error by mere combination.
+.TP
+\fB-e\fP, \fB--extended\fP
+Normally \fBifrtune\fP processes a fixed number of lines from \fIstdin\fP (or
+\fIfilename\fP) when sepcified, and outputs a fixed number of lines to
+\fIstdout\fP (or \fIfilename\fP) when specified.  This fixed number of lines are
+strictly compatible with other implementations of \fBifrtune\fP.
+.RS
+.PP
+When the \fB-e\fP option is specified, additional lines are accepted on input
+and are generated on output.  For the format of the fixed lines and the
+additional lines, see
+.BR ifrtemplate (5).
+.RE
+.TP
+\fB-s\fP, \fB--subnet\fP \fIsubnet\fP
+Specifies the subnetwork identifier, \fIsubnet\fP, to which the tuning operation
+applies.  \fIsubnet\fP is normally an alphabetical character starting at
+\*(lq\fBA\fP\*(rq for the first subnetwork, \*(lq\fBB\fP\*(rq for the second
+subnetwork, and so on.  This option must always be given when the \fB-P\fP or
+\fB-G\fP options are present or assumed.
+.TP
+\fB-d\fP, \fB--device\fP \fIdevice\fP
+Specifies the device to open when tuning.  When unspecified, the device is
+\fB/dev/ifr\fP.  See also \*(lq\fIDEVICES\fP,\*(rq below.
+.TP
+\fB-n\fP, \fB--dryrun\fP
+Execute the command (\fB-P\fP or \fB-G\fP) as a dry run.  When this option is
+specified with the \fB-P\fP option, the input is read and checked for validity,
+but the configuration is not written to the device.  When specified with the
+\fB-G\fP option, information is read from the device, but configuration
+information is not output.  The exit status and diagnostic output of the command
+still reflects the success or failure of the command.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppresses normal output.  This is the same as \fB--verbose\fP=\fB0\fP.
+.TP
+\fB-D\fP, \fB--debug\fP [\fIlevel\fP]
+Increase or specify the debug verbosity \fIlevel\fP.  The default debug
+\fIlevel\fP is zero (0).  This option may be repeated.  Level zero (0)
+corresponds to no debugging output.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Increase or specify the output verbosity \fIlevel\fP.  The default output
+\fIlevel\fP is one (1).  This option may be repeated.  Level zero (0)
+corresponds to no normal output.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The following non-option arguments may be provided on the comman line:
+.TP
+.I filename
+Specifies the \fIfilename\fP from which to read (\fB-P\fP option) or write
+(\fB-G\fP option) configuraiton information.
+.RS
+.PP
+This argument is optiona.  When the \fIfilename\fP is not given and the \fB-P\fP
+option is specified, the values are read from \fIstdin\fP; for the \fB-G\fP
+option, written to \fIstdout\fP.
+.PP
+If the \fIfilename\fP is an absolute path (i.e. begins with \*(lq\fB/\fP\*(rq),
+then \fIfilename\fP is assumed to be the next path specified.  Otherwise, the
+file required is assumed to be
+\fB@configdir@/@PACKAGE@/template/\fP\fIfilename\fP.  See
+.BR ifrtemplate (5)
+for the format of the file.
+.RE
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the option or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of normal output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH FILE FORMAT
+.PP
+For the file format, see
+.BR ifrtemplate (5).
+.\"
+.\"
+.SH NOTICES
+.PP
+On input, this implementation will handle fields that are separated by any
+whitespace (any number of blanks, horizontal tabs, new lines, carriage returns,
+vertical tabs, form feeds).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.BI @configdir@/@PACKAGE@/template/ filename
+The default directory location for configuration files used by this command.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ifrtemplate (5),
+.BR ifr (4),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.B ifrtune
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ifrtune
+command is compatible with
+.IR "Spider Frame Relay" ,
+and implementations based on
+.IR "Spider Frame Relay" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+A version of this command is provided by
+.B @PACKAGE_TITLE@
+for compatibility with systems that require it.  Neither this command nor the
+.BR x25netd (8)
+are recommended for configuration of the
+.B @PACKAGE_TITLE@
+subsystems.  Use the SNMP agent instead.
+.IP \(em
+Options
+.BR -e ", " -n ", " -q ", " -v ", " -h ", " -V ", " -C ,
+and all long options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.BR ifrtune
+and will not be used by portable command scripts.
+.IP \(em
+No other implementation documents printing the output to a file when a
+.I filename
+is specified with the
+.B -G
+command option.  This is an enhancement of this implementation.
+.IP \(em
+No other implementation documents the
+.BR -e ", " -n ", " -q ", " -v ", " -h ", " -V " and " -C
+options.  They will not be used by portable command scripts. 
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards (GNITS);
+.BR --copying ,
+OpenSS7 coding standards.
+.IP \(em
+.B ifrtune
+attempts to be source (and script) compatible with historical implementations
+based on
+.IR "Spider Frame Relay" ,
+however, binary compatibility is not attempted.  Any binary compatability
+acheived is likely to be removed in a subsequent release.
+.PP
+For additional compatibility considerations, see
+.BR ifr (4),
+.BR ifrtemplate (5),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ifrtune
+first appeared in
+.IR "Spider Frame Relay" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
