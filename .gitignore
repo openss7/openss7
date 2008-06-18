@@ -3875,3 +3875,8 @@ TODO
 streams/src/mibs/old2/defaults/
 strsctp/src/snmp/
 strx25/intl/
+strxns/doc/manual/dlpi_porting.info
+strxns/src/lib/libdlpi/mapfile-vers
+strx25/doc/manual/strx25.info
+strx25/doc/specs/nli/nli.info
+strx25/doc/manual/x25_porting.info
