@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_SUBS_UNBIND_REQ.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
+.\" @(#) $Id: DL_SUBS_UNBIND_REQ.7.man,v 0.9.2.8 2008-06-18 16:45:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_SUBS_UNBIND_REQ.7.man,v $
+.\" Revision 0.9.2.8  2008-06-18 16:45:35  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -103,7 +106,9 @@ The message consists of one
 message block, which contains the following structure:
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
 typedef struct {
     t_uscalar_t  dl_primitive;
     t_uscalar_t  dl_subs_sap_offset;
@@ -134,6 +139,12 @@ block.
 .TP
 .I dl_subs_sap_length
 conveys the length of the specified DLSAP.
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
@@ -168,6 +179,62 @@ The primitive was issued from an invalid state
 .B DL_SYSERR
 A system error has occurred and the Linux system error is indicated in the
 .BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_SUBS_UNBIND_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.\"
+.IP \(em \w'\(em\(em'u
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+does not document this primitive.  Portable programs will avoid subsequent
+binds in connection-oriented service modes.
+.\"
+.IP \(em
+.IR AIX \(rg
+LAPB
+.[
+aixlink
+.]
+does not support this primitive.
+.\"
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

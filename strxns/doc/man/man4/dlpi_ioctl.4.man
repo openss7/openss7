@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_ioctl.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: dlpi_ioctl.4.man,v 0.9.2.2 2008-06-18 16:45:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_ioctl.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:31  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -1483,6 +1486,212 @@ typedef struct wantune {
 .\"
 .SH IOCTLS
 .PP
+These are DLPI input-output controls from AIX:
+.\"
+.\"
+.SS DL_PKT_FORMAT
+.PP
+The
+.B DL_PKT_FORMAT
+input-output control permits the DLS user to control in the format of the
+link-layer headers included in the control and data portions of requested and
+indicated DLPI connectionless packets.  It is a transparent input-output
+control and takes a single argument that may contain one of the following
+values:
+.TP
+.B NS_PROTO
+This is the default value on newly opened Streams.
+Strip link-layer headers, but not Sub-Network Access Protocol (SNAP) headers.
+Medium Access Control (MAC) and Logical Link Control (LLC) are included in the
+.BR DL_UNITDATA_REQ "(7) and " DL_UNITDATA_IND (7)
+control block, and the data portion of the message contains only data.  The
+.B NS_PROTO
+header does not include SNAP: that is, any SNAP header is considered part of
+the data and included in the data.  Destination addresses are formatted as the
+MAC[+DSAP] address and source addresses are formatted as the
+MAC+SSAP+DSAP+CTRL.
+.RS
+.PP
+For the
+.BR DL_UNITDATA_REQ (7)
+primitive, the DLPI user must provide the destination address and an optional
+destination service access point (DSAP) in the
+.BR M_PROTO (9)
+control block.  If the DLS User does not specify the DSAP, the LSAP specified
+at bind time is used.
+.RE
+.TP
+.B NS_PROTO_SNAP
+Strip link-layer headers, including Sub-Network Access Protocol (SNAP) headers.
+Medium Access Control (MAC) and Logical Link Control (LLC) are included in the
+.BR DL_UNITDATA_REQ "(7) and " DL_UNITDATA_IND (7)
+control block, and the data portion of the message contains only data.  The
+.B NS_PROTO_SNAP
+header includes SNAP: that is, any SNAP header is considered part of the
+link-layer headers.  Destination addresses are formatted as the MAC[+DSAP]
+address and source addresses are formatted as the MAC+SSAP+DSAP+CTRL+[SNAP].
+.RS
+.PP
+For the
+.BR DL_UNITDATA_REQ (7)
+primitive, the DLPI user must provide the destination address and an optional
+destination service access point (DSAP) in the
+.BR M_PROTO (9)
+control block.  If the DLS User does not specify the DSAP, the LSAP specified
+at bind time is used.
+.RE
+.TP
+.B NS_PROTO_DONTCARE
+The driver does not place addresses in the
+.BR DL_UNITDATA_IND (7)
+message, but addresses are still required in the
+.BR DL_UNITDATA_REQ (7)
+primitive from the DLS user.
+.TP
+.B NS_PROTO_DL_COMPAT
+Addresses are compatible with AIX 3.2.5.  Addresses are included both in
+.BR DL_UNITDATA_IND "(7) and " DL_UNITDATA_REQ (7)
+primitives.  Both destination and source addresses are formatted as
+MAC+DSAP[+SNAP].
+.TP
+.B NS_INCLUDE_LLC
+The Logical Link Control (LLC) portion of the link-layer header is treated as
+data.  Only the MAC portion of the address is included in the control block and
+the LLC headers (DSAP+SSAP+CTRL[+SNAP]) is included in the data.  Both
+destination and source addresses are formatted as simply the MAC address.
+.RS
+For the
+.BR DL_UNITDATA_REQ (7)
+primitive, the DLS user must provide the destination address and an optional
+DSAP in the control block.  If the DLS User does not specify the DSAP, the LSAP
+specified at bind time is used.
+.RE
+.TP
+.B NS_INCLUDE_MAC
+Both the MAC and the LLC link-layer headers are considered data and are placed
+in the data portion of the message.  Thus the DLS user must have knowledge of
+the MAC header and LLC architecture for a specific interface to retrieve the
+MAC header and LLC from the data portion of th emessage.  This format sets the
+Stream to raw mode, which does not process incoming or outgoing messages.
+.RS
+.PP
+For the
+.BR DL_UNITDATA_REQ (7)
+primitive, the DLS user must provide the destination address and an optional
+DSAP in the control block.  If the user does not specify the DSAP, the DSAP
+sepcified at bind time is used.
+.PP
+Downstream messages do not require the
+.BR DL_UNITDATA_REQ (7)
+header and must be received as
+.BR M_DATA (9)
+messages, see
+.BR DL_DATA_REQ (7).
+Downstream messages must contain a completed MAC header that will be copied to
+the medium without further translation.
+.RE
+.\"
+.SS DL_ROUTE
+.PP
+The
+.B DL_ROUTE
+input-output control disables the source routing on the current Stream, queries
+dynamic route discovery for a source route, or statically assigns a source
+route to this Stream.  The input-output control is only valid when the DLS
+Provider is in the
+.B DL_IDLE
+state.
+.PP
+The argument is variable length and this input-output control can only be
+invoked using the
+.BR I_STR (7)
+STREAMS input-output control.  The length of the argument is interpreted as
+follows:
+.IP \(bu \w'\(bu\(em'u
+If the argument is of zero length, no source route is used on outgoing frames.
+.IP \(bu
+If the argument length is equal to the length of the MAC address for the
+current medium, the dynamic route discovery algorithm is used to obtain the
+source route for the address specified in the argument.  The MAC address is
+replaced with the source route on return from the input-output control.
+.IP \(bu
+Otherwise, the argument is assumed to contain an address of the form MAC+SRTE,
+and the SRTE (source route) portion is used as the source route for this stream
+in all communications.
+.\"
+.SS DL_TUNE_LLC
+.PP
+Provides a mechanism whereby the DLS user may change tunable default LLC
+parameters.  The argument must point to a
+.B llctune_t
+data structure.
+.PP
+The
+.I flags
+field is examined to determine which, if any, parameters should be changed.
+Each bit in the
+.I flags
+field corresponds to a similarly named field in the
+.B llctune_t
+structure.  If the bit is set, the corresponding parameter is valid and set to
+the value in the
+.B llctune_t
+structure.  Only the current Stream is affected, and changes are discarded when
+the Stream is closed.
+.PP
+If the
+.B F_LLC_SET
+flag is set and the user has root authority, the altered parameters are saved as
+the new default parameters for all new streams.
+.PP
+This command returns as its argument an update of the current tunable
+parameters.  To query the tunables, issue the
+.B DL_TUNE_LLC
+with the flags field set to zero.  This will alter no parameters and return
+the current tunable values.
+.\"
+.SS DL_ZERO_STATS
+.PP
+The
+.B DL_ZERO_STATS
+input-output control resets the statistics counters to zero.  The driver
+maintains two independent sets of statistics, one for each Stream (local) and
+another that is the cumulative statistics for all Streams (global).  This
+input-output control command access a simple boolean argument.  If the argument
+is true (non-zero), the global statistics are zeroed; if false (zero), the
+local statistics are zeroed.
+.PP
+This input-output control can be issued as a transparent ioctl.  The argument
+is the boolean flag.
+.\"
+.SS DL_SET_REMADDR
+.PP
+The
+.B DL_SET_REMADDR
+allows the DLS user to perform an XID/TEST exchange on an LLC (or
+point-to-multipoint) connection-oriented Stream while still in the
+.B DL_IDLE
+state.
+.PP
+The DLS provider uses both the source (remote) address and the
+.I dl_sap
+from the
+.BR DL_BIND_REQ "(7) and " DL_BIND_ACK (7)
+to determine where to route incoming messages for connection-oriented streams.
+The remote address is ordinarily specified in the
+.BR DL_CONNECT_REQ (7)
+primitive.  If the DLS user needs to exchange XID or TEST messages before
+connecting to the remote station,
+.B DL_SET_REMADDR
+must be used.
+.PP
+The argument to this input-output control is the MAC address of the remote
+station.
+.\"
+.\"
+.\"
+.SH IOCTLS
+.PP
 These are generic Data Link control (GDLC) input-output controls from AIX.
 .[
 aixdlpi
@@ -1703,6 +1912,200 @@ This input-output control returns a structure that describes the GDLC device
 manager.
 .\"
 .\"
+.\"
+.SH IOCTLS
+.PP
+These are DLPI input-output controls from SVR4.2MP and UnixWare 2:
+.\"
+.SS DLIOCSMIB
+Allows a privileged process to initialize the values in the MIB (the DL_mib_t
+structure).  A process cannot use this input-output control to change the
+ifPhyAddress, the ifDescrLen, or the text of the description fields.
+.\"
+.SS DLIOCGENADDR
+Returns the Ethernet address in network order.
+.\"
+.SS DLIOCGLPCFLG
+Returns the state of the local packet copy flags in the
+.I ioc_rval
+of the
+.BR iocblk (9)
+structure.  The local copy flag determines if packets looped back by the
+driver should also be sent to the network.  A non-zero value indicates that
+frames should also be sent to the network after being looped back.  The
+default value of this flag is zero.
+.\"
+.SS DLIOCSLPCFLG
+Allows a privileged process to set the local packet copy flag, causing all
+packets looped back by the driver to be sent to the network as well.
+.\"
+.SS DLIOCGPROMISC
+Returns the value of the promiscuous flag in the
+.I ioc_rval
+of the
+.BR iocblk (9)
+structure.  A non-zero value indicates that the Ethernet interface will
+receive all frames on the network.  The default value of this flag is zero.
+.\"
+.SS DLIOCSPROMISC
+Allows a privileged process to toggle the current state of the promiscuous
+flag.  When the flag is set, the driver captures all frames from the network.
+Processes that are bound to a promiscuous SAP, or to a SAP that matches the
+type field of the received frame, receive a copy of the frame.
+.\"
+.SS DLIOCGETMULTI
+Returns a list of multicast addresses (if it exists).
+.\"
+.SS DLIOCADDMULTI
+Allows a privileged process to add a new multicast address and enable its
+reception.  A 6-byte buffer pointing to the multicast address must be passed
+as the parameter.
+.\"
+.SS DLIOCDELMULTI
+Allows a privileged process to delete a multicast address by passing a 6-byte
+multicast address as the parameter.
+.\"
+.SS DLIOCRAWMODE
+Allows a Token Ring privileged process to identify itself as a raw upstream
+module.  This allows an upstream module to transmit a valid MAC frame using a
+.BR DL_UNITDATA_REQ "(7) or " DL_UNITDATA_IND (7)
+primitive.
+.\"
+.SS DLIOCLLC2MODE
+Allows a privileged process to identify itself as an llc2 upstream module.
+This allows an upstream module to transmit a valid LLC Type 2 (connection
+oriented) frame via a
+.BR DL_UNITDATA_REQ "(7) or " DL_UNITDATA_IND (7)
+message.
+.\"
+.\"
+.\"
+.PP
+Some additional IOCTLS from the UnixWare Intro(D7dlpi) manual page.
+.\"
+.\"
+.SS DLIOCCSMACDMODE
+Switch SAP type to RAW.
+.\"
+.SS DLIOCDISABLE
+Disable controller.
+.\"
+.SS DLIOCENABLE
+Enable controller.
+.\"
+.SS DLIOCGMIB
+Get MIB statistics (DL_mib_t).
+.\"
+.SS DLIOCRESET
+Reset controller.
+.\"
+.SS DLIOCSENADDR
+Set ethernet address.
+.\"
+.SS DLGADDR
+Return ethernet (MAC) address.
+.\"
+.SS DLGBROAD
+Get broadcast address.
+.\"
+.SS DLSLLC2
+Toggle LLC2 mode (Token-Ring adapters).
+.\"
+.SS DLSRAW
+Toggle RAW mode (Token-Ring adapters).
+.\"
+.\"
+.\"
+.SH IOCTL
+.PP
+UnixWare 7 input-output controls:
+.\"
+.SS DLPID_REGISTER
+An input-output control that the UnixWare dlpid(1M) daemon uses to register
+with the module before linking it with an MDI driver.  It also handles the
+.BR I_LINK (7),
+.BR I_PLINK (7),
+.BR I_UNLINK (7),
+.BR I_PUNLINK (7),
+input-output control commands described in
+.BR streamio (7).
+.\"
+.PP
+The DLPI driver intercepts and responds to the following MACIOC input-output
+control commands.
+.\"
+.SS MACIOC_CLRMCA
+.\"
+.SS MACIOC_DIAG
+.\"
+.SS MACIOC_GETADDR
+Return MAC address.
+.\"
+.SS MACIOC_GETIFSTAT
+.\"
+.SS MACIOC_GETRADDR
+Return factory MAC address.
+.\"
+.SS MACIOC_GETSTAT
+Return statistics.
+.\"
+.SS MACIOC_LOCALSTAT
+.\"
+.SS MACIOC_PROMISC
+Enable promiscuous mode.
+.\"
+.SS MACIOC_SETADDR
+Set MAC address.
+.\"
+.SS MACIOC_UNITSEL
+.\"
+.PP
+The DLPI driver passes all other MACIOC input-output control commands to the
+MDI driver beneath it.  Other MACIOC input-output control commands are as
+follows:
+.\"
+.SS MACIOC_CLRSTAT
+Clear statistics structure.
+.\"
+.SS MACIOC_DELALLMCA
+Stop receiving multicast frames.
+.\"
+.SS MACIOC_DELMCA
+Stop receiving MAC frames.
+.\"
+.SS MACIOC_GETADDR
+Return MAC address.
+.\"
+.SS MACIOC_GETMCA
+Return active multicast addresses.
+.\"
+.SS MACIOC_GETMCSIZ
+Return multicast address table size.
+.\"
+.SS MACIOC_GETRADDR
+Return factory MAC address.
+.\"
+.SS MACIOC_GETSTAT
+Return statistics.
+.\"
+.SS MACIOC_PROMISC
+Enable promiscuous mode.
+.\"
+.SS MACIOC_SETADDR
+Set MAC address.
+.\"
+.SS MACIOC_SETALLMCA
+Deliver multicast frames.
+.\"
+.SS MACIOC_SETMCA
+Receive MAC frames.
+.\"
+.SS MACIOC_SETSTAT
+Modify MIB attributes.
+.\"
+.\"
+.\"
+.\"
 .SH BUGS
 .PP
 .\"
@@ -1717,6 +2120,21 @@ manager.
 Megatbits per second was an etremely bad choice for the units of the
 .I dl_speed
 field.
+.IP \(em
+The
+.IR AIX \(rg-specific
+.B DL_SET_REMADDR
+input-output control is unnecessary with DLPI Revision 2.0.0.
+.[
+dlpi revision 2.0.0
+.]
+Under DLPI
+Revision 2.0.0, the
+.BR DL_XID_REQ "(7), " DL_XID_IND "(7), " DL_TEST_REQ "(7), and " DL_TEST_IND (7)
+primitives contain the destination address and source address, and are valid
+in both the
+.BR DL_IDLE " and " DL_DATAXFER
+states.  This is all that is necessary.
 .\"
 .\"
 .SH CONFORMANCE

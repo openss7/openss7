@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $
+ @(#) $RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 21:22:38 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: padent.c,v $
+ Revision 0.9.2.3  2008-06-18 16:45:26  brian
+ - widespread updates
+
  Revision 0.9.2.2  2008-05-03 21:22:38  brian
  - updates for release
 
@@ -59,9 +62,73 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $"
+#ident "@(#) $RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:26 $"
 
-static char const ident[] = "$RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:38 $";
+static char const ident[] =
+    "$RCSfile: padent.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:26 $";
+
+#define _XOPEN_SOURCE 600
+#define _REENTRANT
+#define _THREAD_SAFE
+
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef HAVE_SYS_IOCTL_H
+# include <sys/ioctl.h>
+#endif
+#include <sys/stropts.h>
+#include <sys/poll.h>
+#include <fcntl.h>
+
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+
+#ifndef __EXCEPTIONS
+#define __EXCEPTIONS 1
+#endif
+
+#include <unistd.h>
+#include <errno.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <stropts.h>
+#include <pthread.h>
+#include <linux/limits.h>
+#include <values.h>
+
+#ifndef __P
+#define __P(__prototype) __prototype
+#endif
+
+#if defined __i386__ || defined __x86_64__ || defined __k8__
+#define fastcall __attribute__((__regparm__(3)))
+#else
+#define fastcall
+#endif
+
+#define __hot __attribute__((section(".text.hot")))
+#define __unlikely __attribute__((section(".text.unlikely")))
+
+#if __GNUC__ < 3
+#define inline static inline fastcall __hot
+#define noinline extern fastcall __unlikely
+#else
+#define inline static inline __attribute__((always_inline)) fastcall __hot
+#define noinline static __attribute__((noinline)) fastcall __unlikely
+#endif
+
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
+#undef min
+#define min(a, b) (a < b ? a : b)
 
 #include <netx25/x25_proto.h>
 #include <netx25/xnetdb.h>
@@ -94,11 +161,30 @@ __asm__(".symver __sx25_padtos,padtos@@SX25_1.0");
   * @version SX25_1.0
   * @par Alias:
   * This function is an implementation of linkidtox25().
+  *
+  * This function converts the character string link identifier (most often a
+  * single character) to an unsigned long value (significant to 32-bits)for
+  * use in intput-output controls and other interactions with drivers where a
+  * 32-bit value is used instead of a string.  This function hides the
+  * specifics of the conversion from user programs.
   */
 unsigned long
 __sx25_linkidtox25(unsigned char *str_linkid)
 {
-	return (0);
+	unsigned long val = 0;
+	int i;
+
+	if (str_linkid == NULL)
+		return (-1UL);
+	if ((i = strnlen((char *)str_linkid, 5)) > 4 || i < 1)
+		return (-1UL);
+	for (i = 0; i < 4; i++) {
+		if (str_linkid[i] == '\0')
+			break;
+		val |= (str_linkid[i] << (i << 3));
+	}
+	val &= 0x7fffffff;
+	return (val);
 }
 
 /** @fn unsigned long linkidtox25(unsigned char *str_linkid)
@@ -116,10 +202,28 @@ __asm__(".symver __sx25_linkidtox25,linkidtox25@@SX25_1.0");
   * @version SX25_1.0
   * @par Alias:
   * This function is an implementation of x25tolinkid().
+  *
+  * This function converts the unsigned long value (significant to 32-bits)
+  * to a unsigned character string from an input-output control or other
+  * interaction with driver where a 32-bit value is returned instead of a
+  * string.  This function hides the specifics of the conversion from user
+  * programs.
+  *
+  * This function returns zero (0) on success and minus one (-1) on failure.
   */
 int
 __sx25_x25tolinkid(unsigned long linkid, unsigned char *str_linkid)
 {
+	int i;
+
+	if (str_linkid == NULL)
+		return (-1);
+	for (i = 0; i < 4; i++) {
+		if ((str_linkid[i] = (linkid & 0x00ff)) == 0)
+			break;
+		linkid >>= 8;
+	}
+	str_linkid[i] = '\0';
 	return (0);
 }
 
@@ -132,6 +236,89 @@ __sx25_x25tolinkid(unsigned long linkid, unsigned char *str_linkid)
   */
 #pragma weak x25tolinkid
 __asm__(".symver __sx25_x25tolinkid,x25tolinkid@@SX25_1.0");
+
+/** @brief
+  * @param str_snid
+  * @version SX25_1.0
+  * @par Alias:
+  * This function is an implementation of snidtox25().
+  *
+  * The function converts the character string subnetwork identifier to an
+  * unsigned long value (significant to 32-bits) for use in input-output
+  * controls and other interactions with drivers where a 32-bit value is used
+  * instead of a string.  This function hides the specifics of the conversion
+  * from user programs.
+  *
+  * This function returns minus one when there is an error.
+  */
+unsigned long
+__sx25_snidtox25(unsigned char *str_snid)
+{
+	unsigned long val = 0;
+	int i;
+
+	if (str_snid == NULL)
+		return (-1UL);
+	if ((i = strnlen((char *)str_snid, 5)) > 4 || i < 1)
+		return (-1UL);
+	for (i = 0; i < 4; i++) {
+		if (str_snid[i] == '\0')
+			break;
+		val |= (str_snid[i] << (i << 3));
+	}
+	val &= 0x7fffffff;
+	return (val);
+}
+
+/** @fn unsigned long snidtox25(unsigned char *str_snid)
+  * @param str_snid
+  * @version SX25_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __sx25_snidtox25().
+  */
+#pragma weak snidtox25
+__asm__(".symver __sx25_snidtox25,snidtox25@@SX25_1.0");
+
+/** @brief
+  * @param snid
+  * @param str_snid
+  * @version SX25_1.0
+  * @par Alias:
+  * This function is an implementation of x25tosnid().
+  *
+  * This function converts the unsigned long value (significant to 32-bits)
+  * to a unsigned character string from an input-output control or other
+  * interaction with driver where a 32-bit value is returned instead of a
+  * string.  This function hides the specifics of the conversion from user
+  * programs.
+  *
+  * This function returns zero (0) on success and minus one (-1) on failure.
+  */
+int
+__sx25_x25tosnid(unsigned long snid, unsigned char *str_snid)
+{
+	int i;
+
+	if (str_snid == NULL)
+		return (-1);
+	for (i = 0; i < 4; i++) {
+		if ((str_snid[i] = (snid & 0x00ff)) == 0)
+			break;
+		snid >>= 8;
+	}
+	str_snid[i] = '\0';
+	return (0);
+}
+
+/** @fn int x25tosnid(unsigned long snid, unsigned char *str_snid)
+  * @param snid
+  * @param str_snid
+  * @version SX25_1.0
+  * @par Alias:
+  * This symbol is a weak alias of __sx25_x25tosnid().
+  */
+#pragma weak x25tosnid
+__asm__(".symver __sx25_x25tosnid,x25tosnid@@SX25_1.0");
 
 /** @brief
   * @param linkid
@@ -183,7 +370,7 @@ __asm__(".symver __sx25_setpadent,setpadent@@SX25_1.0");
 struct padent *
 __sx25_getpadbyaddr(char *addr)
 {
-	return ((struct padent *)0);
+	return ((struct padent *) 0);
 }
 
 /** @fn struct padent *getpadbyaddr(char *addr)

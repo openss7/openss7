@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_x25.h,v 0.9.2.1 2008-05-07 16:01:40 brian Exp $
+ @(#) $Id: npi_x25.h,v 0.9.2.2 2008-06-18 16:45:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-07 16:01:40 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_x25.h,v $
+ Revision 0.9.2.2  2008-06-18 16:45:26  brian
+ - widespread updates
+
  Revision 0.9.2.1  2008-05-07 16:01:40  brian
  - added NLI X.25-PLP CONS and XX25 implemetnation
 
@@ -59,7 +62,7 @@
 #ifndef __SYS_NPI_X25_H__
 #define __SYS_NPI_X25_H__
 
-#ident "@(#) $RCSfile: npi_x25.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_x25.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* Additional definitions for NPI for use with X.25. */
 
@@ -157,10 +160,17 @@ typedef struct {
 	uint8_t fac_field[NP_MAX_FAC];	/* raw facilities */
 } fac_string_t;
 
+#if 0
 #define N_QOS_X25_RANGE		0x0100
 #define N_QOS_X25_SEL		0x0101
 #define N_QOS_X25_OPT_RANGE	0x0102
 #define N_QOS_X25_OPT_SEL	0x0103
+#else
+#define N_QOS_X25_RANGE		0x0201
+#define N_QOS_X25_SEL		0x0202
+#define N_QOS_X25_OPT_RANGE	0x0203
+#define N_QOS_X25_OPT_SEL	0x0204
+#endif
 
 /*
  * QOS range for X.25.  (Used with N_CONN_REQ and N_CONN_IND.)
@@ -254,5 +264,85 @@ typedef struct {
 	chg_mu_string_t chg_mu;
 	fac_string_t facilites;		/* raw non-X.25 facilities */
 } N_qos_x25_opt_sel_t;
+
+/*
+ * The following are documented for AIXlink/X.25, Solstice X.25, IRIS SX.25
+ * and SpiderX25.  These Quality of Service parameter structures are used with
+ * the s_npi module.  The s_npi module is pushed over an NLI driver Stream to
+ * provide the NPI interface to X.25.  These structures are the same as the
+ * OSI NPI structures with the exception that there is a facilities structure
+ * appended to each of the structures.  AIXlink/X.25 and HP-UX X.25/9000 do
+ * not document the use of these structures.  
+ */
+
+#define N_QOS_CO_X25_RANGE	0x0107
+#define N_QOS_CO_X25_SEL	0x0108
+#define N_QOS_CO_X25_OPT_SEL	0x0109
+#define N_QOS_CO_X25_OPT_RANGE	0x010a	/* XXX */
+
+typedef struct {
+	unsigned char CONS_call;
+	struct extraformat facs;
+} x_format_t;
+
+typedef struct {
+	np_ulong n_qos_type;		/* always N_QOS_CO_X25_RANGE */
+	thru_values_t src_throughput_range;	/* source throughput range */
+	thru_values_t dest_throughput_range;	/* destination throughput range */
+	td_values_t transit_delay_range;	/* transit delay range */
+	protection_values_t protection_range;	/* protection range */
+	priority_values_t priority_range;	/* priority range */
+	/* above same as N_QOS_CO_RANGE */
+	x_format_t x_format;		/* X.25 facilities */
+} N_qos_co_x25_range_t;
+
+typedef struct {
+	np_ulong n_qos_type;		/* always N_QOS_CO_SEL */
+	np_long src_throughput_sel;	/* source throughput selected */
+	np_long dest_throughput_sel;	/* destination throughput selected */
+	np_long transit_delay_sel;	/* transit delay selected */
+	np_long protection_sel;		/* NC protection selected */
+	np_long priority_sel;		/* NC priority selected */
+	/* above same as N_QOS_CO_SEL */
+	x_format_t x_format;		/* X.25 facilities */
+} N_qos_co_x25_sel_t;
+
+typedef struct {
+	np_ulong n_qos_type;		/* always N_QOS_CO_OPT_SEL */
+	thru_values_t src_throughput;	/* source throughput values */
+	thru_values_t dest_throughput;	/* dest throughput values */
+	td_values_t transit_delay_t;	/* transit delay values */
+	np_long nc_estab_delay;		/* NC establishment delay */
+	np_ulong nc_estab_fail_prob;	/* NC estab failure probability */
+	np_ulong residual_error_rate;	/* residual error rate */
+	np_ulong xfer_fail_prob;	/* transfer failure probability */
+	np_ulong nc_resilience;		/* NC resilience */
+	np_long nc_rel_delay;		/* NC release delay */
+	np_ulong nc_rel_fail_prob;	/* NC release failure probability */
+	np_long protection_sel;		/* protection selected */
+	np_long priority_sel;		/* priority selected */
+	np_long max_accept_cost;	/* maximum acceptable cost */
+	/* above same as N_QOS_CO_OPT_SEL */
+	x_format_t x_format;		/* X.25 facilities */
+} N_qos_co_x25_opt_sel_t;
+
+typedef struct {
+	np_ulong n_qos_type;		/* always N_QOS_CO_OPT_RANGE */
+	thru_values_t src_throughput;	/* source throughput values */
+	thru_values_t dest_throughput;	/* dest throughput values */
+	td_values_t transit_delay_t;	/* transit delay values */
+	np_long nc_estab_delay;		/* NC establishment delay */
+	np_ulong nc_estab_fail_prob;	/* NC estab failure probability */
+	np_ulong residual_error_rate;	/* residual error rate */
+	np_ulong xfer_fail_prob;	/* transfer failure probability */
+	np_ulong nc_resilience;		/* NC resilience */
+	np_long nc_rel_delay;		/* NC release delay */
+	np_ulong nc_rel_fail_prob;	/* NC release failure probability */
+	protection_values_t protection_range;	/* protection range */
+	priority_values_t priority_range;	/* priority range */
+	np_long max_accept_cost;	/* maximum acceptable cost */
+	/* above same as N_QOS_CO_OPT_RANGE */
+	x_format_t x_format;		/* X.25 facilities */
+} N_qos_co_x25_opt_range_t;
 
 #endif				/* __SYS_NPI_X25_H__ */

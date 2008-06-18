@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_ADD_GRP.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_ADD_GRP.4.man,v 0.9.2.2 2008-06-18 16:45:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_ADD_GRP.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:29  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -139,6 +142,46 @@ Specifies the length in bytes of the group or multicast address to add.
 .TP
 .I grp_addr
 Specifies the group or multicast address to add.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I grp_addr
+(group address) field for DLC FDDI contains the full six-octet group address
+with the individual/group and universal/local control bits located in the most
+significant bit positions of the frist (leftmost) byte.
+.TP
+.B DLC TOKEN
+The
+.I grp_addr
+(group address) field for DLC TOKEN contains the four-byte value as described
+in the
+.BR DLC_ENABLE_SAP (4)
+input-output operation definition.
+.TP
+.B DLC 8023
+The
+.I grp_addr
+(group address) field for DLC 8023 contains the six-byte value as described
+in the
+.BR DLC_ENABLE_SAP (4)
+input-output operation definition.
+.TP
+.B DLC ETHER
+The
+.I grp_addr
+(group address) field for DLC ETHER contains the six-byte value as described
+in the
+.BR DLC_ENABLE_SAP (4)
+input-output operation definition.
+.RE
+.PP
+The following protocol-sepcific considerations apply:
+.TP
+.B DLC SDLC
+This input-output control is not supported by DLC SDLC.
 .\"
 .\"
 .SH RETURN

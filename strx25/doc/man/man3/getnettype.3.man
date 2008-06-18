@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: getnettype.3.man,v 0.9.2.2 2008-05-03 21:22:35 brian Exp $
+.\" @(#) $Id: getnettype.3.man,v 0.9.2.3 2008-06-18 16:45:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 21:22:35 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:23 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: getnettype.3.man,v $
+.\" Revision 0.9.2.3  2008-06-18 16:45:23  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.2  2008-05-03 21:22:35  brian
 .\" - updates for release
 .\"
@@ -82,17 +85,8 @@ sort-adjacent-labels
 .\"
 .TH GETNETTYPE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
-.B xxx
-\-
-.\"
-.\"
-.SH SYNOPSIS
-.PP
-.B #include <netx25/x25_proto.h>
-.br
-.B #include <netx25/xnetdb.h>
-.HP
-.BI "int xxx(int " arg );
+.B getnettype
+\- obtain X.25 network type for subnetwork identifier
 .\"
 .\"
 .SH INTERFACE
@@ -106,40 +100,213 @@ X.25 Support Library,
 .BR libsx25 (3).
 .\"
 .\"
+.SH SYNOPSIS
+.PP
+.B #include <netx25/x25_proto.h>
+.br
+.B #include <netx25/xnetdb.h>
+.HP
+.BI "int getnettype(unsigned char *" snid );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I snid
+The subnetwork or link identifying unsigned character string.
+.\"
+.\"
 .SH DESCRIPTION
 .PP
-.\"
-.\"
-.SH NOTICES
+.B getnettype
+determines the type of the subnetwork identified by the subnetwork string,
+\fIsnid\fP, and returns the type of network to which the subnetwork string
+corresponds.  To do this, it reads the \fBx25conf\fP(5) configuration file.
 .PP
+The network type can be one of the following symbolic constants defined in the
+\fBxnetdb.h\fP header file:
+.TP
+.B LAN
+the subnetwork identified by \fIsnid\fP is a local area network;
+.TP
+.B W80
+the subnetwork identifier by \fIsnid\fP is a wide area network providing
+X.25(1980);
+.TP
+.B W84
+the subnetwork identifier by \fIsnid\fP is a wide area network providing
+X.25(1984);
+.TP
+.B W88
+the subnetwork identifier by \fIsnid\fP is a wide area network providing
+X.25(1988).
+.\"
+.\"
+.SH RETURN
+.PP
+Upon success,
+.B getnettype
+returns a value equal to one of the symbolic constants indicating the network
+type associated with the provided subnetwork id.
+Upon failure,
+.B getnettype
+returns a negative value.
+.\"
+.\"
+.SH ERRORS
+.PP
+.B getnetype
+fails when:
+.TP
+.RB [ EINVAL ]
+the supplied \fIsnid\fP was \fBNULL\fP or invalid.
+.TP
+.RB [ ENOENT ]
+the configuration file, \fBx25conf\fP(5), does not exist.
+.\"
+.\"
+.\".SH NOTICES
+.\".PP
 .\"
 .\"
 .SH FILES
 .PP
+.TP
+.B @configdir@/@PACKAGE@/x25conf
+The \fBx25conf\fP(5) configuration file read to determine the subnetwork or
+link type.
 .\"
 .\"
 .SH BUGS
 .PP
+.B getnettype
+has no known bugs.
 .\"
 .\"
 .SH SEE ALSO
 .PP
+.BR x25conf (5),
+.BR lltune (8),
+.BR libsx25 (3).
 .\"
 .\"
 .SH COMPATIBILITY
 .PP
+.B getnettype
+is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.I Solstice X.25
+.[
+solx25pg
+.]
+refers to the subnetwork identifier as a link identifier.
+.IP \(em
+Some implementations place header files in different locations:
+.I Solstice X.25
+.[
+solx25pg
+.]
+includes the \fBxnetdb.h\fP header file from <\fBnetx25/xnetdb.h\fP>.
+.I IRIS SX.25
+.[
+sx25
+.]
+includes the \fBxnetdb.h\fP header file from <\fBxnetdb.h\fP>.
+.I Solstice X.25
+.[
+solx25pg
+.]
+includes the \fBx25_proto.h\fP header file from <\fBnetx25/x25_proto.h\fP>.
+.I IRIS SX.25
+.[
+sx25
+.]
+includes the \fBx25_proto.h\fP header file from <\fBsys/snet/x25_proto.h\fP>.
+For
+.I IRIS SX.25
+.[
+sx25
+.]
+it is necessary to include the \fBx25_proto.h\fP header file.
+For
+.I Solstice X.25
+.[
+solx25ag
+.]
+is is not necessary to include the \fBx25_proto.h\fP header file.
+.PP
+For additional compatibiltiy information see,
+.BR lltune (8),
+.BR lapb (4),
+.BR llc2 (4),
+.BR x25conf (5),
+and
+.BR STREAMS (9).
 .\"
 .\"
 .SH CONFORMANCE
 .PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
-.\"
-.\"
-.SH VERSION
-.PP
+.BR getnettype
+first appeared in
+.IR "Spider X.25" .
 .\"
 .\"
 .[

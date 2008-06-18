@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_QUERY_SAP.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_QUERY_SAP.4.man,v 0.9.2.2 2008-06-18 16:45:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_QUERY_SAP.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:31  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -183,6 +186,44 @@ information on the particular fields returned.
 The optional data area must directly follow (or append to) the end of the
 .B dlc_qsap_arg
 structure.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The device driver-dependent data returned from DLC FDDI for this input-output
+control operation is the
+.B fddi_ndd_stats_t
+structure defined in the
+.BR /usr/include/sys/cdli_fddiuser.h
+file.
+.TP
+.B DLC TOKEN
+The device driver-dependent data returned from DLC TOKEN for this input-output
+control operation is the
+.B tok_ndd_stats_t
+structure defined in the
+.BR /usr/include/sys/cdli_tokuser.h
+file.
+.TP
+.B DLC 8023
+The device driver-dependent data returned from DLC 8023 for this input-output
+control operation is the
+.B ent_ndd_stats_t
+structure defined in the
+.BR /usr/include/sys/cdli_entuser.h
+file.
+.TP
+.B DLC ETHER
+The device driver-dependent data returned from DLC ETHER for this input-output
+control operation is the
+.B ent_ndd_stats_t
+structure defined in the
+.BR /usr/include/sys/cdli_entuser.h
+file.
+.TP
+.B DLC SDLC
+No device driver-dependent data area is supported by DLC SDLC for this
+input-output control operation.
 .\"
 .\"
 .SH RETURN

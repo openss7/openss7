@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x25_proto.h,v 0.9.2.3 2008-05-07 16:01:40 brian Exp $
+ @(#) $Id: x25_proto.h,v 0.9.2.4 2008-06-18 16:45:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-07 16:01:40 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25_proto.h,v $
+ Revision 0.9.2.4  2008-06-18 16:45:25  brian
+ - widespread updates
+
  Revision 0.9.2.3  2008-05-07 16:01:40  brian
- - added NLI X.25-PLP CONS and XX25 implemetnation'
- doc/man/man3/XX25.3.man
- doc/man/man3/xti_x25.3.man
- doc/man/man4/X25.4.man
- doc/man/man5/strx25.5.man
- doc/man/man7/dlpi_lapb.7.man
- doc/man/man7/dlpi_llc2.7.man
- doc/man/man7/dlpi_x25.7.man
- src/drivers/npi.c
- src/include/npi_x25.h
- src/include/netx25/nli.h
- src/include/sys/npi_x25.h
- src/modules/dcc.h
- src/modules/npi.c
- src/modules/xx25.c
-
-
- cvsfiles=
+ - added NLI X.25-PLP CONS and XX25 implemetnation
 
  Revision 0.9.2.2  2008-05-03 21:22:37  brian
  - updates for release
@@ -82,14 +68,25 @@
 #ifndef __NETX25_X25_PROTO_H__
 #define __NETX25_X25_PROTO_H__
 
-#ident "@(#) $RCSfile: x25_proto.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: x25_proto.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #include <stdint.h>
 
-/* The LSAP is defined by the lsapformat structure.  The members of the
+/* From Solstice X.25 documentation:
+ *
+ * The LSAP is defined by the lsapformat structure.  The members of the
  * lsapformat structure are:
  *
- * lsap_len:	The length of the DTE address or LSAP as two BCD digits per
+ * lsap_len:	This gives the length of the DTE address, the MAC+SAP address,
+ *		or the LCI in semi-octets.  For example, for Ethernet, the
+ *		length is always 14 to indicate the MAC (12 semi-octets), plus
+ *		SAP (2 semi-octets).  The SAP always follows the MAC address.
+ *		The DTE can be up to 15 decimal digits unless X.25(88) and
+ *		TO/NPI (Type Of Address/Numbering Plan Identification)
+ *		addressing is being used, when it can be up to 17 decimal
+ *		digits.  For an LCI the length is 3.
+ *
+ *		The length of the DTE address or LSAP as two BCD digits per
  *		byte, right justified.  An LSAP is always 14 digits long.  A
  *		DTE address can be up to 15 decimal digits unless X.25(88) and
  *		TOA/NPI addressing is used, in which case it can be up to 17
@@ -123,44 +120,100 @@
  * lsap_add:	The DTE address, LSAP or PVC_LCI as two BCD digtis per byte,
  *		right justified.
  */
-#define LSAPMAXSIZE 9
+#define LSAPMAXSIZE		9
+
 struct lsapformat {
 	uint8_t lsap_len;
 	uint8_t lsap_add[LSAPMAXSIZE];
 };
 
+/* From Solstice X.25 documentation:
+ *
+ * Addressing is defined by the xaddrf structure.  The members of the xaddrf
+ * structure are:
+ *
+ * link_id:	Holds the link number as a uint32_t.  By default, link_id has
+ *		a value of 0xFF.  When link_id is 0xFF, X.25 attempts to match
+ *		the called address with an entry in a routing configuration
+ *		file.  If it cannot find a match, it routes the call over the
+ *		lowest numbered WAN link.
+ *
+ *		Note that IRIS SX.25 uses sn_id here instead of link_id.
+ *
+ * aflags:	Specifies the options required or used by the subnetwork to
+ *		encode and interpret addresses.  These take on of these values:
+ *
+ *		NSAP_ADDR   0x00    NSAP field contains OSI-encoded NSAP
+ *				    address.
+ *		EXT_ADDR    0x01    NSAP field contains non-OSI-encoded
+ *				    extended address.
+ *		PVC_LCI	    0x02    NSAP field contains a PVC number.
+ *
+ *		When the NSAP field is empty, aflags has the value 0.
+ *
+ * DTE_MAC:	The DTE address or LSAP as two BCD digits per byte, right
+ *		justified, or the PVC_LCI as three BCD digits with two digits
+ *		per byte, right justified.
+ *
+ * nsap_len:	The length in semi-octets of the NSAP as two BCD digits per
+ *		byte, right justified.
+ *
+ * NSAP:	The NSAP or address extension (see aflags) as two BCD digits
+ *		per byte, right justified.
+ */
+#define NSAPMAXSIZE 20
+struct xaddrf {
+	uint32_t link_id;
+	unsigned char aflags;
+#define EXT_ADDR	0x00		/* X.121 subaddress */
+#define NSAP_ADDR	0x01		/* NSAP address */
+#define PVC_LCI		0x02		/* PVC LCI number 0-4095 3 semi-octets */
+	struct lsapformat DTE_MAC;	/* X.121 DTE address or IEEE 802 MAC */
+	unsigned char nsap_len;
+	unsigned char NSAP[NSAPMAXSIZE];
+};
+
 #define MAX_NUI_LEN	64
 #define MAX_RPOA_LEN	 8
 #define MAX_CUG_LEN	 2
+#if 1
 #define MAX_FAC_LEN	32
+#else
+#define MAX_FAC_LEN	109
+#endif
 #define MAX_TARRIFS	 4
-#define MAX_CD_LEN	MAX_TARRIFS * 4
-#define MAX_SC_LEN	MAX_TARRIFS * 8
+#define MAX_CD_LEN	(MAX_TARRIFS * 4)
+#define MAX_SC_LEN	(MAX_TARRIFS * 8)
 #define MAX_MU_LEN	16
 
-#define NEGOT_PKT	0x01	/* packet size negotiable */
-#define NEGOT_WIN	0x02	/* window size negotiable */
-#define ASSERT_HWM	0x04	/* concatenation limit assert */
-
-#define DEF_X25_PKT	7	/* the standard default packet size */
-#define DEF_X25_WIN	2	/* the standard default window size */
-
+/*
+ * Extra format (facilities) structure from Solstice X.25 and IRIS SX.25
+ * documentation.
+ */
 struct extraformat {
 	unsigned char fastselreq;
 	unsigned char restrictresponse;
 	unsigned char reversecharges;
 	unsigned char pwoptions;
+#define NEGOT_PKT	0x01	/* packet size negotiable */
+#define NEGOT_WIN	0x02	/* window size negotiable */
+#define ASSERT_HWM	0x04	/* concatenation limit assert */
 	unsigned char locpacket;
 	unsigned char rempacket;
+#define DEF_X25_PKT	7	/* the standard default packet size */
 	unsigned char locwsize;
 	unsigned char remwsize;
+#define DEF_X25_WIN	2	/* the standard default window size */
 	int nsdulimit;
 	unsigned char nui_len;
 	unsigned char nui_field[MAX_NUI_LEN];
 	unsigned char rpoa_len;
 	unsigned char rpoa_field[MAX_RPOA_LEN];
 	unsigned char cug_type;
+#define CUG		1	/* closed user group, up to four semi-octets */
+#define BCUG		2	/* bilateral CUG (two members only), for semi-octets */
 	unsigned char cug_field[MAX_CUG_LEN];
+	unsigned char reqcharging;
 	unsigned char chg_cd_len;
 	unsigned char chg_cd_field[MAX_CD_LEN];
 	unsigned char chg_sc_len;
@@ -176,6 +229,10 @@ struct extraformat {
 	unsigned char cd_fac_len;
 	unsigned char fac_field[MAX_FAC_LEN];
 };
+
+/*
+ * QOS format structure: from Solstice X.25 and IRIS SX.25 documentation.
+ */
 
 #define MAX_PROT 32
 
@@ -193,6 +250,9 @@ struct qosformat {
 	unsigned char reqpriority;
 	unsigned char reqprtygain;
 	unsigned char reqprtykeep;
+	unsigned char prtydata;
+	unsigned char prtygain;
+	unsigned char prtykeep;
 	unsigned char reqlowprtydata;
 	unsigned char reqlowprtygain;
 	unsigned char reqlowprtykeep;
@@ -200,20 +260,34 @@ struct qosformat {
 	unsigned char lowprtygain;
 	unsigned char lowprtykeep;
 	unsigned char protection_type;
+#define PRT_SRC		1   /* source address specific */
+#define PRT_DST		2   /* destination address specific */
+#define PRT_GLB		3   /* globally unique */
 	unsigned char prot_len;
 	unsigned char lowprot_len;
 	unsigned char protection[MAX_PROT];
 	unsigned char lowprotection[MAX_PROT];
 	unsigned char reqexpedited;
 	unsigned char reqackservice;
+#define RC_CONF_DTE	1
+#define RC_CONF_APP	2
 	struct extraformat xtras;
 };
 
-/* To identify the originator in N_RI and N_DI messages */
-#define NS_USER		1
-#define NS_PROVIDER	2
+/*
+ * Diagnostic codes from Solstice X.25 and IRIS SX.25 documentation.   Note
+ * that the values themselves are from ISO/IEC 8208 and are mapped from X.25
+ * cause and diagnostic codes as described in ISO/IEC 8878.
+ */
+/*
+ * To identify the originator in N_RI and N_DI messages
+ */
+#define NS_USER			0x01
+#define NS_PROVIDER		0x02
 
-/* Reason when the originator is NS Provider */
+/*
+ * Reason when the originator is NS Provider
+ */
 #define NS_GENERIC		0xe0
 #define NS_DTRANSIENT		0xe1
 #define NS_DPERMENEN		0xe2
@@ -225,7 +299,9 @@ struct qosformat {
 #define NS_NSAPPUNREACHABLE	0xe8
 #define NS_NSAPPUNKNOWN		0xeb
 
-/* Reason when the originator is NS User */
+/*
+ * Reason when the originator is NS User
+ */
 #define NU_GENERIC		0xf0
 #define NU_DNORMAL		0xf1
 #define NU_DABNORMAL		0xf2
@@ -237,43 +313,20 @@ struct qosformat {
 #define NU_INCOMPUSERDATA	0xf8
 #define NU_BADPROTID		0xf9
 
-/* To specify the reason when the originator is NS Provider in N_RI messages */
+/*
+ * To specify the reason when the originator is NS Provider in N_RI messages
+ */
 #define NS_RUNSPECIFIED		0xe9
 #define NS_RCONGESTION		0xea
 
-/* To specify the reason when the originator is NS User in N_RI messages */
+/*
+ * To specify the reason when the originator is NS User in N_RI messages
+ */
 #define NU_RESYNC		0xfa
 
-union x25_primitives {
-	struct xcallf xcall;		/* connect request/indication */
-	struct xccnff xccnf;		/* connect confirm/response */
-	struct xdataf xdata;		/* normal, q-bit or d-bit data */
-	struct xdatacf xdatac;		/* data ack */
-	struct xedataf xedata;		/* expedited data */
-	struct xedatacf xedatac;	/* expedited data ack */
-	struct xrstf xrst;		/* reset request/indication */
-#if 0
-	struct xrscf xrsc;		/* reset confirm/response */
-#else
-	struct xrscf xrscf;		/* reset confirm/response */
-#endif
-	struct xdiscf xdisc;		/* disconnect request/indication */
-	struct xdcnff xdcnf;		/* disconnect confirm */
-#if 0
-	struct xabortf xabort;		/* abort indication */
-#else
-	struct xabortf abort;		/* abort indication */
-#endif
-	struct xlistenf xlisten;	/* listen command/response */
-	struct xcanlisf xcanlis;	/* cancel command/response */
-	struct pvcattf pvcatt;		/* PVC attach */
-	struct pvcdetf pvcdet;		/* PVC detach */
-};
-
-typedef struct xhdrf {
-	unsigned char xl_type;		/* XL_CTL/XL_DAT */
-	unsigned char xl_command;	/* Command */
-} S_X25_HDR;
+/*
+ * X.25 Primitive structures taken from Solstice X.25 documentation.
+ */
 
 #define XL_CTL	    0
 #define XL_DAT	    1
@@ -474,5 +527,35 @@ struct pvcdetf {
 	unsigned char xl_command;	/* always N_PVC_DETACH */
 	int reason_code;		/* reports why */
 };
+
+typedef struct xhdrf {
+	unsigned char xl_type;		/* XL_CTL/XL_DAT */
+	unsigned char xl_command;	/* Command */
+} S_X25_HDR;
+
+/*
+ * X.25 primitives union from Solstice X.25 and IRIS SX.25 documentation.  Both
+ * documetnation sources contain errors (maker with "[sic]" below).
+ */
+typedef union x25_primitives {
+	struct xhdrf xhdr;		/* header */
+	struct xcallf xcall;		/* connect request/indication */
+	struct xccnff xccnf;		/* connect confirm/response */
+	struct xdataf xdata;		/* normal, q-bit or d-bit data */
+	struct xdatacf xdatac;		/* data ack */
+	struct xedataf xedata;		/* expedited data */
+	struct xedatacf xedatac;	/* expedited data ack */
+	struct xrstf xrst;		/* reset request/indication */
+	struct xrscf xrsc;		/* reset confirm/response */
+	struct xrscf xrscf;		/* reset confirm/response [sic] */
+	struct xdiscf xdisc;		/* disconnect request/indication */
+	struct xdcnff xdcnf;		/* disconnect confirm */
+	struct xabortf xabort;		/* abort indication */
+	struct xabortf abort;		/* abort indication [sic] */
+	struct xlistenf xlisten;	/* listen command/response */
+	struct xcanlisf xcanlis;	/* cancel command/response */
+	struct pvcattf pvcatt;		/* PVC attach */
+	struct pvcdetf pvcdet;		/* PVC detach */
+} x25_types;
 
 #endif				/* __NETX25_X25_PROTO_H__ */

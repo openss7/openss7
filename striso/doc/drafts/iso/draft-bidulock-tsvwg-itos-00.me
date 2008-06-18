@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: draft-bidulock-tsvwg-itos-00.me,v 0.9.2.1 2007/09/29 14:58:26 brian Exp $
+.\" @(#) $Id: draft-bidulock-tsvwg-itos-00.me,v 0.9.2.2 2008-06-18 16:45:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,18 +52,22 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/09/29 14:58:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: draft-bidulock-tsvwg-itos-00.me,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:17  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2007/09/29 14:58:26  brian
 .\" - added new files
 .\"
 .\" =========================================================================
 .ds version Version\ 0.0
-.ds date September\ 16,\ 2007
-.ds expiry March\ 2007
+.ds date May\ 8,\ 2008
+.ds expiry November\ 2008
+.ds year 2008
 .nr levels 0
 .so ../draft4.me
 .bp
@@ -88,7 +92,7 @@ Version: 1
 .)l
 .rr |x
 .ne 4
-.#S 2007 \*[expiry]
+.#S \*[year] \*[expiry]
 .uh "Abstract"
 .pp
 This document is a revision to ISOT,
@@ -200,13 +204,11 @@ x214
 at the upper boundary.  When Version 3 of ISOT
 .[
 rfc1006
-%Z 1
 .]
 was issued, it was discovered that this modified Transport Protocol could be
 precisely the ISO Transport Protocol
 .[
 x224
-%Z 1
 .]
 class 0, and that TCP could be adapted, using a protocol shim, to provide a
 Network Services Definition
@@ -284,6 +286,88 @@ rfc2126
 .]
 Note that the Protocol does not mandate the use of SCTP port 102 for all
 connections.
+.#e
+.\"
+.\"
+.sh 1 "Scope"
+.pp
+.\"
+.sh 2 "Terminology"
+.pp
+This memo uses the following extended terminology:
+.lp
+\fBTransport Service Definition\fP \(em
+.ix +\n(iiu
+The OSI transport service definition.
+.[
+x214
+.]
+.\"
+.sh 2 "Abbreviations"
+.pp
+The following abbreviations are used throughout this memo:
+.TS
+tab(:);
+llil.
+:BCP:\*- Best Common Practice
+:CC:\*- Connect Confirm (TPDU)
+:CLNS:\*- Connection-less Network Service
+:CLTS:\*- COnnection-less Transport Service
+:CONS:\*- Connection Oriented Network Service
+:COTS:\*- Connection Oriented Transport Service
+:CR:\*- Connect Request (TPDU)
+:DC:\*- Disconnect Confirm (TPDU)
+:DR:\*- Disconnect Request (TPDU)
+:DT:\*- Data (TPDU)
+:ED:\*- Expedited Data (TPDU)
+:IETF:\*- Internet Engineering Task Force
+:IP:\*- Internet Protocol
+:IPR:\*- Intellectual Property Rights
+:ISO:\*- International Organization for Standardization
+:ITOS:\*- ISO Transprot over SCTP
+:ITOT:\*- ISO Transport over TCP
+:ITU:\*- International Telecommunications Union
+:ITU-T:\*- ITU (Telecom Sector)
+:NC:\*- Network Connection
+:NPDU:\*- Network PDU
+:NSAPA:\*- NSAP Address
+:NSAP:\*- Network Service Access Point
+:NSD:\*- Network Service Definition
+:NSDU:\*- Network SDU
+:NSEL:\*- Network Selector (N-Selector)
+:NS:\*- Network Service
+:OSI:\*- Open Systems Interconnect
+:PDU:\*- Protocol Data Unit
+:QOS:\*- Quality Of Service
+:RFC:\*- Request for Comments
+:SCTP:\*- Stream Control Transmission Protocol
+:SDU:\*- Service Data Unit
+:TCP:\*- Transmission Control Protocol
+:TC:\*- Transport Connection
+:TP0:\*- TP Class 0
+:TP1:\*- TP Class 1
+:TP2:\*- TP Class 2
+:TP3:\*- TP Class 3
+:TP4:\*- TP Class 4
+:TPDU:\*- Transport PDU
+:TP:\*- Transport Protocol
+:TSAPA:\*- TSAP Address
+:TSAP:\*- Transport Service Access Point
+:TSD:\*- Transport Service Definition
+:TSDU:\*- Transport SDU
+:TSEL:\*- Transport Selector (T-Selector)
+:TS:\*- Transport Service
+:ULP:\*- Upper Layer Program
+.TE
+.\"
+.sh 2 "Conventions"
+.pp
+The following language conventions are used in the items of specification in
+this memo:
+.#C
+.\"
+.sh 2 "Motivation"
+.pp
 .#e
 .\"
 .\"
@@ -399,7 +483,6 @@ rfc3309
 is used in place of the ITU-T Rec. X.223 | ISO/IEC 8478-1
 .[
 x223
-%Z 2
 .]
 Network Protocol to provide a CONS like service.
 .pp
@@ -652,15 +735,15 @@ expected by the transport provider are straightforward:
 .(b
 .TS
 tab(:);
-lbsw(3.0i)lbw(2.5i).
+lbw(0.5i)sw(2.5i)lbw(2.5i).
 _:_
 Network Service:SCTP
 _:_
 .T&
-lissw(5.5i).
+liss.
 CONNECTION ESTABLISHMENT
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :N\-CONNECT\ Request:T{
 .#v
 SCTP\-ASSOCIATE
@@ -682,10 +765,10 @@ SCTP\-COMMUNICATIONS_UP after SCTP\-ASSOCIATE
 T}
 
 .T&
-lissw(5.5i).
+liss.
 DATA TRANSFER
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :N\-DATA\ Request:T{
 .#v
 SCTP-sEND
@@ -697,10 +780,10 @@ SCTP-DATA_ARRIVE
 T}
 
 .T&
-lissw(5.5i).
+liss.
 CONNECTION RESET
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :N\-RESET\ Request:T{
 .#v
 SCTP\-ABORT
@@ -722,10 +805,10 @@ Not supported.
 T}
 
 .T&
-lissw(5.5i).
+liss.
 CONNECTION RELEASE
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :N\-DISCONNECT\ Request:T{
 .#v
 SCTP\-SHUTDOWN or SCTP\-ABORT
@@ -756,15 +839,15 @@ CONS service is done as follows:
 .(b
 .TS
 tab(:);
-lbsw(2.1i)lbw(3.4i).
+lbw(0.1i)sw(2.0i)lbw(3.4i).
 _:_
 Network Service:SCTP
 _:_
 .T&
-lissw(5.5i).
+liss.
 CONNECTION ESTABLISHMENT
 .T&
-lw(0.1i)lw(2.0i)lw(3.4i).
+lll.
 :Called Address:T{
 .#v
 Server's IPv4 or IPv6 address(es) and SCTP port number passed to
@@ -850,15 +933,15 @@ CONS service is done as follows:
 .(b
 .TS
 tab(:);
-lbsw(3.0i)lbw(2.5i).
+lbw(0.5i)sw(2.5i)lbw(2.5i).
 _:_
 Network Service:SCTP
 _:_
 .T&
-lissw(5.5i).
+liss.
 DATA TRANSFER
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :NS\-User\-Data (NSDU):T{
 .#v
 DATA
@@ -895,15 +978,15 @@ Mapping parameters between the SCTP service and the ITU-T Rec. X.213 | ISO/IEC
 .(b
 .TS
 tab(:);
-lbsw(3.0i)lbw(2.5i).
+lbw(0.5i)sw(2.5i)lbw(2.5i).
 _:_
 Network Service:SCTP
 _:_
 .T&
-lissw(5.5i).
+liss.
 CONNECTION RELEASE
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :all parameters:ignored\*#
 
 :Originator:T{
@@ -941,15 +1024,15 @@ SCTP\-SHUTDOWN_COMPLETE primitives into the Originator Parameter of the
 N\-DISCONNECT\ Indication.
 .TS
 tab(:) box;
-cb|cbs.
+cbw(1.8i)|cbw(1.0i)sw(0.5i)sw(2.0i).
 :N\-DISCONNECT\ Indication
 SCTP Error:_
 .T&
-cbw(1.0i)|cbw(1.0i)|cbw(3.5i).
+cb|cb|cbs.
 :Originator:Description
 _:_:_
 .T&
-ll.
+llls.
 :Provider:T{
 .#v
 provider-originated disconnect
@@ -971,11 +1054,11 @@ SCTP\-SHUTDOWN_COMPLETE primitives into the Reason parameter of the
 N\-DISCONNECT\ Indication.
 .TS
 tab(:) box;
-cb|cbss.
+cbw(1.8i)|cbw(1.0i)sw(0.2i)sw(2.0i).
 :N\-DISCONNECT\ Indication
 SCTP Error:_
 .T&
-cbw(1.0i)|cbw(1.0i)|cbw(0.2i)|cbw(3.0i).
+cb|cb|cb|cb.
 :Originator:P/T:Reason
 _:_:_:_
 .T&
@@ -1485,14 +1568,14 @@ TPDU the initiator adjusts its operation according to the class selected.
 .(c
 .TS
 tab(:) box;
-csw(3.6i)|cw(1.8i).
+cw(1.8i)sw(1.8i)|cw(1.8i).
 Proposed in CR TPDU:CC TPDU
 _:
 .T&
-lw(1.8i)|lw(1.8i)|cw(1.8i).
+l|l|c.
 Preferred Class:Alternative Class:Response
 .T&
-lw(1.8i)|lw(1.8i)|lw(1.8i).
+l|l|l.
 _
 class 0:none:class 0
 class 2:class 0:class 2 or 0
@@ -1526,7 +1609,7 @@ TPDU encoding defined inconsistent encoding rules.
 .TS
 tab(:) box;
 cbw(0.3i)|cbw(5.7i)
-nw(0.3i)|lw(5.7i).
+n|l.
 BIT:OPTION
 _
 8:T{
@@ -1611,40 +1694,40 @@ definition.
 .(c
 .TS
 tab(:) box;
-cw(1.0i)lssw(4.5i).
+cw(1.0i)lw(0.2i)sw(0.3i)sw(4.0i).
 Bits:Service Selected
 1 4 6 7:
 _
 .T&
-cw(1.0i)lssw(4.5i).
+clss.
 0 x x x:T{
 .#v
 Non-use of Transport Expedited Data Service
 T}
 :_
 .T&
-cw(1.0i)lw(0.2i)lw(0.3i)lw(4.0i).
+clll.
 :::T{
 .#v
 Bits 4 6 7 are not applicable (*)
 T}
 _
 .T&
-cw(1.0i)lssw(4.5i).
+clss.
 1 x x x:T{
 .#v
 Use of Transport Expedited Data Service
 T}
 :_
 .T&
-cw(1.0i)lw(0.5i)lsw(4.0i).
+clls.
 1 0 x x::T{
 .#v
 Use of Expedited Data Service without Request Acknowledgement
 T}
 ::_
 .T&
-cw(1.0i)lw(0.2i)lw(0.3i)lw(4.0i).
+clll.
 1 0 1 0:::T{
 .#v
 Forward Connection with Expedited Data Acknowledgement
@@ -1654,7 +1737,7 @@ T}
 Forward Connection with Expedited Data Acknowledgement and use of Non-blocking Expedited Data (*)
 T}
 .T&
-cw(1.0i)lw(0.5i)lsw(4.0i).
+clls.
 ::_
 1 1 x x::T{
 .#v
@@ -1662,7 +1745,7 @@ Use of Expedited Data Service with Request Acknowledgement
 T}
 ::_
 .T&
-cw(1.0i)lw(0.2i)lw(0.3i)lw(4.0i).
+clll.
 1 1 1 0:::T{
 .#v
 Reverse Connection with Expedited Data Acknowledgement
@@ -1829,6 +1912,9 @@ minor formattting changes.
 .nf
 \fC\s-3
 $Log: draft-bidulock-tsvwg-itos-00.me,v $
+Revision 0.9.2.2  2008-06-18 16:45:17  brian
+- widespread updates
+
 Revision 0.9.2.1  2007/09/29 14:58:26  brian
 - added new files
 
@@ -1855,4 +1941,4 @@ for leading the way.
 .lp
 This draft expires \*[expiry].
 .)b
-.#T 2007
+.#T \*[year]

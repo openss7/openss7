@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_QUERY_LS.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_QUERY_LS.4.man,v 0.9.2.2 2008-06-18 16:45:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_QUERY_LS.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:30  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -278,6 +281,28 @@ specifications for information on the specific fields returned.  This optional
 data area must directly follow (or append to) the end of the
 .B dlc_qls_arg
 structure.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+There is no protocol-specific data area supported by DLC FDDI for this
+input-output control operation.
+.TP
+.B DLC TOKEN
+There is no protocol-specific data area supported by DLC TOKEN for this
+input-output control operation.
+.TP
+.B DLC 8023
+There is no protocol-specific data area supported by DLC 8023 for this
+input-output control operation.
+.TP
+.B DLC ETHER
+There is no protocol-specific data area supported by DLC ETHER for this
+input-output control operation.
+.TP
+.B DLC SDLC
+There is no protocol-specific data area supported by DLC SDLC for this
+input-output control operation.
 .\"
 .\"
 .SH RETURN

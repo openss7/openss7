@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_CAPABILITY_REQ.7.man,v 0.9.2.1 2008-05-25 12:46:54 brian Exp $
+.\" @(#) $Id: DL_CAPABILITY_REQ.7.man,v 0.9.2.2 2008-06-18 16:45:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -17,7 +17,7 @@
 .\" manual under the conditions for verbatim copying, provided that the
 .\" entire resulting derived work is distributed under the terms of a
 .\" permission notice identical to this one
-.\" 
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this
 .\" manual page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from
@@ -25,7 +25,7 @@
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
 .\" professionally.  The author(s) will take no responsibility in it.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
@@ -47,17 +47,20 @@
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
 .\" =========================================================================
-.\" 
+.\"
 .\" Commercial licensing and support of this software is available from
 .\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
+.\"
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_CAPABILITY_REQ.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:33  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:54  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -80,7 +83,7 @@ sort-adjacent-labels
 .TH DL_CAPABILITY_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_CAPABILITY_REQ (dl_capability_req_t)
-\- 
+\- control capabilties of underlying driver
 .\"
 .\"
 .SH INTERFACE
@@ -90,16 +93,22 @@ dlpi revision 2.0.0
 .]
 .IR Solaris \(rg-specific.
 .[
-soldlpi
+soldoc11
 .]
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-The message consists of one M_PROTO message block, that contains the following structure:
-.sp
+The message consists of one
+.BR M_PROTO (9)
+message block, that contains the following structure:
+.PP
 .nf
 \f(CW\s-1\
+#define _SUN_SOURCE
+#include <sys/dlpi.h>
+#include <sys/dlpi_sun.h>
+
 typedef struct {
     t_uscalar_t dl_primitive;
     t_uscalar_t dl_sub_offset;
@@ -112,6 +121,25 @@ typedef struct {
 .SH DESCRIPTION
 .PP
 .B DL_CAPABILITY_REQ
+is used both to determine the set of capabilities in the DLS provider and also
+and to turn on an off specific capabilities.  The response is a
+.BR DL_CAPABILITY_ACK (7)
+or
+.BR DL_ERROR_ACK (7)
+primitive.
+.B DL_CAPABILITY_REQ
+can either be empty (i.e.,
+.I dl_sub_length
+is zero) which is a request to return all capabilities.  Otherwise, the
+.B DL_CAPABILITY_REQ
+contains the capabilities the DLS user wants to use and their settings.
+.PP
+A returned
+.BR DL_CAPABILITY_ACK (7)
+primitive will contain the capabilities that the DLS provider can support
+modified based on the what was listed in the request.  If a capability was
+included in the request, then the information returned inthe acknowledgement
+might be modified based on information in the request.
 .\"
 .\"
 .SH PARAMETERS
@@ -120,12 +148,778 @@ typedef struct {
 .I dl_primitive
 conveys
 .BR DL_CAPABILITY_REQ .
+.TP
+.IR dl_sub_length ", " dl_sub_offset
+The length and offset from the beginning of the
+.BR M_PROTO (9)
+message block of the sub-capability structures.
+.PP
+Each of the sub-capability structures is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t dl_cap;
+    t_uscalar_t dl_length;
+    char dl_data[0];
+    /* followed by zero or more bytes of dl_data */
+} dl_capability_sub_t;
+\s+1\fP
+.fi
+.PP
+Where the
+.B dl_capability_sub_t
+structure contains the following members:
+.TP
+.I dl_cap
+The capability represented.  This field can have values:
+.RS
+.TP
+.B DL_CAPAB_ID_WRAPPR
+Module ID wrapper structure.
+.TP
+.B DL_CAPAB_HCKSUM
+Hardware checksum offload.
+.TP
+.B DL_CAPAB_IPSEC_AH
+IPsec AH acceleration.
+.TP
+.B DL_CAPAB_IPSEC_ESP
+IPsec ESP acceleration.
+.TP
+.B DL_CAPAB_MDT
+Multidata transmit capability.
+.TP
+.B DL_CAPAB_ZEROCOPY
+Zero-copy capability.
+.TP
+.B DL_CAPAB_POLL
+Polling capability.
+.TP
+.B DL_CAPAB_SOFT_RING
+Soft ring capable.
+.TP
+.B DL_CAPAB_LSO
+Large send offload (LSO) capability.
+.RE
+.TP
+.I dl_length
+Specifies the length of the data portion of the message.  When set to zero
+(0), it specifies that there is not data portion associated with the
+capability.  In this case, values are only retrieved for the capability and
+are not set.  When non-zero, it has the length of the structure associated
+with the capability value present in the
+.BR dl_cap
+field.
+.TP
+.I dl_data
+Either empty or contains the controls the data structure associated with the
+corresponding
+.I dl_cap
+field value.
+.\"
+.SS Module Id Wrapper
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_ID_WRAPPR ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a
+.B dl_capab_id_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    dl_mid_t id_mid;
+    dl_capability_sub_t id_subcap;
+} dl_capab_id_t;
+\s+1\fP
+.fi
+.PP
+The
+.B dl_capab_id_t
+structure contains the following members:
+.TP
+.I id_mid
+Module ID token.
+This is the module ID of the module for which the contained sub-capability is
+addressed.  The Module ID wrapper capability may required privilege.
+.TP
+.I id_subcap
+Sub-capability.
+This is the sub-capability that is one of the other capabilties defined for
+the
+.I dl_cap
+field.  It is unclear whether a Module ID Wrapper can, in turn, contain
+another Module Id Wrapper.
+.\"
+.SS Hardware Checksum
+.PP
+This set of capabilities address the ability of the underlying driver to
+perform various forms of checksumming in hardware, thus providing the ability
+to offload checksumming from the host to the device.
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_HCKSUM ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a
+.B dl_capab_hcksum_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t hcksum_version;
+    t_uscalar_t hcksum_txflags;
+    dl_mid_t hcksum_mid;
+} dl_capab_hcksum_t;
+.\"
+.\"#define HCKSUM_CURRENT_VERSION  0x01
+.\"#define HCKSUM_VERSION_1        0x01
+.\"
+.\"#define HCKSUM_ENABLE           0x01
+.\"#define HCKSUM_INET_PARTIAL     0x02
+.\"#define HCKSUM_INET_FULL_V4     0x04
+.\"#define HCKSUM_IPDHRCHKSUM      0x10
+\s+1\fP
+.fi
+.PP
+The
+.B dl_capab_hcksum_t
+structure contains the following members:
+.TP
+.I hcksum_version
+Specifies the capability interface version for the data following.
+.RS
+.TP
+.B HCKSUM_CURRENT_VERSION
+The current version of the hardware checksum capability.
+.TP
+.B HCKSUM_VERSION_1
+Version 1 of the hardware checksum capability.
+.RE
+.TP
+.I hcksum_txflags
+Capabilities on transmit.
+.RS
+.TP
+.B HCKSUM_ENABLE
+Set to enable hardware checksum capability; when clear, hardware checksum
+capability is disabled.
+.TP
+.B HCKSUM_INET_PARTIAL
+Partial one's complement checksum ability.
+.TP
+.B HCKSUM_INET_FULL_V4
+Full one's complement checksum ability for IPv4 packets.
+.TP
+.B HCKSUM_INET_FULL_V6
+Full one's complement checksum ability for IPv6 packets.
+.TP
+.B HCKSUM_IPDHRCHKSUM
+IPv4 header checksum offload capability.
+.RE
+.TP
+.I hcksum_mid
+Module ID token.
+.\"
+.SS IPsec AH or ESP Acceleration
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_IPSEC_AH " or " DL_CAPAB_IPSEC_ESP ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a
+.B dl_capab_ipsec_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+
+typedef struct {
+    t_uscalar_t cip_version;
+    t_uscalar_t cip_nciphers;
+    dl_capab_ipsec_alg_t cip_data[1];
+} dl_capabl_ipsec_t;
+\s+1\fP
+.fi
+.PP
+The
+.B dl_capab_ipsec_t
+structure contains the following members:
+.TP
+.I cip_version
+Specifies the capability interface versoin for the data following.
+.RS
+.TP
+.B IPSEC_CURRENT_VERSION
+The current version of the IPSec AH or ESP acceleration capability.
+.TP
+.B IPSEC_VERSION_1
+Version 1 of the IPSec AH or ESP acceleration capability.
+.RE
+.TP
+.I cip_nciphers
+The number of ciphers in the
+.I cip_data
+portion of the message.
+.TP
+.I cip_data
+An array of
+.I cip_nciphers
+elements, each containing a
+.B dl_capab_ipsec_alg_t
+structure describing one cipher (encryption or authentication cipher).
+The
+.B dl_capab_ipsec_alg_t
+structure is formatted as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t alg_type;
+    t_uscalar_t alg_prim;
+    t_uscalar_t alg_thruput;
+    t_uscalar_t alg_flag;
+    t_uscalar_t alg_minbits;
+    t_uscalar_t alg_maxbits;
+    t_uscalar_t alg_incrbits;
+} dl_capab_ipsec_alg_t;
+.\"
+.\"#define DL_CAPAB_IPSEC_ALG_AUTH       0x01
+.\"#define DL_CAPAB_IPSEC_ALG_ENCR       0x02
+.\"
+.\"#define DL_CAPAB_IPSEC_ENCR_DES       0x02
+.\"#define DL_CAPAB_IPSEC_ENCR_3DES      0x03
+.\"#define DL_CAPAB_IPSEC_ENCR_BLOWFISH  0x04
+.\"#define DL_CAPAB_IPSEC_ENCR_NULL      0x0b
+.\"#define DL_CAPAB_IPSEC_ENCR_AES       0x0c
+.\"
+.\"#define DL_CAPAB_IPSEC_AUTH_NONE      0x00
+.\"#define DL_CAPAB_IPSEC_AUTH_MD5HMAC   0x02
+.\"#define DL_CAPAB_IPSEC_AUTH_SHA1HMAC  0x03
+.\"
+.\"#define DL_CAPAB_ALG_ENABLE           0x01
+\s+1\fP
+.fi
+.PP
+The
+.B dl_capab_ipsec_alg_t
+structure contains the following members:
+.TP
+.I alg_type
+Specifies the type of the algorithm.  This can be one of the following
+values:
+.RS
+.TP
+.B DL_CAPAB_IPSEC_ALG_AUTH
+The algorithm is an authentication algorithm.
+.TP
+.B DL_CAPAB_IPSEC_ALG_ENCR
+The algorithm is an encryption algorithm.
+.RE
+.TP
+.I alg_prim
+Specifies or indicates the algorithm primitive form.  This field uses a
+different set of values depending on the value of
+.I alg_type
+as follows:
+.RS
+.PP
+When the
+.I alg_type
+is
+.BR DL_CAPAB_IPSEC_ALG_ENCR ,
+.I alg_prim
+can be one of the following values:
+.TP
+.B DL_CAPAB_IPSEC_ENCR_NULL
+No encryption.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_DES
+Encryption using DES.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_3DES
+Encryption using triple-DES.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_BLOWFISH
+Encryption using Blowfish.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_AES
+Encryption using AES.
+.PP
+When the
+.I alg_type
+is
+.BR DL_CAPAB_IPSEC_ALG_AUTH ,
+.I alg_prim
+can be one of the following values:
+.TP
+.B DL_CAPAB_IPSEC_AUTH_NONE
+No authentication.
+.TP
+.B DL_CAPAB_IPSEC_AUTH_MD5HMAC
+Authentication using MD5 HMAC.
+.TP
+.B DL_CAPAB_IPSEC_AUTH_SHA1HMAC
+Authentication using SHA1 HMAC.
+.RE
+.TP
+.I alg_thruput
+Specifies the throughput capability of the accelerated algortihm.
+.TP
+.I alg_flag
+Indicates the capability flags associated with this algorithm.
+.I alg_flag
+can contain zero or more of the following flags:
+.RS
+.TP
+.B DL_CAPAB_ALG_ENABLE
+.RE
+.TP
+.I alg_minbits
+Indicates the shortest key length for this algorithm in bits.
+.TP
+.I alg_maxbits
+Indicates the longest key length for this algorithm in bits.
+.TP
+.I alg_incrbits
+Indicates the increment that can be added to
+.I alg_minbits
+until
+.I alg_maxbits
+that specifies valid key lengths intermediate to 
+.IR alg_minbits " and " alg_maxbits .
+.RE
+.\"
+.SS Multi-Data Transmit
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_MDT ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a multidata transmit sub-capability,
+.B dl_capab_mdt_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t mdt_version;
+    t_uscalar_t mdt_flags;
+    t_uscalar_t mdt_hdr_head;
+    t_uscalar_t mdt_hdr_tail;
+    t_uscalar_t mdt_max_pld;
+    t_uscalar_t mdt_span_limit;
+    dl_mid_t mdt_mid;
+} dl_capab_mdt_t;
+.\"
+.\"#define MDT_CURRENT_VERSION	0x02
+.\"#define MDT_VERSION_2		0x02
+.\"#define MDT_VERSION_1		0x01
+.\"
+.\"#define DL_CAPAB_MDT_ENABLE	0x01
+\s+1\fP
+.fi
+.PP
+The
+.B dl_capab_mdt_t
+structure contains the following members:
+.TP
+.I mdt_version
+Specifies the capability interface version for the data following.
+.RS
+.TP
+.B MDT_CURRENT_VERSION
+The current version of the multidata transmit capability.
+.TP
+.B MDT_VERSION_2
+Version 2 of the multidata transmit capability.
+.TP
+.B MDT_VERSION_1
+Version 1 of the multidata transmit capability.
+.RE
+.TP
+.I mdt_flags
+Flags.
+.RS
+.TP
+.B DL_CAPAB_MDT_ENABLE
+Enable multidata transmit.
+.RE
+.TP
+.I mdt_hdr_head
+Minimum leading header space.
+.TP
+.I mdt_hdr_tail
+Minimum trailing header space.
+.TP
+.I mdt_max_pld
+Maximum double payload buffers.
+.TP
+.I mdt_span_limit
+Scatter-gatter descriptor limit.
+.TP
+.I mdt_mid
+Module ID token.
+.\"
+.SS Zero-Copy
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_ZEROCOPY ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a
+.B dl_capab_zerocopy_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t zerocopy_version;
+    t_uscalar_t zerocopy_flags;
+    t_uscalar_t reservved[9];
+    dl_mid_t zerocopy_mid;
+} dl_capab_zerocopy_t;
+.\"
+.\"#define ZEROCOPY_CURRENT_VERSION  0x01
+.\"#define ZEROCOPY_VERSION_1        0x01
+.\"
+.\"#define DL_CAPAB_VMSAFE_MEM       0x01
+\s+1\fP
+.fi
+.PP
+The members of the
+.B dl_capab_zerocopy_t
+structure are as follows:
+.TP
+.I zerocopy_version
+Specifies the capability interface version for the data following.
+.RS
+.TP
+.B ZEROCOPY_CURRENT_VERSION
+The current version of the zero copy capability.
+.TP
+.B ZEROCOPY_VERSION_1
+Version 1 of the zero copy capability.
+.RE
+.TP
+.I zerocopy_flags
+.RS
+.TP
+.B DL_CAPAB_VMSAFE_MEM
+When set, specifies that the driver is zero-copy safe with respect to virtual
+memory named buffers.
+.RE
+.TP
+.I zerocopy_mid
+.\"
+.SS Polling
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_POLL ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a
+.B dl_capab_dls_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct dl_capab_dls_s {
+    t_uscalar_t dls_version;
+    t_uscalar_t dls_flags;
+.\"    /* DLD provided information */
+    uintptr_t dls_tx_handle;
+    uintptr_t dls_tx;
+    uintptr_t dls_ring_change_status;
+    uintptr_t dls_ring_bind;
+    uintptr_t dls_ring_unbind;
+.\"    /* IP provided information */
+    uintptr_t dls_rx_handle;
+    uintptr_t dls_ring_assign;
+    uintptr_t dls_rx;
+    uintptr_t dls_ring_add;
+    t_uscalar_t dls_ring_cnt;
+.\"    /* Module ID */
+    dl_mid_t dls_mid;
+} dl_capab_dls_t;
+.\"
+.\"#define POLL_CURRENT_VERSION   0x01
+.\"#define POLL_VERSION_1         0x01
+.\"
+.\"#define POLL_ENABLE            0x01
+.\"#define POLL_CAPABLE           0x02
+.\"#define POLL_DISABLE           0x03
+\s+1\fP
+.fi
+.PP
+The
+.B dl_capab_dls_t
+structure is used by
+.B DL_CAPAB_POLL
+and
+.B DL_CAPAB_SOFT_RING
+capabilities.  It provides a mechanism for IP to exchange function pointers
+with a gldv3-based driver to enable it to bypass streams data paths.  The
+.B DL_CAPAB_POLL
+mechanism provides a mechanism to create soft ring at the dls layer.
+.PP
+The members of the
+.B dl_capab_dls_t
+structure are as follows:
+.TP
+.I dls_version
+Specifies the capability interface version for the data following.
+.RS
+.TP
+.B POLL_CURRENT_VERSION
+The current version of the poll capability.
+.TP
+.B POLL_VERSION_1
+Version 1 of the poll capability.
+.RE
+.TP
+.I dls_flags
+.RS
+.TP
+.B POLL_ENABLE
+.TP
+.B POLL_CAPABLE
+.TP
+.B POLL_DISABLE
+.RE
+.TP
+.I dls_tx_handle
+.TP
+.I dls_tx
+.TP
+.I dls_ring_change_status
+.TP
+.I dls_ring_bind
+.TP
+.I dls_ring_unbind
+.TP
+.I dls_rx_handle
+.TP
+.I dls_ring_assign
+.TP
+.I dls_rx
+.TP
+.I dls_ring_add
+.TP
+.I dls_ring_cnt
+.TP
+.I dls_mid
+.\"
+.SS Soft Ring
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_SOFT_RING ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a
+.B dl_capab_dls_t
+structure, formatted as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+.\"#define SOFT_RING_CURRENT_VERSION  0x01
+.\"#define SOFT_RING_VERSION_1        0x01
+.\"
+.\"#define SOFT_RING_ENABLE           0x04
+.\"#define SOFT_RING_CAPABLE          0x05
+.\"#define SOFT_RING_DISABLE          0x06
+.\"
+.\"#define SOFT_RING_NONE             0x00
+.\"#define SOFT_RING_FANOUT           0x01
+\s+1\fP
+.fi
+.PP
+The members of the
+.B dl_capab_dls_t
+structure are as follows:
+See
+.BR DL_CAPAB_POLL ,
+above.
+.TP
+.I dls_version
+Specifies the capability interface version for the data following.
+.RS
+.TP
+.B SOFT_RING_CURRENT_VERSION
+The current version of the soft ring capability.
+.TP
+.B SOFT_RING_VERSION_1
+Version 1 of the soft ring capability.
+.RE
+.TP
+.I dls_flags
+Interface flags.
+.RS
+.TP
+.B SOFT_RING_ENABLE
+.TP
+.B SOFT_RING_CAPABLE
+.TP
+.B SOFT_RING_DISABLE
+.RE
+.TP
+.I dls_ring_change_status
+Ring status change information.
+.RS
+.TP
+.B SOFT_RING_NONE
+.TP
+.B SOFT_RING_FANOUT
+.RE
+.\"
+.SS Large Send Offload
+.PP
+When
+.I dl_cap
+is set to
+.BR DL_CAPAB_LSO ,
+.I dl_length
+is non-zero,
+.I dl_data
+contains a
+.BR dl_capab_lso_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    t_uscalar_t lso_version;
+    t_uscalar_t lso_flags;
+    t_uscalar_t lso_max;
+    t_uscalar_t reserved[1];
+    dl_mid_t lso_mid;
+} dl_capab_lso_t;
+.\"
+.\"#define LSO_CURRENT_VERSION     0x01
+.\"#define LSO_VERSION_1           0x01
+.\"
+.\"#define LSO_TX_ENABLE           0x01
+.\"#define LSO_TX_BASIC_TCP_IPV4   0x02
+\s+1\fP
+.fi
+.PP
+The members of the
+.B dl_capab_lso_t
+structure are as follows:
+.TP
+.I lso_version
+Specifies the capability interface version for the data following.
+.RS
+.TP
+.B LSO_CURRENT_VERSION
+The current version of the large send offload capability.
+.TP
+.B LSO_VERSION_1
+Version 1 of the large send offload capability.
+.RE
+.TP
+.I lso_flags
+Capability flags.
+.RS
+.TP
+.B LSO_TX_ENABLE
+Set to enable LSO, clear to disable.
+.TP
+.B LSO_TX_BASIC_TCP_IPV4
+TCP LSO capability.
+.RE
+.TP
+.I lso_max
+Maximum payload.
+.TP
+.I lso_mid
+Module ID.
+.\"
+.\"
+.SH RULES
+.PP
+The following rules are followed concerning the issuing of and response to the
+.B DL_CAPABILITY_REQ
+primitive:
+.IP 1. \w'0.\(em'u
+When the
+.IR dl_sub_length
+field is zero (0) in the request, the DLS provider is to assemble all
+supported capabilities from the driver and issue a
+.BR DL_CAPABILITY_ACK (7)
+message containing each capability and its current corresponding value.
+.IP 2.
+When the
+.IR dl_sub_length
+field is non-zero, the
+.IR dl_sub_length " and " dl_sub_offset
+fields describe an extent that contains an array of
+.BR dl_capability_sub_t
+structures.
+.IP 3.
+Each
+.B dl_capability_sub_t
+structure in the request can have a
+.IR dl_length
+field that is either zero (0), or the length of the data
+structure corresponding to the capability identified in the
+.IR dl_cap
+field.
+.IP 4.
+When the
+.IR dl_length
+field is zero (0), it specifies that no value is associated with the
+capability and the value of the capability is to be returned in the
+.BR DL_CAPABILITY_ACK (7)
+message.
+.IP 5.
+When the
+.IR dl_length
+field is non-zero, it specifies that the value is to be associated with the
+capability (i.e., set against the capability) and the value of the capability
+as set or negotiated is to be returned in the
+.BR DL_CAPABILITY_ACK (7)
+message.
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
 .PP
 The message is valid in any state other than state
-.BR DL_UNATTACHED .
+.BR DL_UNATTACHED ,
+or when a local acknowledgement is pending.
 .\"
 .\"
 .SH "NEW STATE"
@@ -136,8 +930,8 @@ The resulting state remains the same.
 .SH RESPONSE
 .PP
 If the request is successful,
-.BR DL_NOTIFY_ACK (7)
-is issued ot the DLS user.
+.BR DL_CAPABILITY_ACK (7)
+is issued to the DLS user.
 If the request fails, message
 .BR DL_ERROR_ACK (7)
 is returned and the resulting state is unchanged.
@@ -166,7 +960,22 @@ primitive.  It might be necessary to define C preprocessor symbol
 .BR _SUN_SOURCE
 before including the
 .RB < sys/dlpi.h >
-header file to expose the declarations and structures associated with this primitive.
+header file,
+or it might be necessary to include the
+.RB < sys/dlpi_sun.h >
+header file,
+to expose the declarations and structures associated with this primitive.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DL_CAPABILITY_ACK (7),
+.BR DL_CONTROL_REQ (7),
+.BR DL_CONTROL_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -175,7 +984,7 @@ header file to expose the declarations and structures associated with this primi
 is compatibible with
 .IR Solaris \(rg,
 .[
-soldoc10
+soldoc11
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -187,6 +996,24 @@ primitive that is not part of the DLPI standard.
 dlpi revision 2.0.0
 .]
 It should not be used by portable DLPI programs.
+.IP \(em
+.IR Solaris \(rg
+does not document this primitive well.
+.[
+soldoc11
+.]
+.IP \(em
+Before attempting to use the features of the
+.B DL_CAPABILITY_REQ
+primitive, the DLS user should issue a
+.B DL_CAPABILITY_REQ
+primitive with the
+.I dl_sub_length
+field set to zero.  If the DLS provider response with a
+.BR DL_ERROR_ACK (7)
+primitive with either the
+.BR DL_BADPRIM " or " DL_NOTSUPPORTED
+error number, the DLS provider does not recognize, or support, the primitive.
 .IP \(em
 .B DL_CAPABILITY_REQ
 is provided by
@@ -201,10 +1028,10 @@ Binary compatibility is not attempted.  Any binary compatibility experienced may
 removed from the next release.
 .PP
 See
-.IR STREAMS (9)
-and
 .BR dlpi (7),
-for additional compatiblity information.
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -227,7 +1054,7 @@ svr4
 was first documented in
 .IR Solaris \(rg .
 .[
-soldoc10
+soldoc11
 .]
 .\"
 .\"

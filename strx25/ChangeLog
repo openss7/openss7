@@ -1,3 +1,60 @@
+2008-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/drafts/x25/draft-bidulock-tsvwg-xos-00.me: XOS draft
+	* doc/man/Makefile.am: added manpages
+	* doc/man/man3/getnettype.3.man: updated manpage
+	* doc/man/man3/linkidtox25.3.man: updated manpage
+	* doc/man/man3/x25tolinkid.3.man: updated manpage
+	* doc/man/man3/XX25.3.man: updated manpage
+	* doc/man/man5/x25template.5.man: updated manpage
+	* doc/man/strx25.refs: updated manpage
+	* doc/manual/Makefile.am: added manual
+	* doc/specs/nli/Makefile.am: updated manual
+	* doc/specs/nli/nli.texi: updated manual
+	* Makefile.am: updates
+	* src/drivers/.indent.pro: tweaks
+	* src/drivers/x25-plp.c: updated driver
+	* src/include/netx25/x25_control.h: updated include file
+	* src/include/netx25/x25_proto.h: updated include file
+	* src/include/netx25/xnetdb.h: updated include file
+	* src/include/sys/npi_x25.h: updated include file
+	* src/include/xti_xx25.h: updated include file
+	* src/lib/sx25/padent.c: updated library
+	* src/modules/cdpmod.c: update module
+	* src/modules/.indent.pro: tweaks
+	* src/modules/lis.conf: update module
+	* src/modules/npi.c: update module
+	* src/modules/xot.c: update module
+	* src/util/lltune.c: updated utility
+	* src/util/x25diags.c: updated utility
+	* src/util/x25tune.c: updated utility
+
+	* doc/man/man3/snidtox25.3.man: added file
+	* doc/man/man3/x25tosnid.3.man: added file
+	* src/drivers/ifr.c: added file
+	* src/drivers/ixe.c: added file
+	* src/drivers/lapb.c: added file
+	* src/drivers/llc2.c: added file
+	* src/drivers/mfe.c: added file
+	* src/drivers/mlp.c: added file
+	* src/drivers/wan.c: added file
+	* src/include/snet/dl_control.h: added file
+	* src/include/snet/dl_proto.h: added file
+	* src/include/snet/ixe_control.h: added file
+	* src/include/snet/ixe_proto.h: added file
+	* src/include/snet/ll_control.h: added file
+	* src/include/snet/ll_proto.h: added file
+	* src/include/snet/mlp_control.h: added file
+	* src/include/snet/mlp_proto.h: added file
+	* src/include/snet/wan_control.h: added file
+	* src/include/snet/wan_proto.h: added file
+	* src/include/snet/x25_control.h: added file
+	* src/include/snet/x25_proto.h: added file
+	* src/include/snet/x32_control.h: added file
+	* src/include/snet/xxx_control.h: added file
+	* src/include/sx25.h: added file
+	* src/include/xnetdb.h: added file
+
 2008-05-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/info.am: updates

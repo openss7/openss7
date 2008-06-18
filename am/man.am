@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008/06/09 09:20:01 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008/06/09 09:20:01 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -61,7 +61,7 @@ man_MACROS		= $(MANMACRO_PFX).macros $(MANMACRO_PFX).refs
 if DEVELOPMENT
 ## DEVELOPMENT
 
-MAN_SUBST_STRING = s|\@PACKAGE\@|$(PACKAGE)|g;s|\@VERSION\@|$(VERSION)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g;s|\@PACKAGE_SHORTTITLE\@|$(PACKAGE_SHORTTITLE)|g;s|\@bindir\@|$(bindir)|g;s|\@datadir\@|$(datadir)|g;s|\@exec_prefix\@|$(exec_prefix)|g;s|\@includedir\@|$(includedir)|g;s|\@infodir\@|$(infodir)|g;s|\@kmoduledir\@|$(kmoduledir)|g;s|\@rootdir\@|$(rootdir)|g;s|\@ksysmap\@|$(ksysmap)|g;s|\@kversion\@|$(kversion)|g;s|\@libdir\@|$(libdir)|g;s|\@libexecdir\@|$(libexecdir)|g;s|\@localstatedir\@|$(localstatedir)|g;s|\@mandir\@|$(mandir)|g;s|\@oldincludedir\@|$(oldincludedir)|g;s|\@prefix\@|$(prefix)|g;s|\@sbindir\@|$(sbindir)|g;s|\@sharedstatedir\@|$(sharedstatedir)|g;s|\@sysconfdir\@|$(sysconfdir)|g;s|\@snmpmibdir\@|$(snmpmibdir)|g;s|\@snmpdlmoddir\@|$(snmpdlmoddir)|g;s|\@build\@|$(build)|g;s|\@build_alias\@|$(build_alias)|g;s|\@build_cpu\@|$(build_cpu)|g;s|\@build_os\@|$(build_os)|g;s|\@build_vendor\@|$(build_vendor)|g;s|\@host\@|$(host)|g;s|\@host_alias\@|$(host_alias)|g;s|\@host_cpu\@|$(host_cpu)|g;s|\@host_os\@|$(host_os)|g;s|\@host_vendor\@|$(host_vendor)|g;s|\@target\@|$(target)|g;s|\@target_alias\@|$(target_alias)|g;s|\@target_cpu\@|$(target_cpu)|g;s|\@target_os\@|$(target_os)|g;s|\@target_vendor\@|$(target_vendor)|g
+MAN_SUBST_STRING = s|\@bindir\@|$(bindir)|g;s|\@build_alias\@|$(build_alias)|g;s|\@build\@|$(build)|g;s|\@build_cpu\@|$(build_cpu)|g;s|\@build_os\@|$(build_os)|g;s|\@build_vendor\@|$(build_vendor)|g;s|\@configdir\@|$(configdir)|g;s|\@datadir\@|$(datadir)|g;s|\@datarootdir\@|$(datarootdir)|g;s|\@docdir\@|$(docdir)|g;s|\@dvidir\@|$(dvidir)|g;s|\@exec_prefix\@|$(exec_prefix)|g;s|\@host_alias\@|$(host_alias)|g;s|\@host_cpu\@|$(host_cpu)|g;s|\@host\@|$(host)|g;s|\@host_os\@|$(host_os)|g;s|\@host_vendor\@|$(host_vendor)|g;s|\@htmldir\@|$(htmldir)|g;s|\@includedir\@|$(includedir)|g;s|\@infodir\@|$(infodir)|g;s|\@initrddir\@|$(initrddir)|g;s|\@kmoduledir\@|$(kmoduledir)|g;s|\@ksysmap\@|$(ksysmap)|g;s|\@kversion\@|$(kversion)|g;s|\@lib32dir\@|$(lib32dir)|g;s|\@libdir\@|$(libdir)|g;s|\@libexecdir\@|$(libexecdir)|g;s|\@localedir\@|$(localedir)|g;s|\@localstatedir\@|$(localstatedir)|g;s|\@mandir\@|$(mandir)|g;s|\@modutildir\@|$(modutildir)|g;s|\@oldincludedir\@|$(oldincludedir)|g;s|\@PACKAGE_DATE\@|$(PACKAGE_DATE)|g;s|\@PACKAGE\@|$(PACKAGE)|g;s|\@PACKAGE_SHORTTITLE\@|$(PACKAGE_SHORTTITLE)|g;s|\@PACKAGE_TITLE\@|$(PACKAGE_TITLE)|g;s|\@pdfdir\@|$(pdfdir)|g;s|\@prefix\@|$(prefix)|g;s|\@psdir\@|$(psdir)|g;s|\@rootdir\@|$(rootdir)|g;s|\@sbindir\@|$(sbindir)|g;s|\@sharedstatedir\@|$(sharedstatedir)|g;s|\@snmpdlmoddir\@|$(snmpdlmoddir)|g;s|\@snmpmibdir\@|$(snmpmibdir)|g;s|\@sysconfdir\@|$(sysconfdir)|g;s|\@target_alias\@|$(target_alias)|g;s|\@target_cpu\@|$(target_cpu)|g;s|\@target_os\@|$(target_os)|g;s|\@target\@|$(target)|g;s|\@target_vendor\@|$(target_vendor)|g;s|\@VERSION\@|$(VERSION)|g
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -626,6 +626,9 @@ EXTRA_DIST		+= \
 ## =============================================================================
 ##
 ## $Log: man.am,v $
+## Revision 0.9.2.65  2008/06/09 09:20:01  brian
+## - more substitutions
+##
 ## Revision 0.9.2.64  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##

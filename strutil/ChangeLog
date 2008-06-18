@@ -1,3 +1,7 @@
+2008-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strutil.refs: update references
+
 2008-05-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* strutil.lsm.in: updates for release

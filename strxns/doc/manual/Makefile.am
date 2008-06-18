@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-04-10 23:24:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-06-18 16:45:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 23:24:20 $ by $Author: brian $
+# Last Modified $Date: 2008-06-18 16:45:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,8 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= strxns.texi
+info_TEXINFOS		+= strxns.texi \
+			   dlpi_porting.texi
 
 strxns_TEXINFOS		= \
 			  configure.texi \
@@ -68,7 +69,7 @@ strxns_TEXINFOS		= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/fdl.texi \
+			  texi/fdl12.texi \
 			  texi/agpl3.texi \
 			  texi/gpl3.texi \
 			  texi/uidlpi.texi \
@@ -101,6 +102,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.33  2008-06-18 16:45:38  brian
+# - widespread updates
+#
 # Revision 0.9.2.32  2008-04-10 23:24:20  brian
 # - distribute agpl3.texi
 #

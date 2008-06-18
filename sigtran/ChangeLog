@@ -1,3 +1,9 @@
+2008-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/drafts/fixup: more portable
+	* sigtran/doc/drafts/idrefs: update references
+	* sigtran/doc/man/sigtran.refs: update references
+
 2008-05-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/m2ua.c: be strict with MORE_flag

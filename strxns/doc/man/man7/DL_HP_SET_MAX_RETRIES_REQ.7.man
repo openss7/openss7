@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_HP_SET_MAX_RETRIES_REQ.7.man,v 0.9.2.1 2008-05-25 12:46:54 brian Exp $
+.\" @(#) $Id: DL_HP_SET_MAX_RETRIES_REQ.7.man,v 0.9.2.2 2008-06-18 16:45:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_HP_SET_MAX_RETRIES_REQ.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:34  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:54  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -104,6 +107,9 @@ message block, that contains the following structure:
 .sp
 .nf
 \f(CW\s-1\
+#include <sys/dlpi.h>
+#include <sys/dlpi_ext.h>
+
 typedef struct {
     t_uscalar_t dl_primitive;
     t_uscalar_t dl_max_retries;
@@ -136,6 +142,12 @@ iso/iec 8802-2 : 1998
 .[
 iso8208
 .]
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+.B DL_CODLS
+mode.
 .\"
 .\"
 .SH STATE

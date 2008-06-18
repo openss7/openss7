@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_RESET_IND.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
+.\" @(#) $Id: DL_RESET_IND.7.man,v 0.9.2.8 2008-06-18 16:45:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_RESET_IND.7.man,v $
+.\" Revision 0.9.2.8  2008-06-18 16:45:35  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -102,13 +105,15 @@ The message consists of one
 message block containing the structure shown below.
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
 typedef struct {
     t_uscalar_t  dl_primitive;
     t_uscalar_t  dl_originator;
     t_uscalar_t  dl_reason;
 } dl_reset_ind_t;
-\fC\s+1
+\f(CW\s+1
 .fi
 .\"
 .\"
@@ -145,6 +150,12 @@ indicates a request for resynchronization of a data link connection.
 .RE
 .\"
 .\"
+.SH MODE
+This primitive is valid in
+.B DL_CODLS
+mode.
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_DATAXFER .
@@ -159,6 +170,86 @@ The resulting state is
 The DLS user should issue a
 .BR DL_RESET_RES (7)
 primitive to continue the resynchronization procedure.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_RESET_IND
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+soldoc11
+.]
+does not support connection-oriented service mode directly.
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+only supports connection-oriented service mode.
+.IP \(em
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+says that the
+.I dl_originator
+is always set to
+.BR DL_USER ,
+and the
+.I dl_reason
+is always set to
+.BR DL_RESET_RESYNCH .
+However, this is not consistent with ISO/IEC 8802-2,
+.[
+iso/iec 8802-2 : 1998
+.]
+that shows that reset indications can be local or remote and that only remote
+indications can be due to the DLS user (peer) and local indications are always
+due to the DLS provider.  Therefore,
+.B @PACKAGE_TITLE@
+indicates
+.BR DL_USER / DL_RESET_RESYNC
+for remote reset indications and
+.BR DL_PROVIDER / DL_RESET_FLOW_CONTROL ,
+.BR DL_PROVIDER / DL_RESET_LINK_ERROR
+or
+.BR DL_PROVIDER / DL_RESET_RESYNCH
+for local reset indications, depending on the mechanism providing the local
+reset indication.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

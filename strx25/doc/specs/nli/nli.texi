@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: nli.texi,v 0.9.2.1 2008-05-03 21:22:37 brian Exp $
+% @(#) $Id: nli.texi,v 0.9.2.2 2008-06-18 16:45:24 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-05-03 21:22:37 $ by $Author: brian $
+% Last Modified $Date: 2008-06-18 16:45:24 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -270,12 +270,15 @@ under no obligation to provide any feature listed herein.
 * Introduction::
 * Model of the Network Layer::
 * NLI Services::
-* NLI Primitives::
+* NLI Message Primitives::
 * Allowable Sequence of NLI Primitives::
-* Precedence of NPI Primitives::
-* Guidelines for Protocol Independent NS Users::
-* Required Information for NS Provider-Specific Addenda::
+@c * Precedence of NPI Primitives::
+@c * Guidelines for Protocol Independent NS Users::
+@c * Required Information for NS Provider-Specific Addenda::
 * NLI Header Files::
+* NLI Library::
+* NLI Modules::
+* NLI Compatibility and Porting::
 * Glossary of NLI Terms and Acronyms::
 * References::
 * Index::
@@ -284,35 +287,2634 @@ under no obligation to provide any feature listed herein.
 @node Introduction
 @chapter Introduction
 
+The Network Layer Interface (NLI) was developed by Spider Systems, Ltd., and is
+widely available on many platforms.  For example, @cite{AIX AIXlink/X.25},
+@cite{HP-UX HP X.25/9000}, @cite{Solaris Solstice X.25} and @cite{SunLink X.25},
+@cite{IRIX IRIS SX.25} and @cite{PT X.25} implement the Network Layer Interface
+(NLI).
+
+The Network Layer Interface (NLI) was designed to be used directly with standard
+@dfn{STREAMS} system calls and does not require the use of a cooperating user
+space shared library.  Applications program directly use the
+@command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)} and
+@command{putpmsg(2)} system calls.@footnote{See @manref{getmsg(2s)},
+@manref{getpmsg(2)}, @manref{putmsg(2s)} and @manref{putpmsg(2)} manual pages.}
+Nevertheless, user shared object libraries can easily be constructed using this
+@dfn{STREAMS} service primitive interface.
+
+The system header files that must be included when compiling user applications,
+or @dfn{STREAMS} drivers and modules that use the interface, are detailed in
+@ref{NLI Header Files}.
+
+A user library, @cite{libsx25}, is provided, not for interfacing to the message
+primitive service interface, but for providing various helper functions when
+using the @dfn{STREAMS} service interface.  This library is detailed in @ref{NLI
+Library}.
+
 @node Model of the Network Layer
 @chapter Model of the Network Layer
+@cindex Data Structures
 
 @node NLI Services
 @chapter NLI Services
+@cindex Listens
 
-@node NLI Primitives
-@chapter NLI Primitives
+@menu
+* NLI Commands::
+* NLI Data Structures::
+@end menu
+
+@node NLI Commands
+@section NLI Commands
+
+@multitable @columnfractions 0.17 0.15 0.68
+@item Command @tab Description @tab Section
+@item @constant{N_CI} @tab @type{xcallf} @tab @ref{Connect Request/Indication}.
+@item @constant{N_CC} @tab @type{xccnff} @tab @ref{Connect Response/Confirmation}.
+@item @constant{N_Data} @tab @type{xdataf} @tab @ref{Data}.
+@item @constant{N_DAck} @tab @type{xdatacf} @tab @ref{Data Acknowledgement}.
+@item @constant{N_EData} @tab @type{xeadataf} @tab @ref{Expedited Data}.
+@item @constant{N_EAck} @tab @type{xedatacf} @tab @ref{Expedited Data Acknowledgement}.
+@c @item @constant{DTflow} @tab @type{} @tab .
+@item @constant{N_RI} @tab @type{xrstf} @tab @ref{Reset Request/Indication}.
+@item @constant{N_RC} @tab @type{xrscf} @tab @ref{Reset Response/Confirmation}.
+@item @constant{N_DI} @tab @type{xdiscf} @tab @ref{Disconnect Request/Indication}.
+@item @constant{N_DC} @tab @type{xdcnff} @tab @ref{Disconnect Confirmation}.
+@item @constant{N_Abort} @tab @type{xabortf} @tab @ref{Abort Indication}.
+@item @constant{N_Xlisten} @tab @type{xlistenf} @tab @ref{Listen Request/Response}.
+@item @constant{N_Xelisten} @tab @type{xlistenf} @tab @ref{Extended Listen Request/Response}.
+@item @constant{N_Xcanlis} @tab @type{xcanlisf} @tab @ref{Listen Cancel Request/Response}.
+@item @constant{N_PVC_ATTACH} @tab @type{pvcattf} @tab @ref{PVC Attach}.
+@item @constant{N_PVC_DETACH} @tab @type{pvcdetf} @tab @ref{PVC Detach}.
+@c @item @constant{M_CParmReref} @tab @type{} @tab
+@c @item @constant{M_CParmUnref} @tab @type{} @tab
+@c @item @constant{M_CircuitId} @tab @type{} @tab
+@end multitable
+
+@node NLI Data Structures
+@section NLI Data Structures
+
+@menu
+* Addresses::
+* CONS Quality of Service Parameters::
+* Non-OSI X.25 Facilities::
+@end menu
+
+@node Addresses
+@subsection Addresses
+
+In call requests and responses, it is necessary to specify the X.25 addresses
+associatedw tih the connection.  These addresses consist of the called, calling
+and responding addresses.  A common structure is used for these addresses.  The
+addressing format used by this stricture provides the following information:
+
+@itemize
+
+@item the subnetwork (data link) on which outgoing Connect Requests are to be
+sent and on which incoming Connect Indications arrive;
+
+@item Network Service Access Points (NSAP) and Subnetwork Point of Attachments
+(SNPA), or Data Terminal Equipment (DTE) addresses and Link Service Access
+Points (LSAP); and,
+
+@item optional formats for the encoding of addresses (NSAP).
+
+@end itemize
+
+Addresses are represent using an @type{xaddrf} structure.  The @type{xaddrf}
+structure is formatted as follows:
+
+@example
+@group
+#define NSAPMAXSIZE 20
+
+struct xaddrf @{
+    union @{
+        uint32_t link_id;
+        uint32_t sn_id;
+    @};
+    unsigned char aflags;
+    struct lsapformat DTE_MAC;
+    unsigned char nsap_len;
+    unsigned char NSAP;
+@};
+@end group
+@end example
+
+The @type{xaddrf} structure contains the following members:
+
+@table @member
+@item link_id
+Holds the link number as a @type{uint32_t}.  By default, @member{link_id} has a
+valud of @constant{0xFF}.  When @member{link_id} is @constant{0xFF}, Solstice
+X.25 attempts to match the valled address with an entry in a routing
+configuration file.  If it cannot find a match, it routes the call over the
+lowest numbered WAN link.
+@item sn_id
+
+Note that in some implementations, the @member{sn_id} field is
+declared as @type{unsigned long}; however, this causes complications for 32-bit
+applications running over a 64-bit kernel: i.e., it requires that the data model
+of the application be known to the kernel module and conversions be supported.
+Therefore, this field appears in the header file as the 32- vs.  64-bit agnostic
+@type{uint32_t}.
+@item aflags
+Specifies the options required (or used) by the subnetwork to encode and
+interpret addresses.  It may have one of the following values:
+@multitable @columnfractions 0.15 0.1 0.6
+@item @constant{NSAP_ADDR} @tab @constant{0x00} @tab @member{NSAP} is OSI-encoded NSAP address.
+@item @constant{EXT_ADDR} @tab @constant{0x01} @tab @member{NSAP} is non-OSI-encoded extended address.
+@item @constant{PVC_LCI} @tab @constant{0x02} @tab @member{NSAP} is a PVC number.
+@item @constant{PVC_LCI} @tab @constant{0x02} @tab @member{DTE_MAC} is the LCI of a PVC.
+@end multitable
+When the @member{NSAP} field is empty, @member{aflags} takes the value zero
+(0).@footnote{See @manref{x25addr(5)}, @manref{stox25(3)}, @manref{x25tos(3)},
+and @manref{gexhostent(3)} manual pages for details about the X.25 address
+format.}
+@item DTE_MAC
+The DTE address, or LSAP as two BCD digits per byte, right justified, or the
+@constant{PVC_LCI} as three BCD digits with two digits per byte, right
+justified.
+Holds the DTE address, the Medium Access Control plus Service Access Point
+(MAC+SAP) address or the LCI.  This is binary.  The @type{lsapformat} structure
+is formatted as follows:.
+@example
+@group
+#define LSAPMAXSIZE
+
+struct lsapformat @{
+    unsigned char lsap_len;
+    unsigned char lsap_add[LSAPMAXSIZE];
+@};
+@end group
+@end example
+The fields in this structure are defined as follows:
+@table @member
+@item lsap_len
+This gives the length of the DTE address, the MAC+SAP addres, or the LCI in
+semi-octets.  For example for Ethernet, the length is always 14 to indicate the
+MAC (12) plush SAP (2).  The SAP always follows the MAC address.  The DTE can be
+up to 15 decimal digits unless X.25(88) and Type Of Address/Numbering Plan
+Identification (TOA/NPI) addressing is being used, in which case, it can be up
+to 17 decimal digits.  For an LCI, the length is 3.
+The length of the DTE address or LSAP as two BCD digits per byte, right
+justified.  An LSAP is always 14 digits long.  A DTE address can be up to 15
+decimal digtis unless X.25(88) and TOA/NPI addressing is used, in which case it
+can be up to 17 decimal digits.  A @constant{PVC_LCI} is 3 digits long.
+@item lsap_add
+This holds the DTE, MAC+SAP or LCI, when present, as indicated by
+@member{lsap_len}.  This is binary.
+The DTE address, LSAP or @constant{PVC_LCI} as two BCD digits per byte, right
+justified.
+@end table
+@item nsap_len
+The length in semi-octets of the NSAP as two BCD digits per byte, right
+justified.
+This indicates the length of the NSAP, if any (and where appropriate), in
+semi-octets.
+@item NSAP
+The NSAP or address extension (see @member{aflags}) as two BCD digitis per byte,
+right justified.
+This carries the NSAP or address extension (see field @member{aflags}) when
+present as indicated by @member{nsap_len}.  This is binary.
+@end table
+
+@node CONS Quality of Service Parameters
+@subsection CONS Quality of Service Parameters
+
+Negotiable X.25 facilities are supported by the PLP driver.  This section
+describes the request and negotiation of these facilities, and the data
+structures used by the NLI primitives.
+
+The facilities are broken down into two groups:
+
+@itemize
+
+@item those required for Connection-Oriented Network Service (CONS) support, and
+
+@item those requried for non-OSI procedures (X.29, for example).
+
+@end itemize
+
+The CONS quality of service (QOS) parameters supported are the following:
+
+@itemize
+
+@item Throughput Class
+
+@item Minimum Throughput Class
+
+@item Target Transit Delay
+
+@item Maximum Acceptable Transit Delay
+
+@item Use of Expedited Data
+
+@item Protection
+
+@item Receipt Acknolwedgement
+
+@end itemize
+
+CONS-related quality of service parameters are defined in the @type{qosformat}
+structure.  The @type{qosformat} structure is formatted as follows:
+
+@example
+@group
+#define MAX_PROT 32
+
+struct qosformat @{
+    unsigned char reqtclass;
+    unsigned char locthroughput;
+    unsigned char remthroughput;
+    unsigned char reqminthruput;
+    unsigned char locminthru;
+    unsigned char remminthru;
+    unsigned char reqtransitdelay;
+    unsigned short transitdelay;
+    unsigned char reqmaxtransitdelay;
+    unsigned char acceptable;
+    unsigned char reqpriority;
+    unsigned char reqprtygain;
+    unsigned char reqprtykeep;
+    unsigned char prtydata;
+    unsigned char prtygain;
+    unsigned char prtykeep;
+    unsigned char reqlowprtydata;
+    unsigned char reqlowprtygain;
+    unsigned char reqlowprtykeep;
+    unsigned char lowprtydata;
+    unsigned char lowprtygain;
+    unsigned char lowprtykeep;
+    unsigned char protection_type;
+    unsigned char prot_len;
+    unsigned char lowprot_len;
+    unsigned char protection[MAX_PROT];
+    unsigned char lowprotection[MAX_PROT];
+    unsigned char reqexpedited;
+    unsigned char reqackservice;
+    struct extraformat xstras;
+@};
+@end group
+@end example
+
+The @type{qosformat} structure has the following members:
+
+@table @member
+@item reqtclass
+When non-zero, conveys that throughput negotiation is selected.
+@item locthroughput
+Contains the four-bit throughput encoding for the local to remote direction.
+@item remthroughput
+Contains the four-bit throughput encoding for the remote to local direction.
+@item reqminthruput
+When non-zero, conveys that minimum throughput negotiation is selected.
+@item locminthru
+When @member{reqminthruput} is non-zero, conveys the four-bit throughput
+encoding for the local to remote direction.
+@item remminthru
+When @member{reqminthruput} is non-zero, conveys the four-bit throughput
+encoding for the remote to local direction.
+@item reqtransitdelay
+When non-zero, conveys that target transit delay negotiation is selected.
+@item transitdelay
+When @member{reqtransitdelay} is non-zero, conveys the 16-bit value.  In a
+Connect Confirmation, the value of the selected transit delay is placed in this
+field and is non-zero.
+@item reqmaxtransitdelay
+When non-zero, conveys that maximum acceptable transit delay negotiation is
+selected.
+@item acceptable
+When @member{reqmaxtransitdelay} is non-zero, conveys the 16-bit value of the
+maximum acceptable transit delay. 
+
+Note: Transit delay selection applies only to Connect Requests.  There is no
+transit dleay QOS parameter in a Connect Response.  The correct response when
+the indicated QOS is unattainable is to make a Disconnect Request.  In a Connect
+Confirmation, the value of the selected transit delay is placed in the
+@member{transitdelay} field when such negotiation takes place.
+@item reqpriority
+When non-zero, conveys that data priority negotiation is selected.
+@item reqprtygain
+When non-zero, conveys that gain priority negotiation is selected.
+@item reqprtykeep
+When non-zero, conveys that keep priority negotiation is selected.
+@item prtydata
+When @member{reqpriority} is non-zero, contains the 8-bit priority for
+sending data.
+@item prtygain
+When @member{reqprtygain} is non-zero, contains the 8-bit priority for
+gaining a connection.
+@item prtykeep
+When @member{reqprtykeep} is non-zero, contains the 8-bit priority for
+keeping a connection.
+@item reqlowprtydata
+When non-zero, conveys that data low priority negotiation is selected.
+This field is only valid on Connect Requests/Indications.
+@item reqlowprtygain
+When non-zero, conveys that gain low priority negotiation is selected.
+This field is only valid on Connect Requests/Indications.
+@item reqlowprtykeep
+When non-zero, conveys that keep low priority negotiation is selected.
+This field is only valid on Connect Requests/Indications.
+@item lowprtydata
+When @member{reqlowprtydata} is non-zero, contains the 8-bit priority for
+sending data.
+This field is only valid on Connect Requests/Indications.
+@item lowprtygain
+When @member{reqlowprtygain} is non-zero, contains the 8-bit priority to gain a
+connection.
+This field is only valid on Connect Requests/Indications.
+@item lowprtykeep
+When @member{reqlowprtykeep} is non-zero, contains the 8-bit priority to keep a
+connection.
+This field is only valid on Connect Requests/Indications.
+@item protection_type
+When non-zero, conveys that protection negotiation is selected.  The field can
+be one of the following valuse:
+
+@multitable @columnfractions 0.1 0.2 0.4
+@item Value @tab Name @tab Meaning
+@item 1 @tab @constant{PRT_SRC} @tab Source address specific.
+@item 2 @tab @constant{PRT_DST} @tab Destination address specific.
+@item 3 @tab @constant{PRT_GLB} @tab Globally unique.
+@end multitable
+@item prot_len
+@item lowprot_len
+This field is only valid on Connect Requests/Indications.
+@item protection
+@item lowprotection
+This field is only valid on Connect Requests/Indications.
+@item reqexpedited
+When non-zero, conveys that expedited data negotiation is selected.  For Connect
+Indications, a non-zero value implies that the Expedited Data negotiation
+facility was present in the incoming call packet, and that its use was requested.
+
+Note: Negotiation is a CONS procedure.  When the facility is present and
+indicates non-use,  use cannot be negotiated by Connect Responses.  For a
+description of the use of the @member{CONS_call} field in Connect Requests and
+Connect Responses, see @ref{Connect Request/Indication}, and @ref{Connect
+Response/Confirmation}.
+
+For incoming or outgoing non-CONS calls (denoted by the @member{CONS_call} flag
+set to zero (0)), Expedited Data negotiation is not required: interrupt data is
+always available in X.25.  This means that this field is ignored on Connect
+Requests and Responses for non-CONS calls.
+@item reqackservice
+When non-zero, conveys that receipt confirmation negotiation is selected.  For
+Connect Indications, a non-zero value implies that the Receipt Confirmation
+negotiation facility was present in the incoming call packet, and that its use
+was requested.  This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item - @tab 0 @tab No receipt confirmation.
+@item @constant{RC_CONF_DTE} @tab 1 @tab Confirmation by the remote terminal.
+@item @constant{RC_CONF_APP} @tab 2 @tab Confirmation by the remote application.
+@end multitable
+In the case of receipt confirmation by the remote DTE, no acknowledgements are
+expected or given over the X.25 service interface.  In the case of receipt
+confirmation by the remote application, there is a one-to-one corrrespondence
+between D-bit data and acknowledgements, with one  data acknowlegement being
+received or sent for each D-bit data packet sent or received over the X.25
+service interface.
+@item xstras
+@end table
+
+@node Non-OSI X.25 Facilities
+@subsection Non-OSI X.25 Facilities
+
+Although these are non-OSI facilities, they are also negotiable with CONS.  For
+those NLI applications that require them, the non-OSI facilities supported are
+as follows:
+
+@itemize
+
+@item non-OSI extended addressing;
+
+@item X.25 fast select request/indication with no restriction on response;
+
+@item X.25 fast select reqeust/indication with restriction on response;
+
+@item X.25 reverse charging;
+
+@item X.25 packet size negotiation;
+
+@item X.25 window size negotiation;
+
+@item X.25 network user identification;
+
+@item X.25 recognized private operating agency selection;
+
+@item X.25 closed user groups;
+
+@item X.25 call deflection; and,
+
+@item X.25 programmable facilities.
+
+@end itemize
+
+Non-OSI X.25 Facilities are defined in the @type{extraformat} structure.  The
+@type{extraformat} structure is formatted as follows:
+
+@example
+@group
+#define MAX_NUI_LEN  64
+#define MAX_RPOA_LEN  8
+#define MAX_CUG_LEN   2
+#define MAX_FAC_LEN  32
+#define MAX_TARIFFS   4
+#define MAX_CD_LEN   MAX_TARRIFS * 4
+#define MAX_SC_LEN   MAX_TARRIFS * 4
+#define MAX_MU_LEN   16
+@end group
+
+@group
+struct extraformat @{
+    unsigned char fastselreq;
+    unsigned char restrictresponse;
+    unsigned char reversecharges;
+    unsigned char pwoptions;
+    unsigned char locpacket;
+    unsigned char rempacket;
+    unsigned char locwsize;
+    unsigned char remwsize;
+    int nsdulimit;
+    unsigned char nui_len;
+    unsigned char nui_field[MAX_NUI_LEN];
+    unsigned char rpoa_len;
+    unsigned char rpoa_field[MAX_RPOA_LEN];
+    unsigned char cug_type;
+    unsigned char cug_field[MAX_CUG_LEN];
+    unsigned char reqcharging;
+    unsigned char chg_cd_len;
+    unsigned char chg_cd_field[MAX_CD_LEN];
+    unsigned char chg_sc_len;
+    unsigned char chg_sc_field[MAX_SC_LEN];
+    unsigned char chg_mu_len;
+    unsigned char chg_mu_field[MAX_MU_LEN];
+    unsigned char called_add_mod;
+    unsigned char call_redirect;
+    struct lsapformat called;
+    unsigned char call_deflect;
+    unsigned char x_fac_len;
+    unsigned char cg_fac_len;
+    unsigned char cd_fac_len;
+    unsigned char fac_field[MAX_FAC_LEN];
+@};
+@end group
+@end example
+
+The @type{extraformat} structure has the following members:
+
+@table @member
+@item fastselreq
+For non-OSI services (e.g. X.29), if the X.25 facility fast select is to be
+requested or indicated, this field is non-zero.  For CONS, the use of fast
+select is optional.
+@item restrictresponse
+If the resonse to a Connect Request or Indication is to be a Diconnect
+Indiciation, this filed is non-zero.
+@item reversecharges
+If reverse charging is requested or indicated for a connection, this field is
+non-zero.  The configuration mod bit @constant{SUB_REVCHARGE} has an impact on
+whether reverse charging is indicated, since it is possible to select a
+per-subnetwork policy for reciept of reverse charging.
+@item pwoptions
+This field is used to indicate per-circuit options.  The field is a bitwise OR
+of zero or more of the following values:
+@multitable @columnfractions 0.2 0.1 0.55
+@item Name @tab Value @tab Meaning when set.
+@item @constant{NEGOT_PKT} @tab 0x01 @tab Packet size negotiation permitted.
+@item @constant{NEGOT_WIN} @tab 0x01 @tab Window size negotiation permitted.
+@item @constant{ASSWERN_HWM} @tab 0x01 @tab Assert concatentaiton limit.
+@end multitable
+The field is defined as follows:
+@example
+@group
+#define NEGOT_PKT       0x01
+#define NEGOT_WIN       0x02
+#define ASSERT_HWM      0x04
+@end group
+@end example
+The field is used for two reasons:
+@enumerate
+@item The X.25 software always indicates the values of the window and packet
+sizes operating on the virtual circuit.  The field @member{pwoptions} for an
+incoming call indicates whether these values are negotiable.
+@item In Connect Request/Response message, the NLI user can set
+@member{nsdulimit}, the limit value for packet concatentation by the X.25 level,
+to a value different from the limit in the subnetwork configuration database.
+It is not a negotiable option, so whatever the user requests is used.
+@end enumerate
+@item locpacket
+When non-zero, contains the local to remote direction packet size.
+The default value, @constant{DEF_X25_PKT}, is seven (7).
+@item rempacket
+When non-zero, contains the remote to local direction packet size.
+The default value, @constant{DEF_X25_PKT}, is seven (7).
+@item locwsize
+When non-zero, contains the local to remote direction window size.
+The default value, @constant{DEF_X25_WIN}, is two (2).
+@item remwsize
+When non-zero, contains the remote to local direction window size.
+The default value, @constant{DEF_X25_WIN}, is two (2).
+@item nsdulimit
+When non-zero, and the appropriate bit is set in the @member{pwoptions} field,
+this field is used as the specified concatentaiton limit.
+@item nui_len
+Valid in Connect Requests and Connect Responses, when non-zero, specifies the
+length of the @member{nui_field} in octets.  The Network User Identification
+facility is not available on 1980 X.25 networks.
+@item nui_field
+Contains the Network User Identification (NUI) octets of length @member{nui_len}.
+@item rpoa_len
+Valid in Connect Requests only.  When non-zero, the RPOA DNIC information is
+suppplied in the @member{rpoa_field} field and the semi-octets in the field are
+of this length.
+@item rpoa_field
+Contains the Recognized Private Operating Agency (RPOA) semi-octets of length
+@member{rpoa_len}.
+@item cug_type
+Valid in Connect Requests and Connect Indications only, this field, when
+non-zero, is 1 for Closed User Group (CUG) and 2 for Bilateral CUG (two members
+only).
+
+Note: Incoming CUG facilities are assumed to have been validated by the network.
+No further cehcking is performed.
+@item cug_field
+Contains the Closed User Group (CUG) semi-octets of length up to four (4)
+semi-octets for CUG and four semi-octets (4) for BCUG (Bilateral CUG).
+@item reqcharging
+When non-zero in a Connect Request of Connect Indication, call charging is
+requested; in a Disconnect Indication of Disconnect Confirmation, the
+six fields below will give the charging information.
+@item chg_cd_len
+When non-zero, conveys the length of the @member{chg_cd_field} field.
+@item chg_cd_field
+Conveys the call duration.
+@item chg_sc_len
+When non-zero, conveys the length of the @member{chg_sc_field} field.
+@item chg_sc_field
+Conveys the segment count.
+@item chg_mu_len
+When non-zero, conveys the length of the @member{chg_mu_field} field.
+@item chg_mu_field
+Conveys the monetary unit.
+@item called_add_mod
+When non-zero, conveys the reason value for call modification.
+@item call_redirect
+When non-zero, conveys the reason for call redirection.
+@item called
+When @member{call_redirect} is non-zero, conveys the orignalling called DTE
+address.
+@item call_deflect
+Valid in the Disconnect Request and Disconnect Indication, when non-zero,
+conveys the reason for call deflection.  The @member{deflected} field in the
+Disconnect Request or Indication conveys the DTE address, and if required, the
+NSAP address to which the call is to be deflected.
+@item x_fac_len
+Valid in Connect Requests and Connect Indications only,
+when non-zero, provides the length of the explicit facility ecnoded strings for
+X.25 facilities.
+@item cg_fac_len
+Valid in Connect Requests and Connect Indiciations only,
+when non-zero, provides the length of the explicit facility encoded strings for
+non-X.25 facilities for the calling network.
+@item cd_fac_len
+Valid in Connect Requests and Connect Indiciations only,
+when non-zero, provides the length of the explicit facility encoded strings for
+non-X.25 facilities for the called network.
+@item fac_field
+When @member{x_fac_len}, @member{cg_fac_len} or @member{cd_fac_len} are
+non-zero, contains the X.25 facilities, non-X.25 facilities for the calling
+network, and/or non-X.25 facilities for the called network.
+
+Note: The contents of this field, if supplied, are not validated  or acted upon
+by the code.  The X.25 facilities are inserted at the end of any other X.25
+facilities that are passed in the Connect Request/Indication (for example,
+packet or window sizes).  If any non-X.25 facilities are supplied, the
+appropriate marker is inserted before the supplied facilities.
+@end table
+
+@node NLI Message Primitives
+@chapter NLI Message Primitives
+@cindex NLI Message Primitives
+
+@menu
+* Connect Request/Indication::
+* Connect Response/Confirmation::
+* Data::
+* Data Acknowledgement::
+* Expedited Data::
+* Expedited Data Acknowledgement::
+* Reset Request/Indication::
+* Reset Response/Confirmation::
+* Disconnect Request/Indication::
+* Disconnect Confirmation::
+* Abort Indication::
+* Listen Request/Response::
+* Extended Listen Request/Response::
+* Listen Cancel Request/Response::
+* PVC Attach::
+* PVC Detach::
+@end menu
+
+@page
+@node Connect Request/Indication
+@section Connect Request/Indication
+
+@unnumberedsubsec Format
+
+The Connect Request and Connect Indication use the @type{xcallf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xcallf} structure.
+The data part of the message consists of zero or one @msg{M_DATA} message blocks
+containing the Call User Data (if any).
+
+The @type{xcallf} structure is formatted as follows:
+
+@example
+@group
+struct xcallf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int conn_id;
+    unsigned char CONS_call;
+    unsigned char negotiate_qos;
+    struct xaddrf calledaddr;
+    struct xaddrf callingaddr;
+    struct qosformat qos;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Connect Request or Indication message primitive, @constant{N_CI}, is used by
+the NS user to request a outgoing connection, or by the NS provider to indicate
+an incoming connection.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xcallf} structure.
+The data part of the message consists of zero or one @msg{M_DATA} message blocks
+containing the Call User Data (CUD) when supplied.
+
+@unnumberedsubsec Parameters
+
+The @type{xcallf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_CI}, for both Connect Requests and Connect Indications.
+@item conn_id
+This field is used only for Connect Indications.  When an NS user Stream is
+listening, multiple incoming Connect Indications can be pending.  This field
+indicates the connection identifier for the current Connect Indication for use
+by the NS user when responding to this Connection Indication with either a
+Connect Response or a Disconnect Request message.
+@item CONS_call
+Either X.25 or CONS procedures@cite{ISO/IEC 8878 or ITU-T X.223.} can be used
+for calls.  When non-zero, this field indicates that CONS procedures are to be
+used.  When zero, this field indicates that X.25 procedures are to be used.
+@item negotiate_qos
+QOS parameters can be negotiated by the peer or left at default values.  When
+non-zero, this field specifies or indicates that QOS parameters are being
+negotiated by the NS user or NS user peer and the pertinent ranges are provided
+in the @member{qos} member.  When zero, this field specifies and indicates that
+default values are to be used for the NS user or were indicated by the NS user
+peer.
+@item calledaddr
+Conveys the called address.  For outgoing Connect Requests, this is the remote
+address to which the call is to be connected.  For incoming Connect Indications,
+this is the local address to which the call was initiated.
+@item callingaddr
+Conveys the calling address.  For outgoing Connect Requests, this is the local
+address from which the call is to be connected.  For incoming Connect
+Indications, this is the remote address from which the call was initiated.
+@item qos
+Conveys the quality of service parameters and CONS an non-CONS facilities that
+are requested or indicated.
+@end table
+
+@unnumberedsubsec State
+
+@unnumberedsubsec Response
+
+When the Connect Request is issued by the NS user, the expected response from
+the NS provider is a Connect Conformation or a Disconnect Indication.
+
+When the Connect Indication is issued by the NS provider, the expected response
+from the NS user is a Connect Response or a Disconnect Request.
+
+@unnumberedsubsec Equivalence
+
+The Connect Request message primitive is equivalent to the @constant{N_CONN_REQ}
+primitive of the NPI; the Connect Indication, the @constant{N_CONN_IND}.
+
+@page
+@node Connect Response/Confirmation
+@section Connect Response/Confirmation
+
+@unnumberedsubsec Format
+
+The Connect Response and Connect Confirmation use the @type{xccnff} structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xccnff} structure.
+The data part of the message consists of zero or one @msg{M_DATA} message blocks
+containing the Call User Data (if any).
+
+The @type{xccnff} structure is formatted as follows:
+
+@example
+@group
+struct xcallf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int conn_id;
+    unsigned char CONS_call;
+    unsigned char negotiate_qos;
+    struct xaddrf responder;
+    struct qosformat rqos;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Connect Response or Confirmation message primitive, @constant{N_CC}, is used
+by the NS user to response to an incoming connection, or by the NS provider to
+confirm an outgoing connection.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xccnff} structure.
+The data part of the message consists of zero or one @msg{M_DATA} message block
+containing the Call User Data (CUD) when supplied.
+
+@unnumberedsubsec Parameters
+
+The @type{xccnff} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_CC}.
+@item conn_id
+This field is only used for Connect Responses.  When an NS user Stream is
+listening, multiple incoming Connect Indications can be pending.  This field
+specifies the connection identifier from the Connection Indication to which the
+NS user is responding.
+@item CONS_call
+Either X.25 or CONS procedures@cite{ISO/IEC 8878 or ITU-T X.223.} can be used
+for calls.  When non-zero, this field indicates that CONS procedures are to be
+used.  When zero, this field indicates that X.25 procedures are to be used.
+@item negotiate_qos
+QOS parameters can be negotiated by the peer or left at default values.  When
+non-zero, this field specifies or indicates that QOS parameters are being
+negotiated by the NS user or NS user peer and the pertinent ranges are provided
+in the @member{qos} member.  When zero, this field specifies and indicates that
+default values are to be used for the NS user or were indicated by the NS user
+peer.
+@item responder
+Conveys the responding address.  For Connect Responses, this is the local
+address that is responding to the incoming call.  For Connect Confirmations,
+this is the remote address that responded to the outgoing call.
+@item rqos
+Conveys the negotiated quality of service parameters and CONS an non-CONS
+facilities in response or confirmation.
+@end table
+
+@unnumberedsubsec State
+
+
+@unnumberedsubsec Response
+
+No response is expected when either the NS user or NS provider issue this
+primitive.
+
+@unnumberedsubsec Equivalence
+
+The Connect Response message primitive is equivalent to the @constant{N_CONN_RES}
+primitive of the NPI; the Connect Confirmation, the @constant{N_CONN_CON}.
+
+@page
+@node Data
+@section Data
+
+@unnumberedsubsec Format
+
+The Data message uses the @type{xdataf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xdataf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the local or remote NS user data (NSDU).
+
+The @type{xdataf} structure is formatted as follows:
+
+@example
+@group
+struct xdataf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned char More;
+    unsigned char setDbit;
+    unsigned char setQbit;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Data message primitive, @constant{N_Data}, is used to transfer NS user data
+to or from the NS user.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xdataf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the local or remote NS user data (NSDU).
+
+@unnumberedsubsec Parameters
+
+The @type{xdataf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_DAT}.
+@item xl_command
+Always @constant{N_Data}.
+@item More
+When non-zero, this field conveys that a subsequent @constant{N_Data} message
+primitive will contain additional data belonging to the same NSDU.  When zero,
+this field conveys that the data contained in the message primitive completes an
+NSDU.
+@item setDbit
+Conveys that the D-bit is to be (or was) associated with the NSDU.  When the
+data portion represents part of an NSDU, the bit must be set or clear on each
+request or indication belonging to the same NSDU.
+@item setQbit
+Conveys that the Q-bit is to be (or was) associated with the NSDU.  When the
+data portion represents part of an NSDU, the bit must be set or clear on each
+request or indication belonging to the same NSDU.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is only valid during the data transfer phase. 
+
+@unnumberedsubsec Response
+
+No response is expected when either the NS user or NS provider issue this
+primitive, unless the D-bit is set, in which case a Data Acknowledgement
+response is expected from the NS provider or NS user, respectively.
+
+@unnumberedsubsec Equivalence
+
+The Data message primitive is equivalent to the @constant{N_DATA_REQ} and
+@constant{N_DATA_IND} primitives of the NPI.
+
+@page
+@node Data Acknowledgement
+@section Data Acknowledgement
+
+@unnumberedsubsec Format
+
+The Data Acknowledgement message uses the @type{xdatacf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xdatacf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{xdatacf} structure is formatted as follows:
+
+@example
+@group
+struct xdatacf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Data Acknowledgement message primitive, @constant{N_DAck}, is used to
+request or indicate acknolwedgement of data.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xdatacf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{xdatacf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_DAT}.
+@item xl_command
+Always @constant{N_DAck}.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is only valid during the data transfer phase. 
+
+@unnumberedsubsec Response
+
+When receipt confirmation from the remote application is active on a VC, this
+message primitive is used to acknowledge a previous @constant{N_DAck} request or
+indication that had the D-bit set.  There is a one-to-one correspondence between
+D-bit data and acknowledgements, with one Data Acknowledgement being conveyed
+for each Data message primitive conveyed.  The Data message primitive
+acknowledged is always the oldest outstanding Data message primitive that
+requested acknowledgement.
+
+For CONS calls, if receipt acknowledgement was negotiated on the connection,
+then an acknowledgement is pending for each Data primitive conveyed.  However,
+to be compatible with previous releases of the NPI, the value of the
+@member{reqackservice} field in the @member{qos} structure can be set to request
+that the D-bit signifies receipt confirmation by the remote DTE only, thus
+ensuring that no acknowledgements are expected or given.
+
+For non-CONS calls, only when the @member{reqackservice} field in the
+@member{qos} structure has been set to the appropriate value will the Data
+Acknolwedgement procedures apply for an D-bit Data requested or indicated.
+Otherwise, no acknowledgement is expected or given.
+
+@unnumberedsubsec Equivalence
+
+The Data Acknowledgement message primitive is equivalent to the
+@constant{N_DATACK_REQ} and @constant{N_DATACK_IND} primitives of the NPI.
+
+@page
+@node Expedited Data
+@section Expedited Data
+
+@unnumberedsubsec Format
+
+The Expedited Data message uses the @type{xedataf} structure.
+THe control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xedataf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the local or remote expedited NS user data (ENSDU).
+
+The @type{xedataf} structure is formatted as follows:
+
+@example
+@group
+struct xedataf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Expedited Data message primitive, @constant{N_EData}, is used to transfer
+expedited NS user data to or from the NS user.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xedataf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the local or remote expedited NS user data (ENSDU).
+
+The Expedited Data message primitive, @constant{N_EData}, is used when expedited
+data, carried by an X.25 interrupt packet, corsses the X.25 NLI service
+interface from NS provider to user or NS user to provider.
+The Expedited Data message is a confirmed primitive and must be acknowledged
+before another expedited data unit can be requested or indicated.
+
+@unnumberedsubsec Parameters
+
+The @type{xedataf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_DAT}.
+@item xl_command
+Always @constant{N_EData}.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is only valid during the data transfer phase. 
+
+@unnumberedsubsec Response
+
+When NS user or provider issues this primtive it expectes an Expedited Data
+Acknowledgement message primitive in reponse.
+The Expedited Data message is a confirmed primitive and must be acknowledged
+before another expedited data unit can be requested or indicated.
+
+@unnumberedsubsec Equivalence
+
+The Expedited Data message primitive is equivalent to the
+@constant{N_EXDATA_REQ} and @constant{N_EXDATA_IND} primitives of the NPI.
+
+@page
+@node Expedited Data Acknowledgement
+@section Expedited Data Acknowledgement
+
+@unnumberedsubsec Format
+
+The Expedited Data Acknowledgement message uses the @type{xedatacf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xedatacf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{xedatacf} structure is formatted as follows:
+
+@example
+@group
+struct xedatacf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Expedited Data Acknowledgement message primitive, @constant{N_EAck}, is used to
+request or indicate acknolwedgement of expedited data.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xedatacf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{xedatacf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_DAT}.
+@item xl_command
+Always @constant{N_EAck}.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is only valid during the data transfer phase. 
+
+@unnumberedsubsec Response
+
+The Expedited Data Acknolwedgement message primitive is issued only in
+confirmation to the Expedited Data message primitive.  When an Expedited Data
+message primitive is delivered to the NS user or provider, the NS provider or
+user, respectively, must acknolwedged the expedited data.
+
+@unnumberedsubsec Equivalence
+
+The Expedited Data Acknowledgement message primitive has no equivalent in the
+NPI.
+
+@page
+@node Reset Request/Indication
+@section Reset Request/Indication
+
+@unnumberedsubsec Format
+
+The Reset Request and Reset Indication use the @type{xrstf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xrstf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{xrstf} structure is formatted as follows:
+
+@example
+@group
+struct xrstf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned char originator;
+    unsigned char reason;
+    unsigned char cause;
+    unsigned char diag;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Reset Request or Indication message primitive, @constant{N_RI}, is used by
+the NS user to request reset of the connection, or by the NS provider to
+indicate a remote reset.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xrstf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The X.25 cause and diagnostic octets, @member{cause} and @member{diag}, are
+conveyrs, as well as the CONS @member{originator} and @member{reason} codes,
+which are mapped from the @member{cause} and @member{diag}.  A Reset Request
+on a non-CONS call can specify a non-zero @member{cause} code.  This has
+no effect for a CONS call.
+
+@unnumberedsubsec Parameters
+
+The @type{xrstf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_RI}.
+@item originator
+For a CONS call, contains the CONS originator mapped from the X.25 cause and
+diagnostic.  This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.6
+@item Constant @tab Value @tab Description
+@item @constant{NS_UNKNOWN} @tab 0 @tab Originator is unknown.
+@item @constant{NS_USER} @tab 1 @tab Originator is the NS user.
+@item @constant{NS_PROVIDER} @tab 2 @tab Originator is the NS provider.
+@end multitable
+@item reason
+For a CONS call, contains the CONS reason, mapped from the X.25 cause and
+diagnostic.
+This field can have one of the following values when the @member{originator} is
+@constant{NS_PROVIDER}:
+@multitable @columnfractions 0.26 0.08 0.52
+@item Constant @tab Value @tab Description
+@item @constant{NS_RUNSPECIFIED} @tab 233 @tab Unspecified reason.
+@item @constant{NS_RCONGESTION} @tab 234 @tab Congestion.
+@end multitable
+The field can have the following values when the @member{originator} is
+@constant{NS_USER}:
+@multitable @columnfractions 0.26 0.08 0.52
+@item Constant @tab Value @tab Description
+@item @constant{NS_RESYNC} @tab 250 @tab Resynchronization.
+@end multitable
+The field can have the following values when the @member{originator} is
+@constant{NS_UNKNOWN}:
+@multitable @columnfractions 0.26 0.08 0.52
+@item Constant @tab Value @tab Description
+@item @constant{NS_UNKNOWN} @tab 0 @tab Unspecified reason.
+@end multitable
+@item cause
+Conveys the X.25 cause octet associated with the reset.
+@item diag
+Conveys the X.25 diagnostic octet associated with the reset.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is valid in the data transfer phase.
+
+@unnumberedsubsec Response
+
+A Reset Request and Reset Indication message primitive is an acknowledged
+service.  The NS user expects a Reset Confirmation primitive in response to a
+Reset Request; the NS provide, a Reset Response primitive in reesponse to a
+Reset Indication.
+
+A collision between a Reset Indication and a Reset Request is taken to
+acknolwedge the Reset Request and no Reset Confirmation is then issued.
+
+@unnumberedsubsec Equivalence
+
+The Reset Request message primitive is equivalent to the @constant{N_RESET_REQ}
+of the NPI; the Reset Indication, @constant{N_RESET_IND}.
+
+@page
+@node Reset Response/Confirmation
+@section Reset Response/Confirmation
+
+@unnumberedsubsec Format
+
+The Reset Response and Reset Confirmation use the @type{xrscf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xrscf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{xrscf} structure is formatted as follows:
+
+@example
+@group
+struct xrscf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Reset Response or Confirmation message primitive, @constant{N_RC}, is used
+by the NS user to respond to a Reset Indication for the connection, or by the NS
+provider to confirm a Reset Request.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xrscf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{xrscf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_RC}.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is valid in the data transfer phase.
+
+@unnumberedsubsec Response
+
+The Reset Response message primitive is used by the NS user to respond to and
+acknowledge a previous Reset Indication message primitive from the NS provider.
+The Reset Confirmation message primitive is used by the NS provider to respond
+to and acknowledge a previou Reset Request message primitive from the NS user.
+
+@unnumberedsubsec Equivalence
+
+The Reset Response message primitive is equivalent to the @constant{N_RESET_RES}
+of the NPI; the Reset Confirmation, @constant{N_RESET_CON}.
+
+@page
+@node Disconnect Request/Indication
+@section Disconnect Request/Indication
+
+@unnumberedsubsec Format
+
+The Disconnect Request and Disconnect Indication use the @type{xdiscf}
+structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xdiscf} structure.
+The data part of the message consists of zero or one @msg{M_DATA} message blocks
+containing the Clear User Data (if any).
+
+The @type{xdiscf} structure is formatted as follows:
+
+@example
+@group
+struct xdiscf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned char originator;
+    unsigned char reason;
+    unsigned char cause;
+    unsigned char diag;
+    int conn_id;
+    unsigned char indicated_qos;
+    struct xaddrf responder;
+    struct xaddrf deflected;
+    struct qosformat qos;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Disconnect Request or Indication message primitive, @constant{N_DI}, is used
+by the NS user to reject an incoming connection or disconnect an existing
+connection, or by the NS provider to reject an outgoing connection or disconnect
+an existing connection.
+The control part of the message consists of one @msg{M_PROTO} message block, and
+contains the @type{xdiscf} structure.
+The data part of the message consists of zero or one @msg{M_DATA} message blocks
+containing the Clear User Data (CUD) when supplied.
+
+The X.25 cause and diagnostic octets, @member{cause} and @member{diag}, are
+presented, as well as the CONS @member{originator} and @member{reason} codes
+mapped from the X.25 cause and diagnostic.  A Disconnect Request for a non-CONS
+call can specify a non-zero @member{cause} code.  This has no effect for a CONS
+call.
+
+@unnumberedsubsec Parameters
+
+The @type{xdiscf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_DI}.
+@item originator
+For a CONS call, contains the CONS originator (NS user, NS provider, or
+unknown), mapped from the X.25 cause and diagnostic.
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.6
+@item Constant @tab Value @tab Description
+@item @constant{NS_UNKNOWN} @tab 0 @tab Originator is unknown.
+@item @constant{NS_USER} @tab 1 @tab Originator is the NS user.
+@item @constant{NS_PROVIDER} @tab 2 @tab Originator is the NS provider.
+@end multitable
+@item reason
+For a CONS call, contains the CONS reason, mapped from the X.25 cause and
+diagnostic.
+This field can have one of the following values when the @member{originator} is
+@constant{NS_PROVIDER}:
+@multitable @columnfractions 0.26 0.08 0.52
+@item Constant @tab Value @tab Description
+@item @constant{NS_GENERIC} @tab 224 @tab General.
+@item @constant{NS_DTRANSIENT} @tab 225 @tab Disconnect, transient.
+@item @constant{NS_DPERMANENT} @tab 226 @tab Disconnect, permanent.
+@item @constant{NS_TUNSPECIFIED} @tab 227 @tab Reject, unspecified, transient.
+@item @constant{NS_PUNSPECIFIED} @tab 228 @tab Reject, unspecified, permanent.
+@item @constant{NS_QOSNATRANSIENT} @tab 229 @tab Reject, QOS unavailable, transient.
+@item @constant{NS_QOSNAPERMANENT} @tab 230 @tab Reject, QOS unavailable, permanent.
+@item @constant{NS_NSAPTUNREACHABLE} @tab 232 @tab Reject, NSAP unreachable, transient.
+@item @constant{NS_NSAPPUNREAHCABLE} @tab 235 @tab Reject, NSAP unreachable, permanent.
+@end multitable
+The field can have the following values when the @member{originator} is
+@constant{NS_USER}:
+@multitable @columnfractions 0.26 0.08 0.52
+@item Constant @tab Value @tab Description
+@item @constant{NU_GENERIC} @tab 240 @tab General.
+@item @constant{NU_DNORMAL} @tab 241 @tab Disconnect, normal.
+@item @constant{NU_DABNORMAL} @tab 242 @tab Disconnect, abnormal.
+@item @constant{NU_DINCOMPUSERDATA} @tab 243 @tab Disconnect, incomprehensible user data.
+@item @constant{NU_TRANSIENT} @tab 244 @tab Reject, transient.
+@item @constant{NU_PERMANENT} @tab 245 @tab Reject, permanent.
+@item @constant{NU_QOSNATRANSIENT} @tab 246 @tab Reject, QOS unavailable, transient.
+@item @constant{NU_QOSNAPERMANENT} @tab 247 @tab Reject, QOS unavailable, permanent.
+@item @constant{NU_INCOMPUSERDATA} @tab 248 @tab Reject, Call User Data facility.
+@item @constant{NU_BADPROTID} @tab 249 @tab Reject, Bad protocol identifier.
+@end multitable
+@item cause
+Conveys the X.25 cause octet associated with the disconnect.
+@item diag
+Conveys the X.25 diagnostic octet associated with the disconnect.
+@item conn_id
+When a Disconnect Request is used to refuse and incoming connection, this field
+contains the @member{conn_id} from the corresponding Connect Indication message
+primitive.
+@item indicated_qos
+When non-zero, conveys that facilities and quality of service paraemters are
+being indicated.
+@item responder
+Conveys the responding address.  This is the local responding address in a
+Disconnect Request used to refuse an incoming call, and a remote
+responding address in a Disconnect Indication refusing an outgoing call.
+@item deflected
+When the @member{call_deflect} field of the associated @member{qos} structure is
+non-zero, this field conveys the deflected address.  The deflected address is
+the address of the remote station to which the call is being deflected.  This is
+set by the NS user when deflecting a call with a Disconnect Request refusing an
+incoming connection; and by the NS provider when an outgoing call has been
+deflected.
+@item qos
+Conveys the CONS quality of service parameters and non-OSI facilities associated
+with the disconnect.  This is used currently for the charging information when
+an existing connection is disconnected, and for the deflection facility when an
+incoming or outgoing call is being deflected.
+@end table
+
+@unnumberedsubsec State
+
+This primitive is valid in the data transfer phase; it is also valid in the
+incoming or outgoing connecting phase.  The call moves to the disconnect phase.
+
+@unnumberedsubsec Response
+
+This primitive is valid in response to a previously sent Connect Request or
+received Connect Indication message primitive; or, to simply request or indicate
+disconnection of an existing connection.
+
+When an existing connection is disconnect with a Disconnect Request by the NS
+user, the NS user expects a Disconnect Confirmation to acknowledge the
+disconnect.  All other message should be discarded from the Stream until the
+Disconnect Confirmation is received.
+
+When a Disconnect Indication is issued by the NS provider, all messages sent
+downstream except Connect Request or Connect Response messages are silently
+discarded.
+
+A disconnect collision can occur, where Disconnect Request and a Disconnect
+Indication messages collide.  In this case, the Disconnect Indication messages
+is taken as a confirmation and no Disconnect Confirmation message should be
+expected by the NS user.
+
+@unnumberedsubsec Equivalence
+
+The Disconnect Request message primitive is equivalent to the
+@constant{N_DISCON_REQ} of the NPI; the Disconnect Indication,
+@constant{N_DISCON_IND}.
+
+@page
+@node Disconnect Confirmation
+@section Disconnect Confirmation
+
+@unnumberedsubsec Format
+
+The Disconnect Confirmation uses the @type{xdcnff} structure.
+The control part of the message consists of one @msg{M_PROTO} message block,
+containing the @type{xdcnff} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{xdcnff} structure is formatted as follows:
+
+@example
+@group
+struct xdcnff @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned char indicated_qos;
+    struct qosformat qos;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Disconnect Confirmation message primitive is used to confirm a previous
+Disconnect Request and provide charging information facilities associated with
+a previously established call.
+The control part of the message consists of one @msg{M_PROTO} message block,
+containing the @type{xdcnff} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{xdcnff} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_DC}.
+@item indicated_qos
+When non-zero, conveys that CONS quality of service parameters and non-OSI
+facilities are indicated.
+@item qos
+Conveys the facilities indicated.  This is only used on a Disconnect
+Confirmation to indicate the charging information facility.
+@end table
+
+@unnumberedsubsec State
+
+This primitive is valid in the disconnecting phase.
+
+@unnumberedsubsec Response
+
+This message primitive is only issued by the NS provider.
+No response is expected when the NS provider issues this primitive.
+
+@unnumberedsubsec Equivalence
+
+The Disconnect Confirmation message primitive has no equivalent in NPI.
+
+@page
+@node Abort Indication
+@section Abort Indication
+
+@unnumberedsubsec Format
+
+The Abort Indication uses the @type{xabortf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xabortf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{xabortf} structure is formatted as follows:
+
+@example
+@group
+struct xabortf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Abort Indication message primtiive is used by the X.25 driver in lieue of a
+Disconnect Indication, when there is insufficient resources to generate a
+Disconnect Indication.  Therefore, some NS providers may never issue this
+message primitive.
+Nevertheless, the NS user must be prepared to receive this message primitive in
+liueue of a Disconnect Indication.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xabortf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{xabortf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_Abort}.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is only valid in the data transfer phase.  The call moves
+to the disconnected phase.
+
+@unnumberedsubsec Response
+
+This message primitive is only issued by the NS provider.
+No response is expected when the NS provider issues this primitive.
+
+@unnumberedsubsec Equivalence
+
+The Abort Indication message primitive is equivalent to the
+@constant{N_DISCON_IND} of the NPI.
+
+@page
+@node Listen Request/Response
+@section Listen Request/Response
+
+@unnumberedsubsec Format
+
+The Listen Request and Listen Response use the @type{xlistenf} structure.
+The control part of the message consists of one @msg{M_PROTO} or @msg{M_PCPROTO}
+message block, and contains the @type{xlistenf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the call user data and address of interest.
+
+The @type{xlistenf} structure is formatted as follows:
+
+@example
+@group
+struct xlistenf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int lmax;
+    int l_result;
+@};
+@end group
+@end example
+
+The @msg{M_DATA} message blocks are formatted as follows:
+
+@example
+@group
+struct lcud @{
+    unsigned char l_cumode;
+    unsigned char l_culength; /* octets */
+    unsigned char l_cubytes[0];
+    /* followed by l_culength bytes */
+@};
+struct ladd @{
+    unsigned char l_mode;
+    unsigned char l_type;
+    unsigned char l_length; /* semi-octets */
+    unsigned char l_add[0];
+    /* followed by ((l_length+1)>>1) bytes
+       containing l_length semi-octets. */
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Listen Request or Response is used when an NS user wishes to register
+interest in incoming calls and the NS provider acknowledges the request.
+The control part of the message consists of one @msg{M_PROTO} or @msg{M_PCPROTO}
+message block, and contains the @type{xlistenf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the call user data and address of interest.
+
+The Listen Request queue is ordered in terms of the amount of listen data
+supplied.  The more a Listen Request asks for, the higher its place in the
+queue.  Connect Indications are sent to the listener whose listening criteria
+are best matched.
+
+Privileged users can ask for a Listen Request to be placed at the front of the
+queue, regardless of the amount of listen data supplied.  To do this, the Listen
+Request should be sent as a @msg{M_PCPROTO} message.  This is achieved by
+setting the @constant{RS_HIPRI} flag in @manref{putmsg(2s)}.  Such requests are
+searched in the order in which they arrive.
+
+The system adminstrator controls whether or not listening for incoming  calls is
+a privileged operation.  If listening is privileged, incoming calls will be sent
+only to on listen streams opened by a user with superuser privilege.  This
+prevents other users accepting calls that may contain private information,
+passwords, and so on.
+
+In systems where privileged and non-privileged listens are allowed:
+
+@itemize
+
+@item Privileged listens have priority.
+
+@item A matching but busy privileged listen prevents a search of any
+non-privileged listens.
+
+@end itemize
+
+@unnumberedsubsec Parameters
+
+The @type{xlistenf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_Xlisten}.
+@item lmax
+Conveys the maximum number of outstanding Connect Indications that the listening
+Stream is willing to accept, for the addresses conveyed in the attached
+@msg{M_DATA} message blocks.
+
+Listen requests are cummulated but this field is not.  The maximum number of
+outstanding Connect Indications will be reflected by the value of this field for
+the last successful Listen Request issued by the NS user.
+@item l_result
+Conveys the result of the Listen Request in a Listen Response message primitive.
+An error in the parameters or a lack of resources results in this flag being set
+to a non-zero value.
+@end table
+
+The @msg{M_DATA} portion of the message contains the following members:
+
+@table @member
+@item l_cumode
+Specifies the type of matching.
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item @constant{X25_DONTCARE} @tab 1 @tab Represents a wildcard.
+@item @constant{X25_STARTSWITTH} @tab 2 @tab Contains a prefix.
+@item @constant{X25_IDENTITY} @tab 3 @tab Contains an identity match.
+@c @item @constant{X25_PATTERN} @tab 4 @tab Contains a pattern.@footnote{Note that @constant{X25_PATTERN} is Solstice X.25 specific.}
+@c @item @constant{X25_MATCH} @tab 4 @tab Contains a pattern match.@footnote{Note that @constant{X25_MATCH} appears to be PT WAN specific.}
+@c @item @constant{X25_SNID} @tab 5 @tab Contains a Subnetwork ID (SNID).
+@end multitable
+Notes:
+@enumerate
+@item When the @member{l_cumode} is set to @constant{X25_DONTCARE}, the
+@member{l_culength} and @member{l_cubytes} fields are ommitted from the
+@msg{M_DATA} message block.
+@end enumerate
+@item l_culength
+Specifies the length of the @member{l_cubytes} field in octets.
+@item l_cubytes
+Contains the bytes to be matched against the Call User Data (CUD).
+@item l_mode
+Specifies the type of matching.
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item @constant{X25_DONTCARE} @tab 1 @tab Represents a wildcard.
+@item @constant{X25_STARTSWITTH} @tab 2 @tab Contains a prefix.
+@item @constant{X25_IDENTITY} @tab 3 @tab Contains an identity match.
+@item @constant{X25_PATTERN} @tab 4 @tab Contains a pattern.@footnote{Note that @constant{X25_PATTERN} is Solstice X.25 specific.}
+@c @item @constant{X25_MATCH} @tab 4 @tab Contains a pattern match.@footnote{Note that @constant{X25_MATCH} appears to be PT WAN specific.}
+@c @item @constant{X25_SNID} @tab 5 @tab Contains a Subnetwork ID (SNID).
+@end multitable
+Notes:
+@enumerate
+@item When the @member{l_mode} is set to @constant{X25_DONTCARE}, the
+@member{l_type}, @member{l_length} and @member{l_add} fields are ommitted from
+the @msg{M_DATA} message block.
+@item When the @member{l_mode} is set to @constant{X25_PATTERN}, the
+@member{l_add} field can contain the wilcard digits @samp{*} and @samp{?} that
+have the same effect as these characters in regular expressions: that is,
+@samp{*} represents zero or more characters of any value, and @samp{?}
+represents single character of any value.  The @samp{*} character is represented
+by the BCD digit @code{0xF} and the @samp{?} character is represented by the BCD
+digit @code{0xE}.
+@end enumerate
+@item l_type
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item @constant{X25_DTE} @tab 1 @tab Contains an X.25 DTE (X.121) address.
+@item @constant{X25_NSAP} @tab 2 @tab Contains a CONS NSAP address.
+@end multitable
+@item l_length
+Specifies the length of the @member{l_add} field in semi-octets.  That is, the
+length of the @member{l_add} field in octets is: @samp{((l_length+1)>>1)}.  The
+maximum length for a DTE address is 15 or 17 semi-octets (that is, 8 or 9
+octets) depending upon whether TOA/NPI addressing is used.  The maximum length
+for an NSAP address is 20 semi-octets (that is, 10 octets).
+@item l_add
+Contains the bytes to be matched against the DTE address or the NSAP address.
+
+Each semi-octet is a BCD representation.  That is, digits in the range @samp{0} through
+@samp{9} are represented by @code{0x0} through @code{0x9} in the semi-octet
+position.  The first digit occupies the high order nibble of the first octet;
+the second digit, the low order nibble of the first octet; the third digit, the
+high order nibble of the second octet; and so on.  If @member{l_length} is odd,
+the low order nibble of the last octet is ignored.
+
+When the @member{l_mode} field is @constant{X25_PATTERN}, a semi-octet of
+@code{0xF} represents a @samp{*} wildcard, and a semi-octet of @code{0xE}
+represents a @samp{?} wildcard.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is valid in the disconnected phase or during an incoming
+connecting phase.
+
+@unnumberedsubsec Response
+
+When an NS user issues a Listen Request, the NS user expects a Listen Response
+message primitive from the NS provider.
+
+@unnumberedsubsec Equivalence
+
+The Listen Request message primitive is equivalent to the
+@constant{N_BIND_REQ} of the NPI; the Listen Response, @constant{N_BIND_ACK}.
+
+@page
+@node Extended Listen Request/Response
+@section Extended Listen Request/Response
+
+@unnumberedsubsec Format
+
+The Extended Listen Request and Extended Listen Response use the @type{xlistenf}
+structure.
+The control part of the message consists of one @msg{M_PROTO} or @msg{M_PCPROTO}
+message block, and contains the @type{xlistenf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the call user data and address of interest.
+
+The @type{xlistenf} structure is formatted as follows:
+
+@example
+@group
+struct xlistenf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int lmax;
+    int l_result;
+@};
+@end group
+@end example
+
+The @msg{M_DATA} message blocks are formatted as follows:
+
+@example
+@group
+struct lcud @{
+    unsigned char l_cumode;
+    unsigned char l_culength; /* octets */
+    unsigned char l_cubytes[0];
+    /* followed by l_culength bytes */
+@};
+struct lsn @{
+    unsigned char l_snmode;
+    unsigned char l_snlen;
+    unsigned char l_snid[0];
+    /* followed by l_snlen bytes */
+@};
+struct ladd @{
+    unsigned char l_mode;
+    unsigned char l_type;
+    unsigned char l_length; /* semi-octets */
+    unsigned char l_add[0];
+    /* followed by ((l_length+1)>>1) bytes
+       containing l_length semi-octets. */
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Extended Listen Request or Response is used when an NS user wishes to
+register interest in incoming calls and the NS provider acknowledges the
+request.  The control part of the message consists of one @msg{M_PROTO} or
+@msg{M_PCPROTO} message block, and contains the @type{xlistenf} structure.
+The data part of the message consists of one or more @msg{M_DATA} message blocks
+containing the call user data and address of interest.
+
+@unnumberedsubsec Parameters
+
+The @type{xlistenf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_Xelisten}.
+@item lmax
+Conveys the maximum number of outstanding Connect Indications that the listening
+Stream is willing to accept, for the addresses conveyed in the attached
+@msg{M_DATA} message blocks.
+
+Listen requests are cummulated but this field is not.  The maximum number of
+outstanding Connect Indications will be reflected by the value of this field for
+the last successful Listen Request issued by the NS user.
+@item l_result
+Conveys the result of the Listen Request in a Listen Response message primitive.
+An error in the parameters or a lack of resources results in this flag being set
+to a non-zero value.
+@end table
+
+The @msg{M_DATA} portion of the message contains the following members:
+
+@table @member
+@item l_cumode
+Specifies the type of matching.
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item @constant{X25_DONTCARE} @tab 1 @tab Represents a wildcard.
+@c @item @constant{X25_STARTSWITTH} @tab 2 @tab Contains a prefix.
+@c @item @constant{X25_IDENTITY} @tab 3 @tab Contains an identity match.
+@c @item @constant{X25_PATTERN} @tab 4 @tab Contains a pattern.@footnote{Note that @constant{X25_PATTERN} is Solstice X.25 specific.}
+@item @constant{X25_MATCH} @tab 4 @tab Contains a pattern match.@footnote{Note that @constant{X25_MATCH} appears to be PT WAN specific.}
+@c @item @constant{X25_SNID} @tab 5 @tab Contains a Subnetwork ID (SNID).
+@end multitable
+Notes:
+@enumerate
+@item When the @member{l_cumode} is set to @constant{X25_DONTCARE}, the
+@member{l_culength} and @member{l_cubytes} fields are ommitted from the
+@msg{M_DATA} message block.
+@end enumerate
+@item l_culength
+Specifies the length of the @member{l_cubytes} field in octets.
+@item l_cubytes
+Contains the bytes to be matched against the Call User Data (CUD).
+@item l_snmode
+Specifies the matching mode.
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item @constant{X25_DONTCARE} @tab 1 @tab Represents a wildcard.
+@c @item @constant{X25_STARTSWITTH} @tab 2 @tab Contains a prefix.
+@c @item @constant{X25_IDENTITY} @tab 3 @tab Contains an identity match.
+@c @item @constant{X25_PATTERN} @tab 4 @tab Contains a pattern.@footnote{Note that @constant{X25_PATTERN} is Solstice X.25 specific.}
+@item @constant{X25_MATCH} @tab 4 @tab Contains a pattern match.@footnote{Note that @constant{X25_MATCH} appears to be PT WAN specific.}
+@c @item @constant{X25_SNID} @tab 5 @tab Contains a Subnetwork ID (SNID).
+@end multitable
+Notes:
+@enumerate
+@item When the @member{l_mode} is set to @constant{X25_DONTCARE}, the
+@member{l_snlen} and @member{l_snid} fields are ommitted from
+the @msg{M_DATA} message block.
+@end enumerate
+@item l_snlen
+@item l_snid
+@item l_mode
+Specifies the type of matching.
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item @constant{X25_DONTCARE} @tab 1 @tab Represents a wildcard.
+@c @item @constant{X25_STARTSWITTH} @tab 2 @tab Contains a prefix.
+@c @item @constant{X25_IDENTITY} @tab 3 @tab Contains an identity match.
+@c @item @constant{X25_PATTERN} @tab 4 @tab Contains a pattern.@footnote{Note that @constant{X25_PATTERN} is Solstice X.25 specific.}
+@item @constant{X25_MATCH} @tab 4 @tab Contains a pattern match.@footnote{Note that @constant{X25_MATCH} appears to be PT WAN specific.}
+@c @item @constant{X25_SNID} @tab 5 @tab Contains a Subnetwork ID (SNID).
+@end multitable
+Notes:
+@enumerate
+@item When the @member{l_mode} is set to @constant{X25_DONTCARE}, the
+@member{l_type}, @member{l_length} and @member{l_add} fields are ommitted from
+the @msg{M_DATA} message block.
+@end enumerate
+@item l_type
+This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item @constant{X25_DTE} @tab 1 @tab Contains an X.25 DTE (X.121) address.
+@item @constant{X25_NSAP} @tab 2 @tab Contains a CONS NSAP address.
+@end multitable
+@item l_length
+Specifies the length of the @member{l_add} field in semi-octets.  That is, the
+length of the @member{l_add} field in octets is: @samp{((l_length+1)>>1)}.  The
+maximum length for a DTE address is 15 or 17 semi-octets (that is, 8 or 9
+octets) depending upon whether TOA/NPI addressing is used.  The maximum length
+for an NSAP address is 20 semi-octets (that is, 10 octets).
+@item l_add
+Contains the bytes to be matched against the DTE address or the NSAP address.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is valid in the disconnected phase or during an incoming
+connecting phase.
+
+@unnumberedsubsec Response
+
+When an NS user issues a Listen Request, the NS user expects an Extended Listen
+Response message primitive from the NS provider.
+
+@unnumberedsubsec Equivalence
+
+The Extended Listen Request message primitive is equivalent to the
+@constant{N_BIND_REQ} of the NPI; the Extended Listen Response,
+@constant{N_BIND_ACK}.
+
+@page
+@node Listen Cancel Request/Response
+@section Listen Cancel Request/Response
+
+@unnumberedsubsec Format
+
+The Listen Cancel Request and Listen Cancel Response use the @type{xcanlisf}
+structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xcanlisf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{xcanlisf} structure is formatted as follows:
+
+@example
+@group
+struct xcanlisf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int c_result;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The Listen Cancel Request message primitive is used by the NS user to cancel
+listening on any address.
+The Listen Cancel Request removes all listen addresses from the Stream.  There
+is no way of cancelling a Listen Request on a particular address; this message
+is probably used when the use of the Stream is about to be changed by the NS
+user.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{xcanlisf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{xcanlisf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_Xcanlis}.
+@item c_result
+Conveys the result of the Listen Cancel Request in a Listen Cancel Response
+message primitive.  An failure to cancel a listen request results in this flag
+being set to a non-zero value.  A Listen Cancel Request may fail because no
+listen was in effect, or a Connect Indication is outstanding.
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is valid in the disconnected phase.
+
+@unnumberedsubsec Response
+
+When an NS user issues a Listen Cancel Request, the NS user expects a Listen
+Cancel Response message primitive from the NS provider.
+
+@unnumberedsubsec Equivalence
+
+The Listen Cancel Request message primitive is equivalent to the
+@constant{N_UNBIND_REQ} of the NPI; the Listen Cancel Response,
+@constant{N_OK_ACK}.
+
+@page
+@node PVC Attach
+@section PVC Attach
+
+@unnumberedsubsec Format
+
+The PVC Attach uses the @type{pvcattf} structure.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{pvcattf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{pvcattf} structure is formatted as follows:
+
+@example
+@group
+struct xcallf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned short lci;
+    union @{
+        uint32_t link_id;
+        uint32_t sn_id;
+    @};
+    unsigned char reqackservice;
+    unsigned char reqnsdulimit;
+    int nsdulimit;
+    int result_code;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The PVC Attach message primitive is used by the NS user when requesting an
+attachment of the Stream to a PVC.  The NS provider uses the PVC Attach message
+primitive to acknolwedge a previous PVC Attach message primitive issued by the
+NS user.
+The control part of the message consists of one @msg{M_PROTO} message block
+containing the @type{pvcattf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{pvcattf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_PVC_ATTACH}.
+@item lci
+Conveys the logical channel identifier (LCI) of the PVC.
+@item link_id
+Conveys the link identifier for the PVC.  This is a Solstice X.25 specific
+field.
+
+The @member{link_id} and @member{sn_id} fields are equivalent, with a slightly
+different name and format for Solstice X.25.
+@item sn_id
+Conveys the subnetwork identifier for the PVC.  This is the non-Solstice X.25
+specific field.
+
+This field is sometimes specified as a @type{unsigned long}.  It has been
+declared as an @type{uint32_t} to support compatibility of 32-bit applications
+running over a 64-bit kernel.
+@item reqackservice
+When non-zero, conveys that the receipt confirmation service is requested by the
+use of the D-bit.  This field can have one of the following values:
+@multitable @columnfractions 0.2 0.1 0.7
+@item Constant @tab Value @tab Description
+@item - @tab 0 @tab No receipt confirmation.
+@item @constant{RC_CONF_DTE} @tab 1 @tab Confirmation by the remote terminal.
+@item @constant{RC_CONF_APP} @tab 2 @tab Confirmation by the remote application.
+@end multitable
+In the case of receipt confirmation by the remote station, no acknowledgements
+are expected or given over the X.25 NLI service interface.  For receipt
+confirmation by the remote application, there is a one-to-one correspondence
+between D-bit data and acknolwedgements passing in opposite directions.  One
+data acknowledgement is received or sent for each D-bit data packet sent or
+received over the X.25 NLI service interface.
+@item reqnsdulimit
+When non-zero, conveys that an NSDU concantenation limit is asserted and the
+@member{nsdulimit} field is valid.
+@item nsdulimit
+When non-zero, conveys the packet concatenation limit for NSDUs when the
+@member{reqnsdulimit} field is also non-zero.
+@item result_code
+When the PVC Attach message primitive is used by the NS provider to acknowledge
+a previous PVC Attach message primitive issued by the NS user, this field is
+non-zero when an error has been encountered that prevents the attachment of the
+PVC.
+
+This field can have one of the following values:
+@multitable @columnfractions 0.3 0.1 0.6
+@item Constant @tab Value @tab Description
+@item @constant{PVC_SUCCESS} @tab 0 @tab Operation was successful.
+@item @constant{PVC_NOSUCHSUBNET} @tab 1 @tab Subnetwork not configured.
+@item @constant{PVC_CFGERROR} @tab 2 @tab LCI not in range, no PVCs.
+@item @constant{PVC_NODBELEMENTS} @tab 3 @tab  No database available.
+@item @constant{PVC_PARERROR} @tab 4 @tab Error in request parameters.
+@item @constant{PVC_BUSY} @tab 6 @tab PVC in non-attach state.
+@item @constant{PVC_CONGESTION} @tab 7 @tab Resources unavailable.
+@item @constant{PVC_WRONGSTATE} @tab 8 @tab  State wrong for function.
+@item @constant{PVC_NOPERMISSION} @tab 9 @tab Inadequate permissions.
+@item @constant{PVC_LINKDOWN} @tab 10 @tab The link has gone down.
+@item @constant{PVC_RMTERROR} @tab 11 @tab No reponse from remote.
+@item @constant{PVC_USRERROR} @tab 12 @tab User interface error detected.
+@item @constant{PVC_INTERROR} @tab 13 @tab Internal error.
+@item @constant{PVC_NOATTACH} @tab 14 @tab Not attached yet.
+@item @constant{PVC_WAIT} @tab 15 @tab Wait code, not to user.
+@end multitable
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is valid in the disconnected phase.
+
+@unnumberedsubsec Response
+
+When an NS user issues a PVC Attach, the NS user expects a PVC Attach message
+primitive from the NS provider in response.
+
+@unnumberedsubsec Equivalence
+
+The PVC Attach message primitive is equivalent to the
+@constant{N_CONN_REQ} and @constant{N_CONN_CON} of the NPI.
+
+@page
+@node PVC Detach
+@section PVC Detach
+
+@unnumberedsubsec Format
+
+The PVC Detach uses the @type{pvcdetf} structure.
+The control part of the message primitive consists of one @msg{M_PROTO} message
+block containing the @type{pvcdetf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+The @type{pvcdetf} structure is formatted as follows:
+
+@example
+@group
+struct pvcdetf @{
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int reason_code;
+@};
+@end group
+@end example
+
+@unnumberedsubsec Usage
+
+The PVC Detach message primitive, @constant{N_PVC_DETACH}, is used when an NS
+user wishes to detach from a currently attached PVC.
+The control part of the message primitive consists of one @msg{M_PROTO} message
+block containing the @type{pvcdetf} structure.
+There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
+
+@unnumberedsubsec Parameters
+
+The @type{pvcdetf} structure contains the following members:
+
+@table @member
+@item xl_type
+Always @constant{XL_CTL}.
+@item xl_command
+Always @constant{N_PVC_DETACH}.
+@item reason_code
+When the PVC Detach message primitive is used by the NS provider to acknowledge
+a previous PVC Detach message primitive issued by the NS user, this field is
+non-zero when an error has been encountered that prevents detaching the PVC.
+
+This field can have one of the following values:
+@multitable @columnfractions 0.3 0.1 0.6
+@item Constant @tab Value @tab Description
+@item @constant{PVC_SUCCESS} @tab 0 @tab Operation was successful.
+@item @constant{PVC_NOSUCHSUBNET} @tab 1 @tab Subnetwork not configured.
+@item @constant{PVC_CFGERROR} @tab 2 @tab LCI not in range, no PVCs.
+@item @constant{PVC_NODBELEMENTS} @tab 3 @tab  No database available.
+@item @constant{PVC_PARERROR} @tab 4 @tab Error in request parameters.
+@item @constant{PVC_BUSY} @tab 6 @tab PVC in non-attach state.
+@item @constant{PVC_CONGESTION} @tab 7 @tab Resources unavailable.
+@item @constant{PVC_WRONGSTATE} @tab 8 @tab  State wrong for function.
+@item @constant{PVC_NOPERMISSION} @tab 9 @tab Inadequate permissions.
+@item @constant{PVC_LINKDOWN} @tab 10 @tab The link has gone down.
+@item @constant{PVC_RMTERROR} @tab 11 @tab No reponse from remote.
+@item @constant{PVC_USRERROR} @tab 12 @tab User interface error detected.
+@item @constant{PVC_INTERROR} @tab 13 @tab Internal error.
+@item @constant{PVC_NOATTACH} @tab 14 @tab Not attached yet.
+@item @constant{PVC_WAIT} @tab 15 @tab Wait code, not to user.
+@end multitable
+@end table
+
+@unnumberedsubsec State
+
+This message primitive is valid in the PVC attached phase.
+
+@unnumberedsubsec Response
+
+When an NS user issues a PVC Detach, the NS user expects a PVC Detach message
+primitive from the NS provider in response.
+
+@unnumberedsubsec Equivalence
+
+The PVC Detach message primitive is equivalent to the
+@constant{N_DISCON_REQ} of the NPI.
 
 @node Allowable Sequence of NLI Primitives
 @chapter Allowable Sequence of NLI Primitives
 
-@node Precedence of NPI Primitives
-@chapter Precedence of NPI Primitives
+@menu
+* Opening a Connection::
+* Data Transfer::
+* Closing a Connection::
+* Listening::
+* PVC Operation::
+@end menu
 
-@node Guidelines for Protocol Independent NS Users
-@appendix Guidelines for Protocol Independent NS Users
+@node Opening a Connection
+@section Opening a Connection
 
-@node Required Information for NS Provider-Specific Addenda
-@appendix Required Information for NS Provider-Specific Addenda
+@node Data Transfer
+@section Data Transfer
+
+@node Closing a Connection
+@section Closing a Connection
+
+@node Listening
+@section Listening
+
+@node PVC Operation
+@section PVC Operation
+
+@c @node Precedence of NPI Primitives
+@c @chapter Precedence of NPI Primitives
+
+@c @node Guidelines for Protocol Independent NS Users
+@c @appendix Guidelines for Protocol Independent NS Users
+
+@c @node Required Information for NS Provider-Specific Addenda
+@c @appendix Required Information for NS Provider-Specific Addenda
 
 @node NLI Header Files
 @appendix NLI Header Files
 
+Applications using the Network Layer Interface (NLI) need to include several
+system header files:
+
+@table @file
+@item <errno.h>
+@item <sys/types.h>
+@item <sys/ioctl.h>
+@item <sys/stropts.h>
+@item <sys/snet/x25_proto.h>
+@end table
+
+@node NLI Library
+@appendix NLI Library
+
+@node NLI Modules
+@appendix NLI Modules
+
+@menu
+* NLI Multiplexing Driver::
+* NLI Conversion Module::
+* NPI Conversion Module::
+* CONS Module::
+* XX25 Module::
+* IXE Multiplexing Driver::
+* IP Multiplexing Driver::
+@end menu
+
+The Network Layer Interface (NLI) is used to provide services to a number of
+@dfn{STREAMS} drivers and modules in addition to user-space applications.
+@cite{@value{PACKAGE_TITLE}} provides a range of @dfn{STREAMS} multiplexing
+drivers, pseudo-device drivers, and pushable modules that complement the X.25
+Packet Layer Protocol driver that provides the Network Layer Interface at it
+upper layer.
+
+@figuresized{nli_figc1,1,NLI Modules,5.5in}
+
+@figref{1} illustrates the @dfn{STREAMS} multiplexing drivers, pseudo-device
+drivers, and pushable modules, and their organization.
+
+@node NLI Multiplexing Driver
+@section NLI Multiplexing Driver
+
+The NLI @dfn{STREAMS} multiplexing driver implements the X.25 Packet Layer
+Protocol (PLP)
+and provides the Network Layer Interface (NLI), Version 3, at it
+upper multiplex.  Data links are linked beneath the driver at the lower
+multiplex.  Linked Streams under @cite{@value{PACKAGE_TITLE}} conform to the
+Data Link Provider Interface (DLPI),@footnote{``@cite{Open Group CAE
+Specification: Data Link Provider Interface (DLPI) Specification, Revision
+2.0.0, Draft 2, August 20, 1992, (Parsippany, New Jersey), UNIX International,
+Inc., UNIX International Press}.'' Available from
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group} or
+@uref{http://www.openss7.org/docs/dlpi.pdf,The OpenSS7 Project}.} however,
+implemetnations based on SpiderX.25 might use some other interface at this
+level.@footnote{For compatibility, the issue is moot.}
+
+Each Stream on the upper multiplex of the NLI multiplexing driver represents
+either a VC or a PVC.  Each Stream on the lower multiplex of the NLI
+multiplexing driver represents a data link@footnote{``@cite{ISO/IEC 7776:1995,
+Information technology -- Telecommunications information exchange between
+systems -- High-level data link control procedures -- Description of the X.25
+LAPB-compatible DTE data link procedures, Second Edition, July 1, 1995,
+International Organization for Standardization.}''
+Available from @uref{http://www.iso.org/,ISO}.}
+or subnetwork@footnote{``@cite{ISO/IEC 8881:1989, Information Processing Systems
+-- Data Communications -- User of the X.25 Packet Level Protocol in Local Area
+Networks, 1989, ISO/IEC, International Organization for Standardization.}''
+Available from @uref{http://www.iso.org/,ISO}.}
+interface.@footnote{``@cite{ANSI/IEEE Standard 802.2-1998 [ISO/IEC
+8802-2:1998], IEEE Standard for Information Technology -- Telecommunications and
+Information Exchange Between Systems -- Local and Metropolitan Area Networks --
+Specific Requirements -- Part 2: Logical Link Contorl, May 7, 1998, (New York),
+ANSI/IEEE, IEEE Computer Society. [ISBN 1-55937-959-6]}  Available from
+@uref{http://www.ieee.org/,The IEEE}.}
+
+Many Spider-based implementations of X.25 will call this multiplexing driver
+simply @file{/dev/x25}.  @cite{AIXlink/X.25} calls the driver
+@file{/dev/x25pckt}.
+
+The @dfn{STREAMS} @file{/dev/x25-plp} multiplexing pseudo-device driver is
+illustrated in @figref{1}.
+
+@node NLI Conversion Module
+@section NLI Conversion Module
+
+Many Spider-based implementations of X.25 will call this multiplexing driver
+@file{s_nli3}.
+
+The @dfn{STREAMS} @file{s_nli3} pushable module is illustrated in @figref{1}.
+
+@node NPI Conversion Module
+@section NPI Conversion Module
+
+Many Spider-based implementations of X.25 will call this pushable module
+@file{s_npi}.  @cite{AIXlink/X.25} calls the module @file{npi}.
+
+The @dfn{STREAMS} @file{s_npi} and @file{npi} pushable modules are illustrated
+in @figref{1}.
+
+@node CONS Module
+@section CONS Module
+
+The @dfn{STREAMS} @file{s_cons} pushable module is illustrated in @figref{1}.
+@footnote{``@cite{Open Group CAE Specification: Network Provider Interface (NPI)
+Specification, Revision 2.0.0, Draft 2, August 17, 1992, (Parisppany, New
+Jersey), UNIX International, Inc., UNIX International Press}.'' Available from
+@uref{http://www.openss7.org/docs/npi.pdf,The OpenSS7 Project}.}
+
+@node XX25 Module
+@section XX25 Module
+
+The @dfn{STREAMS} @file{s_xx25} pushable module is illustrated in @figref{1}.
+
+The XX25 specification@footnote{``@cite{X/Open CAE Specification: X.25
+Programming Interface using XTI (XX25), No. c411, November 1995, (Berkshire, UK), X/Open,
+Open Group Publication. [ISBN: 1-85912-136-5]}.''  Available from
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group}.}
+@footnote{``@cite{Open Group CAE Specification: Transport Provider Interface
+(TPI) Specification, Revision 2.0.0, Draft 2, 1999, (Berkshire, UK), Open Group,
+Open Group Publication}.''  Available from 
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group} or
+@uref{http://www.openss7.org/docs/tpi.pdf,The OpenSS7 Project}.}
+
+@node IXE Multiplexing Driver
+@section IXE Multiplexing Driver
+
+The @dfn{IXE} module provides Internet Protocol over X.25 Encapsulation (IXE) per
+RFC 877 and RFC 1356.  The protocol module provides an @constant{DL_IPX25} MAC
+type DLPI Stream on the upper multiplex and a @dfn{NLI} Stream (or possibly an
+@dfn{NPI} Stream) on the lower multiplex.  Each lower multiplex Stream
+represents an X.25 PVC or VC.  Each upper multiiplex Stream represents a
+@constant{DL_IPX25} connectionless data link Stream.
+
+The @dfn{STREAMS} @file{/dev/ixe} multiplexing driver is illustrated in
+@figref{1}.
+
+@node IP Multiplexing Driver
+@section IP Multiplexing Driver
+
+The @dfn{STREAMS} @file{/dev/ip} multiplexing pseudo-device driver is
+illustrated in @figref{1}.
+
+@node NLI Compatibility and Porting
+@appendix NLI Compatibility and Porting
+
+@menu
+* Compatibility with AIXlink/X.25::
+* Compatibility with HP X.25/9000::
+* Compatibility with IRIS SX.25::
+* Compatibility with PT X.25::
+* Compatibility with SBE X.25::
+* Compatibility with Solstice X.25::
+@end menu
+
+@node Compatibility with AIXlink/X.25
+@section Compatibility with AIXlink/X.25
+
+@cite{AIXlink/X.25} does not document@footnote{``@cite{AIXlink/X.25 Version 2.1
+for AIX: Guide and Reference, No: SC23-2520-07, Eighth Edition, September 2006,
+(Bolder, CO), International Business Machine Corp., IBM},'' available from
+@uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.} a @dfn{Network
+Layer Interface (NLI)}.  It only documents a @dfn{Network Provider Interface
+(NPI)} in support of X.25 applications.  It appears that the NPI provided by
+@cite{AIXlink/X.25} is merely an @file{npi} module, similar to the @file{s_npi}
+module, pushed over an NLI Stream opened on an X.25 packet layer protocol
+driver.  Although it is not documented, it appears that the X.25 packet layer
+protocol driver, @file{/dev/x25pckt}, provided by @cite{AIXlink/X.25} is indeed
+a Spider NLI driver.
+
+As it is undocumented, this NLI driver's compatibility to that of the
+@cite{@value{PACKAGE_TITLE}} cannot be ascertained.  Nevertheless, any NLI
+drivers, modules and applications that rely upon the undocumented capabilities
+of the NLI interface will likely be compatible with, and port easily to,
+@cite{@value{PACKAGE_TITLE}}.
+
+@itemize
+
+@item @cite{AIXlink/X.25} does not document support for the @file{s_npi}
+@dfn{STREAMS} module, but documents an @file{npi}  @dfn{STREAMS} module that
+does not support CONS QoS or non-OSI X.25 and non-X.25 facilities.  @xref{NPI
+Conversion Module}.  See also, @manref{npi(4)}.
+
+@item @cite{AIXlink/X.25} does not document support for the @file{s_npi}
+@dfn{STREAMS} module.  Nevertheless, @cite{@value{PACKAGE_TITLE}} provides
+support for this module.  @xref{NPI Conversion Module}.
+See also, @manref{s_npi(4)}.
+
+@item @cite{AIXlink/X.25} does not document support for the @file{s_nli3}
+@dfn{STREAMS} module.  Nevertheless, @cite{@value{PACKAGE_TITLE}} provides
+support for this module.  @xref{NLI Conversion Module}.
+See also, @manref{s_nli3(4)}.
+
+@end itemize
+
+@node Compatibility with HP X.25/9000
+@section Compatibility with HP X.25/9000
+
+@cite{HP X.25/9000} does not document@footnote{``@cite{HP X.25/9000 Programmer's
+Guide}''.} a @dfn{Network Layer Interface (NLI)} even though its architecture
+document indicates that a @dfn{NLI} is being used.  @cite{HP X.25/9000} only
+documents a BSD IPC interface supported by a library of functions.
+
+As the @dfn{NLI} interface is undocumented, this NLI driver's compatibility to
+that of the @cite{@value{PACKAGE_TITLE}} cannot be ascertained.  Nevertheless,
+any NLI drivers, modules and applications that rely upon the
+undocumented capabilities of the NLI interface will likely be compatible with,
+and port easily to, @cite{@value{PACKAGE_TITLE}}.
+
+@itemize
+
+@item @cite{HP-UX} does not document any @dfn{STREAMS} modules or drivers.
+Nevertheless, @cite{@value{PACKAGE_TITLE}} provides support for NLI modules and
+drivers.  @xref{NLI Modules}.
+
+@end itemize
+
+@node Compatibility with IRIS SX.25
+@section Compatibility with IRIS SX.25
+
+The @cite{SGI IRIX} X.25 driver, @cite{IRIS SX.25}, is documented by
+@cite{SGI}.@footnote{``@cite{IRIS SX.25 NLI Programmer's Guide, 1995,
+(Mountainview, CA), Silicon Graphics, Inc., SGI Technical Publications. [No:
+007-2268-002]}.''  Available from @uref{http://techpubs.sgi.com/,SGI Technical
+Publications}.}
+
+@itemize
+
+@item @cite{IRIS SX.25} documents the @cite{sn_id} field of the @type{xaddrf}
+and @type{pvcattf} structures as being of type @type{unsigned long}.  This is
+note ammeniable to running 32-bit applications over 64-bit kernels, so
+@cite{@value{PACKAGE_TITLE}} changes the type of the @cite{sn_id} field to
+@type{uint32_t}.  This only alters the structure alignment for 64-bit drivers,
+modules and applications.
+
+@end itemize
+
+@node Compatibility with PT X.25
+@section Compatibility with PT X.25
+
+The @cite{PT NexusWare} X.25 driver, @cite{PT X.25}, is documented by
+@cite{Performance Technologies}.@footnote{``@cite{PT X.25 User's Manual}.''}
+
+@itemize
+
+@item @cite{PT X.25} does not document support for the @file{s_npi}
+@dfn{STREAMS} module.  Nevertheless, @cite{@value{PACKAGE_TITLE}} provides
+support for this module.  @xref{NPI Conversion Module}.
+See also, @manref{s_npi(4)}.
+
+@item @cite{PT X.25} does not document support for the @file{s_nli3} @xref{NLI
+Conversion Module}.  @dfn{STREAMS} module.  Nevertheless,
+@cite{@value{PACKAGE_TITLE}} provides support for this module. 
+See also, @manref{s_nli3(4)}.
+
+@item @cite{PT X.25} documents support for the special @constant{N_Xelisten},
+Extended Listen Request/Response message primitive.
+
+@cite{@value{PACKAGE_TITLE}} also provides this message primitive in support of
+drivers, modules and applications ported to @cite{Linux} from @cite{PT X.25}.
+@xref{Extended Listen Request/Response}.
+
+@end itemize
+
+@node Compatibility with SBE X.25
+@section Compatibility with SBE X.25
+
+The @cite{SBE} X.25 driver, @cite{SBE X.25}, is documented by @cite{SBE
+Inc.}.@footnote{``@cite{SBE X.25}.''}
+
+@node Compatibility with Solstice X.25
+@section Compatibility with Solstice X.25
+
+The @cite{Solaris} X.25 driver, @cite{Solstice X.25}, is documented by @cite{Sun
+Microsystems}.@footnote{``@cite{Solstice X.25 Programmer's Guide}.''}
+
+@itemize
+
+@item @cite{Solstice X.25} does not document support for the @file{s_npi}
+@dfn{STREAMS} module.  Nevertheless, @cite{@value{PACKAGE_TITLE}} provides
+support for this module.  @xref{NPI Conversion Module}.
+See also, @manref{s_npi(4)}.
+
+@item @cite{Solstice X.25} does not document support for the @file{s_nli3}
+@dfn{STREAMS} module.  @xref{NLI Conversion Module}.  Nevertheless,
+@cite{@value{PACKAGE_TITLE}} provides support for this module. 
+See also, @manref{s_nli3(4)}.
+
+@item @cite{Solstice X.25} documents the @member{link_id} field in a number of
+data structures where other implementations document an @member{sn_id} field.
+Also, it documents that the @code{0xFF} setting of the @member{link_id} field is
+special in that is causes a database to be consulted for the appropriate link or
+subnetwork and, failing that, uses the lowest numbered WAN port.
+
+@cite{@value{PACKAGE_TITLE}} declares the @member{link_id} and @member{sn_id} in
+these structures as members of an anonymous union to be compatible with both
+approaches, and also supports the special @code{0xFF} value of the field.
+@xref{Addresses}, and @ref{PVC Attach}.
+
+@item @cite{Solstice X.25} documents support for the @constant{X25_PATTERN}
+setting for the @member{l_mode} field of the Listen Request/Response message
+primitive.
+
+@cite{@value{PACKAGE_TITLE}} also supports this pattern matching mode in support
+of drivers, modules and applications ported to @cite{Linux} from @cite{Solstice
+X.25}.  @xref{Listen Request/Response}.
+
+@end itemize
+
 @node Glossary of NLI Terms and Acronyms
 @appendix Glossary of NLI Terms and Acronyms
 
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab Old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.29} @tab ITU-T Recommendation X.29
+@end multitable
+
 @node References
 @unnumbered References
+
+@multitable @columnfractions 0.2 0.8
+@item [X.25] @tab @cite{ITU-T Recommendation X.25}.
+
+@item [X.29] @tab @cite{ITU-T Recommendation X.29}.
+
+@item [AIXlink/X.25] @tab @cite{AIXlink/X.25 Version 2.1 for AIX: Guide and
+Reference}, No: SC23-2520-07, Eighth Edition, September 2006, (Bolder, CO),
+International Business Machine Corp., IBM.
+@uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.
+
+@item [DLPI] @tab @cite{Open Group CAE Specification: Data Link Provider
+Interface (DLPI) Specification, Revision 2.0.0, Draft 2, August 20, 1992,
+(Parsippany, New Jersey), UNIX International, Inc., UNIX International Press}.
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group},
+@uref{http://www.openss7.org/docs/dlpi.pdf,The OpenSS7 Project}.
+
+@item [ISO7776] @tab @cite{ISO/IEC 7776:1995, Information technology --
+Telecommunications information exchange between systems -- High-level data link
+control procedures -- Description of the X.25 LAPB-compatible DTE data link
+procedures, Second Edition, July 1, 1995, International Organization for
+Standardization.} @uref{http://www.iso.org/,ISO}.
+
+@item [ISO8881] @tab @cite{ISO/IEC 8881:1989, Information Processing Systems -- Data
+Communications -- User of the X.25 Packet Level Protocol in Local Area Networks,
+1989, ISO/IEC, International Organization for Standardization.}
+@uref{http://www.iso.org/,ISO}.
+
+@item [ISO8802-2] @tab @cite{ANSI/IEEE Standard 802.2-1998 [ISO/IEC 8802-2:1998], IEEE
+Standard for Information Technology -- Telecommunications and Information
+Exchange Between Systems -- Local and Metropolitan Area Networks -- Specific
+Requirements -- Part 2: Logical Link Contorl, May 7, 1998, (New York),
+ANSI/IEEE, IEEE Computer Society. [ISBN 1-55937-959-6]}
+@uref{http://www.ieee.org/,The IEEE}.
+
+@item [NPI] @tab @cite{Open Group CAE Specification: Network Provider Interface
+(NPI) Specification, Revision 2.0.0, Draft 2, August 17, 1992, (Parisppany, New
+Jersey), UNIX International, Inc., UNIX International Press}.
+@uref{http://www.openss7.org/docs/npi.pdf,The OpenSS7 Project}.
+
+@item [XX25] @tab @cite{X/Open CAE Specification: X.25 Programming Interface
+using XTI (XX25), No. c411, November 1995, (Berkshire, UK), X/Open, Open Group
+Publication. [ISBN: 1-85912-136-5]}.
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group}.
+
+@item [TPI] @tab @cite{Open Group CAE Specification: Transport Provider Interface
+(TPI) Specification, Revision 2.0.0, Draft 2, 1999, (Berkshire, UK), Open Group,
+Open Group Publication}.  @uref{http://www.opengroup.org/onlinepubs/,The Open
+Group}, @uref{http://www.openss7.org/docs/tpi.pdf,The OpenSS7 Project}.
+
+@item [AIXlink/X.25] @tab @cite{AIXlink/X.25 Version 2.1 for AIX: Guide and
+Reference, No: SC23-2520-07, Eighth Edition, September 2006, (Bolder, CO),
+International Business Machine Corp., IBM}.
+@uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.
+
+@item [IRIS SX.25] @tab @cite{IRIS SX.25 NLI Programmer's Guide, 1995,
+(Mountainview, CA), Silicon Graphics, Inc., SGI Technical Publications. [No:
+007-2268-002]}. @uref{http://techpubs.sgi.com/,SGI Technical Publications}.
+
+@item [8] @tab
+
+@item [8] @tab
+
+@item [8] @tab
+
+@end multitable
 
 @node Index
 @unnumbered Index

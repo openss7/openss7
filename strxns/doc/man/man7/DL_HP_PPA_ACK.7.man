@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_HP_PPA_ACK.7.man,v 0.9.2.1 2008-05-25 12:46:54 brian Exp $
+.\" @(#) $Id: DL_HP_PPA_ACK.7.man,v 0.9.2.2 2008-06-18 16:45:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_HP_PPA_ACK.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:34  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:54  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -80,7 +83,7 @@ sort-adjacent-labels
 .TH DL_HP_PPA_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_HP_PPA_ACK (dl_hp_ppa_ack_t)
-\- request to a request for installed PPAs.
+\- acknowledgement to a request for installed PPAs.
 .\"
 .\"
 .SH INTERFACE
@@ -102,12 +105,8 @@ message block, that contains the following structure:
 .sp
 .nf
 \f(CW\s-1\
-typedef struct {
-    t_uscalar_t dl_primitive;
-    t_uscalar_t dl_length;
-    t_uscalar_t dl_count;
-    t_uscalar_t dl_offset;
-} dl_hp_ppa_ack_t;
+#include <sys/dlpi.h>
+#include <sys/dlpi_ext.h>
 
 typedef struct {
     t_uscalar_t dl_next_offset;
@@ -128,6 +127,13 @@ typedef struct {
     t_uscalar_t dl_reserved1;
     t_uscalar_t dl_reserved2;
 } dl_hp_ppa_info_t;
+
+typedef struct {
+    t_uscalar_t dl_primitive;
+    t_uscalar_t dl_length;
+    t_uscalar_t dl_count;
+    t_uscalar_t dl_offset;
+} dl_hp_ppa_ack_t;
 \fR\s+1
 .fi
 .\"
@@ -139,11 +145,14 @@ The
 primitive is issued by the DLS Provider in response to a
 .BR DL_HP_PPA_REQ (7)
 primitive from the DLS User.  It provide information on each valid PPA
-currently installed in the system.
+currently installed in the system that is known to the DLS provider.
 .\"
 .\"
 .SH PARAMETERS
 .PP
+The
+.B dl_hp_ppa_ack_t
+structure contains the following members:
 .TP
 .I dl_primitive
 conveys
@@ -165,40 +174,186 @@ message block of the data area containing one or more
 .BR dl_hp_ppa_info_t
 data structures.
 .PP
-The data area contains one ore more
+The data area contains one or more
 .BR dl_hp_ppa_info_t
-structures, each containing the following members:
+structures, each containing the following members that describe the
+characteristics of the PPA:
 .TP
 .I dl_next_offset
 The offset of the next PPA information structure from the start of the data
 area.
 .TP
 .I dl_ppa
-The PPA number assigned to the LAN interface.
+The Physical Point of Attachment (PPA) number assigned to the LAN interface.
+This is the PPA number that may be used in a
+.BR DL_ATTACH_REQ (7)
+primitive to attachment a DLS provider Style 2 Stream to the interface.
 .TP
 .I dl_hw_path
-The hardware path of the LAN interface.
+The hardware path of the LAN interface.  This is the absolute UNIX filesystem
+path name to the character device special file that implements a DLPI Style 1
+or DLPI Style 2 version of the device driver.
 .TP
 .I dl_mac_type
-THe MAC type of the LAN interface.
+The MAC type of the LAN interface.  This field may contain any of the values
+for the corresponding field in the
+.BR DL_INFO_ACK (7)
+primitive once attached to the PPA, as follows:
+.RS
+.TP \w'\fBDL_100VGTPR\fP\(em'u
+.B DL_CSMACD
+The medium is Carrier Sense Multiple Access with Collision Detection (ISO
+8802/3).
+.TP
+.B DL_TPB
+The medium is Token-Passing Bus (ISO 8802/4).
+.TP
+.B DL_TPR
+The medium is Token-Passing Ring (ISO 8802/5).
+.TP
+.B DL_METRO
+The medium is Metro Net (ISO 8802/6).
+.TP
+.B DL_ETHER
+The medium is Ethernet Bus.
+.TP
+.B DL_HDLC
+The medium is a bit synchronous communication line.
+.TP
+.B DL_CHAR
+The medium is a character synchronous communication line (for example,
+BISYNC).
+.TP
+.B DL_CTCA
+The medium is a channel-to-channel adapter.
+.TP
+.B DL_FDDI
+The medium is a Fiber Distributed Data Interface.
+.TP
+.B DL_FC
+The medium is Fiber Channel.
+.TP
+.B DL_ATM
+The medium is Asynchronous Transfer Mode.
+.TP
+.B DL_IPATM
+The medium is Internet IP over Asynchronous Transfer Mode, RFC 1577.
+.TP
+.B DL_X25
+The medium is X.25 LAPB.
+.TP
+.B DL_IPX25
+The medium is Internet IP over X.25, RFC 1356.
+.TP
+.B DL_ISDN
+The medium is ISDN.
+.TP
+.B DL_HIPPI
+The medium is High Performance Parallel Interface.
+.TP
+.B DL_100VG
+The medium is 100 Based VG Ethernet.
+.TP
+.B DL_100VGTPR
+The medium is 100 Based VG Token Ring.
+.TP
+.B DL_ETH_CSMA
+The medium is capable of both ISO 8802/3 and Ethernet.
+.TP
+.B DL_100BT
+The medium is 100 Base T Ethernet.
+.TP
+.B DL_FRAME
+The medium is Frame Relay LAPF.
+.TP
+.B DL_MPFRAME
+The medium is Multi-Protocol over Frame Relay encapsulation, RFC
+1490.
+.TP
+.B DL_ASYNC
+The medium is a bit asynchronous communication line.
+.TP
+.B DL_LOOP
+The medium is a software loopback.
+.TP
+.B DL_OTHER
+Any other medium that is not listed above.
+.I dl_mac_type
+values above 0x80000000 are available for private or experimental use and will
+not be defined by this Specification.
+.PP
+.IR Solaris \(rg
+.[
+soldoc11
+.]
+provides the following additional private MAC types:
+.TP \w'\fBDL_100VGTPR\fP\(em'u
+.B DL_IPV4
+An IP version 4 tunnel link.
+.TP
+.B DL_IPV6
+An IP version 6 tunnel link.
+.TP
+.B DL_VNI
+A virtual network interface.
+.TP
+.B DL_WIFI
+An IEEE 802.11 interface.
+.RE
 .TP
 .I dl_phys_addr
-The station address.
+The station address.  This is the MAC address and does not contain the SAP
+portion of the DLSAP address.  Only the number of bytes indicated by the
+.I dl_addr_length
+field are significant.
 .TP
 .I dl_addr_length
-The length of the station address.
+The length of the station address.  This is the length of the MAC address.  For
+example, for
+.B DL_ETHER
+and
+.BR DL_CSMACD
+this is the 6-octet MAC address; for
+.B DL_TPR
+this is the 8-octet MAC address.
+Some data links do not have a phsysical address and in such a case this field
+is zero (0).
 .TP
 .I dl_mjr_num
-The major number of the interface driver.
+The major number of the interface driver.  This is the
+.IR STREAMS (9)
+major device number of the interface driver.  For interface drivers that do not
+present a
+.IR STREAMS (9)
+device, this value is
+.BR DL_UNKNOWN .
 .TP
 .I dl_name
-The name of the driver.
+The name of the
+.IR STREAMS (9)
+device driver as a null-terminated ASCII string of no more than
+.B FMNAMESZ
+characters, not including the terminating null character.  This is the
+.IR STREAMS (9)
+device driver name for the driver.  For drivers that do not present a
+.IR STREAMS (9)
+device, this value the null string.
 .TP
 .I dl_instance_num
-The instance number (minor device number) of the device.
+The instance number (minor device number) of the device.  This is the
+.IR STREAMS (9)
+minor device number of the interface driver.  For interface drivers that do not
+present a
+.IR STREAMS (9)
+device, this value is
+.BR DL_UNKNOWN .
 .TP
 .I dl_mtu
-The maximum transfer unit (MTU).
+The maximum transfer unit (MTU).  This is the maximum transfer unit that
+represents the largest DLPDU that may be transferred over the device.  This is
+the maximum value of the
+.I dl_max_sdu
+field that can be supported by the device.
 .TP
 .I dl_hdw_state
 The hardware state.
@@ -222,20 +377,29 @@ Identifies the ARP helper module for the network interface.  If the driver does
 not have an ARP helper, this field will be set to a null string.
 .TP
 .I dl_nmid
-Identifies the network management ID value for a specific interface.
+Identifies the network management ID value for a specific interface.  This
+value is set to the value of the interface index when executing the
+.BR ifconfig (8)
+command.
 .TP
 .I dl_reserved1
-First reserved field.
+First reserved field.  Set to zero (0).
 .TP
 .I dl_reserved2
-Second reserved field.
+Second reserved field.  Set to zero (0).
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
 .PP
 The message is issued in any state but only in response to a
 .BR DL_HP_PPA_REQ (7)
-primitive.
+primitive pending acknowledgement on the Stream upon which it is issued.
 .\"
 .\"
 .SH "NEW STATE"
@@ -282,7 +446,7 @@ Under
 .BR "@PACKAGE_TITLE@" ,
 the PPAs returned correspond to all the available Linux network devices when
 used with the
-.RB ldl (4)
+.RB dl (4)
 driver.
 .IP \(em
 .I dl_module_id1

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi.7.man,v 0.9.2.6 2008-05-25 12:49:27 brian Exp $
+.\" @(#) $Id: dlpi.7.man,v 0.9.2.7 2008-06-18 16:45:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:27 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi.7.man,v $
+.\" Revision 0.9.2.7  2008-06-18 16:45:35  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.6  2008-05-25 12:49:27  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -867,92 +870,175 @@ Local management provides the following services:
 .PP
 .B Information Service
 .RS 4
+.PP
+Provides the DLS User with the ability to obtain information concerning the
+limiting parameters and state associated with the DLS provider and the
+underlying data link.
 .TP
 .BR DL_INFO_REQ "(7) \(em
+Requests that the DLS provider reply with information concerning the limiting
+parameters and state associated with the DLS provider and the underlying data
+link.
 .\"
 .\"
 .TP
 .BR DL_INFO_ACK "(7) \(em
+Provides information to the DLS user regarding the limiting parameters and
+state associated with the DLS provider and the underlying data link.
 .RE
 .\"
 .\"
 .PP
 .B Token Service
 .RS 4
+.PP
+The token service provides the DLS user with the ability to acquire a token
+that uniquely identifies a DLS provider Stream for the purpose of accepting
+incoming connection requests on identified Streams.
 .TP
 .BR DL_TOKEN_REQ "(7) \(em
+Requests that the DLS provider identify the Stream upon which the request is
+initiated with a token uniquely identifying the DLS provider Stream.
 .\"
 .\"
 .TP
 .BR DL_TOKEN_ACK "(7) \(em
+Provides the DLS user with a unique token identifying the DLS provider Stream.
 .RE
 .\"
 .\"
 .PP
 .B Attach Service
 .RS 4
+.PP
+Provides the DLS user with the ability to attach a Style 2 DLS provider Stream
+to an underlying Physical Point of Attachment (PPA) representing a physical
+interface device.
 .TP
 .BR DL_ATTACH_REQ "(7) \(em
+Requests that the DLS provider attach the DLS provider Stream to a specific
+Physical Point of Attachment (PPA).
 .RE
 .\"
 .\"
 .PP
 .B Detach Service
 .RS 4
+.PP
+Provides the DLS user with the ability to detach a Style 2 DLS provider Stream
+from the attached underlying Physical Point of Attachment (PPA).
 .TP
 .BR DL_DETACH_REQ "(7) \(em
+Request that the DLS provider detach the DLS provider Stream from its attached
+Physical Point of Attachment (PPA).
 .RE
 .\"
 .\"
 .PP
 .B Bind Service
 .RS 4
+.PP
+The Bind Service provides the DLS User with the ability to bind the DLS
+provider stream to a Service Access Point (SAP) associated with the attached
+Physical Point of Attachment (PPA).
 .TP
 .BR DL_BIND_REQ "(7) \(em
+Requests that the DLS provider bind the requesting DLS provider Stream to a
+specific Service Access Point (SAP) associated with the attached Physical Point
+of Attachment (PPA), and acknowledge the bind with a
+.BR DL_BIND_ACK (7)
+primitive.
 .\"
 .\"
 .TP
 .BR DL_BIND_ACK "(7) \(em
+Acknowledges to the DLS user that the previously invoked bind request was
+successful and also provides the complete DLSAP (Data Link Service Access
+Point) address associated with the bound Service Access Point (SAP).
 .RE
 .\"
 .\"
 .PP
 .B Unbind Service
 .RS 4
+.PP
+The Unbind Service provides the DLS User with the ability to unbund the DLS
+provider streams from the Service Access Point (SAP) currently associated with
+the attached Physical Point of Attachment (PPA).
 .TP
 .BR DL_UNBIND_REQ "(7) \(em
+Requests that the DLS provider unbind the requesting DLS provider Stream from
+all Service Access Points (SAP) to which the Stream is currently bound, and
+acknowledge the unbinding with a
+.BR DL_OK_ACK (7)
+primitive.
 .RE
 .\"
 .\"
 .PP
 .B Subsequent Bind Service
 .RS 4
+The Subsequent Bind Service provides the DLS User with the ability to bind to
+either an additional and equivalent Service Access Point (SAP),
+.BR DL_PEER_BIND ,
+associated with
+the Physical Point of Attachment (PPA), or to bind to an additional and
+subtending Service Access Point (SAP) associated with the currently bound SAP,
+.BR DL_HIERARCHICAL_BIND .
 .TP
 .BR DL_SUBS_BIND_REQ "(7) \(em
+Requests that the DLS provider bind the requesting DSL provider Stream to a
+subsequent Service Access Point (SAP), where the requested SAP is either a peer
+to,
+.BR DL_PEER_BIND ,
+or hierarchical to,
+.BR DL_HIERARCHICAL_BIND .
+the currently bound SAP, and requests that the DLS provider acknowledge the
+subsequent bind with a
+.BR DL_SUBS_BIND_ACK (7)
+primitive.
 .\"
 .\"
 .TP
 .BR DL_SUBS_BIND_ACK "(7) \(em
+Acknowledges that the previously requested subsequent bind has completed
+successfully.
 .RE
 .\"
 .\"
 .PP
 .B Subsequent Unbind Service
 .RS 4
+.PP
+Provides the DLS user with the ability to unbind from a subsequent Service
+Access Point (SAP).
 .TP
 .BR DL_SUBS_UNBIND_REQ "(7) \(em
+Requests that the DLS provider unbind from the specified subsequent Service
+Access Point (SAP), and that the DLS provider acknolwege receipt of the
+primitive with a
+.BR DL_OK_ACK (7)
+primitive.
 .RE
 .\"
 .\"
 .PP
 .B Receipt Acknowledgment Service
 .RS 4
+.PP
+Provides the DLS User with the ability to be informed as to the success or
+failure of a request primitive where the DLS User expects positive or negative
+acknowledgement.
 .TP
 .BR DL_OK_ACK "(7) \(em
+Provides the DLS user with acknowledgement of successful receipt of a
+previously issued DLS User primitive.
 .\"
 .\"
 .TP
 .BR DL_ERROR_ACK "(7) \(em
+Provides the DLS user with acknowledgement of the unsuccessful receipt of a
+previously issued DLS User primitive, and the reason for the failure.
 .RE
 .\"
 .\"
@@ -964,20 +1050,33 @@ The connection establishment phase consists of the following services:
 .PP
 .B Connection Service
 .RS 4
+.PP
+Provides the DLS User with the ability to initiate and respond to HDLC or LLC
+Type 2 connection establishment.
 .TP
 .BR DL_CONNECT_REQ "(7) \(em
+Requests that an HLDC or LLC Type 2 connection be established on an idle data
+link.
 .\"
 .\"
 .TP
 .BR DL_CONNECT_CON "(7) \(em
+Confirms to the DLS User that a previously initiated HDLC or LLC Type 2
+connection establishment request has completed successfully and that the data
+link has transitioned to the data transfer phase.
 .\"
 .\"
 .TP
 .BR DL_CONNECT_IND "(7) \(em
+Indicates to the DLS User, as a responder, that the peer DLS User on an idle
+data link has initiated HDLC or LLC Type 2 connection establishment.
 .\"
 .\"
 .TP
 .BR DL_CONNECT_RES "(7) \(em
+Provides the DLS User with the ability to accept an incoming HDLC or LLC Type 2
+connection establishment request from the remote DLS User on an otherwise idle
+data link.
 .RE
 .\"
 .\"
@@ -989,32 +1088,49 @@ The connection data transfer phase consists of the following services:
 .PP
 .B Data Transfer Service
 .RS 4
+.PP
+Provides the DLS User with the ability to transfer data toward the peer
+connected DLS User or to receive data from the peer connected DLS User.
 .TP
 .BR DL_DATA_REQ "(7) \(em
+Transfer data to the peer connected DLS User.
 .\"
 .\"
 .TP
 .BR DL_DATA_IND "(7) \(em
+Transfer data from the peer connected DLS User.
 .RE
 .\"
 .\"
 .PP
 .B Reset Service
 .RS 4
+.PP
+Provides the DLS User with the ability to reset a data link connection, or to
+be informed of the reset of the data link connection by the peer DLS user or
+DLS provider.
 .TP
 .BR DL_RESET_CON "(7) \(em
+Confirms to the DLS User that the previously initiated reset request has
+completed.
 .\"
 .\"
 .TP
 .BR DL_RESET_IND "(7) \(em
+Indicates to the DLS User that the remote connected DLS User or Provider is
+resetting the connection, the origin of the reset, and the reason for reset.
 .\"
 .\"
 .TP
 .BR DL_RESET_REQ "(7) \(em
+Provides the DLS User with the ability to request that a data link connection
+be reset.
 .\"
 .\"
 .TP
 .BR DL_RESET_RES "(7) \(em
+Provides the DLS User with the ability to accept a remote reset indication to
+complete the remote provider reset cycle.
 .RE
 .\"
 .\"
@@ -1026,12 +1142,20 @@ The connection release phase consists of the following services:
 .PP
 .B Release Service
 .RS 4
+.PP
+The release service provides the DLS User with the ability to disconnect an
+HDLC or LLC Type 1 connection-oriented mode data link connection, or to be
+informed of such a disconnection by the peer DLS user or provider.
 .TP
 .BR DL_DISCONNECT_IND "(7) \(em
+Provides indication that the data link connection was released, the origin of
+the release, and the reason for release.
 .\"
 .\"
 .TP
 .BR DL_DISCONNECT_REQ "(7) \(em
+Requests that a data link connection be released, or that an incoming
+connection establishment request is to be rejected.
 .RE
 .\"
 .\"
@@ -1043,20 +1167,32 @@ The connectionless data transfer phase consists of the following services:
 .PP
 .B Data Transfer Service
 .RS 4
+.PP
+Provides a service for transferring HDLC or LLC Type 1 connectionless mode data
+to and from the DLS user.
 .TP
 .BR DL_UNITDATA_REQ "(7) \(em
+Transfers connectionless mode unit data from the DLS User to a peer DLS User.
 .\"
 .\"
 .TP
 .BR DL_UNITDATA_IND "(7) \(em
+Transfers connectionless mode unit data from a peer DLS User to the local DLS
+User.
 .\"
 .\"
 .TP
 .BR DL_UDQOS_REQ "(7) \(em
+Establishes the connectionless m ode quality of service to be used in
+subsequent transfers of HLDC or LLC Type 1 connectionless unit data from the
+DLS User to peer DLS users.
 .\"
 .\"
 .TP
 .BR DL_UDERROR_IND "(7) \(em
+Provides an indicates that there was an error in the transmission of HDLC or
+LLC Type 1 connectionless mode unit data from the DLS User toward a peer DLS
+User.
 .RE
 .\"
 .\"
@@ -1114,44 +1250,56 @@ The XID and Test functions consist of the following services:
 .PP
 .B XID Service
 .RS 4
+.PP
+A service for passing HDLC or LLC XID messages to and from the DLS user.
 .TP
 .BR DL_XID_CON "(7) \(em
+Passes an HDLC or LLC XID response message to the DLS user.
 .\"
 .\"
 .TP
 .BR DL_XID_IND "(7) \(em
+Passes an HDLC or LLC XID command message to the DLS user.
 .\"
 .\"
 .TP
 .BR DL_XID_REQ "(7) \(em
+Passes an HDLC or LLC XID command message from the DLS user.
 .\"
 .\"
 .TP
 .BR DL_XID_RES "(7) \(em
+Passes an HDLC or LLC XID response message from the DLS user.
 .RE
 .\"
 .\"
 .PP
 .B TEST Service
 .RS 4
+.PP
+A service for passing HDLC or LLC TEST messages to and from the DLS user.
 .TP
 .BR DL_TEST_CON "(7) \(em
+Passes an HDLC or LLC TEST response message to the DLS user.
 .\"
 .\"
 .TP
 .BR DL_TEST_IND "(7) \(em
+Passes an HDLC or LLC TEST command message to the DLS user.
 .\"
 .\"
 .TP
 .BR DL_TEST_REQ "(7) \(em
+Passes an HDLC or LLC TEST command message from the DLS user.
 .\"
 .\"
 .TP
 .BR DL_TEST_RES "(7) \(em
+Passes an HDLC or LLC TEST response message from the DLS user.
 .RE
 .\"
 .\"
-.SS "Miscelaneous Management"
+.SS "Miscellaneous Management"
 .PP
 The miscellaneous management functions consist of the following services:
 .\"
@@ -1159,52 +1307,111 @@ The miscellaneous management functions consist of the following services:
 .PP
 .B Physical Address Service
 .RS 4
+.PP
+The Physical Address Service provides the DLS User with the ability to
+interrogate and modify the physical address associated with the attached
+Physical Point of Appearance (PPA).
 .TP
 .BR DL_SET_PHYS_ADDR_REQ "(7) \(em
+Sets the physical address value for all Streams for the DLS provider for a
+particular PPA.
 .\"
 .\"
 .TP
 .BR DL_PHYS_ADDR_REQ "(7) \(em
+This primitive requests the DLS provider to return either the default
+(factory) or current value of the physical address associated with the Stream
+depending upon the value of the address type selected in the request.
 .\"
 .\"
 .TP
 .BR DL_PHYS_ADDR_ACK "(7) \(em
+This primitive returns the value for the physical address to the DLS user in
+response to a
+.BR DL_PHYS_ADDR_REQ (7)
+primitive.
 .RE
 .\"
 .\"
 .PP
 .B Promiscuous Monitoring Service
 .RS 4
-.TP
-.BR DL_PROMISCOFF_REQ "(7) \(em
-.\"
-.\"
+.PP
+The Promiscuous Monitoring Service provides the DLS User with the ability to
+request that data associated with all physical addresses for the attached
+Physical Point of Attachment, for all Service Access Points (SAP) associated
+with the PPA, or all multicast addresses on the attached PPA, be also delivered
+to the DLS user.
 .TP
 .BR DL_PROMISCON_REQ "(7) \(em
+Requests that the DLS provider provide promiscuous access to data traversing
+the Physical Point of Attachment (PPA) for all physical addresses, all Service
+Access Points (SAP), or all multicast addresses, and that the DLS provider
+acknowledge the successful receipt of the primitive by issuing a
+.BR DL_OK_ACK (7)
+primitive.
+.\"
+.\"
+.TP
+.BR DL_PROMISCOFF_REQ "(7) \(em
+Request that the DLS provider cease promiscuous access to data traversing the
+Physical Point of Attachment (PPA) for all physical addresses, all Service
+Access Points (SAP), or all multicast addresses, and that the DLS provider
+acknowledge the successful receipt of the primitive by issuing a
+.BR DL_OK_ACK (7)
+primitive.
 .RE
 .\"
 .\"
 .PP
 .B Multicast Address Service
 .RS 4
+.PP
+The Multicast Address Service provides the DLS User with the ability to request
+that data sent to a bound Service Access Point (SAP) with a specified multicast
+destination address also be delivered, or cease to be delivered, to the DLS
+User.
 .TP
 .BR DL_ENABMULTI_REQ "(7) \(em
+Requests that the DLS provider also deliver messages addressed to the specified
+multicast address, and that the DLS provider acknowledge successful receipt of
+the primitive by issuing a
+.BR DL_OK_ACK (7)
+primitive.
 .\"
 .\"
 .TP
 .BR DL_DISABMULTI_REQ "(7) \(em
+Requests that the DLS provider cease delivering messages addressed to the
+specified multicast address, and that the DLS provider acknowledge successful
+receipt of the primitive by issuing a
+.BR DL_OK_ACK (7)
+primitive.
 .RE
 .\"
 .\"
 .PP
 .B Statistics Service
 .RS 4
+.PP
+The Statistics Service provides a mechanism whereby the DLS User may acquire
+information concerning collected statistics for a Physical Point of Attachment
+(PPA), Service Access Point (SAP), or Data Link Connection (DLC), associated
+with a given DLS provider Stream.
 .TP
 .BR DL_GET_STATISTICS_REQ "(7) \(em
+Requests that the DLS provider collect statistics associated with the DLS
+Provider Stream and acknolwedge successful receipt of the primitive and the
+collected statistics by issuing a
+.BR DL_GET_STATISTICS_ACK (7)
+primitive.
 .\"
 .\"
 .TP
 .BR DL_GET_STATISTICS_ACK "(7) \(em
+Acknowledges to the DLS User the successful receipt of a previously issued
+.BR DL_GET_STATISTICS_REQ (7)
+primitive and the collected statistics.
 .RE
 .\"
 .\"
@@ -1218,19 +1425,19 @@ hpuxdlpi
 .\"
 .PP
 .B General Extensions
+.RS 4
 .PP
 The following general extensions apply to all DLS providers:
-.RS 4
 .TP
 .BR DL_HP_PPA_REQ "(7) \(em
 Requests a list of all the valid PPAs currently installed in the system.
 .TP
 .BR DL_HP_PPA_ACK "(7) \(em
-Reponse to a request for all the valid PPAs currently installed in the system.
+Response to a request for all the valid PPAs currently installed in the system.
 .TP
 .BR DL_HP_MULTICAST_LIST_REQ "(7) \(em
 Requests that the DLS provider return a list of all the currently enabled
-multicast adresses on a specific LAN interface corresponding to the Stream on
+multicast addresses on a specific LAN interface corresponding to the Stream on
 which the primitive is issued.
 .TP
 .BR DL_HP_MULTICAST_LIST_ACK "(7) \(em
@@ -1248,16 +1455,60 @@ included.
 Indicates one completely formatted DLSDU from the DLS provider to the DLS user.
 The DLSDU contains the complete link and MAC level headers.
 .TP
+.BR DL_HP_RESET_STATS_REQ "(7) \(em
+Requests of the DLS provider that the statistics being collected associated
+with the DLS User Stream be reset to zero values, and that the DLS provider
+acknowledge successful receipt of the primitive with a
+.BR DL_OK_ACK (7)
+primitive.
+.TP
+.BR DL_HP_GET_64BIT_STATS_REQ "(7) \(em
+Requests that the DLS User retrieve and provide 64-bit statistics instead of
+32-bit statistics, and that the DLS Provider acknowledge successful receipt of
+the primitive and the retrieved 64-bit statistics by issuing a
+.BR DL_HP_GET_64BIT_STATS_ACK (7)
+primitive.
+.TP
+.BR DL_HP_GET_64BIT_STATS_ACK "(7) \(em
+Acknowledges the successful receipt of a
+.BR DL_HP_GET_64BIT_STATS_REQ (7)
+primitive and provides the 64-bit statistics collected.
+.BR DL_HP_GET_64BIT_STATS_REQ (7)
+primitive and delivers the retrieved 64-bit statistics to the DLS User.
+.TP
+.BR DL_HP_NOTIFY_EVENT_REQ "(7) \(em
+Requests that the DLS provider provide, or cease providing, event indications
+upon the occurence of specified DLS provider or underlying data link events,
+using the
+.BR DL_HP_LINK_UP_IND "(7) and " DL_HP_LINK_DOWN_IND (7)
+primitives, and that the DLS provider acknowledge receipt of the primitive with
+a
+.BR DL_OK_ACK (7)
+primitive.
+.TP
+.BR DL_HP_LINK_DOWN_IND "(7) \(em
+Provides indication to the DLS User that the data link associated with the PPA
+attached to the Stream upon which the indiciation is issued, has entered a down
+state.
+.TP
+.BR DL_HP_LINK_UP_IND "(7) \(em
+Provides indication to the DLS User that the data link associated with the PPA
+attached to the Stream upon which the indiciation is issued, has entered a up
+state.
+.TP
 .BR DL_HP_HW_RESET_REQ "(7) \(em
+Requests that the DLS Provider reset the hardware associated with the
+underlying data link for the Physical Point of Attachment attached to the
+issuing DLS User Stream.
 .RE
 .\"
 .PP
 .B Connection-Mode Extensions
+.RS 4
 .PP
 The following extensions apply to DLS providers operating in the
 connection-mode
 .RB ( DL_CLDLS ).
-.RS 4
 .TP
 .BR DL_HP_INFO_REQ "(7) \(em
 Requests that the DLS provider provide the state of the connection on a DLPI
@@ -1300,7 +1551,7 @@ Requests that the DLS provider set the remote window size to the specified
 value.
 .TP
 .BR DL_HP_CLEAR_STATS_REQ "(7) \(em
-Reqeusts that the DLS provider zero the satistics that are resported in the
+Requests that the DLS provider zero the statistics that are reported in the
 .BR DL_HP_INFO_ACK (7)
 primitive.
 .TP
@@ -1323,45 +1574,96 @@ soldoc11
 .PP
 .B Notification Extensions
 .RS 4
+.PP
+The Notification Service extension provides the DLS User with the ability to
+request that it be notified when specific DLS provider events occur and
+indication of such notification.
 .TP
 .BR DL_NOTIFY_REQ "(7) \(em
+Requests that the DLS provider acknowledge receipt of the primitive with a
+.BR DL_NOTIFY_ACK (7)
+primitive, acknowledging the support and activation of notifications for
+specified DLS provider events.
 .TP
 .BR DL_NOTIFY_ACK "(7) \(em
+Acknowledges the receive of a previously issued DLS user
+.BR DL_NOTIFY_REQ (7)
+primitive requesting the support and activation or detactivation of
+specified notifications.
 .TP
 .BR DL_NOTIFY_IND "(7) \(em
+Provides notification to the DLS user that a specified DLS provider event has
+occurred, as well a notifying the DLS user of the initial state of an event
+when notifications are first requested.
+.RE
+.\"
+.PP
+.B Capability and Control Extensions
+.RS 4
+.PP
+The capability and control extensions provide a mechanism whereby a DLS user
+may obtain information concerning the support and current state of an DLS
+provider's underlying device driver implementation.  A DLS user may also
+control, configure, enable or disable the supported underlying capabilities.
+.TP
+.BR DL_CAPABILITY_REQ "(7) \(em
+control capabilties of underlying driver.
+Requests that the DLS provider report, enable or disable the underlying control
+capabilities of its underlying device driver.
+.TP
+.BR DL_CAPABILITY_ACK "(7) \(em
+acknowledges control capablities of underlying driver.
+Acknowledges to the DLS user the retrieval, enabling or disabling of the
+underlying control capabilities of the DLS provider's underlying device driver.
+.TP
+.BR DL_CONTROL_REQ "(7) \(em
+control underlying driver.
+Requests that the DLS provider control (add, delete, flush, update, get or set)
+data elements associated with an underlying device driver implementation
+capability.
+.TP
+.BR DL_CONTROL_ACK "(7) \(em
+acknowledge control of the underlying driver.
+Acknowledges the addition, deletion, flushing, update, retrieval or setting of
+data elements associated with an underlying device driver implementation
+capability.
+.TP
+.BR DL_INTR_MODE_REQ "(7) \(em
 .RE
 .\"
 .PP
 .B Aggregation Extensions
 .RS 4
+.PP
+The Aggrevation Service extensions provide the DLS user with the ability to
+add individual data links to an aggregate data link, to remove individual data
+links from an aggregate, and to access individual data links that form an
+aggregate.
 .TP
 .BR DL_AGGR_REQ "(7) \(em
+Requests that the DLS provider add the data link associated with the requesting
+DLS provider Stream to a specified aggregrate and acknowledge receipt of the
+successful reception of the primitive with a
+.BR DL_OK_ACK (7)
+primitive.
 .TP
 .BR DL_AGGR_IND "(7) \(em
+Indicates to the DLS user that the indicating DLS provider Stream has
+successfully completed being added to the specified aggregate.
 .TP
-.BR DL_UNAGGR_IND "(7) \(em
+.BR DL_UNAGGR_REQ "(7) \(em
+Requests that the DLS provider remote the data link associated with the
+requesting DLS provider Stream from the specified aggregate and acknolwege
+successful receipt of the primitive with a
+.BR DL_OK_ACK (7)
+primitive.
 .TP
 .BR DL_PASSIVE_REQ "(7) \(em
-.RE
-.\"
-.PP
-.B Capability Extensions
-.RS 4
-.TP
-.BR DL_CAPABILITY_REQ "(7) \(em
-.TP
-.BR DL_CAPABILITY_ACK "(7) \(em
-.RE
-.\"
-.PP
-.B Control Extensions
-.RS 4
-.TP
-.BR DL_CONTROL_REQ "(7) \(em
-.TP
-.BR DL_CONTROL_ACK "(7) \(em
-.TP
-.BR DL_INTR_MODE_REQ "(7) \(em
+Requests that the requesting DLS provider Stream be permitted access to
+individual data links that are part of an aggregate, and that the DLS provider
+acknowledge successful receipt of the primitive with a
+.BR DL_OK_ACK (7)
+primitive.
 .RE
 .\"
 .\"
@@ -1391,16 +1693,24 @@ primitives.
 .\"
 .\"
 .SH "SEE ALSO"
+.BR DL_AGGR_IND (7),
+.BR DL_AGGR_REQ (7),
 .BR DL_ATTACH_REQ (7),
 .BR DL_BIND_ACK (7),
 .BR DL_BIND_REQ (7),
+.BR DL_CAPABILITY_ACK (7),
+.BR DL_CAPABILITY_REQ (7),
 .BR DL_CONNECT_CON (7),
 .BR DL_CONNECT_IND (7),
 .BR DL_CONNECT_REQ (7),
 .BR DL_CONNECT_RES (7),
+.BR DL_CONTROL_ACK (7),
+.BR DL_CONTROL_REQ (7),
 .BR DL_DATA_ACK_IND (7),
 .BR DL_DATA_ACK_REQ (7),
 .BR DL_DATA_ACK_STATUS_IND (7),
+.BR DL_DATA_IND (7),
+.BR DL_DATA_REQ (7),
 .BR DL_DETACH_REQ (7),
 .BR DL_DISABMULTI_REQ (7),
 .BR DL_DISCONNECT_IND (7),
@@ -1409,9 +1719,41 @@ primitives.
 .BR DL_ERROR_ACK (7),
 .BR DL_GET_STATISTICS_ACK (7),
 .BR DL_GET_STATISTICS_REQ (7),
+.BR DL_HP_CLEAR_LOCAL_BUSY_REQ (7),
+.BR DL_HP_CLEAR_STATS_REQ (7),
+.BR DL_HP_GET_64BIT_STATS_ACK (7),
+.BR DL_HP_GET_64BIT_STATS_REQ (7),
+.BR DL_HP_HW_RESET_REQ (7),
+.BR DL_HP_INFO_ACK (7),
+.BR DL_HP_INFO_REQ (7),
+.BR DL_HP_LINK_DOWN_IND (7),
+.BR DL_HP_LINK_UP_IND (7),
+.BR DL_HP_MULTICAST_LIST_ACK (7),
+.BR DL_HP_MULTICAST_LIST_REQ (7),
+.BR DL_HP_NOTIFY_EVENT_REQ (7),
+.BR DL_HP_PPA_ACK (7),
+.BR DL_HP_PPA_REQ (7),
+.BR DL_HP_RAWDATA_IND (7),
+.BR DL_HP_RAWDATA_REQ (7),
+.BR DL_HP_RESET_STATS_REQ (7),
+.BR DL_HP_SET_ACK_THRESHOLD_REQ (7),
+.BR DL_HP_SET_ACK_TO_REQ (7),
+.BR DL_HP_SET_BUSY_TO_REQ (7),
+.BR DL_HP_SET_LOCAL_BUSY_REQ (7),
+.BR DL_HP_SET_LOCAL_WIN_REQ (7),
+.BR DL_HP_SET_MAX_RETRIES_REQ (7),
+.BR DL_HP_SET_P_TO_REQ (7),
+.BR DL_HP_SET_REJ_TO_REQ (7),
+.BR DL_HP_SET_REMOTE_WIN_REQ (7),
+.BR DL_HP_SET_SEND_ACK_TO_REQ (7),
 .BR DL_INFO_ACK (7),
 .BR DL_INFO_REQ (7),
+.BR DL_INTR_MODE_REQ (7),
+.BR DL_NOTIFY_ACK (7),
+.BR DL_NOTIFY_IND (7),
+.BR DL_NOTIFY_REQ (7),
 .BR DL_OK_ACK (7),
+.BR DL_PASSIVE_REQ (7),
 .BR DL_PHYS_ADDR_ACK (7),
 .BR DL_PHYS_ADDR_REQ (7),
 .BR DL_PROMISCOFF_REQ (7),
@@ -1437,6 +1779,7 @@ primitives.
 .BR DL_TOKEN_REQ (7),
 .BR DL_UDERROR_IND (7),
 .BR DL_UDQOS_REQ (7),
+.BR DL_UNAGGR_REQ (7),
 .BR DL_UNBIND_REQ (7),
 .BR DL_UNITDATA_IND (7),
 .BR DL_UNITDATA_REQ (7),
@@ -1444,6 +1787,7 @@ primitives.
 .BR DL_XID_IND (7),
 .BR DL_XID_REQ (7),
 .BR DL_XID_RES (7).
+
 .\"
 .\"
 .SH COMPATIBILITY
@@ -1455,7 +1799,7 @@ dlpi revision 2.0.0
 and implementations based on DLPI, including
 .IR Solaris \(rg,
 .[
-soldlpi
+soldoc11
 .]
 .IR HP-UX \(rg,
 .[
@@ -1464,7 +1808,7 @@ hpuxdlpi
 and
 .IR AIX \(rg,
 .[
-aixdpli
+aixdlpi
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u

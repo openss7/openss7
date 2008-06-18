@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_xx25.h,v 0.9.2.2 2008-05-07 16:01:39 brian Exp $
+ @(#) $Id: xti_xx25.h,v 0.9.2.3 2008-06-18 16:45:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-07 16:01:39 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_xx25.h,v $
+ Revision 0.9.2.3  2008-06-18 16:45:26  brian
+ - widespread updates
+
  Revision 0.9.2.2  2008-05-07 16:01:39  brian
- - added NLI X.25-PLP CONS and XX25 implemetnation'
- doc/man/man3/XX25.3.man
- doc/man/man3/xti_x25.3.man
- doc/man/man4/X25.4.man
- doc/man/man5/strx25.5.man
- doc/man/man7/dlpi_lapb.7.man
- doc/man/man7/dlpi_llc2.7.man
- doc/man/man7/dlpi_x25.7.man
- src/drivers/npi.c
- src/include/npi_x25.h
- src/include/netx25/nli.h
- src/include/sys/npi_x25.h
- src/modules/dcc.h
- src/modules/npi.c
- src/modules/xx25.c
-
-
- cvsfiles=
+ - added NLI X.25-PLP CONS and XX25 implemetnation
 
  Revision 0.9.2.1  2008-05-03 10:46:38  brian
  - added package files
@@ -79,7 +65,7 @@
 #ifndef __XTI_XX25_H__
 #define __XTI_XX25_H__
 
-#ident "@(#) $RCSfile: xti_xx25.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_xx25.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  * This appendix presents the additional header file information for XX25.

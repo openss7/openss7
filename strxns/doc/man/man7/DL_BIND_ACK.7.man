@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_BIND_ACK.7.man,v 0.9.2.8 2008-05-25 12:49:26 brian Exp $
+.\" @(#) $Id: DL_BIND_ACK.7.man,v 0.9.2.9 2008-06-18 16:45:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_BIND_ACK.7.man,v $
+.\" Revision 0.9.2.9  2008-06-18 16:45:33  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.8  2008-05-25 12:49:26  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -102,7 +105,9 @@ The message consists of one
 message block, which contains the following structure:
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
 typedef struct {
     t_uscalar_t  dl_primitive;
     t_uscalar_t  dl_sap;
@@ -183,6 +188,12 @@ supported by the Provider.
 .RE
 .\"
 .\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
 .SH STATE
 The message is valid in state
 .BR DL_BIND_PENDING .
@@ -191,6 +202,117 @@ The message is valid in state
 .SH "NEW STATE"
 The resulting state is
 .BR DL_IDLE .
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_BIND_ACK
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+specifies that the
+.IR dl_addr_length " and " dl_addr_offset
+field describe a seven-byte
+.B llc_dladdr
+structure for LLC2 as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+#include <netdlc/llc2.h>
+
+struct llc_dladdr {
+    u_char dl_mac[6]; /* MAC address */
+    u_char dl_sap;    /* LLC SAP */
+};
+\s+1\fP
+.fi
+.PP
+and a zero-byte
+.B pstnformat
+structure for LAPB, as follows:
+.PP
+.nf
+\f(CW\s-1\
+#include <netx25/sdlpi.h>
+
+struct pstnformat {
+    uint8 pstn_len;     /* addess length in octets */
+    uint8 pstn_add[20]; /* LAPB address in hexadecimal */
+};
+\s+1\fP
+.fi
+.PP
+which is rather contradictory as the
+.B pstnformat
+structure could never be zero bytes long.
+.PP
+.B @PACKAGE_TITLE@
+uses a similar format for LLC2, with the exception that, if the underlying
+media is token ring, the MAC portion of the address is 8-bytes long.  For
+Ethernet, the MAC is six-bytes long and the Ethertype is two-bytes long.  For
+SNAP, the MAX is six- or eight-bytes long and the LSAP is 7 bytes long (5-byte
+SNAP plus 2-byte Ethertype).  For LAPB the SAP is zero-bytes long but the
+.I dl_sap
+field contains either 0 for DCE/DXE/STE or 1 for DTE.
+.PP
+.IR AIX \(rg
+and
+.IR HP-UX \(rg
+do not document this, but use format similar to, and compatibility with,
+.BR "@PACKAGE_TITLE@" .
+.RE
+.IP \(em
+.IR UnixWare \(rg
+documents that the
+.I dl_max_conind
+field must be set to zero (0).
+Note also that
+.IR UnixWare \(rg
+does not support connection-oriented mode data link service.
+.B @PACKAGE_TITLE@
+will set the
+.I dl_max_conind
+field to a zero (0) when the data link service mode is connectionless,
+.BR DL_CLDLS .
+.\"
+.\"
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

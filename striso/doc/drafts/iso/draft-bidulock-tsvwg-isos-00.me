@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: draft-bidulock-tsvwg-isos-00.me,v 0.9.2.1 2007/09/29 14:58:26 brian Exp $
+.\" @(#) $Id: draft-bidulock-tsvwg-isos-00.me,v 0.9.2.2 2008-06-18 16:45:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,18 +52,22 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/09/29 14:58:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: draft-bidulock-tsvwg-isos-00.me,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:17  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2007/09/29 14:58:26  brian
 .\" - added new files
 .\"
 .\" =========================================================================
 .ds version Version\ 0.0
-.ds date September\ 16,\ 2007
-.ds expiry March\ 2007
+.ds date May\ 8,\ 2008
+.ds expiry November\ 2008
+.ds year 2008
 .nr levels 0
 .so ../draft4.me
 .bp
@@ -88,7 +92,7 @@ Version: 1
 .)l
 .rr |x
 .ne 4
-.#S 2007 \*[expiry]
+.#S \*[year] \*[expiry]
 .uh "Abstract"
 .pp
 This document is a revision to STD35, RFC1006
@@ -221,7 +225,84 @@ internetwork.
 .#e
 .\"
 .\"
-.sh 1 "Motivation"
+.sh 1 "Scope"
+.pp
+.\"
+.sh 2 Terminology
+.pp
+This memo uses the following extended terminology:
+.lp
+\fBTransport Service Definition\fP \(em
+.ix +\n(iiu
+The OSI transport service definition.
+.[
+x214
+.]
+.\"
+.sh 2 Abbreviations
+.pp
+The following abbreviations are used throughout this memo:
+.TS
+tab(:);
+llil.
+:BCP:\*- Best Common Practice
+:CC:\*- Connect Confirm (TPDU)
+:CLNS:\*- Connection-less Network Service
+:CLTS:\*- COnnection-less Transport Service
+:CONS:\*- Connection Oriented Network Service
+:COTS:\*- Connection Oriented Transport Service
+:CR:\*- Connect Request (TPDU)
+:DC:\*- Disconnect Confirm (TPDU)
+:DR:\*- Disconnect Request (TPDU)
+:DT:\*- Data (TPDU)
+:ED:\*- Expedited Data (TPDU)
+:IETF:\*- Internet Engineering Task Force
+:IP:\*- Internet Protocol
+:IPR:\*- Intellectual Property Rights
+:ISO:\*- International Organization for Standardization
+:ISOS:\*- ISO Transprot over SCTP
+:ISOT:\*- ISO Transport over TCP
+:ITOS:\*- ISO Transprot over SCTP
+:ITOT:\*- ISO Transport over TCP
+:ITU:\*- International Telecommunications Union
+:ITU-T:\*- ITU (Telecom Sector)
+:NC:\*- Network Connection
+:NPDU:\*- Network PDU
+:NSAPA:\*- NSAP Address
+:NSAP:\*- Network Service Access Point
+:NSD:\*- Network Service Definition
+:NSDU:\*- Network SDU
+:NSEL:\*- Network Selector (N-Selector)
+:NS:\*- Network Service
+:OSI:\*- Open Systems Interconnect
+:PDU:\*- Protocol Data Unit
+:QOS:\*- Quality Of Service
+:RFC:\*- Request for Comments
+:SCTP:\*- Stream Control Transmission Protocol
+:SDU:\*- Service Data Unit
+:TCP:\*- Transmission Control Protocol
+:TC:\*- Transport Connection
+:TP0:\*- TP Class 0
+:TP1:\*- TP Class 1
+:TP2:\*- TP Class 2
+:TP3:\*- TP Class 3
+:TP4:\*- TP Class 4
+:TPDU:\*- Transport PDU
+:TP:\*- Transport Protocol
+:TSAPA:\*- TSAP Address
+:TSAP:\*- Transport Service Access Point
+:TSD:\*- Transport Service Definition
+:TSDU:\*- Transport SDU
+:TSEL:\*- Transport Selector (T-Selector)
+:TS:\*- Transport Service
+:ULP:\*- Upper Layer Program
+.TE
+.\"
+.sh 2 Conventions
+.pp
+.#C
+.\"
+.sh 2 "Motivation"
 .pp
 In migrating from the use of TCP/IP to the ISO protocols, there are several
 strategies that one might undertake.  This memo was written with one
@@ -298,7 +379,6 @@ ISO/IEC 8072
 .]
 .[
 ISO/IEC 8073
-%Z 1
 .]
 .[
 ISO/IEC 8327
@@ -401,7 +481,6 @@ This memo describes how to use these services to emulate the following service
 primitives, which are required by TP:
 .[
 ISO/IEC 8073
-%Z 1
 .]
 .(b
 .ce 1
@@ -499,15 +578,15 @@ primitives expected by transport class 0 are quite straight-forward:
 .(b
 .TS
 tab(:);
-lbsw(3.0i)lbw(2.5i).
+lbw(0.5i)sw(2.5i)lbw(2.5i).
 _:_
 Network Service:SCTP
 _:_
 .T&
-lissw(5.5i).
+liss.
 CONNECTION ESTABLISHMENT
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :N-CONNECT.REQUEST:T{
 open completes
 T}
@@ -522,10 +601,10 @@ open (ACTIVE open) finishes
 T}
 
 .T&
-lissw(5.5i).
+liss.
 DATA TRANSFER
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :N-DATA.REQUEST:T{
 send data
 T}
@@ -534,10 +613,10 @@ data ready followed by read data
 T}
 
 .T&
-lissw(5.5i).
+liss.
 CONNECTION RELEASE
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :N-DISCONNECT.REQUEST:T{
 close
 T}
@@ -551,15 +630,15 @@ Mapping parameters is also straight-forward:
 .(b
 .TS
 tab(:);
-lbsw(3.0i)lbw(2.5i).
+lbslb.
 _:_
 Network Service:SCTP
 _:_
 .T&
-lissw(5.5i).
+liss.
 CONNECTION ESTABLISHMENT
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :Called Address:T{
 .ad l
 .hy 0
@@ -573,10 +652,10 @@ T}
 :All other parameters:ignored
 
 .T&
-lissw(5.5i).
+liss.
 DATA TRANSFER
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :NS User Data (NSDU):T{
 .ad l
 .hy 0
@@ -584,10 +663,10 @@ DATA
 T}
 
 .T&
-lissw(5.5i).
+liss.
 CONNECTION RELEASE
 .T&
-lw(0.5i)lw(2.5i)lw(2.5i).
+lll.
 :all parameters:ignored\*#
 _
 .TE
@@ -693,13 +772,15 @@ octets in length.
 A TPKT consists of two parts:  a packet-header and a TPDU.  The format of the
 header is constant regardless of the type of packet.  The format of the
 packet-header is as follows:
-.(l L
+.(b C
+.nf
+\fC\s-1\
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |      vrsn     |    reserved   |          packet length        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-.)l
+.)b
 .lp
 where
 .ip vrsn 3.0i
@@ -726,7 +807,9 @@ To support expedited data, a non-standard TPDU, for expedited data is
 permitted.  The format used for the ED TPDU is nearly identical to the format
 for the normal data, DT, TPDU.  The only difference is that the value used for
 the TPDU's code is ED, not DT:
-.(l L
+.(b C
+.nf
+\fC\s-1\
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -736,7 +819,7 @@ the TPDU's code is ED, not DT:
 |      ...      |      ...      |      ...      |      ...      |
 |      ...      |      ...      |      ...      |      ...      |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-.)l
+.)b
 .lp
 After the credit field (which is always ZERO on output and ignored on input),
 there is one additional field prior to the user data.
@@ -789,6 +872,9 @@ minor formattting changes.
 .nf
 \fC\s-3
 $Log: draft-bidulock-tsvwg-isos-00.me,v $
+Revision 0.9.2.2  2008-06-18 16:45:17  brian
+- widespread updates
+
 Revision 0.9.2.1  2007/09/29 14:58:26  brian
 - added new files
 
@@ -815,4 +901,4 @@ for leading the way.
 .lp
 This draft expires \*[expiry].
 .)b
-.#T 2007
+.#T \*[year]
