@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_DISCONNECT_REQ.7.man,v 0.9.2.6 2008-05-25 12:49:26 brian Exp $
+.\" @(#) $Id: DL_DISCONNECT_REQ.7.man,v 0.9.2.7 2008-06-18 16:45:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_DISCONNECT_REQ.7.man,v $
+.\" Revision 0.9.2.7  2008-06-18 16:45:33  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.6  2008-05-25 12:49:26  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -104,7 +107,9 @@ The message consists of one
 message block containing the structure shown below.
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
 typedef struct {
     t_uscalar_t  dl_primitive;
     t_uscalar_t  dl_reason;
@@ -171,6 +176,12 @@ the value of
 should be zero.
 .\"
 .\"
+.SH MODE
+This primitive is valid in
+.B DL_CODLS
+mode.
+.\"
+.\"
 .SH STATE
 The message is valid in any of the states
 .BR DL_DATAXFER ,
@@ -210,6 +221,65 @@ The primitive was issued from an invalid state.
 A system error has occurred and the Linux system error is indicated in
 the
 .BR DL_ERROR_ACK (7).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_DISCONNECT_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.IR Solaris \(rg
+.[
+soldoc11
+.]
+does not support connection-oriented service mode directly.
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+only supports connection-oriented service mode.
+.IP \(em
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+specifies that any reason placed in the
+.I dl_reason
+field will be ignored as LLC2 and LAPB have no way of carrying a disconnect
+reason across the network.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

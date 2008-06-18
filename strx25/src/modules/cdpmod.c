@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdpmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-12 10:37:28 $
+ @(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-12 10:37:28 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdpmod.c,v $
+ Revision 0.9.2.2  2008-06-18 16:45:27  brian
+ - widespread updates
+
  Revision 0.9.2.1  2008-05-12 10:37:28  brian
  - added CD pipe module
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdpmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-12 10:37:28 $"
+#ident "@(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
 
-static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-12 10:37:28 $";
+static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $";
 
 /*
  * This is a CD pipe module.  It pushes over one side of a STREAMS-based pipe
@@ -69,20 +72,13 @@ static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name: OpenSS7-0_9_2 $($Revi
 #define _MPS_SOURCE
 
 #include <sys/os7/compat.h>
+#include <sys/strsun.h>
 #include <sys/cdi.h>
-
-#ifndef DB_TYPE
-#define DB_TYPE(mp) (mp->b_datap->db_type)
-#endif				/* DB_TYPE */
-
-#ifndef MBLKIN
-#define MBLKIN(mp,off,len) (mp->b_wptr >= mp->b_rptr + off + len)
-#endif
 
 #define CDPMOD_DESCRIP	"HDLC PIPE MODULE FOR LINUX FAST-STREAMS"
 #define CDPMOD_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define CDPMOD_COPYRIGHT "Copyright (c) 1997-2008  OpenSS7 Corporaiton.  All Rights Reserved."
-#define CDPMOD_REVISION	"OpenSS7 $RCSfile: cdpmod.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-12 10:37:28 $"
+#define CDPMOD_REVISION	"OpenSS7 $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
 #define CDPMOD_DEVICE	"SVR 4.2MP CD PIPE Module (CDPMOD) for HDLC"
 #define CDPMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDPMOD_LICENSE	"GPL"
@@ -1525,7 +1521,7 @@ MODULE_PARM_DESC(modid, "Module ID for CDPMOD.  (0 for allocation.)");
 #endif				/* LIS */
 
 struct fmodsw cd_fmod = {
-	.f_name = "chpmod",
+	.f_name = MOD_NAME,
 	.f_str = &cdpmod_info,
 	.f_flag = D_MP,
 	.f_kmod = THIS_MODULE,

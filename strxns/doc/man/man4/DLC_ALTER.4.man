@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_ALTER.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_ALTER.4.man,v 0.9.2.2 2008-06-18 16:45:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_ALTER.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:29  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -307,6 +310,33 @@ inactivity without termination.
 .B DLC_ALT_IT2
 Set automatic halt for inactivity timeout mode.
 Inativity causes the LS to be halted.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.BR DLC_ALT_SM1 " and " DLC_ALT_SM2
+flags are not supported.
+.TP
+.B DLC TOKEN
+The
+.BR DLC_ALT_SM1 " and " DLC_ALT_SM2
+flags are not supported.
+.TP
+.B DLC 8023
+The
+.BR DLC_ALT_SM1 " and " DLC_ALT_SM2
+flags are not supported.
+.TP
+.B DLC ETHER
+The
+.BR DLC_ALT_RTE ", " DLC_ALT_SM1 " and " DLC_ALT_SM2
+flags are not supported.
+.TP
+.B DLC SDLC
+The
+.BR DLC_ALT_AKT " and " DLC_ALT_RTE
+flags are not supported.
 .RE
 .TP
 .I repoll_time
@@ -352,6 +382,15 @@ and X.25 LAPB.
 .[
 x25
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC SDLC
+The
+.I ack_time
+(acknowledgement timeout) field is ignored.
+.RE
 .TP
 .I inact_time
 When the
@@ -462,12 +501,30 @@ flag is set, this field specifies the new value of the LS
 routing field length.
 This is the route that subsequent transmit packets take when transferring data
 across a local area network bridge.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC SDLC
+The
+.I routing_len
+field is ignored.
+.RE
 .TP
 .I routing
 When the
 .B DLC_ALT_RTE
 flag is set, this field specifies the new value of the LS
 routing data.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC SDLC
+The
+.I routing
+field is ignored.
+.RE
 .TP
 .I result_flags
 Returns the following result indicators at the completion of the alter
@@ -510,6 +567,118 @@ additional fields.  This optional data area must directly follow (or append to)
 the end of the
 .B dlc_alter_arg
 structure.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+A protocol-specific data area must be appended to the generic alter link
+station argument structure
+.RB ( dlc_alter_arg ).
+This structure provides DLC FDDI with additional protocol-specific alter
+parameters as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+#define FDL_ALTER_PRTY 0x80000000\" /* alter packet priority */
+#define FDL_ALTER_DYNA 0x40000000\" /* alter dynamic window increment */
+
+struct fdl_alter_psd {
+    uint32_t flags;\"     /* specific alter flags */
+    uint8_t pkt_prty;\"   /* ring access packet priority value */
+    uint8_t dyna_wnd;\"   /* dynamic window increment value */
+    uint16_t reserved;\"  /* reserved, not used, padding for alignment */
+};
+\s+1\fP
+.fi
+.PP
+The protocol-specific data has the following members:
+.TP
+.I flags
+Specifies the alter flags.  This field can be a combination of one or more of
+the following flags:
+.RS
+.TP
+.B FDL_ALTER_PRTY
+Specifies alter priority.  When set, the
+.I pkt_prty
+value field replaces the current priority value being used by the link station.
+The link station must be started for this alter command to be valid.
+.TP
+.B FDL_ALTER_DYNA
+Specifies the dynamic window increment.  When set, the
+.I dnya_wnd
+value field replaces the current dynamic windo value being used by the link
+station.  The link station must be started for this alter command to be valid.
+.RE
+.TP
+.I pkt_prty
+Specifies the new priority reservation value for transmit packets.
+.TP
+.I dyna_wnd
+Specifies the new dynamic window value to control network congestion.
+.RE
+.TP
+.B DLC TOKEN
+A protocol-specific data area must be appended to the generic alter link
+station argument structure
+.RB ( dlc_alter_arg ).
+This structure provides DLC TOKEN with additional protocol-specific alter
+parameters as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+#define TRL_ALTER_PRTY 0x80000000\" /* alter packet priority */
+#define TRL_ALTER_DYNA 0x40000000\" /* alter dynamic window increment */
+
+struct trl_alter_psd {
+    uint32_t flags;\"     /* specific alter flags */
+    uint8_t pkt_prty;\"   /* ring access packet priority value */
+    uint8_t dyna_wnd;\"   /* dynamic window increment value */
+    uint16_t reserved;\"  /* reserved, not used, padding for alignment */
+};
+\s+1\fP
+.fi
+.PP
+The protocol-specific data has the following members:
+.TP
+.I flags
+Specifies the alter flags.  This field can be a combination of one or more of
+the following flags:
+.RS
+.TP
+.B TRL_ALTER_PRTY
+Specifies alter priority.  When set, the
+.I pkt_prty
+value field replaces the current priority value being used by the link station.
+The link station must be started for this alter command to be valid.
+.TP
+.B TRL_ALTER_DYNA
+Specifies the dynamic window increment.  When set, the
+.I dnya_wnd
+value field replaces the current dynamic windo value being used by the link
+station.  The link station must be started for this alter command to be valid.
+.RE
+.TP
+.I pkt_prty
+Specifies the new priority reservation value for transmit packets.
+.TP
+.I dyna_wnd
+Specifies the new dynamic window value to control network congestion.
+.RE
+.TP
+.B DLC 8023
+A protocol-specific data area is not required for DLC 8023 to alter a link
+station.
+.TP
+.B DLC ETHER
+A protocol-specific data area is not required for DLC ETHER to alter a link
+station.
+.TP
+.B DLC SDLC
+A protocol-specific data area is not required for DLC SDLC to alter a link
+station.
 .\"
 .\"
 .SH RETURN

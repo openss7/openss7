@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_INTR_MODE_REQ.7.man,v 0.9.2.1 2008-05-25 12:46:54 brian Exp $
+.\" @(#) $Id: DL_INTR_MODE_REQ.7.man,v 0.9.2.2 2008-06-18 16:45:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_INTR_MODE_REQ.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:34  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:54  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -90,7 +93,7 @@ dlpi revision 2.0.0
 .]
 .IR Solaris \(rg-specific.
 .[
-soldlpi
+soldoc11
 .]
 .\"
 .\"
@@ -120,6 +123,12 @@ typedef struct {
 .I dl_primitive
 conveys
 .BR DL_INTR_MODE_REQ .
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
@@ -175,7 +184,7 @@ header file to expose the declarations and structures associated with this primi
 is compatibible with
 .IR Solaris \(rg,
 .[
-soldoc10
+soldoc11
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -227,7 +236,7 @@ svr4
 was first documented in
 .IR Solaris \(rg .
 .[
-soldoc10
+soldoc11
 .]
 .\"
 .\"

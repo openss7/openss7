@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xnetdb.h,v 0.9.2.3 2008-05-07 16:01:40 brian Exp $
+ @(#) $Id: xnetdb.h,v 0.9.2.4 2008-06-18 16:45:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,30 +46,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-07 16:01:40 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnetdb.h,v $
+ Revision 0.9.2.4  2008-06-18 16:45:25  brian
+ - widespread updates
+
  Revision 0.9.2.3  2008-05-07 16:01:40  brian
- - added NLI X.25-PLP CONS and XX25 implemetnation'
- doc/man/man3/XX25.3.man
- doc/man/man3/xti_x25.3.man
- doc/man/man4/X25.4.man
- doc/man/man5/strx25.5.man
- doc/man/man7/dlpi_lapb.7.man
- doc/man/man7/dlpi_llc2.7.man
- doc/man/man7/dlpi_x25.7.man
- src/drivers/npi.c
- src/include/npi_x25.h
- src/include/netx25/nli.h
- src/include/sys/npi_x25.h
- src/modules/dcc.h
- src/modules/npi.c
- src/modules/xx25.c
-
-
- cvsfiles=
+ - added NLI X.25-PLP CONS and XX25 implemetnation
 
  Revision 0.9.2.2  2008-05-03 21:22:37  brian
  - updates for release
@@ -82,12 +68,13 @@
 #ifndef __NETX25_XNETDB_H__
 #define __NETX25_XNETDB_H__
 
-#ident "@(#) $RCSfile: xnetdb.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xnetdb.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed wtih doxygen(1). */
 
 #include <stdint.h>
 #include <sys/types.h>
+#include <netx25/x25_proto.h>
 
 /** @weakgroup sx25
   * @{ */
@@ -105,46 +92,6 @@ struct MLP_config_data;
 struct LAPB_config_data;
 struct LLC2_config_data;
 struct WAN_config_data;
-
-/* Addressing is defined by the xaddrf structure.  The members of the xaddrf
- * structure are:
- *
- * link_id:	Holds the link number as a uint32_t.  By default, link_id has
- *		a value of 0xFF.  When link_id is 0xFF, X.25 attempts to match
- *		the called address with an entry in a routing configuration
- *		file.  If it cannot find a match, it routes the call over the
- *		lowest numbered WAN link.
- *
- * aflags:	Specifies the options required or used by the subnetwork to
- *		encode and interpret addresses.  These take on of these values:
- *
- *		NSAP_ADDR   0x00    NSAP field contains OSI-encoded NSAP
- *				    address.
- *		EXT_ADDR    0x01    NSAP field contains non-OSI-encoded
- *				    extended address.
- *		PVC_LCI	    0x02    NSAP field contains a PVC number.
- *
- * DTE_MAC:	The DTE address or LSAP as two BCD digits per byte, right
- *		justified, or the PVC_LCI as three BCD digits with two digits
- *		per byte, right justified.
- *
- * nsap_len:	The length in semi-octets of the NSAP as two BCD digits per
- *		byte, right justified.
- *
- * NSAP:	The NSAP or address extension (see aflags) as two BCD digits
- *		per byte, right justified.
- */
-#define NSAPMAXSIZE 20
-struct xaddrf {
-	uint32_t link_id;
-	unsigned char aflags;
-#define EXT_ADDR	0x00		/* X.121 subaddress */
-#define NSAP_ADDR	0x01		/* NSAP address */
-#define PVC_LCI		0x02		/* PVC LCI number 0-4095 3 semi-octets */
-	struct lsapformat DTE_MAC;	/* X.121 DTE address or IEEE 802 MAC */
-	unsigned char nsap_len;
-	unsigned char NSAP[NSAPMAXSIZE];
-};
 
 /* The padent structure is defined in netx25/xnetdb.h.  The structure contains
  * a single entry from the /etc/x25/padmapconf file.  This contains
@@ -220,6 +167,14 @@ extern unsigned long linkidtox25(unsigned char *str_linkid);
 /**
   * a weak alias of __sx25_x25tolinkid(). */
 extern int x25tolinkid(unsigned long linkid, unsigned char *str_linkid);
+
+/**
+  * a weak alias of __sx25_snidtox25(). */
+extern unsigned long snidtox25(unsigned char *str_snid);
+
+/**
+  * a weak alias of __sx25_x25tosnid(). */
+extern int x25tosnid(unsigned long snid, unsigned char *str_snid);
 
 /**
   * a weak alias of __sx25_getnettype(). */
@@ -333,6 +288,8 @@ extern int x25_write_config_parameters_file(char *filename,
 extern int __sx25_padtos(struct padent *p, unsigned char *strp);
 extern unsigned long __sx25_linkidtox25(unsigned char *str_linkid);
 extern int __sx25_x25tolinkid(unsigned long linkid, unsigned char *str_linkid);
+extern unsigned long __sx25_snidtox25(unsigned char *str_snid);
+extern int __sx25_x25tosnid(unsigned long snid, unsigned char *str_snid);
 extern int __sx25_getnettype(unsigned char *linkid);
 
 extern void __sx25_setpadent(int stayopen);

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_DEL_GRP.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_DEL_GRP.4.man,v 0.9.2.2 2008-06-18 16:45:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_DEL_GRP.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:29  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -139,6 +142,39 @@ Specifies the group or multicast address length in octets.
 .TP
 .I grp_addr
 Specifies the group or multicast address to be removed.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The delete group or multicast option is supported by the DLC FDDI device
+manager.  The address being removed must match an address that was added with
+a
+.BR DLC_ENABLE_SAP "(4) or " DLC_ADD_GRP (4)
+input-output control operation.
+.TP
+.B DLC TOKEN
+The delete group or multicast option is supported by the DLC TOKEN device
+manager.  The address being removed must match an address that was added with
+a
+.BR DLC_ENABLE_SAP "(4) or " DLC_ADD_GRP (4)
+input-output control operation.
+.TP
+.B DLC 8023
+The delete group or multicast option is supported by the DLC 8023 device
+manager.  The address being removed must match an address that was added with
+a
+.BR DLC_ENABLE_SAP "(4) or " DLC_ADD_GRP (4)
+input-output control operation.
+.TP
+.B DLC ETHER
+The delete group or multicast option is supported by the DLC ETHER device
+manager.  The address being removed must match an address that was added with
+a
+.BR DLC_ENABLE_SAP "(4) or " DLC_ADD_GRP (4)
+input-output control operation.
+.TP
+.B DLC SDLC
+This input-output control is not supported by DLC SDLC.
 .\"
 .\"
 .SH RETURN

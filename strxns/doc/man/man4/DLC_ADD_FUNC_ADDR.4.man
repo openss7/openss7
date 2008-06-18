@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_ADD_FUNC_ADDR.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_ADD_FUNC_ADDR.4.man,v 0.9.2.2 2008-06-18 16:45:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_ADD_FUNC_ADDR.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:29  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -141,10 +144,46 @@ correlator being requested to delete a functional address from a port.
 .TP
 .I len_func_addr_mask
 Specifies the byte length of the functional address mask to be deleted.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC TOKEN
+The
+.I len_func_addr_mask
+(functional address mask length) field must be set to 4.
+.RE
 .TP
 .I func_addr_mask
 Specifies the functional address of the adapter.  See the individual DLC
 interface documentation for the lengt and format of this field.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC TOKEN
+The
+.I func_addr_mask
+(functional address mask) field must be the logical OR operation with the
+functional address on the adapter.  Only bits 1 through 29 are valid.  Bits 0,
+30 and 31 are ignored.  The most significant two bytes of the full six-byte
+functional address are automatically compared for 0xC000 by the adapter and
+cannot be added.
+.RE
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The add functional address option is not supported.
+.TP
+.B DLC 8023
+The add functional address option is not supported.
+.TP
+.B DLC ETHER
+The add functional address option is not supported.
+.TP
+.B DLC SDLC
+The add functional address option is not supported.
 .\"
 .\"
 .SH RETURN

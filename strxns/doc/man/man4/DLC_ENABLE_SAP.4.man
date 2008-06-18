@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_ENABLE_SAP.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_ENABLE_SAP.4.man,v 0.9.2.2 2008-06-18 16:45:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_ENABLE_SAP.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:30  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -209,6 +212,24 @@ GDLC does not distinguish whether a received packet was accepted by the
 adapter due to a pre-set network, group or functional address.  If the SAP
 address matches and the packet is otherwise valid (no protocol errors, for
 instance), the received packet is passed to the user.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The functional address mask field is not supported.
+.TP
+.B DLC TOKEN
+The
+.I func_addr_mask
+(functional address mask) field must be the logical OR operation with the
+functional address on the adapter, which allows packets that are destined for
+specified functions to be received by the local adapter.  Only bits 1 through
+29 are valid.  Bits 0, 30, and 31 are ignored.  The most significant two bytes
+of the full six-byte functional address are automatically compared for 0xC000
+by the adapter.
+.TP
+.B DLC SDLC
+The functional address mask field is not supported.
 .RE
 .TP
 .I leng_grp_addr
@@ -227,16 +248,94 @@ adapter.
 Most adapters allows only one group address to be active at a time.  If this
 field is nonzero and the adapter rejects the group address because it is
 already in use, the enable SAP call fails with an appropriate error code.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I grp_addr
+field contains the full six-byte group address with the individual control
+bits, group control bits, universal control bits, and local control bits
+located in the most significant bit positions of the first (lefmost) byte.
+.TP
+.B DLC TOKEN
+The
+.I grp_addr
+(group address) field for token ring contains the four least significant bytes
+of the desired six-byte group address.  Only bits 1 thorugh 31 are valid.  Bit
+0 is ignored.  The most significant two bytes are automatically compared for
+0xC000 by the adapter.
+.TP
+.B DLC 8023
+The
+.I grp_addr
+(group address) field is a 6-byte value as specified in the IEEE Standard 802.3
+specifications.  Octet
+.IR grp_addr [0]
+specifies the most significant byte and
+.IR grp_addr [5]
+the least significant byte.  Each octet of the address field is transmitted,
+least significant bit first.  Group addresses sometimes are called multicast
+addresses.
+.TP
+.B DLC ETHER
+The
+.I grp_addr
+(group address) field is a 6-byte value as specified in the IEEE Standard 802.3
+specifications.  Octet
+.IR grp_addr [0]
+specifies the most significant byte and
+.IR grp_addr [5]
+the least significant byte.  Each octet of the address field is transmitted,
+least significant bit first.  Group addresses sometimes are called multicast
+addresses.
+.TP
+.B DLC SDLC
+The
+.I grp_addr
+(group address) field is not supported.
 .RE
 .TP
 .I max_ls
 Specifies the maximum number of link stations (LS) allowed to operate
 concurrently on a particular SAP.  The protocol used determines the values for
 this field.
+.RS
+.PP
+The following protocol specific considerations apply:
+.TP
+.B DLC FDDI
+The maximum link stations field cannot exceed a value of 255.
+.TP
+.B DLC TOKEN
+The
+.I max_ls
+(maximum link stations) field cannot exceed a value of 255.
+.TP
+.B DLC 8023
+The
+.I max_ls
+(maximum link stations) field cannot exceed a value of 255.
+.TP
+.B DLC ETHER
+The
+.I max_ls
+(maximum link stations) field cannot exceed a value of 255.
+.TP
+.B DLC SDLC
+The
+.I max_ls
+(maximum link stations) field cannot exceed a value of 254 on a multidrop
+primary link or a multiple-PU secondary link, and cannot exceed 1 on a
+point-to-point link.
+.RE
 .TP
 .I flags
 Supports the following flags of the input-output control operation:
 .RS
+.TP
+.B DLC_ESAP_ENCD
+Specifies a synchronous data link control (SDLC) serial encoding.
 .TP
 .B DLC_ESAP_NTWK
 The teleprocessing network type.  When this flag is set, it indicates that
@@ -263,6 +362,53 @@ default is a local name.
 The teleprocessing autocall or autoanswer.  When this flag is set, it
 indicates that automatic calls and answers are performed; when clear, that
 manual call and answer is required.  The default is manual call and answer.
+.PP
+The following protocol specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.BR DLC_ESAP_ENCD ,
+.BR DLC_ESAP_NTWK ,
+.BR DLC_ESAP_LINK ,
+.BR DLC_ESAP_PHYC ,
+and
+.BR DLC_ESAP_ANSW ,
+flags are not supported.
+.TP
+.B DLC TOKEN
+The
+.BR DLC_ESAP_ENCD ,
+.BR DLC_ESAP_NTWK ,
+.BR DLC_ESAP_LINK ,
+.BR DLC_ESAP_PHYC ,
+and
+.BR DLC_ESAP_ANSW ,
+flags are not supported.
+.TP
+.B DLC 8023
+The
+.BR DLC_ESAP_ENCD ,
+.BR DLC_ESAP_NTWK ,
+.BR DLC_ESAP_LINK ,
+.BR DLC_ESAP_PHYC ,
+and
+.BR DLC_ESAP_ANSW ,
+flags are not supported.
+.TP
+.B DLC ETHER
+The
+.BR DLC_ESAP_ENCD ,
+.BR DLC_ESAP_NTWK ,
+.BR DLC_ESAP_LINK ,
+.BR DLC_ESAP_PHYC ,
+and
+.BR DLC_ESAP_ANSW ,
+flags are not supported.
+.TP
+.B DLC SDLC
+The
+.BR DLC_ESAP_ADDR
+flag is not supported.
 .RE
 .TP
 .I len_laddr_name
@@ -270,6 +416,68 @@ Specifies the byte length of the following local address or name.  Length
 values of one (1) through
 .B DL_MAX_ADDR
 are supported.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I laddr_name
+(local address or name) field and its associated length are only used for name
+discovery when the common SAP field flag
+.B DLC_ESAP_ADDR
+is set to zero (0).  When resolve parameters are used (the
+.B DLC_ESAP_ADDR
+flag is set to 1), DLC FDDI obtains the local network address from the device
+handler and not from the
+.B dl_esap_arg
+structure.
+.TP
+.B DLC TOKEN
+The
+.I laddr_name
+(local address or name) field and its associated length are only used for name
+discovery when the common SAP flag
+.B DLC_ESAP_ADDR
+is clear.  When resolve procedures are used (that is, the
+.B DLC_ESAP_ADDR
+flag is set), DLC TOKEN obtains the local network address from the device
+handler and not from the
+.B dlc_esap_arg
+structure.
+.TP
+.B DLC 8023
+The
+.I laddr_name
+(local address or name) field and its associated length are only used for name
+discovery when the common SAP flag
+.B DLC_ESAP_ADDR
+is clear.  When resolve procedures are used (that is, the
+.B DLC_ESAP_ADDR
+flag is set), DLC TOKEN obtains the local network address from the device
+handler and not from the
+.B dlc_esap_arg
+structure.
+.TP
+.B DLC ETHER
+The
+.I laddr_name
+(local address or name) field and its associated length are only used for name
+discovery when the common SAP flag
+.B DLC_ESAP_ADDR
+is clear.  When resolve procedures are used (that is, the
+.B DLC_ESAP_ADDR
+flag is set), DLC TOKEN obtains the local network address from the device
+handler and not from the
+.B dlc_esap_arg
+structure.
+.TP
+.B DLC SDLC
+The
+.I laddr_name
+(local address or name) filed is not supported, so the length of the local
+address/name field is ignored.
+.RE
 .TP
 .I laddr_name
 Specifies the unique network name or address of the user local SAP as
@@ -286,11 +494,69 @@ Specifies the number of group SAPs to which the user's local SAP responds.  If
 no group SAPs are needed, this field must contain zero (0).  Up to
 .B DL_MAX_GSAPS
 SAPs can be specified.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC TOKEN
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC 8023
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC ETHER
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC SDLC
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.RE
 .TP
 .I grp_sap
 Specifies the specific group SAP values to which the user local SAP responds
 .RB ( DL_MAX_GSAPS
 maximum).
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC TOKEN
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC 8023
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC ETHER
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.TP
+.B DLC SDLC
+Group SAPs are not supported, so the
+.I num_grp_saps
+field must be set to zero (0).
+.RE
 .TP
 .I res1
 Reserved field, set to zero (0).
@@ -299,6 +565,43 @@ Reserved field, set to zero (0).
 Specifies the local SAP address opened.  Received packets with this LSAP value
 indicated in the destination LSAP field are routed to the link stations (LS)
 opened under this particular SAP.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I local_sap
+(local service access point) field can be set to any value except the null SAP
+(0x00) or the name-discovery SAP (0xfc).  Also, the low-order bit must be set
+to zero (0) (B'XXXXXXX0') to indicate an individual address.
+.TP
+.B DLC TOKEN
+The
+.I local_sap
+(local service access point) field can be set to any value except null SAP
+(0x00) or discovery SAP (0xfc).  Also, the low-order bit must be set to zero
+(B'XXXXXX0') to indicate an individual address.
+.TP
+.B DLC 8023
+The
+.I local_sap
+(local service access point) field can be set to any value except null SAP
+(0x00) or discovery SAP (0xfc).  Also, the low-order bit must be set to zero
+(B'XXXXXX0') to indicate an individual address.
+.TP
+.B DLC ETHER
+The
+.I local_sap
+(local service access point) field can be set to any value except null SAP
+(0x00) or discovery SAP (0xfc).  Also, the low-order bit must be set to zero
+(B'XXXXXX0') to indicate an individual address.
+.TP
+.B DLC SDLC
+The
+.I local_sap
+(local service access point) field is not supported and is ignored.
+.RE
 .PP
 The protocol-specific data area allows parameters to be defined by the
 specific GDLC device manager, such as X.21 call-progress signals or Smartmodem
@@ -306,6 +609,28 @@ call-establishment data.  This optional data area must directly follow (or
 append to) the end of the
 .B dlc_esap_arg
 structure.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+No protocol-specific data area is required for DLC FDDI to enable a SAP.
+.TP
+.B DLC TOKEN
+No protocol-specific data area is required for DLC TOKEN to enable a SAP.
+.TP
+.B DLC 8023
+No protocol-specific data area is required for DLC TOKEN to enable a SAP.
+.TP
+.B DLC ETHER
+No protocol-specific data area is required for DLC TOKEN to enable a SAP.
+.TP
+.B DLC SDLC
+The protocol specific data area is identical to the start device structure
+required by the multiprotocol device handler.  See the
+.B /usr/include/sys/mpqp.h
+file and the
+.B t_start_dev
+structure for more details.
 .\"
 .\"
 .SH RETURN

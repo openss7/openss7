@@ -1,11 +1,132 @@
-%L XNS
+%K XNS99 XNS
+%L XNS99
 %A Open\ Group
-%R XNS Issue 5.2 Draft 2.0
+%R XNS
+%J Issue 5.2, Draft 2
+%S Open Group CAE Specification
 %T Technical Standard: Network Services (XNS)
 %D 1999
+%C Berkshire, UK
 %I Open Group Publication
 %G ISBN 1-85912-241-8
 %U http://www.opengroup.org/onlinepubs/
+
+%K XNS98
+%L XNS98
+%A Open\ Group
+%R C523 (XNS)
+%S CAE Specification
+%T Networking Services (XNS)
+%J Issue 5
+%D February 1997
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-165-9
+%U http://www.opengroup.org/onlinepubs/
+
+%L XMP
+%A X/Open
+%R C306 (XMP)
+%T Systems Management: Management Protocols API (XMP)
+%D March 1994
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-85912-027-X
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XAP
+%A X/Open
+%R C303 (XAP)
+%T ACSE/Presentation Services API (XAP)
+%D September 1993
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-872630-91-X
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XAP-TP
+%A X/Open
+%R C409 (XAP-TP)
+%T ACSE/Presentation: Transaction Procesing API (XAP-TP)
+%D March 1995
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-85912-091-1
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XAP-ROSE
+%A X/Open
+%R C408 (XAP-ROSE)
+%T Remote Operations Service Element (XAP-ROSE) API
+%D January 1995
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN: 1-85912-060-1
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XOM
+%A X/Open
+%R C607 (XOM)
+%T OSI-Abstract-Data Manipulation API (XOM)
+%J Issue 3
+%D May 1996
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-175-6
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XDS
+%A X/Open
+%R C608 (XDS)
+%T API to Directory Services (XDS)
+%J Issue 3
+%D May 1996
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-180-2
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%K XMHS
+%L X400
+%A X/Open
+%R C609 (X400)
+%T API to Electronic Mail (X.400)
+%J Issue 3
+%D May 1996
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-185-3
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XMS
+%A X/Open
+%R C305 (XMS)
+%T Message Store API (XMS)
+%D June 1993
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-872630-83-9
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XFTAM
+%A X/Open
+%R C415 (XFTAM)
+%T FTAM High-Level API (XFTAM)
+%J Version 2
+%D October 1995
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-092-X
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
 
 %L XTI
 %A XPG
@@ -13,14 +134,39 @@
 %D n.d.
 %R XTI/TLI Revision 1.0
 %T XOpen Transport Interface
+%C Berkshire, UK
 %I X Programmer's Group
 %U http://www.opengroup.org/onlinepubs/
+%S Open Group CAE Specification
+%J Revision 1
+
+%L XX25
+%A X/Open
+%R C411 (XX25)
+%T X.25 Programming Interface using XTI (XX25)
+%D November 1995
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-136-5
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XGDMO
+%A X/Open
+%R C502 (XGDMO)
+%T GDMO\ to\ XOM Translation Algorithm
+%D October 1995
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-126-8
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
 
 %L TCI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
-%R TCI Revision 0.9.2
-%N Draft 2
+%R TCI
+%J Revision 0.9.2, Draft 2
 %T Transaction Component Interface (TCI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
@@ -31,8 +177,8 @@
 %L TRI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
-%R TRI Revision 0.9.2
-%N Draft 2
+%R TRI
+%J Revision 0.9.2, Draft 2
 %T Transaction Interface (TRI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
@@ -44,29 +190,31 @@
 %A Open\ Group
 %Q Open\ Group
 %R TPI Revision 2.0.0
-%N Draft 2
+%J Revision 2.0.0, Draft 2
 %T Transport Provider Interface (TPI) Specification
 %D 1999
-%C Parsippany, New Jersey
+%C Berkshire, UK
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
+%S Open Group CAE Specification
 
 %L NPI
 %A UNIX\ International,\ Inc.
 %Q UNIX\ International,\ Inc.
-%R NPI Revision 2.0.0
-%N Draft 2
+%R NPI
+%J Revision 2.0.0, Draft 2
 %T Network Provider Interface (NPI) Specification
 %D August 17, 1992
 %C Parsippany, New Jersey
 %I UNIX International Press
 %U http://www.openss7.org/docs/npi.pdf
+%S Open Group CAE Specification
 
 %L DLPI
 %A UNIX International,\ Inc.
 %Q UNIX International,\ Inc.
-%R DLPI Revision 2.0.0
-%N Draft 2
+%R DLPI
+%J Revision 2.0.0, Draft 2
 %T Data Link Provider Interface (DLPI) Specification
 %D August 20, 1991
 %C Parsippany, New Jersey
@@ -76,13 +224,23 @@
 %L TLI
 %A UNIX\ International,\ Inc.
 %Q UNIX\ International,\ Inc.
-%R TLI Revision 1.5
-%N Draft 2
+%R TLI
+%J Revision 1.5, Draft 2
 %T Transport Provider Interface Specification
 %D December 10, 1992
 %C Parsippany, New Jersey
 %I Unix International Press
 %U http://www.openss7.org/doc/tpi.pdf
+
+%L APLI
+%A UNIX\ International,\ Inc.
+%Q UNIX\ International,\ Inc.
+%R APLI
+%J Draft
+%T ACSE/Presentation Library Interface (APLI) Specification
+%D October 25, 1990
+%C Parsippany, New Jersey
+%I Unix International Press
 
 %L CDI
 %A Geoffrey Gerrien
@@ -90,12 +248,24 @@
 %I Gcom, Inc.
 %D March 1999
 
+%L NLI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R NLI
+%J Revision 0.9.2, Draft 1
+%T OpenSS7 CAE Specification: Network Layer Interface (NLI) Specification
+%D June 9, 2008
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/nli.pdf
+%O Distributed with package strx25-0.9.2.
+
 %L CDI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R CDI Revision 0.9.2
-%N Draft 2
-%T Communications Device Interface (CDI) Specification
+%R CDI
+%J Revision 0.9.2, Draft 2
+%T OpenSS7 CAE Specification: Communications Device Interface (CDI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
@@ -105,8 +275,8 @@
 %L LMI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R LMI Revision 0.9.2
-%N Draft 2
+%R LMI
+%J Revision 0.9.2, Draft 2
 %T Local Management Interface (LMI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -117,8 +287,8 @@
 %L SLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SLI Revision 0.9.2
-%N Draft 2
+%R SLI
+%J Revision 0.9.2, Draft 2
 %T Signalling Link Interface (SLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -129,8 +299,8 @@
 %L SDTI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SDTI Revision 0.9.2
-%N Draft 2
+%R SDTI
+%J Revision 0.9.2, Draft 2
 %T Signalling Data Terminal Interface (SDTI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -141,8 +311,8 @@
 %L SDLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SDLI Revision 0.9.2
-%N Draft 2
+%R SDLI
+%J Revision 0.9.2, Draft 2
 %T Signalling Data Link Interface (SDLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -153,8 +323,8 @@
 %L MTPI
 %A Brian Bidulock
 %Q OpenSS7\ Corporation
-%R MTPI Revision 0.9.2
-%N Draft 1
+%R MTPI
+%J Revision 0.9.2, Draft 1
 %T Message Transfer Provider Interface (MTPI)  Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -165,8 +335,8 @@
 %L CHI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R CHI Revision 0.9.2
-%N Draft 2
+%R CHI
+%J Revision 0.9.2, Draft 2
 %T Channel Interface (CHI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -176,8 +346,8 @@
 %L MXI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R MXI Revision 0.9.2
-%N Draft 2
+%R MXI
+%J Revision 0.9.2, Draft 2
 %T Multiplex Interface (MXI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -274,7 +444,7 @@
 %R ETSI TS 100 939-V7.3.0 (1999-12)
 %T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface signalling layer 3 \(em General aspects
 %D December 1999
-%N GSM 04.07 Version 7.3.0 Release 1998
+%J GSM 04.07 Version 7.3.0 Release 1998
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -286,7 +456,7 @@
 %R ETSI ETS 300 557-1999
 %T Digial cellular telecommunications system (Phase 2) \(em Mobile radio interface \(em Layer 3 specification
 %D December 1999
-%N GSM 04.08 Version 4.23.1 Release 1999
+%J GSM 04.08 Version 4.23.1 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -298,7 +468,7 @@
 %R ETSI TS 100 940-V7.10.0 (2000-12)
 %T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface layer 3 specification
 %D December 2000
-%N 3GPP TS 04.08 Version 7.10.0 Release 1998
+%J 3GPP TS 04.08 Version 7.10.0 Release 1998
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -310,7 +480,7 @@
 %R ETSI TS 100 940-V7.8.0 (2000-10)
 %T Digial cellular telecommunications system (Phase 2+) \(em Mobile radio interface layer 3 specification
 %D October 2000
-%N 3GPP TS 04.08 Version 7.8.0 Release 1998
+%J 3GPP TS 04.08 Version 7.8.0 Release 1998
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -322,7 +492,7 @@
 %R ETSI TS 101 642-V8.0.0 (2000-06)
 %T Digial cellular telecommunications system (Phase 2+) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Interface principles
 %D June 2000
-%N GSM 08.02 Version 8.0.0 Release 1999
+%J GSM 08.02 Version 8.0.0 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -334,7 +504,7 @@
 %R ETSI TS 100 589-V8.0.0 (2000-06)
 %T Digial cellular telecommunications system (Phase 2+) \(em Signalling transport mechanism specification for the \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface
 %D June 2000
-%N GSM 08.06 Version 8.0.0 Release 1999
+%J GSM 08.06 Version 8.0.0 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -346,7 +516,7 @@
 %R ETSI TS 100 589-V8.0.1 (2002-05)
 %T Digial cellular telecommunications system (Phase 2+) \(em Signalling transport mechanism specification for the \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface
 %D May 2000
-%N 3GPP TS 08.06 Version 8.0.1 Release 1999
+%J 3GPP TS 08.06 Version 8.0.1 Release 1999
 %C Sophia Antipolis, Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -358,7 +528,7 @@
 %R ETSI ETS 300 590-1998
 %T Digial cellular telecommunications system (Phase 2) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Layer 3 specification
 %D 1998
-%N GSM 08.08 Version 4.12.1
+%J GSM 08.08 Version 4.12.1
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -370,7 +540,7 @@
 %R ETSI TS 100 590-V8.5.0 (2000-08)
 %T Digial cellular telecommunications system (Phase 2) \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface \(em Layer 3 specification
 %D August 2000
-%N GSM 08.08 Version 8.5.0 Release 1999
+%J GSM 08.08 Version 8.5.0 Release 1999
 %C Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
@@ -418,7 +588,7 @@ Part 1: Protocol Specification
 %L ETS 300 009-1
 %A ETSI
 %R ETSI ETS 300 009-1
-%N Third Edition
+%J Third Edition
 %D September 1996
 %T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection; Part 1: Protocol Specification
 %O (ITU-T Recommendations Q.711 to Q.714 and Q.716 (1993) modified)
@@ -432,7 +602,7 @@ Part 1: Protocol Specification
 %L ETS 300 009
 %A ETSI
 %R ETSI ETS 300 009
-%N Second Edition
+%J Second Edition
 %D January 1995
 %T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection
 %C Sophia Antipolis, Valbonne
@@ -447,7 +617,7 @@ Part 1: Protocol Specification
 %R ETSI EN 300 356-1-V4.2.1 (2001-07)
 %T Integrated Serivces Digital Network (ISDN); Signalling System No. 7 (SS7); ISDN User Part (ISUP) Version 4 for the International Interface; Part 1: Basic Services
 %D July 2001
-%N ISUP Version 4
+%J ISUP Version 4
 %C Sophia Antipolis, Valbonne
 %I European Telecommunications Standards Institute
 %O (ITU-T Rcommendations Q.761 to Q.764 (1999) modified)
@@ -459,7 +629,7 @@ Part 1: Protocol Specification
 %R ETSI ETS 300 134
 %T Integrated Services Digital Network (ISDN); CCITT Signalling System No. 7; Transaction Capabilities Application Part (TCAP)
 %D December 1992
-%N TCAP Version 1
+%J TCAP Version 1
 %C Sophia Antipolis, Valbonne
 %G T/S 43-05
 %Q ETSI Secretariat
@@ -473,7 +643,7 @@ Part 1: Protocol Specification
 %R ETSI ETS 300 287
 %T Integrated Services Digital Network (ISDN); Signalling System No. 7 (SS7); Transaction Capabilities Application Part (TCAP)
 %D 1993
-%N TCAP Version 2
+%J TCAP Version 2
 %C Sophia Antipolis, Valbonne
 %G RE/SPS-02003
 %Q ETSI Secretariat
@@ -487,7 +657,7 @@ Part 1: Protocol Specification
 %R ETSI ETS 300 344
 %T Integrated Services Digital Network (ISDN); Signalling System No. 7; Transaction Capabilities Application Part (TCAP); Test Specification
 %D August 1994
-%N TCAP Version 1
+%J TCAP Version 1
 %C Sophia Antipolis, Valbonne
 %G DE/SPS-6005
 %Q ETSI Secretariat
@@ -1928,7 +2098,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.706/
 
 %K rfc4165
 %K M2PArfc
@@ -2318,7 +2488,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.700/
 
 %K q701
 %L Q.701
@@ -2330,7 +2500,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.701/
 
 %K q702
 %L Q.702
@@ -2342,7 +2512,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.702/
 
 %K q703
 %L Q.703
@@ -2354,7 +2524,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.703/
 
 %K q704
 %L Q.704
@@ -2366,7 +2536,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.704/
 
 %K jtq703
 %L JT-Q\)703
@@ -2396,7 +2566,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.705/
+
+%K q710
+%L Q.710
+%A ITU
+%R ITU-T Recommendation Q.710
+%T Simplified MTP Version for Small Systems
+%D November 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Q.710/
 
 %K q711
 %L Q.711
@@ -2408,14 +2590,14 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.711/
 
 %K jtq711
 %L JT-Q\)711
 %A TTC
 %R TTC Standard JT-Q\)711
 %T Functional Description of the Signalling Connection Control Part (SCCP)
-%N Version 2
+%J Version 2
 %D April 23, 1997
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -2430,14 +2612,14 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.712/
 
 %K jtq712
 %L JT-Q\)712
 %A TTC
 %R TTC Standard JT-Q\)712
 %T Definition and Functions of SCCP Messages
-%N Version 3
+%J Version 3
 %D April 23, 1997
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -2452,14 +2634,14 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.713/
 
 %K jtq713
 %L JT-Q\)713
 %A TTC
 %R TTC Standard JT-Q\)713
 %T SCCP Formats and Codes
-%N Version 8
+%J Version 8
 %D April 20, 2000
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -2474,14 +2656,14 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.714/
 
 %K jtq714
 %L JT-Q\)714
 %A TTC
 %R TTC Standard JT-Q\)714
 %T Signalling Connection Control Part Procedures
-%N Version 3
+%J Version 3
 %D April 23, 1997
 %C Japan
 %I Telecommunication Technology Comittee (TTC)
@@ -2496,7 +2678,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.715/
 
 %K q716
 %L Q.716
@@ -2508,7 +2690,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.716/
 
 %K q721
 %L Q.721
@@ -2520,7 +2702,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.721/
 
 %K q722
 %L Q.722
@@ -2532,7 +2714,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.722/
 
 %K q723
 %L Q.723
@@ -2544,7 +2726,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.723/
 
 %K q724
 %L Q.724
@@ -2556,7 +2738,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.724/
 
 %K q750
 %L Q.750
@@ -2568,7 +2750,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.750/
 
 %K q751.1
 %L Q.751.1
@@ -2580,7 +2762,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.751.1/
 
 %K q751.2
 %L Q.751.2
@@ -2592,7 +2774,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.751.2/
 
 %K q751.3
 %L Q.751.3
@@ -2604,7 +2786,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.751.3/
 
 %K q751.4
 %L Q.751.4
@@ -2616,7 +2798,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.751.4/
 
 %K q752
 %L Q.752
@@ -2628,7 +2810,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.752/
 
 %K q753
 %L Q.753
@@ -2640,7 +2822,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.753/
 
 %K q754
 %L Q.754
@@ -2652,7 +2834,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.754/
 
 %K q755
 %L Q.755
@@ -2664,7 +2846,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.755/
 
 %K q755.1
 %L Q.755.1
@@ -2676,7 +2858,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.755.1/
 
 %K q755.2
 %L Q.755.2
@@ -2688,7 +2870,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.755.2/
 
 %K q756
 %L Q.756
@@ -2700,7 +2882,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.756/
 
 %K q761
 %L Q.761
@@ -2712,7 +2894,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.761/
 
 %K q762
 %L Q.762
@@ -2724,7 +2906,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.762/
 
 %K q763
 %L Q.763
@@ -2736,7 +2918,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.763/
 
 %K q764
 %L Q.764
@@ -2748,7 +2930,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.764/
 
 %K q766
 %L Q.766
@@ -2760,7 +2942,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.765/
 
 %K q767
 %L Q.767
@@ -2772,7 +2954,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.766/
 
 %K q771
 %L Q.771
@@ -2784,7 +2966,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.771/
 
 %K q772
 %L Q.772
@@ -2796,7 +2978,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.772/
 
 %K q773
 %L Q.773
@@ -2808,7 +2990,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.773/
 
 %K q774
 %L Q.774
@@ -2820,7 +3002,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.774/
 
 %K q775
 %L Q.775
@@ -2832,7 +3014,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.775/
 
 %K q780
 %L Q.780
@@ -2844,7 +3026,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.780/
 
 %K q781
 %L Q.781
@@ -2855,7 +3037,7 @@ Part 1: Protocol Specification
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.781/
 
 %K q78193
 %L Q.781
@@ -2867,7 +3049,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.781/
 
 %K q782
 %L Q.782
@@ -2878,7 +3060,7 @@ Part 1: Protocol Specification
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.782/
 
 %K q78296
 %L Q.782
@@ -2890,7 +3072,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.782/
 
 %K q786
 %L Q.786
@@ -2901,7 +3083,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.786/
 
 %K q787
 %L Q.787
@@ -2912,7 +3094,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.787/
 
 %K q920
 %L Q.920
@@ -2924,7 +3106,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.920/
 
 %K q921
 %L Q.921
@@ -2936,7 +3118,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.921/
 
 %K q921bis
 %L Q.921 bis
@@ -2948,7 +3130,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.921/
 
 %K q922
 %L Q.922
@@ -2960,7 +3142,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.922/
 
 %K q930
 %L Q.930
@@ -2972,7 +3154,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.930/
 
 %K q931
 %L Q.931
@@ -2984,7 +3166,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.931/
 
 %K q932
 %L Q.932
@@ -2996,7 +3178,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.932/
+
+%K q933
+%L Q.933
+%A ITU
+%R ITU-T Recommendation Q.933
+%T Digital Subscriber Signalling System No. 1 (DSS1) \(em Network Layer \(em ISDN Digital Subscribed Signalling System No. 1 (DSS1) \(em Signalling specifications for frame mode switched and permanent virtual connection control and status monitoring
+%D February 2003
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-Q.933/
 
 %K q1902
 %L Q.1902
@@ -3007,7 +3201,7 @@ Part 1: Protocol Specification
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.1902/
 
 %K t1bicc
 %K bicc
@@ -3093,7 +3287,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.2110/
 
 %K q2111
 %L Q.2111
@@ -3105,7 +3299,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.2111/
 
 %K q2210
 %L Q.2210
@@ -3117,7 +3311,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.2210/
 
 %K q2140
 %L Q.2140
@@ -3129,7 +3323,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-Q.2140/
 
 %K 802.1X
 %L 802.1X
@@ -3242,7 +3436,31 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.25/
+
+%K x36
+%L X.36
+%A ITU
+%R ITU-T Recommendation X.36
+%T Data Networks and Open System Communications \(em Public Data Networks \(em Interfaces \(em Interface between Data Terminal Equipment (DTE) and Data Circuit-terminating Equipment (DCE) for public data networks providing frame relay data transmission service by dedicated circuit
+%D February 2003
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.36/
+
+%K x37
+%L X.37
+%A ITU
+%R ITU-T Recommendation X.37
+%T Data Networks and Open System Communications \(em Public Data Networks \(em Interfaces \(em Encapsulation in X.25 Packets of Various Protocols Including Frame Relay
+%D April 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.37/
 
 %K x75
 %L X.75
@@ -3254,7 +3472,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.75/
+
+%K x76
+%L X.76
+%A ITU
+%R ITU-T Recommendation X.76
+%T Data Networks and Open System Communications \(em Public Data Networks \(em Transmission, signalling and switching \(em Network-to-network interface between public networks providing PVC and/or SVC frame relay data transmission service
+%D February 2003
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.76/
 
 %K x121
 %L X.121
@@ -3266,14 +3496,15 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.121/
 
 %K iso8208
 %L ISO/IEC 8208
 %A ISO
-%R ISO/IEC 8208 : 1995
+%R ISO/IEC 8208 : 2000
 %T Information Technology \- Data Communications \- X.25 Packet Layer Protocol For Data Terminal Equipment
-%D 1995
+%J Fourth Edition
+%D November 1, 2000
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3298,6 +3529,26 @@ Part 1: Protocol Specification
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso10028
+%L ISO/IEC 10028
+%A ISO
+%R ISO/IEC 10028 : 1993
+%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Definition of the Relaying Functions of a Network Layer Intermeidate System
+%D 1993
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso10177
+%L ISO/IEC 10177
+%A ISO
+%R ISO/IEC 10177 : 1993
+%T Information technlology \(em Telecommunications and information excahnge between systems \(em Provision of the connection-mode Network internal layer service by intermediate systems using ISO/IEC 8208, the X.25 Packet Layer Protocol
+%D 1993
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
 %K iso10030
 %L ISO/IEC 10030
 %A ISO
@@ -3307,6 +3558,63 @@ Part 1: Protocol Specification
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
+
+%K x115
+%L X.115
+%A ITU
+%R ITU-T Recommendation X.115
+%T Public Data Networks \(em Network Aspects \(em Defintion of Address Translation Capability in Public Data Networks
+%D April 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.115/
+
+%K x116
+%L X.116
+%A ITU
+%R ITU-T Recommendation X.116
+%T Public Data Networks \(em Network Aspects \(em Address Translation Registration and Resolution Protocol
+%D October 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.116/
+
+%K iso10038
+%L ISO/IEC 10038
+%A ISO
+%R ISO/IEC 10038 : 1993
+%T Information Technlology \(em Telecommunications and information exchange between systems \(em Local area networks Media access control (MAC) bridges
+%D 1993
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaced by ISO/IEC 15802-3:1988.  Also IEEE 802.1D 1993.
+
+%K iso10039
+%L ISO/IEC 10039
+%A ISO
+%R ISO/IEC 10039 : 1991
+%T Information technology \(em Telecommunications and information exchange between systems \(em Local area networks \(em Medium Access Control (MAC) service definition
+%D 1991
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaced by ISO/IEC 15802-1:1988.  Also IEEE 802.2 1993.
+
+%K iso1580203
+%L ISO/IEC 15802-3
+%A ISO
+%R ISO/IEC 15802-3 : 1998
+%T Information technlology \(em Telecommunications and information exchange between systems \(em Local and metropolitan area networks Common specifications \(em Part 3: Media Access Contrl (MAC) Bridges
+%D 1998
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Replaces ISO/IEC 10038.  Also IEEE 802.1D 1998.
 
 %K iso10589
 %L ISO/IEC 10589
@@ -3338,7 +3646,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.680/
 
 %K x681
 %L X.681
@@ -3350,7 +3658,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.681/
 
 %K x682
 %L X.682
@@ -3362,7 +3670,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.682/
 
 %K x683
 %L X.683
@@ -3374,7 +3682,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.683/
 
 %K x690
 %L X.690
@@ -3386,7 +3694,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.690/
 
 %K x691
 %L X.691
@@ -3398,7 +3706,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.691/
 
 %K x200
 %L X.200
@@ -3410,7 +3718,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.200/
+
+%K x207
+%L X.207
+%A ITU
+%R ITU-T Recommendation X.207 [ISO/IEC 9545 : 1993]
+%T Information Technology \(em Open Ssytems Interconnection \(em Application Layer Structure
+%D November 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.207/
 
 %K x208
 %L X.208
@@ -3422,7 +3742,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.208/
 
 %K x210
 %L X.210
@@ -3434,7 +3754,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.210/
+
+%K x212
+%L X.212
+%A ITU
+%R ITU-Recommendation X.212 [ISO/IEC 8886 : 1995]
+%T Information Technology \(em Open Systems Interconnection \(em Data Link Service Definition
+%D November 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.212/
 
 %K x213
 %L X.213
@@ -3446,7 +3778,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.213/
 
 %K x214
 %L X.214
@@ -3458,7 +3790,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.214/
 
 %K x215
 %L X.215
@@ -3470,7 +3802,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.215/
 
 %K x216
 %L X.216
@@ -3482,7 +3814,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.216/
 
 %K x217
 %L X.217
@@ -3494,7 +3826,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.217/
+
+%K x218
+%L X.218
+%A ITU
+%R ITU-T Recommendation X.218 [ISO/IEC 9066-1]
+%T Open Systems Interconnection \(em General Service Definitions \(em Reliable Transfer: Model and Service Definition
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.218/
 
 %K x219
 %L X.219
@@ -3506,7 +3850,19 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.219/
+
+%K x222
+%L X.222
+%A ITU
+%R ITU-T Recommendation X.222
+%T Use of X.25 LAPB Compatible Data Link Procedures to Provide the OSI Connection-Mode Data Link Service
+%D April 1995
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.222/
 
 %K x223
 %L X.223
@@ -3518,7 +3874,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.223/
 
 %K x224
 %L X.224
@@ -3530,7 +3886,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.224/
 
 %K x225
 %L X.225
@@ -3542,7 +3898,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.225/
 
 %K x226
 %L X.226
@@ -3554,7 +3910,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.226/
 
 %K x227
 %L X.227
@@ -3566,7 +3922,20 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.227/
+
+%K x228
+%L X.228
+%A ITU
+%R ITU-T Recommendation X.228 [ISO/IEC 9066-2]
+%T Open Systems Interconnection \(em PICS Proformas \(em Reliable Transfer: Protocol Specification
+%D n.d.
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%O (Extract from Blue Book)
+%U http://www.itu.int/rec/T-REC-X.228/
 
 %K x229
 %L X.229
@@ -3578,7 +3947,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.229/
 
 %K x233
 %L X.233
@@ -3590,7 +3959,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.233/
 
 %K x234
 %L X.234
@@ -3602,7 +3971,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.234/
 
 %K x235
 %L X.235
@@ -3614,7 +3983,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.235/
 
 %K x236
 %L X.236
@@ -3626,7 +3995,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.236/
 
 %K x237
 %L X.237
@@ -3638,7 +4007,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.237/
 
 %K x264
 %L X.264
@@ -3650,7 +4019,31 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.264/
+
+%K x410-1984
+%L X.410
+%A CCITT
+%R CCITT Recommendation X.410
+%C Geneva
+%D October 1984
+%T Information Technology \(em Message Handling Systems (MHS) \(em Remote Operations and Reliable Transfer Server
+%I CCITT Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Withdrawn on 25/11/1988)
+%U http://www.itu.int/rec/T-REC-X.410/
+
+%K x413
+%L X.413
+%A ITU
+%R ITU-T Recommendation X.413
+%C Geneva
+%D June 1999
+%T Information Technology \(em Message Handling Systems (MHS) \(em Message Store: Abstract Service Definition
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.413/
 
 %K iso8473_2
 %L ISO 8473-2
@@ -3672,7 +4065,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.622/
 
 %K x623
 %L X.623
@@ -3684,7 +4077,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.623/
 
 %K x625
 %L X.625
@@ -3696,43 +4089,43 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.625/
 
 %K x637
 %L X.637
 %A ITU
-%R ITU-T Recommendation X.637
+%R ITU-T Recommendation X.637 [ISO/IEC ISP 11188-1]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Common Upper Layer Requirements
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.637/
 
 %K x638
 %L X.638
 %A ITU
-%R ITU-T Recommendation X.638
+%R ITU-T Recommendation X.638 [ISO/IEC ISP 11188-3]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Minimal OSI Facilities to Support Basic Communications Applications
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.638/
 
 %K x639
 %L X.639
 %A ITU
-%R ITU-T Recommendation X.639
+%R ITU-T Recommendation X.639 [ISO/IEC ISP 11188-2]
 %C Geneva
 %D October 1996
 %T Data Networks and Open System Communication \(em OSI Networking and System Aspects \(em Efficiency \(em Basic Connection-Oriented Requirements for ROSE-based Profiles
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.639/
 
 %K x650
 %L X.650
@@ -3744,7 +4137,56 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-X.650/
+
+%K x710
+%L X.710
+%A ITU
+%R ITU-T Recommendation X.710
+%C Geneva
+%D October 1997
+%T Information Technology \(em Open Systems Interconnection \(em Common Management Information Service
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.710/
+
+%K x711
+%L X.711
+%A ITU
+%R ITU-T Recommendation X.711
+%C Geneva
+%D October 1997
+%T Information Technology \(em Open Systems Interconnection \(em Common Management Information Protocol: Specification
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.711/
+
+%K x721
+%L X.721
+%A ITU
+%R ITU-T Recommendation X.721 [ISO/IEC 10165-2:1992]
+%C Geneva
+%D February 10, 1992
+%T Information Technology \(em Open Systems Interconnection \(em Structure of Management Information: Definition of Management Information
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.721/
+
+%K x722
+%K GDMO
+%L X.722
+%A ITU
+%R ITU-T Recommendation X.722 [ISO/IEC 10165-4 : 1992]
+%C Geneva
+%D January 1992
+%T Information Technology \(em Open Systems Interconnection \(em Structure of Management Information: Guidelines for the Definition of Managed Objects
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.722/
 
 %K h225.0
 %L H.225.0
@@ -3757,7 +4199,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-H.225/
 
 %K h245
 %L H.245
@@ -3770,7 +4212,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-H.245/
 
 %K h248.1
 %L H.248.1
@@ -3781,9 +4223,9 @@ Part 1: Protocol Specification
 %D March 2002
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-H.248/
 
-%k h323
+%K h323
 %L H.323
 %A ITU
 %Q International Telecommunication Union
@@ -3794,7 +4236,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
-%U http://www.itu.int/
+%U http://www.itu.int/rec/T-REC-H.323/
 
 %K t1.111
 %L T1.111
@@ -3870,6 +4312,16 @@ Part 1: Protocol Specification
 %D 1988
 %I International Organization for Standardization
 
+%K iso7776
+%L ISO 7776
+%R ISO/IEC 7776:1995
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information technology \(em Telecommunications and information exchange between systems \(em High-level data link control procedures \(em Description of the X.25 LAPB-compatible DTE data link procedures
+%D July 1, 1995
+%J Second Edition
+%I International Organization for Standardization
+
 %K iso8649
 %L ISO 8649
 %R ISO/IEC 8649:1988
@@ -3888,13 +4340,205 @@ Part 1: Protocol Specification
 %D 1988
 %I International Organization for Standardization
 
-%L ISO 8881
-%R ISO/IEC 8881:1989
+%K iso8571_1
+%L ISO 8571-1
+%R ISO 8571-1:1988
 %A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 1: General Introduction
+%D 1988
 %Q International Organization for Standardization
-%T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
-%D 1989
 %I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_2
+%L ISO 8571-2
+%R ISO 8571-2:1988
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition
+%D 1988
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_2a1
+%L ISO 8571-2|Amd.1
+%R ISO 8571-2:1988|Amd.1:1992
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition \(em Amendment 1: Filestore Management
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_4
+%L ISO 8571-4
+%R ISO 8571-4:1988
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification
+%D 1988
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso8571_4a1
+%L ISO 8571-4|Amd.1
+%R ISO 8571-4:1988|Amd.1:1992
+%A ISO/IEC
+%T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification \(em Amendment 1: Filestore Management
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118301
+%L ISO/IEC 11183-1
+%R ISO/IEC ISP 11183-1:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 1: Specification of ACSE \(em Presentation and session protocols for use by ROSE and CMISE
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118302
+%L ISO/IEC 11183-2
+%R ISO/IEC ISP 11183-2:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 3: CMISE/ROSE for AOM11 \(em Basic Management Communications
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso1118303
+%L ISO/IEC 11183-3
+%R ISO/IEC ISP 11183-3:1992
+%A ISO/IEC
+%T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 2: CMISE/ROSE for AOM12 \(em Enhanced Management Communications
+%D 1992
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14360
+%L ISO/IEC 14360
+%R ISO/IEC 14360:1996
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14361
+%L ISO/IEC 14361
+%R ISO/IEC 14361:1996
+%A ISO/IEC
+%T Information Technology \(em MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14362
+%L ISO/IEC 14362
+%R ISO/IEC 14362:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformace to Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14363
+%L ISO/IEC 14363
+%R ISO/IEC 14363:1996
+%A ISO/IEC
+%D 1996
+%T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14364
+%L ISO/IEC 14364
+%R ISO/IEC 14364:1996
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Bindings for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14365
+%L ISO/IEC 14365
+%R ISO/IEC 14365:1996
+%A ISO/IEC
+%T Information Technology \(em MHS-Based Electronic Messagin C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14366
+%L ISO/IEC 14366
+%R ISO/IEC 14366:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14367
+%L ISO/IEC 14367
+%R ISO/IEC 14367:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14392
+%L ISO/IEC 14392
+%R ISO/IEC 14392:1996
+%A ISO/IEC
+%T Information Technology \(em Directory Services \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14393
+%L ISO/IEC 14393
+%R ISO/IEC 14393:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformace to Directory Services \(em Application Program Interface (API) [Language Independent]
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14394
+%L ISO/IEC 14394
+%R ISO/IEC 14394:1996
+%A ISO/IEC
+%T Information Technology \(em Directory Services C Language Interfaces \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+
+%K iso14395
+%L ISO/IEC 14395
+%R ISO/IEC 14395:1996
+%A ISO/IEC
+%T Information Technology \(em Test Methods for Measuring Conformance to Directory Services C Language Interface \(em Binding for Application Program Interface (API)
+%D 1996
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
 
 %L MINSHALL
 %A Greg Minshall
@@ -3910,14 +4554,14 @@ Part 1: Protocol Specification
 %R SVID
 %K svid
 %T System V, Interface Definition
-%N Fourth Edition
+%J Fourth Edition
 
 %L XBD5
 %K xbd5
 %R XBD Issue 5
 %A Open\ Group
 %T X/Open System Interface Definitions
-%N Issue 5
+%J Issue 5
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
 
@@ -3952,7 +4596,7 @@ Part 1: Protocol Specification
 %L AdvProg
 %A W. Richard Stevens
 %T Advanced Programming in the UNIX\(rg\ Environment
-%N 15th edition
+%J 15th edition
 %D December 1997
 %C Reading, Massachusetts
 %I Addison Wesley
@@ -4039,7 +4683,7 @@ Part 1: Protocol Specification
 
 %L SVR3SPG
 %R SVR 3
-%k svr3spg
+%K svr3spg
 %T UNIX\(rg System V Release 3 STREAMS Programmer's Guide
 %Q AT&T UNIX System Laboratories, Inc.
 %I Prentice Hall
@@ -4047,7 +4691,7 @@ Part 1: Protocol Specification
 
 %L svr3sp
 %R SVR 3
-%k svr3sp
+%K svr3sp
 %T UNIX\(rg System V Release 3 STREAMS Primer
 %Q AT&T UNIX System Laboratories, Inc.
 %I Prentice Hall
@@ -4083,6 +4727,17 @@ Part 1: Protocol Specification
 %C Mountainview, California
 %U http://techpubs.sgi.com/
 
+%L SX25
+%R IRIX\(rg SX.25
+%K sx25pg
+%T SX.25 NLI Programming's Guide
+%G Doc. No: 007-2268-002
+%D 1994
+%Q Silicon Graphics, Inc.
+%I SGI Technical Publications
+%C Mountainview, California
+%U http://techpubs.sgi.com/
+
 %L HPUXDDI
 %R STREAMS/UX
 %K hpuxddi
@@ -4098,6 +4753,39 @@ Part 1: Protocol Specification
 %K hpuxspg
 %T STREAMS Programmer's Guide -- HP 9000 and Integrity Server Computer Systems
 %D October 2005
+%Q Hewlett-Packard Development Company L.P.
+%I HP
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPUXAPLI
+%R HP-UX\(rg OTS/9000
+%K hpuxapli
+%T ACSE/Presentation and ROSE Interface Programmer's Guide
+%G Pub. No: 32070-90032
+%D May 1997
+%Q Hewlett-Packard Company
+%I HP9000 Networking
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPUXOTS
+%R OTS/9000
+%K hpuxots
+%T HP OSI Transport Services/9000 Release Notes
+%G Pub. No: 32070-90049 thru 53
+%D 1997 thru 2004
+%Q Hewlett-Packard Company
+%I HP9000 Networking
+%C Palo Alto, California
+%U http://docs.hp.com/
+
+%L HPDLPI
+%R HP-UX DLPI
+%K hpuxdlpi
+%T HP DLPI Programmer's Guide -- HP-UX 11i v3
+%G Part No: 5991-7498
+%D February 2007
 %Q Hewlett-Packard Development Company L.P.
 %I HP
 %C Palo Alto, California
@@ -4141,6 +4829,110 @@ Part 1: Protocol Specification
 %T STREAMS Programming Guide
 %G Part No: 805-7478-05
 %D August 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLXOM
+%R Solaris\(rg Solstice\(tm XOM
+%K solxom
+%T Solstice\(tm XOM Programming Reference
+%G Part No: 802-1311-12
+%J Revision A
+%D February 1996
+%Q Sun Microsystems, Inc.
+%I SunSoft
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SOLXMP
+%R Solaris\(rg Solstice\(tm XMP
+%K solxmp
+%T Solstice\(tm XMP Programming Reference
+%G Part No: 802-1312-11
+%J Revision A
+%D April 1996
+%Q Sun Microsystems, Inc.
+%I SunSoft
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SOLX500
+%R Solaris\(rg
+%K solx500
+%T Solstice\(tm X.500 XDS Programming Reference
+%G Part No: 802-2130-10
+%D January 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX400
+%R Solaris\(rg
+%K solx400
+%T Solstice\(tm X.400 Client Toolkit 9.0 Administrator's Guide
+%G Part No: 802-5046-10
+%D February 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLCMIP
+%R Solaris\(rg
+%K solcmip
+%T Solstice\(tm CMIP 8.2 Programmer's Guide
+%G Part No: 802-5281-10
+%D April 1996
+%J Revision A
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25AG
+%R Solstice\(rg X.25
+%K solx25ag
+%T Solstice X.25 9.2 Administration Guide
+%G Part No: 806-1234-10
+%D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25DG
+%R Solstice\(rg X.25
+%K solx25dg
+%T Solstice X.25 9.2 Developer's Guide
+%G Part No: 806-1235-10
+%D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25UG
+%R Solstice\(rg X.25
+%K solx25ug
+%T Solstice X.25 9.2 PAD User's Guide
+%G Part No: 806-1236-10
+%D October 1999
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Palo Alto, California
+%U http://docs-pdf.sun.com/
+
+%L SOLX25PG
+%R Solstice\(rg X.25
+%K solx25pg
+%T Solstice\(rg X.25 9.2 Programming Guide
+%G Part No: 806-1235-10
+%D October 1999 
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Palo Alto, California
@@ -4192,6 +4984,23 @@ Part 1: Protocol Specification
 %I PT
 %C Rochester, New York
 
+%L PTX25
+%R PT X.25
+%K ptx25um
+%T X.25 Protocol User's Manual
+%D 2007
+%Q Performance Technologies Inc.
+%I PT
+%C Rochester, New York
+
+%L SBEX25
+%R SBE X.25
+%K sbex25
+%T SBE X.25 Protocol Manual
+%D 2003
+%Q SBE
+%I SBE
+
 %L AIXDOC
 %R AIX\(rg 5L Version 5.1
 %K aixdoc
@@ -4201,6 +5010,42 @@ Part 1: Protocol Specification
 %I IBM
 %C Boulder, Colorado
 %U http://publibn.boulder.ibm.com/
+
+%L AIXX25
+%R AIXlink/X.25
+%K aixx25
+%T AIXlink/X.25 Version 2.1 for AIX: Guide and Reference
+%D September 2005
+%G SC23-2520-07
+%J Eigth Edition
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
+%L AIXCPC
+%R AIX Version 6.1
+%K aixcpc
+%T AIX Version 6.1 \(em Communications Programming Concepts
+%D November 2007
+%G SC23-5258-00
+%J First Edition
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publibn.boulder.ibm.com/
+
+%L AIXDLPI
+%R AIX Version 6.1
+%K aixdlpi
+%T AIX Version 6.1 Technical Reference: Communications, Volume 1
+%D November 2007
+%G SC23-6610-00
+%J First Edition
+%Q Internatonal Business Machines Corp.
+%I IBM
+%C Boulder, Colorado
+%U http://publib.boulder.ibm.com/
 
 %L HPUXDOC
 %R HP-UX\(rg 11i v2
@@ -4232,6 +5077,18 @@ Part 1: Protocol Specification
 %C Palo Alto, California
 %U http://www.true64unix.compaq.com/docs/
 
+%L OSFNPG
+%R Tru64 UNIX (OSF/1.2)
+%K osfnpg
+%T Tru64 UNIX \(em Network Programmer's Guide
+%D September 2003
+%G Part No: AA-RH9UE-TE
+%J Tru64 UNIX Version 5.1B
+%Q Digital Equipment Corporation
+%I Hewlett-Packard Company
+%C Palo Alto, California
+%U http://www.true64unix.compaq.com/docs/
+
 %L SOLDOC
 %R Solaris\(rg 8
 %K soldoc
@@ -4242,11 +5099,57 @@ Part 1: Protocol Specification
 %C Santa Clara, California
 %U http://docs.sun.com/
 
-%L SUNLINK
+%L SOLDOC10
+%R Solaris\(rg 10
+%K soldoc10
+%T Solaris 10 Docmentation
+%D 2007
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Santa Clara, California
+%U http://docs.sun.com/
+
+%L SOLDOC11
+%R Solaris\(rg 11
+%K soldoc11
+%T Solaris 11 Docmentation
+%D 2008
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Santa Clara, California
+%U http://docs.sun.com/
+
+%L SUNLINK-ADM
 %R Solaris\(rg SunLink OSI
 %K sunlink
-%T SunLink OSI 8.1 TLI Programmer's Reference
+%T SunLink\(rg OSI 8.1 Communication Platform Administrator's Guide
+%G Part No: 801-4975-13
+%J Revision A
 %D March 1995
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SUNLINK-TLI
+%R Solaris\(rg SunLink OSI
+%K sunlink
+%T SunLink\(rg OSI 8.1 TLI Programmer's Reference
+%G Part No: 801-7170-12
+%J Revision A
+%D March 1995
+%Q Sun Microsystems, Inc.
+%I Sun
+%C Mountain View, California
+%U http://docs.sun.com/
+
+%L SUNLINK-APLI
+%R Solaris\(rg SunLink OSI
+%K sunlink
+%T SunLink\(rg OSI 8.1 APLI Programmer's Reference
+%J Revision A
+%D March 1995
+%G Part No: 802-2040-11
 %Q Sun Microsystems, Inc.
 %I Sun
 %C Mountain View, California
@@ -4504,7 +5407,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Call Control Interface (CCI) Specification
 %R CCI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D April 2003
 %I OpenSS7 Corporation
@@ -4516,7 +5419,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Channel Interface (CHI) Specification
 %R CHI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D May 2003
 %I OpenSS7 Corporation
@@ -4528,7 +5431,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Media Gateway Interface (MGI) Specification
 %R MGI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D May 2003
 %I OpenSS7 Corporation
@@ -4540,7 +5443,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Messages Transfer Part Interface (MTPI) Specification
 %R MTPI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D January 2003
 %I OpenSS7 Corporation
@@ -4552,7 +5455,7 @@ Part 1: Protocol Specification
 %Q OpenSS7 Corporation
 %T Multiplex Interface (MXI) Specification
 %R MXI Revision 1.0.0
-%N Draft 1
+%J Draft 1
 %C Edmonton
 %D May 2003
 %I OpenSS7 Corporation
@@ -4729,7 +5632,7 @@ Part 1: Protocol Specification
 %U http://www.ietf.org/rfc/rfc0995.txt
 
 %K rfc1006
-%L STD35
+%L RFC1006
 %E Marshall T. Rose
 %A Dwight D. Cass
 %T ISO Transport Service on top of the TCP \(em Version 3
@@ -4758,6 +5661,30 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1008.txt
+
+%K rfc1053
+%L RFC1053
+%R RFC 1053
+%A S. Levy
+%A T. Jacobson
+%T Telnet X.3 PAD option
+%D April 1, 1988
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1053.txt
+
+%K rfc1133
+%L RFC1133
+%R RFC 1133
+%A J. Y. Yu
+%A H. W. Braun
+%T Routing between the NSFNET and the DDN
+%D November 1989
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1133.txt
 
 %K rfc1142
 %L RFC1142
@@ -4791,6 +5718,18 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1223.txt
+
+%K rfc1236
+%L RFC1236
+%R RFC 1236
+%A L. Morales
+%A P. Hasse
+%T IP to X.121 Address Mapping for DDN
+%D June 1991
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1236.txt
 
 %K rfc1237
 %L RFC1237
@@ -4841,6 +5780,17 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1637.txt
+
+%K rfc1698
+%L RFC1698
+%R RFC 1698
+%A Peter Furniss
+%T Octet Sequences for Upper-Layer OSI to Support Basic Communications Applications
+%D October 1994
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1698.txt
 
 %K rfc1706
 %L RFC1706
@@ -5267,6 +6217,20 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2078.txt
 
+%K AgentX
+%L RFC2741
+%R RFC 2741
+%A M. Daniele
+%A B. Wijnen
+%E M. Ellison
+%E D. Francisco
+%D January 2000
+%T Agent Extensibility (AgentX) Protocol, Version 1
+%O (Obsoletes RFC 2257)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2741.txt
+
 %K GSSAPI
 %K rfc2743
 %L RFC2743
@@ -5330,6 +6294,7 @@ Part 1: Protocol Specification
 %T ISO Transport Class 2 Non-use of Explicit Flow Control over TCP RFC 1006 Extension
 %R RFC 1859
 %D October 1995
+%O (Status: INFORMATIONAL) (Obsoleted by RFC 2126)
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1859.txt
@@ -5844,11 +6809,11 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force
 %T Stream Control Transmission Protocol (SCTP)
 %D October 2000
-%O (Updated by RFC 3309) (Status: PROPOSED STANDARD)
+%O (Obsoleted by RFC 4960) (Updated by RFC 3309) (Status: PROPOSED STANDARD)
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2960.txt
 
-%k rfc3309
+%K rfc3309
 %L SCTPCRC
 %R RFC 3309
 %A Jonathan Stone
@@ -5857,10 +6822,21 @@ Part 1: Protocol Specification
 %E Jonathan Stone
 %T Stream Control Transmission Protocol (SCTP) Checksum Change
 %D September 2002
-%O (Updates RFC 2960) (Status: PROPOSED STANDARD)
+%O (Obsoleted by RFC 4960) (Updates RFC 2960) (Status: PROPOSED STANDARD)
 %Q Internet Engineering Task Force
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3309.txt
+
+%K rfc4960
+%L SCTP
+%R RFC 4960
+%E Randall R. Stewart (ed)
+%Q Internet Engineering Task Force
+%T Stream Control Transmission Protocol (SCTP)
+%D September 2007
+%O (Obsoletes RFC 2960, RFC 3309) (Status: PROPOSED STANDARD)
+%I The IETF Trust
+%U http://www.ietf.org/rfc/rfc4960.txt
 
 %K ETSISCTP
 %L TS 102 144
@@ -5969,6 +6945,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1901.txt
 
 %L RFC1902
 %R RFC 1902
@@ -5981,6 +6958,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1902.txt
 
 %L RFC1903
 %R RFC 1903
@@ -5993,6 +6971,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1903.txt
 
 %L RFC1904
 %R RFC 1904
@@ -6005,6 +6984,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1904.txt
 
 %L RFC1905
 %R RFC 1905
@@ -6017,6 +6997,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1905.txt
 
 %L RFC1906
 %R RFC 1906
@@ -6029,6 +7010,7 @@ Part 1: Protocol Specification
 %D January 1996
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc1906.txt
 
 %L RFC2271
 %R RFC 2271
@@ -6040,6 +7022,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2271.txt
 
 %L RFC2272
 %R RFC 2272
@@ -6052,6 +7035,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2272.txt
 
 %L RFC2273
 %R RFC 2273
@@ -6063,6 +7047,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2273.txt
 
 %L RFC2275
 %R RFC 2275
@@ -6074,6 +7059,7 @@ Part 1: Protocol Specification
 %D January 1998
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2275.txt
 
 %L RFC2575
 %R RFC 2575
@@ -6085,6 +7071,7 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2575.txt
 
 %L RFC2574
 %R RFC 2574
@@ -6095,6 +7082,7 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc2574.txt
 
 %L RFC2578
 %R RFC 2578
@@ -6106,6 +7094,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2578.txt
 
 %L RFC2579
 %R RFC 2579
@@ -6117,6 +7107,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2579.txt
 
 %L RFC2580
 %R RFC 2580
@@ -6128,6 +7120,8 @@ Part 1: Protocol Specification
 %D April 1999
 %Q The Internet Society
 %I The Internet Society
+%O (Also STD 58)
+%U http://www.ietf.org/rfc/rfc2580.txt
 
 %L RFC3410
 %R RFC 3410
@@ -6140,6 +7134,7 @@ Part 1: Protocol Specification
 %D December 2002
 %Q The Internet Society
 %I The Internet Society
+%U http://www.ietf.org/rfc/rfc3410.txt
 
 %K rfc3064
 %L RFC3064
@@ -6579,7 +7574,7 @@ Part 1: Protocol Specification
 %K rfc3554
 %L RFC3554
 %R RFC 3554
-%T On the Use of Stream Control Transmission Protocol (SCTP) wih IPsec
+%T On the Use of Stream Control Transmission Protocol (SCTP) with IPsec
 %A S. Bellovin
 %A J. Ioannidis
 %A A. Keromytis
@@ -6623,7 +7618,7 @@ Part 1: Protocol Specification
 %K rfc3708
 %L RFC3708
 %R RFC 3708
-%T Using TCP Duplicate Selective Acknowledgement (DSACKs) and Stream Control Transmission Protocol (SCTP) Duplicat Transmission Sequence Numbers (TSNs) to Detect Spurious Retransmissions
+%T Using TCP Duplicate Selective Acknowledgement (DSACKs) and Stream Control Transmission Protocol (SCTP) Duplicate Transmission Sequence Numbers (TSNs) to Detect Spurious Retransmissions
 %A E. Blanton
 %A M. Allman
 %D February 2004
@@ -6741,3 +7736,171 @@ Part 1: Protocol Specification
 %I AT&T
 %C New Jersey
 
+%K isode
+%L ISODE-8.0
+%R ISODE-8.0
+%Q University College London
+%A Marshall T. Rose
+%T The ISO Development Environment: User Manual
+%D 1992
+%O (Released with the ISODE-8.0 software.)
+%I ISODE
+
+%K rfc1294
+%L RFC1294
+%R RFC 1294
+%T Multiprotocol Interconnect over Frame Relay
+%A T. Bradley
+%A C. Brown
+%A A. Malis
+%D January 1992
+%O (Obsoleted by RFC 1490, RFC 2477) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1294.txt
+
+%K rfc1490
+%L RFC1490
+%R RFC 1490
+%T Multiprotocol Interconnect over Frame Relay
+%A T. Bradley
+%A C. Brown
+%A A. Malis
+%D July 1993
+%O (Obsoletes RFC 1294) (Obsoleted by RFC 2427) (Status: DRAFT STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1490.txt
+
+%K rfc2427
+%L RFC2427
+%R RFC 2427
+%T Multiprotocol Interconnect over Frame Relay
+%A C. Brown
+%A A. Malis
+%D September 1998
+%O (Obsoletes RFC 1490, RFC 1294) (Also STD0055) (Status: STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2427.txt
+
+%K rfc2590
+%L RFC2590
+%R RFC 2590
+%T Transmission of IPv6 Packets over Frame Relay Networks
+%A A. Conta
+%A A. Malis
+%A M. Mueller
+%D May 1999
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2590.txt
+
+%K rfc1315
+%L RFC1315
+%R RFC 1315
+%T Management Information Base for Frame Relay DTEs
+%A C. Brown
+%A F. Baker
+%A C. Carvalho
+%D April 1992
+%O (Obsoleted by RFC 2115) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1315.txt
+
+%K rfc2115
+%L RFC2115
+%R RFC 2115
+%T Management Information Base for Frame Relay DTEs Using SMIv2
+%A C. Brown
+%A F. Baker
+%D September 1997
+%O (Obsoletes RFC 1315) (Status: DRAFT STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2115.txt
+
+%K rfc1596
+%L RFC1596
+%R RFC 1596
+%T Definitions of Managed Objects for Frame Relay Service
+%E T. Brown, Ed.
+%D March 1994
+%O (Obsoleted by RFC 1604) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1596.txt
+
+%K rfc1604
+%L RFC1604
+%R RFC 1604
+%T Definitions of Managed Objects for Frame Relay Service
+%E T. Brown, Ed.
+%D March 1994
+%O (Obsoletes RFC 1596) (Obsoleted by RFC 2954) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1604.txt
+
+%K rfc2954
+%L RFC2954
+%R RFC 2954
+%T Definitions of Managed Objects for Frame Relay Service
+%A K. Rehbehn
+%A D. Fowler
+%D October 2000
+%O (Obsoletes RFC 1604) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2954.txt
+
+%K rfc2955
+%L RFC2955
+%R RFC 2955
+%T Definitions of Managed Objects for Monitoring and Controlling the Frame Relay/ATM PVC Service Interworking Function.
+%A K. Rehbehn
+%A O. Nicklass
+%A G. Mouradian
+%D October 2000
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2955.txt
+
+%K rfc3020
+%L RFC3020
+%R RFC 3020
+%T Definitions of Managed Objects for Monitoring and Controlling the UNI/NNI Multilink Frame Relay Function
+%A P. Pate
+%A B. Lynch
+%A K. Rehbehn
+%D December 2000
+%O (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3020.txt
+
+%K frf32
+%L FRF.3.2
+%E Andrew G. Malis
+%E Rao Cherukuri
+%R FRF.3.2
+%T Frame Relay Multiprotocol Encapsulation Implementation Agreement
+%D April 2000
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.3/FRF.3.2.pdf
+
+%K frf12
+%L FRF.12
+%E Andrew G. Malis
+%R FRF.12
+%T Frame Relay Fragmentation Implementation Agreement
+%D December 1997
+%C Freemont, CA
+%I Frame Relay Forum Technical Committee
+%Q The Frame Relay Forum
+%U http://www.ipmplsforum.org/frame/Approved/FRF.12/FRF.12.pdf

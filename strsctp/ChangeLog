@@ -1,3 +1,7 @@
+2008-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strsctp.refs: update references
+
 2008-05-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/sctp2.c: be strict with MORE_flag

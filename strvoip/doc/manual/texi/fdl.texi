@@ -17,7 +17,12 @@ Everyone is permitted to copy and distribute verbatim copies
 of this license document, but changing it is not allowed.
 @end display
 
+@iftex
 @subsection Preamble
+@end iftex
+@ifnottex
+@heading PREAMBLE
+@end ifnottex
 
 The purpose of this License is to make a manual, textbook, or other
 written document @dfn{free} in the sense of freedom: to assure everyone
@@ -380,7 +385,12 @@ as a draft) by the Free Software Foundation.
 @center @b{END OF TERMS AND CONDITIONS}
 
 @page
+@iftex
 @subsection How to use this License for your documents
+@end iftex
+@ifnottex
+@heading ADDENDUM: How to use this License for your documents
+@end ifnottex
 
 To use this License in a document you have written, include a copy of
 the License in the document and put the following copyright and

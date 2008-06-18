@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_ATTACH_REQ.7.man,v 0.9.2.7 2008-05-25 12:49:26 brian Exp $
+.\" @(#) $Id: DL_ATTACH_REQ.7.man,v 0.9.2.8 2008-06-18 16:45:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_ATTACH_REQ.7.man,v $
+.\" Revision 0.9.2.8  2008-06-18 16:45:33  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.7  2008-05-25 12:49:26  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -102,7 +105,9 @@ The message consists of one M_PROTO message block, which contains the
 following structure.
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
 typedef struct {
     t_uscalar_t  dl_primitive;
     t_uscalar_t  dl_ppa;
@@ -128,6 +133,10 @@ on successful completion of the
 .\"
 .\"
 .SH PARAMETERS
+.PP
+The
+.B dl_attach_req_t
+structure contains the following members:
 .TP
 .I dl_primitive
 conveys
@@ -152,14 +161,22 @@ inspection into the
 .BR DL_ATTACH_REQ .
 .\"
 .\"
+.SH MODE
+This primitive is valid in
+any
+mode.
+.\"
+.\"
 .SH STATE
 The message is valid in state
-.B DL_UNATTACHED .
+.BR DL_UNATTACHED ,
+but only when local acknowledgement of a request or response primitive is not
+pending for the requesting Stream.
 .\"
 .\"
 .SH "NEW STATE"
 The resulting state is
-.B DL_ATTACH_PENDING .
+.BR DL_ATTACH_PENDING .
 .\"
 .\"
 .SH RESPONSE
@@ -177,7 +194,7 @@ is returned and the resulting state is unchanged.
 One of the following errors may be returned in the
 .B DL_ERROR_ACK (7)
 primitive:
-.TP 16
+.TP
 .B DL_ACCESS
 The DLS user did not have proper permission to use the requested PPA.
 .TP
@@ -187,45 +204,120 @@ The specified PPA is invalid.
 .B DL_OUTSTATE
 The primitive was issued from an invalid state.
 .TP
+.B DL_INITFAILED
+Automatic initialization of the PPA failed.
+.TP
+.B DL_NOTINIT
+The PPA had not been initialized prior to this request.
+.TP
 .B DL_SYSERR
 A system error has occurred and the Linux system error is indicated in
 the
 .BR DL_ERROR_ACK (7).
 .PP
-The Linux system error may be one of the following:
-.TP 16
-.B EPERM
-Permission for the control request is incorrect.
-.TP
-.B ENXIO
-Invalid device.
-.TP
-.B ENOMEM
-Insufficient memory.
-.TP
-.B EBUSY
-Control information is already enabled (multicast, VLAN IDs, and so on), or
-the driver is unable to handle the request.
-.TP
-.B EINVAL
-One of the parameters has an invalid value.
-.TP
-.B ENOBUFS
-Inadequate buffers were available.
-.TP
-.B ENOTSUP
-Unspported request, event or call.
-.TP
-.B ENOLINK
-The interface is not connected.
+See
+.BR DL_ERROR_ACK (7)
+for a description of specific Linux error codes applicable to DLPI.
 .\"
 .\"
-.SH NOTICES
+.SH COMPATIBILITY
 .PP
-Note that Linux system errors are not specified in the DLPI standard.
+The
+.B DL_ATTACH_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
 .[
 dlpi revision 2.0.0
 .]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Each implementation of DLPI manages its own Physical Point of Attachment (PPA)
+address space in different ways.
+.B @PACKAGE_TITLE@
+encodes the framing and Linux system interface index in a composite PPA.  When
+porting programs from another implementation to
+.BR "@PACKAGE_TITLE@" ,
+it may be necessary to make modifications to the way in which the PPA is
+managed or passed to the application.
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+provides a non-standard primitive,
+.BR DL_HP_PPA_REQ (7)
+that can be used to obtain a PPA.  It also provides a
+.BR lanscan ()
+utility that lists the available PPAs in the system.
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+documents UNIX error codes (listed in the
+.BR DL_ERROR_ACK (7)
+reference page).  Other implementations do not document these codes.  Portable
+programs will not rely upon the specific value of a Linux error code for proper
+operation.
+.IP \(em
+The DLPI error codes
+.BR DL_NOTINIT " and " DL_INITFAILED
+are not documented by the DLPI standard,
+.[
+dlpi revision 2.0.0
+.]
+but are implied by the text of the standard.  Portable DLPI applications should
+be prepared to receive any DLPI non-fatal error code in reply to any request or
+response primitive.
+.IP \(em
+.IR Solstice \(rg
+.[
+solx25pg
+.]
+documents that LAPB PPAs are defined at system configuration time using the
+.BR L_SETPPA (4)
+input-output control, whereas LLC2 PPAs are associated with the hardware at
+system boot time.
+.B @PACKAGE_TITLE@
+LLC2 driver,
+.BR llc2 (4),
+uses the Linux device index as the PPA.  The LAPB driver,
+.BR lapb (4),
+uses the Linux device index or input-output controls to establish the PPA.
+.IP \(em
+.IR AIX \(rg
+LAPB
+.[
+aixlink
+.]
+does not support this primitive.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

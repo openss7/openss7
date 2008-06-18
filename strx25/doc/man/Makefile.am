@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-05-07 16:01:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-06-18 16:45:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-07 16:01:37 $ by $Author: brian $
+# Last Modified $Date: 2008-06-18 16:45:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,6 +73,7 @@ man_MANS = \
 	man3/padtos.3 \
 	man3/setpadent.3 \
 	man3/setxhostent.3 \
+	man3/snidtox25.3 \
 	man3/stox25.3 \
 	man3/x25diags.3 \
 	man3/x25_find_link_parameters.3 \
@@ -82,17 +83,36 @@ man_MANS = \
 	man3/x25_set_parse_error_function.3 \
 	man3/x25tolinkid.3 \
 	man3/x25tos.3 \
+	man3/x25tosnid.3 \
 	man3/x25_write_config_parameters.3 \
 	man3/x25_write_config_parameters_file.3 \
 	man3/xti_x25.3 \
 	man3/XX25.3 \
+	man4/cons.4 \
+	man4/ipx25.4 \
+	man4/ixe.4 \
+	man4/nli3.4 \
+	man4/npi.4 \
+	man4/s_cons.4 \
+	man4/s_nli3.4 \
+	man4/s_npi.4 \
+	man4/s_xx25.4 \
 	man4/X25.4 \
-	man5/strx25.5 \
+	man4/xx25.4 \
 	man5/extraformat.5 \
+	man5/ifrdlciconf.5 \
+	man5/ifrtemplate.5 \
+	man5/lapbtemplate.5 \
+	man5/llc2template.5 \
 	man5/lsapformat.5 \
+	man5/mfeprotoconf.5 \
+	man5/mfetemplate.5 \
 	man5/padent.5 \
 	man5/qosformat.5 \
+	man5/strx25.5 \
+	man5/wantemplate.5 \
 	man5/x25_primitives.5 \
+	man5/x25template.5 \
 	man5/xaddrf.5 \
 	man5/xhostent.5 \
 	man7/N_Abort.7 \
@@ -136,7 +156,36 @@ man_MANS = \
 	man7/N_Xcanlis.7 \
 	man7/N_Xlisten.7 \
 	man7/N_zerostats.7 \
-	man7/npi_x25.7
+	man7/npi_x25.7 \
+	man8/ifrdlci.8 \
+	man8/ifrstat.8 \
+	man8/ifrtune.8 \
+	man8/ixemap.8 \
+	man8/ixetune.8 \
+	man8/linkadd.8 \
+	man8/linkdel.8 \
+	man8/linklist.8 \
+	man8/linkreset.8 \
+	man8/linkstart.8 \
+	man8/linkstate.8 \
+	man8/linkstop.8 \
+	man8/lltune.8 \
+	man8/mfeproto.8 \
+	man8/mfevc.8 \
+	man8/mlptune.8 \
+	man8/nuimap.8 \
+	man8/pvcmap.8 \
+	man8/vcstat.8 \
+	man8/wantune.8 \
+	man8/x25diags.8 \
+	man8/x25file.8 \
+	man8/x25info.8 \
+	man8/x25netd.8 \
+	man8/x25route.8 \
+	man8/x25stat.8 \
+	man8/x25trace.8 \
+	man8/x25tune.8 \
+	man8/x32map.8
 
 dist_noinst_MANS = \
 	man3/endpadent.3.man \
@@ -153,6 +202,7 @@ dist_noinst_MANS = \
 	man3/padtos.3.man \
 	man3/setpadent.3.man \
 	man3/setxhostent.3.man \
+	man3/snidtox25.3.man \
 	man3/stox25.3.man \
 	man3/x25diags.3.man \
 	man3/x25_find_link_parameters.3.man \
@@ -162,17 +212,36 @@ dist_noinst_MANS = \
 	man3/x25_set_parse_error_function.3.man \
 	man3/x25tolinkid.3.man \
 	man3/x25tos.3.man \
+	man3/x25tosnid.3.man \
 	man3/x25_write_config_parameters.3.man \
 	man3/x25_write_config_parameters_file.3.man \
 	man3/xti_x25.3.man \
 	man3/XX25.3.man \
+	man4/cons.4.man \
+	man4/ipx25.4.man \
+	man4/ixe.4.man \
+	man4/nli3.4.man \
+	man4/npi.4.man \
+	man4/s_cons.4.man \
+	man4/s_nli3.4.man \
+	man4/s_npi.4.man \
+	man4/s_xx25.4.man \
 	man4/X25.4.man \
-	man5/strx25.5.man \
+	man4/xx25.4.man \
 	man5/extraformat.5.man \
+	man5/ifrdlciconf.5.man \
+	man5/ifrtemplate.5.man \
+	man5/lapbtemplate.5.man \
+	man5/llc2template.5.man \
 	man5/lsapformat.5.man \
+	man5/mfeprotoconf.5.man \
+	man5/mfetemplate.5.man \
 	man5/padent.5.man \
 	man5/qosformat.5.man \
+	man5/strx25.5.man \
+	man5/wantemplate.5.man \
 	man5/x25_primitives.5.man \
+	man5/x25template.5.man \
 	man5/xaddrf.5.man \
 	man5/xhostent.5.man \
 	man7/N_Abort.7.man \
@@ -216,7 +285,36 @@ dist_noinst_MANS = \
 	man7/N_Xcanlis.7.man \
 	man7/N_Xlisten.7.man \
 	man7/N_zerostats.7.man \
-	man7/npi_x25.7.man
+	man7/npi_x25.7.man \
+	man8/ifrdlci.8.man \
+	man8/ifrstat.8.man \
+	man8/ifrtune.8.man \
+	man8/ixemap.8.man \
+	man8/ixetune.8.man \
+	man8/linkadd.8.man \
+	man8/linkdel.8.man \
+	man8/linklist.8.man \
+	man8/linkreset.8.man \
+	man8/linkstart.8.man \
+	man8/linkstate.8.man \
+	man8/linkstop.8.man \
+	man8/lltune.8.man \
+	man8/mfeproto.8.man \
+	man8/mfevc.8.man \
+	man8/mlptune.8.man \
+	man8/nuimap.8.man \
+	man8/pvcmap.8.man \
+	man8/vcstat.8.man \
+	man8/wantune.8.man \
+	man8/x25diags.8.man \
+	man8/x25file.8.man \
+	man8/x25info.8.man \
+	man8/x25netd.8.man \
+	man8/x25route.8.man \
+	man8/x25stat.8.man \
+	man8/x25trace.8.man \
+	man8/x25tune.8.man \
+	man8/x32map.8.man
 
 ## PKG_BUILD_INDEP
 endif
@@ -226,6 +324,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2008-06-18 16:45:23  brian
+# - widespread updates
+#
 # Revision 0.9.2.4  2008-05-07 16:01:37  brian
 # - added NLI X.25-PLP CONS and XX25 implemetnation'
 # doc/man/man3/XX25.3.man

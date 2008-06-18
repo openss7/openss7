@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_DETACH_REQ.7.man,v 0.9.2.6 2008-05-25 12:49:26 brian Exp $
+.\" @(#) $Id: DL_DETACH_REQ.7.man,v 0.9.2.7 2008-06-18 16:45:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_DETACH_REQ.7.man,v $
+.\" Revision 0.9.2.7  2008-06-18 16:45:33  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.6  2008-05-25 12:49:26  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -100,7 +103,9 @@ The message consists of one
 message block, which contains the following structure.
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
 typedef struct {
     t_uscalar_t  dl_primitive;
 } dl_detach_req_t;
@@ -119,6 +124,12 @@ issued to a style 1 DLS provider; doing so may cause errors.
 .I dl_primitive
 conveys
 .BR DL_DETACH_REQ .
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
@@ -155,32 +166,89 @@ A system error has occurred and the Linux system error is indicated in
 the
 .BR DL_ERROR_ACK (7).
 .PP
-The Linux system error may be one of the following:
-.TP 16
-.B EPERM
-Permission for the control request is incorrect.
-.TP
-.B ENXIO
-Invalid device.
-.TP
-.B ENOMEM
-Insufficient memory.
-.TP
-.B EBUSY
-Control information is already enabled (multicast, VLAN IDs, and so on), or
-the driver is unable to handle the request.
-.TP
-.B EINVAL
-One of the parameters has an invalid value.
-.TP
-.B ENOBUFS
-Inadequate buffers were available.
-.TP
-.B ENOTSUP
-Unspported request, event or call.
-.TP
-.B ENOLINK
-The interface is not connected.
+See
+.BR DL_ERROR_ACK (7)
+for a description of specific Linux error codes applicable to DLPI.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_DETACH_REQ
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The implementations are rather inconsistent in their error handling of this
+primitive when it is issued on a
+.B DL_STYLE1
+DLS provider.
+.B @PACKAGE_TITLE@
+returns a
+.BR DL_ERROR_ACK (7)
+with the error code
+.BR DL_NOTSUPPORTED .
+.IR HP-UX \(rg
+appears to return
+.BR DL_ERROR_ACK (7)
+with
+.B DL_SYSERR
+and
+.RB [ ENOTSUP ].
+Other are not clear.
+.RS
+.PP
+Portable programs will not issue
+.BR DL_DETACH_REQ
+on a
+.B DL_STYLE1
+Stream.
+.RE
+.IP \(em
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+documents the UNIX error codes (listed as Linux error codes above).  Other
+implementations do not document these codes.  Portable programs will not rely
+upon the specific value of a Linux error code for proper operation.
+.IP \(em
+.IR AIX \(rg
+LAPB
+.[
+aixlink
+.]
+does not support this primitive.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

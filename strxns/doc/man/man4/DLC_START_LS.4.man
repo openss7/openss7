@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_START_LS.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_START_LS.4.man,v 0.9.2.2 2008-06-18 16:45:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_START_LS.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:31  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -210,6 +213,33 @@ responder.
 .B DLC_SLS_ADDR
 When set, indicates that the remote is identified by address (resolve, SDLC);
 when clear, identified by name (discovery).
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.BR DLC_SLS_STAT " and " DLC_SLS_NEGO
+flags are not supported.
+.TP
+.B DLC TOKEN
+The
+.BR DLC_SLS_STAT " and " DLC_SLS_NEGO
+flags are not supported.
+.TP
+.B DLC 8023
+The
+.BR DLC_SLS_STAT " and " DLC_SLS_NEGO
+flags are not supported.
+.TP
+.B DLC ETHER
+The
+.BR DLC_SLS_STAT " and " DLC_SLS_NEGO
+flags are not supported.
+.TP
+.B DLC SDLC
+The
+.B DLC_SLS_LSVC " and " DLC_SLS_ADDR
+flags are not supported.
 .RE
 .TP
 .I trace_chan
@@ -224,6 +254,43 @@ This field must be set to zero (0) if no remote address or name is required to
 start the LS.  Length values of zero (0) through
 .BR DLC_MAX_NAME
 are supported.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I raddr_name
+(remote address or name) field is used only for outgoing calls when the
+.B DLC_SLS_LSVC
+common link station flag is set.
+.TP
+.B DLC TOKEN
+The
+.I raddr_name
+(remote address or name) field is used only for outgoing calls when the
+.B DLC_SLS_LSVC
+common link station flag is set.
+.TP
+.B DLC 8023
+The
+.I raddr_name
+(remote address or name) field is used only for outgoing calls when the
+.B DLC_SLS_LSVC
+common link station flag is set.
+.TP
+.B DLC ETHER
+The
+.I raddr_name
+(remote address or name) field is used only for outgoing calls when the
+.B DLC_SLS_LSVC
+common link station flag is set.
+.TP
+.B DLC SDLC
+The
+.I len_raddr_name
+(length of remote address or name) field must be set to 1.
+.RE
 .TP
 .I raddr_name
 Specifies the unique network address of the remote node if the
@@ -234,6 +301,16 @@ if the
 indicator is clear.  Addresses are entered in hexadecimal notation, and names
 are entered in character notation.  This field is only valid if the previous
 length field is non-zero.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC SDLC
+The
+.I raddr_name
+(remote address or name) field is the one-byte station address of the remote
+node in hexadecimal.
+.RE
 .TP
 .I maxif
 Specifies the maximum number of I-field bytes that can be in one packet.  This
@@ -249,6 +326,41 @@ and LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I maxif
+(maximum I-field length) field can be set to any value greater than zero (0).
+The DLC FDDI device manager adjusts this value to a maximum of 4077 bytes if
+set too large.
+.TP
+.B DLC TOKEN
+The
+.I maxif
+(maximum I-field length) field can be set to any value greater than zero (0).
+DLC TOKEN adjusts this value to a maximum of 4060 bytes if set too large.
+.TP
+.B DLC 8023
+The
+.I maxif
+(maximum I-field length) field can be set to any value greater than zero (0).
+DLC 8023 adjusts this value to a maximum of 1496 bytes if set too large.
+.TP
+.B DLC ETHER
+The
+.I maxif
+(maximum I-field length) field can be set to any value greater than zero (0).
+DLC ETHER adjusts this value to a maximum of 1493 bytes if set too large.
+.TP
+.B DLC SDLC
+The
+.I maxif
+(maximum I-field length) field can be set to any value greater than zero (0).
+DLC SDLC adust this value to a maximum of 4094 btyes if set too large.
+.RE
 .TP
 .I rcv_wind
 Specifies the receive window.  The receive window specifies the maximum number
@@ -263,6 +375,40 @@ and LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I rcv_wind
+(receive window) field can be set to any value from 1 to 127, inclusive.  The
+recommended value is 127.
+.TP
+.B DLC TOKEN
+The
+.I rcv_wind
+(receive window) field can be set to any value between 1 and 127 inclusive.
+The recommended value is 127.
+.TP
+.B DLC 8023
+The
+.I rcv_wind
+(receive window) field can be set to any value between 1 and 127 inclusive.
+The recommended value is 127.
+.TP
+.B DLC ETHER
+The
+.I rcv_wind
+(receive window) field can be set to any value between 1 and 127 inclusive.
+The recommended value is 127.
+.TP
+.B DLC SDLC
+The
+.I rcv_wind
+(receive window) field can be set to any value between 1 and 7 inclusive.
+The recommended value is 7.
+.RE
 .TP
 .I xmit_wind
 Specifies the transmit window and the maximum number of sequentially numebred
@@ -276,6 +422,40 @@ and LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I xmit_wind
+(transmit window) field can be set to any value from 1 to 127, inclusive.  The
+recommended value is 26.
+.TP
+.B DLC TOKEN
+The
+.I xmit_wind
+(transmit window) field can be set to any value from 1 to 127, inclusive.  The
+recommended value is 26.
+.TP
+.B DLC 8023
+The
+.I xmit_wind
+(transmit window) field can be set to any value from 1 to 127, inclusive.  The
+recommended value is 26.
+.TP
+.B DLC ETHER
+The
+.I xmit_wind
+(transmit window) field can be set to any value from 1 to 127, inclusive.  The
+recommended value is 26.
+.TP
+.B DLC SDLC
+The
+.I xmit_wind
+(transmit window) field can be set to any value from 1 to 7, inclusive.  The
+recommended value is 7
+.RE
 .TP
 .I rsap
 Specifies the remote SAP address being called.  This field is valid only if the
@@ -283,18 +463,73 @@ Specifies the remote SAP address being called.  This field is valid only if the
 indicator or the
 .B DLC_SLS_ADDR
 indicator is set.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I rsap
+(remote SAP) field can be set to any value except the null SAP (0x00) or the
+name-discovery SAP (0xfc).  Also, the low-order bit must be set to 0
+(B'XXXXXXX0') to indicate an individual address.
+.TP
+.B DLC TOKEN
+The
+.I rsap
+(remote SAP) field can be set to any value except the null SAP (0x00) or the
+name-discovery SAP (0xfc).  Also, the low-order bit must be set to 0
+(B'XXXXXXX0') to indicate an individual address.
+.TP
+.B DLC 8023
+The
+.I rsap
+(remote SAP) field can be set to any value except the null SAP (0x00) or the
+name-discovery SAP (0xfc).  Also, the low-order bit must be set to 0
+(B'XXXXXXX0') to indicate an individual address.
+.TP
+.B DLC ETHER
+The
+.I rsap
+(remote SAP) field can be set to any value except the null SAP (0x00) or the
+name-discovery SAP (0xfc).  Also, the low-order bit must be set to 0
+(B'XXXXXXX0') to indicate an individual address.
+.TP
+.B DLC SDLC
+The
+.I rasp
+(remote SAP) field is ignored.
+.RE
 .TP
 .I rsap_low
 Specifies the lowest value in the range of remote SAP address values that the
 local SAP response to when listening for a remote-initiated attachment.  This
 value cannot be the null SAP (0x00) or the discovery SAP (0xfc), and must have
 the low-order bit set to 0 (B'XXXXXXX0') to indicate an individual address.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC SDLC
+The
+.I rsap_low
+(remote SAP low range) field is ignored.
+.RE
 .TP
 .I rsap_high
 Sepcifies the highest value in the range of remote SAP address values that the
 local SAP responds to, when listening for a remote-initiated attachment.  This
 value cannot be the null SAP (0x00) or the discovery SAP (0xfc), and must have
 the low-order bit set to 0 (B'XXXXXXX0') to indicate an individual address.
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC SDLC
+The
+.I rsap_high
+(remote SAP high range) field is ignored.
+.RE
 .TP
 .I res1
 Reserved for alignment, set to zero (0).
@@ -312,6 +547,40 @@ and LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I max_repoll
+field can be set to any value from 1 to 255, inclusive.  The recommended value
+is 8.
+.TP
+.B DLC TOKEN
+The
+.I max_repoll
+field can be set to any value from 1 to 255, inclusive.  The recommended value
+is 8.
+.TP
+.B DLC 8023
+The
+.I max_repoll
+field can be set to any value from 1 to 255, inclusive.  The recommended value
+is 8.
+.TP
+.B DLC ETHER
+The
+.I max_repoll
+field can be set to any value from 1 to 255, inclusive.  The recommended value
+is 8.
+.TP
+.B DLC SDLC
+The
+.I max_repoll
+field can be set to any value from 1 to 255, inclusive.  The recommended value
+is 15
+.RE
 .TP
 .I repoll_time
 Specifies the timeout value (in increments defined by the specific GDLC) used
@@ -327,6 +596,45 @@ LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I repoll_time
+field is defined in increments of 0.5 seconds and can be set to any value from
+1 to 255, inclusive.  The recommended value is 2, giving a timeout duration of
+1 to 1.5 seconds.
+.TP
+.B DLC TOKEN
+The
+.I repoll_time
+field is defined in increments of 0.5 seconds and can be set to any value from
+1 to 255, inclusive.  The recommended value is 2, giving a timeout duration of
+1 to 1.5 seconds.
+.TP
+.B DLC 8023
+The
+.I repoll_time
+field is defined in increments of 0.5 seconds and can be set to any value from
+1 to 255, inclusive.  The recommended value is 2, giving a timeout duration of
+1 to 1.5 seconds.
+.TP
+.B DLC ETHER
+The
+.I repoll_time
+field is defined in increments of 0.5 seconds and can be set to any value from
+1 to 255, inclusive.  The recommended value is 2, giving a timeout duration of
+1 to 1.5 seconds.
+.TP
+.B DLC SDLC
+The
+.I repoll_time
+field is defined in increments of 0.5 seconds and can be set to any value from
+1 to 255, inclusive.  The recommended value is 30, giving a timeout duration of
+approximately 30 seconds.
+.RE
 .TP
 .I ack_time
 Specifies the timeout value (in increments defined by the specific GDLC) used
@@ -342,6 +650,43 @@ LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I ack_time
+(acknowlegement time) field is defined in increments of 0.5 seconds and can be
+set to any value from 1 to 255, inclusive.  The recommended value is 1,
+giving a timeout value of 0.5 to 1 second.
+.TP
+.B DLC TOKEN
+The
+.I ack_time
+(acknowlegement time) field is defined in increments of 0.5 seconds and can be
+set to any value from 1 to 255, inclusive.  The recommended value is 1,
+giving a timeout value of 0.5 to 1 second.
+.TP
+.B DLC 8023
+The
+.I ack_time
+(acknowlegement time) field is defined in increments of 0.5 seconds and can be
+set to any value from 1 to 255, inclusive.  The recommended value is 1,
+giving a timeout value of 0.5 to 1 second.
+.TP
+.B DLC ETHER
+The
+.I ack_time
+(acknowlegement time) field is defined in increments of 0.5 seconds and can be
+set to any value from 1 to 255, inclusive.  The recommended value is 1,
+giving a timeout value of 0.5 to 1 second.
+.TP
+.B DLC SDLC
+The
+.I ack_time
+(acknowlegement time) field is ignored.
+.RE
 .TP
 .I inact_time
 Specifies the timeout value (in increments of 1 second) for the
@@ -351,6 +696,45 @@ LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I inact_time
+(inactivity time) field is defined in increments of 1 second and can be set to
+any value from 1 to 255, inclusive.  The recommended value is 48, giving a
+timeout duration of 48 to 48.5 seconds.
+.TP
+.B DLC TOKEN
+The
+.I inact_time
+(inactivity time) field is defined in increments of 1 second and can be set to
+any value from 1 to 255, inclusive.  The recommended value is 48, giving a
+timeout duration of 48 to 48.5 seconds.
+.TP
+.B DLC 8023
+The
+.I inact_time
+(inactivity time) field is defined in increments of 1 second and can be set to
+any value from 1 to 255, inclusive.  The recommended value is 48, giving a
+timeout duration of 48 to 48.5 seconds.
+.TP
+.B DLC ETHER
+The
+.I inact_time
+(inactivity time) field is defined in increments of 1 second and can be set to
+any value from 1 to 255, inclusive.  The recommended value is 48, giving a
+timeout duration of 48 to 48.5 seconds.
+.TP
+.B DLC SDLC
+The
+.I inact_time
+(inactivity time) field is defined in increments of 1 second and can be set to
+any value from 1 to 255, inclusive.  The recommended value is 30, giving a
+timeout duration of approximately 30 seconds.
+.RE
 .TP
 .I force_time
 Specifies the timeout value (in increments of 1 second) for the period to wait
@@ -361,6 +745,45 @@ LAPB.
 .[
 iso7776
 .]
+.RS
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The
+.I force_time
+(force halt time) field is defined in increments of 1 second and can be set to
+any value from 1 to 16383, inclusive.  The recommended value is 120, giving a
+timeout duration of approximately 2 minutes.
+.TP
+.B DLC TOKEN
+The
+.I force_time
+(force halt time) field is defined in increments of 1 second and can be set to
+any value from 1 to 16383, inclusive.  The recommended value is 120, giving a
+timeout duration of approximately 2 minutes.
+.TP
+.B DLC 8023
+The
+.I force_time
+(force halt time) field is defined in increments of 1 second and can be set to
+any value from 1 to 16383, inclusive.  The recommended value is 120, giving a
+timeout duration of approximately 2 minutes.
+.TP
+.B DLC ETHER
+The
+.I force_time
+(force halt time) field is defined in increments of 1 second and can be set to
+any value from 1 to 16383, inclusive.  The recommended value is 120, giving a
+timeout duration of approximately 2 minutes.
+.TP
+.B DLC SDLC
+The
+.I force_time
+(force halt time) field is defined in increments of 1 second and can be set to
+any value from 1 to 16383, inclusive.  The recommended value is 120, giving a
+timeout duration of approximately 2 minutes.
+.RE
 .PP
 The protocol-specific data area allows parameters to be defined by a specific
 GDLC device manager, such as Token-Ring dynamic window increment or SDLC
@@ -368,6 +791,169 @@ primary slow poll.  This optional data area must directly follow (or append to)
 the end of the
 .B dlc_sls_arg
 structure.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+A protocol-specific data are must be appended to the generic start link
+station (LS) argument
+.RB ( dlc_sls_arg ).
+This structure provides DLC FDDI with additional protocol-specific
+configuration paramters as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct fdl_start_psd {
+    uint8_t pkt_prty;   /* ring access packet priority */
+    uint8_t dyna_wnd;   /* dynamic window increment */
+    uint16_t reserved;  /* reserved, padding, not used */
+};
+\s+1\fP
+.fi
+.PP
+The protocol-specific parameters are:
+.TP
+.I pkt_ptry
+Specifies the ring-acecss priotity that the user wishes to reserve on transmit
+packets.  Values of zero (0) through seven (7) are supported, where zero (0)
+is the lowest priority and seven (7) is the highest priority.
+.TP
+.I dyna_wnd
+Network congestion causes the local transmit window count to automatically
+drop to a value of 1.  The dynamic window increment specifies the number of
+consecutive sequenced packets that must be acknowledged by the remote station
+before the local transmit window count can be incremented.  This allows
+gradual increase in network traffic after a period of congestion.  This field
+can be set to any value from 1 to 256; the recommended value is one (1).
+.TP
+.I reserved
+Not used.
+.RE
+.TP
+.B DLC TOKEN
+A protocol-specific data area must be appended to the generic start link
+station argument
+.RB ( dlc_sls_arg ).
+This structure provides DLC TOKEN with additional protocol-specific
+configuration parameters as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct trl_start_psd {
+    uint8_t pkt_prty;   /* ring access packet priority */
+    uint8_t dyna_wnd;   /* dynamic window increment */
+    uint16_t reserved;  /* reserved, padding, not used */
+};
+\s+1\fP
+.fi
+.PP
+The protocol-specific parameters are:
+.TP
+.I pkt_ptry
+Specifies the ring-acecss priotity that the user wishes to reserve on transmit
+packets.  Values of zero (0) through seven (7) are supported, where zero (0)
+is the lowest priority and seven (7) is the highest priority.
+.TP
+.I dyna_wnd
+Network congestion causes the local transmit window count to automatically
+drop to a value of 1.  The dynamic window increment specifies the number of
+consecutive sequenced packets that must be acknowledged by the remote station
+before the local transmit window count can be incremented.  This allows
+gradual increase in network traffic after a period of congestion.  This field
+can be set to any value from 1 to 256; the recommended value is one (1).
+.TP
+.I reserved
+Not used.
+.RE
+.TP
+.B DLC 8023
+No protocol-specific data area is required for the DLC 8023 device manager to
+start a link station.
+.TP
+.B DLC ETHER
+No protocol-specific data area is required for the DLC ETHER device manager to
+start a link station.
+.TP
+.B DLC SDLC
+The following protocol-specific data area must be appended to the generic start
+LS argument structure
+.RB ( dlc_sls_arg ).
+This structure provides DLC SDLC with additional protocol-specific
+configuration parameters as follows:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct sdl_start_psd {
+    uint8_t duplex;   \"/* link station xmit/receive capability */
+    uint8_t secladd;  \"/* secondary station local address */
+    uint8_t prirpth;  \"/* primary repoll timeout threshold */
+    uint8_t priilto;  \"/* primary idle list timeout */
+    uint8_t prislto;  \"/* primary slow list timeout */
+    uint8_t retxct;   \"/* retransmit count ceiling */
+    uint8_t retxth;   \"/* retransmit count threshold */
+    uint8_t reserved; \"/* currently not used */
+};
+\s+1\fP
+.fi
+.PP
+The protocol-specific parameters are as follows:
+.TP
+.I duplex
+Specifies LS transmit-receive capability.  This field must be set to zero (0),
+indicating two-way alternating capability.
+.TP
+.I secladd
+Specifies the secondation station link address of the local station.  If the
+local station is negotiable, this address is used only if the local station
+becomes a secondary station from role negotiation.  This field overlays the
+.BR mpioctl ()
+.RB ( CIO_START )
+poll address variable,
+.IR poll_addr .
+.TP
+.I prirpth
+Specifies primtay repoll threshold: the number of conginguous repolls that
+caust the local primary to log a temporary error.  Valid values are from 1 to
+100.  The recommended value is 10.
+.TP
+.I priilto
+Specifies primary idle list timeout.  If the primary station has specified
+hold-link-on-inactivity paramters and then discovers that a secondary station
+is not responding, the primary station places that secondary station of an idle
+list.  The primary station polls a station on the ilde list less frequently
+than the other secondary stations to avoid tying up the link with fruitless
+polls.  This field sets the amount of time (in seconds) that the primary
+station should wait between polls to stations on the idle list.  Any value from
+1 to 255, inclusive, may be specified.  The recommended value is 60, giving a
+timeout duration of 60 seconds.
+.TP
+.I prislto
+Specifies the primimary slow list timeout.  When the primary station discovers
+that communication with a secondary station is not productive, it places that
+station on a slow list.  The primary station poll a station on the slow list
+less frequently than the other secondary stations to avoid tying up the link
+with fruitless polls.  This field sets the amoutn of time (in seconds) that the
+primary station should wait between polls to stations on the slow list.  Any
+value from 1 to 255, inclusive, can be specified.  The recommended value is 20,
+given a timeout duration of 20 seconds.
+.TP
+.I retxct
+Specifies the retransmission count.  This field specifies the number of
+contiguous information frame bursts containing the same data that the local
+station retransmits before it declares a permanent transmission error.  Any
+value from 1 to 255, inclusive, is valid.  The recommended value is 10.
+.TP
+.I retxth
+Specifies the retransmit threshold: the maximum number of information frame
+retransmissions allows as a percentage of the total information frame
+transmission (sampled only after a block of information frames has been sent).
+If the number of retransmission exceeds the specified percentage, the system
+declares a temporary error.  Any valud from 1 to 100 can be specified.  The
+recommended value is 10, indicating a ratio of 10 percent.
+.RE
 .\"
 .\"
 .SH RETURN

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x25_control.h,v 0.9.2.1 2008-05-03 10:46:38 brian Exp $
+ @(#) $Id: x25_control.h,v 0.9.2.2 2008-06-18 16:45:25 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 10:46:38 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25_control.h,v $
+ Revision 0.9.2.2  2008-06-18 16:45:25  brian
+ - widespread updates
+
  Revision 0.9.2.1  2008-05-03 10:46:38  brian
  - added package files
 
@@ -59,7 +62,7 @@
 #ifndef __NETX25_X25_CONTROL_H__
 #define __NETX25_X25_CONTROL_H__
 
-#ident "@(#) $RCSfile: x25_control.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: x25_control.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* linkid:		the number of the link.
  *
@@ -92,6 +95,63 @@ struct nliformat {
 	unsigned char version;		/**< NLI version number */
 };
 
+enum {
+	cll_in_v = 1,
+#define cll_in_v	cll_in_v
+	cll_out_v,
+#define cll_out_v	cll_out_v
+	caa_in_v,
+#define caa_in_v	caa_in_v
+	caa_out_v,
+#define caa_out_v	caa_out_v
+	dt_in_v,
+#define dt_in_v		dt_in_v
+	dt_out_v,
+#define dt_out_v	dt_out_v
+	ed_in_v,
+#define ed_in_v		ed_in_v
+	ed_out_v,
+#define ed_out_v	ed_out_v
+	rnr_in_v,
+#define rnr_in_v	rnr_in_v
+	rnr_out_v,
+#define rnr_out_v	rnr_out_v
+	rr_in_v,
+#define rr_in_v		rr_in_v
+	rr_out_v,
+#define rr_out_v	rr_out_v
+	rst_in_v,
+#define rst_in_v	rst_in_v
+	rst_out_v,
+#define rst_out_v	rst_out_v
+	rsc_in_v,
+#define rsc_in_v	rsc_in_v
+	rsc_out_v,
+#define rsc_out_v	rsc_out_v
+	clr_in_v,
+#define clr_in_v	clr_in_v
+	clr_out_v,
+#define clr_out_v	clr_out_v
+	clc_in_v,
+#define clc_in_v	clc_in_v
+	clc_out_v,
+#define clc_out_v	clc_out_v
+	octets_in_v,
+#define octetst_in_v	octetst_in_v
+	octets_out_v,
+#define octets_out_v	octets_out_v
+	rst_timeouts_v,
+#define rst_timeouts_v	rst_timeouts_v
+	ed_timeouts_v,
+#define ed_timeouts_v	ed_timeouts_v
+	prov_rst_in_v,
+#define prov_rst_in_v	prov_rst_in_v
+	rem_rst_in_v,
+#define rem_rst_in_v	rem_rst_in_v
+	perVCmon_size
+#define perVCmon_size	perVCmon_size
+};
+
 /* rem_addr:		the called address if its an outgoing call, or the
  *			calling address for incoming calls.
  *
@@ -110,20 +170,21 @@ struct nliformat {
  * call_direction:	0 indicates incoming call, 1 outgoing call
  *
  * perVC_stats:		an array containing the per-virtual channel circuit
- *			statistics.  The array is defined in the x25_contro.h
+ *			statistics.  The array is defined in the x25_control.h
  *			file.
  */
 struct vcinfo {
 	struct xaddrf rem_addr;
-	uint32_t xu_ident;
-	uint32_t process_id;
-	unsigned short lci;
-	unsigned char xstate;
-	unsigned char xtag;
-	unsigned char ampvc;
-	unsigned char call_direction;
-	unsigned char domain;
-	int perVC_stats[perVCmon_size];
+	/* struct xaddrf loc_addr; */
+	uint32_t xu_ident;		/* link identifier */
+	uint32_t process_id;		/* relevant user id */
+	unsigned short lci;		/* logical channel id */
+	unsigned char xstate;		/* VC state */
+	unsigned char xtag;		/* VC check record */
+	unsigned char ampvc;		/* true if is a PVC */
+	unsigned char call_direction;	/* 0, incoming; 1, outgoing */
+	unsigned char domain;		/* vctype */
+	int perVC_stats[perVCmon_size];	/* per-VC statistics */
 };
 
 /* entries:		contains the structure for the returned mapping
@@ -365,7 +426,6 @@ struct linkoptformat {
 	unsigned char rd_wr;
 };
 
-
 #define NUIMAXSIZE 64
 #define NUIFACMAXSIZE 32
 
@@ -376,14 +436,15 @@ struct nuiformat {
 
 struct facformat {
 	unsigned short SUB_MODES;	/**< Mode tuning bits for net */
-	unsigned char LOCDEFPKTSIZE;
-	unsigned char REMDEFPKTSIZE;
-	unsigned char LOCDEFWSIZE;
-	unsigned char REMDEFWSIZE;
-	unsigned char locadefthclass;
-	unsigned char remdeflthclass;
-	unsigned char CUG_CONTROL;
+	unsigned char LOCDEFPKTSIZE;	/**< loc default packet size */
+	unsigned char REMDEFPKTSIZE;	/**< rem default packet size */
+	unsigned char LOCDEFWSIZE;	/**< loc default window size */
+	unsigned char REMDEFWSIZE;	/**< rem default window size */
+	unsigned char locadefthclass;	/**< loc default class */
+	unsigned char remdeflthclass;	/**< rem default class */
+	unsigned char CUG_CONTROL;	/**< CUG facilities */
 };
+
 struct nui_del {
 	char prim_class;		/**< always NUI_MSG */
 	char op;			/**< always NUI_DEL */
@@ -475,35 +536,65 @@ typedef struct x25_route_s {
 	char pstn_number[16];
 } X25_ROUTE;
 
-#define N_getnliversion		SX25_IOC(0x00) /**< read NLI version */
+#define SNIOC ('N'<<8)
 
-#define N_nuidel		SX25_IOC(0x01) /**< delete specified NUI mapping (root) */
-#define N_nuiget		SX25_IOC(0x02) /**< read specified NUI mapping */
-#define N_nuimget		SX25_IOC(0x03) /**< read all NUI mappings */
-#define N_nuiput		SX25_IOC(0x04) /**< store a set of NUI mappings (root) */
-#define N_nuireset		SX25_IOC(0x05) /**< delete all NUI mappings (root) */
+#if 0
+#define N_snident		(SNIOC|0x01)
+#define N_snmode		(SNIOC|0x02)
+#define N_snconfig		(SNIOC|0x03)
+#define N_snread		(SNIOC|0x04)
+#define N_getstats		(SNIOC|0x05)
+#define N_zerostats		(SNIOC|0x06)
+#define N_putpvcmap		(SNIOC|0x07)
+#define N_getpvcmap		(SNIOC|0x08)
+#define N_getVCstatus		(SNIOC|0x09)
+#define N_getnliversion		(SNIOC|0x0a)
+#define N_traceon		(SNIOC|0x0b)
+#define N_traceoff		(SNIOC|0x0c)
+#define N_nuimsg		(SNIOC|0x0d)
+#define N_nuiput		(SNIOC|0x0e)
+#define N_nuidel		(SNIOC|0x0f)
+#define N_nuiget		(SNIOC|0x10)
+#define N_nuimget		(SNIOC|0x11)
+#define N_nuireset		(SNIOC|0x12)
+#define N_zeroVCstats		(SNIOC|0x13)
+#define N_putx32map		(SNIOC|0x14)
+#define N_getx32map		(SNIOC|0x15)
+#define N_getNSNIDstats		(SNIOC|0x16)
+#define N_zeroSNIDstats		(SNIOC|0x17)
+#define N_setQOSDATPRI		(SNIOC|0x18)
+#define N_resetQOSDATPRI	(SNIOC|0x19)
+#endif
 
-#define N_getstats		SX25_IOC(0x06) /**< read X.25 multiplexor statistics */
-#define N_zerostats		SX25_IOC(0x07) /**< reset X.25 multiplexor statistics to zero (root) */
+#define N_getnliversion		(SNIOC|0x00) /**< read NLI version */
 
-#define N_getoneVCstats		SX25_IOC(0x08) /**< get status and statistics for VC associated with current stream */
-#define N_getpvcmap		SX25_IOC(0x09) /**< get default packet and window sizes */
-#define N_getVCstats		SX25_IOC(0x0a) /**< get per VC statistics */
-#define N_getVCstatus		SX25_IOC(0x0b) /**< get per VC state and statistics */
-#define N_putpvcmap		SX25_IOC(0x0c) /**< change per VC packet and window sizes */
+#define N_nuidel		(SNIOC|0x01) /**< delete specified NUI mapping (root) */
+#define N_nuiget		(SNIOC|0x02) /**< read specified NUI mapping */
+#define N_nuimget		(SNIOC|0x03) /**< read all NUI mappings */
+#define N_nuiput		(SNIOC|0x04) /**< store a set of NUI mappings (root) */
+#define N_nuireset		(SNIOC|0x05) /**< delete all NUI mappings (root) */
 
-#define N_traceon		SX25_IOC(0x0d) /**< start packet level tracing */
-#define N_traceoff		SX25_IOC(0x0e) /**< stop packet level tracing */
+#define N_getstats		(SNIOC|0x06) /**< read X.25 multiplexor statistics */
+#define N_zerostats		(SNIOC|0x07) /**< reset X.25 multiplexor statistics to zero (root) */
 
-#define N_X25_ADD_ROUTE		SX25_IOC(0x0f) /**< add a new route or update an existing route (root) */
-#define N_X25_FLUSH_ROUTE	SX25_IOC(0x10) /**< clear all etnries from the routing table (root) */
-#define N_X25_GET_ROUTE		SX25_IOC(0x11) /**< obtain routing information for specified address */
-#define N_X25_NEXT_ROUTE	SX25_IOC(0x12) /**< obtain routine information for the next route in the routeing table */
-#define N_X25_RM_ROUTE		SX25_IOC(0x13) /**< remove the specified route (root) */
+#define N_getoneVCstats		(SNIOC|0x08) /**< get status and statistics for VC associated with current stream */
+#define N_getpvcmap		(SNIOC|0x09) /**< get default packet and window sizes */
+#define N_getVCstats		(SNIOC|0x0a) /**< get per VC statistics */
+#define N_getVCstatus		(SNIOC|0x0b) /**< get per VC state and statistics */
+#define N_putpvcmap		(SNIOC|0x0c) /**< change per VC packet and window sizes */
 
-#define N_linkconfig		SX25_IOC(0x14) /**< configure the wlcfg database */
-#define N_linkent		SX25_IOC(0x15) /**< configure newly linked driver */
-#define N_linkmode		SX25_IOC(0x16) /**< alter link characetistics */
-#define N_linkread		SX25_IOC(0x17) /**< read the wlcfg database */
+#define N_traceon		(SNIOC|0x0d) /**< start packet level tracing */
+#define N_traceoff		(SNIOC|0x0e) /**< stop packet level tracing */
+
+#define N_X25_ADD_ROUTE		(SNIOC|0x0f) /**< add a new route or update an existing route (root) */
+#define N_X25_FLUSH_ROUTE	(SNIOC|0x10) /**< clear all etnries from the routing table (root) */
+#define N_X25_GET_ROUTE		(SNIOC|0x11) /**< obtain routing information for specified address */
+#define N_X25_NEXT_ROUTE	(SNIOC|0x12) /**< obtain routine information for the next route in the routeing table */
+#define N_X25_RM_ROUTE		(SNIOC|0x13) /**< remove the specified route (root) */
+
+#define N_linkconfig		(SNIOC|0x14) /**< configure the wlcfg database */
+#define N_linkent		(SNIOC|0x15) /**< configure newly linked driver */
+#define N_linkmode		(SNIOC|0x16) /**< alter link characetistics */
+#define N_linkread		(SNIOC|0x17) /**< read the wlcfg database */
 
 #endif				/* __NETX25_X25_CONTROL_H__ */

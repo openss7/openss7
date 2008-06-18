@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi_ioctl.h,v 0.9.2.1 2008-05-25 12:46:56 brian Exp $
+ @(#) $Id: dlpi_ioctl.h,v 0.9.2.2 2008-06-18 16:45:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-25 12:46:56 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi_ioctl.h,v $
+ Revision 0.9.2.2  2008-06-18 16:45:40  brian
+ - widespread updates
+
  Revision 0.9.2.1  2008-05-25 12:46:56  brian
  - added manual pages, libraries, utilities and drivers
 
@@ -59,7 +62,7 @@
 #ifndef __SYS_DLPI_IOCTL_H__
 #define __SYS_DLPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: dlpi_ioctl.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifdef _SUN_SOURCE
 
@@ -433,5 +436,122 @@ struct dlc_trace_arg {
 };
 
 #endif				/* _AIX_SOURCE */
+
+#ifdef _SUN_SOURCE
+
+#define ILD_LLC2		(('D'<<8)+100)
+#define LLC2_GET_STA_STATS	0
+#define LLC2_GET_SAP_STATS	1
+#define LLC2_GET_CON_STATS	2
+
+#define LLC2_MAX_SAPS 128
+
+typedef struct llc2GetStaStats {
+	uint32_t ppa;			/* PPA of station component */
+	uint32_t cmd;			/* LLC2_GET_STA_STATS */
+	uint8_t clearflag;		/* clear counters flag: 0 get, 1 reset */
+	uint8_t state;			/* station component state */
+	uint16_t numSaps;		/* number of active SAPs in the array */
+	uint8_t saps[LLC2_MAX_SAPS];	/* array of active SAP values */
+	uint32_t nullSapXidCmdRcvd;	/* number of null SAP XID cmds received */
+	uint32_t nullSapXidRspSent;	/* number of null SAP XID rsps sent */
+	uint32_t nullSapTestCmdRcvd;	/* number of null SAP TEST cmds received */
+	uint32_t nullSapTestRspSent;	/* number of null SAP TEST rsps sent */
+	uint32_t outOfState;		/* number of invalid events received */
+	uint32_t allocFail;		/* number of buffer allocation failures */
+	uint32_t protocolError;		/* numer of protocol errors */
+} llc2GetStaStats_t;
+
+typedef struct llc2GetSapStats {
+	uint32_t ppa;			/* PPA of SAP component */
+	uint32_t cmd;			/* LLC2_GET_SAP_STATS */
+	uint8_t sap;			/* SAP value */
+	uint8_t clearflag;		/* clear counters flag: 0 get, 1 reset */
+	uint8_t state;			/* state */
+	uint32_t numCons;		/* number of active connections */
+	uint16_t cons[LLC2_MAX_CONS];	/* array of active connection indexes */
+	uint32_t xidCmdSent;		/* number of XID commands sent */
+	uint32_t xidCmdRcvd;		/* number of XID commands received */
+	uint32_t xidRspSent;		/* number of XID responses sent */
+	uint32_t xidRspRcvd;		/* number of XID responses received */
+	uint32_t testCmdSent;		/* number of TEST commands sent */
+	uint32_t testCmdRcvd;		/* number of TEST commands received */
+	uint32_t testRspSent;		/* number of TEST responses sent */
+	uint32_t testRspRcvd;		/* number of TEST responses received */
+	uint32_t uiSent;		/* number of UI frames sent */
+	uint32_t uiRcvd;		/* number of UI frames received */
+	uint32_t outOfState;		/* number of invalid events received */
+	uint32_t allocFail;		/* number of buffer allocation failures */
+	uint32_t protocolError;		/* numer of protocol errors */
+} llc2GetSapStats_t;
+
+#define MAC_MAX_LEN 8
+
+/* wild guess */
+struct dlsap {
+	uint8_t mac_len;
+	uint8_t mac[MAC_MAX_LEN];
+	uint8_t lsap;
+} dlsap_t;
+
+typdef struct llc2GetConStats {
+	uint32_t ppa;			/* PPA of Connection component */
+	uint32_t cmd;			/* LLC2_GET_CON_STATS */
+	uint8_t sap;			/* SAP value */
+	uint16_t con;			/* Connection index */
+	uint8_t clearflag;		/* clear counters flag: 0 get, 1 reset */
+	uint8_t stateOldest;		/* previous DLPI state */
+	uint8_t stateOlder;		/* previous DLPI state */
+	uint8_t stateOld;		/* previous DLPI state */
+	uint8_t state;			/* current DLPI state */
+	uint16_t sid;			/* SAP value and connection index */
+	dlsap_t rem;			/* structure containing remote MAC address and SAP */
+	uint16_t flag;			/* connection component processing flag */
+	uint8_t dataflag;		/* DATA_FLAG */
+	uint8_t k;			/* transmit window size */
+	uint8_t vs;			/* sequence number of next I-frame to send */
+	uint8_t vr;			/* seuqnece number of next I-frame expected */
+	uint8_t nrRcvd;			/* number of the last I-frame acked by the remote node */
+	uint16_t retryCount;		/* number of time expirations */
+	uint32_t numToBeAcked;		/* number of outbound I-frames to be acknowledged */
+	uint32_t numToResend;		/* number of outbound I-frames to be re-sent */
+	uint32_t macOutSave;		/* number of outbound I-frames held by the MAC driver to be 
+					   saved on return to LLC2 */
+	uint32_t macOutDump;		/* number of outbound I-frames held by the MAC driver to be 
+					   dumped on return to LLC2 */
+	uint8_t timerOn;		/* Timer activity flag */
+	uint32_t iSent;			/* number of I-frames sent */
+	uint32_t iRcvd;			/* number of I-frames received */
+	uint32_t frmrSent;		/* number of frame rejects sent */
+	uint32_t frmrRcvd;		/* number of frame rejects received */
+	uint32_t rrSent;		/* number of RRs sent */
+	uint32_t rrRcvd;		/* number of RRs received */
+	uint32_t rnrSent;		/* number of RNRs sent */
+	uint32_t rnrRcvd;		/* number of RNRs recevied */
+	uint32_t rejSent;		/* number of rejects sent */
+	uint32_t rejRcvd;		/* number of rejects received */
+	uint32_t sabmeSent;		/* number of SABME sent */
+	uint32_t sabmeRcvd;		/* number of SABME received */
+	uint32_t uaSent;		/* number of UA sent */
+	uint32_t uaRcvd;		/* number of UA received */
+	uint32_t discSent;		/* numbero DISC sent */
+	uint32_t outOfState;		/* number of invalid events received */
+	uint32_t allocFail;		/* number of buffer allocation failures */
+	uint32_t protocolError;		/* number of protocol errors */
+	uint32_t localBusy;		/* number of times in local busy state */
+	uint32_t remoteBusy;		/* number of times in remote busy state */
+	uint32_t maxRetryFail;		/* number of failures due to reaching maxRetry */
+	uint32_t ackTimerExp;		/* number of ack timer expirations */
+	uint32_t pollTimerExp;		/* number of P-timer expirations */
+	uint32_t rejTimerExp;		/* number of reject timer expirations */
+	uint32_t remBusyTimerExp;	/* number of remote busy timer expirations */
+	uint32_t inactTimerExp;		/* number of inactivity timer expirations */
+	uint32_t sendAckTimerExp;	/* number of send acktimer expirations */
+} llc2GetConStats_t;
+
+#endif				/* _SUN_SOURCE */
+
+#ifdef _LFS_SOURCE
+#endif				/* _LFS_SOURCE */
 
 #endif				/* __SYS_DLPI_IOCTL_H__ */

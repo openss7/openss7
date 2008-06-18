@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 21:22:35 $ by $Author: brian $
+# Last Modified $Date: 2008-06-18 16:45:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -124,10 +124,12 @@ noinst_LIBRARIES		= libX25mods.a libX25drvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libX25mods_a_SOURCES = \
-				  src/modules/xot.c
+				  src/modules/cdpmod.c \
+				  src/modules/dlaix.c
 
 dist_EXTRA_libX25mods_a_SOURCES = \
-				  src/modules/xot.c
+				  src/modules/cdpmod.c \
+				  src/modules/dlaix.c
 
 mods_source_FILES		= $(nodist_EXTRA_libX25mods_a_SOURCES)
 
@@ -360,6 +362,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2008-06-18 16:45:22  brian
+# - widespread updates
+#
 # Revision 0.9.2.2  2008-05-03 21:22:35  brian
 # - updates for release
 #

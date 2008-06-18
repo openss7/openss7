@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: draft-bidulock-tsvwg-xos-00.me,v 0.9.2.1 2008-05-09 13:45:20 brian Exp $
+.\" @(#) $Id: draft-bidulock-tsvwg-xos-00.me,v 0.9.2.2 2008-06-18 16:45:23 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,11 +52,14 @@
 .\"
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-09 13:45:20 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:23 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: draft-bidulock-tsvwg-xos-00.me,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:23  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-09 13:45:20  brian
 .\" - initial version of draft
 .\"
@@ -180,7 +183,8 @@ In general, the normal X.25 protocol packet formats and state transition rules
 apply to the X.25 layer in XOS.  Exceptions to this are noted.
 .\"
 .\"
-.sh 2 "Advantages of XOS over XOT"
+.sh 2 Scope
+.sh 3 "Advantages of XOS over XOT"
 .pp
 \fB\)XOS\fP has a number of unique advantages over XOT,
 .[
@@ -218,7 +222,7 @@ These and the additional capabilities of SCTP make \fB\)XOS\fP a superior
 replacement to XOT.
 .\"
 .\"
-.sh 2 "Relationship of XOS to XOT"
+.sh 3 "Relationship of XOS to XOT"
 .pp
 The XOS protocol described in this memo is not intended as a replacement for
 XOT,
@@ -325,6 +329,64 @@ not require additional non-standard messages to support PVCs.  PVC Setup is,
 once again, a matter for management systems and the corresponding section from
 RFC 1613, "PVC Setup", has been removed from this Memo.
 .#e
+.\"
+.\"
+.sh 2 Terminology
+.pp
+This memo uses the following extended terminology:
+.lp
+\fBVirtual Channel\fP \(em
+.ix +\n(iiu
+A virtual channel over which an X.25 connection is established using X.25 call
+setup procedures.
+.lp
+\fBPermanent Virtual Channel\fP \(em
+.ix +\n(iiu
+A virtual channel over which an X.25 connection is permanently established
+without the need for the use of call setup procedures.
+.\"
+.\"
+.sh 2 Abbreviations
+.pp
+The following abbreviations are used throughout this memo:
+.TS
+tab(:);
+llil.
+:CC:\*- Call Confirm (X.25 message)
+:DC:\*- Disconnect Confirm (X.25 message)
+:DCE:\*- Data Control Equipment
+:DLC:\*- Data Link Connection
+:DL:\*- Data Link
+:DLS:\*- Data Link Service
+:DTE:\*- Data Terminal Equipment
+:DXE:\*- DTE/DCE
+:ICMP:\*- Internet Control Managment Protocol
+:IEC:\*- Inernational Engineering Consortia
+:IETF:\*- Internet Engineering Task Force
+:IP:\*- Internet Protocol
+:ISO:\*- International Organization for Standardization
+:ITU:\*- International Telecommunications Union
+:ITU-T:\*- ITU (Telecom Sector)
+:LAPB:\*- Link Access Protocol (Balanced)
+:LCI:\*- Logical Channel Identifier
+:LLC1:\*- LLC Class 1
+:LLC2:\*- LLC Class 2
+:LLC:\*- Logical Link Control
+:OOTB:\*- Out Of The Blue
+:OSI:\*- Open Systems Interconnect
+:PLP:\*- Packet Layer Protocol
+:PVC:\*- Permanent Virtual Channel
+:QOS:\*- Quality of Service
+:REJ:\*- Reject (X.25 message)
+:RFC:\*- Request for Comments
+:RNR:\*- Receiver Not Ready (X.25 message)
+:RR:\*- Receiver Ready (X.25 message)
+:SCTP:\*- Stream Control Transmission Protocol
+:TCP:\*- Transmission Control Protocol
+:VC:\*- Virtual Channel
+:XOS:\*- X.25 over SCTP
+:XOT:\*- X.25 over TCP
+.TE
 .\"
 .\"
 .sh 1 Conventions
@@ -1074,7 +1136,7 @@ the SCTP association using normal X.25 packet formats and state transitions.
 .pp
 Reset and Reset Confirm packets are sent with the same SCTP stream id as other
 data packets associated with the VC or PVC by Local Channel Identifier.
-.PP
+.pp
 Interrupt and Interrupt Confirm packets, on the other hand, are used to
 implement network expedited data and \fB\)SHOULD\fP be sent either with an
 SCTP stream id separate from any normal data stream, or on stream id zero (0).
@@ -1647,6 +1709,9 @@ finalized for publication as an RFC.
 .nf
 \fC\s-3
 $Log: draft-bidulock-tsvwg-xos-00.me,v $
+Revision 0.9.2.2  2008-06-18 16:45:23  brian
+- widespread updates
+
 Revision 0.9.2.1  2008-05-09 13:45:20  brian
 - initial version of draft
 
@@ -1674,4 +1739,3 @@ for leading the way.
 This draft expires \*[expiry].
 .)b
 .#T \*[year]
-

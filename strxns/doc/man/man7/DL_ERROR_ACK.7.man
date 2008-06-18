@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_ERROR_ACK.7.man,v 0.9.2.6 2008-05-25 12:49:26 brian Exp $
+.\" @(#) $Id: DL_ERROR_ACK.7.man,v 0.9.2.7 2008-06-18 16:45:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:49:26 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_ERROR_ACK.7.man,v $
+.\" Revision 0.9.2.7  2008-06-18 16:45:33  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.6  2008-05-25 12:49:26  brian
 .\" - updated manual pages and DLPI header
 .\"
@@ -100,7 +103,9 @@ The message consists of one
 message block, which contains the following structure.
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
+#include <sys/dlpi.h>
+
 typedef struct {
     t_uscalar_t  dl_primitive;
     t_uscalar_t  dl_error_primitive;
@@ -121,6 +126,10 @@ erroneous request or response.
 .\"
 .\"
 .SH PARAMETERS
+.PP
+The
+.B dl_error_ack_t
+structure contains the following members:
 .TP
 .I dl_primitive
 conveys
@@ -132,14 +141,14 @@ identifies the primitive in error.
 .I dl_errno
 conveys the DLPI error code associated with the failure.  See the individual
 request or response for the error codes that are applicable.  In addition to
-those errors:
+those errors, the following errors may be reported:
 .RS
-.TP
+.TP \w'\fBDL_BADPRIM\fP\(em'u
 .B DL_BADPRIM
-error is returned if an unrecognized primitive is issued by the DLS user.
+An unrecognized primitive was issued by the DLS user.
 .TP
 .B DL_NOTSUPPORTED
-error is returned if an unsupported primitive is issued by the DLS user.
+A recognized but unsupported primitive was issued by the DLS user.
 .RE
 .TP
 .I dl_unix_errno
@@ -150,6 +159,64 @@ is set to
 .BR DL_SYSERR .
 It is used to report Linux system failures that prevent the processing of a
 given request or response.
+See the individual request or response reference page for the error codes that
+are applicable.  In addition to those errors, the following errors may be
+reported:
+.RS
+.TP \w'\fBDL_BADPRIM\fP\(em'u
+.RB [ EPERM ]
+Fine-grained permission for the request or response is incorrect.  That is, the
+primitive is recognized and supported by the DLS Provider but the requesting
+DLS User Stream does not have sufficient permissions for the DLS Provider to
+satisfy the request.
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was available to satisfy the request.
+The request or response may be successful if the DLS User reissues the request
+or response primitive at a later time when resources become available.
+.TP
+.RB [ ENOBUFS ]
+Insufficient buffers were available to satisfy the request.
+The request or response may be successful if the DLS User reissues the request
+or response primitive at a later time when resources become available.
+.TP
+.RB [ ENOSR ]
+Insufficient STREAMS resources were available to satisfy the request.
+The request or response may be successful if the DLS User reissues the request
+or response primitive at a later time when resources become available.
+.TP
+.RB [ EAGAIN ]
+A temporary failure occurred and the DLS user should reissue the request or
+response.
+.TP
+.RB [ EBUSY ]
+The control information in the request or response primitive has already been
+subjected to the control request or response, or the driver is unabled to
+handle the request due to some other transient condition.
+.TP
+.RB [ EINVAL ]
+One of the parameters of the request for which there is no prescribed DLPI
+error code has an invalid value.
+.TP
+.RB [ ENOTSUP ]
+Unsupported request, event or call.  The DLS provider recognizes and supportes
+the request or response primitive, however, the specific request or response is
+not supported by the DLS provider or data link protocol.
+.TP
+.RB [ ENOLINK ]
+The interface (Physical Point of Attachment (PPA) or underlying driver or
+device) is not connected and no prescribed DLPI error code is applicable.
+.TP
+.RB [ ENXIO ]
+Invalid device.  The interface (Phsyical Point of Attachment (PPA) or
+underlying driver or device) is no longer installed on the system.
+.RE
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
@@ -160,6 +227,57 @@ confirmation of a previous request or response is pending.
 .SH "NEW STATE"
 The resulting state is that from which the acknowledged request or response
 was generated.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B DL_ERROR_ACK
+primitive is compatible with implementations based on DLPI Revision 2,
+.[
+dlpi revision 2.0.0
+.]
+such as
+.IR AIX \(rg,
+.[
+aixdlpi
+.]
+.IR HP-UX \(rg,
+.[
+hpuxdlpi
+.]
+.IR Solaris \(rg,
+.[
+soldoc11
+.]
+.IR Solstice \(rg,
+.[
+solx25pg
+.]
+and
+.IR UnixWare \(rg,
+.[
+uw7doc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The DLPI standard does not proscribe the use of specific Linux error codes.
+.B @PACKAGE_TITLE@
+details the use of Linux error codes with regard to DLPI primitives for the
+purpose of clarification of the implementation.
+.B @PACKAGE_TITLE@
+is largely compatible with
+.IR HP-UX \(rg
+.[
+hpuxdlpi
+.]
+in this regard.
+.PP
+See
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE

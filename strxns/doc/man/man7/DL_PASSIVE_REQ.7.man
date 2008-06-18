@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_PASSIVE_REQ.7.man,v 0.9.2.1 2008-05-25 12:46:55 brian Exp $
+.\" @(#) $Id: DL_PASSIVE_REQ.7.man,v 0.9.2.2 2008-06-18 16:45:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:55 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_PASSIVE_REQ.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:35  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:55  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -90,7 +93,7 @@ dlpi revision 2.0.0
 .]
 .IR Solaris \(rg-specific.
 .[
-soldlpi
+soldoc11
 .]
 .\"
 .\"
@@ -148,6 +151,12 @@ link from being added to an aggregate.
 .I dl_primitive
 conveys
 .BR DL_PASSIVE_REQ .
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+.B DL_CODLS
+mode.
 .\"
 .\"
 .SH STATE
@@ -230,7 +239,7 @@ header file to expose the declarations and structures associated with this primi
 is compatibible with
 .IR Solaris \(rg,
 .[
-soldoc10
+soldoc11
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -282,7 +291,7 @@ svr4
 was first documented in
 .IR Solaris \(rg .
 .[
-soldoc10
+soldoc11
 .]
 .\"
 .\"

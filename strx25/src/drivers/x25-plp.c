@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-07 16:01:39 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,40 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-07 16:01:39 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 0.9.2.3  2008-06-18 16:45:25  brian
+ - widespread updates
+
  Revision 0.9.2.2  2008-05-07 16:01:39  brian
- - added NLI X.25-PLP CONS and XX25 implemetnation'
- doc/man/man3/XX25.3.man
- doc/man/man3/xti_x25.3.man
- doc/man/man4/X25.4.man
- doc/man/man5/strx25.5.man
- doc/man/man7/dlpi_lapb.7.man
- doc/man/man7/dlpi_llc2.7.man
- doc/man/man7/dlpi_x25.7.man
- src/drivers/npi.c
- src/include/npi_x25.h
- src/include/netx25/nli.h
- src/include/sys/npi_x25.h
- src/modules/dcc.h
- src/modules/npi.c
- src/modules/xx25.c
-
-
- cvsfiles=
+ - added NLI X.25-PLP CONS and XX25 implemetnation
 
  Revision 0.9.2.1  2008-05-03 21:22:40  brian
  - updates for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-07 16:01:39 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-07 16:01:39 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $";
 
 /*
  * This is a multiplexing driver for the X.25 Packet Layer Protocol (PLP).  It
@@ -100,13 +86,17 @@ static char const ident[] =
  * possible by supporting call deflection through NPI CONS.
  */
 
+#define NEVER 0
+
+#if NEVER
+
 #include <sys/os7/compat.h>
 #include <sys/nli.h>
 
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP DRIVER FOR LINUX FAST-STREAMS"
 #define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STERAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-07 16:01:39 $"
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $"
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"
@@ -242,6 +232,9 @@ struct dl {
 	} proto;
 	struct qosformat qosformat;	/* defaults for link */
 };
+
+static caddr_t nl_opens = NULL;
+static caddr_t nl_links = NULL;
 
 #define NL_PRIV(q) ((struct nl *)q->q_ptr)
 #define DL_PRIV(q) ((struct dl *)q->q_ptr)
@@ -3261,32 +3254,17 @@ nl_detach_req(struct nl *nl, queue_t *q, mblk_t *mp)
  */
 
 /**
- * nl_i_link: - perform I_LINK operation
- * @q: active queue (upper write queue)
- * @mp: the I_LINK M_IOCTL
- */
-static fastcall noinline __unlikely int
-nl_i_link(queue_t *q, mblk_t *mp)
-{
-}
-
-/**
  * nl_i_plink: - perform I_PLINK operation
  * @q: active queue (upper write queue)
  * @mp: the I_PLINK M_IOCTL
+ *
+ * Link a DL provider stream beneath the X.25 PLP.   Each stream linked
+ * beneath the X.25 PLP provides a data link for use by X.25.  The data link
+ * can be a LAPB data link, a LAPD data link, an LLC1 or LLC2 data link, or a
+ * XOT or XOS data link.
  */
 static fastcall noinline __unlikely int
 nl_i_plink(queue_t *q, mblk_t *mp)
-{
-}
-
-/**
- * nl_i_unlink: - perform I_UNLINK operation
- * @q: active queue (upper write queue)
- * @mp: the I_UNLINK M_IOCTL
- */
-static fastcall noinline __unlikely int
-nl_i_unlink(queue_t *q, mblk_t *mp)
 {
 }
 
@@ -3690,11 +3668,13 @@ nl_m_ioctl(queue_t *q, mblk_t *mp)
 	if (_IOC_TYPE(ioc->ioc_cmd) == STR) {
 		switch (_IOC_NR(ioc->ioc_cmd)) {
 		case _IOC_NR(I_LINK):
-			return nl_i_link(q, mp);
+			mi_copy_done(q, mp, EINVAL);
+			return (0);
 		case _IOC_NR(I_PLINK):
 			return nl_i_plink(q, mp);
 		case _IOC_NR(I_UNLINK):
-			return nl_i_unlink(q, mp);
+			mi_copy_done(q, mp, EINVAL);
+			return (0);
 		case _IOC_NR(I_PUNLINK):
 			return nl_i_punlink(q, mp);
 		default:
@@ -4243,9 +4223,6 @@ dl_put(queue_t *q, mblk_t *mp)
  * --------------------------------------------------------------------------
  */
 
-static caddr_t nl_opens = NULL;
-static caddr_t nl_links = NULL;
-
 static streamscall int
 nl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
@@ -4446,3 +4423,5 @@ module_init(plp_modinit);
 module_exit(plp_modexit);
 
 #endif				/* LINUX */
+
+#endif

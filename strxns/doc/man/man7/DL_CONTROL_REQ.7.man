@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_CONTROL_REQ.7.man,v 0.9.2.1 2008-05-25 12:46:54 brian Exp $
+.\" @(#) $Id: DL_CONTROL_REQ.7.man,v 0.9.2.2 2008-06-18 16:45:33 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_CONTROL_REQ.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:33  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:54  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -80,7 +83,7 @@ sort-adjacent-labels
 .TH DL_CONTROL_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Data Link Provider Interface (DLPI)"
 .SH NAME
 .B DL_CONTROL_REQ (dl_control_req_t)
-\- 
+\- control underlying driver
 .\"
 .\"
 .SH INTERFACE
@@ -90,16 +93,22 @@ dlpi revision 2.0.0
 .]
 .IR Solaris \(rg-specific.
 .[
-soldlpi
+soldoc11
 .]
 .\"
 .\"
 .SH SYNOPSIS
 .PP
-The message consists of one M_PROTO message block, that contains the following structure:
+The message consists of one
+.BR M_PROTO (9)
+message block, that contains the following structure:
 .sp
 .nf
 \f(CW\s-1\
+#define _SUN_SOURCE
+#include <sys/dlpi.h>
+#include <sys/dlpi_sun.h>
+
 typedef struct {
     t_uscalar_t dl_primitive;
     t_uscalar_t dl_operation;
@@ -116,14 +125,336 @@ typedef struct {
 .SH DESCRIPTION
 .PP
 .B DL_CONTROL_REQ
+is an extensible message to send down control information to the DLS provider.
+The response is a
+.BR DL_CONTROL_ACK "(7) or " DL_ERROR_ACK (7)
+primitive.
+This manual page contains definitions and structures needed for
+.BR DL_CONTROL_REQ "(7) and " DL_CONTROL_ACK (7)
+primitives.
 .\"
 .\"
 .SH PARAMETERS
 .PP
+The
+.B dl_control_req_t
+structure contains the following members:
 .TP
 .I dl_primitive
 conveys
 .BR DL_CONTROL_REQ .
+.TP
+.I dl_operation
+The operation to perform.  Each operation has diffent requirements as to the
+presence or absence of contents in the
+.IR dl_key_offset ", " dl_key_length
+fields,
+.RI < key >,
+and the
+.IR dl_data_offset ", " dl_data_length
+fields,
+.RI < data >.
+The
+.I dl_type
+field,
+.RI < type >,
+is always required.
+.RS
+.PP
+This field can have one of the following values:
+.TP
+.B DL_CO_ADD
+Add new entry matching for
+.RI < type >
+and
+.RI < key >.
+This operation requires the
+.RI < type >,
+.RI < key >
+and
+.RI < data >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+matches an already existing entry, a
+.BR DL_ERROR_ACK (7)
+primitive will be issued in response.
+.TP
+.B DL_CO_DELETE
+Delete the entry matching
+.RI < type >
+and
+.RI < key >.
+This operation requires only the
+.RI < type >
+and
+.RI < key >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+does not match an existing entry, a
+.BR DL_ERROR_ACK (7)
+primitive will be issued in response.
+.TP
+.B DL_CO_FLUSH
+Purge all entries matching
+.RI < type >
+and
+.RI < key >.
+This operation requires only the
+.RI < type >
+field.
+.TP
+.B DL_CO_GET
+Get the data for the
+.RI < type >
+and
+.RI < key >.
+This operation requires only the
+.RI < type >
+and
+.RI < key >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+does not match an existing entry, a
+.BR DL_ERROR_ACK (7)
+primitive will be issued in response.
+.TP
+.B DL_CO_UPDATE
+Updates the data for
+.RI < type >
+and
+.RI < key >.
+This operation requires the
+.RI < type >,
+.RI < key >
+and
+.RI < data >
+fields.
+.TP
+.B DL_CO_SET
+Add or update data for
+.RI < type >
+and
+.RI < key >
+as appropriate.
+This operation requires the
+.RI < type >,
+.RI < key >
+and
+.RI < data >
+fields.
+When the
+.RI < type >
+and
+.RI < key >
+already exists, an update is performed; when it does not
+exist, an add is performed.
+.RE
+.TP
+.I dl_type
+Specifies the
+.RI < type >
+of control.  This field can have one of the following
+values:
+.RS
+.TP
+.B DL_CT_IPSEC_AH
+The
+.RI < key >
+is the SPI and destination IP address using a
+.B dl_ct_ipsec_key_t
+structure, the
+.RI < data >
+is keyring material using a
+.B dl_ct_ipsec_t
+structure.
+.TP
+.B DL_CT_IPSEC_ESP
+The
+.RI < key >
+is the SPI and destination transport address using a
+.B dl_ct_ipsec_key_t
+structure, the
+.RI < data >
+is keyring material using a
+.B dl_ct_ipsec_t
+structure.
+.RE
+.TP
+.IR dl_key_offset ", " dl_key_length
+Describes an area in the
+.BR M_PROTO (9)
+messages block of length
+.I dl_key_length
+beginning
+.I dl_key_offset
+bytes from the beginning of the
+.BR M_PROTO (9)
+message block.
+This area defines the
+.RI < key >
+for the control.
+.RS
+.PP
+When
+.RI < type >
+is
+.BR DL_CT_IPSEC_AH " or " DL_CT_IPSEC_ESP
+this area contains a
+.B dl_ct_ipsec_key_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define DL_CTL_IPSEC_ADDR_LEN   16
+
+typedef struct dl_ct_ipsec_key {
+    uint32_t dl_key_spi;
+    uint8_t dl_key_dest_addr[DL_CTL_IPSEC_ADDR_LEN];
+    uint32_t dl_key_addr_family;
+} dl_ct_ipsec_key_t;
+\s+1\fP
+.fi
+.PP
+The
+.B dl_ct_ipsec_key_t
+structure contains the following members:
+.TP
+.I dl_key_spi
+Conveys the Security Parameters Index (SPI) value.
+.TP
+.I dl_key_dest_addr
+Conveys the destination IP address or destination transport address.
+.TP
+.I dl_key_addr_family
+Conveys the address family:
+.B AF_INET
+for IPv4 or
+.B AF_INET6
+for IPv6.
+.RE
+.TP
+.IR dl_data_offset ", " dl_data_length
+Describes an area in the
+.BR M_PROTO (9)
+messages block of length
+.I dl_data_length
+beginning
+.I dl_data_offset
+bytes from the beginning of the
+.BR M_PROTO (9)
+message block.
+This area defines the
+.RI < data >
+for the control.
+.RS
+.PP
+When
+.RI < type >
+is
+.BR DL_CT_IPSEC_AH " or " DL_CT_IPSEC_ESP
+this area contains a
+.B dl_ct_ipsec_t
+structure, formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+#define DL_CT_IPSEC_MAX_KEY_LEN 512
+
+typedef struct dl_ct_ipsec {
+    uint8_t sadb_sa_auth;
+    uint8_t sadb_sa_encrypt;
+    uint32_t sadb_sa_flags;
+    uint16_t sadb_key_len_a;
+    uint16_t sadb_key_bits_a;
+    uint16_t sadb_key_data_a[DL_CT_IPSEC_MAX_KEY_LEN];
+    uint16_t sadb_key_len_e;
+    uint16_t sadb_key_bits_e;
+    uint16_t sadb_key_data_e[DL_CT_IPSEC_MAX_KEY_LEN];
+} dl_ct_ipsec_t;
+\s+1\fP
+.fi
+.PP
+The
+.B dl_ct_ipsec_t
+structure contains the following members:
+.TP
+.I sadb_sa_auth
+Conveys the authentication security algorithm.  This field can have one of the
+following values:
+.RS
+.TP
+.B DL_CAPAB_IPSEC_AUTH_NONE
+No authentication.
+.TP
+.B DL_CAPAB_IPSEC_AUTH_MD5HMAC
+Authentication using the MD5 HMAC.
+.TP
+.B DL_CAPAB_IPSEC_AUTH_SHA1HMAC
+Authentication using the SHA1 HMAC.
+.RE
+.TP
+.I sadb_sa_encrypt
+Conveys the encryption security algorithm.  This field can have one of the following
+values:
+.RS
+.TP
+.B DL_CAPAB_IPSEC_ENCR_NULL
+No encryption.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_DES
+Encryption using DES.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_3DES
+Encryption using triple-DES.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_BLOWFISH
+Encryption using Blowfish.
+.TP
+.B DL_CAPAB_IPSEC_ENCR_AES
+Encryption using AES.
+.RE
+.TP
+.I sadb_sa_flags
+Conveys the security algorithm flags.  This field can have zero or more of the
+following flags:
+.RS
+.TP
+.B DL_CAPAB_ALG_ENABLE
+.RE
+.TP
+.I sadb_key_len_a
+Conveys the authentication key length in bytes.
+.TP
+.I sadb_key_bits_a
+Conveys the authentication key length in bits.
+.TP
+.I sadb_key_data_a
+Conveys the authentication key.
+.TP
+.I sadb_key_len_e
+Conveys the encryption key length in bytes.
+.TP
+.I sadb_key_bits_e
+Conveys the encryption key length in bits
+.TP
+.I sadb_key_data_e
+Conveys the encryption key.
+.RE
+.\"
+.\"
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
@@ -140,8 +471,8 @@ The resulting state remains the same.
 .SH RESPONSE
 .PP
 If the request is successful,
-.BR DL_NOTIFY_ACK (7)
-is issued ot the DLS user.
+.BR DL_CONTROL_ACK (7)
+is issued to the DLS user.
 If the request fails, message
 .BR DL_ERROR_ACK (7)
 is returned and the resulting state is unchanged.
@@ -170,7 +501,22 @@ primitive.  It might be necessary to define C preprocessor symbol
 .BR _SUN_SOURCE
 before including the
 .RB < sys/dlpi.h >
-header file to expose the declarations and structures associated with this primitive.
+header file,
+or it might be necessary to include the
+.RB < sys/dlpi_sun.h >
+header file,
+to expose the declarations and structures associated with this primitive.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR DL_CONTROL_ACK (7),
+.BR DL_CAPABILITY_REQ (7),
+.BR DL_CAPABILITY_ACK (7),
+.BR DL_ERROR_ACK (7),
+.BR dlpi (7),
+.BR dlpi_ioctl (4),
+.BR STREAMS (9).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -179,7 +525,7 @@ header file to expose the declarations and structures associated with this primi
 is compatibible with
 .IR Solaris \(rg,
 .[
-soldoc10
+soldoc11
 .]
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
@@ -205,10 +551,10 @@ Binary compatibility is not attempted.  Any binary compatibility experienced may
 removed from the next release.
 .PP
 See
-.IR STREAMS (9)
-and
 .BR dlpi (7),
-for additional compatiblity information.
+.BR dlpi_ioctl (4),
+.BR STREAMS (9),
+for additional compatibility information.
 .\"
 .\"
 .SH CONFORMANCE
@@ -231,7 +577,7 @@ svr4
 was first documented in
 .IR Solaris \(rg .
 .[
-soldoc10
+soldoc11
 .]
 .\"
 .\"

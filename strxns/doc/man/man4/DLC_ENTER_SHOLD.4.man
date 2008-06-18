@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DLC_ENTER_SHOLD.4.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DLC_ENTER_SHOLD.4.man,v 0.9.2.2 2008-06-18 16:45:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DLC_ENTER_SHOLD.4.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:30  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -147,6 +150,23 @@ correlator of the target LS.
 .I gdlc_ls_corr
 Contains the generic data link control (GDLC) link station (LS) correlator to
 enter short hold mode.
+.PP
+The following protocol-specific considerations apply:
+.TP
+.B DLC FDDI
+The enter short-hold feature is not supported.
+.TP
+.B DLC TOKEN
+The enter short-hold feature is not supported.
+.TP
+.B DLC 8023
+The enter short-hold feature is not supported.
+.TP
+.B DLC ETHER
+The enter short-hold feature is not supported.
+.TP
+.B DLC SDLC
+The enter short-hold feature is not supported.
 .\"
 .\"
 .SH RETURN

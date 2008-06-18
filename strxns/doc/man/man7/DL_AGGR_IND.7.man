@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_AGGR_IND.7.man,v 0.9.2.1 2008-05-25 12:46:53 brian Exp $
+.\" @(#) $Id: DL_AGGR_IND.7.man,v 0.9.2.2 2008-06-18 16:45:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:32 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_AGGR_IND.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:32  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:53  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -97,7 +100,7 @@ dlpi revision 2.0.0
 .]
 .IR Solaris \(rg-specific.
 .[
-soldlpi
+soldoc11
 .]
 .\"
 .\"
@@ -106,7 +109,7 @@ The message consists of one M_PROTO message block, which contains the
 following structure.
 .sp
 .nf
-\fC\s-1\
+\f(CW\s-1\
 typedef struct {
     t_uscalar_t  dl_primitive;
     t_uscalar_t  dl_ppa;
@@ -154,6 +157,12 @@ identifier.  The DLS user should retrieve the necessary PPA identifier from
 some other entity (such as a management entity) and insert it without
 inspection into the
 .BR DL_ATTACH_REQ .
+.\"
+.\"
+.SH MODE
+This primitive is only valid in
+.B DL_CODLS
+mode.
 .\"
 .\"
 .SH STATE

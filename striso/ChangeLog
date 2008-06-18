@@ -1,3 +1,11 @@
+2008-06-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/drafts/fixup: more portable
+	* doc/drafts/idrefs: update references
+	* doc/drafts/iso/draft-bidulock-tsvwg-isos-00.me: ISOS draft
+	* doc/drafts/iso/draft-bidulock-tsvwg-itos-00.me: ITOS draft
+	* doc/man/striso.refs: update references
+
 2008-05-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/otk6.c: be strict with MORE_flag

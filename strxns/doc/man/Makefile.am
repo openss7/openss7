@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-05-25 12:49:25 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-06-18 16:45:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-25 12:49:25 $ by $Author: brian $
+# Last Modified $Date: 2008-06-18 16:45:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,18 +59,7 @@ if PKG_BUILD_INDEP
 MANS_UNUSED = \
 	man4/XNS.4
 
-man_MANS = \
-	man4/XNS.4 \
-	man4/ipcl.4 \
-	man4/ipco.4 \
-	man4/np_ip.4 \
-	man4/ip2xinet.4 \
-	man4/ip_strms.4 \
-	man4/ip_strm_mod.4 \
-	man4/ip_to_dlpi.4 \
-	man4/ldl.4 \
-	man4/link_driver.4 \
-	man4/dlpi_ioctl.4 \
+dlc_man_MANS = \
 	man4/DLC_ADD_FUNC_ADDR.4 \
 	man4/DLC_ADD_GRP.4 \
 	man4/DLC_ALTER.4 \
@@ -89,7 +78,20 @@ man_MANS = \
 	man4/DLC_QUERY_SAP.4 \
 	man4/DLC_START_LS.4 \
 	man4/DLC_TEST.4 \
-	man4/DLC_TRACE.4 \
+	man4/DLC_TRACE.4
+
+man_MANS = \
+	man4/XNS.4 \
+	man4/ipcl.4 \
+	man4/ipco.4 \
+	man4/np_ip.4 \
+	man4/ip2xinet.4 \
+	man4/ip_strms.4 \
+	man4/ip_strm_mod.4 \
+	man4/ip_to_dlpi.4 \
+	man4/ldl.4 \
+	man4/link_driver.4 \
+	man4/dlpi_ioctl.4 \
 	man5/strxns.5 \
 	man7/CD_ABORT_OUTPUT_REQ.7 \
 	man7/cd_abort_output_req_t.7 \
@@ -327,6 +329,34 @@ man_MANS = \
 	man7/dl_hp_get_64bit_stats_req_t.7 \
 	man7/DL_HP_GET_64BIT_STATS_ACK.7 \
 	man7/dl_hp_get_64bit_stats_ack_t.7 \
+	man7/DL_CLR_SR_REQ.7 \
+	man7/dl_clr_sr_req_t.7 \
+	man7/DL_CLR_STATISTICS_REQ.7 \
+	man7/dl_clr_statistics_req_t.7 \
+	man7/DL_DISABALLMULTI_REQ.7 \
+	man7/dl_disaballmulti_req_t.7 \
+	man7/DL_DLPI_BILOOPMODE.7 \
+	man7/dl_dlpi_biloopmode_t.7 \
+	man7/DL_ENABALLMULTI_REQ.7 \
+	man7/dl_enaballmulti_req_t.7 \
+	man7/DL_ISDN_MSG.7 \
+	man7/dl_isdn_msg_t.7 \
+	man7/DL_MCTABLE_ACK.7 \
+	man7/dl_mctable_ack_t.7 \
+	man7/DL_MCTABLE_REQ.7 \
+	man7/dl_mctable_req_t.7 \
+	man7/DL_SAP_STATISTICS_ACK.7 \
+	man7/dl_sap_statistics_ack_t.7 \
+	man7/DL_SAP_STATISTICS_REQ.7 \
+	man7/dl_sap_statistics_req_t.7 \
+	man7/DL_SET_SRMODE_REQ.7 \
+	man7/dl_set_srmode_req_t.7 \
+	man7/DL_SET_SRPARMS_REQ.7 \
+	man7/dl_set_srparms_req_t.7 \
+	man7/DL_SRTABLE_ACK.7 \
+	man7/dl_srtable_ack_t.7 \
+	man7/DL_SRTABLE_REQ.7 \
+	man7/dl_srtable_req_t.7 \
 	man7/N_BIND_ACK.7 \
 	man7/N_bind_ack_t.7 \
 	man7/N_BIND_REQ.7 \
@@ -391,18 +421,7 @@ man_MANS = \
 #	man4/ip.4
 #	man8/test-ip.8
 
-dist_noinst_MANS = \
-	man4/XNS.4.man \
-	man4/ipcl.4.man \
-	man4/ipco.4.man \
-	man4/np_ip.4.man \
-	man4/ip2xinet.4.man \
-	man4/ip_strms.4.man \
-	man4/ip_strm_mod.4.man \
-	man4/ip_to_dlpi.4.man \
-	man4/ldl.4.man \
-	man4/link_driver.4.man \
-	man4/dlpi_ioctl.4.man \
+dlc_dist_noinst_MANS = \
 	man4/DLC_ADD_FUNC_ADDR.4.man \
 	man4/DLC_ADD_GRP.4.man \
 	man4/DLC_ALTER.4.man \
@@ -421,7 +440,20 @@ dist_noinst_MANS = \
 	man4/DLC_QUERY_SAP.4.man \
 	man4/DLC_START_LS.4.man \
 	man4/DLC_TEST.4.man \
-	man4/DLC_TRACE.4.man \
+	man4/DLC_TRACE.4.man
+
+dist_noinst_MANS = \
+	man4/XNS.4.man \
+	man4/ipcl.4.man \
+	man4/ipco.4.man \
+	man4/np_ip.4.man \
+	man4/ip2xinet.4.man \
+	man4/ip_strms.4.man \
+	man4/ip_strm_mod.4.man \
+	man4/ip_to_dlpi.4.man \
+	man4/ldl.4.man \
+	man4/link_driver.4.man \
+	man4/dlpi_ioctl.4.man \
 	man5/strxns.5.man \
 	man7/CD_ABORT_OUTPUT_REQ.7.man \
 	man7/cd_abort_output_req_t.7.man \
@@ -659,6 +691,34 @@ dist_noinst_MANS = \
 	man7/dl_hp_get_64bit_stats_req_t.7.man \
 	man7/DL_HP_GET_64BIT_STATS_ACK.7.man \
 	man7/dl_hp_get_64bit_stats_ack_t.7.man \
+	man7/DL_CLR_SR_REQ.7.man \
+	man7/dl_clr_sr_req_t.7.man \
+	man7/DL_CLR_STATISTICS_REQ.7.man \
+	man7/dl_clr_statistics_req_t.7.man \
+	man7/DL_DISABALLMULTI_REQ.7.man \
+	man7/dl_disaballmulti_req_t.7.man \
+	man7/DL_DLPI_BILOOPMODE.7.man \
+	man7/dl_dlpi_biloopmode_t.7.man \
+	man7/DL_ENABALLMULTI_REQ.7.man \
+	man7/dl_enaballmulti_req_t.7.man \
+	man7/DL_ISDN_MSG.7.man \
+	man7/dl_isdn_msg_t.7.man \
+	man7/DL_MCTABLE_ACK.7.man \
+	man7/dl_mctable_ack_t.7.man \
+	man7/DL_MCTABLE_REQ.7.man \
+	man7/dl_mctable_req_t.7.man \
+	man7/DL_SAP_STATISTICS_ACK.7.man \
+	man7/dl_sap_statistics_ack_t.7.man \
+	man7/DL_SAP_STATISTICS_REQ.7.man \
+	man7/dl_sap_statistics_req_t.7.man \
+	man7/DL_SET_SRMODE_REQ.7.man \
+	man7/dl_set_srmode_req_t.7.man \
+	man7/DL_SET_SRPARMS_REQ.7.man \
+	man7/dl_set_srparms_req_t.7.man \
+	man7/DL_SRTABLE_ACK.7.man \
+	man7/dl_srtable_ack_t.7.man \
+	man7/DL_SRTABLE_REQ.7.man \
+	man7/dl_srtable_req_t.7.man \
 	man7/N_BIND_ACK.7.man \
 	man7/N_bind_ack_t.7.man \
 	man7/N_BIND_REQ.7.man \
@@ -731,6 +791,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.22  2008-06-18 16:45:28  brian
+# - widespread updates
+#
 # Revision 0.9.2.21  2008-05-25 12:49:25  brian
 # - updated manual pages and DLPI header
 #

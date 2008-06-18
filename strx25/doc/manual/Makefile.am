@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-05-03 21:22:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 21:22:36 $ by $Author: brian $
+# Last Modified $Date: 2008-06-18 16:45:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,6 +82,33 @@ strx25_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+info_TEXINFOS		+= x25_porting.texi
+
+x25_porting_TEXINFOS	= \
+			  configure.texi \
+			  descrip.texi \
+			  news.texi \
+			  prerequisites.texi \
+			  releases.texi \
+			  rpm.texi \
+			  todo.texi \
+			  tree.texi \
+			  bugs.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/fdl.texi \
+			  texi/agpl3.texi \
+			  texi/gpl3.texi \
+			  texi/quick.texi \
+			  texi/install.texi \
+			  texi/testsuite.texi \
+			  texi/lgpl3.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/compat.texi \
+			  $(top_srcdir)/scripts/texi/mail.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
 if MAINTAINER_MODE
 strx25_TEXINFOS		+= \
 			  texi/args.texi
@@ -100,6 +127,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2008-06-18 16:45:24  brian
+# - widespread updates
+#
 # Revision 0.9.2.2  2008-05-03 21:22:36  brian
 # - updates for release
 #

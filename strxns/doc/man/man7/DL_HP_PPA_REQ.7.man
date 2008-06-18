@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_HP_PPA_REQ.7.man,v 0.9.2.1 2008-05-25 12:46:54 brian Exp $
+.\" @(#) $Id: DL_HP_PPA_REQ.7.man,v 0.9.2.2 2008-06-18 16:45:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-25 12:46:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_HP_PPA_REQ.7.man,v $
+.\" Revision 0.9.2.2  2008-06-18 16:45:34  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.1  2008-05-25 12:46:54  brian
 .\" - added manual pages, libraries, utilities and drivers
 .\"
@@ -102,6 +105,9 @@ message block, that contains the following structure:
 .sp
 .nf
 \f(CW\s-1\
+#include <sys/dlpi.h>
+#include <sys/dlpi_ext.h>
+
 typedef struct {
     t_uscalar_t dl_primitive;
 } dl_hp_ppa_req_t;
@@ -113,8 +119,13 @@ typedef struct {
 .PP
 The
 .B DL_HP_PPA_REQ
-primitive is used to obtain a list of all of the valid PPAs currently
-installed in the system.
+primitive is used to obtain a list of all of the valid Physical Points of
+Attachment (PPA) currently installed in the system and known to the DLS
+provider.  The primitive requests that the DLS provider assemble a list of all
+PPA known to the provider and acknowledge successful receipt of the primitive
+by issuing a
+.BR DL_HP_PPA_ACK (7)
+primitive containing the list of PPA and PPA associated information.
 .\"
 .\"
 .SH PARAMETERS
@@ -125,35 +136,47 @@ conveys
 .BR DL_HP_PPA_REQ .
 .\"
 .\"
-.SH RULES
-.PP
-The
-.B DL_HP_PPA_REQ
+.SH MODE
+This primitive is valid in
+any
+mode.
 .\"
 .\"
 .SH STATE
 .PP
 The message is valid in any state in which a local acknowledgement is no
-pending.
+pending for the requesting Stream.
 .\"
 .\"
 .SH "NEW STATE"
 .PP
-The resulting state remains the same.
+The resulting DLPI state remains the same.
 .\"
 .\"
 .SH RESPONSE
 .PP
-If the request is successful,
+If the request is successful, the DLS provider issues a
 .BR DL_HP_PPA_ACK (7)
-is issued to the DLS user.
-If the request fails, message
+to the DLS user acknowledging successful receipt of the primitive, and
+containing the list of installed PPA.
+If the request fails, the DLS provider issues a
 .BR DL_ERROR_ACK (7)
-is returned and the resulting state is unchanged.
+acknowledging unsuccessful receipt of the primitive providing the reason for
+failure.
 .\"
 .\"
 .SH ERRORS
 .PP
+When a
+.B DL_HP_PPA_REQ
+primitive received by the DLS provider is unsuccessful due to a non-fatal
+error, the DLS provider issues a
+.BR DL_ERROR_ACK (7)
+primitive containing the reason for the non-fatal error in the
+.IR dl_errno " and " dl_unix_errno
+fields of that primitive.  The
+.B DL_HP_PPA_REQ
+primitive can fail because:
 .TP 16
 .B DL_ACCESS
 The DLS user did not have proper permission to make the request.
@@ -174,6 +197,9 @@ primitive.
 The DLS provider recognizes the
 .B DL_HP_PPA_REQ
 primitive, but does not support the primitive.
+.PP
+See also,
+.BR DL_ERROR_ACK (7).
 .\"
 .\"
 .SH NOTICES

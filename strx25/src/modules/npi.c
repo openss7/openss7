@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:41 $
+ @(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-07 16:01:41 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi.c,v $
+ Revision 0.9.2.2  2008-06-18 16:45:27  brian
+ - widespread updates
+
  Revision 0.9.2.1  2008-05-07 16:01:41  brian
  - added NLI X.25-PLP CONS and XX25 implemetnation
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:41 $"
+#ident "@(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
 
-static char const ident[] = "$RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:41 $";
+static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $";
 
 /*
  * This is an NPI module for NLI.  It pushes over an NLI stream and provide an
@@ -84,14 +87,14 @@ static char const ident[] = "$RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revisio
  * pushed over an NLI stream available from the x25-plp driver.
  */
 
-#include <sys/os8/compat.h>
+#include <sys/os7/compat.h>
 #include <sys/npi.h>
 #include <sys/npi_x25.h>
 
 #define NPI_DESCRIP	"NLI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:41 $"
+#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
 #define NPI_DEVICE	"SVR 4.2MP NLI to NPI Conversion Module (NPI) for X.25 CONS"
 #define NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_LICENSE	"GPL"
@@ -171,7 +174,7 @@ static struct module_stat np_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES))
  */
 
 struct np;
-sturct nl;
+struct nl;
 
 /* Upper interface structure */
 struct np {

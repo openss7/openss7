@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ldltest.8.man,v 0.9.2.6 2006/10/10 10:50:31 brian Exp $
+.\" @(#) $Id: ldltest.8.man,v 0.9.2.7 2008-06-18 16:45:37 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/10 10:50:31 $ by $Author: brian $
+.\" Last Modified $Date: 2008-06-18 16:45:37 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ldltest.8.man,v $
+.\" Revision 0.9.2.7  2008-06-18 16:45:37  brian
+.\" - widespread updates
+.\"
 .\" Revision 0.9.2.6  2006/10/10 10:50:31  brian
 .\" - updates for release
 .\"
@@ -289,7 +292,7 @@ command.
 .PP
 
 .nf
-\fC\s-1\
+\f(CW\s-1\
 ldltest -r 192.168.1.1 eth0 192.168.1.117
 \s+1\fP
 .fi
@@ -299,7 +302,7 @@ Sends a ping to 192.168.1.1.  The local host address is 192.168.1.117
 (obtainable from the ifconfig command).
 
 .nf
-\fC\s-1\
+\f(CW\s-1\
 ldltest -S 0x00:0x0C -T -R 00:00:C0:D7:54:F8 eth0
 \s+1\fP
 .fi
@@ -308,7 +311,7 @@ Sends an LLC TEST command to the remote system with Ethernet address
 00:00:C0:D7:54:F8, DSAP 0x00 and SSAP 0x0C.  Await the response.
 
 .nf
-\fC\s-1\
+\f(CW\s-1\
 ldltest -s -f RAW eth0 192.168.1.47
 \s+1\fP
 .fi
@@ -317,7 +320,7 @@ Listens for RAW LLC frames addressed to the local machine whose IP address is
 192.168.1.47.  Send responses to TEST and XID commands.
 
 .nf
-\fC\s-1\
+\f(CW\s-1\
 ldltest -d 0x0f
 \s+1\fP
 .fi
@@ -327,7 +330,7 @@ Sets the debug mask in the
 driver.
 
 .nf
-\fC\s-1\
+\f(CW\s-1\
 ldltest -H
 \s+1\fP
 .fi
@@ -336,7 +339,7 @@ Prints the values assigned to the debug mask bits as follows:
 
 .RS
 .nf
-\fC\s-1\
+\f(CW\s-1\
 0x00000001 dump raw frame from net driver
 0x00000002 dump UNITDATA_IND upstream
 0x00000004 dump UNITDATA_REQ downstream
