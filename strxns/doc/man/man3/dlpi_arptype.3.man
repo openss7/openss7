@@ -1,0 +1,554 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpi_arptype.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi_arptype.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPI_ARPTYPE 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI Library"
+.\" =========================================================================
+.SH NAME
+.B dlpi_arptype
+\- convert \fBdlpi\fP(7) MAC Type to an RFC 826 ARP Hardware Type
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libdlpi (3),
+the
+.IR Solaris \(rg-specific,
+DLPI
+.[
+dlpi revision 2.0.0
+.]
+Library.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/dlpi.h>
+.br
+.B #include <libdlpi.h>
+.HP
+\fBuint\ dlpi_arptype\fP(\fBuint\fP\ \fImactype\fP);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fImactype\fP\(em'u
+.I mactype
+specifies the
+.BR dlpi (7)
+MAC Type that is to be converted to an ARP Hardware Type.
+.[
+rfc826
+.]
+This may be one of the following values:
+.RS
+.TP \w'\fBDL_100VGTPR\fP\(em'u
+.B DL_CSMACD
+IEEE 802.3 CSMA/CD network.
+.PD 0
+.TP
+.B DL_TPB
+IEEE 802.4 Token Passing Bus.
+.TP
+.B DL_TPR
+IEEE 802.5 Token Passing Ring.
+.TP
+.B DL_METRO
+IEEE 802.6 Metro Net.
+.TP
+.B DL_ETHER
+Ethernet Bus.
+.TP
+.B DL_HDLC
+ISO HDLC protocol support.
+.TP
+.B DL_CHAR
+Character Synchronous protocol support.
+.TP
+.B DL_CTCA
+IBM Channel-to-Channel Adapter.
+.TP
+.B DL_FDDI
+Fiber Distributed data interface.
+.TP
+.B DL_FC
+Fibre Channel interface.
+.TP
+.B DL_ATM
+ATM.
+.TP
+.B DL_IPATM
+ATM Classical IP interface.
+.TP
+.B DL_X25
+X.25 LAPB interface.
+.TP
+.B DL_ISDN
+ISDN interface.
+.TP
+.B DL_HIPPI
+HIPPI interface.
+.TP
+.B DL_100VG
+100 Based VG Ethernet.
+.TP
+.B DL_100VGTPR
+100 Based VG Token Ring.
+.TP
+.B DL_ETH_CSMA
+ISO 8802/3 and Ethernet.
+.TP
+.B DL_100BT
+100 Base T.
+.TP
+.B DL_IB
+Infiniband.
+.TP
+.B DL_FRAME
+Frame Relay LAPF.
+.TP
+.B DL_MPFRAME
+Multi-protocol over Frame Relay.
+.TP
+.B DL_ASYNC
+Character Asynchronous Protocol.
+.TP
+.B DL_IPX25
+X.25 Classical IP interface.
+.TP
+.B DL_LOOP
+software loopback.
+.TP
+.B DL_OTHER
+Any other medium not listed above.
+.TP
+.B DL_IPV4
+IPv4 Tunnel.
+.TP
+.B DL_IPV6
+IPv6 Tunnel.
+.TP
+.B DL_VNI
+Virtual Network Interface.
+.TP
+.B DL_WIFI
+IEEE 802.11.
+.PD
+.RE
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B dlpi_arptype
+is a DLPI Library
+.[
+soldoc11
+.]
+subroutine.
+This function simply converts constants from a DLPI MAC type (as described in
+the
+.I dl_mac_type
+field of the
+.BR dl_info_ack_t (7)
+structure, or from the
+.I dli_mac_type
+field of the
+.B dlpi_info_t
+structure used by the
+.BR dlpi_info (3)
+library call) to an ARP Hardware Type constant.  Both systems of constants
+describe the hardware and media and there is normally a one-to-one equivalent.
+This is a convenience function for user programs written in terms of the ARP
+Hardware Type rather than the DLPI MAC type.
+.PP
+Currently the mapping is as follows:
+.TS
+tab(:);
+lllss
+lblblss.
+MAC Type:ARP Hardware Type:Description
+_
+DL_CSMACD:ARPHRD_IEEE802:T{
+IEEE 802.2 CSMA/CD
+T}
+DL_TPB:ARPHRD_IEEE802:T{
+IEEE 802.4 Token Passing Bus
+T}
+DL_TPR:ARPHRD_IEEE802_TR:T{
+IEEE 802.5 Token Passing Ring
+T}
+DL_METRO:ARPHRD_IEEE802:T{
+IEEE 802.6 Metro Net
+T}
+DL_ETHER:ARPHRD_ETHER:T{
+Ethernet Bus
+T}
+DL_HDLC:ARPHRD_HDLC:T{
+HDLC
+T}
+DL_CHAR:ARPHRD_RAWHDLC:T{
+Character Synchronous
+T}
+DL_CTCA:0:T{
+IBM Channel-to-Channel Adapter
+T}
+DL_FDDI:ARPHRD_FDDI:T{
+Fiber Distributed Data Interface
+T}
+DL_FC:ARPHRD_FCPP:T{
+Fibre Channel
+T}
+DL_ATM:ARPHRD_ATM:T{
+ATM
+T}
+DL_IPATM:ARPHRD_ATM:T{
+ATM Classical IP
+T}
+DL_X25:ARPHRD_LAPB:T{
+X.25 LAPB
+T}
+DL_ISDN:0:T{
+ISDN
+T}
+DL_HIPPI:ARPHRD_HIPPI:T{
+High Performance Parallel Interface
+T}
+DL_100VG:ARPHRD_ETHER:T{
+100 Base VG Ethernet
+T}
+DL_100VGTPR:ARPHRD_IEEE802_TR:T{
+100 Base VG Token Ring
+T}
+DL_ETH_CSMA:ARPHRD_ETHER:T{
+ISO 8802/3 and Ethernet
+T}
+DL_100BT:ARPHRD_ETHER:T{
+100 Base T Ethernet
+T}
+DL_IB:ARPHRD_INFINIBAND:T{
+Infiniband
+T}
+DL_FRAME:ARPHRD_DLCI:T{
+Frame Relay LAPF
+T}
+DL_MPFRAME:ARPHRD_FRAD:T{
+Multi-Protocol over Frame Relay
+T}
+DL_ASYNC:ARPHRD_DDCMP:T{
+Character Asynchronous Protocol
+T}
+DL_IPX25:ARPHRD_X25:T{
+X.25 Classical IP
+T}
+DL_LOOP:ARPHRD_LOOPBACK:T{
+Software Loopback
+T}
+DL_OTHER:ARPHRD_VOID:T{
+Any other Medium
+T}
+DL_IPV4:ARPHRD_TUNNEL:T{
+IPv4 Tunnel
+T}
+DL_IPV6:ARPHRD_TUNNEL6:T{
+IPv6 Tunnel
+T}
+DL_VNI:ARPHRD_SIT:T{
+Virtual Network Interface
+T}
+DL_WIFI:ARPHRD_IEEE80211:T{
+IEEE 802.11
+T}
+\fRAny Other\fP:0:T{
+Unknown
+T}
+_
+.TE
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B dlpi_arptype
+function, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpi '
+flag to the linker command when linking C language programs that use the
+.B dlpi_arptype
+function or include the
+.B @libdir@/libdlpi.a
+static library object as an target of the linking.
+.PP
+Although a data link need not be opened before calling this function, it is
+useful for converting the MAC type returned in the information for a specific
+link to the ARP Hardware Type.
+.[
+rfc826
+.]
+See \*(lq\fIEXAMPLES\fP,\*(rq below.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B dlpi_arptype
+is fully thread-safe.
+.\"
+.\"
+.SH RETURN
+.PP
+When successful,
+.B dlpi_arptype
+returns the APR hardware type associated with the specified MAC type.  When
+unsuccessful,
+.B dlpi_arptype
+returns zero (0).
+.\"
+.\"
+.SH ERRORS
+.PP
+.B dlpi_arptype
+fails when there is no ARP Hardware Type that corresponds to the specified MAC type or
+the MAC type is invalid.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B dlpi_arptype
+is a
+.IR Solaris \(rg-specific
+function.  It may be necessary to define the C preprocessor symbol,
+.BR _SUN_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file, to expose this symbolic constants, data structures and declarations
+necessary for the use of this function.
+It may also be necessary to include the
+.RB < dlpi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+An example follows:
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+The DLPI header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpi.h
+The DLPI Library header file.
+.TP
+.B @libdir@/libdlpi.a
+The static library containing the
+.BR dlpi_arptype
+function.
+.TP
+.B @libdir@/libdlpi.so
+The shared object library containing the
+.BR dlpi_arptype
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B dlpi_arptype
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi_mactype (4),
+.BR arp (7),
+.BR dlpi (7),
+.BR dlpi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B dlpi_arptype
+is compatible with the
+.IR Solaris \(rg
+DLPI Library,
+.[
+soldoc11
+.]
+and systems providing an interface equivalent to
+.IR Solaris \(rg
+DLPI Library,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Under
+.BR Linux ,
+some ARP Hardware Types are pseudo-types that are specific to
+.BR Linux .
+When these types are returned, they will not have the same numeric values as
+.IR Solaris \(rg.
+.IP \(em
+The
+.B @PACKAGE_TITLE@
+DLPI Library returns more ARP Hardware Types for more DLPI MAC Types than
+.IR Solaris \(rg.
+In fact, almost all types are represented in
+.BR OpenSS7 ,
+while only a handful are represented in
+.IR Solaris \(rg.
+.IP \(em
+.B DLPI Library
+functions are
+.IR Solaris \(rg-specific,
+and are provided only for porting
+.IR Solaris \(rg
+applications programs, drivers and modules to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatibility: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the DLPI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR dlpi (3),
+.BR dlpi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+RFC 826,
+.[
+rfc826
+.]
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and
+.IR Solaris \(rg
+DLPI documentation.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+first appeared in SVR 4.
+.[
+svr4
+.]
+.B dlpi_arptype
+first appeared in the
+.IR Solaris "\(rg " 11 .
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "DLPI Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,442 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpi_bind.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi_bind.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPI_BIND 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI Library"
+.\" =========================================================================
+.SH NAME
+.B dlpi_bind
+\- bind a DLPI Stream to a DLSAP.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libdlpi (3),
+the
+.IR Solaris \(rg-specific,
+DLPI
+.[
+dlpi revision 2.0.0
+.]
+Library.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.nh
+.PP
+.B #include <sys/dlpi.h>
+.br
+.B #include <dlpi.h>
+.HP \w'\fBint\ dlpi_bind\fP('u
+\fBint\ dlpi_bind\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fIsap\fP, \fBuint\ *\fP\fIboundsap\fP);
+.ad b
+.hy
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIboundsap\fP\(em'u
+.I dh
+the handle for the Stream.
+.PD 0
+.TP
+.I sap
+the DLSAP to bind.
+.TP
+.I boundsap
+the bound DLSAP (returned when non-NULL).
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B dlpi_bind
+is a DLPI Library
+.[
+soldoc11
+.]
+subroutine.
+This function binds the Stream indicated by the data link handle, \fIdh\fP, to
+the DLSAP specified in the \fIsap\fP argument.  The \fIsap\fP argument may
+contain the special value \fBDLPI_ANY_SAP\fP, in which case the DLPI library
+will choose a DLSAP to which to bind based on the MAC Type.  When the
+\fIboundsap\fP argument is non-NULL, the function, upon success, will return
+the actual bound DLSAP in the pointed to unsigned integer extent.
+.PP
+This function is only valid in the \fBDL_UNBOUND\fP state.  Upon succesful
+completion, the new state is \fBDL_IDLE\fP.
+.PP
+Note that the \fISolaris\fP\(rg version of this function always binds for
+connectionless mode data link service \fBDL_CLDLS\fP, with a maximum number of
+connection indications of zero (0) and no automatic response for XID or TEST.
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B dlpi_bind
+function, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpi '
+flag to the linker command when linking C language programs that use the
+.B dlpi_bind
+function or include the
+.B @libdir@/libdlpi.a
+static library object as an target of the linking.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B dlpi_bind
+is fully thread-safe.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.B dlpi_bind
+is successful, it returns \fBDLPI_SUCCESS\fP.
+When
+.B dlpi_bind
+fails, it returns a DLPI or DLPI Library error code.  When the DLPI error code
+is \fBDL_SYSERR\fP, the error is contained in the
+.IR errno (3)
+global variable.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B dlpi_bind
+fails, it returns a DLPI, DLPI Library or system error code.
+.B dlpi_bind
+may fail when:
+.PP
+The following are DLPI Library errors:
+.\".TP \w'[\fBDLPI_EUNAVAILSAP\fP]\(em'u
+.TP
+.RB [ DLPI_EBADMSG ]
+Received a bad or unexpected DLPI message.
+.TP
+.RB [ DLPI_EINHANDLE ]
+The DLPI handle, \fIdh\fP, is not a valid data link handle.
+.TP
+.RB [ DLPI_ETIMEDOUT ]
+The operation timed out.
+.TP
+.RB [ DLPI_EUNAVAILSAP ]
+The DLPI SAP specified, \fIsap\fP, is unavailable.
+.PP
+The following are DLPI errors:
+.\".TP \w'[\fBDLPI_EUNAVAILSAP\fP]\(em'u
+.TP
+.RB [ DL_ACCESS ]
+The DLS user did not have proper permission to use the requested DLSAP address.
+.TP
+.RB [ DL_BADADDR ]
+The DLSAP address information was invalid or was in an incorrect format.
+.TP
+.RB [ DL_BOUND ]
+The DLS user attempted to bind a second Stream to a DLSAP with
+\fIdl_max_conind\fP greater than zero, or the DLS user attempted ot bind a
+second \*(lqconnection management\*(rq Stream to a PPA.
+.TP
+.RB [ DL_INITFAILED ]
+Automatic initialization of the PPA failed.
+.TP
+.RB [ DL_NOTINIT ]
+The PPA had not been inititialized prior to this request.
+.TP
+.RB [ DL_NOADDR ]
+The DLS provider could not allocate a DLSAP address for this Stream.
+.TP
+.RB [ DL_NOAUTO ]
+Automatic handling of XID and TEST responses not supported.
+.TP
+.RB [ DL_NOTESTAUTO ]
+Automatic handling of TEST response not supported.
+.TP
+.RB [ DL_NOXIDAUTO ]
+Automatic handling of XID response not supported.
+.TP
+.RB [ DL_OUTSTATE ]
+The primitive was issued from an invalid state.
+.TP
+.RB [ DL_UNSUPPORTED ]
+The DLS provider does not support the requested service mode on this Stream.
+.TP
+.RB [ DL_SYSERR ]
+A system error has occurred and the Linux system error code is indicated in the
+.IR errno (3)
+global variable.
+.PP
+The following are Linux system errors:
+.TP 12
+.RB [ EPERM ]
+Fine-grained permission for the request is incorrect.
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was immediately available to satisfy the request.
+.TP
+.RB [ ENOBUFS ]
+Insufficient buffers were immediately available to satisfy the request.
+.TP
+.RB [ ENOSR ]
+Insufficient \fISTREAMS\fP resources were available to satisfy the request.
+.TP
+.RB [ EAGAIN ]
+A temporary failure occured and the DLS user should reissue the request.
+.TP
+.RB [ EBUSY ]
+THe control information in the request has already been subjected to the
+control request or a transient condition prevented the request.
+.TP
+.RB [ EINVAL ]
+On of the parameters of the requst for which there is no prescribed error code
+has an invalid value.
+.TP
+.RB [ ENOTSUP ]
+The request is recognized by not supported.
+.TP
+.RB [ ENOLINK ]
+The interface, Physical Point of Attachment, or underlying driver or device, is
+not connected.
+.TP
+.RB [ ENXIO ]
+Invalid device.  The interface, Physical Point of Attachment, or underlying
+driver or device is no longer installed on the system.
+.PP
+In addition, any of the error numbers returned by
+.BR putmsg (2s),
+.BR getmsg (2s),
+.BR ioctl (2s)
+may also be returned in \fIerrno\fP(3) when
+.B dlpi_bind
+returns \fBDL_SYSERR\fP.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B dlpi_bind
+is a
+.IR Solaris \(rg-specific
+function.  It may be necessary to define the C preprocessor symbol,
+.BR _SUN_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file, to expose this symbolic constants, data structures and declarations
+necessary for the use of this function.
+It may also be necessary to include the
+.RB < dlpi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+The DLPI header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpi.h
+The DLPI Library header file.
+.TP
+.B @libdir@/libdlpi.a
+The static library containing the
+.BR dlpi_bind
+function.
+.TP
+.B @libdir@/libdlpi.so
+The shared object library containing the
+.BR dlpi_bind
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B dlpi_bind
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi (7),
+.BR dlpi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B dlpi_bind
+is compatible with the
+.IR Solaris \(rg
+DLPI Library,
+.[
+soldoc11
+.]
+and systems providing an interface equivalent to
+.IR Solaris \(rg
+DLPI Library,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+The \fISolaris\fP\(rg DLPI Library only supports connectionless mode data link
+service and does not support automatic response to XID or TEST.
+The \fBOpenSS7\fP DLPI Library, on the other hand, will invoke automatic
+response to XID and TEST if the DLS provider supports it.
+.IP \(em
+.B DLPI Library
+functions are
+.IR Solaris \(rg-specific,
+and are provided only for porting
+.IR Solaris \(rg
+applications programs, drivers and modules to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatibility: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the DLPI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR dlpi (3),
+.BR dlpi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and
+.IR Solaris \(rg
+DLPI documentation.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+first appeared in SVR 4.
+.[
+svr4
+.]
+.B dlpi_bind
+first appeared in the
+.IR Solaris "\(rg " 11 .
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "DLPI Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

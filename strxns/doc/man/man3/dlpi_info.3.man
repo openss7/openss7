@@ -1,0 +1,663 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpi_info.3.man,v 0.9.2.1 2008-07-01 11:50:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi_info.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:54  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPI_INFO 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI Library"
+.\" =========================================================================
+.SH NAME
+.B dlpi_info
+\- obtain information for a DLPI Stream.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libdlpi (3),
+the
+.IR Solaris \(rg-specific,
+DLPI
+.[
+dlpi revision 2.0.0
+.]
+Library.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.nh
+.PP
+.B #include <sys/dlpi.h>
+.br
+.B #include <dlpi.h>
+.HP \w'\fBint\ dlpi_info\fP('u
+\fBint\ dlpi_info\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBdlpi_info_t\ *\fP\fIinfop\fP, \fBuint\fP\ \fIoptions\fP);
+.ad b
+.hy
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP \w'\fIoptions\fP\(em'u
+.I dh
+the handle for the Stream.
+.PD 0
+.TP
+.I infop
+pointer to returned DLPI information structure.
+.TP
+.I options
+unused, must be set to zero (0).
+.PD
+.\"
+.\"
+.SH STRUCTURES
+.PP
+When the \fIinfop\fP argument is non-\fBNULL\fP, and upon successful returned,
+the \fBdlpi_info_t\fP structure pointed to by the argument is completed with
+information from the DLS provider.
+.PP
+The \fBdlpi_info_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    dl_ulong di_opts;
+    dl_ulong di_max_sdu;
+    dl_ulong di_min_sdu;
+    dl_ulong di_state;
+    dl_ulong di_mactype;
+    char di_linkname[DLPI_LINKNAME_MAX];
+    dl_uchar di_physaddr[DLPI_PHYSADDR_MAX];
+    dl_uchar di_physaddrlen;
+    dl_uchar di_bcastaddr[DLPI_PHYSADDR_MAX];
+    dl_uchar di_bcastaddrlen;
+    dl_ulong di_sap;
+    dl_long di_timeout;
+    dl_qos_cl_sel1_t di_qos_sel;
+    dl_qos_cl_range1_t di_qos_range;
+} dlpi_info_t;
+\s+1\fP
+.fi
+.PP
+The \fBdlpi_info_t\fP structure has the following members:
+.TP
+.I di_opts
+reserved for future use.
+.TP
+.I di_max_sdu
+indicates the maximum size of a DLSDU.  This is the maximum number of bytes
+that may be transmitted in a DLSDU.  This value is a positive integer that is
+greater than or equal to \fIdi_min_sdu\fP.
+.TP
+.I di_min_sdu
+indicates the minimum size of a DLSDU.  This is the minimum number of bytes
+that may be transmitted in a DLSDU.  The value is never less than one.
+.TP
+.I di_state
+indicates the state of the DLS provider.  Possible values are:
+.RS
+.TP \w'\fBDL_USER_RESET_PENDING\fP\(em'u
+.B DL_UNATTACHED
+PPA not attached.
+.PD 0
+.TP
+.B DL_ATTACH_PENDING
+Waiting ack of DL_ATTACH_REQ.
+.TP
+.B DL_DETACH_PENDING
+Waiting ack of DL_DETACH_REQ.
+.TP
+.B DL_UNBOUND
+PPA attached.
+.TP
+.B DL_BIND_PENDING
+Waiting ack of DL_BIND_REQ.
+.TP
+.B DL_UNBIND_PENDING
+Waiting ack of DL_UNBIND_REQ.
+.TP
+.B DL_IDLE
+dlsap bound, awaiting use.
+.TP
+.B DL_UDQOS_PENDING
+Waiting ack of DL_UDQOS_REQ.
+.\".TP
+.\".B DL_OUTCON_PENDING
+.\"awaiting DL_CONN_CON.
+.\".TP
+.\".B DL_INCON_PENDING
+.\"awaiting DL_CONN_RES.
+.\".TP
+.\".B DL_CONN_RES_PENDING
+.\"Waiting ack of DL_CONNECT_RES.
+.\".TP
+.\".B DL_DATAXFER
+.\"connection-oriented data transfer.
+.\".TP
+.\".B DL_USER_RESET_PENDING
+.\"awaiting DL_RESET_CON.
+.\".TP
+.\".B DL_PROV_RESET_PENDING
+.\"awaiting DL_RESET_RES.
+.\".TP
+.\".B DL_RESET_RES_PENDING
+.\"Waiting ack of DL_RESET_RES.
+.\".TP
+.\".B DL_DISCON8_PENDING
+.\"Waiting ack of DL_DISC_REQ.
+.\".TP
+.\".B DL_DISCON9_PENDING
+.\"Waiting ack of DL_DISC_REQ.
+.\".TP
+.\".B DL_DISCON11_PENDING
+.\"Waiting ack of DL_DISC_REQ.
+.\".TP
+.\".B DL_DISCON12_PENDING
+.\"Waiting ack of DL_DISC_REQ.
+.\".TP
+.\".B DL_DISCON13_PENDING
+.\"Waiting ack of DL_DISC_REQ.
+.\".TP
+.\".B DL_SUBS_BIND_PND
+.\"Waiting ack of DL_SUBS_BIND_REQ.
+.\".TP
+.\".B DL_SUBS_UNBIND_PND
+.\"Waiting ack of DL_SUBS_UNBIND_REQ.
+.PD
+.RE
+.TP
+.I di_mactype
+indicates the MAC Type of the DLS provider.  This is the type of medium
+supported by this DLPI Stream.  Possible values are:
+.RS
+.TP \w'\fBDL_ETH_CSMA\fP\(em'u
+.B DL_CSMACD
+IEEE 802.3 CSMA/CD network.
+.PD 0
+.TP
+.B DL_TPB
+IEEE 802.4 Token Passing Bus.
+.TP
+.B DL_TPR
+IEEE 802.5 Token Passing Ring.
+.TP
+.B DL_METRO
+IEEE 802.6 Metro Net.
+.TP
+.B DL_ETHER
+Ethernet Bus.
+.TP
+.B DL_HDLC
+ISO HDLC protocol support.
+.TP
+.B DL_CHAR
+Character Synchronous protocol support.
+.TP
+.B DL_CTCA
+IBM Channel-to-Channel Adapter.
+.TP
+.B DL_FDDI
+Fiber Distributed data interface.
+.TP
+.B DL_FC
+Fibre Channel interface.
+.TP
+.B DL_ATM
+ATM.
+.TP
+.B DL_IPATM
+ATM Classical IP interface.
+.TP
+.B DL_X25
+X.25 LAPB interface.
+.TP
+.B DL_ISDN
+ISDN interface.
+.TP
+.B DL_HIPPI
+HIPPI interface.
+.TP
+.B DL_100VG
+100 Based VG Ethernet.
+.TP
+.B DL_100VGTPR
+100 Based VG Token Ring.
+.TP
+.B DL_ETH_CSMA
+ISO 8802/3 and Ethernet.
+.TP
+.B DL_100BT
+100 Base T.
+.TP
+.B DL_IB
+Infiniband.
+.TP
+.B DL_FRAME
+Frame Relay LAPF.
+.TP
+.B DL_MPFRAME
+Multi-protocol over Frame Relay.
+.TP
+.B DL_ASYNC
+Character Asynchronous Protocol.
+.TP
+.B DL_IPX25
+X.25 Classical IP interface.
+.TP
+.B DL_LOOP
+software loopback.
+.TP
+.B DL_OTHER
+Any other medium not listed above.
+.TP
+.B DL_IPV4
+IPv4 Tunnel.
+.TP
+.B DL_IPV6
+IPv4 Tunnel.
+.TP
+.B DL_VNI
+Virtual Network Interface.
+.TP
+.B DL_WIFI
+IEEE 802.11.
+.PD
+.RE
+.TP
+.I di_linkname
+indicates the linkname used to open the DLS provider Stream.  This member
+contains the string that was passed as the \fIlinkname\fP argument to
+.BR dlpi_open (3).
+.TP
+.I di_physaddr
+indicates the physical address for the PPA.
+.TP
+.I di_physaddrlen
+indicates the length of the physical address.
+.TP
+.I di_bcastaddr
+indicates the broadcast address for the PPA.
+.TP
+.I di_bcastaddrlen
+indicates the length of the broadcast address.
+.TP
+.I di_sap
+indicates the bound SAP.
+.TP
+.I di_timeout
+indicates the timeout for DLPI operations.
+.TP
+.I di_qos_sel
+indicates the connectionless mode quality of service parameter selection.
+The \fBdl_qos_cl_sel1_t\fP structure is defined in
+.RB < sys/dlpi.h >
+and is part of the DLPI specification.
+.[
+dlpi revision 2.0.0
+.]
+.TP
+.I di_qos_range
+indicates the connectionless mode quality of service parameter range.
+The \fBdl_qos_cl_range1_t\fP structure is defined in
+.RB < sys/dlpi.h >
+and is part of the DLPI specification.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B dlpi_info
+is a DLPI Library
+.[
+soldoc11
+.]
+subroutine.
+This DLPI Library function returns information obtained from the DLS provider
+concerning the state and characteristics of the DLPI Stream.  This is
+accomplished internally using the
+.BR DL_INFO_REQ "(7) and " DL_INFO_ACK (7)
+primitives of the DLPI.
+.[
+dlpi revision 2.0.0
+.]
+Most of the information returned in the \fBdlpi_info_t\fP structure pointed to
+by the \fIinfop\fP argument to the call are taken directly from the
+.BR DL_INFO_ACK (7)
+response.  One exception is the \fIdi_linkname\fP field, which is set to the
+same name as was passed as the \fIlinkname\fP argument to the
+.BR dlpi_open (3)
+call.
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B dlpi_info
+function, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpi '
+flag to the linker command when linking C language programs that use the
+.B dlpi_info
+function or include the
+.B @libdir@/libdlpi.a
+static library object as an target of the linking.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B dlpi_info
+is fully thread-safe.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.B dlpi_info
+is successful, it returns \fBDLPI_SUCCESS\fP.
+When
+.B dlpi_info
+fails, it returns an error code.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B dlpi_info
+fails, it returns an error code.
+.B dlpi_info
+may fail when:
+.PP
+A DLPI Library error occurs:
+.TP 12
+.RB [ DLPI_EBADMSG ]
+Received a bad or unexpected DLPI message.
+.TP
+.RB [ DLPI_EINHANDLE ]
+The DLPI handle, \fIdh\fP, is not a valid data link handle.
+.TP
+.RB [ DLPI_EINVAL ]
+An invalid argument was passed to \fBdlpi_info\fP.  Either \fIinfop\fP is
+\fBNULL\fP or \fIoptions\fP is non-zero.
+.TP
+.RB [ DLPI_EMODENOTSUP ]
+The DLS provider reported an unsupported data link service mode (i.e.,
+\fBDL_CODLS\fP or \fBDL_ACLDLS\fP).
+.TP
+.RB [ DLPI_ETIMEDOUT ]
+A DLPI operation timed out before the expected response was received.
+.TP
+.RB [ DLPI_EVERNOTSUP ]
+The DLPI version reported by the DLS provider is unsupported by the DLPI
+Library.
+.TP
+.RB [ DLPI_FAILURE ]
+.PP
+A DLPI error occurs:
+.TP 12
+.RB [ DL_SYSERR ]
+A system error has occured and the \fBLinux\fP system error code is indicated
+in the \fIerrno\fP(3) global variable.
+.PP
+A \fBLinux\fP system error occurs:
+.TP 12
+.RB [ EPERM ]
+Fine-grained permission for the request is incorrect.
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was immediately available to satisfy the request.
+.TP
+.RB [ ENOBUFS ]
+Insufficient buffers were immediately available to satisfy the request.
+.TP
+.RB [ ENOSR ]
+Insufficient \fISTREAMS\fP resources were available to satisfy the request.
+.TP
+.RB [ EAGAIN ]
+A temporary failure occured and the DLS user should reissue the request.
+.TP
+.RB [ EBUSY ]
+THe control information in the request has already been subjected to the
+control request or a transient condition prevented the request.
+.TP
+.RB [ EINVAL ]
+On of the parameters of the requst for which there is no prescribed error code
+has an invalid value.
+.TP
+.RB [ ENOTSUP ]
+The request is recognized by not supported.
+.TP
+.RB [ ENOLINK ]
+The interface, Physical Point of Attachment, or underlying driver or device, is
+not connected.
+.TP
+.RB [ ENXIO ]
+Invalid device.  The interface, Physical Point of Attachment, or underlying
+driver or device is no longer installed on the system.
+.PP
+In addition, any of the error numbers returned by
+.BR putmsg (2s),
+.BR getmsg (2s),
+may also be returned by
+.BR dlpi_info .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B dlpi_info
+is a
+.IR Solaris \(rg-specific
+function.  It may be necessary to define the C preprocessor symbol,
+.BR _SUN_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file, to expose this symbolic constants, data structures and declarations
+necessary for the use of this function.
+It may also be necessary to include the
+.RB < dlpi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+The DLPI header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpi.h
+The DLPI Library header file.
+.TP
+.B @libdir@/libdlpi.a
+The static library containing the
+.BR dlpi_info
+function.
+.TP
+.B @libdir@/libdlpi.so
+The shared object library containing the
+.BR dlpi_info
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B dlpi_info
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi (7),
+.BR dlpi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B dlpi_info
+is compatible with the
+.IR Solaris \(rg
+DLPI Library,
+.[
+soldoc11
+.]
+and systems providing an interface equivalent to
+.IR Solaris \(rg
+DLPI Library,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B DLPI Library
+functions are
+.IR Solaris \(rg-specific,
+and are provided only for porting
+.IR Solaris \(rg
+applications programs, drivers and modules to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatibility: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the DLPI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR dlpi (3),
+.BR dlpi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and
+.IR Solaris \(rg
+DLPI documentation.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+first appeared in SVR 4.
+.[
+svr4
+.]
+.B dlpi_info
+first appeared in the
+.IR Solaris "\(rg " 11 .
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "DLPI Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

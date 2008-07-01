@@ -1,0 +1,450 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpiapi.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpiapi.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPIAPI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI API Library"
+.\" =========================================================================
+.SH NAME
+.B DLPIAPI, dlpiapi, libdlpiapi
+\- DLPI API Library
+.\"
+.\"
+.SH INTERFACE
+.PP
+DLPI
+.[
+dlpi revision 2.0.0
+.]
+Application Program Interface.
+.[
+dlpiapi
+.]
+.br
+.IR "GCOM, Inc." ,
+specific and proprietary.
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libdlpiapi (3),
+the
+.IR "DLPI API Library" .
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <sys/ioctl.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/dlpi.h>
+.br
+.B #include <dlpiapi.h>
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B libdlpiapi
+is an
+.B OpenSS7
+implementation of the
+.I GCOM
+DLPI API Library
+.[
+dlpiapi
+.]
+for
+.BR "Linux Fast-STREAMS" .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.I DLPI API Library
+is a library of DLPI helper and utility functions designed for use with the Data
+Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+The original library was designed by
+.IR "GCOM, Inc." ,
+.RB < http://www.gcom.com/ >,
+and first documented
+.[
+dlpiapi
+.]
+in 1995.
+.PP
+The DLPI API Library documented here is the
+.B OpenSS7
+implementation of a library intended on being a work-alike with the
+.I GCOM
+library in accordance with the
+.I GCOM
+documentation.
+.[
+dlpiapi
+.]
+.PP
+The
+.IR GCOM -compatible
+DLPI API Library should not be confused with the
+.IR Solaris \(rg-compatible
+DLPI Library,
+.BR libdlpi (3).
+The two libraries are incompatible and have namespace conflicts (primarily on
+.BR dlpi_open (3)
+and
+.BR dlpi_close (3)).
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.B libdlpiapi
+implements the following DLPI API library functions:
+.TS
+tab(:);
+lb1c1lssss.
+dlpi_attach_ppa\fR(3):-:some lame ass description.
+dlpi_bind_dlsap\fR(3):-:some lame ass description.
+dlpi_clear_zombies\fR(3):-:some lame ass description.
+dlpi_close\fR(3):-:some lame ass description.
+dlpi_complete_req\fR(3):-:some lame ass description.
+dlpi_configure_dlsaps\fR(3):-:some lame ass description.
+dlpi_connect\fR(3):-:some lame ass description.
+dlpi_connect_req\fR(3):-:some lame ass description.
+dlpi_connect_wait\fR(3):-:some lame ass description.
+dlpi_decode_ctl\fR(3):-:some lame ass description.
+dlpi_decode_disconnect_reason\fR(3):-:some lame ass description.
+dlpi_detach_ppa\fR(3):-:some lame ass description.
+dlpi_discon_req\fR(3):-:some lame ass description.
+dlpi_get_a_msg\fR(3):-:some lame ass description.
+dlpi_get_both\fR(3):-:some lame ass description.
+dlpi_get_info_strm\fR(3):-:some lame ass description.
+dlpi_get_style_strm\fR(3):-:some lame ass description.
+dlpi_init\fR(3):-:some lame ass description.
+dlpi_listen\fR(3):-:some lame ass description.
+dlpi_open\fR(3):-:some lame ass description.
+dlpi_open_log\fR(3):-:some lame ass description.
+dlpi_perror\fR(3):-:some lame ass description.
+dlpi_print_msg\fR(3):-:some lame ass description.
+dlpi_printf\fR(3):-:some lame ass description.
+dlpi_put_both\fR(3):-:some lame ass description.
+dlpi_put_proto\fR(3):-:some lame ass description.
+dlpi_rcv\fR(3):-:some lame ass description.
+dlpi_rcv_msg\fR(3):-:some lame ass description.
+dlpi_read_data\fR(3):-:some lame ass description.
+dlpi_reset_req\fR(3):-:some lame ass description.
+dlpi_reset_res\fR(3):-:some lame ass description.
+dlpi_send_attach_req\fR(3):-:some lame ass description.
+dlpi_send_bind_req\fR(3):-:some lame ass description.
+dlpi_send_connect_req\fR(3):-:some lame ass description.
+dlpi_send_connect_res\fR(3):-:some lame ass description.
+dlpi_send_detach_req\fR(3):-:some lame ass description.
+dlpi_send_disconnect_req\fR(3):-:some lame ass description.
+dlpi_send_info_req\fR(3):-:some lame ass description.
+dlpi_send_reset_req\fR(3):-:some lame ass description.
+dlpi_send_reset_res\fR(3):-:some lame ass description.
+dlpi_send_stats_req\fR(3):-:some lame ass description.
+dlpi_send_test_req\fR(3):-:some lame ass description.
+dlpi_send_test_res\fR(3):-:some lame ass description.
+dlpi_send_uic\fR(3):-:some lame ass description.
+dlpi_send_unbind_req\fR(3):-:some lame ass description.
+dlpi_send_xid_req\fR(3):-:some lame ass description.
+dlpi_send_xid_res\fR(3):-:some lame ass description.
+dlpi_set_log_size\fR(3):-:some lame ass description.
+dlpi_set_signal_handling\fR(3):-:some lame ass description.
+dlpi_set_unnum_frame_handler\fR(3):-:some lame ass description.
+dlpi_set_test_req\fR(3):-:some lame ass description.
+dlpi_set_test_res\fR(3):-:some lame ass description.
+dlpi_uic_req\fR(3):-:some lame ass description.
+dlpi_unbind_dlsap\fR(3):-:some lame ass description.
+dlpi_xid_req\fR(3):-:some lame ass description.
+dlpi_xid_res\fR(3):-:some lame ass description.
+dlpi_write_data\fR(3):-:some lame ass description.
+dlpi_xray_req\fR(3):-:some lame ass description.
+.TE
+.\"
+.\"
+.SH USAGE
+.PP
+To use the DLPI API Library, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpiapi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpiapi '
+flag to the linker command when linking C language programs that use this
+library, or add
+.B @libdir@/libdlpiapi.a
+to the objects linked.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+The
+.B @PACKAGE_TITLE@
+implementation of the DLPI API Library is fully thread-safe.
+The variables documented as global are instead contained in thread-specific
+data.
+When static buffers are returned, these buffers are instead thread-specific.
+.\"
+.\"
+.SH RETURN
+.PP
+Most function call return zero (0) on success and minus one (-1) on error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When most functions fail, they return minus one (-1) and set the global
+.IR errno (3)
+variable to an appropriate error code.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B DLPI API Library
+is
+.IR GCOM -specific.
+.[
+dlpiapi
+.]
+It may be necessary to define the `C' preprocessor symbol,
+.BR _GCOM_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file to expose the symbolic constants, data structures and declarations
+necessary for the use of these functions.  It may be necessary to include the
+.RB < dlpiapi.h >
+header file to expose the symbolic constants, data structures and declarations
+necessary for the user of these functions.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+the standard DLPI
+.[
+dlpi revision 2.0.0
+.]
+header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpiapi.h
+the
+.IR GCOM -specific
+header file.
+.TP
+.B @libdir@/libdlpiapi.a
+the static library version of the DLPI API Library.
+.TP
+.B @libdir@/libdlpiapi.so
+the shared object library version of the DLPI API Library.
+.\"
+.\"
+.SH BUGS
+.PP
+The DLPI API Library has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi (7),
+.BR cdiapi (3),
+.BR dlpiapi (3),
+.BR npiapi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The OpenSS7 DLPI API library is compatible with documentation of the GCOM DLPI
+API library
+.[
+dlpiapi
+.]
+and applications based on the DLPI API, with the following compatibility
+considerations:
+.IP \(em \w'\(em\(em'u
+Application programming interfaces for devices and modules that implement the
+Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+have not been subjected to standardization and are, therefore, inherently
+non-portable.  Portable \fISTREAMS\fP applications, drivers and modules will
+utilize the service primitive interface directly using
+.BR putmsg (2s),
+.BR getmsg (2s),
+.BR write (2s),
+.BR read (2s)
+and
+.BR ioctl (2s)
+system calls and the definitions provided in the
+.RB < sys/dlpi.h >
+header file.
+.IP \(em
+.B DLPI API Library
+functions are
+.IR GCOM -specific,
+.[
+dlpiapi
+.]
+and are provided only for porting
+.I GCOM
+applications, drivers and modules to
+.BR "Linux Fast-STREAMS" .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI application programs, drivers and modules.
+.IP \(em
+Binary compatibility is not attempted, only source compatiblity: any binary
+compatibility experienced is coincidental and may change on a future release.
+.RS
+.PP
+It may be necessary to recompile all applications programs, and \fISTREAMS\fP
+drivers and modules, that share definitions with the DLPI API library through
+the
+.RB < dlpiapi.h >
+header file, using
+.B @PACKAGE_TITLE@
+supplied header files.
+.RE
+.IP \(em
+The
+.B @PACKAGE_TITLE@
+implementation of the DLPI API Library is designed to be fully thread-safe.
+When used in a POSIX threads environment, the implementation is not expected
+to be bug-for-bug compatible with the
+.I GCOM
+implementation, which does not document interactions with multi-threaded
+programs.
+.PP
+For further compatibility information, see
+.BR dlpi (7)
+and
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+DLPI API documentation.
+.[
+dlpiapi
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+DLPI
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+DLPI API documentation
+.[
+dlpiapi
+.]
+was first issued by
+.I GCOM
+in 1995.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+version of the
+DLPI API Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

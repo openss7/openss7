@@ -1,0 +1,324 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpi_decode_ctl.3.man,v 0.9.2.1 2008-07-01 11:50:54 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:54 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi_decode_ctl.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:54  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPI_DECODE_CTL 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI API Library"
+.\" =========================================================================
+.SH NAME
+.B dlpi_decode_ctl
+\- 
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libdlpiapi (3),
+the
+.IR GCOM -specific,
+DLPI
+.[
+dlpi revision 2.0.0
+.]
+API Library.
+.[
+dlpiapi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/dlpi.h>
+.br
+.B #include <dlpiapi.h>
+.HP
+\fBint dlpi_decode_ctl\fP(\fBint\fP \fIfd\fP);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the file descriptor for the Stream.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B dlpi_decode_ctl
+is a DLPI API Library
+.[
+dlpiapi
+.]
+subroutine.
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B dlpi_decode_ctl
+function, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpiapi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpiapi '
+flag to the linker command when linking C language programs that use the
+.B dlpi_decode_ctl
+function.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B dlpi_decode_ctl
+is fully thread-safe.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.B dlpi_decode_ctl
+is successful, it returns zero (0) or a positive integer value.
+When
+.B dlpi_decode_ctl
+fails, it returns a negative integer value (-1).
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B dlpi_decode_ctl
+fails, it returns a negative integer value (-1).
+.B dlpi_decode_ctl
+may fail when:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ EBADF ]
+the file descriptor,
+.IR fd ,
+supplied does not correspond to a valid DLPI Stream open for reading and
+writing.
+.TP
+.RB [ EINVAL ]
+one of the arguments supplied was invalid.
+.PP
+In addition, any of the error numbers returned by
+.BR putmsg (2s),
+.BR getmsg (2s),
+.BR open (2s),
+.BR close (2s),
+.BR ioctl (2s)
+may also be returned by
+.BR dlpi_decode_ctl .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B dlpi_decode_ctl
+is a
+.IR GCOM -specific
+function.  It may be necessary to define the C preprocessor smbol,
+.BR _GCOM_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file, to expose this symbolic constants, data structures and declarations
+necessary for the use of this function.
+It may also be necessary to include the
+.RB < dlpiapi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+The DLPI header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpiapi.h
+The DLPI API Library header file.
+.TP
+.B @libdir@/libdlpiapi.a
+The static library containing the
+.BR dlpi_decode_ctl
+function.
+.TP
+.B @libdir@/libdlpiapi.so
+The shared object library containing the
+.BR dlpi_decode_ctl
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B dlpi_decode_ctl
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi (7),
+.BR dlpiapi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B dlpi_decode_ctl
+is compatible with the
+.I GCOM
+DLPI API Library,
+.[
+dlpiapi
+.]
+and systems providing an interface equivalent to
+.I GCOM
+DLPI API Library,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B DLPI API Library
+functions are
+.IR GCOM -specific,
+and are provided only for porting
+.IR GCOM
+software to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatiblity: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the DLPI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR dlpiapi (3),
+.BR dlpi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and
+.I GCOM
+DLPI API documentation.
+.[
+dlpiapi
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+first appeared in SVR 4.
+.[
+svr4
+.]
+.B dlpi_decode_ctl
+first appeared in the
+.I GCOM
+DLPI API.
+.[
+dlpiapi
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "DLPI API Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2
