@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: wantemplate.5.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\" @(#) $Id: wantemplate.5.man,v 0.9.2.2 2008-07-01 12:31:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:31:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: wantemplate.5.man,v $
+.\" Revision 0.9.2.2  2008-07-01 12:31:05  brian
+.\" - updated man pages, drafts, specs, header files
+.\"
 .\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
 .\" - added files
 .\"
@@ -75,7 +78,7 @@ abbreviate-label-ranges ".."
 sort-adjacent-labels
 .R2
 .so strx25.macros
-.TH WANTEMPLATE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.TH WANTEMPLATE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ File Formats"
 .SH NAME
 .B wantemplate
 \- Wide Area Network File Format
@@ -84,43 +87,181 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .PP
 The
-.B lapbtemplate
+.B wantemplate
 describes the file format for input to the
-.BR lltune (8)
-command for LAPB class subnetworks.
+.BR wantune (8)
+command for WAN class subnetworks.
 The file format consists of a number of parameter values, one per line,
 formated as described below.  Each parameter value is described using its line
 number in the file, a parameter name, and a description of the format of the
 value.  Only the value appears in the file, each value on a line by itself, one
 value per line.
 .PP
-Each of the LAPB configuration parameters corresponds to the member and values
+Each of the WAN configuration parameters corresponds to the member and values
 of the
-.B lapb_tune
+.B wantune_t
 structure, that is carried in a
-.B lapb_tnioc
+.B wan_tnioc
 structure by the
-.B L_LAPBTUNE
+.B W_SETTUNE
 input-output control.
 .PP
 These protocol parameters, and the default values that exist when tuning has
-not been applied to a newly created LAPB subnetwork, correspond directly to the
-protocol parameters and defaults in ISO/IEC 7776,
+not been applied to a newly created WAN subnetwork, correspond directly to the
+protocol parameters and defaults in ISO/IEC 3309.
 .[
-iso7776
-.]
-X.25
-.[
-x25
-.]
-and X.75.
-.[
-x75
+iso3309
 .]
 .\"
 .\"
 .SH FORMAT
 .PP
+The WAN subnetwork template consists of 12 or more lines containing the
+following information:
+.\"
+.IP \ 1. \w'00.\(en'u
+.B WAN_maxframe
+specifies the maximum frame size for the WAN interface in octets.
+The value is a positive integer.
+.\"
+.IP \ 2.
+.B WAN_baud
+specifies the baud rate for the WAN interface in bits per second.  When zero
+(0), an external clock must be provided.  The value is a positive integer.
+.\"
+.IP \ 3.
+.B WAN_translate
+specifies whether a remote address should be translated into an interface
+address using the address mapping function.  See
+.BR wanmap (8)
+for more information.  When this value is \*(lqY\*(rq, \*(lqy\*(rq or
+\*(lq1\*(rq, the address mapping will be used to translate the remote address.
+.\"
+.IP \ 4.
+.B WAN_phys_int
+specifies the physical interface type.  This can be the integer numeric value
+\*(lq0\*(rq through \*(lq7\*(rq, where the interpretation of these values iw
+described in the table below:
+.RS
+.TS
+tab(:);
+lblblb
+nblbl.
+Val:Symbol:Description
+_
+0:WAN_X21:X.21 physical interface
+1:WAN_V28:V.28 physical interface
+2:WAN_V35:V.35 physical interface
+.\"3:WAN_V36:V.36 physical interface
+.\"4:WAN_RS232:RS-232 physical interface
+.\"5:WAN_RS422:RS-422 physical interface
+.\"6:WAN_T1E1:G.703/G.704 physical interface
+.\"7:WAN_ATM:ATM physical interface
+_
+.TE
+.RE
+.\"
+.IP \ 5.
+.B WAN_connect_proc
+specifies the calling procedures to be used when generating outgoing calls on
+the WAN interface.  This can be the values \*(lq0\*(rq, \*(lq1\*(rq or
+\*(lq2\*(rq, where the interpretation of these values is described in the
+table below:
+.RS
+.TS
+tab(:);
+lblblb
+nblbl.
+Val:Symbol:Description
+_
+0:WAN_NONE:No calling procedures.
+1:WAN_X21P:X.21 calling procedures.
+2:WAN_V25bis:V.25 bis calling procedures.
+_
+.TE
+.RE
+.\"
+.IP \ 6.
+.B WAN_x21_T1
+specifies the time interval for the X.21 T1 Timer:
+.[
+x21
+.]
+the amount of time that the DTE will await
+\fIproceed-to-select\fP having signalled \fIcall request\fP to the DCE.
+The value is a integer number of deciseconds (0.1 seconds),
+with a default value of 30 (3.0 seconds).
+.\"
+.IP \ 7.
+.B WAN_x21_T2
+specifies the time interval for the X.21 T2 Timer:
+.[
+x21
+.]
+the amount of time that the DTE will await \fIready for
+data\fP having signalled \fIend-of-selection\fP.
+The value is a integer number of deciseconds (0.1 seconds),
+with a default value of 200 (20.0 seconds).
+.\"
+.IP \ 8.
+.B WAN_x21_T3A
+specifies the time interval for the X.21 T3A Timer:
+.[
+x21
+.]
+the time interval the DTE will await additional \fIcall
+progress signals\fP or \fIDCE provided information\fP.
+The value is a integer number of deciseconds (0.1 seconds),
+with a default value of 60 (6.0 seconds).
+.\"
+.IP \ 9.
+.B WAN_x21_T4B
+specifies the time interval for the X.21 T4B Timer:
+.[
+x21
+.]
+the time interval the DTE will await \fIready for data\fP
+having signalled \fIcall accept\fP.
+The value is a integer number of deciseconds (0.1 seconds),
+with a default value of 60 (6.0 seconds).
+.\"
+.IP 10.
+.B WAN_x21_T5
+specifies the time interval for the X.21 T5 Timer:
+.[
+x21
+.]
+the time interval the DTE will await \fIDCE ready\fP having
+signalled \fIDTE clear request\fP.
+The value is a integer number of deciseconds (0.1 seconds),
+with a default value of 20 (2.0 seconds).
+.\"
+.IP 11.
+.B WAN_x21_T6
+specifies the time interval for the X.21 T6 Timer:
+.[
+x21
+.]
+the time interval the DTE will await \fIDCE ready\fP having
+signalled \fIDTE clear confirmation\fP.
+The value is a integer number of deciseconds (0.1 seconds),
+with a default value of 20 (2.0 seconds).
+.\"
+.IP 12.
+.B WAN_v25_callreq
+specifies the time interval for the V.25 bis DTE T1 Timer:
+.[
+v25bis
+.]
+the time interval the DTE will await successful call
+establishment after having initiated a call.
+The value is a integer number of deciseconds (0.1 seconds),
+with a default value of 6000 (600.0 seconds or about 5 minutes).
+.RS
+.PP
+Note that V.25 Timer T1 is only really necessary when CFI (Call Failure
+Indication, aka Anwer Supervision) is not provided by the network.
+.RE
 .\"
 .\"
 .SH FILES
@@ -140,7 +281,7 @@ system.)
 .PP
 .BR wantune (8),
 .BR wan (4),
-.BR x25netd (8).
+.BR xnetd (8).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -172,16 +313,25 @@ solx25ag
 .[
 ptx25
 .]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
 .IR "SBE X.25" ,
 .[
 sbex25
 .]
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
+The template provided is largely compatible across most implementations.
 .IP \(em
+Some implementations provide extensions to the \fBwan_tnioc\fP structure or
+provide additional input-output controls with additional tuning parameters.
 .PP
 For additional compatibiltiy information see,
+.BR wantune (8),
 .BR wan (4),
+.RB xnetd (8),
 and
 .BR STREAMS (9).
 .\"
@@ -208,6 +358,10 @@ solx25ag
 .[
 ptx25
 .]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
 .IR "SBE X.25" ,
 .[
 sbex25
@@ -223,9 +377,16 @@ file format first appeared in
 .IR "Spider X.25" .
 .\"
 .\"
+.XX
+.[
+x21
+.]
+.[
+x21bis
+.]
+.\"
+.\"
 .[
 $LIST$
 .]
 .TI
-
-

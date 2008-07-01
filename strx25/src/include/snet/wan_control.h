@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: wan_control.h,v 0.9.2.1 2008-06-18 16:43:14 brian Exp $
+ @(#) $Id: wan_control.h,v 0.9.2.2 2008-07-01 12:31:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:43:14 $ by $Author: brian $
+ Last Modified $Date: 2008-07-01 12:31:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wan_control.h,v $
+ Revision 0.9.2.2  2008-07-01 12:31:08  brian
+ - updated man pages, drafts, specs, header files
+
  Revision 0.9.2.1  2008-06-18 16:43:14  brian
  - added new files for NLI and DLPI
 
@@ -59,7 +62,14 @@
 #ifndef __SYS_SNET_WAN_CONTROL_H__
 #define __SYS_SNET_WAN_CONTROL_H__
 
-#ident "@(#) $RCSfile: wan_control.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: wan_control.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/*
+ * This file contains a basic SpiderWAN like input-output control interface.
+ * Source compatibility is attempted.  Binary compatibility is not attempted
+ * (but may result, YMMV).  Portable applications programs, STREAMS drivers
+ * and modules, should use the CDI interface instead.
+ */
 
 #endif				/* __SYS_SNET_WAN_CONTROL_H__ */
 
