@@ -1,3 +1,53 @@
+2008-07-01  Brian Bidulock  <bidulock@openss7.org>
+
+	- Checking in changes and additions:
+
+	* doc/man/man4/cd-llc.4.man: added manual page
+	* doc/man/man4/cdpmod.4.man: added manual page
+	* doc/man/man4/dlaix.4.man: added manual page
+	* doc/man/man4/dl-llc.4.man: added manual page
+	* doc/man/man4/hdlc.4.man: added manual page
+	* doc/man/man4/ifr.4.man: added manual page
+	* doc/man/man4/lapb.4.man: added manual page
+	* doc/man/man4/llc2.4.man: added manual page
+	* doc/man/man4/mfe.4.man: added manual page
+	* doc/man/man4/mlp.4.man: added manual page
+	* doc/man/man4/s_cdi.4.man: added manual page
+	* doc/man/man4/s_dlpi.4.man: added manual page
+	* doc/man/man4/s_wan.4.man: added manual page
+	* doc/man/man4/wan.4.man: added manual page
+	* doc/man/man4/x25-lapb.4.man: added manual page
+	* doc/man/man4/x25-llc2.4.man: added manual page
+	* doc/man/man4/x25-llc.4.man: added manual page
+	* doc/man/man4/x25-plp.4.man: added manual page
+	* doc/man/man4/xos.4.man: added manual page
+	* doc/man/man4/xot.4.man: added manual page
+	* doc/man/man5/wanmapconf.5.man: added manual page
+	* doc/man/man5/x25conf.5.man: added manual page
+	* doc/man/man7/WAN.7.man: added manual page
+	* doc/man/man7/wan.7.man: added manual page
+	* doc/man/man8/wanmap.8.man: added manual page
+
+	* doc/specs/lli/.cvsignore: added LLI specification
+	* doc/specs/lli/lli_fig1.fig: added LLI specification
+	* doc/specs/lli/lli.texi: added LLI specification
+	* doc/specs/lli/Makefile.am: added LLI specification
+
+	* doc/specs/wan/.cvsignore: added WAN specification
+	* doc/specs/wan/Makefile.am: added WAN specification
+	* doc/specs/wan/wan_fig1.fig: added WAN specification
+	* doc/specs/wan/wan_fig_s_cdi.fig: added WAN specification
+	* doc/specs/wan/wan_fig_s_wan.fig: added WAN specification
+	* doc/specs/wan/wan_snet.fig: added WAN specification
+	* doc/specs/wan/wan.texi: added WAN specification
+
+	* src/modules/s_lli.c: added conversion module
+	* src/modules/s_llic.c: added conversion module
+	* src/modules/s_nli.c: added conversion module
+	* src/modules/s_nlic.c: added conversion module
+	* src/modules/s_wan.c: added conversion module
+	* src/modules/s_wanc.c: added conversion module
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/drafts/x25/draft-bidulock-tsvwg-xos-00.me: XOS draft

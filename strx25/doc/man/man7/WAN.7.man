@@ -1,0 +1,1904 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: WAN.7.man,v 0.9.2.1 2008-07-01 12:16:23 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 12:16:23 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: WAN.7.man,v $
+.\" Revision 0.9.2.1  2008-07-01 12:16:23  brian
+.\" - added manual pages, specs and conversion modules
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH WAN 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Wide Area Network (WAN)"
+.SH NAME
+.B WAN, wan
+\- Spider Wide Area Network (WAN) Interface
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <errno.h>
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <stdint.h>
+.br
+.B #include <netx25/wan_proto.h>
+.br
+.B #include <netx25/wan_control.h>
+.br
+.B #include <sys/snet/wan_proto.h>
+.br
+.B #include <sys/snet/wan_control.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The Spider Wide Area Newtork (WAN) interface,
+.[
+spiderx25wan
+.]
+.[
+spiderisdnwan
+.]
+is a service primitive interface to the WAN driver layer developed by Spider
+Systems, Ltd. (now part of Emerson Power) for use by applications in
+controlling WAN drivers, interface hardware and protocol software.  The
+service primitive interface was widely used on VxWorks, other embedded RTOS,
+AIXlink/X.25,
+.[
+aixlink
+.]
+Sun Microsystems SunLink starting with version 8.0 and Solstice X.25,
+.[
+solx25pg
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+and other mainstream UNIX operating systems and embedded systems for
+communications.
+.PP
+The interface is not provided as a programming library, as is XTI, but as
+defined service primitives to be exchanged with the WAN driver using standard
+STREAMS
+.BR getpmsg (2s)
+and
+.BR putpmsg (2s)
+system calls.  Although a user level library could be easily constructed from
+these service primitives, in the same way that XTI was built from TPI, it does
+not seem to have happened and applications appear to have wound up using the
+WAN interface directly.
+.PP
+.B @PACKAGE_TITLE@
+and other \fBOpenSS7\fP applications, drivers and modules provide primarily a
+Communications Device Interface (CDI),
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+for devices at this level; however, a compatibility module,
+.BR s_wan (4),
+is provided to convert between CDI and the SpiderWAN interface for the
+purposes of porting SpiderWAN compatible applications, drivers and modules to
+\fBLinux\fP.
+.\"
+.\"
+\".SH ADDRESSES
+\".PP
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+Declarations of structures and symbolic constants necessary for this service
+interface are contained in the
+.B @includedir@/@PACKAGE@/sys/wan_proto.h
+header file.
+.PP
+The SpiderWAN (source) compatible service primitive interface is as follows:
+.PP
+The \fBWAN_primitives\fP union, a union containing all of the WAN primitives,
+is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+union WAN_primitives {
+    uint8_t wan_type;
+    struct wan_sid wsid;
+    struct wan_reg wreg;
+    struct wan_ctl wctl;
+    struct wan_msg wmsg;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwsid\fP\(em'u
+.I wan_type
+The type of the strucutre contained in the union.  This field can have values:
+\fBWAN_SID\fP, \fBWAN_REG\fP, \fBWAN_CTL\fP, or \fBWAN_DAT\fP.
+.TP
+.I wsid
+The structure of the primitive when \fIwan_type\fP is \fBWAN_SID\fP.
+.PD 0
+.TP
+.I wreg
+The structure of the primitive when \fIwan_type\fP is \fBWAN_REG\fP.
+.TP
+.I wctl
+The structure of the primitive when \fIwan_type\fP is \fBWAN_CTL\fP.
+.TP
+.I wmsg
+The structure of the primitive when \fIwan_type\fP is \fBWAN_DAT\fP.
+.PD
+.PP
+These primtive types are described in detail in the subsections that follow.
+.\"
+.SS WAN_SID
+.PP
+Requests that the WAN driver assign the specified subnetwork identifier to the
+Stream and associate the Stream with the underlying device identified by the
+subnetwork identifier.
+This primitive is equivalent to the
+.BR CD_ATTACH_REQ (7)
+primitive of the
+.BR cdi (7).
+.PP
+.nf
+\f(CW\s-1\
+struct wan_sid {
+    uint8_t wan_type;
+    uint8_t wan_spare[3];
+    uint32_t wan_snid;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_spare\fP\(em'u
+.I wan_type
+Always \fBWAN_SID\fP.
+.TP
+.I wan_spare
+Spare bytes for alignment, ignored by responder and set to zero by initiator.
+.TP
+.I wan_snid
+Conveys the subnetwork identifier.
+Equivalent to the Physical Point of Attachment (PPA) of the WAN interface.
+.PP
+Should an error condition occur, an
+.BR M_ERROR (9)
+message is sent upstream with an appropriate error code, resulting in the
+failure of all system calls on the Stream until closed.
+The \fBWAN_SID\fP primitive may fail when:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIwan_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The \fBM_PROTO\fP(9) message block is of an incorrect length for the
+primitive.
+.TP
+.RB [ EEXIST ]
+The \fIwan_snid\fP specified is in use by another Stream.
+.TP
+.RB [ ERANGE ]
+The \fIwan_snid\fP member contains invalid information.
+.TP
+.RB [ EBUSY ]
+The a physical channel referenced by the \fIwan_snid\fP is in use by another
+Stream.
+.TP
+.RB [ ENOSR ]
+The \fBs_wan\fP module, or underlying CDI driver lacks the STREAMS resources
+necessary to satisfy the request.
+.TP
+.RB [ EIO ]
+The \fBWAN_SID\fP primitive was issued from an incorrect state for the
+subnetwork entity.
+.TP
+.RB [ ENXIO ]
+The underlying device driver has encountered a fatal error.
+.\"
+.SS WAN_REG
+.PP
+Registers the subnetwork identifier specified in the \fIwan_snid\fP field of
+the primitive.  Once a subnetwork entity has been registered, it cannot be
+tuned or otherwise altered unless disabled with \fBW_DISABLE\fP.  This
+primitive is used by management applications to place subnetwork entities into
+service.
+.PP
+.nf
+\f(CW\s-1\
+struct wan_reg {
+    uint8_t wan_type;
+    uint8_t wan_spare[3];
+    uint32_t wan_snid;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_spare\fP\(em'u
+.I wan_type
+Always \fBWAN_REG\fP.
+.TP
+.I wan_spare
+Spare bytes for alignment, ignored by responder and set to zero by initiator.
+.TP
+.I wan_snid
+Conveys the subnetwork identifier.
+.PP
+Should an error condition occur, an
+.BR M_ERROR (9)
+message is sent upstream with an appropriate error code, resulting in the
+failure of all system calls on the Stream until closed.
+The \fBWAN_REG\fP primitive may fail when:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIwan_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The \fBM_PROTO\fP(9) message block is of an incorrect length for the
+primitive.
+.TP
+.RB [ EXDEV ]
+There exists a hardware configuraiton errorr for the specified \fIwan_snid\fP.
+.TP
+.RB [ EBUSY ]
+The a physical channel referenced by the \fIwan_snid\fP is alread activated.
+.TP
+.RB [ EIO ]
+The \fBWAN_REG\fP primitive was issued from an incorrect state for the
+subnetwork entity.
+.TP
+.RB [ ENXIO ]
+The underlying device driver has encountered a fatal error.
+.TP
+.RB [ ENOMEM ]
+There was insufficient memory immediately available to register the subnetwork
+entity.
+.TP
+.RB [ E2BIG ]
+The maximum receive buffer size is too small to hold the largest frame
+required by the device.
+.\"
+.SS WAN_CTL
+.PP
+The primitive class consists of four primitives used to enable or disable the
+WAN interface.  These primitives are equivalent to the
+.BR CD_ENABLE_REQ (7),
+.BR CD_ENABLE_CON (7),
+.BR CD_DISABLE_REQ (7),
+.BR CD_DISABLE_CON (7)
+and
+.BR CD_ERROR_IND (7)
+primitives of the
+.BR cdi (7).
+.PP
+The
+.BR M_PROTO (9)
+message block is structured as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_ctl {
+    uint8_t wan_type;
+    uint8_t wan_command;
+    uint8_t wan_remtype;
+    uint8_t wan_remsize;
+    uint8_t wan_remaddr[20];
+    uint8_t wan_status;
+    uint8_t wan_diag;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_spare\fP\(em'u
+.I wan_type
+Always \fBWAN_CTL\fP.
+.TP
+.I wan_command
+Conveys the WAN command.  This may be one of the following values:
+.RS
+.TP
+.B WC_CONNECT
+This command is valid when sent from the WAN user to the WAN provider; or from
+the WAN provider to the WAN user.
+.RS
+.PP
+When sent from the WAN user, the primitive corresponds to the
+.BR CD_ENABLE_REQ (7)
+primitive of the
+.BR cdi (7).
+.PP
+When sent from the WAN provider, the primitive
+has no corresponding primitive in the
+.BR cdi (7).
+.PP
+Fields \fIwan_remtype\fP, \fIwan_remsize\fP and \fIwan_remaddr\fP are
+significant, \fIwan_status\fP and \fIwan_diag\fP are ignored.
+.RE
+.TP
+.B WC_CONCNF
+This command is valid when sent from the WAN provider to the WAN user; or from
+the WAN user to the WAN provider.
+.RS
+.PP
+When sent from the WAN provider, the primitive corresponds to the
+.BR CD_ENABLE_CON (7)
+primitive of the
+.BR cdi (7).
+.PP
+When sent from the WAN user, the primitive has no corresponding primitive in
+the
+.BR cdi (7).
+.PP
+Fields \fIwan_status\fP and \fIwan_diag\fP are significant, \fIwan_remtype\fP,
+\fIwan_remsize\fP and \fIwan_remaddr\fP are ignored.
+.RE
+.TP
+.B WC_DISC
+This command is valid when sent from the WAN user to the WAN provider; or from
+the WAN provider to the WAN user.
+.RS
+.PP
+When sent from the WAN user to the WAN provider, the primitive corresponds to
+the
+.BR CD_DISABLE_REQ (7)
+primtiive of the
+.BR cdi (7).
+.PP
+When sent from the WAN provider to the WAN user, the primitive corresponds to
+the
+.BR CD_ERROR_IND (7)
+primitive of the
+.BR cdi (7).
+.PP
+All fields are ignored.
+.RE
+.TP
+.B WC_DISCCNF
+This command is valid when sent from the WAN provider to the WAN user; or from
+the WAN user to the WAN provider.
+.RS
+.PP
+When sent from the WAN provider to the WAN user, this primitive corresponds to
+the
+.BR CD_DISABLE_CON (7)
+primitive of the
+.BR cdi (7).
+.PP
+When sent from the WAN user to the WAN provider, this primitive has no
+corresponding primitive in the
+.BR cdi (7).
+.PP
+Fields \fIwan_status\fP and \fIwan_diag\fP are significant, \fIwan_remtype\fP,
+\fIwan_remsize\fP and \fIwan_remaddr\fP are ignored.
+.RE
+.RE
+.TP
+.I wan_remtype
+When significant, conveys the type of the remote address.  This field may have
+one of the following values:
+.RS
+.TP
+.B WAN_TYPE_ASC
+The remote address contained in the \fIwan_remaddr\fP field consists of ASCII
+characters and the length field, \fIwan_remsize\fP, conveys the length of the
+ASCII address in characters (octets).
+.TP
+.B WAN_TYPE_BCD
+The remote address contained in the \fIwan_remaddr\fP field consists of BCD
+encoded digits and the length field, \fIwan_remsize\fP, conveys the length of
+the BCD address in digits (semi-octets).
+.PP
+This field is only significant in the \fBWAN_CONNECT\fP primitive.
+.RE
+.TP
+.I wan_remsize
+When significant, conveys the size of the remote address field,
+\fIwan_remaddr\fP, in digits.  Depending on the value of the \fIwan_remtype\fP
+field, this may either be octets or semi-octets.
+This field is only significant in the \fBWAN_CONNECT\fP primitive.
+.TP
+.I wan_remaddr
+When significant, conveys the remote address.  The address contained in this
+field is either represented as ASCII digits or BCD encoded digits, depending on
+the value of the \fIwan_remtype\fP field.
+This field is only significant in the \fBWAN_CONNECT\fP primitive.
+.TP
+.I wan_status
+When significant, provides the status for the \fBWC_CONCNF\fP or
+\fBWC_DISCCNF\fP command.  This field can have one of the following values:
+.RS
+.TP
+.B WAN_FAIL
+The preceding \fBWC_CONNECT\fP or \fBWC_DISC\fP command was unsuccessful.  The
+link remains disconnected or connected as the case may be.
+.TP
+.B WAN_SUCCESS
+The preceding \fBWC_CONNECT\fP or \fBWC_DISC\fP command was successful.  The
+link moves to the connected or disconnected state as the case may be.
+.PP
+This field is only significant in the \fBWC_CONCNF\fP and \fBWC_DISCCNF\fP
+primitives.
+.RE
+.TP
+.I wan_diag
+When significant and the status field is \fBWAN_FAIL\fP, provides diagnostic
+information concerning the failure.
+This field is only significant in the \fBWC_CONCNF\fP and \fBWC_DISCCNF\fP
+primitives when failure is indicated.
+.PP
+Should an error condition occur, an
+.BR M_ERROR (9)
+message is sent upstream with an appropriate error code, resulting in the
+failure of all system calls on the Stream until closed.
+The \fBWAN_CTL\fP primitive may fail when:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.TP
+.RB [ EINVAL ]
+The \fBM_PROTO\fP(9) message block is of an incorrect length for the
+primitive, or the \fIwan_command\fP is invalid.
+.TP
+.RB [ ENXIO ]
+The underlying device driver has encountered a fatal error.
+.TP
+.RB [ EIO ]
+The \fBWAN_CTL\fP primitive was issued from an incorrect state for the
+subnetwork entity.
+.TP
+.RB [ E2BIG ]
+The maximum receive buffer size is too small to hold the largest frame
+required by the device.
+.\"
+.SS WAN_DAT
+.PP
+This primitive class provides two primitives for the transfer of data across
+the service interface.  Attached
+.BR M_DATA (9)
+message blocks contain user data.
+These primitives are equivalent to the
+.BR CD_UNITDATA_REQ "(7) and " CD_UNITDATA_IND (7)
+primitives of the
+.BR cdi (7).
+.PP
+The
+.BR M_PROTO (9)
+message block is structured as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_msg {
+    uint8_t wan_type;
+    uint8_t wan_command;
+};
+\s+1\fP
+.fi
+.TP
+.I wan_type
+Always \fBWAN_DAT\fP.
+.TP
+.I wan_command
+Conveys the WAN command.  This may be one of the following values:
+.RS
+.TP
+.B WC_TX
+Specifies that the user data in the associated
+.BR M_DATA (9)
+message block consists of data for transmission.
+This primitive is equivalent to the
+.BR CD_UNITDATA_REQ (7)
+primitive of the
+.BR cdi (7).
+This primitive is issued by the WAN interface user.
+.TP
+.B WC_RX
+Indicates that the user data in the associated
+.BR M_DATA (9)
+message block consists of received data.
+This primitive is equivalent to the
+.BR CD_UNITDATA_IND (7)
+primitive of the
+.BR cdi (7).
+This primitive is issued by the WAN interface provider.
+.RE
+.PP
+Should an error condition occur, an
+.BR M_ERROR (9)
+message is sent upstream with an appropriate error code, resulting in the
+failure of all system calls on the Stream until closed.
+The \fBWAN_DAT\fP primitive may fail when:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.TP
+.RB [ EINVAL ]
+The \fBM_PROTO\fP(9) message block is of an incorrect length for the
+primitive.
+.TP
+.RB [ ENXIO ]
+The underlying device driver has encountered a fatal error.
+.TP
+.RB [ EIO ]
+The \fBWAN_DAT\fP primitive was issued from an incorrect state for the
+subnetwork entity.
+.TP
+.RB [ E2BIG ]
+The maximum receive buffer size is too small to hold the largest frame
+required by the device.
+.\"
+.SS WAN_NOTIFY
+.PP
+This primitive coresponds to the
+.BR CD_MODEM_SIG_IND (7)
+and
+.BR CD_ERROR_IND (7)
+primitives of the
+.BR cdi (7).
+.PP
+.nf
+\f(CW\s-1\
+struct wan_nty {
+    uint8_t wan_type;
+    uint8_t wan_spare[3];
+    uint32_t wan_snid;
+    uint32_t wan_eventstat;
+    uint32_t wan_reserved[2];
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_spare\fP\(em'u
+.I wan_type
+Always \fBWAN_NOTIFY\fP.
+.TP
+.I wan_spare
+Spare bytes for alignment, ignored by responder and set to zero by initiator.
+.TP
+.I wan_snid
+Conveys the subnetwork identifier.
+Equivalent to the Physical Point of Attachment (PPA) of the WAN interface.
+.TP
+.I wan_eventstat
+This member contains one of the following bit masks:
+.RS
+.TP
+.B W_RECEIVE_BUFFER_OVFL
+.PD 0
+.TP
+.B W_FRAMING_ERROR
+.TP
+.B W_TIMEOUT
+.TP
+.B W_HD_OVERRUN
+.TP
+.B W_ATTACHED_DEV_INACT
+.TP
+.B W_ATTACHED_DEV_ACTIVE
+.TP
+.B W_FCS_ERR
+.TP
+.B W_CTS_ON
+.TP
+.B W_CTS_OFF
+.TP
+.B W_DCD_ON
+.TP
+.B W_DCD_OFF
+.TP
+.B W_DSR_ON
+.TP
+.B W_DSR_OFF
+.TP
+.B W_RI_ON
+.TP
+.B W_RI_OFF
+.TP
+.B W_PARITY_ERROR
+.TP
+.B W_BREAK_DETECTED
+.TP
+.B W_SHORT_FRAME
+.TP
+.B W_TX_UNDERRUN
+.TP
+.B W_ABORT
+.TP
+.B W_RCL_NOTZERO
+.TP
+.B W_BSC_PAD_ERR
+.TP
+.B W_CTS_UNDERRUN
+.PD
+.RE
+.TP
+.I wan_reserved
+Reserved for future use.
+.\"
+.\"
+.SH STRUCTURES
+.PP
+The \fB@includedir@/@PACKAGE@/sys/wan_control.h\fR header file defines a
+number of structures, pointers to which are used as aguments to input-output
+controls.  These structures fall into four classes, identified by the value of
+the first byte of the structure, as follows:
+.TP \w'\fBWAN_STATS\fP\(em'u
+.B WAN_STATS
+A \fBwan_stioc\fP structure that identifies the subnetwork and contains the
+state and statistics associated with the subnetwork.
+Used with the \fBW_ZEROSTATS\fP and \fBW_GETSTATS\fP input-output controls.
+.TP
+.B WAN_TUNE
+A \fBwan_tnioc\fP structure that identifies the subnetwork and contains the
+tunable parameters associated with the subnetwork.
+Used with the \fBW_SETTUNE\fP and \fBW_GETTUNE\fP input-output controls.
+.TP
+.B WAN_MAP
+A \fBwanmapgf\fP, \fBwanmappf\fP, of \fBwanmapdf\fP structure that identifies
+the mapping entries, mapping entry or subnetwork, respectively.
+Used with the \fBW_GETWANMAP\fP, \fBW_PUTWANMAP\fP and \fBW_DELWANMAP\fP
+input-output controls, respectively.
+.TP
+.B WAN_PLAIN
+A \fBwan_hdioc\fP structure that identifiers the subnetwork.
+Used with the \fBW_STATUS\fP, \fBW_ENABLE\fP and \fBW_DISABLE\fP input-output
+controls.
+.TP
+.B WAN_SETSIG
+A \fBwan_setsigf\fP structure that identifies the subnetwork and contains the
+setting for leads associated with the subnetwork.
+Used with the \fBW_SETSIG\fP and \fBW_GETSIG\fP input-output controls.
+.PP
+These structures are described in detail in the subsections that follow.
+.\"
+.SS WAN_STATS
+.PP
+The value of \fBWAN_STATS\fP in the \fIw_type\fP field of the structure
+pointed to by the input-output control argument specifies that the pointed-to
+structure is a \fBwan_stioc\fP structure.  This structure is used by the
+\fBW_ZEROSTATS\fP and \fBW_GETSTATS\fP input-output controls.
+.PP
+The \fBwan_stioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_stioc {
+    uint8_t w_type;
+    uint8_t w_state;
+    uint8_t w_spare[2];
+    uint32_t w_snid;
+    hdlcstats_t hdlc_stats;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwan_stioc\fP structure contains the following members:
+.TP \w'\fIw_spare\fP\(em'u
+.I w_type
+Specifies the type of the structure associated with the input-output control.
+Always \fBWAN_STATS\fP.
+.TP
+.I w_state
+Returns the state of the subnetwork entity.  This member may have one of the
+following values:
+.RS
+.TP \w'\fBHDLC_DISABLED\fP\(em'u
+.B HDLC_IDLE
+The raw HDLC connection is idle.
+.PD 0
+.TP
+.B HDLC_ESTB
+The raw HDLC connection is established.
+.TP
+.B HDLC_DISABLED
+The raw HDLC connection is disabled.
+.TP
+.B HDLC_CONN
+The raw HDLC connection is connecting.
+.TP
+.B HDLC_DISC
+The raw HDLC connection is disconnecting.
+.PD
+.RE
+.TP
+.I w_spare
+Spare bytes for alignment: set to zero (0) by issuer and ignored by responder.
+.TP
+.I w_snid
+Specifies the subnetwork identifier.  Equivalent to the CDI Physical Point of
+Attachment (PPA).
+.TP
+.I hldc_stats
+Contains the \fBhdlcstats_t\fP structure described below.
+.PP
+The \fBhdlcstats_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct hstats {
+    uint32_t hc_txgood;
+    uint32_t hc_txurun;
+    uint32_t hc_rxgood;
+    uint32_t hc_rxorun;
+    uint32_t hc_rxcrc;
+    uint32_t hc_rxnobuf;
+    uint32_t hc_rxnflow;
+    uint32_t hc_rxoflow;
+    uint32_t hc_rxabort;
+    uint32_t hc_intframes;
+} hdlcstats_t;
+\s+1\fP
+.fi
+.PP
+The \fBhdlcstats_t\fP structure contains the following members, each
+reflecting a count since the last reset:
+.TP \w'\fIhc_intframes\fP\(em'u
+.I hc_txgood
+Number of good frames transmitted.
+.PD 0
+.TP
+.I hc_txurun
+Number of transmitter underruns.
+.TP
+.I hc_rxgood
+Number of good frames received.
+.TP
+.I hc_rxorun
+Number of receiver overruns.
+.TP
+.I hc_rxcrc
+Number of receiver CRC or framing errors.
+.TP
+.I hc_rxnobuf
+Number of receive buffer overflows.
+.TP
+.I hc_rxnflow
+Number of received frames with no flow control.
+.TP
+.I hc_rxoflow
+Number of receiver buffer overflows.
+.TP
+.I hc_rxabort
+Number of received aborts.
+.TP
+.I hc_intframes
+Number of frames failed to be transmitted by the loss of modem signals or other phsyical medium error.
+.PD
+.\"
+.SS WAN_TUNE
+.PP
+The value of \fBWAN_TUNE\fP in the \fIw_type\fP field of the structure pointed
+to by the input-output control argument specifies that the pointed-to
+structure is a \fBwan_tnioc\fP structure.  This structure is used by the
+\fBW_SETTUNE\fP and \fBW_GETTUNE\fP input-output controls.
+.PP
+The \fBwan_tnioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_tnioc {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+    wantune_t wan_tune;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwan_tnioc\fP structure contains the following members:
+.TP \w'\fIw_spare\fP\(em'u
+.I w_type
+Specifies the type of the structure associated with the input-output control.
+Always \fBWAN_TUNE\fP.
+.TP
+.I w_spare
+Spare bytes for alignment: set to zero (0) by issuer and ignored by responder.
+.TP
+.I w_snid
+Specifies the subnetwork identifier.  Equivalent to the CDI Physical Point of
+Attachment (PPA).
+.TP
+.I wan_tune
+Contains the \fBwantune_t\fP structure described below.
+.PP
+The \fBwantune_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    uint16_t WAN_options;
+    uint16_t WAN_pad;
+    struct WAN_hddef WAN_hd;
+} wantune_t;
+\s+1\fP
+.fi
+.PP
+The \fBwantune_t\fP structure contains the following members:
+.TP \w'\fIWAN_options\fP\(em'u
+.I WAN_options
+Specifies a number of WAN options associated with the device.  This member is
+a bitwise OR of zero or more of the following values:
+.RS
+.TP
+.B TRANSLATE
+When set, indicates that a translation using the WAN remote address to
+interface address mapping function is to be performed.
+.RE
+.TP
+.I WAN_pad
+Padding for alignment, set to zero by issuer and ignored by responder.
+.TP
+.I WAN_hd
+Contains the \fBWAN_hddef\fP structure described below.
+.PP
+The \fBWAN_hddef\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_hddef {
+    uint32_t WAN_baud;
+    uint16_t WAN_maxframe;
+    uint16_t WAN_interface;
+    union {
+        uint16_t WAN_cptype;
+        struct WAN_x21 WAN_x21def;
+        struct WAN_v25 WAN_v25def;
+    } WAN_cpdef;
+};
+\s+1\fP
+.fi
+.PP
+The \fBWAN_hddef\fP structure contains the following members:
+.TP
+.I WAN_baud
+Conveys the transmission rate in bits per second.
+.TP
+.I WAN_maxframe
+Conveys the maximum frame size in octets.
+.TP
+.I WAN_interface
+This member specifies the WAN interface.  It can assume one of the following
+values:
+.RS
+.TP \w'\fBWAN_X21\fP\(em'u
+.B WAN_X21
+The interface is an X.21 interface.
+.PD 0
+.TP
+.B WAN_V28
+The interface is an V.28 interface.
+.TP
+.B WAN_V35
+The interface is an V.35 interface.
+.TP
+.B WAN_V36
+The interface is an V.36 interface.
+.TP
+.B WAN_RS232
+The interface is an RS-232 interface.
+.TP
+.B WAN_RS422
+The interface is an RS-422 interface.
+.TP
+.B WAN_T1E1
+The interface is a G.703/G.704 interface.
+.TP
+.B WAN_ATM
+The interface is an ATM interface.
+.PD
+.RE
+.TP
+.I WAN_cpdef
+This member defines a number of alternate call procedural definitions
+described by a union.  The union contains the following members:
+.RS
+.TP
+.I WAN_cptype
+Specifies the type of the call procedural definitions.
+Always \fBWAN_NONE\fP, \fBWAN_X21P\fP, or \fBWAN_V25bis\fP.
+When \fIWAN_cptype\fP is \fBWAN_NONE\fP, only this member of the union is
+significant.
+.TP
+.I WAN_x21def
+When \fIWAN_cptype\fP is \fBWAN_X21P\fP, this member of the union is
+significant.
+This member contains the \fBWAN_x21\fP structure described below.
+.TP
+.I WAN_v25def
+When \fIWAN_cptype\fP is \fBWAN_V25bis\fP, this member of the union is
+significant.
+This member contains the \fBWAN_v25\fP structure described below.
+.RE
+.PP
+The \fBWAN_x21\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_x21 {
+    uint16_t WAN_cptype;
+    uint16_t T1;
+    uint16_t T2;
+    uint16_t T3A;
+    uint16_t T4B;
+    uint16_t T5;
+    uint16_t T6;
+};
+\s+1\fP
+.fi
+.PP
+The \fBWAN_x21\fP structure contains the following members:
+.TP
+.I WAN_cptype
+Specifies the type of the call procedural definitions.
+Always \fBWAN_X21P\fP.
+.TP
+.I T1
+The timeout for the call request state in deciseconds.
+.PD 0
+.TP
+.I T2
+The timeout for the EOS to data transfer in deciseconds.
+.TP
+.I T3A
+The timeout for call progress signals in deciseconds.
+.TP
+.I T4B
+The timeout for DCE provided information in deciseconds.
+.TP
+.I T5
+The timeout for DTE clear request in deciseconds.
+.TP
+.I T6
+The timeout for DTE clear confirm state in deciseconds.
+.PD
+.PP
+The \fBWAN_v25\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_v25 {
+    uint16_t WAN_cptype;
+    uint16_t callreq;
+};
+\s+1\fP
+.fi
+.PP
+The \fBWAN_v25\fP structure contains the following members:
+.TP
+.I WAN_cptype
+Specifies the type of the call procedural definitions.
+Always \fBWAN_V25bis\fP.
+.TP
+.I callreq
+Contains the abort time (in deciseconds) for the call request command if the
+network does not support CFI.
+.\"
+.SS WAN_MAP
+.PP
+The value of \fBWAN_MAP\fP in the \fIw_type\fP field of the structure pointed
+to by the input-output control argument specifies that the pointed-to
+structure is a \fBwanmapgf\fP, \fBwanmappf\fP or \fBwanmapdf\fP structure.
+These structures are used by the \fBW_GETWANMAP\fP, \fBW_PUTWANMAP\fP and
+\fBW_DELWANMAP\fP input-output controls, respectively.
+.PP
+The \fBwanmapgf\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wanmapgf {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+    wanget_t wan_ents;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwanmapgf\fP structure contains the following members:
+.TP \w'\fIw_spare\fP\(em'u
+.I w_type
+Specifies the type of the structure associated with the input-output control.
+Always \fBWAN_MAP\fP.
+.TP
+.I w_spare
+Spare bytes for alignment: set to zero (0) by issuer and ignored by responder.
+.TP
+.I w_snid
+Specifies the subnetwork identifier.  Equivalent to the CDI Physical Point of
+Attachment (PPA).
+.TP
+.I wan_ents
+Contains the \fBwanget_t\fP structure described below.
+.PP
+The \fBwanget_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    uint16_t first_ent;
+    uint16_t num_ent;
+    wanmap_t entries[0];
+} wanget_t;
+\s+1\fP
+.fi
+.PP
+The \fBwanget_t\fP structure contains the following members:
+.TP \w'\fIfirst_ent\fP\(em'u
+.I first_ent
+Specifies the index of the first entry in the \fIentries\fP member.
+.TP
+.I num_ent
+Specifies the number of entries in the \fIentries\fP member.
+.TP
+.I entries
+Contains \fInum_ent\fP entries of \fBwanmap_t\fP structures.  The
+\fBwanmap_t\fP structure is described below.
+.PP
+The \fBwanmappf\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wanmappf {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+    wanmap_t wan_ent;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwanmappf\fP structure contains the following members:
+.TP \w'\fIw_spare\fP\(em'u
+.I w_type
+Specifies the type of the structure associated with the input-output control.
+Always \fBWAN_MAP\fP.
+.TP
+.I w_spare
+Spare bytes for alignment: set to zero (0) by issuer and ignored by responder.
+.TP
+.I w_snid
+Specifies the subnetwork identifier.  Equivalent to the CDI Physical Point of
+Attachment (PPA).
+.TP
+.I wan_ent
+Contains the \fBwanmap_t\fP structure described below.
+.PP
+The \fBwanmap_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    uint8_t remsize;
+    uint8_t remaddr[20];
+    uint8_t infsize;
+    uint8_t infaddr[30];
+} wanmap_t;
+\s+1\fP
+.fi
+.PP
+The \fBwanmap_t\fP structure contains the following members:
+.TP \w'\fIremsize\fP\(em'u
+.I remsize
+Conveys the size of the remote address in octets.
+.PD 0
+.TP
+.I remaddr
+Contains the remote address, significant to \fIremsize\fP octets.
+.TP
+.I infsize
+Conveys the size of the interface address in octets.
+.TP
+.I infaddr
+Contains the interface address, significant to \fIinfsize\fP octets.
+.PD
+.PP
+The \fBwanmapdf\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wanmapdf {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwanmapdf\fP structure contains the following members:
+.TP \w'\fIw_spare\fP\(em'u
+.I w_type
+Specifies the type of the structure associated with the input-output control.
+Always \fBWAN_MAP\fP.
+.TP
+.I w_spare
+Spare bytes for alignment: set to zero (0) by issuer and ignored by responder.
+.TP
+.I w_snid
+Specifies the subnetwork identifier.  Equivalent to the CDI Physical Point of
+Attachment (PPA).
+.\"
+.SS WAN_PLAIN
+.PP
+The value of \fBWAN_PLAIN\fP in the \fIw_type\fP field of the structure
+pointed to by the input-output control argument specifies that the pointed-to
+structure is a \fBwan_hdioc\fP structure.  This structure is used by the
+\fBW_STATUS\fP, \fBW_ENABLE\fP and \fBW_DISABLE\fP input-output controls.
+.PP
+The \fBwan_hdioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_hdioc {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwan_hdioc\fP structure contains the following members:
+.TP \w'\fIw_spare\fP\(em'u
+.I w_type
+Specifies the type of the structure associated with the input-output control.
+Always \fBWAN_PLAIN\fP.
+.TP
+.I w_spare
+Spare bytes for alignment: set to zero (0) by issuer and ignored by responder.
+.TP
+.I w_snid
+Specifies the subnetwork identifier.  Equivalent to the CDI Physical Point of
+Attachment (PPA).
+.\"
+.SS WAN_SETSIG
+.PP
+The value of \fBWAN_SETSIG\fP in the \fIw_type\fP field of the structure
+pointed to by the input-output control argument specifies that the pointed-to
+structure is a \fBwan_setsigf\fP structure.  This structure is used by the
+\fBW_SETSIG\fP and \fBW_GETSIG\fP input-output controls.
+.PP
+The \fBwan_setsigf\fP structure is formatted a follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_setsigf {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+    wan_setsig_t wan_setsig;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwan_setsigf\fP structure containst the following members:
+.TP \w'\fIw_spare\fP\(em'u
+.I w_type
+Specifies the type of the structure associated with the input-output control.
+Always \fBWAN_SETSIG\fP.
+.TP
+.I w_spare
+Spare bytes for alignment: set to zero (0) by issuer and ignored by responder.
+.TP
+.I w_snid
+Specifies the subnetwork identifier.  Equivalent to the CDI Physical Point of
+Attachment (PPA).
+.TP
+.I wan_setsig
+Contains the \fBwan_setsig_t\fP structure described below.
+.PP
+The \fBwan_setsig_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    uint8_t w_ctrlsignal;
+    uint8_t w_reserved[3];
+} wan_setsig_t;
+\s+1\fP
+.fi
+.PP
+The \fBwan_setsig_t\fP structure contains the following members:
+.TP
+.I w_ctrlsignal
+Contains the control signals.  This can be a bitwise OR of zero or more of the
+following:
+.RS
+.TP \w'\fBW_RTS_HIGH\fP\(em'u
+.B W_RTS_HIGH
+Set or indicate RTS high, (or X.21 C signal).
+.PD 0
+.TP
+.B W_DTR_HIGH
+Set or indicate DTR high.
+.TP
+.B W_DCD_HIGH
+Indicate DCD high.
+.TP
+.B W_DSR_HIGH
+Indicate DSR high.
+.TP
+.B W_CTS_HIGH
+Indicate CTS high, (or X.21 I signal).
+.TP
+.B W_RI_HIGH
+Indicate RI high.
+.TP
+.B W_RTS_LOW
+Set RTS low.
+.TP
+.B W_DTR_LOW
+Set DTR low.
+.PD
+.RE
+.TP
+.I w_reserved
+Reserved field: set to zero (0) by issuer and ignored by responder.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The \fB@includedir@/@PACKAGE@/sys/wan_control.h\fP header file defines a
+number of input-output controls, as follows:
+.TP \w'\fBW_DELWANMAP\fP\(em'u
+.B W_ZEROSTATS
+Zeroes the statistics associated with a subnetwork entity and collects the
+statistics and state of the subnetwork prior to reset.
+.TP
+.B W_GETSTATS
+Retrieves the statistisc associated with a subnetwork entity.
+.TP
+.B W_SETTUNE
+Sets the tunable parameters associated with a subnetwork entity.
+.TP
+.B W_GETTUNE
+Retrieves the tunable parameters associated with a subnetwork entity.
+.TP
+.B W_PUTWANMAP
+Puts a remote address to interface address mapping entry.
+.TP
+.B W_GETWANMAP
+Gets a block of remote address to interface address mapping entries.
+.TP
+.B W_DELWANMAP
+Deletes all remote address to interface address mapping entries associated
+with a subnetwork entity.
+.TP
+.B W_STATUS
+Retrieve the status of a subnetwork entity.
+.TP
+.B W_ENABLE
+Enables a subnetwork entity for data transfer.
+.TP
+.B W_DISABLE
+Disables a subnetwork entity from data transfer.
+.PP
+These input-output controls are described in detail in the subsections that
+follow.
+.\"
+.SS W_ZEROSTATS
+.PP
+This input-output control takes an argument that is a pointer to a
+\fBwan_stioc\fP structure.
+It requests that the WAN driver reset the statistics associated with the
+\fIw_snid\fP contained in the passed-in structure.  The WAN driver is to reset
+the the statistics, returning the statistics and state immediately before
+reset in the \fIhdlc_stats\fP and \fIw_state\fP members of the provided
+structure.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.\"
+.SS W_GETSTATS
+This input-output control takes an argument that is a pointer to a
+\fBwan_stioc\fP structure.
+It requests that the WAN driver retrieve the statistics associated with the
+\fIw_snid\fP contained in the passed-in structure.  The WAN driver is to
+retrieve the current statistics and state, returning them in hte
+\fIhdlc_stats\fP and \fIw_state\fP members of the provided structure.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.\"
+.SS W_SETTUNE
+This input-output control takes an argument that is a pointer to a
+\fBwan_tnioc\fP structure.
+It requests that the WAN driver set the tunable parameters from the passed-in
+structure for the \fIw_snid\fP contained in that structure.  The WAN driver is
+to set the tunables, returning any negotiated values in the provided structure.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.TP
+.RB [ E2BIG ]
+The specified \fBWAN_maxframe\fP is of insufficient size to hold the maximum
+sized frame necessary for proper operation of the protocol.
+.TP
+.RB [ ENOMEM ]
+The WAN driver cannot allocate single message buffers of size
+\fIWAN_maxframe\fP.
+.TP
+.RB [ EIO ]
+The interace is an a wrong state.  For example, the tuning input-output
+control was issued after the interface was already registered with the
+\fBWAN_REG\fP primitive.
+.TP
+.RB [ EXDEV ]
+The \fIWAN_interface\fP does not match the capabilities or mode of the
+hardware.
+.\"
+.SS W_GETTUNE
+.PP
+This input-output control takes an argument that is a pointer to a
+\fBwan_tnioc\fP structure.
+It requests that the WAN driver get the tunable parameters associated with the
+\fIw_snid\fP contained in the passed-in structure.  The WAN driver is to
+retrieve the tunable parameters and return them in the provided structure.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.\"
+.SS W_PUTWANMAP
+.PP
+This input-output control takes an argumnt that is a pointer to a
+\fBwanmappf\fP structure.
+It requests that the WAN driver add a remote address to interface address
+mapping entry associated to the specified subnetwork identifier, \fIw_snid\fP.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.\"
+.SS W_GETWANMAP
+.PP
+This input-output control takes an argumnt that is a pointer to a
+\fBwanmapgf\fP structure.
+It requests that the WAN driver retrieve a block of remote address to
+interface address mapping entries associated with the specified subnetwork
+identifier, \fIw_snid\fP.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.\"
+.SS W_DELWANMAP
+.PP
+This input-output control takes an argumnt that is a pointer to a
+\fBwanmapdf\fP structure.
+It requests that the WAN driver delete all remote address to interface address
+mapping entries associated with the specified subnetwork identifier,
+\fIw_snid\fP.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.\"
+.SS W_STATUS
+.PP
+This input-output control takes an argument that is a pointer to a
+\fBwan_hdioc\fP structure.
+It requests that the WAN driver return the status of the \fIw_snid\fP
+contained in the passed-in structure.
+.PP
+When successful, the input-output control operation returns zero (0) when the
+associated \fIw_snid\fP is disabled, and one (1) when the associated
+\fIw_snid\fP is enabled.
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.\"
+.SS W_ENABLE
+.PP
+This input-output control takes an argument that is a pointer to a
+\fBwan_hdioc\fP structure.
+It request that the WAN driver enable data transfer for the \fIw_snid\fP
+contained in the passed-in structure.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.TP
+.RB [ EIO ]
+The interface is in the wrong state.
+.\"
+.SS W_DISABLE
+.PP
+This input-output control takes an argument that is a pointer to a
+\fBwan_hdioc\fP structure.
+It request that the WAN driver disable data transfer for the \fIw_snid\fP
+contained in the passed-in structure.
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.TP
+.RB [ EIO ]
+The interface is in the wrong state.
+.\"
+.\".SS W_SETLINE
+.\".PP
+.\"
+.\".SS W_GETLINE
+.\".PP
+.\"
+.SS W_SETSIG
+.PP
+This input-output control takes an argumnet that is a pointer to a
+\fBwan_setsigf\fP structure.
+It request that the WAN driver set the signals as specified.
+This input-output control is equivalent to the
+.BR CD_MODEM_SIG_REQ (7)
+primitive of
+.BR cdi (7).
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.TP
+.RB [ EIO ]
+The interface is in the wrong state.
+.\"
+.SS W_GETSIG
+.PP
+This input-output control takes an argumnet that is a pointer to a
+\fBwan_setsigf\fP structure.
+It request that the WAN driver retrieve the current signals.
+This input-output control is equivalent to the
+.BR CD_MODEM_SIG_POLL (7)
+primitive of
+.BR cdi (7).
+.PP
+When successful, the input-output control operation returns zero (0).
+.PP
+In addition to the errors that may be returned by
+.BR ioctl (2)
+and
+.BR streamio (7),
+errors that may be returned by this input-output control are as follows:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ ENODEV ]
+The specified \fIw_snid\fP is unknown or invalid.
+.TP
+.RB [ EINVAL ]
+The size of the structure corresponding to the passed-in argument is incorrect
+for the input-output control and \fIw_type\fP specified.
+.TP
+.RB [ ENXIO ]
+The underlying device has encountered a fatal error.
+.TP
+.RB [ EIO ]
+The interface is in the wrong state.
+.\"
+.\".SS W_RESET
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Spider Wide Area Network (WAN) interface is a proprietary interface
+without a \fIformal\fP standard (although its widespread use makes it an
+\fIipso facto\fP standard).  The Communications Device Interface (CDI),
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+should be used in its stead.
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B @PACKAGE_TITLE@
+implementation of the WAN interface has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR getpmsg (2s),
+.BR putpmsg (2s),
+.BR wan (4),
+.BR s_cdi (4),
+.BR cdi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B WAN
+interface is compatible with SpiderWAN,
+.[
+spiderx25wan
+.]
+.[
+spiderisdnwan
+.]
+and implementations based on SpiderWAN, such as
+AIXlink/X.25,
+.[
+aixlink
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+Solstice X.25,
+.[
+solx25pg
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+and others, with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Many implementations of SpiderWAN used under license have deviated from binary
+compatibility with the original interface specifications, both in the form and
+style of primitives and in the form of input-output controls supported.
+.[
+spiderx25wan
+.]
+.[
+spiderisdnwan
+.]
+.RS
+.PP
+Many implementations also provide their own extensions to the interface which
+are incompatible with all other implementations.  May of these extensions are
+purportedly in support of vendor-specific hardware, or systems.
+.PP
+.B @PACKAGE_TITLE@
+attempts to maintain \fIsource\fP compatibilty with the core features provided
+by most implementations, but compatibility with all features of all
+implementations is not possible.
+Your mileage may vary.
+.RE
+.IP \(em
+.B @PACKAGE_TITLE@
+provides a core \fIsource\fP compatible implementations of the SpiderWAN
+interface for the purposes of porting legacy WAN applications, drivers and
+modules to \fBLinux\fP with a minimal porting effort.
+While \fIsource\fP compatibility with core features is attempted, \fIbinary\fP
+compatibility is not attempted.  Any binary compatibility experienced could be
+broken in a subsequent release.
+.RS
+.PP
+New applications should use the Communications Device Interface (CDI),
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+instead.
+.RE
+.IP \(em
+For the \fBwan_tnioc\fP \fIwan_tune\fP member of type \fBwantune_t\fP:
+.I ARTIC
+.[
+radwan
+.]
+reversed the order of the \fIWAN_baud\fP and \fIWAN_maxframe\fP members
+(presumably for 32-bit alignment); but, also added device specific
+\fIWAN_phy_if\fP, \fIWAN_loopback\fP and \fIWAN_split_chn\fP members before
+the union.
+.I PT X.25
+.[
+ptx25
+.]
+renames the \fIWAN_interface\fP field to \fIWAN_auto_enabled\fP and gives the
+field a different meaning.
+.I Solstice X.25
+.[
+solx25dg
+.]
+sets the type of the \fIWAN_baud\fP field to \fBint\fP instead of
+\fBuint32_t\fP.
+.RS
+.PP
+.B @PACKAGE_TITLE@
+does not accomodate any of these implementation-dependent changes.
+.RE
+.PP
+For additional compatibility considerations, see
+.BR wan (4),
+.BR s_wan (4),
+.BR s_cdi (4),
+.BR cdi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms in its core features to the WAN interface as
+documented in
+AIXlink/X.25,
+.[
+aixlink
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+Solstice X.25,
+.[
+solx25pg
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Wide Area Network interface first appeared in Spider.
+.[
+spiderx25wan
+.]
+.[
+spiderisdnwan
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

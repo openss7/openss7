@@ -1,0 +1,856 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: wan.4.man,v 0.9.2.1 2008-07-01 12:16:22 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 12:16:22 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: wan.4.man,v $
+.\" Revision 0.9.2.1  2008-07-01 12:16:22  brian
+.\" - added manual pages, specs and conversion modules
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH WAN 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B wan, s_wan
+\- raw HDLC WAN Driver and Module
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sys/stream.h>
+.HP
+\fBint\fP \fIwan_stream\fP = \fBopen\fP(\fIwan_device\fP, \fIflags\fP);
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B WAN
+is a pseudo-device driver and pushable compatibility module that provides and
+interface to \fBWAN\fP Streams.  \fBWAN\fP pseudo-device driver Streams are raw
+HDLC
+.[
+iso3309
+.]
+Stream that present the Communications Device Interface (CDI),
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+service interface.
+These Streams provide raw HDLC in that they perform the data encapsulation into
+frames (for either asyncrhonous or synchronous operation) and perform
+addressing (Address Field) using the addresses passed across the service
+interface; however, elements of procedure for data link control (Control and
+Information Fields) are the responsibility of the service interface user.
+These Streams are of \fIcd_class\fP \fBCD_HDLC\fP and have a \fIcd_duplex\fP of
+either \fBCD_FULLDUPLEX\fP or \fBCD_HALFDUPLEX\fP. (See \fBCD_INFO_ACK\fP(7).)
+.PP
+The \fBs_wan\fP pushable Stream module is a compatibility module that converts
+a
+.B @PACKAGE_TITLE@
+CDI Stream into one compatible with the service primitive interface of
+Spider WAN, described under \*(lq\fIPRIMITIVES\fP,\*(rq below.  Streams with or
+without the \fBs_wan\fP module pushed process the Spider WAN input-output
+controls described under \*(lq\fIIOCTLS\fP,\*(rq below.
+.\"
+.\"
+.SH USAGE
+.PP
+During system initialization, the network configuration daemon and SNMP agent,
+.BR xnetd (8),
+opens \fBWAN\fP driver Streams and links them under a number of multiplexing
+device drivers such as
+.BR x25 (4),
+.BR ifr (4),
+and others.  \fBWAN\fP Streams are configured by the daemon and SNMP agent
+input-output controls.
+.PP
+User-level programs or multiplexing drivers wishing a Spider WAN compatible
+interface must push the \fBs_wan\fP module to be pushed onto the CDI Stream, or
+must open a minor device number on the \fBWAN\fP pseuod-device driver that is
+configured to
+.BR autopush (8)
+the
+.B s_wan
+module.
+.\"
+.\"
+.SH NOTICES
+.PP
+The \fBIFR\fP \fISTREAMS\fP driver was created from publicly available
+documentation of the driver's operation, primarily under \fIIRIX\fP\(rg.  This
+driver may not function identical to that actually present in any given Spider
+WAN or \fIIRIS\fP\(rg release.  Because this driver is not normally accessed by
+user-level programs and is primarily only involved in lower level system
+configuration, this should not be an issue when porting application-level
+programs from these environments to \fBLinux\fP.  See
+\*(lq\fICOMPATIBILITY\fP,\*(rq below, for specific compatibility
+considerations.
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+When the \fBs_wan\fP module is pushed, the
+.BR cdi (7)
+service interface is converted to be (source) compatible with the Spider WAN
+service interface, see \*(lq\fICOMPATIBILITY\fP,\*(rq below.
+Declarations of structures and symbolic constants necessary for this service
+interface are contained in the
+.B @includedir@/@PACKAGE@/sys/wan_proto.h
+header file.
+The Spider WAN (source) compatible service primitive interface is as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_primitives {
+    uint8_t wan_type;
+    struct wan_reg wreg;
+    struct wan_sid wsid;
+    struct wan_ctl wctl;
+    struct wan_msg wmsg;
+};
+\s+1\fP
+.fi
+.TP
+.B WAN_REG
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct wan_reg {
+    uint8_t wan_type;
+    uint8_t wan_spare[3];
+    uint32_t wan_snid;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_remaddr\fP\(em'u
+.I wan_type
+Always \fBWAN_REG\fP.
+.TP
+.I wan_spare
+Spare bytes for alignment, ignored by responder and set to zero by initiator.
+.TP
+.I wan_snid
+Conveys the subnetwork identifier.
+.RE
+.TP
+.B WAN_SID
+Equivalent to the
+.BR CD_ATTACH_REQ (7)
+primitive of the
+.BR cdi (7).
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct wan_sid {
+    uint8_t wan_type;
+    uint8_t wan_spare[3];
+    uint32_t wan_snid;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_remaddr\fP\(em'u
+.I wan_type
+Always \fBWAN_SID\fP.
+.TP
+.I wan_spare
+Spare bytes for alignment, ignored by responder and set to zero by initiator.
+.TP
+.I wan_snid
+Conveys the subnetwork identifier.
+Equivalent to the Physical Point of Attachment (PPA) of the WAN interface.
+.RE
+.TP
+.B WAN_CTL
+The primitive class consists of four primitives used to enable or disable the
+WAN interface.  These primitives are equivalent to the
+.BR CD_ENABLE_REQ (7),
+.BR CD_ENABLE_CON (7),
+.BR CD_DISABLE_REQ (7)
+and
+.BR CD_DISABLE_CON (7)
+primitives of the
+.BR cdi (7).
+.RS
+.PP
+The
+.BR M_PROTO (9)
+message block is structured as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_ctl {
+    uint8_t wan_type;
+    uint8_t wan_command;
+    uint8_t wan_remtype;
+    uint8_t wan_remsize;
+    uint8_t wan_remaddr[20];
+    uint8_t wan_status;
+    uint8_t wan_diag;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_remaddr\fP\(em'u
+.I wan_type
+Always \fBWAN_CTL\fP.
+.TP
+.I wan_command
+Conveys the WAN command.  This may be one of the following values:
+.RS
+.TP \w'\fBWC_CONNECT\fP\(em'u
+.B WC_CONNECT
+This command is valid when sent from the WAN user to the WAN provider.
+Equivalent to the
+.BR CD_ENABLE_REQ (7)
+primitive.
+Fields \fIwan_remtype\fP, \fIwan_remsize\fP and \fIwan_remaddr\fP are
+significant, \fIwan_status\fP and \fIwan_diag\fP are ignored.
+.TP
+.B WC_CONCNF
+This command is valid when sent from the WAN provider to the WAN user.
+Equivalent to the
+.BR CD_ENABLE_CON (7)
+primitive.
+Fields \fIwan_status\fP and \fIwan_diag\fP are significant, \fIwan_remtype\fP,
+\fIwan_remsize\fP and \fIwan_remaddr\fP are ignored.
+.TP
+.B WC_DISC
+This command is valid when sent from the WAN user to the WAN provider.
+Equivalent to the
+.BR CD_DISABLE_REQ (7)
+primitive.
+All fields are ignored.
+.TP
+.B WC_DISCCNF
+This command is valid when sent from the WAN provider to the WAN user.
+Equivalent to the
+.BR CD_DISABLE_CON (7)
+primitive.
+Fields \fIwan_status\fP and \fIwan_diag\fP are significant, \fIwan_remtype\fP,
+\fIwan_remsize\fP and \fIwan_remaddr\fP are ignored.
+.RE
+.TP
+.I wan_remtype
+When significant, conveys the type of the remote address.  This field may have
+one of the following values:
+.RS
+.TP \w'\fBWAN_TYPE_ASC\fP\(em'u
+.B WAN_TYPE_ASC
+The remote address contained in the \fIwan_remaddr\fP field consists of ASCII
+characters and the length field, \fIwan_remsize\fP, conveys the length of the
+ASCII address in characters (octets).
+.TP
+.B WAN_TYPE_BCD
+The remote address contained in the \fIwan_remaddr\fP field consists of BCD
+encoded digits and the length field, \fIwan_remsize\fP, conveys the length of
+the BCD address in digits (semi-octets).
+.PP
+This field is only significant in the \fBWAN_CONNECT\fP primitive.
+.RE
+.TP
+.I wan_remsize
+When significant, conveys the size of the remote address field,
+\fIwan_remaddr\fP, in digits.  Depending on the value of the \fIwan_remtype\fP
+field, this may either be octets or semi-octets.
+This field is only significant in the \fBWAN_CONNECT\fP primitive.
+.TP
+.I wan_remaddr
+When significant, conveys the remote address.  The address contained in this
+field is either represented as ASCII digits or BCD encoded digits, depending on
+the value of the \fIwan_remtype\fP field.
+This field is only significant in the \fBWAN_CONNECT\fP primitive.
+.TP
+.I wan_status
+When significant, provides the status for the \fBWC_CONCNF\fP or
+\fBWC_DISCCNF\fP command.  This field can have one of the following values:
+.RS
+.TP \w'\fBWAN_SUCCESS\fP\(em'u
+.B WAN_FAIL
+The preceding \fBWC_CONNECT\fP or \fBWC_DISC\fP command was unsuccessful.  The
+link remains disconnected or connected as the case may be.
+.TP
+.B WAN_SUCCESS
+The preceding \fBWC_CONNECT\fP or \fBWC_DISC\fP command was successful.  The
+link moves to the connected or disconnected state as the case may be.
+.PP
+This field is only significant in the \fBWC_CONCNF\fP and \fBWC_DISCCNF\fP
+primitives.
+.RE
+.TP
+.I wan_diag
+When significant and the status field is \fBWAN_FAIL\fP, provides diagnostic
+information concerning the failure.
+This field is only significant in the \fBWC_CONCNF\fP and \fBWC_DISCCNF\fP
+primitives when failure is indicated.
+.RE
+.TP
+.B WAN_DAT
+This primitive class provides two primitives for the transfer of data across
+the service interface.  Attached
+.BR M_DATA (9)
+message blocks contain user data.
+These primitives are equivalent to the
+.BR CD_UNITDATA_REQ "(7) and " CD_UNITDATA_IND (7)
+primitives of the
+.BR cdi (7).
+.RS
+.PP
+The
+.BR M_PROTO (9)
+message block is structured as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_msg {
+    uint8_t wan_type;
+    uint8_t wan_command;
+};
+\s+1\fP
+.fi
+.TP \w'\fIwan_remaddr\fP\(em'u
+.I wan_type
+Always \fBWAN_DAT\fP.
+.TP
+.I wan_command
+Conveys the WAN command.  This may be one of the following values:
+.RS
+.TP
+.B WC_TX
+Specifies that the user data in the associated
+.BR M_DATA (9)
+message block consists of data for transmission.
+Equivalent to the
+.BR CD_UNITDATA_REQ (7)
+primitive.
+This primitive is issued by the WAN interface user.
+.TP
+.B WC_RX
+Indicates that the user data in the associated
+.BR M_DATA (9)
+message block consists of received data.
+Equivalent to the
+.BR CD_UNITDATA_IND (7)
+primitive.
+This primitive is issued by the WAN interface provider.
+.RE
+.RE
+.\"
+.\"
+.SH IOCTLS
+.PP
+.TP
+.B W_ZEROSTATS
+Zeroes the statistics associated with the subnetwork identified by the \fIw_snid\fP field of the
+argument.
+.B W_ZEROSTATS
+takes a pointer to a
+.B wan_hdioc
+or
+.B wan_stioc
+structure.  When the pointer points to a \fBwan_stioic\fP structure, the statistics will be
+collected in the same fashion as \fBW_GETSTATS\fP immediately before zeroing the statistics.
+The
+.B wan_stioc
+structure is defined below under \*(lq\fIW_GETSTATS\fP.\*(rq
+The
+.B wan_hdioc
+structure is defined below under \*(lq\fIW_ENABLE\fP.\*(rq
+.TP
+.B W_GETSTATS
+Retrieves the statistics associated with the subnetwork identified by the \fIw_snid\fP field of the
+argument.
+.B W_GETSTATS
+takes a pointer to a
+.B wan_stioc
+structure into which the statistics will be collected.
+.RS
+.PP
+The
+.B wan_stioc
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_stioc {
+    uint8_t w_type;
+    uint8_t w_state;
+    uint8_t w_spare[2];
+    uint32_t w_snid;
+    hdlcstats_t hdlc_stats;
+};
+\s+1\fP
+.fi
+.PP
+The
+.B wan_stioc
+structure contains the following members:
+.TP \w'\fIhdlc_stats\fP\(em'u
+.I w_type
+Always \fBWAN_STATS\fP.
+.TP
+.I w_state
+Returns the state of the HDLC link.  This is one of the following values:
+.RS
+.TP
+.B HDLC_IDLE
+.PD 0
+.TP
+.B HDLC_ESTB
+.TP
+.B HDLC_DISABLED
+.TP
+.B HDLC_CONN
+.TP
+.B HDLC_DISC
+.PD
+.RE
+.TP
+.I w_spare
+Spare bytes for alignment.  Always set to zero by the issuer and ignored by the receiver.
+.TP
+.I w_snid
+The subnetwork (link) identifier for which to retrieve statistics.
+.TP
+.I hdlc_stats
+This member consists of a \fBhdlcstats_t\fP structure containing the statitics for the WAN
+interface.
+.PP
+The
+.B hdlcstats_t
+structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct hstats {
+    uint32_t hc_txgood;
+    uint32_t hc_txurun;
+    uint32_t hc_rxgood;
+    uint32_t hc_rxorun;
+    uint32_t hc_rxcrc;
+    uint32_t hc_rxnobuf;
+    uint32_t hc_rxnflow;
+    uint32_t hc_rxoflow;
+    uint32_t hc_rxabort;
+    uint32_t hc_intframes;
+} hdlcstats_t;
+\s+1\fP
+.fi
+.PP
+The
+.B hdlcstats_t
+structure contains the following members:
+.TP \w'\fIhc_intframes\fP\(em'u
+.I hc_txgood
+The count of the number of frames transmitted without error.
+.TP
+.I hc_txurun
+The count of the number of frames transmitted for which tranmitter underruns occured.
+.TP
+.I hc_rxgood
+The count of the number of frames received without error.
+.TP
+.I hc_rxorun
+The count of the number of frames received for which receiver overruns occured.
+.TP
+.I hc_rxcrc
+The count of the number of frames received that contained CRC or Framing errors.
+.TP
+.I hc_rxnobuf
+The count of the number of frames received for which no buffer could be allocated.
+.TP
+.I hc_rxnflow
+The count of the number of frames received for which no flow control.
+.TP
+.I hc_rxoflow
+The count of the number of frames received for which buffer overflows were encountered.
+.TP
+.I hc_rxabort
+The count of the number of frames received which contained aborts.
+.TP
+.I hc_intframes
+The count of the number of frames failed to be transmitted due to loss of modem signals.
+.RE
+.TP
+.B W_SETTUNE
+Sets the tunable parameters associated with the subnetwork identifier specified
+in the argument.  The argument to the input-output control is a pointer to a
+\fBwan_tnioc\fP structure, described below.
+.RS
+.PP
+The \fBwan_tnioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_tnioc {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+    wantune_t wan_tune;
+};
+\s+1\fP
+.fi
+.TP
+.I w_type
+Always \fBWAN_TUNE\fP indicating that a \fBwan_tnioc\fP structure is the
+argumnent of the input-output control.
+.TP
+.I w_spare
+Spare bytes for alignment.  Always set to zero by the user and ignored by the
+provider.
+.TP
+.I w_snid
+The subnetwork (link) identifier for which to set or retrieve tunables. 
+.TP
+.I wan_tune
+Contains a \fBwantune_t\fP structure that conveys the tunables.
+.PP
+The \fBwantune_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct wantune {
+    uint16_t WAN_options;
+    struct WAN_hddef WAN_hd;
+} wantune_t;
+\s+1\fP
+.fi
+.TP
+.I WAN_options
+This field is a bitwise OR of zero or more of the following flags:
+.RS
+.TP \w'\fBTRANSLATE\fP\(em'u
+.B TRANSLATE
+When this bit is present, translate the remote address to an interface address
+using the WAN address mapping tables.
+.RE
+.TP
+.I WAN_hd
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_hddef {
+    uint16_t WAN_maxframe;
+    uint32_t WAN_baud;
+    uint16_t WAN_interface;
+    wancpdef_t WAN_cpdef;
+};
+\s+1\fP
+.fi
+.TP
+.I WAN_maxframe
+Sets the maximum frame size (in bits).
+.TP
+.I WAN_baud
+For asynchronous interfaces, sets the baud rate associated with the interface.
+.TP
+.I WAN_interface
+Specifies the interface type.  This field can have one of the following values:
+.RS
+.TP
+.B WAN_X21
+.PD 0
+.TP
+.B WAN_V28
+.TP
+.B WAN_V35
+.PD
+.RE
+.TP
+.I WAN_cpdef
+This field contains a \fBwancpdef_t\fP union that provides alternative settings
+depending on the included type.
+.PP
+The \fBwancpdef_t\fP union is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef union {
+    uint16_t WAN_cptype;
+    struct WAN_x21 WAN_x21def;
+    struct WAN_v25 WAN_v25def;
+} wancpdef_t;
+\s+1\fP
+.fi
+.TP
+.I WAN_cptype
+Determines the structure contained in the \fBwancpdef_t\fP union that is
+relevant.  This field can have one of the following values:
+.RS
+.TP \w'\fBWAN_V25bis\fP\(em'u
+.B WAN_NONE
+There is no structure contained in the union.  Only the
+.I WAN_cptype
+member is significant.
+.TP
+.B WAN_X21P
+There is a \fBWAN_x21\fP structure contained in the union.  The
+.I WAN_x25def
+member is significant.
+.TP
+.B WAN_V25bis
+There is a \fBWAN_v25\fP structure contained in the union.  The
+.I WAN_v25def
+member is significant.
+.RE
+.TP
+.I WAN_x21def
+Significant when the \fIWAN_cptype\fP member is set to \fBWAN_X21P\fP.  When
+significant, this member contains a \fBWAN_x21\fP structure.
+.TP
+.I WAN_v25def
+Significant when the \fIWAN_cptype\fP member is set to \fBWAN_V25bis\fP.  When
+significant, this member contains a \fBWAN_v25\fP structure.
+.PP
+The \fBWAN_x21\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_x21 {
+    uint16_t WAN_cptype;
+    uint16_t T1;
+    uint16_t T2;
+    uint16_t T3A;
+    uint16_t T4B;
+    uint16_t T5;
+    uint16_t T6;
+};
+\s+1\fP
+.fi
+.TP \w'\fIWAN_cptype\fP\(em'u
+.I WAN_cptype
+Always \fBWAN_X21P\fP.
+.TP
+.I T1
+Call request state timer.
+.TP
+.I T2
+EOS to data transfer timer.
+.TP
+.I T3A
+Call progress signals timer.
+.TP
+.I T4B
+DCE provided info timer.
+.TP
+.I T5
+DTE clear request timer.
+.TP
+.I T6
+DTE clear configuration state timer.
+.PP
+The \fBWAN_v25\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct WAN_v25 {
+    uint16_t WAN_cptype;
+    uint16_t callreq;
+};
+\s+1\fP
+.fi
+.TP \w'\fIWAN_cptype\fP\(em'u
+.I WAN_cptype
+Always \fBWAN_V25bis\fP.
+.TP
+.I callreq
+.RE
+.TP
+.B W_GETTUNE
+Gets the tunable parameters associated with the subnetwork identifier specified
+in the argument.  The arugment to the input-output control is a pointer to a
+\fBwan_tnioc\fP structure, described under \*(lq\fIW_SETTUNE\fP,\*(rq above.
+.TP
+.B W_PUTWANMAP
+.TP
+.B W_GETWANMAP
+.TP
+.B W_DELWANMAP
+.TP
+.B W_STATUS
+.TP
+.B W_ENABLE
+Enables the WAN interface identified by the \fIw_snid\fP field in the passed in
+structure.
+The argument to the input-output control is a pointer to a \fBwan_hdioc\fP
+structure, described below.
+.RS
+.PP
+The \fBwan_hdioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct wan_hdioc {
+    uint8_t w_type;
+    uint8_t w_spare[3];
+    uint32_t w_snid;
+};
+\s+1\fP
+.fi
+.PP
+The \fBwan_hdioc\fP structure contains the following members:
+.TP
+.I w_type
+Always \fBWAN_PLAIN\fP.
+.TP
+.I w_spare
+Spare bytes for alignment.  Set to zero by the user and ignored by the provider.
+.TP
+.I w_snid
+The subnetwork (link) identifier for which to enable, disable, or zero statistics.
+.RE
+.TP
+.B W_DISABLE
+Disables the WAN interface identified by the \fIw_snid\fP field in the passed in
+structure.
+The argument to the input-output control is a pointer to a \fBwan_hdioc\fP
+structure, described under \*(lq\fIW_ENABLE\fP,\*(rq above.
+.\"
+.\"
+.SH MODULES
+.TP
+.B s_wan
+Spider WAN compatibility module.
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/streams/clone/wan
+A clone Style 2 DLPI pseudo-device driver providing access to \fBLinux\fP
+devices supporting the generic HDLC.
+.TP
+.BI /dev/streams/wan/ n
+A non-clone Style 1 DLPI pseudo-device driver providing access fo \fBLinux\fP
+devices supporting the generic HDLC.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The \fBWAN\fP pseudo-device driver is compatible with DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and implementations based on Spider Frame Relay and Spider X.25, such as
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR Solstice \(rg,
+and others, with the following portability considrations:
+.IP \(em \w'\(em\(em'u
+It appears that the Spider WAN implementation present in \fIIRIS\fP\(rg
+implemented its own service interface and input output controls rather than
+using a standard service interface.  Because of the widespread use of this
+interface, the \fBs_wan\fP, module provides the ability to convert between the
+\fB@PACKAGE_TITLE@\fP CDI,
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+interface and the Spider WAN interface.  \fB@PACKAGE_TITLE@\fP multiplexing
+drivers accept Stream providing the
+.BR cdi (7)
+interface instead of the Spider WAN interface.
+.IP \(em
+.IP \(em
+.PP
+For additional compatibility information, see
+.BR ifr (4),
+.BR ifrdlci (8),
+.BR ifrtune (8),
+.BR mfeproto (8),
+.BR mfevc (8),
+.BR pvcmap (8),
+.BR lltune (8),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B WAN
+driver first appeared in Spider X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

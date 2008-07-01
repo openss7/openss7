@@ -1,0 +1,309 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: mfe.4.man,v 0.9.2.1 2008-07-01 12:16:22 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 12:16:22 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mfe.4.man,v $
+.\" Revision 0.9.2.1  2008-07-01 12:16:22  brian
+.\" - added manual pages, specs and conversion modules
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH MFE 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.SH NAME
+.B mfe
+\- Multi-Protocol over Frame Relay Encapsulation (MFE) Driver
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sys/stream.h>
+.HP
+\fBint\fP \fIifr_stream\fP = \fBopen\fP(\fIifr_device\fP, \fIflags\fP);
+.HP
+\fBint\fP \fImfe_stream\fP = \fBopen\fP(\fImfe_device\fP, \fIflags\fP);
+.HP
+\fBint\fP \fIretval\fP = \fBioctl\fP(\fImfe_device\fP, \fRI_LINK\fP, \fIifr_stream\fP);
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+Multi-Protocol over Frame Relay Encapsulation, \fBMFE\fP, is a \fISTREAMS\fP
+multiplexing driver that provides support for multiple protocols over Frame
+Relay WAN connections, in accordance with X.36,
+.[
+x36
+.]
+RFC 2427,
+.[
+rfc2427
+.]
+and
+FRF 3.2.
+.[
+frf32
+.]
+.PP
+The MFE driver may also utility the services of the Frame Relay IMLI.
+.PP
+\fBMFE\fP is a multiplexing driver.  The upper multiplex service interface is
+the Data Link Provider Interface (DLPI) Revision 2.0.0.
+.[
+dlpi revision 2.0.0
+.]
+The MAC Type for this upper multiplex service interface is
+.BR DL_MPFRAME .
+The lower multiplex service interface is also a DLPI Revision 2.0.0 interface
+with MAC Type
+.BR DL_FRAME .
+Although any DLPI 2 \fBDL_FRAME\fP driver Stream may be linked beneath the
+\fBMFE\fP driver, it is expected that
+.BR ifr (4)
+driver Streams will be used.
+.\"
+.\"
+.SH USAGE
+.PP
+During system initialization, an MFE daemon agent opens the \fBMFE\fP driver
+and links a number of Frame Relay LAPF Streams,
+.BR ifr (4),
+beneath the multiplexing driver using the
+.BR I_LINK (7)
+.I STREAMS
+input-output controls from
+.BR streamio (7).
+Linking Frame Relay Streams in this fashion associates FR VC or PVC Stream for
+use by the \fBMFE\fP driver Stream.
+.PP
+The linked FR Streams are then configured using the \fBIFR_SNREG\fP input-output
+control, described below under \*(lq\fIIOCTLS\fP.\*(rq
+.PP
+The agent then pushes the
+.BR mpfr (4)
+module on the open
+.B DL_FRAME
+DLPI Streams.
+.PP
+Each Stream configured in this fashion provides an additional Network
+interface (virtual NIC) in the native \fBLinux\fP networking subsystem.
+.PP
+Subsequent actions and use of the Stream are then placed under the control of
+native \fBLinux\fP networking.  When the interface is moved to the UP state,
+FR VC or PVC will be connected or attached, and protocol packets will begin to
+flow across the interface.  When the interface is moved to the DOWN state, FR
+VC or PVC will be disconnected or detached, and protocol packets will cease to
+flow across the interface.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B MFE
+.I STREAMS
+driver was created from publicly available documentation of the driver's
+operation, primarly under
+.IR IRIS \(rg.
+This driver may not function identical to that actually present in any given
+Spider Frame Relay or
+.IR IRIS \(rg
+release.  Because this driver is not normally accessed by user-level programs
+and is primarily only invoved in lower level system configuration, this should
+not be an issue when porting application-level programs from these
+environments to \fBLinux\fP.  See \*(lq\fICOMPATIBILITY\fP,\*(rq below, for
+specific compatibility considerations.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The \fBMFE\fP multiplexing driver defines the input-output controls detailed
+in the subsections that follow.
+.\"
+.SS MFE_SNREG
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.B /dev/streams/clone/mfe
+The \fBMFE\fP driver clone device.
+.TP
+.BI /dev/streams/mfe/ n
+The n'th \fBMFE\fP device protocol.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ifr (4),
+.BR ifrdlci (8),
+.BR ifrdlciconf (5),
+.BR ifrtune (8),
+.BR ifrtemplate (5),
+.BR mfeproto (8),
+.BR mfeprotoconf (5),
+.BR mfevc (8),
+.BR mfetemplate (5),
+.BR pvcmap (8),
+.BR lltune (8),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The \fBMFE\fP multiplexing driver is compatible with DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and implementations based on Spider Frame Relay, such as
+.IR AIX \(rg,
+.IR HP-UX \(rg,
+.IR IRIX \(rg,
+.IR Solstice \(rg,
+and others, with the following portability considrations:
+.IP \(em \w'\(em\(em'u
+Because this driver is not intended to be accessed by user-level programs and
+is primarily involved in lower level system configuration, portable
+applications will not access specific input-output controls or other
+facilities provided by this driver.  Input-output controls compatibile with
+Spider Frame Relay have been provided only to assist in porting applications,
+drivers and modules to \fBLinux\fP.  Nevertheless, binary compatibility is not
+attempted and input-output controls may function differently under
+.B @PACKAGE_TITLE@
+in subtle ways.
+.IP \(em
+Because system configuration is not standardized, configuration programs tend
+to be system-specific.
+.B @PACKAGE_TITLE@
+attempts to be compatible to the level of the system configuration file and
+utilities.
+.IP \(em
+Under
+.IR Solaris \(rg,
+the configuration agent daemon is called
+.BR x25netd (8).
+.B @PACKAGE_TITLE@
+calls this agent
+.BR xnetd (8).
+.IP \(em
+Under
+.IR IRIX \(rg,
+the configuration agents are called
+.BR mfeproto (8)
+and
+.BR mfevc (8),
+as they are int
+.BR @PACKAGE_TITLE@ .
+.IP \(em
+It appears that fields specifying time durations were specified using system
+clock ticks by the original Spider Frame Relay.
+.B @PACKAGE_TITLE@
+uses the system clock agnostic value of milliseconds for these fields instead.
+Management software, such as
+.BR mfevc (8),
+specify these values in seconds or deciseconds.
+.IP \(em
+The
+.BR MFE
+driver is provided for compatibility when porting from Spider Frame Relay
+based systems to \fBLinux\fP.  Binary compatibility is not attempted.  Any
+binary compatibility experienced will likely be changed in the next release.
+.PP
+For additional compatibility information, see
+.BR ifr (4),
+.BR ifrdlci (8),
+.BR ifrtune (8),
+.BR mfeproto (8),
+.BR mfevc (8),
+.BR pvcmap (8),
+.BR lltune (8),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI.
+.[
+dlpi revision 2.0.0
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B MFE
+driver first appeared in Spider Frame Relay.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
