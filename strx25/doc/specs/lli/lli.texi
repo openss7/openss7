@@ -1,0 +1,1871 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% =========================================================================
+%
+% @(#) $Id: lli.texi,v 0.9.2.1 2008-07-01 12:16:23 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2008-07-01 12:16:23 $ by $Author: brian $
+%
+% =========================================================================
+\input texinfo @c -*-texinfo-*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c %**start of header
+@setfilename lli.info
+@include texi/args.texi
+@set MANUAL_TITLE Link Layer Interface
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* LLI: (lli).			Link Layer Interface Specification
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE Link Layer Interface
+@set MANUAL_TYPE Specification
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the SpiderX.25 Link Layer Interface.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release
+@value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
+Corporation}.
+
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org,Brian F. G. Bidulock} @*
+
+All Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this manual
+provided the copyright notice and this permission notice are preserved on all
+copies.
+
+@ignore
+Permission is granted to process this file through Tex and print the results,
+provided the printed document carries copying permission notice identical to
+this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name OpenSS7
+Corporation not be use in advertising or publicity pertaining to distribution
+of the software without specific, written prior permission.  OpenSS7 Corporation
+makes no representations about the suitability of this documentation for any
+purpose.  It is provided ``as is'' without express or implied warranty.
+
+Permission is granted to copy and distribute modified versions of this manual
+under the conditions for verbatim copying, provided the entire resulting
+derived work is distributed under the terms of a permission notice identical to
+this one.
+
+Permission is granted to copy and distribute translations of this manual into
+another language, under the above conditions for modified versions.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE Link Layer Interface
+@set MANUAL_TYPE Specification
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2008  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TITLE} containing technical details concerning
+the implementation of the @value{MANUAL_TITLE} for OpenSS7.  It contains
+recommendations on software architecture as well as platform and system
+applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the LAPB
+Protocol (ISO/IEC 7776) and LLC2 Protocol (ISO/IEC 8802) service interface to
+these components as well as providing a basis for link layer control for other
+protocols.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@ignore
+@noindent
+This software and related documentation is protected by copyright and
+distributed under licenses restricting its use, copying, distribution and
+decompilation.  No part of this software or related documentation may be
+reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
+
+@noindent
+The recipient of this document, by its retention and use, warrants that the
+recipient will protect this information and keep it confidential, and will not
+disclose the information contained in this document without the written
+permission of its owner.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation
+for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of the
+technical arts, or the reflection of changes in the design of any techniques, or
+procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
+under no obligation to provide any feature listed herein.
+@end ignore
+
+@noindent
+Permission to use, copy and distribute this documentation without modification,
+for any purpose and without fee or royalty is hereby granted, provided that both
+the above copyright notice and this permission notice appears in all copies and
+that the name of OpenSS7 Corporation not be used in advertising or publicity
+pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation
+about the suitability of this documentation for any purpose.  It is provided
+``as is'' without express or implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR
+OTHER RIGHTS..  IN NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT,
+INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
+FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF THIS
+DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation
+for any reason, including but not limited to, conformity with standards
+promulgated by various agencies, utilization of advances in the state of the
+technical arts, or the reflection of changes in the design of any techniques, or
+procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
+under no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defcodeindex pr
+@c Define an index of primitive values
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
+@c Define an index of protocol states
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
+
+@c syncodeindex pr cp
+@c syncodeindex pv cp
+@c syncodeindex st cp
+@c syncodeindex tp cp
+@c syncodeindex vr cp
+@c syncodeindex ct cp
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@macro prim {name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval {name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr {name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta {name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm {name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc {name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@ifnottex
+@node Top
+@top Link Layer Interface
+@end ifnottex
+
+@menu
+* Introduction::
+* Model of the Link Layer::
+* LLI Services::
+* LLI Message Primitives::
+@c * Allowable Sequence of LLI Primitives::
+* LLI Input-Output Controls::
+* LLI Header Files::
+@c * LLI Library::
+* LLI Drivers and Modules::
+* LLI Utilities::
+* LLI File Formats::
+* LLI Compatibility and Porting::
+* Glossary of LLI Terms and Acronyms::
+* References::
+* Index::
+@end menu
+
+@node Introduction
+@chapter Introduction
+
+The Link Layer Interface (LLI) was developed by Spider Systems, Ltd., (now a
+division of Emerson Power) and is widely available on many platforms.  For
+example, @cite{AIX AIXlink/X.25}, @cite{HP-UX X.25/9000}, @cite{IRIX IRIS
+SX.25}, @cite{PT X.25}, @cite{RadiSys WAN}, @cite{SBE X.25}, @cite{Solaris
+SunLink X.25} and @cite{Solaris Solstice X.25}, implement the Link Layer
+Interface (LLI).@footnote{But, for the most part, it is not called the @i{Link
+Lyaer Interface}, but is instead sunk inside the Network Layer Interface
+(NLI).}
+
+The Link Layer Interface (LLI) as designed to be used directly with standard
+@dfn{STREAMS} system calls and does not require the use of a cooperating user
+space shared library.  Applications programs directly use the
+@command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)},
+@command{putpmsg(2)} and @command{ioctl(2)} system calls.@footnote{See
+@manref{getmsg(2s)}, @manref{getpmsg(2)}, @manref{putmsg(2s)},
+@manref{putpmsg(2)} and @manref{ioctl(2)} manual pages.}  Nevertheless, user
+shared object libraries can easily be constructed using this @dfn{STREAMS}
+service primitive interface.
+
+The system header files that must be included when compiling user applications,
+or @dfn{STREAMS} drivers and modules that use the interface, are detailed in
+@ref{LLI Header Files}.
+
+A user library, @file{libdlpi}, is provided, not for interfacing to the message
+primitive service interface, but for providing various helper functions when
+using the @dfn{STREAMS} service interface.  This library is detailed in @ref{LLI
+Library}.
+
+@node Model of the Link Layer
+@chapter Model of the Link Layer
+
+@node LLI Services
+@chapter LLI Services
+
+@menu
+* LLI Commands::
+* LLI Data Structures::
+@end menu
+
+@node LLI Commands
+@section LLI Commands
+
+@node LLI Data Structures
+@section LLI Data Structures
+
+@node LLI Message Primitives
+@chapter LLI Message Primitives
+
+Although it perhaps did not at first, the LLI uses the service primitives and
+message format of the @cite{Data Link Provider Interface}, @ref{DLPI,,DLPI}.
+
+@c @node Allowable Sequence of LLI Primitives
+@c @chapter Allowable Sequence of LLI Primitives
+
+@node LLI Input-Output Controls
+@chapter LLI Input-Output Controls
+
+@menu
+* Input-Output Control Data Structures::
+* Input-Output Control Commands::
+@end menu
+
+@node Input-Output Control Data Structures
+@section Input-Output Control Data Structures
+
+@menu
+* LI_PLAIN - Plain Data Structures::
+* LI_SNID - Subnetwork Identifier Data Strucures::
+* LI_STATUS - Status Data Strucures::
+* LI_STATS - Statistics Data Structures::
+* LI_GSTATS - Global Statistics Data Structures::
+* LI_LAPBTUNE - LAPB Tuning Data Structures::
+* LI_LLC2TUNE - LLC2 Tuning Data Structures::
+* LI_MLPTUNE - MLP Tuning Data Structures::
+@end menu
+
+The @file{@value{_includedir}/@-@value{PACKAGE}/@-sys/@-snet/@-ll_@-control.h}
+header file (@file{<sys/@-snet/@-ll_@-control.h>} with proper compile flags)
+defines a number of structures, pointers to which are used as argumnets to
+input-output controls.  These structures fall into four classes, identified by
+the value of the first byte of the structure, as follows:
+
+@multitable @columnfractions .15 .85
+
+@item @pval{LI_PLAIN} @tab A @type{ll_hdioc} structure that identifies the
+subnetwork (link) 
+
+@item @pval{LI_SNID} @tab A @type{ll_snioc} structure that identifies the
+subnetwork (link) 
+
+@item @pval{LI_STATUS} @tab A @type{ll_stnioc} structure that identifies the
+subnetwork (link)
+
+@item @pval{LI_STATS} @tab A @type{ll_stioc} or @type{mlp_stioc} structure that
+identifies the subnetwork (link) 
+
+@item @pval{LI_GSTATS} @tab A @type{ll_gstioc} or @type{mlp_gstioc} structure
+that identifies the subnetwork (link) 
+
+@item @pval{LI_LAPBTUNE} @tab A @type{lapb_tnioc} structure that identifies the
+subnetwork (link) 
+
+@item @pval{LI_LLC2TUNE} @tab A @type{llc2_tnioc} structure that identifies the
+subnetwork (link) 
+
+@item @pval{LI_MLPTUNE} @tab A @type{mlp_tnioc} structure that identifies the
+subnetwork (link)
+
+@end multitable
+
+@node LI_PLAIN - Plain Data Structures
+@subsection LI_PLAIN - Plain Data Structures
+
+@node ll_hdioc Structure
+@subsubsection ll_hdioc Structure
+
+The @type{ll_hdioc} structure is formatted as follows:
+
+@example
+@group
+struct ll_hdioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+@};
+@end group
+@end example
+
+The @type{ll_hdioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_PLAIN}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@end table
+
+@node LI_SNID - Subnetwork Identifier Data Strucures
+@subsection LI_SNID - Subnetwork Identifier Data Strucures
+
+@node ll_snioc Structure
+@subsubsection ll_snioc Structure
+
+The @type{ll_snioc} structure is used in the @pioc{L_SETSNID}, @pioc{L_GETSNID},
+@pioc{M_SETSNID} and @pioc{M_GETSNID} input-output controls.
+
+The @type{ll_snioc} structure is formatted as follows:
+
+@example
+@group
+struct ll_snioc @{
+    uint8_t lli_type;
+    uint8_t lli_class;
+    uint8_t lli_spare[2];
+    uint32_t lli_snid;
+    uint32_t lli_index;
+    uint32_t lli_slp_snid;
+    uint16_t lli_slp_pri;
+@};
+@end group
+@end example
+
+The @type{ll_snioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_SNID}.
+@item lli_class
+Specifies the class of the link being registered.  This field can be one of the
+following values:
+@multitable @columnfractions .2 .8
+@item @pval{LC_LLC1} @tab LLC Type 1 link.
+@item @pval{LC_LLC2} @tab LLC TYpe 2 link.
+@item @pval{LC_LAPBDTE} @tab LAPB DTE.
+@item @pval{LC_LAPBXDTE} @tab LAPB DTE with extended addressing.
+@item @pval{LC_LAPBDCE} @tab LAPB DCE.
+@item @pval{LC_LAPBXDCE} @tab LAPB DCE with extended addressing.
+@item @pval{LC_LAPDTE} @tab LAP DTE.
+@item @pval{LC_LAPDCE} @tab LAP DCE.
+@item @pval{LC_HDLC} @tab HDLC.
+@item @pval{LC_HDLCX} @tab HDLC with extended addressing.
+@item @pval{LC_MLAPBDTE} @tab LAPB DTE multilink.
+@item @pval{LC_MLAPBXDTE} @tab LAPB DTE multilink with extended addressing.
+@item @pval{LC_MLAPBDCE} @tab LAPB DCE multilink.
+@item @pval{LC_MLAPBXDCE} @tab LAPB DCE multilink with extended addressing.
+@item @pval{LC_MLP} @tab MLP link.
+@end multitable
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@item lli_index
+Specifies the lower multiplex identifier of the Stream linked under a
+multiplexing driver as returned from @command{I_LINK(7)}.@footnote{See the
+@manref{I_LINK(7)} manual page.}
+@item lli_slp_snid
+Specifies the subnetwork (link) identifier for an SLP link within an MLP link.
+@item lli_slp_pri
+Specifies the subnetwork (link) priority within an MLP link.
+@end table
+
+@node LI_STATUS - Status Data Strucures
+@subsection LI_STATUS - Status Data Strucures
+
+@node ll_stnioc Structure
+@subsubsection ll_stnioc Structure
+
+The @type{ll_stnioc} structure is formatted as follows:
+
+@example
+@group
+struct ll_stnioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+@};
+@end group
+@end example
+
+The @type{ll_stnioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_STATUS}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@end table
+
+@node LI_STATS - Statistics Data Structures
+@subsection LI_STATS - Statistics Data Structures
+
+@node lapb_stioc Structure
+@subsubsection lapb_stioc Structure
+
+The @type{lapb_stioc} structure is formatted as follows:
+
+@example
+@group
+struct lapb_stioc @{
+    uint8_t lli_type;
+    uint8_t state;
+    uint16_t lli_spare;
+    uint32_t lli_snid;
+    lapbstats_t lli_stats;
+@};
+@end group
+@end example
+
+The @type{lapb_stioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_STATS}.
+@item state
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@item lli_stats
+Contains the @type{lapbstats_t} structure described in @ref{lapbstats_t
+Structure}.
+@end table
+
+@node lapbstats_t Structure
+@subsubsection lapbstats_t Structure
+
+The @type{lapbstats_t} structure is formatted as follows:
+
+@example
+@group
+typedef struct lapb_stats @{
+    uint32_t lapbmonarray[49];
+@} lapbstats_t;
+@end group
+@end example
+
+The @type{lapbstats_t} structure contains the following members:
+
+@table @member
+@item lapbmonarray
+Provides an array of 32-bit unsigned integers containing statistics.  The
+indexes of the elements of the array are as follows:
+
+@multitable @columnfractions .05 .25 .7
+@item 0 @tab @pval{tx_ign} @tab -
+@item 1 @tab @pval{rx_badlen} @tab -
+@item 2 @tab @pval{rx_unknown} @tab -
+@item 3 @tab @pval{t1_exp} @tab -
+@item 4 @tab @pval{t4_exp} @tab -
+@item 5 @tab @pval{t4_n2_exp} @tab -
+@item 6 @tab @pval{RR_rx_cmd} @tab -
+@item 7 @tab @pval{RR_rx_rsp} @tab -
+@item 8 @tab @pval{RR_tx_cmd} @tab -
+@item 9 @tab @pval{RR_tx_rsp} @tab -
+@item 10 @tab @pval{RR_tx_cmd_p} @tab -
+@item 11 @tab @pval{RNR_rx_cmd} @tab -
+@item 12 @tab @pval{RNR_rx_rsp} @tab -
+@item 13 @tab @pval{RNR_tx_cmd} @tab -
+@item 14 @tab @pval{RNR_tx_rsp} @tab -
+@item 15 @tab @pval{RNR_tx_cmd_p} @tab -
+@item 16 @tab @pval{REJ_rx_cmd} @tab -
+@item 17 @tab @pval{REJ_rx_rsp} @tab -
+@item 18 @tab @pval{REJ_tx_cmd} @tab -
+@item 19 @tab @pval{REJ_tx_rsp} @tab -
+@item 20 @tab @pval{REJ_tx_cmd_p} @tab -
+@item 21 @tab @pval{SABME_rx_cmd} @tab -
+@item 22 @tab @pval{SABME_tx_cmd} @tab -
+@item 23 @tab @pval{DISC_rx_cmd} @tab -
+@item 24 @tab @pval{DISC_tx_cmd} @tab -
+@item 25 @tab @pval{UA_rx_rsp} @tab -
+@item 26 @tab @pval{UA_tx_rsp} @tab -
+@item 27 @tab @pval{DM_rx_rsp} @tab -
+@item 28 @tab @pval{DM_tx_rsp} @tab -
+@item 29 @tab @pval{I_rx_cmd} @tab -
+@item 30 @tab @pval{I_tx_cmd} @tab -
+@item 31 @tab @pval{FRMR_rx_rsp} @tab -
+@item 32 @tab @pval{FRMR_tx_rsp} @tab -
+@item 33 @tab @pval{tx_rtr} @tab -
+@item 34 @tab @pval{rx_bad} @tab -
+@item 35 @tab @pval{rx_dud} @tab -
+@item 36 @tab @pval{rx_ign} @tab -
+@item 37 @tab @pval{XID_rx_cmd} @tab -
+@item 38 @tab @pval{XID_rx_rsp} @tab -
+@item 39 @tab @pval{XID_tx_cmd} @tab -
+@item 40 @tab @pval{XID_tx_rsp} @tab -
+@item 41 @tab @pval{TEST_rx_cmd} @tab -
+@item 42 @tab @pval{TEST_rx_rsp} @tab -
+@item 43 @tab @pval{TEST_tx_cmd} @tab -
+@item 44 @tab @pval{TEST_tx_rsp} @tab -
+@item 45 @tab @pval{SABM_rx_cmd} @tab -
+@item 46 @tab @pval{SABM_tx_cmd} @tab -
+@item 47 @tab @pval{SARM_rx_cmd} @tab -
+@item 48 @tab @pval{SARM_tx_cmd} @tab -
+@end multitable
+@end table
+
+@node llc2_stioc Structure
+@subsubsection llc2_stioc Structure
+
+The @type{llc2_stioc} structure is formatted as follows:
+
+@example
+@group
+struct llc2_stioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    llc2stats_t lli_stats;
+@};
+@end group
+@end example
+
+The @type{llc2_stioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_STATS}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@item lli_stats
+Contains the @type{llc2stats_t} structure containing the statistics described in
+@ref{llc2stats_t Structure}.
+@end table
+
+@node llc2stats_t Structure
+@subsubsection llc2stats_t Structure
+
+The @type{llc2stats_t} structure is formatted as follows:
+
+@example
+@group
+typedef struct llc2_stats @{
+    uint32_t llc2monarray[49];
+@} llc2stats_t;
+@end group
+@end example
+
+The @type{llc2stats_t} structure contains the following members:
+
+@table @member
+@item llc2monarray
+Provides an array of 32-bit unsigned integers containing the statistics.  The
+indices of the individual elements are as follows:
+
+@multitable @columnfractions .05 .25 .7
+@item 0 @tab @pval{tx_ign} @tab -
+@item 1 @tab @pval{rx_badlen} @tab -
+@item 2 @tab @pval{rx_unknown} @tab -
+@item 3 @tab @pval{t1_exp} @tab -
+@item 4 @tab @pval{t4_exp} @tab -
+@item 5 @tab @pval{t4_n2_exp} @tab -
+@item 6 @tab @pval{RR_rx_cmd} @tab -
+@item 7 @tab @pval{RR_rx_rsp} @tab -
+@item 8 @tab @pval{RR_tx_cmd} @tab -
+@item 9 @tab @pval{RR_tx_rsp} @tab -
+@item 10 @tab @pval{RR_tx_cmd_p} @tab -
+@item 11 @tab @pval{RNR_rx_cmd} @tab -
+@item 12 @tab @pval{RNR_rx_rsp} @tab -
+@item 13 @tab @pval{RNR_tx_cmd} @tab -
+@item 14 @tab @pval{RNR_tx_rsp} @tab -
+@item 15 @tab @pval{RNR_tx_cmd_p} @tab -
+@item 16 @tab @pval{REJ_rx_cmd} @tab -
+@item 17 @tab @pval{REJ_rx_rsp} @tab -
+@item 18 @tab @pval{REJ_tx_cmd} @tab -
+@item 19 @tab @pval{REJ_tx_rsp} @tab -
+@item 20 @tab @pval{REJ_tx_cmd_p} @tab -
+@item 21 @tab @pval{SABME_rx_cmd} @tab -
+@item 22 @tab @pval{SABME_tx_cmd} @tab -
+@item 23 @tab @pval{DISC_rx_cmd} @tab -
+@item 24 @tab @pval{DISC_tx_cmd} @tab -
+@item 25 @tab @pval{UA_rx_rsp} @tab -
+@item 26 @tab @pval{UA_tx_rsp} @tab -
+@item 27 @tab @pval{DM_rx_rsp} @tab -
+@item 28 @tab @pval{DM_tx_rsp} @tab -
+@item 29 @tab @pval{I_rx_cmd} @tab -
+@item 30 @tab @pval{I_tx_cmd} @tab -
+@item 31 @tab @pval{FRMR_rx_rsp} @tab -
+@item 32 @tab @pval{FRMR_tx_rsp} @tab -
+@item 33 @tab @pval{tx_rtr} @tab -
+@item 34 @tab @pval{rx_bad} @tab -
+@item 35 @tab @pval{rx_dud} @tab -
+@item 36 @tab @pval{rx_ign} @tab -
+@item 37 @tab @pval{XID_rx_cmd} @tab -
+@item 38 @tab @pval{XID_rx_rsp} @tab -
+@item 39 @tab @pval{XID_tx_cmd} @tab -
+@item 40 @tab @pval{XID_tx_rsp} @tab -
+@item 41 @tab @pval{TEST_rx_cmd} @tab -
+@item 42 @tab @pval{TEST_rx_rsp} @tab -
+@item 43 @tab @pval{TEST_tx_cmd} @tab -
+@item 44 @tab @pval{TEST_tx_rsp} @tab -
+@item 45 @tab @pval{I_rx_rsp} @tab -
+@item 46 @tab @pval{I_tx_rsp} @tab -
+@item 47 @tab @pval{UI_rx_cmd} @tab -
+@item 48 @tab @pval{UI_tx_cmd} @tab -
+@end multitable
+@end table
+
+@node mlp_stioc Structure
+@subsubsection mlp_stioc Structure
+
+The @type{mlp_stioc} structure is formatted as follows:
+
+@example
+@group
+struct mlp_stioc @{
+    uint8_t lli_type;
+    uint8_t state;
+    uint16_t lli_spare;
+    uint32_t lli_snid;
+    mlpstats_t lli_stats;
+@};
+@end group
+@end example
+
+The @type{mlp_stioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_STATS}.
+@item lli_state
+Provides the state of the link.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@item lli_stats
+Contains the @type{mlpstats_t} structure containing the statistics described in
+@ref{mlpstats_t Structure}.
+@end table
+
+@node mlpstats_t Structure
+@subsubsection mlpstats_t Structure
+
+The @type{mlpstats_t} structure is formatted as follows:
+
+@example
+@group
+typedef struct mlp_stats @{
+    uint32_t mlpmonarray[12];
+@} mlpstats_t;
+@end group
+@end example
+
+The @type{mlpstats_t} structure contains the following members:
+
+@table @member
+@item mlpmonarray
+Contains an array of 32-bit unsigned integers containing the statistics.  The
+indices of the individual elements of the array are as follows:
+
+@multitable {00}{@code{MLP_frames_tx}}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0 @tab @pval{MLP_frames_tx} @tab -
+@item 1 @tab @pval{MLP_frames_rx} @tab -
+@item 2 @tab @pval{MLP_reset_tx} @tab -
+@item 3 @tab @pval{MLP_reset_rx} @tab -
+@item 4 @tab @pval{MLP_confs_tx} @tab -
+@item 5 @tab @pval{MLP_confs_rx} @tab -
+@item 6 @tab @pval{MLP_slps} @tab -
+@item 7 @tab @pval{MLP_num_slps} @tab -
+@item 8 @tab @pval{MLP_mt1_exp} @tab -
+@item 9 @tab @pval{MLP_mt2_exp} @tab -
+@item 10 @tab @pval{MLP_mt3_exp} @tab -
+@item 11 @tab @pval{MLP_mn1_exp} @tab -
+@end multitable
+@end table
+
+@node LI_GSTATS - Global Statistics Data Structures
+@subsection LI_GSTATS - Global Statistics Data Structures
+
+@node lapb_gstioc Structure
+@subsubsection lapb_gstioc Structure
+
+The @type{lapb_gstioc} structure is formatted as follows:
+
+@example
+@group
+struct lapb_gstioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lapbgstats[6];
+@};
+@end group
+@end example
+
+The @type{lapb_gstioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_GSTATS}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lapbgstats
+Contains an array of 32-bit unsigned integers containing the statistics.  The
+indices of the individual elements of the array are as follows:
+
+@multitable @columnfractions .05 .25 .70
+@item 0 @tab @pval{frames_tx} @tab -
+@item 1 @tab @pval{frames_rx} @tab -
+@item 2 @tab @pval{sabm_tx} @tab -
+@item 3 @tab @pval{sabm_rx} @tab -
+@item 4 @tab @pval{bytes_tx} @tab -
+@item 5 @tab @pval{bytes_rx} @tab -
+@end multitable
+@end table
+
+@node llc2_gstioc Structure
+@subsubsection llc2_gstioc Structure
+
+The @type{llc2_gstioc} structure is formatted as follows:
+
+@example
+@group
+struct llc2_gstioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t llc2gstats[6];
+@};
+@end group
+@end example
+
+The @type{llc2_gstioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_GSTATS}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item llc2gstats
+Contains an array of 32-bit unsigned integers containing the statistics.  The
+indices of the individual elements of the array are as follows:
+
+@multitable @columnfractions .05 .25 .70
+@item 0 @tab @pval{frames_tx} @tab -
+@item 1 @tab @pval{frames_rx} @tab -
+@item 2 @tab @pval{sabme_tx} @tab -
+@item 3 @tab @pval{sabme_rx} @tab -
+@item 4 @tab @pval{bytes_tx} @tab -
+@item 5 @tab @pval{bytes_rx} @tab -
+@end multitable
+@end table
+
+@node mlp_gstioc Structure
+@subsubsection mlp_gstioc Structure
+
+The @type{mlp_gstioc} structure is formatted as follows:
+
+@example
+@group
+struct mlp_gstioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t mlpgstats[10];
+@};
+@end group
+@end example
+
+The @type{mlp_gstioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_GSTATS}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item mlpgstats
+Contains an array of 32-bit unsigned integers containing the statistics.  The
+indices of the individual elements of the array are as follows:
+
+@multitable {00}{@code{MLP_frames_tx}}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0 @tab @pval{MLP_frames_tx} @tab -
+@item 1 @tab @pval{MLP_frames_rx} @tab -
+@item 2 @tab @pval{MLP_reset_tx} @tab -
+@item 3 @tab @pval{MLP_reset_rx} @tab -
+@item 4 @tab @pval{MLP_confs_tx} @tab -
+@item 5 @tab @pval{MLP_confs_rx} @tab -
+@item 6 @tab @pval{MLP_slps} @tab -
+@item 7 @tab @pval{MLP_num_slps} @tab -
+@item 8 @tab @pval{MLP_bytes_tx} @tab -
+@item 9 @tab @pval{MLP_bytes_rx} @tab -
+@end multitable
+@end table
+
+@node LI_LAPBTUNE - LAPB Tuning Data Structures
+@subsection LI_LAPBTUNE - LAPB Tuning Data Structures
+
+@node lapb_tnioc Structure
+@subsubsection lapb_tnioc Structure
+
+The @type{lapb_tnioc} structure is formatted as follows:
+
+@example
+@group
+struct lapb_tnioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    lapbtune_t lapb_tune;
+@};
+@end group
+@end example
+
+The @type{lapb_tnioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_LAPBTUNE}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@item lapb_tune
+Contains the @type{lapbtune_t} tuning structure containing tuning parameters
+described in @ref{lapbtune_t Structure}.
+@end table
+
+@node lapbtune_t Structure
+@subsubsection lapbtune_t Structure
+
+The @type{labtune_t} structure is formatted as follows:
+
+@example
+@group
+typedef struct lapbtune @{
+    uint16_t N2;
+    uint16_t T1;
+    uint16_t Tpf;
+    uint16_t Trej;
+    uint16_t Tbusy;
+    uint16_t Tidle;
+    uint16_t ack_delay;
+    uint16_t notack_max;
+    uint16_t tx_window;
+    uint16_t tx_probe;
+    uint16_t max_I_len;
+    uint16_t llconform;
+    uint16_t sabm_in_x32;
+@} lapbtune_t;
+@end group
+@end example
+
+The @type{lapbtune_t} structure contains the following members:
+
+@table @member
+@item N2
+@item T1
+@item Tpf
+@item Trej
+@item Tbusy
+@item Tidle
+@item ack_delay
+@item notack_max
+@item tx_window
+@item tx_probe
+@item max_I_len
+@item llconform
+@item sabm_in_x32
+@end table
+
+@node LI_LLC2TUNE - LLC2 Tuning Data Structures
+@subsection LI_LLC2TUNE - LLC2 Tuning Data Structures
+
+@node llc2_tnioc Structure
+@subsubsection llc2_tnioc Structure
+
+The @type{llc2_tnioc} structure is formatted as follows:
+
+@example
+@group
+struct llc2_tnioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    llc2tune_t llc2_tune;
+@};
+@end group
+@end example
+
+The @type{llc2_tnioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_LLC2TUNE}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@item llc2_tune
+Contains the @type{llc2tune_t} tuning structure containing tuning parameters
+described in @ref{llc2tune_t Structure}.
+@end table
+
+@node llc2tune_t Structure
+@subsubsection llc2tune_t Structure
+
+The @type{llc2tune_t} structure is formatted as follows:
+
+@example
+@group
+typedef struct llc2tune @{
+    uint16_t N2;
+    uint16_t T1;
+    uint16_t Tpf;
+    uint16_t Trej;
+    uint16_t Tbusy;
+    uint16_t Tidle;
+    uint16_t ack_delay;
+    uint16_t notack_max;
+    uint16_t tx_window;
+    uint16_t tx_probe;
+    uint16_t max_I_len;
+    uint16_t xid_window;
+    uint16_t xid_Ndup;
+    uint16_t xid_Tdup;
+@} llc2tune_t;
+@end group
+@end example
+
+The @type{llc2tune_t} structure contains the following members:
+
+@table @member
+@item N2
+@item T1
+@item Tpf
+@item Trej
+@item Tbusy
+@item Tidle
+@item ack_delay
+@item notack_max
+@item tx_window
+@item tx_probe
+@item max_I_len
+@item xid_window
+@item xid_Ndup
+@item xid_Tdup
+@end table
+
+@node LI_MLPTUNE - MLP Tuning Data Structures
+@subsection LI_MLPTUNE - MLP Tuning Data Structures
+
+@node mlp_tnioc Structure
+@subsubsection mlp_tnioc Structure
+
+The @type{mlp_tnioc} structure is formatted as follows:
+
+@example
+@group
+struct mlp_tnioc @{
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    mlptune_t mlp_tune;
+@};
+@end group
+@end example
+
+The @type{mlp_tnioc} structure contains the following members:
+
+@table @member
+@item lli_type
+Always @pval{LLI_MLPTUNE}.
+@item lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+@item lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+@item mlp_tune
+Contains the @type{mlptune_t} tuning structure containing tuning parameters
+described in @ref{mlptune_t Structure}.
+@end table
+
+@node mlptune_t Structure
+@subsubsection mlptune_t Structure
+
+The @type{mlptune_t} structure is formatted as follows:
+
+@example
+@group
+typedef struct mlptune @{
+    uint16_t mw;
+    uint16_t mx;
+    uint16_t mt1;
+    uint16_t mt2;
+    uint16_t mt3;
+    uint16_t mn1;
+@} mlptune_t;
+@end group
+@end example
+
+The @type{mlptune_t} structure contains the following members:
+
+@table @member
+@item mw
+The size of the MLP window.
+@item mx
+The size of the MLP guard region.
+@item mt1
+The time interval to wait for MN(S) == MV(R) in deciseconds.
+@item mt2
+The time interval to wait for unblock in deciseconds.
+@item mt3
+The time interval to wait for reset confirmation.
+@item mn1
+The number of SLP transmission retries.
+@end table
+
+@node Input-Output Control Commands
+@section Input-Output Control Commands
+
+@menu
+* SLP Input-Output Control Commands::
+* MLP Input-Output Control Commands::
+@end menu
+
+@multitable @columnfractions .2 .8
+@item @pioc{L_SETSNID} @tab Set subnetwork identifier.
+@item @pioc{L_GETSNID} @tab Get subnetwork identifier.
+@item @pioc{L_SETTUNE} @tab Set common tuning parameters.
+@item @pioc{L_GETTUNE} @tab Get common tuning parameters.
+@item @pioc{L_GETSTATS} @tab Get subnetwork statistics.
+@item @pioc{L_ZEROSTATS} @tab Zero subnetwork statistics.
+@item @pioc{L_TRACEON} @tab Turn message tracing on.
+@item @pioc{L_TRACEOFF} @tab Turn message tracing off.
+@item @pioc{L_GETGSTATS} @tab Get global statistics.
+@item @pioc{L_ZEROGSTATS} @tab Zero global statistics.
+@item @pioc{L_LINKDISABLE} @tab Disable link (subnetwork identifier).
+@item @pioc{L_LINKENABLE} @tab Enable link (subnetwork identifier).
+@item @pioc{L_PUTX32MAP} @tab Put X.32 table mapping.
+@item @pioc{L_GETX32MAP} @tab Get X.32 table mapping.
+@end multitable
+
+@multitable @columnfractions .2 .8
+@item @pioc{M_SETSNID} @tab Set subnetwork identifier.
+@item @pioc{M_GETSNID} @tab Get subnetwork identifier.
+@item @pioc{M_SETTUNE} @tab Set common tuning parameters.
+@item @pioc{M_GETTUNE} @tab Get common tuning parameters.
+@item @pioc{M_GETSTATS} @tab Get subnetwork statistics.
+@item @pioc{M_ZEROSTATS} @tab Zero subnetwork statistics.
+@item @pioc{M_TRACEON} @tab Turn message tracing on.
+@item @pioc{M_TRACEOFF} @tab Turn message tracing off.
+@item @pioc{M_GETGSTATS} @tab Get global statistics.
+@item @pioc{M_ZEROGSTATS} @tab Zero global statistics.
+@end multitable
+
+@node SLP Input-Output Control Commands
+@subsection SLP Input-Output Control Commands
+
+@menu
+* L_SETSNID::		Set subnetwork identifier.
+* L_GETSNID::		Get subnetwork identifier.
+* L_SETTUNE::		Set common tuning parameters.
+* L_GETTUNE::		Get common tuning parameters.
+* L_GETSTATS::		Get subnetwork statistics.
+* L_ZEROSTATS::		Zero subnetwork statistics.
+* L_TRACEON::		Turn message tracing on.
+* L_TRACEOFF::		Turn message tracing off.
+* L_GETGSTATS::		Get global statistics.
+* L_ZEROGSTATS::	Zero global statistics.
+* L_LINKDISABLE::	Disable link (subnetwork identifier).
+* L_LINKENABLE::	Enable link (subnetwork identifier).
+* L_PUTX32MAP::		Put X.32 table mapping.
+* L_GETX32MAP::		Get X.32 table mapping.
+@end menu
+
+@node L_SETSNID
+@subsubsection L_SETSNID
+
+The argument of this input-output control is a pointer to the @type{ll_snioc}
+structure described in @ref{ll_snioc Structure}.
+
+@node L_GETSNID
+@subsubsection L_GETSNID
+
+The argument of this input-output control is a pointer to the @type{ll_snioc}
+structure described in @ref{ll_snioc Structure}.
+
+@node L_SETTUNE
+@subsubsection L_SETTUNE
+
+The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+@type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
+described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
+@ref{mlp_tnioc Structure}.}
+
+@node L_GETTUNE
+@subsubsection L_GETTUNE
+
+The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+@type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
+described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
+@ref{mlp_tnioc Structure}.}
+
+@node L_GETSTATS
+@subsubsection L_GETSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_stioc},
+@type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
+described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
+@ref{mlp_stioc Structure}.}
+
+@node L_ZEROSTATS
+@subsubsection L_ZEROSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_stioc},
+@type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
+described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
+@ref{mlp_stioc Structure}.}
+
+@node L_TRACEON
+@subsubsection L_TRACEON
+
+The argument of this input-output control is a pointer to the @type{ll_hdioc}
+structure described in @ref{ll_hdioc Structure}.
+
+@node L_TRACEOFF
+@subsubsection L_TRACEOFF
+
+The argument of this input-output control is a pointer to the @type{ll_hdioc}
+structure described in @ref{ll_hdioc Structure}.
+
+@node L_GETGSTATS
+@subsubsection L_GETGSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+@type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
+described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
+@ref{mlp_gstioc Structure}.}
+
+@node L_ZEROGSTATS
+@subsubsection L_ZEROGSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+@type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
+described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
+@ref{mlp_gstioc Structure}.}
+
+@node L_LINKDISABLE
+@subsubsection L_LINKDISABLE
+
+The argument of this input-output control is a pointer to the @type{ll_hdioc}
+structure described in @ref{ll_hdioc Structure}.
+
+@node L_LINKENABLE
+@subsubsection L_LINKENABLE
+
+The argument of this input-output control is a pointer to the @type{ll_hdioc}
+structure described in @ref{ll_hdioc Structure}.
+
+@node L_PUTX32MAP
+@subsubsection L_PUTX32MAP
+
+@node L_GETX32MAP
+@subsubsection L_GETX32MAP
+
+@node MLP Input-Output Control Commands
+@subsection MLP Input-Output Control Commands
+
+@menu
+* M_SETSNID::		Set subnetwork identifier.
+* M_GETSNID::		Get subnetwork identifier.
+* M_SETTUNE::		Set common tuning parameters.
+* M_GETTUNE::		Get common tuning parameters.
+* M_GETSTATS::		Get subnetwork statistics.
+* M_ZEROSTATS::		Zero subnetwork statistics.
+* M_TRACEON::		Turn message tracing on.
+* M_TRACEOFF::		Turn message tracing off.
+* M_GETGSTATS::		Get global statistics.
+* M_ZEROGSTATS::	Zero global statistics.
+@end menu
+
+@node M_SETSNID
+@subsubsection M_SETSNID
+
+The argument of this input-output control is a pointer to the @type{ll_snioc}
+structure described in @ref{ll_snioc Structure}.
+
+@node M_GETSNID
+@subsubsection M_GETSNID
+
+The argument of this input-output control is a pointer to the @type{ll_snioc}
+structure described in @ref{ll_snioc Structure}.
+
+@node M_SETTUNE
+@subsubsection M_SETTUNE
+
+The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+@type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
+described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
+@ref{mlp_tnioc Structure}.}
+
+@node M_GETTUNE
+@subsubsection M_GETTUNE
+
+The argument of this input-output control is a pointer to the @type{lapb_tnioc},
+@type{llc2_tnioc} or @type{mlp_tnioc} structure.@footnote{These structures are
+described in @ref{lapb_tnioc Structure}, @ref{llc2_tnioc Structure}, and
+@ref{mlp_tnioc Structure}.}
+
+@node M_GETSTATS
+@subsubsection M_GETSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_stioc},
+@type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
+described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
+@ref{mlp_stioc Structure}.}
+
+@node M_ZEROSTATS
+@subsubsection M_ZEROSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_stioc},
+@type{llc2_stioc} or @type{mlp_stioc} structure.@footnote{These structures are
+described in @ref{lapb_stioc Structure}, @ref{llc2_stioc Structure}, and
+@ref{mlp_stioc Structure}.}
+
+@node M_TRACEON
+@subsubsection M_TRACEON
+
+The argument of this input-output control is a pointer to the @type{ll_hdioc}
+structure described in @ref{ll_hdioc Structure}.
+
+@node M_TRACEOFF
+@subsubsection M_TRACEOFF
+
+The argument of this input-output control is a pointer to the @type{ll_hdioc}
+structure described in @ref{ll_hdioc Structure}.
+
+@node M_GETGSTATS
+@subsubsection M_GETGSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+@type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
+described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
+@ref{mlp_gstioc Structure}.}
+
+@node M_ZEROGSTATS
+@subsubsection M_ZEROGSTATS
+
+The argument of this input-output control is a pointer to the @type{lapb_gstioc},
+@type{llc2_gstioc} or @type{mlp_gstioc} structure.@footnote{These structures are
+described in @ref{lapb_gstioc Structure}, @ref{llc2_gstioc Structure}, and
+@ref{mlp_gstioc Structure}.}
+
+@node LLI Header Files
+@chapter LLI Header Files
+
+@menu
+* ll_control.h Header File::
+* ll_proto.h Header File::
+* mlp_control.h Header File::
+* mlp_proto.h Header File::
+@end menu
+
+@node ll_control.h Header File
+@section ll_control.h Header File
+
+@node ll_proto.h Header File
+@section ll_proto.h Header File
+
+@node mlp_control.h Header File
+@section mlp_control.h Header File
+
+@node mlp_proto.h Header File
+@section mlp_proto.h Header File
+
+@c @node LLI Library
+@c @chapter LLI Library
+
+@node LLI Drivers and Modules
+@chapter LLI Drivers and Modules
+
+@menu
+* hdlc Driver::
+* lapb Driver::
+* llc1 Driver::
+* llc2 Driver::
+* s_llic Module::
+* s_lli Module::
+@end menu
+
+@node hdlc Driver
+@section hdlc Driver
+
+The @file{hdlc} driver is a pseudo-device @cite{STREAMS} driver that provides
+raw HDLC framing as specified in @cite{ISO/IEC 3309} described in reference
+@ref{ISO3309,,ISO3309}.
+
+The @file{hdlc} driver provides a @cite{Data Link Provider Interface} as its
+upper multiplex service interface, as described in @ref{DLPI,,DLPI}.
+
+The @file{hdlc} driver is documented in the @manref{hdlc(4)} manual page.
+
+@node lapb Driver
+@section lapb Driver
+
+The @file{lapb} driver is a pseudo-device @cite{STREAMS} driver that provides
+the X.25 compatible LAPB procedures as specified in @cite{ISO/IEC 7776}
+described in reference @ref{ISO7776,,ISO7776}.
+This driver, in combination with the @file{x25} multiplexing driver, provides
+X.25 over LAPB as described in reference @ref{ISO8208,,ISO8208}.
+
+The @file{lapb} driver provides a @cite{Data Link Provider Interface} as its
+upper multiplex service interface, as described in @ref{DLPI,,DLPI}.
+
+The @file{lapb} driver is documented in the @manref{lapb(4)} manual page.
+
+@node llc1 Driver
+@section llc1 Driver
+
+The @file{llc1} driver is a pseudo-device @cite{STREAMS} driver that provides
+the IEEE 802.2 LLC Type 1 (LLC1) procedures as specified in @cite{ISO/IEC
+8802-2} described in reference @ref{ISO8802-2,,ISO8802-2}.
+This driver, in combination with the @file{x25} multiplexing driver, provides
+X.25 over LLC1 as described in refeference @ref{ISO8881,,ISO8881}.
+
+The @file{llc1} driver provides a @cite{Data Link Provider Interface} as its
+upper multiplex service interface, as described in @ref{DLPI,,DLPI}.
+
+The @file{llc1} driver is documented in the @manref{llc1(4)} manual page.
+
+@node llc2 Driver
+@section llc2 Driver
+
+The @file{llc1} driver is a pseudo-device @cite{STREAMS} driver that provides
+the IEEE 802.2 LLC Type 2 (LLC2) procedures as specified in @cite{ISO/IEC
+8802-2} described in reference @ref{ISO8802-2,,ISO8802-2}.
+This driver, in combination with the @file{x25} multiplexing driver, provides
+X.25 over LLC2 as described in refeference @ref{ISO8881,,ISO8881}.
+
+The @file{llc2} driver provides a @cite{Data Link Provider Interface} as its
+upper multiplex service interface, as described in @ref{DLPI,,DLPI}.
+
+The @file{llc2} driver is documented in the @manref{llc2(4)} manual page.
+
+@node s_llic Module
+@section s_llic Module
+
+The @file{s_llic} module is a pushable @cite{STREAMS} module that converts
+between the LLI input-output controls described in this manual and the DLPI
+input-output controls used by the @url{http://www.openss7.org/,OpenSS7 Project}.
+This particular module does not convert primitives, as both the LLI and the DLPI
+use the primitives of the @cite{Data Link Provider Interface, Revision
+2.0.0} described in reference @ref{DLPI,,DLPI}.
+
+The @file{s_llic} module provides a @cite{Data Link Provider Interface} as its
+upper and lower service interface, as described in @ref{DLPI,,DLPI}.
+
+The @file{s_llic} module is documented in the @manref{s_llic(4)} manual page.
+
+@node s_lli Module
+@section s_lli Module
+
+The @file{s_lli} module is a pushable @cite{STREAMS} module that converts
+between the LLI input-output controls described in this manual and the DLPI
+input-output controls used by the @url{http://www.openss7.org/,OpenSS7 Project}.
+This particular module converts between the LLI primitives described in this
+manual and the primitives of the @cite{Data Link Provider Interface}, described
+in reference @ref{DLPI,,DLPI}.
+
+The @file{s_llic} module provides a @cite{Data Link Provider Interface} as its
+upper and lower service interface, as described in @ref{DLPI,,DLPI}.
+
+The @file{s_lli} module is documented in the @manref{s_lli(4)} manual page.
+
+@node LLI Utilities
+@chapter LLI Utilities
+
+@menu
+* lltune Utility::
+* mlptune Utility::
+* linkadd Utility::
+* linkdel Utility::
+* linklist Utility::
+* linkreset Utility::
+* linkstart Utility::
+* linkstate Utility::
+* linkstop Utility::
+@end menu
+
+@node lltune Utility
+@section lltune Utility
+
+The @command{lltune} utility is documented in the @manref{lltune(8)} manual
+page.
+
+@node mlptune Utility
+@section mlptune Utility
+
+The @command{mlptune} utility is documented in the @manref{mlptune(8)} manual
+page.
+
+@node linkadd Utility
+@section linkadd Utility
+
+The @command{linkadd} utility is documented in the @manref{linkadd(8)} manual
+page.
+
+@node linkdel Utility
+@section linkdel Utility
+
+The @command{linkdel} utility is documented in the @manref{linkdel(8)} manual
+page.
+
+@node linklist Utility
+@section linklist Utility
+
+The @command{linklist} utility is documented in the @manref{linklist(8)} manual
+page.
+
+@node linkreset Utility
+@section linkreset Utility
+
+The @command{linkreset} utility is documented in the @manref{linkreset(8)} manual
+page.
+
+@node linkstart Utility
+@section linkstart Utility
+
+The @command{linkstart} utility is documented in the @manref{linkstart(8)} manual
+page.
+
+@node linkstate Utility
+@section linkstate Utility
+
+The @command{linkstate} utility is documented in the @manref{linkstate(8)} manual
+page.
+
+@node linkstop Utility
+@section linkstop Utility
+
+The @command{linkstop} utility is documented in the @manref{linkstop(8)} manual
+page.
+
+@node LLI File Formats
+@chapter LLI File Formats
+
+@menu
+* lapbtemplate File Format::
+* llc2template File Format::
+* mlptemplate File Format::
+@end menu
+
+@node lapbtemplate File Format
+@section lapbtemplate File Format
+
+The @file{lapbtemplate} file format is documented in the @manref{lapbtemplate(5)}
+manual page.
+
+@node llc2template File Format
+@section llc2template File Format
+
+The @file{llc2template} file format is documented in the @manref{llc2template(5)}
+manual page.
+
+@node mlptemplate File Format
+@section mlptemplate File Format
+
+The @file{mlptemplate} file format is documented in the @manref{mlptemplate(5)}
+manual page.
+
+@node LLI Compatibility and Porting
+@appendix LLI Compatibility and Porting
+
+@menu
+* Compatibility with AIXlink/X.25::
+* Compatibility with HP X.25/9000::
+* Compatibility with IRIS SX.25::
+* Compatibility with PT X.25::
+* Compatibility with RadiSys WAN::
+* Compatibility with SBE X.25::
+* Compatibility with Solstice X.25::
+@end menu
+
+@node Compatibility with AIXlink/X.25
+@section Compatibility with AIXlink/X.25
+
+@node Compatibility with HP X.25/9000
+@section Compatibility with HP X.25/9000
+
+@node Compatibility with IRIS SX.25
+@section Compatibility with IRIS SX.25
+
+@node Compatibility with PT X.25
+@section Compatibility with PT X.25
+
+@node Compatibility with RadiSys WAN
+@section Compatibility with RadiSys WAN
+
+@node Compatibility with SBE X.25
+@section Compatibility with SBE X.25
+
+@node Compatibility with Solstice X.25
+@section Compatibility with Solstice X.25
+
+@node Glossary of LLI Terms and Acronyms
+@unnumbered Glossary of LLI Terms and Acronyms
+
+@multitable @columnfractions 0.15 0.85
+@item @dfn{ANSI} @tab American National Standards Institute
+@item @dfn{CCITT} @tab Old name for ITU-T
+@item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{ENSDU} @tab Expedited Network Service Data Unit
+@item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{ITU} @tab International Telecommunications Union
+@item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LCI} @tab Logical Channel Identifier
+@item @dfn{LLC1} @tab Logical Link Control Type 1
+@item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC} @tab Logical Link Control
+@item @dfn{MAC} @tab Media Access Control
+@item @dfn{NLI} @tab Network Layer Interface
+@item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NSAP} @tab Network Service Access Point
+@item @dfn{NSDU} @tab Network Service Data Unit
+@item @dfn{NSP} @tab Network Service Provider
+@item @dfn{NS} @tab Network Service
+@item @dfn{NSU} @tab Network Service User
+@item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{SAP} @tab Service Access Point
+@item @dfn{SDU} @tab Service Data Unit
+@item @dfn{VC} @tab Virtual Circuit
+@item @dfn{X.121} @tab ITU-T Recommendation X.121
+@item @dfn{X.25} @tab ITU-T Recommendation X.25
+@item @dfn{X.29} @tab ITU-T Recommendation X.29
+@end multitable
+
+@node References
+@unnumbered References
+
+@multitable @columnfractions 0.2 0.8
+
+@item [AIXlink/X.25] @anchor{AIXlink/X.25} @tab @cite{AIXlink/X.25 Version 2.1
+for AIX: Guide and Reference}, No: SC23-2520-07, Eighth Edition, September 2006,
+(Bolder, CO), International Business Machine Corp., IBM.
+@uref{http://publibn.bould.ibm.com/,IBM Documentation Library}.
+
+@item [ARTIC WAN] @anchor{ARTIC WAN} @tab @cite{ARTIC STREAMS Support WAN Driver
+Interface Reference}, Release 1.7, June 2004, (Hillsboro, OR), RadiSys
+Corporation, RadiSys. [Doc No: 007-01232-0003], @uref{http://www.radisys.com/,
+RadiSys Support Documentation}.
+
+@item [CDI] @anchor{CDI} @tab @cite{OpenSS7 CAE Specification: Communications
+Device Interface (CDI) Specification}, Revision 0.9.2, Draft 2, July 15, 2007,
+(Edmonton, Canada), B. Bidulock, OpenSS7 Corporation.  Distributed with package
+@file{strxns-0.9.2} and @file{openss7-0.9.2}.
+@url{http://www.openss7.org/docs/cdi.pdf, OpenSS7 Documents}.
+
+@item [DLPI] @anchor{DLPI} @tab @cite{Open Group CAE Specification: Data Link
+Provider Interface (DLPI) Specification}, Revision 2.0.0, Draft 2, August 20,
+1992, (Parsippany, New Jersey), UNIX International, Inc., UNIX International
+Press.  @uref{http://www.opengroup.org/onlinepubs/,The Open Group},
+@uref{http://www.openss7.org/docs/dlpi.pdf,The OpenSS7 Project}.
+
+@item [IRIS SX.25] @anchor{IRIS SX.25} @tab @cite{IRIS SX.25 NLI Programmer's
+Guide}, 1995, (Mountainview, CA), Silicon Graphics, Inc., SGI Technical
+Publications. [No: 007-2268-002]. @uref{http://techpubs.sgi.com/,SGI Technical
+Publications}.
+
+@item [ISO3309] @anchor{ISO3309} @tab @b{ISO/IEC 3309:1988}, @cite{Information
+Technology -- Data Communications -- High-Level Data Link Control procedures --
+Frame Structure}, 1988, ISO/IEC, International Orgianization for
+Standardization.  @uref{http://www.iso.org/,International Organization for
+Standardization}.
+
+@item [ISO8208] @anchor{ISO8208} @tab @b{ISO/IEC 8208:2000}, @cite{Information
+Technology -- Data Communications -- X.25 Packet Layer Protocol for Data
+Terminal Equipment}, Fourth Edition, November 1, 2000, ISO/IEC, International
+Organization for Standardization.  @uref{http://www.iso.org/,International
+Organization for Standardization}.
+
+@item [ISO7776] @anchor{ISO7776} @tab @b{ISO/IEC 7776:1995}, @cite{Information
+technology -- Telecommunications information exchange between systems --
+High-level data link control procedures -- Description of the X.25
+LAPB-compatible DTE data link procedures}, Second Edition, July 1, 1995,
+International Organization for Standardization.
+@uref{http://www.iso.org/,International Organization for Standardization}.
+
+@item [ISO8802-2] @anchor{ISO8802-2} @tab @b{ANSI/IEEE Standard 802.2-1998
+[ISO/IEC 8802-2:1998]}, @cite{IEEE Standard for Information Technology --
+Telecommunications and Information Exchange Between Systems -- Local and
+Metropolitan Area Networks -- Specific Requirements -- Part 2: Logical Link
+Control}, May 7, 1998, (New York), ANSI/IEEE, IEEE Computer Society. [ISBN
+1-55937-959-6]. @uref{http://www.ieee.org/,Institute of Electrical and
+Electronics Engineers}.
+
+@item [ISO8881] @anchor{ISO8881} @tab @b{ISO/IEC 8881:1989}, @cite{Information
+Processing Systems -- Data Communications -- User of the X.25 Packet Level
+Protocol in Local Area Networks}, 1989, ISO/IEC, International Organization for
+Standardization. @uref{http://www.iso.org/,International Organization for
+Standardization}.
+
+@item [NLI] @anchor{NLI} @tab @cite{OpenSS7 CAE Specification: Network Layer
+Interface (NLI) Specification}, Revision 0.9.2, Draft 1, June 2008, (Edmonton,
+AB), B. Bidulock, OpenSS7 Corporation.  Distributed with package
+@file{strx25-0.9.2} and @file{openss7-0.9.2}.
+@uref{http://www.openss7.org/docs/nli.pdf,The OpenSS7 Project}.
+
+@item [NPI] @anchor{NPI} @tab @cite{Open Group CAE Specification: Network
+Provider Interface (NPI) Specification}, Revision 2.0.0, Draft 2, August 17,
+1992, (Parisppany, New Jersey), UNIX International, Inc., UNIX International
+Press.  @uref{http://www.openss7.org/docs/npi.pdf,The OpenSS7 Project}.
+
+@item [Solstice X.25] @anchor{Solstice X.25} @tab @cite{Solstice X.25 9.2
+Administration Guide}, October 1999, (Palo Alto, CA), Sun Microsystems, Inc.,
+Sun. [Part No: 806-1234-10], @uref{http://docs-pdf.sun.com/, Solaris
+Documentation}.
+
+@item [TPI] @anchor{TPI} @tab @cite{Open Group CAE Specification: Transport
+Provider Interface (TPI) Specification}, Revision 2.0.0, Draft 2, 1999,
+(Berkshire, UK), Open Group, Open Group Publication.
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group},
+@uref{http://www.openss7.org/docs/tpi.pdf,The OpenSS7 Project}.
+
+@item [V.25 bis] @anchor{V.25 bis} @tab @b{ITU-T Recommendation V.25 bis (10/96)},
+@cite{Synchronous and asyncrhonous automatic dialing procedrues on switched
+networks}, October 1996, (Geneva), ITU, ITU-T Telecommunication Standardization
+Sector of ITU, (Previously ``CCITT Recommendation''),
+@url{http://www.itu.int/rec/T-REC-V.25bis/en/ T-REC-V.25bis}.
+
+@item [X.21] @anchor{X.21} @tab @b{ITU-T Recommendation X.21 (09/92)},
+@cite{Interface between Data Terminal Equipment (DTE) and Data
+Circuit-terminating Equiment (DCE) for synchronous operation on Public Data
+Networks}, September 1992, (Geneva), ITU, ITU-T Telecommunication
+Standardization Sector of ITU.  (Previously ``CCITT Recommendation''),
+@url{http://www.itu.int/rec/T-REC-X.21/en/, T-REC-X.21}.
+
+@item [X.21 bis] @anchor{X.21 bis} @tab @b{ITU-T Recommendation X.21 bis (03/88)},
+@cite{Use on Public Data Networks of Data Terminal Equipment (DTE) which is
+designed for interfacing to synchronous V-series modems}, March 1988, (Geneva),
+ITU, ITU-T Telecommunication Standardization Sector of ITU. (Previously ``CCITT
+Recommendation''), @url{http://www.itu.int/rec/T-REC-X.21bis/en/,
+T-REC-X.21bis}.
+
+@item [X.25] @anchor{X.25} @tab @b{ITU-T Recommendation X.25}.
+@url{http://www.itu.int/rec/T-REC-X.25/en/, T-REC-X.25}.
+
+@item [X.29] @anchor{X.29} @tab @b{ITU-T Recommendation X.29}.
+@url{http://www.itu.int/rec/T-REC-X.29/en/, T-REC-X.29}.
+
+@item [XX25] @anchor{XX25} @tab @cite{X/Open CAE Specification: X.25 Programming
+Interface using XTI (XX25)}, No. c411, November 1995, (Berkshire, UK), X/Open,
+Open Group Publication. [ISBN: 1-85912-136-5].
+@uref{http://www.opengroup.org/onlinepubs/,The Open Group}.
+
+@end multitable
+
+@node Index
+@unnumbered Index
+
+@menu
+* Concept Index::
+* Protocol State Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Manual Page Index::
+@end menu
+
+@node Concept Index
+@section Concept Index
+@printindex cp
+
+@page
+@node Protocol State Index
+@section Protocol State Index
+@printindex st
+
+@page
+@node Primitive Index
+@section Primitive Index
+@printindex pr
+
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
+
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
+@printindex vr
+
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
+
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
+@printindex pe
+
+@page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
+
+@page
+@node Manual Page Index
+@section Manual Page Index
+@printindex mp
+
+@page
+@shortcontents
+@page
+@contents
+
+@bye

@@ -1,0 +1,359 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: wanmap.8.man,v 0.9.2.1 2008-07-01 12:16:23 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 12:16:23 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: wanmap.8.man,v $
+.\" Revision 0.9.2.1  2008-07-01 12:16:23  brian
+.\" - added manual pages, specs and conversion modules
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH WANMAP 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Admin Commands"
+.SH NAME
+.B wanmap
+\- configure WAN remote and interface address mapping
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.hy 0
+.HP \w'\fBwanmap\fP\ 'u
+\fBwanmap\fP [\fIoptions\fP]
+[{\fB-G\fP|\fB--get\fP}]
+{\fB-s\fP|\fB--subnet\fP[\fB=\fP]}\fIsubnetid\fP
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+[\fIfilename\fP]
+.PD 0
+.HP
+\fBwanmap\fP [\fIoptions\fP]
+{\fB-P\fP|\fB--load\fP}
+{\fB-s\fP|\fB--subnet\fP[\fB=\fP]}\fIsubnetid\fP
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+[\fIfilename\fP]
+.HP
+\fBwanmap\fP [\fIoptions\fP]
+{\fB-Z\fP|\fB--zero\fP}
+{\fB-s\fP|\fB--subnet\fP[\fB=\fP]}\fIsubnetid\fP
+[{\fB-d\fP|\fB--device\fP[\fB=\fP]}\fIdevicename\fP]
+[\fIfilename\fP]
+.HP
+\fBwanmap\fP
+{\fB-h\fP|\fB--help\fP}
+.HP
+\fBwanmap\fP
+{\fB-V\fP|\fB--version\fP}
+.HP
+\fBwanmap\fP
+{\fB-C\fP|\fB--copying\fP}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.\"
+.\"
+.SH OPTIONS
+.PP
+.TP
+\fB-G\fP, \fB--get\fP
+Display the address mappings identified by the \fIsubnet_id\fP argument to the
+\fB-s\fP option.  The \fB-s\fP option must be specified.
+.TP
+\fB-P\fP, \fB--load\fP
+Load the address mappings in the file specified by the \fIfilename\fP argument.
+\fIfilename\fP argument may be specified, or allowed to default.
+.TP
+\fB-Z\fP, \fB--zero\fP
+Zero the address mappings (that is, remove all address mappings) from the WAN
+device.
+.TP
+\fB-h\fP, \fB--help\fP
+When this option is encountered, display usage information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered, display version information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered, display copying information to
+.IR stdout ,
+stop options procressing, and exit without taking further action.
+.\"
+.SS Common Options
+.PP
+The following common options can be specified together along with a command
+option.  It is not an error to specify options that are not necessary for the
+command option with which they are specified.
+.TP
+\fB-s\fP, \fB--subnet\fP \fIsubnet_id\fP
+Specify the subnetwork, \fIsubnet_id\fP, for which to retrieve, load or zero
+address mappings.
+The address mappings are retrieved for the \fB-G\fP option, loaded for the
+\fB-P\fP option, and zeroed for the \fB-Z\fP option.
+This option must be specified whenever the \fB-G\fP, \fB-P\fP or \fB-Z\fP option
+is specified.
+.TP
+\fB-d\fP, \fB--device\fP \fIdevicename\fP
+Specify the device name upon which to operate.  When this option is not
+specified, or \fIdevicename\fP is not given, the default is
+.BR /dev/wans " or " /dev/streams/wans ,
+whichever opens successfully first.
+.TP
+\fB-q\fP, \fB--quiet\fP
+Suppress normal output.  Only the return code of the command is of interest.
+This has the same effect as \fB--verbose=0\fP.
+.TP
+\fB--debug\fP [\fIlevel\fP]
+Specify or increase the debugging verbosity.  Sets the debugging verbosity to
+\fIlevel\fP, when given, or simply increases the debug verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIlevel\fP]
+Specify or increase the output verbosity.  Sets the output verbosity to
+\fIlevel\fP, when given, or simply increases the output verbosity by one when
+\fIlevel\fP is not given.  This option can be repeated.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+\fIfilename\fP
+Specify the configuration file that holds mapping information to apply to the
+device when the \fB-P\fP command option is also specified.  When this option
+is not specified, or the \fIfilename\fP is not given, the default is
+.BR @configdir@/interfacemap/null.wmap .
+For the format of this file, see \*(lq\fIFILE FORMAT\fP\*(rq, below.
+.\"
+.\"
+.SH FILE FORMAT
+.PP
+The file format is described in the
+.BR wanmapconf (5)
+manual page.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+An exit status of zero (0) indicates that the command was successful; one (1)
+indicates that an error occured and a diagnostic message is printed to
+.IR stderr ;
+two (2) indicates that the optoin or argument syntax was in error and a
+diagnostic message is printed to
+.IR stderr .
+.PP
+The
+.B --quiet
+option suppresses the printing of output to
+.I stdout
+and diagnostic messages to
+.IR stderr .
+.\"
+.\"
+.SH NOTICES
+.PP
+.\"
+.\"
+.SH DEVICES
+.PP
+.TP
+.BR /dev/wans ", " /dev/streams/wans
+The default WAN device.  See
+.BR ixe (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @configdir@/@PACKAGE@/interfacemap/null.wmap
+The default configuration file for the WAN device.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR wan (4),
+.BR wanmapconf (5).
+.\"
+.\"
+.SH BUGS
+.PP
+.B wanmap
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B wanmap
+is compatible with
+.IR "AIXlink/X.25" ,
+.[
+aixlink
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+and systems based on
+.IR "Spider X.25" ,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Options \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP, \fB-C\fP, and all long
+options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B wanmap
+and should not be used by portable command scripts.
+.IP \(em
+No other implementation documents the \fB-q\fP, \fB-v\fP, \fB-h\fP, \fB-V\fP
+and \fB-C\fP options.  They should not be used by portable command scripts.
+.IP \(em
+Options \fB--help\fP and \fB--version\fP are provided for compatibility with
+GNU coding standards; \fB--copying\fP, OpenSS7 coding standards.
+.IP \(em
+Other implementations document 127 as the maximum window size.
+.B @PACKAGE_TITLE@
+permits window sizes up to 32767.
+.PP
+For additional compatibility considerations, see
+.BR wan (4).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixlink
+.]
+.IR "HP-UX"
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B wanmap
+first appeared in
+.IR "Spider WAN" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

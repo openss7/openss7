@@ -1,0 +1,212 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: x25conf.5.man,v 0.9.2.1 2008-07-01 12:16:22 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 12:16:22 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: x25conf.5.man,v $
+.\" Revision 0.9.2.1  2008-07-01 12:16:22  brian
+.\" - added manual pages, specs and conversion modules
+.\"
+.\" Revision 0.9.2.2  2008-06-18 16:45:24  brian
+.\" - widespread updates
+.\"
+.\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
+.\" - added files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.TH X25CONF 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B x25conf
+\- X.25 Subnetwork Configuration File Format
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The X.25 subnetwork configuration file contains configured information on all
+subnetworks below the X.25 \fISTREAMS\fP multiplexing driver,
+.BR x25 (4).
+Each subnetwork will be one of five types:
+.IP 1. \w'0.\(em'u
+X.25 - LLC2 - ETH
+.IP 2.
+X.25 - LAPB - WAN
+.IP 3.
+X.25 - LAPB - STUN - IP
+.IP 4.
+X.25 - TCP - IP
+.IP 5.
+X.25 - SCTP - IP
+.PP
+where, WAN, LAPB, ETH and LLC2 are facilities that can be configured as
+on-board or in-kernel.
+.PP
+Each entry in the X.25 configuration file conatins the following information:
+.PP
+<\fIdev\fP> <\fIbrd\fP> <\fIline\fP> <\fIsubnet\fP> <\fItype\fP> <\fIcls\fP> <\fIfile\fP> <\fIaddr\fP>
+.TP
+<\fIdev\fP> \fBDevice Prefix\fP
+The device prefix determines to which subnetwork the entry refers and is one
+of the following strings:
+.RS
+.TS
+tab(:);
+lb1c1l.
+wans:-:The device is a Wide Area Network device.
+ethr:-:The device is an Ethernet device.
+.TE
+.RE
+.TP
+<\fIbrd\fP> \fBBoard Number\fP
+.TP
+<\fIline\fP> \fBLine Number\fP
+.TP
+<\fIsubnet\fP> \fBSubnetwork Identifier\fP
+The subnetwork identifier is a single alphabetical character providing a
+logical administrator-selected descriptor for each subnetwork below the X.25
+driver.  Subnetwork identifiers must be unique within each node.
+.TP
+<\fItype\fP> \fBNetwork Type\fP
+The network type describes the particular subnetwork.  It may be one of the
+following tokens:
+.RS
+.TS
+tab(:);
+lb1c1l.
+LAN:-:Local Area Network
+WAN80:-:Wide Area Network 1980
+WAN84:-:Wide Area Network 1984
+WAN88:-:Wide Area Network 1988
+.TE
+.RE
+.TP
+<\fIcls\fP> \fBClass\fP
+The class describes the lower X.25 interface to a particular subnetwork and
+may be one of:
+.RS
+.TS
+tab(:);
+lb1c1lssss.
+LC_LLC1:-:LLC1 to the LAN.
+LC_LLC2:-:LLC2 to the LAN.
+LC_LAPBDTE:-:LAPB to the WAN (as a DTE).
+LC_LAPBDCE:-:LAPB to the WAN (as a DCE).
+LC_LAPBXDTE:-:LAPB to the WAN (as DTE), extended addressing.
+LC_LAPBXDCE:-:LAPB to the WAN (as DCE), extended addressing.
+LC_LAPDTE:-:LAP to the WAN (as a DTE).
+LC_LAPDCE:-:LAP to the WAN (as a DCE).
+.TE
+.RE
+.TP
+<\fIfile\fP> \fBStack File\fP
+The stack file refers to an appropriate configuration file for this particular
+subnetwork.  It may be one of two types: XLB or XLC.  An XLB file contains the
+names of an X.25 configuration file, \fBx25template\fP(5), or LAPB
+configuration file, \fBlapbtemplate\fP(5) and a WAN configuration file,
+\fBwantempate\fP(5) for WAN subnetworks.  An XLC file contains the names of an
+X.25 configuration file, \fBx25template\fP(5), and an LLC2 configuration file,
+\fBllc2template\fP(5), for Ethernet subnetworks.
+.RS
+.PP
+.BR netcreate (8)
+will search for these files in the \fB@configdir@/@PACKAGE@/tempate/\fP
+directory.  In this directory, each file has a special suffix extension where
+the suffix \*(lq\fB.XLB\fP\*(rq is for XLB type files and \*(lq\fB.XLC\fP\*(rq
+is for XLC type files.
+.PP
+The special suffix and the path are not resent in <\fIfile\fP> as
+.BR netcreate (8)
+deduces them automatically.
+.RE
+.TP
+<\fIaddr\fP> \fBAddress\fP
+The Address can be one of two types.  For WAN subnetworks, it is a DTE address
+(of between zero and fifteen BCD digits without TOA/NPI and between zero and
+seventeen BCD digits with TOA/NPI) and for ISO 8802 subnetworks, it is a
+string of sixteen hexadecimal digits.  This ISO 8802 string is the
+concatentation of a twelve digit MAC address, a two digit local SAP and a two
+digit loop SAP.  Each ISO 8802 board has a factry assigned MAC address and if
+the administrator wishes to use this address then the first twelve digits of
+the address must be zeros.  In any case, the two SAPs must be non-zero, even
+and different from each other.
+.PP
+Any token in an entry may be a question mark, \*(lq\fB?\fP\*(rq, meaning
+\*(lq\fInot configured\fP.\*(rq  If an entry contains such a token, then the
+entire entry will be ignored by
+.BR netcreate (8).
+.PP
+A \*(lq\fB#\fP\*(rq indicates the beginning of a comment; characters up to the
+end of the line are not interpreted by routintes that search the file.
+.PP
+The administrator is advised to edit this file using the
+.B x25config
+option in
+.BR x25adm (8)
+only, as this performs necessary consistency checks on each entry in the file.
+
