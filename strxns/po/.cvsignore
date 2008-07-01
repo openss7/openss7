@@ -1,0 +1,10 @@
+boldquot.sed
+en@boldquot.header
+en@quot.header
+insert-header.sin
+Makevars.template
+quot.sed
+remove-potcdate.sin
+Rules-quot
+strxns.pot
+Makefile.in.in
