@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: wan_proto.h,v 0.9.2.1 2008-06-18 16:43:14 brian Exp $
+ @(#) $Id: wan_proto.h,v 0.9.2.2 2008-07-01 12:31:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:43:14 $ by $Author: brian $
+ Last Modified $Date: 2008-07-01 12:31:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wan_proto.h,v $
+ Revision 0.9.2.2  2008-07-01 12:31:08  brian
+ - updated man pages, drafts, specs, header files
+
  Revision 0.9.2.1  2008-06-18 16:43:14  brian
  - added new files for NLI and DLPI
 
@@ -59,7 +62,100 @@
 #ifndef __SYS_SNET_WAN_PROTO_H__
 #define __SYS_SNET_WAN_PROTO_H__
 
-#ident "@(#) $RCSfile: wan_proto.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: wan_proto.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/*
+ * This file contains a basic SpiderWAN like interface.  Source compatibility is
+ * attempted.  Binary compatibility is not attempted (but may result, YMMV).
+ * Portable applications programs, STREAMS drivers and modules, should use the
+ * CDI interface instead.
+ */
+
+/*
+ * Primitive types: These constant values are used in the wan_type field of the
+ * various primitives.
+ */
+#define WAN_REG		2	/* register subnetwork ID */
+#define WAN_SID		1	/* specify subnetwork ID */
+#define WAN_CTL		3	/* control connection */
+#define WAN_DAT		4	/* transfer data */
+
+/*
+ * WAN_CTL command types: These constant values are used in the wan_command
+ * field of the WAN_CTL primitive.
+ */
+#define WC_CONNECT	1	/* connect */
+#define WC_CONCNF	2	/* connect confirm */
+#define WC_DISC		3	/* disconnect */
+#define WC_DISCCNF	4	/* disconnect confirm */
+
+/*
+ * WAN_DAT command types: These constant values are used in the wan_command
+ * field of the WAN_DAT primitive.
+ */
+#define WC_TX		1	/* data for transmission */
+#define WC_RX		2	/* received data */
+
+/*
+ * Address types: These constant values are used in the wan_remtype field of the
+ * WAN_CTL primitive.
+ */
+#define WAN_TYPE_ASC	0	/* ASCII digits */
+#define WAN_TYPE_BCD	1	/* BCD encoded digits */
+
+/*
+ * Status values: These constant values are used in the wan_status field of the
+ * WAN_CTL primitive.
+ */
+#define WAN_FAIL	0	/* operation failed */
+#define WAN_SUCCESS	1	/* operation successful */
+
+/*
+ * WAN_REG primitive, consists of one M_(PC)PROTO message block.
+ */
+struct wan_reg {
+	uint8_t wan_type;		/* always WAN_REG */
+	uint8_t wan_spare[3];		/* spare for alignment */
+	uint32_t wan_snid;		/* subnetwork ID */
+};
+
+/*
+ * WAN_SID primitive, consists of one M_PROTO message block.
+ */
+struct wan_sid {
+	uint8_t wan_type;		/* always WAN_SID */
+	uint8_t wan_spare[3];		/* spare for alignment */
+	uint32_t wan_snid;		/* subnetwork ID */
+};
+
+/*
+ * WAN_CTL primitive, consists of one M_PROTO message block.
+ */
+struct wan_ctl {
+	uint8_t wan_type;		/* always WAN_CTL */
+	uint8_t wan_command;		/* command: WC_CONNECT, WC_CONCNF, WC_DISC, WC_DISCCNF */
+	uint8_t wan_remtype;		/* remote address type: WAN_TYPE_ASC or WAN_TYPE_BCD */
+	uint8_t wan_remsize;		/* size of remote address in octets or semi-octets */
+	uint8_t wan_remaddr[20];	/* the remote address */
+	uint8_t wan_status;		/* status: WAN_SUCCESS or WAN_FAIL */
+	uint8_t wan_diag;		/* diagnostic when failed */
+};
+
+/*
+ * WAN_MSG primitive, consists of one M_PROTO message block followed by one or
+ * more M_DATA message blocks.
+ */
+struct wan_msg {
+	uint8_t wan_type;		/* always WAN_MSG */
+	uint8_t wan_command;		/* WC_TX or WC_RX */
+};
+
+union WAN_primitives {
+	uint8_t wan_type;		/* WAN_SID, WAN_REG, WAN_CTL or WAN_DAT */
+	struct wan_reg wreg;		/* registration message class */
+	struct wan_sid wsid;		/* subnetwork ID message class */
+	struct wan_ctl wctl;		/* control message class */
+	struct wan_msg wmsg;		/* data message class */
+};
 
 #endif				/* __SYS_SNET_WAN_PROTO_H__ */
-

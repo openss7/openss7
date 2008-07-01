@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:31:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-06-18 16:45:24 $ by $Author: brian $
+# Last Modified $Date: 2008-07-01 12:31:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,7 +73,8 @@ endif
 EXTRA_info_TEXINFOS	= \
 			  texi/args.texi \
 			  $(info_TEXINFOS) \
-			  $(nli_TEXINFOS)
+			  $(nli_TEXINFOS) \
+			  $(FIG_FIGS)
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
@@ -94,6 +95,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2008-07-01 12:31:07  brian
+# - updated man pages, drafts, specs, header files
+#
 # Revision 0.9.2.3  2008-06-18 16:45:24  brian
 # - widespread updates
 #

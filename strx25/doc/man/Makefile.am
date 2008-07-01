@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-06-18 16:45:23 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-07-01 12:31:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-06-18 16:45:23 $ by $Author: brian $
+# Last Modified $Date: 2008-07-01 12:31:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -88,16 +88,36 @@ man_MANS = \
 	man3/x25_write_config_parameters_file.3 \
 	man3/xti_x25.3 \
 	man3/XX25.3 \
+	man4/cd-llc.4 \
+	man4/cdpmod.4 \
 	man4/cons.4 \
+	man4/dlaix.4 \
+	man4/dl-llc.4 \
+	man4/hdlc.4 \
+	man4/ifr.4 \
 	man4/ipx25.4 \
 	man4/ixe.4 \
+	man4/lapb.4 \
+	man4/llc2.4 \
+	man4/mfe.4 \
+	man4/mlp.4 \
 	man4/nli3.4 \
 	man4/npi.4 \
 	man4/s_cons.4 \
 	man4/s_nli3.4 \
 	man4/s_npi.4 \
+	man4/s_wan.4 \
+	man4/s_cdi.4 \
+	man4/s_dlpi.4 \
 	man4/s_xx25.4 \
+	man4/wan.4 \
 	man4/X25.4 \
+	man4/x25-lapb.4 \
+	man4/x25-llc2.4 \
+	man4/x25-llc.4 \
+	man4/x25-plp.4 \
+	man4/xos.4 \
+	man4/xot.4 \
 	man4/xx25.4 \
 	man5/extraformat.5 \
 	man5/ifrdlciconf.5 \
@@ -110,8 +130,10 @@ man_MANS = \
 	man5/padent.5 \
 	man5/qosformat.5 \
 	man5/strx25.5 \
+	man5/wanmapconf.5 \
 	man5/wantemplate.5 \
 	man5/x25_primitives.5 \
+	man5/x25conf.5 \
 	man5/x25template.5 \
 	man5/xaddrf.5 \
 	man5/xhostent.5 \
@@ -132,6 +154,8 @@ man_MANS = \
 	man7/N_getVCstatus.7 \
 	man7/NLI.7 \
 	man7/nli.7 \
+	man7/WAN.7 \
+	man7/wan.7 \
 	man7/N_linkconfig.7 \
 	man7/N_linkent.7 \
 	man7/N_linkmode.7 \
@@ -176,6 +200,7 @@ man_MANS = \
 	man8/nuimap.8 \
 	man8/pvcmap.8 \
 	man8/vcstat.8 \
+	man8/wanmap.8 \
 	man8/wantune.8 \
 	man8/x25diags.8 \
 	man8/x25file.8 \
@@ -217,16 +242,36 @@ dist_noinst_MANS = \
 	man3/x25_write_config_parameters_file.3.man \
 	man3/xti_x25.3.man \
 	man3/XX25.3.man \
+	man4/cd-llc.4.man \
+	man4/cdpmod.4.man \
 	man4/cons.4.man \
+	man4/dlaix.4.man \
+	man4/dl-llc.4.man \
+	man4/hdlc.4.man \
+	man4/ifr.4.man \
 	man4/ipx25.4.man \
 	man4/ixe.4.man \
+	man4/lapb.4.man \
+	man4/llc2.4.man \
+	man4/mfe.4.man \
+	man4/mlp.4.man \
 	man4/nli3.4.man \
 	man4/npi.4.man \
 	man4/s_cons.4.man \
 	man4/s_nli3.4.man \
 	man4/s_npi.4.man \
+	man4/s_wan.4.man \
+	man4/s_cdi.4.man \
+	man4/s_dlpi.4.man \
 	man4/s_xx25.4.man \
+	man4/wan.4.man \
 	man4/X25.4.man \
+	man4/x25-lapb.4.man \
+	man4/x25-llc2.4.man \
+	man4/x25-llc.4.man \
+	man4/x25-plp.4.man \
+	man4/xos.4.man \
+	man4/xot.4.man \
 	man4/xx25.4.man \
 	man5/extraformat.5.man \
 	man5/ifrdlciconf.5.man \
@@ -239,8 +284,10 @@ dist_noinst_MANS = \
 	man5/padent.5.man \
 	man5/qosformat.5.man \
 	man5/strx25.5.man \
+	man5/wanmapconf.5.man \
 	man5/wantemplate.5.man \
 	man5/x25_primitives.5.man \
+	man5/x25conf.5.man \
 	man5/x25template.5.man \
 	man5/xaddrf.5.man \
 	man5/xhostent.5.man \
@@ -261,6 +308,8 @@ dist_noinst_MANS = \
 	man7/N_getVCstatus.7.man \
 	man7/NLI.7.man \
 	man7/nli.7.man \
+	man7/WAN.7.man \
+	man7/wan.7.man \
 	man7/N_linkconfig.7.man \
 	man7/N_linkent.7.man \
 	man7/N_linkmode.7.man \
@@ -305,6 +354,7 @@ dist_noinst_MANS = \
 	man8/nuimap.8.man \
 	man8/pvcmap.8.man \
 	man8/vcstat.8.man \
+	man8/wanmap.8.man \
 	man8/wantune.8.man \
 	man8/x25diags.8.man \
 	man8/x25file.8.man \
@@ -324,6 +374,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2008-07-01 12:31:04  brian
+# - updated man pages, drafts, specs, header files
+#
 # Revision 0.9.2.5  2008-06-18 16:45:23  brian
 # - widespread updates
 #

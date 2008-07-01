@@ -1,5 +1,27 @@
 2008-07-01  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/drafts/x25/draft-bidulock-tsvwg-snare-00.me: updated drafts
+	* doc/drafts/x25/draft-bidulock-tsvwg-xos-00.me: updated drafts
+	* doc/man/Makefile.am: added man pages
+	* doc/man/man4/npi.4.man: updated man page
+	* doc/man/man4/s_npi.4.man: updated man page
+	* doc/man/man5/wantemplate.5.man: updated man page
+	* doc/man/man5/x25template.5.man: updated man page
+	* doc/man/man7/NLI.7.man: updated man page
+	* doc/man/man8/ixemap.8.man: updated man page
+	* doc/man/man8/lltune.8.man: updated man page
+	* doc/man/man8/wantune.8.man: updated man page
+	* doc/man/strx25.refs: updated references
+	* doc/specs/Makefile.am: updated specs
+	* doc/specs/nli/Makefile.am: updated specs
+	* doc/specs/nli/nli.texi: updated specs
+	* scripts/texi/args.texi.in: added arguments
+
+	* src/include/snet/wan_control.h: updated header files
+	* src/include/snet/wan_proto.h: updated header files
+	* src/include/sys/snet/wan_control.h: updated header files
+	* src/include/sys/snet/wan_proto.h: updated header files
+
 	- Checking in changes and additions:
 
 	* doc/man/man4/cd-llc.4.man: added manual page

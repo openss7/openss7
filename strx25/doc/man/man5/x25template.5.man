@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: x25template.5.man,v 0.9.2.2 2008-06-18 16:45:24 brian Exp $
+.\" @(#) $Id: x25template.5.man,v 0.9.2.3 2008-07-01 12:31:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:24 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:31:05 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: x25template.5.man,v $
+.\" Revision 0.9.2.3  2008-07-01 12:31:05  brian
+.\" - updated man pages, drafts, specs, header files
+.\"
 .\" Revision 0.9.2.2  2008-06-18 16:45:24  brian
 .\" - widespread updates
 .\"
@@ -887,7 +890,7 @@ system.)
 .PP
 .BR x25tune (8),
 .BR x25 (4),
-.BR x25netd (8).
+.BR xnetd (8).
 .\"
 .\"
 .SH COMPATIBILITY
@@ -943,9 +946,9 @@ x25
 ISO/IEC 8208 editions 1, 2 and 3; as well as ITU-T Recommendation X.25 for
 1993, 1988, 1984 and 1980.
 .IP \(em
-No other implementation documents support for Module 32768.
+No other implementation documents support for Modulo 32768.
 .B @PACKAGE_TITLE@
-supports Module 32768 per ISO/IEC 8208,
+supports Modulo 32768 per ISO/IEC 8208,
 .[
 iso8208
 .]

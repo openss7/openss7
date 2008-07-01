@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ixemap.8.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\" @(#) $Id: ixemap.8.man,v 0.9.2.2 2008-07-01 12:31:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:31:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ixemap.8.man,v $
+.\" Revision 0.9.2.2  2008-07-01 12:31:06  brian
+.\" - updated man pages, drafts, specs, header files
+.\"
 .\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
 .\" - added files
 .\"
@@ -628,6 +631,10 @@ has no known bugs.
 .PP
 .B ixemap
 is compatible with
+.IR "AIXlink/X.25" ,
+.[
+aixlink
+.]
 .IR "HP-UX" ,
 .[
 hpuxdoc
@@ -635,6 +642,18 @@ hpuxdoc
 .IR "IRIS SX.25" ,
 .[
 sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
 .]
 .IR "Solstice X.25" ,
 .[
@@ -667,10 +686,13 @@ For additional compatibility considerations, see
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SunLink X.25" ,
-.IR "Solstice X.25" ,
+.IR "AIXlink/X.25" ,
 .[
-solx25ag
+aixlink
+.]
+.IR "HP-UX"
+.[
+hpuxdoc
 .]
 .IR "IRIS SX.25" ,
 .[
@@ -680,17 +702,25 @@ sx25
 .[
 ptx25
 .]
-and
-.IR "HP-UX"
+.IR "RadiSys WAN" ,
 .[
-hpuxdoc
+radwan
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "SunLink X.25" ,
+.IR "Solstice X.25" ,
+.[
+solx25ag
 .]
 documentation.
 .\"
 .\"
 .SH HISTORY
 .PP
-.I ixemap
+.B ixemap
 first appeared in
 .IR "Spider X.25" .
 .\"

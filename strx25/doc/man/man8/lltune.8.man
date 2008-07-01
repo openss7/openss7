@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lltune.8.man,v 0.9.2.1 2008-06-13 06:43:54 brian Exp $
+.\" @(#) $Id: lltune.8.man,v 0.9.2.2 2008-07-01 12:31:06 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-13 06:43:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:31:06 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lltune.8.man,v $
+.\" Revision 0.9.2.2  2008-07-01 12:31:06  brian
+.\" - updated man pages, drafts, specs, header files
+.\"
 .\" Revision 0.9.2.1  2008-06-13 06:43:54  brian
 .\" - added files
 .\"
@@ -171,15 +174,18 @@ command option.  Non-command options that are not necessary for the specified
 command option do not generate an error by mere combination.
 .TP
 \fB-e\fP, \fB--extended\fP
-Normally \fBx25tune\fP processes a fixed number of lines from \fIstdin\fP (or
-\fIfilename\fP) when sepcified, and outputs a fixed number of lines to
+Normally \fBlltune\fP processes a fixed number of lines from \fIstdin\fP (or
+\fIfilename\fP) when specified, and outputs a fixed number of lines to
 \fIstdout\fP (or \fIfilename\fP) when specified.  This fixed number of lines are
-strictly compatible with other implementations of \fBx25tune\fP.
+strictly compatible with other implementations of \fBlltune\fP.
 .RS
 .PP
-When the \fB-e\fP option is specified, additional lines are accepted on input and are generated on
-output.  For the format of the fixed lines and the additional lines, see
-.BR x25template (5).
+When the \fB-e\fP option is specified, additional lines are accepted on input
+and are generated on output.  For the format of the fixed lines and the
+additional lines, see
+.BR llc2template (5)
+and
+.BR lapbtemplate (5).
 .RE
 .TP
 \fB-s\fP, \fB--subnet\fP \fIsubnet\fP
@@ -439,4 +445,3 @@ first appeared in
 $LIST$
 .]
 .TI
-
