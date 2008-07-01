@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 00:01:52 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-07-01 12:48:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 00:01:52 $ by $Author: brian $
+# Last Modified $Date: 2008-07-01 12:48:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -346,6 +346,11 @@ if RPM_BUILD_USER
 
 SUBDIRS = src
 
+if PKG_BUILD_ARCH
+SUBDIRS += intl po
+CLEANFILES += po/stamp-po
+endif
+
 SUBDIRS += .
 
 if WITH_32BIT_LIBS
@@ -462,6 +467,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.21  2008-07-01 12:48:52  brian
+# - updated drafts and docs
+#
 # Revision 0.9.2.20  2008-04-29 00:01:52  brian
 # - updated headers for release
 #

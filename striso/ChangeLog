@@ -1,5 +1,11 @@
 2008-07-01  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: updates
+	* configure.ac: updates
+	* doc/drafts/iso/draft-bidulock-tsvwg-isos-00.me: updates
+	* doc/drafts/iso/draft-bidulock-tsvwg-itos-00.me: updates
+	* doc/man/striso.refs: updates
+
 	* po/LINGUAS: added po files for gettext
 	* po/Makevars: added po files for gettext
 	* po/POTFILES.in: added po files for gettext
