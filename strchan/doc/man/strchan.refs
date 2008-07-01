@@ -243,10 +243,48 @@
 %I Unix International Press
 
 %L CDI
-%A Geoffrey Gerrien
+%K cdiapi
+%A Geoffrey Gerrietts
+%A Dave Grothe
+%A Mikel Matthews
+%A Dave Healy
+%Q GCOM, Inc.
+%R CDI-API
 %T CDI \(em Application Program Interface Guide
-%I Gcom, Inc.
 %D March 1999
+%J Original Edition, 1997
+%C Savoy, IL
+%I GCOM
+%U http://www.gcom.com/
+
+%L DLPI
+%K dlpiapi
+%A Debra J. Schweiger
+%A Dave Healy
+%A Dave Grothe
+%Q GCOM, Inc.
+%R DLPI-API
+%T DLPI \(em Application Program Inteface Guide
+%D April 2003
+%J Original Edition, 1995
+%C Savoy, IL
+%I GCOM
+%U http://www.gcom.com/
+
+%L NPI
+%K npiapi
+%A Scott D. Smith
+%A Dave Grothe
+%A Dave Healy
+%A Charles Lipp
+%Q GCOM, Inc.
+%R NPI-API
+%T NPI \(em Application Program Interface Guide
+%D April 1998
+%J Original Edition, 1995
+%C Savoy, IL
+%I GCOM
+%U http://www.gcom.com/
 
 %L NLI
 %A Brian Bidulock
@@ -270,7 +308,7 @@
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/cdi.pdf
-%O Distributed with package strss7-0.9.2.
+%O Distributed with package strxns-0.9.2.
 
 %L LMI
 %A Brian Bidulock
@@ -3426,6 +3464,43 @@ Part 1: Protocol Specification
 %Q Institute of Electrical and Electronics Engineers
 %I IEEE Computer Society
 
+%K v25bis
+%L V.25 bis
+%A ITU
+%R ITU-T Recommendation V.25 bis
+%T Synchronous and asynchronous automatic dialling procedures on switched networks
+%D October 1996
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-V.25bis/
+
+
+%K x21
+%L X.21
+%A ITU
+%R ITU-T Recommendation X.21
+%T Interface between Data Terminal Equiment (DTE) and Data Circuit-terminating Equipment (DCE) for synchronous operation on Public Data Networks
+%D September 1992
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.21/
+
+%K x21bis
+%L X.21 bis
+%A ITU
+%R ITU-T Recommendation X.21 bis
+%T Use on Public Data Networks of Data Terminal Equipment (DTE) which is designed for interfacing to synchronous V-series modems
+%D March 1988
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.21bis/
+
 %K x25
 %L X.25
 %A ITU
@@ -5001,6 +5076,36 @@ Part 1: Protocol Specification
 %Q SBE
 %I SBE
 
+%L SpiderX25
+%R SpiderX25
+%K spiderx25wan
+%T SpiderX25 WAN Implementations Guide
+%J Release 8.0
+%I Spider
+%Q Spider Systems, Ltd.
+%C Edinburgh
+
+%L SpiderISDN
+%R SpiderISDN
+%K spiderisdnwan
+%T SpiderISDN WAN Implementations Guide
+%J Release 4.0
+%I Spider
+%Q Shiva Corporation
+%C Edinburgh
+
+%L RadiSys WAN
+%R RadiSys WAN
+%K radwan
+%D June 2004
+%T ARTIC STREAMS Support WAN Driver Interface Reference
+%J Release 1.7
+%I RadiSys
+%C Hillsboro, OR
+%G Doc No: 007-01232-0003
+%Q RadiSys Corporation
+%U http://www.radisys.com/
+
 %L AIXDOC
 %R AIX\(rg 5L Version 5.1
 %K aixdoc
@@ -5521,6 +5626,16 @@ Part 1: Protocol Specification
 %D July 1982
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc0813.txt
+
+%K rfc826
+%L RFC826
+%A David C. Plummer
+%Q Internet Engineering Task Force \(em Network Working Group
+%T An Ethernet Address Resolution Protocol or Converting Network Protocol Addresses to 48.bit Ethernet Address for Transmission on Ethernet Hardware
+%R RFC 826
+%D November 1982
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc0826.txt
 
 %K rfc892
 %L RFC892
@@ -6264,6 +6379,17 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc2853.txt
+
+%K rfc2863
+%L RFC2863
+%R RFC 2863
+%A Keith McCloghrie
+%A Frank Kastenholz
+%T The Interfaces Group MIB
+%D June 2000
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2863.txt
 
 %K rfc2203
 %L RFC2203

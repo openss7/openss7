@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 01:52:14 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-07-01 13:02:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 01:52:14 $ by $Author: brian $
+# Last Modified $Date: 2008-07-01 13:02:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([sigtran],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 01:52:14 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.14 $) $Date: 2008-07-01 13:02:13 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -103,6 +103,7 @@ AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
 dnl AM_GNU_GETTEXT_VERSION([0.16.1])
+dnl AM_GNU_GETTEXT
 
 dnl
 dnl Checks for libraries.
@@ -151,7 +152,6 @@ AC_CHECK_TYPES([ptrdiff_t])
 dnl
 dnl Checks for library functions.
 dnl
-dnl AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
@@ -194,6 +194,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.14  2008-07-01 13:02:13  brian
+# - gettext updates and references updates
+#
 # Revision 0.9.2.13  2008-04-29 01:52:14  brian
 # - updated headers for release
 #
