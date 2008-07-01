@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npiapi.h,v 0.9.2.3 2008-04-25 11:39:32 brian Exp $
+ @(#) $Id: npiapi.h,v 0.9.2.4 2008-07-01 12:06:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:32 $ by $Author: brian $
+ Last Modified $Date: 2008-07-01 12:06:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npiapi.h,v $
+ Revision 0.9.2.4  2008-07-01 12:06:40  brian
+ - updated manual pages, added new API library headers and impl files
+
  Revision 0.9.2.3  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
@@ -65,13 +68,31 @@
 #ifndef __NPIAPI_H__
 #define __NPIAPI_H__
 
-#ident "@(#) $RCSfile: npiapi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npiapi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* *INDENT-OFF* */
 #ifdef __BEGIN_DECLS
 __BEGIN_DECLS
 #endif				/* __BEGIN_DECLS */
 /* *INDENT-ON* */
+
+/* Logging options. */
+#define NPI_LOG_FILE		(1<<0)
+#define NPI_LOG_STDERR		(1<<1)
+#define NPI_LOG_RX_PROTOS	(1<<2)
+#define NPI_LOG_TX_PROTOS	(1<<3)
+#define NPI_LOG_ERRORS		(1<<4)
+#define NPI_LOG_RX_DATA		(1<<5)
+#define NPI_LOG_TX_DATA		(1<<6)
+#define NPI_LOG_SIGNALS		(1<<7)
+#define NPI_LOG_CONINDS		(1<<8)
+#define NPI_LOG_OPTIONS		(1<<9)
+#define NPI_LOG_FACILS		(1<<10)
+#define NPI_LOG_DEFAULT		(NPI_LOG_FILE|NPI_LOG_STDERR|NPI_LOG_ERRORS)
+
+extern int *_nerrno(void);
+
+#define nerrno (*(_nerrno()))
 
 extern char *npi_ascii_facil(int fref, char *fval, unsigned int flgth, int marker);
 extern int npi_bind_ascii_nsap(int npi_data, char *bind_ascii_nsap, int conind_nr, unsigned flags);

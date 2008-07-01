@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_BIND_ACK.7.man,v 0.9.2.9 2008-06-18 16:45:33 brian Exp $
+.\" @(#) $Id: DL_BIND_ACK.7.man,v 0.9.2.10 2008-07-01 12:06:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:06:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_BIND_ACK.7.man,v $
+.\" Revision 0.9.2.10  2008-07-01 12:06:35  brian
+.\" - updated manual pages, added new API library headers and impl files
+.\"
 .\" Revision 0.9.2.9  2008-06-18 16:45:33  brian
 .\" - widespread updates
 .\"
@@ -101,7 +104,7 @@ dlpi revision 2.0.0
 .\"
 .SH SYNOPSIS
 The message consists of one
-.B M_PCPROTO
+.BR M_PCPROTO (9)
 message block, which contains the following structure:
 .sp
 .nf
@@ -153,7 +156,7 @@ the guidelines presented under the description of
 .TP
 .I dl_addr_offset
 conveys the offset from the beginning of the
-.B M_PCPROTO
+.BR M_PCPROTO (9)
 block where the DLSAP address begins.
 .TP
 .I dl_max_conind

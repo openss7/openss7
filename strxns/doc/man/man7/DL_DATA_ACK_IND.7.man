@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_DATA_ACK_IND.7.man,v 0.9.2.7 2008-06-18 16:45:33 brian Exp $
+.\" @(#) $Id: DL_DATA_ACK_IND.7.man,v 0.9.2.8 2008-07-01 12:06:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:06:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_DATA_ACK_IND.7.man,v $
+.\" Revision 0.9.2.8  2008-07-01 12:06:35  brian
+.\" - updated manual pages, added new API library headers and impl files
+.\"
 .\" Revision 0.9.2.7  2008-06-18 16:45:33  brian
 .\" - widespread updates
 .\"
@@ -98,10 +101,10 @@ dlpi revision 2.0.0
 .\"
 .SH SYNOPSIS
 Consists of one
-.B M_PROTO
+.BR M_PROTO (9)
 message block containing the structure shown
 below, followed by one or more
-.B M_DATA
+.BR M_DATA (9)
 blocks containing one or more bytes of data.  The amount of user data that may
 be transferred in a single DLSDU is limited.  This limit is conveyed by the
 parameter
@@ -146,7 +149,7 @@ destination user is implemented using DLPI, this address is the full DLSAP
 .TP
 .I dl_dest_addr_offset
 conveys the offset from the beginning of the
-.B M_PROTO
+.BR M_PROTO (9)
 message block where the destination DLSAP address begins.
 .TP
 .I dl_src_addr_length
@@ -154,7 +157,7 @@ conveys the length of the DLSAP address of the source DLS User.
 .TP
 .I dl_src_addr_offset
 conveys the offset from the beginning of the
-.B M_PROTO
+.BR M_PROTO (9)
 message block where the source DLSAP address begins.  address returned on the
 .BR DL_BIND_ACK (7).
 .TP

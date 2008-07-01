@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_CONNECT_IND.7.man,v 0.9.2.8 2008-06-18 16:45:33 brian Exp $
+.\" @(#) $Id: DL_CONNECT_IND.7.man,v 0.9.2.9 2008-07-01 12:06:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:06:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_CONNECT_IND.7.man,v $
+.\" Revision 0.9.2.9  2008-07-01 12:06:35  brian
+.\" - updated manual pages, added new API library headers and impl files
+.\"
 .\" Revision 0.9.2.8  2008-06-18 16:45:33  brian
 .\" - widespread updates
 .\"
@@ -102,7 +105,7 @@ dlpi revision 2.0.0
 .\"
 .SH SYNOPSIS
 The message consists of one
-.B M_PROTO
+.BR M_PROTO (9)
 message block containing the structure shown below.
 .sp
 .nf
@@ -174,7 +177,7 @@ associated with the given stream.
 .TP
 .I dl_called_addr_offset
 conveys the offset from the beginning of the
-.B M_PROTO
+.BR M_PROTO (9)
 message block where the called DLSAP address begins.
 .TP
 .I dl_calling_addr_length
@@ -184,7 +187,7 @@ primitive was sent.
 .TP
 .I dl_calling_addr_offset
 conveys the offset from the beginning of the
-.B M_PROTO
+.BR M_PROTO (9)
 message block where the calling DLSAP address begins.
 .TP
 .I dl_qos_length
@@ -205,7 +208,7 @@ will be set to zero.
 .TP
 .I dl_qos_offset
 conveys the offset from the beginning of the
-.B M_PROTO
+.BR M_PROTO (9)
 message block where the quality of service parameters begin.
 .TP
 .I dl_growth
