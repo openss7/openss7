@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdiapi.h,v 0.9.2.3 2008-04-25 11:39:32 brian Exp $
+ @(#) $Id: cdiapi.h,v 0.9.2.4 2008-07-01 12:06:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:32 $ by $Author: brian $
+ Last Modified $Date: 2008-07-01 12:06:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdiapi.h,v $
+ Revision 0.9.2.4  2008-07-01 12:06:40  brian
+ - updated manual pages, added new API library headers and impl files
+
  Revision 0.9.2.3  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
@@ -65,7 +68,45 @@
 #ifndef __CDIAPI_H__
 #define __CDIAPI_H__
 
-#ident "@(#) $RCSfile: cdiapi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cdiapi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
+#include <sys/cdi.h>
+
+#define CDI_CTL_BUF_SIZE	(sizeof(union CD_primitives) + 32)
+#define CDI_DATA_BUF_SIZE	4096
+
+extern int *_cdi_data_cnt(void);
+extern int *_cdi_ctl_cnt(void);
+extern unsigned char *_cdi_data_buf(void);
+extern unsigned char *_cdi_ctl_buf(void);
+
+#define cdi_data_cnt	(*_cdi_data_cnt())
+#define cdi_ctl_cnt	(*_cdi_ctl_cnt())
+#define cdi_data_buf	(_cdi_data_buf())
+#define cdi_ctl_buf	(_cid_ctl_buf())
+
+#define Return_error_ack	(1<<0)
+#define Return_info_ack		(1<<1)
+#define Return_unidata_ack	(1<<2)
+#define Return_error_ind	(1<<3)
+#define Return_disable_con	(1<<4)
+#define Return_enable_con	(1<<5)
+#define RetryOnSignal		(1<<6)
+#define Return_ok_ack		(1<<7)
+#define Return_bad_frame_ind	(1<<8)
+#define Return_modem_sig_ind	(1<<9)
+
+#define CDI_LOG_FILE		(1<<0)
+#define CDI_LOG_STDERR		(1<<1)
+#define CDI_LOG_RX_PROTOS	(1<<2)
+#define CDI_LOG_TX_PROTOS	(1<<3)
+#define CDI_LOG_ERRORS		(1<<4)
+#define CDI_LOG_SIGNALS		(1<<5)
+#define CDI_LOG_RX_DATA		(1<<6)
+#define CDI_LOG_TX_DATA		(1<<7)
+#define CDI_LOG_DISCARDS	(1<<8)
+#define CDI_LOG_VERBOSE		(1<<9)
+#define CDI_LOG_DEFAULT		(CDI_LOG_FILE|CDI_LOG_STDERR|CDI_LOG_ERRORS)
 
 #ifdef __BEGIN_DECLS
 __BEGIN_DECLS

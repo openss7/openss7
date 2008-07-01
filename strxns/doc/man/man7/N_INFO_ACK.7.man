@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_INFO_ACK.7.man,v 0.9.2.7 2008-06-18 16:45:36 brian Exp $
+.\" @(#) $Id: N_INFO_ACK.7.man,v 0.9.2.8 2008-07-01 12:06:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:36 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:06:39 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_INFO_ACK.7.man,v $
+.\" Revision 0.9.2.8  2008-07-01 12:06:39  brian
+.\" - updated manual pages, added new API library headers and impl files
+.\"
 .\" Revision 0.9.2.7  2008-06-18 16:45:36  brian
 .\" - widespread updates
 .\"
@@ -93,42 +96,36 @@ addresses or network addresses.) It should be initiated in response to the
 primitive.
 .SH SYNOPSIS
 The format of this message is one
-.B M_PCPROTO
+.BR M_PCPROTO (9)
 message block and its structure is as follows:
 .sp
 .nf
 \f(CW\s-1\
 typedef struct {
-    ulong PRIM_type;            /* always N_INFO_ACK */
-    ulong NSDU_size;            /* maximum NSDU size */
-    ulong ENSDU_size;           /* maximum ENSDU size */
-    ulong CDATA_size;           /* connect data size */
-    ulong DDATA_size;           /* discon data size */
-    ulong ADDR_size;            /* address size */
-    ulong ADDR_length;          /* address length */
-    ulong ADDR_offset;          /* address offset */
-    ulong QOS_length;           /* length of default QOS values */
-    ulong QOS_offset;           /* offset of default QOS values 
-                                   from the beginning of block */
-    ulong QOS_range_length;     /* length of range of QOS
-                                   values */
-    ulong QOS_range_offset;     /* offset of range of QOS
-                                   values from the beginning of 
-                                   block */
-    ulong OPTIONS_flags;        /* bit masking for options
-                                   supported */
-    ulong NIDU_size;            /* network interface data unit
-                                   size */
-    long SERV_type;             /* service type */
-    ulong CURRENT_state;        /* current state */
-    ulong PROVIDER_type;        /* type of provider */
-    ulong NODU_size;            /* optimal NSDU size */
-    ulong PROTOID_length;       /* length of bound protocol ids 
-                                 */
-    ulong PROTOID_offset;       /* offset of bound protocol ids 
-                                 */
-    ulong NPI_version;          /* version number of NPI that's 
-                                   supported */
+    ulong PRIM_type;        /* always N_INFO_ACK */
+    ulong NSDU_size;        /* maximum NSDU size */
+    ulong ENSDU_size;       /* maximum ENSDU size */
+    ulong CDATA_size;       /* connect data size */
+    ulong DDATA_size;       /* discon data size */
+    ulong ADDR_size;        /* address size */
+    ulong ADDR_length;      /* address length */
+    ulong ADDR_offset;      /* address offset */
+    ulong QOS_length;       /* length of default QOS values */
+    ulong QOS_offset;       /* offset of default QOS values 
+                               from the beginning of block */
+    ulong QOS_range_length; /* length of range of QOS values */
+    ulong QOS_range_offset; /* offset of range of QOS values
+                               from the beginning of block */
+    ulong OPTIONS_flags;    /* bit masking for options supported */
+    ulong NIDU_size;        /* network interface data unit size */
+    long SERV_type;         /* service type */
+    ulong CURRENT_state;    /* current state */
+    ulong PROVIDER_type;    /* type of provider */
+    ulong NODU_size;        /* optimal NSDU size */
+    ulong PROTOID_length;   /* length of bound protocol ids */
+    ulong PROTOID_offset;   /* offset of bound protocol ids */
+    ulong NPI_version;      /* version number of NPI that's 
+                               supported */
 } N_info_ack_t;
 
 /* Flags to indicate support of NS provider options */
@@ -189,7 +186,7 @@ via a
 .TP
 .I ADDR_offset
 Specifies the offset of the bound network address from the beginning of the
-.B M_PCPROTO
+.BR M_PCPROTO (9)
 message block (this field should be ignored if the
 .I ADDR_length
 field is zero).
@@ -211,7 +208,7 @@ provider, this field will be zero.
 .TP
 .I QOS_offset
 Indicates the offset of the QOS parameters from the beginning of the
-.B M_PCPROTO
+.BR M_PCPROTO (9)
 message block.
 
 .TP
@@ -235,7 +232,7 @@ length of this field will be zero.
 .I QOS_range_offset
 Indicates the offset of the range of QOS parameter values from the beginning of
 the
-.B M_PCPROTO
+.BR M_PCPROTO (9)
 message block.
 
 .TP

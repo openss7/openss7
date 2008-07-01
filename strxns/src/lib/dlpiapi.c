@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 11:39:33 $
+ @(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:06:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:33 $ by $Author: brian $
+ Last Modified $Date: 2008-07-01 12:06:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpiapi.c,v $
+ Revision 0.9.2.4  2008-07-01 12:06:40  brian
+ - updated manual pages, added new API library headers and impl files
+
  Revision 0.9.2.3  2008-04-25 11:39:33  brian
  - updates to AGPLv3
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 11:39:33 $"
+#ident "@(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:06:40 $"
 
 static char const ident[] =
-    "$RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-25 11:39:33 $";
+    "$RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:06:40 $";
 
 /*
  * This is an OpenSS7 implemetnation of the GCOM dlpiapi library.  It builds
@@ -73,3 +76,6 @@ static char const ident[] =
  * GCOM originally implemented this library as a static library only called
  * dlpiapi.a.
  */
+
+__asm__(".symver __dlpi_open_GCOM_r,dlpi_open_GCOM@@DLPIAPI_1.0");
+__asm__(".symver __dlpi_close_GCOM_r,dlpi_close_GCOM@@DLPIAPI_1.0");

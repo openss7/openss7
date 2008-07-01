@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: CD_BAD_FRAME_IND.7.man,v 0.9.2.6 2008-06-18 16:45:31 brian Exp $
+.\" @(#) $Id: CD_BAD_FRAME_IND.7.man,v 0.9.2.7 2008-07-01 12:06:34 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:31 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:06:34 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: CD_BAD_FRAME_IND.7.man,v $
+.\" Revision 0.9.2.7  2008-07-01 12:06:34  brian
+.\" - updated manual pages, added new API library headers and impl files
+.\"
 .\" Revision 0.9.2.6  2008-06-18 16:45:31  brian
 .\" - widespread updates
 .\"
@@ -86,12 +89,12 @@ sort-adjacent-labels
 \- frame with error
 .SH SYNOPSIS
 This primitive consists of one
-.B M_PROTO
+.BR M_PROTO (9)
 message block followed by zero or more
-.B M_DATA
+.BR M_DATA (9)
 blocks.
 The
-.B M_PROTO
+.BR M_PROTO (9)
 block is structured as follows:
 .sp
 .nf
@@ -164,40 +167,40 @@ a particular device, this error can be one of the following values:
 .B CD_FRMTOOLONG
 The frame was too long; it overflowed the receive buffer.  The data that was
 successfully received is in the
-.B M_DATA
+.BR M_DATA (9)
 message blocks associated with the primitive.
 .TP
 .B CD_FRMNONOCTET
 The frame was not octet-align.  This is a residue error.
 The data that was successfully received (not including the residue error bits)
 is in the
-.B M_DATA
+.BR M_DATA (9)
 message blocks associated with the primitive.
 .TP
 .B CD_EMPTY_BFR
 The receive buffer is empty.  This error is not normally used.
 No
-.B M_DATA
+.BR M_DATA (9)
 blocks are included with this error.
 .TP
 .B CD_BAD_CRC
 There was a CRC error in an otherwise correctly received frame.
 The data that was successfully received, but which failed CRC calculation,
 is in the
-.B M_DATA
+.BR M_DATA (9)
 message blocks associated with the primitive.
 .TP
 .B CD_FRM_ABORTED
 The frame was aborted.
 Any successfully received octets at the time of the abort are included in the
-.B M_DATA
+.BR M_DATA (9)
 message blocks associated with the primitive.
 .TP
 .B CD_RCV_OVERRUN
 There was a receiver overrun in during the reception of the frame.
 Any successfully received octets up to the point of the receiver overrun are
 included in the
-.B M_DATA
+.BR M_DATA (9)
 message blocks associated with the primitive.
 .RE
 .SS State

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-04-10 10:24:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-07-01 12:06:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 10:24:07 $ by $Author: brian $
+# Last Modified $Date: 2008-07-01 12:06:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -375,6 +375,11 @@ if RPM_BUILD_USER
 
 SUBDIRS = src
 
+if PKG_BUILD_ARCH
+SUBDIRS += intl po
+CLEANFILES += po/stamp-po
+endif
+
 SUBDIRS += .
 
 if WITH_32BIT_LIBS
@@ -485,6 +490,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.65  2008-07-01 12:06:34  brian
+# - updated manual pages, added new API library headers and impl files
+#
 # Revision 0.9.2.64  2008-04-10 10:24:07  brian
 # - removed deprecated Nexusware support
 #

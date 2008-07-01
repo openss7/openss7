@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-06-18 16:45:28 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-07-01 12:06:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-06-18 16:45:28 $ by $Author: brian $
+# Last Modified $Date: 2008-07-01 12:06:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,6 +81,230 @@ dlc_man_MANS = \
 	man4/DLC_TRACE.4
 
 man_MANS = \
+	man3/cdi_xxx.3 \
+	man3/dlpi_sun.3 \
+	man3/dlpi_xxx.3 \
+	man3/npi_xxx.3 \
+	man3/cdi_allow_input_req.3 \
+	man3/cdiapi.3 \
+	man3/cdi_attach_req.3 \
+	man3/cdi_close.3 \
+	man3/cdi_decode_ctl.3 \
+	man3/cdi_decode_modem_sigs.3 \
+	man3/cdi_detach_req.3 \
+	man3/cdi_dial_req.3 \
+	man3/cdi_disable_req.3 \
+	man3/cdi_enable_req.3 \
+	man3/cdi_get_a_msg.3 \
+	man3/cdi_get_modem_sigs.3 \
+	man3/cdi_init.3 \
+	man3/cdi_init_FILE.3 \
+	man3/cdi_modem_sig_poll.3 \
+	man3/cdi_modem_sig_req.3 \
+	man3/cdi_open.3 \
+	man3/cdi_open_data.3 \
+	man3/cdi_perror.3 \
+	man3/cdi_printf.3 \
+	man3/cdi_print_msg.3 \
+	man3/cdi_put_allow_input_req.3 \
+	man3/cdi_put_attach_req.3 \
+	man3/cdi_put_both.3 \
+	man3/cdi_put_data.3 \
+	man3/cdi_put_detach_req.3 \
+	man3/cdi_put_dial_req.3 \
+	man3/cdi_put_disable_req.3 \
+	man3/cdi_put_enable_req.3 \
+	man3/cdi_put_frame.3 \
+	man3/cdi_put_proto.3 \
+	man3/cdi_rcv_msg.3 \
+	man3/cdi_read_data.3 \
+	man3/cdi_set_log_size.3 \
+	man3/cdi_wait_ack.3 \
+	man3/cdi_write_data.3 \
+	man3/cdi_xray_req.3 \
+	man3/DLPI.3 \
+	man3/dlpi.3 \
+	man3/dlpiapi.3 \
+	man3/dlpi_arptype.3 \
+	man3/dlpi_attach_ppa.3 \
+	man3/dlpi_bind.3 \
+	man3/dlpi_bind_dlsap.3 \
+	man3/dlpi_clear_zombies.3 \
+	man3/dlpi_close.3 \
+	man3/dlpi_close_GCOM.3 \
+	man3/dlpi_complete_req.3 \
+	man3/dlpi_configure_dlsaps.3 \
+	man3/dlpi_connect.3 \
+	man3/dlpi_connect_req.3 \
+	man3/dlpi_connect_wait.3 \
+	man3/dlpi_decode_ctl.3 \
+	man3/dlpi_decode_disconnect_reason.3 \
+	man3/dlpi_detach_ppa.3 \
+	man3/dlpi_disabmulti.3 \
+	man3/dlpi_disabnotify.3 \
+	man3/dlpi_discon_req.3 \
+	man3/dlpi_enabmulti.3 \
+	man3/dlpi_enabnotify.3 \
+	man3/dlpi_fd.3 \
+	man3/dlpi_get_a_msg.3 \
+	man3/dlpi_get_both.3 \
+	man3/dlpi_get_info_strm.3 \
+	man3/dlpi_get_physaddr.3 \
+	man3/dlpi_get_style_strm.3 \
+	man3/dlpi_iftype.3 \
+	man3/dlpi_info.3 \
+	man3/dlpi_init.3 \
+	man3/dlpi_linkname.3 \
+	man3/dlpi_listen.3 \
+	man3/dlpi_mactype.3 \
+	man3/dlpi_open_GCOM.3 \
+	man3/dlpi_open.3 \
+	man3/dlpi_open_log.3 \
+	man3/dlpi_perror.3 \
+	man3/dlpi_printf.3 \
+	man3/dlpi_print_msg.3 \
+	man3/dlpi_promiscoff.3 \
+	man3/dlpi_promiscon.3 \
+	man3/dlpi_put_both.3 \
+	man3/dlpi_put_proto.3 \
+	man3/dlpi_rcv.3 \
+	man3/dlpi_rcv_msg.3 \
+	man3/dlpi_read_data.3 \
+	man3/dlpi_recv.3 \
+	man3/dlpi_reset_req.3 \
+	man3/dlpi_reset_res.3 \
+	man3/dlpi_send.3 \
+	man3/dlpi_send_attach_req.3 \
+	man3/dlpi_send_bind_req.3 \
+	man3/dlpi_send_connect_req.3 \
+	man3/dlpi_send_connect_res.3 \
+	man3/dlpi_send_detach_req.3 \
+	man3/dlpi_send_disconnect_req.3 \
+	man3/dlpi_send_info_req.3 \
+	man3/dlpi_send_reset_req.3 \
+	man3/dlpi_send_reset_res.3 \
+	man3/dlpi_send_stats_req.3 \
+	man3/dlpi_send_test_req.3 \
+	man3/dlpi_send_test_res.3 \
+	man3/dlpi_send_uic.3 \
+	man3/dlpi_send_unbind_req.3 \
+	man3/dlpi_send_xid_req.3 \
+	man3/dlpi_send_xid_res.3 \
+	man3/dlpi_set_log_size.3 \
+	man3/dlpi_set_physaddr.3 \
+	man3/dlpi_set_signal_handling.3 \
+	man3/dlpi_set_test_req.3 \
+	man3/dlpi_set_test_res.3 \
+	man3/dlpi_set_timeout.3 \
+	man3/dlpi_set_unnum_frame_handler.3 \
+	man3/dlpi_strerror.3 \
+	man3/dlpi_uic_req.3 \
+	man3/dlpi_unbind.3 \
+	man3/dlpi_unbind_dlsap.3 \
+	man3/dlpi_walk.3 \
+	man3/dlpi_write_data.3 \
+	man3/dlpi_xid_req.3 \
+	man3/dlpi_xid_res.3 \
+	man3/dlpi_xray_req.3 \
+	man3/endpadent.3 \
+	man3/endxhostent.3 \
+	man3/equalx25.3 \
+	man3/getnettype.3 \
+	man3/getpadbyaddr.3 \
+	man3/getpadent.3 \
+	man3/getxhostbyaddr.3 \
+	man3/getxhostbyname.3 \
+	man3/getxhostent.3 \
+	man3/libcdiapi.3 \
+	man3/libdlpi.3 \
+	man3/libdlpiapi.3 \
+	man3/libnpiapi.3 \
+	man3/linkidtox25.3 \
+	man3/npiapi.3 \
+	man3/npi_ascii_facil.3 \
+	man3/npi_bind_ascii_nsap.3 \
+	man3/npi_bind_nsap.3 \
+	man3/npi_conenct.3 \
+	man3/npi_connect_req.3 \
+	man3/npi_connect_wait.3 \
+	man3/npi_conn_res.3 \
+	man3/npi_datack_req.3 \
+	man3/npi_decode_ctl.3 \
+	man3/npi_decode_primitive.3 \
+	man3/npi_decode_reason.3 \
+	man3/npi_discon_req.3 \
+	man3/npi_discon_req_seq.3 \
+	man3/npi_ext_bind_nsap.3 \
+	man3/npi_ext_bind_nsap_ascii.3 \
+	man3/npi_ext_connect_req.3 \
+	man3/npi_ext_connect_wait.3 \
+	man3/npi_ext_conn_res.3 \
+	man3/npi_ext_listen.3 \
+	man3/npi_ext_nbio_complete_listen.3 \
+	man3/npi_fac_walk.3 \
+	man3/npi_flags_connect_wait.3 \
+	man3/npi_flags_listen.3 \
+	man3/npi_flow_req.3 \
+	man3/npi_get_a_msg.3 \
+	man3/npi_get_and_log_facils.3 \
+	man3/npi_get_a_proto.3 \
+	man3/npi_get_facils.3 \
+	man3/npi_info_req.3 \
+	man3/npi_init.3 \
+	man3/npi_init_FILE.3 \
+	man3/npi_listen.3 \
+	man3/npi_max_sdu.3 \
+	man3/npi_nbio_complete_listen.3 \
+	man3/npi_open_data.3 \
+	man3/npi_perror.3 \
+	man3/npi_printf.3 \
+	man3/npi_print_msg.3 \
+	man3/npi_put_data_buf.3 \
+	man3/npi_put_data_proto.3 \
+	man3/npi_put_proto.3 \
+	man3/npi_rcv.3 \
+	man3/npi_read_data.3 \
+	man3/npi_reset_req.3 \
+	man3/npi_reset_res.3 \
+	man3/npi_send_connect_req.3 \
+	man3/npi_send_ext_connect_req.3 \
+	man3/npi_send_info_req.3 \
+	man3/npi_send_reset_req.3 \
+	man3/npi_set_log_size.3 \
+	man3/npi_set_marks.3 \
+	man3/npi_set_pid.3 \
+	man3/npi_set_signal_handling.3 \
+	man3/npi_want_a_proto.3 \
+	man3/npi_write_data.3 \
+	man3/npi_x25_clear_cause.3 \
+	man3/npi_x25_diagnostic.3 \
+	man3/npi_x25_reset_cause.3 \
+	man3/npi_x25_restart_cause.3 \
+	man3/padent.3 \
+	man3/padtos.3 \
+	man3/pu_decode_handle.3 \
+	man3/pu_dlpi_upa.3 \
+	man3/pu_get_board_info.3 \
+	man3/pu_get_pu_id.3 \
+	man3/pu_get_stats.3 \
+	man3/pu_id_to_pu_handle.3 \
+	man3/pu_id_to_pu_number.3 \
+	man3/pu_map_npi_lpa_to_handle.3 \
+	man3/pu_strerror.3 \
+	man3/put_npi_proto.3 \
+	man3/setpadent.3 \
+	man3/setxhostent.3 \
+	man3/stox25.3 \
+	man3/x25_find_link_parameters.3 \
+	man3/x25_read_config_parameters.3 \
+	man3/x25_read_config_parameters_file.3 \
+	man3/x25_save_link_parameters.3 \
+	man3/x25_set_parse_error_function.3 \
+	man3/x25tolinkid.3 \
+	man3/x25tos.3 \
+	man3/x25_write_config_parameters.3 \
+	man3/x25_write_config_parameters_file.3 \
+	man3/xhostent.3 \
 	man4/XNS.4 \
 	man4/ipcl.4 \
 	man4/ipco.4 \
@@ -141,12 +365,24 @@ man_MANS = \
 	man7/cd_unitdata_req_t.7 \
 	man7/CD_WRITE_READ_REQ.7 \
 	man7/cd_write_read_req_t.7 \
+	man7/DL_AGGR_IND.7 \
+	man7/dl_aggr_ind_t.7 \
+	man7/DL_AGGR_REQ.7 \
+	man7/dl_aggr_req_t.7 \
 	man7/DL_ATTACH_REQ.7 \
 	man7/dl_attach_req_t.7 \
 	man7/DL_BIND_ACK.7 \
 	man7/dl_bind_ack_t.7 \
 	man7/DL_BIND_REQ.7 \
 	man7/dl_bind_req_t.7 \
+	man7/DL_CAPABILITY_ACK.7 \
+	man7/dl_capability_ack_t.7 \
+	man7/DL_CAPABILITY_REQ.7 \
+	man7/dl_capability_req_t.7 \
+	man7/DL_CLR_SR_REQ.7 \
+	man7/dl_clr_sr_req_t.7 \
+	man7/DL_CLR_STATISTICS_REQ.7 \
+	man7/dl_clr_statistics_req_t.7 \
 	man7/DL_CONNECT_CON.7 \
 	man7/dl_connect_con_t.7 \
 	man7/DL_CONNECT_IND.7 \
@@ -155,6 +391,10 @@ man_MANS = \
 	man7/dl_connect_req_t.7 \
 	man7/DL_CONNECT_RES.7 \
 	man7/dl_connect_res_t.7 \
+	man7/DL_CONTROL_ACK.7 \
+	man7/dl_control_ack_t.7 \
+	man7/DL_CONTROL_REQ.7 \
+	man7/dl_control_req_t.7 \
 	man7/DL_DATA_ACK_IND.7 \
 	man7/dl_data_ack_ind_t.7 \
 	man7/DL_DATA_ACK_REQ.7 \
@@ -165,12 +405,18 @@ man_MANS = \
 	man7/DL_DATA_REQ.7 \
 	man7/DL_DETACH_REQ.7 \
 	man7/dl_detach_req_t.7 \
+	man7/DL_DISABALLMULTI_REQ.7 \
+	man7/dl_disaballmulti_req_t.7 \
 	man7/DL_DISABMULTI_REQ.7 \
 	man7/dl_disabmulti_req_t.7 \
 	man7/DL_DISCONNECT_IND.7 \
 	man7/dl_disconnect_ind_t.7 \
 	man7/DL_DISCONNECT_REQ.7 \
 	man7/dl_disconnect_req_t.7 \
+	man7/DL_DLPI_BILOOPMODE.7 \
+	man7/dl_dlpi_biloopmode_t.7 \
+	man7/DL_ENABALLMULTI_REQ.7 \
+	man7/dl_enaballmulti_req_t.7 \
 	man7/DL_ENABMULTI_REQ.7 \
 	man7/dl_enabmulti_req_t.7 \
 	man7/DL_ERROR_ACK.7 \
@@ -179,12 +425,82 @@ man_MANS = \
 	man7/dl_get_statistics_ack_t.7 \
 	man7/DL_GET_STATISTICS_REQ.7 \
 	man7/dl_get_statistics_req_t.7 \
+	man7/DL_HP_CLEAR_LOCAL_BUSY_REQ.7 \
+	man7/dl_hp_clear_local_busy_req_t.7 \
+	man7/DL_HP_CLEAR_STATS_REQ.7 \
+	man7/dl_hp_clear_stats_req_t.7 \
+	man7/DL_HP_GET_64BIT_STATS_ACK.7 \
+	man7/dl_hp_get_64bit_stats_ack_t.7 \
+	man7/DL_HP_GET_64BIT_STATS_REQ.7 \
+	man7/dl_hp_get_64bit_stats_req_t.7 \
+	man7/DL_HP_HW_RESET_REQ.7 \
+	man7/dl_hp_hw_reset_req_t.7 \
+	man7/DL_HP_INFO_ACK.7 \
+	man7/dl_hp_info_ack_t.7 \
+	man7/DL_HP_INFO_REQ.7 \
+	man7/dl_hp_info_req_t.7 \
+	man7/DL_HP_LINK_DOWN_IND.7 \
+	man7/dl_hp_link_down_ind_t.7 \
+	man7/DL_HP_LINK_UP_IND.7 \
+	man7/dl_hp_link_up_ind_t.7 \
+	man7/DL_HP_MULTICAST_LIST_ACK.7 \
+	man7/dl_hp_multicast_list_ack_t.7 \
+	man7/DL_HP_MULTICAST_LIST_REQ.7 \
+	man7/dl_hp_multicast_list_req_t.7 \
+	man7/DL_HP_NOTIFY_EVENT_REQ.7 \
+	man7/dl_hp_notify_event_req_t.7 \
+	man7/DL_HP_PPA_ACK.7 \
+	man7/dl_hp_ppa_ack_t.7 \
+	man7/DL_HP_PPA_REQ.7 \
+	man7/dl_hp_ppa_req_t.7 \
+	man7/DL_HP_RAWDATA_IND.7 \
+	man7/dl_hp_rawdata_ind_t.7 \
+	man7/DL_HP_RAWDATA_REQ.7 \
+	man7/dl_hp_rawdata_req_t.7 \
+	man7/DL_HP_RESET_STATS_REQ.7 \
+	man7/dl_hp_reset_stats_req_t.7 \
+	man7/DL_HP_SET_ACK_THRESHOLD_REQ.7 \
+	man7/dl_hp_set_ack_threshold_req_t.7 \
+	man7/DL_HP_SET_ACK_TO_REQ.7 \
+	man7/dl_hp_set_ack_to_req_t.7 \
+	man7/DL_HP_SET_BUSY_TO_REQ.7 \
+	man7/dl_hp_set_busy_to_req_t.7 \
+	man7/DL_HP_SET_LOCAL_BUSY_REQ.7 \
+	man7/dl_hp_set_local_busy_req_t.7 \
+	man7/DL_HP_SET_LOCAL_WIN_REQ.7 \
+	man7/dl_hp_set_local_win_req_t.7 \
+	man7/DL_HP_SET_MAX_RETRIES_REQ.7 \
+	man7/dl_hp_set_max_retries_req_t.7 \
+	man7/DL_HP_SET_P_TO_REQ.7 \
+	man7/dl_hp_set_p_to_req_t.7 \
+	man7/DL_HP_SET_REJ_TO_REQ.7 \
+	man7/dl_hp_set_rej_to_req_t.7 \
+	man7/DL_HP_SET_REMOTE_WIN_REQ.7 \
+	man7/dl_hp_set_remote_win_req_t.7 \
+	man7/DL_HP_SET_SEND_ACK_TO_REQ.7 \
+	man7/dl_hp_set_send_ack_to_req_t.7 \
 	man7/DL_INFO_ACK.7 \
 	man7/dl_info_ack_t.7 \
 	man7/DL_INFO_REQ.7 \
 	man7/dl_info_req_t.7 \
+	man7/DL_INTR_MODE_REQ.7 \
+	man7/dl_intr_mode_req_t.7 \
+	man7/DL_ISDN_MSG.7 \
+	man7/dl_isdn_msg_t.7 \
+	man7/DL_MCTABLE_ACK.7 \
+	man7/dl_mctable_ack_t.7 \
+	man7/DL_MCTABLE_REQ.7 \
+	man7/dl_mctable_req_t.7 \
+	man7/DL_NOTIFY_ACK.7 \
+	man7/dl_notify_ack_t.7 \
+	man7/DL_NOTIFY_IND.7 \
+	man7/dl_notify_ind_t.7 \
+	man7/DL_NOTIFY_REQ.7 \
+	man7/dl_notify_req_t.7 \
 	man7/DL_OK_ACK.7 \
 	man7/dl_ok_ack_t.7 \
+	man7/DL_PASSIVE_REQ.7 \
+	man7/dl_passive_req_t.7 \
 	man7/DL_PHYS_ADDR_ACK.7 \
 	man7/dl_phys_addr_ack_t.7 \
 	man7/DL_PHYS_ADDR_REQ.7 \
@@ -213,8 +529,20 @@ man_MANS = \
 	man7/dl_reset_req_t.7 \
 	man7/DL_RESET_RES.7 \
 	man7/dl_reset_res_t.7 \
+	man7/DL_SAP_STATISTICS_ACK.7 \
+	man7/dl_sap_statistics_ack_t.7 \
+	man7/DL_SAP_STATISTICS_REQ.7 \
+	man7/dl_sap_statistics_req_t.7 \
 	man7/DL_SET_PHYS_ADDR_REQ.7 \
 	man7/dl_set_phys_addr_req_t.7 \
+	man7/DL_SET_SRMODE_REQ.7 \
+	man7/dl_set_srmode_req_t.7 \
+	man7/DL_SET_SRPARMS_REQ.7 \
+	man7/dl_set_srparms_req_t.7 \
+	man7/DL_SRTABLE_ACK.7 \
+	man7/dl_srtable_ack_t.7 \
+	man7/DL_SRTABLE_REQ.7 \
+	man7/dl_srtable_req_t.7 \
 	man7/DL_SUBS_BIND_ACK.7 \
 	man7/dl_subs_bind_ack_t.7 \
 	man7/DL_SUBS_BIND_REQ.7 \
@@ -237,6 +565,8 @@ man_MANS = \
 	man7/dl_uderror_ind_t.7 \
 	man7/DL_UDQOS_REQ.7 \
 	man7/dl_udqos_req_t.7 \
+	man7/DL_UNAGGR_REQ.7 \
+	man7/dl_unaggr_req_t.7 \
 	man7/DL_UNBIND_REQ.7 \
 	man7/dl_unbind_req_t.7 \
 	man7/DL_UNITDATA_IND.7 \
@@ -251,112 +581,6 @@ man_MANS = \
 	man7/dl_xid_req_t.7 \
 	man7/DL_XID_RES.7 \
 	man7/dl_xid_res_t.7 \
-	man7/DL_AGGR_IND.7 \
-	man7/dl_aggr_ind_t.7 \
-	man7/DL_AGGR_REQ.7 \
-	man7/dl_aggr_req_t.7 \
-	man7/DL_CAPABILITY_ACK.7 \
-	man7/dl_capability_ack_t.7 \
-	man7/DL_CAPABILITY_REQ.7 \
-	man7/dl_capability_req_t.7 \
-	man7/DL_CONTROL_ACK.7 \
-	man7/dl_control_ack_t.7 \
-	man7/DL_CONTROL_REQ.7 \
-	man7/dl_control_req_t.7 \
-	man7/DL_INTR_MODE_REQ.7 \
-	man7/dl_intr_mode_req_t.7 \
-	man7/DL_NOTIFY_ACK.7 \
-	man7/dl_notify_ack_t.7 \
-	man7/DL_NOTIFY_IND.7 \
-	man7/dl_notify_ind_t.7 \
-	man7/DL_NOTIFY_REQ.7 \
-	man7/dl_notify_req_t.7 \
-	man7/DL_PASSIVE_REQ.7 \
-	man7/dl_passive_req_t.7 \
-	man7/DL_UNAGGR_REQ.7 \
-	man7/dl_unaggr_req_t.7 \
-	man7/DL_HP_CLEAR_LOCAL_BUSY_REQ.7 \
-	man7/dl_hp_clear_local_busy_req_t.7 \
-	man7/DL_HP_CLEAR_STATS_REQ.7 \
-	man7/dl_hp_clear_stats_req_t.7 \
-	man7/DL_HP_HW_RESET_REQ.7 \
-	man7/dl_hp_hw_reset_req_t.7 \
-	man7/DL_HP_INFO_ACK.7 \
-	man7/dl_hp_info_ack_t.7 \
-	man7/DL_HP_INFO_REQ.7 \
-	man7/dl_hp_info_req_t.7 \
-	man7/DL_HP_MULTICAST_LIST_ACK.7 \
-	man7/dl_hp_multicast_list_ack_t.7 \
-	man7/DL_HP_MULTICAST_LIST_REQ.7 \
-	man7/dl_hp_multicast_list_req_t.7 \
-	man7/DL_HP_PPA_ACK.7 \
-	man7/dl_hp_ppa_ack_t.7 \
-	man7/DL_HP_PPA_REQ.7 \
-	man7/dl_hp_ppa_req_t.7 \
-	man7/DL_HP_RAWDATA_IND.7 \
-	man7/dl_hp_rawdata_ind_t.7 \
-	man7/DL_HP_RAWDATA_REQ.7 \
-	man7/dl_hp_rawdata_req_t.7 \
-	man7/DL_HP_SET_ACK_THRESHOLD_REQ.7 \
-	man7/dl_hp_set_ack_threshold_req_t.7 \
-	man7/DL_HP_SET_ACK_TO_REQ.7 \
-	man7/dl_hp_set_ack_to_req_t.7 \
-	man7/DL_HP_SET_BUSY_TO_REQ.7 \
-	man7/dl_hp_set_busy_to_req_t.7 \
-	man7/DL_HP_SET_LOCAL_BUSY_REQ.7 \
-	man7/dl_hp_set_local_busy_req_t.7 \
-	man7/DL_HP_SET_LOCAL_WIN_REQ.7 \
-	man7/dl_hp_set_local_win_req_t.7 \
-	man7/DL_HP_SET_MAX_RETRIES_REQ.7 \
-	man7/dl_hp_set_max_retries_req_t.7 \
-	man7/DL_HP_SET_P_TO_REQ.7 \
-	man7/dl_hp_set_p_to_req_t.7 \
-	man7/DL_HP_SET_REJ_TO_REQ.7 \
-	man7/dl_hp_set_rej_to_req_t.7 \
-	man7/DL_HP_SET_REMOTE_WIN_REQ.7 \
-	man7/dl_hp_set_remote_win_req_t.7 \
-	man7/DL_HP_SET_SEND_ACK_TO_REQ.7 \
-	man7/dl_hp_set_send_ack_to_req_t.7 \
-	man7/DL_HP_NOTIFY_EVENT_REQ.7 \
-	man7/dl_hp_notify_event_req_t.7 \
-	man7/DL_HP_LINK_DOWN_IND.7 \
-	man7/dl_hp_link_down_ind_t.7 \
-	man7/DL_HP_LINK_UP_IND.7 \
-	man7/dl_hp_reset_stats_req_t.7 \
-	man7/DL_HP_RESET_STATS_REQ.7 \
-	man7/dl_hp_link_up_ind_t.7 \
-	man7/DL_HP_GET_64BIT_STATS_REQ.7 \
-	man7/dl_hp_get_64bit_stats_req_t.7 \
-	man7/DL_HP_GET_64BIT_STATS_ACK.7 \
-	man7/dl_hp_get_64bit_stats_ack_t.7 \
-	man7/DL_CLR_SR_REQ.7 \
-	man7/dl_clr_sr_req_t.7 \
-	man7/DL_CLR_STATISTICS_REQ.7 \
-	man7/dl_clr_statistics_req_t.7 \
-	man7/DL_DISABALLMULTI_REQ.7 \
-	man7/dl_disaballmulti_req_t.7 \
-	man7/DL_DLPI_BILOOPMODE.7 \
-	man7/dl_dlpi_biloopmode_t.7 \
-	man7/DL_ENABALLMULTI_REQ.7 \
-	man7/dl_enaballmulti_req_t.7 \
-	man7/DL_ISDN_MSG.7 \
-	man7/dl_isdn_msg_t.7 \
-	man7/DL_MCTABLE_ACK.7 \
-	man7/dl_mctable_ack_t.7 \
-	man7/DL_MCTABLE_REQ.7 \
-	man7/dl_mctable_req_t.7 \
-	man7/DL_SAP_STATISTICS_ACK.7 \
-	man7/dl_sap_statistics_ack_t.7 \
-	man7/DL_SAP_STATISTICS_REQ.7 \
-	man7/dl_sap_statistics_req_t.7 \
-	man7/DL_SET_SRMODE_REQ.7 \
-	man7/dl_set_srmode_req_t.7 \
-	man7/DL_SET_SRPARMS_REQ.7 \
-	man7/dl_set_srparms_req_t.7 \
-	man7/DL_SRTABLE_ACK.7 \
-	man7/dl_srtable_ack_t.7 \
-	man7/DL_SRTABLE_REQ.7 \
-	man7/dl_srtable_req_t.7 \
 	man7/N_BIND_ACK.7 \
 	man7/N_bind_ack_t.7 \
 	man7/N_BIND_REQ.7 \
@@ -381,12 +605,32 @@ man_MANS = \
 	man7/N_discon_ind_t.7 \
 	man7/N_DISCON_REQ.7 \
 	man7/N_discon_req_t.7 \
+	man7/N_DRAIN_REQ.7 \
+	man7/N_drain_req_t.7 \
 	man7/N_ERROR_ACK.7 \
 	man7/N_error_ack_t.7 \
 	man7/N_EXDATA_IND.7 \
 	man7/N_exdata_ind_t.7 \
 	man7/N_EXDATA_REQ.7 \
 	man7/N_exdata_req_t.7 \
+	man7/N_EXT2_BIND_REQ.7 \
+	man7/N_ext2_bind_req_t.7 \
+	man7/N_EXT2_CONN_CON.7 \
+	man7/N_ext2_conn_con_t.7 \
+	man7/N_EXT2_CONN_IND.7 \
+	man7/N_ext2_conn_ind_t.7 \
+	man7/N_EXT_BIND_REQ.7 \
+	man7/N_ext_bind_req_t.7 \
+	man7/N_EXT_CONN_CON.7 \
+	man7/N_ext_conn_con_t.7 \
+	man7/N_EXT_CONN_IND.7 \
+	man7/N_ext_conn_ind_t.7 \
+	man7/N_EXT_CONN_REQ.7 \
+	man7/N_ext_conn_req_t.7 \
+	man7/N_EXT_CONN_RES.7 \
+	man7/N_ext_conn_res_t.7 \
+	man7/N_FLOW_REQ.7 \
+	man7/N_flow_req_t.7 \
 	man7/N_INFO_ACK.7 \
 	man7/N_info_ack_t.7 \
 	man7/N_INFO_REQ.7 \
@@ -405,6 +649,10 @@ man_MANS = \
 	man7/N_reset_req_t.7 \
 	man7/N_RESET_RES.7 \
 	man7/N_reset_res_t.7 \
+	man7/N_TOKEN_ACK.7 \
+	man7/N_token_ack_t.7 \
+	man7/N_TOKEN_REQ.7 \
+	man7/N_token_req_t.7 \
 	man7/N_UDERROR_IND.7 \
 	man7/N_uderror_ind_t.7 \
 	man7/N_UNBIND_REQ.7 \
@@ -443,6 +691,230 @@ dlc_dist_noinst_MANS = \
 	man4/DLC_TRACE.4.man
 
 dist_noinst_MANS = \
+	man3/cdi_xxx.3.man \
+	man3/dlpi_sun.3.man \
+	man3/dlpi_xxx.3.man \
+	man3/npi_xxx.3.man \
+	man3/cdi_allow_input_req.3.man \
+	man3/cdiapi.3.man \
+	man3/cdi_attach_req.3.man \
+	man3/cdi_close.3.man \
+	man3/cdi_decode_ctl.3.man \
+	man3/cdi_decode_modem_sigs.3.man \
+	man3/cdi_detach_req.3.man \
+	man3/cdi_dial_req.3.man \
+	man3/cdi_disable_req.3.man \
+	man3/cdi_enable_req.3.man \
+	man3/cdi_get_a_msg.3.man \
+	man3/cdi_get_modem_sigs.3.man \
+	man3/cdi_init.3.man \
+	man3/cdi_init_FILE.3.man \
+	man3/cdi_modem_sig_poll.3.man \
+	man3/cdi_modem_sig_req.3.man \
+	man3/cdi_open.3.man \
+	man3/cdi_open_data.3.man \
+	man3/cdi_perror.3.man \
+	man3/cdi_printf.3.man \
+	man3/cdi_print_msg.3.man \
+	man3/cdi_put_allow_input_req.3.man \
+	man3/cdi_put_attach_req.3.man \
+	man3/cdi_put_both.3.man \
+	man3/cdi_put_data.3.man \
+	man3/cdi_put_detach_req.3.man \
+	man3/cdi_put_dial_req.3.man \
+	man3/cdi_put_disable_req.3.man \
+	man3/cdi_put_enable_req.3.man \
+	man3/cdi_put_frame.3.man \
+	man3/cdi_put_proto.3.man \
+	man3/cdi_rcv_msg.3.man \
+	man3/cdi_read_data.3.man \
+	man3/cdi_set_log_size.3.man \
+	man3/cdi_wait_ack.3.man \
+	man3/cdi_write_data.3.man \
+	man3/cdi_xray_req.3.man \
+	man3/DLPI.3.man \
+	man3/dlpi.3.man \
+	man3/dlpiapi.3.man \
+	man3/dlpi_arptype.3.man \
+	man3/dlpi_attach_ppa.3.man \
+	man3/dlpi_bind.3.man \
+	man3/dlpi_bind_dlsap.3.man \
+	man3/dlpi_clear_zombies.3.man \
+	man3/dlpi_close.3.man \
+	man3/dlpi_close_GCOM.3.man \
+	man3/dlpi_complete_req.3.man \
+	man3/dlpi_configure_dlsaps.3.man \
+	man3/dlpi_connect.3.man \
+	man3/dlpi_connect_req.3.man \
+	man3/dlpi_connect_wait.3.man \
+	man3/dlpi_decode_ctl.3.man \
+	man3/dlpi_decode_disconnect_reason.3.man \
+	man3/dlpi_detach_ppa.3.man \
+	man3/dlpi_disabmulti.3.man \
+	man3/dlpi_disabnotify.3.man \
+	man3/dlpi_discon_req.3.man \
+	man3/dlpi_enabmulti.3.man \
+	man3/dlpi_enabnotify.3.man \
+	man3/dlpi_fd.3.man \
+	man3/dlpi_get_a_msg.3.man \
+	man3/dlpi_get_both.3.man \
+	man3/dlpi_get_info_strm.3.man \
+	man3/dlpi_get_physaddr.3.man \
+	man3/dlpi_get_style_strm.3.man \
+	man3/dlpi_iftype.3.man \
+	man3/dlpi_info.3.man \
+	man3/dlpi_init.3.man \
+	man3/dlpi_linkname.3.man \
+	man3/dlpi_listen.3.man \
+	man3/dlpi_mactype.3.man \
+	man3/dlpi_open_GCOM.3.man \
+	man3/dlpi_open.3.man \
+	man3/dlpi_open_log.3.man \
+	man3/dlpi_perror.3.man \
+	man3/dlpi_printf.3.man \
+	man3/dlpi_print_msg.3.man \
+	man3/dlpi_promiscoff.3.man \
+	man3/dlpi_promiscon.3.man \
+	man3/dlpi_put_both.3.man \
+	man3/dlpi_put_proto.3.man \
+	man3/dlpi_rcv.3.man \
+	man3/dlpi_rcv_msg.3.man \
+	man3/dlpi_read_data.3.man \
+	man3/dlpi_recv.3.man \
+	man3/dlpi_reset_req.3.man \
+	man3/dlpi_reset_res.3.man \
+	man3/dlpi_send.3.man \
+	man3/dlpi_send_attach_req.3.man \
+	man3/dlpi_send_bind_req.3.man \
+	man3/dlpi_send_connect_req.3.man \
+	man3/dlpi_send_connect_res.3.man \
+	man3/dlpi_send_detach_req.3.man \
+	man3/dlpi_send_disconnect_req.3.man \
+	man3/dlpi_send_info_req.3.man \
+	man3/dlpi_send_reset_req.3.man \
+	man3/dlpi_send_reset_res.3.man \
+	man3/dlpi_send_stats_req.3.man \
+	man3/dlpi_send_test_req.3.man \
+	man3/dlpi_send_test_res.3.man \
+	man3/dlpi_send_uic.3.man \
+	man3/dlpi_send_unbind_req.3.man \
+	man3/dlpi_send_xid_req.3.man \
+	man3/dlpi_send_xid_res.3.man \
+	man3/dlpi_set_log_size.3.man \
+	man3/dlpi_set_physaddr.3.man \
+	man3/dlpi_set_signal_handling.3.man \
+	man3/dlpi_set_test_req.3.man \
+	man3/dlpi_set_test_res.3.man \
+	man3/dlpi_set_timeout.3.man \
+	man3/dlpi_set_unnum_frame_handler.3.man \
+	man3/dlpi_strerror.3.man \
+	man3/dlpi_uic_req.3.man \
+	man3/dlpi_unbind.3.man \
+	man3/dlpi_unbind_dlsap.3.man \
+	man3/dlpi_walk.3.man \
+	man3/dlpi_write_data.3.man \
+	man3/dlpi_xid_req.3.man \
+	man3/dlpi_xid_res.3.man \
+	man3/dlpi_xray_req.3.man \
+	man3/endpadent.3.man \
+	man3/endxhostent.3.man \
+	man3/equalx25.3.man \
+	man3/getnettype.3.man \
+	man3/getpadbyaddr.3.man \
+	man3/getpadent.3.man \
+	man3/getxhostbyaddr.3.man \
+	man3/getxhostbyname.3.man \
+	man3/getxhostent.3.man \
+	man3/libcdiapi.3.man \
+	man3/libdlpi.3.man \
+	man3/libdlpiapi.3.man \
+	man3/libnpiapi.3.man \
+	man3/linkidtox25.3.man \
+	man3/npiapi.3.man \
+	man3/npi_ascii_facil.3.man \
+	man3/npi_bind_ascii_nsap.3.man \
+	man3/npi_bind_nsap.3.man \
+	man3/npi_conenct.3.man \
+	man3/npi_connect_req.3.man \
+	man3/npi_connect_wait.3.man \
+	man3/npi_conn_res.3.man \
+	man3/npi_datack_req.3.man \
+	man3/npi_decode_ctl.3.man \
+	man3/npi_decode_primitive.3.man \
+	man3/npi_decode_reason.3.man \
+	man3/npi_discon_req.3.man \
+	man3/npi_discon_req_seq.3.man \
+	man3/npi_ext_bind_nsap.3.man \
+	man3/npi_ext_bind_nsap_ascii.3.man \
+	man3/npi_ext_connect_req.3.man \
+	man3/npi_ext_connect_wait.3.man \
+	man3/npi_ext_conn_res.3.man \
+	man3/npi_ext_listen.3.man \
+	man3/npi_ext_nbio_complete_listen.3.man \
+	man3/npi_fac_walk.3.man \
+	man3/npi_flags_connect_wait.3.man \
+	man3/npi_flags_listen.3.man \
+	man3/npi_flow_req.3.man \
+	man3/npi_get_a_msg.3.man \
+	man3/npi_get_and_log_facils.3.man \
+	man3/npi_get_a_proto.3.man \
+	man3/npi_get_facils.3.man \
+	man3/npi_info_req.3.man \
+	man3/npi_init.3.man \
+	man3/npi_init_FILE.3.man \
+	man3/npi_listen.3.man \
+	man3/npi_max_sdu.3.man \
+	man3/npi_nbio_complete_listen.3.man \
+	man3/npi_open_data.3.man \
+	man3/npi_perror.3.man \
+	man3/npi_printf.3.man \
+	man3/npi_print_msg.3.man \
+	man3/npi_put_data_buf.3.man \
+	man3/npi_put_data_proto.3.man \
+	man3/npi_put_proto.3.man \
+	man3/npi_rcv.3.man \
+	man3/npi_read_data.3.man \
+	man3/npi_reset_req.3.man \
+	man3/npi_reset_res.3.man \
+	man3/npi_send_connect_req.3.man \
+	man3/npi_send_ext_connect_req.3.man \
+	man3/npi_send_info_req.3.man \
+	man3/npi_send_reset_req.3.man \
+	man3/npi_set_log_size.3.man \
+	man3/npi_set_marks.3.man \
+	man3/npi_set_pid.3.man \
+	man3/npi_set_signal_handling.3.man \
+	man3/npi_want_a_proto.3.man \
+	man3/npi_write_data.3.man \
+	man3/npi_x25_clear_cause.3.man \
+	man3/npi_x25_diagnostic.3.man \
+	man3/npi_x25_reset_cause.3.man \
+	man3/npi_x25_restart_cause.3.man \
+	man3/padent.3.man \
+	man3/padtos.3.man \
+	man3/pu_decode_handle.3.man \
+	man3/pu_dlpi_upa.3.man \
+	man3/pu_get_board_info.3.man \
+	man3/pu_get_pu_id.3.man \
+	man3/pu_get_stats.3.man \
+	man3/pu_id_to_pu_handle.3.man \
+	man3/pu_id_to_pu_number.3.man \
+	man3/pu_map_npi_lpa_to_handle.3.man \
+	man3/pu_strerror.3.man \
+	man3/put_npi_proto.3.man \
+	man3/setpadent.3.man \
+	man3/setxhostent.3.man \
+	man3/stox25.3.man \
+	man3/x25_find_link_parameters.3.man \
+	man3/x25_read_config_parameters.3.man \
+	man3/x25_read_config_parameters_file.3.man \
+	man3/x25_save_link_parameters.3.man \
+	man3/x25_set_parse_error_function.3.man \
+	man3/x25tolinkid.3.man \
+	man3/x25tos.3.man \
+	man3/x25_write_config_parameters.3.man \
+	man3/x25_write_config_parameters_file.3.man \
+	man3/xhostent.3.man \
 	man4/XNS.4.man \
 	man4/ipcl.4.man \
 	man4/ipco.4.man \
@@ -503,12 +975,24 @@ dist_noinst_MANS = \
 	man7/cd_unitdata_req_t.7.man \
 	man7/CD_WRITE_READ_REQ.7.man \
 	man7/cd_write_read_req_t.7.man \
+	man7/DL_AGGR_IND.7.man \
+	man7/dl_aggr_ind_t.7.man \
+	man7/DL_AGGR_REQ.7.man \
+	man7/dl_aggr_req_t.7.man \
 	man7/DL_ATTACH_REQ.7.man \
 	man7/dl_attach_req_t.7.man \
 	man7/DL_BIND_ACK.7.man \
 	man7/dl_bind_ack_t.7.man \
 	man7/DL_BIND_REQ.7.man \
 	man7/dl_bind_req_t.7.man \
+	man7/DL_CAPABILITY_ACK.7.man \
+	man7/dl_capability_ack_t.7.man \
+	man7/DL_CAPABILITY_REQ.7.man \
+	man7/dl_capability_req_t.7.man \
+	man7/DL_CLR_SR_REQ.7.man \
+	man7/dl_clr_sr_req_t.7.man \
+	man7/DL_CLR_STATISTICS_REQ.7.man \
+	man7/dl_clr_statistics_req_t.7.man \
 	man7/DL_CONNECT_CON.7.man \
 	man7/dl_connect_con_t.7.man \
 	man7/DL_CONNECT_IND.7.man \
@@ -517,6 +1001,10 @@ dist_noinst_MANS = \
 	man7/dl_connect_req_t.7.man \
 	man7/DL_CONNECT_RES.7.man \
 	man7/dl_connect_res_t.7.man \
+	man7/DL_CONTROL_ACK.7.man \
+	man7/dl_control_ack_t.7.man \
+	man7/DL_CONTROL_REQ.7.man \
+	man7/dl_control_req_t.7.man \
 	man7/DL_DATA_ACK_IND.7.man \
 	man7/dl_data_ack_ind_t.7.man \
 	man7/DL_DATA_ACK_REQ.7.man \
@@ -527,12 +1015,18 @@ dist_noinst_MANS = \
 	man7/DL_DATA_REQ.7.man \
 	man7/DL_DETACH_REQ.7.man \
 	man7/dl_detach_req_t.7.man \
+	man7/DL_DISABALLMULTI_REQ.7.man \
+	man7/dl_disaballmulti_req_t.7.man \
 	man7/DL_DISABMULTI_REQ.7.man \
 	man7/dl_disabmulti_req_t.7.man \
 	man7/DL_DISCONNECT_IND.7.man \
 	man7/dl_disconnect_ind_t.7.man \
 	man7/DL_DISCONNECT_REQ.7.man \
 	man7/dl_disconnect_req_t.7.man \
+	man7/DL_DLPI_BILOOPMODE.7.man \
+	man7/dl_dlpi_biloopmode_t.7.man \
+	man7/DL_ENABALLMULTI_REQ.7.man \
+	man7/dl_enaballmulti_req_t.7.man \
 	man7/DL_ENABMULTI_REQ.7.man \
 	man7/dl_enabmulti_req_t.7.man \
 	man7/DL_ERROR_ACK.7.man \
@@ -541,12 +1035,82 @@ dist_noinst_MANS = \
 	man7/dl_get_statistics_ack_t.7.man \
 	man7/DL_GET_STATISTICS_REQ.7.man \
 	man7/dl_get_statistics_req_t.7.man \
+	man7/DL_HP_CLEAR_LOCAL_BUSY_REQ.7.man \
+	man7/dl_hp_clear_local_busy_req_t.7.man \
+	man7/DL_HP_CLEAR_STATS_REQ.7.man \
+	man7/dl_hp_clear_stats_req_t.7.man \
+	man7/DL_HP_GET_64BIT_STATS_ACK.7.man \
+	man7/dl_hp_get_64bit_stats_ack_t.7.man \
+	man7/DL_HP_GET_64BIT_STATS_REQ.7.man \
+	man7/dl_hp_get_64bit_stats_req_t.7.man \
+	man7/DL_HP_HW_RESET_REQ.7.man \
+	man7/dl_hp_hw_reset_req_t.7.man \
+	man7/DL_HP_INFO_ACK.7.man \
+	man7/dl_hp_info_ack_t.7.man \
+	man7/DL_HP_INFO_REQ.7.man \
+	man7/dl_hp_info_req_t.7.man \
+	man7/DL_HP_LINK_DOWN_IND.7.man \
+	man7/dl_hp_link_down_ind_t.7.man \
+	man7/DL_HP_LINK_UP_IND.7.man \
+	man7/dl_hp_link_up_ind_t.7.man \
+	man7/DL_HP_MULTICAST_LIST_ACK.7.man \
+	man7/dl_hp_multicast_list_ack_t.7.man \
+	man7/DL_HP_MULTICAST_LIST_REQ.7.man \
+	man7/dl_hp_multicast_list_req_t.7.man \
+	man7/DL_HP_NOTIFY_EVENT_REQ.7.man \
+	man7/dl_hp_notify_event_req_t.7.man \
+	man7/DL_HP_PPA_ACK.7.man \
+	man7/dl_hp_ppa_ack_t.7.man \
+	man7/DL_HP_PPA_REQ.7.man \
+	man7/dl_hp_ppa_req_t.7.man \
+	man7/DL_HP_RAWDATA_IND.7.man \
+	man7/dl_hp_rawdata_ind_t.7.man \
+	man7/DL_HP_RAWDATA_REQ.7.man \
+	man7/dl_hp_rawdata_req_t.7.man \
+	man7/DL_HP_RESET_STATS_REQ.7.man \
+	man7/dl_hp_reset_stats_req_t.7.man \
+	man7/DL_HP_SET_ACK_THRESHOLD_REQ.7.man \
+	man7/dl_hp_set_ack_threshold_req_t.7.man \
+	man7/DL_HP_SET_ACK_TO_REQ.7.man \
+	man7/dl_hp_set_ack_to_req_t.7.man \
+	man7/DL_HP_SET_BUSY_TO_REQ.7.man \
+	man7/dl_hp_set_busy_to_req_t.7.man \
+	man7/DL_HP_SET_LOCAL_BUSY_REQ.7.man \
+	man7/dl_hp_set_local_busy_req_t.7.man \
+	man7/DL_HP_SET_LOCAL_WIN_REQ.7.man \
+	man7/dl_hp_set_local_win_req_t.7.man \
+	man7/DL_HP_SET_MAX_RETRIES_REQ.7.man \
+	man7/dl_hp_set_max_retries_req_t.7.man \
+	man7/DL_HP_SET_P_TO_REQ.7.man \
+	man7/dl_hp_set_p_to_req_t.7.man \
+	man7/DL_HP_SET_REJ_TO_REQ.7.man \
+	man7/dl_hp_set_rej_to_req_t.7.man \
+	man7/DL_HP_SET_REMOTE_WIN_REQ.7.man \
+	man7/dl_hp_set_remote_win_req_t.7.man \
+	man7/DL_HP_SET_SEND_ACK_TO_REQ.7.man \
+	man7/dl_hp_set_send_ack_to_req_t.7.man \
 	man7/DL_INFO_ACK.7.man \
 	man7/dl_info_ack_t.7.man \
 	man7/DL_INFO_REQ.7.man \
 	man7/dl_info_req_t.7.man \
+	man7/DL_INTR_MODE_REQ.7.man \
+	man7/dl_intr_mode_req_t.7.man \
+	man7/DL_ISDN_MSG.7.man \
+	man7/dl_isdn_msg_t.7.man \
+	man7/DL_MCTABLE_ACK.7.man \
+	man7/dl_mctable_ack_t.7.man \
+	man7/DL_MCTABLE_REQ.7.man \
+	man7/dl_mctable_req_t.7.man \
+	man7/DL_NOTIFY_ACK.7.man \
+	man7/dl_notify_ack_t.7.man \
+	man7/DL_NOTIFY_IND.7.man \
+	man7/dl_notify_ind_t.7.man \
+	man7/DL_NOTIFY_REQ.7.man \
+	man7/dl_notify_req_t.7.man \
 	man7/DL_OK_ACK.7.man \
 	man7/dl_ok_ack_t.7.man \
+	man7/DL_PASSIVE_REQ.7.man \
+	man7/dl_passive_req_t.7.man \
 	man7/DL_PHYS_ADDR_ACK.7.man \
 	man7/dl_phys_addr_ack_t.7.man \
 	man7/DL_PHYS_ADDR_REQ.7.man \
@@ -575,8 +1139,20 @@ dist_noinst_MANS = \
 	man7/dl_reset_req_t.7.man \
 	man7/DL_RESET_RES.7.man \
 	man7/dl_reset_res_t.7.man \
+	man7/DL_SAP_STATISTICS_ACK.7.man \
+	man7/dl_sap_statistics_ack_t.7.man \
+	man7/DL_SAP_STATISTICS_REQ.7.man \
+	man7/dl_sap_statistics_req_t.7.man \
 	man7/DL_SET_PHYS_ADDR_REQ.7.man \
 	man7/dl_set_phys_addr_req_t.7.man \
+	man7/DL_SET_SRMODE_REQ.7.man \
+	man7/dl_set_srmode_req_t.7.man \
+	man7/DL_SET_SRPARMS_REQ.7.man \
+	man7/dl_set_srparms_req_t.7.man \
+	man7/DL_SRTABLE_ACK.7.man \
+	man7/dl_srtable_ack_t.7.man \
+	man7/DL_SRTABLE_REQ.7.man \
+	man7/dl_srtable_req_t.7.man \
 	man7/DL_SUBS_BIND_ACK.7.man \
 	man7/dl_subs_bind_ack_t.7.man \
 	man7/DL_SUBS_BIND_REQ.7.man \
@@ -599,6 +1175,8 @@ dist_noinst_MANS = \
 	man7/dl_uderror_ind_t.7.man \
 	man7/DL_UDQOS_REQ.7.man \
 	man7/dl_udqos_req_t.7.man \
+	man7/DL_UNAGGR_REQ.7.man \
+	man7/dl_unaggr_req_t.7.man \
 	man7/DL_UNBIND_REQ.7.man \
 	man7/dl_unbind_req_t.7.man \
 	man7/DL_UNITDATA_IND.7.man \
@@ -613,112 +1191,6 @@ dist_noinst_MANS = \
 	man7/dl_xid_req_t.7.man \
 	man7/DL_XID_RES.7.man \
 	man7/dl_xid_res_t.7.man \
-	man7/DL_AGGR_IND.7.man \
-	man7/dl_aggr_ind_t.7.man \
-	man7/DL_AGGR_REQ.7.man \
-	man7/dl_aggr_req_t.7.man \
-	man7/DL_CAPABILITY_ACK.7.man \
-	man7/dl_capability_ack_t.7.man \
-	man7/DL_CAPABILITY_REQ.7.man \
-	man7/dl_capability_req_t.7.man \
-	man7/DL_CONTROL_ACK.7.man \
-	man7/dl_control_ack_t.7.man \
-	man7/DL_CONTROL_REQ.7.man \
-	man7/dl_control_req_t.7.man \
-	man7/DL_INTR_MODE_REQ.7.man \
-	man7/dl_intr_mode_req_t.7.man \
-	man7/DL_NOTIFY_ACK.7.man \
-	man7/dl_notify_ack_t.7.man \
-	man7/DL_NOTIFY_IND.7.man \
-	man7/dl_notify_ind_t.7.man \
-	man7/DL_NOTIFY_REQ.7.man \
-	man7/dl_notify_req_t.7.man \
-	man7/DL_PASSIVE_REQ.7.man \
-	man7/dl_passive_req_t.7.man \
-	man7/DL_UNAGGR_REQ.7.man \
-	man7/dl_unaggr_req_t.7.man \
-	man7/DL_HP_CLEAR_LOCAL_BUSY_REQ.7.man \
-	man7/dl_hp_clear_local_busy_req_t.7.man \
-	man7/DL_HP_CLEAR_STATS_REQ.7.man \
-	man7/dl_hp_clear_stats_req_t.7.man \
-	man7/DL_HP_HW_RESET_REQ.7.man \
-	man7/dl_hp_hw_reset_req_t.7.man \
-	man7/DL_HP_INFO_ACK.7.man \
-	man7/dl_hp_info_ack_t.7.man \
-	man7/DL_HP_INFO_REQ.7.man \
-	man7/dl_hp_info_req_t.7.man \
-	man7/DL_HP_MULTICAST_LIST_ACK.7.man \
-	man7/dl_hp_multicast_list_ack_t.7.man \
-	man7/DL_HP_MULTICAST_LIST_REQ.7.man \
-	man7/dl_hp_multicast_list_req_t.7.man \
-	man7/DL_HP_PPA_ACK.7.man \
-	man7/dl_hp_ppa_ack_t.7.man \
-	man7/DL_HP_PPA_REQ.7.man \
-	man7/dl_hp_ppa_req_t.7.man \
-	man7/DL_HP_RAWDATA_IND.7.man \
-	man7/dl_hp_rawdata_ind_t.7.man \
-	man7/DL_HP_RAWDATA_REQ.7.man \
-	man7/dl_hp_rawdata_req_t.7.man \
-	man7/DL_HP_SET_ACK_THRESHOLD_REQ.7.man \
-	man7/dl_hp_set_ack_threshold_req_t.7.man \
-	man7/DL_HP_SET_ACK_TO_REQ.7.man \
-	man7/dl_hp_set_ack_to_req_t.7.man \
-	man7/DL_HP_SET_BUSY_TO_REQ.7.man \
-	man7/dl_hp_set_busy_to_req_t.7.man \
-	man7/DL_HP_SET_LOCAL_BUSY_REQ.7.man \
-	man7/dl_hp_set_local_busy_req_t.7.man \
-	man7/DL_HP_SET_LOCAL_WIN_REQ.7.man \
-	man7/dl_hp_set_local_win_req_t.7.man \
-	man7/DL_HP_SET_MAX_RETRIES_REQ.7.man \
-	man7/dl_hp_set_max_retries_req_t.7.man \
-	man7/DL_HP_SET_P_TO_REQ.7.man \
-	man7/dl_hp_set_p_to_req_t.7.man \
-	man7/DL_HP_SET_REJ_TO_REQ.7.man \
-	man7/dl_hp_set_rej_to_req_t.7.man \
-	man7/DL_HP_SET_REMOTE_WIN_REQ.7.man \
-	man7/dl_hp_set_remote_win_req_t.7.man \
-	man7/DL_HP_SET_SEND_ACK_TO_REQ.7.man \
-	man7/dl_hp_set_send_ack_to_req_t.7.man \
-	man7/DL_HP_NOTIFY_EVENT_REQ.7.man \
-	man7/dl_hp_notify_event_req_t.7.man \
-	man7/DL_HP_LINK_DOWN_IND.7.man \
-	man7/dl_hp_link_down_ind_t.7.man \
-	man7/DL_HP_LINK_UP_IND.7.man \
-	man7/dl_hp_reset_stats_req_t.7.man \
-	man7/DL_HP_RESET_STATS_REQ.7.man \
-	man7/dl_hp_link_up_ind_t.7.man \
-	man7/DL_HP_GET_64BIT_STATS_REQ.7.man \
-	man7/dl_hp_get_64bit_stats_req_t.7.man \
-	man7/DL_HP_GET_64BIT_STATS_ACK.7.man \
-	man7/dl_hp_get_64bit_stats_ack_t.7.man \
-	man7/DL_CLR_SR_REQ.7.man \
-	man7/dl_clr_sr_req_t.7.man \
-	man7/DL_CLR_STATISTICS_REQ.7.man \
-	man7/dl_clr_statistics_req_t.7.man \
-	man7/DL_DISABALLMULTI_REQ.7.man \
-	man7/dl_disaballmulti_req_t.7.man \
-	man7/DL_DLPI_BILOOPMODE.7.man \
-	man7/dl_dlpi_biloopmode_t.7.man \
-	man7/DL_ENABALLMULTI_REQ.7.man \
-	man7/dl_enaballmulti_req_t.7.man \
-	man7/DL_ISDN_MSG.7.man \
-	man7/dl_isdn_msg_t.7.man \
-	man7/DL_MCTABLE_ACK.7.man \
-	man7/dl_mctable_ack_t.7.man \
-	man7/DL_MCTABLE_REQ.7.man \
-	man7/dl_mctable_req_t.7.man \
-	man7/DL_SAP_STATISTICS_ACK.7.man \
-	man7/dl_sap_statistics_ack_t.7.man \
-	man7/DL_SAP_STATISTICS_REQ.7.man \
-	man7/dl_sap_statistics_req_t.7.man \
-	man7/DL_SET_SRMODE_REQ.7.man \
-	man7/dl_set_srmode_req_t.7.man \
-	man7/DL_SET_SRPARMS_REQ.7.man \
-	man7/dl_set_srparms_req_t.7.man \
-	man7/DL_SRTABLE_ACK.7.man \
-	man7/dl_srtable_ack_t.7.man \
-	man7/DL_SRTABLE_REQ.7.man \
-	man7/dl_srtable_req_t.7.man \
 	man7/N_BIND_ACK.7.man \
 	man7/N_bind_ack_t.7.man \
 	man7/N_BIND_REQ.7.man \
@@ -743,12 +1215,32 @@ dist_noinst_MANS = \
 	man7/N_discon_ind_t.7.man \
 	man7/N_DISCON_REQ.7.man \
 	man7/N_discon_req_t.7.man \
+	man7/N_DRAIN_REQ.7.man \
+	man7/N_drain_req_t.7.man \
 	man7/N_ERROR_ACK.7.man \
 	man7/N_error_ack_t.7.man \
 	man7/N_EXDATA_IND.7.man \
 	man7/N_exdata_ind_t.7.man \
 	man7/N_EXDATA_REQ.7.man \
 	man7/N_exdata_req_t.7.man \
+	man7/N_EXT2_BIND_REQ.7.man \
+	man7/N_ext2_bind_req_t.7.man \
+	man7/N_EXT2_CONN_CON.7.man \
+	man7/N_ext2_conn_con_t.7.man \
+	man7/N_EXT2_CONN_IND.7.man \
+	man7/N_ext2_conn_ind_t.7.man \
+	man7/N_EXT_BIND_REQ.7.man \
+	man7/N_ext_bind_req_t.7.man \
+	man7/N_EXT_CONN_CON.7.man \
+	man7/N_ext_conn_con_t.7.man \
+	man7/N_EXT_CONN_IND.7.man \
+	man7/N_ext_conn_ind_t.7.man \
+	man7/N_EXT_CONN_REQ.7.man \
+	man7/N_ext_conn_req_t.7.man \
+	man7/N_EXT_CONN_RES.7.man \
+	man7/N_ext_conn_res_t.7.man \
+	man7/N_FLOW_REQ.7.man \
+	man7/N_flow_req_t.7.man \
 	man7/N_INFO_ACK.7.man \
 	man7/N_info_ack_t.7.man \
 	man7/N_INFO_REQ.7.man \
@@ -767,6 +1259,10 @@ dist_noinst_MANS = \
 	man7/N_reset_req_t.7.man \
 	man7/N_RESET_RES.7.man \
 	man7/N_reset_res_t.7.man \
+	man7/N_TOKEN_ACK.7.man \
+	man7/N_token_ack_t.7.man \
+	man7/N_TOKEN_REQ.7.man \
+	man7/N_token_req_t.7.man \
 	man7/N_UDERROR_IND.7.man \
 	man7/N_uderror_ind_t.7.man \
 	man7/N_UNBIND_REQ.7.man \
@@ -791,6 +1287,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.23  2008-07-01 12:06:34  brian
+# - updated manual pages, added new API library headers and impl files
+#
 # Revision 0.9.2.22  2008-06-18 16:45:28  brian
 # - widespread updates
 #

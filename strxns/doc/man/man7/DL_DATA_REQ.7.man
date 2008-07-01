@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: DL_DATA_REQ.7.man,v 0.9.2.8 2008-06-18 16:45:33 brian Exp $
+.\" @(#) $Id: DL_DATA_REQ.7.man,v 0.9.2.9 2008-07-01 12:06:36 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:33 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:06:36 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: DL_DATA_REQ.7.man,v $
+.\" Revision 0.9.2.9  2008-07-01 12:06:36  brian
+.\" - updated manual pages, added new API library headers and impl files
+.\"
 .\" Revision 0.9.2.8  2008-06-18 16:45:33  brian
 .\" - widespread updates
 .\"
@@ -99,7 +102,7 @@ dlpi revision 2.0.0
 .\"
 .SH SYNOPSIS
 The message consists of one or more
-.B M_DATA
+.BR M_DATA (9)
 message blocks containing at least one byte of data.
 .\"
 .\"
@@ -108,9 +111,9 @@ To simplify the support of a
 .BR read (2)/ write (2)
 interface to the data link layer, the DLS provider must recognize and process
 messages that consist of one or more
-.B M_DATA
+.BR M_DATA (9)
 message blocks with non preceding
-.B M_PROTO
+.BR M_PROTO (9)
 message block.  This message type may originate from the
 .BR write (2)
 system call.

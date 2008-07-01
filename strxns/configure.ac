@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/10/16 06:04:39 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-07-01 12:06:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/10/16 06:04:39 $ by $Author: brian $
+# Last Modified $Date: 2008-07-01 12:06:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strxns],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.36 $) $Date: 2007/10/16 06:04:39 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.37 $) $Date: 2008-07-01 12:06:34 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -97,11 +97,13 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_LEX
 AC_PROG_YACC
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-dnl AM_GNU_GETTEXT_VERSION([0.16.1])
+AM_GNU_GETTEXT_VERSION([0.16.1])
+AM_GNU_GETTEXT
 
 dnl
 dnl Checks for libraries.
@@ -150,7 +152,6 @@ AC_CHECK_TYPES([ptrdiff_t])
 dnl
 dnl Checks for library functions.
 dnl
-dnl AM_GNU_GETTEXT
 AC_FUNC_ERROR_AT_LINE
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_FORK fi
 AC_PROG_GCC_TRADITIONAL
@@ -174,6 +175,8 @@ AC_XNS
 
 AC_CONFIG_FILES([Makefile
 		 scripts/texi/args.texi
+		 intl/Makefile
+		 po/Makefile.in
 		 src/include/Makefile
 		 src/Makefile
 		 lib32/Makefile
@@ -193,6 +196,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.37  2008-07-01 12:06:34  brian
+# - updated manual pages, added new API library headers and impl files
+#
 # Revision 0.9.2.36  2007/10/16 06:04:39  brian
 # - fix cross-compile bug
 #

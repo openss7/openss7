@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_DATA_IND.7.man,v 0.9.2.8 2008-06-18 16:45:36 brian Exp $
+.\" @(#) $Id: N_DATA_IND.7.man,v 0.9.2.9 2008-07-01 12:06:39 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-06-18 16:45:36 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-01 12:06:39 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_DATA_IND.7.man,v $
+.\" Revision 0.9.2.9  2008-07-01 12:06:39  brian
+.\" - updated manual pages, added new API library headers and impl files
+.\"
 .\" Revision 0.9.2.8  2008-06-18 16:45:36  brian
 .\" - widespread updates
 .\"
@@ -86,24 +89,23 @@ sort-adjacent-labels
 \- normal data transfer indication
 .SH SYNOPSIS
 The format of the message is one or more
-.B M_DATA
+.BR M_DATA (9)
 message blocks.  The value of the NS user data field is always the same as that
 supplied in the corresponding
 .BR N_DATA_REQ (7)
 primitive at the peer service access point.  Use of
-.B M_PROTO
+.BR M_PROTO (9)
 message blocks is optional (see guidelines under
 .BR N_DATA_REQ (7)).
 The structure of the
-.B M_PROTO
+.BR M_PROTO (9)
 message block, if present, is as follows:
 .sp
 .nf
 \f(CW\s-1\
 typedef struct {
-    ulong PRIM_type;            /* always N_DATA_IND */
-    ulong DATA_xfer_flags;      /* bit masking for data xfer
-                                   flags */
+    ulong PRIM_type;        /* always N_DATA_IND */
+    ulong DATA_xfer_flags;  /* bit masking for data xfer flags */
 } N_data_ind_t;
 
 /* Data Transfer Flags */
