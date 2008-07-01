@@ -1,0 +1,5 @@
+# translatable sources
+src/lib/cdiapi.c
+src/lib/npiapi.c
+src/lib/dlpiapi.c
+src/lib/libdlpi/dlpi.c
