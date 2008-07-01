@@ -1,0 +1,761 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpi_strerror.3.man,v 0.9.2.1 2008-07-01 11:50:55 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:55 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi_strerror.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:55  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPI_STRERROR 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI Library"
+.\" =========================================================================
+.SH NAME
+.B dlpi_strerror
+\- obtain an error string.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libdlpi (3),
+the
+.IR Solaris \(rg-specific,
+DLPI
+.[
+dlpi revision 2.0.0
+.]
+Library.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.nh
+.PP
+.B #include <sys/dlpi.h>
+.br
+.B #include <dlpi.h>
+.HP
+\fBconst\ char\ *dlpi_strerror\fP(\fBint\fP\ \fIerror\fP);
+.ad b
+.hy
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I error
+the error number to decode.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B dlpi_strerror
+is a DLPI Library
+.[
+soldoc11
+.]
+subroutine call.
+This call translates the error code, \fIerror\fP, to a human readible
+description string in the locale of the environment.  When \fIerror\fP is
+\fB\)DL_SYSERR\fP, the error code is taken from \fI\)errno\fP(3).  If
+\fIerror\fP is not one of the known error codes, \fI\*(lqUnknown DLPI error
+code\*(rq\fP, is returned in the 'C' language locale.
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B dlpi_strerror
+function, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpi '
+flag to the linker command when linking C language programs that use the
+.B dlpi_strerror
+function or include the
+.B @libdir@/libdlpi.a
+static library object as an target of the linking.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B dlpi_strerror
+is fully thread-safe.
+.\"
+.\"
+.SH LOCALIZATION
+.PP
+.B dlpi_strerror
+supports full localizations using
+.BR gettext .
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.B dlpi_strerror
+is successful, it returns a pointer to a constant string describing the error
+code, \fIerror\fP.
+When
+.B dlpi_strerror
+fails, it returns a pointer to a constant string generically describing
+unknown error codes.
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B dlpi_strerror
+fails, it returns a pointer to a constant string generically describing
+unknown error codes.
+.B dlpi_strerror
+may fail when the error code, \fIerror\fP, is unknown to the DLPI Library, or
+is an unknown \fBLinux\fP system error code.
+.PP
+DLPI Library
+.[
+soldoc11
+.]
+errors and their corresponding 'C' language locale text strings are as
+follows:
+.TP
+\fB\)DLPI_SUCCESS\fP \(em \fI\*(lqDLPI operation succeeded\*(rq\fP
+The DLPI Library call completed successfully.  Any other value returned from a
+DLPI Library function indicates failure.  Note that this value is not
+necessarily zero (0) and that zero or non-zero return codes generally \fIdo
+not\fP distinguish between non-errors and errors in the DLPI Library.
+.TP
+\fB\)DLPI_EINVAL\fP \(em \fI\*(lqInvalid argument\*(rq\fP
+One of the arguments provided to the DLPI Library call was invalid, contained
+invalid information, or was not formatted properly.  This only applies to DLPI
+Library arguments passed to public interfaces belonging to the DLPI Library.
+This error code is a generic error condition used only when there is not a
+more specific error condition that applies.
+.TP
+\fB\)DLPI_ELINKNAMEINVAL\fP \(em \fI\*(lqInvalid DLPI linkname\*(rq\fP
+The \fIlinkname\fP (first) argument to the \fBdlpi_open\fP(3) library call was
+invalid (e.g. \fBNULL\fP), contained invalid information (e.g. a null string),
+was not formatted properly (e.g. contained control characters).  This error
+code is only returned by the \fBdlpi_open\fP(3) library call.
+See \fBdlpi_open\fP(3).
+.TP
+\fB\)DLPI_ENOLINK\fP \(em \fI\*(lqDLPI link does not exist\*(rq\fP
+The \fIlinkname\fP (first) argument to the \fBdlpi_open\fP(3) library call as
+formatted correctly; ohwever, the link to which it refers does not exist.
+This error code is only returned by the \fBdlpi_open\fP(3) library
+call.
+See \fBdlpi_open\fP(3).
+.TP
+\fB\)DLPI_EBADLINK\fP \(em \fI\*(lqBad DLPI link\*(rq\fP
+The \fIlinkname\fP (first) argument to the \fBdlpi_open\fP(3) library call was
+formatted correctly, and referred to an existing link; however, the existing
+link device is unusable (e.g. it refers to a device other than a data link).
+This error code is only returned by the \fBdlpi_open\fP(3) library
+call.
+See \fBdlpi_open\fP(3).
+.TP
+\fB\)DLPI_EINHANDLE\fP \(em \fI\*(lqInvalid DLPI handle\*(rq\fP
+When a link is opened successfully using the \fBdlpi_open\fP(3) call, it
+returns a handle of type \fBdlpi_handle_t\fP that is later used as the first
+argument to may DLPI library calls and is used to make reference to the open
+data link.  When the data link is closed, the handle that corresponded to the
+open data link can no longer be used.  This error indicates that the passed in
+link handle is invalid and does not reference an open data link.
+See \fBdlpi_open\fP(3) and \fBdlpi_close\fP(3).
+.TP
+\fB\)DLPI_ETIMEDOUT\fP \(em \fI\*(lqDLPI operation timed out\*(rq\fP
+To effect many DLPI Library subroutines, the library passes DLPI primitives to
+the DLS provider on the open Stream and expects a response from the DLS
+provider.  To avoid hanging the calling process, when the expected response is
+not forthcomoing within a user-settable time interval, the library call
+returns with this error code.
+.TP
+\fB\)DLPI_EVERNOTSUP\fP \(em \fI\*(lqUnsupported DLPI version\*(rq\fP
+Some DLPI Library functions rely upon the DLS provider associated with the
+data link providing DLPI Revision 2.0.0
+.[
+dlpi revision 2.0.0
+.]
+compatible support.  This is particularly required by the \fBdlpi_info\fP(3)
+library call.  When a DLPI Library call discovers that the level of support
+required by the library is insufficient, it returns with this error code.
+See \fBdlpi_info\fP(3) and \fBDL_INFO_ACK\fP(7).
+.TP
+\fB\)DLPI_EMODENOTSUP\fP \(em \fI\*(lqUnsupported DLPI connection mode\*(rq\fP
+The DLPI Library only supports connectionless data link service.  Should a
+data link only provide connection-oriented or acknowledged connectionless data
+link service, then the dlpi_info(3) library call will return this error code.
+Note that the \fBDL_UNSUPPORTED\fP error code will be returned in the same
+situation for \fBdlpi_bind\fP(3).
+See \fBdlpi_info\fP(3) and \fBDL_INFO_ACK\fP(7).
+.TP
+\fB\)DLPI_EUNAVAILSAP\fP \(em \fI\*(lqUnavailable DLPI SAP\*(rq\fP
+The DLPI Library always attempts to bind to the requested LSAP selector.  If
+the DLS provider binds to an LSAP other than the requsted one (e.g., the DLS
+provider selects an alternate LSAP in accordance with \fB\)DL_BIND_REQ\fP(7)
+rules), then the DLPI Library call, \fB\)dlpi_bind\fP(3) fails with this error
+code.  See \fBdlpi_bind\fP(3) and \fBDL_BIND_REQ\fP(7).
+.TP
+\fB\)DLPI_FAILURE\fP \(em \fI\*(lqDLPI operation failed\*(rq\fP
+When a DLPI primitive operation or recovery action performed by a DLPI Library
+function fails, and there is no other DLPI Library error that is appropriate,
+or a double-error condition has occurred during recovery, the DLPI Library
+call returns this error code.  See \fB\)dlpi_open\fP(3) and
+\fB\)dlpi_bind\fP(3).
+.TP
+\fB\)DLPI_ENOTSTYLE2\fP \(em \fI\*(lqDLPI style-2 node reports style-1\*(rq\fP
+When the DLPI Library opens a DLPI Stream, it performs transparent opening of
+Style-1 and Style-2 DLPI Streams.  Using the \fI\)linkname\fP and following the
+search algorithm of the \fB\)dlpi_open\fP(3) call, the DLPI Library expects
+some named devices to be Style-2.  If however, such a device happens to report
+Style-1, this error is returned.  See \fBdlpi_open\fP(3) and
+\fBDL_ATTACH_REQ\fP(7).
+.TP
+\fB\)DLPI_EBADMSG\fP \(em \fI\*(lqBad DLPI message\*(rq\fP
+When the DLPI Library receives a DLPI primitive from the DLS provider, and the
+DLPI primitive is recognized and expected, but improperly formatted (according
+to the DLPI Revision 2.0.0 standard or extension specifications), this error
+code is returned.  This error code is not returned by any function in the DLPI
+Library for a proper functioning DLS provider.
+.TP
+\fB\)DLPI_ERAWNOTSUP\fP \(em \fI\*(lqDLPI raw mode not supported\*(rq\fP
+The DLS user may specify the \fB\)DLPI_RAW\fP flag on the call to
+\fB\)dlpi_open\fP(3) to request raw mode of operation for the data link.
+However, not all DLS providers support raw mode.  In the case that the DLS
+provider does not support raw mode, this error code is returned.  See
+\fB\)dlpi_open\fP(3) and \fB\)dlpi_ioctl\fP(4).
+.TP
+\fB\)DLPI_ENOTEINVAL\fP \(em \fI\*(lqInvalid DLPI notification type\*(rq\fP
+This error code is returned by the \fB\)dlpi_enabnotify\fP(3) call when the
+\fInotes\fP (second) argument to that call does not specify a valid
+notification.  See \fBdlpi_enabnotify\fP(3) and \fB\)DL_NOTIFY_REQ\fP(7).
+.TP
+\fB\)DLPI_ENOTENOTSUP\fP \(em \fI\*(lqDLPI notification not supported by link\*(rq\fP
+When the DLS user calls the \fB\)dlpi_enabnotify\fP(3) library function and
+the DLS provider does not support the \fB\)DL_NOTIFY_REQ\fP(7) primitive, this
+error code is returned by the library call.  See \fBdlpi_enabnotify\fP(3) and
+\fB\)DL_NOTIFY_REQ\fP(7).
+.TP
+\fB\)DLPI_ENOTEIDINVAL\fP \(em \fI\*(lqInvalid DLPI notification identifier\*(rq\fP
+When the DLS user successfully invokes the \fB\)dlpi_enabnotify\fP(3) library
+call, the DLS user is provided with an identifier that may be used to identify
+the notification for a subsequent call to \fB\)dlpi_disabnotify\fP(3) to
+disable the same set of notifications.  Once \fB\)dlpi_disabnotify\fP(3) has
+been called for an identifier handle, the handle is no longer valid.  When an
+invalid handle is supplied to the \fB\)dlpi_disabnotify\fP(3) library call,
+the call returns this error code.
+See \fBdlpi_disabnotify\fP(3).
+.PP
+DLPI Standard
+.[
+dlpi revision 2.0.0
+.]
+errors and their corresponding 'C' language locale text strings are as
+follows:
+.TP
+\fB\)DL_BADSAP\fP \(em \fI\*(lqBad LSAP selector\*(rq\fP
+When the DLS user wishes to bind a Stream to a DLSAP, it does so by specifying
+the LSAP selector portion of the DLSAP in a \fB\)DL_BIND_REQ\fP(7) primitive.
+This LSAP selector is subject to rules concerning validity and format by the
+underlying DLS provider.  In the case that the LSAP specified by the DLS user
+in the \fB\)DL_BIND_REQ\fP(7) primitive is invalid or contains an invalid LSAP
+value, the DLS provider will respond with a \fB\)DL_ERROR_ACK\fP(7) primitive
+that may include the DLPI error \fB\)DL_BADSAP\fP.
+.RS
+.PP
+However, the DLPI Revision 2.0.0
+.[
+dlpi revision 2.0.0
+.]
+standard does not describe this error code being returned in response to a
+\fB\)DL_BIND_REQ\fP(7) in this situation, but a \fB\)DL_BADADDR\fP value
+instead; therefore, there is no DLPI Library call that will return this error
+code.  See \fB\)dlpi_bind\fP(3), \fB\)DL_BIND_REQ\fP(7) and
+\fB\)DL_ERROR_ACK\fP(7) for more information.
+.RE
+.TP
+\fB\)DL_BADADDR\fP \(em \fI\*(lqDLSAP address in improper format or invalid\*(rq\fP
+This error code can be returned in a number of contexts, many of which are not
+supported by the DLPI Library and are not discussed further here.
+.RS
+.PP
+When issued by the DLS provider in a \fB\)DL_ERROR_ACK\fP(7) primitive issued
+in response to a \fB\)DL_BIND_REQ\fP(7) primitive containing a bad LSAP
+selector, it indicates that only the LSAP portion of the DLSAP address was in
+an improper or invalid format.  See \fB\)dlpi_bind\fP(3) and
+\fB\)DL_BIND_REQ\fP(7).
+.PP
+When issued by the DLS provider in response to a \fB\)DL_ENABMULTI_REQ\fP(7)
+or \fB\)DL_DISABMULTI_REQ\fP primitive, it indicates that the multicast
+address was in an improper or invalid format.  See \fB\)dlpi_enabmulti\fP(3),
+\fB\)dlpi_disabmulti\fP(3), \fB\)DL_ENABMULTI_REQ\fP(7) and
+\fB\)DL_DISABMULTI_REQ\fP(7).
+.PP
+When issued by the DLS provider in a \fB\)DL_UDERROR_IND\fP(7) primitive
+issued in response to a \fB\)DL_UNITDATA_REQ\fP(7) primitive containing a bad
+address, it indicates that the DLSAP address was in an improper or invalid
+format.  See \fB\)dlpi_send\fP(3), \fB\)DL_UNITDATA_REQ\fP(7) and
+\fB\)DL_UDERROR_IND\fP(7).
+.PP
+Other uses of this error code are not supported by the DLPI Library.
+.RE
+.TP
+\fB\)DL_ACCESS\fP \(em \fI\*(lqImproper permissions for request\*(rq\fP
+This error code can be returned in a number of contexts, many of which are not
+supported by the DLPI Library and not discussed here.
+.RS
+.PP
+When issued in response to a \fB\)DL_ATTACH_REQ\fP(7) primitive containing a
+Physical Point of Attachment (PPA) that has restricted access, the
+\fB\)DL_ACCESS\fP error code indicates that the DLS user did not have
+sufficient privilege (when the Stream was opened) to use the requested PPA.
+See \fB\)dlpi_open\fP(3) and \fB\)DL_ATTACH_REQ\fP(7).
+.PP
+When issued in response to a \fB\)DL_BIND_REQ\fP(7) primitive containing a
+Link Service Access Pointer (LSAP) selector that has restricted access, the
+\fB\)DL_ACCESS\fP error code indicates that the DLS user did not have
+sufficient privilege (when the Stream was opened) to use the requested LSAP
+selector.  See \fB\)dlpi_bind\fP(3) and \fB\)DL_BIND_REQ\fP(7).
+.PP
+Other uses of this error code are not supported by the DLPI Library.
+.RE
+.TP
+\fB\)DL_OUTSTATE\fP \(em \fI\*(lqPrimitive issued in improper state\*(rq\fP
+As primitives are exhcanged between the DLS user and the DLS provider, the DLS
+provider tracks the state of the interface toward the DLS user.  Not all
+primitives are valid in all DLS user-provider interface states.  A
+\fB\)DL_ERROR_ACK\fP(7) primitive containing this error code is issued by the
+DLS provided in response to any primitive requiring negative acknowledgement
+that requires the DLS provider to be in specific DLPI interface states, and
+was not issued in one of those specific states.  For the DLPI Library, this
+consists largely of the bind and unbind subroutine calls.  See
+\fB\)dlpi_bind\fP(3), \fB\)dlpi_unbind\fP(3), \fB\)DL_BIND_REQ\fP(7) and
+\fB\)DL_UNBIND_REQ\fP(7).
+.TP
+\fB\)DL_SYSERR\fP \(em \fI\*(lqUNIX system error occurred\*(rq\fP
+During execution of a DLPI Library subroutine call or processing by the DLS
+provider of a DLS user issued primitive, an error may occur that is described
+by a UNIX system error code per \fI\)errno\fP(3).  \fB\)DL_SYSERR\fP in the
+DLPI error code indicates that the UNIX system error code is either contained
+in the \fI\)dl_unix_errno\fP field of the associated \fB\)DL_ERROR_ACK\fP(7)
+primitive, or, when returned by a DLPI Library call, contained in the
+\fI\)errno\fP(3) global variable.
+.TP
+\fB\)DL_BADCORR\fP \(em \fI\*(lqSequence number not from outstanding DL_CONN_IND\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.
+.TP
+\fB\)DL_BADDATA\fP \(em \fI\*(lqUser data exceeded provider limit\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_UDERROR_IND\fP(7).
+.TP
+\fB\)DL_UNSUPPORTED\fP \(em \fI\*(lqRequested service not supplied by provider\*(rq\fP
+When the DLS user wishes to bind a DLPI Stream, the DLS user issues a
+\fB\)DL_BIND_REQ\fP(7) primitive that specifies the requested service mode in
+the \fI\)dl_service_mode\fP field of the primitive.  As the DLPI Library only
+supports connectionless mode service, \fB\)DL_CLDLS\fP, the
+\fB\)dlpi_bind\fP(3) subroutine always binds with this service type.  When the
+DLS provider does not support the \fB\)DL_CLDLS\fP service mode, this error
+code is returned.  See \fB\)dlpi_bind\fP(3) and \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_BADPPA\fP \(em \fI\*(lqSepcified PPA was invalid\*(rq\fP
+When the DLS user wishes to attach a Style-2 DLPI Stream to a Physical Point
+of Attachment (PPA), it issues a \fB\)DL_ATTACH_REQ\fP(7) primitive to the DLS
+provider that contains the requested PPA in the \fI\)dl_ppa\fP field of the
+primitive.  The DLPI Library transparently attaches Style-2 providers as part
+of the \fB\)dlpi_open\fP(3) library call.  When the determined PPA is not
+appropriate for the driver, this error code is returned.  See
+\fB\)dlpi_open\fP(3) and \fB\)DL_ATTACH_REQ\fP(7).
+.TP
+\fB\)DL_BADPRIM\fP \(em \fI\*(lqPrimitive received not known by provider\*(rq\fP
+When the DLS provider receives a primitive from the DLS user that is either
+too short to be a primitive (is not long enough to contain a
+\fI\)dl_primitive\fP field) or contains a \fI\)dl_primitive\fP value that
+indicates a primitive that is unknown to the DLS provider, the DLS provider
+returns a \fB\)DL_ERROR_ACK\fP(7) primitive with the \fB\)DL_BADPRIM\fP error
+code.  This error code may be returned for extension primitives that are not
+known to the DLS provider.  See \fB\)dlpi_disabnotify\fP(3) and
+\fB\)dlpi_enabnotify\fP(3).
+.TP
+\fB\)DL_BADQOSPARAM\fP \(em \fI\*(lqQOS parameters contained invalid values\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_UDQOS_REQ\fP(7).
+.TP
+\fB\)DL_BADQOSTYPE\fP \(em \fI\*(lqQOS structure type is unknown or unsupported\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_UDQOS_REQ\fP(7).
+.TP
+\fB\)DL_BADTOKEN\fP \(em \fI\*(lqToken used not an active stream\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_CONNECT_RES\fP(7).
+.TP
+\fB\)DL_BOUND\fP \(em \fI\*(lqAttempted second bind with dl_max_conind\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_INITFAILED\fP \(em \fI\*(lqPhysical link initialization failed\*(rq\fP
+DLS providers are permitted to initialize the link when it is successfully
+attached or bound.  The DLPI standard requires that the link be initialized by
+the time that the \fB\)DL_BIND_ACK\fP(7) primitive is issued, either using
+automatic initialization using the \fB\)DL_ATTACH_REQ\fP(7) or
+\fB\)DL_BIND_REQ\fP(7) primitives, or non-automatic initialization requiring
+some other mechanism (such as an input-output control).  If link
+initialization has been attempted and failed, this error code may be returned
+to the attach or bind.  See \fB\)dlpi_open\fP(3), \fB\)dlpi_bind\fP(3),
+\fB\)DL_ATTACH_REQ\fP(7) and \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_NOADDR\fP \(em \fI\*(lqProvider could not allocate alternate address\*(rq\fP
+When the DLS user attempts to bind to an LSAP selector that results in a DLSAP
+address that is already bound to another DLPI Stream and the DLS provider does
+not support multiple DLPI Streams to be bound to the same DLSAP, the DLS
+provider may attempt to choose an alternate DLSAP address to which to bind.  If
+an alternate DLSAP address cannot be formulated, the DLS provider may return
+this error code.  See \fB\)dlpi_bind\fP(3) and \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_NOTINIT\fP \(em \fI\*(lqPhysical link not initialized\*(rq\fP
+DLS providers are permitted to initialize the link when it is successfully
+attached or bound.  The DLPI standard requires that the link be initialized by
+the time that the \fB\)DL_BIND_ACK\fP(7) primitive is issued, either using
+automatic initialization using the \fB\)DL_ATTACH_REQ\fP(7) or
+\fB\)DL_BIND_REQ\fP(7) primitives, or non-automatic initialization requiring
+some other mechanism (such as an input-output control).  If the DLS provider
+requires non-automatic initialization of the link and the link has not so been
+initialized at the time that DLS user requests the link be attached or bound,
+this error code is returned.  See \fB\)dlpi_open\fP(3), \fB\)dlpi_bind\fP(3),
+\fB\)DL_ATTACH_REQ\fP(7) and \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_UNDELIVERABLE\fP \(em \fI\*(lqPrevious data unit could not be delivered\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_UDERROR_IND\fP(7).
+.TP
+\fB\)DL_NOTSUPPORTED\fP \(em \fI\*(lqPrimitive is known but not supported\*(rq\fP
+When the DLS provider receives a primitive that is known (part of the DLPI
+Revision 2.0.0 standard or a known extension) but is not supported by the DLS
+provider, this error code is returned.  This error code can be returned by the
+DLPI library for features which are optionally supported by the DLS provider.
+See \fB\)dlpi_disabmulti\fP(3), \fB\)dlpi_disabnotify\fP(3),
+\fB\)dlpi_enabmulti\fP(3), \fB\)dlpi_enabnotify\fP(3),
+\fB\)dlpi_get_physaddr\fP(3), \fB\)dlpi_promiscoff\fP(3),
+\fB\)dlpi_promiscon\fP(3) and \fB\)dlpi_set_physaddr\fP(3).
+.TP
+\fB\)DL_TOOMANY\fP \(em \fI\*(lqLimit exceeded\*(rq\fP
+When the DLS user binds or enables additional DLSAPs or multicast addresses on
+a DLPI Stream, the number of DLSAP or multicast addresses that the DLS user
+attempts to bind may exceed a limit on the number of DLSAPs or multicast
+addresses that the DLS provider imposes.  In this case, the DLS provider
+returns this error code in response to the primitive that attempts to exceed
+the limit.  For the DLPI Library, this error code may be returned by the
+\fB\)dlpi_enabmulti\fP(3) library call.  See \fB\)dlpi_enabmulti\fP(3) and
+\fB\)DL_ENABMULTI_REQ\fP(7).
+.TP
+\fB\)DL_NOTENAB\fP \(em \fI\*(lqPromiscuous mode or multicast address not enabled\*(rq\fP
+When the DLS user enables promiscuous mode on a device or enables a multicast
+address, the state of the interface does not change.  Therefore, if the DLS
+user requests that a promiscious mode be turned off or that a multicast
+address be disabled, and the promiscuous mode was not enabled, or the
+multicast address was not enabled, this error code is returned by the DLS
+provider.  See \fB\)dlpi_promiscoff\fP(3), \fB\)dlpi_disabmulti\fP(3),
+\fB\)DL_PROMISCOFF_REQ\fP(7) and \fB\)DL_DISABMULTI_REQ\fP(7).
+.TP
+\fB\)DL_BUSY\fP \(em \fI\*(lqOther streams for PPA in post-attached state\*(rq\fP
+When a DLS user wishes to set the physical address for a particular PPA on a
+Style-2 DLPI Stream, the DLS provider will not allow the physical address to
+be set provided that there is another DLPI Stream attached and bound to the
+PPA.  In the case where the DLS provider must prohibit the setting of the
+physical address, this error code is returned.  See
+\fB\)dlpi_set_physaddr\fP(3) and \fB\)DL_SET_PHYS_ADDR_REQ\fP(7).
+.TP
+\fB\)DL_NOAUTO\fP \(em \fI\*(lqAutomatic handling of XID and TEST response not supported\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_NOXIDAUTO\fP \(em \fI\*(lqAutomatic handling of XID not supported\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_NOTESTAUTO\fP \(em \fI\*(lqAutomatic handling of TEST not supported\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_BIND_REQ\fP(7).
+.TP
+\fB\)DL_XIDAUTO\fP \(em \fI\*(lqAutomatic handling of XID response\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_XID_REQ\fP(7).
+.TP
+\fB\)DL_TESTAUTO\fP \(em \fI\*(lqAutomatic handling of TEST response\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_TEST_REQ\fP(7).
+.TP
+\fB\)DL_PENDING\fP \(em \fI\*(lqPending outstanding connect indications\*(rq\fP
+This error code is not returned by any function in the DLPI Library for a
+proper functioning DLS provider.  See \fB\)DL_CONNECT_RES\fP(7).
+.PP
+Some UNIX errors and their corresponding 'C' language locale text strings are
+as follows:
+.TP
+[\fB\)EPERM\fP] \(em \fI\*(lqOperation not permitted\*(rq\fP
+Fine-grained permission for the request or response is incorrect.  That is,
+the primitive is recognized and supported by the DLS provider but the
+reqeusting DLS user Stream does not have sufficient permissions for the DLS
+provider to satisfy the request.  This is only returned where
+\fB\)DL_ACCESS\fP does not apply.
+.TP
+[\fB\)ENOMEM\fP] \(em \fI\*(lqCannot allocate memory\*(rq\fP
+Insufficient memory was available to satisfy the request.  The request or
+response may be successful if the DLS user reissues the request or response
+primitive at a later time when resources become available.
+.TP
+[\fB\)ENOBUFS\fP] \(em \fI\*(lqNo buffer space available\*(rq\fP
+Insufficient buffers were available to satisfy the request.  The request or
+response may be successful if the DLS user reissues the request or response
+primitive at a later time when resources become available.
+.TP
+[\fB\)ENOSR\fP] \(em \fI\*(lqOut of streams resources\*(rq\fP
+Insufficient STREAMS resources were available to satisfy the request.  The
+request or ressponse may be successful if the DLS user reissues the request or
+response primitive at a later time when resources become available.
+.TP
+[\fB\)EAGAIN\fP] \(em \fI\*(lqResource temporarily unavailable\*(rq\fP
+A temporary failure occured and the DLS user should reissue the request or
+response.
+.TP
+[\fB\)EBUSY\fP] \(em \fI\*(lqDevice or resource busy\*(rq\fP
+The control information in the request or response primitive has already been
+subjected to the control request or response, or the driver is unable to
+handle the request due to some other transient condition.
+.TP
+[\fB\)EINVAL\fP] \(em \fI\*(lqInvalid argument\*(rq\fP
+One of the parameters of the request for which there is no prescribed DLPI
+error code has an invalid value.
+.TP
+[\fB\)ENOTSUP\fP] \(em \fI\*(lqOperation not supported\*(rq\fP
+Unsupported request, event or call.  The DLS provider recognizes and supports
+the request or response primitive, however, the specific request or response
+is not supported by the DLS provider or data link protocol and there is no
+prescribed DLPI error code.
+.TP
+[\fB\)ENOLINK\fP] \(em \fI\*(lqLink has been severed\*(rq\fP
+THe interface (Physical Point of Attachment (PPA) or underlying driver or
+device) is not connected and no prescribed DLPI error code is applicable.
+.TP
+[\fB\)ENXIO\fP] \(em \fI\*(lqNo such device or address\*(rq\fP
+Invalid device.  The interace (Physical Point of Attachment (PPA) or
+underlying driver or device) is no longer installed on the system.
+.PP
+When the error code, \fIerror\fP is unknown:
+.TP
+{\fBunknown\fP} \(em \fI\*(lqUnknown DLPI error code\*(lq\fP
+The error code is unknown to the DLPI Library.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B dlpi_strerror
+is a
+.IR Solaris \(rg-specific
+function.  It may be necessary to define the C preprocessor symbol,
+.BR _SUN_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file, to expose this symbolic constants, data structures and declarations
+necessary for the use of this function.
+It may also be necessary to include the
+.RB < dlpi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+The DLPI header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpi.h
+The DLPI Library header file.
+.TP
+.B @libdir@/libdlpi.a
+The static library containing the
+.BR dlpi_strerror
+function.
+.TP
+.B @libdir@/libdlpi.so
+The shared object library containing the
+.BR dlpi_strerror
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B dlpi_strerror
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi (7),
+.BR dlpi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B dlpi_strerror
+is compatible with the
+.IR Solaris \(rg
+DLPI Library,
+.[
+soldoc11
+.]
+and systems providing an interface equivalent to
+.IR Solaris \(rg
+DLPI Library,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B DLPI Library
+functions are
+.IR Solaris \(rg-specific,
+and are provided only for porting
+.IR Solaris \(rg
+applications programs, drivers and modules to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatibility: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the DLPI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR dlpi (3),
+.BR dlpi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+and
+.IR Solaris \(rg
+DLPI documentation.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+first appeared in SVR 4.
+.[
+svr4
+.]
+.B dlpi_strerror
+first appeared in the
+.IR Solaris "\(rg " 11 .
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "DLPI Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

@@ -1,0 +1,600 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: dlpi.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: dlpi.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH DLPI 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 DLPI Library"
+.\" =========================================================================
+.SH NAME
+.B DLPI, dlpi, libdlpi
+\- Data Link Provider Interface (DLPI) Subroutines
+.\"
+.\"
+.SH INTERFACE
+.PP
+DLPI
+.[
+dlpi revision 2.0.0
+.]
+Library.
+.br
+.IR Solaris \(rg-specific
+and proprietary.
+.\"
+.\"
+.SH LIBRARY
+.PP
+.BR libdlpi (3),
+the
+.IR "DLPI Library" .
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.nh
+.PP
+.B #include <sys/types.h>
+.br
+.B #include <sys/ioctl.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <sys/dlpi.h>
+.br
+.B #include <dlpi.h>
+.HP
+\fBuint\ dlpi_arptype\fP(\fBuint\fP\ \fImactype\fP);
+.PD 0
+.HP
+\fBint\ dlpi_bind\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fIsap\fP, \fBuint\ *\fP\fIboundsap\fP);
+.HP
+\fBvoid\ dlpi_close\fP(\fBdlpi_handle_t\fP\ \fIdh\fP);
+.HP
+\fBint\ dlpi_disabmulti\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBconst\ void\ *\fP\fImaddr_ptr\fP, \fBsize_t\fP\ \fImaddr_len\fP);
+.HP
+\fBint\ dlpi_disabnotify\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBdlpi_notifyid_t\fP\ \fIid\fP, \fBvoid\ **\fP\fIargp\fP);
+.HP
+\fBint\ dlpi_enabmulti\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBconst\ void\ *\fP\fImaddr_ptr\fP, \fBsize_t\fP\ \fImaddr_len\fP);
+.HP
+\fBint\ dlpi_enabnotify\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fInotes\fP, \fBdlpi_notifyfunc_t\ *\fIfuncp\fP, \fBvoid\ *\fP\fIarg\fP, \fBdlpi_notifyid_t\ *\fP\fIidp\fP);
+.HP
+\fBint\ dlpi_fd\fP(\fBdlpi_handle_t\fP\ \fIdh\fP);
+.HP
+\fBint\ dlpi_get_physaddr\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fItype\fP, \fBvoid\ *\fP\fIpaddr_ptr\fP, \fBsize_t\ *\fP\fIpaddr_len\fP);
+.HP
+\fBuint\ dlpi_iftype\fP(\fBuint\fP\ \fImactype\fP);
+.HP
+\fBint\ dlpi_info\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBdlpi_info_t\ *\fP\fIinfop\fP, \fBuint\fP\ \fIoptions\fP);
+.HP
+\fBconst\ char\ *dlpi_linkname\fP(\fBdlpi_handle_t\fP\ \fIdh\fP);
+.HP
+\fBconst\ char\ *dlpi_mactype\fP(\fBuint\fP\ \fImactype\fP);
+.HP
+\fBint\ dlpi_open\fP(\fBconst\ char\ *\fP\fIlinkname\fP, \fBdlpi_handle_t\ *\fP\fIdhp\fP, \fBuint\fP\ \fIflags\fP);
+.HP
+\fBint\ dlpi_promiscoff\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fIlevel\fP);
+.HP
+\fBint\ dlpi_promiscon\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fIlevel\fP);
+.HP
+\fBint\ dlpi_recv\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBvoid\ *\fP\fIsaddr_ptr\fP, \fBsize_t\ *\fP\fIsaddr_len\fP, \fBvoid\ *\fP\fIdata_ptr\fP, \fBsize_t\ *\fP\fIdata_len\fP, \fBint\fP\ \fImsec\fP, \fBdlpi_recvinfo_t\ *\fP\fIrecvp\fP);
+.HP
+\fBint\ dlpi_send\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBconst\ void\ *\fP\fIdaddr_ptr\fP, \fBsize_t\fP\ \fIdaddr_len\fP, \fBconst\ void\ *\fP\fIdata_ptr\fP, \fBsize_t\fP\ \fIdata_len\fP, \fBconst\ dlpi_sendinfo_t\ *\fP\fIsendp\fP);
+.HP
+\fBint\ dlpi_set_physaddr\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBuint\fP\ \fItype\fP, \fBconst\ void\ *\fP\fIpaddr_ptr\fP, \fBsize_t\fP\ \fIpaddr_len\fP);
+.HP
+\fBint\ dlpi_set_timeout\fP(\fBdlpi_handle_t\fP\ \fIdh\fP, \fBint\fP\ \fImsec\fP);
+.HP
+\fBconst\ char\ *dlpi_strerror\fP(\fBint\fP\ \fIerror\fP);
+.HP
+\fBint\ dlpi_unbind\fP(\fBdlpi_handle_t\fP\ \fIdh\fP);
+.HP
+\fBvoid\ dlpi_walk\fP(\fBdlpi_walkfunc_t\ *\fP\fIfuncp\fP, \fBvoid\ *\fP\fIarg\fP, \fBuint\fP\ \fIflags\fP);
+.PD
+.ad b
+.hy
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B libdlpi
+is an
+.B OpenSS7
+implementation of the
+.IR Solaris \(rg
+DLPI Library
+.[
+soldoc11
+.]
+for
+.BR Linux .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.I DLPI Library
+is a library of DLPI helper and utility functions designed for use with the Data
+Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7).
+The original library was designed by
+.IR "Sun Microsystems, Inc." ,
+.RB < http://www.sun.com/ >,
+and first documented
+.[
+soldoc10
+.]
+in
+.IR Solaris "\(rg " 10 .
+.PP
+The DLPI Library documented here is the
+.B OpenSS7
+implementation of a library intended on being a work-alike with the
+.IR Solaris \(rg
+library in accordance with the
+.I Sun Microsystems
+documentation.
+.[
+soldoc11
+.]
+.PP
+The
+.IR Solaris \(rg-compatible
+DLPI Library should not be confused with the
+.IR GCOM -compatible
+DLPI API Library,
+.BR libdlpiapi (3).
+The two libraries are incompatible and have namespace conflicts (primarily on
+.BR dlpi_open (3)
+and
+.BR dlpi_close (3)).
+.PP
+The
+.IR Solaris \(rg
+DLPI Library only supports connectionless mode data link service,
+\fBDL_CLDLS\fP and does not invoke automatic response to XID and TEST, even
+when the DLS provider advertises that it is capable of automatic response.
+However, the
+.IR Solaris \(rg
+DLPI Library does support native, passive and raw modes.
+Nevertheless, the
+.IR Solaris \(rg
+DLPI Library is useful in only limited cases.  In contrast, the
+.IR GCOM
+DLPI API Library,
+.[
+dlpiapi
+.]
+.BR dlpiapi (3),
+supports both connectionless mode and connection-oriented mode data link
+service, \fBDL_CLDLS\fP and \fBDL_CODLS\fP, and is still capable of native,
+passive and raw modes.
+.\"
+.\"
+.SH FUNCTIONS
+.PP
+.B libdlpi
+implements the following DLPI library functions:
+.TS
+tab(:);
+lb1c1lssss.
+dlpi_arptype\fR(3):-:convert MAC Type to RFC 826 ARP Hardware Type.
+dlpi_bind\fR(3):-:bind a DLPI Stream to a DLSAP.
+dlpi_close\fR(3):-:close a DLPI Stream.
+dlpi_disabmulti\fR(3):-:disable a multicast address.
+dlpi_disabnotify\fR(3):-:disable notifications.
+dlpi_enabmulti\fR(3):-:enable a multicast address.
+dlpi_enabnotify\fR(3):-:enable notifications.
+dlpi_fd\fR(3):-:obtain file descriptor for Stream.
+dlpi_get_physaddr\fR(3):-:get physical address.
+dlpi_iftype\fR(3):-:convert MAC Type to RFC 2863 IANA ifType.
+dlpi_info\fR(3):-:obtain information for a DLPI Stream.
+dlpi_linkname\fR(3):-:get linkname for DLPI Stream.
+dlpi_mactype\fR(3):-:get description for DLPI MAC Type.
+dlpi_open\fR(3):-:open a new DLPI Stream.
+dlpi_promiscoff\fR(3):-:set promiscuous mode off.
+dlpi_promiscon\fR(3):-:set promiscuous mode on.
+dlpi_recv\fR(3):-:received data.
+dlpi_send\fR(3):-:transmit data.
+dlpi_set_physaddr\fR(3):-:set physical address.
+dlpi_set_timeout\fR(3):-:set a timeout.
+dlpi_strerror\fR(3):-:obtain error string.
+dlpi_unbind\fR(3):-:unbind a DLPI Stream.
+dlpi_walk\fR(3):-:walk the available DLPI PPAs.
+.TE
+.\"
+.\"
+.SH USAGE
+.PP
+To user the DLPI Library, include
+.RB < sys/dlpi.h >
+and
+.RB < dlpi.h >
+header files in C language programs.
+Add the
+.RB ` -ldlpi '
+flag to the linker command when linking C language programs that use this
+library, or add
+.B @libdir@/libdlpi.a
+to the objects linked.
+.\"
+.SS Establishing Streams
+.PP
+The following functions establish and destroy DLPI Streams:
+.TP
+.BR dlpi_open (3)
+Opens and attaches (when necessary) a DLPI Stream in the native, raw or
+passive mode.
+.TP
+.BR dlpi_bind (3)
+Binds the stream to a DLSAP.
+.TP
+.BR dlpi_info (3)
+Request information about the DL provider.
+.TP
+.BR dlpi_unbind (3)
+Unbind the stream from a DLSAP.
+.TP
+.BR dlpi_close (3)
+Detaches (when necessary) and closes a DLPI Stream.
+.\"
+.SS Manipulating Addresses
+.PP
+The following functions manipulate addresses associated with the data link:
+.TP
+.BR dlpi_enablmulti (3)
+Enable a multicast address.
+.TP
+.BR dlpi_disabmulti (3)
+Disable a multicast address.
+.TP
+.BR dlpi_get_physaddr (3)
+Get various types of physical address.
+.TP
+.BR dlpi_set_physaddr (3)
+Set various types of physical address.
+.TP
+.BR dlpi_promiscon (3)
+Enter promiscous mode.
+.TP
+.BR dlpi_promiscoff (3)
+Leave promiscous mode.
+.\"
+.SS Notifications
+.PP
+The following functions request notifications:
+.TP
+.BR dlpi_enabnotify (3)
+Enable notifications and callback functions.
+.TP
+.BR dlpi_disabnotify (3)
+Disable notifications and callback functions.
+.\"
+.SS Data Transfer
+.PP
+The following functions are responsible for data transfer:
+.TP
+.BR dlpi_send (3)
+Send data.
+.TP
+.BR dlpi_recv (3)
+Receive data.
+.\"
+.SS Management
+.PP
+The following functions perform management operations:
+.TP
+.BR dlpi_fd (3)
+Obtain the file descriptor for a DLPI handle.
+.TP
+.BR dlpi_walk (3)
+Walk the available Physical Points of Appearance.
+.TP
+.BR dlpi_set_timeout (3)
+Set a timeout (to be notified on expiry).
+.\"
+.SS MAC Type Conversions
+.PP
+The following functions perform DLPI MAC Type conversions:
+.TP
+.BR dlpi_arptype (3)
+Converts the DLPI MAC Type to an RFC 826
+.[
+rfc826
+.]
+ARP Hardware Type.
+.TP
+.BR dlpi_iftype (3)
+Converts the DLPI MAC Type to an RFC 2863
+.[
+rfc2863
+.]
+IANA ifType.
+.\"
+.SS Error Strings
+The followin functions perform error string reporting:
+.TP
+.BR dlpi_strerror (3)
+Returns the error string that corresponds to the passed in error code, and
+possibly from the
+.IR errno (3)
+global variable.  This error string corresponds to DLPI errors, DLPI Library
+errors, and UNIX errors.
+.TP
+.BR dlpi_linkname (3)
+Returns the link name that was used to open the DLPI device or pseudo-device
+driver, and as was passed to
+.BR dlpi_open (3).
+.TP
+.BR dlpi_mactype (3)
+Converts the DLPI MAC Type to a DLPI
+.[
+dlpi revision 2.0.0
+.]
+descriptive string.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+The
+.B @PACKAGE_TITLE@
+implementation of the DLPI Library is fully thread-safe.
+The variables documented as global are instead contained in thread-specific
+data.
+When static buffers are returned, these buffers are instead thread-specific.
+.\"
+.\"
+.SH RETURN
+.PP
+Most function call return zero (0) on success and minus one (-1) on error.
+.\"
+.\"
+.SH ERRORS
+.PP
+When most functions fail, they return minus one (-1) and set the global
+.IR errno (3)
+variable to an appropriate error code.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B DLPI API Library
+is
+.IR Solaris \(rg-specific.
+.[
+soldoc11
+.]
+It may be necessary to define the `C' preprocessor symbol,
+.BR _SUN_SOURCE ,
+before including the
+.RB < sys/dlpi.h >
+header file to expose the symbolic constants, data structures and declarations
+necessary for the use of these functions.  It may be necessary to include the
+.RB < dlpi.h >
+header file to expose the symbolic constants, data structures and declarations
+necessary for the user of these functions.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/dlpi.h
+the standard DLPI
+.[
+dlpi revision 2.0.0
+.]
+header file.
+.TP
+.B @includedir@/@PACKAGE@/dlpi.h
+the
+.IR Solaris \(rg-specific
+header file.
+.TP
+.B @libdir@/libdlpi.a
+the static library version of the DLPI Library.
+.TP
+.B @libdir@/libdlpi.so
+the shared object library version of the DLPI Library.
+.\"
+.\"
+.SH BUGS
+.PP
+The DLPI Library has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR dlpi (7),
+.BR dlpiapi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The OpenSS7 DLPI library is compatible with documentation of the
+.IR Solaris \(rg
+DLPI library
+.[
+soldoc11
+.]
+and applications based on the DLPI, with the following compatibility
+considerations:
+.IP \(em \w'\(em\(em'u
+Application programming interfaces for devices and modules that implement the
+Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+have not been subjected to standardization and are, therefore, inherently
+non-portable.  Portable \fISTREAMS\fP applications, drivers and modules will
+utilize the service primitive interface directly using
+.BR putmsg (2s),
+.BR getmsg (2s),
+.BR write (2s),
+.BR read (2s)
+and
+.BR ioctl (2s)
+system calls and the definitions provided in the
+.RB < sys/dlpi.h >
+header file.
+.IP \(em
+.B DLPI Library
+functions are
+.IR Solaris \(rg-specific,
+.[
+soldoc11
+.]
+and are provided only for porting
+.IR Solaris \(rg
+applications, drivers and modules to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+DLPI application programs, drivers and modules.
+.IP \(em
+Binary compatibility is not attempted, only source compatibility: any binary
+compatibility experienced is coincidental and may change on a future release.
+.RS
+.PP
+It may be necessary to recompile all applications programs, and \fISTREAMS\fP
+drivers and modules, that share definitions with the DLPI library through the
+.RB < dlpi.h >
+header file, using
+.B @PACKAGE_TITLE@
+supplied header files.
+.RE
+.IP \(em
+The
+.B @PACKAGE_TITLE@
+implementation of the DLPI Library is designed to be fully thread-safe.
+When used in a POSIX threads environment, the implementation is not expected
+to be bug-for-bug compatible with the
+.IR Solaris \(rg
+implementation, which does not document interactions with multi-threaded
+programs.
+.PP
+For further compatibility information, see
+.BR dlpi (7)
+and
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+DLPI,
+.[
+dlpi revision 2.0.0
+.]
+DLPI documentation.
+.[
+soldoc11
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+DLPI
+first appeared in SVR 4.
+.[
+svr4
+.]
+.PP
+DLPI documentation
+.[
+soldoc10
+.]
+was first issued by
+.I Sun Microsystems
+for
+.IR Solaris "\(rg " 10 .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+version of the
+DLPI Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.T2

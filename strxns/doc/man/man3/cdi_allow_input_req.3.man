@@ -1,0 +1,323 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: cdi_allow_input_req.3.man,v 0.9.2.1 2008-07-01 11:50:52 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-07-01 11:50:52 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: cdi_allow_input_req.3.man,v $
+.\" Revision 0.9.2.1  2008-07-01 11:50:52  brian
+.\" - added manual pages and library implementation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strxns.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strxns.macros
+.\"
+.\"
+.TH CDI_ALLOW_INPUT_REQ 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 CDI API Library"
+.\" =========================================================================
+.SH NAME
+.B cdi_allow_input_req
+\- send \fBCD_ALLOW_INPUT_REQ\fR(7) and await ack.
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libdlpiapi (3),
+the
+.IR GCOM -specific,
+CDI
+.[
+cdi revision 0.9.2
+.]
+API Library.
+.[
+cdiapi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/cdi.h>
+.br
+.B #include <cdiapi.h>
+.HP
+\fBint cdi_allow_input_req\fP(\fBint\fP\ \fIfd\fP, \fBint\ *\fP\fIstate_ptr\fP);
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I fd
+the file descriptor for the Stream.
+.TP
+.I state_ptr
+pointer to state variable to receive state (or \fBNULL\fP).
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B cdi_allow_input_req
+is a CDI API Library
+.[
+cdiapi
+.]
+subroutine.
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B cdi_allow_input_req
+function, include
+.RB < sys/cdi.h >
+and
+.RB < cdiapi.h >
+header files in C language programs.
+Add the
+.RB ` -lcdiapi '
+flag to the linker command when linking C language programs that use the
+.B cdi_allow_input_req
+function.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B cdi_allow_input_req
+is fully thread-safe.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.B cdi_allow_input_req
+is successful, it returns zero (0) or a positive integer value.
+When
+.B cdi_allow_input_req
+fails, it returns a negative integer value (-1).
+.\"
+.\"
+.SH ERRORS
+.PP
+When
+.B cdi_allow_input_req
+fails, it returns a negative integer value (-1).
+.B cdi_allow_input_req
+may fail when:
+.TP \w'[\fBENOMEM\fP]\(em'u
+.RB [ EBADF ]
+the file descriptor,
+.IR fd ,
+supplied does not correspond to a valid CDI Stream open for reading and
+writing.
+.TP
+.RB [ EINVAL ]
+one or more of the arguments are invalid.
+.PP
+In addition, any of the error number returned by
+.BR cdi_put_proto (3)
+or
+.BR cdi_wait_ack (3)
+can be returned by
+.BR cdi_allow_input_req .
+.\"
+.\"
+.SH NOTICES
+.PP
+.B cdi_allow_input_req
+is a
+.IR GCOM -specific
+function.  It may be necessary to define the C preprocessor smbol,
+.BR _GCOM_SOURCE ,
+before including the
+.RB < sys/cdi.h >
+header file,
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+It may also be necessary to include the
+.RB < cdiapi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/cdi.h
+The CDI header file.
+.TP
+.B @includedir@/@PACKAGE@/cdiapi.h
+The CDI API Library header file.
+.TP
+.B @libdir@/libcdiapi.a
+The static library containing the
+.BR cdi_allow_input_req
+function.
+.TP
+.B @libdir@/libcdiapi.so
+The shared object library containing the
+.BR cdi_allow_input_req
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B cdi_allow_input_req
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR cdi (7),
+.BR cdiapi (3),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B cdi_allow_input_req
+is compatible with the
+.I GCOM
+CDI API Library,
+.[
+npiapi
+.]
+and system providing an interface equialent to the
+.I GCOM
+CDI API Library,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B CDI API Library
+functions are
+.IR GCOM -specific,
+and are provided only for porting
+.IR GCOM
+software to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+CDI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatiblity: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the CDI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR cdiapi (3),
+.BR cdi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+CDI,
+.[
+cdi revision 0.9.2
+.]
+and
+.I GCOM
+CDI API documentation.
+.[
+cdiapi
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Communiations Device Interface (CDI),
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+was developed by NCR Comten.
+.B cdi_allow_input_req
+first appeared in the
+.I GCOM
+CDI API.
+.[
+cdiapi
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "CDI API Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
