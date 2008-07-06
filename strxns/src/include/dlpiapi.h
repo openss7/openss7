@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpiapi.h,v 0.9.2.4 2008-07-01 12:06:40 brian Exp $
+ @(#) $Id: dlpiapi.h,v 0.9.2.5 2008-07-06 14:58:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 12:06:40 $ by $Author: brian $
+ Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpiapi.h,v $
+ Revision 0.9.2.5  2008-07-06 14:58:20  brian
+ - improvements
+
  Revision 0.9.2.4  2008-07-01 12:06:40  brian
  - updated manual pages, added new API library headers and impl files
 
@@ -68,11 +71,59 @@
 #ifndef __DLPIAPI_H__
 #define __DLPIAPI_H__
 
-#ident "@(#) $RCSfile: dlpiapi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpiapi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* These two definitions clash with the Solaris DLPI library. */
 #define dlpi_open	dlpi_open_GCOM
 #define dlpi_close	dlpi_close_GCOM
+
+#define DLPI_CTL_BUF_SIZE	5000
+#define DLPI_DATA_BUF_SIZE	5000
+#define DLPI_DEFAULT_PPA	~0
+#define DLPI_LOG_NAME		"/var/spool/dlpi.log"
+#define DLPI_N_CONINIDS		1
+
+#define DLPIAPI_SYSERR		(-DL_SYSERR)
+#define DLPIAPI_UNSUPPORTED_MSG	(-1024)
+#define DLPIAPI_NO_NOTHING	(-1025)
+#define DLPIAPI_STYLE_UNKNOWN	(-1026)
+#define DLPIAPI_PARAM_ERROR	(-1027)
+#define DLPIAPI_NOT_INIT	(-1028)
+#define DLPIAPI_OPEN_ERROR	(-1029)
+#define DLPIAPI_REJECT		(-1030)
+#define DLPIAPI_UNUSABLE	(-1031)
+#define DLPIAPI_EINTR		(-1032)
+#define DLPIAPI_EAGAIN		(-1033)
+
+#define DLPI_LOG_FILE		(1<< 0)
+#define DLPI_LOG_STDERR		(1<< 1)
+#define DLPI_LOG_RX_PROTOS	(1<< 2)
+#define DLPI_LOG_TX_PROTOS	(1<< 3)
+#define DLPI_LOG_ERRORS		(1<< 4)
+#define DLPI_LOG_SIGNALS	(1<< 5)
+#define DLPI_LOG_RX_DATA	(1<< 6)
+#define DLPI_LOG_TX_DATA	(1<< 7)
+#define DLPI_LOG_DISCONNECTS	(1<< 8)
+#define DLPI_LOG_RESETS		(1<< 9)
+#define DLPI_LOG_VERBOSE	(1<<10)
+#define DLPI_LOG_DEFAULT \
+	( DLPI_LOG_FILE \
+	| DLPI_LOG_STDERR \
+	| DLPI_LOG_ERRORS \
+	| DLPI_LOG_DISCONNECTS \
+	| DLPI_LOG_RESETS \
+	)
+
+#define dlpi_bind_ack	(_dlpi_bind_ack())
+#define dlpi_conn_con	(_dlpi_conn_con())
+#define dlpi_conn_ind	(_dlpi_conn_ind())
+#define dlpi_ctl_buf	(_dlpi_ctl_buf())
+#define dlpi_ctl_cnt	(*_dlpi_ctl_cnt())
+#define dlpi_data_buf	(_dlpi_data_buf())
+#define dlpi_data_cnt	(*_dlpi_data_cnt())
+
+typedef int (*dlpi_sig_func_t)(int, char *, int, char *, int);
+typedef void (*unnum_frame_t)(int, unsigned char *, int, unsigned char *, int);
 
 #ifdef __BEGIN_DECLS
 __BEGIN_DECLS
@@ -87,7 +138,6 @@ extern int dlpi_connect_req(int fd, ulong peer_sap);
 extern int dlpi_connect_wait(int data);
 extern void dlpi_decode_ctl(char *p);
 extern char *dlpi_decode_disconnect_reason(long reason);
-extern int dlpi_connect_req(int fd);
 extern int dlpi_discon_req(int fd, int reason);
 extern int dlpi_disconnect_req(int fd, int reason);
 extern int dlpi_get_a_msg(int fd, char *buf, int cnt);
@@ -120,15 +170,15 @@ extern int dlpi_send_info_req(int fd);
 extern int dlpi_send_reset_req(int fd);
 extern int dlpi_send_reset_res(int fd);
 extern int dlpi_send_stats_req(int fd);
-extern int dlpi_send_test_req(int fd, ulong pfb, char *datap, int length, uchar *addr_ptr,
+extern int dlpi_send_test_req(int fd, ulong pfb, char *datap, int length, unsigned char *addr_ptr,
 			      int addr_len);
-extern int dlpi_send_test_res(int fd, ulong pfb, char *datap, int length, uchar *addr_ptr,
+extern int dlpi_send_test_res(int fd, ulong pfb, char *datap, int length, unsigned char *addr_ptr,
 			      int addr_len);
-extern int dlpi_send_uic(int fd, cahr * datap, int data_len, uchar *addr_ptr, int addr_len);
+extern int dlpi_send_uic(int fd, char * datap, int data_len, unsigned char *addr_ptr, int addr_len);
 extern int dlpi_send_unbind_req(int fd);
-extern int dlpi_send_xid_req(int fd, ulong pfb, char *datap, int length, uchar *addr_ptr,
+extern int dlpi_send_xid_req(int fd, ulong pfb, char *datap, int length, unsigned char *addr_ptr,
 			     int addr_len);
-extern int dlpi_send_xid_res(int fd, ulong pfb, char *datap, int length, uchar *addr_ptr,
+extern int dlpi_send_xid_res(int fd, ulong pfb, char *datap, int length, unsigned char *addr_ptr,
 			     int addr_len);
 extern int dlpi_set_log_size(long log_size);
 extern int dlpi_set_signal_handling(int fd, dlpi_sig_func_t func, int sig_num, int primitive_mask);

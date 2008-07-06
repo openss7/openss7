@@ -447,9 +447,6 @@ union CD_primitives {
 	cd_disable_req_t disable_req;
 	cd_ok_ack_t ok_ack;
 	cd_error_ack_t error_ack;
-	cd_enable_con_t enable_con;
-	cd_disable_con_t disable_con;
-	cd_error_ind_t error_ind;
 	cd_allow_input_req_t allow_input_req;
 	cd_read_req_t read_req;
 	cd_unitdata_req_t unitdata_req;
@@ -457,6 +454,14 @@ union CD_primitives {
 	cd_unitdata_ack_t unitdata_ack;
 	cd_unitdata_ind_t unitdata_ind;
 	cd_halt_input_req_t halt_input_req;
+	cd_abort_output_req_t abort_output_req;
+	cd_error_ind_t error_ind;
+	cd_enable_con_t enable_con;
+	cd_disable_con_t disable_con;
+	cd_bad_frame_ind_t bad_frame_ind;
+	cd_modem_sig_req_t modem_sig_req;
+	cd_modem_sig_ind_t modem_sig_ind;
+	cd_modem_sig_poll_t modem_sig_poll;
 };
 
 #define CD_INFO_REQ_SIZE		sizeof(cd_info_req_t)

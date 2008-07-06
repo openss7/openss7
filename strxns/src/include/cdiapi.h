@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdiapi.h,v 0.9.2.4 2008-07-01 12:06:40 brian Exp $
+ @(#) $Id: cdiapi.h,v 0.9.2.5 2008-07-06 14:58:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 12:06:40 $ by $Author: brian $
+ Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdiapi.h,v $
+ Revision 0.9.2.5  2008-07-06 14:58:20  brian
+ - improvements
+
  Revision 0.9.2.4  2008-07-01 12:06:40  brian
  - updated manual pages, added new API library headers and impl files
 
@@ -68,7 +71,7 @@
 #ifndef __CDIAPI_H__
 #define __CDIAPI_H__
 
-#ident "@(#) $RCSfile: cdiapi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cdiapi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include <sys/cdi.h>
 
@@ -83,7 +86,7 @@ extern unsigned char *_cdi_ctl_buf(void);
 #define cdi_data_cnt	(*_cdi_data_cnt())
 #define cdi_ctl_cnt	(*_cdi_ctl_cnt())
 #define cdi_data_buf	(_cdi_data_buf())
-#define cdi_ctl_buf	(_cid_ctl_buf())
+#define cdi_ctl_buf	(_cdi_ctl_buf())
 
 #define Return_error_ack	(1<<0)
 #define Return_info_ack		(1<<1)

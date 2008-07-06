@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-07-01 12:06:34 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-07-06 14:58:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-01 12:06:34 $ by $Author: brian $
+# Last Modified $Date: 2008-07-06 14:58:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strxns],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.37 $) $Date: 2008-07-01 12:06:34 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.38 $) $Date: 2008-07-06 14:58:17 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -102,7 +102,7 @@ AC_PROG_YACC
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION([0.16.1])
+AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT
 
 dnl
@@ -196,6 +196,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.38  2008-07-06 14:58:17  brian
+# - improvements
+#
 # Revision 0.9.2.37  2008-07-01 12:06:34  brian
 # - updated manual pages, added new API library headers and impl files
 #

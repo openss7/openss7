@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:06:40 $
+ @(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-06 14:58:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 12:06:40 $ by $Author: brian $
+ Last Modified $Date: 2008-07-06 14:58:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdiapi.c,v $
+ Revision 0.9.2.5  2008-07-06 14:58:21  brian
+ - improvements
+
  Revision 0.9.2.4  2008-07-01 12:06:40  brian
  - updated manual pages, added new API library headers and impl files
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:06:40 $"
+#ident "@(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-06 14:58:21 $"
 
 static char const ident[] =
-    "$RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:06:40 $";
+    "$RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-06 14:58:21 $";
 
 /*
  * This is an OpenSS7 implementation of the GCOM cdiapi library.  It builds
@@ -147,6 +150,7 @@ static char const ident[] =
 #else
 #define inline inline __attribute__((always_inline)) fastcall __hot
 #define noinline static __attribute__((noinline)) fastcall __unlikely
+#endif
 
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
@@ -158,7 +162,7 @@ static char const ident[] =
   */
 struct __cdi_tsd {
 	int cerrno;
-	char strbuf[BUFSIZ]; /* string buffer */
+	unsigned char strbuf[BUFSIZ]; /* string buffer */
 	int data_cnt;
 	int ctl_cnt;
 	unsigned char data_buf[CDI_DATA_BUF_SIZE];
@@ -208,7 +212,7 @@ __cdi_get_tsd(void)
 __hot int *
 __cdi__cerrno(void)
 {
-	return (&__cdi_get_tsd()->cerror);
+	return (&__cdi_get_tsd()->cerrno);
 }
 
 /** @fn int *_cerrno(void)
@@ -287,7 +291,7 @@ __cdi_put_both(int fd, char *ctrl_ptr, int ctrl_length, char *data_ptr, int data
 			switch (errno) {
 			case EAGAIN:
 			case EINTR:
-			case ERESTARTSYS:
+			case ERESTART:
 				continue;
 			default:
 				break;
@@ -339,7 +343,7 @@ __asm__(".symver __cdi_put_both_r,cdi_put_both@@CDIAPI_1.0");
 int
 __cdi_put_proto(int fd, int nbytes, long flags)
 {
-	return __cdi_put_both(fd, cdi_ctl_buf, nbytes, NULL, -1, flags);
+	return __cdi_put_both(fd, (char *)cdi_ctl_buf, nbytes, NULL, -1, flags);
 }
 
 /** @brief The reentrant version of __cdi_put_proto().
@@ -585,6 +589,7 @@ int
 __cdi_put_dial_req(int fd, char *dial_string, int dial_length)
 {
 	cd_enable_req_t *p;
+	int ret;
 
 	p = (typeof(p)) cdi_ctl_buf;
 	cdi_ctl_cnt = sizeof(*p);
@@ -661,7 +666,7 @@ __asm__(".symver __cdi_put_enable_req_r,cdi_put_enable_req@@CDIAPI_1.0");
   * @param nbytes the number of bytes in the data buffer.
   */
 int
-__cdi_put_frame(int fd, uchar address, uchar control, unsigned char *buf, int nbytes)
+__cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned char *buf, int nbytes)
 {
 	cdi_data_buf[0] = address;
 	cdi_data_buf[1] = control;
@@ -670,8 +675,8 @@ __cdi_put_frame(int fd, uchar address, uchar control, unsigned char *buf, int nb
 		return (-1);
 	}
 	cdi_data_cnt = nbytes + 2;
-	strcpy(&cdi_data_buf[2], buf, nbytes);
-	return __cdi_put_data(fd, cdi_data_buf, cdi_data_cnt, 0);
+	strncpy((char *)&cdi_data_buf[2], (char *)buf, nbytes);
+	return __cdi_put_data(fd, (char *)cdi_data_buf, cdi_data_cnt, 0);
 }
 
 /** @brief The reentrant version of __cdi_put_frame().
@@ -685,12 +690,12 @@ __cdi_put_frame(int fd, uchar address, uchar control, unsigned char *buf, int nb
   * This is an implementation of cdi_put_frame().
   */
 int
-__cdi_put_frame_r(int fd, uchar address, uchar control, unsigned char *buf, int nbytes)
+__cdi_put_frame_r(int fd, unsigned char address, unsigned char control, unsigned char *buf, int nbytes)
 {
 	return __cdi_put_frame(fd, address, control, buf, nbytes);
 }
 
-/** @fn int cdi_put_frame(int fd, uchar address, uchar control, unsigned char *buf, int nbytes)
+/** @fn int cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned char *buf, int nbytes)
   * @param fd the CDI Stream.
   * @param address the address field.
   * @param control the control field.
@@ -706,7 +711,7 @@ __asm__(".symver __cdi_put_frame_r,cdi_put_frame@@CDIAPI_1.0");
   * @param fd the CDI Stream.
   */
 int
-__cid_modem_sig_poll(int fd)
+__cdi_modem_sig_poll(int fd)
 {
 	cd_modem_sig_poll_t *p;
 	int ret;
@@ -729,7 +734,7 @@ __cid_modem_sig_poll(int fd)
   * This is an implementation of cdi_modem_sig_poll().
   */
 int
-__cid_modem_sig_poll_r(int fd)
+__cdi_modem_sig_poll_r(int fd)
 {
 	return __cdi_modem_sig_poll(fd);
 }
@@ -754,7 +759,7 @@ __cdi_get_a_msg(int fd, char *buf, int nbytes)
 	int flags;
 	int ret;
 
-	ctrl.buf = cdi_ctl_buf;
+	ctrl.buf = (char *)cdi_ctl_buf;
 	ctrl.len = -1;
 	ctrl.maxlen = CDI_CTL_BUF_SIZE;
 
@@ -766,8 +771,8 @@ __cdi_get_a_msg(int fd, char *buf, int nbytes)
 		/* FIXME */
 		return (ret);
 	}
-	cdi_ctl_cnt = ctrl->len;
-	cdi_data_cnt = data->len;
+	cdi_ctl_cnt = ctrl.len;
+	cdi_data_cnt = data.len;
 	return (ret);
 }
 
@@ -812,7 +817,7 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 				switch (errno) {
 				case EAGAIN:
 				case EINTR:
-				case ERESTARTSYS:
+				case ERESTART:
 					continue;
 				default:
 					break;
@@ -821,7 +826,7 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 			return (ret);
 		}
 		if (cdi_ctl_cnt > 0) {
-			switch (*(np_ulong *) cdi_ctl_buf) {
+			switch (*(cd_ulong *) cdi_ctl_buf) {
 			case CD_ERROR_ACK:
 				if (flags & Return_error_ack)
 					return (0);
@@ -831,7 +836,7 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 					return (0);
 				break;
 			case CD_UNITDATA_ACK:
-				if (flags & Return_unitdata_ack)
+				if (flags & Return_unidata_ack)
 					return (0);
 				break;
 			case CD_ERROR_IND:
@@ -847,7 +852,7 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 					return (0);
 				break;
 			case CD_OK_ACK:
-				if (flags & Return_ok - ack)
+				if (flags & Return_ok_ack)
 					return (0);
 				break;
 			case CD_BAD_FRAME_IND:
@@ -866,7 +871,7 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 	}
 }
 
-/** @brief The reentrant version of __cid_rcv_msg().
+/** @brief The reentrant version of __cdi_rcv_msg().
   * @param fd the CDI Stream.
   * @param buf data buffer.
   * @param nbytes length of data buffer.
@@ -978,7 +983,7 @@ __cdi_wait_ack(int fd, long primitive, int *state_ptr)
 		flags |= Return_error_ack | Return_info_ack;
 		break;
 	case CD_UNITDATA_ACK:
-		flags |= Return_error_ack | Return_unitdata_ack;
+		flags |= Return_error_ack | Return_unidata_ack;
 		break;
 	case CD_ERROR_IND:
 		flags |= Return_error_ind;
@@ -1000,17 +1005,17 @@ __cdi_wait_ack(int fd, long primitive, int *state_ptr)
 		return (-1);
 	}
 
-	while ((ret = __cdi_rcv_msg(fd, cdi_data_buf, CDI_DATA_BUF_SIZE, flags)) > 0) ;
+	while ((ret = __cdi_rcv_msg(fd, (char *)cdi_data_buf, CDI_DATA_BUF_SIZE, flags)) > 0) ;
 	if (ret < 0) {
 		/* FIXME */
 		return (ret);
 	}
 	/* Have expected control primitive. */
 	if (state_ptr != NULL) {
-		/* cd_state is always in the second np_ulong location */
-		*state_ptr = ((np_ulong *) cdi_ctl_buf)[1];
+		/* cd_state is always in the second cd_ulong location */
+		*state_ptr = ((cd_ulong *) cdi_ctl_buf)[1];
 	}
-	return (*(np_ulong *) cdi_ctl_buf == (np_ulong) primitive);
+	return (*(cd_ulong *) cdi_ctl_buf == (cd_ulong) primitive);
 }
 
 /** @brief The reentrant version of __cdi_wait_ack().
@@ -1142,7 +1147,7 @@ __asm__(".symver __cdi_close_r,cdi_close@@CDIAPI_1.0");
 int
 __cdi_init_FILE(int log_options, FILE *log_file)
 {
-	/* FIXME */
+	return (0); /* FIXME */
 }
 
 /** @brief The reentrant version of __cdi_init_FILE().
@@ -1476,13 +1481,13 @@ __cdi_get_modem_sigs(int fd, int flags)
 		return (ret);
 	}
 	flags |= Return_modem_sig_ind;
-	while ((ret = __cdi_rcv_msg(fd, cdi_data_buf, CDI_DATA_BUF_SIZE, flags)) > 0) ;
+	while ((ret = __cdi_rcv_msg(fd, (char *)cdi_data_buf, CDI_DATA_BUF_SIZE, flags)) > 0) ;
 	if (ret < 0) {
 		/* FIXME */
 		return (ret);
 	}
 	/* Have expected control primitive */
-	if (*(np_ulong *) cdi_ctl_buf == CD_MODEM_SIG_IND)
+	if (*(cd_ulong *) cdi_ctl_buf == CD_MODEM_SIG_IND)
 		return (((cd_modem_sig_ind_t *) cdi_ctl_buf)->cd_sigs);
 	return (0);
 }
@@ -1564,9 +1569,9 @@ __asm__(".symver __cdi_modem_sig_req_r,cdi_modem_sig_req@@CDIAPI_1.0");
 int
 __cdi_dial_req(int fd, uint ppa, uint sigs, char *dial_string, int dial_length)
 {
-	int ret;
+	int ret, state = 0;
 
-	if ((ret = __cdi_attach_req(fd, ppa)) < 0) {
+	if ((ret = __cdi_attach_req(fd, ppa, &state)) < 0) {
 		/* FIXME */
 		return (ret);
 	}
@@ -1578,7 +1583,7 @@ __cdi_dial_req(int fd, uint ppa, uint sigs, char *dial_string, int dial_length)
 		/* FIXME */
 		return (ret);
 	}
-	if ((ret = __cdi_wait_ack(fd, CD_ENABLE_CON, RetryOnSignal)) < 0) {
+	if ((ret = __cdi_wait_ack(fd, CD_ENABLE_CON, &state)) < 0) {
 		/* FIXME */
 		return (ret);
 	}
@@ -1620,6 +1625,7 @@ int
 __cdi_perror(char *msg)
 {
 	syslog(LOG_INFO, "%s: %m", msg);
+	return (0); /* XXX */
 }
 
 /** @brief the reentrant version of __cdi_perror().
@@ -1701,6 +1707,7 @@ __cdi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
 			sprintf(q, "%02X ", *p);
 		syslog(LOG_INFO, "%s", tmp);
 	}
+	return (0); /* XXX */
 }
 
 /** @brief The reentrant version of __cdi_print_msg().
@@ -1733,8 +1740,7 @@ __asm__(".symver __cdi_print_msg_r,cdi_print_msg@@CDIAPI_1.0");
 int
 __cdi_decode_ctl(char *msg)
 {
-	char tmp[BUFSIZ];
-	union CD_primtives *p;
+	union CD_primitives *p = (typeof(p)) msg;
 
 	if (cdi_ctl_cnt >= sizeof(p->cd_primitive)) {
 		switch (p->cd_primitive) {
@@ -1743,149 +1749,151 @@ __cdi_decode_ctl(char *msg)
 			if (cdi_ctl_cnt >= sizeof(p->info_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_INFO_ACK:
 			syslog(LOG_INFO, "%s: CD_INFO_ACK", msg);
 			if (cdi_ctl_cnt >= sizeof(p->info_ack)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_ATTACH_REQ:
 			syslog(LOG_INFO, "%s: CD_ATTACH_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->attach_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_DETACH_REQ:
 			syslog(LOG_INFO, "%s: CD_DETACH_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->detach_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_ENABLE_REQ:
 			syslog(LOG_INFO, "%s: CD_ENABLE_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->enable_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_DISABLE_REQ:
 			syslog(LOG_INFO, "%s: CD_DISABLE_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->disable_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_OK_ACK:
 			syslog(LOG_INFO, "%s: CD_OK_ACK", msg);
 			if (cdi_ctl_cnt >= sizeof(p->ok_ack)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_ERROR_ACK:
 			syslog(LOG_INFO, "%s: CD_ERROR_ACK", msg);
 			if (cdi_ctl_cnt >= sizeof(p->error_ack)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_ENABLE_CON:
 			syslog(LOG_INFO, "%s: CD_ENABLE_CON", msg);
 			if (cdi_ctl_cnt >= sizeof(p->enable_con)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_DISABLE_CON:
 			syslog(LOG_INFO, "%s: CD_DISABL_CON", msg);
 			if (cdi_ctl_cnt >= sizeof(p->disable_con)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_ERROR_IND:
 			syslog(LOG_INFO, "%s: CD_ERROR_IND", msg);
 			if (cdi_ctl_cnt >= sizeof(p->error_ind)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_ALLOW_INPUT_REQ:
 			syslog(LOG_INFO, "%s: CD_ALLOW_INPUT_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->allow_input_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_READ_REQ:
 			syslog(LOG_INFO, "%s: CD_READ_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->read_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_UNITDATA_REQ:
 			syslog(LOG_INFO, "%s: CD_UNITDATA_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->unitdata_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_WRITE_READ_REQ:
 			syslog(LOG_INFO, "%s: CD_WRITE_READ_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->write_read_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_UNITDATA_ACK:
 			syslog(LOG_INFO, "%s: CD_UNITDATA_ACK", msg);
 			if (cdi_ctl_cnt >= sizeof(p->unitdata_ack)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_UNITDATA_IND:
 			syslog(LOG_INFO, "%s: CD_UNITDATA_IND", msg);
 			if (cdi_ctl_cnt >= sizeof(p->unitdata_ind)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_HALT_INPUT_REQ:
 			syslog(LOG_INFO, "%s: CD_HALT_INPUT_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->halt_input_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_ABORT_OUTPUT_REQ:
 			syslog(LOG_INFO, "%s: CD_ABORT_OUTPUT_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->abort_output_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
+#if 0
 		case CD_MUX_NAME_REQ:
 			syslog(LOG_INFO, "%s: CD_MUX_NAME_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->mux_name_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
+#endif
 		case CD_BAD_FRAME_IND:
 			syslog(LOG_INFO, "%s: CD_BAD_FRAME_IND", msg);
 			if (cdi_ctl_cnt >= sizeof(p->bad_frame_ind)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_MODEM_SIG_REQ:
 			syslog(LOG_INFO, "%s: CD_MODEM_SIG_REQ", msg);
 			if (cdi_ctl_cnt >= sizeof(p->modem_sig_req)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_MODEM_SIG_IND:
 			syslog(LOG_INFO, "%s: CD_MODEM_SIG_IND", msg);
 			if (cdi_ctl_cnt >= sizeof(p->modem_sig_ind)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		case CD_MODEM_SIG_POLL:
 			syslog(LOG_INFO, "%s: CD_MODEM_SIG_POLL", msg);
 			if (cdi_ctl_cnt >= sizeof(p->modem_sig_poll)) {
 				/* XXX decode more */
 			}
-			return;
+			return (0);
 		}
 	}
 	syslog(LOG_INFO, "%s:", msg);
-	return;
+	return (-1);
 }
 
 /** @brief The reentrant version of __cdi_decode_ctl().

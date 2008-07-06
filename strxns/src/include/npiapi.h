@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npiapi.h,v 0.9.2.4 2008-07-01 12:06:40 brian Exp $
+ @(#) $Id: npiapi.h,v 0.9.2.5 2008-07-06 14:58:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 12:06:40 $ by $Author: brian $
+ Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npiapi.h,v $
+ Revision 0.9.2.5  2008-07-06 14:58:20  brian
+ - improvements
+
  Revision 0.9.2.4  2008-07-01 12:06:40  brian
  - updated manual pages, added new API library headers and impl files
 
@@ -68,7 +71,7 @@
 #ifndef __NPIAPI_H__
 #define __NPIAPI_H__
 
-#ident "@(#) $RCSfile: npiapi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npiapi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* *INDENT-OFF* */
 #ifdef __BEGIN_DECLS
@@ -93,6 +96,9 @@ __BEGIN_DECLS
 extern int *_nerrno(void);
 
 #define nerrno (*(_nerrno()))
+
+typedef int facil_proc_t(char, char *, unsigned, int);
+typedef int (*npi_sig_func_t)(int, char *, int, char *, int);
 
 extern char *npi_ascii_facil(int fref, char *fval, unsigned int flgth, int marker);
 extern int npi_bind_ascii_nsap(int npi_data, char *bind_ascii_nsap, int conind_nr, unsigned flags);

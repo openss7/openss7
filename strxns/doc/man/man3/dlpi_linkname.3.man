@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_linkname.3.man,v 0.9.2.1 2008-07-01 11:50:54 brian Exp $
+.\" @(#) $Id: dlpi_linkname.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_linkname.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:54  brian
 .\" - added manual pages and library implementation
 .\"
@@ -122,7 +125,9 @@ is a DLPI Library
 .[
 soldoc11
 .]
-subroutine.
+subroutine that returns a pointer to the \fIlinkname\fP string that was
+provided as an argument to the \fBdlpi_open\fP(3) library call.  This is the
+link name with which the referenced DLPI Stream was opened.
 .\"
 .\"
 .SH USAGE
@@ -147,43 +152,32 @@ static library object as an target of the linking.
 .PP
 .B dlpi_linkname
 is fully thread-safe.
+When called in a threaded environment,
+.B dlpi_linkname
+returns a pointer to a static buffer that is thread-specific and suvives
+beyond another thread invalidaing the handle, \fIdh\fP.  The contents of this
+thread-specific buffer are only valid until the next DLPI library call from
+the same thread.
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .B dlpi_linkname
-is successful, it returns zero (0) or a positive integer value.
+is successful, it returns a pointer to a character string representing the
+\fIlinkname\fP parameter to the \fBdlpi_open\fP(3) call.
 When
 .B dlpi_linkname
-fails, it returns a negative integer value (-1).
+fails, it returns \fBNULL\fP.
 .\"
 .\"
 .SH ERRORS
 .PP
 When
 .B dlpi_linkname
-fails, it returns a negative integer value (-1).
+fails, it returns \fBNULL\fP.
 .B dlpi_linkname
-may fail when:
-.TP \w'[\fBENOMEM\fP]\(em'u
-.RB [ EBADF ]
-the file descriptor,
-.IR fd ,
-supplied does not correspond to a valid DLPI Stream open for reading and
-writing.
-.TP
-.RB [ EINVAL ]
-one of the arguments supplied was invalid.
-.PP
-In addition, any of the error numbers returned by
-.BR putmsg (2s),
-.BR getmsg (2s),
-.BR open (2s),
-.BR close (2s),
-.BR ioctl (2s)
-may also be returned by
-.BR dlpi_linkname .
+may fail when the provided DLPI handle, \fIdh\fP, is invalid.
 .\"
 .\"
 .SH NOTICES
@@ -202,10 +196,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES
@@ -236,6 +226,7 @@ has no known bugs.
 .\"
 .SH SEE ALSO
 .PP
+.BR dlpi_open (3),
 .BR dlpi (7),
 .BR dlpi (3),
 .IR STREAMS (9).
@@ -255,6 +246,14 @@ and systems providing an interface equivalent to
 DLPI Library,
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
+The
+.IR Solaris \(rg
+implementation does not permit use by multiple threads of a given DLPI handle,
+\fIdh\fP.
+.B @PACKAGE_TITLE@
+permits full use by multiple threads of any DLPI handle, \fIdh\fP.  This
+should not lead to compatibility problems.
+.IP \(em
 .B DLPI Library
 functions are
 .IR Solaris \(rg-specific,

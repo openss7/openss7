@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\" @(#) $Id: dlpi.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
 .\" - added manual pages and library implementation
 .\"
@@ -387,8 +390,15 @@ rfc2863
 .]
 IANA ifType.
 .\"
-.SS Error Strings
-The followin functions perform error string reporting:
+.SS Strings
+The following functions perform string reporting:
+.TP
+.BR dlpi_mactype (3)
+Converts the DLPI MAC Type to a DLPI
+.[
+dlpi revision 2.0.0
+.]
+descriptive string.
 .TP
 .BR dlpi_strerror (3)
 Returns the error string that corresponds to the passed in error code, and
@@ -401,13 +411,6 @@ errors, and UNIX errors.
 Returns the link name that was used to open the DLPI device or pseudo-device
 driver, and as was passed to
 .BR dlpi_open (3).
-.TP
-.BR dlpi_mactype (3)
-Converts the DLPI MAC Type to a DLPI
-.[
-dlpi revision 2.0.0
-.]
-descriptive string.
 .\"
 .\"
 .SH MT CONTEXT

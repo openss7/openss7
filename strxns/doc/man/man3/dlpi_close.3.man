@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_close.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\" @(#) $Id: dlpi_close.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_close.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
 .\" - added manual pages and library implementation
 .\"
@@ -97,15 +100,22 @@ Library.
 .[
 soldoc11
 .]
+.PP
+For the \fIGCOM\fP DLPI API Library version of the function of the same name,
+see \fBdlpi_close_GCOM\fP(3).
 .\"
 .\"
 .SH SYNOPSIS
+.ad l
+.nh
 .PP
 .B #include <sys/dlpi.h>
 .br
 .B #include <dlpi.h>
 .HP
 \fBvoid\ dlpi_close\fP(\fBdlpi_handle_t\fP\ \fIdh\fP);
+.ad b
+.hy
 .\"
 .\"
 .SH ARGUMENTS
@@ -123,6 +133,8 @@ is a DLPI Library
 soldoc11
 .]
 subroutine.
+This library call is responsible for closing an open DLPI Stream and freeing
+any resources associated with the Stream and the DLPI handle.
 .\"
 .\"
 .SH USAGE
@@ -151,39 +163,19 @@ is fully thread-safe.
 .\"
 .SH RETURN
 .PP
+.B dlpi_close
+returns
+.BR void .
 When
 .B dlpi_close
-is successful, it returns zero (0) or a positive integer value.
-When
-.B dlpi_close
-fails, it returns a negative integer value (-1).
+fails, it fails silently.
 .\"
 .\"
 .SH ERRORS
 .PP
 When
 .B dlpi_close
-fails, it returns a negative integer value (-1).
-.B dlpi_close
-may fail when:
-.TP \w'[\fBENOMEM\fP]\(em'u
-.RB [ EBADF ]
-the file descriptor,
-.IR fd ,
-supplied does not correspond to a valid DLPI Stream open for reading and
-writing.
-.TP
-.RB [ EINVAL ]
-one of the arguments supplied was invalid.
-.PP
-In addition, any of the error numbers returned by
-.BR putmsg (2s),
-.BR getmsg (2s),
-.BR open (2s),
-.BR close (2s),
-.BR ioctl (2s)
-may also be returned by
-.BR dlpi_close .
+is passed an invalid data link handle, \fIdh\fP, it is simply ignored.
 .\"
 .\"
 .SH NOTICES
@@ -202,10 +194,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES

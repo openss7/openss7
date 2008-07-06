@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_mactype.3.man,v 0.9.2.1 2008-07-01 11:50:54 brian Exp $
+.\" @(#) $Id: dlpi_mactype.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_mactype.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:54  brian
 .\" - added manual pages and library implementation
 .\"
@@ -247,97 +250,97 @@ lblss.
 MAC Type:Descriptive String
 _
 DL_CSMACD:T{
-IEEE 802.2 CSMA/CD
+\*(lq\fIIEEE 802.2 CSMA/CD\fP\*(rq
 T}
 DL_TPB:T{
-IEEE 802.4 Token Passing Bus
+\*(lq\fIIEEE 802.4 Token Passing Bus\fP\*(rq
 T}
 DL_TPR:T{
-IEEE 802.5 Token Passing Ring
+\*(lq\fIIEEE 802.5 Token Passing Ring\fP\*(rq
 T}
 DL_METRO:T{
-IEEE 802.6 Metro Net
+\*(lq\fIIEEE 802.6 Metro Net\fP\*(rq
 T}
 DL_ETHER:T{
-Ethernet Bus
+\*(lq\fIEthernet Bus\fP\*(rq
 T}
 DL_HDLC:T{
-HDLC
+\*(lq\fIHDLC\fP\*(rq
 T}
 DL_CHAR:T{
-Character Synchronous
+\*(lq\fICharacter Synchronous\fP\*(rq
 T}
 DL_CTCA:T{
-IBM Channel-to-Channel Adapter
+\*(lq\fIIBM Channel-to-Channel Adapter\fP\*(rq
 T}
 DL_FDDI:T{
-Fiber Distributed Data Interface
+\*(lq\fIFiber Distributed Data Interface\fP\*(rq
 T}
 DL_FC:T{
-Fibre Channel
+\*(lq\fIFibre Channel\fP\*(rq
 T}
 DL_ATM:T{
-ATM
+\*(lq\fIATM\fP\*(rq
 T}
 DL_IPATM:T{
-ATM Classical IP
+\*(lq\fIATM Classical IP\fP\*(rq
 T}
 DL_X25:T{
-X.25 LAPB
+\*(lq\fIX.25 LAPB\fP\*(rq
 T}
 DL_ISDN:T{
-ISDN
+\*(lq\fIISDN\fP\*(rq
 T}
 DL_HIPPI:T{
-High Performance Parallel Interface
+\*(lq\fIHigh Performance Parallel Interface\fP\*(rq
 T}
 DL_100VG:T{
-100 Base VG Ethernet
+\*(lq\fI100 Base VG Ethernet\fP\*(rq
 T}
 DL_100VGTPR:T{
-100 Base VG Token Ring
+\*(lq\fI100 Base VG Token Ring\fP\*(rq
 T}
 DL_ETH_CSMA:T{
-ISO 8802/3 and Ethernet
+\*(lq\fIISO 8802/3 and Ethernet\fP\*(rq
 T}
 DL_100BT:T{
-100 Base T Ethernet
+\*(lq\fI100 Base T Ethernet\fP\*(rq
 T}
 DL_IB:T{
-Infiniband
+\*(lq\fIInfiniband\fP\*(rq
 T}
 DL_FRAME:T{
-Frame Relay LAPF
+\*(lq\fIFrame Relay LAPF\fP\*(rq
 T}
 DL_MPFRAME:T{
-Multi-Protocol over Frame Relay
+\*(lq\fIMulti-Protocol over Frame Relay\fP\*(rq
 T}
 DL_ASYNC:T{
-Character Asynchronous Protocol
+\*(lq\fICharacter Asynchronous Protocol\fP\*(rq
 T}
 DL_IPX25:T{
-X.25 Classical IP
+\*(lq\fIX.25 Classical IP\fP\*(rq
 T}
 DL_LOOP:T{
-Software Loopback
+\*(lq\fISoftware Loopback\fP\*(rq
 T}
 DL_OTHER:T{
-Any other Medium
+\*(lq\fIAny other Medium\fP\*(rq
 T}
 DL_IPV4:T{
-IPv4 Tunnel
+\*(lq\fIIPv4 Tunnel\fP\*(rq
 T}
 DL_IPV6:T{
-IPv6 Tunnel
+\*(lq\fIIPv6 Tunnel\fP\*(rq
 T}
 DL_VNI:T{
-Virtual Network Interface
+\*(lq\fIVirtual Network Interface\fP\*(rq
 T}
 DL_WIFI:T{
-IEEE 802.11
+\*(lq\fIIEEE 802.11\fP\*(rq
 T}
 \fRAny Other\fP:T{
-Unknown
+\*(lq\fIUnknown\fP\*(rq
 T}
 _
 .TE
@@ -469,8 +472,11 @@ has no known bugs.
 .\"
 .SH SEE ALSO
 .PP
-.BR dlpi (7),
+.BR dlpi_arptype (3),
+.BR dlpi_iftype (3),
+.BR dlpi_info (3),
 .BR dlpi (3),
+.BR dlpi (7),
 .IR STREAMS (9).
 .\"
 .\"

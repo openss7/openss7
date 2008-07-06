@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_send.3.man,v 0.9.2.1 2008-07-01 11:50:55 brian Exp $
+.\" @(#) $Id: dlpi_send.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:55 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_send.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:55  brian
 .\" - added manual pages and library implementation
 .\"
@@ -190,7 +193,25 @@ is a DLPI Library
 .[
 soldoc11
 .]
-subroutine.
+subroutine that requests that the DLS provider send the specified message,
+\fIbuf\fP and \fIbuflen\fP, for transmission to the specified destination
+address, \fIdaptr\fP and \fIdalen\fP, with the specified send options,
+\fIsendp\fP.  Data for transmission, \fIbuf\fP and \fIbuflen\fP, must always be
+specified and must always specify at least one byte of data, but in no event,
+less than the \fIdi_min_sdu\fP field, nor greater than the \fIdi_max_sdu\fP
+field, of the \fBdlpi_info_t\fP structure returned by \fBdlpi_info\fP(3).
+.PP
+When the DLPI Stream has was successfully opened with the \fB\)DLPI_RAW\fP flag
+set in the \fIflags\fP argument to \fBdlpi_open\fP(3), the destination address
+is not necessary and \fIdaptr\fP and \fIdalen\fP will be ignored.  The actual
+destination address for the message must be contained in the link layer header
+that must be included in the user data buffer, \fIbuf\fP and \fIbuflen\fP, while
+in raw mode.
+.PP
+Otherwise, when not opened in raw mode, the destination address, \fIdaptr\fP and
+\fIdalen\fP, must be specified and must specify a valid destination address of
+the proper length.  For IEEE 802 interfaces the destination address is 48-bit
+MAC address.
 .\"
 .\"
 .SH USAGE

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-06 14:58:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 03:31:03 $ by $Author: brian $
+# Last Modified $Date: 2008-07-06 14:58:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,6 +91,71 @@ test_np_ip_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 #test_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 #test_ip_CFLAGS			= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
+libcdiapi_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
+				  $(top_srcdir)/src/lib/cdiapi.c \
+				  $(top_srcdir)/src/include/cdiapi.h \
+				  $(top_srcdir)/gettext.h
+libcdiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/cdiapi.VERSION
+libcdiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/cdiapi.VERSION \
+				  $(STREAMS_LDFLAGS32) $(STREAMS_LDADD32) $(MACHINE_FLAGS)
+libcdiapi_la_CPPFLAGS		= -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libcdiapi_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+libcdiapi_la_LIBADD		= 
+
+lib32_LTLIBRARIES		+= libcdiapi.la
+
+libdlpiapi_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
+				  $(top_srcdir)/src/lib/dlpiapi.c \
+				  $(top_srcdir)/src/include/dlpiapi.h \
+				  $(top_srcdir)/gettext.h
+libdlpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/dlpiapi.VERSION
+libdlpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/dlpiapi.VERSION \
+				  $(STREAMS_LDFLAGS32) $(STREAMS_LDADD32) $(MACHINE_FLAGS)
+libdlpiapi_la_CPPFLAGS		= -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libdlpiapi_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+libdlpiapi_la_LIBADD		= 
+
+lib32_LTLIBRARIES		+= libdlpiapi.la
+
+libnpiapi_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
+				  $(top_srcdir)/src/lib/npiapi.c \
+				  $(top_srcdir)/src/include/npiapi.h \
+				  $(top_srcdir)/gettext.h
+libnpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/npiapi.VERSION
+libnpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/npiapi.VERSION \
+				  $(STREAMS_LDFLAGS32) $(STREAMS_LDADD32) $(MACHINE_FLAGS)
+libnpiapi_la_CPPFLAGS		= -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libnpiapi_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+libnpiapi_la_LIBADD		= 
+
+lib32_LTLIBRARIES		+= libnpiapi.la
+
+libdlpi_la_SOURCES		= $(top_srcdir)/src/lib/pthread.c \
+				  $(top_srcdir)/src/lib/libdlpi/dlpi.c \
+				  $(top_srcdir)/src/include/libdlpi.h \
+				  $(top_srcdir)/gettext.h
+libdlpi_la_DEPENDENCIES		= $(top_srcdir)/src/lib/libdlpi/dlpi.VERSION
+libdlpi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/libdlpi/dlpi.VERSION \
+				  $(STREAMS_LDFLAGS32) $(STREAMS_LDADD32) $(MACHINE_FLAGS)
+libdlpi_la_CPPFLAGS		= -I$(top_builddir) -I$(top_srcdir) \
+				  -I$(top_srcdir)/src/lib/libdlpi -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libdlpi_la_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
+libdlpi_la_LIBADD		= 
+
+lib32_LTLIBRARIES		+= libdlpi.la
+
 ## RPM_BUILD_USER
 endif
 
@@ -105,6 +170,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2008-07-06 14:58:19  brian
+# - improvements
+#
 # Revision 0.9.2.4  2007/08/14 03:31:03  brian
 # - GPLv3 header update
 #

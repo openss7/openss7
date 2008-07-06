@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_disabnotify.3.man,v 0.9.2.1 2008-07-01 11:50:54 brian Exp $
+.\" @(#) $Id: dlpi_disabnotify.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_disabnotify.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:54  brian
 .\" - added manual pages and library implementation
 .\"
@@ -134,7 +137,22 @@ is a DLPI Library
 .[
 soldoc11
 .]
-subroutine.
+subroutine that requests that the DLS provider cancel notifications and
+invocation of the associated callback functions identified by the handle,
+\fIid\fP, when events occur.  When \fIargp\fP is \fBNULL\fP it is ignored, but
+when non-\fBNULL\fP, the argument that was associated with the callback function
+using the \fBdlpi_enabnotify\fP(3) library call will be returned in the area
+pointed to by \fIargp\fP.
+.PP
+Multiple notification callbacks can be active at a given point in time for a
+given DLPI Stream.  The notification identifier, \fIid\fP, retured by the
+\fBdlpi_enabnotify\fP(3) library call is used to distinguish between callback
+function registrations.  Once enabled, a notification callback function will be
+invoked for each registered event until the DLPI Stream is closed, or the
+notification callback is deregistered with \fBdlpi_disabnotify\fP.
+.PP
+Note that \fBdlpi_notifyid_t\fP is opaque to the DLPI library user, but can be
+treated as a \fB(void *)\fP type.
 .\"
 .\"
 .SH USAGE
@@ -165,37 +183,111 @@ is fully thread-safe.
 .PP
 When
 .B dlpi_disabnotify
-is successful, it returns zero (0) or a positive integer value.
+is successful, it returns \fBDLPI_SUCCESS\fP, and, when non-\fBNULL\fP, the
+argument associated with the notification callback function is stored in the
+area pointed to by \fIargp\fP.
 When
 .B dlpi_disabnotify
-fails, it returns a negative integer value (-1).
+fails, it returns a DLPI or DLPI Library error code.  When the DLPI error code
+is \fBDL_SYSERR\fP, the error is contained in the \fIerrno\fP(3) global
+variable.
 .\"
 .\"
 .SH ERRORS
 .PP
 When
 .B dlpi_disabnotify
-fails, it returns a negative integer value (-1).
+fails, it returns a DLPI, DLPI Library or system error code.
 .B dlpi_disabnotify
 may fail when:
-.TP \w'[\fBENOMEM\fP]\(em'u
-.RB [ EBADF ]
-the file descriptor,
-.IR fd ,
-supplied does not correspond to a valid DLPI Stream open for reading and
-writing.
+.PP
+The following DLPI Library errors occur:
+.TP \w'[\fBDLPI_ENOTEIDINVAL\fP]\(em'u
+.RB [ DLPI_EINHANDLE ]
+The DLPI handle, \fIdh\fP, is not a valid data link handle.
+.PD 0
+.TP
+.RB [ DLPI_ENOTEIDINVAL ]
+The \fIid\fP argument is invalid.
+.\".TP
+.\".RB [ DLPI_EINVAL ]
+.\"An argument is invalid.
+.\".TP
+.\".RB [ DLPI_EBADMSG ]
+.\"Received a bad or unexpected DLPI message.
+.TP
+.RB [ DLPI_ETIMEDOUT ]
+The operation timed out awaiting an acknowledgement.
+.TP
+.RB [ DLPI_FAILURE ]
+Recovery from a failed DLPI operation failed.
+.PD
+.PP
+The following DLPI errors occur:
+.TP \w'[\fBDLPI_ENOTEIDINVAL\fP]\(em'u
+.RB [ DL_ACCESS ]
+The DLS user did not have proper permission to make the request.
+.PD 0
+.\".TP
+.\".RB [ DL_OUTSTATE ]
+.\"The primitive was issued from an invalid state.
+.TP
+.RB [ DL_BADPRIM ]
+The DLS provider does not recognize \fB\)DL_NOTIFY_REQ\fP(7).
+.TP
+.RB [ DL_NOTSUPPORTED ]
+The DLS provider recognizes, but does support, \fB\)DL_NOTIFY_REQ\fP(7).
+.TP
+.RB [ DL_SYSERR ]
+A system error occurred and the \fBLinux\fP system error code is in the
+\fIerrno\fP(3) global variable.
+.PD
+.PP
+The following \fBLinux\fP system errors occur:
+.TP \w'[\fBDLPI_ENOTEIDINVAL\fP]\(em'u
+.RB [ EPERM ]
+Fine-grained permission for the request is incorrect.
+.PD 0
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was immediately available to satisfy the request.
+.TP
+.RB [ ENOBUFS ]
+Insufficient buffers were immediately available to satisfy the request.
+.TP
+.RB [ ENOSR ]
+Insufficient \fISTREAMS\fP resources were available to satisfy the request.
+.TP
+.RB [ EAGAIN ]
+A temporary failure occured and the DLS user should reissue the request.
+.TP
+.RB [ EBUSY ]
+The control information in the request has already been subjected to the
+control request or a transient condition prevented the request.
 .TP
 .RB [ EINVAL ]
-one of the arguments supplied was invalid.
+On of the parameters of the requst for which there is no prescribed error code
+has an invalid value.
+.TP
+.RB [ ENOTSUP ]
+The request is recognized by not supported.
+.TP
+.RB [ ENOLINK ]
+The interface, Physical Point of Attachment, or underlying driver or device, is
+not connected.
+.TP
+.RB [ ENXIO ]
+Invalid device.  The interface, Physical Point of Attachment, or underlying
+driver or device is no longer installed on the system.
+.PD
 .PP
 In addition, any of the error numbers returned by
-.BR putmsg (2s),
-.BR getmsg (2s),
-.BR open (2s),
-.BR close (2s),
-.BR ioctl (2s)
-may also be returned by
-.BR dlpi_disabnotify .
+.BR putmsg (2s)
+or
+.BR getmsg (2s)
+may also be returned in \fIerrno\fP(3) when
+.B dlpi_disabnotify
+returns \fBDL_SYSERR\fP.
 .\"
 .\"
 .SH NOTICES
@@ -214,10 +306,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES
@@ -248,8 +336,10 @@ has no known bugs.
 .\"
 .SH SEE ALSO
 .PP
-.BR dlpi (7),
+.BR dlpi_enabnotify (3),
+.BR DL_NOTIFY_REQ (7),
 .BR dlpi (3),
+.BR dlpi (7),
 .IR STREAMS (9).
 .\"
 .\"

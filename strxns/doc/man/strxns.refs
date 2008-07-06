@@ -4782,9 +4782,9 @@ Part 1: Protocol Specification
 %C Boulder, Colorado
 %U http://publibn.boulder.ibm.com/
 
-%L AIXCPC
+%L AIXCPC51
 %R AIX\(rg 5L Version 5.1
-%K aixcpc
+%K aixcpc51
 %T AIX Communications Programming Concepts
 %D 2001
 %Q Internatonal Business Machines Corp.
@@ -6535,6 +6535,40 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1575.txt
+
+%K rfc1577
+%L RFC1577
+%R RFC 1577
+%A M. Laubach
+%T Classical IP and ARP over ATM
+%D January 1994
+%O (Obsoleted by RFC 2225) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1577.txt
+
+%K rfc1626
+%L RFC1626
+%R RFC 1626
+%A R. Atkinson
+%T Default IP MTU for use over ATM AAL5
+%D May 1994
+%O (Obsoleted by RFC 2225) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1626.txt
+
+%K rfc2225
+%L RFC2225
+%R RFC 2225
+%A M. Laubach
+%A J. Halpern
+%T Classical IP and ARM over ATM
+%D April 1998
+%O (Obsoletes by RFC 1577, RFC 1626) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2225.txt
 
 %K rfc1095
 %L rfc 1095

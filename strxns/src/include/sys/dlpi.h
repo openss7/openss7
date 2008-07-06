@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.10 2008-06-18 16:45:39 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.11 2008-07-06 14:58:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:39 $ by $Author: brian $
+ Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.h,v $
+ Revision 0.9.2.11  2008-07-06 14:58:20  brian
+ - improvements
+
  Revision 0.9.2.10  2008-06-18 16:45:39  brian
  - widespread updates
 
@@ -74,7 +77,7 @@
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -285,6 +288,9 @@ typedef ushort dl_ushort;
 #define DL_CODLS			0x01	/* connection-oriented service */
 #define DL_CLDLS			0x02	/* connectionless data link service */
 #define DL_ACLDLS			0x04	/* acknowledged connectionless service */
+#ifdef _HPUX_SOURCE
+#define DL_HP_RAWDLS			0x08	/* raw data link service */
+#endif				/* _HPUX_SOURCE */
 
 /* 
    DLPI provider style.
@@ -1147,9 +1153,9 @@ union DL_primitives {
 	dl_disabmulti_req_t disabmulti_req;
 	dl_promiscon_req_t promiscon_req;
 	dl_promiscoff_req_t promiscoff_req;
-	dl_phys_addr_req_t physaddr_req;
-	dl_phys_addr_ack_t physaddr_ack;
-	dl_set_phys_addr_req_t set_physaddr_req;
+	dl_phys_addr_req_t phys_addr_req;
+	dl_phys_addr_ack_t phys_addr_ack;
+	dl_set_phys_addr_req_t set_phys_addr_req;
 	dl_get_statistics_req_t get_statistics_req;
 	dl_get_statistics_ack_t get_statistics_ack;
 	dl_test_req_t test_req;
