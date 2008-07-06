@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: libdlpi.h,v 0.9.2.1 2008-07-01 11:50:59 brian Exp $
+ @(#) $Id: libdlpi.h,v 0.9.2.2 2008-07-06 14:58:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 11:50:59 $ by $Author: brian $
+ Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: libdlpi.h,v $
+ Revision 0.9.2.2  2008-07-06 14:58:20  brian
+ - improvements
+
  Revision 0.9.2.1  2008-07-01 11:50:59  brian
  - added manual pages and library implementation
 
@@ -59,7 +62,7 @@
 #ifndef __LIBDLPI_H__
 #define __LIBDLPI_H__
 
-#ident "@(#) $RCSfile: libdlpi.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: libdlpi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -71,17 +74,29 @@
   * DLPI (User) Header File. */
 
 #include <sys/types.h>
+#include <ctype.h>
+#include <stddef.h>
+#include <stdbool.h>
+
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
 
 #ifdef _SUN_SOURCE
 #include <sys/dlpi.h>
-#include <sys/sundlpi.h>
+#include <sys/dlpi_sun.h>
 #else
 #define _SUN_SOURCE
 #include <sys/dlpi.h>
-#include <sys/sundlpi.h>
+#include <sys/dlpi_sun.h>
 #undef _SUN_SOURCE
 #endif
 
+#if 0
 #define DLPI_EBADMSG		(-EBADMSG)
 #define DLPI_EINHANDLE		(-EBADF)
 #define DLPI_ETIMEDOUT		(-ETIMEDOUT)
@@ -95,6 +110,7 @@
 #define DLPI_EVERNOTSUP		(-ENOTSUP)
 #define DLPI_ENOTENOTSUP	(-ENOTSUP)
 #define DLPI_ENOTEIDINVAL	(-EINVAL)
+#endif
 
 #define DLPI_NATIVE		0
 #define DLPI_PASSIVE		1
@@ -107,54 +123,53 @@
 #define DLPI_LINKNAME_MAX	32
 #define DLPI_ANY_SAP		(-1U)
 
-#define DLPI_SUCCESS		(0)
-#define DLPI_FAILURE		(-1)
-#define DLPI_EBADLINK		0x1001
-#define DLPI_EBADMSG		0x1002
-#define DLPI_EINHANDLE		0x1003
-#define DLPI_EINVAL		0x1004
-#define DLPI_ELINKNAMEINVAL	0x1005
-#define DLPI_EMODENOTSUP	0x1006
-#define DLPI_ENOLINK		0x1007
-#define DLPI_ENOTEIDINVAL	0x1008
-#define DLPI_ENOTEINVAL		0x1009
-#define DLPI_ENOTENOTSUP	0x100a
-#define DLPI_ENOTSTYLE2		0x100b
-#define DLPI_ERAWNOTSUP		0x100c
-#define DLPI_ETIMEDOUT		0x100d
-#define DLPI_EUNAVAILSAP	0x100e
-#define DLPI_EVERNOTSUP		0x100f
+#define DLPI_SUCCESS		0x1000
+#define DLPI_FAILURE		0x1001
+#define DLPI_EBADLINK		0x1002
+#define DLPI_EBADMSG		0x1003
+#define DLPI_EINHANDLE		0x1004
+#define DLPI_EINVAL		0x1005
+#define DLPI_ELINKNAMEINVAL	0x1006
+#define DLPI_EMODENOTSUP	0x1007
+#define DLPI_ENOLINK		0x1008
+#define DLPI_ENOTEIDINVAL	0x1009
+#define DLPI_ENOTEINVAL		0x100a
+#define DLPI_ENOTENOTSUP	0x100b
+#define DLPI_ENOTSTYLE2		0x100c
+#define DLPI_ERAWNOTSUP		0x100d
+#define DLPI_ETIMEDOUT		0x100e
+#define DLPI_EUNAVAILSAP	0x100f
+#define DLPI_EVERNOTSUP		0x1010
 
 /* should put these in sys/libdlpi.h */
 
-struct __dlpi_handle {
-	int dh_fd;
-	/* more information */
-};
+struct __dlpi_user;
 
-typedef struct __dlpi_handle *dlpi_handle_t;
+typedef struct __dlpi_user *dlpi_handle_t;
 
 struct __dlpi_notify_id {
 	uint dnid_note;
 	uint dnid_speed;
 	uint dnid_size;
-	uchar dnid_physaddrlen;
-	uchar dnid_physaddr[DLPI_PHYSADDR_MAX];
+	uint8_t dnid_physaddrlen;
+	uint8_t dnid_physaddr[DLPI_PHYSADDR_MAX];
 };
 
-typedef struct __dlpi_notify_id *dlpi_notifyid_t;
+struct __dlpi_notify;
+
+typedef struct __dlpi_notify *dlpi_notifyid_t;
 
 typedef struct {
 	uint di_opts;
 	uint di_max_sdu;
 	uint di_min_sdu;
 	uint di_state;
-	uchar di_mactype;
+	uint8_t di_mactype;
 	char di_linkname[DLPI_LINKNAME_MAX];
-	uchar di_physaddrlen;
-	uchar di_physaddr[DLPI_PHYSADDR_MAX];
-	uchar di_bcastaddrlen;
-	uchar di_bcastaddr[DLPI_PHYSADDR_MAX];
+	uint8_t di_physaddrlen;
+	uint8_t di_physaddr[DLPI_PHYSADDR_MAX];
+	uint8_t di_bcastaddrlen;
+	uint8_t di_bcastaddr[DLPI_PHYSADDR_MAX];
 	uint di_sap;
 	int di_timeout;
 	dl_qos_cl_sel1_t di_qos_sel;
@@ -164,8 +179,8 @@ typedef struct {
 typedef ushort dlpi_addrtype_t;
 
 typedef struct {
-	uchar dri_destaddrlen;
-	uchar dri_destaddr[DLPI_PHYSADDR_MAX];
+	uint8_t dri_destaddrlen;
+	uint8_t dri_destaddr[DLPI_PHYSADDR_MAX];
 	dlpi_addrtype_t dri_destaddrtype;
 	size_t dri_totmsglen;
 } dlpi_recvinfo_t;
@@ -181,14 +196,14 @@ typedef struct {
 		uint dni_speed;
 		uint dni_size;
 		struct {
-			uchar dni_physaddrlen;
-			uchar dni_physaddr[DLPI_PHYSADDR_MAX];
+			uint8_t dni_physaddrlen;
+			uint8_t dni_physaddr[DLPI_PHYSADDR_MAX];
 		};
 	};
 } dlpi_notifyinfo_t;
 
-typedef void (*dlpi_notifyfunc_t) (dlpi_handle_t, dlpi_notifyinfo_t *, void *);
-typedef bool (*dlpi_walkfunc_t) (const char *name, void *arg);
+typedef void dlpi_notifyfunc_t(dlpi_handle_t, dlpi_notifyinfo_t *, void *);
+typedef bool dlpi_walkfunc_t(const char *name, void *arg);
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -218,29 +233,29 @@ extern int dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp);
 /** DLPI Library Function: dlpi_enabmulti - enable a multicast address */
 extern int dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen);
 /** DLPI Library Function: dlpi_enabnotify - enable notification */
-extern int dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg, dlpi_notifyid_t * nid);
+extern int dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg, dlpi_notifyid_t *nid);
 /** DLPI Library Function: dlpi_fd - get link file descriptor */
 extern int dlpi_fd(dlpi_handle_t dh);
 /** DLPI Library Function: dlpi_get_physaddr - get link physical address */
 extern int dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen);
 /** DLPI Library Function: dlpi_iftype - convert mactype to iftype */
-extern uint dlpi_iftype(uint type);
+extern uint dlpi_iftype(uint mactype);
 /** DLPI Library Function: dlpi_info - get link information */
-extern int dlpi_info(dlpi_handle_t dh, dlpi_info_t ** iptr, uint opt);
+extern int dlpi_info(dlpi_handle_t dh, dlpi_info_t **di, uint opt);
 /** DLPI Library Function: dlpi_linkname - get link name string */
 extern const char *dlpi_linkname(dlpi_handle_t dh);
 /** DLPI Library Function: dlpi_mactyp - get link mactype string */
 extern const char *dlpi_mactype(uint mactype);
 /** DLPI Library Function: dlpi_open - open a link */
-extern int dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags);
+extern int dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags);
 /** DLPI Library Function: dlpi_promiscoff - turn promiscuous mode off */
 extern int dlpi_promiscoff(dlpi_handle_t dh, uint level);
 /** DLPI Library Function: dlpi_promiscon - turn promiscuous mode on */
 extern int dlpi_promiscon(dlpi_handle_t dh, uint level);
 /** DLPI Library Function: dlpi_recv - receive events from link */
-extern int dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait, dlpi_recvinfo_t * recvp);
+extern int dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait, dlpi_recvinfo_t *recvp);
 /** DLPI Library Function: dlpi_send - send events to link */
-extern int dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen, const dlpi_sendinfo_t * sendp);
+extern int dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen, const dlpi_sendinfo_t *sendp);
 /** DLPI Library Function: dlpi_set_physaddr - set link physical address */
 extern int dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen);
 /** DLPI Library Function: dlpi_set_timeout - set timeout */
@@ -250,7 +265,7 @@ extern const char *dlpi_strerror(int error);
 /** DLPI Library Function: dlpi_unbind - unbind link from SAP */
 extern int dlpi_unbind(dlpi_handle_t dh);
 /** DLPI Library Function: dlpi_walk - walk available links */
-extern void dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags);
+extern void dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags);
 /* *INDENT-ON* */
 /** @} */
 
@@ -266,26 +281,23 @@ extern void __dlpi_close(dlpi_handle_t dh);
 extern int __dlpi_disabmulti(dlpi_handle_t dh, const void *aptr, size_t alen);
 extern int __dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp);
 extern int __dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen);
-extern int __dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
-			     dlpi_notifyid_t * nid);
+extern int __dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg, dlpi_notifyid_t *nid);
 extern int __dlpi_fd(dlpi_handle_t dh);
 extern int __dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen);
-extern uint __dlpi_iftype(uint type);
-extern int __dlpi_info(dlpi_handle_t dh, dlpi_info_t ** iptr, uint opt);
+extern uint __dlpi_iftype(uint mactype);
+extern int __dlpi_info(dlpi_handle_t dh, dlpi_info_t *di, uint opt);
 extern const char *__dlpi_linkname(dlpi_handle_t dh);
 extern const char *__dlpi_mactype(uint mactype);
-extern int __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags);
+extern int __dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags);
 extern int __dlpi_promiscoff(dlpi_handle_t dh, uint level);
 extern int __dlpi_promiscon(dlpi_handle_t dh, uint level);
-extern int __dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen,
-		       int wait, dlpi_recvinfo_t * recvp);
-extern int __dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf,
-		       size_t buflen, const dlpi_sendinfo_t * sendp);
+extern int __dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait, dlpi_recvinfo_t *recvp);
+extern int __dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen, const dlpi_sendinfo_t *sendp);
 extern int __dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen);
 extern int __dlpi_set_timeout(dlpi_handle_t dh, int seconds);
 extern const char *__dlpi_strerror(int error);
 extern int __dlpi_unbind(dlpi_handle_t dh);
-extern void __dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags);
+extern void __dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags);
 
 /** @} */
 
@@ -314,26 +326,26 @@ extern void __dlpi_close_r(dlpi_handle_t dh);
 extern int __dlpi_disabmulti_r(dlpi_handle_t dh, const void *aptr, size_t alen);
 extern int __dlpi_disabnotify_r(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp);
 extern int __dlpi_enabmulti_r(dlpi_handle_t dh, const void *aptr, size_t alen);
-extern int __dlpi_enabnotify_r(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
-			       dlpi_notifyid_t * nid);
+extern int __dlpi_enabnotify_r(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg,
+			       dlpi_notifyid_t *nid);
 extern int __dlpi_fd_r(dlpi_handle_t dh);
 extern int __dlpi_get_physaddr_r(dlpi_handle_t dh, uint type, void *aptr, size_t *alen);
-extern uint __dlpi_iftype_r(uint type);
-extern int __dlpi_info_r(dlpi_handle_t dh, dlpi_info_t ** iptr, uint opt);
+extern uint __dlpi_iftype_r(uint mactype);
+extern int __dlpi_info_r(dlpi_handle_t dh, dlpi_info_t *iptr, uint opt);
 extern const char *__dlpi_linkname_r(dlpi_handle_t dh);
 extern const char *__dlpi_mactype_r(uint mactype);
-extern int __dlpi_open_r(const char *linkname, dlpi_handle_t * dhp, uint flags);
+extern int __dlpi_open_r(const char *linkname, dlpi_handle_t *dhp, uint flags);
 extern int __dlpi_promiscoff_r(dlpi_handle_t dh, uint level);
 extern int __dlpi_promiscon_r(dlpi_handle_t dh, uint level);
 extern int __dlpi_recv_r(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen,
-			 int wait, dlpi_recvinfo_t * recvp);
+			 int wait, dlpi_recvinfo_t *recvp);
 extern int __dlpi_send_r(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf,
-			 size_t buflen, const dlpi_sendinfo_t * sendp);
+			 size_t buflen, const dlpi_sendinfo_t *sendp);
 extern int __dlpi_set_physaddr_r(dlpi_handle_t dh, uint type, const void *aptr, size_t alen);
 extern int __dlpi_set_timeout_r(dlpi_handle_t dh, int seconds);
 extern const char *__dlpi_strerror_r(int error);
 extern int __dlpi_unbind_r(dlpi_handle_t dh);
-extern void __dlpi_walk_r(dlpi_walkfunc_t * fn, void *arg, uint flags);
+extern void __dlpi_walk_r(dlpi_walkfunc_t *fn, void *arg, uint flags);
 
 /** @} */
 #endif				/* __KERNEL__ */

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_disabmulti.3.man,v 0.9.2.1 2008-07-01 11:50:54 brian Exp $
+.\" @(#) $Id: dlpi_disabmulti.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_disabmulti.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:54  brian
 .\" - added manual pages and library implementation
 .\"
@@ -135,6 +138,16 @@ is a DLPI Library
 soldoc11
 .]
 subroutine.
+This library call disables a multicast address that was previously enabled with
+the \fBdlpi_enabmulti\fP(3) library call.
+Multiple multicast addresses may be enabled for any given DLPI Stream.
+Disabling an address that is already disabled for the specified Stream,
+\fIdh\fP, is an error.  Disabling an address that was never enabled for the
+specified Stream, \fIdh\fP, is an error.
+.PP
+The multicast address, \fImaddr_ptr\fP and \fImaddr_len\fP, must be specified
+and must be of a length appropriate for the DLS provider.  For an IEEE 802
+provider, this is a 48-bit mutlicast MAC address.
 .\"
 .\"
 .SH USAGE
@@ -165,37 +178,103 @@ is fully thread-safe.
 .PP
 When
 .B dlpi_disabmulti
-is successful, it returns zero (0) or a positive integer value.
+is successful, it returns \fBDLPI_SUCCESS\fP.
 When
 .B dlpi_disabmulti
-fails, it returns a negative integer value (-1).
+fails, it returns a DLPI or DLPI Library error code.  When the DLPI error code
+is \fBDL_SYSERR\fP, the error is contained in the \fIerrno\fP(3) global
+variable.
 .\"
 .\"
 .SH ERRORS
 .PP
 When
 .B dlpi_disabmulti
-fails, it returns a negative integer value (-1).
+fails, it returns a DLPI, DLPI Library or system error code.
 .B dlpi_disabmulti
 may fail when:
-.TP \w'[\fBENOMEM\fP]\(em'u
-.RB [ EBADF ]
-the file descriptor,
-.IR fd ,
-supplied does not correspond to a valid DLPI Stream open for reading and
-writing.
+.PP
+The following DLPI Library errors occur:
+.TP \w'[\fBDLPI_ETIMEDOUT\fP]\(em'u
+.RB [ DLPI_EINHANDLE ]
+The DLPI handle, \fIdh\fP, is not a valid data link handle.
+.PD 0
+.TP
+.RB [ DLPI_EINVAL ]
+The \fImaddr_ptr\fP or \fImaddr_len\fP argument is invalid.
+.TP
+.RB [ DLPI_EBADMSG ]
+Received a bad or unexpected DLPI message.
+.TP
+.RB [ DLPI_ETIMEDOUT ]
+The operation timed out awaiting an acknowledgement.
+.PD
+.PP
+The following DLPI provider errors occur:
+.TP \w'[\fBDLPI_ETIMEDOUT\fP]\(em'u
+.RB [ DL_BADADDR ]
+Address information was invalid or was in an incorrect format.
+.PD 0
+.TP
+.RB [ DL_NOTENAB ]
+Address specified is not enabled.
+.TP
+.RB [ DL_NOTSUPPORTED ]
+The primitive is known, but not supported by the DLS provider.
+.\".TP
+.\".RB [ DL_OUTSTATE ]
+.\"The primitive was issued from an invalid state.
+.TP
+.RB [ DL_SYSERR ]
+A system error occurred and the \fBLinux\fP system error code is in the
+\fIerrno\fP(3) global variable.
+.PD
+.PP
+The following \fBLinux\fP system errors occur:
+.TP \w'[\fBDLPI_ETIMEDOUT\fP]\(em'u
+.RB [ EPERM ]
+Fine-grained permission for the request is incorrect.
+.PD 0
+.TP
+.RB [ ENOMEM ]
+Insufficient memory was immediately available to satisfy the request.
+.TP
+.RB [ ENOBUFS ]
+Insufficient buffers were immediately available to satisfy the request.
+.TP
+.RB [ ENOSR ]
+Insufficient \fISTREAMS\fP resources were available to satisfy the request.
+.TP
+.RB [ EAGAIN ]
+A temporary failure occured and the DLS user should reissue the request.
+.TP
+.RB [ EBUSY ]
+The control information in the request has already been subjected to the
+control request or a transient condition prevented the request.
 .TP
 .RB [ EINVAL ]
-one of the arguments supplied was invalid.
+On of the parameters of the requst for which there is no prescribed error code
+has an invalid value.
+.TP
+.RB [ ENOTSUP ]
+The request is recognized by not supported.
+.TP
+.RB [ ENOLINK ]
+The interface, Physical Point of Attachment, or underlying driver or device, is
+not connected.
+.TP
+.RB [ ENXIO ]
+Invalid device.  The interface, Physical Point of Attachment, or underlying
+driver or device is no longer installed on the system.
+.PD
 .PP
 In addition, any of the error numbers returned by
-.BR putmsg (2s),
-.BR getmsg (2s),
-.BR open (2s),
-.BR close (2s),
-.BR ioctl (2s)
-may also be returned by
-.BR dlpi_disabmulti .
+.BR putmsg (2s)
+or
+.BR getmsg (2s)
+may also be returned in \fIerrno\fP(3) when
+.B dlpi_disabmulti
+returns \fBDL_SYSERR\fP.
 .\"
 .\"
 .SH NOTICES
@@ -214,10 +293,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES
@@ -248,8 +323,10 @@ has no known bugs.
 .\"
 .SH SEE ALSO
 .PP
-.BR dlpi (7),
+.BR dlpi_enabmulti (3),
+.BR DL_ENABMULTI_REQ (7),
 .BR dlpi (3),
+.BR dlpi (7),
 .IR STREAMS (9).
 .\"
 .\"

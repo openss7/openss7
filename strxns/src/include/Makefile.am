@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 03:31:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-07-06 14:58:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 03:31:12 $ by $Author: brian $
+# Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,11 +55,29 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
+	cdiapi.h \
+	dlpiapi.h \
+	libdlpi.h \
+	npiapi.h \
 	sys/cdi.h \
+	sys/cdli.h \
+	sys/dl.h \
+	sys/dlpi_aix.h \
+	sys/dlpi_ext.h \
 	sys/dlpi.h \
+	sys/dlpi_ioctl.h \
+	sys/dlpi_sgi.h \
+	sys/dlpi_sun.h \
+	sys/dl_x25.h \
 	sys/ldl.h \
+	sys/llc.h \
+	sys/npiext.h \
 	sys/npi.h \
-	sys/npi_ip.h
+	sys/npi_ip.h \
+	sys/scodlpi.h
+
+
+
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \
@@ -84,6 +102,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.15  2008-07-06 14:58:20  brian
+# - improvements
+#
 # Revision 0.9.2.14  2007/08/14 03:31:12  brian
 # - GPLv3 header update
 #

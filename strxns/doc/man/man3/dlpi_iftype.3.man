@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_iftype.3.man,v 0.9.2.1 2008-07-01 11:50:54 brian Exp $
+.\" @(#) $Id: dlpi_iftype.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:54 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_iftype.3.man,v $
+.\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
+.\" - improvements
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:54  brian
 .\" - added manual pages and library implementation
 .\"
@@ -366,7 +369,6 @@ link to the IANA ifType.
 .[
 rfc2863
 .]
-See \*(lq\fIEXAMPLES\fP,\*(rq below.
 .\"
 .\"
 .SH MT CONTEXT
@@ -430,10 +432,6 @@ to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
 .\"
 .\"
-.SH EXAMPLES
-.PP
-.\"
-.\"
 .SH FILES
 .PP
 .TP
@@ -463,8 +461,11 @@ has no known bugs.
 .\"
 .SH SEE ALSO
 .PP
-.BR dlpi (7),
+.BR dlpi_arptype (3),
+.BR dlpi_mactype (3),
+.BR dlpi_info (3),
 .BR dlpi (3),
+.BR dlpi (7),
 .IR STREAMS (9).
 .\"
 .\"

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-07-01 12:06:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008-07-06 14:58:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-01 12:06:34 $ by $Author: brian $
+# Last Modified $Date: 2008-07-06 14:58:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,6 +127,70 @@ test_np_ip_LDADD		= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 test_np_ip_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
 test_np_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_np_ip_CFLAGS		= $(USER_CFLAGS)
+
+libcdiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/cdiapi.c \
+				  src/include/cdiapi.h \
+				  gettext.h
+libcdiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/cdiapi.VERSION
+libcdiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/cdiapi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libcdiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libcdiapi_la_CFLAGS		= $(USER_CFLAGS)
+libcdiapi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libcdiapi.la
+
+libdlpiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/dlpiapi.c \
+				  src/include/dlpiapi.h \
+				  gettext.h
+libdlpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/dlpiapi.VERSION
+libdlpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/dlpiapi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libdlpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libdlpiapi_la_CFLAGS		= $(USER_CFLAGS)
+libdlpiapi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libdlpiapi.la
+
+libnpiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/npiapi.c \
+				  src/include/npiapi.h \
+				  gettext.h
+libnpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/npiapi.VERSION
+libnpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/npiapi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libnpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libnpiapi_la_CFLAGS		= $(USER_CFLAGS)
+libnpiapi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libnpiapi.la
+
+libdlpi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/libdlpi/dlpi.c \
+				  src/include/libdlpi.h \
+				  gettext.h
+libdlpi_la_DEPENDENCIES		= $(top_srcdir)/src/lib/libdlpi/dlpi.VERSION
+libdlpi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/libdlpi/dlpi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libdlpi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib/libdlpi -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libdlpi_la_CFLAGS		= $(USER_CFLAGS)
+libdlpi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libdlpi.la
 
 ## RPM_BUILD_USER
 endif
@@ -237,6 +301,71 @@ test_np_ip_LDADD		= $(STREAMS_LDADD) $(STRCOMP_LDADD)
 test_np_ip_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
 test_np_ip_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_np_ip_CFLAGS		= $(USER_CFLAGS)
+
+libcdiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/cdiapi.c \
+				  src/include/cdiapi.h \
+				  gettext.h
+libcdiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/cdiapi.VERSION
+libcdiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/cdiapi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libcdiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libcdiapi_la_CFLAGS		= $(USER_CFLAGS)
+libcdiapi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libcdiapi.la
+
+libdlpiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/dlpiapi.c \
+				  src/include/dlpiapi.h \
+				  gettext.h
+libdlpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/dlpiapi.VERSION
+libdlpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/dlpiapi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libdlpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libdlpiapi_la_CFLAGS		= $(USER_CFLAGS)
+libdlpiapi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libdlpiapi.la
+
+libnpiapi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/npiapi.c \
+				  src/include/npiapi.h \
+				  gettext.h
+libnpiapi_la_DEPENDENCIES	= $(top_srcdir)/src/lib/npiapi.VERSION
+libnpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/npiapi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libnpiapi_la_CPPFLAGS		= -I. -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libnpiapi_la_CFLAGS		= $(USER_CFLAGS)
+libnpiapi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libnpiapi.la
+
+libdlpi_la_SOURCES		= src/lib/pthread.c \
+				  src/lib/libdlpi/dlpi.c \
+				  src/include/libdlpi.h \
+				  gettext.h
+libdlpi_la_DEPENDENCIES		= $(top_srcdir)/src/lib/libdlpi/dlpi.VERSION
+libdlpi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/libdlpi/dlpi.VERSION \
+				  $(STREAMS_LDFLAGS)
+libdlpi_la_CPPFLAGS		= -I$(top_builddir) -I$(top_srcdir) \
+				  -I$(top_srcdir)/src/lib/libdlpi -I$(top_srcdir)/src/lib \
+				  $(PKG_INCLUDES) $(USER_CPPFLAGS) \
+				  -I$(top_srcdir)/include -I$(top_builddir)/include
+libdlpi_la_CFLAGS		= $(USER_CFLAGS)
+libdlpi_la_LIBADD		= $(STREAMS_LDADD)
+
+lib_LTLIBRARIES			+= libdlpi.la
 
 ## RPM_BUILD_USER
 endif
@@ -490,6 +619,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.66  2008-07-06 14:58:17  brian
+# - improvements
+#
 # Revision 0.9.2.65  2008-07-01 12:06:34  brian
 # - updated manual pages, added new API library headers and impl files
 #

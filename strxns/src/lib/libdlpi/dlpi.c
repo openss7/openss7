@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 11:51:00 $
+ @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-06 14:58:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 11:51:00 $ by $Author: brian $
+ Last Modified $Date: 2008-07-06 14:58:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.c,v $
+ Revision 0.9.2.2  2008-07-06 14:58:21  brian
+ - improvements
+
  Revision 0.9.2.1  2008-07-01 11:51:00  brian
  - added manual pages and library implementation
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 11:51:00 $"
+#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-06 14:58:21 $"
 
-static char const ident[] = "$RCSfile: dlpi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 11:51:00 $";
+static char const ident[] =
+    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-06 14:58:21 $";
 
 /* This file can be processed by doxygen(1). */
 
@@ -68,11 +72,18 @@ static char const ident[] = "$RCSfile: dlpi.c,v $ $Name: OpenSS7-0_9_2 $($Revisi
 /** @file
   * OpenSS7 DLPI Library implementation file. */
 
-#define _XOPEN_SOURCE	600
+#define _XOPEN_SOURCE 600
 #define _REENTRANT
 #define _THREAD_SAFE
 
+#if 0
+#define __USE_UNIX98
+#define __USE_XOPEN2K
+#define __USE_GNU
+#endif
+
 #include <stdlib.h>
+
 #include "gettext.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -111,13 +122,15 @@ static char const ident[] = "$RCSfile: dlpi.c,v $ $Name: OpenSS7-0_9_2 $($Revisi
 
 #ifdef _SUN_SOURCE
 #include <sys/dlpi.h>
-#include <sys/sundlpi.h>
+#include <sys/dlpi_sun.h>
 #else
 #define _SUN_SOURCE
 #include <sys/dlpi.h>
-#include <sys/sundlpi.h>
+#include <sys/dlpi_sun.h>
 #undef _SUN_SOURCE
 #endif
+
+#include <libdlpi.h>
 
 #if defined __i386__ || defined __x86_64__ || defined __k8__
 #define fastcall __attribute__((__regparm__(3)))
@@ -148,7 +161,7 @@ static char const ident[] = "$RCSfile: dlpi.c,v $ $Name: OpenSS7-0_9_2 $($Revisi
   */
 struct __dlpi_tsd {
 	int dlerrno;
-	char strbuf[BUFSIZ]; /* string buffer */
+	char strbuf[BUFSIZ];		/* string buffer */
 };
 
 /** @brief once condition for Thread-Specific Data key creation.
@@ -187,7 +200,7 @@ __dlpi_get_tsd(void)
 }
 
 /** @brief #dlerrno location function.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This function is an implementation of _dlerrno().
   */
@@ -198,7 +211,7 @@ __dlpi_dlerrno(void)
 }
 
 /** @fn int *_dlerrno(void)
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi__dlerrno().
   *
@@ -210,38 +223,48 @@ __dlpi_dlerrno(void)
   * #define dlerrno (*(_dlerrno()))
   * @endcode
   */
-__asm__(".symver __dlpi__dlerrno,_dlerrno@@DLPI_1.0");
+__asm__(".symver __dlpi__dlerrno,_dlerrno@@DLPI_1.1");
 
 #ifndef dlerrno
 #define dlerrno (*(_dlerrno()))
 #endif
 
-struct __dlpi_user {
-	pthread_rwlock_t lock;		/**< lock for this structure */
-	struct strbuf ctrl;		/**< ctrl part buffer */
-	struct strbuf data;		/**< data part buffer */
-	int ppa;			/**< Physical Point of Attachment */
-	int fd;				/**< file descriptor */
-	int mac_type;			/**< MAC Type for this Stream */
-	char linkname[32];		/**< link name opened */
+struct __dlpi_notify {
+	uint dln_notes;
+	dlpi_notifyfunc_t *dln_fncp;
+	void *dln_arg;
+	struct __dlpi_notify *dln_next;
 };
 
-static struct __dlpi_user *__dlpi_dhs[OPEN_MAX] = { NULL, };
+struct __dlpi_user {
+	pthread_rwlock_t du_lock;	/**< lock for this structure */
+	struct strbuf du_ctrl;		/**< ctrl part buffer */
+	struct strbuf du_data;		/**< data part buffer */
+	int du_ppa;			/**< Physical Point of Attachment */
+	int du_fd;				/**< file descriptor */
+	int du_mac_type;			/**< MAC Type for this Stream */
+	char *du_linkname;		/**< link name opened */
+	struct __dlpi_notify *du_nids;	/**< list of notifications */
+	uint du_notifications;		/**< active notifications */
+	uint du_timeout;
+};
 
-static struct pthread_rwlock_t __dlpi_fd_lock = PTHREAD_RWLOCK_INITIALIZER;
+static dlpi_handle_t __dlpi_dhs[OPEN_MAX] = { NULL, };
+
+static pthread_rwlock_t __dlpi_fd_lock = PTHREAD_RWLOCK_INITIALIZER;
 
 static inline int
-__dlpi_lock_rdlock(pthread_rwlock_t *rwlock)
+__dlpi_lock_rdlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_rdlock(rwlock);
 }
 static inline int
-__dlpi_lock_wrlock(pthread_rwlock_t *rwlock)
+__dlpi_lock_wrlock(pthread_rwlock_t * rwlock)
 {
 	return pthread_rwlock_wrlock(rwlock);
 }
 static inline void
-__dlpi_lock_unlock(pthread_rwlock_t *rwlock)
+__dlpi_lock_unlock(pthread_rwlock_t * rwlock)
 {
 	pthread_rwlock_unlock(rwlock);
 }
@@ -255,37 +278,79 @@ __dlpi_list_wrlock(void)
 {
 	return __dlpi_lock_wrlock(&__dlpi_fd_lock);
 }
-static inline void
+static void
 __dlpi_list_unlock(void *ignore)
 {
 	return __dlpi_lock_unlock(&__dlpi_fd_lock);
 }
 static inline int
-__dlpi_user_rdlock(struct __dlpi_user *user)
+__dlpi_user_rdlock(dlpi_handle_t dh)
 {
-	return __dlpi_lock_rdlock(&user->lock);
+	return __dlpi_lock_rdlock(&dh->du_lock);
 }
 static inline int
-__dlpi_user_wrlock(struct __dlpi_user *user)
+__dlpi_user_wrlock(dlpi_handle_t dh)
 {
-	return __dlpi_lock_wrlock(&user->lock);
+	return __dlpi_lock_wrlock(&dh->du_lock);
 }
 static inline void
-__dlpi_user_unlock(struct __dlpi_user *user)
+__dlpi_user_unlock(dlpi_handle_t dh)
 {
-	return __dlpi_lock_unlock(&user->lock);
+	return __dlpi_lock_unlock(&dh->du_lock);
 }
+
+/* Forward declarations of internal functions. */
+static __hot void __dlpi_putuser(void *arg);
+static __hot dlpi_handle_t __dlpi_getuser(dlpi_handle_t dh, int *errp);
+static __hot dlpi_handle_t __dlpi_hlduser(dlpi_handle_t dh, int *errp);
+static __hot dlpi_handle_t __dlpi_chkuser(dlpi_handle_t dh, int *errp);
+#if 0
+static int __dlpi_getmsg(dlpi_handle_t dh, struct strbuf *ctrl, struct strbuf *data, int *flagsp);
+#endif
+static int __dlpi_putmsg(dlpi_handle_t dh, struct strbuf *ctrl, struct strbuf *data, int flags);
+#if 0
+static int __dlpi_peek(dlpi_handle_t dh, int timeout);
+#endif
+static int __dlpi_getpri(dlpi_handle_t dh, int prim, struct strbuf *ctrl);
+
+static uint _dlpi_arptype(uint mactype);
+static int _dlpi_bind(dlpi_handle_t dh, uint sap, uint *boundsap);
+static void _dlpi_close(dlpi_handle_t dh);
+static int _dlpi_disabmulti(dlpi_handle_t dh, const void *aptr, size_t alen);
+static int _dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp);
+static int _dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen);
+static int _dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
+			    dlpi_notifyid_t * nid);
+static int _dlpi_fd(dlpi_handle_t dh);
+static int _dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen);
+static uint _dlpi_iftype(uint mactype);
+static int _dlpi_info(dlpi_handle_t dh, dlpi_info_t * di, uint opt);
+static const char *_dlpi_linkname(dlpi_handle_t dh);
+static const char *_dlpi_mactype(uint mactype);
+static int _dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags);
+static int _dlpi_promiscoff(dlpi_handle_t dh, uint level);
+static int _dlpi_promiscon(dlpi_handle_t dh, uint level);
+static int _dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen,
+		      int wait, dlpi_recvinfo_t * recvp);
+static int _dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf,
+		      size_t buflen, const dlpi_sendinfo_t * sendp);
+static int _dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen);
+static int _dlpi_set_timeout(dlpi_handle_t dh, int seconds);
+static const char *_dlpi_strerror(int error);
+static int _dlpi_unbind(dlpi_handle_t dh);
+static void _dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags);
 
 /** @internal
   * @brief release a user whether held or got
   * @param arg argument
   */
-static void
+static __hot void
 __dlpi_putuser(void *arg)
 {
 	int fd = *(int *) arg;
-	struct __dlpi_user *user = __dlpi_dhs[fd];
-	__dlpi_user_unlock(user);
+	dlpi_handle_t dh = __dlpi_dhs[fd];
+
+	__dlpi_user_unlock(dh);
 	__dlpi_list_unlock(NULL);
 	return;
 }
@@ -297,33 +362,45 @@ __dlpi_putuser(void *arg)
   * This is a range-checked array lookup of the library user structure
   * associated with the specified file descriptor.  In addition, this function
   * takes the necessary locks for thread-safe write operation.
+  *
+  * [EAGAIN] The number of read locks on the list is excessive.
+  * [EDEADLK] The list or fd lock is already held by the calling thread.
   */
-static __hot struct __dlpi_user *
-__dlpi_getuser(int fd)
+static __hot dlpi_handle_t
+__dlpi_getuser(dlpi_handle_t dh, int *errp)
 {
-	struct __dlpi_user *user;
-	int err;
+	dlpi_handle_t du;
+	int err, fd;
 
 	if (unlikely((err = __dlpi_list_rdlock())))
 		goto list_lock_error;
+	if (unlikely(dh == NULL))
+		goto ebadf;
+	fd = dh->du_fd;
 	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
 		goto ebadf;
-	if (unlikely(!(user = __dlpi_dhs[fd])))
+	if (unlikely((du = __dlpi_dhs[fd]) == NULL))
 		goto ebadf;
-	if (unlikely((err = __dlpi_user_wrlock(user))))
+	if (unlikely(du != dh))
+		goto ebadf;
+	if (unlikely((err = __dlpi_user_wrlock(dh))))
 		goto user_lock_error;
-	return (user);
+	return (dh);
       user_lock_error:
-	dlerrno = DL_SYSERR;
-	errno = err;
 	__dlpi_list_unlock(NULL);
+	if (errp != NULL)
+		*errp = DL_SYSERR;
+	errno = err;
 	goto error;
       ebadf:
-	dlerrno = DL_SYSERR;
+	__dlpi_list_unlock(NULL);
+	if (errp != NULL)
+		*errp = DL_SYSERR;
 	errno = EBADF;
 	goto error;
       list_lock_error:
-	dlerrno = DL_SYSERR;
+	if (errp != NULL)
+		*errp = DL_SYSERR;
 	errno = err;
 	goto error;
       error:
@@ -337,57 +414,86 @@ __dlpi_getuser(int fd)
   * This is a range-checked array lookup of the library user structure
   * associated with the specified file descriptor.  In addition, this function
   * takes the necessary locks for thread-safe read operation.
+  *
+  * [EAGAIN] The number of read locks on the list is excessive.
+  * [EDEADLK] The list or fd lock is already held by the calling thread.
   */
-static __hot struct __dlpi_user *
-__dlpi_hlduser(int fd)
+static __hot dlpi_handle_t
+__dlpi_hlduser(dlpi_handle_t dh, int *errp)
 {
-	struct __dlpi_user *user;
-	int err;
+	dlpi_handle_t du;
+	int err, fd;
 
 	if (unlikely((err = __dlpi_list_rdlock())))
 		goto list_lock_error;
+	if (unlikely(dh == NULL))
+		goto ebadf;
+	fd = dh->du_fd;
 	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
 		goto ebadf;
-	if (unlikely(!(user = __dlpi_dhs[fd])))
+	if (unlikely((du = __dlpi_dhs[fd]) == NULL))
 		goto ebadf;
-	if (unlikely((err = __dlpi_user_rdlock(user))))
+	if (unlikely(du != dh))
+		goto ebadf;
+	if (unlikely((err = __dlpi_user_rdlock(dh))))
 		goto user_lock_error;
-	return (user);
+	return (dh);
       user_lock_error:
-	dlerrno = DL_SYSERR;
-	errno = err;
 	__dlpi_list_unlock(NULL);
+	if (errp != NULL)
+		*errp = DL_SYSERR;
+	errno = err;
 	goto error;
       ebadf:
-	dlerrno = DL_SYSERR;
+	__dlpi_list_unlock(NULL);
+	if (errp != NULL)
+		*errp = DLPI_EINHANDLE;
 	errno = EBADF;
 	goto error;
       list_lock_error:
-	dlerrno = DL_SYSERR;
 	errno = err;
+	if (errp != NULL)
+		*errp = DL_SYSERR;
 	goto error;
       error:
 	return (NULL);
 }
 
-static __hot struct __dlpi_user *
-__dlpi_chkuser(int fd)
+/** @internal
+  * @brief Check a data link user structure.
+  * @param dh The DLPI handle for which to get the associated endpoint.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  This function takes no
+  * locks.  It is primarily called by the non-reentrant verisons of this
+  * function.
+  */
+static __hot dlpi_handle_t
+__dlpi_chkuser(dlpi_handle_t dh, int *errp)
 {
-	struct __dlpi_user *user;
+	dlpi_handle_t du;
+	int fd;
 
+	if (unlikely(dh == NULL))
+		goto ebadf;
+	fd = dh->du_fd;
 	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
 		goto ebadf;
-	if (unlikely(!(user = __dlpi_dhs[fd])))
+	if (unlikely((du = __dlpi_dhs[fd]) == NULL))
 		goto ebadf;
-	return (user);
+	if (unlikely(du != dh))
+		goto ebadf;
+	return (dh);
       ebadf:
-	dlerrno = DL_SYSERR;
+	if (errp != NULL)
+		*errp = DLPI_EINHANDLE;
 	errno = EBADF;
 	goto error;
       error:
 	return (NULL);
 }
 
+#if 0
 /** @internal
   * @brief A version of getmsg with DLPI errors.
   * @param dh a file descriptor representing the data link.
@@ -413,87 +519,184 @@ __dlpi_chkuser(int fd)
 static int
 __dlpi_getmsg(dlpi_handle_t dh, struct strbuf *ctrl, struct strbuf *data, int *flagsp)
 {
-	int ret;
-
-	if ((ret = getmsg(dh, ctrl, data, flagsp)) >= 0)
-		return (ret);
-	dlerrno = DL_SYSERR;
-	switch (errno) {
-	case EISDIR:
-	case EBADF:
-		dlerrno = DLPI_ENOLINK;
-		break;
-	case EFAULT:
-	case ENODEV:
-	case ENOSTR:
-	case EIO:
-	case EINVAL:
-	case EAGAIN:
-	case EINTR:
-	case ENOSR:
-		break;
-	case EBADMSG:
-		dlerrno = DLPI_EBADMSG;
-		break;
-	}
-	return (-1);
+	if (getmsg(dh->du_fd, ctrl, data, flagsp) < 0)
+		return (DL_SYSERR);
+	return (DLPI_SUCCESS);
 }
+#endif
 
 static int
 __dlpi_putmsg(dlpi_handle_t dh, struct strbuf *ctrl, struct strbuf *data, int flags)
 {
-	return putmsg(dh, ctlr, data, flags);
+	if (putmsg(dh->du_fd, ctrl, data, flags) < 0)
+		return (DL_SYSERR);
+	return (DLPI_SUCCESS);
 }
 
+#if 0
 static int
 __dlpi_peek(dlpi_handle_t dh, int timeout)
 {
-	struct __dlpi_user *user;
+#if 0
+	int err = DLPI_SUCCESS;
 
-	if (!(user = __dlpi_chkuser(dh)))
-		goto error;
-	if (user->event == 0) {
+	if (dh->du_event == 0) {
 		struct pollfd pfd;
 
 		pfd.fd = dh;
-		pfd.events = (POLLIN|POLLPRI|POLLRDNORM|POLLRDBAND|POLLMSG|POLLERR|POLLHUP);
+		pfd.events =
+		    (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP);
 		pfd.revents = 0;
 
 		switch (poll(&pfd, 1, timeout)) {
 		case 1:
-			if (pfd.revents & (POLLMSG|POLLERR|POLLHUP))
+			if (pfd.revents & (POLLMSG | POLLERR | POLLHUP))
 				break;
-			if (pfd.revents & (POLLIN|POLLPRI|POLLRDNORM|POLLRDBAND))
+			if (pfd.revents & (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND))
 				break;
 		case 0:
-			return (0); /* nothing to report */
+			return (0);	/* nothing to report */
 		case -1:
 			goto syserr;
 		default:
 			goto proto;
 		}
 	}
-	if (user->event == 0) {
+	if (dh->du_event == 0) {
 		int ret, flag = 0;
-		union DL_primitives *p = (typeof(p)) user->ctlbuf;
+		union DL_primitives *p = (typeof(p)) dh->du_ctlbuf;
 
-		user->ctrl.maxlen = user->ctlmax;
-		user->ctrl.len = 0;
-		user->ctrl.buf = user->ctlbuf;
-		user->data.maxlen = user->datmax;
-		user->data.len = 0;
-		user->data.buf = user->datbuf;
-		if (user->state == DL_IDLE)
-			user->data.maxlen = 0;
-		if ((ret = __dlpi_getmsg(dh, &user->ctrl, &user->data, &flag)) < 0)
+		dh->du_ctrl.maxlen = dh->du_ctlmax;
+		dh->du_ctrl.len = 0;
+		dh->du_ctrl.buf = dh->du_ctlbuf;
+		dh->du_data.maxlen = dh->du_datmax;
+		dh->du_data.len = 0;
+		dh->du_data.buf = dh->du_datbuf;
+		if (dh->du_state == DL_IDLE)
+			dh->du_data.maxlen = 0;
+		if ((ret = __dlpi_getmsg(dh, &dh->du_ctrl, &dh->du_data, &flag)) < 0)
 			goto error;
-		if ((ret & MORECTL) || ((ret & MOREDATA) && user->data.maxlen > 0))
+		if ((ret & MORECTL) || ((ret & MOREDATA) && dh->du_data.maxlen > 0))
 			goto cleanup;
 		if (flag != 0 || flags == RS_HIPRI)
 			goto sync;
-		switch (user->state) {
+		switch (dh->du_state) {
 		}
 	}
+#endif
+	return (DLPI_FAILURE);
+}
+#endif
+
+/** @internal
+  * @brief get a high-priority (M_PCPROTO) acknowledgement message
+  * @param dh the DLPI stream
+  * @param prim the primitive for which a response is expected
+  * @param ctrl a pointer to the strbuf into which to receive the primitive
+  *
+  * This function receives an RS_HIPRI message (M_PCPROTO, POLLPRI) in
+  * acknowledgement to the primitive #prim.
+  */
+static int
+__dlpi_getpri(dlpi_handle_t dh, int prim, struct strbuf *ctrl)
+{
+	struct {
+		union DL_primitives prim;
+		unsigned char buffer[64];
+	} buf;
+	int ret, flag;
+	struct pollfd pfd;
+
+	pfd.fd = dh->du_fd;
+	pfd.events = POLLPRI | POLLERR | POLLHUP | POLLMSG;
+	pfd.revents = 0;
+
+	switch (poll(&pfd, 1, dh->du_timeout)) {
+	default:
+	case -1:		/* error */
+		return (DL_SYSERR);
+	case 0:		/* timeout */
+		return (DLPI_ETIMEDOUT);
+	case 1:		/* one file descriptor */
+		break;
+	}
+
+	flag = RS_HIPRI;
+	ret = getmsg(dh->du_fd, ctrl, NULL, &flag);
+	if (ret < 0)
+		return (DL_SYSERR);
+	if (ret != 0)
+		return (DLPI_EBADMSG);
+	if (ctrl->len < sizeof(buf.prim.dl_primitive))
+		return (DLPI_EBADMSG);
+	switch (buf.prim.dl_primitive) {
+	case DL_ERROR_ACK:
+		/* handle DL_ERROR_ACK reply */
+		if (ctrl->len < sizeof(buf.prim.error_ack))
+			return (DLPI_EBADMSG);
+		if (buf.prim.error_ack.dl_error_primitive != prim)
+			return (DLPI_EBADMSG);
+		if (buf.prim.error_ack.dl_errno == DL_SYSERR) {
+			errno = buf.prim.error_ack.dl_unix_errno;
+			return (DL_SYSERR);
+		}
+		return (buf.prim.error_ack.dl_errno);
+	case DL_OK_ACK:
+		/* handle DL_OK_ACK reply */
+		if (ctrl->len < sizeof(buf.prim.ok_ack))
+			return (DLPI_EBADMSG);
+		if (buf.prim.ok_ack.dl_correct_primitive != prim)
+			return (DLPI_EBADMSG);
+		return (DLPI_SUCCESS);
+	case DL_INFO_ACK:
+		if (prim != DL_INFO_REQ)
+			return (DLPI_EBADMSG);
+		if (ctrl->len < sizeof(buf.prim.info_ack))
+			return (DLPI_EBADMSG);
+		if (buf.prim.info_ack.dl_addr_length != 0
+		    && ctrl->len <
+		    buf.prim.info_ack.dl_addr_length + buf.prim.info_ack.dl_addr_offset)
+			return (DLPI_EBADMSG);
+		if (buf.prim.info_ack.dl_qos_length != 0
+		    && ctrl->len <
+		    buf.prim.info_ack.dl_qos_length + buf.prim.info_ack.dl_qos_offset)
+			return (DLPI_EBADMSG);
+		if (buf.prim.info_ack.dl_qos_range_length != 0
+		    && ctrl->len <
+		    buf.prim.info_ack.dl_qos_range_length + buf.prim.info_ack.dl_qos_range_offset)
+			return (DLPI_EBADMSG);
+		if (buf.prim.info_ack.dl_brdcst_addr_length != 0
+		    && ctrl->len <
+		    buf.prim.info_ack.dl_brdcst_addr_length +
+		    buf.prim.info_ack.dl_brdcst_addr_offset)
+			return (DLPI_EBADMSG);
+		return (DLPI_SUCCESS);
+	case DL_BIND_ACK:
+		if (prim != DL_BIND_REQ)
+			return (DLPI_EBADMSG);
+		if (ctrl->len < sizeof(buf.prim.bind_ack))
+			return (DLPI_EBADMSG);
+		if (buf.prim.bind_ack.dl_addr_length != 0
+		    && ctrl->len <
+		    buf.prim.bind_ack.dl_addr_length + buf.prim.bind_ack.dl_addr_offset)
+			return (DLPI_EBADMSG);
+		return (DLPI_SUCCESS);
+	case DL_PHYS_ADDR_ACK:
+		if (prim != DL_PHYS_ADDR_REQ)
+			return (DLPI_EBADMSG);
+		if (ctrl->len < sizeof(buf.prim.phys_addr_ack))
+			return (DLPI_EBADMSG);
+		if (buf.prim.phys_addr_ack.dl_addr_length != 0
+		    && ctrl->len <
+		    buf.prim.phys_addr_ack.dl_addr_length + buf.prim.phys_addr_ack.dl_addr_offset)
+			return (DLPI_EBADMSG);
+		return (DLPI_SUCCESS);
+	case DL_NOTIFY_ACK:
+		if (prim != DL_NOTIFY_REQ)
+			return (DLPI_EBADMSG);
+		return (DLPI_SUCCESS);
+	}
+	return (DLPI_EBADMSG);
 }
 
 /** A bit of a discussion on locking:  Solaris(R) DLPI Library documentation
@@ -508,15 +711,12 @@ __dlpi_peek(dlpi_handle_t dh, int timeout)
   * fully thread-safe.
   */
 
-/** @brief convert MAC type to ARP type
+/** @internal
+  * @brief convert MAC type to ARP type
   * @param mactype The MAC type to convert.
-  *
-  * Simply converts the provided DLPI MAC type to an ARP hardware type.  If
-  * the conversion is not possible, zero is returned; otherwise the ARP
-  * hardware type is returned.
   */
-uint
-__dlpi_arptype(uint mactype)
+static uint
+_dlpi_arptype(uint mactype)
 {
 	switch (mactype) {
 	case DL_CSMACD:	/* IEEE 802.3 CSMA/CD network */
@@ -579,8 +779,10 @@ __dlpi_arptype(uint mactype)
 		return (ARPHRD_AX25);	/* AX.25 Level 2 */
 	case DL_LOOP:		/* software loopback */
 		return (ARPHRD_LOOPBACK);	/* Loopback device */
+#if 0
 	case DL_OTHER:		/* Any other medium not listed above */
 		return (ARPHRD_VOID);	/* Void type, nothing is known */
+#endif
 	case DL_IPV4:		/* IPv4 Tunnel Link */
 		return (ARPHRD_TUNNEL);	/* IPIP tunnel */
 	case DL_IPV6:		/* IPv6 Tunnel Link */
@@ -625,25 +827,107 @@ __dlpi_arptype(uint mactype)
 #endif
 }
 
+/** @brief convert MAC type to ARP type
+  * @param mactype The MAC type to convert.
+  *
+  * Simply converts the provided DLPI MAC type to an ARP hardware type.  If
+  * the conversion is not possible, zero is returned; otherwise the ARP
+  * hardware type is returned.
+  */
+uint
+__dlpi_arptype(uint mactype)
+{
+	return _dlpi_arptype(mactype);
+}
+
 /** @brief The reentrant version of __dlpi_arptype().
   * @param mactype The MAC type to convert.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_arptype().
   */
 uint
 __dlpi_arptype_r(uint mactype)
 {
-	return __dlpi_arptype(mactype);
+	return _dlpi_arptype(mactype);
 }
 
 /** @fn uint dlpi_arptype(uint mactype)
   * @param mactype The MAC type to convert.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_arptype_r().
   */
-__asm__(".symver __dlpi_arptype_r,dlpi_arptype@@DLPI_1.0");
+__asm__(".symver __dlpi_arptype_r,dlpi_arptype@@DLPI_1.1");
+
+#ifndef DLPI_ANY_SAP
+#define DLPI_ANY_SAP -1U
+#endif
+
+/** @internal
+  * @brief bind a link to a SAP
+  * @param dh the link to bind.
+  * @param sap the SAP to bind to the link.
+  * @param boundsap returned bound SAP when successful.
+  *
+  * This version of the implemetnation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_bind(dlpi_handle_t dh, uint sap, uint *boundsap)
+{
+	union {
+		union DL_primitives prim;
+		unsigned char buffer[BUFSIZ];
+	} buf;
+	struct strbuf ctrl;
+	uint mysap = sap;
+	int err;
+
+	if (mysap == DLPI_ANY_SAP) {
+		switch (dh->du_mac_type) {
+		case DL_TPR:
+		case DL_100VGTPR:
+			/* Token ring starts with 0x02 */
+			mysap = 0x02;
+			break;
+		default:
+			/* Others start with 0x00 */
+			mysap = 0x00;
+			break;
+		}
+	}
+
+	buf.prim.bind_req.dl_primitive = DL_BIND_REQ;
+	buf.prim.bind_req.dl_sap = mysap;
+	buf.prim.bind_req.dl_service_mode = DL_CLDLS;
+	buf.prim.bind_req.dl_conn_mgmt = 0;
+	buf.prim.bind_req.dl_xidtest_flg = 0;
+
+	ctrl.buf = (char *) &buf.prim.bind_req;
+	ctrl.len = sizeof(buf.prim.bind_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, 0)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &buf;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(buf);
+
+	if (unlikely(__dlpi_getpri(dh, DL_BIND_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+
+	if (unlikely(sap != DLPI_ANY_SAP && buf.prim.bind_ack.dl_sap != mysap)) {
+		_dlpi_unbind(dh);
+		return (DLPI_EUNAVAILSAP);
+	}
+
+	if (boundsap != NULL)
+		*boundsap = buf.prim.bind_ack.dl_sap;
+
+	return (DLPI_SUCCESS);
+}
 
 /** @brief bind a link to a SAP
   * @param dh the link to bind.
@@ -653,34 +937,84 @@ __asm__(".symver __dlpi_arptype_r,dlpi_arptype@@DLPI_1.0");
 int
 __dlpi_bind(dlpi_handle_t dh, uint sap, uint *boundsap)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_bind(dh, sap, boundsap));
 }
 
 /** @brief The reentrant version of __dlpi_bind().
   * @param dh the link to bind.
   * @param sap the SAP to bind to the link.
   * @param boundsap returned bound SAP when successful.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_bind().
   */
 int
 __dlpi_bind_r(dlpi_handle_t dh, uint sap, uint *boundsap)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_bind(dh, sap, boundsap);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_bind(dlpi_handle_t dh, uint sap, uint *boundsap)
   * @param dh the link to bind.
   * @param sap the SAP to bind to the link.
   * @param boundsap returned bound SAP when successful.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_bind_r().
   */
-__asm__(".symver __dlpi_bind_r,dlpi_bind@@DLPI_1.0");
+__asm__(".symver __dlpi_bind_r,dlpi_bind@@DLPI_1.1");
+
+/** @internal
+  * @brief close a link.
+  * @param dh the link to close.
+  * @version DLPI_1.1
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static void
+_dlpi_close(dlpi_handle_t dh)
+{
+	if (close(dh->du_fd) == 0 || errno != EINTR) {
+		__dlpi_dhs[dh->du_fd] = NULL;
+		pthread_rwlock_destroy(&dh->du_lock);
+#if 0
+		if (dh->du_ctrlbuf)
+			free(dh->du_ctlbuf);
+		if (dh->du_datbuf)
+			free(dh->du_datbuf);
+#endif
+		if (dh->du_nids) {
+			dlpi_notifyid_t dln, dln_next;
+
+			dln_next = dh->du_nids;
+			while ((dln = dln_next)) {
+				dln_next = dln->dln_next;
+				free(dln);
+			}
+		}
+		if (dh->du_linkname)
+			free(dh->du_linkname);
+		free(dh);
+	}
+	return;
+}
 
 /** @brief close a link.
   * @param dh the link to close.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   *
   * This function is a thread cancellation point.  dlpi_close() is a thread
   * cancellation point, and so is close(2); therefore, we defer cancellation
@@ -689,30 +1023,16 @@ __asm__(".symver __dlpi_bind_r,dlpi_bind@@DLPI_1.0");
 void
 __dlpi_close(dlpi_handle_t dh)
 {
-	struct __dlpi_user *user;
+	int err = DLPI_SUCCESS;
 
-	if (!(user = __dlpi_chkuser(dh)))
-		goto error;
-	if (close(dh) == 0 || errno != EINTR) {
-		if (--user->refs == 0) {
-			__dlpi_dhs[dh] = NULL;
-			pthread_wrlock_destroy(&user->lock);
-			if (user->ctrlbuf)
-				free(user->ctlbuf);
-			if (user->datbuf)
-				free(user->datbuf);
-			free(user);
-		}
-	}
-	if (errno == EINTR)
-		dlerrno = DL_SYSERR;
-      error:
-	return;
+	if (__dlpi_chkuser(dh, &err) == NULL)
+		return;
+	return (_dlpi_close(dh));
 }
 
 /** @brief The reentrant version of __dlpi_close().
   * @param dh the link to close.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_close().
   * 
@@ -728,27 +1048,72 @@ __dlpi_close(dlpi_handle_t dh)
 void
 __dlpi_close_r(dlpi_handle_t dh)
 {
-	int err, ret = -1;
+	int err;
 
 	pthread_cleanup_push_defer_np(__dlpi_list_unlock, NULL);
 	if ((err = __dlpi_list_wrlock()) == 0) {
-		ret = __dlpi_close(dh);
+		_dlpi_close(dh);
 		__dlpi_list_unlock(NULL);
 	} else {
-		dlerrno = DL_SYSERR;
 		errno = err;
 	}
 	pthread_cleanup_pop_restore_np(0);
-	return (ref);
+	return;
 }
 
 /** @fn void dlpi_close(dlpi_handle_t dh)
   * @param dh the link to close.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_close_r().
   */
-__asm__(".symver __dlpi_close_r,dlpi_close@@DLPI_1.0");
+__asm__(".symver __dlpi_close_r,dlpi_close@@DLPI_1.1");
+
+/** @internal
+  * @brief disable a multicast address.
+  * @param dh link for which to disable address.
+  * @param aptr pointer to multicast address to disabled.
+  * @param alen length of multicase address.
+  *
+  * This version of the implemetnation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_disabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
+{
+	struct {
+		union DL_primitives prim;
+		unsigned char buffer[DLPI_PHYSADDR_MAX];
+	} buf;
+	struct strbuf ctrl;
+	int err;
+
+	if (unlikely(aptr == NULL))
+		return (DLPI_EINVAL);
+	if (unlikely(alen == 0) || unlikely(alen > DLPI_PHYSADDR_MAX))
+		return (DLPI_EINVAL);
+
+	buf.prim.disabmulti_req.dl_primitive = DL_DISABMULTI_REQ;
+	buf.prim.disabmulti_req.dl_addr_length = alen;
+	buf.prim.disabmulti_req.dl_addr_offset = sizeof(buf.prim.disabmulti_req);
+
+	bcopy(aptr, (unsigned char *) (&buf.prim.disabmulti_req + 1), alen);
+
+	ctrl.buf = (char *) &buf.prim;
+	ctrl.len = sizeof(buf.prim.disabmulti_req) + alen;
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, 0)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &buf;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(buf);
+
+	if (unlikely(__dlpi_getpri(dh, DL_DISABMULTI_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+	return (DLPI_SUCCESS);
+}
 
 /** @brief disable a multicast address.
   * @param dh link for which to disable address.
@@ -758,30 +1123,97 @@ __asm__(".symver __dlpi_close_r,dlpi_close@@DLPI_1.0");
 int
 __dlpi_disabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_disabmulti(dh, aptr, alen));
 }
 
 /** @brief The reentrant version of __dlpi_disabmulti().
   * @param dh link for which to disable address.
   * @param aptr pointer to multicast address to disabled.
   * @param alen length of multicase address.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_disabmulti().
   */
 int
 __dlpi_disabmulti_r(dlpi_handle_t dh, const void *aptr, size_t alen)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, NULL);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_disabmulti(dh, aptr, alen);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_disabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
   * @param dh link for which to disable address.
   * @param aptr pointer to multicast address to disabled.
   * @param alen length of multicase address.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_diabmulti_r().
   */
-__asm__(".symver __dlpi_disabmulti_r,dlpi_disabmulti@@DLPI_1.0");
+__asm__(".symver __dlpi_disabmulti_r,dlpi_disabmulti@@DLPI_1.1");
+
+/** @internal
+  * @brief disable a notification.
+  * @param dh link for which to disable notification.
+  * @param id notification handle from dlpi_enabnotify().
+  * @param argp returned argument associated with notification.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp)
+{
+	union DL_primitives prim;
+	struct strbuf ctrl;
+	dlpi_notifyid_t dln, *np, n;
+	int err;
+
+	if (unlikely((dln = (typeof(dln)) id) == NULL))
+		return (DLPI_ENOTEIDINVAL);
+	for (np = &dh->du_nids; (*np) && (*np) != dln; np = &(*np)->dln_next) ;
+	if (unlikely((*np) != dln))
+		return (DLPI_ENOTEIDINVAL);
+
+	/* delete notification regardless of whether suppressing notifications is indeed successful 
+	   or not. */
+	*np = (*np)->dln_next;
+	if (argp != NULL)
+		*argp = dln->dln_arg;
+	free(dln);
+
+	for (n = dh->du_nids, dh->du_notifications = 0; n; n = n->dln_next)
+		dh->du_notifications |= n->dln_notes;
+
+	prim.notify_req.dl_primitive = DL_NOTIFY_REQ;
+	prim.notify_req.dl_notifications = dh->du_notifications;
+
+	ctrl.buf = (char *) &prim.notify_req;
+	ctrl.len = sizeof(prim.notify_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, RS_HIPRI)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &prim;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(prim);
+
+	if (unlikely((err = __dlpi_getpri(dh, DL_NOTIFY_REQ, &ctrl)) != DLPI_SUCCESS))
+		return (err);
+
+	return (DLPI_SUCCESS);
+}
 
 /** @brief disable a notification.
   * @param dh link for which to disable notification.
@@ -791,30 +1223,91 @@ __asm__(".symver __dlpi_disabmulti_r,dlpi_disabmulti@@DLPI_1.0");
 int
 __dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_disabnotify(dh, id, argp));
 }
 
 /** @brief The reentrant version of __dlpi_disabnotify().
   * @param dh link for which to disable notification.
   * @param id notification handle from dlpi_enabnotify().
   * @param argp returned argument associated with notification.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_disabnotify().
   */
 int
 __dlpi_disabnotify_r(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_disabnotify(dh, id, argp);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_disabnotify(dlpi_handle_t dh, dlpi_notifyid_t id, void **argp)
   * @param dh link for which to disable notification.
   * @param id notification handle from dlpi_enabnotify().
   * @param argp returned argument associated with notification.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_disabnotify_r().
   */
-__asm__(".symver __dlpi_disabnotify_r,dlpi_disabnotify@@DLPI_1.0");
+__asm__(".symver __dlpi_disabnotify_r,dlpi_disabnotify@@DLPI_1.1");
+
+/** @internal
+  * @brief enable a multicast address.
+  * @param dh link for which to enable address.
+  * @param aptr pointer to multicast address to enable.
+  * @param alen length of multicase address.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
+{
+	struct {
+		union DL_primitives prim;
+		unsigned char buffer[DLPI_PHYSADDR_MAX];
+	} buf;
+	struct strbuf ctrl;
+	int err;
+
+	if (unlikely(aptr == NULL))
+		return (DLPI_EINVAL);
+
+	if (unlikely(alen == 0) | unlikely(alen > DLPI_PHYSADDR_MAX))
+		return (DLPI_EINVAL);
+
+	buf.prim.enabmulti_req.dl_primitive = DL_ENABMULTI_REQ;
+	buf.prim.enabmulti_req.dl_addr_length = alen;
+	buf.prim.enabmulti_req.dl_addr_offset = sizeof(buf.prim.enabmulti_req);
+
+	bcopy(aptr, (unsigned char *) (&buf.prim.enabmulti_req + 1), alen);
+
+	ctrl.buf = (char *) &buf.prim;
+	ctrl.len = sizeof(buf.prim.enabmulti_req) + alen;
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, 0)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &buf;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(buf);
+
+	if (unlikely(__dlpi_getpri(dh, DL_ENABMULTI_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+	return (DLPI_SUCCESS);
+}
 
 /** @brief enable a multicast address.
   * @param dh link for which to enable address.
@@ -824,30 +1317,116 @@ __asm__(".symver __dlpi_disabnotify_r,dlpi_disabnotify@@DLPI_1.0");
 int
 __dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_enabmulti(dh, aptr, alen));
 }
 
 /** @brief The reentrant version of __dlpi_enabmulti().
   * @param dh link for which to enable address.
   * @param aptr pointer to multicast address to enable.
   * @param alen length of multicase address.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_enabmulti().
   */
 int
 __dlpi_enabmulti_r(dlpi_handle_t dh, const void *aptr, size_t alen)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_enabmulti(dh, aptr, alen);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_enabmulti(dlpi_handle_t dh, const void *aptr, size_t alen)
   * @param dh link for which to enable address.
   * @param aptr pointer to multicast address to enable.
   * @param alen length of multicase address.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_enabmulti_r().
   */
-__asm__(".symver __dlpi_enabmulti_r,dlpi_enabmulti@@DLPI_1.0");
+__asm__(".symver __dlpi_enabmulti_r,dlpi_enabmulti@@DLPI_1.1");
+
+/** @internal
+  * @brief enable notification for a link.
+  * @param dh link for notification.
+  * @param fncp notification callback function.
+  * @param arg argument to pass to callback.
+  * @param nid location to receive notification handle.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
+		 dlpi_notifyid_t * nid)
+{
+	dlpi_notifyid_t dln, n;
+	union DL_primitives prim;
+	struct strbuf ctrl;
+	int err;
+
+	if (unlikely(notes & ~((1 << 11) - 1)))
+		return (DLPI_ENOTEINVAL);
+	if (unlikely(fncp == NULL))
+		return (DLPI_EINVAL);
+	if (unlikely(nid == NULL))
+		return (DLPI_EINVAL);
+
+	if (unlikely((dln = malloc(sizeof(*dln))) == NULL))
+		return (DL_SYSERR);
+	bzero(dln, sizeof(*dln));
+
+	dln->dln_notes = notes;
+	dln->dln_fncp = fncp;
+	dln->dln_arg = arg;
+	dln->dln_next = dh->du_nids;
+
+	for (n = dln, dh->du_notifications = 0; n; n = n->dln_next)
+		dh->du_notifications |= n->dln_notes;
+
+	prim.notify_req.dl_primitive = DL_NOTIFY_REQ;
+	prim.notify_req.dl_notifications = dh->du_notifications;
+
+	ctrl.buf = (char *) &prim.notify_req;
+	ctrl.len = sizeof(prim.notify_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, RS_HIPRI)) != DLPI_SUCCESS)) {
+		free(dln);
+		return (err);
+	}
+
+	ctrl.buf = (char *) &prim;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(prim);
+
+	if (unlikely((err = __dlpi_getpri(dh, DL_NOTIFY_REQ, &ctrl)) != DLPI_SUCCESS)) {
+		free(dln);
+		if (err == DL_UNSUPPORTED)
+			return (DLPI_ENOTENOTSUP);
+		return (err);
+	}
+
+	if (unlikely((notes & prim.notify_ack.dl_notifications) == 0)) {
+		free(dln);
+		return (DLPI_ENOTENOTSUP);
+	}
+	dh->du_notifications &= prim.notify_ack.dl_notifications;
+
+	*nid = (void *) dln;
+	dh->du_nids = dln;
+	return (DLPI_SUCCESS);
+}
 
 /** @brief enable notification for a link.
   * @param dh link for notification.
@@ -859,6 +1438,11 @@ int
 __dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
 		  dlpi_notifyid_t * nid)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_enabnotify(dh, notes, fncp, arg, nid));
 }
 
 /** @brief The reentrant version of __dlpi_enabnotify().
@@ -866,7 +1450,7 @@ __dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *
   * @param fncp notification callback function.
   * @param arg argument to pass to callback.
   * @param nid location to receive notification handle.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_enabnotify().
   */
@@ -874,18 +1458,40 @@ int
 __dlpi_enabnotify_r(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg,
 		    dlpi_notifyid_t * nid)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_enabnotify(dh, notes, fncp, arg, nid);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
-/** @fn int dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t * fncp, void *arg, dlpi_notifyid_t * nid)
+/** @fn int dlpi_enabnotify(dlpi_handle_t dh, uint notes, dlpi_notifyfunc_t *fncp, void *arg, dlpi_notifyid_t *nid)
   * @param dh link for notification.
   * @param fncp notification callback function.
   * @param arg argument to pass to callback.
   * @param nid location to receive notification handle.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_enabnotify_r().
   */
-__asm__(".symver __dlpi_enabnotify_r,dlpi_enabnotify@@DLPI_1.0");
+__asm__(".symver __dlpi_enabnotify_r,dlpi_enabnotify@@DLPI_1.1");
+
+/** @internal
+  * @brief return file description for link.
+  * @param dh link for which to return file descriptor.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_fd(dlpi_handle_t dh)
+{
+	return (dh->du_fd);
+}
 
 /** @brief return file description for link.
   * @param dh link for which to return file descriptor.
@@ -893,31 +1499,29 @@ __asm__(".symver __dlpi_enabnotify_r,dlpi_enabnotify@@DLPI_1.0");
 int
 __dlpi_fd(dlpi_handle_t dh)
 {
-	struct __dlpi_user *user;
+	int err = DLPI_SUCCESS;
 
-	if ((user = __dlpi_chkuser(dh)) == NULL)
-		goto error;
-	return (dh);
-      error:
-	dlerrno = DL_SYSERR;
-	errno = EBADF;
-	return (-1);
+	if (__dlpi_chkuser(dh, &err) == NULL) {
+		errno = err;
+		return (-1);
+	}
+	return (_dlpi_fd(dh));
 }
 
 /** @brief The reentrant version of __dlpi_fd().
   * @param dh link for which to return file descriptor.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_fd().
   */
 int
 __dlpi_fd_r(dlpi_handle_t dh)
 {
-	int ret = -1;
+	int err = DLPI_SUCCESS, ret = -1;
 
 	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
-	if (__dlpi_hlduser(dh)) {
-		ret = __dlpi_fd(dh);
+	if (__dlpi_hlduser(dh, &err)) {
+		ret = _dlpi_fd(dh);
 		__dlpi_putuser(&dh);
 	}
 	pthread_cleanup_pop_restore_np(0);
@@ -926,11 +1530,74 @@ __dlpi_fd_r(dlpi_handle_t dh)
 
 /** @fn int dlpi_fd(dlpi_handle_t dh)
   * @param dh link for which to return file descriptor.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_fd_r().
   */
-__asm__(".symver __dlpi_fd_r,dlpi_fd@@DLPI_1.0");
+__asm__(".symver __dlpi_fd_r,dlpi_fd@@DLPI_1.1");
+
+/** @internal
+  * @brief get physical address of link.
+  * @param dh link for which to get physical address.
+  * @param type type of physical address to retrieve.
+  * @param aptr pointer to buffer to received address.
+  * @param alen length of buffer on call and return.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
+{
+	struct {
+		union DL_primitives prim;
+		unsigned char buffer[DLPI_PHYSADDR_MAX];
+	} buf;
+	struct strbuf ctrl;
+	int len, err;
+	unsigned char *ptr;
+
+	switch (type) {
+	case DL_CURR_PHYS_ADDR:
+	case DL_FACT_PHYS_ADDR:
+	case DL_IPV6_TOKEN:
+	case DL_IPV6_LINK_LAYER_ADDR:
+		break;
+	default:
+		return (DLPI_EINVAL);
+	}
+	if (unlikely(aptr == NULL))
+		return (DLPI_EINVAL);
+	if (unlikely(alen == NULL))
+		return (DLPI_EINVAL);
+
+	buf.prim.phys_addr_req.dl_primitive = DL_PHYS_ADDR_REQ;
+	buf.prim.phys_addr_req.dl_addr_type = type;
+
+	ctrl.buf = (char *) &buf.prim.phys_addr_req;
+	ctrl.len = sizeof(buf.prim.phys_addr_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, RS_HIPRI)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &buf;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(buf);
+
+	if (unlikely(__dlpi_getpri(dh, DL_PHYS_ADDR_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+
+	len = *alen;
+	*alen = buf.prim.phys_addr_ack.dl_addr_length;
+	if (len > *alen)
+		len = *alen;
+	ptr = (unsigned char *) &buf;
+	ptr += buf.prim.phys_addr_ack.dl_addr_offset;
+
+	bcopy(ptr, aptr, len);
+	return (DLPI_SUCCESS);
+}
 
 /** @brief get physical address of link.
   * @param dh link for which to get physical address.
@@ -941,23 +1608,11 @@ __asm__(".symver __dlpi_fd_r,dlpi_fd@@DLPI_1.0");
 int
 __dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
 {
-	struct __dlpi_user *user;
-	union DL_primitives prim;
-	struct strbuf ctrl;
+	int err = DLPI_SUCCESS;
 
-	if ((user = __dlpi_chkuser(dh)) == NULL)
-		goto error;
-
-	prim.phys_addr_req.dl_primitive = DL_PHYS_ADDR_REQ;
-	prim.phys_addr_req.dl_addr_type = type;
-
-	ctrl.buf = (uchar *) &prim;
-	ctrl.len = sizeof(prim.phys_addr_req);
-	ctrl.maxlen = -1;
-
-	if (putmsg(dh, &ctrl, NULL, 0) < 0)
-		goto syserr;
-
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_get_physaddr(dh, type, aptr, alen));
 }
 
 /** @brief The reentrant version of __dlpi_get_physaddr().
@@ -965,18 +1620,18 @@ __dlpi_get_physaddr(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
   * @param type type of physical address to retrieve.
   * @param aptr pointer to buffer to received address.
   * @param alen length of buffer on call and return.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_get_physaddr().
   */
 int
 __dlpi_get_physaddr_r(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
 {
-	int ret = DLPI_FAILURE;
+	int ret = DLPI_SUCCESS;
 
 	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
-	if (__dlpi_getuser(dh)) {
-		ret = __dlpi_get_physaddr(dh, type, aptr, alen);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_get_physaddr(dh, type, aptr, alen);
 		__dlpi_putuser(dh);
 	}
 	pthread_cleanup_pop_restore_np(0);
@@ -988,17 +1643,18 @@ __dlpi_get_physaddr_r(dlpi_handle_t dh, uint type, void *aptr, size_t *alen)
   * @param type type of physical address to retrieve.
   * @param aptr pointer to buffer to received address.
   * @param alen length of buffer on call and return.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_get_physaddr_r().
   */
-__asm__(".symver __dlpi_get_physaddr_r,dlpi_get_physaddr@@DLPI_1.0");
+__asm__(".symver __dlpi_get_physaddr_r,dlpi_get_physaddr@@DLPI_1.1");
 
-/** @brief convert MAC type to IF type.
+/** @internal
+  * @brief convert MAC type to IF type.
   * @param mactype MAC type to convert.
   */
-uint
-__dlpi_iftype(uint mactype)
+static uint
+_dlpi_iftype(uint mactype)
 {
 	switch (mactype) {
 	case DL_CSMACD:	/* IEEE 802.3 CSMA/CD network */
@@ -1065,85 +1721,214 @@ __dlpi_iftype(uint mactype)
 	return (0);
 }
 
+/** @brief convert MAC type to IF type.
+  * @param mactype MAC type to convert.
+  */
+uint
+__dlpi_iftype(uint mactype)
+{
+	return _dlpi_iftype(mactype);
+}
+
 /** @brief The reentrant version of __dlpi_iftype().
   * @param mactype MAC type to convert.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_iftype().
   */
 uint
 __dlpi_iftype_r(uint mactype)
 {
-	return __dlpi_iftype(mactype);
+	return _dlpi_iftype(mactype);
 }
 
 /** @fn uint dlpi_iftype(uint mactype)
   * @param mactype MAC type to convert.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_iftype_r().
   */
-__asm__(".symver __dlpi_iftype_r,dlpi_iftype@@DLPI_1.0");
+__asm__(".symver __dlpi_iftype_r,dlpi_iftype@@DLPI_1.1");
+
+/** @internal
+  * @brief get link information.
+  * @param dh link for which to get information.
+  * @param di information structu pointer to return.
+  * @param opt options.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_info(dlpi_handle_t dh, dlpi_info_t * di, uint opt)
+{
+	union {
+		union DL_primitives prim;
+		unsigned char buffer[BUFSIZ];
+	} buf;
+	struct strbuf ctrl;
+	int err;
+
+	buf.prim.dl_primitive = DL_INFO_REQ;
+
+	ctrl.buf = (char *) &buf.prim.info_req;
+	ctrl.len = sizeof(buf.prim.info_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, 0)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &buf;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(buf);
+
+	if (unlikely((err = __dlpi_getpri(dh, DL_INFO_REQ, &ctrl)) != DLPI_SUCCESS))
+		return (err);
+
+	if (di) {
+		di->di_max_sdu = buf.prim.info_ack.dl_max_sdu;
+		di->di_min_sdu = buf.prim.info_ack.dl_min_sdu;
+		di->di_state = buf.prim.info_ack.dl_current_state;
+		di->di_mactype = buf.prim.info_ack.dl_mac_type;
+		if (dh->du_linkname != NULL)
+			strncpy(dh->du_linkname, di->di_linkname, DLPI_LINKNAME_MAX);
+		if ((di->di_bcastaddrlen = buf.prim.info_ack.dl_brdcst_addr_length)) {
+			bcopy((unsigned char *) &buf + buf.prim.info_ack.dl_brdcst_addr_offset,
+			      di->di_bcastaddr, buf.prim.info_ack.dl_brdcst_addr_length);
+		}
+		if ((di->di_physaddrlen = buf.prim.info_ack.dl_addr_length)) {
+			bcopy((unsigned char *) &buf + buf.prim.info_ack.dl_addr_offset,
+			      di->di_bcastaddr, buf.prim.info_ack.dl_addr_length);
+		}
+#if 0
+		/* FIXME: this must be dug out of dl_addr_(length/offset) using dl_sap_length. */
+		di->di_sap = buf.prim.info_ack.dl_sap;
+#endif
+		di->di_timeout = dh->du_timeout;
+		if (buf.prim.info_ack.dl_qos_length == sizeof(dl_qos_cl_sel1_t)) {
+			bcopy((unsigned char *) &buf + buf.prim.info_ack.dl_qos_offset,
+			      &di->di_qos_sel, buf.prim.info_ack.dl_qos_length);
+		}
+		if (buf.prim.info_ack.dl_qos_range_length == sizeof(dl_qos_cl_range1_t)) {
+			bcopy((unsigned char *) &buf + buf.prim.info_ack.dl_qos_range_offset,
+			      &di->di_qos_range, buf.prim.info_ack.dl_qos_range_length);
+		}
+	}
+
+	return (DLPI_SUCCESS);
+}
 
 /** @brief get link information.
   * @param dh link for which to get information.
-  * @param iptr information structu pointer to return.
+  * @param di information structu pointer to return.
   * @param opt options.
   */
 int
-__dlpi_info(dlpi_handle_t dh, dlpi_info_t ** iptr, uint opt)
+__dlpi_info(dlpi_handle_t dh, dlpi_info_t * di, uint opt)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_info(dh, di, opt));
 }
 
 /** @brief The reentrant version of __dlpi_info().
   * @param dh link for which to get information.
   * @param iptr information structu pointer to return.
   * @param opt options.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_info().
   */
 int
-__dlpi_info_r(dlpi_handle_t dh, dlpi_info_t ** iptr, uint opt)
+__dlpi_info_r(dlpi_handle_t dh, dlpi_info_t * iptr, uint opt)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret) != NULL) {
+		ret = _dlpi_info(dh, iptr, opt);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
-/** @fn int dlpi_info(dlpi_handle_t dh, dlpi_info_t **iptr, uint opt)
+/** @fn int dlpi_info(dlpi_handle_t dh, dlpi_info_t *iptr, uint opt)
   * @param dh link for which to get information.
   * @param iptr information structu pointer to return.
   * @param opt options.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_info_r().
   */
-__asm__(".symver __dlpi_info_r,dlpi_info@@DLPI_1.0");
+__asm__(".symver __dlpi_info_r,dlpi_info@@DLPI_1.1");
+
+/** @internal
+  * @brief name a link.
+  * @param dh link to name.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static const char *
+_dlpi_linkname(dlpi_handle_t dh)
+{
+	return (dh->du_linkname);
+}
 
 /** @brief name a link.
   * @param dh link to name.
+  *
+  * The non-thread-safe version simply returns a pointer to the linkname that
+  * is part of the data link user structure.
   */
 const char *
 __dlpi_linkname(dlpi_handle_t dh)
 {
+	int err = DLPI_SUCCESS;
+
+	if (__dlpi_chkuser(dh, &err) == NULL)
+		return (NULL);
+	return (_dlpi_linkname(dh));
 }
 
 /** @brief The reentrant version of __dlpi_linkname().
   * @param dh link to name.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_linkname().
+  *
+  * The reentrant version holds a read lock on the user data structure while
+  * reading link name and copies the link name into a per-thread static buffer
+  * location.
   */
 const char *
 __dlpi_linkname_r(dlpi_handle_t dh)
 {
+	int err = DLPI_SUCCESS;
+	char *ret = NULL;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_hlduser(dh, &err) != NULL) {
+		if (dh->du_linkname == NULL)
+			return (NULL);
+		ret = __dlpi_get_tsd()->strbuf;
+		strncpy(ret, dh->du_linkname, BUFSIZ);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
-/** @fn const char * dlpi_linkname(dlpi_handle_t dh)
+/** @fn const char *dlpi_linkname(dlpi_handle_t dh)
   * @param dh link to name.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_linkname_r().
   */
-__asm__(".symver __dlpi_linkname_r,dlpi_linkname@@DLPI_1.0");
+__asm__(".symver __dlpi_linkname_r,dlpi_linkname@@DLPI_1.1");
 
 /* *INDENT-OFF* */
 const char *__dlpi_maclist[] = {
@@ -1151,133 +1936,170 @@ const char *__dlpi_maclist[] = {
 TRANS  This MAC type corresponds to an interface to an IEEE 802.3 CSMA/CD
 TRANS  network.
 */
-	gettext_noop("IEEE 802.3 CSMA/CD"),
+	[DL_CSMACD]	= gettext_noop("IEEE 802.3 CSMA/CD"),
 /*
 TRANS  This MAC type corresponds to an interface to an IEEE 802.4 Token
 TRANS  Passing Bus network.
 */
-	gettext_noop("IEEE 802.4 Token Passing Bus"),
+	[DL_TPB]	= gettext_noop("IEEE 802.4 Token Passing Bus"),
 /*
 TRANS  This MAC type corresponds to an interface to an IEEE 802.5 Token
 TRANS  Passing Ring (Token Ring).
 */
-	gettext_noop("IEEE 802.5 Token Passing Ring"),
+	[DL_TPR]	= gettext_noop("IEEE 802.5 Token Passing Ring"),
 /*
 TRANS  This MAC type corresponds to an interface to an IEEE 802.6 Metro Net
 TRANS  network.
 */
-	gettext_noop("IEEE 802.6 Metro Net"),
+	[DL_METRO]	= gettext_noop("IEEE 802.6 Metro Net"),
 /*
 TRANS  This MAC type corresponds to an interface to an Ethernet Bus network.
 */
-	gettext_noop("Ethernet Bus"),
+	[DL_ETHER]	= gettext_noop("Ethernet Bus"),
 /*
 TRANS  This MAC type corresponds to an interface to ISO HDLC data link.
 */
-	gettext_noop("ISO HDLC Protocol Support"),
+	[DL_HDLC]	= gettext_noop("ISO HDLC Protocol Support"),
 /*
 TRANS  This MAC type corresponds to an interface to Character Syncrhonous data
 TRANS  link.  This may be synchronous character protocols such as BSC or
 TRANS  DDCMP.
 */
-	gettext_noop("Character Synchronous Protocol Support"),
+	[DL_CHAR]	= gettext_noop("Character Synchronous Protocol Support"),
 /*
-TRANS This MAC type corresponds to an IBM Channel-to-Channel Adapter.
+TRANS  This MAC type corresponds to an IBM Channel-to-Channel Adapter.
 */
-	gettext_noop("IBM Channel-to-Channel Adapter"),
+	[DL_CTCA]	= gettext_noop("IBM Channel-to-Channel Adapter"),
 /*
-TRANS This MAC type corresponds to a Fiber Distributed Data Interface (FDDI)
-TRANS to an FDDI LAN.
+TRANS  This MAC type corresponds to a Fiber Distributed Data Interface (FDDI)
+TRANS  to an FDDI LAN.
 */
-	gettext_noop("Fiber Distributed Data Interface"),
+	[DL_FDDI]	= gettext_noop("Fiber Distributed Data Interface"),
 /*
-TRANS
+TRANS  This MAC type corresponse to an interface other than those listed
+TRANS  above.
 */
-	gettext_noop("Other Interface"),
+	[DL_OTHER]	= gettext_noop("Other Interface"),
+/*
+TRANS  This MAC type corresponds to a Fibre Channel Interface.
+*/
+	[DL_FC]		= gettext_noop("Fibre Channel Interface"),
+/*
+TRANS  This MAC type corresponds to an ATM (Asynchronous Transfer Mode)
+TRANS  Interface.
+*/
+	[DL_ATM]	= gettext_noop("ATM (Asynchronous Transfer Mode)"),
+/*
+TRANS  This MAC type corresponds to an ATM (Asynchronous Transfer Mode)
+TRANS  Classical IP Interface.  In this case a "classical" IP interface is one
+TRANS  that corresponds to RFC 1577, which uses a classical approach by name.
+*/
+	[DL_IPATM]	= gettext_noop("ATM Classical IP Interface"),
+/*
+TRANS  This MAC type corresponds to an X.25 LAPB (Link Access Procedure,
+TRANS  Balanced) Interface [ITU-T Recommenation X.25, ISO/IEC 7776].
+*/
+	[DL_X25]	= gettext_noop("X.25 LAPB Interface"),
+/*
+TRANS  This MAC type corresponds to a Q.921 LAPD (Link Access Procedure,
+TRANS  D-Channel) Interface [ITU-T Recommendation Q.921].
+*/
+	[DL_ISDN]	= gettext_noop("ISDN Interface"),
+/*
+TRANS  This MAC type corresponds to a High Performance Parallel Interface.
+*/
+	[DL_HIPPI]	= gettext_noop("HIPPI Interface"),
+/*
+TRANS  This MAC type corresponds a 100 Based VG Ethernet.  This MAC type is
+TRANS  deprecated.  Use DL_ETHER or DL_ETH_CSMA instead.
+*/
+	[DL_100VG]	= gettext_noop("100 Based VG Ethernet"),
+/*
+TRANS  This MAC type corresponse to 100 Based VG Token Ring [IEEE 802.5].
+TRANS  This MAC type is deprecated.  Use DL_TPR instead.
+*/
+	[DL_100VGTPR]	= gettext_noop("100 Based VG Token Ring"),
+/*
+TRANS  This MAC type coresponds to Ethernet II and CSMA/CD [IEEE 802.2 and
+TRANS  802.3] on the same medium.
+*/
+	[DL_ETH_CSMA]	= gettext_noop("ISO 8802/3 and Ethernet"),
+/*
+TRANS  This MAC type coresponds to 100 Base T Ethernet.  This MAC type is
+TRANS  deprecated.  Use DL_ETHER or DL_ETH_CSMA instead.
+*/
+	[DL_100BT]	= gettext_noop("100 Base T"),
+/*
+TRANS  This MAC type corresponds to an Infiniband interface.
+*/
+	[DL_IB]		= gettext_noop("Infiniband"),
 /*
 TRANS  This MAC type corresponds to a Frame Relay LAPF (Link Access Procedure
 TRANS  Frame-Relay) WAN data link.
 */
-	gettext_noop("Frame Relay LAPF"),
+	[DL_FRAME]	= gettext_noop("Frame Relay LAPF"),
 /*
 TRANS  This MAC type corresponds to an interface using Multi-protocol over
 TRANS  Frame Relay.
 */
-	gettext_noop("Multi-protocol over Frame Relay"),
+	[DL_MPFRAME]	= gettext_noop("Multi-protocol over Frame Relay"),
 /*
-TRANS
+TRANS  This MAC type corresponds to an interface using Character Asyncrhonous
+TRANS  Protocol.
 */
-	gettext_noop("Character Asyncrhonous Protocol"),
+	[DL_ASYNC]	= gettext_noop("Character Asynchronous Protocol"),
 /*
-TRANS
+TRANS  This MAC type corresponds to a Classical IP Interface.  A "classical"
+TRANS  IP interface is one that corresponds to RFC 877, which is a long
+TRANS  standing and, therefore, classical standards specification.
 */
-	gettext_noop("X.25 Classical IP Interface"),
+	[DL_IPX25]	= gettext_noop("X.25 Classical IP Interface"),
 /*
-TRANS
+TRANS  This MAC type corresponds to a Software Loopback.
 */
-	gettext_noop("Software Loopback"),
-/*
-TRANS
-*/
-	gettext_noop("Fibre Channel Interface"),
-/*
-TRANS
-*/
-	gettext_noop("ATM (Asynchronous Transfer Mode)"),
-/*
-TRANS
-*/
-	gettext_noop("ATM Classical IP Interface"),
-/*
-TRANS
-*/
-	gettext_noop("X.25 LAPB Interface"),
-/*
-TRANS
-*/
-	gettext_noop("ISDN Interface"),
-/*
-TRANS
-*/
-	gettext_noop("HIPPI Interface"),
-/*
-TRANS
-*/
-	gettext_noop("100 Based VG Ethernet"),
-/*
-TRANS
-*/
-	gettext_noop("100 Based VG Token Ring"),
-/*
-TRANS
-*/
-	gettext_noop("ISO 8802/3 and Ethernet"),
-/*
-TRANS
-*/
-	gettext_noop("100 Base T"),
-/*
-TRANS
-*/
-	gettext_noop("Infiniband"),
-/*
-TRANS
-*/
-	gettext_noop("IPv4 Tunnel Link"),
-/*
-TRANS
-*/
-	gettext_noop("IPv6 Tunnel Link"),
-/*
-TRANS
-*/
-	gettext_noop("Virtual Network Interface"),
-/*
-TRANS
-*/
-	gettext_noop("IEEE 802.11"),
+	[DL_LOOP]	= gettext_noop("Software Loopback"),
 };
 /* *INDENT-ON* */
+
+/* *INDENT-OFF* */
+const char *__dlpi_maclist_sun[] = {
+/*
+TRANS  This MAC type corresponds to an IPv4 tunnel.  This MAC type is a
+TRANS  Solaris extension.
+*/
+	[DL_IPV4	- DL_IPV4]	= gettext_noop("IPv4 Tunnel Link"),
+/*
+TRANS  This MAC type corresponds to an IPv6 tunnel.  This MAC type is a
+TRANS  Solaris extension.
+*/
+	[DL_IPV6	- DL_IPV4]	= gettext_noop("IPv6 Tunnel Link"),
+/*
+TRANS  This MAC type corresponds to a Virtual Network Inteface, such as is
+TRANS  provided for VLAN and other pseudo-interfaces.  This MAC type is a
+TRANS  Solaris extension.
+*/
+	[DL_VNI		- DL_IPV4]	= gettext_noop("Virtual Network Interface"),
+/*
+TRANS  This MAC type corresponds to a WiFi [IEEE 802.11] interface.  This MAC
+TRANS  type is a Solaris extension.
+*/
+	[DL_WIFI	- DL_IPV4]	= gettext_noop("IEEE 802.11"),
+};
+/* *INDENT-ON* */
+
+/** @internal
+  * @brief name a MAC type.
+  * @param mactype MAC type to name.
+  */
+static const char *
+_dlpi_mactype(uint mactype)
+{
+	if (mactype >= 0 && mactype <= DL_LOOP)
+		return __dlpi_maclist[mactype];
+	if (mactype >= DL_IPV4 && mactype <= DL_WIFI)
+		return __dlpi_maclist_sun[mactype - DL_IPV4];
+	return ("Unknown MAC type");
+}
 
 /** @brief name a MAC type.
   * @param mactype MAC type to name.
@@ -1285,64 +2107,64 @@ TRANS
 const char *
 __dlpi_mactype(uint mactype)
 {
+	return _dlpi_mactype(mactype);
 }
 
 /** @brief The reentrant version of __dlpi_mactype().
   * @param mactype MAC type to name.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_mactype().
   */
 const char *
 __dlpi_mactype_r(uint mactype)
 {
+	return _dlpi_mactype(mactype);
 }
 
 /** @fn const char *dlpi_mactype(uint mactype)
   * @param mactype MAC type to name.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_mactype_r().
   */
-__asm__(".symver __dlpi_mactype_r,dlpi_mactype@@DLPI_1.0");
+__asm__(".symver __dlpi_mactype_r,dlpi_mactype@@DLPI_1.1");
 
-/** @brief open a link.
+/** @internal
+  * @brief open a link.
   * @param linkname path name for link.
   * @param dhp area to return link handle.
   * @param flags open flags.
-  *
-  * The approach here is to open the /dev/streams/clone/dlmux multiplexing
-  * driver and then issue the DLIOCGETPPA using the linkname as an argument to
-  * obtain the PPA to be used to attach the Stream, and then issueing a
-  * DL_ATTACH_REQ using that PPA.  Once the Stream is in the DL_UNBOUND state,
-  * issue a DLIOCRAW if DLPI_RAW is set in flags, DLIOCNATIVE if DLPI_NATIVE
-  * is set in flags, and DL_PASSIVE_REQ if DLPI_PASSIVE is set in flags.
   */
-int
-__dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
+static int
+_dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 {
-	int fd = 0, ppa, err, save, flags, type;
-	struct __dlpi_user *user = NULL;
+	int fd = 0, ppa, err, save, flag, type;
+	dlpi_handle_t dh = NULL;
 	struct strioctl ic;
 	union DL_primitives prim;
 	struct strbuf ctrl;
 	struct pollfd pfd;
+	int len;
 
-	if (linkname == NULL | strnlen(linkname, 17) > 16)
-		goto elinknameinval;
+	if (unlikely(linkname == NULL))
+		return (DLPI_ELINKNAMEINVAL);
+	if (unlikely((len = strnlen(linkname, BUFSIZ + 1)) > BUFSIZ))
+		return (DLPI_ELINKNAMEINVAL);
 
-	if ((user = malloc(sizeof(*user))) == NULL)
+	if (unlikely((dh = malloc(sizeof(*dh))) == NULL))
 		goto syserr;
-	bzero(user, sizeof(*user));
+	bzero(dh, sizeof(*dh));
 
-	strncpy(user->linkname, linkname, 16);
+	if (unlikely((dh->du_linkname = malloc(len)) == NULL))
+		goto syserr;
+	strncpy(dh->du_linkname, linkname, len);
 
 	if ((fd = open("/dev/streams/clone/dlmux", O_RDWR)) < 0)
 		goto syserr;
+	dh->du_fd = fd;
 
-	user->fd = fd;
-
-	ic.ic_cmd = DLIOCGETPPA;
+	ic.ic_cmd = 0 /* DLIOCGETPPA */;
 	ic.ic_timout = 0;
 	ic.ic_len = strnlen(linkname, 16);
 	ic.ic_dp = (char *) linkname;
@@ -1355,12 +2177,12 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 	if (ppa == 0)
 		goto badlink;
 
-	user->ppa = ppa;
+	dh->du_ppa = ppa;
 
 	prim.dl_primitive = DL_ATTACH_REQ;
 	prim.attach_req.dl_ppa = ppa;
 
-	ctrl.buf = (unsigned char *) &prim;
+	ctrl.buf = (char *) &prim;
 	ctrl.len = sizeof(prim.attach_req);
 	ctrl.maxlen = -1;
 
@@ -1383,11 +2205,11 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 		goto failure;
 	}
 
-	ctrl.buf = (unsigned char *) &prim;
+	ctrl.buf = (char *) &prim;
 	ctrl.len = -1;
 	ctrl.maxlen = sizeof(prim) + 32;
 
-	if (getmsg(fd, &ctrl, NULL, &flags) < 0)
+	if (getmsg(fd, &ctrl, NULL, &flag) < 0)
 		goto syserr;
 
 	if (ctrl.len < sizeof(prim.dl_primitive))
@@ -1435,15 +2257,18 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 			}
 			goto syserr;
 		}
-		user->mac_type = type;
+		dh->du_mac_type = type;
 	}
 	if (flags & DLPI_PASSIVE) {
 		prim.dl_primitive = DL_PASSIVE_REQ;
-		ctrl.buf = (unsigned char *) &prim;
-		ctrl.len = sizeof(prim.dl_passive_req);
+
+		ctrl.buf = (char *) &prim;
+		ctrl.len = sizeof(prim.passive_req);
 		ctrl.maxlen = -1;
+
 		if (putmsg(fd, &ctrl, NULL, 0) < 0)
 			goto syserr;
+
 		pfd.fd = fd;
 		pfd.events = POLLIN | POLLRDNORM | POLLRDBAND | POLLERR | POLLHUP | POLLMSG;
 		pfd.revents = 0;
@@ -1459,11 +2284,11 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 				break;
 			goto failure;
 		}
-		ctrl.buf = (unsigned char *) &prim;
+		ctrl.buf = (char *) &prim;
 		ctrl.len = -1;
 		ctrl.maxlen = sizeof(prim) + 32;
 
-		if (getmsg(fd, &ctrl, NULL, &flags) < 0)
+		if (getmsg(fd, &ctrl, NULL, &flag) < 0)
 			goto syserr;
 
 		if (ctrl.len < sizeof(prim.dl_primitive))
@@ -1488,11 +2313,13 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 			goto badmsg;
 		}
 	}
-	*dlp = (void *) user;
+	*dhp = dh;
 	return (DLPI_SUCCESS);
 
+#if 0
       elinknameinval:
 	err = DLPI_ELINKNAMEINVAL;
+#endif
       failure:
 	err = DLPI_FAILURE;
 	goto error;
@@ -1503,10 +2330,10 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 	err = DLPI_EBADLINK;
 	goto error;
       nolink:
-	err = DLPI_NOLINK;
+	err = DLPI_ENOLINK;
 	goto error;
       badmsg:
-	err = DLPI_BADMSG;
+	err = DLPI_EBADMSG;
 	goto error;
       syserr:
 	err = DL_SYSERR;
@@ -1515,34 +2342,110 @@ __dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
 	save = errno;
 	if (fd > 0)
 		close(fd);
-	if (user != NULL)
-		free(user);
+	if (dh != NULL) {
+		if (dh->du_linkname)
+			free(dh->du_linkname);
+		free(dh);
+	}
 	errno = save;
 	return (err);
+}
+
+/** @brief open a link.
+  * @param linkname path name for link.
+  * @param dhp area to return link handle.
+  * @param flags open flags.
+  *
+  * The approach here is to open the /dev/streams/clone/dlmux multiplexing
+  * driver and then issue the DLIOCGETPPA using the linkname as an argument to
+  * obtain the PPA to be used to attach the Stream, and then issueing a
+  * DL_ATTACH_REQ using that PPA.  Once the Stream is in the DL_UNBOUND state,
+  * issue a DLIOCRAW if DLPI_RAW is set in flags, DLIOCNATIVE if DLPI_NATIVE
+  * is set in flags, and DL_PASSIVE_REQ if DLPI_PASSIVE is set in flags.
+  */
+int
+__dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
+{
+	return _dlpi_open(linkname, dhp, flags);
 }
 
 /** @brief The reentrant version of __dlpi_open().
   * @param linkname path name for link.
   * @param dhp area to return link handle.
   * @param flags open flags.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_open().
   */
 int
 __dlpi_open_r(const char *linkname, dlpi_handle_t * dhp, uint flags)
 {
+	int err = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_list_unlock, NULL);
+	if ((err = __dlpi_list_wrlock()) == 0) {
+		err = _dlpi_open(linkname, dhp, flags);
+		__dlpi_list_unlock(NULL);
+	} else {
+		errno = err;
+		err = DL_SYSERR;
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
-/** @fn int dlpi_open(const char *linkname, dlpi_handle_t * dhp, uint flags)
+/** @fn int dlpi_open(const char *linkname, dlpi_handle_t *dhp, uint flags)
   * @param linkname path name for link.
   * @param dhp area to return link handle.
   * @param flags open flags.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_open_r().
   */
-__asm__(".symver __dlpi_open_r,dlpi_open@@DLPI_1.0");
+__asm__(".symver __dlpi_open_r,dlpi_open@@DLPI_1.1");
+
+/** @internal
+  * @brief turn promiscuous mode off for a link.
+  * @param dh the link.
+  * @param level the level.
+  *
+  * This internal version does not need to check the validity of the DLPI
+  * handle.
+  */
+static int
+_dlpi_promiscoff(dlpi_handle_t dh, uint level)
+{
+	union DL_primitives prim;
+	struct strbuf ctrl;
+	int err;
+
+	switch (level) {
+	case DL_PROMISC_PHYS:
+	case DL_PROMISC_SAP:
+	case DL_PROMISC_MULTI:
+		break;
+	default:
+		return (DLPI_EINVAL);
+	}
+
+	prim.promiscoff_req.dl_primitive = DL_PROMISCOFF_REQ;
+	prim.promiscoff_req.dl_level = level;
+
+	ctrl.buf = (char *) &prim;
+	ctrl.len = sizeof(prim.promiscoff_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, 0)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &prim;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(prim);
+
+	if (unlikely(__dlpi_getpri(dh, DL_PROMISCOFF_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+	return (DLPI_SUCCESS);
+}
 
 /** @brief turn promiscuous mode off for a link.
   * @param dh the link.
@@ -1551,28 +2454,85 @@ __asm__(".symver __dlpi_open_r,dlpi_open@@DLPI_1.0");
 int
 __dlpi_promiscoff(dlpi_handle_t dh, uint level)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return _dlpi_promiscoff(dh, level);
 }
 
 /** @brief The reentrant version of __dlpi_promiscoff().
   * @param dh the link.
   * @param level the level.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_promiscoff().
   */
 int
 __dlpi_promiscoff_r(dlpi_handle_t dh, uint level)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_promiscoff(dh, level);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_promiscoff(dlpi_handle_t dh, uint level)
   * @param dh the link.
   * @param level the level.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_promiscoff_r().
   */
-__asm__(".symver __dlpi_promiscoff_r,dlpi_promiscoff@@DLPI_1.0");
+__asm__(".symver __dlpi_promiscoff_r,dlpi_promiscoff@@DLPI_1.1");
+
+/** @internal
+  * @brief turn promiscuous mode on for a link.
+  * @param dh the link.
+  * @param level the level.
+  *
+  * This version of the implemetnation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_promiscon(dlpi_handle_t dh, uint level)
+{
+	union DL_primitives prim;
+	struct strbuf ctrl;
+	int err;
+
+	switch (level) {
+	case DL_PROMISC_PHYS:
+	case DL_PROMISC_SAP:
+	case DL_PROMISC_MULTI:
+		break;
+	default:
+		return (DLPI_EINVAL);
+	}
+
+	prim.promiscon_req.dl_primitive = DL_PROMISCON_REQ;
+	prim.promiscon_req.dl_level = level;
+
+	ctrl.buf = (char *) &prim;
+	ctrl.len = sizeof(prim.promiscon_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, 0)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &prim;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(prim);
+
+	if (unlikely(__dlpi_getpri(dh, DL_PROMISCON_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+	return (DLPI_SUCCESS);
+}
 
 /** @brief turn promiscuous mode on for a link.
   * @param dh the link.
@@ -1581,28 +2541,65 @@ __asm__(".symver __dlpi_promiscoff_r,dlpi_promiscoff@@DLPI_1.0");
 int
 __dlpi_promiscon(dlpi_handle_t dh, uint level)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_promiscon(dh, level));
 }
 
 /** @brief The reentrant version of __dlpi_promiscon().
   * @param dh the link.
   * @param level the level.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_promiscon().
   */
 int
 __dlpi_promiscon_r(dlpi_handle_t dh, uint level)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_promiscon(dh, level);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_promiscon(dlpi_handle_t dh, uint level)
   * @param dh the link.
   * @param level the level.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_promiscon_r().
   */
-__asm__(".symver __dlpi_promiscon_r,dlpi_promiscon@@DLPI_1.0");
+__asm__(".symver __dlpi_promiscon_r,dlpi_promiscon@@DLPI_1.1");
+
+/** @internal
+  * @brief receive a message or callback.
+  * @param dh the link.
+  * @param saptr the source address buffer pointer.
+  * @param salen the length of the source address buffer (on call and return).
+  * @param buf the buffer for user data.
+  * @param buflen the length of the buffer for user data.
+  * @param recvp a pointer to a dlpi_recvinfo_t structure.
+  *
+  * This version of the implemetnation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait,
+	   dlpi_recvinfo_t * recvp)
+{
+	if (salen != NULL && (*salen < 0 || *salen > DLPI_PHYSADDR_MAX))
+		return (DLPI_EINVAL);
+	if (salen != NULL && *salen > 0 && saptr == NULL)
+		return (DLPI_EINVAL);
+	return (DLPI_FAILURE);
+}
 
 /** @brief receive a message or callback.
   * @param dh the link.
@@ -1616,6 +2613,11 @@ int
 __dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait,
 	    dlpi_recvinfo_t * recvp)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_recv(dh, saptr, salen, buf, buflen, wait, recvp));
 }
 
 /** @brief The reentrant version of __dlpi_recv().
@@ -1625,7 +2627,7 @@ __dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *bu
   * @param buf the buffer for user data.
   * @param buflen the length of the buffer for user data.
   * @param recvp a pointer to a dlpi_recvinfo_t structure.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_recv().
   */
@@ -1633,20 +2635,49 @@ int
 __dlpi_recv_r(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait,
 	      dlpi_recvinfo_t * recvp)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_hlduser(dh, &ret)) {
+		ret = _dlpi_recv(dh, saptr, salen, buf, buflen, wait, recvp);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
-/** @fn int dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait, dlpi_recvinfo_t * recvp)
+/** @fn int dlpi_recv(dlpi_handle_t dh, void **saptr, size_t *salen, void *buf, size_t *buflen, int wait, dlpi_recvinfo_t *recvp)
   * @param dh the link.
   * @param saptr the source address buffer pointer.
   * @param salen the length of the source address buffer (on call and return).
   * @param buf the buffer for user data.
   * @param buflen the length of the buffer for user data.
   * @param recvp a pointer to a dlpi_recvinfo_t structure.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_recv_r().
   */
-__asm__(".symver __dlpi_recv_r,dlpi_recv@@DLPI_1.0");
+__asm__(".symver __dlpi_recv_r,dlpi_recv@@DLPI_1.1");
+
+/** @internal
+  * @brief send message.
+  * @param daptr destination address pointer.
+  * @param dalen destination address length.
+  * @param buf message buffer.
+  * @param buflen message buffer lenght.
+  * @param sendp a pointer to a dlpi_sendinfo_t structure.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen,
+	   const dlpi_sendinfo_t * sendp)
+{
+	if (daptr == NULL || dalen < 0 || dalen > DLPI_PHYSADDR_MAX)
+		return (DLPI_EINVAL);
+	return (DLPI_FAILURE);
+}
 
 /** @brief send message.
   * @param daptr destination address pointer.
@@ -1659,6 +2690,11 @@ int
 __dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen,
 	    const dlpi_sendinfo_t * sendp)
 {
+	int err = DLPI_SUCCESS;
+
+	if (__dlpi_chkuser(dh, &err) == NULL)
+		return (err);
+	return (_dlpi_send(dh, daptr, dalen, buf, buflen, sendp));
 }
 
 /** @brief The reentrant version of __dlpi_send().
@@ -1667,7 +2703,7 @@ __dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, 
   * @param buf message buffer.
   * @param buflen message buffer lenght.
   * @param sendp a pointer to a dlpi_sendinfo_t structure.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_send().
   */
@@ -1675,6 +2711,15 @@ int
 __dlpi_send_r(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen,
 	      const dlpi_sendinfo_t * sendp)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_hlduser(dh, &ret)) {
+		ret = _dlpi_send(dh, daptr, dalen, buf, buflen, sendp);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_send(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf, size_t buflen, const dlpi_sendinfo_t *sendp)
@@ -1683,11 +2728,60 @@ __dlpi_send_r(dlpi_handle_t dh, const void *daptr, size_t dalen, const void *buf
   * @param buf message buffer.
   * @param buflen message buffer lenght.
   * @param sendp a pointer to a dlpi_sendinfo_t structure.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_send_r().
   */
-__asm__(".symver __dlpi_send_r,dlpi_send@@DLPI_1.0");
+__asm__(".symver __dlpi_send_r,dlpi_send@@DLPI_1.1");
+
+/** @internal
+  * @brief set a link physical address.
+  * @param dh the link.
+  * @param type the type of physical address.
+  * @param aptr the address pointer.
+  * @param alen the address length.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen)
+{
+	struct {
+		union DL_primitives prim;
+		unsigned char buffer[DLPI_PHYSADDR_MAX];
+	} buf;
+	struct strbuf ctrl;
+	int err;
+
+	if (unlikely(type != DL_CURR_PHYS_ADDR))
+		return (DLPI_EINVAL);
+	if (unlikely(aptr == NULL))
+		return (DLPI_EINVAL);
+	if (unlikely(alen == 0) || unlikely(alen > DLPI_PHYSADDR_MAX))
+		return (DLPI_EINVAL);
+
+	buf.prim.set_phys_addr_req.dl_primitive = DL_SET_PHYS_ADDR_REQ;
+	buf.prim.set_phys_addr_req.dl_addr_length = alen;
+	buf.prim.set_phys_addr_req.dl_addr_offset = sizeof(buf.prim.set_phys_addr_req);
+
+	bcopy(aptr, (unsigned char *) (&buf.prim.set_phys_addr_req + 1), alen);
+
+	ctrl.buf = (char *) &buf.prim;
+	ctrl.len = sizeof(buf.prim.set_phys_addr_req) + alen;
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, RS_HIPRI)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &buf;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(buf);
+
+	if (unlikely(__dlpi_getpri(dh, DL_SET_PHYS_ADDR_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+	return (DLPI_SUCCESS);
+}
 
 /** @brief set a link physical address.
   * @param dh the link.
@@ -1698,6 +2792,11 @@ __asm__(".symver __dlpi_send_r,dlpi_send@@DLPI_1.0");
 int
 __dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_set_physaddr(dh, type, aptr, alen));
 }
 
 /** @brief The reentrant version of __dlpi_set_physaddr().
@@ -1705,13 +2804,22 @@ __dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen)
   * @param type the type of physical address.
   * @param aptr the address pointer.
   * @param alen the address length.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_set_physaddr().
   */
 int
 __dlpi_set_physaddr_r(dlpi_handle_t dh, uint type, const void *aptr, size_t alen)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_set_physaddr(dh, type, aptr, alen);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_set_physaddr(dlpi_handle_t dh, uint type, const void *aptr, size_t alen)
@@ -1719,11 +2827,49 @@ __dlpi_set_physaddr_r(dlpi_handle_t dh, uint type, const void *aptr, size_t alen
   * @param type the type of physical address.
   * @param aptr the address pointer.
   * @param alen the address length.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_set_physaddr_r().
   */
-__asm__(".symver __dlpi_set_physaddr_r,dlpi_set_physaddr@@DLPI_1.0");
+__asm__(".symver __dlpi_set_physaddr_r,dlpi_set_physaddr@@DLPI_1.1");
+
+#ifndef DLPI_INF_TIMEOUT
+#define DLPI_INF_TIMEOUT -1
+#endif
+
+#ifndef DLPI_DEF_TIMEOUT
+#define DLPI_DEF_TIMEOUT -2
+#endif
+
+/** @internal
+  * @brief set a timeout.
+  * @param dh the link.
+  * @param seconds the seconds to wait.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_set_timeout(dlpi_handle_t dh, int seconds)
+{
+	switch (seconds) {
+	case 0:
+		dh->du_timeout = 0;	/* immediate */
+		break;
+	case -1:
+		dh->du_timeout = -1;	/* infinite */
+		break;
+	case -2:
+		dh->du_timeout = 100;	/* default */
+		break;
+	default:
+		if (seconds < -2)
+			return (DLPI_EINVAL);
+		dh->du_timeout = seconds * 1000;	/* make it millisecs */
+		break;
+	}
+	return (DLPI_SUCCESS);
+}
 
 /** @brief set a timeout.
   * @param dh the link.
@@ -1732,28 +2878,42 @@ __asm__(".symver __dlpi_set_physaddr_r,dlpi_set_physaddr@@DLPI_1.0");
 int
 __dlpi_set_timeout(dlpi_handle_t dh, int seconds)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_set_timeout(dh, seconds));
 }
 
 /** @brief The reentrant version of __dlpi_set_timeout().
   * @param dh the link.
   * @param seconds the seconds to wait.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_set_timeout().
   */
 int
 __dlpi_set_timeout_r(dlpi_handle_t dh, int seconds)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_set_timeout(dh, seconds);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_set_timeout(dlpi_handle_t dh, int seconds)
   * @param dh the link.
   * @param seconds the seconds to wait.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_set_timeout_r().
   */
-__asm__(".symver __dlpi_set_timeout_r,dlpi_set_timeout@@DLPI_1.0");
+__asm__(".symver __dlpi_set_timeout_r,dlpi_set_timeout@@DLPI_1.1");
 
 /* *INDENT-OFF* */
 const char *__dlpi_lib_errstr[] = {
@@ -1901,7 +3061,7 @@ TRANS  supplied to the dlpi_disabnotify() library call, the call returns this
 TRANS  error code.  See dlpi_disabnotify(3).
  */
 	[DLPI_ENOTEIDINVAL	- DLPI_SUCCESS] = gettext_noop("Invalid DLPI notification identifier"),
-}
+};
 /* *INDENT-ON* */
 
 /* *INDENT-OFF* */
@@ -2179,7 +3339,20 @@ TRANS  functioning DLS provider.  See DL_CONNECT_RES(7).
 };
 /* *INDENT-ON* */
 
-
+/** @brief provide a DLPI error string.
+  * @param error the error number.
+  */
+static const char *
+_dlpi_strerror(int error)
+{
+	if (error == DL_SYSERR)
+		return strerror(errno);
+	if (DLPI_SUCCESS <= error && error <= DLPI_ENOTEIDINVAL)
+		return __dlpi_lib_errstr[error];
+	if (0 <= error && error < 0x1c)
+		return __dlpi_std_errstr[error];
+	return ("Unknown DLPI error");
+}
 
 /** @brief provide a DLPI error string.
   * @param error the error number.
@@ -2187,42 +3360,60 @@ TRANS  functioning DLS provider.  See DL_CONNECT_RES(7).
 const char *
 __dlpi_strerror(int error)
 {
-	if (error == DL_SYSERR)
-		return strerror(errno);
-	if (DLPI_SUCCESS <= error && error < DLPI_ERRMAX)
-		return __dlpi_lib_errstr[error];
-	if (0 <= error && error < 0x1c)
-		return __dlpi_std_errstr[error];
-
+	return _dlpi_strerror(error);
 }
 
 /** @brief The reentrant version of __dlpi_strerror().
   * @param error the error number.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_strerror().
   */
 const char *
 __dlpi_strerror_r(int error)
 {
-	if (error == DL_SYSERR) {
-		switch (strerror_r(errno, __dlpi_get_tsd()->strbuf, BUFSIZ)) {
-		case EINVAL:
-		case ERANGE:
-		case 0:
-		}
-		return (__dlpi_get_tsd()->strbuf);
-	}
-
+	return _dlpi_strerror(error);
 }
 
 /** @fn const char *dlpi_strerror(int error)
   * @param error the error number.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_strerror_r().
   */
-__asm__(".symver __dlpi_strerror_r,dlpi_strerror@@DLPI_1.0");
+__asm__(".symver __dlpi_strerror_r,dlpi_strerror@@DLPI_1.1");
+
+/** @internal
+  * @brief unbind a link.
+  * @param dh the link to unbind.
+  *
+  * This version of the implementation does not need to check the validity of
+  * the DLPI handle.
+  */
+static int
+_dlpi_unbind(dlpi_handle_t dh)
+{
+	union DL_primitives prim;
+	struct strbuf ctrl;
+	int err;
+
+	prim.unbind_req.dl_primitive = DL_UNBIND_REQ;
+
+	ctrl.buf = (char *) &prim.unbind_req;
+	ctrl.len = sizeof(prim.unbind_req);
+	ctrl.maxlen = -1;
+
+	if (unlikely((err = __dlpi_putmsg(dh, &ctrl, NULL, 0)) != DLPI_SUCCESS))
+		return (err);
+
+	ctrl.buf = (char *) &prim;
+	ctrl.len = -1;
+	ctrl.maxlen = sizeof(prim);
+
+	if (unlikely(__dlpi_getpri(dh, DL_UNBIND_REQ, &ctrl) != DLPI_SUCCESS))
+		return (err);
+	return (DLPI_SUCCESS);
+}
 
 /** @brief unbind a link.
   * @param dh the link to unbind.
@@ -2230,26 +3421,52 @@ __asm__(".symver __dlpi_strerror_r,dlpi_strerror@@DLPI_1.0");
 int
 __dlpi_unbind(dlpi_handle_t dh)
 {
+	int err = DLPI_SUCCESS;
+
+	if (unlikely(__dlpi_chkuser(dh, &err) == NULL))
+		return (err);
+	return (_dlpi_unbind(dh));
 }
 
 /** @brief The reentrant version of __dlpi_unbind().
   * @param dh the link to unbind.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_unbind().
   */
 int
 __dlpi_unbind_r(dlpi_handle_t dh)
 {
+	int ret = DLPI_SUCCESS;
+
+	pthread_cleanup_push_defer_np(__dlpi_putuser, &dh);
+	if (__dlpi_getuser(dh, &ret)) {
+		ret = _dlpi_unbind(dh);
+		__dlpi_putuser(dh);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (ret);
 }
 
 /** @fn int dlpi_unbind(dlpi_handle_t dh)
   * @param dh the link to unbind.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_unbind_r().
   */
-__asm__(".symver __dlpi_unbind_r,dlpi_unbind@@DLPI_1.0");
+__asm__(".symver __dlpi_unbind_r,dlpi_unbind@@DLPI_1.1");
+
+/** @internal
+  * @brief walk the available links.
+  * @param fn callback function.
+  * @param arg argument for callback function.
+  * @param flags options flags.
+  */
+static void
+_dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags)
+{
+	return;
+}
 
 /** @brief walk the available links.
   * @param fn callback function.
@@ -2259,30 +3476,32 @@ __asm__(".symver __dlpi_unbind_r,dlpi_unbind@@DLPI_1.0");
 void
 __dlpi_walk(dlpi_walkfunc_t * fn, void *arg, uint flags)
 {
+	return _dlpi_walk(fn, arg, flags);
 }
 
 /** @brief The reentrant version of __dlpi_walk().
   * @param fn callback function.
   * @param arg argument for callback function.
   * @param flags options flags.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is an implementation of dlpi_walk().
   */
 void
 __dlpi_walk_r(dlpi_walkfunc_t * fn, void *arg, uint flags)
 {
+	return _dlpi_walk(fn, arg, flags);
 }
 
 /** @fn void dlpi_walk(dlpi_walkfunc_t *fn, void *arg, uint flags)
   * @param fn callback function.
   * @param arg argument for callback function.
   * @param flags options flags.
-  * @version DLPI_1.0
+  * @version DLPI_1.1
   * @par Alias:
   * This symbol is a strong alias of __dlpi_walk_r().
   */
-__asm__(".symver __dlpi_walk_r,dlpi_walk@@DLPI_1.0");
+__asm__(".symver __dlpi_walk_r,dlpi_walk@@DLPI_1.1");
 
 /* @} */
 

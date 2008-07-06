@@ -1,3 +1,63 @@
+2008-07-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release file
+	* NEWS: updated release file
+	* README: updated release file
+	* README-cvs: updated release file
+	* THANKS: updated release file
+	* Makefile.am: added libraries
+	* configure.ac: used gettext
+	* strxns.spec.in: added libraries
+	* debian/rules.in: added libraries
+	* doc/man/strxns.refs: more references
+	* doc/man/man3/dlpi.3.man: completed manual page
+	* doc/man/man3/dlpi_arptype.3.man: completed manual page
+	* doc/man/man3/dlpi_bind.3.man: completed manual page
+	* doc/man/man3/dlpi_close.3.man: completed manual page
+	* doc/man/man3/dlpi_disabmulti.3.man: completed manual page
+	* doc/man/man3/dlpi_disabnotify.3.man: completed manual page
+	* doc/man/man3/dlpi_enabmulti.3.man: completed manual page
+	* doc/man/man3/dlpi_enabnotify.3.man: completed manual page
+	* doc/man/man3/dlpi_fd.3.man: completed manual page
+	* doc/man/man3/dlpi_get_physaddr.3.man: completed manual page
+	* doc/man/man3/dlpi_iftype.3.man: completed manual page
+	* doc/man/man3/dlpi_info.3.man: completed manual page
+	* doc/man/man3/dlpi_linkname.3.man: completed manual page
+	* doc/man/man3/dlpi_mactype.3.man: completed manual page
+	* doc/man/man3/dlpi_promiscoff.3.man: completed manual page
+	* doc/man/man3/dlpi_promiscon.3.man: completed manual page
+	* doc/man/man3/dlpi_send.3.man: completed manual page
+	* doc/man/man3/dlpi_set_physaddr.3.man: completed manual page
+	* doc/man/man3/dlpi_set_timeout.3.man: completed manual page
+	* doc/man/man3/dlpi_unbind.3.man: completed manual page
+	* doc/man/man7/DL_BIND_REQ.7.man: corrected manual page
+	* doc/man/man7/DL_PHYS_ADDR_ACK.7.man: corrected manual page
+	* doc/man/man7/DL_PHYS_ADDR_REQ.7.man: corrected manual page
+	* doc/man/man7/DL_SET_PHYS_ADDR_REQ.7.man: corrected manual page
+	* lib32/Makefile.am: added libraries
+	* m4/.cvsignore: updates
+	* src/.indent.pro: updates
+	* src/include/Makefile.am: added new header files
+	* src/include/cdiapi.h: updates
+	* src/include/dlpiapi.h: updates
+	* src/include/libdlpi.h: updates
+	* src/include/npiapi.h: updates
+	* src/include/sys/cdi.h: updates
+	* src/include/sys/dlpi.h: updates
+	* src/lib/cdiapi.c: working up implementation
+	* src/lib/dlpiapi.c: working up implementation
+	* src/lib/npiapi.c: working up implementation
+	* src/lib/libdlpi/dlpi.c: working up implementation
+
+2008-07-05  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* m4/gettext.m4: Upgrade to gettext-0.17.
+	* m4/iconv.m4: Upgrade to gettext-0.17.
+	* m4/lib-link.m4: Upgrade to gettext-0.17.
+	* m4/po.m4: Upgrade to gettext-0.17.
+	* Makefile.am (ACLOCAL_AMFLAGS): New variable.
+	* configure.ac (AM_GNU_GETTEXT_VERSION): Bump to 0.17.
+
 2008-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* po/.cvsignore: added po files for gettext
