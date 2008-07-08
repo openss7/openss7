@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdiapi.h,v 0.9.2.5 2008-07-06 14:58:20 brian Exp $
+ @(#) $Id: cdiapi.h,v 0.9.2.6 2008/07/08 16:57:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
+ Last Modified $Date: 2008/07/08 16:57:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdiapi.h,v $
+ Revision 0.9.2.6  2008/07/08 16:57:32  brian
+ - updated libraries and manual pages
+
  Revision 0.9.2.5  2008-07-06 14:58:20  brian
  - improvements
 
@@ -71,7 +74,7 @@
 #ifndef __CDIAPI_H__
 #define __CDIAPI_H__
 
-#ident "@(#) $RCSfile: cdiapi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cdiapi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include <sys/cdi.h>
 
@@ -111,43 +114,50 @@ extern unsigned char *_cdi_ctl_buf(void);
 #define CDI_LOG_VERBOSE		(1<<9)
 #define CDI_LOG_DEFAULT		(CDI_LOG_FILE|CDI_LOG_STDERR|CDI_LOG_ERRORS)
 
+extern int *_cerrno(void);
+#define cerrno (*(_cerrno()))
+
 #ifdef __BEGIN_DECLS
 __BEGIN_DECLS
 #endif
-extern int cdi_allow_input_req(int fid, int *state_ptr);
-extern int cdi_attach_req(int fid, long ppa, int *state_ptr);
-extern void cid_decode_ctl(char *p);
+extern int cdi_allow_input_req(int fd, int *state_ptr);
+extern int cdi_attach_req(int fd, long ppa, int *state_ptr);
+extern int cdi_close(int fd);
+extern void cdi_decode_ctl(char *p);
 extern char *cdi_decode_modem_sigs(unsigned sigs);
-extern int cdi_detach_req(int fid, int *state_ptr);
-extern int cdi_disable_req(int fid, unsigned long disposal, int *state_ptr);
-extern int cdi_enable_req(int fid, int *state_ptr);
-extern int cdi_get_a_msg(int fid, char *buf, int size);
-extern int cdi_get_modem_sigs(int fid, int flag);
+extern int cdi_detach_req(int fd, int *state_ptr);
+extern int cdi_dial_req(int fd, unsigned int ppa, unsigned int sigs, char *dial_string, int dial_length);
+extern int cdi_disable_req(int fd, unsigned long disposal, int *state_ptr);
+extern int cdi_enable_req(int fd, int *state_ptr);
+extern int cdi_get_a_msg(int fd, char *buf, int size);
+extern int cdi_get_modem_sigs(int fd, int flag);
 extern int cdi_init(int log_optns, char *log_name);
 extern int cdi_init_FILE(int log_optns, FILE * filestream);
-extern int cdi_modem_sig_poll(int fid);
-extern int cdi_modem_sig_req(int fid, unsigned sigs);
+extern int cdi_modem_sig_poll(int fd);
+extern int cdi_modem_sig_req(int fd, unsigned sigs);
 extern int cdi_open_data(void);
-extern int cdi_perror(char *msg);
+extern int cdi_open(char *hostname);
+extern void cdi_perror(char *msg);
 extern int cdi_printf(char *fmt, ...);
 extern void cdi_print_msg(unsigned char *p, unsigned n, int indent);
-extern int cdi_put_allow_input_req(int fid);
-extern int cdi_put_attach_req(int fid, long ppa);
-extern int cdi_put_both(int fid, char *header, int hdr_length, char *data_ptr, int data_length,
+extern int cdi_put_allow_input_req(int fd);
+extern int cdi_put_attach_req(int fd, long ppa);
+extern int cdi_put_both(int fd, char *header, int hdr_length, char *data_ptr, int data_length,
 			int flags);
-extern int cdi_put_data(int fid, char *data_ptr, int length, long flags);
-extern int cdi_put_detach_req(int fid);
-extern int cdi_put_disable_req(int fid, unsigned long disposal);
-extern int cdi_put_enable_req(int fid);
-extern int cdi_put_frame(int fid, unsigned char address, unsigned char control, unsigned char *ptr,
+extern int cdi_put_data(int fd, char *data_ptr, int length, long flags);
+extern int cdi_put_detach_req(int fd);
+extern int cdi_put_dial_req(int fd, char *dial_string, int dial_length);
+extern int cdi_put_disable_req(int fd, unsigned long disposal);
+extern int cdi_put_enable_req(int fd);
+extern int cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned char *ptr,
 			 int count);
 extern int cdi_put_proto(int cid, int length, long flags);
-extern int cdi_rcv_msg(int fid, char *data_ptr, int bfr_len, long flags);
+extern int cdi_rcv_msg(int fd, char *data_ptr, int bfr_len, long flags);
 extern int cdi_read_data(int cdi_data, char *buf, int cnt);
 extern int cdi_set_log_size(long nbytes);
-extern int cdi_wait_ack(int fid, unsigned long primitive, int *state_ptr);
+extern int cdi_wait_ack(int fd, unsigned long primitive, int *state_ptr);
 extern int cdi_write_data(int cdi_data, char *buf, int cnt);
-extern int cdi_xray_req(int fid, int upa, int on_off, int hi_wat, int lo_wat);
+extern int cdi_xray_req(int fd, int upa, int on_off, int hi_wat, int lo_wat);
 
 #ifdef __END_DECLS
 __END_DECLS

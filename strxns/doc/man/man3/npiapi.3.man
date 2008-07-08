@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npiapi.3.man,v 0.9.2.1 2008-07-01 11:50:56 brian Exp $
+.\" @(#) $Id: npiapi.3.man,v 0.9.2.2 2008/07/08 16:57:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:56 $ by $Author: brian $
+.\" Last Modified $Date: 2008/07/08 16:57:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npiapi.3.man,v $
+.\" Revision 0.9.2.2  2008/07/08 16:57:28  brian
+.\" - updated libraries and manual pages
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:56  brian
 .\" - added manual pages and library implementation
 .\"
@@ -107,6 +110,8 @@ the
 .\"
 .\"
 .SH SYNOPSIS
+.ad l
+.nh
 .PP
 .B #include <sys/types.h>
 .br
@@ -117,6 +122,154 @@ the
 .B #include <sys/npi.h>
 .br
 .B #include <npiapi.h>
+.HP
+\fBchar *npi_ascii_facil\fP(\fBint\fP\ \fIfref\fP, \fBchar\ *\fP\fIfval\fP, \fBunsigned\ int\fP\ \fIflgth\fP, \fBint\fP\ \fImarker\fP);
+.PD 0
+.HP
+\fBint npi_bind_ascii_nsap\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIbind_ascii_nsap\fP, \fBint\fP\ \fIconind_nr\fP, \fBunsigned\fP\ \fIflags\fP);
+.HP
+\fBint npi_bind_nsap\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIbind_sap\fP, \fBint\fP\ \fInsap_lgth\fP, \fBint\fP\ \fIconind_nr\fP, \fBunsigned\fP\ \fIflags\fP);
+.HP
+\fBint npi_conn_res\fP(\fBint\fP\ \fInpi_data\fP, \fBN_conn_ind_t\ *\fP\fIc\fP, \fBlong\fP\ \fItknval\fP);
+.HP
+\fBint npi_connect\fP(\fBchar\ *\fP\fIremote_asp\fP, \fBunsigned\fP\ \fIbind_flags\fP);
+.HP
+\fBint npi_connect_req\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIpeer_sap\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP);
+.HP
+\fBint npi_connect_wait\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_datack_req\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBvoid npi_decode_ctl\fP(\fBchar\ *\fP\fIp\fP);
+.HP
+\fBchar *npi_decode_primitive\fP(\fBlong\fP\ \fIprimitive\fP);
+.HP
+\fBchar *npi_decode_reason\fP(\fBlong\fP\ \fIreason\fP);
+.HP
+\fBint npi_discon_req\fP(\fBint\fP\ \fInpi_data\fP, \fBint\fP\ \fIreason\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP);
+.HP
+\fBint npi_discon_req_seq\fP(\fBint\fP\ \fInpi_data\fP, \fBint\fP\ \fIreason\fP, \fBlong\fP\ \fIseq\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP);
+.HP
+\fBint npi_ext_bind_nsap\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fInsap\fP, \fBint\fP\ \fInsap_lgth\fP, \fBchar\ *\fP\fIrem_nsap\fP, \fBint\fP\ \fIrem_lgth\fP, \fBlong\fP\ \fIlpa\fP, \fBint\fP\ \fIconind_nr\fP, \fBunsigned\ int\fP\ \fIflags\fP);
+.HP
+\fBint npi_ext_bind_nsap_ascii\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fInsap\fP, \fBchar\ *\fP\fIrem_nsap\fP, \fBlong\fP\ \fIlpa\fP, \fBint\fP\ \fIconind_nr\fP, \fBunsigned\ int\fP\ \fIflags\fP);
+.HP
+\fBint npi_ext_connect_req\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIpeer_sap\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP);
+.HP
+\fBint npi_ext_connect_wait\fP(\fBint\fP\ \fIlisten_fid\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP);
+.HP
+\fBint npi_ext_conn_res\fP(\fBint\fP\ \fInpi_data\fP, \fBN_conn_ind_t\ *\fP\fIc\fP, \fBlong\fP\ \fItknval\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP);
+.HP
+\fBint npi_ext_listen\fP(\fBchar\ *\fP\fInsap\fP, \fBunsigned\ int\fP\ \fIfork_optns\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP);
+.HP
+\fBint npi_ext_nbio_complete_listen\fP(\fBint\fP\ \fIlisten_fid\fP, \fBint\fP\ \fIoptions\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP);
+.HP
+\fBint npi_fac_walk\fP(\fBchar\ *\fP\fIfacp\fP, \fBunsigned\ int\fP\ \fIfacl\fP, \fBfacil_proc_t\ *\fP\fIfcn\fP);
+.HP
+\fBint npi_flags_connect_wait\fP(\fBint\fP\ \fIlisten_fid\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP, \fBint\fP\ \fIbind_flags\fP);
+.HP
+\fBint npi_flags_listen\fP(\fBchar\ *\fP\fInsap\fP, \fBunsigned\ int\fP\ \fIfork_optns\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP, \fBint\fP\ \fIbind_flags\fP);
+.HP
+\fBint npi_flow_req\fP(\fBint\fP\ \fInpi_data\fP, \fBunsigned\ long\fP\ \fIflow_incr\fP);
+.HP
+\fBint npi_get_a_msg\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP);
+.HP
+\fBint npi_get_a_proto\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_get_and_log_facils\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_get_facils\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP);
+.HP
+\fBint npi_info_req\fP(\fBint\fP\ \fIstrm\fP);
+.HP
+\fBint npi_init\fP(\fBunsigned\ int\fP\ \fIlog_optns\fP, \fBchar\ *\fP\fIlog_name\fP);
+.HP
+\fBint npi_init_FILE\fP(\fBunsigned\ int\fP\ \fIlog_optns\fP, \fBFILE\ *\fP\fIlog_FILE\fP);
+.HP
+\fBint npi_listen\fP(\fBchar\ *\fP\fInsap\fP, \fBunsigned\ int\fP\ \fIfork_optns\fP);
+.HP
+\fBint npi_max_sdu\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_nbio_complete_listen\fP(\fBint\fP\ \fIlisten_fd\fP, \fBint\fP\ \fIoptions\fP);
+.HP
+\fBint npi_open_data\fP(\fBvoid\fP);
+.HP
+\fBvoid npi_perror\fP(\fBchar\ *\fP\fImsg\fP);
+.HP
+\fBvoid npi_print_msg\fP(\fBunsigned\ char\ *\fP\fIp\fP, \fBunsigned\fP\ \fIn\fP, \fBint\fP\ \fIindent\fP);
+.HP
+\fBvoid npi_printf\fP(\fBchar\ *\fP\fIfmt\fP, \fB...\fP);
+.HP
+\fBint npi_put_data_buf\fP(\fBint\fP\ \fInpi_data\fP, \fBint\fP\ \fIlgth\fP);
+.HP
+\fBint npi_put_data_proto\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIdata_ptr\fP, \fBint\fP\ \fIdata_lgth\fP, \fBlong\fP\ \fIflags\fP);
+.HP
+\fBint npi_put_exdata_proto(int\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIdata_ptr\fP, \fBint\fP\ \fIdata_lgth\fP);
+.HP
+\fBint npi_put_proto\fP(\fBint\fP\ \fInpi_data\fP, \fBint\fP\ \fIlgth\fP);
+.HP
+\fBint npi_rcv\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP, \fBlong\fP\ \fIflags_in\fP, \fBlong\ *\fP\fIflags_out\fP);
+.HP
+\fBint npi_read_data\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP);
+.HP
+\fBint npi_reset_req\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_reset_res\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_send_connect_req\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIpeer_sap\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP);
+.HP
+\fBint npi_send_ext_connect_req\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIpeer_sap\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP, \fBchar\ *\fP\fIfac_ptr\fP, \fBint\fP\ \fIfac_cnt\fP);
+.HP
+\fBint npi_send_info_req\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_send_reset_req\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_send_reset_res\fP(\fBint\fP\ \fInpi_data\fP);
+.HP
+\fBint npi_set_log_size\fP(\fBlong\fP\ \fInbytes\fP);
+.HP
+\fBint npi_set_marks\fP(\fBint\fP\ \fIfid\fP, \fBunsigned\ int\fP\ \fIrd_lo_make\fP, \fBunsigned\ int\fP\ \fIrd_hi_mark\fP, \fBunsigned\ int\fP\ \fIwr_lo_mark\fP, \fBunsigned\ int\fP\ \fIwr_hi_mark\fP);
+.HP
+\fBint npi_set_pid\fP(\fBint\fP\ \fIfid\fP);
+.HP
+\fBint npi_set_signal_handling\fP(\fBint\fP\ \fIfid\fP, \fBnpi_sig_func_t\fP\ \fIfunc\fP, \fBint\fP\ \fIsig_num\fP, \fBint\fP\ \fIprimitive_mask\fP);
+.HP
+\fBint npi_want_a_proto\fP(\fBint\fP\ \fInpi_data\fP, \fBint\fP\ \fIproto_type\fP);
+.HP
+\fBint npi_write_data\fP(\fBint\fP\ \fInpi_data\fP, \fBchar\ *\fP\fIbuf\fP, \fBint\fP\ \fIcnt\fP);
+.HP
+\fBchar *npi_x25_clear_cause\fP(\fBint\fP\ \fIcause\fP);
+.HP
+\fBchar *npi_x25_diagnostic\fP(\fBint\fP\ \fIdiagnostic\fP);
+.HP
+\fBchar *npi_x25_registration_cause\fP(\fBint\fP\ \fIcause\fP);
+.HP
+\fBchar *npi_x25_reset_cause\fP(\fBint\fP\ \fIcause\fP);
+.HP
+\fBchar *npi_x25_restart_cause\fP(\fBint\fP\ \fIcause\fP);
+.HP
+\fBint put_npi_proto\fP(\fBint\fP\ \fIfid\fP, \fBint\fP\ \fIlen\fP);
+.HP
+\fBchar *pu_decode_handle\fP(\fBunsigned\ long\fP\ \fIpu_handle\fP);
+.HP
+\fBint pu_dlpi_upa\fP(\fBint\fP\ \fIboard\fP, \fBint\fP\ \fIport\fP, \fBint\fP\ \fIstation\fP, \fBint\ *\fP\fIupa_ptr\fP);
+.HP
+\fBint pu_get_pu_id\fP(\fBint\fP\ \fIboard\fP, \fBint\fP\ \fIport\fP, \fBint\fP\ \fIstation\fP, \fBint\ *\fP\fIpu_id_ptr\fP, \fBunsigned\ long\ *\fP\fIpu_hndl_ptr\fP);
+.HP
+\fBint pu_get_stats\fP(\fBunsigned\ long\fP\ \fIpu_handle\fP, \fBint\fP\ \fIpu_id\fP, \fBint\ *\fP\fIpu_up_down_ptr\fP, \fBint\ *\fP\fIlink_state_ptr\fP, \fBint\ *\fP\fImodem_state_ptr\fP);
+.HP
+\fBint pu_get_board_info\fP(\fBunsigned\ long\fP\ \fIpu_handle\fP, \fBint\fP\ \fIpu_id\fP, \fBint\ *\fP\fIboard_ptr\fP, \fBint\ *\fP\fIport_ptr\fP);
+.HP
+\fBint pu_id_to_pu_handle\fP(\fBint\fP\ \fIpu_id\fP, \fBunsigned\ long\ *\fP\fIpu_handle_ptr\fP);
+.HP
+\fBint pu_id_to_pu_number\fP(\fBunsigned\ long\fP\ \fIpu_id\fP);
+.HP
+\fBint pu_map_npi_lpa_to_handle\fP(\fBint\fP\ \fInpi_lpa\fP, \fBint\ *\fP\fIpu_id_ptr\fP, \fBunsigned\ long\fP\ \fIhandle_ptr\fP);
+.HP
+\fBint pu_strerror\fP(\fBint\fP\ \fIpu_errnum\fP);
+.PD
+.ad b
+.hy
 .\"
 .\"
 .SH OVERVIEW
@@ -172,75 +325,75 @@ implements the following NPI API library functions:
 .TS
 tab(:);
 lb1c1lssss.
-npi_ascii_facil\fR(3):-:some laim ass description.
-npi_bind_ascii_nsap\fR(3):-:some laim ass description.
-npi_bind_nsap\fR(3):-:some laim ass description.
-npi_conenct\fR(3):-:some laim ass description.
-npi_connect_req\fR(3):-:some laim ass description.
-npi_connect_wait\fR(3):-:some laim ass description.
-npi_conn_res\fR(3):-:some laim ass description.
-npi_datack_req\fR(3):-:some laim ass description.
-npi_decode_ctl\fR(3):-:some laim ass description.
-npi_decode_primitive\fR(3):-:some laim ass description.
-npi_decode_reason\fR(3):-:some laim ass description.
-npi_discon_req\fR(3):-:some laim ass description.
-npi_discon_req_seq\fR(3):-:some laim ass description.
-npi_ext_bind_nsap\fR(3):-:some laim ass description.
-npi_ext_bind_nsap_ascii\fR(3):-:some laim ass description.
-npi_ext_connect_req\fR(3):-:some laim ass description.
-npi_ext_connect_wait\fR(3):-:some laim ass description.
-npi_ext_conn_res\fR(3):-:some laim ass description.
-npi_ext_listen\fR(3):-:some laim ass description.
-npi_ext_nbio_complete_listen\fR(3):-:some laim ass description.
-npi_fac_walk\fR(3):-:some laim ass description.
-npi_flags_connect_wait\fR(3):-:some laim ass description.
-npi_flags_listen\fR(3):-:some laim ass description.
-npi_flow_req\fR(3):-:some laim ass description.
-npi_get_a_msg\fR(3):-:some laim ass description.
-npi_get_and_log_facils\fR(3):-:some laim ass description.
-npi_get_a_proto\fR(3):-:some laim ass description.
-npi_get_facils\fR(3):-:some laim ass description.
-npi_info_req\fR(3):-:some laim ass description.
-npi_init\fR(3):-:some laim ass description.
-npi_init_FILE\fR(3):-:some laim ass description.
-npi_listen\fR(3):-:some laim ass description.
-npi_max_sdu\fR(3):-:some laim ass description.
-npi_nbio_complete_listen\fR(3):-:some laim ass description.
-npi_open_data\fR(3):-:some laim ass description.
-npi_perror\fR(3):-:some laim ass description.
-npi_printf\fR(3):-:some laim ass description.
-npi_print_msg\fR(3):-:some laim ass description.
-npi_put_data_buf\fR(3):-:some laim ass description.
-npi_put_data_proto\fR(3):-:some laim ass description.
-npi_put_proto\fR(3):-:some laim ass description.
-npi_rcv\fR(3):-:some laim ass description.
-npi_read_data\fR(3):-:some laim ass description.
-npi_reset_req\fR(3):-:some laim ass description.
-npi_reset_res\fR(3):-:some laim ass description.
-npi_send_connect_req\fR(3):-:some laim ass description.
-npi_send_ext_connect_req\fR(3):-:some laim ass description.
-npi_send_info_req\fR(3):-:some laim ass description.
-npi_send_reset_req\fR(3):-:some laim ass description.
-npi_set_log_size\fR(3):-:some laim ass description.
-npi_set_marks\fR(3):-:some laim ass description.
-npi_set_pid\fR(3):-:some laim ass description.
-npi_set_signal_handling\fR(3):-:some laim ass description.
-npi_want_a_proto\fR(3):-:some laim ass description.
-npi_write_data\fR(3):-:some laim ass description.
-npi_x25_clear_cause\fR(3):-:some laim ass description.
-npi_x25_diagnostic\fR(3):-:some laim ass description.
-npi_x25_reset_cause\fR(3):-:some laim ass description.
-npi_x25_restart_cause\fR(3):-:some laim ass description.
-put_npi_proto\fR(3):-:some laim ass description.
-pu_decode_handle\fR(3):-:some laim ass description.
-pu_dlpi_upa\fR(3):-:some laim ass description.
-pu_get_board_info\fR(3):-:some laim ass description.
-pu_get_pu_id\fR(3):-:some laim ass description.
-pu_get_stats\fR(3):-:some laim ass description.
-pu_id_to_pu_handle\fR(3):-:some laim ass description.
-pu_id_to_pu_number\fR(3):-:some laim ass description.
-pu_map_npi_lpa_to_handle\fR(3):-:some laim ass description.
-pu_strerror\fR(3):-:some laim ass description.
+npi_ascii_facil\fR(3):-:some description.
+npi_bind_ascii_nsap\fR(3):-:some description.
+npi_bind_nsap\fR(3):-:some description.
+npi_conenct\fR(3):-:some description.
+npi_connect_req\fR(3):-:some description.
+npi_connect_wait\fR(3):-:some description.
+npi_conn_res\fR(3):-:some description.
+npi_datack_req\fR(3):-:some description.
+npi_decode_ctl\fR(3):-:some description.
+npi_decode_primitive\fR(3):-:some description.
+npi_decode_reason\fR(3):-:some description.
+npi_discon_req\fR(3):-:some description.
+npi_discon_req_seq\fR(3):-:some description.
+npi_ext_bind_nsap\fR(3):-:some description.
+npi_ext_bind_nsap_ascii\fR(3):-:some description.
+npi_ext_connect_req\fR(3):-:some description.
+npi_ext_connect_wait\fR(3):-:some description.
+npi_ext_conn_res\fR(3):-:some description.
+npi_ext_listen\fR(3):-:some description.
+npi_ext_nbio_complete_listen\fR(3):-:some description.
+npi_fac_walk\fR(3):-:some description.
+npi_flags_connect_wait\fR(3):-:some description.
+npi_flags_listen\fR(3):-:some description.
+npi_flow_req\fR(3):-:some description.
+npi_get_a_msg\fR(3):-:some description.
+npi_get_and_log_facils\fR(3):-:some description.
+npi_get_a_proto\fR(3):-:some description.
+npi_get_facils\fR(3):-:some description.
+npi_info_req\fR(3):-:some description.
+npi_init\fR(3):-:some description.
+npi_init_FILE\fR(3):-:some description.
+npi_listen\fR(3):-:some description.
+npi_max_sdu\fR(3):-:some description.
+npi_nbio_complete_listen\fR(3):-:some description.
+npi_open_data\fR(3):-:some description.
+npi_perror\fR(3):-:some description.
+npi_printf\fR(3):-:some description.
+npi_print_msg\fR(3):-:some description.
+npi_put_data_buf\fR(3):-:some description.
+npi_put_data_proto\fR(3):-:some description.
+npi_put_proto\fR(3):-:some description.
+npi_rcv\fR(3):-:some description.
+npi_read_data\fR(3):-:some description.
+npi_reset_req\fR(3):-:some description.
+npi_reset_res\fR(3):-:some description.
+npi_send_connect_req\fR(3):-:some description.
+npi_send_ext_connect_req\fR(3):-:some description.
+npi_send_info_req\fR(3):-:some description.
+npi_send_reset_req\fR(3):-:some description.
+npi_set_log_size\fR(3):-:some description.
+npi_set_marks\fR(3):-:some description.
+npi_set_pid\fR(3):-:some description.
+npi_set_signal_handling\fR(3):-:some description.
+npi_want_a_proto\fR(3):-:some description.
+npi_write_data\fR(3):-:some description.
+npi_x25_clear_cause\fR(3):-:some description.
+npi_x25_diagnostic\fR(3):-:some description.
+npi_x25_reset_cause\fR(3):-:some description.
+npi_x25_restart_cause\fR(3):-:some description.
+put_npi_proto\fR(3):-:some description.
+pu_decode_handle\fR(3):-:some description.
+pu_dlpi_upa\fR(3):-:some description.
+pu_get_board_info\fR(3):-:some description.
+pu_get_pu_id\fR(3):-:some description.
+pu_get_stats\fR(3):-:some description.
+pu_id_to_pu_handle\fR(3):-:some description.
+pu_id_to_pu_number\fR(3):-:some description.
+pu_map_npi_lpa_to_handle\fR(3):-:some description.
+pu_strerror\fR(3):-:some description.
 .TE
 .\"
 .\"
@@ -376,7 +529,7 @@ applications, drivers and modules to
 They are inherently non-portable.  These functions will be avoided by portable
 NPI application programs, drivers and modules.
 .IP \(em
-Binary compatibility is not attempted, only source compatiblity: any binary
+Binary compatibility is not attempted, only source compatibility: any binary
 compatibility experienced is coincidental and may change on a future release.
 .RS
 .PP

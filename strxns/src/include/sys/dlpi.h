@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.11 2008-07-06 14:58:20 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.12 2008/07/08 16:57:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
+ Last Modified $Date: 2008/07/08 16:57:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.h,v $
+ Revision 0.9.2.12  2008/07/08 16:57:32  brian
+ - updated libraries and manual pages
+
  Revision 0.9.2.11  2008-07-06 14:58:20  brian
  - improvements
 
@@ -77,7 +80,7 @@
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -1181,12 +1184,12 @@ union DL_primitives {
 	dl_aggr_req_t aggr_req;
 	dl_aggr_ind_t aggr_ind;
 	dl_unaggr_req_t unaggr_req;
-	dl_capability_req_t capabiltiy_req;
-	dl_capability_ack_t capabiltiy_ack;
+	dl_capability_req_t capability_req;
+	dl_capability_ack_t capability_ack;
 	dl_control_req_t control_req;
 	dl_control_ack_t control_ack;
 	dl_passive_req_t passive_req;
-	dl_intr_mode_req_t intr_mod_req;
+	dl_intr_mode_req_t intr_mode_req;
 #endif					/* _SUN_SOURCE */
 #ifdef _HPUX_SOURCE
 	dl_hp_ppa_req_t ppa_req;

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_send.3.man,v 0.9.2.2 2008-07-06 14:58:18 brian Exp $
+.\" @(#) $Id: dlpi_send.3.man,v 0.9.2.3 2008/07/08 16:57:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-06 14:58:18 $ by $Author: brian $
+.\" Last Modified $Date: 2008/07/08 16:57:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_send.3.man,v $
+.\" Revision 0.9.2.3  2008/07/08 16:57:20  brian
+.\" - updated libraries and manual pages
+.\"
 .\" Revision 0.9.2.2  2008-07-06 14:58:18  brian
 .\" - improvements
 .\"
@@ -291,10 +294,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES

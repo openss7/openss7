@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: npi_x25_restart_cause.3.man,v 0.9.2.1 2008-07-01 11:50:57 brian Exp $
+.\" @(#) $Id: npi_x25_restart_cause.3.man,v 0.9.2.2 2008/07/08 16:57:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:57 $ by $Author: brian $
+.\" Last Modified $Date: 2008/07/08 16:57:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_x25_restart_cause.3.man,v $
+.\" Revision 0.9.2.2  2008/07/08 16:57:28  brian
+.\" - updated libraries and manual pages
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:57  brian
 .\" - added manual pages and library implementation
 .\"
@@ -145,6 +148,9 @@ function.
 .PP
 .B npi_x25_restart_cause
 is fully thread-safe.
+What is described as global variables are in fact thread-specific data when
+linked with
+.BR libpthread .
 .\"
 .\"
 .SH RETURN
@@ -200,10 +206,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES
@@ -263,7 +265,7 @@ software to
 They are inherently non-portable.  These functions will be avoided by portable
 NPI programs.
 .IP \(em
-Binary compatibility is not attempted, only source compatiblity: any binary
+Binary compatibility is not attempted, only source compatibility: any binary
 compatibility experienced is coincidental and may change on a future release.
 It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
 share definitions with the NPI API library using

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-06 14:58:21 $
+ @(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/07/08 16:57:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-06 14:58:21 $ by $Author: brian $
+ Last Modified $Date: 2008/07/08 16:57:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdiapi.c,v $
+ Revision 0.9.2.6  2008/07/08 16:57:33  brian
+ - updated libraries and manual pages
+
  Revision 0.9.2.5  2008-07-06 14:58:21  brian
  - improvements
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-06 14:58:21 $"
+#ident "@(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/07/08 16:57:33 $"
 
 static char const ident[] =
-    "$RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-06 14:58:21 $";
+    "$RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/07/08 16:57:33 $";
 
 /*
  * This is an OpenSS7 implementation of the GCOM cdiapi library.  It builds
@@ -161,8 +164,8 @@ static char const ident[] =
 /** @brief thread-specific data.
   */
 struct __cdi_tsd {
-	int cerrno;
-	unsigned char strbuf[BUFSIZ]; /* string buffer */
+	int _cerrno;
+	unsigned char strbuf[BUFSIZ];	/* string buffer */
 	int data_cnt;
 	int ctl_cnt;
 	unsigned char data_buf[CDI_DATA_BUF_SIZE];
@@ -212,7 +215,7 @@ __cdi_get_tsd(void)
 __hot int *
 __cdi__cerrno(void)
 {
-	return (&__cdi_get_tsd()->cerrno);
+	return (&__cdi_get_tsd()->_cerrno);
 }
 
 /** @fn int *_cerrno(void)
@@ -230,11 +233,289 @@ __cdi__cerrno(void)
   */
 __asm__(".symver __cdi__cerrno,_cerrno@@CDIAPI_1.0");
 
+#ifndef cerrno
+#define cerrno (*(_cerrno()))
+#endif
+
+struct __cdi_user {
+	pthread_rwlock_t cu_lock;
+	int cu_fd;
+};
+
+static struct __cdi_user *__cdi_fds[OPEN_MAX] = { NULL, };
+
+static pthread_rwlock_t __cdi_fd_lock = PTHREAD_RWLOCK_INITIALIZER;
+
+static inline int
+__cdi_lock_init(pthread_rwlock_t *rwlock)
+{
+	return pthread_rwlock_init(rwlock, NULL);
+}
+static inline int
+__cdi_lock_rdlock(pthread_rwlock_t *rwlock)
+{
+	return pthread_rwlock_rdlock(rwlock);
+}
+
+static inline int
+__cdi_lock_wrlock(pthread_rwlock_t *rwlock)
+{
+	return pthread_rwlock_wrlock(rwlock);
+}
+
+static inline void
+__cdi_lock_unlock(pthread_rwlock_t *rwlock)
+{
+	pthread_rwlock_unlock(rwlock);
+}
+static inline int
+__cdi_lock_destroy(pthread_rwlock_t *rwlock)
+{
+	return pthread_rwlock_destroy(rwlock);
+}
+static inline int
+__cdi_list_rdlock(void)
+{
+	return __cdi_lock_rdlock(&__cdi_fd_lock);
+}
+static inline int
+__cdi_list_wrlock(void)
+{
+	return __cdi_lock_wrlock(&__cdi_fd_lock);
+}
+static void
+__cdi_list_unlock(void *ignore)
+{
+	return __cdi_lock_unlock(&__cdi_fd_lock);
+}
+static inline int
+__cdi_user_destroy(int fd)
+{
+	struct __cdi_user *cu;
+	int err;
+
+	if (unlikely((cu = __cdi_fds[fd]) == NULL)) {
+		errno = ENXIO;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (unlikely((err = __cdi_lock_destroy(&cu->cu_lock)) != 0)) {
+		errno = err;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	__cdi_fds[fd] = NULL;
+	free(cu);
+	return (0);
+}
+static inline struct __cdi_user *
+__cdi_user_init(int fd)
+{
+	struct __cdi_user *cu;
+	int err;
+
+	if (unlikely((cu = (struct __cdi_user *) malloc(sizeof(*cu))) == NULL)) {
+		cerrno = CD_SYSERR;
+		return (cu);
+	}
+	memset(cu, 0, sizeof(*cu));
+	if (unlikely((err = __cdi_lock_init(&cu->cu_lock)) != 0)) {
+		free(cu);
+		errno = err;
+		cerrno = CD_SYSERR;
+		return (NULL);
+	}
+	/** At one the CDI API library did not have a
+	  * cdi_close() function, meaning that some older
+	  * applications programs might just do a close(2s) on
+	  * an existing Stream.
+	  */
+	if (unlikely(__cdi_fds[fd] != NULL))
+		__cdi_user_destroy(fd);
+	cu->cu_fd = fd;
+	__cdi_fds[fd] = cu;
+	return (cu);
+}
+static inline int
+__cdi_user_rdlock(struct __cdi_user *cu)
+{
+	return __cdi_lock_rdlock(&cu->cu_lock);
+}
+static inline int
+__cdi_user_wrlock(struct __cdi_user *cu)
+{
+	return __cdi_lock_wrlock(&cu->cu_lock);
+}
+static inline void
+__cdi_user_unlock(struct __cdi_user *cu)
+{
+	return __cdi_lock_unlock(&cu->cu_lock);
+}
+
+static int __cdi_initialized = 0;
+
+/* Forward declarations of internal functions. */
+static __hot void __cdi_putuser(void *arg);
+static __hot int __cdi_getuser(int fd);
+static __hot int __cdi_hlduser(int fd);
+static __hot int __cdi_chkuser(int fd);
+
+/** @internal
+  * @brief release a user whether held or got.
+  * @param arg argument.
+  */
+static __hot void
+__cdi_putuser(void *arg)
+{
+	int fd = *(int *) arg;
+	struct __cdi_user *cu = __cdi_fds[fd];
+
+	(void) __cdi_putuser;
+	__cdi_user_unlock(cu);
+	__cdi_list_unlock(NULL);
+	return;
+}
+
+/** @internal
+  * @brief Get a write locked data link user structure.
+  * @param fd the file descriptor for which to get the associated data link.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  In addition, this function
+  * takes the necessary locks for thread-safe write operation.
+  *
+  * [EAGAIN] the number of read locks on the list is excessive.
+  * [EDEADLK] the list of fd lock is already held by the calling thread.
+  */
+static __hot int
+__cdi_getuser(int fd)
+{
+	struct __cdi_user *cu;
+	int err;
+
+	(void) __cdi_getuser;
+	if (unlikely(__cdi_initialized == 0))
+		goto uninit;
+	if (unlikely((err = __cdi_list_rdlock())))
+		goto list_lock_error;
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
+		goto ebadf;
+	if (unlikely((cu = __cdi_fds[fd]) == NULL))
+		goto ebadf;
+	if (unlikely((err = __cdi_user_wrlock(cu))))
+		goto user_lock_error;
+	return (0);
+      user_lock_error:
+	__cdi_list_unlock(NULL);
+	errno = err;
+	goto error;
+      ebadf:
+	errno = EBADF;
+	goto error;
+      list_lock_error:
+	errno = err;
+	goto error;
+      uninit:
+	errno = ELIBACC;	/* XXX */
+	goto error;
+      error:
+	cerrno = CD_SYSERR;
+	return (-1);
+}
+
+/** @internal
+  * @brief Get a read locked data link user structure.
+  * @param fd the file descriptor for which to get the associated data link.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  In addition, this function
+  * takes the necessary locks for thread-safe write operation.
+  *
+  * [EAGAIN] the number of read locks on the list is excessive.
+  * [EDEADLK] the list of fd lock is already held by the calling thread.
+  */
+static __hot int
+__cdi_hlduser(int fd)
+{
+	struct __cdi_user *cu;
+	int err;
+
+	(void) __cdi_hlduser;
+	if (unlikely(__cdi_initialized == 0))
+		goto uninit;
+	if (unlikely((err = __cdi_list_rdlock())))
+		goto list_lock_error;
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
+		goto ebadf;
+	if (unlikely((cu = __cdi_fds[fd]) == NULL))
+		goto ebadf;
+	if (unlikely((err = __cdi_user_rdlock(cu))))
+		goto user_lock_error;
+	return (0);
+      user_lock_error:
+	__cdi_list_unlock(NULL);
+	errno = err;
+	goto error;
+      ebadf:
+	errno = EBADF;
+	goto error;
+      list_lock_error:
+	errno = err;
+	goto error;
+      uninit:
+	errno = ELIBACC;	/* XXX */
+	goto error;
+      error:
+	cerrno = CD_SYSERR;
+	return (-1);
+}
+
+/** @internal
+  * @brief Check a data link user structure.
+  * @param fd the file descriptor for which to check the associated data link.
+  *
+  * This is a range-checked array lookup of the library user structure
+  * associated with the specified file descriptor.  This function takes no
+  * locks.  It is primarily called by the non-reentrant versions of the
+  * library functions.
+  */
+static __hot int
+__cdi_chkuser(int fd)
+{
+	struct __cdi_user *cu;
+
+	if (unlikely(__cdi_initialized == 0))
+		goto uninit;
+	if (unlikely(0 > fd) || unlikely(fd >= OPEN_MAX))
+		goto ebadf;
+	if (unlikely((cu = __cdi_fds[fd]) == NULL))
+		goto ebadf;
+	return (0);
+      ebadf:
+	errno = EBADF;
+	goto error;
+      uninit:
+	errno = ELIBACC;	/* XXX */
+	goto error;
+      error:
+	cerrno = CD_SYSERR;
+	return (-1);
+}
+
+/* These are the supposed global variables that are actually implemented as
+ * thread-specific data. */
+
+extern unsigned char *_cdi_ctl_buf(void);
+extern unsigned char *_cdi_data_buf(void);
+extern int *_cdi_ctl_cnt(void);
+extern int *_cdi_data_cnt(void);
+
 int *
 __cdi_data_cnt(void)
 {
 	return (&(__cdi_get_tsd()->data_cnt));
 }
+
 __asm__(".symver __cdi_data_cnt,_cdi_data_cnt@@CDIAPI_1.0");
 
 int *
@@ -242,6 +523,7 @@ __cdi_ctl_cnt(void)
 {
 	return (&(__cdi_get_tsd()->ctl_cnt));
 }
+
 __asm__(".symver __cdi_ctl_cnt,_cdi_ctl_cnt@@CDIAPI_1.0");
 
 unsigned char *
@@ -249,6 +531,7 @@ __cdi_data_buf(void)
 {
 	return (__cdi_get_tsd()->data_buf);
 }
+
 __asm__(".symver __cdi_data_buf,_cdi_data_buf@@CDIAPI_1.0");
 
 unsigned char *
@@ -256,82 +539,157 @@ __cdi_ctl_buf(void)
 {
 	return (__cdi_get_tsd()->ctl_buf);
 }
+
 __asm__(".symver __cdi_ctl_buf,_cdi_ctl_buf@@CDIAPI_1.0");
+
+static int __cdi_log_options = CDI_LOG_DEFAULT;
+
+/** @internal
+  * @brief perform putmsg() with CDI API errors.
+  * @param fd the CDI Stream.
+  * @param ctlp control part.
+  * @param datp data part.
+  * @param flag putmsg flag.
+  * @param flags retry on interrupt.
+  */
+static int
+__cdi_putmsg(int fd, struct strbuf *ctlp, struct strbuf *datp, int flag, int flags)
+{
+	int ret, save;
+
+	save = errno;
+	do {
+		if (likely((ret = putmsg(fd, ctlp, datp, flag)) >= 0)) {
+			errno = save;
+			return (ret);
+		}
+		if (!(flags & RetryOnSignal))
+			break;
+	} while (errno == EINTR || errno == ERESTART);
+	cerrno = CD_SYSERR;
+	return (-1);
+}
+
+/** @internal
+  * @brief put control and data
+  * @param fd the CDI Stream.
+  * @param ctrl_ptr control portion data buffer.
+  * @param ctrl_len length of control buffer.
+  * @param data_ptr data portion data buffer.
+  * @param data_len length of data buffer.
+  * @param flags retry on interrupt.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_both(int fd, char *ctrl_ptr, int ctrl_len, char *data_ptr, int data_len, int flags)
+{
+	struct strbuf ctrl, data, *ctl = NULL, *dat = NULL;
+
+	if (ctrl_len >= 0) {
+		ctrl.buf = ctrl_ptr;
+		ctrl.len = ctrl_len;
+		ctrl.maxlen = -1;
+		ctl = &ctrl;
+	}
+	if (data_len >= 0) {
+		data.buf = data_ptr;
+		data.len = data_len;
+		data.maxlen = -1;
+		dat = &data;
+	}
+	return __cdi_putmsg(fd, ctl, dat, 0, flags);
+}
 
 /** @brief put control and data
   * @param fd the CDI Stream.
   * @param ctrl_ptr control portion data buffer.
-  * @param ctrl_length length of control buffer.
+  * @param ctrl_len length of control buffer.
   * @param data_ptr data portion data buffer.
-  * @param data_length length of data buffer.
+  * @param data_len length of data buffer.
   * @param flags retry on interrupt.
   *
   * This is really just a ridiculous wrapper for putmsg(2s).
   */
 int
-__cdi_put_both(int fd, char *ctrl_ptr, int ctrl_length, char *data_ptr, int data_length, int flags)
+__cdi_put_both(int fd, char *ctrl_ptr, int ctrl_len, char *data_ptr, int data_len, int flags)
 {
-	struct strbuf ctrl, data, *ctl = NULL, *dat = NULL;
-	int ret;
+	int err;
 
-	if (ctrl_length >= 0) {
-		ctrl.buf = ctrl_ptr;
-		ctrl.len = ctrl_length;
-		ctrl.maxlen = -1;
-		ctl = &ctrl;
-	}
-	if (data_length >= 0) {
-		data.buf = data_ptr;
-		data.len = data_length;
-		data.maxlen = -1;
-		dat = &data;
-	}
-	while ((ret = putmsg(fd, ctl, dat, 0)) < 0) {
-		if (flags & RetryOnSignal) {
-			switch (errno) {
-			case EAGAIN:
-			case EINTR:
-			case ERESTART:
-				continue;
-			default:
-				break;
-			}
-		}
-		break;
-	}
-	return (ret);
+	if (unlikely(ctrl_ptr == NULL && ctrl_len > 0))
+		goto einval;
+	if (unlikely(data_ptr == NULL && data_len > 0))
+		goto einval;
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_both(fd, ctrl_ptr, ctrl_len, data_ptr, data_len, flags);
+      einval:
+	errno = EINVAL;
+	cerrno = CD_SYSERR;
+	return (-1);
 }
 
 /** @brief The reentrant version of __cdi_put_both().
   * @param fd the CDI Stream.
   * @param ctrl_ptr control portion data buffer.
-  * @param ctrl_length length of control buffer.
+  * @param ctrl_len length of control buffer.
   * @param data_ptr data portion data buffer.
-  * @param data_length length of data buffer.
+  * @param data_len length of data buffer.
   * @param flags retry on interrupt.
   * @version CDIAPI_1.0
   * @par Alias:
   * This symbol is an implementation of cdi_put_both().
   */
 int
-__cdi_put_both_r(int fd, char *ctrl_ptr, int ctrl_length, char *data_ptr, int data_length,
+__cdi_put_both_r(int fd, char *ctrl_ptr, int ctrl_len, char *data_ptr, int data_len,
 		 int flags)
 {
-	return __cdi_put_both(fd, ctrl_ptr, ctrl_length, data_ptr, data_length, flags);
+	int err;
+
+	if (unlikely(ctrl_ptr == NULL && ctrl_len > 0))
+		goto einval;
+	if (unlikely(data_ptr == NULL && data_len > 0))
+		goto einval;
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_both(fd, ctrl_ptr, ctrl_len, data_ptr, data_len, flags);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
+      einval:
+	errno = EINVAL;
+	cerrno = CD_SYSERR;
+	return (-1);
 }
 
-/** @fn int cdi_put_both(int fd, char *ctrl_ptr, int ctrl_length, char *data_ptr, int data_length, int flags)
+/** @fn int cdi_put_both(int fd, char *ctrl_ptr, int ctrl_len, char *data_ptr, int data_len, int flags)
   * @param fd the CDI Stream.
   * @param ctrl_ptr control portion data buffer.
-  * @param ctrl_length length of control buffer.
+  * @param ctrl_len length of control buffer.
   * @param data_ptr data portion data buffer.
-  * @param data_length length of data buffer.
+  * @param data_len length of data buffer.
   * @param flags retry on interrupt.
   * @version CDIAPI_1.0
   * @par Alias:
   * This symbol is a strong alias of __cdi_put_both_r().
   */
 __asm__(".symver __cdi_put_both_r,cdi_put_both@@CDIAPI_1.0");
+
+/** @internal
+  * @brief put a control message
+  * @param fd the CDI Stream.
+  * @param nbytes the number of bytes in the control message.
+  * @param flags whether to retry on interrupt.
+  *
+  * This version of the implementation does not need to check the validity of
+  * its arguments.
+  */
+static int
+_cdi_put_proto(int fd, int nbytes, long flags)
+{
+	return _cdi_put_both(fd, (char *) cdi_ctl_buf, nbytes, NULL, -1, flags);
+}
 
 /** @brief put a control message
   * @param fd the CDI Stream.
@@ -343,7 +701,11 @@ __asm__(".symver __cdi_put_both_r,cdi_put_both@@CDIAPI_1.0");
 int
 __cdi_put_proto(int fd, int nbytes, long flags)
 {
-	return __cdi_put_both(fd, (char *)cdi_ctl_buf, nbytes, NULL, -1, flags);
+	int err;
+
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_proto(fd, nbytes, flags);
 }
 
 /** @brief The reentrant version of __cdi_put_proto().
@@ -357,7 +719,15 @@ __cdi_put_proto(int fd, int nbytes, long flags)
 int
 __cdi_put_proto_r(int fd, int nbytes, long flags)
 {
-	return __cdi_put_proto(fd, nbytes, flags);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_proto(fd, nbytes, flags);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn cdi_put_proto(int fd, int nbytes, long retry)
@@ -370,6 +740,21 @@ __cdi_put_proto_r(int fd, int nbytes, long flags)
   */
 __asm__(".symver __cdi_put_proto_r,cdi_put_proto@@CDIAPI_1.0");
 
+/** @internal
+  * @brief put a data message
+  * @param fd of the CDI Stream.
+  * @param buf the buffer containing the data message.
+  * @param nbytes the number of bytes in the data message.
+  * @param flags whether to retry on interrupt.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_data(int fd, char *buf, int nbytes, long flags)
+{
+	return _cdi_put_both(fd, NULL, -1, buf, nbytes, flags);
+}
+
 /** @brief put a data message
   * @param fd of the CDI Stream.
   * @param buf the buffer containing the data message.
@@ -381,7 +766,11 @@ __asm__(".symver __cdi_put_proto_r,cdi_put_proto@@CDIAPI_1.0");
 int
 __cdi_put_data(int fd, char *buf, int nbytes, long flags)
 {
-	return __cdi_put_both(fd, NULL, -1, buf, nbytes, flags);
+	int err;
+
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_data(fd, buf, nbytes, flags);
 }
 
 /** @brief The reentrant version of __cdi_put_data().
@@ -396,7 +785,15 @@ __cdi_put_data(int fd, char *buf, int nbytes, long flags)
 int
 __cdi_put_data_r(int fd, char *buf, int nbytes, long flags)
 {
-	return __cdi_put_data(fd, buf, nbytes, flags);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_data(fd, buf, nbytes, flags);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_data(int fd, char *buf, int nbytes, long flags)
@@ -410,24 +807,114 @@ __cdi_put_data_r(int fd, char *buf, int nbytes, long flags)
   */
 __asm__(".symver __cdi_put_data_r,cdi_put_data@@CDIAPI_1.0");
 
+/** @internal
+  * @brief get a message
+  * @param fd the CDI Stream.
+  * @param buf buffer for data portion of message.
+  * @param nbytes size of buffer.
+  *
+  * This version of the implementation does not need to check the validity of
+  * its arguments.
+  */
+static int
+_cdi_get_a_msg(int fd, char *buf, int nbytes)
+{
+	struct strbuf ctrl, data;
+	int ret, flag;
+
+	ctrl.buf = (char *) cdi_ctl_buf;
+	ctrl.len = -1;
+	ctrl.maxlen = CDI_CTL_BUF_SIZE;
+
+	data.buf = buf;
+	data.len = -1;
+	data.maxlen = nbytes;
+
+	ret = getmsg(fd, &ctrl, &data, &flag);
+
+	if (ret < 0) {
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	cdi_ctl_cnt = ctrl.len;
+	cdi_data_cnt = data.len;
+	return (ret);
+}
+
+/** @brief get a message
+  * @param fd the CDI Stream.
+  * @param buf buffer for data portion of message.
+  * @param nbytes size of buffer.
+  */
+int
+__cdi_get_a_msg(int fd, char *buf, int nbytes)
+{
+	int err;
+
+	if (likely((err = __cdi_chkuser(fd)) >= 0))
+		return _cdi_get_a_msg(fd, buf, nbytes);
+	return (err);
+}
+
+/** @brief The reentrant version of __cdi_get_a_msg().
+  * @param fd the CDI Stream.
+  * @param buf buffer for data portion of message.
+  * @param nbytes size of buffer.
+  * @version CDIAPI_1.0
+  * @par Alias:
+  * This is an implementation of cdi_get_a_msg().
+  */
+int
+__cdi_get_a_msg_r(int fd, char *buf, int nbytes)
+{
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_get_a_msg(fd, buf, nbytes);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (0);
+}
+
+/** @fn int cdi_get_a_msg(int fd, char *buf, int nbytes)
+  * @param fd the CDI Stream.
+  * @param buf buffer for data portion of message.
+  * @param nbytes size of buffer.
+  * @version CDIAPI_1.0
+  * @par Alias:
+  * This symbol is a strong alias of __cdi_get_a_msg_r().
+  */
+__asm__(".symver __cdi_get_a_msg_r,cdi_get_a_msg@@CDIAPI_1.0");
+
+/** @internal
+  * @brief put CD_ALLOW_INPUT_REQ primitive
+  * @param fd the CDI Stream.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_allow_input_req(int fd)
+{
+	cd_allow_input_req_t *p = (typeof(p)) cdi_ctl_buf;
+
+	p->cd_primitive = CD_ALLOW_INPUT_REQ;
+
+	return _cdi_put_proto(fd, sizeof(*p), 0);
+}
+
 /** @brief put CD_ALLOW_INPUT_REQ primitive
   * @param fd the CDI Stream.
   */
 int
 __cdi_put_allow_input_req(int fd)
 {
-	cd_allow_input_req_t *p;
-	int ret;
+	int err;
 
-	p = (typeof(p)) cdi_ctl_buf;
-	cdi_ctl_cnt = sizeof(*p);
-
-	p->cd_primitive = CD_ALLOW_INPUT_REQ;
-
-	if ((ret = __cdi_put_proto(fd, cdi_ctl_cnt, 0))) {
-		/* FIXME */
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_allow_input_req(fd);
 }
 
 /** @brief The reentrant version of __cdi_put_allow_input_req().
@@ -439,7 +926,15 @@ __cdi_put_allow_input_req(int fd)
 int
 __cdi_put_allow_input_req_r(int fd)
 {
-	return __cdi_put_allow_input_req(fd);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_allow_input_req(fd);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_allow_input_req(int fd)
@@ -450,6 +945,24 @@ __cdi_put_allow_input_req_r(int fd)
   */
 __asm__(".symver __cdi_put_allow_input_req_r,cdi_put_allow_input_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief put a CD_ATTACH_REQ primitive
+  * @param fd the CDI Stream.
+  * @param ppa the Physcial Point of Attachment.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_attach_req(int fd, long ppa)
+{
+	cd_attach_req_t *p = (typeof(p)) cdi_ctl_buf;
+
+	p->cd_primitive = CD_ATTACH_REQ;
+	p->cd_ppa = ppa;
+
+	return _cdi_put_proto(fd, sizeof(*p), 0);
+}
+
 /** @brief put a CD_ATTACH_REQ primitive
   * @param fd the CDI Stream.
   * @param ppa the Physcial Point of Attachment.
@@ -457,19 +970,11 @@ __asm__(".symver __cdi_put_allow_input_req_r,cdi_put_allow_input_req@@CDIAPI_1.0
 int
 __cdi_put_attach_req(int fd, long ppa)
 {
-	cd_attach_req_t *p;
-	int ret;
+	int err;
 
-	p = (typeof(p)) cdi_ctl_buf;
-	cdi_ctl_cnt = sizeof(*p);
-
-	p->cd_primitive = CD_ATTACH_REQ;
-	p->cd_ppa = ppa;
-
-	if ((ret = __cdi_put_proto(fd, cdi_ctl_cnt, 0))) {
-		/* FIXME */
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_attach_req(fd, ppa);
 }
 
 /** @brief The reentrant version of __cdi_put_attach_req().
@@ -482,7 +987,15 @@ __cdi_put_attach_req(int fd, long ppa)
 int
 __cdi_put_attach_req_r(int fd, long ppa)
 {
-	return __cdi_put_attach_req(fd, ppa);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_attach_req(fd, ppa);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_attach_req(int fd, long ppa)
@@ -492,7 +1005,23 @@ __cdi_put_attach_req_r(int fd, long ppa)
   * @par Alias:
   * This symbol is a strong alias of __cdi_put_attach_req_r().
   */
-__asm__(".symver __cdi_put_attach_req_t,cdi_put_attach_req@@CDIAPI_1.0");
+__asm__(".symver __cdi_put_attach_req_r,cdi_put_attach_req@@CDIAPI_1.0");
+
+/** @internal
+  * @brief put a CD_DETACH_REQ primitive
+  * @param fd the CDI Stream.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_detach_req(int fd)
+{
+	cd_detach_req_t *p = (typeof(p)) cdi_ctl_buf;
+
+	p->cd_primitive = CD_DETACH_REQ;
+
+	return _cdi_put_proto(fd, sizeof(*p), 0);
+}
 
 /** @brief put a CD_DETACH_REQ primitive
   * @param fd the CDI Stream.
@@ -500,18 +1029,11 @@ __asm__(".symver __cdi_put_attach_req_t,cdi_put_attach_req@@CDIAPI_1.0");
 int
 __cdi_put_detach_req(int fd)
 {
-	cd_detach_req_t *p;
-	int ret;
+	int err;
 
-	p = (typeof(p)) cdi_ctl_buf;
-	cdi_ctl_cnt = sizeof(*p);
-
-	p->cd_primitive = CD_DETACH_REQ;
-
-	if ((ret = __cdi_put_proto(fd, cdi_ctl_cnt, 0))) {
-		/* FIXME */
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_detach_req(fd);
 }
 
 /** @brief The reentrant version of __cdi_put_detach_req().
@@ -523,7 +1045,15 @@ __cdi_put_detach_req(int fd)
 int
 __cdi_put_detach_req_r(int fd)
 {
-	return __cdi_put_detach_req(fd);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_detach_req(fd);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_detach_req(int fd)
@@ -534,6 +1064,24 @@ __cdi_put_detach_req_r(int fd)
   */
 __asm__(".symver __cdi_put_detach_req_r,cdi_put_detach_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief put a CD_DISABLE_REQ primitive
+  * @param fd the CDI Stream.
+  * @param disposal disposal type for queued messages.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_disable_req(int fd, unsigned long disposal)
+{
+	cd_disable_req_t *p = (typeof(p)) cdi_ctl_buf;
+
+	p->cd_primitive = CD_DISABLE_REQ;
+	p->cd_disposal = disposal;
+
+	return _cdi_put_proto(fd, sizeof(*p), 0);
+}
+
 /** @brief put a CD_DISABLE_REQ primitive
   * @param fd the CDI Stream.
   * @param disposal disposal type for queued messages.
@@ -543,19 +1091,11 @@ __asm__(".symver __cdi_put_detach_req_r,cdi_put_detach_req@@CDIAPI_1.0");
 int
 __cdi_put_disable_req(int fd, unsigned long disposal)
 {
-	cd_disable_req_t *p;
-	int ret;
+	int err;
 
-	p = (typeof(p)) cdi_ctl_buf;
-	cdi_ctl_cnt = sizeof(*p);
-
-	p->cd_primitive = CD_DISABLE_REQ;
-	p->cd_disposal = disposal;
-
-	if ((ret = __cdi_put_proto(fd, cdi_ctl_cnt, 0))) {
-		/* FIXME */
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_disable_req(fd, disposal);
 }
 
 /** @brief The reentrant version of __cdi_put_disable_req().
@@ -568,7 +1108,15 @@ __cdi_put_disable_req(int fd, unsigned long disposal)
 int
 __cdi_put_disable_req_r(int fd, unsigned long disposal)
 {
-	return __cdi_put_disable_req(fd, disposal);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_disable_req(fd, disposal);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_disable_req(int fd, unsigned long disposal)
@@ -580,6 +1128,28 @@ __cdi_put_disable_req_r(int fd, unsigned long disposal)
   */
 __asm__(".symver __cdi_put_disable_req_r,cdi_put_disable_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief put a CD_ENABLE_REQ primitive with dial string.
+  * @param fd the CDI Stream.
+  * @param dial_string the dial string (or NULL).
+  * @param dial_length the dial string length (or zero).
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_dial_req(int fd, char *dial_string, int dial_length)
+{
+	cd_enable_req_t *p = (typeof(p)) cdi_ctl_buf;
+
+	p->cd_primitive = CD_ENABLE_REQ;
+	p->cd_dial_type = dial_string ? 0 : CD_NODIAL;
+	p->cd_dial_length = dial_length;
+	p->cd_dial_offset = dial_length ? sizeof(*p) : 0;
+	memcpy((char *) (p + 1), dial_string, dial_length);
+
+	return _cdi_put_proto(fd, sizeof(*p) + dial_length, 0);
+}
+
 /** @brief put a CD_ENABLE_REQ primitive with dial string.
   * @param fd the CDI Stream.
   * @param dial_string the dial string (or NULL).
@@ -588,21 +1158,17 @@ __asm__(".symver __cdi_put_disable_req_r,cdi_put_disable_req@@CDIAPI_1.0");
 int
 __cdi_put_dial_req(int fd, char *dial_string, int dial_length)
 {
-	cd_enable_req_t *p;
-	int ret;
+	int err;
 
-	p = (typeof(p)) cdi_ctl_buf;
-	cdi_ctl_cnt = sizeof(*p);
-
-	p->cd_primitive = CD_ENABLE_REQ;
-	p->cd_dial_type = dial_string ? 0 : CD_NODIAL;
-	p->cd_dial_length = dial_length;
-	p->cd_dial_offset = dial_length ? sizeof(*p) : 0;
-
-	if ((ret = __cdi_put_proto(fd, cdi_ctl_cnt, 0)) < 0) {
-		/* FIXME */
+	if (dial_string == NULL || dial_length <= 0) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
 	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_dial_req(fd, dial_string, dial_length);
+
 }
 
 /** @brief The reentrant version of __cdi_put_dial_req().
@@ -616,7 +1182,20 @@ __cdi_put_dial_req(int fd, char *dial_string, int dial_length)
 int
 __cdi_put_dial_req_r(int fd, char *dial_string, int dial_length)
 {
-	return __cdi_put_dial_req(fd, dial_string, dial_length);
+	int err;
+
+	if (dial_string == NULL || dial_length <= 0) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_dial_req(fd, dial_string, dial_length);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_dial_req(int fd, char *dial_string, int dial_length)
@@ -629,13 +1208,29 @@ __cdi_put_dial_req_r(int fd, char *dial_string, int dial_length)
   */
 __asm__(".symver __cdi_put_dial_req_r,cdi_put_dial_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief put a CD_ENABLE_REQ primitive
+  * @param fd the CDI Stream.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_enable_req(int fd)
+{
+	return _cdi_put_dial_req(fd, NULL, 0);
+}
+
 /** @brief put a CD_ENABLE_REQ primitive
   * @param fd the CDI Stream.
   */
 int
 __cdi_put_enable_req(int fd)
 {
-	return __cdi_put_dial_req(fd, NULL, 0);
+	int err;
+
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_enable_req(fd);
 }
 
 /** @brief The reentrant version of __cdi_put_enable_req().
@@ -647,7 +1242,15 @@ __cdi_put_enable_req(int fd)
 int
 __cdi_put_enable_req_r(int fd)
 {
-	return __cdi_put_enable_req(fd);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_enable_req(fd);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_enable_req(int fd)
@@ -658,6 +1261,26 @@ __cdi_put_enable_req_r(int fd)
   */
 __asm__(".symver __cdi_put_enable_req_r,cdi_put_enable_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief put a frame
+  * @param fd the CDI Stream.
+  * @param address the address field.
+  * @param control the control field.
+  * @param buf pointer to data buffer.
+  * @param nbytes the number of bytes in the data buffer.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned char *buf, int nbytes)
+{
+	cdi_data_buf[0] = address;
+	cdi_data_buf[1] = control;
+	cdi_data_cnt = nbytes + 2;
+	strncpy((char *) &cdi_data_buf[2], (char *) buf, nbytes);
+	return __cdi_put_data(fd, (char *) cdi_data_buf, cdi_data_cnt, 0);
+}
+
 /** @brief put a frame
   * @param fd the CDI Stream.
   * @param address the address field.
@@ -666,17 +1289,19 @@ __asm__(".symver __cdi_put_enable_req_r,cdi_put_enable_req@@CDIAPI_1.0");
   * @param nbytes the number of bytes in the data buffer.
   */
 int
-__cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned char *buf, int nbytes)
+__cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned char *buf,
+		int nbytes)
 {
-	cdi_data_buf[0] = address;
-	cdi_data_buf[1] = control;
-	if (nbytes > CDI_DATA_BUF_SIZE - 2) {
+	int err;
+
+	if (unlikely(nbytes > CDI_DATA_BUF_SIZE - 2)) {
 		errno = EMSGSIZE;
+		cerrno = CD_SYSERR;
 		return (-1);
 	}
-	cdi_data_cnt = nbytes + 2;
-	strncpy((char *)&cdi_data_buf[2], (char *)buf, nbytes);
-	return __cdi_put_data(fd, (char *)cdi_data_buf, cdi_data_cnt, 0);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_put_frame(fd, address, control, buf, nbytes);
 }
 
 /** @brief The reentrant version of __cdi_put_frame().
@@ -690,9 +1315,23 @@ __cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned c
   * This is an implementation of cdi_put_frame().
   */
 int
-__cdi_put_frame_r(int fd, unsigned char address, unsigned char control, unsigned char *buf, int nbytes)
+__cdi_put_frame_r(int fd, unsigned char address, unsigned char control, unsigned char *buf,
+		  int nbytes)
 {
-	return __cdi_put_frame(fd, address, control, buf, nbytes);
+	int err;
+
+	if (unlikely(nbytes > CDI_DATA_BUF_SIZE - 2)) {
+		errno = EMSGSIZE;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_put_frame(fd, address, control, buf, nbytes);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_put_frame(int fd, unsigned char address, unsigned char control, unsigned char *buf, int nbytes)
@@ -707,24 +1346,33 @@ __cdi_put_frame_r(int fd, unsigned char address, unsigned char control, unsigned
   */
 __asm__(".symver __cdi_put_frame_r,cdi_put_frame@@CDIAPI_1.0");
 
+/** @internal
+  * @brief put a CD_MODEM_SIG_POLL primitive
+  * @param fd the CDI Stream.
+  *
+  * This version of the implementation does not need to check the validity of its arguments.
+  */
+static int
+_cdi_modem_sig_poll(int fd)
+{
+	cd_modem_sig_poll_t *p = (typeof(p)) cdi_ctl_buf;
+
+	p->cd_primitive = CD_MODEM_SIG_POLL;
+
+	return _cdi_put_proto(fd, sizeof(*p), 0);
+}
+
 /** @brief put a CD_MODEM_SIG_POLL primitive
   * @param fd the CDI Stream.
   */
 int
 __cdi_modem_sig_poll(int fd)
 {
-	cd_modem_sig_poll_t *p;
-	int ret;
+	int err;
 
-	p = (typeof(p)) cdi_ctl_buf;
-	cdi_ctl_cnt = sizeof(*p);
-
-	p->cd_primitive = CD_MODEM_SIG_POLL;
-
-	if ((ret = __cdi_put_proto(fd, cdi_ctl_cnt, 0))) {
-		/* FIXME */
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_modem_sig_poll(fd);
 }
 
 /** @brief The reentrant version of __cdi_modem_sig_poll().
@@ -736,7 +1384,15 @@ __cdi_modem_sig_poll(int fd)
 int
 __cdi_modem_sig_poll_r(int fd)
 {
-	return __cdi_modem_sig_poll(fd);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_modem_sig_poll(fd);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cid_modem_sig_poll(int fd)
@@ -747,75 +1403,23 @@ __cdi_modem_sig_poll_r(int fd)
   */
 __asm__(".symver __cdi_modem_sig_poll_r,cdi_modem_sig_poll@@CDIAPI_1.0");
 
-/** @brief get a message
-  * @param fd the CDI Stream.
-  * @param buf buffer for data portion of message.
-  * @param nbytes size of buffer.
-  */
-int
-__cdi_get_a_msg(int fd, char *buf, int nbytes)
-{
-	struct strbuf ctrl, data;
-	int flags;
-	int ret;
-
-	ctrl.buf = (char *)cdi_ctl_buf;
-	ctrl.len = -1;
-	ctrl.maxlen = CDI_CTL_BUF_SIZE;
-
-	data.buf = buf;
-	data.len = -1;
-	data.maxlen = nbytes;
-
-	if ((ret = getmsg(fd, &ctrl, &data, &flags)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	cdi_ctl_cnt = ctrl.len;
-	cdi_data_cnt = data.len;
-	return (ret);
-}
-
-/** @brief The reentrant version of __cdi_get_a_msg().
-  * @param fd the CDI Stream.
-  * @param buf buffer for data portion of message.
-  * @param nbytes size of buffer.
-  * @version CDIAPI_1.0
-  * @par Alias:
-  * This is an implementation of cdi_get_a_msg().
-  */
-int
-__cdi_get_a_msg_r(int fd, char *buf, int nbytes)
-{
-	return __cdi_get_a_msg_r(fd, buf, nbytes);
-}
-
-/** @fn int cdi_get_a_msg(int fd, char *buf, int nbytes)
-  * @param fd the CDI Stream.
-  * @param buf buffer for data portion of message.
-  * @param nbytes size of buffer.
-  * @version CDIAPI_1.0
-  * @par Alias:
-  * This symbol is a strong alias of __cdi_get_a_msg_r().
-  */
-__asm__(".symver __cdi_get_a_msg_r,cdi_get_a_msg@@CDIAPI_1.0");
-
-/** @brief receive a message.
+/** @internal
+  * @brief receive a message.
   * @param fd the CDI Stream.
   * @param buf data buffer.
   * @param nbytes length of data buffer.
   * @param flags expected message types.
   */
 int
-__cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
+_cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 {
-	int ret;
+	int ret, save;
 
 	for (;;) {
+		save = errno;
 		while ((ret = __cdi_get_a_msg(fd, buf, nbytes)) < 0) {
 			if (flags & RetryOnSignal) {
 				switch (errno) {
-				case EAGAIN:
 				case EINTR:
 				case ERESTART:
 					continue;
@@ -823,8 +1427,10 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 					break;
 				}
 			}
-			return (ret);
+			cerrno = CD_SYSERR;
+			return (-1);
 		}
+		errno = save;
 		if (cdi_ctl_cnt > 0) {
 			switch (*(cd_ulong *) cdi_ctl_buf) {
 			case CD_ERROR_ACK:
@@ -871,6 +1477,27 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 	}
 }
 
+/** @brief receive a message.
+  * @param fd the CDI Stream.
+  * @param buf data buffer.
+  * @param nbytes length of data buffer.
+  * @param flags expected message types.
+  */
+int
+__cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
+{
+	int err;
+
+	if (unlikely(buf == NULL) || unlikely(nbytes <= 0)) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_rcv_msg(fd, buf, nbytes, flags);
+}
+
 /** @brief The reentrant version of __cdi_rcv_msg().
   * @param fd the CDI Stream.
   * @param buf data buffer.
@@ -883,7 +1510,20 @@ __cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
 int
 __cdi_rcv_msg_r(int fd, char *buf, int nbytes, long flags)
 {
-	return __cdi_rcv_msg_r(fd, buf, nbytes, flags);
+	int err;
+
+	if (unlikely(buf == NULL) || unlikely(nbytes <= 0)) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_rcv_msg(fd, buf, nbytes, flags);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_rcv_msg(int fd, char *buf, int nbytes, long flags)
@@ -897,6 +1537,18 @@ __cdi_rcv_msg_r(int fd, char *buf, int nbytes, long flags)
   */
 __asm__(".symver __cdi_rcv_msg_r,cdi_rcv_msg@@CDIAPI_1.0");
 
+/** @internal
+  * @brief read data
+  * @param fd the CDI Stream.
+  * @param buf the data buffer into which to read.
+  * @param nbytes the size of the data buffer.
+  */
+static int
+_cdi_read_data(int fd, char *buf, int nbytes)
+{
+	return _cdi_rcv_msg(fd, buf, nbytes, -1UL);
+}
+
 /** @brief read data
   * @param fd the CDI Stream.
   * @param buf the data buffer into which to read.
@@ -905,7 +1557,16 @@ __asm__(".symver __cdi_rcv_msg_r,cdi_rcv_msg@@CDIAPI_1.0");
 int
 __cdi_read_data(int fd, char *buf, int nbytes)
 {
-	return __cdi_rcv_msg(fd, buf, nbytes, -1UL);
+	int err;
+
+	if (buf == NULL || nbytes <= 0) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_read_data(fd, buf, nbytes);
 }
 
 /** @brief The reentrant version of __cdi_read_data().
@@ -919,7 +1580,20 @@ __cdi_read_data(int fd, char *buf, int nbytes)
 int
 __cdi_read_data_r(int fd, char *buf, int nbytes)
 {
-	return __cdi_read_data(fd, buf, nbytes);
+	int err;
+
+	if (buf == NULL || nbytes <= 0) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_read_data(fd, buf, nbytes);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_read_data(int fd, char *buf, int nbytes)
@@ -932,6 +1606,18 @@ __cdi_read_data_r(int fd, char *buf, int nbytes)
   */
 __asm__(".symver __cdi_read_data_r,cdi_read_data@@CDIAPI_1.0");
 
+/** @internal
+  * @brief write data to CDI Stream.
+  * @param fd the CDI Stream.
+  * @param buf the data buffer to write.
+  * @param nbytes the length of the data buffer to write.
+  */
+static int
+_cdi_write_data(int fd, char *buf, int nbytes)
+{
+	return _cdi_put_data(fd, buf, nbytes, 0);
+}
+
 /** @brief write data to CDI Stream.
   * @param fd the CDI Stream.
   * @param buf the data buffer to write.
@@ -940,7 +1626,16 @@ __asm__(".symver __cdi_read_data_r,cdi_read_data@@CDIAPI_1.0");
 int
 __cdi_write_data(int fd, char *buf, int nbytes)
 {
-	return __cdi_put_data(fd, buf, nbytes, 0);
+	int err;
+
+	if (unlikely(buf == NULL) || unlikely(nbytes <= 0)) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_write_data(fd, buf, nbytes);
 }
 
 /** @brief The reentrant version of __cdi_write_data().
@@ -954,7 +1649,20 @@ __cdi_write_data(int fd, char *buf, int nbytes)
 int
 __cdi_write_data_r(int fd, char *buf, int nbytes)
 {
-	return __cdi_write_data(fd, buf, nbytes);
+	int err;
+
+	if (unlikely(buf == NULL) || unlikely(nbytes <= 0)) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_write_data(fd, buf, nbytes);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_write_data(int fd, char *buf, int nbytes)
@@ -971,11 +1679,12 @@ __asm__(".symver __cdi_write_data_r,cdi_write_data@@CDIAPI_1.0");
   * @param fd the CDI Stream.
   * @param primitive the expected primitive.
   * @param state_ptr a pointer to state variable (or NULL).
+  * @param flags additional exit flags.
   */
-int
-__cdi_wait_ack(int fd, long primitive, int *state_ptr)
+static int
+_cdi_wait_ack(int fd, long primitive, int *state_ptr, long flags)
 {
-	long flags = RetryOnSignal;
+	union CD_primitives *p = (typeof(p)) cdi_ctl_buf;
 	int ret;
 
 	switch (primitive) {
@@ -1000,22 +1709,45 @@ __cdi_wait_ack(int fd, long primitive, int *state_ptr)
 	case CD_BAD_FRAME_IND:
 		flags |= Return_bad_frame_ind;
 		break;
+	case CD_MODEM_SIG_IND:
+		flags |= Return_error_ack | Return_modem_sig_ind;
+		break;
 	default:
 		errno = EINVAL;
+		cerrno = CD_SYSERR;
 		return (-1);
 	}
 
-	while ((ret = __cdi_rcv_msg(fd, (char *)cdi_data_buf, CDI_DATA_BUF_SIZE, flags)) > 0) ;
+	while ((ret = _cdi_rcv_msg(fd, (char *) cdi_data_buf, CDI_DATA_BUF_SIZE, flags)) > 0) ;
 	if (ret < 0) {
-		/* FIXME */
-		return (ret);
+		cerrno = CD_SYSERR;
+		return (-1);
 	}
 	/* Have expected control primitive. */
-	if (state_ptr != NULL) {
+	if (state_ptr != NULL && primitive != CD_MODEM_SIG_IND) {
 		/* cd_state is always in the second cd_ulong location */
-		*state_ptr = ((cd_ulong *) cdi_ctl_buf)[1];
+		*state_ptr = p->ok_ack.cd_state;
 	}
-	return (*(cd_ulong *) cdi_ctl_buf == (cd_ulong) primitive);
+	if (p->cd_primitive == CD_ERROR_ACK) {
+		if ((cerrno = p->error_ack.cd_errno) == CD_SYSERR)
+			errno = p->error_ack.cd_explanation;
+	}
+	return (p->cd_primitive == (cd_ulong) primitive);
+}
+
+/** @brief wait for an acknowlegement.
+  * @param fd the CDI Stream.
+  * @param primitive the expected primitive.
+  * @param state_ptr a pointer to state variable (or NULL).
+  */
+int
+__cdi_wait_ack(int fd, long primitive, int *state_ptr)
+{
+	int err;
+
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_wait_ack(fd, primitive, state_ptr, RetryOnSignal);
 }
 
 /** @brief The reentrant version of __cdi_wait_ack().
@@ -1029,7 +1761,15 @@ __cdi_wait_ack(int fd, long primitive, int *state_ptr)
 int
 __cdi_wait_ack_r(int fd, long primitive, int *state_ptr)
 {
-	return __cdi_wait_ack(fd, primitive, state_ptr);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_wait_ack(fd, primitive, state_ptr, RetryOnSignal);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_wait_ack(int fd, long primitive, int *state_ptr)
@@ -1042,17 +1782,39 @@ __cdi_wait_ack_r(int fd, long primitive, int *state_ptr)
   */
 __asm__(".symver __cdi_wait_ack_r,cdi_wait_ack@@CDIAPI_1.0");
 
+/** @internal
+  * @brief open a CDI Stream.
+  */
+static int
+_cdi_open_data(void)
+{
+	struct __cdi_user *cu;
+	int fd, save;
+
+	if (unlikely(__cdi_initialized == 0)) {
+		errno = ELIBACC;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if ((fd = open("/dev/streams/clone/cdmux", O_RDWR)) < 0) {
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (unlikely((cu = __cdi_user_init(fd)) == NULL)) {
+		save = errno;
+		close(fd);
+		errno = save;
+		return (-1);
+	}
+	return (fd);
+}
+
 /** @brief open a CDI Stream.
   */
 int
 __cdi_open_data(void)
 {
-	int fd;
-
-	if ((fd = open("/dev/streams/clone/cdmux", O_RDWR)) < 0) {
-		/* FIXME */
-	}
-	return (fd);
+	return _cdi_open_data();
 }
 
 /** @brief The reentrant version of __cdi_open_data().
@@ -1063,7 +1825,19 @@ __cdi_open_data(void)
 int
 __cdi_open_data_r(void)
 {
-	return __cdi_open_data();
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_list_unlock, NULL);
+	if (likely((err = __cdi_list_wrlock()) == 0)) {
+		err = _cdi_open_data();
+		__cdi_list_unlock(NULL);
+	} else {
+		errno = err;
+		cerrno = CD_SYSERR;
+		err = -1;
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_open_data(void)
@@ -1073,6 +1847,16 @@ __cdi_open_data_r(void)
   */
 __asm__(".symver __cdi_open_data_r,cdi_open_data@@CDIAPI_1.0");
 
+/** @internal
+  * @brief open a CDI Stream.
+  * @param hostname name of remote host (or NULL).
+  */
+static int
+_cdi_open(char *hostname)
+{
+	return _cdi_open_data();
+}
+
 /** @brief open a CDI Stream.
   * @param hostname name of remote host (or NULL).
   */
@@ -1081,9 +1865,10 @@ __cdi_open(char *hostname)
 {
 	if (hostname != NULL) {
 		errno = ENOTSUP;
+		cerrno = CD_SYSERR;
 		return (-1);
 	}
-	return __cdi_open_data();
+	return _cdi_open(hostname);
 }
 
 /** @brief The reentrant version of __cdi_open().
@@ -1095,7 +1880,20 @@ __cdi_open(char *hostname)
 int
 __cdi_open_r(char *hostname)
 {
-	return __cdi_open(hostname);
+	int err;
+
+	if (hostname != NULL) {
+		errno = ENOTSUP;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	pthread_cleanup_push_defer_np(__cdi_list_unlock, NULL);
+	if (likely((err = __cdi_list_wrlock()) == 0)) {
+		err = _cdi_open(hostname);
+		__cdi_list_unlock(NULL);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_open(char *hostname)
@@ -1106,18 +1904,33 @@ __cdi_open_r(char *hostname)
   */
 __asm__(".symver __cdi_open_r,cdi_open@@CDIAPI_1.0");
 
+/** @internal
+  * @brief close a CDI Stream.
+  * @param fd the CDI Stream.
+  */
+static int
+_cdi_close(int fd)
+{
+	int err;
+
+	if (unlikely((err = close(fd)) < 0)) {
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	return __cdi_user_destroy(fd);
+}
+
 /** @brief close a CDI Stream.
   * @param fd the CDI Stream.
   */
 int
 __cdi_close(int fd)
 {
-	int ret;
+	int err;
 
-	if ((ret = close(fd)) < 0) {
-		/* FIXME */
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_close(fd);
 }
 
 /** @brief The reentrant version of __cdi_close().
@@ -1129,7 +1942,21 @@ __cdi_close(int fd)
 int
 __cdi_close_r(int fd)
 {
-	return __cdi_close(fd);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_list_unlock, NULL);
+	if (likely((err = __cdi_list_wrlock()) == 0)) {
+		if (likely((err = __cdi_chkuser(fd)) >= 0)) {
+			err = _cdi_close(fd);
+		}
+		__cdi_list_unlock(NULL);
+	} else {
+		errno = err;
+		cerrno = CD_SYSERR;
+		err = -1;
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_close(int fd)
@@ -1140,6 +1967,24 @@ __cdi_close_r(int fd)
   */
 __asm__(".symver __cdi_close_r,cdi_close@@CDIAPI_1.0");
 
+/** @internal
+  * @brief initialize CDI library with log file.
+  * @param log_options logging options flags.
+  * @param log_file file stream of open log file.
+  */
+static int
+_cdi_init_FILE(int log_options, FILE *log_file)
+{
+	if (unlikely(__cdi_initialized != 0)) {
+		errno = EALREADY;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	__cdi_initialized = 1;
+	__cdi_log_options = log_options;
+	return (0);		/* FIXME */
+}
+
 /** @brief initialize CDI library with log file.
   * @param log_options logging options flags.
   * @param log_file file stream of open log file.
@@ -1147,7 +1992,12 @@ __asm__(".symver __cdi_close_r,cdi_close@@CDIAPI_1.0");
 int
 __cdi_init_FILE(int log_options, FILE *log_file)
 {
-	return (0); /* FIXME */
+	if (unlikely(log_file == NULL)) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	return _cdi_init_FILE(log_options, log_file);
 }
 
 /** @brief The reentrant version of __cdi_init_FILE().
@@ -1160,7 +2010,24 @@ __cdi_init_FILE(int log_options, FILE *log_file)
 int
 __cdi_init_FILE_r(int log_options, FILE *log_file)
 {
-	return __cdi_init_FILE(log_options, log_file);
+	int err;
+
+	if (unlikely(log_file == NULL)) {
+		errno = EINVAL;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	pthread_cleanup_push_defer_np(__cdi_list_unlock, NULL);
+	if (likely((err = __cdi_list_wrlock()) == 0)) {
+		err = _cdi_init_FILE(log_options, log_file);
+		__cdi_list_unlock(NULL);
+	} else {
+		errno = err;
+		cerrno = CD_SYSERR;
+		err = -1;
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_init_FILE(int log_options, FILE *log_file)
@@ -1172,6 +2039,40 @@ __cdi_init_FILE_r(int log_options, FILE *log_file)
   */
 __asm__(".symver __cdi_init_FILE_r,cdi_init_FILE@@CDIAPI_1.0");
 
+/** @internal
+  * @brief initialize CDI library.
+  * @param log_options logging options flags.
+  * @param log_name name of log file (or NULL for default).
+  */
+static int
+_cdi_init(int log_options, char *log_name)
+{
+	FILE *f;
+	int err, save;
+
+	if (unlikely(__cdi_initialized != 0)) {
+		errno = EALREADY;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (log_name == NULL) {
+		log_name = "/var/log/cdiapi.log";
+		// log_name = "cdilogfile";
+	}
+	if (unlikely((f = fopen(log_name, "+w")) == NULL)) {
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (unlikely((err = __cdi_init_FILE(log_options, f)) < 0)) {
+		save = errno;
+		fclose(f);
+		errno = save;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	return (0);
+}
+
 /** @brief initialize CDI library.
   * @param log_options logging options flags.
   * @param log_name name of log file (or NULL for default).
@@ -1179,21 +2080,7 @@ __asm__(".symver __cdi_init_FILE_r,cdi_init_FILE@@CDIAPI_1.0");
 int
 __cdi_init(int log_options, char *log_name)
 {
-	FILE *f;
-	int ret;
-
-	if (log_name == NULL) {
-		log_name = "cdilogfile";
-	}
-	if ((f = fopen(log_name, "+w")) == NULL) {
-		/* FIXME */
-		return (-1);
-	}
-	if ((ret = __cdi_init_FILE(log_options, f)) < 0) {
-		/* FIXME */
-		fclose(f);
-	}
-	return (ret);
+	return _cdi_init(log_options, log_name);
 }
 
 /** @brief The reentrant version of __cdi_init().
@@ -1206,7 +2093,19 @@ __cdi_init(int log_options, char *log_name)
 int
 __cdi_init_r(int log_options, char *log_name)
 {
-	return __cdi_init(log_options, log_name);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_list_unlock, NULL);
+	if (likely((err = __cdi_list_wrlock()) == 0)) {
+		err = _cdi_init(log_options, log_name);
+		__cdi_list_unlock(NULL);
+	} else {
+		errno = err;
+		cerrno = CD_SYSERR;
+		err = -1;
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_init(int log_options, char *log_name)
@@ -1218,17 +2117,33 @@ __cdi_init_r(int log_options, char *log_name)
   */
 __asm__(".symver __cdi_init_r,cdi_init@@CDIAPI_1.0");
 
+/** @internal
+  * @brief set log file size.
+  * @param nbytes maximum size of log file (<=0 infinite).
+  */
+static int
+_cdi_set_log_size(long nbytes)
+{
+	if (unlikely(__cdi_initialized == 0)) {
+		errno = ELIBACC;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	if (unlikely(nbytes > 0)) {
+		errno = ENOTSUP;
+		cerrno = CD_SYSERR;
+		return (-1);
+	}
+	return (0);
+}
+
 /** @brief set log file size.
   * @param nbytes maximum size of log file (<=0 infinite).
   */
 int
 __cdi_set_log_size(long nbytes)
 {
-	if (nbytes > 0) {
-		errno = EINVAL;
-		return (-1);
-	}
-	return (0);
+	return _cdi_set_log_size(nbytes);
 }
 
 /** @brief The reentrant version of __cdi_set_log_size().
@@ -1240,7 +2155,19 @@ __cdi_set_log_size(long nbytes)
 int
 __cdi_set_log_size_r(long nbytes)
 {
-	return __cdi_set_log_size(nbytes);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_list_unlock, NULL);
+	if (likely((err = __cdi_list_wrlock()) == 0)) {
+		err = _cdi_set_log_size(nbytes);
+		__cdi_list_unlock(NULL);
+	} else {
+		errno = err;
+		cerrno = CD_SYSERR;
+		err = -1;
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_set_log_size(long nbytes)
@@ -1251,6 +2178,21 @@ __cdi_set_log_size_r(long nbytes)
   */
 __asm__(".symver __cdi_set_log_size_r,cdi_set_log_size@@CDIAPI_1.0");
 
+/** @internal
+  * @brief sent CD_ALLOW_INPUT_REQ and wait for acknowlegement.
+  * @param fd the CDI Stream.
+  * @param state_ptr location for returned state variable.
+  */
+static int
+_cdi_allow_input_req(int fd, int *state_ptr)
+{
+	int err;
+
+	if (unlikely((err = _cdi_put_allow_input_req(fd)) < 0))
+		return (err);
+	return _cdi_wait_ack(fd, CD_OK_ACK, state_ptr, RetryOnSignal);
+}
+
 /** @brief sent CD_ALLOW_INPUT_REQ and wait for acknowlegement.
   * @param fd the CDI Stream.
   * @param state_ptr location for returned state variable.
@@ -1258,17 +2200,11 @@ __asm__(".symver __cdi_set_log_size_r,cdi_set_log_size@@CDIAPI_1.0");
 int
 __cdi_allow_input_req(int fd, int *state_ptr)
 {
-	int ret;
+	int err;
 
-	if ((ret = __cdi_put_allow_input_req(fd)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_wait_ack(fd, CD_OK_ACK, state_ptr)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_allow_input_req(fd, state_ptr);
 }
 
 /** @brief The reentrant version of __cdi_allow_input_req().
@@ -1281,7 +2217,15 @@ __cdi_allow_input_req(int fd, int *state_ptr)
 int
 __cdi_allow_input_req_r(int fd, int *state_ptr)
 {
-	return __cdi_allow_input_req(fd, state_ptr);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_getuser(fd)) >= 0)) {
+		err = _cdi_allow_input_req(fd, state_ptr);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_allow_input_req(int fd, int *state_ptr)
@@ -1293,6 +2237,22 @@ __cdi_allow_input_req_r(int fd, int *state_ptr)
   */
 __asm__(".symver __cdi_allow_input_req_r,cdi_allow_input_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief send CD_ATTACH_REQ and await acknowledgement.
+  * @param fd the CDI Stream.
+  * @param ppa the Physical Point of Attachment.
+  * @param state_ptr location for returned state variable.
+  */
+static int
+_cdi_attach_req(int fd, long ppa, int *state_ptr)
+{
+	int err;
+
+	if (unlikely((err = _cdi_put_attach_req(fd, ppa)) < 0))
+		return (err);
+	return _cdi_wait_ack(fd, CD_OK_ACK, state_ptr, RetryOnSignal);
+}
+
 /** @brief send CD_ATTACH_REQ and await acknowledgement.
   * @param fd the CDI Stream.
   * @param ppa the Physical Point of Attachment.
@@ -1301,17 +2261,11 @@ __asm__(".symver __cdi_allow_input_req_r,cdi_allow_input_req@@CDIAPI_1.0");
 int
 __cdi_attach_req(int fd, long ppa, int *state_ptr)
 {
-	int ret;
+	int err;
 
-	if ((ret = __cdi_put_attach_req(fd, ppa)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_wait_ack(fd, CD_OK_ACK, state_ptr)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_attach_req(fd, ppa, state_ptr);
 }
 
 /** @brief The reentrant version of __cdi_attach_req().
@@ -1325,7 +2279,15 @@ __cdi_attach_req(int fd, long ppa, int *state_ptr)
 int
 __cdi_attach_req_r(int fd, long ppa, int *state_ptr)
 {
-	return __cdi_attach_req(fd, ppa, state_ptr);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_getuser(fd)) >= 0)) {
+		err = _cdi_attach_req(fd, ppa, state_ptr);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_attach_req(int fd, long ppa, int *state_ptr)
@@ -1342,20 +2304,28 @@ __asm__(".symver __cdi_attach_req_r,cdi_attach_req@@CDIAPI_1.0");
   * @param fd the CDI Stream.
   * @param state_ptr location for returned state variable.
   */
+static int
+_cdi_detach_req(int fd, int *state_ptr)
+{
+	int err;
+
+	if (unlikely((err = _cdi_put_detach_req(fd)) < 0))
+		return (err);
+	return _cdi_wait_ack(fd, CD_OK_ACK, state_ptr, RetryOnSignal);
+}
+
+/** @brief send CD_DETACH_REQ and await acknowledgement.
+  * @param fd the CDI Stream.
+  * @param state_ptr location for returned state variable.
+  */
 int
 __cdi_detach_req(int fd, int *state_ptr)
 {
-	int ret;
+	int err;
 
-	if ((ret = __cdi_put_detach_req(fd)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_wait_ack(fd, CD_OK_ACK, state_ptr)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_detach_req(fd, state_ptr);
 }
 
 /** @brief The reentrant version of __cdi_detach_req().
@@ -1368,7 +2338,15 @@ __cdi_detach_req(int fd, int *state_ptr)
 int
 __cdi_detach_req_r(int fd, int *state_ptr)
 {
-	return __cdi_detach_req(fd, state_ptr);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_getuser(fd)) >= 0)) {
+		err = _cdi_detach_req(fd, state_ptr);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_detach_req(int fd, int *state_ptr)
@@ -1380,6 +2358,22 @@ __cdi_detach_req_r(int fd, int *state_ptr)
   */
 __asm__(".symver __cdi_detach_req_r,cdi_detach_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief send CDI_DISABLE_REQ and await acknolwedgement.
+  * @param fd the CDI Stream.
+  * @param displosal the disposal method for unacknolwedged frames.
+  * @param state_ptr location for returned state variable.
+  */
+static int
+_cdi_disable_req(int fd, unsigned long disposal, int *state_ptr)
+{
+	int err;
+
+	if (unlikely((err = _cdi_put_disable_req(fd, disposal)) < 0))
+		return (err);
+	return _cdi_wait_ack(fd, CD_DISABLE_CON, state_ptr, RetryOnSignal);
+}
+
 /** @brief send CDI_DISABLE_REQ and await acknolwedgement.
   * @param fd the CDI Stream.
   * @param displosal the disposal method for unacknolwedged frames.
@@ -1388,17 +2382,11 @@ __asm__(".symver __cdi_detach_req_r,cdi_detach_req@@CDIAPI_1.0");
 int
 __cdi_disable_req(int fd, unsigned long disposal, int *state_ptr)
 {
-	int ret;
+	int err;
 
-	if ((ret = __cdi_put_disable_req(fd, disposal)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_wait_ack(fd, CD_DISABLE_CON, state_ptr)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_disable_req(fd, disposal, state_ptr);
 }
 
 /** @brief The reentrant version of __cdi_disable_req().
@@ -1412,7 +2400,15 @@ __cdi_disable_req(int fd, unsigned long disposal, int *state_ptr)
 int
 __cdi_disable_req_r(int fd, unsigned long disposal, int *state_ptr)
 {
-	return __cdi_disable_req(fd, disposal, state_ptr);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_getuser(fd)) >= 0)) {
+		err = _cdi_disable_req(fd, disposal, state_ptr);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_disable_req(int fd, unsigned long disposal, int *state_ptr)
@@ -1425,6 +2421,21 @@ __cdi_disable_req_r(int fd, unsigned long disposal, int *state_ptr)
   */
 __asm__(".symver __cdi_disable_req_r,cdi_disable_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief send CD_ENABLE_REQ and await acknowledgement.
+  * @param fd the CDI Stream.
+  * @param state_ptr location for returned state variable.
+  */
+static int
+_cdi_enable_req(int fd, int *state_ptr)
+{
+	int err;
+
+	if (unlikely((err = _cdi_put_enable_req(fd)) < 0))
+		return (err);
+	return _cdi_wait_ack(fd, CD_ENABLE_CON, state_ptr, RetryOnSignal);
+}
+
 /** @brief send CD_ENABLE_REQ and await acknowledgement.
   * @param fd the CDI Stream.
   * @param state_ptr location for returned state variable.
@@ -1432,17 +2443,11 @@ __asm__(".symver __cdi_disable_req_r,cdi_disable_req@@CDIAPI_1.0");
 int
 __cdi_enable_req(int fd, int *state_ptr)
 {
-	int ret;
+	int err;
 
-	if ((ret = __cdi_put_enable_req(fd)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_wait_ack(fd, CD_ENABLE_CON, state_ptr)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_enable_req(fd, state_ptr);
 }
 
 /** @brief The reentrant version of __cdi_enable_req().
@@ -1455,7 +2460,15 @@ __cdi_enable_req(int fd, int *state_ptr)
 int
 __cdi_enable_req_r(int fd, int *state_ptr)
 {
-	return __cdi_enable_req(fd, state_ptr);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_getuser(fd)) >= 0)) {
+		err = _cdi_enable_req(fd, state_ptr);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_enable_req(int fd, int *state_ptr)
@@ -1467,6 +2480,24 @@ __cdi_enable_req_r(int fd, int *state_ptr)
   */
 __asm__(".symver __cdi_enable_req_r,cdi_enable_req@@CDIAPI_1.0");
 
+/** @internal
+  * @brief send CD_MODEM_SIG_POLL and await response.
+  * @param fd the CDI Stream.
+  * @param flags extra flags for received control messages.
+  */
+static int
+_cdi_get_modem_sigs(int fd, int flags)
+{
+	int err;
+
+	if (unlikely((err = _cdi_modem_sig_poll(fd)) < 0))
+		return (err);
+	if (unlikely
+	    ((err = _cdi_wait_ack(fd, CD_MODEM_SIG_IND, NULL, (flags | (RetryOnSignal)))) != 1))
+		return (err);
+	return (((cd_modem_sig_ind_t *) cdi_ctl_buf)->cd_sigs);
+}
+
 /** @brief send CD_MODEM_SIG_POLL and await response.
   * @param fd the CDI Stream.
   * @param flags extra flags for received control messages.
@@ -1474,22 +2505,11 @@ __asm__(".symver __cdi_enable_req_r,cdi_enable_req@@CDIAPI_1.0");
 int
 __cdi_get_modem_sigs(int fd, int flags)
 {
-	int ret;
+	int err;
 
-	if ((ret = __cdi_modem_sig_poll(fd)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	flags |= Return_modem_sig_ind;
-	while ((ret = __cdi_rcv_msg(fd, (char *)cdi_data_buf, CDI_DATA_BUF_SIZE, flags)) > 0) ;
-	if (ret < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	/* Have expected control primitive */
-	if (*(cd_ulong *) cdi_ctl_buf == CD_MODEM_SIG_IND)
-		return (((cd_modem_sig_ind_t *) cdi_ctl_buf)->cd_sigs);
-	return (0);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_get_modem_sigs(fd, flags);
 }
 
 /** @brief The reentrant version of __cdi_get_modem_sigs().
@@ -1502,7 +2522,15 @@ __cdi_get_modem_sigs(int fd, int flags)
 int
 __cdi_get_modem_sigs_r(int fd, int flags)
 {
-	return __cdi_get_modem_sigs(fd, flags);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_getuser(fd)) >= 0)) {
+		err = _cdi_get_modem_sigs(fd, flags);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_get_modem_sigs(int fd, int flags)
@@ -1514,6 +2542,22 @@ __cdi_get_modem_sigs_r(int fd, int flags)
   */
 __asm__(".symver __cdi_get_modem_sigs_r,cdi_get_modem_sigs@@CDIAPI_1.0");
 
+/** @internal
+  * @brief send CD_MODEM_SIG_REQ primitive.
+  * @param fd the CDI Stream.
+  * @param sig the signals requested.
+  */
+static int
+_cdi_modem_sig_req(int fd, unsigned int sigs)
+{
+	cd_modem_sig_req_t *p = (typeof(p)) cdi_ctl_buf;
+
+	p->cd_primitive = CD_MODEM_SIG_REQ;
+	p->cd_sigs = sigs;
+
+	return _cdi_put_proto(fd, sizeof(*p), 0);
+}
+
 /** @brief send CD_MODEM_SIG_REQ primitive.
   * @param fd the CDI Stream.
   * @param sig the signals requested.
@@ -1521,19 +2565,11 @@ __asm__(".symver __cdi_get_modem_sigs_r,cdi_get_modem_sigs@@CDIAPI_1.0");
 int
 __cdi_modem_sig_req(int fd, unsigned int sigs)
 {
-	cd_modem_sig_req_t *p;
-	int ret;
+	int err;
 
-	p = (typeof(p)) cdi_ctl_buf;
-	cdi_ctl_cnt = sizeof(*p);
-
-	p->cd_primitive = CD_MODEM_SIG_REQ;
-	p->cd_sigs = sigs;
-
-	if ((ret = __cdi_put_proto(fd, cdi_ctl_cnt, 0)) < 0) {
-		/* FIXME */
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_modem_sig_req(fd, sigs);
 }
 
 /** @brief The reentrant version of __cdi_modem_sig_req().
@@ -1546,7 +2582,15 @@ __cdi_modem_sig_req(int fd, unsigned int sigs)
 int
 __cdi_modem_sig_req_r(int fd, unsigned int sigs)
 {
-	return __cdi_modem_sig_req(fd, sigs);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_hlduser(fd)) >= 0)) {
+		err = _cdi_modem_sig_req(fd, sigs);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_modem_sig_req(int fd, unsigned int sigs)
@@ -1557,6 +2601,29 @@ __cdi_modem_sig_req_r(int fd, unsigned int sigs)
   * This symbol is a strong alias of __cdi_modem_sig_req_r().
   */
 __asm__(".symver __cdi_modem_sig_req_r,cdi_modem_sig_req@@CDIAPI_1.0");
+
+/** @internal
+  * @brief dial a modem.
+  * @param fd the CDI Stream.
+  * @param ppa the upper ppa.
+  * @param dial_string the modem dial string.
+  * @param dial_length the modem dial string length.
+  *
+  * This doesn't seem to be quite right...
+  */
+static int
+_cdi_dial_req(int fd, uint ppa, uint sigs, char *dial_string, int dial_length)
+{
+	int err, state = 0;
+
+	if (unlikely((err = _cdi_attach_req(fd, ppa, &state)) < 0))
+		return (err);
+	if (unlikely((err = _cdi_modem_sig_req(fd, sigs)) < 0))
+		return (err);
+	if (unlikely((err = _cdi_put_dial_req(fd, dial_string, dial_length)) < 0))
+		return (err);
+	return _cdi_wait_ack(fd, CD_ENABLE_CON, &state, RetryOnSignal);
+}
 
 /** @brief dial a modem.
   * @param fd the CDI Stream.
@@ -1569,25 +2636,11 @@ __asm__(".symver __cdi_modem_sig_req_r,cdi_modem_sig_req@@CDIAPI_1.0");
 int
 __cdi_dial_req(int fd, uint ppa, uint sigs, char *dial_string, int dial_length)
 {
-	int ret, state = 0;
+	int err;
 
-	if ((ret = __cdi_attach_req(fd, ppa, &state)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_modem_sig_req(fd, sigs)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_put_dial_req(fd, dial_string, dial_length)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	if ((ret = __cdi_wait_ack(fd, CD_ENABLE_CON, &state)) < 0) {
-		/* FIXME */
-		return (ret);
-	}
-	return (ret);
+	if (unlikely((err = __cdi_chkuser(fd)) < 0))
+		return (err);
+	return _cdi_dial_req(fd, ppa, sigs, dial_string, dial_length);
 }
 
 /** @brief The reentrante version of __cdi_dial_req().
@@ -1602,7 +2655,15 @@ __cdi_dial_req(int fd, uint ppa, uint sigs, char *dial_string, int dial_length)
 int
 __cdi_dial_req_r(int fd, uint ppa, uint sigs, char *dial_string, int dial_length)
 {
-	return __cdi_dial_req(fd, ppa, sigs, dial_string, dial_length);
+	int err;
+
+	pthread_cleanup_push_defer_np(__cdi_putuser, &fd);
+	if (likely((err = __cdi_getuser(fd)) >= 0)) {
+		err = _cdi_dial_req(fd, ppa, sigs, dial_string, dial_length);
+		__cdi_putuser(&fd);
+	}
+	pthread_cleanup_pop_restore_np(0);
+	return (err);
 }
 
 /** @fn int cdi_dial_req(int fd, uint ppa, uint sigs, char *dial_string, int dial_length)
@@ -1616,16 +2677,210 @@ __cdi_dial_req_r(int fd, uint ppa, uint sigs, char *dial_string, int dial_length
   */
 __asm__(".symver __cdi_dial_req_r,cdi_dial_req@@CDIAPI_1.0");
 
+/* *INDENT-OFF* */
+const char *__cdi_std_errstr[] = {
+/*
+TRANS  CD_BADADDRESS: Address was invalid.
+*/
+	[0]			= gettext_noop("No error"),
+/*
+TRANS  CD_BADADDRESS: Address was invalid.
+*/
+	[CD_BADADDRESS]		= gettext_noop("Address was invalid"),
+/*
+TRANS  CD_BADADDRTYPE: Invalid address type.
+*/
+	[CD_BADADDRTYPE]	= gettext_noop("Invalid address type"),
+/*
+TRANS  CD_BADDIAL: Dial information was invalid.
+*/
+	[CD_BADDIAL]		= gettext_noop("Dial information was invalid"),
+/*
+TRANS  CD_BADDIALTYPE: Invalid dial information type.
+*/
+	[CD_BADDIALTYPE]	= gettext_noop("Invalid dial information type"),
+/*
+TRANS  CD_BADDISPOSAL: Invalid disposal parameter.
+*/
+	[CD_BADDISPOSAL]	= gettext_noop("Invalid disposal parameter"),
+/*
+TRANS  CD_BADFRAME: Defective SDU received.
+*/
+	[CD_BADFRAME]		= gettext_noop("Defective SDU received"),
+/*
+TRANS  CD_BADPPA: Invalid PPA identifier.
+*/
+	[CD_BADPPA]		= gettext_noop("Invalid PPA identifier"),
+/*
+TRANS  CD_BADPRIM: Unrecognized primitive.
+*/
+	[CD_BADPRIM]		= gettext_noop("Unrecognized primitive"),
+/*
+TRANS  CD_DISC: Disconnected.
+*/
+	[CD_DISC]		= gettext_noop("Disconnected"),
+/*
+TRANS  CD_EVENT: Protocol-specific event occurred.
+*/
+	[CD_EVENT]		= gettext_noop("Protocol-specific event occurred"),
+/*
+TRANS  CD_FATALERR: Device has become unusable.
+*/
+	[CD_FATALERR]		= gettext_noop("Device has become unusable"),
+/*
+TRANS  CD_INITFAILED: Line initialization failed.
+*/
+	[CD_INITFAILED]		= gettext_noop("Line initialization failed"),
+/*
+TRANS  CD_NOTSUPP: Primitive not supported by this device.
+*/
+	[CD_NOTSUPP]		= gettext_noop("Primitive not supported by this device"),
+/*
+TRANS  CD_OUTSTATE: Primitive was issued from an invalid state.
+*/
+	[CD_OUTSTATE]		= gettext_noop("Primitive was issued from an invalid state"),
+/*
+TRANS  CD_PROTOSHORT: M_PROTO block too short.
+*/
+	[CD_PROTOSHORT]		= gettext_noop("M_PROTO block too short"),
+/*
+TRANS  CD_READTIMEOUT: Read request timed out before data arrived.
+*/
+	[CD_READTIMEOUT]	= gettext_noop("Read request timed out before data arrived"),
+/*
+TRANS  CD_SYSERR: UNIX system error.
+*/
+	[CD_SYSERR]		= gettext_noop("UNIX system error"),
+/*
+TRANS  CD_WRITEFAIL: Unitdata request failed.
+*/
+	[CD_WRITEFAIL]		= gettext_noop("Unitdata request failed"),
+/*
+TRANS  Any other value: Unknown error.
+*/
+	[CD_WRITEFAIL + 1]	= gettext_noop("Unknown error"),
+};
+/* *INDENT-ON* */
+
+/* *INDENT-OFF* */
+const char *__cdi_std_expstr[] = {
+/*
+TRANS  No explanation.
+*/
+	[0]			= gettext_noop("No explanation"),
+/*
+TRANS  CD_CRCERR: CRC or FCS error.
+*/
+	[CD_CRCERR]		= gettext_noop("CRC or FCS error"),
+/*
+TRANS  CD_DLE_EOT: DLE EOT detected.
+*/
+	[CD_DLE_EOT]		= gettext_noop("DLE EOT detected"),
+/*
+TRANS  CD_FORMAT: Format error detected.
+*/
+	[CD_FORMAT]		= gettext_noop("Format error detected"),
+/*
+TRANS  CD_HDLC_ABORT: Aborted frame detected.
+*/
+	[CD_HDLC_ABORT]		= gettext_noop("Aborted frame detected"),
+/*
+TRANS  CD_OVERRUN: Input overrun.
+*/
+	[CD_OVERRUN]		= gettext_noop("Input overrun"),
+/*
+TRANS  CD_TOOSHORT: Frame too short.
+*/
+	[CD_TOOSHORT]		= gettext_noop("Frame too short"),
+/*
+TRANS  CD_INCOMPLETE: Partial frame received.
+*/
+	[CD_INCOMPLETE]		= gettext_noop("Partial frame received"),
+/*
+TRANS  CD_BUSY: Telephone was busy.
+*/
+	[CD_BUSY]		= gettext_noop("Telephone was busy"),
+/*
+TRANS  CD_NOASNWER: Connection went unanswered.
+*/
+	[CD_NOANSWER]		= gettext_noop("Connection went unanswered"),
+/*
+TRANS  CD_CALLREJECT: Connection rejected.
+*/
+	[CD_CALLREJECT]		= gettext_noop("Connection rejected"),
+/*
+TRANS  CD_HDLC_IDLE: HDLC line went idle.
+*/
+	[CD_HDLC_IDLE]		= gettext_noop("HDLC line went idle"),
+/*
+TRANS  CD_HDLC_NOTIDLE: HDLC line no longer idle.
+*/
+	[CD_HDLC_NOTIDLE]	= gettext_noop("HDLC line no longer idle"),
+/*
+TRANS  CD_QUIESCENT: Line being reassigned.
+*/
+	[CD_QUIESCENT]		= gettext_noop("Line being reassigned"),
+/*
+TRANS  CD_RESUMED: Line has been reassigned.
+*/
+	[CD_RESUMED]		= gettext_noop("Line has been reassigned"),
+/*
+TRANS  CD_DSRTIMEOUT: Did not see DSR in time.
+*/
+	[CD_DSRTIMEOUT]		= gettext_noop("Did not see DSR in time"),
+/*
+TRANS  CD_LAN_COLLISIONS: LAN excessive collisions.
+*/
+	[CD_LAN_COLLISIONS]	= gettext_noop("LAN excessive collisions"),
+/*
+TRANS  CD_LAN_REFUSED: LAN message refused.
+*/
+	[CD_LAN_REFUSED]	= gettext_noop("LAN message refused"),
+/*
+TRANS  CD_LAN_NOSTATION: LAN no such station.
+*/
+	[CD_LAN_NOSTATION]	= gettext_noop("LAN no such station"),
+/*
+TRANS  CD_LOSTCTS: Lost Clear to Send signal.
+*/
+	[CD_LOSTCTS]		= gettext_noop("Lost Clear to Send signal"),
+};
+/* *INDENT-ON* */
+
+/** @internal
+  * @brief perror() to log file.
+  * @param msg the prefix message.
+  *
+  * Note that msg should be const char *.
+  */
+static void
+_cdi_perror(char *msg)
+{
+	int error = cerrno;
+
+	if (unlikely(__cdi_initialized == 0)) {
+		errno = ELIBACC;
+		cerrno = CD_SYSERR;
+		return;
+	}
+	if (error == CD_SYSERR) {
+		syslog(LOG_INFO, "%s: %m", msg);
+	} else {
+		if (error < 0 || error > CD_WRITEFAIL)
+			error = CD_WRITEFAIL + 1;
+		syslog(LOG_INFO, "%s: %s", msg, gettext(__cdi_std_errstr[error]));
+	}
+}
+
 /** @brief perror() to log file.
   * @param msg the prefix message.
   *
   * Note that msg should be const char *.
   */
-int
+void
 __cdi_perror(char *msg)
 {
-	syslog(LOG_INFO, "%s: %m", msg);
-	return (0); /* XXX */
+	return _cdi_perror(msg);
 }
 
 /** @brief the reentrant version of __cdi_perror().
@@ -1634,19 +2889,29 @@ __cdi_perror(char *msg)
   * @par Alias:
   * This is an implementation of cdi_perror().
   */
-int
+void
 __cdi_perror_r(char *msg)
 {
-	return __cdi_perror(msg);
+	return _cdi_perror(msg);
 }
 
-/** @fn int cdi_perror(char *msg)
+/** @fn void cdi_perror(char *msg)
   * @param msg the prefix message.
   * @verison CDIAPI_1.0
   * @par Alias:
   * This symbol is a strong alias of __cdi_perror_r().
   */
 __asm__(".symver __cdi_perror_r,cdi_perror@@CDIAPI_1.0");
+
+/** @internal
+  * @brief print message to log file.
+  * @param fmt format string.
+  */
+static void
+_cdi_vprintf(const char *fmt, va_list args)
+{
+	vsyslog(LOG_INFO, fmt, args);
+}
 
 /** @brief print message to log file.
   * @param fmt format string.
@@ -1657,7 +2922,7 @@ __cdi_printf(char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	vsyslog(LOG_INFO, fmt, args);
+	_cdi_vprintf(fmt, args);
 	va_end(args);
 }
 
@@ -1673,7 +2938,7 @@ __cdi_printf_r(char *fmt, ...)
 	va_list args;
 
 	va_start(args, fmt);
-	vsyslog(LOG_INFO, fmt, args);
+	_cdi_vprintf(fmt, args);
 	va_end(args);
 }
 
@@ -1685,13 +2950,14 @@ __cdi_printf_r(char *fmt, ...)
   */
 __asm__(".symver __cdi_printf_r,cdi_printf@@CDIAPI_1.0");
 
-/** @brief print data with indented hexadecimal.
+/** @internal
+  * @brief print data with indented hexadecimal.
   * @param buf buffer contianing data.
   * @param nbytes number of bytes to print.
   * @param indent the number of spaces to indent.
   */
-int
-__cdi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
+static int
+_cdi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
 {
 	char tmp[BUFSIZ];
 	int i, rows, cols, remaining;
@@ -1707,7 +2973,18 @@ __cdi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
 			sprintf(q, "%02X ", *p);
 		syslog(LOG_INFO, "%s", tmp);
 	}
-	return (0); /* XXX */
+	return (0);		/* XXX */
+}
+
+/** @brief print data with indented hexadecimal.
+  * @param buf buffer contianing data.
+  * @param nbytes number of bytes to print.
+  * @param indent the number of spaces to indent.
+  */
+int
+__cdi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
+{
+	return _cdi_print_msg(buf, nbytes, indent);
 }
 
 /** @brief The reentrant version of __cdi_print_msg().
@@ -1721,7 +2998,7 @@ __cdi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
 int
 __cdi_print_msg_r(unsigned char *buf, unsigned int nbytes, int indent)
 {
-	return __cdi_print_msg(buf, nbytes, indent);
+	return _cdi_print_msg(buf, nbytes, indent);
 }
 
 /** @fn int cdi_print_msg(unsigned char *buf, unsigned int nbytes, int indent)
@@ -1734,11 +3011,12 @@ __cdi_print_msg_r(unsigned char *buf, unsigned int nbytes, int indent)
   */
 __asm__(".symver __cdi_print_msg_r,cdi_print_msg@@CDIAPI_1.0");
 
-/** @brief decode primtiive and output to syslog.
+/** @internal
+  * @brief decode primtiive and output to syslog.
   * @param msg message to prefix to output.
   */
-int
-__cdi_decode_ctl(char *msg)
+static int
+_cdi_decode_ctl(char *msg)
 {
 	union CD_primitives *p = (typeof(p)) msg;
 
@@ -1896,6 +3174,15 @@ __cdi_decode_ctl(char *msg)
 	return (-1);
 }
 
+/** @brief decode primtiive and output to syslog.
+  * @param msg message to prefix to output.
+  */
+int
+__cdi_decode_ctl(char *msg)
+{
+	return _cdi_decode_ctl(msg);
+}
+
 /** @brief The reentrant version of __cdi_decode_ctl().
   * @param msg message to prefix to output.
   * @version CDIAPI_1.0
@@ -1905,7 +3192,7 @@ __cdi_decode_ctl(char *msg)
 int
 __cdi_decode_ctl_r(char *msg)
 {
-	return __cdi_decode_ctl(msg);
+	return _cdi_decode_ctl(msg);
 }
 
 /** @fn int cdi_decode_ctl(char *msg)
@@ -1916,11 +3203,12 @@ __cdi_decode_ctl_r(char *msg)
   */
 __asm__(".symver __cdi_decode_ctl_r,cdi_decode_ctl@@CDIAPI_1.0");
 
-/** @brief decode modem signals to string.
+/** @internal
+  * @brief decode modem signals to string.
   * @param sigs the modem signals.
   */
-char *
-__cdi_decode_modem_sigs(uint sigs)
+static char *
+_cdi_decode_modem_sigs(uint sigs)
 {
 	char *mybuf = (char *) __cdi_get_tsd()->strbuf, *buf = mybuf;
 
@@ -1938,6 +3226,15 @@ __cdi_decode_modem_sigs(uint sigs)
 	return (mybuf);
 }
 
+/** @brief decode modem signals to string.
+  * @param sigs the modem signals.
+  */
+char *
+__cdi_decode_modem_sigs(uint sigs)
+{
+	return _cdi_decode_modem_sigs(sigs);
+}
+
 /** @brief The reentrant version of __cdi_decode_modem_sigs().
   * @param sigs the modem signals.
   * @version CDIAPI_1.0
@@ -1947,7 +3244,7 @@ __cdi_decode_modem_sigs(uint sigs)
 char *
 __cdi_decode_modem_sigs_r(uint sigs)
 {
-	return __cdi_decode_modem_sigs(sigs);
+	return _cdi_decode_modem_sigs(sigs);
 }
 
 /** @fn char *cdi_decode_modem_sigs(uint sigs)
@@ -1958,6 +3255,27 @@ __cdi_decode_modem_sigs_r(uint sigs)
   */
 __asm__(".symver __cdi_decode_modem_sigs_r,cdi_decode_modem_sigs@@CDIAPI_1.0");
 
+static int
+_cdi_xray_req(int fd, int upa, int on_off, int hi_wat, int lo_wat)
+{
+	errno = ENOTSUP;
+	cerrno = CD_SYSERR;
+	return (-1);
+}
+
+int
+__cdi_xray_req(int fd, int upa, int on_off, int hi_wat, int lo_wat)
+{
+	return _cdi_xray_req(fd, upa, on_off, hi_wat, lo_wat);
+}
+
+int
+__cdi_xray_req_r(int fd, int upa, int on_off, int hi_wat, int lo_wat)
+{
+	return _cdi_xray_req(fd, upa, on_off, hi_wat, lo_wat);
+}
+
+__asm__(".symver __cdi_xray_req_r,cdi_xray_req@@CDIAPI_1.0");
 
 /** @} */
 

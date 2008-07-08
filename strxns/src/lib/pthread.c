@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pthread.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 11:51:00 $
+ @(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/07/08 16:57:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 11:51:00 $ by $Author: brian $
+ Last Modified $Date: 2008/07/08 16:57:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pthread.c,v $
+ Revision 0.9.2.2  2008/07/08 16:57:34  brian
+ - updated libraries and manual pages
+
  Revision 0.9.2.1  2008-07-01 11:51:00  brian
  - added manual pages and library implementation
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pthread.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 11:51:00 $"
+#ident "@(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/07/08 16:57:34 $"
 
 static char const ident[] =
-    "$RCSfile: pthread.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 11:51:00 $";
+    "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/07/08 16:57:34 $";
 
 /* This file can be processed with doxygen(1). */
 

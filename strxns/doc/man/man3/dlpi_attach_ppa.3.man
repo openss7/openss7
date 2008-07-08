@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: dlpi_attach_ppa.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\" @(#) $Id: dlpi_attach_ppa.3.man,v 0.9.2.2 2008/07/08 16:57:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008/07/08 16:57:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: dlpi_attach_ppa.3.man,v $
+.\" Revision 0.9.2.2  2008/07/08 16:57:17  brian
+.\" - updated libraries and manual pages
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
 .\" - added manual pages and library implementation
 .\"
@@ -100,12 +103,16 @@ dlpiapi
 .\"
 .\"
 .SH SYNOPSIS
+.ad l
+.nh
 .PP
 .B #include <sys/dlpi.h>
 .br
 .B #include <dlpiapi.h>
 .HP
-\fBint dlpi_attach_ppa\fP(\fBint\fP \fIfd\fP);
+\fBint dlpi_attach_ppa\fP(\fBint\fP \fIfd\fP, \fBulong\fP \fIppa\fP);
+.ad b
+.hy 6
 .\"
 .\"
 .SH ARGUMENTS
@@ -113,6 +120,9 @@ dlpiapi
 .TP
 .I fd
 the file descriptor for the Stream.
+.TP
+.I ppa
+the Physical Point of Attachment (PPA).
 .\"
 .\"
 .SH DESCRIPTION
@@ -123,6 +133,26 @@ is a DLPI API Library
 dlpiapi
 .]
 subroutine.
+It issues a
+.BR DL_ATTACH_REQ (7)
+primitive for the specified PPA, \fIppa\fP, on the DLPI Stream specified by the
+file descriptor, \fIfd\fP, and awaits and processes either a
+.BR DL_OK_ACK (7)
+primitive acknowledging the attachment, or a
+.BR DL_ERROR_ACK (7)
+primitive negatively acknowledging the attachment.
+.BR dlpi_send_attach_req (3)
+is used to issue the
+.BR DL_ATTACH_REQ (7)
+primitive, and
+.BR dlpi_complete_req (3)
+is used to await and process the acknowledgement.
+.PP
+This library call is only valid in when the DLPI Stream is in the
+.BR DL_UNATTACHED
+state.  The next state upon successful completion is the
+.BR DL_UNBOUND
+state.
 .\"
 .\"
 .SH USAGE
@@ -145,13 +175,16 @@ function.
 .PP
 .B dlpi_attach_ppa
 is fully thread-safe.
+What is described as global variables are in fact thread-specific data when
+linked with
+.BR libpthread .
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .B dlpi_attach_ppa
-is successful, it returns zero (0) or a positive integer value.
+is successful, it returns a non-zero, positive integer value.
 When
 .B dlpi_attach_ppa
 fails, it returns a negative integer value (-1).
@@ -164,22 +197,129 @@ When
 fails, it returns a negative integer value (-1).
 .B dlpi_attach_ppa
 may fail when:
-.TP \w'[\fBENOMEM\fP]\(em'u
+.PP
+A DLPI Library error occurs:
+.\".TP \w'[\fBDLPIAPI_SYSERR\fP]\(em'u
+.TP
+.RB [ DLPIAPI_UNSUPPORTED_MSG ]
+an unexpected DLPI response message was received.
+.TP
+.RB [ DLPIAPI_NO_NOTHING ]
+terminal end of file, the DLPI Stream is hung up.
+.TP
+.RB [ DLPIAPI_STYLE_UNKNOWN ]
+the provider style is not known.
+.TP
+.RB [ DLPIAPI_PARAM_ERROR ]
+invalid parameter error: at least one of the arguments passed is invalid.
+.TP
+.RB [ DLPIAPI_NOT_INIT ]
+.BR dlpi_init (3)
+has not been called to initialize the library.
+.TP
+.RB [ DLPIAPI_OPEN_ERROR ]
+could not open a DLPI Stream.
+.TP
+.RB [ DLPIAPI_REJECT ]
+.BR dlpi_complete_req (3)
+was rejected with an
+.BR DL_ERROR_ACK (7)
+or
+.BR DL_DISCONNECT_IND (7)
+primitive.
+.TP
+.RB [ DLPIAPI_UNUSABLE ]
+a
+.BR putmsg (2s)
+or
+.BR getmsg (2s)
+system call failed.
+.TP
+.RB [ DLPIAPI_EINTR ]
+an interrupt occured before the command could complete.
+.TP
+.RB [ DLPIAPI_EAGAIN ]
+a non-blocking attempt on an empty or flow controlled DLPI Stream would have
+blocked.
+.TP
+.RB [ DLPIAPI_SYSERR ]
+.IR errno (3)
+contains the \fBLinux\fP system error.
+.PP
+DLPI Library error numbers are negative integer values, whose values are
+returned from the library call, and stored in the
+.IR dlerrno (3)
+global variable.
+.PP
+A DLPI error occurs:
+.\".TP \w'[\fBDLPIAPI_SYSERR\fP]\(em'u
+.TP
+.RB [ DL_ACCESS ]
+the DLS user did not have proper permission to use the requested PPA.
+.TP
+.RB [ DL_BADPPA ]
+the specified PPA is invalid.
+.TP
+.RB [ DL_OUTSTATE ]
+the primitive was issued from an invalid state.
+.TP
+.RB [ DL_INITFAILED ]
+automatic initialization of the PPA failed.
+.TP
+.RB [ DL_NOTINIT ]
+the PPA had not been initialized prior to this request.
+.TP
+.RB [ DL_SYSERR ]
+a \fBLinux\fP system error has occured and the \fBLinux\fP system error is
+indicated in the
+.IR errno (3)
+global variable.
+.PP
+DLPI error numbers are positive integer values, whose values are nevery
+returned from the library call, however, a copy of the last DLPI error is
+contained in the
+.IR dlerrno (3)
+global vairable.
+.PP
+A \fBLinux\fP system error occurs:
+.\".TP \w'[\fBDLPIAPI_SYSERR\fP]\(em'u
+.TP
+.RB [ ELIBACC ]
+See [\fBDLPIAPI_NOT_INIT\fP].
+.TP
 .RB [ EBADF ]
-the file descriptor,
-.IR fd ,
-supplied does not correspond to a valid DLPI Stream open for reading and
-writing.
+the file descriptor, \fIfd\fP, supplied does not correspond to a valid DLPI
+Stream open for reading and writing.
 .TP
 .RB [ EINVAL ]
-one of the arguments supplied was invalid.
+See [\fBDLPIAPI_PARAM_ERROR\fP].
+.TP
+.RB [ ETIMEDOUT ]
+the call timed out awaiting a
+.BR DL_OK_ACK (7)
+or
+.BR DL_ERROR_ACK (7)
+primitive.  The default time for which these rpimitives are awaited is
+\fB100\fP milliseconds.
+.TP
+.RB [ EINTR ]
+See [\fBDLPIAPI_EINTR\fP].
+.TP
+.RB [ ERESTART ]
+See [\fBDLPIAPI_EINTR\fP].
+.TP
+.RB [ ERESTARTSYS ]
+See [\fBDLPIAPI_EINTR\fP].
+.TP
+.RB [ EAGAIN ]
+See [\fBDLPIAPI_EAGAIN\fP].
+.TP
+.RB [ EBADMSG ]
+See [\fBDLPIAPI_UNSUPPORTED_MSG\fP].
 .PP
 In addition, any of the error numbers returned by
 .BR putmsg (2s),
 .BR getmsg (2s),
-.BR open (2s),
-.BR close (2s),
-.BR ioctl (2s)
 may also be returned by
 .BR dlpi_attach_ppa .
 .\"
@@ -200,10 +340,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES
@@ -234,8 +370,17 @@ has no known bugs.
 .\"
 .SH SEE ALSO
 .PP
+.BR DL_ATTACH_REQ (7),
+.BR DL_OK_ACK (7),
+.BR DL_ERROR_ACK (7),
 .BR dlpi (7),
 .BR dlpiapi (3),
+.BR dlpi_init (3),
+.IR dlerrno (3),
+.IR errno (3),
+.BR poll (2s),
+.BR putmsg (2s),
+.BR getmsg (2s),
 .IR STREAMS (9).
 .\"
 .\"
@@ -253,6 +398,12 @@ and systems providing an interface equivalent to
 DLPI API Library,
 with the following compatibility considerations:
 .IP \(em \w'\(em\(em'u
+.B dlpi_attach_req
+blocks awaiting a response regardless of the blocking or non-blocking flag
+settings associated with the open file descriptor.  That is, the function
+internally uses
+.BR poll (2s).
+.IP \(em
 .B DLPI API Library
 functions are
 .IR GCOM -specific,
@@ -263,7 +414,7 @@ software to
 They are inherently non-portable.  These functions will be avoided by portable
 DLPI programs.
 .IP \(em
-Binary compatibility is not attempted, only source compatiblity: any binary
+Binary compatibility is not attempted, only source compatibility: any binary
 compatibility experienced is coincidental and may change on a future release.
 It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
 share definitions with the DLPI API library using
