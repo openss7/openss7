@@ -1,3 +1,22 @@
+2008-07-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man3/dlpi_disconnect_req.3.man: added manpage
+	* doc/man/man3/dlpi_get_info.3.man: added manpage
+	* doc/man/man3/dlpi_get_style.3.man: added manpage
+	* doc/man/man3/dlpi_init_FILE.3.man: added manpage
+	* doc/man/man3/dlpi_open_data.3.man: added manpage
+	* doc/man/man3/dlpi_test_req.3.man: added manpage
+	* doc/man/man3/dlpi_test_res.3.man: added manpage
+	* doc/man/man3/npi_connect.3.man: added manpage
+	* doc/man/man3/npi_put_exdata_proto.3.man: added manpage
+	* doc/man/man3/npi_send_reset_res.3.man: added manpage
+	* doc/man/man3/npi_x25_registration_cause.3.man: added manpage
+	* doc/man/man3/pu_xxx.3.man: added manpage
+
+2008-07-07  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): New variable.
+
 2008-07-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release file
