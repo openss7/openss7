@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: cdi.texi,v 0.9.2.1 2007/07/14 01:13:40 brian Exp $
+% @(#) $Id: cdi.texi,v 0.9.2.2 2008/07/08 16:57:31 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/07/14 01:13:40 $ by $Author: brian $
+% Last Modified $Date: 2008/07/08 16:57:31 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -2575,7 +2575,96 @@ Unit data request failed.
 @end table
 
 @item cd_explanation
-Not documented.
+Indicates a futher explanation of the error.  When @var{cd_errno} is @var{CD_SYSERR}, this field contains the
+@cite{UNIX} system error as described in @manref{errno(3)}.  Otherwise, @var{cd_explanation} may contain one of the
+following values:
+
+@table @var
+
+@item CD_CRCERR
+@peindex CD_CRCERR
+CRC or FCS error.
+
+@item CD_DLE_EOT
+@peindex CD_DLE_EOT
+DLE EOT detected.
+
+@item CD_FORMAT
+@peindex CD_FORMAT
+Format error detected.
+
+@item CD_HDLC_ABORT
+@peindex CD_HDLC_ABORT
+Aborted frame detected.
+
+@item CD_OVERRUN
+@peindex CD_OVERRUN
+Input overrun.
+
+@item CD_TOOSHORT
+@peindex CD_TOOSHORT
+Frame too short.
+
+@item CD_INCOMPLETE
+@peindex CD_INCOMPLETE
+Partial frame received.
+
+@item CD_BUSY
+@peindex CD_BUSY
+Telephone was busy.
+
+@item CD_NOANSWER
+@peindex CD_NOANSWER
+Connection went unanswered.
+
+@item CD_CALLREJECT
+@peindex CD_CALLREJECT
+Connection rejected.
+
+@item CD_HDLC_IDLE
+@peindex CD_HDLC_IDLE
+HDLC line went idle.
+
+@item CD_HDLC_NOTIDLE
+@peindex CD_HDLC_NOTIDLE
+HDLC line no longer idle.
+
+@item CD_QUIESCENT
+@peindex CD_QUIESCENT
+Line being reassigned.
+
+@item CD_RESUMED
+@peindex CD_RESUMED
+Line has been reassigned.
+
+@item CD_DSRTIMEOUT
+@peindex CD_DSRTIMEOUT
+Did not see DSR in time.
+
+@item CD_LAN_COLLISIONS
+@peindex CD_LAN_COLLISIONS
+LAN excessive collisions.
+
+@item CD_LAN_REFUSED
+@peindex CD_LAN_REFUSED
+LAN message refused.
+
+@item CD_LAN_NOSTATION
+@peindex CD_LAN_NOSTATION
+LAN no such station.
+
+@item CD_LOSTCTS
+@peindex CD_LOSTCTS
+Lost Clear to Send signal.
+
+@item CD_DEVERR
+@peindex CD_DEVERR
+Start of device-specific codes.
+
+@end table
+
+In addition, when the explanation is @var{CD_DEVERR} or greater, the explanation may be a device-specific explanation
+code.
 
 @end vtable
 
@@ -3432,7 +3521,97 @@ Unit data request failed.
 @end table
 
 @item cd_explanation
-No documented.
+Indicates a futher explanation of the error.  When @var{cd_errno} is @var{CD_SYSERR}, this field contains the
+@cite{UNIX} system error as described in @manref{errno(3)}.  Otherwise, @var{cd_explanation} may contain one of the
+following values:
+
+@table @var
+
+@item CD_CRCERR
+@peindex CD_CRCERR
+CRC or FCS error.
+
+@item CD_DLE_EOT
+@peindex CD_DLE_EOT
+DLE EOT detected.
+
+@item CD_FORMAT
+@peindex CD_FORMAT
+Format error detected.
+
+@item CD_HDLC_ABORT
+@peindex CD_HDLC_ABORT
+Aborted frame detected.
+
+@item CD_OVERRUN
+@peindex CD_OVERRUN
+Input overrun.
+
+@item CD_TOOSHORT
+@peindex CD_TOOSHORT
+Frame too short.
+
+@item CD_INCOMPLETE
+@peindex CD_INCOMPLETE
+Partial frame received.
+
+@item CD_BUSY
+@peindex CD_BUSY
+Telephone was busy.
+
+@item CD_NOANSWER
+@peindex CD_NOANSWER
+Connection went unanswered.
+
+@item CD_CALLREJECT
+@peindex CD_CALLREJECT
+Connection rejected.
+
+@item CD_HDLC_IDLE
+@peindex CD_HDLC_IDLE
+HDLC line went idle.
+
+@item CD_HDLC_NOTIDLE
+@peindex CD_HDLC_NOTIDLE
+HDLC line no longer idle.
+
+@item CD_QUIESCENT
+@peindex CD_QUIESCENT
+Line being reassigned.
+
+@item CD_RESUMED
+@peindex CD_RESUMED
+Line has been reassigned.
+
+@item CD_DSRTIMEOUT
+@peindex CD_DSRTIMEOUT
+Did not see DSR in time.
+
+@item CD_LAN_COLLISIONS
+@peindex CD_LAN_COLLISIONS
+LAN excessive collisions.
+
+@item CD_LAN_REFUSED
+@peindex CD_LAN_REFUSED
+LAN message refused.
+
+@item CD_LAN_NOSTATION
+@peindex CD_LAN_NOSTATION
+LAN no such station.
+
+@item CD_LOSTCTS
+@peindex CD_LOSTCTS
+Lost Clear to Send signal.
+
+@item CD_DEVERR
+@peindex CD_DEVERR
+Start of device-specific codes.
+
+@end table
+
+In addition, when the explanation is @var{CD_DEVERR} or greater, the explanation may be a device-specific explanation
+code.
+
 
 @end table
 

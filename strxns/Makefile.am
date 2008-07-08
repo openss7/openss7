@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008-07-06 14:58:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2008/07/08 16:57:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-06 14:58:17 $ by $Author: brian $
+# Last Modified $Date: 2008/07/08 16:57:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -478,9 +478,13 @@ endif
 ##
 ## Rules for building libraries
 ##
-##LIBRARY_VERSION_FILES		=
-##
-##include am/libraries.am
+LIBRARY_VERSION_FILES		= \
+				  src/lib/cdiapi.VERSION \
+				  src/lib/dlpiapi.VERSION \
+				  src/lib/npiapi.VERSION \
+				  src/lib/libdlpi/dlpi.VERSION
+
+include am/libraries.am
 
 EXPORT_SRCFILES			=
 
@@ -619,6 +623,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.67  2008/07/08 16:57:13  brian
+# - updated libraries and manual pages
+#
 # Revision 0.9.2.66  2008-07-06 14:58:17  brian
 # - improvements
 #

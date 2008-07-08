@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: cdi_enable_req.3.man,v 0.9.2.1 2008-07-01 11:50:52 brian Exp $
+.\" @(#) $Id: cdi_enable_req.3.man,v 0.9.2.2 2008/07/08 16:57:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:52 $ by $Author: brian $
+.\" Last Modified $Date: 2008/07/08 16:57:15 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cdi_enable_req.3.man,v $
+.\" Revision 0.9.2.2  2008/07/08 16:57:15  brian
+.\" - updated libraries and manual pages
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:52  brian
 .\" - added manual pages and library implementation
 .\"
@@ -109,17 +112,19 @@ cdiapi
 .HP \w'\fBint\ cdi_enable_req\fP('u
 \fBint cdi_enable_req\fP(\fBint\fP\ \fIfd\fP, \fBint\ *\fP\fIstate_ptr\fP);
 .ad b
-.hy
+.hy 6
 .\"
 .\"
 .SH ARGUMENTS
 .PP
-.TP
+.TP \w'\fIstate_ptr\fP\(em'u
 .I fd
 the file descriptor for the Stream.
+.PD 0
 .TP
 .I state_ptr
 pointer to state variable to receive state (or \fBNULL\fP).
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -130,6 +135,36 @@ is a CDI API Library
 cdiapi
 .]
 subroutine.
+It issues a
+.BR CD_ENABLE_REQ (7)
+primitive on the NPI Stream specified by file descriptor, \fIfd\fP, and awaits
+and processes either a
+.BR CD_ENABLE_CON (7)
+primitive confirming the enable request, or a
+.BR CD_ERROR_ACK (7)
+primitive negatively acknowledging the enable request.
+.BR cd_put_enable_req (3)
+is used to issue to issue the
+.BR CD_ENABLE_REQ (7)
+primitive, and
+.BR cd_wait_ack (3)
+is used to await and process the confirmation or negative acknowledgement.
+.PP
+When the operation is confirmed or negatively acknowledged, upon return, the
+area pointed to by \fIstate_ptr\fP, when non-\fBNULL\fP, will contain the CDS
+provider's current view of the state of the interface.
+.PP
+This library call is only valid when the CDI Stream is in the
+\fB\)CD_DISABLED\fP state.  The next state upon successful completion is the
+\fB\)CD_ENABLED\fP state.
+.PP
+The function prototype for
+.B cdi_enable_req
+cannot control the dial type or dial string.  The \fIcd_dial_type\fP member is
+always set by this function to \fBCD_NODIAL\fP and the \fIcd_dial_length\fP and
+\fIcd_dial_offset\fP members of the
+.BR CD_ENABLE_REQ (7)
+primitive are set to zero (0).
 .\"
 .\"
 .SH USAGE
@@ -152,34 +187,133 @@ function.
 .PP
 .B cdi_enable_req
 is fully thread-safe.
+What is described as global variables are in fact thread-specific data when
+linked with
+.BR libpthread .
 .\"
 .\"
 .SH RETURN
 .PP
 When
 .B cdi_enable_req
-is successful, it returns zero (0) or a positive integer value.
+is successful, it returns one (1), indicating that the
+.BR CD_ENABLE_REQ (7)
+primtive was issued and confirmed by a
+.BR CD_ENABLE_CON (7)
+primitive, as is normally the case.  If the \fIstate_ptr\fP argument is
+non-\fBNULL\fP, the CDS provider's view of the state of the interface is stored
+in the pointed-to extent.
+.PP
+When
+.B cdi_enable_req
+is unsuccessful, zero (0) is returned, indicating that the
+.BR CD_ENABLE_REQ (7)
+primitive was issued, but negatively acknowledged by a
+.BR CD_ERROR_ACK (7)
+primitive.
+.
+The CDI error number is in
+.IR cerrno (3)
+and, when
+.IR cerrno (3)
+is
+.BR CD_SYSERR ,
+.IR errno (3)
+holds the \fBLinux\fP system error number.  If the \fIstate_ptr\fP argument is
+non-\fBNULL\fP, the CDS provider's view of the state of the interface is stored
+in the pointed-to extent.
+.PP
 When
 .B cdi_enable_req
 fails, it returns a negative integer value (-1).
+.
+The CDI error number is
+.IR cerrno (3)
+and, when
+.IR cerrno (3)
+is
+.BR CD_SYSERR ,
+.IR errno (3)
+holds the \fBLinux\fP system error number.
+.
+The area pointed to by the \fIstate_ptr\fP is unaffected.
 .\"
 .\"
 .SH ERRORS
 .PP
 When
 .B cdi_enable_req
-fails, it returns a negative integer value (-1).
+is unsuccessful or fails, it returns zero (0) or a negative integer value (-1).
+.
 .B cdi_enable_req
-may fail when:
-.TP \w'[\fBENOMEM\fP]\(em'u
+is unsuccessfull or fails when:
+.PP
+A CDI provider error occurs:
+.TP \w'[\fB\)CD_PROTOSHORT\fP]\(em'u
+.RB [ CD_BADDIAL ]
+dial information was invalid.
+.TP
+.RB [ CD_BADDIALTYPE ]
+invalid dial information type.
+.TP
+.RB [ CD_BADPRIM ]
+unrecognized primitive.
+.TP
+.RB [ CD_EVENT ]
+protocol-specific event occurred.
+.TP
+.RB [ CD_FATALERR ]
+device has become unusable.
+.TP
+.RB [ CD_INITFAILED ]
+line initialization failed.
+.TP
+.RB [ CD_NOTSUPP ]
+primitive not supported by this device.
+.TP
+.RB [ CD_OUTSTATE ]
+primitive was issued from an invalid state.
+.TP
+.RB [ CD_PROTOSHORT ]
+.BR M_PROTO (9)
+block too short.
+.TP
+.RB [ CD_SYSERR ]
+A \fBLinux\fP system error occurred and the \fBLinux\fP system error code is
+contained in the \fIerrno\fP(3) global variable.
+.PP
+A \fBLinux\fP system error occurs:
+.TP \w'[\fB\)CD_PROTOSHORT\fP]\(em'u
+.RB [ ELIBACC ]
+The CDI API library was not initialized.  See \fBcdi_init\fP(3).
+.TP
 .RB [ EBADF ]
-the file descriptor,
-.IR fd ,
-supplied does not correspond to a valid CDI Stream open for reading and
-writing.
+the file descriptor, \fIfd\fP, supplied does not correspond to a valid CDI
+Stream open for reading and writing.
 .TP
 .RB [ EINVAL ]
 one or more of the arguments are invalid.
+.TP
+.RB [ ETIMEDOUT ]
+the call timed out awaiting a \fB\)CD_ENABLE_CON\fP(7) or
+\fB\)CD_ERROR_ACK\fP(7) primitive.  The default time for which these primitives
+are awaited is \fB15000\fP milliseconds (15 seconds).
+.TP
+.RB [ EINTR ]
+the call was interrupted by a signal before it could complete.
+.TP
+.RB [ ERESTART ]
+the call was interrupted by a signal before it could begin.
+.TP
+.RB [ ERESTARTSYS ]
+See [\fBERESTART\fP].
+.TP
+.RB [ EAGAIN ]
+the call was non-blocking and a message was not immediately available or
+flow control was in effect.
+.TP
+.RB [ EBADMSG ]
+a message of the incorrect type was waiting on the Stream.
 .PP
 In addition, any of the error number returned by
 .BR cdi_put_proto (3)
@@ -194,7 +328,7 @@ can be returned by
 .B cdi_enable_req
 is a
 .IR GCOM -specific
-function.  It may be necessary to define the C preprocessor smbol,
+function.  It may be necessary to define the C preprocessor symbol,
 .BR _GCOM_SOURCE ,
 before including the
 .RB < sys/cdi.h >
@@ -206,10 +340,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES
@@ -240,8 +370,17 @@ has no known bugs.
 .\"
 .SH SEE ALSO
 .PP
+.BR cdi_put_enable_req (3),
+.BR cdi_wait_ack (3),
+.BR CD_ENABLE_REQ (7),
+.BR CD_ENABLE_CON (7),
+.BR CD_ERROR_ACK (7),
 .BR cdi (7),
 .BR cdiapi (3),
+.BR cdi_init (3),
+.IR cerrno (3),
+.IR errno (3),
+.BR poll (2s),
 .IR STREAMS (9).
 .\"
 .\"
@@ -254,11 +393,24 @@ CDI API Library,
 .[
 npiapi
 .]
-and system providing an interface equialent to the
+and system providing an interface equivalent to the
 .I GCOM
 CDI API Library,
 with the following portability considerations:
 .IP \(em \w'\(em\(em'u
+The earlier versions of the CDI API library were unable to dial a modem.  For
+support in later version, see
+.BR cdi_dial_req (3)
+and
+.BR cdi_put_dial_req (3)
+for library calls that accept dial strings.
+.IP \(em
+.B cdi_enable_req
+blocks awaiting a response regardless of the blocking or non-blocking flag
+settings associated with the open file descriptor.  That is, the function
+internally uses
+.BR poll (2s).
+.IP \(em
 .B CDI API Library
 functions are
 .IR GCOM -specific,
@@ -269,7 +421,7 @@ software to
 They are inherently non-portable.  These functions will be avoided by portable
 CDI programs.
 .IP \(em
-Binary compatibility is not attempted, only source compatiblity: any binary
+Binary compatibility is not attempted, only source compatibility: any binary
 compatibility experienced is coincidental and may change on a future release.
 It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
 share definitions with the CDI API library using
@@ -298,7 +450,7 @@ cdiapi
 .\"
 .SH HISTORY
 .PP
-The Communiations Device Interface (CDI),
+The Communications Device Interface (CDI),
 .[
 cdi revision 0.9.2
 .]

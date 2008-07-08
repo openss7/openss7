@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: cdi_write_data.3.man,v 0.9.2.1 2008-07-01 11:50:53 brian Exp $
+.\" @(#) $Id: cdi_write_data.3.man,v 0.9.2.2 2008/07/08 16:57:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 11:50:53 $ by $Author: brian $
+.\" Last Modified $Date: 2008/07/08 16:57:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cdi_write_data.3.man,v $
+.\" Revision 0.9.2.2  2008/07/08 16:57:17  brian
+.\" - updated libraries and manual pages
+.\"
 .\" Revision 0.9.2.1  2008-07-01 11:50:53  brian
 .\" - added manual pages and library implementation
 .\"
@@ -157,6 +160,9 @@ function.
 .PP
 .B cdi_write_data
 is fully thread-safe.
+What is described as global variables are in fact thread-specific data when
+linked with
+.BR libpthread .
 .\"
 .\"
 .SH RETURN
@@ -197,7 +203,7 @@ can be returned by
 .B cdi_write_data
 is a
 .IR GCOM -specific
-function.  It may be necessary to define the C preprocessor smbol,
+function.  It may be necessary to define the C preprocessor symbol,
 .BR _GCOM_SOURCE ,
 before including the
 .RB < sys/cdi.h >
@@ -209,10 +215,6 @@ It may also be necessary to include the
 header file
 to expose this symbolic constants, data structures and declarations necessary
 for the use of this function.
-.\"
-.\"
-.SH EXAMPLES
-.PP
 .\"
 .\"
 .SH FILES
@@ -257,7 +259,7 @@ CDI API Library,
 .[
 npiapi
 .]
-and system providing an interface equialent to the
+and system providing an interface equivalent to the
 .I GCOM
 CDI API Library,
 with the following portability considerations:
@@ -272,7 +274,7 @@ software to
 They are inherently non-portable.  These functions will be avoided by portable
 CDI programs.
 .IP \(em
-Binary compatibility is not attempted, only source compatiblity: any binary
+Binary compatibility is not attempted, only source compatibility: any binary
 compatibility experienced is coincidental and may change on a future release.
 It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
 share definitions with the CDI API library using
@@ -301,7 +303,7 @@ cdiapi
 .\"
 .SH HISTORY
 .PP
-The Communiations Device Interface (CDI),
+The Communications Device Interface (CDI),
 .[
 cdi revision 0.9.2
 .]

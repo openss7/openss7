@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-07-01 12:06:34 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008/07/08 16:57:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-01 12:06:34 $ by $Author: brian $
+# Last Modified $Date: 2008/07/08 16:57:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,8 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 MANS_UNUSED = \
-	man4/XNS.4
+	man4/XNS.4 \
+	man4/dlpi_ioctl.4
 
 dlc_man_MANS = \
 	man4/DLC_ADD_FUNC_ADDR.4 \
@@ -81,10 +82,6 @@ dlc_man_MANS = \
 	man4/DLC_TRACE.4
 
 man_MANS = \
-	man3/cdi_xxx.3 \
-	man3/dlpi_sun.3 \
-	man3/dlpi_xxx.3 \
-	man3/npi_xxx.3 \
 	man3/cdi_allow_input_req.3 \
 	man3/cdiapi.3 \
 	man3/cdi_attach_req.3 \
@@ -143,22 +140,24 @@ man_MANS = \
 	man3/dlpi_disabmulti.3 \
 	man3/dlpi_disabnotify.3 \
 	man3/dlpi_discon_req.3 \
+	man3/dlpi_disconnect_req.3 \
 	man3/dlpi_enabmulti.3 \
 	man3/dlpi_enabnotify.3 \
 	man3/dlpi_fd.3 \
 	man3/dlpi_get_a_msg.3 \
-	man3/dlpi_get_both.3 \
-	man3/dlpi_get_info_strm.3 \
+	man3/dlpi_get_info.3 \
 	man3/dlpi_get_physaddr.3 \
-	man3/dlpi_get_style_strm.3 \
+	man3/dlpi_get_style.3 \
 	man3/dlpi_iftype.3 \
 	man3/dlpi_info.3 \
 	man3/dlpi_init.3 \
+	man3/dlpi_init_FILE.3 \
 	man3/dlpi_linkname.3 \
 	man3/dlpi_listen.3 \
 	man3/dlpi_mactype.3 \
-	man3/dlpi_open_GCOM.3 \
 	man3/dlpi_open.3 \
+	man3/dlpi_open_data.3 \
+	man3/dlpi_open_GCOM.3 \
 	man3/dlpi_open_log.3 \
 	man3/dlpi_perror.3 \
 	man3/dlpi_printf.3 \
@@ -193,11 +192,11 @@ man_MANS = \
 	man3/dlpi_set_log_size.3 \
 	man3/dlpi_set_physaddr.3 \
 	man3/dlpi_set_signal_handling.3 \
-	man3/dlpi_set_test_req.3 \
-	man3/dlpi_set_test_res.3 \
 	man3/dlpi_set_timeout.3 \
 	man3/dlpi_set_unnum_frame_handler.3 \
 	man3/dlpi_strerror.3 \
+	man3/dlpi_test_req.3 \
+	man3/dlpi_test_res.3 \
 	man3/dlpi_uic_req.3 \
 	man3/dlpi_unbind.3 \
 	man3/dlpi_unbind_dlsap.3 \
@@ -206,25 +205,15 @@ man_MANS = \
 	man3/dlpi_xid_req.3 \
 	man3/dlpi_xid_res.3 \
 	man3/dlpi_xray_req.3 \
-	man3/endpadent.3 \
-	man3/endxhostent.3 \
-	man3/equalx25.3 \
-	man3/getnettype.3 \
-	man3/getpadbyaddr.3 \
-	man3/getpadent.3 \
-	man3/getxhostbyaddr.3 \
-	man3/getxhostbyname.3 \
-	man3/getxhostent.3 \
 	man3/libcdiapi.3 \
 	man3/libdlpi.3 \
 	man3/libdlpiapi.3 \
 	man3/libnpiapi.3 \
-	man3/linkidtox25.3 \
 	man3/npiapi.3 \
 	man3/npi_ascii_facil.3 \
 	man3/npi_bind_ascii_nsap.3 \
 	man3/npi_bind_nsap.3 \
-	man3/npi_conenct.3 \
+	man3/npi_connect.3 \
 	man3/npi_connect_req.3 \
 	man3/npi_connect_wait.3 \
 	man3/npi_conn_res.3 \
@@ -261,6 +250,7 @@ man_MANS = \
 	man3/npi_print_msg.3 \
 	man3/npi_put_data_buf.3 \
 	man3/npi_put_data_proto.3 \
+	man3/npi_put_exdata_proto.3 \
 	man3/npi_put_proto.3 \
 	man3/npi_rcv.3 \
 	man3/npi_read_data.3 \
@@ -270,6 +260,7 @@ man_MANS = \
 	man3/npi_send_ext_connect_req.3 \
 	man3/npi_send_info_req.3 \
 	man3/npi_send_reset_req.3 \
+	man3/npi_send_reset_res.3 \
 	man3/npi_set_log_size.3 \
 	man3/npi_set_marks.3 \
 	man3/npi_set_pid.3 \
@@ -278,10 +269,9 @@ man_MANS = \
 	man3/npi_write_data.3 \
 	man3/npi_x25_clear_cause.3 \
 	man3/npi_x25_diagnostic.3 \
+	man3/npi_x25_registration_cause.3 \
 	man3/npi_x25_reset_cause.3 \
 	man3/npi_x25_restart_cause.3 \
-	man3/padent.3 \
-	man3/padtos.3 \
 	man3/pu_decode_handle.3 \
 	man3/pu_dlpi_upa.3 \
 	man3/pu_get_board_info.3 \
@@ -292,19 +282,6 @@ man_MANS = \
 	man3/pu_map_npi_lpa_to_handle.3 \
 	man3/pu_strerror.3 \
 	man3/put_npi_proto.3 \
-	man3/setpadent.3 \
-	man3/setxhostent.3 \
-	man3/stox25.3 \
-	man3/x25_find_link_parameters.3 \
-	man3/x25_read_config_parameters.3 \
-	man3/x25_read_config_parameters_file.3 \
-	man3/x25_save_link_parameters.3 \
-	man3/x25_set_parse_error_function.3 \
-	man3/x25tolinkid.3 \
-	man3/x25tos.3 \
-	man3/x25_write_config_parameters.3 \
-	man3/x25_write_config_parameters_file.3 \
-	man3/xhostent.3 \
 	man4/XNS.4 \
 	man4/ipcl.4 \
 	man4/ipco.4 \
@@ -557,10 +534,6 @@ man_MANS = \
 	man7/dl_test_req_t.7 \
 	man7/DL_TEST_RES.7 \
 	man7/dl_test_res_t.7 \
-	man7/DL_TOKEN_ACK.7 \
-	man7/dl_token_ack_t.7 \
-	man7/DL_TOKEN_REQ.7 \
-	man7/dl_token_req_t.7 \
 	man7/DL_UDERROR_IND.7 \
 	man7/dl_uderror_ind_t.7 \
 	man7/DL_UDQOS_REQ.7 \
@@ -649,10 +622,6 @@ man_MANS = \
 	man7/N_reset_req_t.7 \
 	man7/N_RESET_RES.7 \
 	man7/N_reset_res_t.7 \
-	man7/N_TOKEN_ACK.7 \
-	man7/N_token_ack_t.7 \
-	man7/N_TOKEN_REQ.7 \
-	man7/N_token_req_t.7 \
 	man7/N_UDERROR_IND.7 \
 	man7/N_uderror_ind_t.7 \
 	man7/N_UNBIND_REQ.7 \
@@ -691,10 +660,6 @@ dlc_dist_noinst_MANS = \
 	man4/DLC_TRACE.4.man
 
 dist_noinst_MANS = \
-	man3/cdi_xxx.3.man \
-	man3/dlpi_sun.3.man \
-	man3/dlpi_xxx.3.man \
-	man3/npi_xxx.3.man \
 	man3/cdi_allow_input_req.3.man \
 	man3/cdiapi.3.man \
 	man3/cdi_attach_req.3.man \
@@ -753,22 +718,24 @@ dist_noinst_MANS = \
 	man3/dlpi_disabmulti.3.man \
 	man3/dlpi_disabnotify.3.man \
 	man3/dlpi_discon_req.3.man \
+	man3/dlpi_disconnect_req.3.man \
 	man3/dlpi_enabmulti.3.man \
 	man3/dlpi_enabnotify.3.man \
 	man3/dlpi_fd.3.man \
 	man3/dlpi_get_a_msg.3.man \
-	man3/dlpi_get_both.3.man \
-	man3/dlpi_get_info_strm.3.man \
+	man3/dlpi_get_info.3.man \
 	man3/dlpi_get_physaddr.3.man \
-	man3/dlpi_get_style_strm.3.man \
+	man3/dlpi_get_style.3.man \
 	man3/dlpi_iftype.3.man \
 	man3/dlpi_info.3.man \
 	man3/dlpi_init.3.man \
+	man3/dlpi_init_FILE.3.man \
 	man3/dlpi_linkname.3.man \
 	man3/dlpi_listen.3.man \
 	man3/dlpi_mactype.3.man \
-	man3/dlpi_open_GCOM.3.man \
 	man3/dlpi_open.3.man \
+	man3/dlpi_open_data.3.man \
+	man3/dlpi_open_GCOM.3.man \
 	man3/dlpi_open_log.3.man \
 	man3/dlpi_perror.3.man \
 	man3/dlpi_printf.3.man \
@@ -803,11 +770,11 @@ dist_noinst_MANS = \
 	man3/dlpi_set_log_size.3.man \
 	man3/dlpi_set_physaddr.3.man \
 	man3/dlpi_set_signal_handling.3.man \
-	man3/dlpi_set_test_req.3.man \
-	man3/dlpi_set_test_res.3.man \
 	man3/dlpi_set_timeout.3.man \
 	man3/dlpi_set_unnum_frame_handler.3.man \
 	man3/dlpi_strerror.3.man \
+	man3/dlpi_test_req.3.man \
+	man3/dlpi_test_res.3.man \
 	man3/dlpi_uic_req.3.man \
 	man3/dlpi_unbind.3.man \
 	man3/dlpi_unbind_dlsap.3.man \
@@ -816,25 +783,15 @@ dist_noinst_MANS = \
 	man3/dlpi_xid_req.3.man \
 	man3/dlpi_xid_res.3.man \
 	man3/dlpi_xray_req.3.man \
-	man3/endpadent.3.man \
-	man3/endxhostent.3.man \
-	man3/equalx25.3.man \
-	man3/getnettype.3.man \
-	man3/getpadbyaddr.3.man \
-	man3/getpadent.3.man \
-	man3/getxhostbyaddr.3.man \
-	man3/getxhostbyname.3.man \
-	man3/getxhostent.3.man \
 	man3/libcdiapi.3.man \
 	man3/libdlpi.3.man \
 	man3/libdlpiapi.3.man \
 	man3/libnpiapi.3.man \
-	man3/linkidtox25.3.man \
 	man3/npiapi.3.man \
 	man3/npi_ascii_facil.3.man \
 	man3/npi_bind_ascii_nsap.3.man \
 	man3/npi_bind_nsap.3.man \
-	man3/npi_conenct.3.man \
+	man3/npi_connect.3.man \
 	man3/npi_connect_req.3.man \
 	man3/npi_connect_wait.3.man \
 	man3/npi_conn_res.3.man \
@@ -871,6 +828,7 @@ dist_noinst_MANS = \
 	man3/npi_print_msg.3.man \
 	man3/npi_put_data_buf.3.man \
 	man3/npi_put_data_proto.3.man \
+	man3/npi_put_exdata_proto.3.man \
 	man3/npi_put_proto.3.man \
 	man3/npi_rcv.3.man \
 	man3/npi_read_data.3.man \
@@ -880,6 +838,7 @@ dist_noinst_MANS = \
 	man3/npi_send_ext_connect_req.3.man \
 	man3/npi_send_info_req.3.man \
 	man3/npi_send_reset_req.3.man \
+	man3/npi_send_reset_res.3.man \
 	man3/npi_set_log_size.3.man \
 	man3/npi_set_marks.3.man \
 	man3/npi_set_pid.3.man \
@@ -888,10 +847,9 @@ dist_noinst_MANS = \
 	man3/npi_write_data.3.man \
 	man3/npi_x25_clear_cause.3.man \
 	man3/npi_x25_diagnostic.3.man \
+	man3/npi_x25_registration_cause.3.man \
 	man3/npi_x25_reset_cause.3.man \
 	man3/npi_x25_restart_cause.3.man \
-	man3/padent.3.man \
-	man3/padtos.3.man \
 	man3/pu_decode_handle.3.man \
 	man3/pu_dlpi_upa.3.man \
 	man3/pu_get_board_info.3.man \
@@ -902,19 +860,6 @@ dist_noinst_MANS = \
 	man3/pu_map_npi_lpa_to_handle.3.man \
 	man3/pu_strerror.3.man \
 	man3/put_npi_proto.3.man \
-	man3/setpadent.3.man \
-	man3/setxhostent.3.man \
-	man3/stox25.3.man \
-	man3/x25_find_link_parameters.3.man \
-	man3/x25_read_config_parameters.3.man \
-	man3/x25_read_config_parameters_file.3.man \
-	man3/x25_save_link_parameters.3.man \
-	man3/x25_set_parse_error_function.3.man \
-	man3/x25tolinkid.3.man \
-	man3/x25tos.3.man \
-	man3/x25_write_config_parameters.3.man \
-	man3/x25_write_config_parameters_file.3.man \
-	man3/xhostent.3.man \
 	man4/XNS.4.man \
 	man4/ipcl.4.man \
 	man4/ipco.4.man \
@@ -1167,10 +1112,6 @@ dist_noinst_MANS = \
 	man7/dl_test_req_t.7.man \
 	man7/DL_TEST_RES.7.man \
 	man7/dl_test_res_t.7.man \
-	man7/DL_TOKEN_ACK.7.man \
-	man7/dl_token_ack_t.7.man \
-	man7/DL_TOKEN_REQ.7.man \
-	man7/dl_token_req_t.7.man \
 	man7/DL_UDERROR_IND.7.man \
 	man7/dl_uderror_ind_t.7.man \
 	man7/DL_UDQOS_REQ.7.man \
@@ -1259,10 +1200,6 @@ dist_noinst_MANS = \
 	man7/N_reset_req_t.7.man \
 	man7/N_RESET_RES.7.man \
 	man7/N_reset_res_t.7.man \
-	man7/N_TOKEN_ACK.7.man \
-	man7/N_token_ack_t.7.man \
-	man7/N_TOKEN_REQ.7.man \
-	man7/N_token_req_t.7.man \
 	man7/N_UDERROR_IND.7.man \
 	man7/N_uderror_ind_t.7.man \
 	man7/N_UNBIND_REQ.7.man \
@@ -1287,6 +1224,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.24  2008/07/08 16:57:13  brian
+# - updated libraries and manual pages
+#
 # Revision 0.9.2.23  2008-07-01 12:06:34  brian
 # - updated manual pages, added new API library headers and impl files
 #

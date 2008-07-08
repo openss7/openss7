@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npiapi.h,v 0.9.2.5 2008-07-06 14:58:20 brian Exp $
+ @(#) $Id: npiapi.h,v 0.9.2.6 2008/07/08 16:57:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
+ Last Modified $Date: 2008/07/08 16:57:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npiapi.h,v $
+ Revision 0.9.2.6  2008/07/08 16:57:32  brian
+ - updated libraries and manual pages
+
  Revision 0.9.2.5  2008-07-06 14:58:20  brian
  - improvements
 
@@ -71,7 +74,7 @@
 #ifndef __NPIAPI_H__
 #define __NPIAPI_H__
 
-#ident "@(#) $RCSfile: npiapi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npiapi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* *INDENT-OFF* */
 #ifdef __BEGIN_DECLS
@@ -79,19 +82,45 @@ __BEGIN_DECLS
 #endif				/* __BEGIN_DECLS */
 /* *INDENT-ON* */
 
+#define NPI_CTL_BUF_SIZE	5000
+#define NPI_DATA_BUF_SIZE	5000
+#define NPI_LOG_NAME		"/var/spool/npiapi.log"
+#define NPI_N_CONINDS		1
+
 /* Logging options. */
-#define NPI_LOG_FILE		(1<<0)
-#define NPI_LOG_STDERR		(1<<1)
-#define NPI_LOG_RX_PROTOS	(1<<2)
-#define NPI_LOG_TX_PROTOS	(1<<3)
-#define NPI_LOG_ERRORS		(1<<4)
-#define NPI_LOG_RX_DATA		(1<<5)
-#define NPI_LOG_TX_DATA		(1<<6)
-#define NPI_LOG_SIGNALS		(1<<7)
-#define NPI_LOG_CONINDS		(1<<8)
-#define NPI_LOG_OPTIONS		(1<<9)
+#define NPI_LOG_FILE		(1<< 0)
+#define NPI_LOG_STDERR		(1<< 1)
+#define NPI_LOG_RX_PROTOS	(1<< 2)
+#define NPI_LOG_TX_PROTOS	(1<< 3)
+#define NPI_LOG_ERRORS		(1<< 4)
+#define NPI_LOG_RX_DATA		(1<< 5)
+#define NPI_LOG_TX_DATA		(1<< 6)
+#define NPI_LOG_SIGNALS		(1<< 7)
+#define NPI_LOG_CONINDS		(1<< 8)
+#define NPI_LOG_OPTIONS		(1<< 9)
 #define NPI_LOG_FACILS		(1<<10)
 #define NPI_LOG_DEFAULT		(NPI_LOG_FILE|NPI_LOG_STDERR|NPI_LOG_ERRORS)
+
+#define npi_bind_ack		(_npi_bind_ack())
+#define npi_conn_con		(_npi_conn_con())
+#define npi_conn_ind		(_npi_conn_ind())
+#define npi_data_cnt		(*_npi_data_cnt())
+#define npi_ctl_cnt		(*_npi_ctl_cnt())
+#define npi_data_buf		(_npi_data_buf())
+#define npi_ctl_buf		(_npi_ctl_buf())
+#define npi_conn_ind_data_size	(*_npi_conn_ind_data_size())
+#define npi_conn_ind_data_skip	(*_npi_conn_ind_data_skip())
+#define npi_disc_ind_data_size	(*_npi_disc_ind_data_size())
+#define npi_disc_ind_data_skip	(*_npi_disc_ind_data_skip())
+#define npi_conn_con_data_size	(*_npi_conn_con_data_size())
+#define npi_conn_con_data_skip	(*_npi_conn_con_data_skip())
+#define npi_discon_req_band	(*_npi_discon_req_band())
+#define npi_reset_req_band	(*_npi_reset_req_band())
+#define npi_flow_req_band	(*_npi_flow_req_band())
+#define npi_data_req_band	(*_npi_data_req_band())
+#define npi_exdata_req_band	(*_npi_exdata_req_band())
+#define npi_datack_req_band	(*_npi_datack_req_band())
+#define npi_other_req_band	(*_npi_other_req_band())
 
 extern int *_nerrno(void);
 

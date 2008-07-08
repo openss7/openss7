@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpiapi.h,v 0.9.2.5 2008-07-06 14:58:20 brian Exp $
+ @(#) $Id: dlpiapi.h,v 0.9.2.6 2008/07/08 16:57:32 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-06 14:58:20 $ by $Author: brian $
+ Last Modified $Date: 2008/07/08 16:57:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpiapi.h,v $
+ Revision 0.9.2.6  2008/07/08 16:57:32  brian
+ - updated libraries and manual pages
+
  Revision 0.9.2.5  2008-07-06 14:58:20  brian
  - improvements
 
@@ -71,11 +74,10 @@
 #ifndef __DLPIAPI_H__
 #define __DLPIAPI_H__
 
-#ident "@(#) $RCSfile: dlpiapi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpiapi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
-/* These two definitions clash with the Solaris DLPI library. */
-#define dlpi_open	dlpi_open_GCOM
-#define dlpi_close	dlpi_close_GCOM
+#define dlpi_open(h)		dlpi_open_GCOM(h)
+#define dlpi_close(fd)		dlpi_close_GCOM(fd)
 
 #define DLPI_CTL_BUF_SIZE	5000
 #define DLPI_DATA_BUF_SIZE	5000
@@ -125,12 +127,16 @@
 typedef int (*dlpi_sig_func_t)(int, char *, int, char *, int);
 typedef void (*unnum_frame_t)(int, unsigned char *, int, unsigned char *, int);
 
+extern int *_dlerrno(void);
+#define dlerrno (*(_dlerrno()))
+
 #ifdef __BEGIN_DECLS
 __BEGIN_DECLS
 #endif
 extern int dlpi_attach_ppa(int fd, ulong ppa);
 extern int dlpi_bind_dlsap(int fd, ulong dlsap, int conind_nr);
 extern int dlpi_clear_zombies(void);
+extern int dlpi_close_GCOM(int fd);
 extern int dlpi_complete_req(int fd, int request, char *caller, int discard_un_iframes);
 extern int dlpi_configure_dlsaps(int fd, ulong local_dlsap, ulong remote_dlsap);
 extern int dlpi_connect(ulong ppa, ulong bind_dlsap, ulong local_dlsap, ulong remote_dlsap);
@@ -138,6 +144,7 @@ extern int dlpi_connect_req(int fd, ulong peer_sap);
 extern int dlpi_connect_wait(int data);
 extern void dlpi_decode_ctl(char *p);
 extern char *dlpi_decode_disconnect_reason(long reason);
+extern int dlpi_detach_ppa(int fd);
 extern int dlpi_discon_req(int fd, int reason);
 extern int dlpi_disconnect_req(int fd, int reason);
 extern int dlpi_get_a_msg(int fd, char *buf, int cnt);
@@ -147,6 +154,7 @@ extern int dlpi_init(uint log_optns, char *log_name);
 extern int dlpi_init_FILE(uint log_optns, FILE *log_file);
 extern int dlpi_listen(ulong ppa, ulong bind_dlsap, ulong local_dlsap, ulong remote_dlsap,
 		       uint fork_options);
+extern int dlpi_open_GCOM(char *hostname);
 extern int dlpi_open_data(void);
 extern int dlpi_open_log(void);
 extern int dlpi_perror(char *prefix);
@@ -187,7 +195,7 @@ extern int dlpi_test_req(int fd, ulong pfb, char *datap, int length);
 extern int dlpi_test_res(int fd, ulong pfb, char *datap, int length);
 extern int dlpi_uic_req(int fd, char *datap, int length);
 extern int dlpi_unbind_dlsap(int fd);
-extern int dlpi_test_res(int fd, ulong pfb, char *datap, int length);
+extern int dlpi_xid_req(int fd, ulong pfb, char *datap, int length);
 extern int dlpi_xid_res(int fd, ulong pfb, char *datap, int length);
 extern int dlpi_write_data(int fd, char *buf, int cnt);
 extern int dlpi_xray_req(int fd, int upa, int on_off, int hi_wat, int lo_wat);

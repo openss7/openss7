@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-06 14:58:21 $
+ @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/07/08 16:57:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-06 14:58:21 $ by $Author: brian $
+ Last Modified $Date: 2008/07/08 16:57:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.c,v $
+ Revision 0.9.2.3  2008/07/08 16:57:34  brian
+ - updated libraries and manual pages
+
  Revision 0.9.2.2  2008-07-06 14:58:21  brian
  - improvements
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-06 14:58:21 $"
+#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/07/08 16:57:34 $"
 
 static char const ident[] =
-    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-06 14:58:21 $";
+    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/07/08 16:57:34 $";
 
 /* This file can be processed by doxygen(1). */
 
