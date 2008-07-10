@@ -1,3 +1,23 @@
+2008-07-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/tpi/tpi.texi: improvements
+
+	* doc/man/strxnet.macros: documentation improvements
+	* doc/specs/tpi/tpi_fi10.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fi11.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fi12.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig1.txt: documentation improvements
+	* doc/specs/tpi/tpi_fig2.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig3.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig4.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig5.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig6.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig7.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig8.tbl: documentation improvements
+	* doc/specs/tpi/tpi_fig9.tbl: documentation improvements
+	* doc/specs/tpi/tpi_tab8.tbl: documentation improvements
+	* doc/specs/tpi/tpi_tabx.tbl: documentation improvements
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strxnet.refs: updated references
