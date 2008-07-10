@@ -1,3 +1,36 @@
+2008-07-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/macros.texi: make info files use text diagrams
+
+	* doc/specs/cdi/cdi.texi: documentation improvements
+	* doc/specs/cdi/cdi_ta10.tbl: documentation improvements
+	* doc/specs/cdi/cdi_ta11.tbl: documentation improvements
+	* doc/specs/cdi/cdi_ta12.tbl: documentation improvements
+	* doc/specs/dlpi/dlpi.texi: documentation improvements
+	* doc/specs/dlpi/dlpi_ta10.tbl: documentation improvements
+	* doc/specs/dlpi/dlpi_ta11.tbl: documentation improvements
+	* doc/specs/dlpi/dlpi_ta12.tbl: documentation improvements
+	* doc/specs/npi/npi.texi: documentation improvements
+	* doc/specs/npi/npi_tab1.tbl: documentation improvements
+	* doc/specs/npi/npi_tab2.tbl: documentation improvements
+	* doc/specs/npi/npi_tab3.tbl: documentation improvements
+	* doc/specs/npi/npi_tab4.tbl: documentation improvements
+	* doc/specs/npi/npi_tab5.tbl: documentation improvements
+	* doc/specs/npi/npi_tab6.tbl: documentation improvements
+	* doc/specs/npi/npi_tab7.tbl: documentation improvements
+	* doc/specs/npi/npi_tab8.tbl: documentation improvements
+	* doc/specs/npi/npi_taba1.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb1.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb2.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb3.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb4.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb5.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb6.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb7.tbl: documentation improvements
+	* doc/specs/npi/npi_tabb8.tbl: documentation improvements
+	* doc/specs/npi/npi_tabc1.tbl: documentation improvements
+	* doc/specs/npi/npi_tabc2.tbl: documentation improvements
+
 2008-07-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: update libs and manpages

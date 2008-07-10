@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: cdi.texi,v 0.9.2.2 2008/07/08 16:57:31 brian Exp $
+% @(#) $Id: cdi.texi,v 0.9.2.3 2008/07/10 23:50:33 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 %
 % All Rights Reserved.
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008/07/08 16:57:31 $ by $Author: brian $
+% Last Modified $Date: 2008/07/10 23:50:33 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -69,7 +69,7 @@
 
 @dircategory OpenSS7
 @direntry
-* CDI: (cdi).			Communication Device Interface Specification
+* CDI: (cdi).                   Communication Device Interface Specification
 @end direntry
 
 @include texi/args.texi
@@ -85,8 +85,10 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
 Corporation}.  This specification was originally published by NRC Compten.
 
-Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org,Brian F. G. Bidulock} @*
+
 
 All Rights Reserved.
 
@@ -123,9 +125,7 @@ another language, under the above conditions for modified versions.
 @set MANUAL_TITLE Communications Device Interface
 @set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -231,8 +231,9 @@ Fax: (65) 776-0421
 @end ignore
 
 @noindent
-Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org,Brian F. G. Bidulock} @*
+
 
 @noindent
 All Rights Reserved. @*
@@ -301,7 +302,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved.
 
@@ -351,17 +352,83 @@ obligation to provide any feature listed herein.
 @defcodeindex pe
 @c Define an index of protocol states
 @defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
 @c Define an index of manual pages.
 @defcodeindex mp
 
-@c syncodeindex pr cp
-@c syncodeindex pv cp
-@c syncodeindex st cp
-@c syncodeindex tp cp
-@c syncodeindex vr cp
+@ifnottex
+@c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
+
+@iftex
+
+@macro prim {name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval {name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr {name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta {name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm {name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc {name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
 
 @ifnottex
 @node Top
@@ -383,6 +450,15 @@ obligation to provide any feature listed herein.
 * Index::
 @end menu
 
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Introduction
 @chapter Introduction
@@ -687,12 +763,12 @@ port, the minor device number 1 or 2 could be opened for port 1 or 2 on card 1, 
 opened for port 1 or 2 on card 2, and so on.  One major device number for the driver could easily support 127 cards in a
 system, which is not possible for typical PCI systems and, therefore, is ample.
 
-@dfn{Style 1} providers do not use the CD_@-ATTACH_@-REQ
+@dfn{Style 1} providers do not use the CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
-or CD_@-DETACH_@-REQ
+or CD_DETACH_REQ
 @prindex CD_DETACH_REQ
 primitives and when freshly opened are in
-the CD_@-DISABLED
+the CD_DISABLED
 @stindex CD_DISABLED
 state.  That is, as illustrated in @figref{2}, the @dfn{Style 1} CDS provider associates the stream with the PPA during
 the @manref{open(2)} call.
@@ -707,15 +783,15 @@ the attach primitive then associates a particular PPA with that stream.  The for
 the CDS provider, and should be described in the provider-specific addendum documentation.
 
 The CDS user uses the support primitives
-(CD_@-ATTACH_@-REQ,
+(CD_ATTACH_REQ,
 @prindex CD_ATTACH_REQ
-CD_@-ENABLE_@-REQ)
+CD_ENABLE_REQ)
 @prindex CD_ENABLE_REQ
 to associate a stream with a given Physical Point of Appearance.  @dfn{Style 2} CDS providers, when freshly opened, are
-in the CD_@-UNATTACHED
+in the CD_UNATTACHED
 @stindex CD_UNATTACHED
 state.  That is, the @dfn{Style 2} CDS provider does not associated the stream with the PPA during the @manref{open(2)}
-call, but only later when the CD_@-ATTACH_@-REQ
+call, but only later when the CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 primitive is issued by the CDS user.
 
@@ -809,17 +885,17 @@ This service provides information about the CDI stream to the CDS user.
 @itemize @bullet
 
 @item @b{CD_INFO_REQ}:
-The message CD_@-INFO_@-REQ
+The message CD_INFO_REQ
 @prindex CD_INFO_REQ
 requests the CDS provider to return operating information about the stream.
 
 @item @b{CD_INFO_ACK}:
-The CDS provider returns the information in a CD_@-INFO_@-ACK
+The CDS provider returns the information in a CD_INFO_ACK
 @prindex CD_INFO_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the information request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the information request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -830,8 +906,8 @@ The normal message sequence is illustrated in @figref{3}.
 
 @figuresized{cdi_fig3,3,Message Flow: Information Reporting,4in}
 
-In @figref{3}, the CDS user requests information with a CD_@-INFO_@-REQ message and the local CDS provider responds with
-the requested information in a CD_@-INFO_@-ACK message.
+In @figref{3}, the CDS user requests information with a CD_INFO_REQ message and the local CDS provider responds with
+the requested information in a CD_INFO_ACK message.
 
 @node Attach Service
 @subsection Attach Service
@@ -843,17 +919,17 @@ occur.
 @itemize @bullet
 
 @item @b{CD_ATTACH_REQ}:
-The CDS user requests the attach service with a CD_@-ATTACH_@-REQ
+The CDS user requests the attach service with a CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 message.
 
 @item @b{CD_OK_ACK}:
-The CDS provider indicates success with a CD_@-OK_@-ACK
+The CDS provider indicates success with a CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider indicates failure with a CD_@-ERROR_@-ACK
+The CDS provider indicates failure with a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -864,9 +940,9 @@ The normal message sequence is illustrated in @figref{4}.
 
 @figuresized{cdi_fig4,4,Message Flow: Attaching a stream to a Physical Line,4in}
 
-In @figref{4}, the CDS user issues a CD_@-ATTACH_@-REQ message for a Style 2 CDS provider which results in the
+In @figref{4}, the CDS user issues a CD_ATTACH_REQ message for a Style 2 CDS provider which results in the
 association of the stream with the requested PPA and possible enabling of the medium associated with the PPA.  The CDS
-provider acknowledges the attach with a CD_@-OK_@-ACK message.
+provider acknowledges the attach with a CD_OK_ACK message.
 
 @node Detach Service
 @subsection Detach Service
@@ -878,17 +954,17 @@ stream over which communication has occurred.
 @itemize @bullet
 
 @item @b{CD_DETACH_REQ}:
-The CDS user request the detach service with a CD_@-DETACH_@-REQ
+The CDS user request the detach service with a CD_DETACH_REQ
 @prindex CD_DETACH_REQ
 message.
 
 @item @b{CD_OK_ACK}:
-The CDS provider indicates success with a CD_@-OK_@-ACK
+The CDS provider indicates success with a CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider indicates failure with a CD_@-ERROR_@-ACK
+The CDS provider indicates failure with a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -899,9 +975,9 @@ The normal message sequence is illustrated in @figref{5}.
 
 @figuresized{cdi_fig5,5,Message Flow: Detaching a Stream from a Physical Line,4in}
 
-In @figref{5}, the CDS user issues a CD_@-DETACH_@-REQ message for a Style 2 CDS provider which results in the
+In @figref{5}, the CDS user issues a CD_DETACH_REQ message for a Style 2 CDS provider which results in the
 disassociation of the stream with the attached PPA and possible disabling of the medium associated with the PPA.
-The CDS provider acknowledges the detach with a CD_@-OK_@-ACK message.
+The CDS provider acknowledges the detach with a CD_OK_ACK message.
 
 @node Multiplex Name Service
 @subsection Multiplex Name Service
@@ -926,17 +1002,17 @@ attached to a permanent medium.
 @itemize @bullet
 
 @item @b{CD_ENABLE_REQ}:
-The message CD_@-ENABLE_@-REQ
+The message CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 is used to request that a communications device be enabled and to optionally provide a dial string for a modem.
 
 @item @b{CD_ENABLE_CON}:
-The CDS provider confirms that the communications device was successfully enabled using a CD_@-ENABLE_@-CON
+The CDS provider confirms that the communications device was successfully enabled using a CD_ENABLE_CON
 @prindex CD_ENABLE_CON
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider indicates a failure to enable the communications device using a CD_@-ERROR_@-ACK
+The CDS provider indicates a failure to enable the communications device using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -947,7 +1023,7 @@ The normal message sequence is illustrated in @figref{36}.
 
 @figuresized{cdi_fi36,36,Message Flow: Enabling a Stream,4in}
 
-In @figref{36}, the CDS user issues a CD_@-ENABLE_@-REQ message requesting that the communications device and medium be
+In @figref{36}, the CDS user issues a CD_ENABLE_REQ message requesting that the communications device and medium be
 enabled or connected.  Enabling can be soley a local matter, affecting only the local communications device, or can be
 an end-to-end matter, where the underlying protocol exchanges PDUs necessary to dial, connect or enable the medium.
 
@@ -961,27 +1037,27 @@ communications device attached to a permanent medium.
 @itemize @bullet
 
 @item @b{CD_DISABLE_REQ}:
-The CD_@-DISABLE_@-REQ
+The CD_DISABLE_REQ
 @prindex CD_DISABLE_REQ
 message is used to request that a communications device be disabled and to optionally provide for the disposition of
 unsent data units.
 
 @item @b{CD_DISABLE_CON}:
 The CDS provider confirms that the communications device was successfully disable, and that unsent
-data units were properly disposed of, using a CD_@-DISABLE_@-CON
+data units were properly disposed of, using a CD_DISABLE_CON
 @prindex CD_DISABLE_CON
 message.
 
 @item @b{CD_ERROR_IND}:
 The CDS provider indicats a failure of the communications device resulting in it being disabled locally using a
-CD_@-ERROR_@-IND
+CD_ERROR_IND
 @prindex CD_ERROR_IND
-message.  (The CD_@-ERROR_@-IND message normally has an error number indicating that the communications device was
-disconnected, i.e. CD_@-DISC.)
+message.  (The CD_ERROR_IND message normally has an error number indicating that the communications device was
+disconnected, i.e. CD_DISC.)
 @peindex CD_DISC
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider indicates a failure to disable the communications device using a CD_@-ERROR_@-ACK
+The CDS provider indicates a failure to disable the communications device using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -992,7 +1068,7 @@ The normal message sequence is illustrated in @figref{37}.
 
 @figuresized{cdi_fi37,37,Message Flow: Disabling a Stream,4in}
 
-In @figref{37}, the CDS user issues a CD_@-DISABLE_@-REQ message requesting that the communications device and medium be
+In @figref{37}, the CDS user issues a CD_DISABLE_REQ message requesting that the communications device and medium be
 disabled or disconnected.  Disabling can be soley a local matter, affecting only the local communications device, or can
 be an end-to-end matter, where the underlying protocol exchanges PDUs necessary to disconnect or disable the medium.
 
@@ -1027,25 +1103,25 @@ the loss, duplication and reordering of data.
 @itemize @bullet
 
 @item @b{CD_UNITDATA_REQ}:
-The sending CDS user transfers data to the receiving CDS user with the CD_@-UNITDATA_@-REQ
+The sending CDS user transfers data to the receiving CDS user with the CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 message.
 
 @item @b{CD_UNITDATA_IND}:
 Upon receiving user data, the CDS provider indicates the received data to the local CDS user with the
-CD_@-UNITDATA_@-IND
+CD_UNITDATA_IND
 @prindex CD_UNITDATA_IND
 message.
 
 @item @b{CD_ERROR_IND}:
-If the local CDS provider is unable to transmit CDS user data requested in a CD_@-UNITDATA_@-REQ message, it responds to
-the local sending CDS user with a CD_@-ERROR_@-IND
+If the local CDS provider is unable to transmit CDS user data requested in a CD_UNITDATA_REQ message, it responds to
+the local sending CDS user with a CD_ERROR_IND
 @prindex CD_ERROR_IND
 message.
 
 @item @b{CD_BAD_FRAME_IND}:
 If the local CDS provider is unable to receive CDS user data correctly, it is indicated to the local receiving CDS user
-with the CD_@-BAD_@-FRAME_@-IND
+with the CD_BAD_FRAME_IND
 @prindex CD_BAD_FRAME_IND
 message.
 
@@ -1064,19 +1140,19 @@ The normal sequence of primitives for an unsuccessful unacknowledged reception i
 
 @figuresized{cdi_fi44,44,Message Flow: Unsuccessful Unacknowleged Data Reception,4in}
 
-In @figref{42}, the CD_@-UNITDATA_@-REQ message at the sending CDS user results in data transfer to the receiving CDS
-user.  The CDS provider at the receiving side indicates the data in a CD_@-UNITDATA_@-IND message.  No acknowledgments
+In @figref{42}, the CD_UNITDATA_REQ message at the sending CDS user results in data transfer to the receiving CDS
+user.  The CDS provider at the receiving side indicates the data in a CD_UNITDATA_IND message.  No acknowledgments
 or receipt confirmation is indicated at the sending CDS provider, regardless of whether the underlying protocol supports
 receipt confirmation.
 
-In @figref{43}, the CD_@-UNITDATA_@-REQ message at the sending CDS user cannot have its data transmitted by the
+In @figref{43}, the CD_UNITDATA_REQ message at the sending CDS user cannot have its data transmitted by the
 CDS provider due to a transmission error (e.g. the communications medium has disconnected).  The CDS provider indicates
-the transmission error the CDS user with a CD_@-ERROR_@-IND message.
+the transmission error the CDS user with a CD_ERROR_IND message.
 This is the same in the unacknowledged, acknowledged and paced cases.
 
-In @figref{44}, the CD_@-UNITDATA_@-REQ message at the sending CDS user results in data transfer to the receiving CDS
+In @figref{44}, the CD_UNITDATA_REQ message at the sending CDS user results in data transfer to the receiving CDS
 user.  The CDS provider at the receiving side detects an error in the transmission (e.g. a CRC error) and indicates an
-errored frame to the receiving CDS user with a CD_@-BAD_@-FRAME_@-IND message.  No error is indicated to the sending CDS
+errored frame to the receiving CDS user with a CD_BAD_FRAME_IND message.  No error is indicated to the sending CDS
 user, regardless of whether the underlying protocol supports negative acknowledgements of received data.
 
 @node Acknowledged Data Transfer Service
@@ -1091,31 +1167,31 @@ The acknowledged data transfer service requires support from the underlying prot
 @itemize @bullet
 
 @item @b{CD_UNITDATA_REQ}:
-The sending CDS user transfers data to the receiving CDS user with the CD_@-UNITDATA_@-REQ
+The sending CDS user transfers data to the receiving CDS user with the CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 message.
 
 @item @b{CD_UNITDATA_IND}:
 Upon receiving user data, the CDS provider indicates the received data to the local CDS user with the
-CD_@-UNITDATA_@-IND
+CD_UNITDATA_IND
 @prindex CD_UNITDATA_IND
 message.
 
 @item @b{CD_UNITDATA_ACK}:
 Upon successful receipt acknowledgement, the CDS provider indicates receipt acknowledgement to the local sending CDS
-user with the CD_@-UNITDATA_@-ACK
+user with the CD_UNITDATA_ACK
 @prindex CD_UNITDATA_ACK
 message.
 
 @item @b{CD_ERROR_IND}:
-If the local CDS provider is unable to transmit CDS user data requested in a CD_@-UNITDATA_@-REQ message, or a negative
-acknowledgement is received by the peer CDS provider, it responds to the local sending CDS user with a CD_@-ERROR_@-IND
+If the local CDS provider is unable to transmit CDS user data requested in a CD_UNITDATA_REQ message, or a negative
+acknowledgement is received by the peer CDS provider, it responds to the local sending CDS user with a CD_ERROR_IND
 @prindex CD_ERROR_IND
 message.
 
 @item @b{CD_BAD_FRAME_IND}:
 If the local CDS provider is unable to receive CDS user data correctly, it is indicated to the local receiving CDS user
-with the CD_@-BAD_@-FRAME_@-IND
+with the CD_BAD_FRAME_IND
 @prindex CD_BAD_FRAME_IND
 message.
 
@@ -1133,22 +1209,22 @@ The normal sequence of primitives for an unsuccessful acknowledged reception is 
 
 @figuresized{cdi_fi47,47,Message Flow: Unsuccessful Acknowleged Data Reception,4in}
 
-In @figref{45}, the CD_@-UNITDATA_@-REQ message at the sending CDS user results in data transfer to the receiving CDS
-user.  The CDS provider at the receiving side indicates the data in a CD_@-UNITDATA_@-IND message and provides a
+In @figref{45}, the CD_UNITDATA_REQ message at the sending CDS user results in data transfer to the receiving CDS
+user.  The CDS provider at the receiving side indicates the data in a CD_UNITDATA_IND message and provides a
 positive acknowledgement or receipt confirmation to the sending CDS provider.  The sending CDS provider, upon receipt of
 the positive acknolwedgement or receipt confirmation indicates acknowledgement to the local sending CDS user with the
-CD_@-UNITDATA_@-ACK message.
+CD_UNITDATA_ACK message.
 
-In @figref{46}, the CD_@-UNITDATA_@-REQ message at the sending CDS user cannot have its data transmitted by the CDS
+In @figref{46}, the CD_UNITDATA_REQ message at the sending CDS user cannot have its data transmitted by the CDS
 provider due to a transmission error (e.g. the communications medium has disconnected).  The CDS provider indicates the
-transmission error the CDS user with a CD_@-ERROR_@-IND message.
+transmission error the CDS user with a CD_ERROR_IND message.
 This is the same in the unacknowledged, acknowledged and paced cases.
 
-In @figref{47}, the CD_@-UNITDATA_@-REQ message at the sending CDS user results in data transfer to the receiving CDS
+In @figref{47}, the CD_UNITDATA_REQ message at the sending CDS user results in data transfer to the receiving CDS
 user.  The CDS provider at the receiving side detects an error in the transmission (e.g. a CRC error) and indicates an
-errored frame to the receiving CDS user with a CD_@-BAD_@-FRAME_@-IND message.  A negative acknowledgement is
+errored frame to the receiving CDS user with a CD_BAD_FRAME_IND message.  A negative acknowledgement is
 sent to the sending CDS provider using the underlying protocol.  The sending CDS provider, upon receipt of the negative
-acknowledgement, indicates the reception error to the sending CDS user with a CD_@-ERROR_@-IND message.
+acknowledgement, indicates the reception error to the sending CDS user with a CD_ERROR_IND message.
 
 @node Paced Data Transfer Service
 @subsection Paced Data Transfer Service
@@ -1163,31 +1239,31 @@ The paced data transfer service requires support from the sending CDS provider.
 @itemize @bullet
 
 @item @b{CD_UNITDATA_REQ}:
-The sending CDS user transfers data to the receiving CDS user with the CD_@-UNITDATA_@-REQ
+The sending CDS user transfers data to the receiving CDS user with the CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 message.
 
 @item @b{CD_UNITDATA_ACK}:
 Upon successful @emph{transmission} of the user data, the CDS provider acknowledges the data transmission to the local
-sending CDS user with the CD_@-UNITDATA_@-ACK
+sending CDS user with the CD_UNITDATA_ACK
 @prindex CD_UNITDATA_ACK
 message.
 
 @item @b{CD_UNITDATA_IND}:
 Upon receiving user data, the CDS provider indicates the received data to the local CDS user with the
-CD_@-UNITDATA_@-IND
+CD_UNITDATA_IND
 @prindex CD_UNITDATA_IND
 message.
 
 @item @b{CD_ERROR_IND}:
-If the local CDS provider is unable to transmit CDS user data requested in a CD_@-UNITDATA_@-REQ message, it responds to
-the local sending CDS user with a CD_@-ERROR_@-IND
+If the local CDS provider is unable to transmit CDS user data requested in a CD_UNITDATA_REQ message, it responds to
+the local sending CDS user with a CD_ERROR_IND
 @prindex CD_ERROR_IND
 message.
 
 @item @b{CD_BAD_FRAME_IND}:
 If the local CDS provider is unable to receive CDS user data correctly, it is indicated to the local receiving CDS user
-with the CD_@-BAD_@-FRAME_@-IND
+with the CD_BAD_FRAME_IND
 @prindex CD_BAD_FRAME_IND
 message.
 
@@ -1205,22 +1281,22 @@ The normal sequence of primitives for an unsuccessful paced reception is illustr
 
 @figuresized{cdi_fi50,50,Message Flow: Unsuccessful Paced Data Reception,4in}
 
-In @figref{48}, the CD_@-UNITDATA_@-REQ message at the sending CDS user results in data transfer to the receiving CDS
+In @figref{48}, the CD_UNITDATA_REQ message at the sending CDS user results in data transfer to the receiving CDS
 user.  The CDS provider at the sending side, once the data has been transmitted, or using some other timing que, issues
-an acknowledgement of the transmission to the local CDS user with the CD_@-UNITDATA_@-ACK message.  The CDS provider at
-the receiving side indicates the data in a CD_@-UNITDATA_@-IND message.  No receipt confirmation is indicated at the
+an acknowledgement of the transmission to the local CDS user with the CD_UNITDATA_ACK message.  The CDS provider at
+the receiving side indicates the data in a CD_UNITDATA_IND message.  No receipt confirmation is indicated at the
 sending CDS provider, regardless of whether the underlying protocol supports receipt confirmation.
 
-In @figref{49}, the CD_@-UNITDATA_@-REQ message at the sending CDS user cannot have its data transmitted by the CDS
+In @figref{49}, the CD_UNITDATA_REQ message at the sending CDS user cannot have its data transmitted by the CDS
 provider due to a transmission error (e.g. the communications medium has disconnected).  The CDS provider indicates the
-transmission error the CDS user with a CD_@-ERROR_@-IND message.
+transmission error the CDS user with a CD_ERROR_IND message.
 This is the same in the unacknowledged, acknowledged and paced cases.
 
-In @figref{50}, the CD_@-UNITDATA_@-REQ message at the sending CDS user results in data transfer to the receiving CDS
+In @figref{50}, the CD_UNITDATA_REQ message at the sending CDS user results in data transfer to the receiving CDS
 user.  The CDS provider at the sending side, once the data has been transmitted, or using some other timing que, issues
-an acknowledgement of the transmission to the local CDS user with the CD_@-UNITDATA_@-ACK message.  The CDS provider at
+an acknowledgement of the transmission to the local CDS user with the CD_UNITDATA_ACK message.  The CDS provider at
 the receiving side detects an error in the transmission (e.g. a CRC error) and indicates an errored frame to the
-receiving CDS user with a CD_@-BAD_@-FRAME_@-IND message.  No negative acknowledgement is indicated to the sending CDS
+receiving CDS user with a CD_BAD_FRAME_IND message.  No negative acknowledgement is indicated to the sending CDS
 user, regardless of whether the underlying protocol supports negative acknowledgements.
 
 @node Duplex Management Services
@@ -1267,33 +1343,33 @@ until an time interval has passed, whichever comes first.
 @itemize @bullet
 
 @item @b{CD_READ_REQ}:
-The CDS user requests the read service using the CD_@-READ_@-REQ
+The CDS user requests the read service using the CD_READ_REQ
 @prindex CD_READ_REQ
-message.  This message also specifies the period of time to await input data before failing with a CD_@-READTIMEOUT
+message.  This message also specifies the period of time to await input data before failing with a CD_READTIMEOUT
 @peindex CD_READTIMEOUT
 error.
 
 @item @b{CD_OK_ACK}:
-The CDS provider acknowledges successful receipt of the CD_@-READ_@-REQ message using the CD_@-OK_@-ACK
+The CDS provider acknowledges successful receipt of the CD_READ_REQ message using the CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the read request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the read request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
 
 @item @b{CD_UNITDATA_IND}:
-If data is available to be read, the CDS provider confirms the read request using a CD_@-UNITDATA_@-IND
+If data is available to be read, the CDS provider confirms the read request using a CD_UNITDATA_IND
 @prindex CD_UNITDATA_IND
 message.
 
 @item @b{CD_ERROR_IND}:
 The CDS provider indicates the failure of the read request (the interval of time has elapsed before data was available
-to be read) using a CD_@-ERROR_@-IND
+to be read) using a CD_ERROR_IND
 @prindex CD_ERROR_IND
-message containing the error CD_@-READTIMEOUT.
+message containing the error CD_READTIMEOUT.
 @peindex CD_READTIMEOUT
 
 @end itemize
@@ -1315,17 +1391,17 @@ notice.  The allow input service is typically used with the halt input service (
 @itemize @bullet
 
 @item @b{CD_ALLOW_INPUT_REQ}:
-The CDS user requests that the input section be allowed using the CD_@-ALLOW_@-INPUT_@-REQ
+The CDS user requests that the input section be allowed using the CD_ALLOW_INPUT_REQ
 @prindex CD_ALLOW_INPUT_REQ
 message.
 
 @item @b{CD_OK_ACK}:
-The CDS provide acknowledges successful receipt of the message using the CD_@-OK_@-ACK
+The CDS provide acknowledges successful receipt of the message using the CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the allow input request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the allow input request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -1345,17 +1421,17 @@ notice.  The halt input service is typically used following the allow input serv
 @itemize @bullet
 
 @item @b{CD_HALT_INPUT_REQ}:
-The CDS user request that the input section be halted using the CD_@-HALT_@-INPUT_@-REQ
+The CDS user request that the input section be halted using the CD_HALT_INPUT_REQ
 @prindex CD_HALT_INPUT_REQ
 message.
 
 @item @b{CD_OK_ACK}:
-The CDS provide acknowledges successful receipt of the message using the CD_@-OK_@-ACK
+The CDS provide acknowledges successful receipt of the message using the CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the allow input request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the allow input request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -1375,17 +1451,17 @@ user to abort any output currently being transmitted by the communications devic
 @itemize @bullet
 
 @item @b{CD_ABORT_OUTPUT_REQ}:
-The CDS user request that output be aborted using the CD_@-ABORT_@-OUTPUT_@-REQ
+The CDS user request that output be aborted using the CD_ABORT_OUTPUT_REQ
 @prindex CD_ABORT_OUTPUT_REQ
 message.
 
 @item @b{CD_OK_ACK}:
-The CDS provide acknowledges successful receipt of the message using the CD_@-OK_@-ACK
+The CDS provide acknowledges successful receipt of the message using the CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the allow input request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the allow input request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -1404,31 +1480,31 @@ unit data request service followed by a read service.
 @itemize @bullet
 
 @item @b{CD_WRITE_READ_REQ}:
-The CDS user request that a write read request be performed using the CD_@-WRITE_@-READ_@-REQ
+The CDS user request that a write read request be performed using the CD_WRITE_READ_REQ
 @prindex CD_WRITE_READ_REQ
 message.
 
 @item @b{CD_OK_ACK}:
-The CDS provide acknowledges successful receipt of the write read request using the CD_@-OK_@-ACK
+The CDS provide acknowledges successful receipt of the write read request using the CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the write read request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the write read request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
 
 @item @b{CD_UNITDATA_IND}:
-If data is available to be read, the CDS provider confirms the write read request using a CD_@-UNITDATA_@-IND
+If data is available to be read, the CDS provider confirms the write read request using a CD_UNITDATA_IND
 @prindex CD_UNITDATA_IND
 message.
 
 @item @b{CD_ERROR_IND}:
 The CDS provider indicates the failure of the write read request (the interval of time has elapsed before data was
-available to be read) using a CD_@-ERROR_@-IND
+available to be read) using a CD_ERROR_IND
 @prindex CD_ERROR_IND
-message containing the error CD_@-READTIMEOUT.
+message containing the error CD_READTIMEOUT.
 @peindex CD_READTIMEOUT
 
 @end itemize
@@ -1477,12 +1553,12 @@ The normal sequence of primitives for an unsuccessful write read service request
 @item @b{CD_MODEM_SIG_REQ}:
 
 @item @b{CD_OK_ACK}:
-The CDS provide acknowledges successful receipt of the modem signal request using the CD_@-OK_@-ACK
+The CDS provide acknowledges successful receipt of the modem signal request using the CD_OK_ACK
 @prindex CD_OK_ACK
 message.
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the modem signal request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the modem signal request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -1499,7 +1575,7 @@ message.
 @item @b{CD_MODEM_SIG_IND}:
 
 @item @b{CD_ERROR_ACK}:
-The CDS provider acknowledges failure for the modem signal poll request using a CD_@-ERROR_@-ACK
+The CDS provider acknowledges failure for the modem signal poll request using a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 message.
 @xref{Error Reporting Service}.
@@ -1552,7 +1628,7 @@ these primitive initialize the stream, preparing it for use.
 The PPA associated with each stream must be initialized before the CDS provider can transfer data over the medium.  The
 initialization and de-initialization of the PPA is a network management issue, but CDI must address the issue because of
 the impact such actions will have on a CDS user.  More specifically, CDI requires the CDS provider to initialize the PPA
-associated with a stream at some point before it completes the processing of the CD_@-ENABLE_@-REQ.
+associated with a stream at some point before it completes the processing of the CD_ENABLE_REQ.
 @prindex CD_ENABLE_REQ
 Guidelines for initialization and de-initialization of a PPA by a CDS provider are presented here.
 
@@ -1562,13 +1638,13 @@ A CDS provide may initialize a PPA using the following methods:
 
 @itemize @bullet
 
-@item pre-initialized by some network management mechanism before the CD_@-ENABLE_@-REQ
+@item pre-initialized by some network management mechanism before the CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 primitive is received; or
 
-@item automatic initialization on receipt of a CD_@-ENABLE_@-REQ
+@item automatic initialization on receipt of a CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
-or CD_@-ATTACH_@-REQ
+or CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 primitive.
 
@@ -1576,32 +1652,32 @@ primitive.
 
 A specific CDS provider may support either of these methods, or possibly some combination of the two, but the method
 implemented has no impact on the CDS user.  From the CDS user's viewpoint, the PPA is guaranteed to be initialized on
-receipt of a CD_@-ENABLE_@-CON
+receipt of a CD_ENABLE_CON
 @prindex CD_ENABLE_CON
-primitive.  For automatic initialization, this implies that the CD_@-ENABLE_@-CON
+primitive.  For automatic initialization, this implies that the CD_ENABLE_CON
 @prindex CD_ENABLE_CON
 primitive may not be issued until the initialization has completed.
 
 If pre-initialization has not been performed and/or automatic initialization fails, the CDS provider will fail the
-CD_@-ENABLE_@-REQ.
+CD_ENABLE_REQ.
 @prindex CD_ENABLE_REQ
 Two errors,
-CD_@-INITFAILED
+CD_INITFAILED
 @peindex CD_INITFAILED
-and CD_@-FATALERR
+and CD_FATALERR
 @peindex CD_FATALERR
-may be returned in the CD_@-ERROR_@-ACK
+may be returned in the CD_ERROR_ACK
 @prindex CD_ERROR_ACK
-primitive in response to a CD_@-ENABLE_@-REQ
+primitive in response to a CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 primitive if PPA initialization fails.
-CD_@-INITFAILED
+CD_INITFAILED
 @peindex CD_INITFAILED
 is returned when a CDS provider supports automatic PPA initialization, but the initialization attempt failed.
-CD_@-FATALERR
+CD_FATALERR
 @peindex CD_FATALERR
 is returned wen the CDS provider requires pre-initialization, but the PPA is not initialized before the
-CD_@-ENABLE_@-REQ
+CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 is received.
 
@@ -1611,15 +1687,15 @@ A CDS provider may handle PPA de-initialization using the following methods:
 
 @itemize @bullet
 
-@item automatic de-initialization upon receipt of the final CD_@-DETACH_@-REQ
+@item automatic de-initialization upon receipt of the final CD_DETACH_REQ
 @prindex CD_DETACH_REQ
-(for @dfn{Style 2} providers) or CD_@-DISABLE_@-REQ
+(for @dfn{Style 2} providers) or CD_DISABLE_REQ
 @prindex CD_DISABLE_REQ
 (for @dfn{Style 1} providers), or upon closing of the last stream associated with the PPA;
 
-@item automatic de-initialization after expiration of a timer following the last CD_@-DETACH_@-REQ,
+@item automatic de-initialization after expiration of a timer following the last CD_DETACH_REQ,
 @prindex CD_DETACH_REQ
-CD_@-DISABLE_@-REQ,
+CD_DISABLE_REQ,
 @prindex CD_DISABLE_REQ
 or close as appropriate; or
 
@@ -1644,7 +1720,7 @@ de-initialization.
 @anchor{cd_info_req_t}
 
 This user originated primitive requests that the provider acknowledge the primitive with a
-CD_@-INFO_@-ACK
+CD_INFO_ACK
 @prindex CD_INFO_ACK
 primitive indicating protocol and option information.
 
@@ -1652,12 +1728,12 @@ primitive indicating protocol and option information.
 
 This primitive consists fo one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
 @} cd_info_req_t;
 @tpindex cd_info_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -1670,7 +1746,7 @@ Specifies the primitive type.
 
 @subsubheading State
 
-This primitive is valid in any state other than CD_@-UNUSABLE
+This primitive is valid in any state other than CD_UNUSABLE
 @stindex CD_UNUSABLE
 where a local acknowledgement is not pending.
 
@@ -1686,12 +1762,12 @@ This primitive requires the provider to acknowledge receipt of the primitive as 
 
 @item @b{Successful:}
 When successful, the provider acknowledges the primitive with the
-CD_@-INFO_@-ACK.
+CD_INFO_ACK.
 @prindex CD_INFO_ACK
 
 @item @b{Unsuccessful (non-fatal errors):}
 When unsuccessful, the provider acknowledges the primitive with the
-CD_@-ERROR_@-ACK
+CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 indicating the reason for failure of the primitive.
 
@@ -1736,18 +1812,18 @@ UNIX system error.
 @anchor{cd_info_ack_t}
 
 This provider originated primitive acknowledges a previously issued
-CD_@-INFO_@-REQ
+CD_INFO_REQ
 @prindex CD_INFO_REQ
 primitive, and provides protocol and limits information for the stream upon which the primitive is issued.
 
 If the stream is in state
-CD_@-UNATTACHED,
+CD_UNATTACHED,
 @stindex CD_UNATTACHED
 the information returned by
-CD_@-INFO_@-ACK
+CD_INFO_ACK
 @prindex CD_INFO_ACK
 might be different after a successful
-CD_@-ATTACH_@-REQ
+CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 than it was before the attach was completed.  This is because the CD provider might not yet have all protocol
 information concerning the underlying communications device until after it has been attached to a specific Physical
@@ -1757,7 +1833,7 @@ Point of Attachment.
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
@@ -1771,7 +1847,7 @@ typedef struct @{
     cd_ulong cd_ppa_style;
 @} cd_info_ack_t;
 @tpindex cd_info_ack_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -1790,12 +1866,12 @@ can be one of the following values:
 @item CD_UNATTACHED
 @stindex CD_UNATTACHED
 No Physical Point of Attachment (PPA) is associated with the stream.  Only Style 2 communications devices (streams that
-return CD_@-STYLE2
+return CD_STYLE2
 @pvindex CD_STYLE2
 in the @var{cd_ppa_style}
 @vrindex cd_ppa_style
 field) can exist in this state.
-CD_@-STYLE2
+CD_STYLE2
 @pvindex CD_STYLE2
 communication devices start in this state after @manref{open(2)}.
 
@@ -1806,7 +1882,7 @@ PPA cannot be used.
 @item CD_DISABLED
 @stindex CD_DISABLED
 A Physical Point of Attachment (PPA) is associated with the stream, but the communications device is disabled.  Style 1
-communications devices (streams that return CD_@-STYLE1
+communications devices (streams that return CD_STYLE1
 @pvindex CD_STYLE1
 in the @var{cd_ppa_style}
 @vrindex cd_ppa_style
@@ -1814,12 +1890,12 @@ field) start in this state after @manref{open(2)}.
 
 @item CD_ENABLE_PENDING
 @stindex CD_ENABLE_PENDING
-A CD_@-ENABLE_@-REQ
+A CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 has been issued and is pending.  The provider is waiting for enabling of the communications device to complete before
-confirmation with CD_@-ENABLE_@-CON
+confirmation with CD_ENABLE_CON
 @prindex CD_ENABLE_CON
-or error acknowledgement with CD_@-ERROR_@-ACK.
+or error acknowledgement with CD_ERROR_ACK.
 @prindex CD_ERROR_ACK
 
 @item CD_ENABLED
@@ -1837,12 +1913,12 @@ The input section is permanently enabled.
 
 @item CD_DISABLE_PENDING
 @stindex CD_DISABLE_PENDING
-A CD_@-DISABLE_@-REQ
+A CD_DISABLE_REQ
 @prindex CD_DISABLE_REQ
 has been issued and is pending.  The provider is waiting for disabling of the communications device to complete before
-confirmation with CD_@-DISABLE_@-CON
+confirmation with CD_DISABLE_CON
 @prindex CD_DISABLE_CON
-or error acknowledgement with CD_@-ERROR_@-ACK.
+or error acknowledgement with CD_ERROR_ACK.
 @prindex CD_ERROR_ACK
 
 @item CD_OUTPUT_ACTIVE
@@ -1906,21 +1982,21 @@ Indicates the output style.  @var{cd_output_style} can be one of the following v
 
 @item CD_UNACKEDOUTPUT
 @pvindex CD_UNACKEDOUTPUT
-The communications device does not issue CD_@-UNITDATA_@-ACK
+The communications device does not issue CD_UNITDATA_ACK
 @prindex CD_UNITDATA_ACK
 primitives.
 
 @item CD_ACKEDOUTPUT
 @pvindex CD_ACKEDOUTPUT
-The communications device issues CD_@-UNITDATA_@-ACK
+The communications device issues CD_UNITDATA_ACK
 @prindex CD_UNITDATA_ACK
-primitives in acknowledgement of CD_@-UNITDATA_@-REQ
+primitives in acknowledgement of CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 primitives.
 
 @item CD_PACEDOUTPUT
 @pvindex CD_PACEDOUTPUT
-The communications device issues CD_@-UNITDATA_@-ACK
+The communications device issues CD_UNITDATA_ACK
 @prindex CD_UNITDATA_ACK
 primitives only as output timing hints.
 
@@ -1942,22 +2018,22 @@ Dial information supported.
 
 @item CD_AUTOALLOW
 @pvindex CD_AUTOALLOW
-CD_@-INPUT_@-ALLOWED
+CD_INPUT_ALLOWED
 @stindex CD_INPUT_ALLOWED
 as soon as enabled.
 
 @item CD_KEEPALIVE
 @pvindex CD_KEEPALIVE
-Do not send off at CD_@-DISABLE_@-REQ.
+Do not send off at CD_DISABLE_REQ.
 @prindex CD_DISABLE_REQ
 This is a Gcom extension.
 
 @end table
 
 @item cd_addr_length
-The maximum size of an address for use with CD_@-UNITDATA_@-REQ,
+The maximum size of an address for use with CD_UNITDATA_REQ,
 @prindex CD_UNITDATA_REQ
-CD_@-UNITDATA_@-IND.
+CD_UNITDATA_IND.
 @prindex CD_UNITDATA_IND
 
 @item cd_ppa_style
@@ -1968,16 +2044,16 @@ Indicates the Physical Point of Attachment (PPA) style.  @var{cd_ppa_style} can 
 @item CD_STYLE1
 @pvindex CD_STYLE1
 The communications device is already attached to the physical point of appearance at @manref{open(2)}.  The device
-starts in the CD_@-DISABLED
+starts in the CD_DISABLED
 @stindex CD_DISABLED
 state.
 
 @item CD_STYLE2
 @pvindex CD_STYLE2
 The communications device is not attached to the physical point of appearance at @manref{open(2)}, and must be attached
-with CD_@-ATTACH_@-REQ.
+with CD_ATTACH_REQ.
 @prindex CD_ATTACH_REQ
-The device starts in the CD_@-UNATTACHED
+The device starts in the CD_UNATTACHED
 @stindex CD_UNATTACHED
 state.
 
@@ -1988,9 +2064,9 @@ state.
 @subsubheading State
 
 This primitive is valid in any state where a local acknowledgement (requiring response with a
-CD_@-OK_@-ACK)
+CD_OK_ACK)
 @prindex CD_OK_ACK
-is not pending, and only in response to a CD_@-INFO_@-REQ
+is not pending, and only in response to a CD_INFO_REQ
 @prindex CD_INFO_REQ
 primitive.
 
@@ -2009,26 +2085,26 @@ The new state is unchanged.
 This user originated primitive requests that the requesting stream be attached to the physical device indicated by the
 Physical Point of Attachment (PPA).
 
-When a Style 2 CDI stream is first opened, it is opened in the CD_@-UNATTACHED
+When a Style 2 CDI stream is first opened, it is opened in the CD_UNATTACHED
 @stindex CD_UNATTACHED
-state and is not associated with a Physical Point of Appearance (PPA).  The CD_@-ATTACH_@-REQ
+state and is not associated with a Physical Point of Appearance (PPA).  The CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 primitive requests that the provider associate the stream with the specified PPA and move the stream to the
-CD_@-DISABLED
+CD_DISABLED
 @stindex CD_DISABLED
 state.
 
-Style 1 CDI streams open in the CD_@-DISABLED
+Style 1 CDI streams open in the CD_DISABLED
 @stindex CD_DISABLED
-state, and a CD_@-ATTACH_@-REQ
+state, and a CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 primitive issued on a Style 1 stream will fail.
 
-This primitive is only valid for devices that return CD_@-STYLE2
+This primitive is only valid for devices that return CD_STYLE2
 @pvindex CD_STYLE2
 in the @var{cd_ppa_style}
 @vrindex cd_ppa_style
-field in a CD_@-INFO_@-ACK.
+field in a CD_INFO_ACK.
 @prindex CD_INFO_ACK
 
 @subsubheading Addressing
@@ -2045,13 +2121,13 @@ provider-specific documentation.
 
 This primitive consists of on M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_ppa;
 @} cd_attach_req_t;
 @tpindex cd_attach_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2069,32 +2145,32 @@ Specifies the Physical Point of Attachment (PPA).  The format of this field is p
 
 @subsubheading State
 
-This primitive is only valid in state CD_@-UNATTACHED.
+This primitive is only valid in state CD_UNATTACHED.
 @stindex CD_UNATTACHED
 
 @subsubheading New State
 
-The new state is CD_@-DISABLED.
+The new state is CD_DISABLED.
 @stindex CD_DISABLED
 
 @subsubheading Response
 
 This primitive requires the provider to return an acknowledgement indicating the success or failure of the
-CD_@-ATTACH_@-REQ.
+CD_ATTACH_REQ.
 @prindex CD_ATTACH_REQ
 
 @itemize @minus
 
 @item @b{Successful:}
-When successful, the provider responds with a CD_@-OK_@-ACK
+When successful, the provider responds with a CD_OK_ACK
 @prindex CD_OK_ACK
-primitive acknowledging successful processing of the CD_@-ATTACH_@-REQ.
+primitive acknowledging successful processing of the CD_ATTACH_REQ.
 @prindex CD_ATTACH_REQ.
-The new state is CD_@-DISABLED.
+The new state is CD_DISABLED.
 @stindex CD_DISABLED
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, the provider responds with a CD_@-ERROR_@-ACK
+When unsuccessful, the provider responds with a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 indicating the non-fatal error.  The state is unchanged.
 
@@ -2147,7 +2223,7 @@ UNIX system error.
 @anchor{cd_detach_req_t}
 
 This user originated primitive requests that the requesting stream be detached from the Physical Point of Attachment
-(PPA) to which it was previously attached with a successful CD_@-ATTACH_@-REQ
+(PPA) to which it was previously attached with a successful CD_ATTACH_REQ
 @prindex CD_ATTACH_REQ
 primitive.
 
@@ -2155,11 +2231,11 @@ primitive.
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
 @} cd_detach_req_t;
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2174,29 +2250,29 @@ Specifies the primitive type.
 
 @subsubheading State
 
-This primitive is only valid in state CD_@-DISABLED.
+This primitive is only valid in state CD_DISABLED.
 @stindex CD_DISABLED
 
 @subsubheading New State
 
-The new state is CD_@-UNATTACHED.
+The new state is CD_UNATTACHED.
 @prindex CD_UNATTACHED
 
 @subsubheading Response
 
-This primitive requires the provider to acknowledge the receipt of the CD_@-DETACH_@-REQ
+This primitive requires the provider to acknowledge the receipt of the CD_DETACH_REQ
 @prindex CD_DETACH_REQ
 primitive as follows:
 
 @itemize @minus
 
 @item @b{Successful:}
-When the primitive is successful, the provider acknowledges receipt of the primitive with the CD_@-OK_@-ACK
+When the primitive is successful, the provider acknowledges receipt of the primitive with the CD_OK_ACK
 @prindex CD_OK_ACK
 primitive.
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, the provider acknowledges receipt of the primitive with the CD_@-ERROR_@-ACK
+When unsuccessful, the provider acknowledges receipt of the primitive with the CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive indicating the error.
 
@@ -2246,7 +2322,7 @@ UNIX system error.
 @anchor{CD_OK_ACK}
 @anchor{cd_ok_ack_t}
 
-This provider originated primitive acknowledges that a primitive requiring local acknowledgement with the CD_@-OK_@-ACK
+This provider originated primitive acknowledges that a primitive requiring local acknowledgement with the CD_OK_ACK
 @prindex CD_OK_ACK
 has been received and successfully processed.
 
@@ -2254,14 +2330,14 @@ has been received and successfully processed.
 
 This primitive consists of one M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
     cd_ulong cd_correct_primitive;
 @} cd_ok_ack_t;
 @tpindex cd_ok_ack_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2274,7 +2350,7 @@ Indicates the primitive type.
 
 @item cd_state
 Indicates the new state of the CD provider following successful processing of the request message that elicited the
-CD_@-OK_@-ACK.
+CD_OK_ACK.
 @prindex CD_OK_ACK
 
 @table @var
@@ -2382,7 +2458,7 @@ received in error.  The primitive to which the error acknowledgement applies and
 
 This primitive consists of one M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
@@ -2391,7 +2467,7 @@ typedef struct @{
     cd_ulong cd_explanation;
 @} cd_error_ack_t;
 @tpindex cd_error_ack_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2672,31 +2748,31 @@ code.
 
 This primitive is valid in any state where a local acknowledgement is pending in response to one of the following
 primitives:
-CD_@-ABORT_@-OUTPUT_@-REQ,
+CD_ABORT_OUTPUT_REQ,
 @prindex CD_ABORT_OUTPUT_REQ
-CD_@-ALLOW_@-INPUT_@-REQ,
+CD_ALLOW_INPUT_REQ,
 @prindex CD_ALLOW_INPUT_REQ
-CD_@-ATTACH_@-REQ,
+CD_ATTACH_REQ,
 @prindex CD_ATTACH_REQ
-CD_@-DETACH_@-REQ,
+CD_DETACH_REQ,
 @prindex CD_DETACH_REQ
-CD_@-DISABLE_@-REQ,
+CD_DISABLE_REQ,
 @prindex CD_DISABLE_REQ
-CD_@-ENABLE_@-REQ,
+CD_ENABLE_REQ,
 @prindex CD_ENABLE_REQ
-CD_@-HALT_@-INPUT_@-REQ,
+CD_HALT_INPUT_REQ,
 @prindex CD_HALT_INPUT_REQ
-CD_@-INFO_@-REQ,
+CD_INFO_REQ,
 @prindex CD_INFO_REQ
-CD_@-MODEM_@-SIG_@-REQ,
+CD_MODEM_SIG_REQ,
 @prindex CD_MODEM_SIG_REQ
-CD_@-MUX_@-NAME_@-REQ,
+CD_MUX_NAME_REQ,
 @prindex CD_MUX_NAME_REQ
-CD_@-READ_@-REQ,
+CD_READ_REQ,
 @prindex CD_READ_REQ
-CD_@-UNITDATA_@-REQ,
+CD_UNITDATA_REQ,
 @prindex CD_UNITDATA_REQ
-CD_@-WRITE_@-READ_@-REQ.
+CD_WRITE_READ_REQ.
 @prindex CD_WRITE_READ_REQ
 
 @subsubheading New State
@@ -2718,12 +2794,12 @@ This user originated primitive request is not documented.
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
 @} cd_mux_name_req_t;
 @tpindex cd_mux_name_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2861,27 +2937,27 @@ device.  These primitives support the Enable and Disable services described earl
 This user originated primitive requests that the communications device be prepared for service and enabled.
 
 A CDI stream that is in the
-CD_@-DISABLED
+CD_DISABLED
 @stindex CD_DISABLED
 stat is not yet ready for transmission.  Before the stream can be used for transmission, ti must be successfully enabled
 with the
-CD_@-ENABLE_@-REQ
+CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 primitive.  Successful processing of the
-CD_@-ENABLE_@-REQ
+CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 primitive moves the stream to the
-CD_@-ENABLED
+CD_ENABLED
 @stindex CD_ENABLED
 state.
 
-If the communications device returns the CD_@-CANDIAL
+If the communications device returns the CD_CANDIAL
 @pvindex CD_CANDIAL
 flag in the
 @var{cd_features}
 @vrindex cd_features
 field of the
-CD_@-INFO_@-ACK,
+CD_INFO_ACK,
 @prindex CD_INFO_ACK
 the device is capable of dialling and a dial string can be provided, specified by the
 @var{cd_dial_length}
@@ -2893,23 +2969,23 @@ fields.  The specification of the dial string is provider- and device-specific.
 
 
 In the
-CD_@-ENABLED
+CD_ENABLED
 @stindex CD_ENABLED
 state, the stream is able to transmit must have not yet necessarily been allowed for input.  If the stream returns
-CD_@-AUTOALLOW
+CD_AUTOALLOW
 in the
 @var{cd_features}
 @vrindex cd_features
 field of the
-CD_@-INFO_@-ACK,
+CD_INFO_ACK,
 @prindex CD_INFO_ACK
 the communications device will be allowed for both transmission and reception upon successful completion of the
-CD_@-ENABLE_@-REQ;
+CD_ENABLE_REQ;
 @prindex CD_ENABLE_REQ
 however, if the
-CD_@-AUTOALLOW
+CD_AUTOALLOW
 flag is not returned, the CD user must first call
-CD_@-ALLOW_@-INPUT_@-REQ
+CD_ALLOW_INPUT_REQ
 @prindex CD_ALLOW_INPUT_REQ
 before reception can begin.
 
@@ -2917,7 +2993,7 @@ before reception can begin.
 
 This primitive consists of one M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_dial_type;
@@ -2925,7 +3001,7 @@ typedef struct @{
     cd_ulong cd_dial_offset;
 @} cd_enable_req_t;
 @tpindex cd_enable_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -2941,27 +3017,27 @@ Specifies the type of the provided dial string.  The type can be set to a provid
 set as follows:
 
 @table @var
-@item CD_@-NODIAL
+@item CD_NODIAL
 @pvindex CD_NODIAL
 Specifies that there is no dial string associated with the
-CD_@-ENABLE_@-REQ.
+CD_ENABLE_REQ.
 @prindex CD_ENABLE_REQ
 @end table
 
 @item cd_dial_length
 Specifies the length of the dial string.  Specification of dial strings is only allowed when the provider returns
-CD_@-CANDIAL
+CD_CANDIAL
 @pvindex CD_CANDIAL
 in the
 @var{cd_features}
 @vrindex cd_features
 field of the
-CD_@-INFO_@-ACK.
+CD_INFO_ACK.
 @prindex CD_INFO_ACK
 When no dial string is specified by the user, or
 @var{cd_dial_type}
 @vrindex cd_dial_type
-is set to CD_@-NODIAL,
+is set to CD_NODIAL,
 @pvindex CD_NODIAL
 this field is set to zero
 (0).
@@ -2976,30 +3052,30 @@ is zero (0), this field is ignored.
 
 @subsubheading State
 
-This primitive is valid in state CD_@-DISABLED.
+This primitive is valid in state CD_DISABLED.
 @stindex CD_DISABLED
 
 @subsubheading New State
 
-The new state is CD_@-ENABLED
+The new state is CD_ENABLED
 @stindex CD_ENABLED
-for stream that do not return CD_@-AUTOALLOW
+for stream that do not return CD_AUTOALLOW
 @pvindex CD_AUTOALLOW
 in the
 @var{cd_features}
 @vrindex cd_features
 field of the
-CD_@-INFO_@-ACK,
+CD_INFO_ACK,
 @prindex CD_INFO_ACK
-or the new state is CD_@-INPUT_@-ALLOWED
+or the new state is CD_INPUT_ALLOWED
 @stindex CD_INPUT_ALLOWED
-for those streams that do return CD_@-AUTOALLOW
+for those streams that do return CD_AUTOALLOW
 @pvindex CD_AUTOALLOW
 in the
 @var{cd_features}
 @vrindex cd_features
 field of the
-CD_@-INFO_@-ACK.
+CD_INFO_ACK.
 @prindex CD_INFO_ACK
 
 @subsubheading Response
@@ -3010,13 +3086,13 @@ This primitive requires that the provider acknowledge the receipt of the primiti
 
 @item @b{Successful:}
 Upon success, the provider confirms that the device is enabled with the
-CD_@-ENABLE_@-CON
+CD_ENABLE_CON
 @prindex CD_ENABLE_CON
 primitive.
 
 @item @b{Unsuccessful (non-fatal errors):}
 Upon failure, the provider acknowledges the receipt of the primitive with the
-CD_@-ERROR_@-ACK
+CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive indicating the error.
 
@@ -3028,43 +3104,43 @@ primitive indicating the error.
 
 @table @var
 
-@item CD_@-BADDIAL
+@item CD_BADDIAL
 @peindex CD_BADDIAL
 Dial information was invalid.
 
-@item CD_@-BADDIALTYPE
+@item CD_BADDIALTYPE
 @peindex CD_BADDIALTYPE
 Invalid dial information type.
 
-@item CD_@-BADPRIM
+@item CD_BADPRIM
 @peindex CD_BADPRIM
 Unrecognized primitive.
 
-@item CD_@-EVENT
+@item CD_EVENT
 @peindex CD_EVENT
 Protocol-specific event occurred.
 
-@item CD_@-FATALERR
+@item CD_FATALERR
 @peindex CD_FATALERR
 Device has become unusable.
 
-@item CD_@-INITFAILED
+@item CD_INITFAILED
 @peindex CD_INITFAILED
 Line initialization failed.
 
-@item CD_@-NOTSUPP
+@item CD_NOTSUPP
 @peindex CD_NOTSUPP
 Primitive not supported by this device.
 
-@item CD_@-OUTSTATE
+@item CD_OUTSTATE
 @peindex CD_OUTSTATE
 Primitive was issued from an invalid state.
 
-@item CD_@-PROTOSHORT
+@item CD_PROTOSHORT
 @peindex CD_PROTOSHORT
 M_PROTO block too short.
 
-@item CD_@-SYSERR
+@item CD_SYSERR
 @peindex CD_SYSERR
 UNIX system error.
 
@@ -3078,7 +3154,7 @@ UNIX system error.
 @anchor{CD_ENABLE_CON}
 @anchor{cd_enable_con_t}
 
-This provider originated primitive confirms that the previously issued CD_@-ENABLE_@-REQ
+This provider originated primitive confirms that the previously issued CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 primitive has been successful.
 
@@ -3086,13 +3162,13 @@ primitive has been successful.
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
 @} cd_enable_con_t;
 @tpindex cd_enable_con_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -3153,21 +3229,21 @@ X-raying another PPA.
 
 @subsubheading State
 
-This primitive is issued by the CD provider in the CD_@-ENABLE_@-PENDING
+This primitive is issued by the CD provider in the CD_ENABLE_PENDING
 @stindex CD_ENABLE_PENDING
 state.
 
 @subsubheading New State
 
-After issuing this primitive, the CD provider enters the CD_@-ENABLED
+After issuing this primitive, the CD provider enters the CD_ENABLED
 @stindex CD_ENABLED
-state, unless the CD_@-INFO_@-ACK
+state, unless the CD_INFO_ACK
 @prindex CD_INFO_ACK
-returns the CD_@-AUTOALLOW
+returns the CD_AUTOALLOW
 @pvindex CD_AUTOALLOW
 flag in the @var{cd_features}
 @vrindex cd_features
-field.  In that case, the CD provider enters the CD_@-INPUT_@-ALLOWED
+field.  In that case, the CD provider enters the CD_INPUT_ALLOWED
 @stindex CD_INPUT_ALLOWED
 state.
 
@@ -3180,7 +3256,7 @@ state.
 @anchor{cd_disable_req_t}
 
 This user originated primitive requests that the communications device, previously enabled with a successful
-CD_@-ENABLE_@-REQ
+CD_ENABLE_REQ
 @prindex CD_ENABLE_REQ
 primitive, be disabled.  In addition, ti specifies the disposition of unsent messages.
 
@@ -3188,13 +3264,13 @@ primitive, be disabled.  In addition, ti specifies the disposition of unsent mes
 
 This primitive consists of one M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_disposal;
 @} cd_disable_req_t;
 @tpindex cd_disable_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -3210,18 +3286,18 @@ Specifies how unsent message are to be disposed.  This field can be one of the f
 
 @item CD_FLUSH
 @pvindex CD_FLUSH
-Discard undeliverable data.  All data that is unsent at the time that the CD_@-DISABLE_@-REQ primitive is received will
+Discard undeliverable data.  All data that is unsent at the time that the CD_DISABLE_REQ primitive is received will
 be discarded.  Any data awaiting transmission in the device's write queue will be flushed.
 
 @item CD_WAIT
 @pvindex CD_WAIT
-Attempt to deliver unsent data.  All data that is unsent, at the time that the CD_@-DISABLE_@-REQ primitive is received,
+Attempt to deliver unsent data.  All data that is unsent, at the time that the CD_DISABLE_REQ primitive is received,
 the provider will attempt to send before confirming the primitive.  The provider will not wait for acknowledgement of
 sent message.
 
 @item CD_DELIVER
 @pvindex CD_DELIVER
-Deliver unsent data.  All data that is unsent, at the time that the CD_@-DISABLE_@-REQ primitive is received, the
+Deliver unsent data.  All data that is unsent, at the time that the CD_DISABLE_REQ primitive is received, the
 provider will deliver before confirming the primitive.  The provider will wait for acknowledgement of sent messages.
 
 @end table
@@ -3230,12 +3306,12 @@ provider will deliver before confirming the primitive.  The provider will wait f
 
 @subsubheading State
 
-This primitive is valid in state CD_@-ENABLED.
+This primitive is valid in state CD_ENABLED.
 @stindex CD_ENABLED
 
 @subsubheading New State
 
-The new state is CD_@-DISABLED.
+The new state is CD_DISABLED.
 @stindex CD_DISABLED
 
 @subsubheading Response
@@ -3245,13 +3321,13 @@ This primitive requires the provider to acknowledge receipt of the primitive as 
 @itemize @minus
 
 @item @b{Successful:}
-When successful, the provider confirms the receipt of the primitive with a CD_@-DISABLE_@-CON
+When successful, the provider confirms the receipt of the primitive with a CD_DISABLE_CON
 @prindex CD_DISABLE_CON
-primitive indicating the success of the operation.  The new state is CD_@-UNATTACHED.
+primitive indicating the success of the operation.  The new state is CD_UNATTACHED.
 @stindex CD_UNATTACHED
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, the provider acknowledges the receipt of the primitive with a CD_@-ERROR_@-ACK
+When unsuccessful, the provider acknowledges the receipt of the primitive with a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive indicating the error.  The state is unchanged.
 
@@ -3305,7 +3381,7 @@ UNIX system error.
 @anchor{CD_DISABLE_CON}
 @anchor{cd_disable_con_t}
 
-This provider originated primitive confirms that the previous CD_@-DISABLE_@-REQ
+This provider originated primitive confirms that the previous CD_DISABLE_REQ
 @prindex CD_DISABLE_REQ
 has been successful.
 
@@ -3313,13 +3389,13 @@ has been successful.
 
 This primitive consists of one M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
 @} cd_disable_req_t;
 @tpindex cd_disable_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -3380,13 +3456,13 @@ X-raying another PPA.
 
 @subsubheading State
 
-This primitive is issued in the CD_@-DISABLE_@-PENDING
+This primitive is issued in the CD_DISABLE_PENDING
 @stindex CD_DISABLE_PENDING
 state.
 
 @subsubheading New State
 
-After issuing this primitive the provider enters the CD_@-DISABLED
+After issuing this primitive the provider enters the CD_DISABLED
 @stindex CD_DISABLED
 state.
 
@@ -3417,7 +3493,7 @@ new state of the CD provider.
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
@@ -3425,7 +3501,7 @@ typedef struct @{
     cd_ulong cd_explanation;
 @} cd_error_ind_t;
 @tpindex cd_error_ind_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -3437,7 +3513,7 @@ This primitive contains the following parameters:
 Indicates the primitive type.
 
 @item cd_state
-Indicates the state of the CD provider following the CD_@-ERROR_@-IND.
+Indicates the state of the CD provider following the CD_ERROR_IND.
 @prindex CD_ERROR_IND
 @var{cd_state} can be one of the following values:
 
@@ -3639,14 +3715,14 @@ data that is retrievable from the frame received in error.
 This primitive consists of one M_PROTO message block followed by zero or more M_DATA message blocks.  The M_PROTO
 message block is structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
     cd_ulong cd_error;
 @} cd_bad_frame_ind_t;
 @tpindex cd_bad_frame_ind_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -3770,7 +3846,7 @@ communications device.
 This primitive consists of one M_PROTO message block followed by one or more M_DATA message blocks.  The M_PROTO message
 block is optional.  The M_PROTO message block is structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
@@ -3782,7 +3858,7 @@ typedef struct @{
     cd_ulong cd_dest_addr_offset;
 @} cd_unitdata_ind_t;
 @tpindex cd_unitdata_ind_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -3845,7 +3921,7 @@ X-raying another PPA.
 Indicates the length of the source address associated with the received data.  When the sending endpoint uses CDI, this
 address is the same as the @var{cd_dest_addr_length}
 @vrindex cd_dest_addr_length
-of the corresponding CD_@-UNITDATA_@-REQ
+of the corresponding CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 primitive.  When no source address is provided, or the source address is implicit to the data, this field is coded zero
 (0).
@@ -3860,19 +3936,19 @@ Indicates the offset of the source address from the beginning of the M_PROTO mes
 
 @item CD_SPECIFIC
 @pvindex CD_SPECIFIC
-Indicates that an address is contained in the primitive.  When @var{cd_addr_type} is set to CD_@-SPECIFIC, a destination
+Indicates that an address is contained in the primitive.  When @var{cd_addr_type} is set to CD_SPECIFIC, a destination
 address is indicated in the @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} fields.
 
 @item CD_BROADCAST
 @pvindex CD_BROADCAST
 Indicates that the data was sent to the implicit broadcast address and no specific address follows.  When
-@var{cd_addr_type} is set to CD_@-BROADCAST, the fields @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} are
+@var{cd_addr_type} is set to CD_BROADCAST, the fields @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} are
 coded zero (0) and should be ignored by the CD user.
 
 @item CD_IMPLICIT
 @pvindex CD_IMPLICIT
 Indicates that an implicit address was used, or that the address is embedded in the data.  When @var{cd_addr_type} is
-set to CD_@-IMPLICIT, the fields @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} are coded zero (0) and should
+set to CD_IMPLICIT, the fields @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} are coded zero (0) and should
 be ignored by the CD user.
 
 @end table
@@ -3892,9 +3968,9 @@ Indicates the offset of the destination address from the start of the M_PROTO me
 
 @subsubheading State
 
-This primitive is valid in any state when the device is allowed to receive data (i.e. CD_@-READ_@-ACTIVE
+This primitive is valid in any state when the device is allowed to receive data (i.e. CD_READ_ACTIVE
 @stindex CD_READ_ACTIVE
-and CD_@-INPUT_@-ALLOWED).
+and CD_INPUT_ALLOWED).
 @stindex CD_INPUT_ALLOWED
 
 @subsubheading New State
@@ -3917,7 +3993,7 @@ specified priority.
 This primitive consists of one M_PROTO message block followed by one or more M_DATA message blocks.  The M_PROTO message
 block is structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_addr_type;
@@ -3926,7 +4002,7 @@ typedef struct @{
     cd_ulong cd_dest_addr_offset;
 @} cd_unitdata_req_t;
 @tpindex cd_unitdata_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -3944,19 +4020,19 @@ Specifies the address type.  The address type can be one of the following values
 
 @item CD_SPECIFIC
 @pvindex CD_SPECIFIC
-Specifies that an address is contained in the primitive.  When @var{cd_addr_type} is set to CD_@-SPECIFIC, a destination
+Specifies that an address is contained in the primitive.  When @var{cd_addr_type} is set to CD_SPECIFIC, a destination
 address must be specified in the @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} fields.
 
 @item CD_BROADCAST
 @pvindex CD_BROADCAST
 Specifies that the data is to be sent to the implicit broadcast address and no specific address follows.  When
-@var{cd_addr_type} is set to CD_@-BROADCAST, the field @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} should
+@var{cd_addr_type} is set to CD_BROADCAST, the field @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} should
 be coded zero (0) and are ignored by the CD provider.
 
 @item CD_IMPLICIT
 @pvindex CD_IMPLICIT
 Specifies that an implicit address is to be used, or that the address is embedded in the data.  When @var{cd_addr_type}
-is set to CD_@-IMPLICIT, the fields @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} should be coded zero (0) and
+is set to CD_IMPLICIT, the fields @var{cd_dest_addr_length} and @var{cd_dest_addr_offset} should be coded zero (0) and
 are ignored by the CD provider.  No address or embedded address.
 
 @end table
@@ -3965,11 +4041,11 @@ are ignored by the CD provider.  No address or embedded address.
 Specifies the priority of the data.  Priorities are provider- and device-specific.
 
 @item cd_dest_addr_length
-When @var{cd_addr_type} is CD_@-SPECIFIC, this field specifies the length of the destination address to which to send
+When @var{cd_addr_type} is CD_SPECIFIC, this field specifies the length of the destination address to which to send
 the message.  Otherwise, this field is coded zero (0) and ignored by the CD provider.
 
 @item cd_dest_addr_offset
-When @var{cd_addr_type} is CD_@-SPECIFIC, this field specifies the offset of the destination address from the start of
+When @var{cd_addr_type} is CD_SPECIFIC, this field specifies the offset of the destination address from the start of
 the M_PROTO message block.  Otherwise, this field is ignored by the CD provider.
 
 @end vtable
@@ -3977,13 +4053,13 @@ the M_PROTO message block.  Otherwise, this field is ignored by the CD provider.
 @subsubheading State
 
 This primitive is valid in states
-CD_@-ENABLED,
+CD_ENABLED,
 @stindex CD_ENABLED
-CD_@-INPUT_@-ALLOWED,
+CD_INPUT_ALLOWED,
 @stindex CD_INPUT_ALLOWED
-CD_@-OUTPUT_@-ACTIVE,
+CD_OUTPUT_ACTIVE,
 @stindex CD_OUTPUT_ACTIVE
-CD_@-READ_@-ACTIVE.
+CD_READ_ACTIVE.
 @stindex CD_READ_ACTIVE
 
 @subsubheading New State
@@ -3999,16 +4075,16 @@ This primitive requires an acknowledgement under the following conditions:
 @item @b{Successful:}
 When field @var{cd_output_style}
 @vrindex cd_output_style
-in CD_@-INFO_@-ACK
+in CD_INFO_ACK
 @prindex CD_INFO_ACK
-is set to CD_@-ACKED@-OUTPUT,
+is set to CD_ACKEDOUTPUT,
 @pvindex CD_ACKEDOUTPUT
-then the provider is required to acknowledge the CD_@-UNITDATA_@-REQ with a CD_@-UNITDATA_@-ACK.
+then the provider is required to acknowledge the CD_UNITDATA_REQ with a CD_UNITDATA_ACK.
 @prindex CD_UNITDATA_ACK
 Otherwise, the primitive does not require an acknowledgement.  In either case, the state remains unchanged.
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, the provider is required to acknowledge the primitive with a CD_@-ERROR_@-ACK
+When unsuccessful, the provider is required to acknowledge the primitive with a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive indicating the error.
 
@@ -4074,14 +4150,14 @@ Unit data request failed.
 @anchor{CD_UNITDATA_ACK}
 @anchor{cd_unitdata_ack_t}
 
-This provider originated primitive acknowledges that the previous CD_@-UNITDATA_@-REQ
+This provider originated primitive acknowledges that the previous CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 primitive was acknowledged as sent.
 
-CD_@-UNITDATA_@-ACK primitives are indicated or not depending on the output style as indicated in the
+CD_UNITDATA_ACK primitives are indicated or not depending on the output style as indicated in the
 @var{cd_output_style}
 @vrindex cd_output_style
-field of the CD_@-INFO_@-ACK
+field of the CD_INFO_ACK
 @prindex CD_INFO_ACK
 primitive as follows:
 
@@ -4089,25 +4165,25 @@ primitive as follows:
 
 @item CD_UNACKEDOUTPUT
 @pvindex CD_UNACKEDOUTPUT
-No CD_@-UNITDATA_@-ACK primitives will be indicated.
+No CD_UNITDATA_ACK primitives will be indicated.
 
 @item CD_ACKEDOUTPUT
 @pvindex CD_ACKEDOUTPUT
-CD_@-UNITDATA_@-ACK primitives will be issued for every outstanding CD_@-UNITDATA_@-REQ.
+CD_UNITDATA_ACK primitives will be issued for every outstanding CD_UNITDATA_REQ.
 @prindex CD_UNITDATA_REQ
 
 @item CD_PACEDOUTPUT
 @pvindex CD_PACEDOUTPUT
-CD_@-UNITDATA_@-ACK primitives will only be issued as a timing clue for output.
+CD_UNITDATA_ACK primitives will only be issued as a timing clue for output.
 
 @end table
 
-When the CD_@-DISABLE_@-REQ
+When the CD_DISABLE_REQ
 @prindex CD_DISABLE_REQ
 primitive is requested, outstanding acknowledgements may be cancelled depending on the value contained in the
 @var{cd_disposal}
 @vrindex cd_disposal
-field of this primitive.  When the CD_@-ABORT_@-OUTPUT_@-REQ
+field of this primitive.  When the CD_ABORT_OUTPUT_REQ
 @prindex CD_ABORT_OUTPUT_REQ
 primitive is requested, outstanding acknowledgements are cancelled.
 
@@ -4115,13 +4191,13 @@ primitive is requested, outstanding acknowledgements are cancelled.
 
 This primitive consists of one M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_state;
 @} cd_unitdata_ack_t;
 @tpindex cd_unitdata_ack_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4183,7 +4259,7 @@ X-raying another PPA.
 
 @subsubheading State
 
-This primitive is valid in any state where a CD_@-UNITDATA_@-REQ
+This primitive is valid in any state where a CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 is outstanding, or when a paced output request is necessary.
 
@@ -4213,17 +4289,17 @@ The new state is unchanged.
 
 This user originated primitive requests that an enabled communications device temporarily allow the input section.
 
-When a stream is enabled with CD_@-ENABLE_@-REQ,
+When a stream is enabled with CD_ENABLE_REQ,
 @prindex CD_ENABLE_REQ
-it can be used for transmission.  If the stream returns CD_@-AUTOALLOW
+it can be used for transmission.  If the stream returns CD_AUTOALLOW
 @pvindex CD_AUTOALLOW
 in the @var{cd_features}
 @vrindex cd_features
-field of the CD_@-INFO_@-ACK,
+field of the CD_INFO_ACK,
 @prindex CD_INFO_ACK
-the device automatically allows input and there is no need to call the CD_@-READ_@-REQ
+the device automatically allows input and there is no need to call the CD_READ_REQ
 @prindex CD_READ_REQ
-primitive for the device, unless CD_@-HALT_@-INPUT_@-REQ
+primitive for the device, unless CD_HALT_INPUT_REQ
 @prindex CD_HALT_INPUT_REQ
 has been successfully called beforehand.
 
@@ -4231,13 +4307,13 @@ has been successfully called beforehand.
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_msec;
 @} cd_read_req_t;
 @tpindex cd_read_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4255,15 +4331,15 @@ Specifies the interval of time for which to allow the input section, in units of
 
 @subsubheading State
 
-This primitive is valid in the CD_@-ENABLED
+This primitive is valid in the CD_ENABLED
 @stindex CD_ENABLED
 state.
 
 @subsubheading New State
 
-When successful, the new state is CD_@-INPUT_@-ALLOWED.
+When successful, the new state is CD_INPUT_ALLOWED.
 @stindex CD_INPUT_ALLOWED
-After the interval, @var{cd_msec}, has expired, the state will revert to CD_@-ENABLED.
+After the interval, @var{cd_msec}, has expired, the state will revert to CD_ENABLED.
 @stindex CD_ENABLED
 
 @subsubheading Response
@@ -4273,13 +4349,13 @@ This primitive requires that the provider acknowledge the receipt of the primiti
 @itemize @minus
 
 @item @b{Successful:}
-When successful, the provider acknowledges the receipt of the primitive with the CD_@-OK_@-ACK
+When successful, the provider acknowledges the receipt of the primitive with the CD_OK_ACK
 @prindex CD_OK_ACK
-primitive.  The new state is CD_@-INPUT_@-ALLOWED.
+primitive.  The new state is CD_INPUT_ALLOWED.
 @stindex CD_INPUT_ALLOWED
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, the provider acknowledges the receipt of the primitive with the CD_@-ERROR_@-ACK
+When unsuccessful, the provider acknowledges the receipt of the primitive with the CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive indicating the error.  The new state is unchanged.
 
@@ -4343,16 +4419,16 @@ UNIX system error.
 
 This user originated primitive request that an enabled communications device permanently allow the input section.
 
-When a stream is enabled with CD_@-ENABLE_@-REQ,
+When a stream is enabled with CD_ENABLE_REQ,
 @prindex CD_ENABLE_REQ
-it can be used for transmission.  If the stream returns CD_@-AUTOALLOW
+it can be used for transmission.  If the stream returns CD_AUTOALLOW
 @pvindex CD_AUTOALLOW
 in the @var{cd_features}
 @vrindex cd_features
-field of the CD_@-INFO_@-ACK,
+field of the CD_INFO_ACK,
 @prindex CD_INFO_ACK
-the device automatically allows input and there is no need to call the CD_@-ALLOW_@-INPUT_@-REQ primitive for the
-device, unless the CD_@-HALT_@-INPUT_@-REQ
+the device automatically allows input and there is no need to call the CD_ALLOW_INPUT_REQ primitive for the
+device, unless the CD_HALT_INPUT_REQ
 @prindex CD_HALT_INPUT_REQ
 has been successfully called beforehand.
 
@@ -4360,12 +4436,12 @@ has been successfully called beforehand.
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
 @} cd_allow_input_req_t;
 @tpindex cd_allow_input_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4380,13 +4456,13 @@ Specifies the primitive type.
 
 @subsubheading State
 
-This primitive is valid in the CD_@-ENABLED
+This primitive is valid in the CD_ENABLED
 @stindex CD_ENABLED
 state.
 
 @subsubheading New State
 
-When successful, the new stat is CD_@-INPUT_@-ALLOWED.
+When successful, the new stat is CD_INPUT_ALLOWED.
 @stindex CD_INPUT_ALLOWED
 
 @subsubheading Response
@@ -4396,13 +4472,13 @@ This primitive requires that the provider acknowledge receipt of the primitive a
 @itemize @minus
 
 @item @b{Successful:}
-When successful, the provider acknowledges the receipt of the primitive with the CD_@-OK_@-ACK
+When successful, the provider acknowledges the receipt of the primitive with the CD_OK_ACK
 @prindex CD_OK_ACK
-primitive.  The new state is CD_@-INPUT_@-ALLOWED.
+primitive.  The new state is CD_INPUT_ALLOWED.
 @stindex CD_INPUT_ALLOWED
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, the provider acknowledges the receipt of the primitive with the CD_@-ERROR_@-ACK
+When unsuccessful, the provider acknowledges the receipt of the primitive with the CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive.  The reason for failure is provided in the error field of the primitive.  The state remains unchanged.
 
@@ -4448,7 +4524,7 @@ UNIX system error.
 
 @end table
 
-If the input section is already allowed and this primitive is issued in the CD_@-INPUT_@-ALLOWED
+If the input section is already allowed and this primitive is issued in the CD_INPUT_ALLOWED
 @stindex CD_INPUT_ALLOWED
 state, the provider should ignore the primitive and not generate a non-fatal error.
 
@@ -4462,33 +4538,33 @@ state, the provider should ignore the primitive and not generate a non-fatal err
 
 This user originated primitive requests that the input section be halted.
 
-When a stream is enabled with CD_@-ENABLE_@-REQ,
+When a stream is enabled with CD_ENABLE_REQ,
 @prindex CD_ENABLED_REQ
-it can be used immediately for transmission.  If the stream returns CD_@-AUTOALLOW
+it can be used immediately for transmission.  If the stream returns CD_AUTOALLOW
 @pvindex CD_AUTOALLOW
 in the @var{cd_features}
 @vrindex cd_features
-field of the CD_@-INFO_@-ACK,
+field of the CD_INFO_ACK,
 @prindex CD_INFO_ACK
-the device automatically allows input and there is no need to call CD_@-ALLOW_@-INPUT_@-REQ
+the device automatically allows input and there is no need to call CD_ALLOW_INPUT_REQ
 @prindex CD_ALLOW_INPUT_REQ
-for the device.  However, CD_@-HALT_@-INPUT_@-REQ will halt input on such a device.
+for the device.  However, CD_HALT_INPUT_REQ will halt input on such a device.
 
-In addition, if the input section is temporarily enabled with CD_@-READ_@-REQ,
+In addition, if the input section is temporarily enabled with CD_READ_REQ,
 @prindex CD_READ_REQ
-on a half-duplex communications device, then CD_@-HALT_@-INPUT_@-REQ will abort the read operation.
+on a half-duplex communications device, then CD_HALT_INPUT_REQ will abort the read operation.
 
 @subsubheading Message Format
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_disposal;
 @} cd_halt_input_req_t;
 @tpindex cd_halt_input_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4506,18 +4582,18 @@ Specifies how unsent messages are to be disposed.  This field can be one of the 
 
 @item CD_FLUSH
 @pvindex CD_FLUSH
-Discard undeliverable data.  All data that is undelivered at the time that the CD_@-HALT_@-INPUT_@-REQ primitive is
+Discard undeliverable data.  All data that is undelivered at the time that the CD_HALT_INPUT_REQ primitive is
 received will be discarded.  Any data awaiting delivery in the device's read queue will be flushed.
 
 @item CD_WAIT
 @pvindex CD_WAIT
-Attempt to deliver undelivered data.  All data that is undelivered at the timer that the CD_@-HALT_@-INPUT_@-REQ
+Attempt to deliver undelivered data.  All data that is undelivered at the timer that the CD_HALT_INPUT_REQ
 primitive is received the provider will attempt to deliver before acknowledging the primitive.  The provider will not
 wait for acknowledgement of sent messages.
 
 @item CD_DELIVER
 @pvindex CD_DELIVER
-Deliver undelivered data.  All data that is undelivered at the time that the CD_@-HALT_@-INPUT_@-REQ primitive  is
+Deliver undelivered data.  All data that is undelivered at the time that the CD_HALT_INPUT_REQ primitive  is
 received the provider will deliver before acknowledging the primitive.  The provider will also wait for an deliver
 acknowledgement of sent messages.
 
@@ -4528,16 +4604,16 @@ acknowledgement of sent messages.
 @subsubheading State
 
 This primitive is valid in state
-CD_@-ENABLED,
+CD_ENABLED,
 @stindex CD_ENABLED
-CD_@-INPUT_@-ALLOWED or
+CD_INPUT_ALLOWED or
 @stindex CD_INPUT_ALLOWED
-CD_@-READ_@-ACTIVE,
+CD_READ_ACTIVE,
 @stindex CD_READ_ACTIVE
 
 @subsubheading New State
 
-The new state is CD_@-ENABLED.
+The new state is CD_ENABLED.
 @stindex CD_ENABLED
 
 @subsubheading Response
@@ -4547,13 +4623,13 @@ This primitive requires that the CD provider acknowledge receipt of the primitiv
 @itemize @minus
 
 @item @b{Successful:}
-Upon success, the provider will acknowledge receipt of the primitive with the CD_@-OK_@-ACK
+Upon success, the provider will acknowledge receipt of the primitive with the CD_OK_ACK
 @prindex CD_OK_ACK
-primitive.  The new state is CD_@-ENABLED.
+primitive.  The new state is CD_ENABLED.
 @stindex CD_ENABLED
 
 @item @b{Unsuccessful (non-fatal errors):}
-Upon failure, the provider will acknowledge receipt of the primitive with the CD_@-ERROR_@-ACK
+Upon failure, the provider will acknowledge receipt of the primitive with the CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive with the error indicated in the primitive.  The new state remains unchanged.
 
@@ -4603,9 +4679,9 @@ UNIX system error.
 
 @end table
 
-If the communications device is in the CD_@-ENABLED
+If the communications device is in the CD_ENABLED
 @stindex CD_ENABLED
-state and the input section is not active, the CD_@-HALT_@-INPUT_@-REQ primitive should be ignored and no non-fatal
+state and the input section is not active, the CD_HALT_INPUT_REQ primitive should be ignored and no non-fatal
 error generated.
 
 @page
@@ -4622,12 +4698,12 @@ This user originated primitive requests that any transmission operation currentl
 
 This primitive consists of one M_PROTO or M_PCPROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
 @} cd_abort_output_req_t;
 @tpindex cd_abort_output_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4646,11 +4722,11 @@ This primitive is valid in any state in which the output section is enabled, but
 
 @subsubheading New State
 
-The new state remains unchanged unless the current state is CD_@-OUTPUT_@-ACTIVE,
-@prindex CD_@-OUTPUT_@-ACTIVE
-in which case the new state is CD_@-ENABLED
+The new state remains unchanged unless the current state is CD_OUTPUT_ACTIVE,
+@prindex CD_OUTPUT_ACTIVE
+in which case the new state is CD_ENABLED
 @stindex CD_ENABLED
-or CD_@-INPUT_@-ALLOWED,
+or CD_INPUT_ALLOWED,
 @stindex CD_INPUT_ALLOWED
 depending on the state of the input section.
 
@@ -4661,17 +4737,17 @@ This primitive requires the CD provider to acknowledge receipt of the primitive 
 @itemize @minus
 
 @item @b{Successful:}
-Upon success, the provider acknowledges the receipt of the primitive with the CD_@-OK_@-ACK
+Upon success, the provider acknowledges the receipt of the primitive with the CD_OK_ACK
 @prindex CD_OK_ACK
 primitive.  The new state is unchanged.
 
 @item @b{Unsuccessful (non-fatal errors):}
-Upon failure, the provider acknowledges the receipt of the primitive with the CD_@-ERROR_@-ACK
+Upon failure, the provider acknowledges the receipt of the primitive with the CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 including the reason for failure.  The new state remains unchanged.
 
-Note that if the output section is not active at the time that the CD_@-ABORT_@-OUTPUT_@-REQ is issued, but the
-communications device is enabled, the provider should discard the CD_@-ABORT_@-OUTPUT_@-REQ primitive and not issue any
+Note that if the output section is not active at the time that the CD_ABORT_OUTPUT_REQ is issued, but the
+communications device is enabled, the provider should discard the CD_ABORT_OUTPUT_REQ primitive and not issue any
 non-fatal error.
 
 @end itemize
@@ -4730,14 +4806,14 @@ and the input section enabled immediately following the transmission.
 This primitive consists of one M_PROTO message block followed by one or more M_DATA message blocks.  The M_PROTO message
 block is structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_unitdata_req_t cd_unitdata_req;
     cd_read_req_t cd_read_req;
 @} cd_write_read_req_t;
 @tpindex cd_write_read_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4749,14 +4825,14 @@ This primitive contains the following parameters:
 Specifies the primitive type.
 
 @item cd_unitdata_req
-Specifies a CD_@-UNITDATA_@-REQ
+Specifies a CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
 primitive.  See @ref{cd_unitdata_req_t}
 @tpindex cd_unitdata_req_t
 for formatting of this parameter.
 
 @item cd_read_req
-Specifies a CD_@-READ_@-REQ
+Specifies a CD_READ_REQ
 @prindex CD_READ_REQ
 primitive.  See @ref{cd_read_req_t}
 @tpindex cd_read_req_t
@@ -4766,9 +4842,9 @@ for formatting of this parameter.
 
 @subsubheading State
 
-This primitive is valid in any state where the CD_@-UNITDATA_@-REQ
+This primitive is valid in any state where the CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
-primitive and CD_@-ALLOW_@-INPUT_@-REQ
+primitive and CD_ALLOW_INPUT_REQ
 @prindex CD_ALLOW_INPUT_REQ
 primitive are permitted.
 
@@ -4781,14 +4857,14 @@ The new state remains unchanged.
 @itemize @minus
 
 @item @b{Successful:}
-This primitive requires the same response from the CD provider as if a CD_@-UNITDATA_@-REQ
+This primitive requires the same response from the CD provider as if a CD_UNITDATA_REQ
 @prindex CD_UNITDATA_REQ
-primitive immediately followed by a CD_@-READ_@-REQ
+primitive immediately followed by a CD_READ_REQ
 @prindex CD_READ_REQ
 primitive were to be issued.
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, this primitive requires an error acknowledgement using the CD_@-ERROR_@-ACK
+When unsuccessful, this primitive requires an error acknowledgement using the CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive with the error indicated.
 
@@ -4869,7 +4945,7 @@ Unit data request failed.
 @anchor{cd_modem_sig_ind_t}
 
 This provider originated primitive indicates the status of a number of modem lines and signals.  This primitive is
-issued in response to a change in modem signals or in response to a CD_@-MODEM_@-SIG_@-POLL
+issued in response to a change in modem signals or in response to a CD_MODEM_SIG_POLL
 @prindex CD_MODEM_SIG_POLL
 primitive.
 
@@ -4877,13 +4953,13 @@ primitive.
 
 This primitive consists of one M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_sigs;
 @} cd_modem_sig_ind_t;
 @tpindex cd_modem_sig_ind_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4944,7 +5020,7 @@ The new state is unchanged.
 @anchor{CD_MODEM_SIG_POLL}
 @anchor{cd_modem_sig_poll_t}
 
-This user originated primitive request that the CD provider respond with a CD_@-MODEM_@-SIG_@-IND
+This user originated primitive request that the CD provider respond with a CD_MODEM_SIG_IND
 @prindex CD_MODEM_SIG_IND
 indicating the current state of modem lines and signals.
 
@@ -4952,11 +5028,11 @@ indicating the current state of modem lines and signals.
 
 This primitive consists of one M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
 @} cd_modem_sig_poll_t;
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -4971,9 +5047,9 @@ Specifies the primitive type.
 
 @subsubheading State
 
-This primitive is valid in any state other than CD_@-UNUSABLE
+This primitive is valid in any state other than CD_UNUSABLE
 @stindex CD_UNUSABLE
-or CD_@-UNATTACHED,
+or CD_UNATTACHED,
 @stindex CD_UNATTACHED
 and where a local acknowledgement is not pending.
 
@@ -4988,12 +5064,12 @@ This primitive requires the CD provider to respond with an acknowledgement messa
 @itemize @minus
 
 @item @b{Successful:}
-When successful, the CD provider response with a CD_@-MODEM_@-SIG_@-IND
+When successful, the CD provider response with a CD_MODEM_SIG_IND
 @prindex CD_MODEM_SIG_IND
 indicating the state of modem leads and signals.
 
 @item @b{Unsuccessful (non-fatal errors):}
-When unsuccessful, the CD provider responds with a CD_@-ERROR_@-ACK
+When unsuccessful, the CD provider responds with a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 primitive indicating the reason for failure.
 
@@ -5053,13 +5129,13 @@ This user originated primitive request that the CD provider assert or de-assert 
 
 This primitive consists of one M_PROTO message block structured as follows:
 
-@smallexample
+@example
 typedef struct @{
     cd_ulong cd_primitive;
     cd_ulong cd_sigs;
 @} cd_modem_sig_req_t;
 @tpindex cd_modem_sig_req_t
-@end smallexample
+@end example
 
 @subsubheading Parameters
 
@@ -5102,15 +5178,15 @@ Ring indicator.
 @end table
 
 If the flag is set in @var{cd_sigs}, the corresponding lead will be asserted.  If the flag is clear, the corresponding
-lead will be de-asserted.  Flags that are not output leads and are input leads only (such as CD_@-DCD) are ignored.
+lead will be de-asserted.  Flags that are not output leads and are input leads only (such as CD_DCD) are ignored.
 
 @end vtable
 
 @subsubheading State
 
-This primitive is valid in any state other than CD_@-UNATTACHED
+This primitive is valid in any state other than CD_UNATTACHED
 @stindex CD_UNATTACHED
-or CD_@-UNUSABLE,
+or CD_UNUSABLE,
 @stindex CD_UNUSABLE
 and where a local acknowledgement is not pending.
 
@@ -5125,12 +5201,12 @@ This primitive requires the CD provider to acknowledge receipt of the primitive 
 @itemize @minus
 
 @item @b{Successful:}
-Upon success, the CD provider acknowledges receipt of the primitive with a CD_@-OK_@-ACK
+Upon success, the CD provider acknowledges receipt of the primitive with a CD_OK_ACK
 @prindex CD_OK_ACK
 primitive.  The state remains unchanged.
 
 @item @b{Unsuccessful (non-fatal errors):}
-Upon failure, the CD provider acknowledges receipt of the primitive with a CD_@-ERROR_@-ACK
+Upon failure, the CD provider acknowledges receipt of the primitive with a CD_ERROR_ACK
 @prindex CD_ERROR_ACK
 indicating the reason for failure in the error number.  The state remains unchanged.
 
@@ -5187,15 +5263,519 @@ UNIX system error.
 @node CDI Header File
 @appendix CDI Header File
 
+@smallexample
+@verbatim
+#ifndef _SYS_CDI_H
+#define _SYS_CDI_H
+
+#ident "@(#) cdi.h 1.20 11/17/03"
+
+/* This file can be processed by doxygen(1). */
+
+/// @file
+/// @brief This header file provides the Communications Device Interface (CDI).
+
+/* 
+   cdi.h header for Communications Device Interface
+
+   Copyright (c) 1989 NCR Comten
+
+   This file distributed by Gcom, Inc with permission of NCR Comten
+ */
+
+/* 
+   Primitives for Local Management Services
+ */
+#define CD_INFO_REQ             0x00    /* Information request */
+#define CD_INFO_ACK             0x01    /* Information acknowledgement */
+#define CD_ATTACH_REQ           0x02    /* Attach a PPA */
+#define CD_DETACH_REQ           0x03    /* Detach a PPA */
+#define CD_ENABLE_REQ           0x04    /* Prepare a device */
+#define CD_DISABLE_REQ          0x05    /* Disable a device */
+#define CD_OK_ACK               0x06    /* Success acknowledgement */
+#define CD_ERROR_ACK            0x07    /* Error acknowledgement */
+#define CD_ENABLE_CON           0x08    /* Enable confirmation */
+#define CD_DISABLE_CON          0x09    /* Disable confirmation */
+#define CD_ERROR_IND            0x0a    /* Error indication */
+
+/* 
+   Primitives used for Data Transfer
+ */
+#define CD_ALLOW_INPUT_REQ      0x0b    /* Allow input */
+#define CD_READ_REQ             0x0c    /* Wait-for-input request */
+#define CD_UNITDATA_REQ         0x0d    /* Data send request */
+#define CD_WRITE_READ_REQ       0x0e    /* Write/read request */
+#define CD_UNITDATA_ACK         0x0f    /* Data send acknowledgement */
+#define CD_UNITDATA_IND         0x10    /* Data receive indication */
+#define CD_HALT_INPUT_REQ       0x11    /* Halt input */
+#define CD_ABORT_OUTPUT_REQ     0x12    /* Abort output */
+#define CD_MUX_NAME_REQ         0x13    /* get mux name (Gcom) */
+#define CD_BAD_FRAME_IND        0x14    /* frame w/error (Gcom extension) */
+#define CD_MODEM_SIG_REQ        0x15    /* Assert modem signals (Gcom) */
+#define CD_MODEM_SIG_IND        0x16    /* Report modem signal state (Gcom) */
+#define CD_MODEM_SIG_POLL       0x17    /* requests a CD_MODEM_SIG_IND (Gcom) */
+
+/* 
+   CDI device states
+ */
+#define CD_UNATTACHED           0x00    /* No PPA attached */
+#define CD_UNUSABLE             0x01    /* PPA cannot be used */
+#define CD_DISABLED             0x02    /* PPA attached */
+#define CD_ENABLE_PENDING       0x03    /* Waiting ack of enable req */
+#define CD_ENABLED              0x04    /* Awaiting use */
+#define CD_READ_ACTIVE          0x05    /* Input section enabled; */
+                                        /* disabled after data arrives */
+#define CD_INPUT_ALLOWED        0x06    /* Input section permanently enabled */
+#define CD_DISABLE_PENDING      0x07    /* Waiting ack of disable req */
+#define CD_OUTPUT_ACTIVE        0x08    /* Output section active only */
+#define CD_XRAY                 0x09    /* Xray-ing another ppa */
+#define CD_NOT_AUTH             0x0A    /* Not authorized, unusable */
+
+/* 
+   CD_ERROR_ACK and CD_ERROR_IND error return values
+ */
+#define CD_BADADDRESS           0x01    /* Address was invalid */
+#define CD_BADADDRTYPE          0x02    /* Invalid address type */
+#define CD_BADDIAL              0x03    /* Dial information was invalid */
+#define CD_BADDIALTYPE          0x04    /* Invalid dial information type */
+#define CD_BADDISPOSAL          0x05    /* Invalid disposal parameter */
+#define CD_BADFRAME             0x06    /* Defective SDU received */
+#define CD_BADPPA               0x07    /* Invalid PPA identifier */
+#define CD_BADPRIM              0x08    /* Unrecognized primitive */
+#define CD_DISC                 0x09    /* Disconnected */
+#define CD_EVENT                0x0a    /* Protocol-specific event occurred */
+#define CD_FATALERR             0x0b    /* Device has become unusable */
+#define CD_INITFAILED           0x0c    /* Line initialization failed */
+#define CD_NOTSUPP              0x0d    /* Primitive not supported by this device */
+#define CD_OUTSTATE             0x0e    /* Primitive was issued from an invalid state */
+#define CD_PROTOSHORT           0x0f    /* M_PROTO block too short */
+#define CD_READTIMEOUT          0x10    /* Read request timed out before data arrived */
+#define CD_SYSERR               0x11    /* UNIX system error */
+#define CD_WRITEFAIL            0x12    /* Unitdata request failed */
+
+/* 
+   Error explanations
+ */
+#define CD_CRCERR               0x01    /* CRC or FCS error */
+#define CD_DLE_EOT              0x02    /* DLE EOT detected */
+#define CD_FORMAT               0x03    /* Format error detected */
+#define CD_HDLC_ABORT           0x04    /* Aborted frame detected */
+#define CD_OVERRUN              0x05    /* Input overrun */
+#define CD_TOOSHORT             0x06    /* Frame too short */
+#define CD_INCOMPLETE           0x07    /* Partial frame received */
+#define CD_BUSY                 0x08    /* Telephone was busy */
+#define CD_NOANSWER             0x09    /* Connection went unanswered */
+#define CD_CALLREJECT           0x0a    /* Connection rejected */
+#define CD_HDLC_IDLE            0x0b    /* HDLC line went idle */
+#define CD_HDLC_NOTIDLE         0x0c    /* HDLC line no longer idle */
+#define CD_QUIESCENT            0x0d    /* Line being reassigned */
+#define CD_RESUMED              0x0e    /* Line has been reassigned */
+#define CD_DSRTIMEOUT           0x0f    /* Did not see DSR in time */
+#define CD_LAN_COLLISIONS       0x10    /* LAN excessive collisions */
+#define CD_LAN_REFUSED          0x11    /* LAN message refused */
+#define CD_LAN_NOSTATION        0x12    /* LAN no such station */
+#define CD_LOSTCTS              0x13    /* Lost Clear to Send signal */
+#define CD_DEVERR               0x100   /* Start of device-specific codes */
+
+/* 
+   CDI device classes
+ */
+#define CD_HDLC         0x00    /* Bit-synchronous */
+#define CD_BISYNC       0x01    /* Character-synchronous */
+#define CD_LAN          0x02    /* ISO 8802-3,4,5 local-area network MAC */
+#define CD_NODEV        0x03    /* no device, ppa used for X-ray */
+
+/* 
+   CDI duplex types
+ */
+#define CD_FULLDUPLEX   0x00    /* Full duplex; allow input supported */
+#define CD_HALFDUPLEX   0x01    /* Half duplex; read and write/read supported */
+
+/* 
+   CDI output styles
+ */
+#define CD_UNACKEDOUTPUT 0x00   /* No unitdata acknowledgements */
+#define CD_ACKEDOUTPUT   0x01   /* Unitdata acknowledgements */
+#define CD_PACEDOUTPUT   0x02   /* Unitdata acks as output timing hints */
+
+/* 
+   CDI optional features
+ */
+#define CD_CANREAD      0x01    /* Read request supported on full duplex */
+#define CD_CANDIAL      0x02    /* Dial information supported */
+#define CD_AUTOALLOW    0x04    /* CD_INPUT_ALLOWED as soon as enabled */
+#define CD_KEEPALIVE    0x08    /* Gcom: Don't send off at CD_DISABLE_REQ */
+
+/* 
+   CDI provider style.
+
+   The CDI provider style which determines whether a provider requires a
+   CD_ATTACH_REQ to inform the provider which PPA user messages should be
+   sent/received on.
+ */
+#define CD_STYLE1       0x00    /* PPA is implicitly bound by open(2) */
+#define CD_STYLE2       0x01    /* PPA must be explicitly bound via CD_ATTACH_REQ */
+#define CD_STYLE_1      CD_STYLE1       /* Gcom -- to match document */
+#define CD_STYLE_2      CD_STYLE2       /* Gcom -- to match document */
+
+/* 
+   Symbolic value for "no dialing information"
+ */
+#define CD_NODIAL       0x00
+
+/* 
+   Actions to take with undelivered data in a CD_DISABLE_REQ or
+ CD_HALT_INPUT_REQ
+ */
+#define CD_FLUSH        0x00    /* Discard undelivered data */
+#define CD_WAIT         0x01    /* Attempt to deliver unsent data */
+#define CD_DELIVER      0x02
+
+/* 
+   Address types
+ */
+#define CD_SPECIFIC     0x00    /* Specific address follows */
+#define CD_BROADCAST    0x01    /* Broadcast; no address follows */
+#define CD_IMPLICIT     0x02    /* No address or embedded address */
+
+/* 
+   Error types for CD_BAD_FRAME_IND
+ */
+
+#define CD_FRMTOOLONG   0xFFFF  /* frame overflowed rcv bfr */
+#define CD_FRMNONOCTET  0xFFFE  /* frame not octet-aligned */
+#define CD_EMPTY_BFR    0xFFFD  /* empty rcv buffer (not used) */
+#define CD_BAD_CRC      0xFFFC  /* CRC error */
+#define CD_FRM_ABORTED  0xFFFB  /* frame aborted */
+#define CD_RCV_OVERRUN  0xFFFA  /* receive overrun */
+
+/* 
+   Modem signal bits for modem signal related requests and indications
+ */
+#define CD_DTR          0x01
+#define CD_RTS          0x02
+#define CD_DSR          0x04
+#define CD_DCD          0x08
+#define CD_CTS          0x10
+#define CD_RI           0x20
+
+/* 
+   CDI interface primitive definitions.
+
+   Each primitive is sent as a Stream message.  It is possible that the messages
+   may be viewed as a sequence of bytes that have the following form without any
+   padding. The structure definition of the following messages may have to
+   change depending on the underlying hardware architecture and crossing of a
+   hardware boundary with a different hardware architecture.
+
+   Each message has the name defined followed by the Stream message type
+   (M_PROTO, M_PCPROTO, M_DATA)
+ */
+#ifdef __LP64__
+typedef int32_t cd_long;
+typedef u_int32_t cd_ulong;
+typedef u_int16_t cd_ushort;
+#else                           /* __LP64__ */
+typedef long cd_long;
+typedef ulong cd_ulong;
+typedef ushort cd_ushort;
+#endif                          /* __LP64__ */
+
+/* 
+        LOCAL MANAGEMENT PRIMITIVES
+ */
+
+/* 
+   CD_INFO_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+} cd_info_req_t;
+
+/* 
+   CD_INFO_ACK, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+        cd_ulong cd_max_sdu;
+        cd_ulong cd_min_sdu;
+        cd_ulong cd_class;
+        cd_ulong cd_duplex;
+        cd_ulong cd_output_style;
+        cd_ulong cd_features;
+        cd_ulong cd_addr_length;
+        cd_ulong cd_ppa_style;
+} cd_info_ack_t;
+
+/* 
+   CD_ATTACH_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_ppa;
+} cd_attach_req_t;
+
+/* 
+   CD_DETACH_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+} cd_detach_req_t;
+
+/* 
+   CD_ENABLE_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_dial_type;
+        cd_ulong cd_dial_length;
+        cd_ulong cd_dial_offset;
+} cd_enable_req_t;
+
+/* 
+   CD_DISABLE_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_disposal;
+} cd_disable_req_t;
+
+/* 
+   CD_OK_ACK, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+        cd_ulong cd_correct_primitive;
+} cd_ok_ack_t;
+
+/* 
+   CD_ERROR_ACK, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+        cd_ulong cd_error_primitive;
+        cd_ulong cd_errno;
+        cd_ulong cd_explanation;
+} cd_error_ack_t;
+
+/* 
+   CD_ENABLE_CON, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+} cd_enable_con_t;
+
+/* 
+   CD_DISABLE_CON, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+} cd_disable_con_t;
+
+/* 
+   CD_ERROR_IND, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+        cd_ulong cd_errno;
+        cd_ulong cd_explanation;
+} cd_error_ind_t;
+
+/* 
+        DATA TRANSFER PRIMITIVES
+ */
+
+/* 
+   CD_ALLOW_INPUT_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+} cd_allow_input_req_t;
+
+/* 
+   CD_READ_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_msec;
+} cd_read_req_t;
+
+/* 
+   CD_UNITDATA_REQ, optional M_PROTO type, with M_DATA block(s)
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ushort cd_addr_type;
+        cd_ushort cd_priority;
+        cd_ulong cd_dest_addr_length;
+        cd_ulong cd_dest_addr_offset;
+} cd_unitdata_req_t;
+
+/* 
+   CD_WRITE_READ_REQ, M_PROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_unitdata_req_t cd_unitdata_req;
+        cd_read_req_t cd_read_req;
+} cd_write_read_req_t;
+
+/* 
+   CD_UNITDATA_ACK, M_PROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+} cd_unitdata_ack_t;
+
+/* 
+   CD_UNITDATA_IND, optional M_PROTO type, with M_DATA block(s)
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+        cd_ulong cd_src_addr_length;
+        cd_ulong cd_src_addr_offset;
+        cd_ushort cd_addr_type;
+        cd_ushort cd_priority;
+        cd_ulong cd_dest_addr_length;
+        cd_ulong cd_dest_addr_offset;
+} cd_unitdata_ind_t;
+
+/* 
+   CD_BAD_FRAME_IND, M_PROTO type, with M_DATA block(s)
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_state;
+        cd_ulong cd_error;              /* what is wrong with the frame */
+
+} cd_bad_frame_ind_t;
+
+/* 
+   CD_MODEM_SIG_REQ, M_PROTO type
+
+   Assert the modem signals with '1' bits in the cd_sigs mask and drop those
+   signals with '0' bits.  Sensed modem signals such as DCD or CTS are ignored.
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_sigs;
+
+} cd_modem_sig_req_t;
+
+/* 
+   CD_MODEM_SIG_IND, M_PROTO type
+
+   The cd_sigs field reports the current state of the modem signals.  This
+   message is sent when modem signals change at the hardware interface.  Only
+   changes in signals selected by the cd_modem_sig_enb_req_t cd_sigs mask will
+   be evaluated for purposes of change detection.
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_sigs;
+
+} cd_modem_sig_ind_t;
+
+typedef struct {
+        cd_ulong cd_primitive;
+
+} cd_modem_sig_poll_t;
+
+/* 
+   CD_HALT_INPUT_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+        cd_ulong cd_disposal;
+} cd_halt_input_req_t;
+
+/* 
+   CD_ABORT_OUTPUT_REQ, M_PROTO or M_PCPROTO type
+ */
+typedef struct {
+        cd_ulong cd_primitive;
+} cd_abort_output_req_t;
+
+union CD_primitives {
+        cd_ulong cd_primitive;
+        cd_info_req_t info_req;
+        cd_info_ack_t info_ack;
+        cd_attach_req_t attach_req;
+        cd_detach_req_t detach_req;
+        cd_enable_req_t enable_req;
+        cd_disable_req_t disable_req;
+        cd_ok_ack_t ok_ack;
+        cd_error_ack_t error_ack;
+        cd_allow_input_req_t allow_input_req;
+        cd_read_req_t read_req;
+        cd_unitdata_req_t unitdata_req;
+        cd_write_read_req_t write_read_req;
+        cd_unitdata_ack_t unitdata_ack;
+        cd_unitdata_ind_t unitdata_ind;
+        cd_halt_input_req_t halt_input_req;
+        cd_abort_output_req_t abort_output_req;
+        cd_error_ind_t error_ind;
+        cd_enable_con_t enable_con;
+        cd_disable_con_t disable_con;
+        cd_bad_frame_ind_t bad_frame_ind;
+        cd_modem_sig_req_t modem_sig_req;
+        cd_modem_sig_ind_t modem_sig_ind;
+        cd_modem_sig_poll_t modem_sig_poll;
+};
+
+#define CD_INFO_REQ_SIZE                sizeof(cd_info_req_t)
+#define CD_INFO_ACK_SIZE                sizeof(cd_info_ack_t)
+#define CD_ATTACH_REQ_SIZE              sizeof(cd_attach_req_t)
+#define CD_DETACH_REQ_SIZE              sizeof(cd_detach_req_t)
+#define CD_ENABLE_REQ_SIZE              sizeof(cd_enable_req_t)
+#define CD_DISABLE_REQ_SIZE             sizeof(cd_disable_req_t)
+#define CD_OK_ACK_SIZE                  sizeof(cd_ok_ack_t)
+#define CD_ERROR_ACK_SIZE               sizeof(cd_error_ack_t)
+#define CD_ALLOW_INPUT_REQ_SIZE         sizeof(cd_allow_input_req_t)
+#define CD_READ_REQ_SIZE                sizeof(cd_read_req_t)
+#define CD_UNITDATA_REQ_SIZE            sizeof(cd_unitdata_req_t)
+#define CD_WRITE_READ_REQ_SIZE          sizeof(cd_write_read_req_t)
+#define CD_UNITDATA_ACK_SIZE            sizeof(cd_unitdata_ack_t)
+#define CD_UNITDATA_IND_SIZE            sizeof(cd_unitdata_ind_t)
+#define CD_HALT_INPUT_REQ_SIZE          sizeof(cd_halt_input_req_t)
+#define CD_ABORT_OUTPUT_REQ_SIZE        sizeof(cd_abort_output_req_t)
+#define CD_ERROR_IND_SIZE               sizeof(cd_error_ind_t)
+#define CD_ENABLE_CON_SIZE              sizeof(cd_enable_con_t)
+#define CD_DISABLE_CON_SIZE             sizeof(cd_disable_con_t)
+#define CD_BAD_FRAME_IND_SIZE           sizeof(cd_bad_frame_ind_t)
+#define CD_MODEM_SIG_REQ_SIZE           sizeof(cd_modem_sig_req_t)
+#define CD_MODEM_SIG_IND_SIZE           sizeof(cd_modem_sig_ind_t)
+#define CD_MODEM_SIG_POLL_SIZE          sizeof(cd_modem_sig_poll_t)
+
+#endif                          /* _SYS_CDI_H */
+@end verbatim
+@end smallexample
+
 @node Glossary of CDI Terms and Acronyms
 @appendix Glossary of CDI Terms and Acronyms
 
 @node References
 @unnumbered References
 
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
 @node Index
 @unnumbered Index
 
+@ifnottex
+@c concatenate indices for html and info
+@printindex cp
+@end ifnottex
+
+@iftex
 @menu
 * Concept Index::
 * Protocol State Index::
@@ -5204,6 +5784,7 @@ UNIX system error.
 * Primitive Structure Field Index::
 * Primitive Values Index::
 * Primitive Error Values Index::
+* Input-Output Control Index::
 * Manual Page Index::
 @end menu
 
@@ -5242,13 +5823,19 @@ UNIX system error.
 @printindex pe
 
 @page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
+
+@page
 @node Manual Page Index
 @section Manual Page Index
 @printindex mp
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents
 @page
 @contents
 @bye
-
