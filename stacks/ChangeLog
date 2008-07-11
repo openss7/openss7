@@ -1,3 +1,77 @@
+2008-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated documentation
+	* NEWS: updated documentation
+	* README: updated documentation
+	* README-cvs: updated documentation
+	* THANKS: updated documentation
+	* doc/.cvsignore: updated documentation
+	* doc/drafts/isua/.cvsignore: updated documentation
+	* doc/drafts/m2ua/.cvsignore: updated documentation
+	* doc/drafts/m3pa/.cvsignore: updated documentation
+	* doc/drafts/m3ua/.cvsignore: updated documentation
+	* doc/drafts/sctp/.cvsignore: updated documentation
+	* doc/drafts/sua/.cvsignore: updated documentation
+	* doc/drafts/ua/.cvsignore: updated documentation
+	* doc/man/strss7.macros: updated documentation
+	* doc/projects/.cvsignore: updated documentation
+	* doc/projects/hlr_cost.tbl: updated documentation
+	* doc/projects/hlr_gate0.tbl: updated documentation
+	* doc/projects/hlr_gate1.tbl: updated documentation
+	* doc/projects/hlr_gate2.tbl: updated documentation
+	* doc/projects/hlr_gate3.tbl: updated documentation
+	* doc/projects/hlr_gate4.tbl: updated documentation
+	* doc/projects/hlr_gate5.tbl: updated documentation
+	* doc/projects/hlr_gate6.tbl: updated documentation
+	* doc/projects/hlr_sched.tbl: updated documentation
+	* doc/projects/hlr_schest.tbl: updated documentation
+	* doc/projects/hlr_traf.tbl: updated documentation
+	* doc/projects/labmini.tbl: updated documentation
+	* doc/projects/labnodes.tbl: updated documentation
+	* doc/projects/labpref.tbl: updated documentation
+	* doc/specs/cci/cci.h: updated documentation
+	* doc/specs/cci/cci.texi: updated documentation
+	* doc/specs/cci/cci_tab1.tbl: updated documentation
+	* doc/specs/cci/cci_tab2.tbl: updated documentation
+	* doc/specs/cci/cci_tab3.tbl: updated documentation
+	* doc/specs/cci/isdni.h: updated documentation
+	* doc/specs/cci/isupi.h: updated documentation
+	* doc/specs/mapi/mapi.texi: updated documentation
+	* doc/specs/mtpi/mtpi.h: updated documentation
+	* doc/specs/mtpi/mtpi.texi: updated documentation
+	* doc/specs/mtpi/mtpi_tab01.tbl: updated documentation
+	* doc/specs/mtpi/mtpi_tab02.tbl: updated documentation
+	* doc/specs/mtpi/mtpi_tab03.tbl: updated documentation
+	* doc/specs/mtpi/mtpi_tab04.tbl: updated documentation
+	* doc/specs/mtpi/mtpi_tab05.tbl: updated documentation
+	* doc/specs/mtpi/mtpi_tab06.tbl: updated documentation
+	* doc/specs/mtpi/mtpi_tab07.tbl: updated documentation
+	* doc/specs/sdli/lmi.h: updated documentation
+	* doc/specs/sdli/sdli.h: updated documentation
+	* doc/specs/sdli/sdli.texi: updated documentation
+	* doc/specs/sdti/lmi.h: updated documentation
+	* doc/specs/sdti/sdti.h: updated documentation
+	* doc/specs/sdti/sdti.texi: updated documentation
+	* doc/specs/sli/lmi.h: updated documentation
+	* doc/specs/sli/sli.h: updated documentation
+	* doc/specs/sli/sli.texi: updated documentation
+	* doc/specs/tci/tc.h: updated documentation
+	* doc/specs/tci/tci.texi: updated documentation
+	* doc/specs/tpi/tpi.texi: updated documentation
+	* doc/specs/tri/tr.h: updated documentation
+	* doc/specs/tri/tri.texi: updated documentation
+	* doc/specs/tri/tri_tab1.tbl: updated documentation
+	* doc/specs/tri/tri_tab2.tbl: updated documentation
+	* doc/specs/tri/tri_tab3.tbl: updated documentation
+	* doc/specs/tri/tri_tab4.tbl: updated documentation
+	* doc/specs/tri/tri_tab5.tbl: updated documentation
+	* doc/specs/tri/tri_tab6.tbl: updated documentation
+	* doc/specs/tri/tri_tab8.tbl: updated documentation
+	* doc/specs/tri/tri_tabn.tbl: updated documentation
+	* doc/specs/tri/tri_tabx.tbl: updated documentation
+	* po/de.po: updated documentation
+	* src/.cvsignore: updated documentation
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/drafts/fixup: more portable

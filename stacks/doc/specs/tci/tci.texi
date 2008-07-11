@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tci.texi,v 0.9.2.14 2008-04-29 07:10:40 brian Exp $
+% @(#) $Id: tci.texi,v 0.9.2.15 2008-07-11 09:36:13 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-29 07:10:40 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:36:13 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -63,7 +63,7 @@
 @setfilename tci.info
 @include texi/args.texi
 @set MANUAL_TITLE Transaction Component Interface (TCI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
@@ -74,18 +74,20 @@
 
 @include texi/args.texi
 @set MANUAL_TITLE Transaction Component Interface (TCI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
-published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} published by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.
+
 
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
 
 All Rights Reserved.
 
@@ -121,11 +123,9 @@ no obligation to provide any feature listed herein.
 
 @include texi/args.texi
 @set MANUAL_TITLE Transaction Component Interface (TCI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -143,8 +143,8 @@ no obligation to provide any feature listed herein.
 This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
 the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
 as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
-transaction component interface to these components as well as providing a basis for transaction component 
-control for other transaction component protocols.
+transaction component interface to these components as well as providing a basis for transaction
+component control for other transaction component protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -183,11 +183,12 @@ this information and keep it confidential, and will not disclose the information
 document without the written permission of its owner.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} reserves the right to revise this software and documentation for any reason,
-including but not limited to, conformity with standards promulgated by various agencies, utilization
-of advances in the state of the technical arts, or the reflection of changes in the design of any
-techniques, or procedures embodied, described, or referred to herein.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under
-no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
 @end ignore
 
 @noindent
@@ -227,8 +228,8 @@ no obligation to provide any feature listed herein.
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
-@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
 @page
@@ -237,46 +238,87 @@ no obligation to provide any feature listed herein.
 @defcodeindex pr
 @c Define an index of primitive values
 @defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
 @defcodeindex st
-@c Define an index of protocol errors
-@defcodeindex pe
-@c Define an index of manual pages
-@defindex mp
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
 
-@c @syncodeindex pr cp
-@c @syncodeindex pv cp
-@c @syncodeindex pe cp
-@c @syncodeindex tp cp
-@c @syncodeindex vr cp
+@ifnottex
+@c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
 
-@macro prim {name}
-@prindex \name\
+@iftex
+
+@macro prim{name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval{name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr{name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta{name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm{name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
 @code{\name\}
 @end macro
 
-@macro pval {name}
-@pvindex \name\
+@macro pval{name}
 @code{\name\}
 @end macro
 
-@macro perr {name}
-@peindex \name\
+@macro perr{name}
 @code{\name\}
 @end macro
 
-@macro psta {name}
-@stindex \name\
+@macro psta{name}
 @code{\name\}
 @end macro
 
-@macro parm {name}
-@vrindex \name\
+@macro parm{name}
 @code{\name\}
 @end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
 
 @ifnottex
 @node Top
@@ -290,11 +332,27 @@ no obligation to provide any feature listed herein.
 * TCI Services Definition::
 * TCI Primitives::
 * TCI Header File::
+* License::
 * Glossary::
 * Acronyms::
 * References::
+@iftex
 * Indices::
+@end iftex
+@ifnottex
+* Index::
+@end ifnottex
 @end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Preface
 @unnumbered Preface
@@ -335,18 +393,18 @@ as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
 This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Transaction
-Capablities Application Part (TCAP) protocol stacks.  It provides abstraction of the transaction
-component interface to these components as well as providing a basis for transaction control for
-other transaction control protocols.
+Capablities Application Part (TCAP) protocol stacks.  It provides abstraction of the transaction component
+interface to these components as well as providing a basis for transaction control for other
+transaction control protocols.
 
 @section Purpose
+@cpindex STREAMS
 
 The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
-This document is intended to be included with the OpenSS7 @cite{STREAMS}
-@cpindex STREAMS
-software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software
-developers, maintainers and users of the @value{MANUAL_TITLE} with understanding the software
-architecture and technical interfaces that are made available in the software package.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
 
 @section Intent
 
@@ -377,6 +435,9 @@ is an @strong{UNCONTROLLED VERSION}.
 @verbatim
 
 $Log: tci.texi,v $
+Revision 0.9.2.15  2008-07-11 09:36:13  brian
+- updated documentation
+
 Revision 0.9.2.14  2008-04-29 07:10:40  brian
 - updating headers for release
 
@@ -391,17 +452,17 @@ Revision 0.9.2.12  2007/06/27 08:42:15  brian
 
 @node Introduction
 @chapter Introduction
-
-This document specifies a @cite{STREAMS}-based
 @cpindex STREAMS
-kernel-level instantiation of the ITU-T Transaction Capabilities Application Part (TCAP) Component
-(TC) Sub-Layer.  The Transaction Component Interface (TCI) enables the user of a component sub-layer
-service to access and use any of a variety of conforming transaction providers without specific
-knowledge of the provider's protocol.  The service interface is designed to support any transaction
-protocol but is intended for the ITU-T Recommendation Q.771 Transaction Capabilities Application
-Part (TCAP) Component (TC) Sub-Layer.  This interface only specifies access to transaction component
-sub-layer services providers, and does not address issues concerning transaction or component
-sub-layer management, protocol performance, and performance analysis tools.
+
+This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ITU-T Transaction
+Capabilities Application Part (TCAP) Component (TC) Sub-Layer.  The Transaction Component Interface
+(TCI) enables the user of a component sub-layer service to access and use any of a variety of
+conforming transaction providers without specific knowledge of the provider's protocol.  The service
+interface is designed to support any transaction protocol but is intended for the ITU-T
+Recommendation Q.771 Transaction Capabilities Application Part (TCAP) Component (TC) Sub-Layer.
+This interface only specifies access to transaction component sub-layer services providers, and does
+not address issues concerning transaction or component sub-layer management, protocol performance,
+and performance analysis tools.
 
 The specification assumes that the reader is familiar with the ISO reference model terminology,
 ISO/ITU-T transaction service definitions (ROSE, ACSE, TCAP), and STREAMS.
@@ -961,17 +1022,16 @@ diagrams as shown in @figref{3.6}.
 @figuresized{tci_fig6,3.6,Sequence of Primitives -- Successful Transaction Initiation,3.5in}
 
 The sequence of primitives for the transaction initiation response token value determination is
-shown in @figref{3.7} (procedures for transaction initiation response token value determination
-are discussed in @ref{TC_BIND_REQ}, and @ref{TC_BIND_ACK}).
+shown in @figref{3.7} (procedures for transaction initiation response token value determination are
+discussed in @ref{TC_BIND_REQ}, and @ref{TC_BIND_ACK}).
 
 @figuresized{tci_fig7,3.7,Sequence of Primitives -- Transaction Reponse Token Value Determination,3.5in}
 
 @node Transaction Component Transfer
 @subsection Transaction Component Transfer
 
-Flow control on the transaction dialogue is done by management of the queue
-capacity, and by allowing objects of certain types to be inserted to the queues,
-as shown in @emph{Table 4}.
+Flow control on the transaction dialogue is done by management of the queue capacity, and by
+allowing objects of certain types to be inserted to the queues, as shown in @emph{Table 4}.
 
 @subsubsection Primitives for Component Transfer
 
@@ -1284,6 +1344,7 @@ Tables}).  This primitive does not affect the state of the TC provider and does 
 state tables.
 
 @subsubheading Format
+@tpindex TC_info_req_t
 
 The format of the message is one @prim{M_PCPROTO} message block and its structure is as follows:
 
@@ -1293,7 +1354,6 @@ typedef struct TC_info_req {
     ulong PRIM_type;	/* Always TC_INFO_REQ */
 } TC_info_req_t;
 @end verbatim
-@tpindex TC_info_req_t
 @end display
 
 @subsubheading Parameters
@@ -1303,7 +1363,6 @@ The primitive has the following arguments:
 @table @parm
 
 @item PRIM_type
-
 Indicates the primitive type.  Always @prim{TC_INFO_REQ}.
 
 @end table
@@ -1318,8 +1377,7 @@ This primitive is originated by the TC User.
 
 @subsubheading Valid States
 
-This primitive is valid in any state where a local acknowledgement is not
-pending.
+This primitive is valid in any state where a local acknowledgement is not pending.
 
 @subsubheading New State
 
@@ -1360,6 +1418,7 @@ should be initiated in response to the @prim{TC_INFO_REQ} primitive described ab
 @ref{TC_INFO_REQ}.
 
 @subsubheading Format
+@tpindex TC_info_ack_t
 
 The format of the message is one @prim{M_PCPROTO} message block and its structure is as follows:
 
@@ -1380,7 +1439,6 @@ typedef struct TC_info_ack {
     long TCI_version;	/* TCI version */
 } TC_info_ack_t;
 @end verbatim
-@tpindex TC_info_ack_t
 @end display
 
 @subsubheading Parameters
@@ -1509,6 +1567,8 @@ address.@footnote{Note that a @dfn{Stream} is viewed as active when the TC provi
 transmit TPDUs (transaction protocol data units) associated with the @dfn{Stream}.}
 
 @subsubheading Format
+@tpindex TC_bind_req_t
+@tpindex TC_subs_bind_req_t
 
 This message consists of one @prim{M_PROTO} message block formatted as follows:
 
@@ -1526,8 +1586,6 @@ typedef struct TC_subs_bind_req {
     ulong PRIM_type;
 } TC_subs_bind_req_t;
 @end verbatim
-@tpindex TC_bind_req_t
-@tpindex TC_subs_bind_req_t
 @end display
 
 @subsubheading Parameters
@@ -1642,6 +1700,8 @@ be queued by the TC provider for the specified protocol address, and that the @d
 associated with the specified protocol address has been activated.
 
 @subsubheading Format
+@tpindex TC_bind_ack_t
+@tpindex TC_subs_bind_ack_t
 
 This message consists of one @prim{M_PCPROTO} message block formatted as follows:
 
@@ -1659,8 +1719,6 @@ typedef struct TC_subs_bind_ack {
     ulong PRIM_type;
 } TC_subs_bind_ack_t;
 @end verbatim
-@tpindex TC_bind_ack_t
-@tpindex TC_subs_bind_ack_t
 @end display
 
 @subsubheading Parameters
@@ -1764,6 +1822,7 @@ This primitive requests that the TC provider unbind the protocol address associa
 @dfn{Stream} and deactivate the @dfn{Stream}.
 
 @subsubheading Format
+@tpindex TC_unbind_req_t
 
 This message consists of a @prim{M_PROTO} message block, formatted as follows:
 
@@ -1773,7 +1832,6 @@ typedef struct TC_unbind_req {
     ulong PRIM_type;	/* Always TC_UNBIND_REQ */
 } TC_unbind_req_t;
 @end verbatim
-@tpindex TC_unbind_req_t
 @end display
 
 @subsubheading Parameters
@@ -1838,11 +1896,11 @@ A system error has occurred and the @cite{Linux} system error is indicated in th
 @subsubheading @prim{TC_ADDR_REQ}
 
 @subsubheading Format
+@tpindex TC_addr_req_t
 
 @display
 @verbatim
 @end verbatim
-@tpindex TC_addr_req_t
 @end display
 
 @subsubheading Parameters
@@ -1871,13 +1929,13 @@ The primitive has the following arguments:
 @subsubheading @prim{TC_ADDR_ACK}
 
 @subsubheading Format
+@tpindex TC_addr_ack_t
 
 The format of the message is one @prim{M_PCPROTO} message block structured as follows:
 
 @display
 @verbatim
 @end verbatim
-@tpindex TC_addr_ack_t
 @end display
 
 @subsubheading Parameters
@@ -1918,6 +1976,7 @@ This primitive allows the TC user to manage the options associated with the @dfn
 format of the message is one @prim{M_PROTO} message block.
 
 @subsubheading Format
+@tpindex TC_optmgmt_req_t
 
 This message consists of one @prim{M_PROTO} message block formatted as follows:
 
@@ -1930,7 +1989,6 @@ typedef struct TC_optmgmt_req {
     ulong MGMT_flags;
 } TC_optmgmt_req_t;
 @end verbatim
-@tpindex TC_optmgmt_req_t
 @end display
 
 @subsubheading Parameters
@@ -2048,6 +2106,7 @@ A system error has occurred and the @cite{Linux} system error is indicated in th
 This primitive indicates to the TC user that the options management request has completed.
 
 @subsubheading Format
+@tpindex TC_optmgmt_ack_t
 
 The format of the message is one @prim{M_PCPROTO} message block structured as follows:
 
@@ -2060,7 +2119,6 @@ typedef struct TC_optmgmt_ack {
     ulong MGMT_flags;
 } TC_optmgmt_ack_t;
 @end verbatim
-@tpindex TC_optmgmt_ack_t
 @end display
 
 @subsubheading Parameters
@@ -2200,6 +2258,7 @@ action taken due to issuing the primitive.  This may only be initiated as an ack
 those primitives that require one.
 
 @subsubheading Format
+@tpindex TC_ok_ack_t
 
 The format of the message is one @prim{M_PCPROTO} message block structured as follows:
 
@@ -2210,7 +2269,6 @@ typedef struct TC_ok_ack {
     ulong CORRECT_prim;
 } TC_ok_ack_t;
 @end verbatim
-@tpindex TC_ok_ack_t
 @end display
 
 @subsubheading Parameters
@@ -2258,6 +2316,7 @@ for those primitives that require one.  It also indicates to the TR user that no
 the primitive that cause the error.
 
 @subsubheading Format
+@tpindex TC_error_ack_t
 
 The format of the message is one @prim{M_PCPROTO} message block structured as follows:
 
@@ -2272,7 +2331,6 @@ typedef struct TC_error_ack {
     ulong INVOKE_id;
 } TC_error_ack_t;
 @end verbatim
-@tpindex TC_error_ack_t
 @end display
 
 @subsubheading Parameters
@@ -2469,6 +2527,7 @@ specified options.  Any components that have been accumulated using the componen
 primitives (@pxref{Component Handling Primitives}), will accompany the primitive.
 
 @subsubheading Format
+@tpindex TC_begin_req_t
 
 The format of the message is one @prim{M_PROTO} message block followed by zero or more @prim{M_DATA}
 message blocks containing raw transaction user information.  The @prim{M_PROTO} message block is
@@ -2488,7 +2547,6 @@ typedef struct TC_begin_req {
     ulong COMP_flags;	/* For use with ANSI QWP/QWOP */
 } TC_begin_req_t;
 @end verbatim
-@tpindex TC_begin_req_t
 @end display
 
 @subsubheading Parameters
@@ -2651,6 +2709,7 @@ transaction dialogue, the source protocol address associated with the peer TC us
 address to which the transaction dialogue is initiated, the options for the dialogue.
 
 @subsubheading Format
+@tpindex TC_begin_ind_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -2668,7 +2727,6 @@ typedef struct TC_begin_ind {
     ulong COMP_flags;	/* For use with ANSI QWP/QWOP */
 } TC_begin_ind_t;
 @end verbatim
-@tpindex TC_begin_ind_t
 @end display
 
 @subsubheading Parameters
@@ -2778,6 +2836,7 @@ transaction dialogue begin indication, either on the current @dfn{Stream} or on 
 @dfn{Stream}.
 
 @subsubheading Format
+@tpindex TC_begin_res_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -2793,7 +2852,6 @@ typedef struct TC_begin_res {
     ulong COMP_flags;	/* For use with ANSI CWP/CWOP */
 } TC_begin_res_t;
 @end verbatim
-@tpindex TC_begin_res_t
 @end display
 
 @subsubheading Parameters
@@ -2923,6 +2981,7 @@ This primitive indicates to the TC user that a dialogue begin request ahs been c
 specified responding address.
 
 @subsubheading Format
+@tpindex TC_begin_con_t
 
 This message consists of one @prim{M_PROTO} message block followed by zero or more @prim{M_DATA}
 message blocks if any TC user data is associated with the primitive.  The format of the
@@ -2938,7 +2997,6 @@ typedef struct TC_begin_con {
     ulong COMP_flags;	/* For use with ANSI CWP/CWOP */
 } TC_begin_con_t;
 @end verbatim
-@tpindex TC_begin_con_t
 @end display
 
 @subsubheading Parameters
@@ -3037,6 +3095,7 @@ transaction service preserves both the sequence and the boundaries of the TSDUs.
 @subsubheading @prim{TC_CONT_REQ}
 
 @subsubheading Format
+@tpindex TC_cont_req_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -3050,7 +3109,6 @@ typedef struct TC_cont_req {
     ulong COMP_flags;	/* For use with ANSI CWP/CWOP */
 } TC_cont_req_t;
 @end verbatim
-@tpindex TC_cont_req_t
 @end display
 
 @subsubheading Parameters
@@ -3097,6 +3155,7 @@ provider specific.
 @subsubheading @prim{TC_CONT_IND}
 
 @subsubheading Format
+@tpindex TC_cont_ind_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -3110,7 +3169,6 @@ typedef struct TC_cont_ind {
     ulong COMP_flags;	/* For use with ANSI CWP/CWOP */
 } TC_cont_ind_t;
 @end verbatim
-@tpindex TC_cont_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3168,6 +3226,7 @@ provider specific.
 @subsubheading @prim{TC_END_REQ}
 
 @subsubheading Format
+@tpindex TC_end_req_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -3181,7 +3240,6 @@ typedef struct TC_end_req {
     ulong TERM_scenario;/* Reason for termination */
 } TC_end_req_t;
 @end verbatim
-@tpindex TC_end_req_t
 @end display
 
 @subsubheading Parameters
@@ -3226,6 +3284,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_END_IND}
 
 @subsubheading Format
+@tpindex TC_end_ind_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -3239,7 +3298,6 @@ typedef struct TC_end_ind {
     ulong COMP_flags;	/* Components present flag */
 } TC_end_ind_t;
 @end verbatim
-@tpindex TC_end_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3286,6 +3344,7 @@ provider specific.
 @subsubheading @prim{TC_ABORT_REQ}
 
 @subsubheading Format
+@tpindex TC_abort_req_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -3299,7 +3358,6 @@ typedef struct TC_abort_req {
     ulong ABORT_reason;	/* Abort reason */
 } TC_abort_req_t;
 @end verbatim
-@tpindex TC_abort_req_t
 @end display
 
 @subsubheading Parameters
@@ -3344,6 +3402,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_ABORT_IND}
 
 @subsubheading Format
+@tpindex TC_abort_ind_t
 
 The format of the message is one @prim{M_PROTO} message block structured as follows:
 
@@ -3358,7 +3417,6 @@ typedef struct TC_abort_ind {
     ulong ORIGINATOR;	/* Either User or Provider originated */
 } TC_abort_ind_t;
 @end verbatim
-@tpindex TC_abort_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3425,6 +3483,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_UNI_REQ}
 
 @subsubheading Format
+@tpindex TC_uni_req_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3443,7 +3502,6 @@ typedef struct TC_uni_req {
     ulong DIALOG_id;	/* Dialog Identifier */
 } TC_uni_req_t;
 @end verbatim
-@tpindex TC_uni_req_t
 @end display
 
 @subsubheading Parameters
@@ -3501,6 +3559,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_UNI_IND}
 
 @subsubheading Format
+@tpindex TC_uni_ind_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3520,7 +3579,6 @@ typedef struct TC_uni_ind {
     ulong COMP_flags;	/* Components preset flag */
 } TC_uni_ind_t;
 @end verbatim
-@tpindex TC_uni_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3581,6 +3639,7 @@ provider specific.
 @subsubheading @prim{TC_NOTICE_IND}
 
 @subsubheading Format
+@tpindex TC_notice_ind_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3594,7 +3653,6 @@ typedef struct TC_notice_ind {
     ulong REPORT_cause;	/* Report cause */
 } TC_notice_ind_t;
 @end verbatim
-@tpindex TC_notice_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3685,6 +3743,7 @@ Rejection of a Component
 @subsubheading @prim{TC_INVOKE_REQ}
 
 @subsubheading Format
+@tpindex TC_invoke_req_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3703,7 +3762,6 @@ typedef struct TC_invoke_req {
     ulong TIMEOUT;		/* Timeout */
 } TC_invoke_req_t;
 @end verbatim
-@tpindex TC_invoke_req_t
 @end display
 
 @subsubheading Parameters
@@ -3751,6 +3809,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_INVOKE_IND}
 
 @subsubheading Format
+@tpindex TC_invoke_ind_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3768,7 +3827,6 @@ typedef struct TC_invoke_ind {
     ulong MORE_flag;	/* Not last */
 } TC_invoke_ind_t;
 @end verbatim
-@tpindex TC_invoke_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3823,6 +3881,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_RESULT_REQ}
 
 @subsubheading Format
+@tpindex TC_result_req_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3838,7 +3897,6 @@ typedef struct TC_result_req {
     ulong MORE_flag;	/* Not last */
 } TC_result_req_t;
 @end verbatim
-@tpindex TC_result_req_t
 @end display
 
 @subsubheading Parameters
@@ -3881,6 +3939,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_RESULT_IND}
 
 @subsubheading Format
+@tpindex TC_result_ind_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3896,7 +3955,6 @@ typedef struct TC_result_ind {
     ulong MORE_flag;	/* Not last */
 } TC_result_ind_t;
 @end verbatim
-@tpindex TC_result_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3947,6 +4005,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_ERROR_REQ}
 
 @subsubheading Format
+@tpindex TC_error_req_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -3962,7 +4021,6 @@ typedef struct TC_error_req {
     ulong MORE_flag;	/* Not last */
 } TC_error_req_t;
 @end verbatim
-@tpindex TC_error_req_t
 @end display
 
 @subsubheading Parameters
@@ -4005,6 +4063,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_ERROR_IND}
 
 @subsubheading Format
+@tpindex TC_error_ind_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -4019,7 +4078,6 @@ typedef struct TC_error_ind {
     ulong ERROR_code;	/* Error code */
 } TC_error_ind_t;
 @end verbatim
-@tpindex TC_error_ind_t
 @end display
 
 @subsubheading Parameters
@@ -4067,6 +4125,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_CANCEL_REQ}
 
 @subsubheading Format
+@tpindex TC_cancel_req_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -4080,7 +4139,6 @@ typedef struct TC_cancel_req {
     ulong INVOKE_id;	/* Invoke identifier */
 } TC_cancel_req_t;
 @end verbatim
-@tpindex TC_cancel_req_t
 @end display
 
 @subsubheading Parameters
@@ -4120,6 +4178,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_CANCEL_IND}
 
 @subsubheading Format
+@tpindex TC_cancel_ind_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -4133,7 +4192,6 @@ typedef struct TC_cancel_ind {
     ulong INVOKE_id;	/* Invoke identifier */
 } TC_cancel_ind_t;
 @end verbatim
-@tpindex TC_cancel_ind_t
 @end display
 
 @subsubheading Parameters
@@ -4180,6 +4238,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_REJECT_REQ}
 
 @subsubheading Format
+@tpindex TC_reject_req_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -4194,7 +4253,6 @@ typedef struct TC_reject_req {
     ulong PROBLEM_code;	/* Problem code */
 } TC_reject_req_t;
 @end verbatim
-@tpindex TC_reject_req_t
 @end display
 
 @subsubheading Parameters
@@ -4235,6 +4293,7 @@ those assigned by the component provider have the high bit set to zero (0).
 @subsubheading @prim{TC_REJECT_IND}
 
 @subsubheading Format
+@tpindex TC_reject_ind_t
 
 The format of the message is one @prim{M_PROTO} message block, followed by zero or more
 @prim{M_DATA} message blocks if any components are specified by the TC user.  The format of the
@@ -4250,7 +4309,6 @@ typedef struct TC_reject_ind {
     ulong PROBLEM_code;	/* Problem code */
 } TC_reject_ind_t;
 @end verbatim
-@tpindex TC_reject_ind_t
 @end display
 
 @subsubheading Parameters
@@ -4294,48 +4352,63 @@ those assigned by the component provider have the high bit set to zero (0).
 @verbatiminclude tc.h
 @end smallformat
 
+@node License
+@unnumbered License
+
+@menu
+* GNU Free Documentation License::
+@end menu
+
+@include texi/fdl.texi
+
 @node Glossary
 @unnumbered Glossary
 
 @table @emph
 
 @item Signalling Data Link Service Data Unit
+
 A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
 connection to the other.
 
 @item Data transfer
+
 The phase in connection and connectionless modes that supports the transfer of data between to
 signalling data link users.
 
 @item SDL provider
+
 The signalling data link layer protocol that provides the services of the signalling data link
 interface.
 
 @item SDL user
+
 The user-level application or user-level or kernel-level protocol that accesses the services of the
 signalling data link layer.
 
 @item Local management
+
 The phase in connection and connectionless modes in which a SDL user initializes a @dfn{Stream} and
 attaches a PPA address to the @dfn{Stream}.  Primitives in this phase generate local operations only.
 
 @item PPA
+
 The point at which a system attaches itself to a physical communications medium.
 
 @item PPA identifier
-An identifier of a particular physical medium over which communication transpires.
 
+An identifier of a particular physical medium over which communication transpires.
 @end table
 
 @node Acronyms
 @unnumbered Acronyms
 
 @multitable {SDL SDU}{International Telecommunication Union - Telecom Sector}
-@item SDLI @tab Signalling Data Link Interface
-@item SDL @tab Signalling Data Link
-@item SDL SDU @tab Signalling Data Link Service Data Unit
 @item ITU-T @tab International Telecommunications Union - Telecom Sector
 @item PPA @tab Physical Point of Attachment
+@item SDLI @tab Signalling Data Link Interface
+@item SDL SDU @tab Signalling Data Link Service Data Unit
+@item SDL @tab Signalling Data Link
 @end multitable
 
 @node References
@@ -4383,99 +4456,78 @@ An identifier of a particular physical medium over which communication transpire
 
 @end enumerate
 
-@c @node Index
-@c @unnumbered Index
-@c @printindex cp
-
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@iftex
 @node Indices
 @unnumbered Indices
+@end iftex
 
+@ifnottex
+@c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@end ifnottex
+
+@iftex
 @menu
 * Concept Index::
-* Type Index::
-@c * Function Index::
-* Variable Index::
-@c * File Index::
-@c * Option Index::
-@c * Author Index::
-* Primitive Index::
-* Primitive Value Index::
 * Protocol State Index::
-* Protocol Error Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Input-Output Control Index::
 * Manual Page Index::
 @end menu
 
 @node Concept Index
 @section Concept Index
-
 @printindex cp
-
-@page
-@node Type Index
-@section Type Index
-
-@printindex tp
-
-@c @page
-@c @node Function Index
-@c @section Function Index
-
-@c @printindex fn
-
-@page
-@node Variable Index
-@section Variable Index
-
-@printindex vr
-
-@c @page
-@c @node File Index
-@c @section File Index
-
-@printindex pg
-
-@c @page
-@c @node Option Index
-@c @section Option Index
-
-@c @printindex op
-
-@c @page
-@c @node Author Index
-@c @section Author Index
-
-@c @printindex au
-
-@page
-@node Primitive Index
-@section Primitive Index
-
-@printindex pr
-
-@page
-@node Primitive Value Index
-@section Primitive Value Index
-
-@printindex pv
 
 @page
 @node Protocol State Index
 @section Protocol State Index
-
 @printindex st
 
 @page
-@node Protocol Error Index
-@section Protocol Error Index
+@node Primitive Index
+@section Primitive Index
+@printindex pr
 
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
+
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
+@printindex vr
+
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
+
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
 @printindex pe
+
+@page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
 
 @page
 @node Manual Page Index
 @section Manual Page Index
-
 @printindex mp
-
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents

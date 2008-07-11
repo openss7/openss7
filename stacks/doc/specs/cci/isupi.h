@@ -1,81 +1,11 @@
-/*****************************************************************************
-
- @(#) isupi.h,v 0.9.2.1 2007/08/13 19:55:39 brian Exp
-
- -----------------------------------------------------------------------------
-
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-
- All Rights Reserved.
-
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
-
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
-
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
- -----------------------------------------------------------------------------
-
- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
- behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
- is classified as "Commercial Computer Software" under paragraph 252.227-7014
- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
- successor regulations) and the Government is acquiring only the license rights
- granted herein (the license rights customarily provided to non-Government
- users).  If the Software is supplied to any unit or agency of the Government
- other than DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
- (or any successor regulations).
-
- -----------------------------------------------------------------------------
-
- Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified 2007/08/13 19:55:39 by brian
-
- -----------------------------------------------------------------------------
-
- isupi.h,v
- Revision 0.9.2.1  2007/08/13 19:55:39  brian
- - added spec headers
-
- Revision 0.9.2.5  2007/08/13 19:28:12  brian
- - updated headers
-
- Revision 0.9.2.4  2006/10/31 21:04:37  brian
- - changes for 32-bit compatibility and remove HZ dependency
-
- *****************************************************************************/
-
-#ifndef __SS7_ISUPI_H__
-#define __SS7_ISUPI_H__
-
-#ident "@(#) isupi.h,v (0.9.2.1) Copyright (c) 2001-2006 OpenSS7 Corporation."
-
-/* This file can be processed by doxygen(1). */
-
 /*
  *  ISUP addresss
  */
 
 typedef struct isup_addr {
-        cc_ulong scope;                 /* the scope of the identifier */
-        cc_ulong id;                    /* the identifier within the scope */
-        cc_ulong cic;                   /* circuit identification code within the scope */
+    cc_ulong scope;             /* the scope of the identifier */
+    cc_ulong id;                /* the identifier within the scope */
+    cc_ulong cic;               /* circuit identification code within the scope */
 } isup_addr_t;
 
 #define ISUP_SCOPE_CT           1       /* circuit scope */
@@ -91,36 +21,36 @@ typedef struct isup_addr {
  */
 
 enum {
-        ISUP_INCOMING_INTERNATIONAL_EXCHANGE = 0x00000001UL,
-        ISUP_SUSPEND_NATIONALLY_PERFORMED = 0x00000002UL,
+    ISUP_INCOMING_INTERNATIONAL_EXCHANGE = 0x00000001UL,
+    ISUP_SUSPEND_NATIONALLY_PERFORMED = 0x00000002UL,
 };
 
 enum {
-        CMS_IDLE = 0,
-        CMS_WCON_BLREQ,
-        CMS_WRES_BLIND,
-        CMS_WACK_BLRES,
-        CMS_WCON_UBREQ,
-        CMS_WRES_UBIND,
-        CMS_WACK_UBRES,
-        CMS_WCON_RESREQ,
-        CMS_WRES_RESIND,
-        CMS_WACK_RESRES,
-        CMS_WCON_QRYREQ,
-        CMS_WRES_QRYIND,
-        CMS_WACK_QRYRES,
+    CMS_IDLE = 0,
+    CMS_WCON_BLREQ,
+    CMS_WRES_BLIND,
+    CMS_WACK_BLRES,
+    CMS_WCON_UBREQ,
+    CMS_WRES_UBIND,
+    CMS_WACK_UBRES,
+    CMS_WCON_RESREQ,
+    CMS_WRES_RESIND,
+    CMS_WACK_RESRES,
+    CMS_WCON_QRYREQ,
+    CMS_WRES_QRYIND,
+    CMS_WACK_QRYRES,
 };
 
 enum {
-        CKS_IDLE = 0,
-        CKS_WIND_CONT,
-        CKS_WRES_CONT,
-        CKS_WIND_CTEST,
-        CKS_WREQ_CTEST,
-        CKS_WIND_CCREP,
-        CKS_WREQ_CCREP,
-        CKS_WCON_RELREQ,
-        CKS_WRES_RELIND,
+    CKS_IDLE = 0,
+    CKS_WIND_CONT,
+    CKS_WRES_CONT,
+    CKS_WIND_CTEST,
+    CKS_WREQ_CTEST,
+    CKS_WIND_CCREP,
+    CKS_WREQ_CCREP,
+    CKS_WCON_RELREQ,
+    CKS_WRES_RELIND,
 };
 
 /*
@@ -364,7 +294,8 @@ enum {
 #define ISUP_EVNT_PRES_RESTRICT                 0x80
 #define ISUP_EVNT_ALERTING                      0x01    /* alerting */
 #define ISUP_EVNT_PROGRESS                      0x02    /* progress */
-#define ISUP_EVNT_IBI                           0x03    /* in-band info or approp pattern avail */
+#define ISUP_EVNT_IBI                           0x03    /* in-band info or approp pattern 
+                                                           avail */
 #define ISUP_EVNT_CFB                           0x04    /* call forwarded busy */
 #define ISUP_EVNT_CFNA                          0x05    /* call forwarded no reply */
 #define ISUP_EVNT_CFU                           0x06    /* call forwarded unconditional */
@@ -393,17 +324,21 @@ enum {
 /*
    Normal class 
  */
-#define CC_CAUS_UNALLOCATED_NUMBER                1     /* Unallocated (unassigned) number */
-#define CC_CAUS_NO_ROUTE_TO_TRANSIT_NETWORK       2     /* No route to specified transit network */
+#define CC_CAUS_UNALLOCATED_NUMBER                1     /* Unallocated (unassigned)
+                                                           number */
+#define CC_CAUS_NO_ROUTE_TO_TRANSIT_NETWORK       2     /* No route to specified transit
+                                                           network */
 #define CC_CAUS_NO_ROUTE_TO_DESTINATION           3     /* No route to destination */
 #define CC_CAUS_SEND_SPECIAL_INFO_TONE            4     /* Send special information tone */
 #define CC_CAUS_MISDIALLED_TRUNK_PREFIX           5     /* Misdialled trunk prefix */
 #define CC_CAUS_PREEMPTION                        8     /* Preemption */
-#define CC_CAUS_PREEMPTION_CCT_RESERVED           9     /* Preemption - circuit reserved for reuse */
+#define CC_CAUS_PREEMPTION_CCT_RESERVED           9     /* Preemption - circuit reserved
+                                                           for reuse */
 #define CC_CAUS_NORMAL_CALL_CLEARING             16     /* Normal call clearing */
 #define CC_CAUS_USER_BUSY                        17     /* User busy */
 #define CC_CAUS_NO_USER_RESPONDING               18     /* No user responding */
-#define CC_CAUS_NO_ANSWER                        19     /* No answer from user (user alerted) */
+#define CC_CAUS_NO_ANSWER                        19     /* No answer from user (user
+                                                           alerted) */
 #define CC_CAUS_SUBSCRIBER_ABSENT                20     /* Subscriber absent */
 #define CC_CAUS_CALL_REJECTED                    21     /* Call rejected */
 #define CC_CAUS_NUMBER_CHANGED                   22     /* Number changed */
@@ -419,53 +354,66 @@ enum {
 #define CC_CAUS_NO_CCT_AVAILABLE                 34     /* No circuit/channel available */
 #define CC_CAUS_NETWORK_OUT_OF_ORDER             38     /* Network out of order */
 #define CC_CAUS_TEMPORARY_FAILURE                41     /* Temporary failure */
-#define CC_CAUS_SWITCHING_EQUIP_CONGESTION       42     /* Switching equipment congestion */
+#define CC_CAUS_SWITCHING_EQUIP_CONGESTION       42     /* Switching equipment congestion 
+                                                         */
 #define CC_CAUS_ACCESS_INFO_DISCARDED            43     /* Access information discarded */
-#define CC_CAUS_REQUESTED_CCT_UNAVAILABLE        44     /* Requested circuit/channel not available */
+#define CC_CAUS_REQUESTED_CCT_UNAVAILABLE        44     /* Requested circuit/channel not
+                                                           available */
 #define CC_CAUS_PRECEDENCE_CALL_BLOCKED          46     /* Precedence call blocked */
-#define CC_CAUS_RESOURCE_UNAVAILABLE             47     /* Resource unavailable, unspecified */
+#define CC_CAUS_RESOURCE_UNAVAILABLE             47     /* Resource unavailable,
+                                                           unspecified */
 /*
    Service or Option Unavaialble Class 
  */
-#define CC_CAUS_NOT_SUBSCRIBED                   50     /* Requested facility not subscribed */
-#define CC_CAUS_OGC_BARRED_WITHIN_CUG            53     /* Outgoing calls barred within CUG */
-#define CC_CAUS_ICC_BARRED WITHIN_CUG            55     /* Incoming calls barred within CUG */
-#define CC_CAUS_BC_NOT_AUTHORIZED                57     /* Bearer capability not authorized */
-#define CC_CAUS_BC_NOT_AVAILABLE                 58     /* Bearer capability not presently
-                                                           available */
-#define CC_CAUS_INCONSISTENCY                    62     /* Inconsistency in designated outgoing
-                                                           access information and subscriber class */
-#define CC_CAUS_SERVICE_OPTION_NOT_AVAILABLE     63     /* Service or option not available,
-                                                           unspecified */
+#define CC_CAUS_NOT_SUBSCRIBED                   50     /* Requested facility not
+                                                           subscribed */
+#define CC_CAUS_OGC_BARRED_WITHIN_CUG            53     /* Outgoing calls barred within
+                                                           CUG */
+#define CC_CAUS_ICC_BARRED WITHIN_CUG            55     /* Incoming calls barred within
+                                                           CUG */
+#define CC_CAUS_BC_NOT_AUTHORIZED                57     /* Bearer capability not
+                                                           authorized */
+#define CC_CAUS_BC_NOT_AVAILABLE                 58     /* Bearer capability not
+                                                           presently available */
+#define CC_CAUS_INCONSISTENCY                    62     /* Inconsistency in designated
+                                                           outgoing access information
+                                                           and subscriber class */
+#define CC_CAUS_SERVICE_OPTION_NOT_AVAILABLE     63     /* Service or option not
+                                                           available, unspecified */
 /*
    Service or Option Not Implemented Class 
  */
-#define CC_CAUS_BC_NOT_IMPLEMENTED               65     /* Bearer capability not implemented */
-#define CC_CAUS_FACILITY_NOT_IMPLEMENTED         69     /* Requested facility not implemented */
-#define CC_CAUS_RESTRICTED_BC_ONLY               70     /* Only restricted digital information
-                                                           bearer capability is available */
-#define CC_CAUS_SERIVCE_OPTION_NOT_IMPLEMENTED   79     /* Service or option not implemented,
-                                                           unspecified */
+#define CC_CAUS_BC_NOT_IMPLEMENTED               65     /* Bearer capability not
+                                                           implemented */
+#define CC_CAUS_FACILITY_NOT_IMPLEMENTED         69     /* Requested facility not
+                                                           implemented */
+#define CC_CAUS_RESTRICTED_BC_ONLY               70     /* Only restricted digital
+                                                           information bearer capability
+                                                           is available */
+#define CC_CAUS_SERIVCE_OPTION_NOT_IMPLEMENTED   79     /* Service or option not
+                                                           implemented, unspecified */
 /*
    Invalid Message (e.g., Parameter out of Range) Class 
  */
 #define CC_CAUS_USER_NOT_MEMBER_OF_CUG           87     /* User not member of CUG */
 #define CC_CAUS_INCOMPATIBLE_DESTINATION         88     /* Incompatible destination */
 #define CC_CAUS_NON_EXISTENT_CUG                 90     /* Non-existent CUG */
-#define CC_CAUS_INVALID_TRANSIT_NTWK_SELECTION   91     /* Invalid transit network selection */
+#define CC_CAUS_INVALID_TRANSIT_NTWK_SELECTION   91     /* Invalid transit network
+                                                           selection */
 #define CC_CAUS_INVALID_MESSAGE                  95     /* Invalid message, unspecified */
 /*
    Protocol Error (e.g., Unknwon Message) Class 
  */
-#define CC_CAUS_MESSAGE_TYPE_NOT_IMPLEMENTED     97     /* Message typ non-existent or not
-                                                           implemented. */
+#define CC_CAUS_MESSAGE_TYPE_NOT_IMPLEMENTED     97     /* Message typ non-existent or
+                                                           not implemented. */
 #define CC_CAUS_PARAMETER_NOT_IMPLEMENTED        99     /* Information element/Parameter
-                                                           non-existent or not implemented */
+                                                           non-existent or not
+                                                           implemented */
 #define CC_CAUS_RECOVERY_ON_TIMER_EXPIRY        102     /* Recovery on timer expiry */
 #define CC_CAUS_PARAMETER_PASSED_ON             103     /* Parameter non-existent or not
                                                            implemented - passed on */
-#define CC_CAUS_MESSAGE_DISCARDED               110     /* Message with unrecognized parameter
-                                                           discarded */
+#define CC_CAUS_MESSAGE_DISCARDED               110     /* Message with unrecognized
+                                                           parameter discarded */
 #define CC_CAUS_PROTOCOL_ERROR                  111     /* Protocol error, unspecified */
 /*
    Interworking Class 
@@ -477,12 +425,15 @@ enum {
 /*
    Normal Class 
  */
-#define CC_CAUS_UNALLOCATED_DEST_NUMBER          23     /* Unallocated destination number */
+#define CC_CAUS_UNALLOCATED_DEST_NUMBER          23     /* Unallocated destination number 
+                                                         */
 #define CC_CAUS_UNKNOWN_BUSINESS_GROUP           24     /* Unknown business group */
 #define CC_CAUS_EXCHANGE_ROUTING_ERROR           25     /* Exchange routing error */
-#define CC_CAUS_MISROUTED_CALL_TO_PORTED_NUMBER  26     /* Misrouted call to a ported number */
-#define CC_CAUS_LNP_QOR_NUMBER_NOT_FOUND         27     /* Number portability Query on Release
-                                                           (QoR) number not found. */
+#define CC_CAUS_MISROUTED_CALL_TO_PORTED_NUMBER  26     /* Misrouted call to a ported
+                                                           number */
+#define CC_CAUS_LNP_QOR_NUMBER_NOT_FOUND         27     /* Number portability Query on
+                                                           Release (QoR) number not
+                                                           found. */
 /*
    Resource Unavailable Class 
  */
@@ -491,9 +442,10 @@ enum {
 /*
    Service or Option Not Available Class 
  */
-#define CC_CAUS_CALL_TYPE_INCOMPATIBLE           51     /* Call type incompatible with service
-                                                           request */
-#define CC_CAUS_GROUP_RESTRICTIONS               54     /* Call blocked due to group restrictions */
+#define CC_CAUS_CALL_TYPE_INCOMPATIBLE           51     /* Call type incompatible with
+                                                           service request */
+#define CC_CAUS_GROUP_RESTRICTIONS               54     /* Call blocked due to group
+                                                           restrictions */
 
 /*
    Management flags -- Q.764 Conforming 
@@ -529,7 +481,8 @@ enum {
 #define ISUP_MAINT_USER_PART_UNEQUIPPED         20UL
 #define ISUP_MAINT_USER_PART_UNAVAILABLE        21UL    /* Q.752 10.1, 10.8 on occrence */
 #define ISUP_MAINT_USER_PART_AVAILABLE          22UL    /* Q.752 10.3, 10.9 on occrence */
-#define ISUP_MAINT_USER_PART_MAN_MADE_BUSY      23UL    /* Q.752 10.2 on occrence */    /* XXX */
+#define ISUP_MAINT_USER_PART_MAN_MADE_BUSY      23UL    /* Q.752 10.2 on occrence */    /* XXX 
+                                                                                         */
 #define ISUP_MAINT_USER_PART_CONGESTED          24UL    /* Q.752 10.5, 10.11 on occrence */
 #define ISUP_MAINT_USER_PART_UNCONGESTED        25UL    /* Q.752 10.6, 10.12 on occrence */
 #define ISUP_MAINT_MISSING_ACK_IN_CGBA          26UL    /* Q.752 12.8 1st and delta */
@@ -538,8 +491,8 @@ enum {
 #define ISUP_MAINT_ABNORMAL_ACK_IN_CGUA         29UL    /* Q.752 12.11 1st and delta */
 #define ISUP_MAINT_UNEXPECTED_BLA               30UL    /* Q.752 12.14 1st and delta */
 #define ISUP_MAINT_UNEXPECTED_UBA               31UL    /* Q.752 12.15 1st and delta */
-#define ISUP_MAINT_RELEASE_UNREC_INFO           32UL    /* Q.752 12.22 1st and delta */ /* XXX */
-#define ISUP_MAINT_RELEASE_FAILURE              33UL    /* Q.752 12.23 1st and delta */ /* XXX */
-#define ISUP_MAINT_MESSAGE_FORMAT_ERROR         34UL    /* Q.752 12.20 1st and delta */ /* XXX */
-
-#endif                          /* __SS7_ISUPI_H__ */
+#define ISUP_MAINT_RELEASE_UNREC_INFO           32UL    /* Q.752 12.22 1st and delta */ /* XXX 
+                                                                                         */
+#define ISUP_MAINT_RELEASE_FAILURE              33UL    /* Q.752 12.23 1st and delta */ /* XXX 
+                                                                                         */
+#define ISUP_MAINT_MESSAGE_FORMAT_ERROR         34UL    /* Q.752 12.20 1st and delta */ /* XXX 

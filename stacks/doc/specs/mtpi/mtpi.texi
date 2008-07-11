@@ -1,8 +1,8 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: mtpi.texi,v 0.9.2.3 2008-04-29 07:10:38 brian Exp $
+% @(#) $Id: mtpi.texi,v 0.9.2.4 2008-07-11 09:36:12 brian Exp $
 %
 % =========================================================================
 %
@@ -54,16 +54,16 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-29 07:10:38 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:36:12 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename mtpi.info
 @include texi/args.texi
 @set MANUAL_TITLE Message Transfer Part Interface (MTPI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
@@ -74,55 +74,58 @@
 
 @include texi/args.texi
 @set MANUAL_TITLE Message Transfer Part Interface (MTPI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
-published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} published by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.
+
 
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
+
 All Rights Reserved.
 
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
-this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
-representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
 @ignore
-Permission is granted to process this file through Tex and print the results, provided the printed document carries
-copying permission notice identical to this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
-merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
-suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
-copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
-special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
-action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
-or the performance or implementation of the contents thereof.
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
 
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE Message Transfer Part Interface (MTPI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -137,10 +140,11 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @sp 4
 @quotation
 @subheading Abstract
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
-@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the signlling link interface to these components
-as well as providing a basis for signalling link control for other signalling link protocols.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+signalling link interface to these components as well as providing a basis for signalling link
+control for other signalling link protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -168,48 +172,54 @@ Unauthorized distribution or duplication is prohibited.
 
 @ignore
 @noindent
-This software and related documentation is protected by copyright and distributed under licenses restricting its use,
-copying, distribution and decompilation.  No part of this software or related documentation may be reproduced in any
-form by any means without the prior written authorization of the copyright holder, and licensors, if any.
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the recipient will protect this information and
-keep it confidential, and will not disclose the information contained in this document without the written permission of
-its owner.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
 @end ignore
 
 @noindent
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
-this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
-representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
 @subsubheading Notice:
 
 @noindent
-@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
-merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
-suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
-copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
-special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
-action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
-or the performance or implementation of the contents thereof.}
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
 
 @sp 1
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -218,26 +228,97 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
-@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
 @page
 
 @c Define an index of primitives
-@defindex pr
+@defcodeindex pr
 @c Define an index of primitive values
-@defindex pv
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
-@defindex st
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
 
-@c @syncodeindex pr cp
-@c @syncodeindex pv cp
-@c @syncodeindex tp cp
-@c @syncodeindex vr cp
+@ifnottex
+@c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
+
+@iftex
+
+@macro prim{name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval{name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr{name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta{name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm{name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
 
 @ifnottex
 @node Top
@@ -261,12 +342,27 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 * State/Event Tables::
 * Precedence Tables::
 * MTPI Header File Listing::
-* References::
+* License::
 * Glossary::
 * Acronyms::
+* References::
+@iftex
 * Indices::
-* License::
+@end iftex
+@ifnottex
+* Index::
+@end ifnottex
 @end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Preface
 @unnumbered Preface
@@ -274,76 +370,83 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @section Security Warning
 
 @noindent
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of @cite{OpenSS7 Corporation} not be used in advertising or publicity pertaining to
-distribution of this documentation or its contents without specific, written prior permission.  @cite{OpenSS7
-Corporation} makes no representation about the suitability of this documentation for any purpose.  It is provided ``as
-is'' without express or implied warranty.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used
+in advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this documentation including
-all implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that the
-contents of the document are suitable for any purpose, or that the implementation of such contents will not infringe on
-any third party patents, copyrights, trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable
-for any direct, indirect, special or consequential damages or any damages whatsoever resulting from loss of use, data or
-profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with any
-use of this document or the performance or implementation of the contents thereof.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action of contract, negligence or other tortious action, arising out
+of or in connection with any use of this document or the performance or implementation of the
+contents thereof.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a reference point for the
-industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this release of the
-document, minor changes may be made prior to products conforming to the interfaces being made available.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a
+reference point for the industry.  While @cite{OpenSS7 Corporation} believes that these interfaces
+are well defined in this release of the document, minor changes may be made prior to products
+conforming to the interfaces being made available.
 
 @section Abstract
 
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
-@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling Link (SL) protocol
-stacks.  It provides abstraction of the signalling link interface to these components as well as providing a basis for
-signalling link control for other link control protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling
+Link (SL) protocol stacks.  It provides abstraction of the signalling link interface to these
+components as well as providing a basis for signalling link control for other link control
+protocols.
 
 @section Purpose
-
-The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.  This document
-is intended to be included with the OpenSS7 @cite{STREAMS}
 @cpindex STREAMS
-software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and
-users of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces that are
-made available in the software package.
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
 
 @section Intent
 
-It is the intent of this document that it act as the primary source of information concerning the @value{MANUAL_TITLE}.
-This document is intended to provide information for writers of OpenSS7 @value{MANUAL_TITLE} applications as well as
-writers of OpenSS7 @value{MANUAL_TITLE} Users.
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
 
 @section Audience
 
 The audience for this document is software developers, maintainers and users and integrators of the
-@value{MANUAL_TITLE}.
-The target audience is developers and users of the OpenSS7 SS7 stack.
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
 
 @section Disclaimer
 
-Although the author has attempted to ensure that the information in this document is complete and correct, neither
-the Author nor OpenSS7 Corporation will take any responsibility in it.
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
 
 @section Revision History
 
-Take care that you are working with a current version of this documentation: you will not be notified of updates.  To
-ensure that you are working with a current version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for
-a current version.
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
 
-Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document is an
-@strong{UNCONTROLLED VERSION}.
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document
+is an @strong{UNCONTROLLED VERSION}.
 
 @smallexample
 
 $Log: mtpi.texi,v $
+Revision 0.9.2.4  2008-07-11 09:36:12  brian
+- updated documentation
+
 Revision 0.9.2.3  2008-04-29 07:10:38  brian
 - updating headers for release
 
@@ -357,17 +460,18 @@ Revision 0.9.2.1  2007/06/27 08:42:19  brian
 
 @node Introduction
 @chapter Introduction
-
-This document specifies a @cite{STREAMS}-based
 @cpindex STREAMS
-kernel-level instantiation of the ITU-T @value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a
-a message transfer service to access and use any of a variety of conforming message transfer providers without specific
-knowledge of the provider's protocol.  The service interface is designed to support any network message transfer protocol
-and user message transfer protocol.  This interface only specifies access to message transfer service providers, and does not
-address issues concerning message transfer management, protocol performance, and performance analysis tools.
 
-This specification assumes that the reader is familiar with ITU-T state machines and message transfer interfaces (e.g.
-Q.704, T1.111.4), and @cite{STREAMS}.
+This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ITU-T
+@value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a a message transfer
+service to access and use any of a variety of conforming message transfer providers without specific
+knowledge of the provider's protocol.  The service interface is designed to support any network
+message transfer protocol and user message transfer protocol.  This interface only specifies access
+to message transfer service providers, and does not address issues concerning message transfer
+management, protocol performance, and performance analysis tools.
+
+This specification assumes that the reader is familiar with ITU-T state machines and message
+transfer interfaces (e.g.  Q.704, T1.111.4), and @cite{STREAMS}.
 @cpindex STREAMS
 
 @section Related Documentation
@@ -381,12 +485,13 @@ Q.704, T1.111.4), and @cite{STREAMS}.
 
 @subsection Role
 
-This document specifies an interface that supports the services provided by the
-@dfn{Signalling System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation Q.704,
-ANSI T1.111.4, ETSI ETS 300 008-1.  These
-specifications are targeted for use by developers and testers of protocol modules that require signalling link service.
+This document specifies an interface that supports the services provided by the @dfn{Signalling
+System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation
+Q.704, ANSI T1.111.4, ETSI ETS 300 008-1.  These specifications are targeted for use by developers
+and testers of protocol modules that require signalling link service.
 
 @section Definitions, Acronyms, Abbreviations
+@cpindex STREAMS
 
 @table @dfn
 @item Originating SL User
@@ -412,7 +517,6 @@ Open Systems Interconnection
 @item QOS
 Quality of Service
 @item STREAMS
-@cpindex STREAMS
 A communication services development facility first available with UNIX System V Release 3.
 @end table
 
@@ -425,41 +529,39 @@ A communication services development facility first available with UNIX System V
 * MTP Service Primitives::
 @end menu
 
-The Message Transfer Part Layer provides the means to manage the association of MTP-Users into connections.  It is responsible
-for the routing and management of data to and from SS7 network connections between MTP-user entities.
+The Message Transfer Part Layer provides the means to manage the association of MTP-Users into
+connections.  It is responsible for the routing and management of data to and from SS7 network
+connections between MTP-user entities.
 
 @node Model of the MTPI
 @section Model of the MTPI
-
-The MTPI defines the services provided by the signalling link layer to the signalling link user at the boundary between
-the signalling link provider and the signalling link user entity.  The interface consists of a set of primitives defined
-as @cite{STREAMS}
 @cpindex STREAMS
-messages that provide access to the signalling link layer services, and are transferred between the MTP user entity and the
-MTP provider.  These primitives are of two types; ones that originate from the MTP user, and other that originate from
-the MTP provider.  The primitives that originate from the MTP user make requests to the MTP provider, or respond to an
-indication of an event of the MTP provider.  The primitives that originate from the MTP provider are either
-confirmations of a request or are indications to the CCS user that an event has occurred.  @figref{1} shows the model
-of the MTPI.
+
+The MTPI defines the services provided by the signalling link layer to the signalling link user at
+the boundary between the signalling link provider and the signalling link user entity.  The
+interface consists of a set of primitives defined as @cite{STREAMS} messages that provide access to
+the signalling link layer services, and are transferred between the MTP user entity and the MTP
+provider.  These primitives are of two types; ones that originate from the MTP user, and other that
+originate from the MTP provider.  The primitives that originate from the MTP user make requests to
+the MTP provider, or respond to an indication of an event of the MTP provider.  The primitives that
+originate from the MTP provider are either confirmations of a request or are indications to the CCS
+user that an event has occurred.  @figref{1} shows the model of the MTPI.
 
 @figuresized{mtpi01,1,Model of the MTPI,4.0in}
 
-The MTPI allows the MTP provider to be configured with any MTP user (such as ISUP) that also conforms to the MTPI.  A
-call control layer user can also be a user program that conforms to the MTPI and accesses the MTP provider via
-@command{@b{putmsg}(2s)}
-and
-@command{@b{getmsg}(2s)}
-system calls.
+The MTPI allows the MTP provider to be configured with any MTP user (such as ISUP) that also
+conforms to the MTPI.  A call control layer user can also be a user program that conforms to the
+MTPI and accesses the MTP provider via @manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
 
 @node MTPI Services
 @section MTPI Services
 
-The features of the MTPI are defined in terms of the services provided by the MTP, and the individual primitives that
-may flow between the MTP-User and the MTP.
+The features of the MTPI are defined in terms of the services provided by the MTP, and the
+individual primitives that may flow between the MTP-User and the MTP.
 
-The services supported by the MTPI are based on two distinct modes of communication, connectionless (CLMS) and
-connection oriented (COMS).  Within these modes, the MTPI provides support for both sequenced and unsequenced message
-transfer.  Also, the MTPI supports services for local mangement.
+The services supported by the MTPI are based on two distinct modes of communication, connectionless
+(CLMS) and connection oriented (COMS).  Within these modes, the MTPI provides support for both
+sequenced and unsequenced message transfer.  Also, the MTPI supports services for local mangement.
 
 @subsection CLMS
 
@@ -474,15 +576,15 @@ it provides transfer of data in self contained units;
 there is no logical relationship between these units of data.
 @end enumerate
 
-Connectionless mode communication has no separate phases.  Each unit of data is transmitted from source to
-destination independently, appropriate addressing information is included with each unit of data.  Although the
-units of data are transmitted independently from source to destination, MTP provides a high level of assurance of
-sequencing if sequenced service is requested.  When unsequenced service is requested, there are no guarantees of
-proper sequence.  Although MTP services are inherently unreliable, MTP provide a high level of assurance that
-messages are not lost.
+Connectionless mode communication has no separate phases.  Each unit of data is transmitted from
+source to destination independently, appropriate addressing information is included with each unit
+of data.  Although the units of data are transmitted independently from source to destination, MTP
+provides a high level of assurance of sequencing if sequenced service is requested.  When
+unsequenced service is requested, there are no guarantees of proper sequence.  Although MTP services
+are inherently unreliable, MTP provide a high level of assurance that messages are not lost.
 
-The connectionless service of MTP is suited to MTP User protocols such as the Signalling Connection Control Part
-(SCCP).@footnote{Q.711}
+The connectionless service of MTP is suited to MTP User protocols such as the Signalling Connection
+Control Part (SCCP).@footnote{Q.711}
 
 @subsection COMS
 
@@ -495,28 +597,29 @@ it is virtual circuit oriented;
 it provides transfer of data via a pre-established path.
 @end enumerate
 
-There are three phases to each instance of communication: Connection Establishment, Data Transfer; and Connection
-Termination.  Units of data arrive at their destination in the same order as they departed their source when the
-sequenced delivery service is requested and the data is protected against duplication or loss of data within some
-specified quality of service.
+There are three phases to each instance of communication: Connection Establishment, Data Transfer;
+and Connection Termination.  Units of data arrive at their destination in the same order as they
+departed their source when the sequenced delivery service is requested and the data is protected
+against duplication or loss of data within some specified quality of service.
 
-The connection oriented service of MTP is suited to MTP User protocols such as the Integrated Services Digital Network
-User Part (ISUP), [Q.764] Telephone User Part (TUP), [Q.724] and Bearer Indexed Call Control (BICC).@footnote{ISUP
-consists of @dfn{signalling relations} between two switches which also have digital facilities between them.  In general
-an ISUP MTP-User can communicate with many other MTP-User peers, however, signalling between any given two enpoints only
-concerns the digital facilities which exist between the two endpoints.  So, management of ISUP switches is best
-performed on a pairing of endpoints (@dfn{signalling relations}).  Also, the COMS mode of operation is provided in
-support of DPC list Routing Keys for M3UA. [RFC 4666]}
+The connection oriented service of MTP is suited to MTP User protocols such as the Integrated
+Services Digital Network User Part (ISUP), [Q.764] Telephone User Part (TUP), [Q.724] and Bearer
+Indexed Call Control (BICC).@footnote{ISUP consists of @dfn{signalling relations} between two
+switches which also have digital facilities between them.  In general an ISUP MTP-User can
+communicate with many other MTP-User peers, however, signalling between any given two enpoints only
+concerns the digital facilities which exist between the two endpoints.  So, management of ISUP
+switches is best performed on a pairing of endpoints (@dfn{signalling relations}).  Also, the COMS
+mode of operation is provided in support of DPC list Routing Keys for M3UA. [RFC 4666]}
 
 @subsection Local Management
 
-The MTPI specifications also defines a set of local management functions that apply to COMS and CLMS modes of
-communication.  These services have local significance only.
+The MTPI specifications also defines a set of local management functions that apply to COMS and CLMS
+modes of communication.  These services have local significance only.
 
 @subsection Provider Management
 
-The MTPI specification also defines a set of provider management functions that apply to the MTP service provider.
-These services have local and end-to-end significance.
+The MTPI specification also defines a set of provider management functions that apply to the MTP
+service provider.  These services have local and end-to-end significance.
 
 @node MTP Service Primitives
 @section MTP Service Primitives
@@ -539,17 +642,18 @@ These services have local and end-to-end significance.
 * MTP Provider Management Services::
 @end menu
 
-This section describes the services of the MTPI primitives.  Time-sequence diagrams that illustrate the sequence of
-primitives are included.@footnote{Conventions for the time-sequence diagrams are defined in ITU-T X.210. [X.210]}
-The format of the primitives will be defined later in this document.
+This section describes the services of the MTPI primitives.  Time-sequence diagrams that illustrate
+the sequence of primitives are included.@footnote{Conventions for the time-sequence diagrams are
+defined in ITU-T X.210. [X.210]} The format of the primitives will be defined later in this
+document.
 
 @node Local Management Services
 @section Local Management Services
 
-The services defined in this section are outside the scope of international standards.  These services apply to COMS and
-CLMS modes of communication.  They are invoked for the initialization/de-initialization of a stream connected to the
-MTP.  They are also used to manage options supported by the MTP and to report information on the supported parameter
-values.
+The services defined in this section are outside the scope of international standards.  These
+services apply to COMS and CLMS modes of communication.  They are invoked for the
+initialization/de-initialization of a stream connected to the MTP.  They are also used to manage
+options supported by the MTP and to report information on the supported parameter values.
 
 @subsection Message Transfer Part Information Reporting Service
 
@@ -1065,15 +1169,15 @@ and also the current state of the MTP (as defined in Appendix B).  This primitiv
 MTP and does not appear in the state tables.
 
 @subsubheading Format
+@tpindex struct MTP_info_req
+@tpindex MTP_info_req_t
 
-The format of the message is one @code{M_PCPROTO} message block and its structure is as follows:
+The format of the message is one @msg{M_PCPROTO} message block and its structure is as follows:
 
 @smallexample
 typedef struct MTP_info_req @{
         mtp_ulong mtp_primitive;        /* always MTP_INFO_REQ */
 @} MTP_info_req_t;
-@tpindex struct MTP_info_req
-@tpindex MTP_info_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1113,8 +1217,10 @@ This primitive indicates to the MTP-User any relevant protocol-dependent paramet
 to the MTP_INFO_REQ primitive described above.
 
 @subsubheading Format
+@tpindex struct MTP_info_ack
+@tpindex MTP_info_ack_t
 
-The format of this message is one M_PCPROTO message block and its structure is as follows:
+The format of this message is one @msg{M_PCPROTO} message block and its structure is as follows:
 
 @smallexample
 typedef struct MTP_info_ack @{
@@ -1127,8 +1233,6 @@ typedef struct MTP_info_ack @{
         mtp_ulong mtp_serv_type;        /* service type */
         mtp_ulong mtp_version;          /* version of interface */
 @} MTP_info_ack_t;
-@tpindex struct MTP_info_ack
-@tpindex MTP_info_ack_t
 
 #define M_COMS  1               /* Connection-mode MTP service supported */
 #define M_CLMS  2               /* Connection-less MTP service supported */
@@ -1150,7 +1254,7 @@ Indicates the length of the bound and connected MTP addresses.  When the stream 
 the MTP addresses include the bound address.  When the stream is in a connected state and the
 service type is M_COMS, the MTP addresses also includes the connected address.
 @item mtp_addr_offset
-Indicates the offset of the bound and connected MTP addresses from the start of the M_PCPROTO block.
+Indicates the offset of the bound and connected MTP addresses from the start of the @msg{M_PCPROTO} block.
 @item mtp_current_state
 Indicates the current state of the MTP interface.
 @item mtp_serv_type
@@ -1178,15 +1282,15 @@ The state remains the same.
 This primitive requests that the MTP return information concerning the MTP addresses upon which the
 MTP-User is bound or engaged in an association.
 
-The format of the message is one M_PROTO message block and its structure is as follows:
+The format of the message is one @msg{M_PROTO} message block and its structure is as follows:
 
 @smallexample
 typedef struct MTP_addr_req @{
         mtp_ulong mtp_primitive;        /* always MTP_ADDR_REQ */
 @} MTP_addr_req_t;
+@end smallexample
 @tpindex struct MTP_addr_req
 @tpindex MTP_addr_req_t
-@end smallexample
 
 @subsubheading Parameters
 
@@ -1241,7 +1345,7 @@ A system error occured and the UNIX system error is indicated in the primitive.
 This primitive acknowledges the corresponding request primitive and is used by the MTP to return
 information concerning the local and remote protocol addresses for the stream.
 
-The format of the message is one M_PCPROTO message block and its structure is as follows:
+The format of the message is one @msg{M_PCPROTO} message block and its structure is as follows:
 
 @smallexample
 typedef struct MTP_addr_ack @{
@@ -1251,9 +1355,9 @@ typedef struct MTP_addr_ack @{
         mtp_ulong mtp_rem_length;       /* length of remote MTP address */
         mtp_ulong mtp_rem_offset;       /* offset of remote MTP address */
 @} MTP_addr_ack_t;
+@end smallexample
 @tpindex struct MTP_addr_ack
 @tpindex MTP_addr_ack_t
-@end smallexample
 
 @subsubheading Parameters
 
@@ -1264,13 +1368,13 @@ Indicates the primitive type.  This field is always coded MTP_ADDR_ACK.
 Indicates the length of the local MTP address (MTP-SAPI).  If the stream is not bound to a local
 MTP-SAPI, this field will be coded zero (0).
 @item mtp_loc_offset
-Indicates the offset of the local MTP address (MTP-SAPI) from the start of the M_PCPROTO message
+Indicates the offset of the local MTP address (MTP-SAPI) from the start of the @msg{M_PCPROTO} message
 block.  If the stream is not bound to a local MTP-SAPI, this field will be coded zero (0).
 @item mtp_rem_length
 Indicates the length of the remote MTP address (MTP-SAPI).  If the stream is not connected to a
 remote MTP-SAPI, this field will be coded zero (0).
 @item mtp_rem_offset
-Indicates the offset of the remote MTP address (MTP-SAPI) from the start of the M_PCPROTO message
+Indicates the offset of the remote MTP address (MTP-SAPI) from the start of the @msg{M_PCPROTO} message
 block.  If the stream is not connected to a remote MTP-SAPI, this field will be coded zero (0).
 @end vtable
 
@@ -1305,8 +1409,10 @@ MTP-User.
 This primitive requests that the MTP bind an MTP-User entity to an MTP address (MTP-SAPI).
 
 @subsubheading Format
+@tpindex struct MTP_bind_req
+@tpindex MTP_bind_req_t
 
-The format of the message is one M_PROTO message block and its structure is as follows:
+The format of the message is one @msg{M_PROTO} message block and its structure is as follows:
 
 @smallexample
 typedef struct MTP_bind_req @{
@@ -1315,8 +1421,6 @@ typedef struct MTP_bind_req @{
         mtp_ulong mtp_addr_offset;      /* offset of MTP address */
         mtp_ulong mtp_bind_flags;       /* bind flags */
 @} MTP_bind_req_t;
-@tpindex struct MTP_bind_req
-@tpindex MTP_bind_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1327,7 +1431,7 @@ Is the primitive type.  This field is always coded MTP_BIND_REQ.
 @item mtp_addr_length
 Is the length in bytes of the MTP address (MTP-SAPI) to be bound to the stream.
 @item mtp_addr_offset
-Is the offset from the beginning of the M_PROTO block where the MTP address (MTP-SAPI) begins.
+Is the offset from the beginning of the @msg{M_PROTO} block where the MTP address (MTP-SAPI) begins.
 @item mtp_bind_flags
 See "Flags" below.
 @end vtable
@@ -1402,8 +1506,10 @@ This primitive indicates to the MTP-User that the specified MTP-User entity has 
 requested MTP address (MTP-SAPI).
 
 @subsubheading Format
+@tpindex struct MTP_bind_ack
+@tpindex MTP_bind_ack_t
 
-The format of the meessage is one M_PCPROTO message block, and its structure is the following:
+The format of the meessage is one @msg{M_PCPROTO} message block, and its structure is the following:
 
 @smallexample
 typedef struct MTP_bind_ack @{
@@ -1411,8 +1517,6 @@ typedef struct MTP_bind_ack @{
         mtp_ulong mtp_addr_length;      /* length of bound MTP address */
         mtp_ulong mtp_addr_offset;      /* offset of bound MTP address */
 @} MTP_bind_ack_t;
-@tpindex struct MTP_bind_ack
-@tpindex MTP_bind_ack_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1423,9 +1527,9 @@ Indicates the primitive type.  This field is always coded MTP_BIND_ACK.
 @item mtp_addr_length
 Is the length of the MTP address (MTP-SAPI) that was bound.
 @item mtp_addr_offset
-Is the offset from the beginning of the M_PCPROTO block where the MTP address (MTP-SAPI) begins.
+Is the offset from the beginning of the @msg{M_PCPROTO} block where the MTP address (MTP-SAPI) begins.
 
-The proper alignment of the address in the M_PCPROTO message block is not guaranteed.
+The proper alignment of the address in the @msg{M_PCPROTO} message block is not guaranteed.
 @end vtable
 
 @subsubheading Rules
@@ -1465,15 +1569,15 @@ This primitive requests that the MTP unbind the MTP-User entity that was previou
 address (MTP-SAPI).
 
 @subsubheading Format
+@tpindex struct MTP_unbind_req
+@tpindex MTP_unbind_req_t
 
-The format of the message is one M_PROTO block, and its structure is as follows:
+The format of the message is one @msg{M_PROTO} block, and its structure is as follows:
 
 @smallexample
 typedef struct MTP_unbind_req @{
         mtp_ulong mtp_primitive;        /* always MTP_UNBIND_REQ */
 @} MTP_unbind_req_t;
-@tpindex struct MTP_unbind_req
-@tpindex MTP_unbind_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1518,8 +1622,10 @@ A system error has occured and the UNIX system error is indicated in the primtii
 This primitive allows the MTP-User to manage the MTP parameter values associated with the stream.
 
 @subsubheading Format
+@tpindex struct MTP_optmgmt_req
+@tpindex MTP_optmgmt_req_t
 
-The format of the message is one M_PROTO message block, and its structure is as follows:
+The format of the message is one @msg{M_PROTO} message block, and its structure is as follows:
 
 @smallexample
 typedef struct MTP_optmgmt_req @{
@@ -1528,8 +1634,6 @@ typedef struct MTP_optmgmt_req @{
         mtp_ulong mtp_opt_offset;       /* offset of options */
         mtp_ulong mtp_mgmt_flags;       /* management flags */
 @} MTP_optmgmt_req_t;
-@tpindex struct MTP_optmgmt_req
-@tpindex MTP_optmgmt_req_t
 
 #define MTP_DEFAULT     0UL
 #define MTP_CHECK       1UL
@@ -1544,11 +1648,11 @@ typedef struct MTP_optmgmt_req @{
 Specifies the primitive type.  This field is always coded MTP_OPTMGMT_REQ.
 @item mtp_opt_length
 Specifies the length of the default values of the options parameters as selected by the MTP-User.
-These values will be used in subsequent M_DATA transfers to the stream.  If the MTP-User cannot
+These values will be used in subsequent @msg{M_DATA} transfers to the stream.  If the MTP-User cannot
 determine the value of an option, it value should be set to MTP_UNKNOWN.  If the MTP-User does not
 specify any option parameter values, the length of this field should be set to zero.
 @item mtp_opt_offset
-Specifies the offset of the options parameters from the beginning of the M_PROTO message block.
+Specifies the offset of the options parameters from the beginning of the @msg{M_PROTO} message block.
 @item mtp_mgmt_flags
 See "Flags" below.
 @end vtable
@@ -1620,8 +1724,10 @@ primitives that require one.  It also indicates to the user that no action was t
 primitive that caused the error.
 
 @subsubheading Format
+@tpindex struct MTP_error_ack
+@tpindex MTP_error_ack_t
 
-The format of the mssage is one M_PCPROTO message block, and its structure is as follows:
+The format of the mssage is one @msg{M_PCPROTO} message block, and its structure is as follows:
 
 @smallexample
 typedef struct MTP_error_ack @{
@@ -1630,8 +1736,6 @@ typedef struct MTP_error_ack @{
         mtp_ulong mtp_mtpi_error;       /* MTP interface error */
         mtp_ulong mtp_unix_error;       /* UNIX error */
 @} MTP_error_ack_t;
-@tpindex struct MTP_error_ack
-@tpindex MTP_error_ack_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1700,16 +1804,16 @@ be initiated as an acknowledgement for those user or management originated primi
 other means of confirmation.
 
 @subsubheading Format
+@tpindex struct MTP_ok_ack
+@tpindex MTP_ok_ack_t
 
-The format of the mssage is one M_PCPROTO message block, and its structrue is as follows:
+The format of the mssage is one @msg{M_PCPROTO} message block, and its structrue is as follows:
 
 @smallexample
 typedef struct MTP_ok_ack @{
         mtp_ulong mtp_primitive;        /* always MTP_OK_ACK */
         mtp_ulong mtp_correct_prim;     /* correct primitive */
 @} MTP_ok_ack_t;
-@tpindex struct MTP_ok_ack
-@tpindex MTP_ok_ack_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1756,8 +1860,10 @@ provided the MTP users exist, and are known to the MTP.
 This primitive requests that the MTP form an association to the specified destination.
 
 @subsubheading Format
+@tpindex struct MTP_conn_req
+@tpindex MTP_conn_req_t
 
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO message block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} message block is as follows:
 
 @smallexample
 typedef struct MTP_conn_req @{
@@ -1766,8 +1872,6 @@ typedef struct MTP_conn_req @{
         mtp_ulong mtp_addr_offset;      /* offset of MTP address to connect */
         mtp_ulong mtp_conn_flags;       /* connect flags */
 @} MTP_conn_req_t;
-@tpindex struct MTP_conn_req
-@tpindex MTP_conn_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1780,7 +1884,7 @@ Specifies the length of the MTP address (MTP-SAPI) of the peer to which a signal
 If no MTP address is provided by the MTP-User, this field must be coded zero (0).
 The coding of the MTP address (MTP-SAPI) is protocol and provider-specific.
 @item mtp_addr_offset
-Specifies the offset of the MTP address (MTP-SAPI) from the beginning of the M_PROTO message block.
+Specifies the offset of the MTP address (MTP-SAPI) from the beginning of the @msg{M_PROTO} message block.
 @item mtp_conn_flags
 Indicates a bit field of connection options.  (See @emph{Flags} below.)
 @end vtable
@@ -1873,26 +1977,28 @@ broken up into more than one MIDU.  When an MSDU is broken up into more than one
 set on each MIDU except the last one.
 
 @subsubheading Format
+@tpindex struct MTP_transfer_req
+@tpindex MTP_transfer_req_t
 
-The format of the message is one or more M_DATA blocks.  Use of a M_PROTO message block is optional.  The M_PROTO
+The format of the message is one or more @msg{M_DATA} blocks.  Use of a @msg{M_PROTO} message block is optional.  The @msg{M_PROTO}
 message block is used for two reasons:
 
 @enumerate
 @item
-to indicate that the MSDU is broken into more than one MIDU, and that the data carried in the following M_DATA message
+to indicate that the MSDU is broken into more than one MIDU, and that the data carried in the following @msg{M_DATA} message
 block constitutes one MIDU;
 @item
 to indicate the message priority and signalling link selection to be associated with the MSDU.
 @end enumerate
 
 @noindent
-@emph{Guidelines for the use of M_PROTO}
+@emph{Guidelines for the use of @msg{M_PROTO}}
 
-The following guidelines must be followed with respect to the use of the M_PROTO message block:
+The following guidelines must be followed with respect to the use of the @msg{M_PROTO} message block:
 
 @enumerate
 @item
-The M_PROTO message block need not be present when the MSDU size is less than or equal to the MIDU size and one of the
+The @msg{M_PROTO} message block need not be present when the MSDU size is less than or equal to the MIDU size and one of the
 following is true:
 @itemize @minus{}
 @item
@@ -1902,7 +2008,7 @@ primitive; or
 the default values of the message priority and signalling link selection are to be specified.
 @end itemize
 @item
-The M_PROTO message block must be present when:
+The @msg{M_PROTO} message block must be present when:
 @itemize @minus{}
 @item
 The MSDU size is greater than the MIDU size.
@@ -1912,7 +2018,7 @@ be overriden for this MSDU.
 @end itemize
 @end enumerate
 
-The format of the M_PROTO message block, if present, is as follows:
+The format of the @msg{M_PROTO} message block, if present, is as follows:
 
 @smallexample
 typedef struct MTP_transfer_req @{
@@ -1922,8 +2028,6 @@ typedef struct MTP_transfer_req @{
         mtp_ulong mtp_mp;               /* message priority */
         mtp_ulong mtp_sls;              /* signalling link selection */
 @} MTP_transfer_req_t;
-@tpindex struct MTP_transfer_req
-@tpindex MTP_transfer_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1935,7 +2039,7 @@ Specifies the primitive type.  This field is always coded @var{MTP_TRANSFER_REQ}
 Specifies the length of the destination MTP address (MTP-SAPI) to which the message is to be sent.  If the stream is
 connected in an established signalling relation, this field may be coded zero (0).
 @item mtp_dest_offset
-Specifies the offset of the destination MTP address (MTP-SAPI) from the beginning of the M_PROTO message block.
+Specifies the offset of the destination MTP address (MTP-SAPI) from the beginning of the @msg{M_PROTO} message block.
 @item mtp_mp
 Specifies the message priority to be used when sending the message.  Support for message priority is protocol variant
 and provider specific.
@@ -1947,8 +2051,8 @@ resulting message traffic.
 
 @subsubheading Rules
 
-If the signalling relation is associated with a single destination address (MTP-SAPI), M_DATA blocks can be used with no
-M_PROTO block to transfer messages.  The destination adddress and the values of SLS and MP will be the default values or
+If the signalling relation is associated with a single destination address (MTP-SAPI), @msg{M_DATA} blocks can be used with no
+@msg{M_PROTO} block to transfer messages.  The destination adddress and the values of SLS and MP will be the default values or
 the laster values that were successfully set with MTP_OPTMGMT_REQ.
 
 @subsubheading Valid States
@@ -1963,10 +2067,10 @@ The new state is unchanged.
 @subsubheading Acknowledgements
 
 This primitive does not require any acknowledgements, although it may generate a fatal error.  This is indicated to the
-MTP-User via a M_ERROR STREAMS message type (specifying an errno value of EPROTO) which results in the failure of all
+MTP-User via a @msg{M_ERROR} STREAMS message type (specifying an errno value of @errno{EPROTO}) which results in the failure of all
 system calls on that stream.  The applicable errors are defined as follows:
 
-@vtable @var
+@vtable @errno
 @item EPROTO
 This indicates one of the following unrecoverable protocol conditions:
 @itemize ---
@@ -1978,7 +2082,7 @@ the MIDU_size parameter of the MTP_INFO_ACK primitive).
 @item
 The options requested are either not support by the MTP.
 @item
-The M_PROTO message block was not followed by one or more M_DATA message blocks.
+The @msg{M_PROTO} message block was not followed by one or more @msg{M_DATA} message blocks.
 @item
 The amount of MTP-User data associated with the current MSDU is outside the range supported by the MTP (as specified by
 the MSDU_size parameter in the MTP_INFO_ACK primitive.)
@@ -1995,8 +2099,10 @@ then the MTP should discard the request without generating a fatal error.}
 @subsubheading MTP_TRANSFER_IND
 @prindex MTP_TRANSFER_IND
 @subsubheading Format
-The format of this message is one M_PROTO message block followed by one or more M_DATA blocks.  The structure of the
-M_PROTO block is as follows:
+@tpindex struct MTP_transfer_ind
+@tpindex MTP_transfer_ind_t
+The format of this message is one @msg{M_PROTO} message block followed by one or more @msg{M_DATA} blocks.  The structure of the
+@msg{M_PROTO} block is as follows:
 @smallexample
 typedef struct MTP_transfer_ind @{
         mtp_ulong mtp_primitive;        /* always MTP_TRANSFER_IND */
@@ -2005,8 +2111,6 @@ typedef struct MTP_transfer_ind @{
         mtp_ulong mtp_mp;               /* message priority */
         mtp_ulong mtp_sls;              /* signalling link selection */
 @} MTP_transfer_ind_t;
-@tpindex struct MTP_transfer_ind
-@tpindex MTP_transfer_ind_t
 @end smallexample
 @subsubheading Parameters
 @vtable @var
@@ -2028,7 +2132,9 @@ The new state is unchanged.
 @subsubheading MTP_STATUS_IND
 @prindex MTP_STATUS_IND
 @subsubheading Format
-The format of the message is one M_PCPROTO message block.  The structure of the M_PCPROTO block is as follows:
+@tpindex struct MTP_status_ind
+@tpindex MTP_status_ind_t
+The format of the message is one @msg{M_PCPROTO} message block.  The structure of the @msg{M_PCPROTO} block is as follows:
 @smallexample
 typedef struct MTP_status_ind @{
         mtp_ulong mtp_primitive;        /* always MTP_STATUS_IND */
@@ -2037,8 +2143,6 @@ typedef struct MTP_status_ind @{
         mtp_ulong mtp_type;             /* type */
         mtp_ulong mtp_status;           /* status */
 @} MTP_status_ind_t;
-@tpindex struct MTP_status_ind
-@tpindex MTP_status_ind_t
 
 /* Type for MTP_STATUS_IND */
 #define MTP_STATUS_TYPE_CONG            0x00    /* congestion */
@@ -2064,7 +2168,7 @@ Indicates the primitive type.  This field is always coded MTP_STATUS_IND.
 @item mtp_addr_length
 Indicates the length of the affected MTP address (MTP-SAPI).
 @item mtp_addr_offset
-Indicates the offset of the affected MTP address (MTP-SAPI) from the beginning of the M_PCPROTO message block.
+Indicates the offset of the affected MTP address (MTP-SAPI) from the beginning of the @msg{M_PCPROTO} message block.
 @item mtp_type
 Inidcates the type of the status indication.  See @emph{Type and Status} below.
 @item mtp_status
@@ -2127,15 +2231,15 @@ The new state is unchanged (MTPS_DATA_XFER).
 This primitive indicates to the MTP-User that the indicated remote MTP-entity (signalling point) is temporarily
 inaccessible.  This implies the inaccessibility of remote MTP-User at the affected signalling point.
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+@tpindex struct MTP_pause_ind
+@tpindex MTP_pause_ind_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 typedef struct MTP_pause_ind @{
         mtp_ulong mtp_primitive;        /* always MTP_PAUSE_IND */
         mtp_ulong mtp_addr_length;      /* length of affected MTP address */
         mtp_ulong mtp_addr_offset;      /* offset of affected MTP address */
 @} MTP_pause_ind_t;
-@tpindex struct MTP_pause_ind
-@tpindex MTP_pause_ind_t
 @end smallexample
 @subsubheading Parameters
 @vtable @var
@@ -2144,7 +2248,7 @@ Indicates the primitive type.
 @item mtp_addr_length
 Indicates the length of the MTP address (MTP-SAPI) corresponding to the affected remote MTP-entity.
 @item mtp_addr_offset
-Indicates the offset of the MTP address (MTP-SAPI) from the beginning of the M_PROTO message block.
+Indicates the offset of the MTP address (MTP-SAPI) from the beginning of the @msg{M_PROTO} message block.
 @end vtable
 @subsubheading Rules
 @subsubheading Valid States
@@ -2160,15 +2264,15 @@ This primitive indicates to the MTP-User that a previously inaccesible remote MT
 accessible.  This does not imply the accessibility of the remote MTP-User at the affected signalling point: the MTP-User
 is responsible for sending protocol messages to the remote MTP-User to test its accessibility.
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+@tpindex struct MTP_resume_ind
+@tpindex MTP_resume_ind_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 typedef struct MTP_resume_ind @{
         mtp_ulong mtp_primitive;        /* always MTP_RESUME_IND */
         mtp_ulong mtp_addr_length;      /* length of affected MTP address */
         mtp_ulong mtp_addr_offset;      /* offset of affected MTP address */
 @} MTP_resume_ind_t;
-@tpindex struct MTP_resume_ind
-@tpindex MTP_resume_ind_t
 @end smallexample
 @subsubheading Parameters
 @vtable @var
@@ -2177,7 +2281,7 @@ Indicates the primitive type.
 @item mtp_addr_length
 Indicates the length of the MTP address (MTP-SAPI) corresponding to the affected remote MTP-entity.
 @item mtp_addr_offset
-Indicates the offset of the MTP address (MTP-SAPI) from the beginning of the M_PROTO message block.
+Indicates the offset of the MTP address (MTP-SAPI) from the beginning of the @msg{M_PROTO} message block.
 @end vtable
 @subsubheading Rules
 @subsubheading Valid States
@@ -2190,13 +2294,13 @@ The new state is unchanged (MTPS_DATA_XFER).
 @subsubheading MTP_RESTART_COMPLETE_IND
 @prindex MTP_RESTART_COMPLETE_IND
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+@tpindex struct MTP_restart_complete_ind
+@tpindex MTP_restart_complete_ind_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 typedef struct MTP_restart_complete_ind @{
         mtp_ulong mtp_primitive;        /* always MTP_RESTART_COMPLETE_IND */
 @} MTP_restart_complete_ind_t;
-@tpindex struct MTP_restart_complete_ind
-@tpindex MTP_restart_complete_ind_t
 @end smallexample
 @subsubheading Parameters
 @vtable @var
@@ -2216,13 +2320,13 @@ The new state is unchanged (MTPS_DATA_XFER).
 @subsubheading MTP_DISCON_REQ
 @prindex MTP_DISCON_REQ
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+@tpindex struct MTP_discon_req
+@tpindex MTP_discon_req_t
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 typedef struct MTP_discon_req @{
         mtp_ulong mtp_primitive;        /* always MTP_DISCON_REQ */
 @} MTP_discon_req_t;
-@tpindex struct MTP_discon_req
-@tpindex MTP_discon_req_t
 @end smallexample
 @subsubheading Parameters
 @vtable @var
@@ -2244,7 +2348,7 @@ The new state is MTPS_WACK_DREQ.
 @subsubheading MTP_INHIBIT_REQ
 @prindex MTP_INHIBIT_REQ
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2262,7 +2366,7 @@ Specifies the primitive type.
 @subsubheading MTP_INHIBIT_IND
 @prindex MTP_INHIBIT_IND
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2280,7 +2384,7 @@ Indicates the primitive type.
 @subsubheading MTP_INHIBIT_CON
 @prindex MTP_INHIBIT_CON
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2298,7 +2402,7 @@ Indicates the primitive type.
 @subsubheading MTP_UNINHIBIT_REQ
 @prindex MTP_UNINHIBIT_REQ
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2316,7 +2420,7 @@ Specifies the primitive type.
 @subsubheading MTP_UNINHIBIT_IND
 @prindex MTP_UNINHIBIT_IND
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2334,7 +2438,7 @@ Indicates the primitive type.
 @subsubheading MTP_UNINHIBIT_CON
 @prindex MTP_UNINHIBIT_CON
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2353,7 +2457,7 @@ Indicates the primitive type.
 @subsubheading MTP_PROHIBIT_REQ
 @prindex MTP_PROHIBIT_REQ
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2371,7 +2475,7 @@ Specifies the primitive type.
 @subsubheading MTP_PROHIBIT_IND
 @prindex MTP_PROHIBIT_IND
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2389,7 +2493,7 @@ Indicates the primitive type.
 @subsubheading MTP_PROHIBIT_CON
 @prindex MTP_PROHIBIT_CON
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2407,7 +2511,7 @@ Indicates the primitive type.
 @subsubheading MTP_ALLOW_REQ
 @prindex MTP_ALLOW_REQ
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2425,7 +2529,7 @@ Specifies the primitive type.
 @subsubheading MTP_ALLOW_IND
 @prindex MTP_ALLOW_IND
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2443,7 +2547,7 @@ Indicates the primitive type.
 @subsubheading MTP_ALLOW_CON
 @prindex MTP_ALLOW_CON
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2462,7 +2566,7 @@ Indicates the primitive type.
 @subsubheading MTP_EVENT_IND
 @prindex MTP_EVENT_IND
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2480,7 +2584,7 @@ Indicates the primitive type.
 @subsubheading MTP_STATS_IND
 @prindex MTP_STATS_IND
 @subsubheading Format
-The format of the message is one M_PROTO message block.  The structure of the M_PROTO block is as follows:
+The format of the message is one @msg{M_PROTO} message block.  The structure of the @msg{M_PROTO} block is as follows:
 @smallexample
 
 @end smallexample
@@ -2512,13 +2616,13 @@ the non-fatal error handling facility.
 
 These errors are issued by the MAP provider when it detects errors that are not correctable by the MAP user, or if it is
 unable to report a correctible error to the MTP user.  Fatal errors are indicated via the STREAMS message type
-@code{M_ERROR} with the UNIX system error @code{EPROTO}.  The @code{M_ERROR} STREAMS message type will result in the
+@msg{M_ERROR} with the UNIX system error @errno{EPROTO}.  The @msg{M_ERROR} STREAMS message type will result in the
 failure of all the UNIX system calls on the stream.  The MTP user can recover from a fatal error by having all
 the processes close the files associated with the stream, and then reopening them for processing.
 
 These errors are issued by the MTP when it detects errors that are not correctable by the MTP service user, or if it is
 unable to report a correctable error to the MTP service user.  Fatal errors are indicated via the STREAMS message type
-@code{M_ERROR} with the UNIX system error @code{EPROTO}.  The @code{M_ERROR} STREAMS message type will result in the
+@msg{M_ERROR} with the UNIX system error @errno{EPROTO}.  The @msg{M_ERROR} STREAMS message type will result in the
 failure of all the UNIX system calls on the stream.  The MTP service user can recover from a fatal error by having all
 the processes close the files associated with the stream, and then reopening them for processing.
 
@@ -3424,6 +3528,65 @@ MTP_DISCON_REQ primitives are used to establish and release an association betwe
 @verbatiminclude mtpi.h
 @end smallformat
 
+@node License
+@unnumbered License
+
+@menu
+* GNU Free Documentation License::
+@end menu
+
+@include texi/fdl.texi
+
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+
+@item Signalling Data Link Service Data Unit
+
+A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
+connection to the other.
+
+@item Data transfer
+
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data link users.
+
+@item SDL provider
+
+The signalling data link layer protocol that provides the services of the signalling data link
+interface.
+
+@item SDL user
+
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data link layer.
+
+@item Local management
+
+The phase in connection and connectionless modes in which a SDL user initializes a stream and
+attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+
+@item PPA
+
+The point at which a system attaches itself to a physical communications medium.
+
+@item PPA identifier
+
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable {SDL SDU}{International Telecommunication Union - Telecom Sector}
+@item ITU-T @tab International Telecommunications Union - Telecom Sector
+@item PPA @tab Physical Point of Attachment
+@item SDLI @tab Signalling Data Link Interface
+@item SDL SDU @tab Signalling Data Link Service Data Unit
+@item SDL @tab Signalling Data Link
+@end multitable
+
 @node References
 @unnumbered References
 
@@ -3439,153 +3602,116 @@ MTP_DISCON_REQ primitives are used to establish and release an association betwe
 @end enumerate
 
 @multitable {000}{Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.}
-@item [1] @tab ITU-T Recommendation Q.700
-@item [2] @tab ITU-T Recommendation Q.701
-@item [3] @tab ITU-T Recommendation Q.702
-@item [4] @tab ITU-T Recommendation Q.703
-@item [5] @tab ITU-T Recommendation Q.704
-@item [6] @tab Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.
-@item [7] @tab ITU-T Recommendation Q.771
+@item [1] @anchor{Q.700} @tab @uref{http://www.itu.int/rec/T-REC-Q.700/,ITU-T Recommendation Q.700},
+@cite{Introduction to CCITT Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [2] @anchor{Q.701} @tab @uref{http://www.itu.int/rec/T-REC-Q.701/,ITU-T Recommendation Q.701},
+@cite{Functional Description of the Message Transfer Part (MTP) of Signalling System No. 7},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [3] @anchor{Q.702} @tab @uref{http://www.itu.int/rec/T-REC-Q.702/,ITU-T Recommendation Q.702},
+@cite{Signalling System No. 7---Signalling Data Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [4] @anchor{Q.703} @tab @uref{http://www.itu.int/rec/T-REC-Q.703/,ITU-T Recommendation Q.703},
+@cite{Signalling System No. 7---Signalling Link},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [5] @anchor{Q.704} @tab @uref{http://www.itu.int/rec/T-REC-Q.704/,ITU-T Recommendation Q.704},
+@cite{Message Transfer Part---Signalling Network Functions and Messages},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
+@item [6] @anchor{CDIAPI} @tab
+Geoffrey Gerrietts; Dave Grothe, Mikel Matthews, Dave Healy,
+@cite{CDI---Application Program Interface Guide},
+March 1999,
+(Savoy, IL),
+GCOM, Inc.
+@item [7] @anchor{Q.771} @tab @uref{http://www.itu.int/rec/T-REC-Q.771/,ITU-T Recommendation Q.771},
+@cite{Signalling System No. 7---Functional Description of Transaction Capabilities},
+March 1993, (Geneva), ITU,
+@uref{http://www.itu.int/,,ITU-T Telecommunication Standardization Sector of ITU}, 
+(Previously ``CCITT Recommendation'').
 @end multitable
 
-@node Glossary
-@unnumbered Glossary
-
-@table @emph
-
-@item Signalling Data Link Service Data Unit
-
-A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link connection to the
-other.
-
-@item Data transfer
-
-The phase in connection and connectionless modes that supports the transfer of data between to signalling data link
-users.
-
-@item SDL provider
-
-The signalling data link layer protocol that provides the services of the signalling data link interface.
-
-@item SDL user
-
-The user-level application or user-level or kernel-level protocol that accesses the services of the signalling data link
-layer.
-
-@item Local management
-
-The phase in connection and connectionless modes in which a SDL user initializes a stream and attaches a PPA address to
-the stream.  Primitives in this phase generate local operations only.
-
-@item PPA
-
-The point at which a system attaches itself to a physical communications medium.
-
-@item PPA identifier
-
-An identifier of a particular physical medium over which communication transpires.
-@end table
-
-@node Acronyms
-@unnumbered Acronyms
-
-@multitable {SDL SDU}{International Telecommunication Union - Telecom Sector}
-@item SDLI @tab Signalling Data Link Interface
-@item SDL @tab Signalling Data Link
-@item SDL SDU @tab Signalling Data Link Service Data Unit
-@item ITU-T @tab International Telecommunications Union - Telecom Sector
-@item PPA @tab Physical Point of Attachment
-@end multitable
-
-@c @node Index
-@c @unnumbered Index
-@c @printindex cp
-
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@iftex
 @node Indices
 @unnumbered Indices
+@end iftex
 
+@ifnottex
+@c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@end ifnottex
+
+@iftex
 @menu
 * Concept Index::
-* Type Index::
-@c * Function Index::
-* Variable Index::
-@c * File Index::
-@c * Option Index::
-@c * Author Index::
-* Primitive Index::
-@c * Primitive Value Index::
 * Protocol State Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Input-Output Control Index::
+* Manual Page Index::
 @end menu
 
-@page
 @node Concept Index
 @section Concept Index
-
 @printindex cp
-
-@page
-@node Type Index
-@section Type Index
-
-@printindex tp
-
-@c @page
-@c @node Function Index
-@c @section Function Index
-
-@c @printindex fn
-
-@page
-@node Variable Index
-@section Variable Index
-
-@printindex vr
-
-@c @page
-@c @node File Index
-@c @section File Index
-
-@printindex pg
-
-@c @page
-@c @node Option Index
-@c @section Option Index
-
-@c @printindex op
-
-@c @page
-@c @node Author Index
-@c @section Author Index
-
-@c @printindex au
-
-@page
-@node Primitive Index
-@section Primitive Index
-
-@printindex pr
-
-@c @page
-@c @node Primitive Value Index
-@c @section Primitive Value Index
-
-@c @printindex pv
 
 @page
 @node Protocol State Index
 @section Protocol State Index
-
 @printindex st
 
-@node License
-@unnumbered License
+@page
+@node Primitive Index
+@section Primitive Index
+@printindex pr
 
-@menu
-* GNU Free Documentation License::
-@end menu
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
 
-@include texi/fdl.texi
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
+@printindex vr
 
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
+
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
+@printindex pe
+
+@page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
+
+@page
+@node Manual Page Index
+@section Manual Page Index
+@printindex mp
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents

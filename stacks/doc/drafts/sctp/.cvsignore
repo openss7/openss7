@@ -1,3 +1,6 @@
 .*
 *.pic
 *.eps
+*.pdf
+*.ps
+*.txt
