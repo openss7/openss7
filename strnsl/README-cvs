@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Network Services Library -- read me CVS file.  2008-05-04
-$Id: README-cvs,v 0.9.2.31 2008-05-04 16:16:48 brian Exp $
+OpenSS7 STREAMS Network Services Library -- read me CVS file.  2008-07-01
+$Id: README-cvs,v 0.9.2.32 2008-07-11 09:58:15 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -16,7 +16,7 @@ can download release, mid-release or release candidate versions of the
 
 The OpenSS7 STREAMS Network Services Library package is located in the
 `strnsl' module of `/var/cvs'.  For release tag information, see
-`Releases', in the manual.
+`Releases',in the manual.
 
 To access the archive from the project CVS pserver, use the following
 commands to check out a version from the archive:
@@ -75,13 +75,13 @@ following locations:
 
    * flex-2.5.33 (http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2)
 
-It should be stressed that, in particular, the `autoconf(1)', and `automake(1)',
-must be at version releases `2.61' and `1.10'.  _The versions normally
-distributed in some mainstream GNU/Linux distributions are, in fact,
-much older than these versions._(2)  GNU version of these packages
-configured and installed to default directories will install in
-`/usr/local/' allowing them to coexist with distribution installed
-versions.
+It should be stressed that, in particular, the `autoconf(1)', and
+`automake(1)', must be at version releases `2.61' and `1.10'.  _The
+versions normally distributed in some mainstream GNU/Linux
+distributions are, in fact, much older than these versions._(2)  GNU
+version of these packages configured and installed to default
+directories will install in `/usr/local/' allowing them to coexist with
+distribution installed versions.
 
 For building documentation, the build host also requires the following
 documentation tools:
@@ -107,22 +107,22 @@ some server-style installations (e.g. `Ubuntu'-server, `SLES 9' or
 `Fedora 6 or 7') will not and they must be installed separately.(3)
 
 For uncooked manual pages, the entire `groff(1)' package is required on
-`Debian' and `Ubuntu' systems (the base package does not include `grefer(1)'
-which is used extensively by uncooked manual pages).  The following
-will get what you need:
+`Debian' and `Ubuntu' systems (the base package does not include
+`grefer(1)' which is used extensively by uncooked manual pages).  The
+following will get what you need:
 
      Debian: % apt-get install groff_ext
      Ubuntu: % apt-get install groff
 
 In addition, the build host requires a complete tool chain for
-compiling for the target host, including kernel tools such as `genksyms(8)'
-and others.
+compiling for the target host, including kernel tools such as
+`genksyms(8)' and others.
 
-If you wish to package `rpms' on an `rpm(1)' system, or `debs' on a `dpkg(1)'
-system, you will need the appropriate tool chain.  Systems based on `rpm(1)'
-typically have the necessary tool chain available, however, `dpkg(1)'
-systems do not.  The following on a `Debian' or `Ubuntu' system will
-get what you need:
+If you wish to package `rpms' on an `rpm(1)' system, or `debs' on a
+`dpkg(1)' system, you will need the appropriate tool chain.  Systems
+based on `rpm(1)' typically have the necessary tool chain available,
+however, `dpkg(1)' systems do not.  The following on a `Debian' or
+`Ubuntu' system will get what you need:
 
      % apt-get install debhelper
      % apt-get install fakeroot
@@ -146,14 +146,14 @@ may need to perform something like the following:
 
 After reconfiguring the directory, the package can then be configured
 and built using the same instructions as are used for the Tar Ball, see
-`Configuring the Tar Ball', in the manual, and `Building from the Tar
-Ball', in the manual.
+`Configuring the Tar Ball',in the manual, and `Building from the Tar
+Ball',in the manual.
 
 Do note, however, that `make(1)' will rebuild the documentation that is
 normally released with the package.  Additional tools may be necessary
 for building the documentation.  To avoid building and installing the
 documentation, use the `--disable-devel' or `--disable-docs' option to
-configure described in `Configuring the Tar Ball', in the manual.
+configure described in `Configuring the Tar Ball',in the manual.
 
 When configuring the package in a working directory and while working a
 change-compile-test cycle that involves configuration macros or

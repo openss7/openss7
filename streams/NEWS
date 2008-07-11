@@ -1,5 +1,5 @@
-Linux Fast-STREAMS -- history of user visible changes.  2008-05-04
-$Id: NEWS,v 0.9.2.70 2008-05-04 16:16:41 brian Exp $
+Linux Fast-STREAMS -- history of user visible changes.  2008-07-01
+$Id: NEWS,v 0.9.2.71 2008-07-11 09:58:11 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -150,7 +150,8 @@ Major features since the last public release are as follows:
      release for more information.
 
    - Added feature to perform automatic reference counting of modules
-     for the `esballoc(9)' free routines on Linux 2.6 kernels.  See new `esballoc(9)'.
+     for the `esballoc(9)' free routines on Linux 2.6 kernels.  See new
+     `esballoc(9)'.
 
    - Added versions to all exported symbols.  Made LFS unique functions
      GPL export.

@@ -1,5 +1,5 @@
-Dialogic Open Systems Release 6.1 -- history of user visible changes.  2008-05-04
-$Id: NEWS,v 0.9.2.27 2008-05-04 16:16:32 brian Exp $
+Dialogic Open Systems Release 6.1 -- history of user visible changes.  2008-07-01
+$Id: NEWS,v 0.9.2.28 2008-07-11 09:58:09 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -39,7 +39,7 @@ This release is the third public release.
 
 
 _This is the initial public alpha release of the package.  Please see
-`README-alpha' in the release, or `Maturity', in the manual._
+`README-alpha' in the release, or `Maturity',in the manual._
 
 This is the initial public alpha release of the package.  This package
 is complete but untested.  It is being released for testing by the
