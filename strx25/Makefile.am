@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-11 09:46:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-06-18 16:45:22 $ by $Author: brian $
+# Last Modified $Date: 2008-07-11 09:46:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -79,11 +79,63 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
+				  ifrdlci \
+				  ifrstat \
+				  ifrtune \
+				  ixemap \
+				  ixetune \
+				  linkadd \
+				  linkdel \
+				  linklist \
+				  linkreset \
+				  linkstart \
+				  linkstate \
+				  linkstop \
+				  lltune \
+				  mlptune \
+				  nuimap \
+				  pvcmap \
+				  vcstat \
+				  wantune \
+				  x25diags \
+				  x25file \
+				  x25info \
+				  x25netd \
+				  x25route \
+				  x25stat \
+				  x25trace \
+				  x25tune \
+				  x32map \
 				  @PACKAGE_TARNAME@_mknod
 
 pkglibexec_PROGRAMS		= 
 
 sbin_PROGRAMS			= \
+				  ifrdlci \
+				  ifrstat \
+				  ifrtune \
+				  ixemap \
+				  ixetune \
+				  linkadd \
+				  linkdel \
+				  linklist \
+				  linkreset \
+				  linkstart \
+				  linkstate \
+				  linkstop \
+				  mlptune \
+				  nuimap \
+				  pvcmap \
+				  vcstat \
+				  wantune \
+				  x25diags \
+				  x25file \
+				  x25info \
+				  x25netd \
+				  x25route \
+				  x25stat \
+				  x25trace \
+				  x32map \
 				  @PACKAGE_TARNAME@_mknod
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
@@ -91,6 +143,168 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+ifrdlci_SOURCES			= src/util/ifrdlci.c
+ifrdlci_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ifrdlci_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+ifrdlci_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+ifrdlci_CFLAGS			= $(USER_CFLAGS)
+
+ifrstat_SOURCES			= src/util/ifrstat.c
+ifrstat_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ifrstat_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+ifrstat_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+ifrstat_CFLAGS			= $(USER_CFLAGS)
+
+ifrtune_SOURCES			= src/util/ifrtune.c
+ifrtune_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ifrtune_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+ifrtune_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+ifrtune_CFLAGS			= $(USER_CFLAGS)
+
+ixemap_SOURCES			= src/util/ixemap.c
+ixemap_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ixemap_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+ixemap_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+ixemap_CFLAGS			= $(USER_CFLAGS)
+
+ixetune_SOURCES			= src/util/ixetune.c
+ixetune_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+ixetune_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+ixetune_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+ixetune_CFLAGS			= $(USER_CFLAGS)
+
+linkadd_SOURCES			= src/util/linkadd.c
+linkadd_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+linkadd_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+linkadd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+linkadd_CFLAGS			= $(USER_CFLAGS)
+
+linkdel_SOURCES			= src/util/linkdel.c
+linkdel_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+linkdel_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+linkdel_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+linkdel_CFLAGS			= $(USER_CFLAGS)
+
+linklist_SOURCES		= src/util/linklist.c
+linklist_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+linklist_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+linklist_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+linklist_CFLAGS			= $(USER_CFLAGS)
+
+linkreset_SOURCES		= src/util/linkreset.c
+linkreset_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+linkreset_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+linkreset_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+linkreset_CFLAGS		= $(USER_CFLAGS)
+
+linkstart_SOURCES		= src/util/linkstart.c
+linkstart_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+linkstart_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+linkstart_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+linkstart_CFLAGS		= $(USER_CFLAGS)
+
+linkstate_SOURCES		= src/util/linkstate.c
+linkstate_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+linkstate_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+linkstate_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+linkstate_CFLAGS		= $(USER_CFLAGS)
+
+linkstop_SOURCES		= src/util/linkstop.c
+linkstop_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+linkstop_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+linkstop_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+linkstop_CFLAGS			= $(USER_CFLAGS)
+
+lltune_SOURCES			= src/util/lltune.c
+lltune_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+lltune_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+lltune_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+lltune_CFLAGS			= $(USER_CFLAGS)
+
+mlptune_SOURCES			= src/util/mlptune.c
+mlptune_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+mlptune_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+mlptune_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+mlptune_CFLAGS			= $(USER_CFLAGS)
+
+nuimap_SOURCES			= src/util/nuimap.c
+nuimap_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+nuimap_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+nuimap_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+nuimap_CFLAGS			= $(USER_CFLAGS)
+
+pvcmap_SOURCES			= src/util/pvcmap.c
+pvcmap_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+pvcmap_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+pvcmap_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+pvcmap_CFLAGS			= $(USER_CFLAGS)
+
+vcstat_SOURCES			= src/util/vcstat.c
+vcstat_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+vcstat_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+vcstat_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+vcstat_CFLAGS			= $(USER_CFLAGS)
+
+wantune_SOURCES			= src/util/wantune.c
+wantune_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+wantune_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+wantune_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+wantune_CFLAGS			= $(USER_CFLAGS)
+
+x25diags_SOURCES		= src/util/x25diags.c
+x25diags_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25diags_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25diags_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25diags_CFLAGS			= $(USER_CFLAGS)
+
+x25file_SOURCES			= src/util/x25file.c
+x25file_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25file_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25file_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25file_CFLAGS			= $(USER_CFLAGS)
+
+x25info_SOURCES			= src/util/x25info.c
+x25info_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25info_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25info_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25info_CFLAGS			= $(USER_CFLAGS)
+
+x25netd_SOURCES			= src/util/x25netd.c
+x25netd_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25netd_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25netd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25netd_CFLAGS			= $(USER_CFLAGS)
+
+x25route_SOURCES		= src/util/x25route.c
+x25route_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25route_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25route_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25route_CFLAGS			= $(USER_CFLAGS)
+
+x25stat_SOURCES			= src/util/x25stat.c
+x25stat_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25stat_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25stat_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25stat_CFLAGS			= $(USER_CFLAGS)
+
+x25trace_SOURCES		= src/util/x25trace.c
+x25trace_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25trace_LDFLAGS		= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25trace_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25trace_CFLAGS			= $(USER_CFLAGS)
+
+x25tune_SOURCES			= src/util/x25tune.c
+x25tune_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x25tune_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x25tune_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x25tune_CFLAGS			= $(USER_CFLAGS)
+
+x32map_SOURCES			= src/util/x32map.c
+x32map_LDADD			= $(STREAMS_LDADD) $(STRCOMP_LDADD)
+x32map_LDFLAGS			= $(STREAMS_LDFLAGS) $(STRCOMP_LDFLAGS)
+x32map_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x32map_CFLAGS			= $(USER_CFLAGS)
 
 libsx25_la_SOURCES		= src/lib/sx25/padent.c \
 				  src/lib/sx25/x25config.c \
@@ -362,6 +576,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2008-07-11 09:46:27  brian
+# - roughed in implementation, updated documentation
+#
 # Revision 0.9.2.3  2008-06-18 16:45:22  brian
 # - widespread updates
 #

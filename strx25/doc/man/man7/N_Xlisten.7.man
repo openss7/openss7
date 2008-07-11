@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_Xlisten.7.man,v 0.9.2.1 2008-05-03 11:42:29 brian Exp $
+.\" @(#) $Id: N_Xlisten.7.man,v 0.9.2.2 2008-07-11 09:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:29 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_Xlisten.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:29  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:29  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,283 @@ sort-adjacent-labels
 .TH N_XLISTEN 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_Xlisten
-\-
+\- Listen Request and Listen Response
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_Xlisten {
+struct xlistenf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int lmax;
+    int l_result;
+};
+\s+1\fP
+.fi
+.PP
+.nf
+\f(CW\s-1\
+struct lcud {
+    unsigned char l_cumode;
+    unsigned char l_culength; /* octets */
+    unsigned char l_cubytes[0];
+    /* followed by l_culength bytes */
+};
+struct ladd {
+    unsigned char l_mode;
+    unsigned char l_type;
+    unsigned char l_length; /* semi-octets */
+    unsigned char l_add[0];
+    /* followed by ((l_length+1)>>1) bytes
+       containing l_length semi-octets. */
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Listen Request or Response is used when an NS user wishes to register
+interest in incoming calls and the NS provider acknowledges the request.
+The control part of the message consists of one
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+message block, and contains the
+.B xlistenf
+structure.
+The data part of the message consists of one or more
+.BR M_DATA (9)
+message blocks
+containing the call user data and address of interest.
+.PP
+The Listen Request queue is ordered in terms of the amount of listen data
+supplied.  The more a Listen Request asks for, the higher its place in the
+queue.  Connect Indications are sent to the listener whose listening criteria
+are best matched.
+.PP
+Privileged users can ask for a Listen Request to be placed at the front of the
+queue, regardless of the amount of listen data supplied.  To do this, the Listen
+Request should be sent as a
+.BR M_PCPROTO (9)
+message.  This is achieved by
+setting the
+.B RS_HIPRI
+flag in
+.BR putmsg (2s).
+Such requests are
+searched in the order in which they arrive.
+.PP
+The system adminstrator controls whether or not listening for incoming  calls is
+a privileged operation.  If listening is privileged, incoming calls will be sent
+only to on listen streams opened by a user with superuser privilege.  This
+prevents other users accepting calls that may contain private information,
+passwords, and so on.
+.PP
+In systems where privileged and non-privileged listens are allowed:
+.IP \(bu \w'\(bu\(em'u
+Privileged listens have priority.
+.IP \(bu
+A matching but busy privileged listen prevents a search of any
+non-privileged listens.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Listen Request and Listen Response use the
+.B xlistenf
+structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+message block, and contains the
+.B xlistenf
+structure.
+The data part of the message consists of one or more
+.BR M_DATA (9)
+message blocks
+containing the call user data and address of interest.
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B xlistenf
+structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_Xlisten\fP, for both Listen Request and Listen Response.
+.TP
+.I lmax
+Conveys the maximum number of outstanding Connect Indications that the listening
+Stream is willing to accept, for the addresses conveyed in the attached
+.BR M_DATA (9)
+message blocks.
+.RS
+.PP
+Listen requests are cummulated but this field is not.  The maximum number of
+outstanding Connect Indications will be reflected by the value of this field for
+the last successful Listen Request issued by the NS user.
+.RE
+.TP
+.I l_result
+Conveys the result of the Listen Request in a Listen Response message primitive.
+An error in the parameters or a lack of resources results in this flag being set
+to a non-zero value.
+.PP
+The
+.BR M_DATA (9)
+portion of the message contains the following members:
+.TP
+.I l_cumode
+Specifies the type of matching.
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+X25_DONTCARE:1:Represents a wildcard.
+X25_STARTSWITTH:2:Contains a prefix.
+X25_IDENTITY:3:Contains an identity match.
+.\"X25_PATTERN:4:Contains a pattern. (Note that \fBX25_PATTERN\fP is Solstice X.25 specific.)
+.\"X25_MATCH:4:Contains a pattern match. (Note that \fBX25_MATCH\fP appears to be PT WAN specific.)
+.\"X25_SNID:5:Contains a Subnetwork ID (SNID).
+_
+.TE
+.TP
+.B Notes:
+.IP 1. \w'0.\(em'u
+When the \fIl_cumode\fP is set to \fBX25_DONTCARE\fP, the
+\fIl_culength\fP and \fIl_cubytes\fP fields are ommitted from the
+.BR M_DATA (9)
+message block.
+.RE
+.TP
+.I l_culength
+Contains the bytes to be matched against the Call User Data (CUD).
+.TP
+.I l_cubytes
+Contains the bytes to be matched against the Call User Data (CUD).
+.TP
+.I l_mode
+Specifies the type of matching.
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+X25_DONTCARE:1:Represents a wildcard.
+X25_STARTSWITTH:2:Contains a prefix.
+X25_IDENTITY:3:Contains an identity match.
+X25_PATTERN:4:Contains a pattern.
+.\"X25_MATCH:4:Contains a pattern match. (Note that \fBX25_MATCH\fP appears to be PT WAN specific.)
+.\"X25_SNID:5:Contains a Subnetwork ID (SNID).
+_
+.TE
+.TP
+.B Notes:
+.IP 1. \w'1.\(em'u
+When the \fIl_mode\fP is set to \fBX25_DONTCARE\fP, the
+\fIl_type\fP, \fIl_length\fP and \fIl_add\fP fields are ommitted from
+the
+.BR M_DATA (9)
+message block.
+.IP 2.
+When the \fIl_mode\fP is set to \fBX25_PATTERN\fP, the
+\fIl_add\fP field can contain the wilcard digits \*(lq\fB*\fP\*(rq and \*(lq\fB?\fP\*(rq that
+have the same effect as these characters in regular expressions: that is,
+\*(lq\fB*\fP\*(rq represents zero or more characters of any value, and \*(lq\fB?\fP\*(rq
+represents single character of any value.  The \*(lq\fB*\fP\*(rq character is represented
+by the BCD digit \fB0xF\fP and the \*(lq\fB?\fP\*(rq character is represented by the BCD
+digit \fB0xE\fP.
+.IP 3.
+\fBX25_PATTERN\fP is Solstice X.25 specific.
+.RE
+.TP
+.I l_type
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+X25_DTE:1:Contains an X.25 DTE (X.121) address.
+X25_NSAP:2:Contains a CONS NSAP address.
+_
+.TE
+.RE
+.TP
+.I l_length
+Specifies the length of the \fIl_add\fP field in semi-octets.  That is, the
+length of the \fIl_add\fP field in octets is: \*(lq\fB((l_length+1)>>1)\fP\*(rq.  The
+maximum length for a DTE address is 15 or 17 semi-octets (that is, 8 or 9
+octets) depending upon whether TOA/NPI addressing is used.  The maximum length
+for an NSAP address is 20 semi-octets (that is, 10 octets).
+.TP
+.I l_add
+Contains the bytes to be matched against the DTE address or the NSAP address.
+.RS
+.PP
+Each semi-octet is a BCD representation.  That is, digits in the range \*(lq\fB0\fP\*(rq through
+\*(lq\fB9\fP\*(rq are represented by \fB0x0\fP through \fB0x9\fP in the semi-octet
+position.  The first digit occupies the high order nibble of the first octet;
+the second digit, the low order nibble of the first octet; the third digit, the
+high order nibble of the second octet; and so on.  If @member{l_length} is odd,
+the low order nibble of the last octet is ignored.
+.PP
+When the @member{l_mode} field is @pval{X25_PATTERN}, a semi-octet of
+\fB0xF\fP represents a \*(lq\fB*\fP\*(rq wildcard, and a semi-octet of \fB0xE\fP
+represents a \*(lq\fB?\fP\*(rq wildcard.
+.RE
+.\"
+.\"
+.SH STATE
+.PP
+This message primitive is valid in the disconnected phase or during an incoming
+connecting phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+When an NS user issues a Listen Request, the NS user expects a Listen Response
+message primitive from the NS provider.
+.\"
+.\"
+.SH USAGE
+.PP
+The Listen Request message primitive is equivalent to the
+.BR N_BIND_REQ (7)
+of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7);
+the Listen Response,
+.BR N_BIND_ACK (7).
 .\"
 .\"
 .\".SH CONTEXT

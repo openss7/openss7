@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_PVC_ATTACH.7.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\" @(#) $Id: N_PVC_ATTACH.7.man,v 0.9.2.2 2008-07-11 09:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_PVC_ATTACH.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:29  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,197 @@ sort-adjacent-labels
 .TH N_PVC_ATTACH 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_PVC_ATTACH
-\-
+\- PVC Attach
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_PVC_ATTACH {
+struct xcallf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned short lci;
+    union {
+        uint32_t link_id;
+        uint32_t sn_id;
+    };
+    unsigned char reqackservice;
+    unsigned char reqnsdulimit;
+    int nsdulimit;
+    int result_code;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The PVC Attach message primitive is used by the NS user when requesting an
+attachment of the Stream to a PVC.  The NS provider uses the PVC Attach message
+primitive to acknolwedge a previous PVC Attach message primitive issued by the
+NS user.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B pvcattf
+structure.
+There is no data part
+.RB ( M_DATA (9)
+message blocks) associated with this message primitive.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The PVC Attach uses the
+.B pvcattf
+structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B pvcattf
+structure.
+There is no data part
+.RB ( M_DATA (9)
+message blocks) associated with this message primitive.
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B pvcattf
+structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_PVC_ATTACH\fP, for PVC Attach.
+.TP
+.I lci
+Conveys the logical channel identifier (LCI) of the PVC.
+.TP
+.I link_id
+Conveys the link identifier for the PVC.  This is a Solstice X.25 specific
+field.
+.RS
+.PP
+The \fIlink_id\fP and \fIsn_id\fP fields are equivalent, with a slightly
+different name and format for Solstice X.25.
+.RE
+.TP
+.I sn_id
+Conveys the subnetwork identifier for the PVC.  This is the non-Solstice X.25
+specific field.
+.RS
+.PP
+This field is sometimes specified as a
+.BR "unsigned long" .
+It has been declared as an
+.B uint32_t
+to support compatibility of 32-bit applications
+running over a 64-bit kernel.
+.RE
+.TP
+.I reqackservice
+When non-zero, conveys that the receipt confirmation service is requested by the
+use of the D-bit.  This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+-:0:No receipt confirmation.
+RC_CONF_DTE:1:Confirmation by the remote terminal.
+RC_CONF_APP:2:Confirmation by the remote application.
+_
+.TE
+.PP
+In the case of receipt confirmation by the remote station, no acknowledgements
+are expected or given over the X.25 NLI service interface.  For receipt
+confirmation by the remote application, there is a one-to-one correspondence
+between D-bit data and acknolwedgements passing in opposite directions.  One
+data acknowledgement is received or sent for each D-bit data packet sent or
+received over the X.25 NLI service interface.
+.RE
+.TP
+.I reqnsdulimit
+When non-zero, conveys that an NSDU concantenation limit is asserted and the
+\fInsdulimit\fP field is valid.
+.TP
+.I nsdulimit
+When non-zero, conveys the packet concatenation limit for NSDUs when the
+\fIreqnsdulimit\fP field is also non-zero.
+.TP
+.I result_code
+When the PVC Attach message primitive is used by the NS provider to acknowledge
+a previous PVC Attach message primitive issued by the NS user, this field is
+non-zero when an error has been encountered that prevents the attachment of the
+PVC.
+.RS
+.PP
+This field can have one of the following values:
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+PVC_SUCCESS:0:Operation was successful.
+PVC_NOSUCHSUBNET:1:Subnetwork not configured.
+PVC_CFGERROR:2:LCI not in range, no PVCs.
+PVC_NODBELEMENTS:3: No database available.
+PVC_PARERROR:4:Error in request parameters.
+PVC_BUSY:6:PVC in non-attach state.
+PVC_CONGESTION:7:Resources unavailable.
+PVC_WRONGSTATE:8: State wrong for function.
+PVC_NOPERMISSION:9:Inadequate permissions.
+PVC_LINKDOWN:10:The link has gone down.
+PVC_RMTERROR:11:No reponse from remote.
+PVC_USRERROR:12:User interface error detected.
+PVC_INTERROR:13:Internal error.
+PVC_NOATTACH:14:Not attached yet.
+PVC_WAIT:15:Wait code, not to user.
+_
+.TE
+.RE
+.\"
+.\"
+.SH STATE
+.PP
+This message primitive is valid in the disconnected phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+When an NS user issues a PVC Attach, the NS user expects a PVC Attach message
+primitive from the NS provider in response.
+.\"
+.\"
+.SH USAGE
+.PP
+The PVC Attach message primitive is equivalent to the
+.BR N_CONN_REQ (7)
+and
+.BR N_CONN_CON (7)
+of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
 .\"
 .\"
 .\".SH CONTEXT

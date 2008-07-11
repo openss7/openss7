@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_Xcanlis.7.man,v 0.9.2.1 2008-05-03 11:42:29 brian Exp $
+.\" @(#) $Id: N_Xcanlis.7.man,v 0.9.2.2 2008-07-11 09:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:29 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_Xcanlis.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:29  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:29  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,105 @@ sort-adjacent-labels
 .TH N_XCANLIS 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_Xcanlis
-\-
+\- Listen Cancel Request and Listen Cancel Response
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_Xcanlis {
+struct xcanlisf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int c_result;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Listen Cancel Request message primitive is used by the NS user to cancel
+listening on any address.
+The Listen Cancel Request removes all listen addresses from the Stream.  There
+is no way of cancelling a Listen Request on a particular address; this message
+is probably used when the use of the Stream is about to be changed by the NS
+user.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B xcanlisf
+structure.
+There is no data part
+.RB ( M_DATA (9)
+message blocks) associated with this message primitive.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Listen Cancel Request and Listen Cancel Response use the
+.B xcanlisf
+structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B xcanlisf
+structure.
+There is no data part
+.BR ( M_DATA (9)
+message blocks) associated with this message primitive.
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B xcanlisf
+structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_Xcanlis\fP, for both Listen Cancel Request and Listen Cancel Response.
+.TP
+.I c_result
+Conveys the result of the Listen Cancel Request in a Listen Cancel Response
+message primitive.  An failure to cancel a listen request results in this flag
+being set to a non-zero value.  A Listen Cancel Request may fail because no
+listen was in effect, or a Connect Indication is outstanding.
+.\"
+.\"
+.SH STATE
+.PP
+This message primitive is valid in the disconnected phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+When an NS user issues a Listen Cancel Request, the NS user expects a Listen
+Cancel Response message primitive from the NS provider.
+.\"
+.\"
+.SH USAGE
+.PP
+The Listen Cancel Request message primitive is equivalent to the
+.BR N_UNBIND_REQ (7)
+of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7);
+the Listen Cancel Response,
+.BR N_OK_ACK (7).
 .\"
 .\"
 .\".SH CONTEXT

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: s_dlpi.4.man,v 0.9.2.1 2008-07-01 12:16:22 brian Exp $
+.\" @(#) $Id: s_dlpi.4.man,v 0.9.2.2 2008-07-11 09:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 12:16:22 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: s_dlpi.4.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:28  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-07-01 12:16:22  brian
 .\" - added manual pages, specs and conversion modules
 .\"
@@ -89,9 +92,9 @@ sort-adjacent-labels
 .br
 .B #include <stropts.h>
 .HP 12
-\fIwan_stream\fP = \fBopen\fP(\fIwan_driver\fP, O_RDWR);
+\fIlli_stream\fP = \fBopen\fP(\fIlli_driver\fP, O_RDWR);
 .HP
-\fIretval\fP = \fBioctl\fP(\fIwan_stream\fP, I_PUSH, \*(lq\fBs_dlpi\fP\*(rq);
+\fIretval\fP = \fBioctl\fP(\fIlli_stream\fP, I_PUSH, \*(lq\fBs_dlpi\fP\*(rq);
 .\"
 .\"
 .SH DESCRIPTION
@@ -102,14 +105,14 @@ and most OpenSS7 packages, utilize the Data Link Provider Interface (DLPI),
 dlpi revision 2.0.0
 .]
 .BR dlpi (7),
-as an interface to WAN devices.  However, due to the widespread use in the 1990's of systems
+as an interface to LLI devices.  However, due to the widespread use in the 1990's of systems
 deploying SpiderWAN, SpiderX.25
 .[
-spiderx25wan
+spiderx25
 .]
 and SpiderISDN
 .[
-spiderisdnwan
+spiderisdn
 .]
 a number of applications programs, as well as \fISTREAMS\fP(9) drivers and modules may have been
 written to provide these interfaces.  Therefore, to provide compatibility between the OpenSS7 DLPI
@@ -118,9 +121,9 @@ implementations of applications and user modules or drivers expecting a DLPI int
 .PP
 The \fBS_DLPI\fP module is a pushable \fISTREAMS\fP(9) module that performs
 conversion between the Spider
-.IR "Wide Area Network (WAN)" ,
+.IR "Link Layer Interface (LLI)" ,
 .[
-spiderx25wan
+lli revision 0.9.2
 .]
 interface at the lower service interface, and the
 .IR "Data Link Provider Interface (DLPI)" ,
@@ -139,14 +142,10 @@ at the upper service interface.
 .\"
 .SH NOTICES
 .PP
-The Spider Wide Area Network (WAN) interface is a proprietary interface without
-a \fIformal\fP standard (although its widespread use makes it an \fIipso
-facto\fP standard).  Either the Communications Device Interface (CDI),
-.[
-cdi revision 0.9.2
-.]
-.BR cdi (7),
-or the Data Link Provider Interface (DLPI),
+The Spider Link Layer Interface (LLI) is, to some degree, a proprietary
+interface without a \fIformal\fP standard (although its widespread use makes
+it an \fIipso facto\fP standard).
+The Data Link Provider Interface (DLPI),
 .[
 dlpi revision 2.0.0
 .]

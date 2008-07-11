@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x32map.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:58 $
+ @(#) $RCSfile: x32map.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-11 09:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-13 06:43:58 $ by $Author: brian $
+ Last Modified $Date: 2008-07-11 09:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x32map.c,v $
+ Revision 0.9.2.2  2008-07-11 09:46:32  brian
+ - roughed in implementation, updated documentation
+
  Revision 0.9.2.1  2008-06-13 06:43:58  brian
  - added files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x32map.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:58 $"
+#ident "@(#) $RCSfile: x32map.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-11 09:46:32 $"
 
-static char const ident[] = "$RCSfile: x32map.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:58 $";
+static char const ident[] = "$RCSfile: x32map.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-11 09:46:32 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -109,7 +112,7 @@ Usage:\n\
 }
 
 static void
-help(argc, char *argv[])
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -187,7 +190,7 @@ int
 main(int argc, char *argv[])
 {
 	for (;;) {
-		int c val;
+		int c, val;
 
 #if defined _GNU_SOURCE
 		int option_index = 0;
@@ -218,7 +221,7 @@ main(int argc, char *argv[])
 			goto bad_usage;
 		case 'D':	/* -D, --debug [level] */
 			if (debug)
-				printf(stderr, "%s: increasing debug verbosity\n", argv[0]);
+				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
 			} else {
@@ -283,6 +286,7 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
+	exit(0);
 }
 
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lltune.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $
+ @(#) $RCSfile: lltune.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-07-11 09:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:27 $ by $Author: brian $
+ Last Modified $Date: 2008-07-11 09:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lltune.c,v $
+ Revision 0.9.2.3  2008-07-11 09:46:32  brian
+ - roughed in implementation, updated documentation
+
  Revision 0.9.2.2  2008-06-18 16:45:27  brian
  - widespread updates
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lltune.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#ident "@(#) $RCSfile: lltune.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-07-11 09:46:32 $"
 
 static char const ident[] =
-    "$RCSfile: lltune.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $";
+    "$RCSfile: lltune.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-07-11 09:46:32 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -81,7 +84,8 @@ static char const ident[] =
 #endif
 
 #include <stropts.h>
-#include <sys/snet/ll_control.h>
+#include <snet/ll_control.h>
+#include <netx25/ll_control.h>
 
 static int debug = 0;			/* default no debug */
 static int output = 1;			/* default normal output */
@@ -97,8 +101,8 @@ static int islapb = 0;			/* is link an LAPB link */
 static int isllc2 = 0;			/* is link an LLC2 link */
 static int usedev = 0;			/* was device specified */
 
-static char lapbdevice[BUFSIZE] = "/dev/streams/lapb,/dev/lapb";
-static char llc2device[BUFSIZE] = "/dev/streams/llc2,/dev/llc2";
+static char lapbdevice[BUFSIZ] = "/dev/streams/lapb,/dev/lapb";
+static char llc2device[BUFSIZ] = "/dev/streams/llc2,/dev/llc2";
 
 static const char *lapbparms[] = {
 	[0] = "N2_VAL",			/* N2_VAL */

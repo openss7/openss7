@@ -292,10 +292,22 @@
 %R NLI
 %J Revision 0.9.2, Draft 1
 %T OpenSS7 CAE Specification: Network Layer Interface (NLI) Specification
-%D June 9, 2008
+%D July 15, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/nli.pdf
+%O Distributed with package strx25-0.9.2.
+
+%L LLI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R LLI
+%J Revision 0.9.2, Draft 1
+%T OpenSS7 CAE Specification: Link Layer Interface (LLI) Specification
+%D July 15, 2008
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/lli.pdf
 %O Distributed with package strx25-0.9.2.
 
 %L CDI
@@ -309,6 +321,18 @@
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/cdi.pdf
 %O Distributed with package strxns-0.9.2.
+
+%L WAN
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R WAN
+%J Revision 0.9.2, Draft 1
+%T OpenSS7 CAE Specification: Wide Area Network (WAN) Interface Specification
+%D July 15, 2008
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/wan.pdf
+%O Distributed with package strx25-0.9.2.
 
 %L LMI
 %A Brian Bidulock
