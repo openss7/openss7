@@ -1,76 +1,3 @@
-/*****************************************************************************
-
- @(#) sli.h,v 0.9.2.1 2007/08/13 19:55:44 brian Exp
-
- -----------------------------------------------------------------------------
-
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-
- All Rights Reserved.
-
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
-
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
-
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
- -----------------------------------------------------------------------------
-
- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
- behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
- is classified as "Commercial Computer Software" under paragraph 252.227-7014
- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
- successor regulations) and the Government is acquiring only the license rights
- granted herein (the license rights customarily provided to non-Government
- users).  If the Software is supplied to any unit or agency of the Government
- other than DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
- (or any successor regulations).
-
- -----------------------------------------------------------------------------
-
- Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified 2007/08/13 19:55:44 by brian
-
- -----------------------------------------------------------------------------
-
- sli.h,v
- Revision 0.9.2.1  2007/08/13 19:55:44  brian
- - added spec headers
-
- Revision 0.9.2.7  2007/08/12 16:19:53  brian
- - new PPA handling
-
- Revision 0.9.2.6  2007/08/03 13:35:01  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.5  2007/06/17 01:56:02  brian
- - updates for release, remove any later language
-
- *****************************************************************************/
-
-#ifndef __SS7_SLI_H__
-#define __SS7_SLI_H__
-
-#ident "@(#) sli.h,v (0.9.2.1) Copyright (c) 2001-2007 OpenSS7 Corporation."
-
-/* This file can be processed by doxygen(1). */
-
 typedef lmi_long sl_long;
 typedef lmi_ulong sl_ulong;
 typedef lmi_ushort sl_ushort;
@@ -168,16 +95,16 @@ typedef lmi_uchar sl_uchar;
  *  SL_PDU_REQ, optional M_PROTO type, with M_DATA block(s)
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_mp;
+    sl_long sl_primitive;
+    sl_ulong sl_mp;
 } sl_pdu_req_t;
 
 /*
  *  SL_PDU_IND, optional M_PROTO type, with M_DATA block(s)
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_mp;
+    sl_long sl_primitive;
+    sl_ulong sl_mp;
 } sl_pdu_ind_t;
 
 /*
@@ -188,188 +115,188 @@ typedef struct {
  *  SL_EMERGENCY_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_emergency_req_t;
 
 /*
  *  SL_EMERGENCY_CEASES_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_emergency_ceases_req_t;
 
 /*
  *  SL_START_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_start_req_t;
 
 /*
  *  SL_STOP_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_stop_req_t;
 
 /*
  *  SL_RETRIEVE_BSNT_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_retrieve_bsnt_req_t;
 
 /*
  *  SL_RETRIEVAL_REQUEST_AND_FSNC_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_fsnc;
+    sl_long sl_primitive;
+    sl_ulong sl_fsnc;
 } sl_retrieval_req_and_fsnc_t;
 
 /*
  *  SL_CLEAR_BUFFERS_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_clear_buffers_req_t;
 
 /*
  *  SL_CLEAR_RTB_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_clear_rtb_req_t;
 
 /*
  *  SL_CONTINUE_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_continue_req_t;
 
 /*
  *  SL_LOCAL_PROCESSOR_OUTAGE_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_local_proc_outage_req_t;
 
 /*
  *  SL_RESUME_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_resume_req_t;
 
 /*
  *  SL_CONGESTION_DISCARD_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_cong_discard_req_t;
 
 /*
  *  SL_CONGESTION_ACCEPT_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_cong_accept_req_t;
 
 /*
  *  SL_NO_CONGESTION_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_no_cong_req_t;
 
 /*
  * SL_POWER_ON_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_power_on_req_t;
 
 /*
  *  SL_LINK_CONGESTED_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_timestamp;
-        sl_ulong sl_cong_status;        /* congestion status */
-        sl_ulong sl_disc_status;        /* discard status */
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
+    sl_ulong sl_cong_status;    /* congestion status */
+    sl_ulong sl_disc_status;    /* discard status */
 } sl_link_cong_ind_t;
 
 /*
  *  SL_LINK_CONGESTION_CEASED_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_timestamp;
-        sl_ulong sl_cong_status;        /* congestion status */
-        sl_ulong sl_disc_status;        /* discard status */
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
+    sl_ulong sl_cong_status;    /* congestion status */
+    sl_ulong sl_disc_status;    /* discard status */
 } sl_link_cong_ceased_ind_t;
 
 /*
  *  SL_RETRIEVED_MESSAGE_IND, M_PROTO or M_PCPROTO type with M_DATA block(s)
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_mp;
+    sl_long sl_primitive;
+    sl_ulong sl_mp;
 } sl_retrieved_msg_ind_t;
 
 /*
  *  SL_RETRIEVAL_COMPLETE_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_mp;
+    sl_long sl_primitive;
+    sl_ulong sl_mp;
 } sl_retrieval_comp_ind_t;
 
 /*
  *  SL_RETRIEVAL_NOT_POSSIBLE_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_retrieval_not_poss_ind_t;
 
 /*
  *  SL_RB_CLEARED_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_rb_cleared_ind_t;
 
 /*
  *  SL_BSNT_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_bsnt;
+    sl_long sl_primitive;
+    sl_ulong sl_bsnt;
 } sl_bsnt_ind_t;
 
 /*
  *  SL_BSNT_NOT_RETRIEVABLE_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_bsnt;
+    sl_long sl_primitive;
+    sl_ulong sl_bsnt;
 } sl_bsnt_not_retr_ind_t;
 
 /*
  *  SL_IN_SERVICE_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_in_service_ind_t;
 
 /*
  *  SL_OUT_OF_SERVICE_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_timestamp;
-        sl_ulong sl_reason;
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
+    sl_ulong sl_reason;
 } sl_out_of_service_ind_t;
 
 /*
@@ -394,105 +321,105 @@ typedef struct {
  *  SL_REMOTE_PROCESSOR_OUTAGE_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_timestamp;
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
 } sl_rem_proc_out_ind_t;
 
 /*
  *  SL_REMOTE_PROCESSOR_RECOVERED_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_timestamp;
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
 } sl_rem_proc_recovered_ind_t;
 
 /*
  *  SL_RTB_CLEARED_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
+    sl_long sl_primitive;
 } sl_rtb_cleared_ind_t;
 
 /*
  *  SL_LOCAL_PROCESSOR_OUTAGE_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_timestamp;
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
 } sl_loc_proc_out_ind_t;
 
 /*
  *  SL_LOCAL_PROCESSOR_RECOVERED_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-        sl_long sl_primitive;
-        sl_ulong sl_timestamp;
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
 } sl_loc_proc_recovered_ind_t;
 
 /*
  *  Generic single argument type
  */
 typedef struct {
-        sl_ulong sl_cmd;
-        sl_ulong sl_arg;
+    sl_ulong sl_cmd;
+    sl_ulong sl_arg;
 } sl_cmd_arg_t;
 
 /*
  *  Generic double argument type
  */
 typedef struct {
-        sl_ulong sl_cmd;
-        sl_ulong sl_arg1;
-        sl_ulong sl_arg2;
+    sl_ulong sl_cmd;
+    sl_ulong sl_arg1;
+    sl_ulong sl_arg2;
 } sl_cmd_2arg_t;
 
 /*
  *  Generic triple argument type
  */
 typedef struct {
-        sl_ulong sl_cmd;
-        sl_ulong sl_arg1;
-        sl_ulong sl_arg2;
-        sl_ulong sl_arg3;
+    sl_ulong sl_cmd;
+    sl_ulong sl_arg1;
+    sl_ulong sl_arg2;
+    sl_ulong sl_arg3;
 } sl_cmd_3arg_t;
 
 union SL_primitives {
-        sl_long sl_primitive;
-        sl_cmd_arg_t cmd_arg;
-        sl_cmd_2arg_t cmd_2arg;
-        sl_cmd_3arg_t cmd_3arg;
-        sl_pdu_req_t pdu_req;
-        sl_pdu_ind_t pdu_ind;
-        sl_emergency_req_t emergency_req;
-        sl_emergency_ceases_req_t emergency_ceases_req;
-        sl_start_req_t start_req;
-        sl_stop_req_t stop_req;
-        sl_retrieve_bsnt_req_t retrieve_bsnt_req;
-        sl_retrieval_req_and_fsnc_t retrieval_req_and_fsnc;
-        sl_resume_req_t resume_req;
-        sl_continue_req_t continue_req;
-        sl_clear_buffers_req_t clear_buffers_req;
-        sl_clear_rtb_req_t clear_rtb_req;
-        sl_local_proc_outage_req_t local_proc_outage_req;
-        sl_cong_discard_req_t cong_discard_req;
-        sl_cong_accept_req_t cong_accept_req;
-        sl_no_cong_req_t no_cong_req;
-        sl_power_on_req_t power_on_req;
-        sl_link_cong_ind_t link_cong_ind;
-        sl_link_cong_ceased_ind_t link_cong_ceased_ind;
-        sl_retrieved_msg_ind_t retrieved_msg_ind;
-        sl_retrieval_comp_ind_t retrieval_comp_ind;
-        sl_retrieval_not_poss_ind_t retrieval_not_poss_ind;
-        sl_rb_cleared_ind_t rb_cleared_ind;
-        sl_bsnt_ind_t bsnt_ind;
-        sl_bsnt_not_retr_ind_t bsnt_not_retr_ind;
-        sl_in_service_ind_t in_service_ind;
-        sl_out_of_service_ind_t out_of_service_ind;
-        sl_rem_proc_out_ind_t rem_proc_out_ind;
-        sl_rem_proc_recovered_ind_t rem_proc_recovered_ind;
-        sl_rtb_cleared_ind_t rtb_cleared_ind;
-        sl_loc_proc_out_ind_t loc_proc_out_ind;
-        sl_loc_proc_recovered_ind_t loc_proc_recovered_ind;
+    sl_long sl_primitive;
+    sl_cmd_arg_t cmd_arg;
+    sl_cmd_2arg_t cmd_2arg;
+    sl_cmd_3arg_t cmd_3arg;
+    sl_pdu_req_t pdu_req;
+    sl_pdu_ind_t pdu_ind;
+    sl_emergency_req_t emergency_req;
+    sl_emergency_ceases_req_t emergency_ceases_req;
+    sl_start_req_t start_req;
+    sl_stop_req_t stop_req;
+    sl_retrieve_bsnt_req_t retrieve_bsnt_req;
+    sl_retrieval_req_and_fsnc_t retrieval_req_and_fsnc;
+    sl_resume_req_t resume_req;
+    sl_continue_req_t continue_req;
+    sl_clear_buffers_req_t clear_buffers_req;
+    sl_clear_rtb_req_t clear_rtb_req;
+    sl_local_proc_outage_req_t local_proc_outage_req;
+    sl_cong_discard_req_t cong_discard_req;
+    sl_cong_accept_req_t cong_accept_req;
+    sl_no_cong_req_t no_cong_req;
+    sl_power_on_req_t power_on_req;
+    sl_link_cong_ind_t link_cong_ind;
+    sl_link_cong_ceased_ind_t link_cong_ceased_ind;
+    sl_retrieved_msg_ind_t retrieved_msg_ind;
+    sl_retrieval_comp_ind_t retrieval_comp_ind;
+    sl_retrieval_not_poss_ind_t retrieval_not_poss_ind;
+    sl_rb_cleared_ind_t rb_cleared_ind;
+    sl_bsnt_ind_t bsnt_ind;
+    sl_bsnt_not_retr_ind_t bsnt_not_retr_ind;
+    sl_in_service_ind_t in_service_ind;
+    sl_out_of_service_ind_t out_of_service_ind;
+    sl_rem_proc_out_ind_t rem_proc_out_ind;
+    sl_rem_proc_recovered_ind_t rem_proc_recovered_ind;
+    sl_rtb_cleared_ind_t rtb_cleared_ind;
+    sl_loc_proc_out_ind_t loc_proc_out_ind;
+    sl_loc_proc_recovered_ind_t loc_proc_recovered_ind;
 };
 
 typedef union SL_primitives sl_prim_t;
@@ -538,5 +465,3 @@ typedef union SL_primitives sl_prim_t;
 #define SL_OPT_CONFIG           3       /* use struct sl_config */
 #define SL_OPT_STATEM           4       /* use struct sl_statem */
 #define SL_OPT_STATS            5       /* use struct sl_stats */
-
-#endif                          /* __SS7_SLI_H__ */

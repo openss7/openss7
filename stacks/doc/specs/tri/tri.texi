@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tri.texi,v 0.9.2.16 2008-04-29 07:10:40 brian Exp $
+% @(#) $Id: tri.texi,v 0.9.2.17 2008-07-11 09:36:14 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-29 07:10:40 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:36:14 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -63,7 +63,7 @@
 @setfilename tri.info
 @include texi/args.texi
 @set MANUAL_TITLE Transaction Interface (TRI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
@@ -74,18 +74,20 @@
 
 @include texi/args.texi
 @set MANUAL_TITLE Transaction Interface (TRI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
-published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} published by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.
+
 
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
 
 All Rights Reserved.
 
@@ -106,7 +108,7 @@ paragraph (this paragraph not being relevant to the printed manual).
 OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
 warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
 the contents of the document are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
 damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
 of contract, negligence or other tortious action, arising out of or in connection with any use of
@@ -121,11 +123,9 @@ no obligation to provide any feature listed herein.
 
 @include texi/args.texi
 @set MANUAL_TITLE Transaction Interface (TRI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -183,11 +183,12 @@ this information and keep it confidential, and will not disclose the information
 document without the written permission of its owner.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} reserves the right to revise this software and documentation for any reason,
-including but not limited to, conformity with standards promulgated by various agencies, utilization
-of advances in the state of the technical arts, or the reflection of changes in the design of any
-techniques, or procedures embodied, described, or referred to herein.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under
-no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
 @end ignore
 
 @noindent
@@ -205,7 +206,7 @@ implied warranty.
 @b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
 implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
 that the contents of the document are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
 damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
 of contract, negligence or other tortious action, arising out of or in connection with any use of
@@ -227,8 +228,8 @@ no obligation to provide any feature listed herein.
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
-@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
 @page
@@ -237,46 +238,87 @@ no obligation to provide any feature listed herein.
 @defcodeindex pr
 @c Define an index of primitive values
 @defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
 @defcodeindex st
-@c Define an index of protocol errors
-@defcodeindex pe
-@c Define an index of manual pages
-@defindex mp
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
 
-@c @syncodeindex pr cp
-@c @syncodeindex pv cp
-@c @syncodeindex pe cp
-@c @syncodeindex tp cp
-@c @syncodeindex vr cp
+@ifnottex
+@c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
 
-@macro prim {name}
-@prindex \name\
+@iftex
+
+@macro prim{name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval{name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr{name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta{name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm{name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
 @code{\name\}
 @end macro
 
-@macro pval {name}
-@pvindex \name\
+@macro pval{name}
 @code{\name\}
 @end macro
 
-@macro perr {name}
-@peindex \name\
+@macro perr{name}
 @code{\name\}
 @end macro
 
-@macro psta {name}
-@stindex \name\
+@macro psta{name}
 @code{\name\}
 @end macro
 
-@macro parm {name}
-@vrindex \name\
+@macro parm{name}
 @code{\name\}
 @end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
 
 @ifnottex
 @node Top
@@ -302,8 +344,23 @@ no obligation to provide any feature listed herein.
 * Glossary::
 * Acronyms::
 * References::
+@iftex
 * Indices::
+@end iftex
+@ifnottex
+* Index::
+@end ifnottex
 @end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Preface
 @unnumbered Preface
@@ -345,17 +402,17 @@ as platform and system applicability of the @value{MANUAL_TITLE}.
 @noindent
 This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Transaction
 Capablities Application Part (TCAP) protocol stacks.  It provides abstraction of the transaction
-interface to these components as well as providing a basis for transaction control for
-other transaction control protocols.
+interface to these components as well as providing a basis for transaction control for other
+transaction control protocols.
 
 @section Purpose
+@cpindex STREAMS
 
 The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
-This document is intended to be included with the OpenSS7 @cite{STREAMS}
-@cpindex STREAMS
-software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software
-developers, maintainers and users of the @value{MANUAL_TITLE} with understanding the software
-architecture and technical interfaces that are made available in the software package.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
 
 @section Intent
 
@@ -383,28 +440,32 @@ Only the texinfo or roff source is controlled.  A printed (or postscript) versio
 is an @strong{UNCONTROLLED VERSION}.
 
 @smallexample
+@verbatim
 
 $Log: tri.texi,v $
+Revision 0.9.2.17  2008-07-11 09:36:14  brian
+- updated documentation
+
 Revision 0.9.2.16  2008-04-29 07:10:40  brian
 - updating headers for release
 
 Revision 0.9.2.15  2007/08/03 13:34:59  brian
 - manual updates, put ss7 modules in public release
 
+@end verbatim
 @end smallexample
 
 @node Introduction
 @chapter Introduction
-
-This document specifies a @cite{STREAMS}-based
 @cpindex STREAMS
-kernel-level instantiation of the ITU-T Transaction Capabilities Application Part (TCAP) Transaction
-(TR) Sub-Layer.  The Transaction Interface (TRI) enables the user of a transaction sub-layer service
-to access and use any of a variety of conforming transaction providers without specific knowledge of
-the provider's protocol.  The service interface is designed to support any transaction protocol.
-This interface only specifies access to transaction sub-layer services providers, and does not
-address issues concerning transaction sub-layer management, protocol performance, and performance
-analysis tools.
+
+This document specifies a @cite{STREAMS}-based kernel-level instantiation of the ITU-T Transaction
+Capabilities Application Part (TCAP) Transaction (TR) Sub-Layer.  The Transaction Interface (TRI)
+enables the user of a transaction sub-layer service to access and use any of a variety of conforming
+transaction providers without specific knowledge of the provider's protocol.  The service interface
+is designed to support any transaction protocol.  This interface only specifies access to
+transaction sub-layer services providers, and does not address issues concerning transaction
+sub-layer management, protocol performance, and performance analysis tools.
 
 The specification assumes that the reader is familiar with the ISO reference model terminology,
 ISO/ITU-T transaction service definitions (ROSE, ACSE, TCAP), and STREAMS.
@@ -513,22 +574,22 @@ confirmations of a request or are indications to the NS user that the event has 
 The TRI allows the TR provider to be configured with any transaction sub-layer user (such as the
 Transaction Component (TC) Sub-Layer) that also conforms to the TRI.  A transaction sub-layer user
 can also be a user program that conforms to the TRI and accesses the TR provider via
-@strong{putmsg}(2) and @strong{getmsg}(2) system calls.
+@manref{putmsg(2s)} and @manref{getmsg(2s)} system calls.
 
 @dfn{STREAMS} messages that are used to communicate transaction service primitives between the
 transaction user and the transaction provider may have one of the following formats:
 
 @enumerate
 
-@item A @prim{M_PROTO} message block followed by zero or more @prim{M_DATA} message blocks.  The
-@prim{M_PROTO} message block contains the type of service primitive and all relevant arguments
-associated with the primitive.  The @prim{M_DATA} blocks contain user data associated with the
+@item A @msg{M_PROTO} message block followed by zero or more @msg{M_DATA} message blocks.  The
+@msg{M_PROTO} message block contains the type of service primitive and all relevant arguments
+associated with the primitive.  The @msg{M_DATA} blocks contain user data associated with the
 service primitive.
 
-@item One @prim{M_PCPROTO} message block containing the type of service primitive and all the
+@item One @msg{M_PCPROTO} message block containing the type of service primitive and all the
 relevant arguments associated with the primitive.
 
-@item One or more @prim{M_DATA} message blocks containing user data.
+@item One or more @msg{M_DATA} message blocks containing user data.
 
 @end enumerate
 
@@ -1053,8 +1114,9 @@ Tables}).  This primitive does not affect the state of the TR provider and does 
 state tables.
 
 @subsubheading Format
+@tpindex TR_info_req_t
 
-The format of the message is one @prim{M_PCPROTO} message block and its structure is as follows:
+The format of the message is one @msg{M_PCPROTO} message block and its structure is as follows:
 
 @display
 @verbatim
@@ -1062,7 +1124,6 @@ typedef struct TR_info_req {
     ulong PRIM_type;          /* Always TR_INFO_REQ */
 } TR_info_req_t;
 @end verbatim
-@tpindex TR_info_req_t
 @end display
 
 @subsubheading Parameters
@@ -1127,8 +1188,9 @@ should be initiated in response to the @prim{TR_INFO_REQ} primitive described ab
 @ref{TR_INFO_REQ}.
 
 @subsubheading Format
+@tpindex TR_info_ack_t
 
-The format of the message is one @prim{M_PCPROTO} message block and its structure is as follows:
+The format of the message is one @msg{M_PCPROTO} message block and its structure is as follows:
 
 @display
 @verbatim
@@ -1147,7 +1209,6 @@ typedef struct TR_info_ack {
     long TRI_version;         /* version # of tri that is supported */
 } TR_info_ack_t;
 @end verbatim
-@tpindex TR_info_ack_t
 @end display
 
 @subsubheading Parameters
@@ -1252,8 +1313,9 @@ provider may receive and transmit APDUs (ACSE protocol data units) associated wi
 @dfn{stream}.} the @dfn{stream} associated with the protocol address.
 
 @subsubheading Format
+@tpindex TR_bind_req_t
 
-The format of the message is one @prim{M_PROTO} message block.  The format of the @prim{M_PROTO}
+The format of the message is one @msg{M_PROTO} message block.  The format of the @msg{M_PROTO}
 message block is as follows:@footnote{The format of the @prim{TR_BIND_REQ} primitive is chosen to be
 as consistent as possible with the equivalent TPI and NPI primitives.}
 
@@ -1267,7 +1329,6 @@ typedef struct TR_bind_req {
     ulong BIND_flags;         /* bind flags */
 } TR_bind_req_t;
 @end verbatim
-@tpindex TR_bind_req_t
 @end display
 
 @subsubheading Parameters
@@ -1284,9 +1345,9 @@ Specifies the length@footnote{All lengths, offsets and sizes in all structures r
 of octets.} of the protocol address to be bound to the @dfn{stream}.
 
 @item ADDR_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
-address begins.  The proper alignment of the address in the @prim{M_PROTO} message block is not
-guaranteed.  The address in the @prim{M_PROTO} message block is, however, aligned the same as it was
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
+address begins.  The proper alignment of the address in the @msg{M_PROTO} message block is not
+guaranteed.  The address in the @msg{M_PROTO} message block is, however, aligned the same as it was
 received from the TR user.
 
 @item XACT_number
@@ -1379,8 +1440,9 @@ provider for the specified protocol address, and that the @dfn{stream} associate
 protocol address has been activated.
 
 @subsubheading Format
+@tpindex TR_bind_ack_t
 
-The format of the message is one @prim{M_PCPROTO} message block.  The format of the @prim{M_PCPROTO}
+The format of the message is one @msg{M_PCPROTO} message block.  The format of the @msg{M_PCPROTO}
 message block is as follows:
 
 @display
@@ -1393,7 +1455,6 @@ typedef struct TR_bind_ack {
     ulong TOKEN_value;        /* value of "token" assigned to stream */
 } TR_bind_ack_t;
 @end verbatim
-@tpindex TR_bind_ack_t
 @end display
 
 @subsubheading Parameters
@@ -1409,8 +1470,8 @@ Indicates the primitive type.  Always @prim{TR_BIND_ACK}.
 Indicates the length of the protocol address that was bound to the @dfn{stream}.
 
 @item ADDR_offset
-Indicates the offset from the beginning of the @prim{M_PCPROTO} message block where the protocol
-address begins.  The proper alignment of the address in the @prim{M_PCPROTO} message block is not
+Indicates the offset from the beginning of the @msg{M_PCPROTO} message block where the protocol
+address begins.  The proper alignment of the address in the @msg{M_PCPROTO} message block is not
 guaranteed.
 
 @item XACT_number
@@ -1500,8 +1561,9 @@ This primitive requests that the TR provider unbind the protocol address previou
 the @dfn{stream} and deactivate the @dfn{stream}.
 
 @subsubheading Format
+@tpindex TR_unbind_req_t
 
-The format of the message is one @prim{M_PROTO} message block structured as follows:
+The format of the message is one @msg{M_PROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -1509,7 +1571,6 @@ typedef struct TR_unbind_req {
     ulong PRIM_type;          /* Always TR_UNBIND_REQ */
 } TR_unbind_req_t;
 @end verbatim
-@tpindex TR_unbind_req_t
 @end display
 
 @subsubheading Parameters
@@ -1574,8 +1635,9 @@ This primitive requests that the TR provider return the local protocol address t
 @dfn{stream} and the address of the remote ASE if a transaction association has been established.
 
 @subsubheading Format
+@tpindex TR_addr_req_t
 
-The format of the message is one @prim{M_PROTO} message block structured as follows:
+The format of the message is one @msg{M_PROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -1584,7 +1646,6 @@ typedef struct TR_addr_req {
     ulong TRANS_id;           /* Transaction id */
 } TR_addr_req_t;
 @end verbatim
-@tpindex TR_addr_req_t
 @end display
 
 @subsubheading Parameters
@@ -1662,8 +1723,9 @@ address is the protocol address that has been bound to the @dfn{stream}.  If an 
 association has been established, the remote address is the protocol address of the remote ASE.
 
 @subsubheading Format
+@tpindex TR_addr_ack_t
 
-The format of the message is one @prim{M_PCPROTO} message block structured as follows:
+The format of the message is one @msg{M_PCPROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -1675,7 +1737,6 @@ typedef struct TR_addr_ack {
     long REMADDR_offset;      /* offset of remote address */
 } TR_addr_ack_t;
 @end verbatim
-@tpindex TR_addr_ack_t
 @end display
 
 @subsubheading Parameters
@@ -1691,19 +1752,19 @@ Indicates the primitive type.  Always @prim{TR_ADDR_ACK}.
 Indicates the length of the protocol address that was bound to the @dfn{stream}.
 
 @item LOCADDR_offset
-Indicates the offset from the beginning of the @prim{M_PCPROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PCPROTO} message block where the protocol
 address begins.
 
 @item REMADDR_length
 Indicates the length of the protocol address of the remote ASE.
 
 @item REMADDR_offset
-Indicates the offset from the beginning of the @prim{M_PCPROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PCPROTO} message block where the protocol
 address begins.
 
 @end table
 
-The proper alignement of the addresses in the @prim{M_PCPROTO} message block is not guaranteed.
+The proper alignement of the addresses in the @msg{M_PCPROTO} message block is not guaranteed.
 
 @subsubheading Modes
 
@@ -1761,11 +1822,12 @@ remote association address for the specified transaction.
 @subsubheading @prim{TR_OPTMGMT_REQ}
 
 This primitive alllows the transaction user to manage the options associated with the @dfn{stream}.
-The format of the message is one @prim{M_PROTO} message block.
+The format of the message is one @msg{M_PROTO} message block.
 
 @subsubheading Format
+@tpindex TR_optmgmt_req_t
 
-The format of the message is one @prim{M_PCPROTO} message block structured as follows:
+The format of the message is one @msg{M_PCPROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -1776,7 +1838,6 @@ typedef struct TR_optmgmt_req {
     ulong MGMT_flags;         /* options data flags */
 } TR_optmgmt_req_t;
 @end verbatim
-@tpindex TR_optmgmt_req_t
 @end display
 
 @subsubheading Parameters
@@ -1792,7 +1853,7 @@ Specifies the primitive type.  Always @prim{TR_OPTMGMT_REQ}.
 Specifies the length of the protocol options associated with the primitive.
 
 @item OPT_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the options begin.
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the options begin.
 
 @item MGMT_flags
 Specifies the management flags which define the request made by the transaction user.
@@ -1893,8 +1954,9 @@ A system error occurred and the UNIX System error is indicated in the primitive.
 This primitive indicates to the transaction user that the options management request has completed.
 
 @subsubheading Format
+@tpindex TR_optmgmt_ack_t
 
-The format of the message is one @prim{M_PCPROTO} message block structured as follows:
+The format of the message is one @msg{M_PCPROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -1905,7 +1967,6 @@ typedef struct TR_optmgmt_ack {
     ulong MGMT_flags;         /* options data flags */
 } TR_optmgmt_ack_t;
 @end verbatim
-@tpindex TR_optmgmt_ack_t
 @end display
 
 @subsubheading Parameters
@@ -1921,7 +1982,7 @@ Indicates the primitive type.  Always @prim{TR_OPTMGMT_ACK}.
 Indicates the length of the protocol options associated with the primitive.
 
 @item OPT_offset
-Indicates the offset from the beginning of the @manref{M_PCPROTO(9)} message block where the options
+Indicates the offset from the beginning of the @msg{M_PCPROTO} message block where the options
 begin.  The proper alignment of the options is not guaranteed.
 
 @item MGMT_flags
@@ -2044,8 +2105,9 @@ due to the issuance of the last primitive.  This may only be initiated as an ack
 those primitives that require one.
 
 @subsubheading Format
+@tpindex TR_ok_ack_t
 
-The format of the message is one @prim{M_PCPROTO} message block structured as follows:
+The format of the message is one @msg{M_PCPROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -2054,7 +2116,6 @@ typedef struct TR_ok_ack {
     ulong CORRECT_prim;       /* correct primitive */
 } TR_ok_ack_t;
 @end verbatim
-@tpindex TR_ok_ack_t
 @end display
 
 @subsubheading Parameters
@@ -2100,8 +2161,9 @@ for those primitives that require one.  It also indicates to the TR user that no
 the primitive that cause the error.
 
 @subsubheading Format
+@tpindex TR_error_ack_t
 
-The format of the message is one @prim{M_PCPROTO} message block structured as follows:
+The format of the message is one @msg{M_PCPROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -2113,7 +2175,6 @@ typedef struct TR_error_ack {
     ulong TRANS_id;           /* Transaction id */
 } TR_error_ack_t;
 @end verbatim
-@tpindex TR_error_ack_t
 @end display
 
 @subsubheading Parameters
@@ -2237,7 +2298,7 @@ Indicates that the TR provider does not support the requested capability.
 @end menu
 
 The transaction begin service provides means to start a transaction between two TR-users.  This may
-be accompanied by the transfer of TR-user information contained in @prim{M_DATA} message blocks
+be accompanied by the transfer of TR-user information contained in @msg{M_DATA} message blocks
 accompanying the primitive.
 
 @node TR_BEGIN_REQ
@@ -2249,10 +2310,11 @@ This primitive requests that the TR provider form an transaction association to 
 destination protocol address.
 
 @subsubheading Format
+@tpindex TR_begin_req_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks if any user data is specified by the TR user.  The format of the
-@prim{M_PROTO} message block is as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks if any user data is specified by the TR user.  The format of the
+@msg{M_PROTO} message block is as follows:
 
 @display
 @verbatim
@@ -2268,7 +2330,6 @@ typedef struct TR_begin_req {
     ulong OPT_offset;         /* Options structure offset */
 } TR_begin_req_t;
 @end verbatim
-@tpindex TR_begin_req_t
 @end display
 
 @subsubheading Parameters
@@ -2296,21 +2357,21 @@ provider specific.
 Specifies the length of the protocol address to which to establish an transaction association.
 
 @item DEST_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 address begins.
 
 @item ORIG_length
 Specifies the length of the protocol address from which to establish an transaction association.
 
 @item ORIG_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 address begins.
 
 @item OPT_length
 Specifies the length of the protocol options associated with the transaction.
 
 @item OPT_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 options begin.
 
 @end table
@@ -2418,9 +2479,10 @@ This primitive indicates to the destination TR user that a transaction associati
 been made by the user at the specified source protocol address.
 
 @subsubheading Format
+@tpindex TR_begin_ind_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -2436,7 +2498,6 @@ typedef struct TR_begin_ind {
     ulong OPT_offset;         /* Options structure offset */
 } TR_begin_ind_t;
 @end verbatim
-@tpindex TR_begin_ind_t
 @end display
 
 @subsubheading Parameters
@@ -2461,7 +2522,7 @@ Indicates the length of the protocol address to which a transaction association 
 established by the peer.
 
 @item DEST_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 address begins.
 
 @item ORIG_length
@@ -2469,14 +2530,14 @@ Indicates the length of the protocol address from which a transaction associatio
 established.
 
 @item ORIG_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 address begins.
 
 @item OPT_length
 Indicates the length of the protocol options associated with the transaction begin indication.
 
 @item OPT_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 options begin.
 
 @end table
@@ -2542,9 +2603,10 @@ This primitive allows the destination TR user to request that the transaction pr
 previous transaction association begin indication.
 
 @subsubheading Format
+@tpindex TR_begin_res_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -2558,7 +2620,6 @@ typedef struct TR_begin_res {
     ulong OPT_offset;         /* Options structure offset */
 } TR_begin_res_t;
 @end verbatim
-@tpindex TR_begin_res_t
 @end display
 
 @subsubheading Parameters
@@ -2582,14 +2643,14 @@ provider specific.
 Specifies the length of the protocol address to be used as the responding address.
 
 @item ORIG_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 address begins.
 
 @item OPT_length
 Specifies the length of the protocol options to be associated with the begin response.
 
 @item OPT_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 options begin.
 
 @end table
@@ -2680,9 +2741,10 @@ This primitive indicates to the source transaction user that a previous transact
 begin request has been confirmed on the specified responding protocol address.
 
 @subsubheading Format
+@tpindex TR_begin_con_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -2697,7 +2759,6 @@ typedef struct TR_begin_con {
     ulong OPT_offset;         /* Options structure offset */
 } TR_begin_con_t;
 @end verbatim
-@tpindex TR_begin_con_t
 @end display
 
 @subsubheading Parameters
@@ -2727,19 +2788,19 @@ provider specific.
 Indicates the length of the responding protocol address from which the confirmation was received.
 
 @item ORIG_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the responding
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the responding
 protocol address begins.
 
 @item OPT_length
 Indicates the length of the confirmed protocol options negotiated by the transaction peer.
 
 @item OPT_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the confirmed
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the confirmed
 protocol options begin.
 
 @end table
 
-The proper alignment of the responding address and options in the @prim{M_PROTO} message block is
+The proper alignment of the responding address and options in the @msg{M_PROTO} message block is
 not guaranteed.
 
 @subsubheading Flags
@@ -2819,20 +2880,21 @@ broken up into more than one TIDU.  When a TSDU is broken up into more than one 
 @pval{T_MORE} flag will be set on each TIDU except the last one.
 
 @subsubheading Format
+@tpindex TR_cont_req_t
 
-The format of the message is one or more @prim{M_DATA} message blocks.  Use of a @prim{M_PROTO}
-message block is optional.  The @prim{M_PROTO} message block is used for two reasons:
+The format of the message is one or more @msg{M_DATA} message blocks.  Use of a @msg{M_PROTO}
+message block is optional.  The @msg{M_PROTO} message block is used for two reasons:
 
 @enumerate a
 
 @item to indicate that the TSDU is broken into more than one TIDU, and that the data carried in the
-following @prim{M_DATA} message block constitutes one TIDU;
+following @msg{M_DATA} message block constitutes one TIDU;
 
 @item to indicate whether receipt confirmation is desired for the TSDU.
 
 @end enumerate
 
-message block, followed by zero or more @prim{M_DATA} message blocks containing user data for the
+message block, followed by zero or more @msg{M_DATA} message blocks containing user data for the
 association, structured as follows:
 
 @display
@@ -2845,12 +2907,11 @@ typedef struct TR_cont_req {
     ulong OPT_offset;         /* Options structure offset */
 } TR_cont_req_t;
 @end verbatim
-@tpindex TR_cont_req_t
 @end display
 
 @subsubheading Guidelines for use of @t{M_PROTO}
 
-The following guidelines must be followed with respect to the user of the @prim{M_PROTO} message
+The following guidelines must be followed with respect to the user of the @msg{M_PROTO} message
 block:
 
 @enumerate
@@ -2908,9 +2969,9 @@ options with the primitive, the @parm{OPT_length} and @parm{OPT_offset} fields m
 (0) by the transaction user.  The format of the protocol options are provider specific.
 
 @item OPT_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
-options begin.  Alignment of the protocol options in the @prim{M_PROTO} message block is not
-guaranteed.  However, the alignment of the protocol options in the @prim{M_PROTO} message block are
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
+options begin.  Alignment of the protocol options in the @msg{M_PROTO} message block is not
+guaranteed.  However, the alignment of the protocol options in the @msg{M_PROTO} message block are
 the same as was specified by the transport user.
 
 @end table
@@ -2953,10 +3014,10 @@ The new state for the transaction remains unchanged.
 This primitive does not require acknowledgement.  If a non-fatal error occurs, it is the
 responsibility of the peer ASE to report it within the upper-layer protocol or using the
 @prim{TR_ABORT_IND} primitive (@pxref{TR_ABORT_IND}).  Fatal errors are indicated with the
-@prim{M_ERROR} message type which results in the failure of all operating system service routines on
+@msg{M_ERROR} message type which results in the failure of all operating system service routines on
 the @dfn{stream}.  The allowable fatal errors are as follows:
 
-@table @perr
+@table @errno
 
 @item EPROTO
 This error indicates on of the following unrecoverable protocol conditions:
@@ -2972,7 +3033,7 @@ supported by the transaction provider (as specified by the @parm{TIDU_size} para
 @item The options requested are either not support by the transaction provider or their use is not
 specified with the @prim{TR_BEGIN_REQ} primitive.
 
-@item The @prim{M_PROTO} message block was not follows by one or more @prim{M_DATA} message blocks.
+@item The @msg{M_PROTO} message block was not follows by one or more @msg{M_DATA} message blocks.
 
 @item The amount of transaction user data associated with the current NSDU is outside the range
 supported by the transaction provider (as specified by the @parm{TSDU_size} parameter in the
@@ -2999,13 +3060,14 @@ This transaction provider originated primitive indicates to the transaction user
 contains transaction user data.  As in the @prim{TR_CONT_REQ} primitive (@pxref{TR_CONT_REQ}), the
 TSDU can eb segmented into more than one TIDU.  The TIDUs are assocated with the TSDU by using the
 @pval{TR_MORE_DATA_FLAG}.  The @pval{TR_RC_FLAG} and @pval{TR_NO_PERMISSION} flags are allowed to be
-set only on the last TIDU.  Use of the @prim{M_PROTO} message blocks is optional (see guidelines
+set only on the last TIDU.  Use of the @msg{M_PROTO} message blocks is optional (see guidelines
 describe in @pxref{TR_CONT_REQ}).
 
 @subsubheading Format
+@tpindex TR_cont_ind_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -3017,7 +3079,6 @@ typedef struct TR_cont_ind {
     ulong OPT_offset;         /* Options structure offset */
 } TR_cont_ind_t;
 @end verbatim
-@tpindex TR_cont_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3047,7 +3108,7 @@ protocol.  If the transport provider does not indicate protocol options, the @pa
 specific.
 
 @item OPT_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 options begin.
 
 @end table
@@ -3111,9 +3172,10 @@ The new state for the transaction is unchanged.
 @subsubheading @prim{TR_END_REQ}
 
 @subsubheading Format
+@tpindex TR_end_req_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -3125,7 +3187,6 @@ typedef struct TR_end_req {
     ulong OPT_offset;         /* Options structure offset */
 } TR_end_req_t;
 @end verbatim
-@tpindex TR_end_req_t
 @end display
 
 @subsubheading Parameters
@@ -3156,9 +3217,9 @@ fields must be set to zero (0) by the transaction user.  The format of the proto
 provider specific.
 
 @item OPT_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
-options begin.  Alignment of the protocol options in the @prim{M_PROTO} message block is not
-guaranteed.  However, the alignment of the protocol options in the @prim{M_PROTO} message block are
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
+options begin.  Alignment of the protocol options in the @msg{M_PROTO} message block is not
+guaranteed.  However, the alignment of the protocol options in the @msg{M_PROTO} message block are
 the same as was specified by the transport user.
 
 @end table
@@ -3206,9 +3267,10 @@ A system error occurred and the UNIX System error is indicated in the primitive.
 @subsubheading @prim{TR_END_IND}
 
 @subsubheading Format
+@tpindex TR_end_ind_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -3220,7 +3282,6 @@ typedef struct TR_end_ind {
     ulong OPT_offset;         /* Options structure offset */
 } TR_end_ind_t;
 @end verbatim
-@tpindex TR_end_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3251,7 +3312,7 @@ the @parm{OPT_length} and @parm{OPT_offset} fields must be set to zero (0).  The
 protocol options are provider specific.
 
 @item OPT_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 options begin.
 
 @end table
@@ -3291,8 +3352,9 @@ corresponding to the @parm{TRANS_id} indicated in the primitive.
 @subsubheading @prim{TR_ABORT_REQ}
 
 @subsubheading Format
+@tpindex TR_abort_req_t
 
-The format of the message is one @prim{M_PROTO} message block structured as follows:
+The format of the message is one @msg{M_PROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -3304,7 +3366,6 @@ typedef struct TR_abort_req {
     ulong OPT_offset;         /* Options structure offset */
 } TR_abort_req_t;
 @end verbatim
-@tpindex TR_abort_req_t
 @end display
 
 @subsubheading Parameters
@@ -3332,9 +3393,9 @@ primitive, the @parm{OPT_length} and @parm{OPT_offset} fields must be set to zer
 transaction user.  The format of the protocol options are provider specific.
 
 @item OPT_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
-options begin.  Alignment of the protocol options in the @prim{M_PROTO} message block is not
-guaranteed.  However, the alignment of the protocol options in the @prim{M_PROTO} message block are
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
+options begin.  Alignment of the protocol options in the @msg{M_PROTO} message block is not
+guaranteed.  However, the alignment of the protocol options in the @msg{M_PROTO} message block are
 the same as was specified by the transport user.
 
 @end table
@@ -3404,8 +3465,9 @@ This primitive indicates to the user that either a request for association has b
 existing association has been aborted.
 
 @subsubheading Format
+@tpindex TR_abort_ind_t
 
-The format of the message is one @prim{M_PROTO} message block structured as follows:
+The format of the message is one @msg{M_PROTO} message block structured as follows:
 
 @display
 @verbatim
@@ -3419,7 +3481,6 @@ typedef struct TR_abort_ind {
     ulong ORIGINATOR;         /* Originator P or U */
 } TR_abort_ind_t;
 @end verbatim
-@tpindex TR_abort_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3450,7 +3511,7 @@ the @parm{OPT_length} and @parm{OPT_offset} fields must be set to zero (0).  The
 protocol options are provider specific.
 
 @item OPT_offset
-Indicates the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Indicates the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 options begin.
 
 @item ABORT_cause
@@ -3501,9 +3562,10 @@ message to the specified destination with the specified options and optional ori
 address.
 
 @subsubheading Format
+@tpindex TR_uni_req_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -3517,7 +3579,6 @@ typedef struct TR_uni_req {
     ulong ORIG_offset;        /* Originating address offset */
 } TR_uni_req_t;
 @end verbatim
-@tpindex TR_uni_req_t
 @end display
 
 @subsubheading Parameters
@@ -3533,7 +3594,7 @@ Specifies the primitive type: always @prim{TR_UNI_REQ}.
 Specifies the length of the protocol address to which to send the unidirectional invocation.
 
 @item DEST_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 address begins.
 
 @item ORIG_length
@@ -3544,14 +3605,14 @@ used in the bind service (@pxref{TR_BIND_REQ}) with the primitive as the origina
 address.
 
 @item ORIG_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 address begins.
 
 @item OPT_length
 Specifies the length of the protocol options associated with the unidirectional invocation.
 
 @item OPT_offset
-Specifies the offset from the beginning of the @prim{M_PROTO} message block where the protocol
+Specifies the offset from the beginning of the @msg{M_PROTO} message block where the protocol
 options begin.
 
 @end table
@@ -3572,11 +3633,11 @@ The new state remains unchanged.
 This primitive does not require an acknowledgement.@footnote{This is a TCAP operations class 4 or a
 ROSE operations class 5 transaction that requires neither a positive or negative acknowledgement.}
 If a non-fatal error occurs, it is the responsibility of the TR provider to report it with the
-@prim{TR_NOTICE_IND} indication.  Fatal errors are indicated with the @prim{M_ERROR} message type
+@prim{TR_NOTICE_IND} indication.  Fatal errors are indicated with the @msg{M_ERROR} message type
 which results in the failure of all operating system service routines on the @dfn{stream}.  The
 allowable fatal errors are as follows:
 
-@table @perr
+@table @errno
 
 @item EPROTO
 This error indicates one of the following unrecoverable protocol conditions:
@@ -3602,9 +3663,10 @@ This primitive indicates to the TR user that a unidirectional invocation has bee
 specified source address.
 
 @subsubheading Format
+@tpindex TR_uni_ind_t
 
-The format of the message is one @prim{M_PROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, where each @prim{M_DATA}
+The format of the message is one @msg{M_PROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, where each @msg{M_DATA}
 message block contains at least one byte of data, structured as follows:
 
 @display
@@ -3619,7 +3681,6 @@ typedef struct TR_uni_ind {
     ulong OPT_offset;         /* Options structure offset */
 } TR_uni_ind_t;
 @end verbatim
-@tpindex TR_uni_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3639,21 +3700,21 @@ the @dfn{stream} is bound to an SCCP subsystem, this protocol address may contai
 Title.
 
 @item DEST_offset
-Indicates the offset from the start of the @prim{M_PROTO} message block where the protocol address
+Indicates the offset from the start of the @msg{M_PROTO} message block where the protocol address
 begins.
 
 @item ORIG_length
 Indicates the length of the protocol address from which the message was sent.
 
 @item ORIG_offset
-Indicates the offset from the start of the @prim{M_PROTO} message block where the protocol address
+Indicates the offset from the start of the @msg{M_PROTO} message block where the protocol address
 begins.
 
 @item OPT_length
 Indicates the length of the protocol options that were associated with the received message.
 
 @item OPT_offset
-Indicates the offset from the start of the @prim{M_PROTO} message block where the protocol options
+Indicates the offset from the start of the @msg{M_PROTO} message block where the protocol options
 begin.
 
 @end table
@@ -3670,7 +3731,7 @@ The new state remains unchanged.
 @subsubheading Rules
 
 The proper alignment of the destination address, originating address and protocol options in the
-@prim{M_PROTO} message block is not guaranteed.
+@msg{M_PROTO} message block is not guaranteed.
 
 @page
 @node TR_NOTICE_IND
@@ -3682,9 +3743,10 @@ This primtiive indicates to the transaction user that a component of a transacti
 error.
 
 @subsubheading Format
+@tpindex TR_notice_ind_t
 
-The format of the message is one @prim{M_PCPROTO} message block, followed by zero or more
-@prim{M_DATA} message blocks containing user data for the association, structured as follows:
+The format of the message is one @msg{M_PCPROTO} message block, followed by zero or more
+@msg{M_DATA} message blocks containing user data for the association, structured as follows:
 
 @display
 @verbatim
@@ -3695,7 +3757,6 @@ typedef struct TR_notice_ind {
     ulong REPORT_cause;       /* SCCP return cause */
 } TR_notice_ind_t;
 @end verbatim
-@tpindex TR_notice_ind_t
 @end display
 
 @subsubheading Parameters
@@ -3782,9 +3843,9 @@ uncorrectable non-protocol error internal to the transaction provider, the provi
 fatal error to the user.
 
 Fatal errors are indicated to the transaction user with the @dfn{STREAMS} message type
-@prim{M_ERROR} with the UNIX System error @perr{EPROTO}.  This is the only type of error that the
+@msg{M_ERROR} with the UNIX System error @errno{EPROTO}.  This is the only type of error that the
 transaction provider should use to indicate a fatal protocol error to the transaction user.  The
-message @prim{M_ERROR} will result in the failure of all the operating system service routines on
+message @msg{M_ERROR} will result in the failure of all the operating system service routines on
 the @dfn{stream}.  The only way for the user to recover from a fatal error is to ensure that all
 processes close the file associated with the @dfn{stream}.  Then the user may reopen the file
 associated with the @dfn{stream}.
@@ -3801,7 +3862,7 @@ associated with the @dfn{stream}.
 @c @section Fatal Error Handling Facility
 @c These errors are issued by the TR provider when it detects errors that are not correctable by the TR user, or if it is
 @c unable to report a correctable error to the TR service user.  Fatal errors are indicated via the STREAMS message type
-@c @prim{M_ERROR} with the UNIX system error @perr{EPROTO}.  The @prim{M_ERROR} STREAMS message type will result in the
+@c @msg{M_ERROR} with the UNIX system error @errno{EPROTO}.  The @msg{M_ERROR} STREAMS message type will result in the
 @c failure of all the UNIX system calls on the stream.  The TR service user can recover from a fatal error by having all
 @c the processes close the files associated with the stream, and then reopening them for processing.
 
@@ -3828,7 +3889,7 @@ interface as viewed by the transaction user.
 @item The uninitialized state of a @dfn{stream} is the initial and final state, and it must be bound
 (@pxref{TR_BIND_REQ}) before the transaction provider may view it as an active @dfn{stream}.
 
-@item If the transaction provider sends a @prim{M_ERROR} upstream, it should also drop any further
+@item If the transaction provider sends a @msg{M_ERROR} upstream, it should also drop any further
 messages received on its write side of the @dfn{stream}.
 
 @end itemize
@@ -3917,12 +3978,12 @@ to keep the queues in the proper condition.)
 
 @itemize @bullet
 
-@item The transaction providers must be aware that they will receive @prim{M_FLUSH} message from
+@item The transaction providers must be aware that they will receive @msg{M_FLUSH} message from
 upstream.  These flush requests are issued to ensure that the providers receive certain messages and
 primitives.  It is the responsibility of the providers to act appropriately as deemed necessary by
 the providers.
 
-@item The transaction provider must send up a @prim{M_FLUSH} message to flush both the read and
+@item The transaction provider must send up a @msg{M_FLUSH} message to flush both the read and
 write queues after receiving a successful @prim{TR_UNBIND_REQ} message and prior to issuing the
 @prim{TR_OK_ACK} primitive.
 
@@ -3935,11 +3996,11 @@ The following rules apply only to the connection-oriented transaction services:
 @itemize @bullet
 
 @item If the interface is in the @psta{TRS_DATA_XFER}, @psta{TRS_WIND_ORDREL} or
-@psta{TRS_WACK_ORDREL} state, the transaction provider must send up a @prim{M_FLUSH} message to
+@psta{TRS_WACK_ORDREL} state, the transaction provider must send up a @msg{M_FLUSH} message to
 flush both the read and write queues before sending up a @prim{TR_ABORT_IND}.
 
 @item If the interface is in the @psta{TRS_DATA_XFER}, @psta{TRS_WIND_ORDREL} or
-@psta{TRS_WACK_ORDREL} state, the transaction provider must send up a @prim{M_FLUSH} message to
+@psta{TRS_WACK_ORDREL} state, the transaction provider must send up a @msg{M_FLUSH} message to
 flush both the read and write queues after receiving a successful @prim{TR_ABORT_REQ} primitive and
 before issuing the @prim{TR_OK_ACK} primitive.
 
@@ -4117,7 +4178,7 @@ control messages that include options cna be contained within the buffer without
 Although a TCAP provider can support unlimited ASDU size, it cannot normally support unlimited TIDU
 size.  This is because the underlying SCCP NSDU may be limited in size.  The TCAP provider is not
 responsible for segmenting user data sequences offered to the provider from the user in an
-@prim{M_DATA} message chain.  This is the maximum size of the TIDU which corresponds to the maximum
+@msg{M_DATA} message chain.  This is the maximum size of the TIDU which corresponds to the maximum
 size of the underlying NSDU.  Because the underlying SCCP provider may have no limit on the NSDU
 size (i.e, it supports segmentation of connectionless NSDUs) this may be more in the manner of a
 optimal recommendation to the user rather than an absolute maximum.  Because of this, a given TCAP
@@ -4369,7 +4430,7 @@ control messages that include options cna be contained within the buffer without
 Although a TCAP provider can support unlimited ASDU size, it cannot normally support unlimited TIDU
 size.  This is because the underlying SCCP NSDU may be limited in size.  The TCAP provider is not
 responsible for segmenting user data sequences offered to the provider from the user in an
-@prim{M_DATA} message chain.  This is the maximum size of the TIDU which corresponds to the maximum
+@msg{M_DATA} message chain.  This is the maximum size of the TIDU which corresponds to the maximum
 size of the underlying NSDU.  Because the underlying SCCP provider may have no limit on the NSDU
 size (i.e, it supports segmentation of connectionless NSDUs) this may be more in the manner of a
 optimal recommendation to the user rather than an absolute maximum.  Because of this, a given TCAP
@@ -4706,42 +4767,48 @@ Set to the current version.
 @table @emph
 
 @item Signalling Data Link Service Data Unit
+
 A grouping of SDL user data whose boundaries are preserved from one end of the signalling data link
 connection to the other.
 
 @item Data transfer
+
 The phase in connection and connectionless modes that supports the transfer of data between to
 signalling data link users.
 
 @item SDL provider
+
 The signalling data link layer protocol that provides the services of the signalling data link
 interface.
 
 @item SDL user
+
 The user-level application or user-level or kernel-level protocol that accesses the services of the
 signalling data link layer.
 
 @item Local management
-The phase in connection and connectionless modes in which a SDL user initializes a stream and
-attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
+
+The phase in connection and connectionless modes in which a SDL user initializes a @dfn{Stream} and
+attaches a PPA address to the @dfn{Stream}.  Primitives in this phase generate local operations only.
 
 @item PPA
+
 The point at which a system attaches itself to a physical communications medium.
 
 @item PPA identifier
-An identifier of a particular physical medium over which communication transpires.
 
+An identifier of a particular physical medium over which communication transpires.
 @end table
 
 @node Acronyms
 @unnumbered Acronyms
 
 @multitable {SDL SDU}{International Telecommunication Union - Telecom Sector}
-@item SDLI @tab Signalling Data Link Interface
-@item SDL @tab Signalling Data Link
-@item SDL SDU @tab Signalling Data Link Service Data Unit
 @item ITU-T @tab International Telecommunications Union - Telecom Sector
 @item PPA @tab Physical Point of Attachment
+@item SDLI @tab Signalling Data Link Interface
+@item SDL SDU @tab Signalling Data Link Service Data Unit
+@item SDL @tab Signalling Data Link
 @end multitable
 
 @node References
@@ -4789,99 +4856,78 @@ An identifier of a particular physical medium over which communication transpire
 
 @end enumerate
 
-@c @node Index
-@c @unnumbered Index
-@c @printindex cp
-
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@iftex
 @node Indices
 @unnumbered Indices
+@end iftex
 
+@ifnottex
+@c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@end ifnottex
+
+@iftex
 @menu
 * Concept Index::
-* Type Index::
-@c * Function Index::
-* Variable Index::
-@c * File Index::
-@c * Option Index::
-@c * Author Index::
-* Primitive Index::
-* Primitive Value Index::
 * Protocol State Index::
-* Protocol Error Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Input-Output Control Index::
 * Manual Page Index::
 @end menu
 
 @node Concept Index
 @section Concept Index
-
 @printindex cp
-
-@page
-@node Type Index
-@section Type Index
-
-@printindex tp
-
-@c @page
-@c @node Function Index
-@c @section Function Index
-
-@c @printindex fn
-
-@page
-@node Variable Index
-@section Variable Index
-
-@printindex vr
-
-@c @page
-@c @node File Index
-@c @section File Index
-
-@printindex pg
-
-@c @page
-@c @node Option Index
-@c @section Option Index
-
-@c @printindex op
-
-@c @page
-@c @node Author Index
-@c @section Author Index
-
-@c @printindex au
-
-@page
-@node Primitive Index
-@section Primitive Index
-
-@printindex pr
-
-@page
-@node Primitive Value Index
-@section Primitive Value Index
-
-@printindex pv
 
 @page
 @node Protocol State Index
 @section Protocol State Index
-
 @printindex st
 
 @page
-@node Protocol Error Index
-@section Protocol Error Index
+@node Primitive Index
+@section Primitive Index
+@printindex pr
 
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
+
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
+@printindex vr
+
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
+
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
 @printindex pe
+
+@page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
 
 @page
 @node Manual Page Index
 @section Manual Page Index
-
 @printindex mp
-
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents

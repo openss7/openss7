@@ -1,8 +1,8 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: mapi.texi,v 0.9.2.10 2008-04-29 07:10:38 brian Exp $
+% @(#) $Id: mapi.texi,v 0.9.2.11 2008-07-11 09:36:11 brian Exp $
 %
 % =========================================================================
 %
@@ -17,7 +17,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,16 +54,16 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-29 07:10:38 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:36:11 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename mapi.info
 @include texi/args.texi
 @set MANUAL_TITLE Mobile Application Part Interface (MAPI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
@@ -74,55 +74,58 @@
 
 @include texi/args.texi
 @set MANUAL_TITLE Mobile Application Part Interface (MAPI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
-published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} published by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.
+
 
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
+
 All Rights Reserved.
 
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
-this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
-representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
 @ignore
-Permission is granted to process this file through Tex and print the results, provided the printed document carries
-copying permission notice identical to this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
-merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
-suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
-copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
-special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
-action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
-or the performance or implementation of the contents thereof.
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
 
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE Mobile Application Part Interface (MAPI)
-@set MANUAL_TYPE Application Programming Interface
+@set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -137,9 +140,9 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @sp 4
 @quotation
 @subheading Abstract
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
-@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -167,48 +170,54 @@ Unauthorized distribution or duplication is prohibited.
 
 @ignore
 @noindent
-This software and related documentation is protected by copyright and distributed under licenses restricting its use,
-copying, distribution and decompilation.  No part of this software or related documentation may be reproduced in any
-form by any means without the prior written authorization of the copyright holder, and licensors, if any.
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the recipient will protect this information and
-keep it confidential, and will not disclose the information contained in this document without the written permission of
-its owner.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
 @end ignore
 
 @noindent
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
-this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
-representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
 @subsubheading Notice:
 
 @noindent
-@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
-merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
-suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
-copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
-special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
-action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
-or the performance or implementation of the contents thereof.}
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
 
 @sp 1
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -217,26 +226,97 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
-@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
 @page
 
 @c Define an index of primitives
-@defindex pr
+@defcodeindex pr
 @c Define an index of primitive values
-@defindex pv
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
-@c @defindex ps
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
 
-@c @syncodeindex pr cp
-@c @syncodeindex pv cp
-@c @syncodeindex tp cp
-@c @syncodeindex vr cp
+@ifnottex
+@c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
+
+@iftex
+
+@macro prim{name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval{name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr{name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta{name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm{name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc{name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
 
 @ifnottex
 @node Top
@@ -257,7 +337,23 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 * Primitive Precedence Tables::
 * MAPI Header File Listing::
 * License::
+@iftex
+* Indices::
+@end iftex
+@ifnottex
+* Index::
+@end ifnottex
 @end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Preface
 @unnumbered Preface
@@ -265,68 +361,78 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @section Security Warning
 
 @noindent
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of @cite{OpenSS7 Corporation} not be used in advertising or publicity pertaining to
-distribution of this documentation or its contents without specific, written prior permission.  @cite{OpenSS7
-Corporation} makes no representation about the suitability of this documentation for any purpose.  It is provided ``as
-is'' without express or implied warranty.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used
+in advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this documentation including
-all implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that the
-contents of the document are suitable for any purpose, or that the implementation of such contents will not infringe on
-any third party patents, copyrights, trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable
-for any direct, indirect, special or consequential damages or any damages whatsoever resulting from loss of use, data or
-profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with any
-use of this document or the performance or implementation of the contents thereof.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action of contract, negligence or other tortious action, arising out
+of or in connection with any use of this document or the performance or implementation of the
+contents thereof.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a reference point for the
-industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this release of the
-document, minor changes may be made prior to products conforming to the interfaces being made available.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a
+reference point for the industry.  While @cite{OpenSS7 Corporation} believes that these interfaces
+are well defined in this release of the document, minor changes may be made prior to products
+conforming to the interfaces being made available.
 
 @section Abstract
 
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
-@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @section Purpose
-
-The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.  This document
-is intended to be included with the OpenSS7 @cite{STREAMS}
 @cpindex STREAMS
-software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and
-users of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces that are
-made available in the software package.
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS} software package released
+by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and users
+of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces
+that are made available in the software package.
 
 @section Intent
 
-It is the intent of this document that it act as the primary source of information concerning the @value{MANUAL_TITLE}.
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
 
 @section Audience
 
 The audience for this document is software developers, maintainers and users and integrators of the
-@value{MANUAL_TITLE}.
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
 
 @section Disclaimer
 
-Although the author has attempted to ensure that the information in this document is complete and correct, neither
-the Author nor OpenSS7 Corporation will take any responsibility in it.
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
 
 @section Revision History
 
-Take care that you are working with a current version of this documentation: you will not be notified of updates.  To
-ensure that you are working with a current version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for
-a current version.
-@sp 1
-Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document is an
-@strong{UNCONTROLLED VERSION}.
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
+
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document
+is an @strong{UNCONTROLLED VERSION}.
 
 @smallexample
+@verbatim
 
 $Log: mapi.texi,v $
+Revision 0.9.2.11  2008-07-11 09:36:11  brian
+- updated documentation
+
 Revision 0.9.2.10  2008-04-29 07:10:38  brian
 - updating headers for release
 
@@ -346,22 +452,24 @@ Revision 0.9.2.5  2006/01/04 08:04:14  brian
 - corrected documentation
 
 
+@end verbatim
 @end smallexample
 
 @node Introduction
 @chapter Introduction
-
-This document specifies a @cite{STREAMS}-based
 @cpindex STREAMS
-kernel-level instantiation of the 3GPP GSM/UMTS TS.29002 Mobile Application Part (MAP) service definition.  The Mobile
-Application Part Interface (MAPI) enables the user of a mobile application service to access and use a wide variety of
-conforming mobile application service providers without specific knowledge of the provider's protocol.  The service
-interface is designed to support any operation class of transaction protocol.  This interface only specifies access to
-mobile application layer service providers, and does not address issues concerning mobile application layer management,
-protocol performance, and performance analysis tools.
 
-This specification assumes that the reader is familiar with the 3GPP GSM/UTMS reference points and protocol stacks,
-Mobile Application Part services, and STREAMS.
+This document specifies a @cite{STREAMS}-based kernel-level instantiation of the 3GPP GSM/UMTS
+TS.29002 Mobile Application Part (MAP) service definition.  The Mobile Application Part Interface
+(MAPI) enables the user of a mobile application service to access and use a wide variety of
+conforming mobile application service providers without specific knowledge of the provider's
+protocol.  The service interface is designed to support any operation class of transaction protocol.
+This interface only specifies access to mobile application layer service providers, and does not
+address issues concerning mobile application layer management, protocol performance, and performance
+analysis tools.
+
+This specification assumes that the reader is familiar with the 3GPP GSM/UTMS reference points and
+protocol stacks, Mobile Application Part services, and STREAMS.
 
 @section Related Documentation
 
@@ -377,9 +485,10 @@ Mobile Application Part services, and STREAMS.
 
 @subsection Role
 
-This document specifies an interface that supports the service provided by the Mobile Applications Part (MAP)
-specification for 3GPP GSM/UMTS as described in 3GPP TS 29.002.  These specifications are targeted for use by developers
-and testers of protocol modules that require Mobile Applications Part services.
+This document specifies an interface that supports the service provided by the Mobile Applications
+Part (MAP) specification for 3GPP GSM/UMTS as described in 3GPP TS 29.002.  These specifications are
+targeted for use by developers and testers of protocol modules that require Mobile Applications Part
+services.
 
 @section Definitions, Acronyms, Abbreviations
 
@@ -441,14 +550,15 @@ routing and management of data exchange between the MAP-User entities.
 
 @section Model of the MAPI
 
-The MAPI defines the services provided by the MAP layer to the MAP-User at the boundary between the MAP layer and the
-MAP layer user entity.  The interface consists of a set of primitives defined as STREAMS messages that provide access to
-the MAP layer services, and are transferred between the MAP user entity and the MAP provider.  These primitives are of
-two types: ones that originate from the MAP user, and others that originate from the MAP provider.  The primitives that
-originate from the MAP user make requests to the MAP provider, or respond to an event of the MAP provider.  The
-primitives that originate from the MAP provider are either confirmation of a request or are indications to the MAP user
-that the event has occurred.  @emph{Figure 1} shows the model of the MAPI.
-(See @ref{Modelling Principles, , , ,3GPP TS 29.002 V6.6.0}.)
+The MAPI defines the services provided by the MAP layer to the MAP-User at the boundary between the
+MAP layer and the MAP layer user entity.  The interface consists of a set of primitives defined as
+STREAMS messages that provide access to the MAP layer services, and are transferred between the MAP
+user entity and the MAP provider.  These primitives are of two types: ones that originate from the
+MAP user, and others that originate from the MAP provider.  The primitives that originate from the
+MAP user make requests to the MAP provider, or respond to an event of the MAP provider.  The
+primitives that originate from the MAP provider are either confirmation of a request or are
+indications to the MAP user that the event has occurred.  @emph{Figure 1} shows the model of the
+MAPI.  (See @ref{Modelling Principles, , , ,3GPP TS 29.002 V6.6.0}.)
 
 @cartouche
 @center Figure 1 -- @emph{Module of the MAP Interface}
@@ -1596,6 +1706,7 @@ This primitive requests the MAP provider to return the values of all supported p
 do not appear in the state tables in @ref{State/Event Tables}.}
 
 @subsubheading Format
+@tpindex MAP_info_req_t
 
 The format of the message is one @samp{M_PROTO} message block and its structure is as follows:
 
@@ -1603,7 +1714,6 @@ The format of the message is one @samp{M_PROTO} message block and its structure 
 typedef struct @{
         ulong PRIM_type;    /* always MAP_INFO_REQ */
 @} MAP_info_req_t;
-@tpindex MAP_info_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1644,6 +1754,7 @@ This primitive indicates to the MAP users any relevant protocol-dependent parame
 It should be initiated in response to the @code{MAP_INFO_REQ} primitive described above in @ref{MAP_INFO_REQ}.
 
 @subsubheading Format
+@tpindex MAP_info_ack_t
 
 The format of the message is one @samp{M_PCPROTO} message block.  The format of the @samp{M_PCPROTO} message block is as
 follows:
@@ -1672,7 +1783,6 @@ typedef struct @{
     ulong PROTOID_offset;   /* offset of bound protocol ids */
     ulong MAPI_version;     /* supported MAPI version number */
 @} MAP_info_ack_t;
-@tpindex MAP_info_ack_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1754,6 +1864,7 @@ Protocol Data Units) associated with the @dfn{stream}}
 the @dfn{stream} associated with the protocol address.
 
 @subsubheading Format
+@tpindex MAP_bind_req_t
 
 The format of the message is one @samp{M_PROTO} message block.  The format of the @samp{M_PROTO} message block is as
 follows:
@@ -1765,7 +1876,6 @@ typedef struct @{
     ulong ADDR_offset;              /* offset of protocol address */
     unsigned long DIAIND_number;    /* requested number of dialogue indications to be queued */
 @} MAP_bind_req_t;
-@tpindex MAP_bind_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1832,6 +1942,7 @@ the specified number of dialogue open indications are allowed to be queued by th
 address, and that the @dfn{stream} associated with the specified protocol address has ben activated.
 
 @subsubheading Format
+@tpindex MAP_bind_ack_t
 
 The format of the message is one @samp{M_PCPROTO} message block.  The format of the @samp{M_PCPROTO} message block is as
 follows:
@@ -1843,7 +1954,6 @@ typedef struct @{
     long ADDR_offset;       /* offset of address */
     ulong DIAIND_number;    /* dialogue open indications to be queued */
 @} MAP_bind_ack_t;
-@tpindex MAP_bind_ack_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1877,6 +1987,7 @@ This primitive requests that the MAP provider unbind the protocol address associ
 deactivate the @dfn{stream}.
 
 @subsubheading Format
+@tpindex MAP_unbind_req_t
 
 The format of the message is one @samp{M_PROTO} message block.  The format of the @samp{M_PROTO} mesage block is as
 follows:
@@ -1885,7 +1996,6 @@ follows:
 typedef struct @{
     long PRIM_type;         /* always MAP_UNBIND_REQ */
 @} MAP_unbind_req_t;
-@tpindex MAP_unbind_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -1926,6 +2036,7 @@ A system error has occurred and the UNIX system error is indicated in the primit
 This primitive allows the MAP user to manage the options associated with the @dfn{stream}.
 
 @subsubheading Format
+@tpindex MAP_optmgmt_req_t
 
 The format of the message is one @samp{M_PROTO} message block.  The format of the @samp{M_PROTO} message block is as
 follows:
@@ -1937,7 +2048,6 @@ typedef struct @{
     long OPT_offset;        /* options offset */
     long MGMT_flags;        /* flags */
 @} MAP_optmgmt_req_t;
-@tpindex MAP_optmgmt_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -2011,6 +2121,7 @@ This primitive requests that the MAP provider return the local protocol address 
 the address of the remote MAP entity if a dialogue has been established.
 
 @subsubheading Format
+@tpindex MAP_addr_req_t
 
 The format of the message is one @samp{M_PROTO} message block.  The format of the @samp{M_PROTO} message block is as
 follows:
@@ -2019,7 +2130,6 @@ follows:
 typedef struct @{
     long PRIM_type;     /* always MAP_ADDR_REQ */
 @} MAP_addr_req_t;
-@tpindex MAP_addr_req_t
 @end smallexample
 
 @subsubheading Parameters
@@ -9060,23 +9170,78 @@ Release 6.6.0.
 
 @include texi/fdl.texi
 
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@iftex
 @node Indices
 @unnumbered Indices
+@end iftex
 
-@node Index of Primitives
-@section Index of Primitives
+@ifnottex
+@c concatenate indices for html and info
+@node Index
+@unnumbered Index
+@printindex cp
+@end ifnottex
 
+@iftex
+@menu
+* Concept Index::
+* Protocol State Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Input-Output Control Index::
+* Manual Page Index::
+@end menu
+
+@node Concept Index
+@section Concept Index
+@printindex cp
+
+@page
+@node Protocol State Index
+@section Protocol State Index
+@printindex st
+
+@page
+@node Primitive Index
+@section Primitive Index
 @printindex pr
 
-@node Index of Primitive Fields
-@section Index of Primitive Fields
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
 
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
 @printindex vr
 
-@node Index of Primitive Structure Types
-@section Index of Primitive Structure Types
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
 
-@printindex tp
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
+@printindex pe
+
+@page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
+
+@page
+@node Manual Page Index
+@section Manual Page Index
+@printindex mp
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents

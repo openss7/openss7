@@ -18,6 +18,7 @@
 .pl 11.0i
 .ll 8.0i
 .lt 8.0i
+.po 0.0i
 .nr LL 8.0i
 .nr LT 8.0i
 .nr PO 0.0i

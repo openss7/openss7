@@ -1,76 +1,3 @@
-/*****************************************************************************
-
- @(#) lmi.h,v 0.9.2.1 2007/08/13 19:55:43 brian Exp
-
- -----------------------------------------------------------------------------
-
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-
- All Rights Reserved.
-
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
-
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
-
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
- -----------------------------------------------------------------------------
-
- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
- behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
- is classified as "Commercial Computer Software" under paragraph 252.227-7014
- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
- successor regulations) and the Government is acquiring only the license rights
- granted herein (the license rights customarily provided to non-Government
- users).  If the Software is supplied to any unit or agency of the Government
- other than DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
- (or any successor regulations).
-
- -----------------------------------------------------------------------------
-
- Commercial licensing and support of this software is available from OpenSS7
- Corporation at a fee.  See http://www.openss7.com/
-
- -----------------------------------------------------------------------------
-
- Last Modified 2007/08/13 19:55:43 by brian
-
- -----------------------------------------------------------------------------
-
- lmi.h,v
- Revision 0.9.2.1  2007/08/13 19:55:43  brian
- - added spec headers
-
- Revision 0.9.2.9  2007/08/12 16:19:53  brian
- - new PPA handling
-
- Revision 0.9.2.8  2007/03/25 18:59:12  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.7  2007/01/28 01:09:50  brian
- - updated test programs and working up m2ua-as driver
-
- *****************************************************************************/
-
-#ifndef __LMI_H__
-#define __LMI_H__
-
-#ident "@(#) lmi.h,v (0.9.2.1) Copyright (c) 2001-2007 OpenSS7 Corporation."
-
-/* This file can be processed by doxygen(1). */
-
 #define LMI_PROTO_BASE            16L
 
 #define LMI_DSTR_FIRST          ( 1L + LMI_PROTO_BASE )
@@ -119,8 +46,10 @@
 #define LMI_EVENT               0x000a0000      /* Protocol-specific event ocurred */
 #define LMI_FATALERR            0x000b0000      /* Device has become unusable */
 #define LMI_INITFAILED          0x000c0000      /* Link initialization failed */
-#define LMI_NOTSUPP             0x000d0000      /* Primitive not supported by this device */
-#define LMI_OUTSTATE            0x000e0000      /* Primitive was issued from invalid state */
+#define LMI_NOTSUPP             0x000d0000      /* Primitive not supported by this device 
+                                                 */
+#define LMI_OUTSTATE            0x000e0000      /* Primitive was issued from invalid
+                                                   state */
 #define LMI_PROTOSHORT          0x000f0000      /* M_PROTO block too short */
 #define LMI_SYSERR              0x00100000      /* UNIX system error */
 #define LMI_WRITEFAIL           0x00110000      /* Unitdata request failed */
@@ -159,7 +88,7 @@ typedef unsigned char lmi_uchar;
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_INFO_REQ */
+    lmi_long lmi_primitive;     /* LMI_INFO_REQ */
 } lmi_info_req_t;
 
 /*
@@ -167,18 +96,18 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_INFO_ACK */
-        lmi_ulong lmi_version;
-        lmi_ulong lmi_state;
-        lmi_ulong lmi_max_sdu;
-        lmi_ulong lmi_min_sdu;
-        lmi_ulong lmi_header_len;
-        lmi_ulong lmi_ppa_style;
-        lmi_ulong lmi_ppa_length;
-        lmi_ulong lmi_ppa_offset;
-        lmi_ulong lmi_prov_flags;       /* provider specific flags */
-        lmi_ulong lmi_prov_state;       /* provider specific state */
-        lmi_uchar lmi_ppa_addr[0];
+    lmi_long lmi_primitive;     /* LMI_INFO_ACK */
+    lmi_ulong lmi_version;
+    lmi_ulong lmi_state;
+    lmi_ulong lmi_max_sdu;
+    lmi_ulong lmi_min_sdu;
+    lmi_ulong lmi_header_len;
+    lmi_ulong lmi_ppa_style;
+    lmi_ulong lmi_ppa_length;
+    lmi_ulong lmi_ppa_offset;
+    lmi_ulong lmi_prov_flags;   /* provider specific flags */
+    lmi_ulong lmi_prov_state;   /* provider specific state */
+    lmi_uchar lmi_ppa_addr[0];
 } lmi_info_ack_t;
 
 #define LMI_VERSION_1       1
@@ -200,10 +129,10 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_ATTACH_REQ */
-        lmi_ulong lmi_ppa_length;
-        lmi_ulong lmi_ppa_offset;
-        lmi_uchar lmi_ppa[0];
+    lmi_long lmi_primitive;     /* LMI_ATTACH_REQ */
+    lmi_ulong lmi_ppa_length;
+    lmi_ulong lmi_ppa_offset;
+    lmi_uchar lmi_ppa[0];
 } lmi_attach_req_t;
 
 /*
@@ -211,7 +140,7 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_DETACH_REQ */
+    lmi_long lmi_primitive;     /* LMI_DETACH_REQ */
 } lmi_detach_req_t;
 
 /*
@@ -219,10 +148,10 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_ENABLE_REQ */
-        lmi_ulong lmi_rem_length;
-        lmi_ulong lmi_rem_offset;
-        lmi_uchar lmi_rem[0];
+    lmi_long lmi_primitive;     /* LMI_ENABLE_REQ */
+    lmi_ulong lmi_rem_length;
+    lmi_ulong lmi_rem_offset;
+    lmi_uchar lmi_rem[0];
 } lmi_enable_req_t;
 
 /*
@@ -230,7 +159,7 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_DISABLE_REQ */
+    lmi_long lmi_primitive;     /* LMI_DISABLE_REQ */
 } lmi_disable_req_t;
 
 /*
@@ -238,9 +167,9 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_OK_ACK */
-        lmi_long lmi_correct_primitive;
-        lmi_ulong lmi_state;
+    lmi_long lmi_primitive;     /* LMI_OK_ACK */
+    lmi_long lmi_correct_primitive;
+    lmi_ulong lmi_state;
 } lmi_ok_ack_t;
 
 /*
@@ -248,11 +177,11 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_ERROR_ACK */
-        lmi_ulong lmi_errno;
-        lmi_ulong lmi_reason;
-        lmi_long lmi_error_primitive;
-        lmi_ulong lmi_state;
+    lmi_long lmi_primitive;     /* LMI_ERROR_ACK */
+    lmi_ulong lmi_errno;
+    lmi_ulong lmi_reason;
+    lmi_long lmi_error_primitive;
+    lmi_ulong lmi_state;
 } lmi_error_ack_t;
 
 /*
@@ -260,8 +189,8 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_ENABLE_CON */
-        lmi_ulong lmi_state;
+    lmi_long lmi_primitive;     /* LMI_ENABLE_CON */
+    lmi_ulong lmi_state;
 } lmi_enable_con_t;
 
 /*
@@ -269,8 +198,8 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_DISABLE_CON */
-        lmi_ulong lmi_state;
+    lmi_long lmi_primitive;     /* LMI_DISABLE_CON */
+    lmi_ulong lmi_state;
 } lmi_disable_con_t;
 
 /*
@@ -278,10 +207,10 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_OPTMGMT_REQ */
-        lmi_ulong lmi_opt_length;
-        lmi_ulong lmi_opt_offset;
-        lmi_ulong lmi_mgmt_flags;
+    lmi_long lmi_primitive;     /* LMI_OPTMGMT_REQ */
+    lmi_ulong lmi_opt_length;
+    lmi_ulong lmi_opt_offset;
+    lmi_ulong lmi_mgmt_flags;
 } lmi_optmgmt_req_t;
 
 /*
@@ -289,10 +218,10 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_OPMGMT_ACK */
-        lmi_ulong lmi_opt_length;
-        lmi_ulong lmi_opt_offset;
-        lmi_ulong lmi_mgmt_flags;
+    lmi_long lmi_primitive;     /* LMI_OPMGMT_ACK */
+    lmi_ulong lmi_opt_length;
+    lmi_ulong lmi_opt_offset;
+    lmi_ulong lmi_mgmt_flags;
 } lmi_optmgmt_ack_t;
 
 #undef LMI_DEFAULT
@@ -312,10 +241,10 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_ERROR_IND */
-        lmi_ulong lmi_errno;
-        lmi_ulong lmi_reason;
-        lmi_ulong lmi_state;
+    lmi_long lmi_primitive;     /* LMI_ERROR_IND */
+    lmi_ulong lmi_errno;
+    lmi_ulong lmi_reason;
+    lmi_ulong lmi_state;
 } lmi_error_ind_t;
 
 /*
@@ -323,9 +252,9 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_STATS_IND */
-        lmi_ulong lmi_interval;
-        lmi_ulong lmi_timestamp;
+    lmi_long lmi_primitive;     /* LMI_STATS_IND */
+    lmi_ulong lmi_interval;
+    lmi_ulong lmi_timestamp;
 } lmi_stats_ind_t;
 
 /*
@@ -333,36 +262,36 @@ typedef struct {
  */
 
 typedef struct {
-        lmi_long lmi_primitive;         /* LMI_EVENT_IND */
-        lmi_ulong lmi_objectid;
-        lmi_ulong lmi_timestamp;
-        lmi_ulong lmi_severity;
+    lmi_long lmi_primitive;     /* LMI_EVENT_IND */
+    lmi_ulong lmi_objectid;
+    lmi_ulong lmi_timestamp;
+    lmi_ulong lmi_severity;
 } lmi_event_ind_t;
 
 union LMI_primitive {
-        lmi_long lmi_primitive;
-        lmi_ok_ack_t ok_ack;
-        lmi_error_ack_t error_ack;
-        lmi_error_ind_t error_ind;
-        lmi_stats_ind_t stats_ind;
-        lmi_event_ind_t event_ind;
+    lmi_long lmi_primitive;
+    lmi_ok_ack_t ok_ack;
+    lmi_error_ack_t error_ack;
+    lmi_error_ind_t error_ind;
+    lmi_stats_ind_t stats_ind;
+    lmi_event_ind_t event_ind;
 };
 
 union LMI_primitives {
-        lmi_long lmi_primitive;
-        lmi_info_req_t info_req;
-        lmi_info_ack_t info_ack;
-        lmi_attach_req_t attach_req;
-        lmi_detach_req_t detach_req;
-        lmi_enable_req_t enable_req;
-        lmi_disable_req_t disable_req;
-        lmi_ok_ack_t ok_ack;
-        lmi_error_ack_t error_ack;
-        lmi_enable_con_t enable_con;
-        lmi_disable_con_t disable_con;
-        lmi_error_ind_t error_ind;
-        lmi_stats_ind_t stats_ind;
-        lmi_event_ind_t event_ind;
+    lmi_long lmi_primitive;
+    lmi_info_req_t info_req;
+    lmi_info_ack_t info_ack;
+    lmi_attach_req_t attach_req;
+    lmi_detach_req_t detach_req;
+    lmi_enable_req_t enable_req;
+    lmi_disable_req_t disable_req;
+    lmi_ok_ack_t ok_ack;
+    lmi_error_ack_t error_ack;
+    lmi_enable_con_t enable_con;
+    lmi_disable_con_t disable_con;
+    lmi_error_ind_t error_ind;
+    lmi_stats_ind_t stats_ind;
+    lmi_event_ind_t event_ind;
 };
 
 #define LMI_INFO_REQ_SIZE       sizeof(lmi_info_req_t)
@@ -380,14 +309,13 @@ union LMI_primitives {
 #define LMI_EVENT_IND_SIZE      sizeof(lmi_event_ind_t)
 
 typedef struct lmi_opthdr {
-        lmi_ulong level;
-        lmi_ulong name;
-        lmi_ulong length;
-        lmi_ulong status;
-        lmi_uchar value[0];
-        /*
-           followed by option value 
-         */
+    lmi_ulong level;
+    lmi_ulong name;
+    lmi_ulong length;
+    lmi_ulong status;
+    lmi_uchar value[0];
+    /* 
+       followed by option value */
 } lmi_opthdr_t;
 
 #define LMI_LEVEL_COMMON        '\0'
@@ -402,5 +330,3 @@ typedef struct lmi_opthdr {
 
 #define LMI_OPT_PROTOCOL        1       /* use struct lmi_option */
 #define LMI_OPT_STATISTICS      2       /* use struct lmi_sta */
-
-#endif                          /* __LMI_H__ */
