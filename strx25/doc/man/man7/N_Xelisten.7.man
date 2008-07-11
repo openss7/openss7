@@ -1,0 +1,465 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: N_Xelisten.7.man,v 0.9.2.1 2008/07/11 00:04:50 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008/07/11 00:04:50 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: N_Xelisten.7.man,v $
+.\" Revision 0.9.2.1  2008/07/11 00:04:50  brian
+.\" - added new manual pages
+.\"
+.\" Revision 0.9.2.1  2008-05-03 11:42:29  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.TH N_XELISTEN 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
+.SH NAME
+.B N_Xelisten
+\- Extended Listen Request and Extended Listen Response
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <netx25/x25_proto.h>
+
+struct xlistenf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int lmax;
+    int l_result;
+};
+\s+1\fP
+.fi
+.PP
+.nf
+\f(CW\s-1\
+struct lcud {
+    unsigned char l_cumode;
+    unsigned char l_culength; /* octets */
+    unsigned char l_cubytes[0];
+    /* followed by l_culength bytes */
+};
+struct lsn {
+    unsigned char l_snmode;
+    unsigned char l_snlen;
+    unsigned char l_snid[0];
+    /* followed by l_snlen bytes */
+};
+struct ladd {
+    unsigned char l_mode;
+    unsigned char l_type;
+    unsigned char l_length; /* semi-octets */
+    unsigned char l_add[0];
+    /* followed by ((l_length+1)>>1) bytes
+       containing l_length semi-octets. */
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The Extended Listen Request or Response is used when an NS user wishes to
+register interest in incoming calls and the NS provider acknowledges the
+request.  The control part of the message consists of one
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+message block, and contains the
+.B xlistenf
+structure.
+The data part of the message consists of one or more
+.BR M_DATA (9)
+message blocks
+containing the call user data and address of interest.
+.\"
+.\"
+.SH FORMAT
+.PP
+The Extended Listen Request and Extended Listen Response use the
+.B xlistenf
+structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+or
+.BR M_PCPROTO (9)
+message block, and contains the
+.B xlistenf
+structure.
+The data part of the message consists of one or more
+.BR M_DATA (9)
+message blocks
+containing the call user data and address of interest.
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B xlistenf
+structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_Xelisten\fP, for both Extended Listen Request and Extended Listen Response.
+.TP
+.I lmax
+Conveys the maximum number of outstanding Connect Indications that the listening
+Stream is willing to accept, for the addresses conveyed in the attached
+.BR M_DATA (9)
+message blocks.
+.PP
+Listen requests are cummulated but this field is not.  The maximum number of
+outstanding Connect Indications will be reflected by the value of this field for
+the last successful Listen Request issued by the NS user.
+.TP
+.I l_result
+Conveys the result of the Listen Request in a Listen Response message primitive.
+An error in the parameters or a lack of resources results in this flag being set
+to a non-zero value.
+.PP
+The
+.BR M_DATA (9)
+portion of the message contains the following members:
+.TP
+.I l_cumode
+Specifies the type of matching.
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+X25_DONTCARE:1:Represents a wildcard.
+X25_MATCH:4:Contains a pattern match.
+_
+.TE
+.TP
+.B Notes:
+.IP 1. \w'0.\(em'u
+When the \fIl_cumode\fP is set to \fBX25_DONTCARE\fP, the
+\fIl_culength\fP and \fIl_cubytes\fP fields are ommitted from the
+.BR M_DATA (9)
+message block.
+.IP 2.
+\fBX25_MATCH\fP appears to be PT WAN specific.
+.RE
+.TP
+.I l_culength
+Specifies the length of the \fIl_cubytes\fP field in octets.
+.TP
+.I l_cubytes
+Contains the bytes to be matched against the Call User Data (CUD).
+.TP
+.I l_snmode
+Specifies the matching mode.
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+X25_DONTCARE:1:Represents a wildcard.
+X25_MATCH:4:Contains a pattern match.
+_
+.TE
+.TP
+.B Notes:
+.IP 1. \w'1.\(em'u
+When the \fIl_mode\fP is set to \fBX25_DONTCARE\fP, the
+\fIl_snlen\fP and \fIl_snid\fP fields are ommitted from
+the
+.BR M_DATA (9)
+message block.
+.IP 2.
+\fBX25_MATCH\fP appears to be PT WAN specific.
+.RE
+.TP
+.I l_snlen
+Conveys the length of the \fIl_snid\fP field.
+.TP
+.I l_snid
+Contains the subnetwork identifier.
+.TP
+.I l_mode
+Specifies the type of matching.
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+X25_DONTCARE:1:Represents a wildcard.
+X25_MATCH:4:Contains a pattern match.
+_
+.TE
+.TP
+.B Notes:
+.IP 1. \w'1.\(em'u
+When the \fIl_mode\fP is set to \fBX25_DONTCARE\fP, the
+\fIl_type\fP, \fIl_length\fP and \fIl_add\fP fields are ommitted from
+the
+.BR M_DATA (9)
+message block.
+.IP 2.
+\fBX25_MATCH\fP appears to be PT WAN specific.
+.RE
+.TP
+.I l_type
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+X25_DTE:1:Contains an X.25 DTE (X.121) address.
+X25_NSAP:2:Contains a CONS NSAP address.
+_
+.TE
+.RE
+.TP
+.I l_length
+Specifies the length of the \fIl_add\fP field in semi-octets.  That is, the
+length of the \fIl_add\fP field in octets is: \*(lq\fB((l_length+1)>>1)\fP\*(rq.  The
+maximum length for a DTE address is 15 or 17 semi-octets (that is, 8 or 9
+octets) depending upon whether TOA/NPI addressing is used.  The maximum length
+for an NSAP address is 20 semi-octets (that is, 10 octets).
+.TP
+.I l_add
+Contains the bytes to be matched against the DTE address or the NSAP address.
+.\"
+.\"
+.SH STATE
+.PP
+This message primitive is valid in the disconnected phase or during an incoming
+connecting phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+When an NS user issues a Listen Request, the NS user expects an Extended Listen
+Response message primitive from the NS provider.
+.\"
+.\"
+.SH USAGE
+.PP
+The Extended Listen Request message primitive is equivalent to the
+.BR N_BIND_REQ (7)
+of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7);
+the Extended Listen Response,
+.BR N_BIND_ACK (7).
+.\"
+.\"
+.\".SH CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH MT-CONTEXT
+.\".PP
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.SH NOTICES
+.PP
+The Network Layer Interface (NLI) is a proprietary interface without a formal
+standard.  Either the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7),
+or the XTI-X25 interface,
+.[
+xx25
+.]
+.BR xti_x25 (3),
+should be used in its stead.
+.\"
+.\"
+.SH FILES
+.PP
+.B N_Xelisten
+is defined in the
+.RB < netx25/x25_proto.h >
+file.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR xaddrf (5),
+.BR lsapformat (5),
+.BR qosformat (5),
+.BR extraformat (5),
+.BR NLI (7),
+.IR STREAMS (4).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B N_Xelisten
+is compatible with NLI, and implementations based on NLI such as
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "HP-UX X.25/9000" ,
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+with the following considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solaris Solstice" \(rg " X.25 9.2" ,
+.[
+solx25pg
+.]
+.IR "IRIX SX.25" ,
+.[
+sx25
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+are consistent in their documentation of
+.BR N_Xelisten .
+.IP \(em
+NLI is an inherently low level and non-portable interface and should not be
+used by portable programs.  Portable programs should use the NPI or XX25
+interfaces in its stead.
+.IP \(em
+Binary compatibility is not attempted: only a rough source compatibility.  Any
+binary compatibility exhibited is a bug and is scheduled to be removed in the
+next release.
+.PP
+See
+.BR NLI (7),
+.IR STREAMS (4),
+for additional compatiblity considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The NLI is not a formal standard.  The
+.IR OpenSS7 \(tm
+implementation of NLI conforms to documentation for Version 3 of the NLI.
+.\"
+.\"
+.SH HISTORY
+.PP
+The NLI is an interface originally developed by Spider Systems, Ltd. (now a
+division of Emmerson Power).  The NLI interface found its way into may
+mainstream UNIX implementations and UNIX-like RTOS sporting STREAMS such as
+Windriver's VxWorks.  The NLI was never standardized and remains an inherently
+non-portable interface.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.IR OpenSS7 \(tm
+implementation of X.25.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
