@@ -1,3 +1,26 @@
+2008-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: documentation updates
+	* NEWS: documentation updates
+	* README: documentation updates
+	* README-cvs: documentation updates
+	* THANKS: documentation updates
+	* doc/man/sigtran.macros: documentation updates
+	* doc/projects/hlr_cost.tbl: documentation updates
+	* doc/projects/hlr_gate0.tbl: documentation updates
+	* doc/projects/hlr_gate1.tbl: documentation updates
+	* doc/projects/hlr_gate2.tbl: documentation updates
+	* doc/projects/hlr_gate3.tbl: documentation updates
+	* doc/projects/hlr_gate4.tbl: documentation updates
+	* doc/projects/hlr_gate5.tbl: documentation updates
+	* doc/projects/hlr_gate6.tbl: documentation updates
+	* doc/projects/hlr_sched.tbl: documentation updates
+	* doc/projects/hlr_schest.tbl: documentation updates
+	* doc/projects/hlr_traf.tbl: documentation updates
+	* doc/projects/labmini.tbl: documentation updates
+	* doc/projects/labnodes.tbl: documentation updates
+	* doc/projects/labpref.tbl: documentation updates
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/drafts/fixup: more portable
