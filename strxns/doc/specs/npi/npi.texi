@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: npi.texi,v 0.9.2.16 2008/07/10 23:50:37 brian Exp $
+% @(#) $Id: npi.texi,v 0.9.2.17 2008-07-11 09:48:46 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008/07/10 23:50:37 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:48:46 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -1347,7 +1347,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -1445,7 +1445,7 @@ typedef struct {
 
 The above fields have the following meaning:
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -1477,7 +1477,7 @@ via a @prim{N_BIND_REQ}).
 @item ADDR_offset
 Specifies the offset of the bound network address from the beginning of the
 @msg{M_PCPROTO} message block (this field should be ignored if the
-@member{ADDR_length} field is zero).
+@parm{ADDR_length} field is zero).
 
 @item QOS_length
 in an addendum to this document.  In the connection-mode environment, when this
@@ -1516,8 +1516,8 @@ and default selection for use of receipt confirmation.
 
 @item NIDU_size
 This indicates the amount of user data that may be present in a @prim{N_DATA}
-primitive.  The @member{NIDU_size} should not be larger than the
-@member{NSDU_size} specification.
+primitive.  The @parm{NIDU_size} should not be larger than the
+@parm{NSDU_size} specification.
 
 @item SERV_type
 Specifies the service type supported by the NS provider.  The possible values
@@ -1631,7 +1631,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Is the primitive type.
@@ -1646,11 +1646,11 @@ address begins.
 @item CONIND_number
 Is the requested number of connect indications allowed to be outstanding by the
 NS provider for the specified protocol address.  (If the number of outstanding
-connect indications equals @member{CONIND_number}, the NS provider need not discard
+connect indications equals @parm{CONIND_number}, the NS provider need not discard
 further incoming connect indications, but may choose to queue them internally
 until the number of outstanding connect indications drops below the
-@member{CONIND_number}.) Only one stream per network address is allowed to have a
-@member{CONIND_number} value greater than zero.  This indicates to the network provider
+@parm{CONIND_number}.) Only one stream per network address is allowed to have a
+@parm{CONIND_number} value greater than zero.  This indicates to the network provider
 that this stream is the listener stream for the NS user.  This stream will be
 used by the NS provider for connect indications for that network address.
 
@@ -1679,7 +1679,7 @@ id begins.
 When set, this flag indicates that this stream is the ``default listener
 stream''.  This stream is used to pass connect indications for all incoming
 calls that contain protocol identifiers that are not bound to any other
-listener, or when a listener stream with @member{CONIND_number} value of greater than
+listener, or when a listener stream with @parm{CONIND_number} value of greater than
 zero is not found.  Also, the default listener will receive all incoming call
 indications that contain no user data.
 
@@ -1747,7 +1747,7 @@ information.  It is not intended to indicate protocol errors.
 
 @item NBOUND
 The NS user attempted to bind a second stream to a network address with the
-@member{CONIND_number} set to a non-zero value, or attempted to bind a second
+@parm{CONIND_number} set to a non-zero value, or attempted to bind a second
 stream with the @pval{DEFAULT_LISTENER} flag value set to non-zero.
 
 @item NNOADDR
@@ -1804,7 +1804,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -1851,7 +1851,7 @@ stream:
 
 @itemize ---
 
-@item If the @member{ADDR_length} field in the @prim{N_BIND_REQ} primitive is
+@item If the @parm{ADDR_length} field in the @prim{N_BIND_REQ} primitive is
 zero, then the NS provider is to assign a network address to the user.
 
 @item The NS provider is to bind the network address as specified in the
@@ -1862,11 +1862,11 @@ user's responsibility to check the network address returned in the
 
 @end itemize
 
-The following rules apply to negotiating @member{CONIND_number} argument:
+The following rules apply to negotiating @parm{CONIND_number} argument:
 
 @itemize ---
 
-@item The @member{CONIND_number} in the @prim{N_BIND_ACK} primitive must be less
+@item The @parm{CONIND_number} in the @prim{N_BIND_ACK} primitive must be less
 than or equal to the corresponding requested number as indicated in the
 @prim{N_BIND_REQ} primitive.
 
@@ -1877,18 +1877,18 @@ stream has already bound itself to the given network address with a value
 greater than zero, the NS provider should assign another protocol address to the
 user.
 
-@item If a stream with @member{CONIND_number} greater than zero is used to
+@item If a stream with @parm{CONIND_number} greater than zero is used to
 accept a connection,the stream will be found busy during the duration of that
 connection and no other streams may be bound to that network address with a
-@member{CONIND_number} greater than zero.  This will prevent more than one
+@parm{CONIND_number} greater than zero.  This will prevent more than one
 stream bound to the identical network address from accepting connect
 indications.
 
-@item A stream requesting a @member{CONIND_number} of zero should always be
+@item A stream requesting a @parm{CONIND_number} of zero should always be
 legal.  This indicates to the NS provider that the stream is to be used to
 request connections only.
 
-@item A stream with a negotiated @member{CONIND_number} greater than zero may
+@item A stream with a negotiated @parm{CONIND_number} greater than zero may
 generate connect requests or accept connect indications.
 
 @end itemize
@@ -1932,7 +1932,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -2004,7 +2004,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -2116,7 +2116,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Identifies the primitive type
@@ -2227,7 +2227,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Identifies the primitive.
@@ -2334,7 +2334,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -2481,7 +2481,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -2587,7 +2587,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -2749,7 +2749,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -2822,7 +2822,7 @@ This user-originated primitive indicates to the NS provider that this message
 contains NS user data.  It allows the transfer of NS_user_data between NS users,
 without modification by the NS provider.  The NS user must send any integral
 number of octets of data greater than zero.  In a case where the size of the
-NSDU exceeds the NIDU (as specified by the size of the @member{NIDU_size}
+NSDU exceeds the NIDU (as specified by the size of the @parm{NIDU_size}
 parameter of the @prim{N_INFO_ACK} primitive), the NSDU may be broken up into
 more than one NIDU.  When an NSDU is broken up into more than one NIDU, the
 @pval{N_MORE_DATA_FLAG} will be set on each NIDU except the last one.  The
@@ -2897,7 +2897,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -2947,7 +2947,7 @@ This indicates one of the following unrecoverable protocol conditions:
 @item The network interface was found to be in an incorrect state.
 
 @item The amount of NS user data associated with the primitive is outside the
-range supported by the NS provider (as specified by the @member{NIDU_size}
+range supported by the NS provider (as specified by the @parm{NIDU_size}
 parameter of @prim{N_INFO_ACK} primitive).
 
 @item The options requested are either not supported by the NS provider or its
@@ -2957,7 +2957,7 @@ use not specified with the @prim{N_CONN_REQ} primitive.
 @msg{M_DATA} message blocks.
 
 @item The amount of NS user data associated with the current NSDU is outside the
-range supported by the NS provider (as specified by the @member{NSDU_size}
+range supported by the NS provider (as specified by the @parm{NSDU_size}
 parameter if the @prim{N_INFO_ACK} primitive.)
 
 @item The @pval{N_RC_FLAG} and @pval{N_MORE_DATA_FLAG} were both set in the
@@ -3011,7 +3011,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3095,7 +3095,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3164,7 +3164,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3234,7 +3234,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3310,7 +3310,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3374,7 +3374,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3451,7 +3451,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3498,7 +3498,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3571,7 +3571,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3653,7 +3653,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3769,7 +3769,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3877,7 +3877,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -3986,7 +3986,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -4059,7 +4059,7 @@ typedef struct {
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item PRIM_type
 Indicates the primitive type.
@@ -4169,7 +4169,7 @@ long nc_estab_delay;        /* maximum NC establishment delay */
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item nc_estab_delay
 Is the maximum acceptable delay value for NC establishment.
@@ -4197,7 +4197,7 @@ long nc_estab_fail_prob;    /* maximum NC estab failure probability
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item nc_estab_fail_prob
 Is the maximum acceptable percent value (rounded to the nearest integer) for the
@@ -4241,7 +4241,7 @@ typedef struct {
 @tpindex thru_values_t
 @end smallexample
 
-@table @member
+@table @parm
 
 @item thru_targ_value
 Specifies the requested QOS value for throughput for data transfer between the
@@ -4274,7 +4274,7 @@ typedef struct {
 @tpindex td_values_t
 @end smallexample
 
-@table @member
+@table @parm
 
 @item td_targ_value
 Specifies the desired QOS value for transit delay between the two NS users.
@@ -4301,7 +4301,7 @@ long residual_error_rate;   /* maximum acceptable residual error
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item residual_error_rate
 Specifies the maximum acceptable percent value (rounded to the nearest integer)
@@ -4324,7 +4324,7 @@ long nc_resilience;         /* maximum acceptable nc resilience */
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item nc_resilience
 Specifies the maximum acceptable value for NC resilience.
@@ -4352,7 +4352,7 @@ long xfer_fail_prob;        /* maximum xfer failure prob */
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item xfer_fail_prob
 Specifies the maximum acceptable percent value (rounded to the nearest integer)
@@ -4377,7 +4377,7 @@ long nc_rel_delay;          /* maximum nc release delay */
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item nc_rel_delay
 Is the maximum acceptable value for NC release delay.
@@ -4405,7 +4405,7 @@ long nc_rel_fail_prob;      /* maximum nc rel fail probability */
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item nc_rel_fail_prob
 Is the maximum acceptable percent value (rounded to the nearest integer) of NC
@@ -4460,7 +4460,7 @@ typedef struct {
 @tpindex protection_values_t
 @end smallexample
 
-@table @member
+@table @parm
 
 @item protect_targ_value
 Specifies the target protection of the NS user originated information.
@@ -4498,7 +4498,7 @@ typedef struct {
 @tpindex priority_values_t
 @end smallexample
 
-@table @member
+@table @parm
 
 @item priority_targ_value
 Specifies the target NC priority level.
@@ -4527,7 +4527,7 @@ long max_accept_cost;       /* acceptable cost maximum */
 @end verbatim
 @end smallexample
 
-@table @member
+@table @parm
 
 @item max_accept_cost
 Specifies the maximum acceptable cost in local currency.
@@ -4554,25 +4554,25 @@ the @prim{N_CONN_RES} and @prim{N_CONN_CON} primitives.
 @item N_QOS_CL_RANGE1
 
 Range of quality of service values for connectionless-mode service as specified
-with the @member{QOS_range_length} and @member{QOS_range_offset} parameters of
+with the @parm{QOS_range_length} and @parm{QOS_range_offset} parameters of
 the @prim{N_INFO_ACK} primitive.
 
 @item N_QOS_CL_SEL1
 
 Quality of service values supported/selected for connectionless-mode service as
-specified with the @member{QOS_length} and @member{QOS_offset} parameters of the
+specified with the @parm{QOS_length} and @parm{QOS_offset} parameters of the
 @prim{N_INFO_ACK} and the @prim{N_OPTMGMT_REQ} primitives.
 
 @item N_QOS_CO_OPT_RANGE1
 
 Range of quality of service values for connection-mode service as specified with
-the @member{QOS_range_length} and @member{QOS_range_offset} parameters of the
+the @parm{QOS_range_length} and @parm{QOS_range_offset} parameters of the
 @prim{N_INFO_ACK} primitive.
 
 @item N_QOS_CO_OPT_SEL1
 
 Default quality of service values supported/selected for connection-mode service
-as specified with the @member{QOS_length} and @member{QOS_offset} parameters of
+as specified with the @parm{QOS_length} and @parm{QOS_offset} parameters of
 the @prim{N_INFO_ACK} and the @prim{N_OPTMGMT_REQ} primitives.
 
 @end table
@@ -4600,7 +4600,7 @@ typedef struct {
 @tpindex N_qos_co_range1_t
 @end smallexample
 
-This structure should be used in the @member{QOS_length} and @member{QOS_offset}
+This structure should be used in the @parm{QOS_length} and @parm{QOS_offset}
 fields of the following NPI primitives:
 
 @itemize @bullet
@@ -4632,7 +4632,7 @@ typedef struct {
 @tpindex N_qos_co_sel1_t
 @end smallexample
 
-This structure should be used in the @member{QOS_length} and @member{QOS_offset}
+This structure should be used in the @parm{QOS_length} and @parm{QOS_offset}
 fields of the following NPI primitives:
 
 @itemize @bullet
@@ -4668,7 +4668,7 @@ This structure should be used in the:
 
 @itemize @bullet
 
-@item @member{QOS_range_length} and @member{QOS_range_offset} fields of the
+@item @parm{QOS_range_length} and @parm{QOS_range_offset} fields of the
 @prim{N_INFO_ACK} primitive;
 
 @end itemize
@@ -4698,10 +4698,10 @@ This structure should be used in the:
 
 @itemize @bullet
 
-@item @member{QOS_length} and @member{QOS_offset} fields of the
+@item @parm{QOS_length} and @parm{QOS_offset} fields of the
 @prim{N_INFO_ACK} primitive;
 
-@item @member{QOS_length} and @member{QOS_offset} fields of the
+@item @parm{QOS_length} and @parm{QOS_offset} fields of the
 @prim{N_OPTMGMT_REQ} primitive.
 
 @end itemize
@@ -4742,7 +4742,7 @@ This structure should be used in the:
 
 @itemize @bullet
 
-@item @member{QOS_range_length} and @member{QOS_range_offset} fields of the
+@item @parm{QOS_range_length} and @parm{QOS_range_offset} fields of the
 @prim{N_INFO_ACK} primitive;
 
 @end itemize
@@ -4780,10 +4780,10 @@ This structure should be used in the:
 
 @itemize @bullet
 
-@item @member{QOS_length} and @member{QOS_offset} fields of the
+@item @parm{QOS_length} and @parm{QOS_offset} fields of the
 @prim{N_INFO_ACK} primitive;
 
-@item @member{QOS_length} and @member{QOS_offset} fields of the
+@item @parm{QOS_length} and @parm{QOS_offset} fields of the
 @prim{N_OPTMGMT_REQ} primitive.
 
 @end itemize
@@ -4801,7 +4801,7 @@ compatibility.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item NSDU_size
 A value greater than zero specifies the maximum size of a Network Service Data
@@ -4819,18 +4819,18 @@ A value between 1 and 128 inclusive specifies the maximum number of octets of
 data that may be associated with connection establishment primitives.  A value
 of @samp{0} specifies that the NS provider does not allow data to be sent with
 connection establishment primitives.  When used in an OSI conforming
-environment, @member{CDATA_size} shall always equal 128.
+environment, @parm{CDATA_size} shall always equal 128.
 
 @item DDATA_size
 A value between 1 and 128 inclusive specifies the maximum number of octets of
 data that may be associated with the disconnect primitives; a value of @samp{0}
 specifies that the NS provider does not allow data to be sent with the
 disconnect primitives.  When used in an OSI conforming environment,
-@member{DDATA_size} shall always equal 128.
+@parm{DDATA_size} shall always equal 128.
 
 @item ADDR_size
 A value between 1 and 40 indicates the maximum size of a network address in
-decimal digits.  When used in an OSI conforming environment, @member{ADDR_size}
+decimal digits.  When used in an OSI conforming environment, @parm{ADDR_size}
 shall always equal 40 in order to accommodate a full NSAP address.
 
 @item QOS_length
@@ -4882,26 +4882,26 @@ zero.
 
 @item NIDU_size
 This indicates the amount of user data that may be present in aN_DATA primitive.
-The @member{NIDU_size} should not be larger than the @member{NSDU_size}
+The @parm{NIDU_size} should not be larger than the @parm{NSDU_size}
 specification.
 
 @item SERV_type
 Specifies the service type supported by the NS provider.  The possible values
 can be @pval{N_CONS}, @pval{N_CLNS}, (or both by using
-@pval{N_CONS}|@pval{N_CLNS}).  If the @member{SERV_type} is @pval{N_CLNS}, the
+@pval{N_CONS}|@pval{N_CLNS}).  If the @parm{SERV_type} is @pval{N_CLNS}, the
 following rules will apply:
 
 @itemize ---
 
-@item The @member{ENSDU_size}, @member{CDATA_size}, @member{DDATA_size}, and
+@item The @parm{ENSDU_size}, @parm{CDATA_size}, @parm{DDATA_size}, and
 DEFAULT_rc_sel fields are not used and their values should be set to @samp{0};
 
-@item The @member{NSDU_size} should be the same as the @member{NIDU_size}.
+@item The @parm{NSDU_size} should be the same as the @parm{NIDU_size}.
 
 @end itemize
 
 @item NODU_size
-The @member{NODU_size} specifies the optimal NSDU size in octets of an NSDU
+The @parm{NODU_size} specifies the optimal NSDU size in octets of an NSDU
 given the current routing information.
 
 @item PROTOID_length
@@ -4918,7 +4918,7 @@ block.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item QOS_length
 Indicates the length of the default values of the QOS parameters as selected by
@@ -5276,7 +5276,7 @@ and the destination NS user agrees to its use---it can be used.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item QOS_length
 Indicates the length of the QOS parameters values that apply to the NC being
@@ -5321,7 +5321,7 @@ indicates ``no use of expedited data''.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item QOS_length
 Indicates the length of the QOS parameters values that are negotiated during NC
@@ -5374,7 +5374,7 @@ the value on the request primitive or is ``no use of expedited data''.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item QOS_length
 Indicates the length of the QOS parameters values that are negotiated during NC
@@ -5424,7 +5424,7 @@ value on the indication primitive or is ``no use of expedited data''.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item QOS_length
 Indicates the length of the QOS parameters values selected by the responding NS
@@ -5472,7 +5472,7 @@ the response primitive.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item RESET_reason
 
@@ -5487,7 +5487,7 @@ indicate @pval{N_USER_RESYNC}.
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item RESET_orig
 This parameter indicates the source of the reset.
@@ -5560,7 +5560,7 @@ reset reason undefined
 
 @subsubheading Parameters:
 
-@table @member
+@table @parm
 
 @item DISCON_reason
 Gives information about the cause of the release.
@@ -5604,7 +5604,7 @@ The value conveyed in the parameter will be as follows:
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item DISCON_orig
 Indicates the source of the NC release.  Its value are as follows:
@@ -5717,7 +5717,7 @@ disconnect reason undefined
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item ERROR_type
 Specifies the reason for the error.  The possible values are:
