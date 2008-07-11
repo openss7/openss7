@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 18:38:38 $
+ @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:38 $ by $Author: brian $
+ Last Modified $Date: 2008/07/11 00:23:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnsl.c,v $
+ Revision 0.9.2.7  2008/07/11 00:23:42  brian
+ - gettext declarations
+
  Revision 0.9.2.6  2008-04-28 18:38:38  brian
  - header updates for release
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 18:38:38 $"
+#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:42 $"
 
 static char const ident[] =
-    "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 18:38:38 $";
+    "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:42 $";
 
 /* This file cannot be processed with doxygen. */
 
@@ -1047,20 +1050,20 @@ __nsl_nc_sperror(void)
 		case NC_NOERROR:
 		case NC_NOMEM:
 		case NC_NOSET:
-			(void) strncpy(errbuf, __nsl_nc_errlist[idx], NCERR_BUFSZ);
+			(void) strncpy(errbuf, gettext(__nsl_nc_errlist[idx]), NCERR_BUFSZ);
 			break;
 		case NC_OPENFAIL:
 		case NC_NOTFOUND:
 		case NC_NOMOREENTRIES:
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], NETCONFIG);
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), NETCONFIG);
 			break;
 		case NC_BADLINE:
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], NETCONFIG,
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), NETCONFIG,
 					tsd->fieldnum, tsd->linenum);
 			break;
 		default:
 			idx = NC_ERROR_MAX;
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], err);
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), err);
 			break;
 		}
 	}
@@ -1825,15 +1828,15 @@ __nsl_netdir_sperror(void)
 		case ND_FAILCTRL:
 		case ND_SYSTEM:
 		case ND_NOCONVERT:
-			(void) strncpy(errbuf, __nsl_nd_errlist[idx], NDERR_BUFSZ);
+			(void) strncpy(errbuf, gettext(__nsl_nd_errlist[idx]), NDERR_BUFSZ);
 			break;
 		case ND_NOSYM:
 		case ND_OPEN:
-			(void) snprintf(errbuf, NDERR_BUFSZ, __nsl_nd_errlist[idx], dlerror());
+			(void) snprintf(errbuf, NDERR_BUFSZ, gettext(__nsl_nd_errlist[idx]), dlerror());
 			break;
 		default:
 			idx = ND_ERROR_MAX - ND_ERROR_OFS;
-			(void) snprintf(errbuf, NDERR_BUFSZ, __nsl_nd_errlist[idx], err);
+			(void) snprintf(errbuf, NDERR_BUFSZ, gettext(__nsl_nd_errlist[idx]), err);
 			break;
 		}
 	}
@@ -2338,10 +2341,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.6 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.7 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.6 $)
- * @date \$Date: 2008-04-28 18:38:38 $
+ * @version \$Name:  $(\$Revision: 0.9.2.7 $)
+ * @date \$Date: 2008/07/11 00:23:42 $
  *
  * @}
  */

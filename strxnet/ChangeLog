@@ -18,6 +18,10 @@
 	* doc/specs/tpi/tpi_tab8.tbl: documentation improvements
 	* doc/specs/tpi/tpi_tabx.tbl: documentation improvements
 
+	* src/lib/netdir.c: gettext declarations
+	* src/lib/netselect.c: gettext declarations
+	* src/lib/xnsl.c: gettext declarations
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strxnet.refs: updated references

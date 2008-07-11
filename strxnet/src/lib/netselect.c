@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 18:38:38 $
+ @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:38 $ by $Author: brian $
+ Last Modified $Date: 2008/07/11 00:23:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netselect.c,v $
+ Revision 0.9.2.7  2008/07/11 00:23:41  brian
+ - gettext declarations
+
  Revision 0.9.2.6  2008-04-28 18:38:38  brian
  - header updates for release
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 18:38:38 $"
+#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:41 $"
 
 static char const ident[] =
-    "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 18:38:38 $";
+    "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:41 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -771,20 +774,20 @@ __nsl_nc_sperror(void)
 		case NC_NOERROR:
 		case NC_NOMEM:
 		case NC_NOSET:
-			(void) strncpy(errbuf, __nsl_nc_errlist[idx], NCERR_BUFSZ);
+			(void) strncpy(errbuf, gettext(__nsl_nc_errlist[idx]), NCERR_BUFSZ);
 			break;
 		case NC_OPENFAIL:
 		case NC_NOTFOUND:
 		case NC_NOMOREENTRIES:
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], NETCONFIG);
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), NETCONFIG);
 			break;
 		case NC_BADLINE:
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], NETCONFIG,
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), NETCONFIG,
 					tsd->fieldnum, tsd->linenum);
 			break;
 		default:
 			idx = NC_ERROR_MAX;
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], err);
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), err);
 			break;
 		}
 	}
