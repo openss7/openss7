@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: tpi.texi,v 0.9.2.15 2008-04-28 18:38:35 brian Exp $
+% @(#) $Id: tpi.texi,v 0.9.2.18 2008-07-11 09:40:27 brian Exp $
 %
 % =========================================================================
 %
@@ -54,14 +54,17 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-28 18:38:35 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:40:27 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 @c %**start of header
 @setfilename tpi.info
-@settitle Transport Provider Interface
+@include texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
 @c %**end of header
 
 @dircategory OpenGroup
@@ -70,17 +73,18 @@
 @end direntry
 
 @include texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Specification
 
+@comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the X/Open Transport Provider Interface.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release
 @value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
-Corporation}.
-
-This specification was originally published by UNIX International OSI Special
-Interest Group in Revision: 1.5 (1992/12/10).
+Corporation}.  This specification was originally published by UNIX International
+OSI Special Interest Group in Revision: 1.5 (1992/12/10).
 
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
@@ -118,10 +122,14 @@ another language, under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Specification
 
-@shorttitlepage Transport Provider Interface
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
-@title Transport Provider Interface
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
 @subtitle UNIX International
 @subtitle OSI Special Interest Group
 @subtitle Revision: 1.5
@@ -139,13 +147,87 @@ another language, under the above conditions for modified versions.
 @vskip 0pt plus 1filll
 @subsubheading Published by:
 
+@center UNIX International
+@center Waterview Corporate Center
+@center 20 Waterview Boulevard
+@center Parsippany, NJ 07054
+@sp 1
+@center for further information, contact:
+@center Vice President of Marketing
+@sp 1
+@center Phone: +1 201-263-8400
+@center Fax: +1 201-263-8401
 @sp 1
 
+@ignore
+@subsubheading International Offices:
+
+@multitable @columnfractions .33 .33 .34
+@item
+
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
-1469 Jefferys Crescent @*
-Edmonton, Alberta  T6L 6T1 @*
-Canada @*
+UNIX International @*
+Asian/Pacific Office @*
+Shinei Bldg. 1F @*
+Kameido @*
+Koto-ku, Tokyo 136 @*
+Japan
+
+@noindent
+Phone: (81) 3-3636-1122 @*
+Fax: (81) 3-3636-1121
+
+@tab
+
+@noindent
+UNIX International @*
+Australian Office @*
+22/74 - 76 Monarch St. @*
+Cremorne, NSW 2090 @*
+Australia
+
+@noindent
+Phone: (61) 2-953-7838 @*
+Fax: (61) 2 953-3542
+
+@tab
+
+@noindent
+UNIX International @*
+Pacific Basin Office @*
+Cintech II @*
+75 Science Park Drive @*
+Singapore Science Park @*
+Singapore 0511 @*
+Singapore
+
+@noindent
+Phone: (32) 2-672-3700 @*
+Fax: (32) 2-672-4415
+
+@end multitable
+
+@multitable @columnfractions .5 .5
+@item
+
+@noindent
+UNIX International @*
+European Office @*
+25, Avenue de Beaulieu @*
+1160 Brussels @*
+Belgium
+
+@noindent
+Phone: (65) 776-0313 @*
+Fax: (65) 776-0421
+
+@tab
+
+@noindent
+@ 
+
+@end multitable
+@end ignore
 
 @noindent
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
@@ -196,12 +278,57 @@ products conforming to the interfaces being made available from UNIX System
 Laboratories or UNIX International members.
 
 @subsubheading Trademarks:
+
+@noindent
 UNIX@registeredsymbol{} is a registered trademark of UNIX System Laboratories in the United
 States and other countries.
 X/Open(TM) is a trademark of the X/Open Company Ltd. in the UK and other
 countries.
 OpenSS7(TM) is a trademark of OpenSS7 Corporation in the United States and other
 countries.
+
+@page
+@vskip 0pt plus 1filll
+
+@subsubheading Published by:
+
+@sp 1
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
+All Rights Reserved.
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@noindent
+This software and related documentation is protected by copyright and
+distributed under licenses restricting its use, copying, distribution and
+de-compilation.  No part of this software or related documentation may be
+reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
+
+@noindent
+The recipient of this document, by its retention and use, warrants that the
+recipient will protect this information and keep it confidential, and will not
+disclose the information contained in this document without the written
+permission of its owner.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} reserves the right to revise
+this software and documentation for any reason, including but not limited to,
+conformity with standards promulgated by various agencies, utilization of
+advances in the state of the technical arts, or the reflection of changes in the
+design of any techniques, or procedures embodied, described, or referred to
+herein.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no
+obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -217,24 +344,94 @@ countries.
 @page
 
 @c Define an index of primitives
-@defindex pr
+@defcodeindex pr
 @c Define an index of primitive values
-@defindex pv
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
-@defindex st
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
 
+@ifnottex
+@c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
 @syncodeindex tp cp
 @syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
-@defcodeindex mp
 @include texi/macros.texi
 @include texi/versions.texi
 
+@iftex
+
+@macro prim {name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval {name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr {name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta {name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm {name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc {name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
 @ifnottex
 @node Top
-@top Network Provider Interface
+@top Transport Provider Interface
 @end ifnottex
 
 @menu
@@ -243,27 +440,41 @@ countries.
 * Mapping of Transport Primitives to OSI::
 * Allowable Sequence of Transport Service Primitives::
 * Transport Primitive Precedence::
+* References::
 * Index::
 @end menu
 
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
 @node Introduction
 @chapter Introduction
+@cindex Introduction
 
-To support a framework for providing networking products in the UNIX system, an
-effort is underway to define service interfaces that map to strategic levels of
-the Open Systems Interconnection (OSI) Reference Model.  These service
-interfaces hide implementation details of a particular service from the consumer
-of the service.  This enables system programmers to develop software independent
-of the particular protocol that provides a specific service.  The interfaces
-being specified for UNIX System V are defined within the @dfn{STREAMS}
-environment.  This document specifies a kernel-level interface that supports the
-services of the Transport Layer for connection-mode and connectionless mode
-services.
+To support a framework for providing networking products in the
+@cite{UNIX@registeredsymbol{}} system, an effort is underway to define service
+interfaces that map to strategic levels of the @cite{Open Systems
+Interconnection (OSI) Reference Model}.  These service interfaces hide
+implementation details of a particular service from the consumer of the service.
+This enables system programmers to develop software independent of the
+particular protocol that provides a specific service.  The interfaces being
+specified for @cite{UNIX@registeredsymbol{} System V} are defined within the
+@dfn{STREAMS} environment.  This document specifies a kernel-level interface
+that supports the services of the Transport Layer for connection-mode and
+connectionless mode services.
 
-This specification applies to System V Release 4.2 ES/MP.
+This specification applies to @cite{System V Release 4.2 ES/MP}.
 
 @node Transport Provider Interface
 @chapter Transport Provider Interface
+@cindex Transport provider interface
 
 @menu
 * Common Transport Primitives::
@@ -277,20 +488,16 @@ This specification applies to System V Release 4.2 ES/MP.
 @end menu
 
 The transport interface defines a message interface to a transport provider
-implemented under @dfn{STREAMS}.
-@footnote{It is assumed that the reader of this document is familiar with the
-concept @dfn{STREAMS}.}
+implemented under @dfn{STREAMS}.@footnote{It is assumed that the reader of this
+document is familiar with the concept @dfn{STREAMS}.}
 
-This version of the transport provider interface supports the XPG4 version of
-the X/Open Transport Interface (XTI).  A user communicates to a transport
-provider via a full duplex path known as a @dfn{stream} (see figure 1). This
-@dfn{stream} provides a mechanism in which messages may be passed to the
-transport provider from the transport user and vice versa.
+This version of the transport provider interface supports the @cite{XPG4}
+version of the @cite{X/Open Transport Interface (XTI)}.  A user communicates to
+a transport provider via a full duplex path known as a @dfn{stream} (see
+@figref{1}). This @dfn{stream} provides a mechanism in which messages may be
+passed to the transport provider from the transport user and vice versa.
 
-@cartouche
-@center @image{tpi_fig1}
-@center @b{Figure 1. Example of a stream from a user to a transport provider}
-@end cartouche
+@figure{tpi_fig1,1,Example of a stream from a user to a transport provider}
 
 The @dfn{STREAMS} messages that are used to communicate transport service
 primitives between the transport user and the transport provider may have one of
@@ -299,17 +506,18 @@ the following formats:
 @enumerate
 
 @item
-A M_PROTO message block followed by zero or more M_DATA message blocks.  The
-M_PROTO message block contains the type of transport service primitive and all
-the relevant arguments associated with the primitive. The M_DATA blocks contain
-transport user data associated with the transport service primitive.
+A @msg{M_PROTO} message block followed by zero or more @msg{M_DATA} message
+blocks.  The @msg{M_PROTO} message block contains the type of transport service
+primitive and all the relevant arguments associated with the primitive. The
+@msg{M_DATA} blocks contain transport user data associated with the transport
+service primitive.
 
 @item
-One M_PCPROTO message block containing the type of transport service primitive
-and all the relevant arguments associated with the primitive.
+One @msg{M_PCPROTO} message block containing the type of transport service
+primitive and all the relevant arguments associated with the primitive.
 
 @item
-One or more M_DATA message blocks containing transport user data.
+One or more @msg{M_DATA} message blocks containing transport user data.
 
 @end enumerate
 
@@ -324,17 +532,18 @@ provider. The primitives which originate from the transport provider are either
 confirmations of a request or are indications to the transport user that an
 event has occurred.  Section 2 lists the primitive types along with the mapping
 of those primitives to the @dfn{STREAMS} message types and the transport
-primitives of the ISO IS 8072 and IS 8072/DAD transport service definitions.
-The format of these primitives and the rules governing the use of them are
-described in sections 2.1, 2.2, and 2.3.
+primitives of the @cite{ISO IS 8072} and @cite{IS 8072/DAD} transport service
+definitions.  The format of these primitives and the rules governing the use of
+them are described in sections 2.1, 2.2, and 2.3.
 
 @page
 @node Common Transport Primitives
 @section Common Transport Primitives
+@cindex Common transport primitives
 
 @menu
-* MGMT User-Originated Primitives::
-* MGMT Provider-Originated Primitives::
+* Management User-Originated Primitives::
+* Management Provider-Originated Primitives::
 * COTS User-Originated Primitives::
 * COTS Provider-Originated Primitives::
 * CLTS User-Originated Primitives::
@@ -344,8 +553,9 @@ described in sections 2.1, 2.2, and 2.3.
 The following transport primitives are common to both the connection-mode
 and connectionless-mode transport services.
 
-@node MGMT User-Originated Primitives
+@node Management User-Originated Primitives
 @subsection User-Originated Primitives
+@cindex Management user-originated primitives
 
 @menu
 * T_INFO_REQ::
@@ -360,21 +570,26 @@ generated by the transport user.
 
 @node T_INFO_REQ
 @subsubsection T_INFO_REQ - get transport protocol parameter sizes.
+@prindex T_INFO_REQ
+@cindex Transport protocol parameters
 
 This primitive requests the transport provider to return the sizes of all
 relevant protocol parameters, plus the current state of the provider.
-@footnote{The T_INFO_REQ and T_INFO_ACK primitives have no effect on the state
-of the transport provider and do not appear in the state tables.}
-The format of the message is one M_PCPROTO message block. The format of the
-M_PCPROTO message block is as follows:
+@footnote{The @prim{T_INFO_REQ} and @prim{T_INFO_ACK} primitives have no effect
+on the state of the transport provider and do not appear in the state tables.}
+The format of the message is one @msg{M_PCPROTO} message block. The format of
+the @msg{M_PCPROTO} message block is as follows:
 
+@tpindex T_info_req
 @smallexample
-struct T_info_req @{
-        long PRIM_type;                 /* always T_INFO_REQ */
-@}
+@verbatim
+struct T_info_req {
+    long PRIM_type;     /* always T_INFO_REQ */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type.
+Where @parm{PRIM_type} indicates the primitive type.
 
 This primitive requires the transport provider to generate one of the following
 acknowledgements upon receipt of the primitive and that the transport user wait
@@ -384,7 +599,7 @@ for the acknowledgement prior to issuing any other primitives:
 
 @item Successful
 
-Acknowledgement of the primitive via the T_INFO_ACK described in
+Acknowledgement of the primitive via the @prim{T_INFO_ACK} described in
 @ref{T_INFO_ACK,,T_INFO_ACK}.
 
 @item Non-fatal errors
@@ -395,46 +610,47 @@ There are no errors associated with the issuance of this primitive.
 
 @node T_BIND_REQ
 @subsubsection T_BIND_REQ - bind protocol address request.
+@prindex T_BIND_REQ
+@cindex Bind protocol address
 
 This primitive requests that the transport provider bind a protocol address to
 the stream, negotiate the number of connect indications allowed to be
 outstanding by the transport provider for the specified protocol address, and
-activate
-@footnote{A stream is viewed as active when the transport provider may receive
-and transmit TPDUs (transportprotocol data units) associated with
-the stream.}
-the stream associated with the protocol address. The format of the message is
-one M_PROTO message block.  The format of the M_PROTO message block is as
-follows:
+activate@footnote{A stream is viewed as active when the transport provider may
+receive and transmit TPDUs (transportprotocol data units) associated with the
+stream.} the stream associated with the protocol address. The format of the
+message is one @msg{M_PROTO} message block.  The format of the @msg{M_PROTO}
+message block is as follows:
 
+@tpindex T_bind_req
 @smallexample
-struct T_bind_req @{
-        long PRIM_type;                 /* always T_BIND_REQ */
-        long ADDR_length;               /* length of address */
-        long ADDR_offset;               /* offset of address */
-        unsigned long CONIND_number;    /* requested number of connect
-                                           indications to be queued */
-@}
+@verbatim
+struct T_bind_req {
+    long PRIM_type;     /* always T_BIND_REQ */
+    long ADDR_length;   /* length of address */
+    long ADDR_offset;   /* offset of address */
+    unsigned long CONIND_number;        /* requested number of
+                                           connect indications to
+                                           be queued */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type.  @var{ADDR_length} is the
-length
-@footnote{All lengths, offsets, and sizes in all structures refer to the number
-of bytes.}
-of the protocol address to be bound to the stream and ADDR_offset is the offset
-from the beginning of the M_PROTO block where the protocol address begins.
-CONIND_number
-@footnote{This field should be ignored by those providing a connectionless
-transport service.}
-is the requested number of connect indications
-@footnote{If the number of outstanding connect indications equals CONIND_number,
-the transport provider need not discard further incoming connect indications,
-but may chose to queue them internally until the number of outstanding connect
-indications drops below CONIND_number.}
-allowed to be outstanding by the transport provider for the specified protocol
-address.  The proper alignment of the address in the M_PROTO message block is
-not guaranteed.  The address in the M_PROTO message block is however, aligned
-the same as it was received from the transport user.
+Where @parm{PRIM_type} indicates the primitive type.  @parm{ADDR_length} is
+the length@footnote{All lengths, offsets, and sizes in all structures refer to
+the number of bytes.} of the protocol address to be bound to the stream and
+@parm{ADDR_offset} is the offset from the beginning of the @msg{M_PROTO} block
+where the protocol address begins.  @parm{CONIND_number}@footnote{This field
+should be ignored by those providing a connectionless transport service.} is the
+requested number of connect indications@footnote{If the number of outstanding
+connect indications equals @parm{CONIND_number}, the transport provider need
+not discard further incoming connect indications, but may chose to queue them
+internally until the number of outstanding connect indications drops below
+@parm{CONIND_number}.} allowed to be outstanding by the transport provider for
+the specified protocol address.  The proper alignment of the address in the
+@msg{M_PROTO} message block is not guaranteed.  The address in the @msg{M_PROTO}
+message block is however, aligned the same as it was received from the transport
+user.
 
 For rules governing the requests made by this primitive,
 @pxref{T_BIND_ACK,,T_BIND_ACK}.
@@ -447,16 +663,15 @@ for the acknowledgement before issuing any other primitives:
 
 @item Successful
 
-Correct acknowledgement of the primitive is indicated via the
-T_BIND_ACK primitive.
+Correct acknowledgement of the primitive is indicated via the @prim{T_BIND_ACK}
+primitive.
 
 @item Non-fatal errors
 
-These errors will be indicated via the T_ERROR_ACK primitive described in
-@ref{T_ERROR_ACK,,T_ERROR_ACK}.
-The allowable errors are as follows:
+These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
+@ref{T_ERROR_ACK,,T_ERROR_ACK}.  The allowable errors are as follows:
 
-@vtable @var
+@table @perr
 
 @item TBADADDR
 This indicates that the protocol address was in an incorrect format or the
@@ -474,32 +689,37 @@ requested address.
 The primitive would place the transport interface out of state.
 
 @item TSYSERR
-A system error has occurred and the UNIX System error is indicated in the
-primitive.
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
+is indicated in the primitive.
 
 @item TADDRBUSY
 This indicates that the requested address is already in use.
 
-@end vtable
+@end table
 
 @end itemize
 
 
 @node T_UNBIND_REQ
 @subsubsection T_UNBIND_REQ - unbind protocol address request.
+@prindex T_UNBIND_REQ
+@cindex Unbind protocol address
 
 This primitive requests that the transport provider unbind the protocol address
-associated with the stream and deactivate the @dfn{stream}.
-The format of the message is one M_PROTO message block.
-The format of the M_PROTO message block is as follows:
+associated with the stream and deactivate the @dfn{stream}.  The format of the
+message is one @msg{M_PROTO} message block.  The format of the @msg{M_PROTO}
+message block is as follows:
 
+@tpindex T_unbind_req
 @smallexample
-struct T_unbind_req @{
-        long PRIM_type;                 /* always T_UNBIND_REQ */
-@}
+@verbatim
+struct T_unbind_req {
+    long PRIM_type;     /* always T_UNBIND_REQ */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type.
+Where @parm{PRIM_type} indicates the primitive type.
 
 This primitive requires the transport provider to generate the following
 acknowledgements upon receipt of the primitive and that the transport user must
@@ -509,56 +729,57 @@ wait for the acknowledgement before issuing any other primitives:
 
 @item Successful
 
-Correct acknowledgement of the primitive is indicated via the T_OK_ACK primitive
-described in @ref{T_OK_ACK,,T_OK_ACK}.
+Correct acknowledgement of the primitive is indicated via the @prim{T_OK_ACK}
+primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 
 @item Non-fatal errors
 
-These errors will be indicated via the T_ERROR_ACK primitive described in
+These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@vtable @var
+@table @perr
 
 @item TOUTSTATE
 The primitive would place the transport interface out of state.
 
 @item TSYSERR
-A system error has occurred and the UNIX System error is indicated in the
-primitive.
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
+is indicated in the primitive.
 
-@end vtable
+@end table
 
 @end itemize
 
 @node T_OPTMGMT_REQ
 @subsubsection T_OPTMGMT_REQ - options management.
+@prindex T_OPTMGMT_REQ
+@cindex Options management
 
 This primitive allows the transport user to manage the options associated with
-the stream.
-The format of the message is one M_PROTO message block.
-The format of the M_PROTO message block is as follows:
+the stream.  The format of the message is one @msg{M_PROTO} message block.  The
+format of the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_optmgmt_req
 @smallexample
-struct T_optmgmt_req @{
-        long PRIM_type;                 /* always T_OPTMGMT_REQ */
-        long OPT_length;                /* options length */
-        long OPT_offset;                /* options offset */
-        long MGMT_flags;                /* flags */
-@}
+@verbatim
+struct T_optmgmt_req {
+    long PRIM_type;     /* always T_OPTMGMT_REQ */
+    long OPT_length;    /* options length */
+    long OPT_offset;    /* options offset */
+    long MGMT_flags;    /* flags */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type.
-@var{OPT_length} is the length of the protocol options associated with the
-primitive and
-@var{OPT_offset} is the offset from the beginning of the M_PROTO block where the
-options begin.
-The proper alignment of the options is not guaranteed.
+Where @parm{PRIM_type} indicates the primitive type.  @parm{OPT_length} is
+the length of the protocol options associated with the primitive and
+@parm{OPT_offset} is the offset from the beginning of the @msg{M_PROTO} block
+where the options begin.  The proper alignment of the options is not guaranteed.
 The options are however, aligned the same as it was received from the transport
-user.
-@var{MGMT_flags} are the flags which define the request made by the
+user.  @parm{MGMT_flags} are the flags which define the request made by the
 transport user. The allowable flags are:
 
-@vtable @var
+@table @pval
 @item T_NEGOTIATE
 Negotiate and set the options with the transport provider.
 @item T_CHECK
@@ -567,27 +788,26 @@ Check the validity of the specified options.
 Return the options currently in effect.
 @item T_DEFAULT
 Return the default options.
-@end vtable
+@end table
 
 For the rules governing the requests made by this primitive see the
-T_OPTMGMT_ACK primitive in @ref{T_OPTMGMT_ACK,,T_OPTMGMT_ACK}.
+@prim{T_OPTMGMT_ACK} primitive in @ref{T_OPTMGMT_ACK,,T_OPTMGMT_ACK}.
 
-This primitive requires the transport provider to generate one of the
-following acknowledgements upon receipt of the primitive and that the
-transport user wait for the acknowledgement before issuing any other
-primitives:
+This primitive requires the transport provider to generate one of the following
+acknowledgements upon receipt of the primitive and that the transport user wait
+for the acknowledgement before issuing any other primitives:
 
 @itemize --
 @item Successful
 
-Acknowledgement of the primitive via the T_OPTMGMT_ACK.
+Acknowledgement of the primitive via the @prim{T_OPTMGMT_ACK}.
 
 @item Non-fatal errors
 
-These errors will be indicated via the T_ERROR_ACK primitive described in
+These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@vtable @var
+@table @perr
 
 @item TACCES
 This indicates that the user did not have proper permissions for the use of the
@@ -604,35 +824,40 @@ they contained illegal information.
 This indicates that the flags as specified were incorrect or illegal.
 
 @item TSYSERR
-A system error has occurred and the UNIX System error is indicated in the
-primitive.
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
+is indicated in the primitive.
 
 @item TNOTSUPPORT
-This transport provider does not support the requested flag (T_CHECK or
-T_CURRENT).
+This transport provider does not support the requested flag (@pval{T_CHECK} or
+@pval{T_CURRENT}).
 
-@end vtable
+@end table
 
 @end itemize
 
 @node T_ADDR_REQ
 @subsubsection T_ADDR_REQ - get protocol addresses request.
+@prindex T_ADDR_REQ
+@cindex Protocol addresses
 
 This primitive requests that the transport provider return the local protocol
 address that is bound to the stream and the address of the remote transport
 entity if a connection has been established.
 
-The format of the message is one M_PROTO message block. The format of the
-M_PROTO message block is as follows:
+The format of the message is one @msg{M_PROTO} message block. The format of the
+@msg{M_PROTO} message block is as follows:
 
+@tpindex T_addr_req
 @smallexample
-struct T_addr_req @{
-        long PRIM_type;                 /* always T_ADDR_REQ */
-@}
+@verbatim
+struct T_addr_req {
+    long PRIM_type;     /* always T_ADDR_REQ */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type. This primitive requires the
-transport provider to generate one of the following acknowledgements upon
+Where @parm{PRIM_type} indicates the primitive type. This primitive requires
+the transport provider to generate one of the following acknowledgements upon
 receipt of the primitive, and the transport user must wait for the
 acknowledgement before issuing any other primitives:
 
@@ -640,7 +865,7 @@ acknowledgement before issuing any other primitives:
 
 @item Successful
 
-Correct acknowledgement of the primitive is indicated via the T_ADDR_ACK
+Correct acknowledgement of the primitive is indicated via the @prim{T_ADDR_ACK}
 primitive.
 
 @item Non-fatal errors
@@ -649,8 +874,9 @@ There are no errors associated with the issuance of this primitive.
 
 @end itemize
 
-@node MGMT Provider-Originated Primitives
+@node Management Provider-Originated Primitives
 @subsection Provider-Originated Primitives
+@cindex Management provider-originated primitives
 
 @menu
 * T_INFO_ACK::
@@ -666,32 +892,36 @@ generated by the transport provider.
 
 @node T_INFO_ACK
 @subsubsection T_INFO_ACK - protocol information acknowledgement.
+@prindex T_INFO_ACK
+@cindex Protocol information
 
 This primitive indicates to the transport user any relevant protocol-dependent
-parameters.  It should be initiated in response to the T_INFO_REQ primitive
-described above.
-The format of this message is one M_PCPROTO message block.
-The format of the M_PCPROTO message block is as follows:
+parameters.  It should be initiated in response to the @prim{T_INFO_REQ}
+primitive described above.  The format of this message is one @msg{M_PCPROTO}
+message block.  The format of the @msg{M_PCPROTO} message block is as follows:
 
+@tpindex T_info_ack
 @smallexample
-struct T_info_ack @{
-        long PRIM_type;                 /* always T_INFO_ACK */
-        long TSDU_size;                 /* max TSDU size */
-        long ETSDU_size;                /* max ETSDU size */
-        long CDATA_size;                /* Connect data size */
-        long DDATA_size;                /* Discon data size */
-        long ADDR_size;                 /* TSAP size */
-        long OPT_size;                  /* options size */
-        long TIDU_size;                 /* TIDU size */
-        long SERV_type;                 /* service type */
-        long CURRENT_state;             /* current state */
-        long PROVIDER_flag;             /* provider flags */
-@}
+@verbatim
+struct T_info_ack {
+    long PRIM_type;     /* always T_INFO_ACK */
+    long TSDU_size;     /* max TSDU size */
+    long ETSDU_size;    /* max ETSDU size */
+    long CDATA_size;    /* Connect data size */
+    long DDATA_size;    /* Discon data size */
+    long ADDR_size;     /* TSAP size */
+    long OPT_size;      /* options size */
+    long TIDU_size;     /* TIDU size */
+    long SERV_type;     /* service type */
+    long CURRENT_state; /* current state */
+    long PROVIDER_flag; /* provider flags */
+}
+@end verbatim
 @end smallexample
 
 where the fields of this message have the following meanings:
 
-@vtable @var
+@table @parm
 
 @item PRIM_type
 This indicates the primitive type.
@@ -700,55 +930,55 @@ This indicates the primitive type.
 A value greater than zero specifies the maximum size of a transport service data
 unit (TSDU); a value of zero specifies that the transport provider does not
 support the concept of TSDU, although it does support the sending of a data
-stream with no logical boundaries preserved across a connection; a value of -1
-specifies that there is nolimit on the size of a TSDU; and a value of -2
-specifies that the transfer of normal data is not supported by the transport
-provider.
+stream with no logical boundaries preserved across a connection; a value of
+@samp{-1} specifies that there is nolimit on the size of a TSDU; and a value of
+@samp{-2} specifies that the transfer of normal data is not supported by the
+transport provider.
 
 @item ETSDU_size
 A value greater than zero specifies the maximum size of an expeditedtransport
 service data unit (ETSDU); a value of zero specifies that the transport provider
 does not support the concept of ETSDU, although it does support the sending of
 an expedited data stream with no logical boundaries preserved across a
-connection; a value of -1 specifies thatthere is no limit on the size of an
-ETSDU; and a value of -2 specifies that the transfer of expedited data is not
-supported by the transport provider.
+connection; a value of @samp{-1} specifies thatthere is no limit on the size of
+an ETSDU; and a value of @samp{-2} specifies that the transfer of expedited data
+is not supported by the transport provider.
 
 @item CDATA_size
 A value greater than or equal to zero specifies the maximum amount of data that
-may be associated with connection establishment primitives; and a value of -2
-specifies that the transport provider does not allow data to be sent with
-connection establishment primitives.
+may be associated with connection establishment primitives; and a value of
+@samp{-2} specifies that the transport provider does not allow data to be sent
+with connection establishment primitives.
 
 @item DDATA_size
 A value greater than or equal to zero specifies the maximum amount of data that
-may be associated with the disconnect primitives; and a value of -2 specifies
-that the transport provider does not allow data to be sent with the disconnect
-primitives.
+may be associated with the disconnect primitives; and a value of @samp{-2}
+specifies that the transport provider does not allow data to be sent with the
+disconnect primitives.
 
 @item ADDR_size
 A value greater than or equal to zero indicates the maximum size of a transport
-protocol address; and a value of -2 specifies that the transport provider does
-not provide user access to transport protocol addresses.
+protocol address; and a value of @samp{-2} specifies that the transport provider
+does not provide user access to transport protocol addresses.
 
 @item OPT_size
 A value greater than or equal to zero indicates the maximum number of bytes of
-protocol-specific options supported by the provider; a value of -2 specifies
-that the transport provider does not support user-settable options although
-they're read-only; and a value of -3 specifies that the transport provider does
-not support any options.
+protocol-specific options supported by the provider; a value of @samp{-2}
+specifies that the transport provider does not support user-settable options
+although they're read-only; and a value of -3 specifies that the transport
+provider does not support any options.
 
 @item TIDU_size
 @footnote{This is the amount of user data that may be present in a single
-T_DATA_REQ or T_EXDATA_REQ primitive.} This is the size of the transport
-protocol interface data unit, and should not exceed the tunable system limit, if
-non-zero, for the size of a STREAMS message.
+@prim{T_DATA_REQ} or @prim{T_EXDATA_REQ} primitive.} This is the size of the
+transport protocol interface data unit, and should not exceed the tunable system
+limit, if non-zero, for the size of a STREAMS message.
 
 @item SERV_type
 This field specifies the service type supported by the transport provider, and
 is one of the following:
 
-@vtable @var
+@table @pval
 
 @item T_COTS
 The provider service is connection oriented with no orderly release support.
@@ -759,7 +989,7 @@ The provider service is connection oriented with orderly release support.
 @item T_CLTS
 The provider service is a connectionless transport service.
 
-@end vtable
+@end table
 
 @item CURRENT_state
 This is the current state of the transport provider.
@@ -770,7 +1000,7 @@ and may alter the way the transport user communicates.  Transport providers
 supporting the features of XTI in XPG4 and beyond must send up a version number
 as specified below. The following flags may be set by the provider:
 
-@vtable @var
+@table @pval
 
 @item SENDZERO
 This flag indicates that the transport provider supports the sending of
@@ -778,194 +1008,217 @@ zero-length TSDUs.
 
 @item XPG4_1
 This indicates that the transport provider conforms to XTI in XPG4 and supports
-the new primitives T_ADDR_REQ and T_ADDR_ACK.
+the new primitives @prim{T_ADDR_REQ} and @prim{T_ADDR_ACK}.
 
-@end vtable
+@end table
 
-@end vtable
+@end table
 
-The following rules apply when the type of service is T_CLTS:
+The following rules apply when the type of service is @pval{T_CLTS}:
 
 @itemize ---
-@item The ETSDU_size, CDATA_size and DDATA_size fields should be -2.
-@item The TSDU_size should equal the TIDU_size.
+@item The @parm{ETSDU_size}, @parm{CDATA_size} and @parm{DDATA_size}
+fields should be @samp{-2}.
+@item The @parm{TSDU_size} should equal the @parm{TIDU_size}.
 @end itemize
 
 @node T_BIND_ACK
 @subsubsection T_BIND_ACK - bind protocol address acknowledgement.
+@prindex T_BIND_ACK
+@cindex Bind protocol address
 
 This primitive indicates to the transport user that the specified protocol
 address has been bound to the stream, that the specified number of connect
 indications are allowed to be queued by the transport provider for the specified
 protocol address, and that the stream associated with the specified protocol
-address has been activated. The format of the message is one M_PCPROTO message
-block. The format of the M_PCPROTO message block is as follows:
+address has been activated. The format of the message is one @msg{M_PCPROTO}
+message block. The format of the @msg{M_PCPROTO} message block is as follows:
 
+@tpindex T_bind_ack
 @smallexample
-struct T_bind_ack @{
-        long PRIM_type;                 /* always T_BIND_ACK */
-        long ADDR_length;               /* length of address - see note in sec. 1.4 */
-        long ADDR_offset;               /* offset of address */
-        unsigned long CONIND_number;    /* connect indications to be queued */
-@}
+@verbatim
+struct T_bind_ack {
+    long PRIM_type;     /* always T_BIND_ACK */
+    long ADDR_length;   /* length of address - see note in sec.
+                           1.4 */
+    long ADDR_offset;   /* offset of address */
+    unsigned long CONIND_number;        /* connect indications to
+                                           be queued */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type.  @var{ADDR_length} is the
-length of the protocol address that was bound to the stream and
-@var{ADDR_offset} is the offset from the beginning of the M_PCPROTO block where
-the protocol address begins. @var{CONIND_number}@footnote{This field doesn't
-apply to connectionless transport providers.} is the accepted number of connect
-indications allowed to be outstanding by the transport provider for the
-specified protocol address. The proper alignment of the address in the M_PCPROTO
-message block is not guaranteed.
+Where @parm{PRIM_type} indicates the primitive type.  @parm{ADDR_length} is
+the length of the protocol address that was bound to the stream and
+@parm{ADDR_offset} is the offset from the beginning of the @msg{M_PCPROTO}
+block where the protocol address begins. @parm{CONIND_number}@footnote{This
+field doesn't apply to connectionless transport providers.} is the accepted
+number of connect indications allowed to be outstanding by the transport
+provider for the specified protocol address. The proper alignment of the address
+in the @msg{M_PCPROTO} message block is not guaranteed.
 
 The following rules apply to the binding of the specified protocol address to
 the stream:
 
 @itemize ---
 
-@item If the ADDR_length field in the T_BIND_REQ primitive is 0, then the transport
-provider must assign a transport protocol address to the user.
+@item If the @parm{ADDR_length} field in the @prim{T_BIND_REQ} primitive is
+@samp{0}, then the transport provider must assign a transport protocol address
+to the user.
 
-@item The transport provider is to bind the transport protocol address as specified
-in the T_BIND_REQ primitive. If the requested transport protocol address is in
-use or if the transport provider cannot bind the specified address, it must
-return an error.
+@item The transport provider is to bind the transport protocol address as
+specified in the @prim{T_BIND_REQ} primitive. If the requested transport
+protocol address is in use or if the transport provider cannot bind the
+specified address, it must return an error.
 
 @end itemize
 
-The following rules apply to negotiating the CONIND_number argument:
+The following rules apply to negotiating the @parm{CONIND_number} argument:
 
 @itemize ---
 
-@item The returned value must be less than or equal to the corresponding requested
-number as indicated in the T_BIND_REQ primitive.
+@item The returned value must be less than or equal to the corresponding
+requested number as indicated in the @prim{T_BIND_REQ} primitive.
 
-@item If the requested value is greater than zero, the returned value must also be
-greater than zero.
+@item If the requested value is greater than zero, the returned value must also
+be greater than zero.
 
 @item Only one stream that is bound to the indicated protocol address may have a
 negotiated accepted number of maximum connect requests greater than zero. If a
-T_BIND_REQ primitive specifies a value greater than zero, but another stream has
-already bound itself to the given protocol address with a value greater than
-zero, the transport provider must return an error.
+@prim{T_BIND_REQ} primitive specifies a value greater than zero, but another
+stream has already bound itself to the given protocol address with a value
+greater than zero, the transport provider must return an error.
 
-@item If a stream with CONIND_number greater than zero is used to accept a
-connection, the stream will be found busy during the duration of that connection
-and no other streams may be bound to that protocol address with a CONIND_number
-greater than zero. This will prevent more than one stream bound to the identical
-protocol address from accepting connect indications.
+@item If a stream with @parm{CONIND_number} greater than zero is used to
+accept a connection, the stream will be found busy during the duration of that
+connection and no other streams may be bound to that protocol address with a
+@parm{CONIND_number} greater than zero. This will prevent more than one stream
+bound to the identical protocol address from accepting connect indications.
 
-@item A stream requesting a CONIND_number of zero should always be legal. This
-indicates to the transport provider that the stream is to be used to request
-connections only.
+@item A stream requesting a @parm{CONIND_number} of zero should always be
+legal. This indicates to the transport provider that the stream is to be used to
+request connections only.
 
-@item A stream with a negotiated CONIND_number greater than zero may generate
-connect requests or accept connect indications.
+@item A stream with a negotiated @parm{CONIND_number} greater than zero may
+generate connect requests or accept connect indications.
 
 @end itemize
 
 If the above rules result in an error condition, then the transport provider
-must issue an T_ERROR_ACK primitive to the transport user specifying the error
-as defined in the description of the T_BIND_REQ primitive.
+must issue an @prim{T_ERROR_ACK} primitive to the transport user specifying the
+error as defined in the description of the @prim{T_BIND_REQ} primitive.
 
 @node T_OPTMGMT_ACK
 @subsubsection T_OPTMGMT_ACK - option management acknowledgement.
+@prindex T_OPTMGMT_ACK
+@cindex Options management
 
 This indicates to the transport user that the options management request has
-completed.  The format of the message is one M_PCPROTO message block. The format
-of the M_PCPROTO message block is as follows:
+completed.  The format of the message is one @msg{M_PCPROTO} message block. The
+format of the @msg{M_PCPROTO} message block is as follows:
 
+@tpindex T_optmgmt_ack
 @smallexample
-struct T_optmgmt_ack @{
-        long PRIM_type;                 /* always T_OPTMGMT_ACK */
-        long OPT_length;                /* options length - see note in sec. 1.4 */
-        long OPT_offset;                /* options offset */
-        long MGMT_flags;                /* flags */
-@}
+@verbatim
+struct T_optmgmt_ack {
+    long PRIM_type;     /* always T_OPTMGMT_ACK */
+    long OPT_length;    /* options length - see note in sec. 1.4 */
+    long OPT_offset;    /* options offset */
+    long MGMT_flags;    /* flags */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type.  @var{OPT_length} is the
-length of the protocol options associated with the primitive and
-@var{OPT_offset} is the offset from the beginning of the M_PCPROTO block where
-the options begin. The proper alignment of the options is not guaranteed.
+Where @parm{PRIM_type} indicates the primitive type.  @parm{OPT_length} is
+the length of the protocol options associated with the primitive and
+@parm{OPT_offset} is the offset from the beginning of the @msg{M_PCPROTO}
+block where the options begin. The proper alignment of the options is not
+guaranteed.
 
-@var{MGMT_flags} should be the same as those specified in the T_OPTMGMT_REQ
-primitive with any additional flags as specified below.
+@parm{MGMT_flags} should be the same as those specified in the
+@prim{T_OPTMGMT_REQ} primitive with any additional flags as specified below.
 
-The following rules apply to the T_OPTMGMT_ACK primitive.
-
-@itemize ---
-
-@item If the value of MGMT_flags in the T_OPTMGMT_REQ primitive is T_DEFAULT,
-the provider should return the default provider options without changing the
-existing options associated with the stream.
-
-@item If the value of MGMT_flags in the T_OPTMGMT_REQ primitive is T_CHECK, the
-provider should return the options as specified in the T_OPTMGMT_REQ primitive
-along with the additional flags T_SUCCESS or T_FAILURE which indicate to the
-user whether the specified options are supportable by the provider. The provider
-should not change any existing options associated with the stream.
-
-@item If the value of MGMT_flags in the T_OPTMGMT_REQ primitive is
-T_NEGOTIATE, the provider should set and negotiate the option as specified by
-the following rules:
+The following rules apply to the @prim{T_OPTMGMT_ACK} primitive.
 
 @itemize ---
 
-@item If the OPT_length field of the T_OPTMGMT_REQ primitive is 0, then the
-transport provider is to set and return the default options associated
-with the stream in the T_OPTMGMT_ACK primitive.
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+is @pval{T_DEFAULT}, the provider should return the default provider options
+without changing the existing options associated with the stream.
 
-@item If options are specified in the T_OPTMGMT_REQ primitive, then the transport
-provider should negotiate those options, set the negotiated options and return
-the negotiated options in the T_OPTMGMT_ACK primitive. It is the user's
-responsibility to check the negotiated options returned in the T_OPTMGMT_ACK
-primitive and take appropriate action.
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+is @pval{T_CHECK}, the provider should return the options as specified in the
+@prim{T_OPTMGMT_REQ} primitive along with the additional flags @pval{T_SUCCESS}
+or @pval{T_FAILURE} which indicate to the user whether the specified options are
+supportable by the provider. The provider should not change any existing options
+associated with the stream.
+
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+is @pval{T_NEGOTIATE}, the provider should set and negotiate the option as
+specified by the following rules:
+
+@itemize ---
+
+@item If the @parm{OPT_length} field of the @prim{T_OPTMGMT_REQ} primitive is
+@samp{0}, then the transport provider is to set and return the default options
+associated with the stream in the @prim{T_OPTMGMT_ACK} primitive.
+
+@item If options are specified in the @prim{T_OPTMGMT_REQ} primitive, then the
+transport provider should negotiate those options, set the negotiated options
+and return the negotiated options in the @prim{T_OPTMGMT_ACK} primitive. It is
+the user's responsibility to check the negotiated options returned in the
+@prim{T_OPTMGMT_ACK} primitive and take appropriate action.
 
 @end itemize
 
-@item If the value of MGMT_flags in the T_OPTMGMT_REQ primitive is T_CURRENT,
-the provider should return the current options that are currently
-associated with the stream.
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+is @pval{T_CURRENT}, the provider should return the current options that are
+currently associated with the stream.
 
-@item If the value of MGMT_flags in the T_OPTMGMT_REQ primitive is either
-T_NEGOTIATE or T_CHECK and the transport provider cannot support the requested
-flag, an error is to be returned.
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+is either @pval{T_NEGOTIATE} or @pval{T_CHECK} and the transport provider cannot
+support the requested flag, an error is to be returned.
 
 @end itemize
 
 If the above rules result in an error condition, the transport provider must
-issue a T_ERROR_ACK primitive to the transport user specifying the error as
-defined in the description of the T_OPTMGMT_REQ primitive.
+issue a @prim{T_ERROR_ACK} primitive to the transport user specifying the error
+as defined in the description of the @prim{T_OPTMGMT_REQ} primitive.
 
 @node T_ERROR_ACK
 @subsubsection T_ERROR_ACK - error acknowledgement.
+@prindex T_ERROR_ACK
+@cindex Error acknowledgement
 
 This primitive indicates to the transport user that a non-fatal@footnote{For a
 overview of the error handling capabilities available to the transport provider
 see section 2.4.} error has occurred in the last transport-user-originated
 primitive. This may only be initiated as an acknowledgement for those primitives
 that require one. It also indicates to the user that no action was taken on the
-primitive that caused the error. The format of the message is one M_PCPROTO
-message block. The format of the M_PCPROTO message block is as follows:
+primitive that caused the error. The format of the message is one
+@msg{M_PCPROTO} message block. The format of the @msg{M_PCPROTO} message block
+is as follows:
 
+@tpindex T_error_ack
 @smallexample
-struct T_error_ack @{
-        long PRIM_type;                 /* always T_ERROR_ACK */
-        long ERROR_prim;                /* primitive in error */
-        long TLI_error;                 /* TLI error code - see note in sec. 1.4 */
-        long UNIX_error;                /* UNIX error code - see note in sec. 1.4 */
-@}
+@verbatim
+struct T_error_ack {
+    long PRIM_type;     /* always T_ERROR_ACK */
+    long ERROR_prim;    /* primitive in error */
+    long TLI_error;     /* TLI error code - see note in sec. 1.4 */
+    long UNIX_error;    /* UNIX error code - see note in sec. 1.4 */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive.  @var{ERROR_prim} identifies the
-primitive type that caused the error and @var{TLI_error} contains the Transport
-Level Interface error code.  @var{UNIX_error} contains the UNIX System error
-code. This may only be non zero if TLI_error is equal to TSYSERR.  The following
-Transport Level Interface error codes are allowed to be returned:
+Where @parm{PRIM_type} identifies the primitive.  @parm{ERROR_prim}
+identifies the primitive type that caused the error and @parm{TLI_error}
+contains the Transport Level Interface error code.  @parm{UNIX_error} contains
+the @cite{UNIX@registeredsymbol{}} System error code. This may only be non zero
+if @parm{TLI_error} is equal to @perr{TSYSERR}.  The following Transport Level
+Interface error codes are allowed to be returned:
 
-@vtable @var
+@table @perr
 
 @item TBADADDR
 This indicates that the protocol address as specified in the primitive was in an
@@ -998,8 +1251,8 @@ The flags specified in the primitive were incorrect or illegal.
 The amount of user data specified was illegal.
 
 @item TSYSERR
-A system error has occurred and the UNIX System error is indicated in the
-primitive.
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
+is indicated in the primitive.
 
 @item TADDRBUSY
 The requested address is in use.
@@ -1011,80 +1264,94 @@ address as the stream on which the connection indication was received.
 @item TNOTSUPPORT
 The transport provider does not support the requested capability.
 
-@end vtable
+@end table
 
 @node T_OK_ACK
 @subsubsection T_OK_ACK - success acknowledgement.
+@prindex T_OK_ACK
+@cindex Success acknowledgement
 
 This primitive indicates to the transport user that the previous
 transport-user-originated primitive was received successfully by the transport
 provider. It does not indicate to the transport user any transport protocol
 action taken due to the issuance of the last primitive.  This may only be
 initiated as an acknowledgement for those primitives that require one. The
-format of the message is one M_PCPROTO message block. The format of the
-M_PCPROTO message block is as follows:
+format of the message is one @msg{M_PCPROTO} message block. The format of the
+@msg{M_PCPROTO} message block is as follows:
 
+@tpindex T_ok_ack
 @smallexample
-struct T_ok_ack @{
-        long PRIM_type;                 /* always T_OK_ACK */
-        long CORRECT_prim;              /* primitive */
-@}
+@verbatim
+struct T_ok_ack {
+    long PRIM_type;     /* always T_OK_ACK */
+    long CORRECT_prim;  /* primitive */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive.  @var{CORRECT_prim} contains the
-successfully received primitive type.
+Where @parm{PRIM_type} identifies the primitive.  @parm{CORRECT_prim}
+contains the successfully received primitive type.
 
 @node T_ADDR_ACK
 @subsubsection T_ADDR_ACK - get protocol addresses acknowledgement.
+@prindex T_ADDR_ACK
+@cindex Protocol addresses
 
 This primitive indicates to the transport user the addresses of the local and
 remote transport entities. The local address is the protocol address that has
 been bound to the stream. If a connection has been established, the remote
 address is the protocol address of the remote transport entity. The format of
-the message is one M_PCPROTO message block. The format of the M_PCPROTO message
-block is as follows:
+the message is one @msg{M_PCPROTO} message block. The format of the
+@msg{M_PCPROTO} message block is as follows:
 
+@tpindex T_addr_ack
 @smallexample
-struct T_addr_ack @{
-        long PRIM_type;                 /* always T_ADDR_ACK */
-        long LOCADDR_length;            /* length of local address - see note
-                                           in sec. 1.4 */
-        long LOCADDR_offset;            /* offset of local address */
-        long REMADDR_length;            /* length of remote address - see note
-                                           in sec. 1.4 */
-        long REMADDR_offset;            /* offset of remote address */
-@}
+@verbatim
+struct T_addr_ack {
+    long PRIM_type;     /* always T_ADDR_ACK */
+    long LOCADDR_length;        /* length of local address - see
+                                   note in sec. 1.4 */
+    long LOCADDR_offset;        /* offset of local address */
+    long REMADDR_length;        /* length of remote address - see
+                                   note in sec. 1.4 */
+    long REMADDR_offset;        /* offset of remote address */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} indicates the primitive type.  @var{LOCADDR_length} is the
-length of the protocol address that was bound to the stream and
-@var{LOCADDR_offset} is the offset from the beginning of the M_PCPROTO block
-where the protocol address begins. If the stream is in the data transfer state,
-@var{REMADDR_length} is the length of the protocol address of the remote
-transport entity and @var{REMADDR_offset} is the offset from the beginning of
-the M_PCPROTO block where the protocol address begins.
+Where @parm{PRIM_type} indicates the primitive type.  @parm{LOCADDR_length}
+is the length of the protocol address that was bound to the stream and
+@parm{LOCADDR_offset} is the offset from the beginning of the @msg{M_PCPROTO}
+block where the protocol address begins. If the stream is in the data transfer
+state, @parm{REMADDR_length} is the length of the protocol address of the
+remote transport entity and @parm{REMADDR_offset} is the offset from the
+beginning of the @msg{M_PCPROTO} block where the protocol address begins.
 
 The following rules apply:
 
 @itemize ---
 
-@item If the interface is in any state but T_DATAXFER, the values returned for
-REMADDR_length and REMADDR_offset must be 0.
+@item If the interface is in any state but @psta{T_DATA_XFER}, the values
+returned for @parm{REMADDR_length} and @parm{REMADDR_offset} must be
+@samp{0}.
 
-@item If the interface is in the T_UNINIT or T_UNBND state, the values returned
-for LOCADDR_length and LOCADDR_offset must be 0.
+@item If the interface is in the @psta{T_UNINIT} or @psta{T_UNBND} state, the
+values returned for @parm{LOCADDR_length} and @parm{LOCADDR_offset} must be
+@samp{0}.
 
 @end itemize
 
 @page
 @node Connection-Mode Transport Primitives
 @section Connection-Mode Transport Primitives
+@cindex Connection-mode transport primitives
 
 The following transport primitives pertain only to the connection-mode transport
 service.
 
 @node COTS User-Originated Primitives
 @subsection User-Originated Primitives
+@cindex COTS user-originated primitives
 
 @menu
 * T_CONN_REQ::
@@ -1100,35 +1367,41 @@ generated by the transport user.
 
 @node T_CONN_REQ
 @subsubsection T_CONN_REQ - connect request.
+@prindex T_CONN_REQ
+@cindex Connect
 
 This primitive requests that the transport provider make a connection to the
-specified destination. The format of this message is one M_PROTO message block
-followed by zero or more M_DATA blocks if any user data is specified by the
-transport user. The format of the M_PROTO message block is as follows:
+specified destination. The format of this message is one @msg{M_PROTO} message
+block followed by zero or more @msg{M_DATA} blocks if any user data is specified
+by the transport user. The format of the @msg{M_PROTO} message block is as
+follows:
 
+@tpindex T_conn_req
 @smallexample
-struct T_conn_req @{
-        long PRIM_type;                 /* always T_CONN_REQ */
-        long DEST_length;               /* dest addr length */
-        long DEST_offset;               /* dest addr offset */
-        long OPT_length;                /* options length */
-        long OPT_offset;                /* options offset */
-@}
+@verbatim
+struct T_conn_req {
+    long PRIM_type;     /* always T_CONN_REQ */
+    long DEST_length;   /* dest addr length */
+    long DEST_offset;   /* dest addr offset */
+    long OPT_length;    /* options length */
+    long OPT_offset;    /* options offset */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{DEST_length} is the
-length of the destination address and @var{DEST_offset} is the offset from the
-beginning of the M_PROTO message block where the destination address begins.
-Similarly, @var{OPT_length} and @var{OPT_offset} describe the location of the
-requested options associated with the primitive.  The proper alignment of the
-destination address and options in the M_PROTO message block is not
-guaranteed.@footnote{The information located by the defined structures may not
-be in the proper alignment in the message blocks, so the casting of structure
-definitions over these fields may produce incorrect results. It is advised that
-the transport providers supply exact format specifications for the appropriate
-information to the transport users.} The destination address and options in the
-M_PROTO message block are however, aligned the same as they were received from
-the transport user.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{DEST_length} is
+the length of the destination address and @parm{DEST_offset} is the offset
+from the beginning of the @msg{M_PROTO} message block where the destination
+address begins.  Similarly, @parm{OPT_length} and @parm{OPT_offset} describe
+the location of the requested options associated with the primitive.  The proper
+alignment of the destination address and options in the @msg{M_PROTO} message
+block is not guaranteed.@footnote{The information located by the defined
+structures may not be in the proper alignment in the message blocks, so the
+casting of structure definitions over these fields may produce incorrect
+results. It is advised that the transport providers supply exact format
+specifications for the appropriate information to the transport users.} The
+destination address and options in the @msg{M_PROTO} message block are however,
+aligned the same as they were received from the transport user.
 
 This primitive requires the transport provider to generate one of the following
 acknowledgements upon receipt of the primitive, and the transport user must wait
@@ -1138,15 +1411,15 @@ for the acknowledgement before issuing any other primitives:
 
 @item Successful
 
-Correct acknowledgement of the primitive is indicated via the T_OK_ACK primitive
-described in @ref{T_OK_ACK,,T_OK_ACK}.
+Correct acknowledgement of the primitive is indicated via the @prim{T_OK_ACK}
+primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 
 @item Non-fatal errors
 
-These errors will be indicated via the T_ERROR_ACK primitive described in
+These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@vtable @var
+@table @perr
 
 @item TACCES
 This indicates that the user did not have proper permissions for the use of the
@@ -1156,7 +1429,7 @@ requested address or options.
 This indicates that the protocol address was in an incorrect format or the
 address contained illegal information. It is not intended to indicate protocol
 connection errors, such as an unreachable destination. Those error types are
-indicated via the T_DISCON_IND primitive.
+indicated via the @prim{T_DISCON_IND} primitive.
 
 @item TBADOPT
 This indicates that the options were in an incorrect format, or they contained
@@ -1169,48 +1442,54 @@ The primitive would place the transport interface out of state.
 The amount of user data specified was illegal.
 
 @item TSYSERR
-A system error has occurred and the UNIX System error is indicated in the
-primitive.
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
+is indicated in the primitive.
 
 @item TADDRBUSY
 This transport provider does not support multiple connections with the same
 local and remote addresses.
 
-@end vtable
+@end table
 
 @end itemize
 
 @node T_CONN_RES
 @subsubsection T_CONN_RES - connection response.
+@prindex T_CONN_RES
+@cindex Connect
 
 This primitive requests that the transport provider accept a previous connect
 request on the specified response queue.  The format of this message is one
-M_PROTO message block followed by zero or more M_DATA blocks if any user data is
-specified by the transport user. The format of the M_PROTO message block is as
-follows:
+@msg{M_PROTO} message block followed by zero or more @msg{M_DATA} blocks if any
+user data is specified by the transport user. The format of the @msg{M_PROTO}
+message block is as follows:
 
+@tpindex T_conn_res
 @smallexample
-struct T_conn_res @{
-        long PRIM_type;                 /* always T_CONN_RES */
-        queue_t *QUEUE_ptr;             /* response queue ptr */
-        long OPT_length;                /* options length */
-        long OPT_offset;                /* options offset */
-        long SEQ_number;                /* sequence number */
-@}
+@verbatim
+struct T_conn_res {
+    long PRIM_type;     /* always T_CONN_RES */
+    queue_t *QUEUE_ptr; /* response queue ptr */
+    long OPT_length;    /* options length */
+    long OPT_offset;    /* options offset */
+    long SEQ_number;    /* sequence number */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{QUEUE_ptr} identifies
-the transport provider queue pair (i.e.  read queue pointer) which should be
-used to accept the connect request. This queue pointer should map onto a stream
-which is already bound to a protocol address but if the stream is not bound, the
-transport provider must bind it to the same protocol address that was bound to
-the stream on which the connection indication arrived.  @var{OPT_length} is the
-length of the responding options and @var{OPT_offset} is the offset from the
-beginning of the M_PROTO message block where the responding options begin.
-@var{SEQ_number} is the sequence number which identifies the connection to be
-responded to.  The proper alignment of the options in the M_PROTO message block
-is not guaranteed.  The options in the M_PROTO message block are, however,
-aligned the same as they were received from the transport user.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{QUEUE_ptr}
+identifies the transport provider queue pair (i.e.  read queue pointer) which
+should be used to accept the connect request. This queue pointer should map onto
+a stream which is already bound to a protocol address but if the stream is not
+bound, the transport provider must bind it to the same protocol address that was
+bound to the stream on which the connection indication arrived.
+@parm{OPT_length} is the length of the responding options and
+@parm{OPT_offset} is the offset from the beginning of the @msg{M_PROTO}
+message block where the responding options begin.  @parm{SEQ_number} is the
+sequence number which identifies the connection to be responded to.  The proper
+alignment of the options in the @msg{M_PROTO} message block is not guaranteed.
+The options in the @msg{M_PROTO} message block are, however, aligned the same as
+they were received from the transport user.
 
 This primitive requires the transport provider to generate one of the following
 acknowledgements upon receipt of the primitive, and the transport user wait for
@@ -1220,15 +1499,15 @@ the acknowledgement before issuing any other primitives:
 
 @item Successful
 
-Correct acknowledgement of the primitive is indicated via the T_OK_ACK primitive
-described in @ref{T_OK_ACK,,T_OK_ACK}.
+Correct acknowledgement of the primitive is indicated via the @prim{T_OK_ACK}
+primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 
 @item Non-fatal errors
 
-These errors will be indicated via the T_ERROR_ACK primitive described in
+These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@vtable @var
+@table @perr
 
 @item TBADF
 This indicates that the response queue pointer was illegal.
@@ -1251,8 +1530,8 @@ The amount of user data specified was illegal.
 The sequence number specified in the primitive was incorrect or illegal.
 
 @item TSYSERR
-A system error has occurred and the UNIX System error is indicated in the
-primitive.
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
+is indicated in the primitive.
 
 @item TRESADDR
 The transport provider requires that the responding stream is bound to the same
@@ -1262,30 +1541,35 @@ address as the stream on which the connection indication was received.
 This indicates that the protocol address was in an incorrect format or the
 address contained illegal information.
 
-@end vtable
+@end table
 
 @end itemize
 
 @node T_DISCON_REQ
 @subsubsection T_DISCON_REQ - disconnect request.
+@prindex T_DISCON_REQ
+@cindex Disconnect
 
 This primitive requests that the transport provider deny a request for
 connection, or disconnect an existing connection. The format of this message is
-one M_PROTO message block possibly followed by one or more M_DATA message blocks
-if there is any user data specified by the transport user. The format of the
-M_PROTO message block is as follows:
+one @msg{M_PROTO} message block possibly followed by one or more @msg{M_DATA}
+message blocks if there is any user data specified by the transport user. The
+format of the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_discon_req
 @smallexample
-struct T_discon_req @{
-        long PRIM_type;                 /* always T_DISCON_REQ */
-        long SEQ_number;                /* sequence number */
-@}
+@verbatim
+struct T_discon_req {
+    long PRIM_type;     /* always T_DISCON_REQ */
+    long SEQ_number;    /* sequence number */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{SEQ_number}
+Where @parm{PRIM_type} identifies the primitive type.  @parm{SEQ_number}
 identifies the outstanding connect indication that is to by denied. If the
 disconnect request is disconnecting an already existing connection, then the
-value of @var{SEQ_number} will be ignored.
+value of @parm{SEQ_number} will be ignored.
 
 This primitive requires the transport provider to generate the following
 acknowledgement upon receipt of the primitive, and the transport user must wait
@@ -1295,15 +1579,15 @@ for the acknowledgement prior to issuing any other primitives:
 
 @item Successful
 
-Correct acknowledgement of the primitive is indicated via the T_OK_ACK primitive
-described in @ref{T_OK_ACK,,T_OK_ACK}.
+Correct acknowledgement of the primitive is indicated via the @prim{T_OK_ACK}
+primitive described in @ref{T_OK_ACK,,T_OK_ACK}.
 
 @item Non-fatal errors
 
-These errors will be indicated via the T_ERROR_ACK primitive described in
+These errors will be indicated via the @prim{T_ERROR_ACK} primitive described in
 @ref{T_ERROR_ACK,,T_ERROR_ACK}. The allowable errors are as follows:
 
-@vtable @var
+@table @perr
 
 @item TOUTSTATE
 The primitive would place the transport interface out of state.
@@ -1315,54 +1599,61 @@ The amount of user data specified was illegal.
 The sequence number specified in the primitive was incorrect or illegal.
 
 @item TSYSERR
-A system error has occurred and the UNIX System error is indicated in the
-primitive.
+A system error has occurred and the @cite{UNIX@registeredsymbol{}} System error
+is indicated in the primitive.
 
-@end vtable
+@end table
 
 @end itemize
 
 @node T_DATA_REQ
 @subsubsection T_DATA_REQ - data request.
+@prindex T_DATA_REQ
+@cindex Data transfer
 
 This primitive indicates to the transport provider that this message contains a
 transport interface data unit. One or more transport interface data units form a
 transport service data unit (TSDU).@footnote{The maximum transport service data
 unit size allowed by the transport provider is indicated to the transport user
-via the T_INFO_ACK primitive.} This primitive has a mechanism that indicates the
-beginning and end of a transport service data unit. However, not all transport
-providers support the concept of a transport service data unit, as noted in
-@ref{T_INFO_ACK,,T_INFO_ACK}. The format of the message is one M_PROTO message
-block followed by zero or more M_DATA message blocks where each
+via the @prim{T_INFO_ACK} primitive.} This primitive has a mechanism that
+indicates the beginning and end of a transport service data unit. However, not
+all transport providers support the concept of a transport service data unit, as
+noted in @ref{T_INFO_ACK,,T_INFO_ACK}. The format of the message is one
+@msg{M_PROTO} message block followed by zero or more @msg{M_DATA} message blocks
+where each
 
-M_DATA message block contains zero or more bytes of data. The format of the
-M_PROTO message block is as follows:
+@msg{M_DATA} message block contains zero or more bytes of data. The format of the
+@msg{M_PROTO} message block is as follows:
 
+@tpindex T_data_req
 @smallexample
-struct T_data_req @{
-        long PRIM_type;                 /* always T_DATA_REQ */
-        long MORE_flag;                 /* indicates more data in TSDU */
-@}
+@verbatim
+struct T_data_req {
+    long PRIM_type;     /* always T_DATA_REQ */
+    long MORE_flag;     /* indicates more data in TSDU */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{MORE_flag} when
-greater than zero, indicates that the next T_DATA_REQ primitive is also part of
-this transport service data unit.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{MORE_flag} when
+greater than zero, indicates that the next @prim{T_DATA_REQ} primitive is also
+part of this transport service data unit.
 
-The transport provider must also recognize a message of one or more M_DATA
-message blocks without the leading M_PROTO message block as a T_DATA_REQ
-primitive. This message type will be initiated from the WRITE(BA_OS) operating
-system service routine.  In this case there are no implied transport service
-data unit boundaries, and the transport provider may view this message type as a
-self contained transport service data unit. If these two types of messages are
-intermixed, then transport service data boundaries may be lost.
+The transport provider must also recognize a message of one or more @msg{M_DATA}
+message blocks without the leading @msg{M_PROTO} message block as a
+@prim{T_DATA_REQ} primitive. This message type will be initiated from the
+WRITE(BA_OS) operating system service routine.  In this case there are no
+implied transport service data unit boundaries, and the transport provider may
+view this message type as a self contained transport service data unit. If these
+two types of messages are intermixed, then transport service data boundaries may
+be lost.
 
 This primitive does not require any acknowledgements, although it may generate a
-fatal error.  This is indicated via a M_ERROR message type which results in the
-failure of all operating system service routines on the stream. The allowable
-errors are as follows:
+fatal error.  This is indicated via a @msg{M_ERROR} message type which results
+in the failure of all operating system service routines on the stream. The
+allowable errors are as follows:
 
-@vtable @var
+@table @errno
 
 @item EPROTO
 
@@ -1371,19 +1662,21 @@ This indicates one of the following unrecoverable protocol conditions:
 @itemize ---
 
 @item The transport service interface was found to be in an incorrect state. If
-the interface is in the T_IDLE state when the provider receives the T_DATA_REQ
-primitive, then the transport provider should just drop the message without
-generating a fatal error.
+the interface is in the @psta{T_IDLE} state when the provider receives the
+@prim{T_DATA_REQ} primitive, then the transport provider should just drop the
+message without generating a fatal error.
 
 @item The amount of transport user data associated with the primitive defines a
 transport service data unit larger than that allowed by the transport provider.
 
 @end itemize
 
-@end vtable
+@end table
 
 @node T_EXDATA_REQ
 @subsubsection T_EXDATA_REQ - expedited data request.
+@prindex T_EXDATA_REQ
+@cindex Expedited data transfer
 
 This primitive indicates to the transport provider that this message contains an
 expedited transport interface data unit. One or more expedited transport
@@ -1392,28 +1685,31 @@ maximum size of a expedited transport service data unit is indicated to the
 transport user via theT_INFO_ACK primitive.} This primitive has a mechanism
 which indicates the beginning and end of an expedited transport service data
 unit. However, not all transport providers support the concept of an expedited
-transport service data unit, as noted in @ref{T_INFO_ACK,,T_INFO_ACK}. The format
-of the message is one M_PROTO message block followed by one or more M_DATA
-message blocks containing at least one byte of data.  The format of the M_PROTO
-message block is as follows:
+transport service data unit, as noted in @ref{T_INFO_ACK,,T_INFO_ACK}. The
+format of the message is one @msg{M_PROTO} message block followed by one or more
+@msg{M_DATA} message blocks containing at least one byte of data.  The format of
+the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_exdata_req
 @smallexample
-struct T_exdata_req @{
-        long PRIM_type;                 /* always T_EXDATA_REQ */
-        long MORE_flag;                 /* indicates more data in ETSDU */
-@}
+@verbatim
+struct T_exdata_req {
+    long PRIM_type;     /* always T_EXDATA_REQ */
+    long MORE_flag;     /* indicates more data in ETSDU */
+}
+@end verbatim
 @end smallexample
 
-Where PRIM_type identifies the primitive type. MORE_flag when greater than zero
-indicates that the next T_EXDATA_REQ primitive is also part of this expedited
-transport service data unit.
+Where @parm{PRIM_type} identifies the primitive type. @parm{MORE_flag} when
+greater than zero indicates that the next @prim{T_EXDATA_REQ} primitive is also
+part of this expedited transport service data unit.
 
 This primitive does not require any acknowledgements, although it may generate a
-fatal error. This is indicated via a M_ERROR message type which results in the
-failure of all operating system service routines on the stream. The allowable
-errors are as follows:
+fatal error. This is indicated via a @msg{M_ERROR} message type which results in
+the failure of all operating system service routines on the stream. The
+allowable errors are as follows:
 
-@vtable @var
+@table @errno
 
 @item EPROTO
 This indicates one of the following unrecoverable protocol conditions:
@@ -1421,9 +1717,9 @@ This indicates one of the following unrecoverable protocol conditions:
 @itemize ---
 
 @item The transport service interface was found to be in an incorrect state. If
-the interface is in the T_IDLE state when the provider receives the T_EXDATA_REQ
-primitive, then the transport provider should just drop the message without
-generating a fatal error.
+the interface is in the @psta{T_IDLE} state when the provider receives the
+@prim{T_EXDATA_REQ} primitive, then the transport provider should just drop the
+message without generating a fatal error.
 
 @item The amount of transport user data associated with the primitive defines an
 expedited transport service data unit larger than that allowed by the transport
@@ -1431,30 +1727,35 @@ provider.
 
 @end itemize
 
-@end vtable
+@end table
 
 @node T_ORDREL_REQ
 @subsubsection T_ORDREL_REQ - orderly release request.
+@prindex T_ORDREL_REQ
+@cindex Orderly release
 
 This primitive indicates to the transport provider that the user is finished
 sending data.  This primitive is only supported by the transport provider if it
-is of type T_COTS_ORD.  The format of the message is one M_PROTO message block.
-The format of the M_PROTO message block is as follows:
+is of type @pval{T_COTS_ORD}.  The format of the message is one @msg{M_PROTO}
+message block.  The format of the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_ordrel_req
 @smallexample
-struct T_ordrel_req @{
-        long PRIM_type;                 /* always T_ORDREL_REQ */
-@}
+@verbatim
+struct T_ordrel_req {
+    long PRIM_type;     /* always T_ORDREL_REQ */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.
+Where @parm{PRIM_type} identifies the primitive type.
 
 This primitive does not require any acknowledgements, although it may generate a
-fatal error. This is indicated via a M_ERROR message type which results in the
-failure of all operating system service routines on the stream. The allowable
-errors are as follows:
+fatal error. This is indicated via a @msg{M_ERROR} message type which results in
+the failure of all operating system service routines on the stream. The
+allowable errors are as follows:
 
-@vtable @var
+@table @errno
 
 @item EPROTO
 This indicates one of the following unrecoverable protocol conditions:
@@ -1465,10 +1766,11 @@ This indicates one of the following unrecoverable protocol conditions:
 
 @end itemize
 
-@end vtable
+@end table
 
 @node COTS Provider-Originated Primitives
 @subsection Provider-Originated Primitives
+@cindex COTS provider-originated primitives
 
 @menu
 * T_CONN_IND::
@@ -1484,121 +1786,143 @@ generated by the transport provider.
 
 @node T_CONN_IND
 @subsubsection T_CONN_IND - connect indication.
+@prindex T_CONN_IND
+@cindex Connect
 
 This primitive indicates to the transport user that a connect request to the
 user has been made by the user at the specified source address. The format of
-this message is one M_PROTO message block followed by zero or more M_DATA blocks
-if any user data is associated with the primitive. The format of the M_PROTO
-message block is as follows:
+this message is one @msg{M_PROTO} message block followed by zero or more
+@msg{M_DATA} blocks if any user data is associated with the primitive. The
+format of the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_conn_ind
 @smallexample
-struct T_conn_ind @{
-        long PRIM_type;                 /* always T_CONN_IND */
-        long SRC_length;                /* source addr length - see note in
-                                           sec. 1.4 */
-        long SRC_offset;                /* source addr offset */
-        long OPT_length;                /* options length - see note in sec.
-                                           1.4 */
-        long OPT_offset;                /* options offset */
-        long SEQ_number;                /* sequence number - see note in sec.
-                                           1.4 */
-@}
+@verbatim
+struct T_conn_ind {
+    long PRIM_type;     /* always T_CONN_IND */
+    long SRC_length;    /* source addr length - see note in sec.
+                           1.4 */
+    long SRC_offset;    /* source addr offset */
+    long OPT_length;    /* options length - see note in sec. 1.4 */
+    long OPT_offset;    /* options offset */
+    long SEQ_number;    /* sequence number - see note in sec. 1.4 */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{SRC_length} is the
-length of the source address and SRC_offset is the offset from the beginning of
-the M_PROTO message block where the source address begins. Similarly,
-@var{OPT_length} and @var{OPT_offset} describe the location of the requested
-options associated with the primitive.  @var{SEQ_number} should bean unique
-number other than -1 to identify the connect indication. The proper alignment of
-the source address and options in the M_PROTO message block is not guaranteed.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{SRC_length} is
+the length of the source address and @parm{SRC_offset} is the offset from the
+beginning of the @msg{M_PROTO} message block where the source address begins.
+Similarly, @parm{OPT_length} and @parm{OPT_offset} describe the location of
+the requested options associated with the primitive.  @parm{SEQ_number} should
+bean unique number other than @samp{-1} to identify the connect indication. The
+proper alignment of the source address and options in the @msg{M_PROTO} message
+block is not guaranteed.
 
 @node T_CONN_CON
 @subsubsection T_CONN_CON - connection confirm.
+@prindex T_CONN_CON
+@cindex Connect
 
 This primitive indicates to the user that a connect request has been confirmed
-on the specified responding address. The format of this message is one M_PROTO
-message block followed by zero or more M_DATA blocks if any user data is
-associated with the primitive. The format of the M_PROTO message block is as
-follows:
+on the specified responding address. The format of this message is one
+@msg{M_PROTO} message block followed by zero or more @msg{M_DATA} blocks if any
+user data is associated with the primitive. The format of the @msg{M_PROTO}
+message block is as follows:
 
+@tpindex T_conn_con
 @smallexample
-struct T_conn_con @{
-        long PRIM_type;                 /* always T_CONN_CON */
-        long RES_length;                /* responding addr length - see note in 
-                                           sec. 1.4 */
-        long RES_offest;                /* responding addr offset */
-        long OPT_length;                /* options length - see note in sec.
-                                           1.4 */
-        long OPT_offset;                /* options offset */
-@}
+@verbatim
+struct T_conn_con {
+    long PRIM_type;     /* always T_CONN_CON */
+    long RES_length;    /* responding addr length - see note in
+                           sec. 1.4 */
+    long RES_offset;    /* responding addr offset */
+    long OPT_length;    /* options length - see note in sec. 1.4 */
+    long OPT_offset;    /* options offset */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{RES_length} is the
-length of the responding address that the connection was accepted on and
-@var{RES_offset} is the offset from the beginning of the M_PROTO message block
-where the responding address begins.  Similarly, @var{OPT_length} and
-@var{OPT_offset} describe the size and location of the confirmed options
-associated with the primitive.  The proper alignment of the responding address
-and options in the M_PROTO message block is not guaranteed.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{RES_length} is
+the length of the responding address that the connection was accepted on and
+@parm{RES_offset} is the offset from the beginning of the @msg{M_PROTO}
+message block where the responding address begins.  Similarly,
+@parm{OPT_length} and @parm{OPT_offset} describe the size and location of
+the confirmed options associated with the primitive.  The proper alignment of
+the responding address and options in the @msg{M_PROTO} message block is not
+guaranteed.
 
 @node T_DISCON_IND
 @subsubsection T_DISCON_IND - disconnect indication.
+@prindex T_DISCON_IND
+@cindex Disconnect
 
 This primitive indicates to the user that either a request for connection has
 been denied or an existing connection has been disconnected. The format of this
-message is one M_PROTO message block possibly followed by one or more M_DATA
-message blocks if there is any user data associated with the primitive. The
-format of the M_PROTO message block is as follows:
+message is one @msg{M_PROTO} message block possibly followed by one or more
+@msg{M_DATA} message blocks if there is any user data associated with the
+primitive. The format of the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_discon_ind
 @smallexample
-struct T_discon_ind @{
-        long PRIM_type;                 /* always T_DISCON_IND */
-        long DISCON_reason;             /* disconnect reason - see note in sec. 
-                                           1.4 */
-        long SEQ_number;                /* sequence number - see note in sec.
-                                           1.4 */
-@}
+@verbatim
+struct T_discon_ind {
+    long PRIM_type;     /* always T_DISCON_IND */
+    long DISCON_reason; /* disconnect reason - see note in sec.
+                           1.4 */
+    long SEQ_number;    /* sequence number - see note in sec. 1.4 */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type and @var{DISCON_reason} is
-the reason for disconnect.  The reason codes are protocol specific.
-@var{SEQ_number} is the sequence number which identifies which connect
-indication was denied, or it is -1 if the provider is disconnecting an existing
-connection.  The @var{SEQ_number} is only meaningful when this primitive is sent
-to a passive user who has the corresponding connect indication outstanding. It
-allows the transport user to identify which of its outstanding connect
-indications is associated with the disconnect.
+Where @parm{PRIM_type} identifies the primitive type and
+@parm{DISCON_reason} is the reason for disconnect.  The reason codes are
+protocol specific.  @parm{SEQ_number} is the sequence number which identifies
+which connect indication was denied, or it is @samp{-1} if the provider is
+disconnecting an existing connection.  The @parm{SEQ_number} is only
+meaningful when this primitive is sent to a passive user who has the
+corresponding connect indication outstanding. It allows the transport user to
+identify which of its outstanding connect indications is associated with the
+disconnect.
 
 @node T_DATA_IND
 @subsubsection T_DATA_IND - data indication.
+@prindex T_DATA_IND
+@cindex Data transfer
 
 This primitive indicates to the transport user that this message contains a
 transport interface data unit. One or more transport interface data units form a
 transport service data unit. This primitive has a mechanism which indicates the
 beginning and end of a transport service data unit. However, not all transport
 providers support the concept of a transport service data unit, as noted in
-@ref{T_INFO_ACK,,T_INFO_ACK}. The format of the message is one M_PROTO message
-block followed by zero or more M_DATA message blocks where each M_DATA message
-block, except for the last, must contain at least one byte of data.  The format
-of the M_PROTO message block is as follows:
+@ref{T_INFO_ACK,,T_INFO_ACK}. The format of the message is one @msg{M_PROTO}
+message block followed by zero or more @msg{M_DATA} message blocks where each
+@msg{M_DATA} message block, except for the last, must contain at least one byte
+of data.  The format of the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_data_ind
 @smallexample
-struct T_data_ind @{
-        long PRIM_type;                 /* always T_DATA_IND */
-        long MORE_flag;                 /* indicates more data in TSDU */
-@}
+@verbatim
+struct T_data_ind {
+    long PRIM_type;     /* always T_DATA_IND */
+    long MORE_flag;     /* indicates more data in TSDU */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{MORE_flag}, when
-greater than zero, indicates that the next T_DATA_IND primitive is also part of
-this transport service data unit.  If a TSDU spans multiple T_DATA_IND message
-blocks, then an ETSDU may be placed in between two T_DATA_IND message blocks.
-Once an ESTDU is started, then the ETSDU must be completed before any T_DATA_IND
-message blocks defining a TSDUis resumed.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{MORE_flag},
+when greater than zero, indicates that the next @prim{T_DATA_IND} primitive is
+also part of this transport service data unit.  If a TSDU spans multiple
+@prim{T_DATA_IND} message blocks, then an ETSDU may be placed in between two
+@prim{T_DATA_IND} message blocks.  Once an ESTDU is started, then the ETSDU must
+be completed before any @prim{T_DATA_IND} message blocks defining a TSDU is
+resumed.
 
 @node T_EXDATA_IND
 @subsubsection T_EXDATA_IND - expedited data indication.
+@prindex T_EXDATA_IND
+@cindex Expedited data transfer
 
 This primitive indicates to the transport user that this message contains an
 expedited transport interface data unit. One or more expedited transport
@@ -1606,47 +1930,58 @@ interface data units form an expedited transport service data unit. This
 primitive has a mechanism which indicates the beginning and end of an expedited
 transport service data unit. However, not all transport providers support the
 concept of an expedited transport service data unit, as noted in
-@ref{T_INFO_ACK,,T_INFO_ACK}. The format of the message is one M_PROTO message
-block followed by one or more M_DATA message blocks containing at least one byte
-of data.  The format of the M_PROTO message block is as follows:
+@ref{T_INFO_ACK,,T_INFO_ACK}. The format of the message is one @msg{M_PROTO}
+message block followed by one or more @msg{M_DATA} message blocks containing at
+least one byte of data.  The format of the @msg{M_PROTO} message block is as
+follows:
 
+@tpindex T_exdata_ind
 @smallexample
-struct T_exdata_ind @{
-        long PRIM_type;                 /* always T_EXDATA_IND */
-        long MORE_flag;                 /* indicates more data in ETSDU */
-@}
+@verbatim
+struct T_exdata_ind {
+    long PRIM_type;     /* always T_EXDATA_IND */
+    long MORE_flag;     /* indicates more data in ETSDU */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{MORE_flag}, when
-greater than zero, indicates that the next T_EXDATA_IND primitive is also part of
-this expedited transport service data unit.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{MORE_flag},
+when greater than zero, indicates that the next @prim{T_EXDATA_IND} primitive is
+also part of this expedited transport service data unit.
 
 @node T_ORDREL_IND
 @subsubsection T_ORDREL_IND - orderly release indication.
+@prindex T_ORDREL_IND
+@cindex Orderly release
 
 This primitive indicates to the transport user that the user on the other side
 of the connection is finished sending data. This primitive is only supported by
-the transport provider if it is of type T_COTS_ORD. The format of the message is
-one M_PROTO message block. The format of the M_PROTO message block is as
-follows:
+the transport provider if it is of type @pval{T_COTS_ORD}. The format of the
+message is one @msg{M_PROTO} message block. The format of the @msg{M_PROTO}
+message block is as follows:
 
+@tpindex T_ordrel_ind
 @smallexample
-struct T_ordrel_ind @{
-        long PRIM_type;                 /* always T_ORDREL_IND */
-@}
+@verbatim
+struct T_ordrel_ind {
+    long PRIM_type;     /* always T_ORDREL_IND */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.
+Where @parm{PRIM_type} identifies the primitive type.
 
 @page
 @node Connectionless-Mode Transport Primitives
 @section Connectionless-Mode Transport Primitives
+@cindex Connectionless-mode transport primitives
 
 The following transport primitives pertain only to the connectionless-mode
 transport service.
 
 @node CLTS User-Originated Primitives
 @subsection User-Originated Primitives
+@cindex CLTS user-originated primitives
 
 @menu
 * T_UNITDATA_REQ::
@@ -1654,39 +1989,45 @@ transport service.
 
 @node T_UNITDATA_REQ
 @subsubsection T_UNITDATA_REQ - unitdata request.
+@prindex T_UNITDATA_REQ
+@cindex Data transfer
 
 This primitive requests that the transport provider send the specified datagram
-to the specified destination. The format of the message is one M_PROTO message
-block followed by zero or more M_DATA message blocks where each M_DATA message
-block contains zero or more bytes of data. The format of the M_PROTO message
-block is as follows:
+to the specified destination. The format of the message is one @msg{M_PROTO}
+message block followed by zero or more @msg{M_DATA} message blocks where each
+@msg{M_DATA} message block contains zero or more bytes of data. The format of
+the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_unitdata_req
 @smallexample
-struct T_unitdata_req @{
-        long PRIM_type;                 /* always T_UNITDATA_REQ */
-        long DEST_length;               /* dest addr length */
-        long DEST_offset;               /* dest addr offset */
-        long OPT_length;                /* options length */
-        long OPT_offset;                /* options offset */
-@}
+@verbatim
+struct T_unitdata_req {
+    long PRIM_type;     /* always T_UNITDATA_REQ */
+    long DEST_length;   /* dest addr length */
+    long DEST_offset;   /* dest addr offset */
+    long OPT_length;    /* options length */
+    long OPT_offset;    /* options offset */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{DEST_length} is the
-length of the destination address and @var{DEST_offset} is the offset from the
-beginning of the M_PROTO message block where the destination address begins.
-Similarly, @var{OPT_length} and @var{OPT_offset} describe the location of the
-requested options associated with the primitive.  The proper alignment of the
-destination address and options in the M_PROTO message block is not guaranteed.
-The destination address and options in the M_PROTO message block are, however,
-aligned the same as they were received from the transport user.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{DEST_length} is
+the length of the destination address and @parm{DEST_offset} is the offset
+from the beginning of the @msg{M_PROTO} message block where the destination
+address begins.  Similarly, @parm{OPT_length} and @parm{OPT_offset} describe
+the location of the requested options associated with the primitive.  The proper
+alignment of the destination address and options in the @msg{M_PROTO} message
+block is not guaranteed.  The destination address and options in the
+@msg{M_PROTO} message block are, however, aligned the same as they were received
+from the transport user.
 
 This primitive does not require any acknowledgement. If an non-fatal error
 occurs, it is the responsibility of the transport provider to report it via the
-T_UDERROR_IND indication. Fatal errors are indicated via a M_ERROR message type
-which results in the failure of all operating system service routines on the
-stream. The allowable fatal errors are as follows:
+@prim{T_UDERROR_IND} indication. Fatal errors are indicated via a @msg{M_ERROR}
+message type which results in the failure of all operating system service
+routines on the stream. The allowable fatal errors are as follows:
 
-@vtable @var
+@table @errno
 
 @item EPROTO
 This indicates one of the following unrecoverable protocol conditions:
@@ -1700,10 +2041,11 @@ transport service data unit larger than that allowed by the transport provider.
 
 @end itemize
 
-@end vtable
+@end table
 
 @node CLTS Provider-Originated Primitives
 @subsection Provider-Originated Primitives
+@cindex CLTS provider-originated primitives
 
 @menu
 * T_UNITDATA_IND::
@@ -1712,64 +2054,74 @@ transport service data unit larger than that allowed by the transport provider.
 
 @node T_UNITDATA_IND
 @subsubsection T_UNITDATA_IND - unitdata indication.
+@prindex T_UNITDATA_IND
+@cindex Data transfer
 
 This primitive indicates to the transport user that a datagram has been received
-from the specified source address. The format of the message is one M_PROTO
-message block followed by zero or more M_DATA message blocks where each M_DATA
-message block contains at least one byte of data. The format of the M_PROTO
-message block is as follows:
+from the specified source address. The format of the message is one
+@msg{M_PROTO} message block followed by zero or more @msg{M_DATA} message blocks
+where each @msg{M_DATA} message block contains at least one byte of data. The
+format of the @msg{M_PROTO} message block is as follows:
 
+@tpindex T_unitdata_ind
 @smallexample
-struct T_unitdata_ind @{
-        long PRIM_type;                 /* always T_UNITDATA_IND */
-        long SRC_length;                /* source addr length - see note in
-                                           sec. 1.4 */
-        long SRC_offset;                /* source addr offset */
-        long OPT_length;                /* options length - see note in sec.
-                                           1.4 */
-        long OPT_offset;                /* options offset */
-@}
+@verbatim
+struct T_unitdata_ind {
+    long PRIM_type;     /* always T_UNITDATA_IND */
+    long SRC_length;    /* source addr length - see note in sec.
+                           1.4 */
+    long SRC_offset;    /* source addr offset */
+    long OPT_length;    /* options length - see note in sec. 1.4 */
+    long OPT_offset;    /* options offset */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type.  @var{SRC_length} is the
-length of the source address and @var{SRC_offset} is the offset from the
-beginning of the M_PROTO message block where the source address begins.
-Similarly, @var{OPT_length} and @var{OPT_offset} describe the location of the
-requested options associated with the primitive. The proper alignment of the
-source address and options in the M_PROTO message block is not guaranteed.
+Where @parm{PRIM_type} identifies the primitive type.  @parm{SRC_length} is
+the length of the source address and @parm{SRC_offset} is the offset from the
+beginning of the @msg{M_PROTO} message block where the source address begins.
+Similarly, @parm{OPT_length} and @parm{OPT_offset} describe the location of
+the requested options associated with the primitive. The proper alignment of the
+source address and options in the @msg{M_PROTO} message block is not guaranteed.
 
 @node T_UDERROR_IND
 @subsubsection T_UDERROR_IND - unitdata error indication.
+@prindex T_UDERROR_IND
+@cindex Unitdata error
 
 This primitive indicates to the transport user that a datagram with the
 specified destination address and options produced an error. The format of this
-message is one M_PROTO message block. The format of the M_PROTO message block is
-as follows:
+message is one @msg{M_PROTO} message block. The format of the @msg{M_PROTO}
+message block is as follows:
 
+@tpindex T_uderror_ind
 @smallexample
-struct T_uderror_ind @{
-        long PRIM_type;                 /* always T_UDERROR_IND */
-        long DEST_length;               /* destination addr length - see note
-                                           in sec. 1.4 */
-        long DEST_offset;               /* destination addr offset */
-        long OPT_length;                /* options length - see note in sec.
-                                           1.4 */
-        long OPT_offset;                /* options offset */
-        long ERROR_type;                /* error type */
-@}
+@verbatim
+struct T_uderror_ind {
+    long PRIM_type;     /* always T_UDERROR_IND */
+    long DEST_length;   /* destination addr length - see note in
+                           sec. 1.4 */
+    long DEST_offset;   /* destination addr offset */
+    long OPT_length;    /* options length - see note in sec. 1.4 */
+    long OPT_offset;    /* options offset */
+    long ERROR_type;    /* error type */
+}
+@end verbatim
 @end smallexample
 
-Where @var{PRIM_type} identifies the primitive type. @var{DEST_length} is the
-length of the destination address and @var{DEST_offset} is the offset from the
-beginning of the M_PROTO message block where the destination address begins.
-Similarly, @var{OPT_length} and @var{OPT_offset} describe the location of the
-requested options associated with the primitive. @var{ERROR_type} defines the
-protocol dependent error code. The proper alignment of the destination address
-and options in the M_PROTO message block is not guaranteed.
+Where @parm{PRIM_type} identifies the primitive type. @parm{DEST_length} is
+the length of the destination address and @parm{DEST_offset} is the offset
+from the beginning of the @msg{M_PROTO} message block where the destination
+address begins.  Similarly, @parm{OPT_length} and @parm{OPT_offset} describe
+the location of the requested options associated with the primitive.
+@parm{ERROR_type} defines the protocol dependent error code. The proper
+alignment of the destination address and options in the @msg{M_PROTO} message
+block is not guaranteed.
 
 @page
 @node Note about Structure Elements
 @section Note about Structure Elements
+@cindex Note about structure elements
 
 Although the structure elements in the Transport Provider Interface are declared
 as long data types, the value the transport provider assigns to those elements
@@ -1780,6 +2132,7 @@ an int.
 @page
 @node Overview of Error Handling Capabilities
 @section Overview of Error Handling Capabilities
+@cindex Overview of error handling capabilities
 
 @menu
 * Non-fatal Errors::
@@ -1791,6 +2144,7 @@ handle non-fatal errors and one to handle fatal errors.
 
 @node Non-fatal Errors
 @subsection Non-fatal Errors
+@cindex Non-fatal errors
 
 The non-fatal errors are those that a transport user can correct, and are
 reported in the form of an error acknowledgement to the appropriate primitive in
@@ -1799,19 +2153,21 @@ non-fatal error acknowledgement. These acknowledgements always report a
 syntactical error in the specified primitive when the transport provider
 receives the primitive. The primitive descriptions above define those primitives
 and rules regarding the acknowledgement of them. These errors are reported to
-the transport user via the T_ERROR_ACK primitive, and give the transport user the
-option of reissuing the transport service primitive that caused the error. The
-T_ERROR_ACK primitive also indicates to the transport user that no action was
-taken by the transport provider upon receipt of the primitive which caused the
-error. These errors do not change the state of the transport service interface
-as seen by the transport user. The state of the interface after the issuance of
-a T_ERROR_ACK primitive should be the same as it was before the transport
-provider received the interface primitive that was in error. The allowable
-errors that can be reported on the receipt of a transport initiated primitive
-are presented in the description of the appropriate primitives.
+the transport user via the @prim{T_ERROR_ACK} primitive, and give the transport
+user the option of reissuing the transport service primitive that caused the
+error. The @prim{T_ERROR_ACK} primitive also indicates to the transport user
+that no action was taken by the transport provider upon receipt of the primitive
+which caused the error. These errors do not change the state of the transport
+service interface as seen by the transport user. The state of the interface
+after the issuance of a @prim{T_ERROR_ACK} primitive should be the same as it
+was before the transport provider received the interface primitive that was in
+error. The allowable errors that can be reported on the receipt of a transport
+initiated primitive are presented in the description of the appropriate
+primitives.
 
 @node Fatal Errors
 @subsection Fatal Errors
+@cindex Fatal errors
 
 Fatal errors are those which can not be corrected by the transport user, or
 those errors which result in an uncorrectable error in the interface or in the
@@ -1825,17 +2181,18 @@ detects an uncorrectable non-protocol error internal to the transport provider,
 the provider should issue a fatal error to the user.
 
 Fatal errors are indicated to the transport user via the STREAMS message type
-M_ERROR with the UNIX System error EPROTO. This is the only type of error that
-the transport provider should use to indicate a fatal protocol error to the
-transport user. The message M_ERROR will result in the failure of all the
-operating system service routines on the stream. The only way for a user to
-recover from a fatal error is to ensure that all processes close the file
-associated with the stream. At that point, the user may reopen the file
-associated with the stream.
+@msg{M_ERROR} with the @cite{UNIX@registeredsymbol{}} System error
+@errno{EPROTO}. This is the only type of error that the transport provider
+should use to indicate a fatal protocol error to the transport user. The message
+@msg{M_ERROR} will result in the failure of all the operating system service
+routines on the stream. The only way for a user to recover from a fatal error is
+to ensure that all processes close the file associated with the stream. At that
+point, the user may reopen the file associated with the stream.
 
 @page
 @node Transport Service Interface Sequence of Primitives
 @section Transport Service Interface Sequence of Primitives
+@cindex Transport service interface sequence of primitives
 
 The allowable sequence of primitives are described in the state diagrams and
 tables in section 4 for both the connection-mode and connectionless-mode
@@ -1851,25 +2208,25 @@ state of the interface as viewed by the transport user.
 interface out of state.
 
 @item The uninitialized state of a stream is the initial and final state, and it
-must be bound (see T_BIND_REQ primitive) before the transport provider may view
-it as an active stream.
+must be bound (see @prim{T_BIND_REQ} primitive) before the transport provider
+may view it as an active stream.
 
-@item If the transport provider sends a M_ERROR upstream, it should also drop
-any further messages received on its write side of the stream. The following
-rules apply only to the connection-mode transport services.
+@item If the transport provider sends a @msg{M_ERROR} upstream, it should also
+drop any further messages received on its write side of the stream. The
+following rules apply only to the connection-mode transport services.
 
 @item A transport connection release procedure can be initiated at any time
 during the transport connection establishment or data transfer phase.
 
 @item The state tables for the connection-mode transport service providers
 include the management of the sequence numbering when a transport provider sends
-multiple T_CONN_IND requests without waiting for the response of the previously
-sent indication. It is the responsibility of the transport providers not to
-change state until all the indications have been responded to, therefore the
-provider should remain in the indications have been responded to.
+multiple @prim{T_CONN_IND} requests without waiting for the response of the
+previously sent indication. It is the responsibility of the transport providers
+not to change state until all the indications have been responded to, therefore
+the provider should remain in the indications have been responded to.
 
 @item The only time the state of a transport service interface of a stream may
-be transferred to another stream is when it is indicated in a T_CONN_RES
+be transferred to another stream is when it is indicated in a @prim{T_CONN_RES}
 primitive. The following rules then apply to the cooperating streams:
 
 @itemize ---
@@ -1890,6 +2247,7 @@ placed into an appropriate state after the completion of the transfer.
 @page
 @node Precedence of Transport Interface Primitives on a Stream
 @section Precedence of Transport Interface Primitives on a Stream
+@cindex Precedence of transport interface primitives on a stream
 
 The following rules apply to the precedence of transport interface primitives
 with respect to their position on a stream:@footnote{The stream queue which
@@ -1911,7 +2269,7 @@ stream read queue, as per the rules in section 5.
 correct sequence as defined above. The following rules apply only to the
 connection-mode transport services.
 
-@item There is no guarantee of delivery of user data once a T_DISCON_REQ
+@item There is no guarantee of delivery of user data once a @prim{T_DISCON_REQ}
 primitive has been issued.
 
 @end itemize
@@ -1919,20 +2277,21 @@ primitive has been issued.
 @page
 @node Rules for Flushing Queues
 @section Rules for Flushing Queues
+@cindex Rules for flushing queues
 
 The following rules pertain to flushing the stream queues. No other flushes
 should be needed to keep the queues in the proper condition.
 
 @itemize @bullet
 
-@item The transport providers must be aware that they will receive M_FLUSH
+@item The transport providers must be aware that they will receive @msg{M_FLUSH}
 messages from upstream. These flush requests are issued to ensure that the
 providers receive certain messages and primitives. It is the responsibility of
 the providers to act appropriately as deemed necessary by the providers.
 
-@item The transport provider must send up a M_FLUSH message to flush both the
-read and write queues after receiving a successful T_UNBIND_REQ message and
-prior to issuing the T_OK_ACK primitive.
+@item The transport provider must send up a @msg{M_FLUSH} message to flush both the
+read and write queues after receiving a successful @prim{T_UNBIND_REQ} message
+and prior to issuing the @prim{T_OK_ACK} primitive.
 
 @end itemize
 
@@ -1940,57 +2299,47 @@ The following rules pertain only to the connection-mode transport providers.
 
 @itemize @bullet
 
-@item If the interface is in the T_DATA_XFER, T_WIND_ORDREL or T_WACK_ORDREL
-state, the transport provider must send up a M_FLUSH message to flush both the
-read and write queues before sending up a T_DISCON_IND.
+@item If the interface is in the @psta{T_DATA_XFER}, @psta{T_WIND_ORDREL} or
+@psta{T_WACK_ORDREL} state, the transport provider must send up a @msg{M_FLUSH}
+message to flush both the read and write queues before sending up a
+@prim{T_DISCON_IND}.
 
-@item If the interface is in the T_DATA_XFER, T_WIND_ORDREL or T_WACK_ORDREL
-state, the transport provider must send up a M_FLUSH message to flush both the
-read and write queues after receiving a successful T_DISCON_REQ message and
-before issuing the T_OK_ACK primitive.
+@item If the interface is in the @psta{T_DATA_XFER}, @psta{T_WIND_ORDREL} or
+@psta{T_WACK_ORDREL} state, the transport provider must send up a @msg{M_FLUSH}
+message to flush both the read and write queues after receiving a successful
+@prim{T_DISCON_REQ} message and before issuing the @prim{T_OK_ACK} primitive.
 
 @end itemize
 
 @node Mapping of Transport Primitives to OSI
 @chapter Mapping of Transport Primitives to OSI
+@cindex Mapping of transport primitives to osi
 
 The following table maps those transport primitives as seen by the transport
 provider to the @dfn{STREAMS} message types used to realize the primitives and
 to the ISO IS 8072 and IS8072/DAD1 transport service definition primitives.
 
-@cartouche
-@center @image{tpi_fig2}
-@center @b{Figure 2.   Mapping ISO IS 8072 and IS 8072/DAD1 to}
-@center @b{Kernel-level Transport Service Primitives}
-@end cartouche
+@figure{tpi_fig2,2,Mapping ISO IS 8072 and IS 8072/DAD1 to Kernel-level Transport Service Primitives}
 
 @node Allowable Sequence of Transport Service Primitives
 @chapter Allowable Sequence of Transport Service Primitives
+@cindex Allowable sequence of transport service primitives
 
 The following tables describe the possible events that may occur on the
 interface and the possible states as viewed by the transport user that the
 interface may enter due to an event. The events map directly to the transport
 service interface primitives as described in section 2.
 
-@cartouche
-@center @image{tpi_fig3}
-@center @b{Figure 3.  Kernel Level Transport Interface States}
-@end cartouche
+@figure{tpi_fig3,3,Kernel Level Transport Interface States}
 
 @page
 @subsubheading Variables and Outputs
 
 The following describes the variables and outputs used in the state tables.
 
-@cartouche
-@center @image{tpi_fig4}
-@center @b{Figure 4.  State table Variables}
-@end cartouche
+@tabfig{tpi_fig4,1,State Table Variables}
 
-@cartouche
-@center @image{tpi_fig5}
-@center @b{Figure 5. State Table Outputs}
-@end cartouche
+@tabfig{tpi_fig5,2,State Table Outputs}
 
 @page
 @subsubheading Outgoing Events
@@ -1999,10 +2348,7 @@ The following outgoing events are those which are initiated from the transport
 service user. They either make requests of the transport provider or respond to
 an event of the transport provider.
 
-@cartouche
-@center @image{tpi_fig6}
-@center @b{Figure 6.  Kernel Level Transport Interface Outgoing Events}
-@end cartouche
+@figure{tpi_fig6,6,Kernel Level Transport Interface Outgoing Events}
 
 @page
 @subsubheading Incoming Events
@@ -2011,10 +2357,7 @@ The following incoming events are those which are initiated from the transport
 provider.  They are either confirmations of a request or are indications to the
 transport user that an event has occurred.
 
-@cartouche
-@center @image{tpi_fig7}
-@center @b{Figure 7.  Kernel Level Transport Interface Incoming Events}
-@end cartouche
+@figure{tpi_fig7,7,Kernel Level Transport Interface Incoming Events}
 
 @page
 @subsubheading Transport Service State Tables
@@ -2028,25 +2371,16 @@ represents a state/event combination that is invalid. Along with the next state,
 each box may include an action.  The transport provider must take the specific
 actions in the order specified in the state table.
 
-@cartouche
-@center @image{tpi_fig8}
-@center @b{Figure 8.  Initialization State Table}
-@end cartouche
+@tabfig{tpi_fig8,3,Initialization State Table}
 
 @page
-@cartouche
-@center @image{tpi_fig9}
-@center @b{Figure 9.  Connection/Release/Data-Transfer State Table}
-@center @b{for Connection Oriented Service}
-@end cartouche
+@tabfig{tpi_fig9,4,Connection/Release/Data-Transfer State Table for Connection Oriented Service}
 
-@cartouche
-@center @image{tpi_fi10}
-@center @b{Figure 10.  Data-Transfer State Table for Connectionless Service}
-@end cartouche
+@tabfig{tpi_fi10,5,Data-Transfer State Table for Connectionless Service}
 
 @node Transport Primitive Precedence
 @chapter Transport Primitive Precedence
+@cindex Transport primitive precedence
 
 The following describes the precedence of the transport primitives for both the
 stream@footnote{The stream queue which contains the transport user initiated
@@ -2054,21 +2388,86 @@ primitives is referred to as the stream write queue. The stream queue which
 contains the transport provider initiated primitives is referred to as the
 stream read queue.} write and read queues.
 
-@cartouche
-@center @image{tpi_fi11}
-@center @b{Figure 11.  Stream Write Queue Precedence Table}
-@end cartouche
+@tabfig{tpi_fi11,6,Stream Write Queue Precedence Table}
 
 @page
-@cartouche
-@center @image{tpi_fi12}
-@center @b{Figure 12.  Stream Read Queue Precedence Table}
-@end cartouche
+@tabfig{tpi_fi12,7,Stream Read Queue Precedence Table}
 
+@node References
+@unnumbered References
+
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
+@iftex
+@node Indices
+@unnumbered Indices
+@end iftex
+
+@ifnottex
+@c concatenate indices for html and info
 @node Index
 @unnumbered Index
-
 @printindex cp
+@end ifnottex
+
+@iftex
+@menu
+* Concept Index::
+* Protocol State Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Input-Output Control Index::
+* Manual Page Index::
+@end menu
+
+@node Concept Index
+@section Concept Index
+@printindex cp
+
+@page
+@node Protocol State Index
+@section Protocol State Index
+@printindex st
+
+@page
+@node Primitive Index
+@section Primitive Index
+@printindex pr
+
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
+
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
+@printindex vr
+
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
+
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
+@printindex pe
+
+@page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
+
+@page
+@node Manual Page Index
+@section Manual Page Index
+@printindex mp
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents
