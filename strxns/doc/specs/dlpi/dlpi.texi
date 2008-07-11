@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: dlpi.texi,v 0.9.2.17 2008/07/10 23:50:35 brian Exp $
+% @(#) $Id: dlpi.texi,v 0.9.2.18 2008-07-11 09:48:46 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008/07/10 23:50:35 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:48:46 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -1616,7 +1616,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 
 @item dl_primitive
 conveys
@@ -1676,7 +1676,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_INFO_ACK}.
@@ -1894,7 +1894,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_ATTACH_REQ}.
@@ -1974,7 +1974,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_DETACH_REQ}.
@@ -2051,7 +2051,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys @prim{DL_BIND_REQ}.
 
@@ -2283,7 +2283,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_BIND_ACK}.
@@ -2363,7 +2363,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_UNBIND_REQ}.
@@ -2424,7 +2424,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_SUBS_BIND_REQ}.
@@ -2516,7 +2516,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_SUBS_BIND_ACK}.
@@ -2557,7 +2557,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_SUBS_UNBIND_REQ}.
@@ -2622,7 +2622,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_ENABMULTI_REQ}
@@ -2686,7 +2686,7 @@ typedef struct @{
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_DISABMULTI_REQ}
@@ -2754,7 +2754,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_PROMISCON_REQ}
@@ -2816,7 +2816,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_PROMISCOFF_REQ}
@@ -2879,7 +2879,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_OK_ACK}.
@@ -2933,7 +2933,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_ERROR_ACK}.
@@ -3064,7 +3064,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_CONNECT_REQ}.
@@ -3192,7 +3192,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_CONNECT_IND}.
@@ -3300,7 +3300,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_CONNECT_RES}.
@@ -3424,7 +3424,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_CONNECT_CON}.
@@ -3485,7 +3485,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_TOKEN_REQ}.
@@ -3523,7 +3523,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_TOKEN_ACK}.
@@ -3648,7 +3648,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_DISCONNECT_REQ}.
@@ -3745,7 +3745,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_DISCONNECT_IND}.
@@ -3834,7 +3834,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_RESET_REQ}.
@@ -3890,7 +3890,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 
 @item dl_primitive
 conveys
@@ -3953,7 +3953,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_RESET_RES}.
@@ -4008,7 +4008,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_RESET_CON}.
@@ -4070,7 +4070,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_UNITDATA_REQ}.
@@ -4163,7 +4163,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_UNITDATA_IND}.
@@ -4225,7 +4225,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_UDERROR_IND}.
@@ -4294,7 +4294,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_UDQOS_REQ}.
@@ -4396,7 +4396,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys @prim{DL_TEST_REQ}
 
@@ -4488,7 +4488,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_TEST_IND}
@@ -4556,7 +4556,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_TEST_RES}
@@ -4617,7 +4617,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_TEST_RES}
@@ -4684,7 +4684,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive conveys
 @prim{DL_XID_REQ}
 
@@ -4773,7 +4773,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_XID_IND}
@@ -4844,7 +4844,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive conveys
 @prim{DL_XID_RES}
 
@@ -4902,7 +4902,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_XID_CON}
@@ -4998,7 +4998,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_DATA_ACK_REQ}
@@ -5117,7 +5117,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_DATA_ACK_IND}
@@ -5183,7 +5183,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_DATA_ACK_STATUS_IND}
@@ -5260,7 +5260,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_REPLY_REQ}
@@ -5365,7 +5365,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys @prim{DL_REPLY_IND}
 
@@ -5426,7 +5426,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_REPLY_STATUS_IND}
@@ -5521,7 +5521,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_REPLY_UPDATE_REQ}
@@ -5592,7 +5592,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 DL_UPDATE_STATUS_IND
@@ -5834,7 +5834,7 @@ typedef struct @{
 @end example
 
 This typedef is used to negotiate the transmit and receive throughput values.
-@table @member
+@table @parm
 @item dl_target_value
 specifies the desired throughput value for the connection in bits/second.
 
@@ -5889,7 +5889,7 @@ typedef struct @{
 @end example
 
 This typedef is used to negotiate the transmit and receive transit delay values.
-@table @member
+@table @parm
 @item dl_target_value
 specifies the desired transit delay value.
 
@@ -5949,7 +5949,7 @@ typedef struct @{
 @tpindex dl_priority_t
 @end example
 
-@table @member
+@table @parm
 @item dl_min
 specifies the minimum acceptable priority.
 
@@ -6005,7 +6005,7 @@ typedef struct @{
 @tpindex dl_protect_t
 @end example
 
-@table @member
+@table @parm
 @item dl_min
 specifies the minimum acceptable protection.
 
@@ -6077,7 +6077,7 @@ typedef struct @{
 @tpindex dl_resilience_t
 @end example
 
-@table @member
+@table @parm
 @item dl_disc_prob
 specifies the probability of receiving a provider-initiated disconnect, scaled
 by 10000.
@@ -6719,7 +6719,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_PHYS_ADDR_REQ};
@@ -6785,7 +6785,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_PHYS_ADDR_ACK}
@@ -6824,7 +6824,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_SET_PHYS_ADDR_REQ}
@@ -6887,7 +6887,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 dl_primitive conveys
 @prim{DL_GET_STATISTICS_REQ}
 @end table
@@ -6935,7 +6935,7 @@ typedef struct @{
 @end example
 
 @subsubheading Parameters
-@table @member
+@table @parm
 @item dl_primitive
 conveys
 @prim{DL_GET_STATISTICS_ACK}

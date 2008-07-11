@@ -1,3 +1,8 @@
+2008-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/specs/dlpi/dlpi.texi: formatting updates
+	* doc/specs/npi/npi.texi: formatting updates
+
 2008-07-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/macros.texi: make info files use text diagrams
