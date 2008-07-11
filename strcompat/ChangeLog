@@ -1,3 +1,8 @@
+2008-07-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: documented BUG 006.
+	* src/kernel/liscompat.c: fixed BUG 006.
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strcompat.refs: update references

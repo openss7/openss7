@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008/07/11 13:56:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-26 14:16:30 $ by $Author: brian $
+ Last Modified $Date: 2008/07/11 13:56:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.55  2008/07/11 13:56:31  brian
+ - BUG 006
+
  Revision 0.9.2.54  2008-05-26 14:16:30  brian
  - little bug fix in lis_register_strdev
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008/07/11 13:56:31 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008/07/11 13:56:31 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -124,7 +127,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-05-26 14:16:30 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008/07/11 13:56:31 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -2520,7 +2523,7 @@ lis_sem_alloc(int count)
 	lis_semaphore_t *lsem;
 	lsem = WARN(kmem_zalloc(sizeof(lis_semaphore_t), KM_NOSLEEP));
 	if (lsem != NULL)
-		init_MUTEX((struct semaphore *) lsem->sem_mem);
+		sema_init((struct semaphore *) lsem->sem_mem, count);
 	return lsem;
 }
 
