@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: wan.texi,v 0.9.2.1 2008-07-01 12:16:24 brian Exp $
+% @(#) $Id: wan.texi,v 0.9.2.2 2008-07-11 09:46:30 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-01 12:16:24 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:46:30 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -254,15 +254,21 @@ under no obligation to provide any feature listed herein.
 @c Define an index of manual pages.
 @defcodeindex mp
 
-@c syncodeindex pr cp
-@c syncodeindex pv cp
-@c syncodeindex st cp
-@c syncodeindex tp cp
-@c syncodeindex vr cp
-@c syncodeindex ct cp
+@ifnottex
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
+
+@iftex
 
 @macro prim {name}
 @code{\name\}@prindex \name\
@@ -288,6 +294,38 @@ under no obligation to provide any feature listed herein.
 @code{\name\}@ctindex \name\
 @end macro
 
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
 @ifnottex
 @node Top
 @top Wide Area Network Interface
@@ -310,6 +348,16 @@ under no obligation to provide any feature listed herein.
 * References::
 * Index::
 @end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Introduction
 @chapter Introduction
@@ -3097,9 +3145,17 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 
 @end multitable
 
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
 @node Index
 @unnumbered Index
 
+@ifnottex
+@c concatenate indices for html and info
+@printindex cp
+@end ifnottex
+
+@iftex
 @menu
 * Concept Index::
 * Protocol State Index::
@@ -3155,6 +3211,8 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 @node Manual Page Index
 @section Manual Page Index
 @printindex mp
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents

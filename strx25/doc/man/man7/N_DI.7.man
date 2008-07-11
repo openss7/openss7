@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_DI.7.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\" @(#) $Id: N_DI.7.man,v 0.9.2.2 2008-07-11 09:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_DI.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:28  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,303 @@ sort-adjacent-labels
 .TH N_DI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_DI
-\-
+\- Disconnect Request and Disconnect Indication
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_DI {
+struct xdiscf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned char originator;
+    unsigned char reason;
+    unsigned char cause;
+    unsigned char diag;
+    int conn_id;
+    unsigned char indicated_qos;
+    struct xaddrf responder;
+    struct xaddrf deflected;
+    struct qosformat qos;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Disconnect Request or Indication message primitive, \fBN_DI\fP, is used
+by the NS user to reject an incoming connection or disconnect an existing
+connection, or by the NS provider to reject an outgoing connection or disconnect
+an existing connection.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block, and
+contains the \fBxdiscf\fP structure.
+The data part of the message consists of zero or one
+.BR M_DATA (9)
+message blocks
+containing the Clear User Data (CUD) when supplied.
+.PP
+The X.25 cause and diagnostic octets, \fIcause\fP and \fIdiag\fP, are
+presented, as well as the CONS \fIoriginator\fP and \fIreason\fP codes
+mapped from the X.25 cause and diagnostic.  A Disconnect Request for a non-CONS
+call can specify a non-zero \fIcause\fP code.  This has no effect for a CONS
+call.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Disconnect Request and Disconnect Indication use the
+.B xdiscf
+structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B xdiscf
+structure.
+The data part of the message consists of zero or one
+.BR M_DATA (9)
+message blocks
+containing the Clear User Data (if any).
+.\"
+.\"
+.SH MEMBERS
+.PP
+The \fBxdiscf\fI structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_DI\fP, for both Disconnect Request and Disconnect Indication.
+.TP
+.I originator
+For a CONS call, contains the CONS originator (NS user, NS provider, or
+unknown), mapped from the X.25 cause and diagnostic.
+This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+NS_UNKNOWN:0:Originator is unknown.
+NS_USER:1:Originator is the NS user.
+NS_PROVIDER:2:Originator is the NS provider.
+_
+.TE
+.RE
+.TP
+.I reason
+For a CONS call, contains the CONS reason, mapped from the X.25 cause and
+diagnostic.
+.RS
+.PP
+This field can have one of the following values when the \fIoriginator\fP is
+\fBNS_PROVIDER\fP:
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+NS_GENERIC:224:T{
+.ad l
+.nh
+General.
+T}
+NS_DTRANSIENT:225:T{
+.ad l
+.nh
+Disconnect, transient.
+T}
+NS_DPERMANENT:226:T{
+.ad l
+.nh
+Disconnect, permanent.
+T}
+NS_TUNSPECIFIED:227:T{
+.ad l
+.nh
+Reject, unspecified, transient.
+T}
+NS_PUNSPECIFIED:228:T{
+.ad l
+.nh
+Reject, unspecified, permanent.
+T}
+NS_QOSNATRANSIENT:229:T{
+.ad l
+.nh
+Reject, QOS unavailable, transient.
+T}
+NS_QOSNAPERMANENT:230:T{
+.ad l
+.nh
+Reject, QOS unavailable, permanent.
+T}
+NS_NSAPTUNREACHABLE:232:T{
+.ad l
+.nh
+Reject, NSAP unreachable, transient.
+T}
+NS_NSAPPUNREAHCABLE:235:T{
+.ad l
+.nh
+Reject, NSAP unreachable, permanent.
+T}
+_
+.TE
+.PP
+The field can have the following values when the \fIoriginator\fP is
+\fBNS_USER\fP:
+.PP
+.TS
+tab(:);
+lnls
+lbnls.
+Constant:Value:Description
+_
+NU_GENERIC:240:T{
+.ad l
+.nh
+General.
+T}
+NU_DNORMAL:241:T{
+.ad l
+.nh
+Disconnect, normal.
+T}
+NU_DABNORMAL:242:T{
+.ad l
+.nh
+Disconnect, abnormal.
+T}
+NU_DINCOMPUSERDATA:243:T{
+.ad l
+.nh
+Disconnect, incomprehensible user data.
+T}
+NU_TRANSIENT:244:T{
+.ad l
+.nh
+Reject, transient.
+T}
+NU_PERMANENT:245:T{
+.ad l
+.nh
+Reject, permanent.
+T}
+NU_QOSNATRANSIENT:246:T{
+.ad l
+.nh
+Reject, QOS unavailable, transient.
+T}
+NU_QOSNAPERMANENT:247:T{
+.ad l
+.nh
+Reject, QOS unavailable, permanent.
+T}
+NU_INCOMPUSERDATA:248:T{
+.ad l
+.nh
+Reject, Call User Data facility.
+T}
+NU_BADPROTID:249:T{
+.ad l
+.nh
+Reject, Bad protocol identifier.
+T}
+_
+.TE
+.RE
+.TP
+.I cause
+Conveys the X.25 cause octet associated with the disconnect.
+.TP
+.I diag
+Conveys the X.25 diagnostic octet associated with the disconnect.
+.TP
+.I conn_id
+When a Disconnect Request is used to refuse and incoming connection, this field
+contains the \fIconn_id\fP from the corresponding Connect Indication message
+primitive.
+.TP
+.I indicated_qos
+When non-zero, conveys that facilities and quality of service paraemters are
+being indicated.
+.TP
+.I responder
+Conveys the responding address.  This is the local responding address in a
+Disconnect Request used to refuse an incoming call, and a remote
+responding address in a Disconnect Indication refusing an outgoing call.
+.TP
+.I deflected
+When the \fIcall_deflect\fP field of the associated \fIqos\fP structure is
+non-zero, this field conveys the deflected address.  The deflected address is
+the address of the remote station to which the call is being deflected.  This is
+set by the NS user when deflecting a call with a Disconnect Request refusing an
+incoming connection; and by the NS provider when an outgoing call has been
+deflected.
+.TP
+.I qos
+Conveys the CONS quality of service parameters and non-OSI facilities associated
+with the disconnect.  This is used currently for the charging information when
+an existing connection is disconnected, and for the deflection facility when an
+incoming or outgoing call is being deflected.
+.\"
+.\"
+.SH STATE
+.PP
+This primitive is valid in the data transfer phase; it is also valid in the
+incoming or outgoing connecting phase.  The call moves to the disconnect phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+This primitive is valid in response to a previously sent Connect Request or
+received Connect Indication message primitive; or, to simply request or indicate
+disconnection of an existing connection.
+.PP
+When an existing connection is disconnect with a Disconnect Request by the NS
+user, the NS user expects a Disconnect Confirmation to acknowledge the
+disconnect.  All other message should be discarded from the Stream until the
+Disconnect Confirmation is received.
+.PP
+When a Disconnect Indication is issued by the NS provider, all messages sent
+downstream except Connect Request or Connect Response messages are silently
+discarded.
+.PP
+A disconnect collision can occur, where Disconnect Request and a Disconnect
+Indication messages collide.  In this case, the Disconnect Indication messages
+is taken as a confirmation and no Disconnect Confirmation message should be
+expected by the NS user.
+.\"
+.\"
+.SH USAGE
+.PP
+The Disconnect Request message primitive is equivalent to the
+.BR N_DISCON_REQ (7)
+primitive of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7);
+the Disconnect Indication,
+.BR N_DISCON_IND (7).
 .\"
 .\"
 .\".SH CONTEXT

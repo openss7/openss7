@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_EData.7.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\" @(#) $Id: N_EData.7.man,v 0.9.2.2 2008-07-11 09:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_EData.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:29  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,97 @@ sort-adjacent-labels
 .TH N_EDATA 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_EData
-\-
+\- Expedited Data
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_EData {
+struct xedataf {
+    unsigned char xl_type;
+    unsigned char xl_command;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Expedited Data message primitive, \fBN_EData\fP, is used to transfer
+expedited NS user data to or from the NS user.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block, and
+contains the \fBxedataf\fP structure.
+The data part of the message consists of one or more
+.BR M_DATA (9)
+message blocks
+containing the local or remote expedited NS user data (ENSDU).
+.PP
+The Expedited Data message primitive, \fBN_EData\fP, is used when expedited
+data, carried by an X.25 interrupt packet, corsses the X.25 NLI service
+interface from NS provider to user or NS user to provider.
+The Expedited Data message is a confirmed primitive and must be acknowledged
+before another expedited data unit can be requested or indicated.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Expedited Data message uses the \fBxedataf\fP structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block, and
+contains the \fBxedataf\fP structure.
+The data part of the message consists of one or more
+.BR M_DATA (9)
+message blocks
+containing the local or remote expedited NS user data (ENSDU).
+.\"
+.\"
+.SH MEMBERS
+.PP
+The \fBxedataf\fP structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_DAT\fP.
+.TP
+.I xl_command
+Always \fBN_EData\fP.
+.\"
+.\"
+.SH STATE
+.PP
+This message primitive is only valid during the data transfer phase. 
+.\"
+.\"
+.SH RESPONSE
+.PP
+When NS user or provider issues this primtive it expectes an Expedited Data
+Acknowledgement message primitive in reponse.
+The Expedited Data message is a confirmed primitive and must be acknowledged
+before another expedited data unit can be requested or indicated.
+.\"
+.\"
+.SH USAGE
+.PP
+The Expedited Data message primitive is equivalent to the
+.BR N_EXDATA_REQ (7)
+and
+.BR N_EXDATA_IND (7)
+primitives of
+the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
 .\"
 .\"
 .\".SH CONTEXT

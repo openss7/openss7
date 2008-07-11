@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25diags.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $
+ @(#) $RCSfile: x25diags.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-07-11 09:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:27 $ by $Author: brian $
+ Last Modified $Date: 2008-07-11 09:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25diags.c,v $
+ Revision 0.9.2.3  2008-07-11 09:46:32  brian
+ - roughed in implementation, updated documentation
+
  Revision 0.9.2.2  2008-06-18 16:45:27  brian
  - widespread updates
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25diags.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#ident "@(#) $RCSfile: x25diags.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-07-11 09:46:32 $"
 
-static char const ident[] = "$RCSfile: x25diags.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $";
+static char const ident[] = "$RCSfile: x25diags.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-07-11 09:46:32 $";
 
 
 /* x25diags converts the numeric argument to a message using the definitions
@@ -118,7 +121,7 @@ Usage:\n\
 }
 
 static void
-help(argc, char *argv[])
+help(int argc, char *argv[])
 {
 	if (!output && !debug)
 		return;
@@ -196,7 +199,7 @@ int
 main(int argc, char *argv[])
 {
 	for (;;) {
-		int c val;
+		int c, val;
 
 #if defined _GNU_SOURCE
 		int option_index = 0;
@@ -227,7 +230,7 @@ main(int argc, char *argv[])
 			goto bad_usage;
 		case 'D':	/* -D, --debug [level] */
 			if (debug)
-				printf(stderr, "%s: increasing debug verbosity\n", argv[0]);
+				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
 				debug++;
 			} else {
@@ -292,4 +295,5 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 	}
+	exit(0);
 }

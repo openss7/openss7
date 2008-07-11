@@ -12,6 +12,66 @@
 	* doc/man/man7/N_Xelisten.7.man: added manual page
 	* doc/man/man8/strx25_mknod.8.man: added manual page
 
+	* AUTHORS: updated documentation
+	* NEWS: updated documentation
+	* README: updated documentation
+	* THANKS: updated documentation
+	* doc/man/Makefile.am: updated documentation
+	* doc/man/strx25.macros: updated documentation
+	* doc/man/strx25.refs: updated documentation
+	* doc/man/man4/s_cdi.4.man: updated documentation
+	* doc/man/man4/s_dlpi.4.man: updated documentation
+	* doc/man/man5/llc2template.5.man: updated documentation
+	* doc/man/man7/NLI.7.man: updated documentation
+	* doc/man/man7/N_Abort.7.man: updated documentation
+	* doc/man/man7/N_CC.7.man: updated documentation
+	* doc/man/man7/N_CI.7.man: updated documentation
+	* doc/man/man7/N_DAck.7.man: updated documentation
+	* doc/man/man7/N_DC.7.man: updated documentation
+	* doc/man/man7/N_DI.7.man: updated documentation
+	* doc/man/man7/N_Data.7.man: updated documentation
+	* doc/man/man7/N_EAck.7.man: updated documentation
+	* doc/man/man7/N_EData.7.man: updated documentation
+	* doc/man/man7/N_PVC_ATTACH.7.man: updated documentation
+	* doc/man/man7/N_PVC_DETACH.7.man: updated documentation
+	* doc/man/man7/N_RC.7.man: updated documentation
+	* doc/man/man7/N_RI.7.man: updated documentation
+	* doc/man/man7/N_Xcanlis.7.man: updated documentation
+	* doc/man/man7/N_Xlisten.7.man: updated documentation
+	* doc/manual/x25_porting.info: updated documentation
+	* doc/specs/lli/lli.texi: updated documentation
+	* doc/specs/nli/nli.texi: updated documentation
+	* doc/specs/wan/wan.texi: updated documentation
+
+	* Makefile.am: roughed out implementation
+	* src/include/Makefile.am: roughed out implementation
+	* src/include/snet/ll_control.h: roughed out implementation
+	* src/include/sys/snet/ll_control.h: roughed out implementation
+	* src/modules/lis.conf: roughed out implementation
+	* src/util/ixemap.c: roughed out implementation
+	* src/util/ixetune.c: roughed out implementation
+	* src/util/linkadd.c: roughed out implementation
+	* src/util/linkdel.c: roughed out implementation
+	* src/util/linklist.c: roughed out implementation
+	* src/util/linkreset.c: roughed out implementation
+	* src/util/linkstart.c: roughed out implementation
+	* src/util/linkstate.c: roughed out implementation
+	* src/util/linkstop.c: roughed out implementation
+	* src/util/lltune.c: roughed out implementation
+	* src/util/mlptune.c: roughed out implementation
+	* src/util/nuimap.c: roughed out implementation
+	* src/util/pvcmap.c: roughed out implementation
+	* src/util/vcstat.c: roughed out implementation
+	* src/util/wantune.c: roughed out implementation
+	* src/util/x25diags.c: roughed out implementation
+	* src/util/x25file.c: roughed out implementation
+	* src/util/x25info.c: roughed out implementation
+	* src/util/x25netd.c: roughed out implementation
+	* src/util/x25route.c: roughed out implementation
+	* src/util/x25stat.c: roughed out implementation
+	* src/util/x25trace.c: roughed out implementation
+	* src/util/x32map.c: roughed out implementation
+
 2008-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/drafts/x25/draft-bidulock-tsvwg-snare-00.me: updated drafts

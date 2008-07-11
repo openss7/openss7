@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: NLI.7.man,v 0.9.2.2 2008-07-01 12:31:06 brian Exp $
+.\" @(#) $Id: NLI.7.man,v 0.9.2.3 2008-07-11 09:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 12:31:06 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: NLI.7.man,v $
+.\" Revision 0.9.2.3  2008-07-11 09:46:28  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.2  2008-07-01 12:31:06  brian
 .\" - updated man pages, drafts, specs, header files
 .\"
@@ -170,13 +173,32 @@ of porting SpiderX.25 compatible applications, drivers and modules to
 .\"
 .SH ADDRESSES
 .PP
+In call requests and responses, it is necessary to specify the X.25 addresses
+associated with the connection.  These addresses consist of the called, calling
+and responding addresses.  A common structure is used for these addresses.  The
+addressing format used by this stricture provides the following information:
+.IP \(bu \w'\(bu\(em'u
+the subnetwork (data link) on which outgoing Connect Requests are to be
+sent and on which incoming Connect Indications arrive;
+.IP \(bu
+Network Service Access Points (NSAP) and Subnetwork Point of Attachments
+(SNPA), or Data Terminal Equipment (DTE) addresses and Link Service Access
+Points (LSAP); and,
+.IP \(bu
+optional formats for the encoding of addresses (NSAP).
+.PP
+Addresses are represent using an \fBxaddrf\fP structure.  The \fBxaddrf\fP
+structure is formatted as follows:
 .PP
 .nf
 \f(CW\s-1\
 #define NSAPMAXISZE 20
 
 struct xaddrf {
-    unsigned long sn_id;
+    union {
+        uint32_t link_id;
+        uint32_t sn_id;
+    };
     unsigned char aflags;
     struct lsapformat DTE_MAC;
     unsigned char nsap_len;
@@ -185,55 +207,64 @@ struct xaddrf {
 \s+1\fP
 .fi
 .TP
+.I link_id
+Holds the link number as a \fBuint32_t\fP.  By default, \fIlink_id\fP has a
+valud of \fB0xFF\fP.  When \fIlink_id\fP is \fB0xFF\fP, Solstice
+X.25 attempts to match the valled address with an entry in a routing
+configuration file.  If it cannot find a match, it routes the call over the
+lowest numbered WAN link.
+.TP
 .I sn_id
 The subnetwork identifier, selected by the system administrator.  It
 identifies the subnetwork required for a Connect Request, or on which a
 Connect Indication arrived.  The
 .I sn_id
 field holds a representation of the one byte string subnetwork identifier as
-an unsigned long.  The X.25 library routine
+an \fBunsigned long\fP.  The X.25 library routine
 .BR snidtox25 (3)
 can be used to conver the character subnetwork identifier to an unsigned long.
-.TP
-.I aflags
-Specifies the options requird (or used) by the subnetwork to encode and
-interpret addresses.  When there is a value in the
-.I NSAP
-field,
-.I aflags
-takes one of three values, listed below.  When the
-.I NSAP
-field is empty,
-.I aflags
-has the value zero
-.RB ( 0 ).
-See
-.BR xaddrf "(5),
-.BR stox25 "(3),
-.BR x25tos "(3) and
-.BR getxhostent (3)
-for details about the X.25 address format.
 .RS
+.PP
+Note that in some implementations, the \fIsn_id\fP field is
+declared as \fBunsigned long\fP; however, this causes complications for 32-bit
+applications running over a 64-bit kernel: i.e., it requires that the data model
+of the application be known to the kernel module and conversions be supported.
+Therefore, this field appears in the header file as the 32- vs.  64-bit agnostic
+\fBuint32_t\fP.
+.RE
 .TP
-.B 0
-.I NSAP
-field contains an OSI (Open Systems Interconnection) encoded NSAP address.
-.TP
-.B 1
-.I NSAP
-field contains a non-OSI encoded extended address.
-.TP
-.B 2
-.I DTE_MAC
-field contains the logical channel identifier (LCI) of a permanent virtual
-circuit (PVC).
+.I aflags
+Specifies the options required (or used) by the subnetwork to encode and
+interpret addresses.  It may have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lbnls.
+NSAP_ADDR:0x00:\fINSAP\fP is OSI-encoded NSAP address.
+EXT_ADDR:0x01:\fINSAP\fP is non-OSI-encoded extended address.
+PVC_LCI:0x02:\fINSAP\fP is a PVC number.
+PVC_LCI:0x02:\fIDTE_MAC\fP is the LCI of a PVC.
+.TE
+.PP
+When the \fINSAP\fP field is empty, \fIaflags\fP takes the value zero
+(0).
+See
+.BR x25addr (5),
+.BR stox25 (3),
+.BR x25tos (3),
+and
+.BR gexhostent (3),
+manual pages for details about the X.25 address format.
 .RE
 .TP
 .I DTE_MAC
-Holds the DTE address, the MAC+SAP (medium access control plus service access
-point) address or the LCI.  This is binary.  The
-.B lsapformat
-structure is described below.
+The DTE address, or LSAP as two BCD digits per byte, right justified, or the
+\fBPVC_LCI\fP as three BCD digits with two digits per byte, right
+justified.
+Holds the DTE address, the Medium Access Control plus Service Access Point
+(MAC+SAP) address or the LCI.  This is binary.  The \fBlsapformat\fP structure
+is define below.
 .TP
 .I nsap_len
 This indicates the length of the NSAP, if any (and where appropriate), in
@@ -277,18 +308,149 @@ This is binary.
 .\"
 .SH QUALITY OF SERVICE
 .PP
-The quality of service structure used in NLI primitives is described in
-.BR qosformat (5)
-and
+Negotiable X.25 facilities are supported by the PLP driver.  This section
+describes the request and negotiation of these facilities, and the data
+structures used by the NLI primitives.
+.PP
+The facilities are broken down into two groups:
+.PP
+.IP 1. \w'1.\(em'u
+those required for Connection-Oriented Network Service (CONS) support, and
+.PD 0
+.IP 2.
+those requried for non-OSI procedures (X.29, for example).
+.PD
+.PP
+The CONS quality of service (QOS) parameters supported are the following:
+.IP \(bu \w'\(bu\(em'u
+Throughput Class
+.PD 0
+.IP \(bu
+Minimum Throughput Class
+.IP \(bu
+Target Transit Delay
+.IP \(bu
+Maximum Acceptable Transit Delay
+.IP \(bu
+Use of Expedited Data
+.IP \(bu
+Protection
+.IP \(bu
+Receipt Acknolwedgement
+.PD
+.PP
+The CONS quality of service structure used in NLI primitives is described in
+.BR qosformat (5).
+.PP
+Non-OSI X.25 Facilities are supported as follows.
+Although these are non-OSI facilities, they are also negotiable with CONS.  For
+those NLI applications that require them, the non-OSI facilities supported are
+as follows:
+.IP \(bu \w'\(bu\(em'u
+non-OSI extended addressing;
+.PD 0
+.IP \(bu
+X.25 fast select request/indication with no restriction on response;
+.IP \(bu
+X.25 fast select reqeust/indication with restriction on response;
+.IP \(bu
+X.25 reverse charging;
+.IP \(bu
+X.25 packet size negotiation;
+.IP \(bu
+X.25 window size negotiation;
+.IP \(bu
+X.25 network user identification;
+.IP \(bu
+X.25 recognized private operating agency selection;
+.IP \(bu
+X.25 closed user groups;
+.IP \(bu
+X.25 call deflection; and,
+.IP \(bu
+X.25 programmable facilities.
+.PD
+.PP
+The X.25 quality of service structure used in NLI primitives is described in
 .BR extraformat (5).
 .\"
 .\"
 .SH PRIMITIVES
 .PP
+The primtives provided by the Network Layer Interface are as follows:
+.PP
+.TS
+tab(:);
+llls
+lblbls.
+Prim./Manpage:Structure:Description
+_
+N_CI\fR(7):xcallf:Connect Request/Indication.
+N_CC\fR(7):xccnff:Connect Response/Confirmation.
+N_Data\fR(7):xdataf:Data.
+N_DAck\fR(7):xdatacf:Data Acknowledgement.
+N_EData\fR(7):xeadataf:Expedited Data.
+N_EAck\fR(7):xedatacf:Expedited Data Acknowledgement.
+.\"DTflow\fR(7)::
+N_RI\fR(7):xrstf:Reset Request/Indication.
+N_RC\fR(7):xrscf:Reset Response/Confirmation.
+N_DI\fR(7):xdiscf:Disconnect Request/Indication.
+N_DC\fR(7):xdcnff:Disconnect Confirmation.
+N_Abort\fR(7):xabortf:Abort Indication.
+N_Xlisten\fR(7):xlistenf:Listen Request/Response.
+N_Xelisten\fR(7):xlistenf:Extended Listen Request/Response.
+N_Xcanlis\fR(7):xcanlisf:Listen Cancel Request/Response.
+N_PVC_ATTACH\fR(7):pvcattf:PVC Attach.
+N_PVC_DETACH\fR(7):pvcdetf:PVC Detach.
+.\"M_CParmReref\fR(7)::
+.\"M_CParmUnref\fR(7)::
+.\"M_CircuitId\fR(7)::
+_
+.TE
+.PP
+Each primitive is documented in its own manual page.
 .\"
 .\"
 .SH IOCTLS
 .PP
+The input-output controls provided by the Network Layer Interface are as
+follows:
+.PP
+.TS
+tab(:);
+llls
+llbls.
+Ioctl/Manpage:Structure:Description
+_
+\fBN_snident\fP(7):xll_reg:Identify subnetwork.
+\fBN_snmode\fP(7):snoptformat:Adjust subscription mode.
+\fBN_snconfig\fP(7):wlcfg:Configure data link.
+\fBN_snread\fP(7):wlcfg:Read data link configuration.
+\fBN_getstats\fP(7):(array):Get global stats.
+\fBN_zerostats\fP(7):(array):Zero global stats.
+\fBN_putpvcmap\fP(7):pvcmapf:Put a PVC map.
+\fBN_getpvcmap\fP(7):pvcmapf:Get a PVC map.
+\fBN_getVCstatus\fP(7):vcstatusf:Get VC stats.
+\fBN_getnliversion\fP(7):nliformat:Get NLI version.
+\fBN_traceon\fP(7)::Turn tracing on.
+\fBN_traceoff\fP(7)::Turn tracing off.
+\fBN_nuimsg\fP(7)::Network user info message.
+\fBN_nuiput\fP(7):nui_put:Put ntwk user info.
+\fBN_nuidel\fP(7):nui_del:Delete ntwk user info.
+\fBN_nuiget\fP(7):nui_get:Get ntwk user info.
+\fBN_nuimget\fP(7):nui_mget:Multiple get ntwk user info.
+\fBN_nuireset\fP(7):nui_reset:Reset ntwk user info.
+\fBN_zeroVCstats\fP(7):vcstatusf:Zero
+\fBN_putx32map\fP(7)::Put X.32 map.
+\fBN_getx32map\fP(7)::Get X.32 map.
+\fBN_getSNIDstats\fP(7):persnidstats:Get per-subnet stats.
+\fBN_zeroSNIDstats\fP(7):persnidstats:Zero per-subnet stats.
+\fBN_setQOSDATPRI\fP(7):qosdatpri:Set QoS data priority.
+\fBN_resetQOSDATPRI\fP(7)::Reset QoS data priority.
+_
+.TE
+.PP
+Each input-output control is documented in its own manual page.
 .\"
 .\"
 .SH NOTICES

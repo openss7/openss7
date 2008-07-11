@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-07-01 12:31:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-07-11 09:46:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-01 12:31:04 $ by $Author: brian $
+# Last Modified $Date: 2008-07-11 09:46:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,6 +59,9 @@ if PKG_BUILD_INDEP
 MANS_UNUSED = 
 
 man_MANS = \
+	man3/libsx25.3 \
+	man3/SX25.3 \
+	man3/sx25.3 \
 	man3/endpadent.3 \
 	man3/endxhostent.3 \
 	man3/equalx25.3 \
@@ -99,11 +102,14 @@ man_MANS = \
 	man4/ixe.4 \
 	man4/lapb.4 \
 	man4/llc2.4 \
+	man4/lli.4 \
 	man4/mfe.4 \
 	man4/mlp.4 \
 	man4/nli3.4 \
 	man4/npi.4 \
+	man4/plp.4 \
 	man4/s_cons.4 \
+	man4/s_lli.4 \
 	man4/s_nli3.4 \
 	man4/s_npi.4 \
 	man4/s_wan.4 \
@@ -113,9 +119,12 @@ man_MANS = \
 	man4/wan.4 \
 	man4/X25.4 \
 	man4/x25-lapb.4 \
+	man4/x25_lapb.4 \
 	man4/x25-llc2.4 \
+	man4/x25_llc2.4 \
 	man4/x25-llc.4 \
 	man4/x25-plp.4 \
+	man4/x25_plp.4 \
 	man4/xos.4 \
 	man4/xot.4 \
 	man4/xx25.4 \
@@ -178,6 +187,7 @@ man_MANS = \
 	man7/N_X25_GET_ROUTE.7 \
 	man7/N_X25_RM_ROUTE.7 \
 	man7/N_Xcanlis.7 \
+	man7/N_Xelisten.7 \
 	man7/N_Xlisten.7 \
 	man7/N_zerostats.7 \
 	man7/npi_x25.7 \
@@ -199,6 +209,7 @@ man_MANS = \
 	man8/mlptune.8 \
 	man8/nuimap.8 \
 	man8/pvcmap.8 \
+	man8/strx25_mknod.8 \
 	man8/vcstat.8 \
 	man8/wanmap.8 \
 	man8/wantune.8 \
@@ -213,6 +224,9 @@ man_MANS = \
 	man8/x32map.8
 
 dist_noinst_MANS = \
+	man3/libsx25.3.man \
+	man3/SX25.3.man \
+	man3/sx25.3.man \
 	man3/endpadent.3.man \
 	man3/endxhostent.3.man \
 	man3/equalx25.3.man \
@@ -253,11 +267,14 @@ dist_noinst_MANS = \
 	man4/ixe.4.man \
 	man4/lapb.4.man \
 	man4/llc2.4.man \
+	man4/lli.4.man \
 	man4/mfe.4.man \
 	man4/mlp.4.man \
 	man4/nli3.4.man \
 	man4/npi.4.man \
+	man4/plp.4.man \
 	man4/s_cons.4.man \
+	man4/s_lli.4.man \
 	man4/s_nli3.4.man \
 	man4/s_npi.4.man \
 	man4/s_wan.4.man \
@@ -267,9 +284,12 @@ dist_noinst_MANS = \
 	man4/wan.4.man \
 	man4/X25.4.man \
 	man4/x25-lapb.4.man \
+	man4/x25_lapb.4.man \
 	man4/x25-llc2.4.man \
+	man4/x25_llc2.4.man \
 	man4/x25-llc.4.man \
 	man4/x25-plp.4.man \
+	man4/x25_plp.4.man \
 	man4/xos.4.man \
 	man4/xot.4.man \
 	man4/xx25.4.man \
@@ -332,6 +352,7 @@ dist_noinst_MANS = \
 	man7/N_X25_GET_ROUTE.7.man \
 	man7/N_X25_RM_ROUTE.7.man \
 	man7/N_Xcanlis.7.man \
+	man7/N_Xelisten.7.man \
 	man7/N_Xlisten.7.man \
 	man7/N_zerostats.7.man \
 	man7/npi_x25.7.man \
@@ -353,6 +374,7 @@ dist_noinst_MANS = \
 	man8/mlptune.8.man \
 	man8/nuimap.8.man \
 	man8/pvcmap.8.man \
+	man8/strx25_mknod.8.man \
 	man8/vcstat.8.man \
 	man8/wanmap.8.man \
 	man8/wantune.8.man \
@@ -374,6 +396,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2008-07-11 09:46:27  brian
+# - roughed in implementation, updated documentation
+#
 # Revision 0.9.2.6  2008-07-01 12:31:04  brian
 # - updated man pages, drafts, specs, header files
 #

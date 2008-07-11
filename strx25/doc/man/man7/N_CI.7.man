@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_CI.7.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\" @(#) $Id: N_CI.7.man,v 0.9.2.2 2008-07-11 09:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_CI.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:28  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,144 @@ sort-adjacent-labels
 .TH N_CI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_CI
-\-
+\- Connect Request or Connect Indication
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_CI {
+struct xcallf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int conn_id;
+    unsigned char CONS_call;
+    unsigned char negotiate_qos;
+    struct xaddrf calledaddr;
+    struct xaddrf callingaddr;
+    struct qosformat qos;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Connection Request or Indication message primitive, \fBN_CI\fP, is used by
+the NS user to request an outgoing connection, or by the NS provider to
+indicate an incoming connection.  The control part of the message consists of
+one
+.BR M_PROTO (9)
+message block, and contains the \fBxcallf\fP structure.  The data part of the
+message consists of zero or one
+.BR M_DATA (9)
+message blocks containing the Call User Data (CUD) when supplied.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Connect Request and Connect Indicaiton use the \fBxcallf\fP structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block containing the \fBxcallf\fP structure.  The data part of the
+message consists of zero or one
+.BR M_DATA (9)
+message blocks containing the Call User Data (if any).
+.\"
+.\"
+.SH MEMBERS
+.PP
+The \fBxcallf\fP structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_CI\fP, for both Connect Requests and Connect Indications.
+.TP
+.I conn_did
+This field is used only for Connect Indications.  When an NS user Stream is
+listening, multiple incoming Connect Indications can be pending.  This field
+indicates the connection identifier for the current Connect Indication for use
+by the NS user when responding to this Connect Indication with either a
+Connect Response or a Disconnect Request message.
+.TP
+.I CONS_call
+Either X.25
+.[
+x25
+.]
+.[
+iso8208
+.]
+or CONS
+.[
+x223
+.]
+procedures can be used for calls.  When non-zero, this field indicates that
+CONS
+.[
+x223
+.]
+procedures are to be used.  When zero, this field indicates that X.25
+.[
+x25
+.]
+.[
+iso8208
+.]
+procedures are to be used.
+.TP
+.I negotiate_qos
+QoS parameters can be negotiated by the peer or left at default values.  WHen
+non-zero, this field specifies or indicates that QoS parameter are being
+negotiated by the NS user or NS user peer and the pertinent ranges are
+provided in the \fIqos\fP member.  When zero, this field specifies and
+indicates that default values are ot be used for the NS user or were indicated
+by the NS user peer.
+.TP
+.I calledaddr
+Conveys the called address.  For outgoing Connect Requests, this is the remote
+address to which the call is to be connected.  For incoming Connect
+Indications, this is the local address to which the call was intitiated.
+.TP
+.I callingaddr
+Conveys the calling address.  For outgoing Connect Requests, this is the local
+address from which the call is to be connected.  For incoming Connect
+Indications, this is the remote address form which the call was initiated.
+.TP
+.I qos
+Conveys the quality of service parameters and CONS or non-CONS facilities that
+are requested or indicated.
+.\"
+.\"
+.SH RESPONSE
+.PP
+When the Connect Request is issued by the NS user, the expected response from
+the NS provider is a Connect Confirmation or a Disconnect Indication.
+.PP
+When the Connect Indication is issued by the NS provider, the expected
+response from the NS user is a Connect Response or a Disconnect Request.
+.\"
+.\"
+.SH USAGE
+.PP
+The Connect Request message primitive is equivalent to the
+.BR N_CONN_REQ (7)
+primitive of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+The Connect Indication is equivalent to the
+.BR N_CONN_IND (7).
 .\"
 .\"
 .\".SH CONTEXT

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_Abort.7.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\" @(#) $Id: N_Abort.7.man,v 0.9.2.2 2008-07-11 09:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_Abort.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:28  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,97 @@ sort-adjacent-labels
 .TH N_ABORT 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_Abort
-\-
+\- Abort Indication
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_Abort {
+struct xabortf {
+    unsigned char xl_type;
+    unsigned char xl_command;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Abort Indication message primtiive is used by the X.25 driver in lieue of a
+Disconnect Indication, when there is insufficient resources to generate a
+Disconnect Indication.  Therefore, some NS providers may never issue this
+message primitive.
+Nevertheless, the NS user must be prepared to receive this message primitive in
+liueue of a Disconnect Indication.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B xabortf
+structure.
+There is no data part
+.RB ( M_DATA (9)
+message blocks) associated with this message primitive.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Abort Indication uses the
+.B xabortf
+structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the
+.B xabortf
+structure.
+There is no data part
+.RB ( M_DATA (9)
+message blocks) associated with this message primitive.
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B xabortf
+structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_Abort\fP, for Abort Indication. 
+.\"
+.\"
+.SH STATE
+.PP
+This message primitive is only valid in the data transfer phase.  The call moves
+to the disconnected phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+This message primitive is only issued by the NS provider.
+No response is expected when the NS provider issues this primitive.
+.\"
+.\"
+.SH USAGE
+.PP
+The Abort Indication message primitive is equivalent to the
+.BR N_DISCON_IND (7)
+of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
 .\"
 .\"
 .\".SH CONTEXT

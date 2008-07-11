@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: nli.texi,v 0.9.2.3 2008-07-01 12:31:07 brian Exp $
+% @(#) $Id: nli.texi,v 0.9.2.4 2008-07-11 09:46:29 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-01 12:31:07 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -254,15 +254,22 @@ under no obligation to provide any feature listed herein.
 @c Define an index of manual pages.
 @defcodeindex mp
 
-@c syncodeindex pr cp
-@c syncodeindex pv cp
-@c syncodeindex st cp
-@c syncodeindex tp cp
-@c syncodeindex vr cp
-@c syncodeindex ct cp
+@ifnottex
+@c concatenate indices for text, html and info
+@syncodeindex pr cp
+@syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
+@syncodeindex tp cp
+@syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
+
+@iftex
 
 @macro prim {name}
 @code{\name\}@prindex \name\
@@ -287,6 +294,38 @@ under no obligation to provide any feature listed herein.
 @macro pioc {name}
 @code{\name\}@ctindex \name\
 @end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
 
 @ifnottex
 @node Top
@@ -313,6 +352,16 @@ under no obligation to provide any feature listed herein.
 * References::
 * Index::
 @end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Introduction
 @chapter Introduction
@@ -396,7 +445,7 @@ Library}.
 @subsection Addresses
 
 In call requests and responses, it is necessary to specify the X.25 addresses
-associatedw tih the connection.  These addresses consist of the called, calling
+associated with the connection.  These addresses consist of the called, calling
 and responding addresses.  A common structure is used for these addresses.  The
 addressing format used by this stricture provides the following information:
 
@@ -1007,7 +1056,7 @@ indicates the connection identifier for the current Connect Indication for use
 by the NS user when responding to this Connection Indication with either a
 Connect Response or a Disconnect Request message.
 @item CONS_call
-Either X.25 or CONS procedures@cite{ISO/IEC 8878 or ITU-T X.223.} can be used
+Either X.25 or CONS procedures@footnote{ISO/IEC 8878 or ITU-T X.223.} can be used
 for calls.  When non-zero, this field indicates that CONS procedures are to be
 used.  When zero, this field indicates that X.25 procedures are to be used.
 @item negotiate_qos
@@ -1062,7 +1111,7 @@ The @type{xccnff} structure is formatted as follows:
 
 @example
 @group
-struct xcallf @{
+struct xccnff @{
     unsigned char xl_type;
     unsigned char xl_command;
     int conn_id;
@@ -1092,21 +1141,21 @@ The @type{xccnff} structure contains the following members:
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
-Always @prim{N_CC}.
+Always @prim{N_CC}, for both Connect Response and Connect Confirmation.
 @item conn_id
 This field is only used for Connect Responses.  When an NS user Stream is
 listening, multiple incoming Connect Indications can be pending.  This field
 specifies the connection identifier from the Connection Indication to which the
 NS user is responding.
 @item CONS_call
-Either X.25 or CONS procedures@cite{ISO/IEC 8878 or ITU-T X.223.} can be used
+Either X.25 or CONS procedures@footnote{ISO/IEC 8878 or ITU-T X.223.} can be used
 for calls.  When non-zero, this field indicates that CONS procedures are to be
 used.  When zero, this field indicates that X.25 procedures are to be used.
 @item negotiate_qos
 QOS parameters can be negotiated by the peer or left at default values.  When
 non-zero, this field specifies or indicates that QOS parameters are being
 negotiated by the NS user or NS user peer and the pertinent ranges are provided
-in the @member{qos} member.  When zero, this field specifies and indicates that
+in the @member{rqos} member.  When zero, this field specifies and indicates that
 default values are to be used for the NS user or were indicated by the NS user
 peer.
 @item responder
@@ -1175,7 +1224,7 @@ The @type{xdataf} structure contains the following members:
 @item xl_type
 Always @prim{XL_DAT}.
 @item xl_command
-Always @prim{N_Data}.
+Always @prim{N_Data}, for both Data Request and Data Indication.
 @item More
 When non-zero, this field conveys that a subsequent @prim{N_Data} message
 primitive will contain additional data belonging to the same NSDU.  When zero,
@@ -1287,7 +1336,7 @@ The Data Acknowledgement message primitive is equivalent to the
 @subheading Format
 
 The Expedited Data message uses the @type{xedataf} structure.
-THe control part of the message consists of one @msg{M_PROTO} message block, and
+The control part of the message consists of one @msg{M_PROTO} message block, and
 contains the @type{xedataf} structure.
 The data part of the message consists of one or more @msg{M_DATA} message blocks
 containing the local or remote expedited NS user data (ENSDU).
@@ -1396,7 +1445,7 @@ This message primitive is only valid during the data transfer phase.
 The Expedited Data Acknolwedgement message primitive is issued only in
 confirmation to the Expedited Data message primitive.  When an Expedited Data
 message primitive is delivered to the NS user or provider, the NS provider or
-user, respectively, must acknolwedged the expedited data.
+user, respectively, must acknowledged the expedited data.
 
 @subheading Equivalence
 
@@ -1562,7 +1611,7 @@ This message primitive is valid in the data transfer phase.
 The Reset Response message primitive is used by the NS user to respond to and
 acknowledge a previous Reset Indication message primitive from the NS provider.
 The Reset Confirmation message primitive is used by the NS provider to respond
-to and acknowledge a previou Reset Request message primitive from the NS user.
+to and acknowledge a previous Reset Request message primitive from the NS user.
 
 @subheading Equivalence
 
@@ -1758,7 +1807,7 @@ struct xdcnff @{
 
 @subheading Usage
 
-The Disconnect Confirmation message primitive is used to confirm a previous
+The Disconnect Confirmation message primitive, @prim{N_DC}, is used to confirm a previous
 Disconnect Request and provide charging information facilities associated with
 a previously established call.
 The control part of the message consists of one @msg{M_PROTO} message block,
@@ -2322,7 +2371,7 @@ The @type{pvcattf} structure is formatted as follows:
 
 @example
 @group
-struct xcallf @{
+struct pvcattf @{
     unsigned char xl_type;
     unsigned char xl_command;
     unsigned short lci;
@@ -4545,18 +4594,162 @@ documentation.  @xref{References}.
 * XOT Template File::
 @end menu
 
-@page
 @node LAPB Template File
 @section LAPB Template File
 @cindex LAPB Template File
 
 @subheading Name
+@file{lapbtemplate} --- Link Access Protocol (Balanced) File Format
+
 @subheading Description
+The @file{lapbtemplate} describes the file format for input to the
+@manref{lltune(8)} command for LAPB class subnetworks.  The file format
+consists of a number of parameter values, one per line, formatted as described
+below.  Each parameter value is described using its line number in the file, a
+parameter name, and a description of the format of the value.  Only the value
+appears in the file, each value on a line by itself, one value per line.
+
+Each of the LAPB configuration parameters correspons to the member and values
+of the @type{lapb_tune} structure, that is carried in a @type{lapb_tnioc}
+structure by the @pioc{L_LAPBTUNE} input-output control.
+
+These protocol parameters, and the default values that exist when tuning has
+not been applied to a newly created LAPB subnetwork, correspond directly to the
+protocol parameters and defaults in @cite{ISO/IEC 7776}, @cite{ITU-T Rec. X.25}
+and @cite{X.75}.
+
 @subheading Format
+The LAPB template consists of 16 to 18 lines containing the following
+configuration information:
+
+@enumerate
+
+@item @pval{N2_VAL} is the maximum number of times that a protocol data unit
+(PDU) is set following the expiry of the acknowlegement timer, the P-bit timer,
+or the reject timer.  It also limits the number of times an RR with the P-bit
+set is sent when remote busy is true and the busy timer expires.
+
+@item @pval{T1_VAL} is the time during which the LAPB expects to receive an
+acknowledgement to an outstanding I-PDU or an expected response to a sent
+UI-PDU.  The value is in units of 0.1 seconds (deciseconds).
+
+@item @pval{TPF_VAL} is the time during which the LAPB expectes to receive a
+PDU with the F-bit set to 1 in response to a command with the P-bit set to 1.
+The value should be less than the acknowledgement timer.  The value is in units
+of 0.1 seconds (deciseconds).
+
+@item @pval{TREJ_VAL} is the time interval during which the LAPB expects to
+receive a reply to a sent REJ DPU.  The value is in units of 0.1 seconds
+(deciseconds).
+
+@item @pval{TBUSY_VAL} is the time interval during which the LAPB waits for an
+indication of the clearance of a busy condition at the other LAPB.  The value
+is in units of 0.1 seconds (deciseconds).
+
+@item @pval{IDLE_VAL} is the time interval during which the LAPB expects to
+receive a PDU from the other LAPB.  If it expires then the P/F cycle is
+intiated which may result in link disconnection.  The value is in units of 0.1
+seconds (decicseconds).
+
+@item @pval{ACK_DELAY} is the maximum delay in 0.1 second units before
+transmitting a delayed RR.  This must be considerably less that the
+acknowledgement timer value, @pval{T1_VAL}.
+
+@item @pval{NOTACK_MAX} is the maximuum number of unacknowledged receive I PDUs
+before the RR acknowledging them all must be sent.
+
+@item @pval{LOC_WIND} is the number of unacknowledged I PDUs that may be sent.
+
+@item @pval{LOC_PROBE} is the position before the window is closed at which an
+I PDU is sent with the P-bit set to solicit an acknowledgement from the
+receiver.
+
+@item @pval{MAX_I_LEN} is the maximum isze of a LAPB I-frame.  LAPB requires
+all incoming I-frames above a certain size to be rejected by a FRMR.  This
+parameter specifies the maximum size.  It is constructured as the sum of the
+maximum X.25 data size, the X.25 protocol length and the LAPB protocol length.
+
+@item @pval{IGN_UA_ERROR} define whether or not to ignore any UA frams
+received, when the connection is in ERROR state.  The value is @samp{1} for
+@var{true} and @samp{0} for @var{false}.  The defalt value is @var{false}.
+
+@item @pval{FRMR_FRMR_ERROR} defines whether or not to re-transmit a frame
+reject if a frame reject is received, when the connection is in @psta{ERROR}
+state.  The value is @samp{1} for @var{true} and @samp{0} for @var{false}.  The
+default value is @var{false}.
+
+@item @pval{FRMR_INVRSP_ERROR} defines whether or not  to transmit a frame
+reject if an invalid frame response is received, when the connection is in
+@psta{ERROR} state.  The value is @samp{1} for @var{true} and @samp{0} for
+@var{false}.  The default value is @var{false}.
+
+@item @pval{SFRAME_PBIT} defines whether or not to send a frame reject if an
+S-frame is received without the P-bit set.  The value is @samp{1} for
+@var{true}a nd @samp{0} for @var{false}.  The default value is @var{false}.
+
+@item @pval{NO_DM_ADM} defines whether or not to send a @psta{DM} on entry to
+@psta{ADM} state after an N2 count expiry.  The value is @samp{1} for
+@var{true} and @samp{0} for @var{false}.  The default value is @var{false}.
+
+@end enumerate
+
+The following two fields are optional extensions:
+
+@enumerate 17
+
+@item @pval{IGN_DM_ERROR} defines whether or not to ignore DM frames received,
+when the connection is in @psta{ERROR} state.  The value is @samp{1} for
+@var{true} and @samp{0} for @var{false}.  The default value is false.
+
+@item @pval{SABM_IN_X32} defines the action to take when a SABM is received in
+X.32 setup.  The value is @samp{1} for @var{true} and @samp{0} for @var{false}.
+The default value is @var{false}.
+
+@end enumerate
+
+The last two fields (@samp{17} and @samp{18}) are enhancements.
+
 @subheading Files
+Files following this format are normally kept in the
+@file{@value{_configdir}/@value{PACKAGE}/template/} directory.@footnote{Note
+that this directory varies depending on whether the build was on a
+@manref{dpkg(1)}-based or @manref{rpm(1)}-based system.}
+
 @subheading See Also
+@itemize @bullet
+@item @manref{lltune(8)}
+@item @manref{lapb(4)}
+@item @manref{x25netd(8)}
+@end itemize
+
 @subheading Compatibility
+The @file{lapbtemplate} file format is compatible with @cite{Spider X.25}, and
+implementations based on @cite{Spider X.25}, such as @cite{AIXlink/X.25},
+@cite{HP-UX}, @cite{IRIS SX.25}, @cite{Solstice X.25}, @cite{PT X.25},
+@cite{SBE X.25}, with the following compatibility considerations:
+
+@itemize ---
+
+@item Most implementations only define the first 16 lines.  This implementation
+defines 18 lines, where the first 16 lines are compatible with other
+implementations and the last additional two lines are optional.
+
+@item @cite{PT X.25} documents the @pval{SABM_IN_X32} LAPB template field but
+not the @pval{IGN_DM_ERROR} LAPB template field.  @cite{Solstice X.25} and
+@cite{IRIS SX.25} do not document either the @pval{IGN_DM_ERROR} nor
+@pval{SABM_IN_X32} LAPB template fields.
+
+@end itemize
+
+For additional compatiblity infromation see, @manref{lapb(4)}, and
+@manref{STREAMS(9)}.
+
+@subheading Conformance
+@cite{AIXlink/X.25}, @cite{HP-UX}, @cite{IRIS SX.25}, @cite{Solstice X.25},
+@cite{PT X.25}, @cite{SBE X.25}, documentation.
+
 @subheading History
+The @file{lapbtemplate} file format first appeared in @cite{Spider X.25}.
 
 @page
 @node LLC2 Template File
@@ -4564,12 +4757,137 @@ documentation.  @xref{References}.
 @cindex LLC2 Template File
 
 @subheading Name
+@file{llc2template} --- Logical Link Control Type 2 File Format
+
 @subheading Description
+The @file{llc2template} describes the file format for input to the
+@manref{lltune(8)} command for LLC2 class subnetworks.  The file format
+consists of a number of parameter values, one per line, formatted as described
+below.  Each parameter value is described using its line number in the file, a
+parameter name, and a description of the format of the value.  Only the value
+appears in the file, each value on a line by itself, one value per line.
+
+Each of the LLC2 configuration parameters corresponds to the member and values
+of the @type{llc2_tune} structure, that is carried in a @type{llc2_tnioc}
+structure by the @pioc{L_LLC2TUNE} input-output control.
+
+These protocol parameters, and the default values that exist when tuning has
+not been applied to a newly created LLC2 subnetwork, correspond directly to the
+protocol parameters and defaults in @cite{ISO/IEC 8802-2:1998}.
+
 @subheading Format
+The LLC2 template consists of 14 lines containing the following configuration
+information.
+
+@enumerate
+
+@item @pval{N2_VAL}
+is the maximum number of times that a Protocol Data Unit (PDU) is sent
+following the expiry of the acknowledgement timer, the P-bit timer, or the
+reject timer.  This parameter also limits the number of times an RR is sent
+with the P-bit set when remote busy is true and the busy timer expires.
+
+@item @pval{T1_VAL}
+is the time interval during which the LLC2 expects to receive an
+acknowledgement to an outstanding I-PDU or an expected response to a sent
+UI-PDU.  The value is in units of 0.1 seconds.
+
+@item @pval{TPF_VAL}
+is the time during which the LLC2 expects to receive a PDU with the F-bit set
+to 1 in response to a command with the P-bit set to 1.  The value should be
+less than that specified for the akcnowledgement timer.  The value is in units
+of 0.1 seconds.
+
+@item @pval{TREJ_VAL}
+is the time interval during which the LLC2 expects to receive a reply to a sent
+REJ PDU.  The value is in units of 0.1 seconds.
+
+@item @pval{TBUSY_VAL}
+is the timer interval during which the LLC2 waits for an indication of the
+clearance of busy condition at the other LLC2.  The value is in units of 0.1
+seconds.
+
+@item @pval{TIDLE_VAL}
+is the time interval during which the LLC2 expects to receive a PDU from the
+other LLC2.  The value is in units of 0.1 seconds.
+
+@item @pval{ACK_DELAY}
+is the RR delay time.  This is the time interval for which the LLC2 will
+withhold acknowledgements of unacknowledged received I-PDUs.  The value is in
+units of 0.1 seconds.
+
+@item @pval{NOTACK_MAX}
+is the maximum number of unacknowledged received I-frames.
+
+@item @pval{TX_WINDOW}
+is the transmit window (if no XID received).
+
+@item @pval{TX_PROBE}
+is the position before the window is closed at which an I-PDU is sent with the
+P-bit set to solicit an acknowledgement from the receiver.
+
+@item @pval{MAX_I_LEN}
+is the maximum size of an LLC2 I-frame.  LLC2 requires all incoming I-frames
+above a certain size to be rejected by a FRMR.  This parameter specifies the
+maximum size of data that may bereceived starint from the LLC2 protocol header.
+
+In an X.25 network, it is constructed as (maximum X.25 data length + X.25
+protool header length + LLC2 protocol header length).  In an SNA network, it
+is constructed as (maximum SNA data length + SNA request header length + SNA
+transmission header length + LLC2 protocol header length).
+
+@item @pval{XID_WINDOW}
+is the XID window size (receive window), when the remote window size is unknown
+or zero.
+
+@item @pval{XID_NDUP}
+is the duplicate MAC XID count (0 means no test).
+
+@item @pval{XID_TDUP}
+is the duplicate MAC XID time.  The value is in units of 0.1 seconds.
+
+@end enumerate
+
 @subheading Files
+Files following this format are normally kept in the
+@file{@value{_configdir}/@value{PACKAGE}/template/} directory.@footnote{Note
+that this directory varies depending on whether the build was on a
+@manref{dpkg(1)}-based or @manref{rpm(1)}-based system.}
+
 @subheading See Also
+@itemize @bullet
+@item @manref{lltune(8)}
+@item @manref{llc2(4)}
+@item @manref{x25netd(8)}
+@end itemize
+
 @subheading Compatibility
+The @file{llc2template} file format is compatible with @cite{Spider X.25},
+and implementations based on @cite{Spider X.25}, such as
+@cite{AIXlink/X.25},
+@cite{HP-UX},
+@cite{IRIS SX.25},
+@cite{Solstice X.25},
+@cite{PT X.25},
+@cite{SBE X.25},
+with the following compatibility considerations:
+@itemize ---
+@item @cite{PT X.25} does not support LLC2.  @cite{@value{PACKAGE_TITLE}}
+supports LLC2 in support of XOL and porting applications from
+@cite{AIXlink/X.25}, @cite{Solstice X.25}, @cite{HP-UX}, @cite{IRIS
+SX.25}, @cite{VxWorks}, @cite{pSOS}, @cite{SpiderX}, and many other
+implementations based on @cite{SpiderX.25} support LLC2.  Portable X.25 and XOL
+applications will use @cite{@value{PACKAGE_TITLE}} instead of @cite{PT X.25}.
+@end itemize
+For additional compatibiltiy information see, @manref{llc2(4)}, and
+@manref{STREAMS(9)}.
+
+@subheading Conformance
+@cite{AIXlink/X.25}, @cite{HP-UX}, @cite{IRIS SX.25}, @cite{Solstice X.25},
+@cite{PT X.25}, @cite{SBE X.25}, documentation.
+
 @subheading History
+The @file{llc2template} file format first appeared in @cite{Spider X.25}.
 
 @page
 @node NUI Mapping File
@@ -4603,12 +4921,877 @@ documentation.  @xref{References}.
 @cindex X.25 Template File
 
 @subheading Name
+
+@file{x25template} --- X.25 Subnetwork File Format
+
 @subheading Description
+
+The @file{x25template} describes the file format for input to the
+@manref{x25tune(8)} command for X.25 subnetworks.  The file format consists of
+a number of parameter values, one per line, formated as described below.  Each
+parameter value is described using its line number in the file, a parameter
+name, and a description of the format of the value.  Only the value appears in
+the file, each value on a line by itself, one value per line.
+
+Each of the X.25 configuration parameters corresponds to the member and values
+of the @type{wlcfg} structure by the @pioc{N_snconfig} and @pioc{N_snread}
+input-output controls.
+.
+These protocol parameters, and the default values that exist when tuning has
+not been applied to a newly created X.25 subnetwork, correspond directly to the
+protocol parameters and defaults in @cite{ISO/IEC 8208} , @cite{ITU-T Rec.
+X.25} and @cite{X.75}.
+
 @subheading Format
+
+The X.25 subnetwork template consists of 76 or more lines containing the
+following configuration information:
+
+@enumerate
+
+@item
+@pval{NET_MODE}
+determines the various characteristics of the network protocol.  Valid values
+are integers, as specified below, that refers to the networks listed:
+
+@multitable {25}{m}{X25_CIRCUIT}{25}{m}{X25_CIRCUIT}{25}{m}{X25_CIRCUIT}
+@item 1 @tab - @tab X25_LLC @tab 10 @tab - @tab TRANSPAC @tab 19 @tab - @tab DCS
+@item 2 @tab - @tab X25_88  @tab 11 @tab - @tab TYMNET   @tab 20 @tab - @tab TELEPAC
+@item 3 @tab - @tab X25_84  @tab 12 @tab - @tab DATEX_P  @tab 21 @tab - @tab F_DATAPAC
+@item 4 @tab - @tab X25_80  @tab 13 @tab - @tab DDX_P    @tab 22 @tab - @tab FINPAC
+@item 5 @tab - @tab PSS     @tab 14 @tab - @tab VENUS_P  @tab 23 @tab - @tab PACNET
+@item 6 @tab - @tab AUSTPAC @tab 15 @tab - @tab ACCUNET  @tab 24 @tab - @tab LUXPAC
+@item 7 @tab - @tab DATAPAC @tab 16 @tab - @tab ITAPAC   @tab 25 @tab - @tab X25_CIRCUIT
+@item 8 @tab - @tab DDN     @tab 17 @tab - @tab DATAPAK
+@item 9 @tab - @tab TELENET @tab 18 @tab - @tab DATANET
+@end multitable
+
+@item
+@pval{X25_VERSION}
+determines the version of the X.25 protocol that is being used over the
+network.  Valid values are integers, as specified below.  Note that a
+@pval{NET_MODE} of @pval{X25_LLC} will override any value in this field to 1984
+(or later).
+
+@multitable {2004}{m}{indicates 2004}
+@item 80 @tab - @tab indicates 1980
+@item 84 @tab - @tab indicates 1984
+@item 88 @tab - @tab indicates 1988
+@item 1980 @tab - @tab indicates 1980
+@item 1984 @tab - @tab indicates 1984
+@item 1988 @tab - @tab indicates 1988
+@item 1992 @tab - @tab indicates 1992
+@item 1996 @tab - @tab indicates 1996
+@item 2000 @tab - @tab indicates 2000
+@item 2004 @tab - @tab indicates 2004
+@item @i{YYYY} @tab - @tab indicates @i{YYYY}
+@end multitable
+
+@item
+@pval{L3PLPMODE}
+indicates the DTE/DCE nature of the link.  Valid value are integers, as
+specified below.  Note that DXE operation is per ISO
+8208.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+
+@multitable {2}{m}{indicates DXE}
+@item 0 @tab - @tab indicates DCE
+@item 1 @tab - @tab indicates DTE
+@item 2 @tab - @tab indicates DXE
+@end multitable
+
+@item
+@pval{LPC}
+is the lowest LCI for Permanent Virtual Circuits (PVC).  @pval{LPC} and
+@pval{HPC} define the range of LCI that are assigned to PVC.  This range cannot
+overlap with the other defined ranges.  Setting this value to zero and
+@pval{HPC} to zero specifies that there are no PVC.
+ Valid values contain 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+
+@item
+@pval{HPC}
+is the highest LCI for PVC.  @pval{LPC} and @pval{HPC} define the range of LCI
+that are assigned to PVC.  This range cannot overlap with the other defined
+ranges.  @pval{LPC} and @pval{HPC} set to zero means no PVC.
+Valid values contain 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+
+@item
+@pval{LIC}
+is the lowest incoming (IC) VC.
+@pval{LIC} and @pval{HIC} define the range of LCI that are assigned to incoming call circuits.
+This range cannot overlap with the other defined ranges.
+@pval{LIC} and @pval{HIC} zero means no IC VC.
+Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+
+@item
+@pval{HIC}
+is the highest IC VC.
+@pval{LIC} and @pval{HIC} define the range of LCI that are assigned to incoming call circuits.
+This range cannot overlap.
+@pval{LIC} and @pval{HIC} zero means no IC VC.
+Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+
+@item
+@pval{LTC}
+is the lowest two-way (TW) VC.
+@pval{LTC} and @pval{HTC} define the LCI that are assigned to two-way call circuits.
+This range cannot overlap.
+@pval{LTC} and @pval{HTC} zero means no TW VC.
+Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+
+@item
+@pval{HTC}
+is the highest TW VC.
+@pval{LTC} and @pval{HTC} define the LCI that are assigned to two-way call circuits.
+This range cannot overlap.
+@pval{LTC} and @pval{HTC} zero means no TW VC.
+Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+j
+@item
+@pval{LOC}
+is the lowest outgoing (OG) VC.
+@pval{LOC} and @pval{HOC} define the range assigned to outgoing call circuits.
+This range cannot overlap.
+@pval{LOC} and @pval{HOC} zero means no OG VC.
+Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+
+@item
+@pval{HOC}
+is the highest OG VC.
+@pval{LOC} and @pval{HOC} define the range assigned to outgoing call circuits.
+This range cannot overlap.
+@pval{LOC} and @pval{HOC} zero means no OG VC.
+Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
+Leading zeros are optional.
+j
+@item
+@pval{THISGFI}
+indicates which Modulo operates on the network.  It can have one of three
+integer values.
+
+@multitable {2147483648}{m}{Modulo 2147483648}{31 bits}
+@item 8 @tab - @tab Modulo 8 @tab 3 bits
+@item 128 @tab - @tab Modulo 128 @tab 7 bits
+@item 32768 @tab - @tab Modulo 32768 @tab 15 bits
+@item 2147483648 @tab - @tab Modulo 2147483648 @tab 31 bits
+@end multitable
+
+@item
+@pval{LOCMAXPKTSIZE}
+is the maximum acceptable packet size for sent packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The default value is 7 (or 128 octets).
+The local maximum packet size and remote maximum packet size should be the
+same.
+The value should be less than the maximum LAPB I-frame size, N2, see
+@manref{lltune(8)}.
+
+@item
+@pval{REMMAXPKTSIZE}
+is the maximum acceptable packet size for received packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The default value is 7 (or 128 octets).
+The local maximum packet size and remote maximum packet size should be the
+same.
+The value should be less than the maximum LAPB I-frame size, N2, see
+@manref{lltune(8)}.
+
+@item
+@pval{LOCDEFPKTSIZE}
+is the default packet size for sent packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The local default packet size and remote maximum packet size should be the
+same.
+The default value is 7 (or 128 octets).
+When specified as 7 (128 octets), negotiation of the non-standard default
+packet size facility will neither be initiated nor rejected.
+
+@item
+@pval{REMDEFPKTSIZE}
+is the default packet size for received packets.
+The value is the logarithm, base two, of the packet size.  Valid values are in
+the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The local default packet size and remote maximum packet size should be the
+same.
+The default value is 7 (or 128 octets).
+When specified as 7 (128 octets), negotiation of the non-standard default
+packet size facility will neither be initiated nor rejected.
+
+@item
+@pval{LOCMAXWSIZE}
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+
+@item
+@pval{REMMAXWSIZE}
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+
+@item
+@pval{LOCDEFWSIZE}
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+When specified as 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768, the
+non-standard default window size facility will neither be initiated nor
+rejected.
+
+@item
+@pval{REMDEFWSIZE}
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+When specified as 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768, the
+non-standard default window size facility will neither be initiated nor
+rejected.
+
+@item
+@pval{MAXNSDULEN}
+
+@item
+@pval{ACKDELAY}
+
+@item
+@pval{T20VALUE}
+(Restart Request Response Timer)
+is the time period that the DTE will await a restart confirmation or restart
+indication following issuing a request request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+
+@pval{T10VALUE}
+(Restart Indication Response Timer)
+is the equivalient timer for the DCE, and defines the time period that the DCE
+will wait for a restart confirmation or restart request after having issued a
+restart indication.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+
+@item
+@pval{T21VALUE}
+(Call Request Response Timer)
+is the time period that the DTE will await a call connected or clear
+indication having issued a call request.
+The timeout value should not be less than 200 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+200 seconds is specified as 2000 (deciseconds).
+
+@pval{T11VALUE}
+(Incoming Call Response Timer)
+is the equivalent timer for the DCE, and defines the time period that the DCE
+will wait for a call accepted, clear request or call request after having
+issued an incoming call.  The timeout value is a minimum of 180 seconds.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+
+@item
+@pval{T22VALUE}
+(Reset Request Response Timer)
+is the time period that the DTE will await a reset confirmation or reset
+indication having issued a reset request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+
+@pval{T12VALUE}
+(Reset Indication Response Timer)
+is the equivalent timer for the DCE, and defines the time period that the DCE
+will wait for a reset confirmation or request request after having issued a
+reset indication.  The timeout value is a minimum of 60 seconds.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+
+@item
+@pval{T23VALUE}
+(Clear Request Response Timer)
+is the time period that the DTE will await a clear confirmation or clear
+indication having issued a clear request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+
+@pval{T13VALUE}
+(Clear Indication Response Timer)
+is the equivalent timer for the DCE, and defines the time period that the DCE
+will wait for a clear confirmation or clear request following issuing a clear
+indication.
+The timeout value is a minimum of 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+
+@item
+@pval{TVALUE}
+
+@item
+@pval{T25VALUE}
+(Window Rotation Timer)
+is the time period that the DTE will await acknowledgement of all outstanding
+data packets having trasnmitted the last available data packet or the window
+is rotated.
+The timeout value should not be less than 200 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+200 seconds is specified as 2000 (deciseconds).
+
+Note that this T25 timer is only needed if the associated
+procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 11.2.1.} is used.
+
+@item
+@pval{T26VALUE}
+(Interrupt Response Timer)
+is the time period that the DTE will await an interrupt confirmation having
+issued an interrupt.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+
+@item
+@pval{IDLEVALUE}
+
+@item
+@pval{CONNECTVALUE}
+
+@item
+@pval{R20VALUE}
+(Restart Request Retransmission Count) is the number of times that a restart
+request will be re-issued, and T20 restarted, upon expiry of timer T20.
+This value has a default of 1 and a minimum of 1.
+
+@item
+@pval{R22VALUE}
+(Reset Request Retransmission Count) is the number of times that a reset
+request will be re-issued, and T22 restarted, upon expiry of timer T22.
+This value has a default of 1 and a minimum of 1.
+
+@item
+@pval{R23VALUE}
+(Clear Request Retransmission Count) is the number of times that a clear
+request will be re-issued, and T23 retstarted, upon expiry of timer T23.
+This value has a default of 1 and a minimum of 1.
+
+@item
+@pval{LOCALDELAY}
+
+@item
+@pval{ACCESSDELAY}
+
+@item
+@pval{LOCMAXTHCLASS}
+is the local maximum throughput class.
+The value is an integer number from 3 to 44.
+
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+
+@item
+@pval{REMMAXTHCLASS}
+is the remote maximum throughput class.
+The value is an integer number from 3 to 44.
+
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+
+@item
+@pval{LOCDEFTHCLASS}
+is the local default throughput class.
+The value is an integer number from 3 to 44.
+
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+
+@item
+@pval{REMDEFTHCLASS}
+is the remote default throughput class.
+The value is an integer number from 3 to 44.
+
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+
+@item
+@pval{LOCMINTHCLASS}
+is the local minimum throughput class.
+The value is an integer number from 3 to 44.
+
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+
+@item
+@pval{REMMINTHCLASS}
+is the remote minimum throughput class.
+The value is an integer number from 3 to 44.
+
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+
+@item
+@pval{SUB_CUG}
+(Closed User Group)
+is the index to the closed user group selected for the virtual
+call in the form of two to four decimal digits.  Indexes to the close user
+group at different DXE interfaces may be different.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_PREF}
+(Preferential Closed User Group).  When the DTE belongs to more than one
+closed user group, a preferential closed user group must be specified.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_CUGOA}
+(Closed User Group with Outgoing Access)
+is the index to the closed user group selected for the virtual call in the
+form of two to four decimal digits.  Indexes to the close user group at
+different DXE interfaces may be different.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_CUGIA}
+(Closed User Group with Incoming Access)
+is the index to the closed user group selected for the virtual call in the
+form of two to four decimal digits.  Indexes to the close user group at
+different DXE interfaces may be different.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{CUG_FORMAT}
+(Number of Closed User Groups Subscribed) defines the maximum number of closed
+user groups to which the DTE is subscribed.  The value is in the range 0 to
+100 for basic and in the range 101 to 10000 for extended.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{BAR_CUG_IN}
+(Closed User Group Incoming Calls Barred) is a user option that bars incoming
+calls containing the closed user group facility.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_EXTENDED}
+(Extended Call Packets)
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{BAR_EXTENDED}
+(Extended Call Packets Barred) is a user option that bars incoming calls
+containing flow control negotiation facilities.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_FSELECT}
+(Fast Select Acceptance) is an optional user facility agreed for a period of
+time.  This user facility, if subscribed to, authorizes the DCE to transmit to
+the DTE incoming calls that request the fast select facility.  In the absence
+of this facility, the DCE will not transmit to the DTE incoming calls that
+request the fast select facility.  This parameter defines whether the DTE
+accepts calls with a fast select facility requesting no restriction on
+response.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_FSRRESP}
+(Fast Select Acceptance) is an optional user facility agreed for a period of
+time.  This user facility, if subscribed to, authorizes the DCE to transmit to
+the DTE incoming calls that request the fast select facility.  In the absence
+of this facility, the DCE will not transmit to the DTE incoming calls that
+request the fast select facility.  This parameter defines whether the DTE
+accepts calls with a fast select facility requesting restriction on
+response.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_REVCHARGE}
+(Reverse Charging Acceptance) is an optional user facility agree for a period
+of time for virtual calls.  This user facility, if subscribed to, authorizes
+the DCE to transmit to the DTE incoming calls that request the reverse
+charging facility.  In the absence of this facility, the DCE will not transmit
+to the DTE incoming calls that request the reverse charging facility.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_LOC_CHG_PREV}
+(Local Charging Prevention)
+is an optional user faciltiy agreed for a period of time for virtual calls.
+This user facility, if subscribed to, authorizes the DCE to prevent the
+establishment of virtual calls that the suscriber must pay for by: a) not
+transmitting to the DTE incoming calls that request the reverse charging
+facility; and, b) ensuring that the charges are made to another party whether
+a call is requested by the DTE.  When the party to be changed has not been
+established for a call request, the DCE that receives the call request packet
+will apply reverse charging to this call.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{BAR_INCALL}
+(Incoming Calls Barred) determines whether the optional user facility is
+agreed for a period of time.  This facility applies to all logical channels
+used at the DTE/DCE interface for virtual calls.  This user facility, if
+subscribed to, prevents incoming virtual calls from being presented to the
+DTE.  The DTE may originate outgoing virtual calls.  Logical chanels used for
+virtual calls retain their full duplex capability.  Some administratoins may
+provide a capability that allows a virtual call to be presented to the DTE
+only in cases where the called DTE address is the address of the calling DTE.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{BAR_OUTCALL}
+(Outgoing Calls Barred) determines whether the optional user facilty is agreed
+for a period of time.  This facility applies to all logical channels used at
+the DTE/DCE interface for virtual calls.  This user facility, if subscribed
+to, prevents the DCE from accepting outgoing virtual calls from the DTE.  The
+DTE may receive incoming virtual calls.  Logical channels used for virtual
+calls retain their full duplex capability.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_TOA_NPI_FMT}
+(TOA/NPI Address) is an optional user facility agreed for a period of time for
+virtual calls.  When this facility is subscribed to, the DCE and DTE shall
+transmit call set-up and clearing packets only using the TOA/NPI address
+format.  In this case, addresses in facilities are also in TOA/NPI format.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{BAR_TOA_NPI_FMT}
+(TOA/NPI Address Incoming Calls Barred) is a user option that bars incoming
+calls containing TOA/NPI addresses.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{SUB_NUI_OVERRIDE}
+(NUI Override) is an optional user facility agreed for a period of time for
+virtual calls.  When this facility is subscribed to, one or more network user
+identifiers are also agreed for a period of time.  Associated with each
+network user identifier is a set of subscription-time optional user
+facilities.  When one of these network user identifiers is provdied in a call
+request packet by means of the NUI selection facility, the set of
+subscription-time optional user facilities associated with it overrides the
+facilities that apply to the interface.  This override does not apply to other
+existing calls or subsequent calls on the interface.  It remains in effect for
+the duration of the particular call to which it applies.
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{ACC_NODIAG}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{USE_DIAG}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{CCITT_CLEAR_LEN}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{BAR_DIAG}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{DISC_NS_DIAG}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{ACC_HEX_ADD}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{BAR_NONPRIV_LISTEN}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{INTL_ADDR_REGION}
+
+@item
+@pval{INTL_PRIORITISED}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{DNIC}
+The value is 4 hexadecimal digits.
+
+@item
+@pval{PRTY_ENCODE_CONTROL}
+The value is an integer decimal number.
+
+@item
+@pval{PRTY_PKT_FORCED_VAL}
+The value is an integer decimal number.
+
+@item
+@pval{SRC_ADDR_CONTROL}
+The value is an integer decimal number.
+
+@item
+@pval{DBIT_ACCEPT_IND}
+
+@multitable {0}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0 @tab - @tab leave the D-bit set and pass the packet on,
+@item 1 @tab - @tab zero the D-bit and pass the packet on, and,
+@item 2 @tab - @tab reset the call.
+@end multitable
+
+@item
+@pval{DBIT_ACCEPT_OUT}
+
+@multitable {0}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0 @tab - @tab leave the D-bit set and pass the packet on,
+@item 1 @tab - @tab zero the D-bit and pass the packet on, and,
+@item 2 @tab - @tab reset the call.
+@end multitable
+
+@item
+@pval{DBIT_DATA_IN}
+
+@multitable {0}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0 @tab - @tab leave the D-bit set and pass the packet on,
+@item 1 @tab - @tab zero the D-bit and pass the packet on, and,
+@item 2 @tab - @tab reset the call.
+@end multitable
+
+@item
+@pval{DBIT_DATA_OUT}
+defines the action to taken when the local user sends a data packet with the
+D-bit set, but the remote party has not indicated D-bit support.  It can have
+one of the following values:
+
+@multitable {0}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0 @tab - @tab leave the D-bit set and pass the packet on,
+@item 1 @tab - @tab zero the D-bit and pass the packet on, and,
+@item 2 @tab - @tab reset the call.
+@end multitable
+
+@end enumerate
+
+The following are optional extension parameters:
+
+@enumerate 77
+
+@item
+@pval{THCLASS_NEG_TO_DEF}
+The value is @samp{Y} for use and @samp{N} for non-use.
+
+@item
+@pval{THCLASS_TYPE}
+The value is an integer decimal number.
+
+@item
+@pval{TH_WMAP}
+The value is 16 decimal numbers, 0 to 255, separated by @samp{.}.
+
+@item
+@pval{TH_PMAP}
+The value is 16 decimal numbers, 0 to 255, separated by @samp{.}.
+
+@end enumerate
+
+Extensions parameters can be enabled using the @option{-e} flag to
+@manref{x25tune(8)}, and specifying additional lines in the template.
+@cite{@value{PACKAGE_TITLE}} defines extension parameters primarily to support
+facilities of ISO/IEC 8208:2000@footnote{@xref{ISO8208,,ISO/IEC 8208}.} not provided for
+according to the documentation of other, older implementations.
+
+The following parameters, therefore, are the extensions specific to the
+@cite{@value{PACKAGE_TITLE}} implementation:
+
+@enumerate 81
+
+@item
+@pval{T24VALUE}
+(Window Status Transmission Timer)
+is the time period that the DTE will wait without sending a window status
+packet (a packet with a P(R): RR, RNR, DATA or REJECT).
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+
+Note that this T24 timer is only needed if the associated
+procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 11.2.2.} is used.
+
+@item
+@pval{T27VALUE}
+(Reject Response Timer)
+is the time period that the DTE will await a data retransmission after
+issuing a reject.
+The timeout value should not be less than 60 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+60 seconds is specified as 600 (deciseconds).
+
+Note that this T27 timer is only needed if the associated
+procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 13.4.} is used.
+
+@item
+@pval{T28VALUE}
+(Registration Request Response Timer)
+is the time period that the DTE will await a registration confirmation or
+diagnostic packet having issued a registration request.
+The timeout value should not be less than 300 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+300 seconds is specified as 3000 (deciseconds).
+
+Note that this T28 timer is only needed if the associated
+procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 13.1.} is used.
+
+@item
+@pval{R25VALUE}
+(Data Packet Retransmission Count) is the number of times that a data packet
+will be retransmitted, and T25 restarted, upon expiry of T25.
+This value has a default of 0.
+A value of zero (0) conveys that no retransmission will be performed.
+
+Note that R25 is only needed if the associated
+procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 11.2.1.} is used.
+
+@item
+@pval{R27VALUE}
+(Reject Retransmission Count) is the number of times that a reject is
+reissued, and T27 restarted, upon expiry of T27.
+This value has a default of 0.
+A value of zero (0) conveys that no reissuing will be performed.
+
+Note that R27 is only needed if the associated
+procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 13.4.} is used.
+
+@item
+@pval{R28VALUE}
+(Registration Request Retransmission Count) is the number of times a
+registration request will be reissued, and T28 restarted, upon expiry of T28.
+This value has a default of 1.
+A value of zero (0) conveys that no reissuing will be performed.
+
+Note that R28 is only needed if the associated
+procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 13.1.} is used.
+
+@end enumerate
+
 @subheading Files
+
+Files following this format are normally kept in the
+@file{@value{_configdir}/@value{PACKAGE}/template/} directory.@footnote{Note
+that this directory varies depending on whether the build was on a
+@manref{dpkg(1)}-based or @manref{rpm(1)}-based system.}
+
 @subheading See Also
+
+@itemize @bullet
+@item @manref{x25tune(8)}
+@item @manref{x25(4)}
+@item @manref{xnetd(8)}
+@end itemize
+
 @subheading Compatibility
+
+The @file{x25template} file format is compatible with @cite{Spider X.25},
+and implementations based on @cite{Spider X.25}, such as
+@cite{AIXlink/X.25},
+@cite{HP-UX},
+@cite{IRIS SX.25},
+@cite{Solstice X.25},
+@cite{PT X.25},
+@cite{SBE X.25},
+with the following compatibility considerations:
+
+@itemize ---
+
+@item
+@cite{@value{PACKAGE_TITLE}}
+fairly much ignores the setting of the
+@pval{NET_MODE} and @pval{X25_VERSION}
+parameters.
+The
+@cite{@value{PACKAGE_TITLE}}
+implementation of X.25 is based on ISO/IEC 8208:2000 (Edition 4),
+@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+which is compatible with ITU-T Recommendation X.25 of 1996,@footnote{X25,,X.25}
+(the lastest current release of the standard) and is backward compatible with
+ISO/IEC 8208 editions 1, 2 and 3; as well as ITU-T Recommendation X.25 for
+1993, 1988, 1984 and 1980.
+
+@item
+No other implementation documents support for Modulo 32768.
+@cite{@value{PACKAGE_TITLE}}
+supports Modulo 32768 per ISO/IEC 8208,@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
+X.25@footnote{@xref{X.25,,ITU-T Recommendation X.25}.}
+and X.75.@footnote{@xref{X.75,,ITU-T Recommendation X.75}.}
+
+@item
+No other implementation documents support for a true T24 timer.
+@cite{@value{PACKAGE_TITLE}}
+supports this as an extension (line 81).  If this line is not present,
+the default (180 seconds) will be assumed.
+
+@item
+No other implementation documents support for the retransmission of reject
+messages and the associated @pval{T27} and @pval{R27} parameter values.
+@cite{@value{PACKAGE_TITLE}}
+supports these as extensions (line 82 and line 85).  If these lines are not
+present, defaults (60 seconds and 0 retransmission) will be assumed.
+
+@item
+Most implementations do not document support for the On-Line Registration
+facilities, and the associated @pval{T28} and @pval{R28} parameter values.
+@cite{@value{PACKAGE_TITLE}}
+supports these as extensions (line 83 and line 86).  If these lines are not
+present, defaults (300 seconds and 1 retransmission) will be assumed.
+
+@item
+All implementations document support for a @pval{T25} timer, but no other
+implementation documents support the @pval{R25} parameter value.
+@cite{@value{PACKAGE_TITLE}}
+supports this as an extension (line 84).  If this line is not present,
+the default (zero (0) retransmissions) will be assumed.
+
+@item
+No implementations documents support throughput classes above 48,000 bits per
+second (index 3 to 12).
+@cite{@value{PACKAGE_TITLE}}
+support basic throughput classes to 192,000 bits per second (index 3 to 16),
+and extended throughput classes up to 2,048,000 bits per second (index 17 to 44).
+@end itemize
+For additional compatibiltiy information see, @manref{x25tune(8)},
+@manref{x25(4)}, @manref{x25netd(8)}, and @manref{STREAMS(9)}.
+
+@subheading Conformance
+
+@cite{AIXlink/X.25},
+@cite{HP-UX},
+@cite{IRIS SX.25},
+@cite{PT X.25},
+@cite{RadiSys WAN},
+@cite{SBE X.25},
+@cite{Solstice X.25},
+documentation.  @xref{References}.
+
 @subheading History
+The @file{x25template} file format first appeared in @cite{Spider X.25}.
 
 @page
 @node X.25 Host Entries File
@@ -4674,6 +5857,43 @@ documentation.  @xref{References}.
 * Compatibility with SBE X.25::
 * Compatibility with Solstice X.25::
 @end menu
+
+It should be noted that the Network Layer Interface (NLI) is not, by any
+stretch of the imagination, a current application programming interface.  It
+is, however, traditional on many @cite{UNIX} systems.  This inteface is
+provided by @cite{@value{PACKAGE_TITLE}} solely for compatibility with
+applications, drivers and modules developed to operate on implementations based
+on @cite{Spider X.25} and is intended to ease the porting of legacy
+applications to @cite{Linux}.  New projects must use the standard @cite{X.25}
+@cite{NPI}@footnote{@xref{NPI}} or @cite{XX25}@footnote{@xref{XX25}.}
+intefaces, with the preference being for the latter which is a @cite{Open
+Group} standard.@footnote{The @i{Network Provider Interface (NPI)} is not an
+@cite{Open Group} standard, but is only a @cite{UNIX International} published
+@i{ipso facto} standard.}
+
+The following discussion,
+
+@format
+@smallexample
+Newsgroups: comp.unix.solaris, comp.sys.sun.apps
+From: "Charles T. Smith" <cts.priv...@@yahoo.com>
+Date: Wed, 18 Apr 2007 07:12:37 +0200
+Local: Wed, Apr 18 2007 1:12 am
+Subject: Sun thumbs its nose at a 30 year-old goal (including its own)
+
+Protocol independence has been the goal of network programming since the
+beginning.  But for X.25, Sun blithely pushes its NLI interface - which is
+basically hard-coded X.25.  It shares no abstractions with any other API
+and is not compatible with any of the facilities that support all other
+protocols as a group.  Plus it is complicated to use (desipte that Sun uses
+happy tones to market it).
+
+Somebody at Sun ought to take responsibility.
+@end smallexample
+@end format
+
+starts off
+@url{http://groups.google.com/group/comp.sys.sun.apps/browse_thread/thread/0264b2b100506ffc/7552ac05164fb84e,this thread}.
 
 @node Compatibility with AIXlink/X.25
 @section Compatibility with AIXlink/X.25
@@ -4902,22 +6122,28 @@ Publications. [No: 007-2268-002]. @uref{http://techpubs.sgi.com/,SGI Technical
 Publications}.
 
 @item [ISO7776] @anchor{ISO7776} @tab @b{ISO/IEC 7776:1995}, @cite{Information
-technology -- Telecommunications information exchange between systems --
-High-level data link control procedures -- Description of the X.25
+technology --- Telecommunications information exchange between systems ---
+High-level data link control procedures --- Description of the X.25
 LAPB-compatible DTE data link procedures}, Second Edition, July 1, 1995,
 International Organization for Standardization.
 @uref{http://www.iso.org/,International Organization for Standardization}.
 
+@item [ISO8208] @anchor{ISO8208} @tab @b{ISO/IEC 8208:2000}, @cite{Information
+technology --- Data Communications --- X.25 Packet Layer Protocol For Data
+Terminal Equipment}, Fourth Edition, November 1, 2000, (Geneva), International
+Organization for Standardization.  @uref{http://www.iso.org/,International
+Organization for Standardization}.
+
 @item [ISO8802-2] @anchor{ISO8802-2} @tab @b{ANSI/IEEE Standard 802.2-1998
-[ISO/IEC 8802-2:1998]}, @cite{IEEE Standard for Information Technology --
-Telecommunications and Information Exchange Between Systems -- Local and
-Metropolitan Area Networks -- Specific Requirements -- Part 2: Logical Link
+[ISO/IEC 8802-2:1998]}, @cite{IEEE Standard for Information Technology ---
+Telecommunications and Information Exchange Between Systems --- Local and
+Metropolitan Area Networks --- Specific Requirements --- Part 2: Logical Link
 Control}, May 7, 1998, (New York), ANSI/IEEE, IEEE Computer Society. [ISBN
 1-55937-959-6]. @uref{http://www.ieee.org/,Institute of Electrical and
 Electronics Engineers}.
 
 @item [ISO8881] @anchor{ISO8881} @tab @b{ISO/IEC 8881:1989}, @cite{Information
-Processing Systems -- Data Communications -- User of the X.25 Packet Level
+Processing Systems --- Data Communications --- User of the X.25 Packet Level
 Protocol in Local Area Networks}, 1989, ISO/IEC, International Organization for
 Standardization. @uref{http://www.iso.org/,International Organization for
 Standardization}.
@@ -4975,9 +6201,17 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 
 @end multitable
 
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
 @node Index
 @unnumbered Index
 
+@ifnottex
+@c concatenate indices for html and info
+@printindex cp
+@end ifnottex
+
+@iftex
 @menu
 * Concept Index::
 * Protocol State Index::
@@ -4986,6 +6220,7 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 * Primitive Structure Field Index::
 * Primitive Values Index::
 * Primitive Error Values Index::
+* Input-Output Control Index::
 * Manual Page Index::
 @end menu
 
@@ -5032,10 +6267,11 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 @node Manual Page Index
 @section Manual Page Index
 @printindex mp
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents
 @page
 @contents
 @bye
-

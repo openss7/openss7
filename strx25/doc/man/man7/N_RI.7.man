@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_RI.7.man,v 0.9.2.1 2008-05-03 11:42:29 brian Exp $
+.\" @(#) $Id: N_RI.7.man,v 0.9.2.2 2008-07-11 09:46:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:29 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_RI.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:29  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:29  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,172 @@ sort-adjacent-labels
 .TH N_RI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_RI
-\-
+\- Reset Request and Reset Indication
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_RI {
+struct xrstf {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    unsigned char originator;
+    unsigned char reason;
+    unsigned char cause;
+    unsigned char diag;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Reset Request or Indication message primitive, \fBN_RI\fP, is used by
+the NS user to request reset of the connection, or by the NS provider to
+indicate a remote reset.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block, and
+contains the \fBxrstf\fP structure.
+There is no data part
+.RB ( M_DATA (9)
+message blocks) associated with this message primitive.
+.PP
+The X.25 cause and diagnostic octets, \fIcause\fP and \fIdiag\fP, are
+conveyrs, as well as the CONS \fIoriginator\fP and \fIreason\fP codes,
+which are mapped from the \fIcause\fP and \fIdiag\fP.  A Reset Request
+on a non-CONS call can specify a non-zero \fIcause\fP code.  This has
+no effect for a CONS call.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Reset Request and Reset Indication use the \fBxrstf\fP structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block
+containing the \fBxrstf\fI structure.
+There is no data part
+.RB ( M_DATA (9)
+message blocks) associated with this message primitive.
+.\"
+.\"
+.SH MEMBERS
+.PP
+The \fBxrstf\fP structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBXL_RI\fP, for both Reset Request and Reset Indication.
+.TP
+.I originator
+For a CONS call, contains the CONS \fIoriginator\fP mapped from the X.25 cause
+and diagnostic.  This field can have one of the following values:
+.RS
+.PP
+.TS
+tab(:);
+lnlss
+lbnlss.
+Constant:Value:Description
+_
+NS_UNKNOWN:0:Originator is unknown.
+NS_USER:1:Originator is the NS user.
+NS_PROVIDER:2:Originator is the NS provider.
+_
+.TE
+.RE
+.TP
+.I reason
+For a CONS call, contains the CONS reason, mapped from the X.25 cause and
+diagnostic.
+.RS
+.PP
+This field can have one of the following values when the \fIoriginator\fP is
+\fBNS_PROVIDER\fP:
+.PP
+.TS
+tab(:);
+lnlss
+lbnlss.
+Constant:Value:Description
+_
+NS_RUNSPECIFIED:233:Unspecified reason.
+NS_RCONGESTION:234:Congestion.
+_
+.TE
+.PP
+The field can have the following values when the \fIoriginator\fP is
+\fBNS_USER\fP:
+.PP
+.TS
+tab(:);
+lnlss
+lbnlss.
+Constant:Value:Description
+_
+NS_RESYNC:250:Resynchronization.
+_
+.TE
+.PP
+The field can have the following values when the \fIoriginator\fP is
+\fBNS_UNKNOWN\fP:
+.PP
+.TS
+tab(:);
+lnlss
+lbnlss.
+Constant:Value:Description
+_
+NS_UNKNOWN:0:Unspecified reason.
+_
+.TE
+.RE
+.TP
+.I cause
+Conveys the X.25 cause octet associated with the reset.
+.TP
+.I diag
+Conveys the X.25 diagnostic octet associated with the reset.
+.\"
+.\"
+.SH STATE
+.PP
+This message primitive is valid in the data transfer phase.
+.\"
+.\"
+.SH RESPONSE
+.PP
+A Reset Request and Reset Indication message primitive is an acknowledged
+service.  The NS user expects a Reset Confirmation primitive in response to a
+Reset Request; the NS provide, a Reset Response primitive in reesponse to a
+Reset Indication.
+.PP
+A collision between a Reset Indication and a Reset Request is taken to
+acknolwedge the Reset Request and no Reset Confirmation is then issued.
+.\"
+.\"
+.SH USAGE
+.PP
+The Reset Request message primitive is equivalent to the
+.BR N_RESET_REQ (7)
+of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7);
+the Reset Indication,
+.BR N_RESET_IND (7).
 .\"
 .\"
 .\".SH CONTEXT

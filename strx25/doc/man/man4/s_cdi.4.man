@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: s_cdi.4.man,v 0.9.2.1 2008-07-01 12:16:22 brian Exp $
+.\" @(#) $Id: s_cdi.4.man,v 0.9.2.2 2008-07-11 09:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-07-01 12:16:22 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: s_cdi.4.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:28  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-07-01 12:16:22  brian
 .\" - added manual pages, specs and conversion modules
 .\"
@@ -102,8 +105,8 @@ and most OpenSS7 packages, utilize the Communications Device Interface (CDI),
 cdi revision 0.9.2
 .]
 .BR cdi (7),
-as an interface to WAN devices.  However, due to the widespread use in the 1990's of systems
-deploying SpiderWAN, SpiderX.25
+as an interface to WAN devices.  However, due to the widespread use in the
+1990's of systems deploying SpiderWAN, SpiderX.25
 .[
 spiderx25wan
 .]
@@ -111,10 +114,11 @@ and SpiderISDN
 .[
 spiderisdnwan
 .]
-a number of applications programs, as well as \fISTREAMS\fP(9) drivers and modules may have been
-written to provide these interfaces.  Therefore, to provide compatibility between the OpenSS7 DLPI
-implementations of applications and user modules or drivers expecting a CDI interface, the
-\fBS_CDI\fP module was developed to provide source compatibility with these modules or drivers.
+a number of applications programs, as well as \fISTREAMS\fP(9) drivers and
+modules may have been written to provide these interfaces.  Therefore, to
+provide compatibility between the OpenSS7 CDI implementations of applications
+and user modules or drivers expecting a CDI interface, the \fBS_CDI\fP module
+was developed to provide source compatibility with these modules or drivers.
 .PP
 The \fBS_CDI\fP module is a pushable \fISTREAMS\fP(9) module that performs
 conversion between the Spider
@@ -133,16 +137,51 @@ at the upper service interface.
 .\"
 .SH USAGE
 .PP
+.B S_CDI
+is not normally pushed by user applications.  Rather, it is pushed as necessary
+by OpenSS7 stack configuration programs or as part of an extended interface for
+a WAN device driver using an
+.BR autopush (8)
+specification in configuration files, or an
+.BR autopush (9)
+specification within the device driver itself.
 .\"
 .\"
+.SH PRIMITIVES
+.PP
+.B S_CDI
+accepts and issues Communications Device Interface (CDI),
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+service primitives at its upper service interface boundary.
+.B S_CDI
+accepts and issues Wide Area Network (WAN) Interface,
+.[
+wan revision 0.9.2
+.]
+.BR wan (7),
+services primitives at its lower service interface boundary.
 .\"
+.\"
+.SH IOCTLS
+.PP
+While the underlying driver should support the WAN input-output controls
+described under
+.BR wan (7),
+the
+.B S_CDI
+module also supports CDI input-output controls described for the OpenSS7
+Project drivers under
+.BR cdi (7).
 .\"
 .\"
 .SH NOTICES
 .PP
-The Spider Wide Area Network (WAN) interface is a proprietary interface
-without a \fIformal\fP standard (although its widespread use makes it an
-\fIipso facto\fP standard).  Either the Communications Device Interface (CDI),
+The Spider Wide Area Network (WAN) interface is a proprietary interface without
+a \fIformal\fP standard (although its widespread use makes it an \fIipso
+facto\fP standard).  Either the Communications Device Interface (CDI),
 .[
 cdi revision 0.9.2
 .]
@@ -155,8 +194,125 @@ dlpi revision 2.0.0
 should be used in its stead.
 .\"
 .\"
+.SH MODULES
+.PP
+.TP
+.B s_cdi
+The pushable
+.IR STREAMS (9)
+module named \*(lq\fBs_cdi\fP\*(rq.
 .\"
 .\"
+.SH BUGS
+.PP
+.B S_CDI
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR cdi (7),
+.BR autopush (8),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B S_CDI
+is compatible with the Spider WAN interface,
+.[
+wan revision 0.9.2
+.]
+and implementations based on 
+.IR SpiderWAN ,
+such as
+.IR "AIXlink/X.25" ,
+.IR "HP-UX X.25" ,
+.IR "IRIS SX.25" ,
+.IR "Solstice X.25" ,
+.IR "PT X.25" , 
+.IR "SBE X.25" , 
+.IR "RadiSys WAN" ,
+and others,
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Although the
+.BR wan (7)
+interface is an \fiipso facto\fP standard, it should not be used by portable
+programs.  The Open Group Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0
+.]
+.BR dlpi (7),
+should be used in its stead.
+.IP \(em
+.B @PACKAGE_TITLE@
+attempts to maintain
+.I source compatibility
+with the core features provided by most implementations, but compatibility with
+all features of all implementations is not possible.  Your mileage may vary.
+.RS
+.PP
+.B @PACKAGE_TITLE@
+provides a core
+.I source compatible
+implementation of the Spider WAN interface as described in OpenSS7 project
+documentation,
+.[
+wan revision 0.9.2
+.]
+for the purpose of porting legacy WAN applications, drivers and modules to
+.B Linux
+with a minimal porting effort.  While
+.I source compatibility
+with core features is attempted,
+.I binary compatibility
+is not attempted.  Any binary compatibility experienced could be broken in a
+subsequent release.
+.PP
+New applications should use the Communications Device Interface (CDI),
+.[
+cdi revision 0.9.2
+.]
+.BR cdi (7),
+instead.
+.RE
+.PP
+For additional compatibility information, see
+.BR dlpi (7),
+.BR cdi (7),
+.BR wan (7),
+.BR cdi (4),
+.BR wan (4),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+CDI,
+.[
+cdi revision 0.9.2
+.]
+WAN.
+.[
+wan revision 0.9.2
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B S_CDI
+module first appears in OpenSS7
+.BR strx25-0.9.2.1 .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This version of the
+.B S_CDI
+module was developed for the OpenSS7 Project, and included in the
+.BR "@PACKAGE_TITLE@" .
 .\"
 .\"
 .[

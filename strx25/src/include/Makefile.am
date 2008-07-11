@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 10:46:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-11 09:46:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 10:46:38 $ by $Author: brian $
+# Last Modified $Date: 2008-07-11 09:46:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -55,8 +55,30 @@ if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
 nobase_pkginclude_HEADERS = \
-	xti_xx25.h
-
+	npi_x25.h \
+	sx25.h \
+	xnetdb.h \
+	xti_xx25.h \
+	netx25/ll_control.h \
+	netx25/nli.h \
+	netx25/x25_control.h \
+	netx25/x25_proto.h \
+	netx25/xnetdb.h \
+	snet/dl_control.h \
+	snet/dl_proto.h \
+	snet/ixe_control.h \
+	snet/ixe_proto.h \
+	snet/ll_control.h \
+	snet/ll_proto.h \
+	snet/mlp_control.h \
+	snet/mlp_proto.h \
+	snet/wan_control.h \
+	snet/wan_proto.h \
+	snet/x25_control.h \
+	snet/x25_proto.h \
+	snet/x32_control.h \
+	sys/npi_x25.h \
+	sys/xti_xx25.h
 
 nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/config.h \
@@ -81,6 +103,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-07-11 09:46:30  brian
+# - roughed in implementation, updated documentation
+#
 # Revision 0.9.2.1  2008-05-03 10:46:38  brian
 # - added package files
 #

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: N_CC.7.man,v 0.9.2.1 2008-05-03 11:42:28 brian Exp $
+.\" @(#) $Id: N_CC.7.man,v 0.9.2.2 2008-07-11 09:46:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 11:42:28 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:46:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: N_CC.7.man,v $
+.\" Revision 0.9.2.2  2008-07-11 09:46:28  brian
+.\" - roughed in implementation, updated documentation
+.\"
 .\" Revision 0.9.2.1  2008-05-03 11:42:28  brian
 .\" - added manual pages
 .\"
@@ -80,29 +83,129 @@ sort-adjacent-labels
 .TH N_CC 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Network Layer Interface (NLI)"
 .SH NAME
 .B N_CC
-\-
+\- Connect Response or Connect Confirmation
+.SH INTERFACE
+.PP
+Network Layer Interface (NLI),
+.[
+nli Revision 0.9.2
+.]
+.BR nli (7).
 .SH SYNOPSIS
 .PP
 .nf
 \f(CW\s-1\
 .B #include <netx25/x25_proto.h>
 
-struct N_CC {
+struct xccnff {
+    unsigned char xl_type;
+    unsigned char xl_command;
+    int conn_id;
+    unsigned char CONS_call;
+    unsigned char negotiate_qos;
+    struct xaddrf responder;
+    struct qosformat rqos;
 };
 \s+1\fP
 .fi
 .\"
 .\"
-.SH MEMBERS
-.PP
-.\"
-.\"
 .SH DESCRIPTION
 .PP
+The Connect Response or Confirmation message primitive, \fBN_CC\fP, is used
+by the NS user to response to an incoming connection, or by the NS provider to
+confirm an outgoing connection.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block, and
+contains the \fBxccnff\fP structure.
+The data part of the message consists of zero or one
+.BR M_DATA (9)
+message block
+containing the Call User Data (CUD) when supplied.
 .\"
 .\"
-.\".SH USAGE
-.\".PP
+.SH FORMAT
+.PP
+The Connect Response and Connect Confirmation use the \fBxccnff\fP structure.
+The control part of the message consists of one
+.BR M_PROTO (9)
+message block containing the \fBxccnff\fP structure.  The data part of the
+message consists of zero or one
+.BR M_DATA (9)
+message block containing the Call User Data (if any).
+.\"
+.\"
+.SH MEMBERS
+.PP
+The \fBxccnff\fP structure contains the following members:
+.TP
+.I xl_type
+Always \fBXL_CTL\fP.
+.TP
+.I xl_command
+Always \fBN_CC\fP, for both Connect Response and Connect Confirmation.
+.TP
+.I conn_id
+This field is only used for Connect Responses.  When an NS user Stream is
+listening, multiple incoming Connect Indications can be pending.  This field
+specifies the connection identifier from the Connection Indication to which the
+NS user is responding.
+.TP
+.I CONS_call
+Either X.25
+.[
+x25
+.]
+or CONS procedures
+.[
+x223
+.]
+can be used for calls.  When non-zero, this field indicates that CONS
+.[
+x223
+.]
+procedures are to be used.  When zero, this field indicates that X.25
+.[
+x25
+.]
+procedures are to be used.
+.TP
+.I negotiate_qos
+QOS parameters can be negotiated by the peer or left at default values.  When
+non-zero, this field specifies or indicates that QOS parameters are being
+negotiated by the NS user or NS user peer and the pertinent ranges are provided
+in the \fIrqos\fP member.  When zero, this field specifies and indicates that
+default values are to be used for the NS user or were indicated by the NS user
+peer.
+.TP
+.I responder
+Conveys the responding address.  For Connect Responses, this is the local
+address that is responding to the incoming call.  For Connect Confirmations,
+this is the remote address that responded to the outgoing call.
+.TP
+.I rqos
+Conveys the negotiated quality of service parameters and CONS an non-CONS
+facilities in response or confirmation.
+.\"
+.\"
+.SH RESPONSE
+.PP
+No response is expected when either the NS user or NS provider issue this
+primitive.
+.\"
+.\"
+.SH USAGE
+.PP
+The Connect Response message primitive is equivalent to the
+.BR N_CONN_RES (7)
+primitive of the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0
+.]
+.BR npi (7).
+The Connect Confirmation is equivalent to the
+.BR N_CONN_CON (7).
 .\"
 .\"
 .\".SH CONTEXT
