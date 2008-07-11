@@ -1,5 +1,5 @@
-Dialogic Open Systems Release 6.1 -- read me first file.  2008-05-04
-$Id: README,v 0.9.2.26 2008-05-04 16:16:32 brian Exp $
+Dialogic Open Systems Release 6.1 -- read me first file.  2008-07-01
+$Id: README,v 0.9.2.27 2008-07-11 09:58:09 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  Dialogic Open Systems Release 6.1
 ==================================
 
-Package osr61-0.9.2.3 was released under AGPLv3 2008-05-04.
+Package osr61-0.9.2.3 was released under AGPLv3 2008-07-01.
 
 The `Dialogic Open Systems Release 6.1' package provides "STREAMS"
 modules and drivers, libraries, programs, init scripts, and daemons
@@ -150,7 +150,7 @@ well.
  Release
 --------
 
-This is the `osr61-0.9.2.3' package, released 2008-05-04.  This
+This is the `osr61-0.9.2.3' package, released 2008-07-01.  This
 `0.9.2.3' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -170,10 +170,10 @@ more detailed history of implementation changes.  The `TODO' file lists
 features not yet implemented and other outstanding items.
 
 Please see the `INSTALL', `INSTALL-osr61' and `README-make', files (or
-see `Installation', in the manual) for installation instructions.
+see `Installation',in the manual) for installation instructions.
 
 When working from `cvs(1)' or `git(1)', please see the `README-cvs',
-file (or see `Downloading from CVS', in the manual).  An abbreviated
+file (or see `Downloading from CVS',in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 3 of
@@ -200,7 +200,7 @@ follows:
      compiling out-of-tree kernel modules.  Most recent `Linux'
      distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
-     `Compatibility', in the manual.
+     `Compatibility',in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
@@ -290,9 +290,9 @@ proceed as follows:
 See `README-make' for additional specialized make targets.
 
 For custom applications, see the `INSTALL' and `INSTALL-osr61' files or
-the see `Installation', in the manual, as listed below.  If you
-encounter troubles, see `Troubleshooting', in the manual, before
-issuing a bug report.
+the see `Installation',in the manual, as listed below.  If you
+encounter troubles, see `Troubleshooting',in the manual, before issuing
+a bug report.
 
  Brief Installation Instructions
 --------------------------------
@@ -375,7 +375,7 @@ Then the build directory and tarball can be simply removed:
 -----------------------------------
 
 More detailed installation instructions can be found in the
-`Installation', in the manual, contained in the distribution in `text',
+`Installation',in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
      $> cd ../osr61-0.9.2.3
@@ -394,7 +394,7 @@ Project' website at:
 
 ---------- Footnotes ----------
 
-(1) See `GNU/Linux Distributions', in the manual, for more information.
+(1) See `GNU/Linux Distributions',in the manual, for more information.
 
 (2) If you are using a Debian release, please make sure to install the
 groff extension package (`groff_ext'), as it contains the `refer' or
@@ -404,7 +404,7 @@ pages.
 (3) Although, at one time, this package supported `LiS', `LiS' is now
 deprecated and unsupported.
 
-(4) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
+(4) Please see `Problem Reports',in the manual, or the file `PROBLEMS'
 in the release directory for more information on filing a proper
 "Problem Report".
 

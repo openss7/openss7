@@ -35,3 +35,9 @@ stamp-h1
 TODO
 libltdl
 LSM
+lstat.c
+memcmp.c
+realloc.c
+stat.c
+strnlen.c
+strtod.c

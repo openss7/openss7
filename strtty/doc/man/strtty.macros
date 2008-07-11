@@ -1,6 +1,6 @@
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strtty.macros,v 0.9.2.6 2008-04-28 10:10:47 brian Exp $
+.\" @(#) $Id: strtty.macros,v 0.9.2.7 2008-07-11 09:58:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -52,11 +52,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 10:10:47 $ by $Author: brian $
+.\" Last Modified $Date: 2008-07-11 09:58:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strtty.macros,v $
+.\" Revision 0.9.2.7  2008-07-11 09:58:17  brian
+.\" - minor doc updates
+.\"
 .\" Revision 0.9.2.6  2008-04-28 10:10:47  brian
 .\" - updated release files
 .\"
@@ -74,7 +77,7 @@
 .de ]>
 .\".PD
 .ad b
-.hy 6
+.hy
 .\".PP
 .\"Trademarks mentioned are the property of their owners.
 .TM
@@ -82,7 +85,7 @@
 .de ]-
 .\".PD 0.4v
 .ad l
-.hy 0
+.nh
 .IP "\\fR[\\fB\\*([F\\fR]\\ \\fP" \\w'[00]00'u
 .\"\\fR[\\fB\\*([F\\fR]\\fP
 .\".IP \\*([F. \\w'(00.)'u
@@ -91,7 +94,7 @@
 .de ][
 .if !'\\*([T'' \{\
 .ad b
-.hy 0
+.hy
 .if !'\\*([R'' \{\
 \fB\\*([R\fR,
 .rm [R
@@ -337,7 +340,7 @@ The OpenSS7 Project http://www.openss7.org/
 .de ID
 .SH IDENTIFICATION
 .ad l
-.hy 0
+.nh
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -348,13 +351,13 @@ The OpenSS7 Project http://www.openss7.org/
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
-.hy 6
+.hy
 .ad b
 ..
 .de I2
 .SH IDENTIFICATION
 .ad l
-.hy 0
+.nh
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -367,13 +370,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
-.hy 6
+.hy
 .ad b
 ..
 .de I3
 .SH IDENTIFICATION
 .ad l
-.hy 0
+.nh
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -386,13 +389,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
-.hy 6
+.hy
 .ad b
 ..
 .de I4
 .SH IDENTIFICATION
 .ad l
-.hy 0
+.nh
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -403,13 +406,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
-.hy 6
+.hy
 .ad b
 ..
 .de I5
 .SH IDENTIFICATION
 .ad l
-.hy 0
+.nh
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -422,7 +425,7 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
-.hy 6
+.hy
 .ad b
 ..
 .de VR
@@ -439,6 +442,8 @@ The OpenSS7 Project http://www.openss7.org/
 ..
 .de TM
 .SH "TRADEMARKS"
+.ad l
+.nh
 .TP \w'\fBOpenSS7\fR\(tm\(em'u
 .BR OpenSS7 \(tm
 is a trademark of OpenSS7 Corporation.
@@ -448,13 +453,16 @@ is a trademark of OpenSS7 Corporation.
 is a registered trademark of Linus Torvalds.
 .TP
 .BR UNIX \(rg
-is a registered trademark of The Open Group in the United States and other countries.
+is a registered trademark of The Open Group.
+.\"in the United States and other countries.
 .TP
 .BR Solaris \(rg
 is a registered trademark of Sun Microsystems.
 .PD
 .PP
 Other trademarks are the property of their respective owners.
+.ad b
+.hy
 ..
 .de TA
 .VR
@@ -491,11 +499,11 @@ Other trademarks are the property of their respective owners.
 ..
 .ie '\\*(.T'ps' \{\
 .nr ps 0.4v
-.hy 6
+.hy
 .\}
 .el \{\
 .nr ps 1v
-.hy 4
+.hy
 .\}
 .if !r LL .nr LL \n(.lu
 .if !r LT .nr LT \n(.lu

@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Channels -- history of user visible changes.  2008-05-04
-$Id: NEWS,v 0.9.2.34 2008-05-04 16:16:39 brian Exp $
+OpenSS7 STREAMS Channels -- history of user visible changes.  2008-07-01
+$Id: NEWS,v 0.9.2.35 2008-07-11 09:58:10 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -19,7 +19,7 @@ components were separated from the `strss7' package and placed in this
 package.  Not all of the Channel components previously part of the
 `strss7' package have been strapped into this release.  Components will
 be re-validated against `Linux Fast-STREAMS' on a module-by-module and
-driver-by-driver basis.(1) See `TODO' in the release, or `Schedule', in
+driver-by-driver basis.(1) See `TODO' in the release, or `Schedule',in
 the manual, for more information about the release schedule.
 
 This is the fourth pre-alpha release for `Linux Fast-STREAMS' and is an
@@ -34,11 +34,11 @@ Major features since the last public release are as follows:
    - Kernel module license made explicit "GPL v2".  And then changed
      back to "GPL".
 
-   - Added `mx-pmod' and `ch-pmod' STREAMS modules and manual pages (`ch-pmod(4)'
-     and `mx-pmod(4)').  These STREAMS modules provide the CH and MX
-     interfaces to a STREAMS-based pipe acting as a channel or
-     multiplex connection for testing and complex interconnection of
-     channels and multiplexes.
+   - Added `mx-pmod' and `ch-pmod' STREAMS modules and manual pages
+     (`ch-pmod(4)' and `mx-pmod(4)').  These STREAMS modules provide
+     the CH and MX interfaces to a STREAMS-based pipe acting as a
+     channel or multiplex connection for testing and complex
+     interconnection of channels and multiplexes.
 
    - 64-bit corrections to the CHI header file, `sys/chi.h'.
 
@@ -58,7 +58,7 @@ Major features since the last public release are as follows:
 
 
 _This is a public pre-alpha release of the package.  Please see
-`README-alpha' in the release or `Maturity', in the manual._
+`README-alpha' in the release or `Maturity',in the manual._
 
 This package is currently incomplete.  It is being released as a
 reference point for the community.  If you are interested in completion
@@ -99,7 +99,7 @@ components were separated from the `strss7' package and placed in this
 package.  Not all of the Channel components previously part of the
 `strss7' package have been strapped into this release.  Components will
 be re-validated against `Linux Fast-STREAMS' on a module-by-module and
-driver-by-driver basis.(1) See `TODO' in the release, or `Schedule', in
+driver-by-driver basis.(1) See `TODO' in the release, or `Schedule',in
 the manual, for more information about the release schedule.
 
 This is the third pre-alpha release for `Linux Fast-STREAMS' and is an
@@ -145,7 +145,7 @@ components were separated from the `strss7' package and placed in this
 package.  Not all of the Channel components previously part of the
 `strss7' package have been strapped into this release.  Components will
 be re-validated against `Linux Fast-STREAMS' on a module-by-module and
-driver-by-driver basis.(1) See `TODO' in the release, or `Schedule', in
+driver-by-driver basis.(1) See `TODO' in the release, or `Schedule',in
 the manual, for more information about the release schedule.
 
 This is the second pre-alpha release for `Linux Fast-STREAMS' and is an
@@ -185,7 +185,7 @@ components were separated from the `strss7' package and placed in this
 package.  Not all of the Channel components previously part of the
 `strss7' package have been strapped into this release.  Components will
 be re-validated against `Linux Fast-STREAMS' on a module-by-module and
-driver-by-driver basis.(1) See `TODO' in the release, or `Schedule', in
+driver-by-driver basis.(1) See `TODO' in the release, or `Schedule',in
 the manual, for more information about the release schedule.
 
 In this initial release, the major component first available is the
