@@ -1,5 +1,8 @@
 2008-07-23  Brian Bidulock  <bidulock@openss7.org>
 
+	* scripts/texi/compat.texi: support to CentOS 5.2
+	* m4/rpm.m4: support to CentOS 5.2
+
 	* openss7.refs: updated references
 
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>

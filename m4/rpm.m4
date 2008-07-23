@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008/07/23 19:14:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/07/23 19:14:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -156,21 +156,21 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra=".centos3"	;;
 			    (4|4.?)	rpm_cv_dist_extra=".centos4"	;;
-			    (5|5.0)	rpm_cv_dist_extra=".centos5"	;;
+			    (5|5.?)	rpm_cv_dist_extra=".centos5"	;;
 			esac
 			;;
 		    (lineox)
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra=".lel3"	;;
-			    (4|4.0)	rpm_cv_dist_extra=".lel4"	;;
-			    (5|5.0)	rpm_cv_dist_extra=".lel5"	;;
+			    (4|4.?)	rpm_cv_dist_extra=".lel4"	;;
+			    (5|5.?)	rpm_cv_dist_extra=".lel5"	;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
-			    (3|3.0)	rpm_cv_dist_extra=".WB3"	;;
-			    (4|4.0)	rpm_cv_dist_extra=".WB4"	;;
-			    (5|5.0)	rpm_cv_dist_extra=".WB5"	;;
+			    (3|3.?)	rpm_cv_dist_extra=".WB3"	;;
+			    (4|4.?)	rpm_cv_dist_extra=".WB4"	;;
+			    (5|5.?)	rpm_cv_dist_extra=".WB5"	;;
 			esac
 			;;
 		    (fedora)
@@ -193,9 +193,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (8.0)	rpm_cv_dist_extra=".8.0"	;;
 			    (9)		rpm_cv_dist_extra=".9"		;;
 			    (2|2.?)	rpm_cv_dist_extra=".EL"		;;
-			    (3|3.0)	rpm_cv_dist_extra=".E3"		;;
-			    (4|4.0)	rpm_cv_dist_extra=".EL4"	;;
-			    (5|5.0)	rpm_cv_dist_extra=".EL5"	;;
+			    (3|3.?)	rpm_cv_dist_extra=".E3"		;;
+			    (4|4.?)	rpm_cv_dist_extra=".EL4"	;;
+			    (5|5.?)	rpm_cv_dist_extra=".EL5"	;;
 			esac
 			;;
 		    (mandrake)
@@ -234,7 +234,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
 			    (*)		rpm_cv_dist_extra2=".COS${dist_cvs_host_release}" ;;
 			esac
 			;;
@@ -242,15 +242,15 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
 			    (*)		rpm_cv_dist_extra2=".LEL${dist_cvs_host_release}" ;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
-			    (3|3.0)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
+			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
+			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
 			    (*)		rpm_cv_dist_extra2=".WB${dist_cvs_host_release}" ;;
 			esac
 			;;
@@ -272,9 +272,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (8.0)	rpm_cv_dist_extra2=".8"		;;
 			    (9)		rpm_cv_dist_extra2=".9"		;;
 			    (2|2.?)	rpm_cv_dist_extra2=".EL"	;;
-			    (3|3.0)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.0)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.0)	rpm_cv_dist_extra2=".EL5"	;;
+			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
+			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
+			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
 			    (*)		rpm_cv_dist_extra2=".RH${dist_cvs_host_release}" ;;
 			esac
 			;;
@@ -553,6 +553,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.66  2008/07/23 19:14:41  brian
+# - indicates support to CentOS 5.2
+#
 # Revision 0.9.2.65  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
