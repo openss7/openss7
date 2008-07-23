@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
+ Last Modified $Date: 2008-07-23 08:29:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.43  2008-07-23 08:29:19  brian
+ - updated references and support for 2.6.18-92.1.6.el5 kernel
+
  Revision 0.9.2.42  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -130,7 +133,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -236,6 +239,7 @@ struct streamtab ldl_info = {
 
 
 #if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
 	return skb->tail;
@@ -291,6 +295,7 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
 	skb_reset_mac_header(skb);
 	skb->mac.raw += offset;
 }
+#endif				/* !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER */
 #endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 

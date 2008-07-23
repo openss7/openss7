@@ -1,8 +1,8 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: wan.texi,v 0.9.2.2 2008-07-11 09:46:30 brian Exp $
+% @(#) $Id: wan.texi,v 0.9.2.3 2008-07-23 08:29:16 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,11 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-11 09:46:30 $ by $Author: brian $
+% Last Modified $Date: 2008-07-23 08:29:16 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename wan.info
 @include texi/args.texi
@@ -78,54 +78,54 @@
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file documents the SpiderWAN Wide Area Network Interface.
+This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release
-@value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
-Corporation}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} published by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
-Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org,Brian F. G. Bidulock} @*
+
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
 
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @ignore
-Permission is granted to process this file through Tex and print the results,
-provided the printed document carries copying permission notice identical to
-this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-Permission to use, copy, modify, and distribute this documentation for any
-purpose and without fee is hereby granted, provided that the above copyright
-notice appears in all copies and that both that copyright notice and this
-permission notice appear in supporting documentation, and that the name OpenSS7
-Corporation not be use in advertising or publicity pertaining to distribution
-of the software without specific, written prior permission.  OpenSS7 Corporation
-makes no representations about the suitability of this documentation for any
-purpose.  It is provided ``as is'' without express or implied warranty.
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
 
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting
-derived work is distributed under the terms of a permission notice identical to
-this one.
-
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE Wide Area Network Interface
 @set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -140,12 +140,11 @@ another language, under the above conditions for modified versions.
 @sp 4
 @quotation
 @subheading Abstract
-This document is a @value{MANUAL_TITLE} containing technical details concerning
-the implementation of the @value{MANUAL_TITLE} for OpenSS7.  It contains
-recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the HDLC
-Frame Protocol (ISO 3309) to these components as well as providing a basis for
-link layer control for other network protocols.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+HDLC Frame Protocol (ISO 3309) to these components as well as providing a basis for link layer
+control for other network protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -173,60 +172,54 @@ Unauthorized distribution or duplication is prohibited.
 
 @ignore
 @noindent
-This software and related documentation is protected by copyright and
-distributed under licenses restricting its use, copying, distribution and
-decompilation.  No part of this software or related documentation may be
-reproduced in any form by any means without the prior written authorization of
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
 the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the
-recipient will protect this information and keep it confidential, and will not
-disclose the information contained in this document without the written
-permission of its owner.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation
-for any reason, including but not limited to, conformity with standards
-promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or
-procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
-under no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
 @end ignore
 
 @noindent
-Permission to use, copy and distribute this documentation without modification,
-for any purpose and without fee or royalty is hereby granted, provided that both
-the above copyright notice and this permission notice appears in all copies and
-that the name of OpenSS7 Corporation not be used in advertising or publicity
-pertaining to distribution of this documentation or its contents without
-specific, written prior permission.  OpenSS7 Corporation makes no representation
-about the suitability of this documentation for any purpose.  It is provided
-``as is'' without express or implied warranty.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @subsubheading Notice:
 
 @noindent
-@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
-CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR
-OTHER RIGHTS..  IN NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT,
-INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
-FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
-OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF THIS
-DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 
 @sp 1
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation
-for any reason, including but not limited to, conformity with standards
-promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or
-procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
-under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -235,7 +228,7 @@ under no obligation to provide any feature listed herein.
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
@@ -255,6 +248,7 @@ under no obligation to provide any feature listed herein.
 @defcodeindex mp
 
 @ifnottex
+@c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
 @syncodeindex pe cp
@@ -270,27 +264,27 @@ under no obligation to provide any feature listed herein.
 
 @iftex
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}@prindex \name\
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}@pvindex \name\
 @end macro
 
-@macro perr {name}
+@macro perr{name}
 @code{\name\}@peindex \name\
 @end macro
 
-@macro psta {name}
+@macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
-@macro parm {name}
+@macro parm{name}
 @code{\name\}@vrindex \name\
 @end macro
 
-@macro pioc {name}
+@macro pioc{name}
 @code{\name\}@ctindex \name\
 @end macro
 
@@ -346,7 +340,12 @@ under no obligation to provide any feature listed herein.
 * WAN Compatibility and Porting::
 * Glossary of WAN Terms and Acronyms::
 * References::
+@iftex
+* Indices::
+@end iftex
+@ifnottex
 * Index::
+@end ifnottex
 @end menu
 
 @iftex
@@ -362,30 +361,25 @@ under no obligation to provide any feature listed herein.
 @node Introduction
 @chapter Introduction
 
-The Wide Area Network (WAN) Interface was developed by Spider Systems, Ltd.,
-(now a division of Emerson Power) and is widely available on many platforms.
-For example, @cite{AIX AIXlink/X.25}, @cite{HP-UX HP X.25/9000}, @cite{Solaris
-Solstice X.25} and @cite{SunLink X.25}, @cite{IRIX IRIS SX.25}, @cite{PT X.25},
-@cite{RadiSys WAN} and @cite{SBE X.25} implement the Wide Area Newtork (WAN)
+The Wide Area Network (WAN) Interface was developed by Spider Systems, Ltd., (now a division of
+Emerson Power) and is widely available on many platforms.  For example, @cite{AIX AIXlink/X.25},
+@cite{HP-UX HP X.25/9000}, @cite{Solaris Solstice X.25} and @cite{SunLink X.25}, @cite{IRIX IRIS
+SX.25}, @cite{PT X.25}, @cite{RadiSys WAN} and @cite{SBE X.25} implement the Wide Area Newtork (WAN)
 Interface.
 
-The Wide Area Network (WAN) Inteface was designed to be used directly with
-standard @dfn{STREAMS} system calls and does not require the use of a
-cooperating user space shared library.  Applications program directly use the
-@command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)} and
-@command{putpmsg(2)} system calls.@footnote{See @manref{getmsg(2s)},
-@manref{getpmsg(2)}, @manref{putmsg(2s)} and @manref{putpmsg(2)} manual pages.}
-Nevertheless, user shared object libraries can easily be constructed using this
-@dfn{STREAMS} service primitive interface.
+The Wide Area Network (WAN) Inteface was designed to be used directly with standard @dfn{STREAMS}
+system calls and does not require the use of a cooperating user space shared library.  Applications
+program directly use the @command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)} and
+@command{putpmsg(2)} system calls.@footnote{See @manref{getmsg(2s)}, @manref{getpmsg(2)},
+@manref{putmsg(2s)} and @manref{putpmsg(2)} manual pages.} Nevertheless, user shared object
+libraries can easily be constructed using this @dfn{STREAMS} service primitive interface.
 
-The system header files that must be included when compiling user applications,
-or @dfn{STREAMS} drivers and modules that use the interface, are detailed in
-@ref{WAN Header Files}.
+The system header files that must be included when compiling user applications, or @dfn{STREAMS}
+drivers and modules that use the interface, are detailed in @ref{WAN Header Files}.
 
-A user library, @file{libcdiapi}, is provided, not for interfacing to the message
-primitive service interface, but for providing various helper functions when
-using the @dfn{STREAMS} service interface.  This library is detailed in @ref{WAN
-Library}.
+A user library, @file{libcdiapi}, is provided, not for interfacing to the message primitive service
+interface, but for providing various helper functions when using the @dfn{STREAMS} service
+interface.  This library is detailed in @ref{WAN Library}.
 
 @node Model of the WAN Layer
 @chapter Model of the WAN Layer
@@ -418,8 +412,8 @@ Library}.
 @end menu
 
 The @file{@value{_includedir}/@-@value{PACKAGE}/@-sys/@-snet/@-wan_@-proto.h} header file
-(@file{<sys/@-snet/@-wan_@-proto.h>} with proper compile flags) contains
-definitions and declarations of primitive structures and field values.
+(@file{<sys/@-snet/@-wan_@-proto.h>} with proper compile flags) contains definitions and
+declarations of primitive structures and field values.
 
 The @type{WAN_primitives} union is formatted as follows:
 
@@ -438,7 +432,7 @@ union WAN_primitives @{
 
 The @type{WAN_primitives} union contains the following members:
 
-@table @member
+@table @parm
 @item wan_type
 Specifies the type of the structure contained in the @msg{M_PROTO} message block.
 Always one of the following values:
@@ -451,23 +445,23 @@ Always one of the following values:
 @item @prim{WAN_NTY} @tab The contained structure is a @type{wan_nty} structure.
 @end multitable
 @item wsid
-The structure of the primitive when @member{wan_type} is @prim{WAN_SID}.
+The structure of the primitive when @parm{wan_type} is @prim{WAN_SID}.
 
 @xref{WAN_SID - Set Subnetwork Identifier}.
 @item wreg
-The structure of the primitive when @member{wan_type} is @prim{WAN_REG}.
+The structure of the primitive when @parm{wan_type} is @prim{WAN_REG}.
 
 @xref{WAN_REG - Register Subnetwork Identifier}.
 @item wctl
-The structure of the primitive when @member{wan_type} is @prim{WAN_CTL}.
+The structure of the primitive when @parm{wan_type} is @prim{WAN_CTL}.
 
 @xref{WAN_CTL - Control}.
 @item wmsg
-The structure of the primitive when @member{wan_type} is @prim{WAN_DAT}.
+The structure of the primitive when @parm{wan_type} is @prim{WAN_DAT}.
 
 @xref{WAN_DAT - Data}.
 @item wnty
-The structure of the primitive when @member{wan_type} is @prim{WAN_NTY}.
+The structure of the primitive when @parm{wan_type} is @prim{WAN_NTY}.
 
 @xref{WAN_NTY - Notify}.
 @end table
@@ -505,7 +499,7 @@ struct wan_sid @{
 
 The @type{wan_sid} structure contains the following members:
 
-@table @member
+@table @parm
 @item wan_type
 Specifies the type of the structure contained in the @msg{M_PROTO} message block.
 Always @prim{WAN_SID}.
@@ -527,15 +521,15 @@ Stream until closed.  The @prim{WAN_SID} primitive may fail when:
 
 @table @perr
 @item ENODEV
-The specified @member{wan_snid} is unknown or invalid.
+The specified @parm{wan_snid} is unknown or invalid.
 @item EINVAL
 The @msg{M_PROTO} message block is of an incorrect length for the primitive.
 @item EEXIST
-The @member{wan_snid} specified is in use by another Stream.
+The @parm{wan_snid} specified is in use by another Stream.
 @item ERANGE
-The @member{wan_snid} member contains invalid information.
+The @parm{wan_snid} member contains invalid information.
 @item EBUSY
-The physical channel referenced by the @member{wan_snid} is in use by another
+The physical channel referenced by the @parm{wan_snid} is in use by another
 Stream.
 @item ENOSR
 The @file{s_wan} module, or underlying CDI driver lacks the @cite{STREAMS}
@@ -555,7 +549,7 @@ The underlying device has encountered a fatal error.
 @node WAN_REG - Register Subnetwork Identifier
 @section WAN_REG - Register Subnetwork Identifier
 
-Registers the subnetwork identifier specified in the @member{wan_snid} field of
+Registers the subnetwork identifier specified in the @parm{wan_snid} field of
 the primitive.  Once a subnetwork entity has been registered, it cannot be tuned
 or otherwise altered unless disabled with
 @constant{W_DISABLE}.@footnote{@xref{W_DISABLE - Disable Interface Data
@@ -584,7 +578,7 @@ struct wan_reg @{
 
 The @type{wan_reg} structure contains the following members:
 
-@table @member
+@table @parm
 @item wan_type
 Specifies the type of the structure contained in the @msg{M_PROTO} message block.
 Always @prim{WAN_REG}.
@@ -606,13 +600,13 @@ Stream until closed.  The @prim{WAN_REG} primitive may fail when:
 
 @table @perr
 @item ENODEV
-The specified @member{wan_snid} is unknown or invalid.
+The specified @parm{wan_snid} is unknown or invalid.
 @item EINVAL
 The @msg{M_PROTO} message block is of an incorrect length for the primitive.
 @item EXDEV
-There exists a hardware configuration error for the specified @member{wan_snid}.
+There exists a hardware configuration error for the specified @parm{wan_snid}.
 @item EBUSY
-The physical channel referenced by the @member{wan_snid} is in use by another
+The physical channel referenced by the @parm{wan_snid} is in use by another
 Stream.
 @item EIO
 The @prim{WAN_REG} primitive was issued from an incorrect state for the
@@ -665,13 +659,13 @@ struct wan_ctl @{
 
 The @pval{WC_CONNECT} command is valid from the WAN user to the WAN driver; or
 from the WAN driver to the WAN user.
-Fields @member{wan_remtype}, @member{wan_remsize} and @member{wan_remaddr} are
-significant, @member{wan_status} and @member{wan_diag} are ignored.
+Fields @parm{wan_remtype}, @parm{wan_remsize} and @parm{wan_remaddr} are
+significant, @parm{wan_status} and @parm{wan_diag} are ignored.
 
 This @pval{WC_CONCNF} command is valid when sent from the WAN driver to the WAN
 user; or from the WAN user to the WAN driver.
-Fields @member{wan_status} and @member{wan_diag} are significant,
-@member{wan_remtype}, @member{wan_remsize} and @member{wan_remaddr} are ignored.
+Fields @parm{wan_status} and @parm{wan_diag} are significant,
+@parm{wan_remtype}, @parm{wan_remsize} and @parm{wan_remaddr} are ignored.
 
 This @pval{WC_DISC} command is valid when sent from the WAN user to the WAN
 driver; or from the WAN driver to the WAN user.
@@ -679,14 +673,14 @@ All fields are ignored.
 
 This @pval{WC_DISCCNF} command is valid when sent from the WAN driver to the WAN
 user; or from the WAN user to the WAN driver.
-Fields @member{wan_status} and @member{wan_diag} are significant,
-@member{wan_remtype}, @member{wan_remsize} and @member{wan_remaddr} are ignored.
+Fields @parm{wan_status} and @parm{wan_diag} are significant,
+@parm{wan_remtype}, @parm{wan_remsize} and @parm{wan_remaddr} are ignored.
 
 @subheading Parameters
 
 The @type{wan_ctl} structure contains the following members:
 
-@table @member
+@table @parm
 @item wan_type
 Specifies the type of the structure contained in the @msg{M_PROTO} message block.
 Always @prim{WAN_CTL}.
@@ -705,11 +699,11 @@ one of the following values:
 
 @table @pval
 @item WAN_TYPE_ASC
-The @member{wan_remaddr} field contains ASCII coded digits.  The
-@member{wan_remsize} field contains the number of digits (in octets).
+The @parm{wan_remaddr} field contains ASCII coded digits.  The
+@parm{wan_remsize} field contains the number of digits (in octets).
 @item WAN_TYPE_BCD
-The @member{wan_remaddr} field contains BCD encoded digits.  The
-@member{wan_remsize} field contains the number of digits (in semi-octets).
+The @parm{wan_remaddr} field contains BCD encoded digits.  The
+@parm{wan_remsize} field contains the number of digits (in semi-octets).
 @end table
 
 This field is only significant in the @pval{WC_CONNECT} primitive, and for
@@ -717,7 +711,7 @@ devices that have call procedural definitions. Otherwise, the field is set to
 zero (0).
 @item wan_remsize
 When significant, conveys the length of the remote address in digits (either
-octets or semi-octets depending on the @member{wan_remtype} member).
+octets or semi-octets depending on the @parm{wan_remtype} member).
 
 This field is only significant in the @pval{WC_CONNECT} primitive, and for
 devices that have call procedural definitions. Otherwise, the field is set to
@@ -725,7 +719,7 @@ zero (0).
 @item wan_remaddr
 When significant, conveys the remote address.  The address contianed in this
 field is either represented as ASCII digits or BCD encoded digits, depending on
-the value of the @member{wan_remtype} field.  This field is only significant in
+the value of the @parm{wan_remtype} field.  This field is only significant in
 the @pval{WC_CONNECT} primitive.
 
 This field is only significant in the @pval{WC_CONNECT} primitive, and for
@@ -777,7 +771,7 @@ Stream until closed.  The @prim{WAN_CTL} primitive may fail when:
 @table @perr
 @item EINVAL
 The @msg{M_PROTO} message block is of an incorrect length for the primitive, or
-the @member{wan_command} is invalid.
+the @parm{wan_command} is invalid.
 @item ENXIO
 The underlying device driver has encountered a fatal error.
 @item EIO
@@ -809,7 +803,7 @@ corresponding primitive.
 @subheading Compatibility
 
 Some implementations ignore all of the parameter fields of the @type{wan_ctl}
-structure other than @member{wan_type} and @member{wan_command}, as is normally
+structure other than @parm{wan_type} and @parm{wan_command}, as is normally
 the case for @pval{WAN_NONE}: no call procedural definitions.
 
 @page
@@ -847,7 +841,7 @@ The @pval{WC_RX} command indicates that the user data in the associated
 
 The @type{wan_msg} structure contains the following members:
 
-@table @member
+@table @parm
 @item wan_type
 Specifies the type of the structure contained in the @msg{M_PROTO} message block.
 Always @prim{WAN_DAT}.
@@ -899,7 +893,7 @@ the @pval{WC_RX}, issued by the WAN driver, the
 
 @subheading Compatibility
 
-Some implementations provide additional @member{wan_command} values with
+Some implementations provide additional @parm{wan_command} values with
 hardware- or implementation-specific fields.  Some implementations also define a
 structure for the initial portion of the @msg{M_DATA} block that contains media-
 or hardware-specific fields.
@@ -908,7 +902,7 @@ or hardware-specific fields.
 @node WAN_NTY - Notify
 @section WAN_NTY - Notify
 
-Registers for or provide notification of events for the @member{wan_snid} field
+Registers for or provide notification of events for the @parm{wan_snid} field
 of the primitive.  When passed to the WAN driver, the primitive requests that
 the WAN driver record the events for which notification is to be given.  When
 passed to the WAN user, the primitive notifies of a triggered event.
@@ -939,7 +933,7 @@ struct wan_nty @{
 
 The @type{wan_nty} structure has the following members:
 
-@table @member
+@table @parm
 @item wan_type
 Specifies the type of the structure contained in the @msg{M_PROTO} message block.
 Always @prim{WAN_NTY}.
@@ -1004,7 +998,7 @@ resulting in the failure of all system acalls on the Stream until closed.  The
 @table @perr
 @item EINVAL
 The @msg{M_PROTO} message block is of an incorrect length for the primitive, or
-the @member{wan_command} is invalid.
+the @parm{wan_command} is invalid.
 @item ENXIO
 The underlying device driver has encountered a fatal error.
 @item EIO
@@ -1098,7 +1092,7 @@ These structures are described in detail in the subsections that follow.
 @node WAN_STATS - Statistics Data Structures
 @subsection WAN_STATS - Statistics Data Structures
 
-The value of @pval{WAN_STATS} in the @member{w_type} field of the structure
+The value of @pval{WAN_STATS} in the @parm{w_type} field of the structure
 pointed to by the input-output control argument specifies that the pointed-to
 structure is a @type{wan_stioc} structure.  This structure is used by the
 @pioc{W_ZEROSTATS} and @pioc{W_GETSTATS} input-output controls.
@@ -1127,7 +1121,7 @@ struct wan_stioc @{
 
 The @type{wan_stioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item w_type
 Specifies the type of the structure associated with the input-output control.
 Always @pval{WAN_STATS}.
@@ -1178,7 +1172,7 @@ typedef struct hstats @{
 The @type{hdlcstats_t} structure has the following members, each reflecting a
 count since the last reset:
 
-@table @member
+@table @parm
 @item hc_txgood
 A count of the number of good frames transmitted since the last reset.
 This is a non-wrapping counter: should the counter reach its maximum value, it
@@ -1227,7 +1221,7 @@ will no longer be incremented.
 @node WAN_TUNE - Tunable Data Structures
 @subsection WAN_TUNE - Tunable Data Structures
 
-The value of @pval{WAN_TUNE} in the @member{w_type} field of the structure
+The value of @pval{WAN_TUNE} in the @parm{w_type} field of the structure
 pointed to by the input-output control argument specifies that the pointed-to
 structure is a @type{wan_tnioc} structure.  This structure is used by the
 @pioc{W_SETTUNE} and @pioc{W_GETTUNE} input-output controls.
@@ -1256,7 +1250,7 @@ struct wan_tnioc @{
 @end group
 @end example
 
-@table @member
+@table @parm
 @item w_type
 Specifies the type of the structure associated with the input-output control.
 Always @pval{WAN_TUNE}.
@@ -1288,7 +1282,7 @@ typedef struct @{
 
 The @type{wantune_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item WAN_options
 Specifies a number of WAN options associated with the device.  This member is a
 bitwise OR of zero or more of the following values:
@@ -1327,7 +1321,7 @@ struct WAN_hddef @{
 
 The @type{WAN_hddef} structure contains the following members:
 
-@table @member
+@table @parm
 @item WAN_maxframe
 Conveys the maximum frame size in octets.
 @item WAN_baud
@@ -1350,16 +1344,16 @@ values:
 This member defines a number of alternate call procedural defintions described
 by a union.  The union contains the following members:
 
-@table @member
+@table @parm
 @item WAN_cptype
 Specifies the tye of the call procedural definitions.  Always @pval{WAN_NONE},
-@pval{WAN_X21P} or @pval{WAN_V25bis}.  When @member{WAN_cptype} is
+@pval{WAN_X21P} or @pval{WAN_V25bis}.  When @parm{WAN_cptype} is
 @pval{WAN_NONE}, only this member of the union is significant.
 @item WAN_x21def
-When @member{WAN_cptype} is @pval{WAN_X21P}, this member of the union is
+When @parm{WAN_cptype} is @pval{WAN_X21P}, this member of the union is
 significant.  This member contains the @type{WAN_x21} structure described below.
 @item WAN_v25def
-When @member{WAN_cptype} is @pval{WAN_V25bis}, this member of the union is
+When @parm{WAN_cptype} is @pval{WAN_V25bis}, this member of the union is
 significant.  This member contains the @type{WAN_v25} structure described below.
 @end table
 @end table
@@ -1386,7 +1380,7 @@ struct WAN_x21 @{
 
 The @type{WAN_x21} structure has the following members:
 
-@table @member
+@table @parm
 @item WAN_cptype
 Specifies the type of the call procedural defintions.  Always @pval{WAN_X21P}.
 @item T1
@@ -1420,7 +1414,7 @@ struct WAN_v25 @{
 
 The @type{WAN_v25} structure has the following members:
 
-@table @member
+@table @parm
 @item WAN_cptype
 Specifies the type of the call procedural defintions.  Always @pval{WAN_V25bis}.
 @item callreq
@@ -1432,7 +1426,7 @@ network does not support CFI.
 @node WAN_MAP - Mapping Data Structures
 @subsection WAN_MAP - Mapping Data Structures
 
-The value of @pval{WAN_MAP} in the @member{w_type} field of the structure
+The value of @pval{WAN_MAP} in the @parm{w_type} field of the structure
 pointed to by the input-output control argument specifies that the pointed-to
 structure is a @type{wanmapgf}, @type{wanmappf} or @type{wanmapdf} structure.
 These structures are used by the @pioc{W_GETWANMAP}, @pioc{W_PUTWANMAP} and
@@ -1464,7 +1458,7 @@ struct wanmapgf @{
 
 The @type{wanmapgf} structure contains the following members:
 
-@table @member
+@table @parm
 @item w_type
 Specifies the type of the structure associated with the input-output control.
 Always @pval{WAN_MAP}.
@@ -1495,13 +1489,13 @@ typedef struct @{
 
 The @type{wanget_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item first_ent
-Specifies the index of the first entry in the @member{entries} member.
+Specifies the index of the first entry in the @parm{entries} member.
 @item num_ent
-Specifies the number of entries in the @member{entries} member.
+Specifies the number of entries in the @parm{entries} member.
 @item entries
-Contains @member{num_ent} entries of @type{wanmap_t} structures.  The
+Contains @parm{num_ent} entries of @type{wanmap_t} structures.  The
 @type{wanmap_t} structure is described below.
 @end table
 
@@ -1524,7 +1518,7 @@ struct wanmappf @{
 
 The @type{wanmappf} structure contains the following members:
 
-@table @member
+@table @parm
 @item w_type
 Specifies the type of the structure associated with the input-output control.
 Always @pval{WAN_MAP}.
@@ -1556,17 +1550,17 @@ typedef struct @{
 
 The @type{wanmap_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item remsize
-Conveys the size of the remote address contained in the @member{remaddr} field
+Conveys the size of the remote address contained in the @parm{remaddr} field
 in octets.
 @item remaddr
-Contains the remote address, significant to @member{remsize} octets.
+Contains the remote address, significant to @parm{remsize} octets.
 @item infsize
-Conveys the size of the interface address contained in the @member{infaddr}
+Conveys the size of the interface address contained in the @parm{infaddr}
 field in octets.
 @item infaddr
-Contains the remote address, significant to @member{infsize} octets.
+Contains the remote address, significant to @parm{infsize} octets.
 @end table
 
 @page
@@ -1587,7 +1581,7 @@ struct wanmapdf @{
 
 The @type{wanmapdf} structure contains the following members:
 
-@table @member
+@table @parm
 @item w_type
 Specifies the type of the structure associated with the input-output control.
 Always @pval{WAN_MAP}.
@@ -1603,7 +1597,7 @@ Attachment (PPA).
 @node WAN_PLAIN - Plain Data Structures
 @subsection WAN_PLAIN - Plain Data Structures
 
-The value of @pval{WAN_PLAIN} in the @member{w_type} field of the structure
+The value of @pval{WAN_PLAIN} in the @parm{w_type} field of the structure
 pointed to by the input-output control argument specifies that the pointed-to
 structure is a @type{wan_hdioc} structure.  The structure is used by the
 @pioc{W_STATUS}, @pioc{W_ENABLE} and @pioc{W_DISABLE} input-output controls.
@@ -1629,7 +1623,7 @@ struct wan_hdioc @{
 
 The @type{wan_hdioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item w_type
 Specifies the type of the structure associated with the input-output control.
 Always @pval{WAN_PLAIN}.
@@ -1645,7 +1639,7 @@ Attachment (PPA).
 @node WAN_SETSIG - Signal and Lead Data Structures
 @subsection WAN_SETSIG - Signal and Lead Data Structures
 
-The value @pval{WAN_SETSIG} in the @member{w_type} field of the structure
+The value @pval{WAN_SETSIG} in the @parm{w_type} field of the structure
 pointed to by the input-output control argument specifies that the pointed-to
 structure is a @type{wan_setsigf} structure.  This structure is used by the
 @pioc{W_SETSIG} and @pioc{W_GETSIG} input-output controls.
@@ -1673,7 +1667,7 @@ struct wan_setsigf @{
 
 The @type{wan_setsigf} structure contains the following members:
 
-@table @member
+@table @parm
 @item w_type
 Specifies the type of the structure associated with the input-output control.
 Always @pval{WAN_SETSIG}.
@@ -1703,7 +1697,7 @@ typedef struct @{
 
 The @type{wan_setsig_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item w_ctrlsignal
 Contains the control signals.  This can be a bitwise OR of zero or more of the
 following:
@@ -1775,10 +1769,10 @@ This input-output control takes an argument that is a pointer to a
 @subsubheading Description
 
 The @pioc{W_ZEROSTATS} input-output control requests that the WAN driver reset
-the statistics associated with the @member{w_snid} contained in the passed-in
+the statistics associated with the @parm{w_snid} contained in the passed-in
 structure.
 The WAN driver is to reset the statistics, returning the statistics and state
-immediately before reset in the @member{hdlc_stats} and @member{w_state} members
+immediately before reset in the @parm{hdlc_stats} and @parm{w_state} members
 of the provided structure.
 @xref{hdlcstats_t Structure}.
 
@@ -1792,10 +1786,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -1814,10 +1808,10 @@ This input-output control takes an argument that is a pointer to a
 @subsubheading Description
 
 The @pioc{W_GETSTATS} input-output control requests that the WAN driver retrieve
-the statistics and state associated with the @member{w_snid} contained in the
+the statistics and state associated with the @parm{w_snid} contained in the
 passed-in structure.
 The WAN driver is to retrieve the current statistics and state, returning them
-in the @member{hdlc_stats} and @member{w_state} members of the provided
+in the @parm{hdlc_stats} and @parm{w_state} members of the provided
 structure.
 
 @subsubheading Return Value
@@ -1830,10 +1824,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -1852,7 +1846,7 @@ This input-output control takes an argument that is a pointer to a
 @subsubheading Description
 
 The @pioc{W_SETTUNE} input-output control requests that the WAN driver set the
-tunable parameters form the passed-in structure for the @member{w_snid}
+tunable parameters form the passed-in structure for the @parm{w_snid}
 contained in that structure.
 The WAN driver is to set th tunable, returning any negotiated value in the
 provided structure.
@@ -1867,24 +1861,24 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @item E2BIG
-The specified @member{WAN_maxframe} is of insufficient size to hold the maximum
+The specified @parm{WAN_maxframe} is of insufficient size to hold the maximum
 size frame necessary for proper operation of the protocol.
 @item ENOMEM
 The WAN driver cannot allocate single message buffers of size
-@member{WAN_maxframe}.
+@parm{WAN_maxframe}.
 @item EIO
 The interface is in a wrong state.  For example, the tuning input-output control
 was issued after the interface was already registered with the @prim{WAN_REG}
 primitive.
 @item EXDEV
-The @member{WAN_interface} does not match the capabilities or mode of the
+The @parm{WAN_interface} does not match the capabilities or mode of the
 hardware.
 @end table
 
@@ -1902,7 +1896,7 @@ This input-output control takes an argument that is a pointer to a
 @subsubheading Description
 
 The @pioc{W_GETTUNE} input-output control requests that the WAN driver get the
-tunable parameters associated with the @member{w_snid} contained in the
+tunable parameters associated with the @parm{w_snid} contained in the
 passed-in structure.
 The WAN driver is to retrieve the tunable parameters and return them in the
 provided structure.
@@ -1917,10 +1911,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -1940,7 +1934,7 @@ This input-output control takes an argument that is a pointer to a
 
 The @pioc{W_PUTWANMAP} input-output control requests that the WAN driver add a
 remote address to interface address mapping entry associated to the specified
-subnetwork identifier, @member{w_snid}.
+subnetwork identifier, @parm{w_snid}.
 
 @subsubheading Return Value
 
@@ -1952,10 +1946,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -1975,7 +1969,7 @@ This input-output control takes an argument that is a pointer to a
 
 The @pioc{W_GETWANMAP} input-output control requests that the WAN driver
 retrieve a block of remote address to interface address mapping entries
-associated with the specified subnetwork identifier, @member{w_snid}.
+associated with the specified subnetwork identifier, @parm{w_snid}.
 
 @subsubheading Return Value
 
@@ -1987,10 +1981,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -2010,7 +2004,7 @@ This input-output control takes an argument that is a pointer to a
 
 The @pioc{W_DELWANMAP} input-output control requests that the WAN driver delete
 all remote address to interface address mapping entries associatedw with the
-specified subnetwork identifier, @member{w_snid}.
+specified subnetwork identifier, @parm{w_snid}.
 
 @subsubheading Return Value
 
@@ -2022,10 +2016,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -2044,13 +2038,13 @@ This input-output control takes an argument that is a pointer to a
 @subsubheading Description
 
 The @pioc{W_STATUS} input-output control requests that the WAN driver return the
-status of the @member{w_snid} contained in the passed-in structure.
+status of the @parm{w_snid} contained in the passed-in structure.
 
 @subsubheading Return Value
 
 When successful, the input-output control operation returns zero (0) when the
-associated @member{w_snid} is disabled, and one (1) when the associated
-@member{w_snid} is enabled.
+associated @parm{w_snid} is disabled, and one (1) when the associated
+@parm{w_snid} is enabled.
 
 In addition to the errors that may be returned by @manref{ioctl(2)} and
 @manref{streamio(7)}, errors that may be returned by this input-output control
@@ -2058,10 +2052,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -2080,7 +2074,7 @@ This input-output control takes an argument that is a pointer to a
 @subsubheading Description
 
 The @pioc{W_ENABLE} input-output control requests that the WAN driver enable
-data transfer for the @member{w_snid} contained in the passed-in structure.
+data transfer for the @parm{w_snid} contained in the passed-in structure.
 
 @subsubheading Return Value
 
@@ -2092,10 +2086,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -2114,7 +2108,7 @@ This input-output control takes an argument that is a pointer to a
 @subsubheading Description
 
 The @pioc{W_DISABLE} input-output control requests that the WAN driver disable
-data transfer for the @member{w_snid} contained in the passed-in structure.
+data transfer for the @parm{w_snid} contained in the passed-in structure.
 
 @subsubheading Return Value
 
@@ -2126,10 +2120,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -2162,10 +2156,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -2198,10 +2192,10 @@ are as follows:
 
 @table @perr
 @item ENODEV
-The specified @member{w_snid} is unknown or invalid.
+The specified @parm{w_snid} is unknown or invalid.
 @item EINVAL
 The size of the structure corresponding to the passed-in argument is incorrect
-for the input-output control and @member{w_type} specified.
+for the input-output control and @parm{w_type} specified.
 @item ENXIO
 The underlying device has encountered a fatal error.
 @end table
@@ -3147,11 +3141,15 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 
 @ifnotplaintext
 @c skip indexes for plain text (regex search works better)
-@node Index
-@unnumbered Index
+@iftex
+@node Indices
+@unnumbered Indices
+@end iftex
 
 @ifnottex
 @c concatenate indices for html and info
+@node Index
+@unnumbered Index
 @printindex cp
 @end ifnottex
 

@@ -1,8 +1,8 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: lli.texi,v 0.9.2.2 2008-07-11 09:46:29 brian Exp $
+% @(#) $Id: lli.texi,v 0.9.2.3 2008-07-23 08:29:15 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,11 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
+% Last Modified $Date: 2008-07-23 08:29:15 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename lli.info
 @include texi/args.texi
@@ -78,54 +78,54 @@
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file documents the SpiderX.25 Link Layer Interface.
+This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release
-@value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
-Corporation}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} published by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
-Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org,Brian F. G. Bidulock} @*
+
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
 
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @ignore
-Permission is granted to process this file through Tex and print the results,
-provided the printed document carries copying permission notice identical to
-this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-Permission to use, copy, modify, and distribute this documentation for any
-purpose and without fee is hereby granted, provided that the above copyright
-notice appears in all copies and that both that copyright notice and this
-permission notice appear in supporting documentation, and that the name OpenSS7
-Corporation not be use in advertising or publicity pertaining to distribution
-of the software without specific, written prior permission.  OpenSS7 Corporation
-makes no representations about the suitability of this documentation for any
-purpose.  It is provided ``as is'' without express or implied warranty.
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
 
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting
-derived work is distributed under the terms of a permission notice identical to
-this one.
-
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE Link Layer Interface
 @set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -140,13 +140,11 @@ another language, under the above conditions for modified versions.
 @sp 4
 @quotation
 @subheading Abstract
-This document is a @value{MANUAL_TITLE} containing technical details concerning
-the implementation of the @value{MANUAL_TITLE} for OpenSS7.  It contains
-recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the LAPB
-Protocol (ISO/IEC 7776) and LLC2 Protocol (ISO/IEC 8802) service interface to
-these components as well as providing a basis for link layer control for other
-protocols.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+LAPB Protocol (ISO/IEC 7776) and LLC2 Protocol (ISO/IEC 8802) service interface to these components
+as well as providing a basis for link layer control for other protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -174,60 +172,54 @@ Unauthorized distribution or duplication is prohibited.
 
 @ignore
 @noindent
-This software and related documentation is protected by copyright and
-distributed under licenses restricting its use, copying, distribution and
-decompilation.  No part of this software or related documentation may be
-reproduced in any form by any means without the prior written authorization of
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
 the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the
-recipient will protect this information and keep it confidential, and will not
-disclose the information contained in this document without the written
-permission of its owner.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation
-for any reason, including but not limited to, conformity with standards
-promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or
-procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
-under no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
 @end ignore
 
 @noindent
-Permission to use, copy and distribute this documentation without modification,
-for any purpose and without fee or royalty is hereby granted, provided that both
-the above copyright notice and this permission notice appears in all copies and
-that the name of OpenSS7 Corporation not be used in advertising or publicity
-pertaining to distribution of this documentation or its contents without
-specific, written prior permission.  OpenSS7 Corporation makes no representation
-about the suitability of this documentation for any purpose.  It is provided
-``as is'' without express or implied warranty.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @subsubheading Notice:
 
 @noindent
-@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
-CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR
-OTHER RIGHTS..  IN NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT,
-INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
-FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
-OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF THIS
-DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 
 @sp 1
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation
-for any reason, including but not limited to, conformity with standards
-promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or
-procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
-under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -236,7 +228,7 @@ under no obligation to provide any feature listed herein.
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
@@ -256,6 +248,7 @@ under no obligation to provide any feature listed herein.
 @defcodeindex mp
 
 @ifnottex
+@c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
 @syncodeindex pe cp
@@ -271,27 +264,27 @@ under no obligation to provide any feature listed herein.
 
 @iftex
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}@prindex \name\
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}@pvindex \name\
 @end macro
 
-@macro perr {name}
+@macro perr{name}
 @code{\name\}@peindex \name\
 @end macro
 
-@macro psta {name}
+@macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
-@macro parm {name}
+@macro parm{name}
 @code{\name\}@vrindex \name\
 @end macro
 
-@macro pioc {name}
+@macro pioc{name}
 @code{\name\}@ctindex \name\
 @end macro
 
@@ -347,7 +340,12 @@ under no obligation to provide any feature listed herein.
 * LLI Compatibility and Porting::
 * Glossary of LLI Terms and Acronyms::
 * References::
+@iftex
+* Indices::
+@end iftex
+@ifnottex
 * Index::
+@end ifnottex
 @end menu
 
 @iftex
@@ -363,40 +361,33 @@ under no obligation to provide any feature listed herein.
 @node Introduction
 @chapter Introduction
 
-@cite{UNIX System V Release 3.2} included a Logical Link Interface (LLI) that
-was later standardized as the Data Link Provider Interface (DLPI) by the
-@cite{Open Group}.@footnote{Evidence of this can still be found in the
-@file{dlpi.h} header file distributed by @cite{The Open Group} in the DLPI
-standard.  Reference is made in the header file to backward compatibility to the
-LLI interface.}
+@cite{UNIX System V Release 3.2} included a Logical Link Interface (LLI) that was later standardized
+as the Data Link Provider Interface (DLPI) by the @cite{Open Group}.@footnote{Evidence of this can
+still be found in the @file{dlpi.h} header file distributed by @cite{The Open Group} in the DLPI
+standard.  Reference is made in the header file to backward compatibility to the LLI interface.}
 
-The Link Layer Interface (LLI) was developed by Spider Systems, Ltd., (now a
-division of Emerson Power) and is widely available on many platforms.  For
-example, @cite{AIX AIXlink/X.25}, @cite{HP-UX X.25/9000}, @cite{IRIX IRIS
-SX.25}, @cite{PT X.25}, @cite{RadiSys WAN}, @cite{SBE X.25}, @cite{Solaris
-SunLink X.25} and @cite{Solaris Solstice X.25}, implement the Link Layer
-Interface (LLI).@footnote{But, for the most part, it is not called the @i{Link
-Lyaer Interface}, but is instead sunk inside the Network Layer Interface
-(NLI).}
+The Link Layer Interface (LLI) was developed by Spider Systems, Ltd., (now a division of Emerson
+Power) and is widely available on many platforms.  For example, @cite{AIX AIXlink/X.25}, @cite{HP-UX
+X.25/9000}, @cite{IRIX IRIS SX.25}, @cite{PT X.25}, @cite{RadiSys WAN}, @cite{SBE X.25},
+@cite{Solaris SunLink X.25} and @cite{Solaris Solstice X.25}, implement the Link Layer Interface
+(LLI).@footnote{But, for the most part, it is not called the @i{Link Lyaer Interface}, but is
+instead sunk inside the Network Layer Interface (NLI).}
 
-The Link Layer Interface (LLI) as designed to be used directly with standard
-@dfn{STREAMS} system calls and does not require the use of a cooperating user
-space shared library.  Applications programs directly use the
-@command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)},
-@command{putpmsg(2)} and @command{ioctl(2)} system calls.@footnote{See
-@manref{getmsg(2s)}, @manref{getpmsg(2)}, @manref{putmsg(2s)},
-@manref{putpmsg(2)} and @manref{ioctl(2)} manual pages.}  Nevertheless, user
-shared object libraries can easily be constructed using this @dfn{STREAMS}
+The Link Layer Interface (LLI) as designed to be used directly with standard @dfn{STREAMS} system
+calls and does not require the use of a cooperating user space shared library.  Applications
+programs directly use the @command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)},
+@command{putpmsg(2)} and @command{ioctl(2)} system calls.@footnote{See @manref{getmsg(2s)},
+@manref{getpmsg(2)}, @manref{putmsg(2s)}, @manref{putpmsg(2)} and @manref{ioctl(2)} manual pages.}
+Nevertheless, user shared object libraries can easily be constructed using this @dfn{STREAMS}
 service primitive interface.
 
 The system header files that must be included when compiling user applications,
 or @dfn{STREAMS} drivers and modules that use the interface, are detailed in
 @ref{LLI Header Files}.
 
-A user library, @file{libdlpi}, is provided, not for interfacing to the message
-primitive service interface, but for providing various helper functions when
-using the @dfn{STREAMS} service interface.  This library is detailed in @ref{LLI
-Library}.
+A user library, @file{libsx25}, is provided, not for interfacing to the message primitive service
+interface, but for providing various helper functions when using the @dfn{STREAMS} service
+interface.  This library is detailed in @ref{LLI Library}.
 
 @node Model of the Link Layer
 @chapter Model of the Link Layer
@@ -500,7 +491,7 @@ struct ll_hdioc @{
 
 The @type{ll_hdioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_PLAIN}.
 @item lli_spare
@@ -536,7 +527,7 @@ struct ll_snioc @{
 
 The @type{ll_snioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_SNID}.
 @item lli_class
@@ -593,7 +584,7 @@ struct ll_stnioc @{
 
 The @type{ll_stnioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_STATUS}.
 @item lli_spare
@@ -624,7 +615,7 @@ struct lapb_stioc @{
 
 The @type{lapb_stioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_STATS}.
 @item state
@@ -652,7 +643,7 @@ typedef struct lapb_stats @{
 
 The @type{lapbstats_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item lapbmonarray
 Provides an array of 32-bit unsigned integers containing statistics.  The
 indexes of the elements of the array are as follows:
@@ -728,7 +719,7 @@ struct llc2_stioc @{
 
 The @type{llc2_stioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_STATS}.
 @item lli_spare
@@ -755,7 +746,7 @@ typedef struct llc2_stats @{
 
 The @type{llc2stats_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item llc2monarray
 Provides an array of 32-bit unsigned integers containing the statistics.  The
 indices of the individual elements are as follows:
@@ -832,7 +823,7 @@ struct mlp_stioc @{
 
 The @type{mlp_stioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_STATS}.
 @item lli_state
@@ -861,7 +852,7 @@ typedef struct mlp_stats @{
 
 The @type{mlpstats_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item mlpmonarray
 Contains an array of 32-bit unsigned integers containing the statistics.  The
 indices of the individual elements of the array are as follows:
@@ -902,7 +893,7 @@ struct lapb_gstioc @{
 
 The @type{lapb_gstioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_GSTATS}.
 @item lli_spare
@@ -938,7 +929,7 @@ struct llc2_gstioc @{
 
 The @type{llc2_gstioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_GSTATS}.
 @item lli_spare
@@ -974,7 +965,7 @@ struct mlp_gstioc @{
 
 The @type{mlp_gstioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_GSTATS}.
 @item lli_spare
@@ -1018,7 +1009,7 @@ struct lapb_tnioc @{
 
 The @type{lapb_tnioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_LAPBTUNE}.
 @item lli_spare
@@ -1057,7 +1048,7 @@ typedef struct lapbtune @{
 
 The @type{lapbtune_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item N2
 @item T1
 @item Tpf
@@ -1094,7 +1085,7 @@ struct llc2_tnioc @{
 
 The @type{llc2_tnioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_LLC2TUNE}.
 @item lli_spare
@@ -1134,7 +1125,7 @@ typedef struct llc2tune @{
 
 The @type{llc2tune_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item N2
 @item T1
 @item Tpf
@@ -1172,7 +1163,7 @@ struct mlp_tnioc @{
 
 The @type{mlp_tnioc} structure contains the following members:
 
-@table @member
+@table @parm
 @item lli_type
 Always @pval{LLI_MLPTUNE}.
 @item lli_spare
@@ -1204,7 +1195,7 @@ typedef struct mlptune @{
 
 The @type{mlptune_t} structure contains the following members:
 
-@table @member
+@table @parm
 @item mw
 The size of the MLP window.
 @item mx
@@ -2150,11 +2141,15 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 
 @ifnotplaintext
 @c skip indexes for plain text (regex search works better)
-@node Index
-@unnumbered Index
+@iftex
+@node Indices
+@unnumbered Indices
+@end iftex
 
 @ifnottex
 @c concatenate indices for html and info
+@node Index
+@unnumbered Index
 @printindex cp
 @end ifnottex
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-05-05 15:34:57 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:57 $ by $Author: brian $
+ Last Modified $Date: 2008-07-23 08:29:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.70  2008-07-23 08:29:06  brian
+ - updated references and support for 2.6.18-92.1.6.el5 kernel
+
  Revision 0.9.2.69  2008-05-05 15:34:57  brian
  - be strict with MORE_data and DATA_flag
 
@@ -279,10 +282,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-05-05 15:34:57 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-05-05 15:34:57 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -364,7 +367,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-05-05 15:34:57 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -487,6 +490,7 @@ MODULE_STATIC struct streamtab udp_info = {
 };
 
 #if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
 	return skb->tail;
@@ -547,6 +551,7 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
 	skb_reset_mac_header(skb);
 	skb->mac.raw += offset;
 }
+#endif				/* !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER */
 #endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /*

@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: mtpi.texi,v 0.9.2.4 2008-07-11 09:36:12 brian Exp $
+% @(#) $Id: mtpi.texi,v 0.9.2.5 2008-07-23 08:29:01 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-11 09:36:12 $ by $Author: brian $
+% Last Modified $Date: 2008-07-23 08:29:01 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -108,7 +108,7 @@ paragraph (this paragraph not being relevant to the printed manual).
 OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
 warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
 the contents of the document are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
 damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
 of contract, negligence or other tortious action, arising out of or in connection with any use of
@@ -203,14 +203,14 @@ implied warranty.
 @subsubheading Notice:
 
 @noindent
-@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
-implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
-that the contents of the document are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
-no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
-damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
-of contract, negligence or other tortious action, arising out of or in connection with any use of
-this document or the performance or implementation of the contents thereof.}
+@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 
 @sp 1
 
@@ -444,6 +444,9 @@ is an @strong{UNCONTROLLED VERSION}.
 @smallexample
 
 $Log: mtpi.texi,v $
+Revision 0.9.2.5  2008-07-23 08:29:01  brian
+- updated references and support for 2.6.18-92.1.6.el5 kernel
+
 Revision 0.9.2.4  2008-07-11 09:36:12  brian
 - updated documentation
 

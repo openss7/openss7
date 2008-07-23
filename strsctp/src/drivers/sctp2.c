@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:59 $ by $Author: brian $
+ Last Modified $Date: 2008-07-23 08:29:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.78  2008-07-23 08:29:10  brian
+ - updated references and support for 2.6.18-92.1.6.el5 kernel
+
  Revision 0.9.2.77  2008-05-05 15:34:59  brian
  - be strict with MORE_data and DATA_flag
 
@@ -167,10 +170,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -188,7 +191,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-05-05 15:34:59 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -245,6 +248,7 @@ MODULE_ALIAS("streams-driver-sctp");
 #define sctplogda(sp, fmt, ...)  sctplog(sp, SCTPLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
 
 #if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
 	return skb->tail;
@@ -305,6 +309,7 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
 	skb_reset_mac_header(skb);
 	skb->mac.raw += offset;
 }
+#endif				/* !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER */
 #endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /*

@@ -292,10 +292,22 @@
 %R NLI
 %J Revision 0.9.2, Draft 1
 %T OpenSS7 CAE Specification: Network Layer Interface (NLI) Specification
-%D June 9, 2008
+%D July 15, 2008
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/nli.pdf
+%O Distributed with package strx25-0.9.2.
+
+%L LLI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R LLI
+%J Revision 0.9.2, Draft 1
+%T OpenSS7 CAE Specification: Link Layer Interface (LLI) Specification
+%D July 15, 2008
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/lli.pdf
 %O Distributed with package strx25-0.9.2.
 
 %L CDI
@@ -309,6 +321,18 @@
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/cdi.pdf
 %O Distributed with package strxns-0.9.2.
+
+%L WAN
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R WAN
+%J Revision 0.9.2, Draft 1
+%T OpenSS7 CAE Specification: Wide Area Network (WAN) Interface Specification
+%D July 15, 2008
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/wan.pdf
+%O Distributed with package strx25-0.9.2.
 
 %L LMI
 %A Brian Bidulock
@@ -3431,10 +3455,11 @@ Part 1: Protocol Specification
 %Q Institute of Electrical and Electronics Engineers
 %I IEEE Computer Society
 
+%K iso15802_5
 %K 802.1G
 %L 802.1G
 %A ANSI/IEEE
-%R ANSI/IEEE Std. 802.1G-1998 [ISO/IEC 15802-5 : 1998(E)]
+%R ANSI/IEEE Std. 802.1G-1998 [ISO/IEC 15802-5:1998(E)]
 %T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Common Specifications \(em Part 5: Remove media Access Control (MAC) Bridging
 %D March 13, 1998
 %C New York
@@ -3445,7 +3470,7 @@ Part 1: Protocol Specification
 %K 802.1H
 %L 802.1H
 %A IEEE
-%R IEEE Std. 802.1H-1997 [ISO/IEC 11802-5 : 1997(E)]
+%R IEEE Std. 802.1H-1997 [ISO/IEC 11802-5:1997(E)]
 %T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Common Specifications \(em Part 5: Remove media Access Control (MAC) Bridging of Ethernet V2.0 in Local Area Networks
 %D May 2, 2002
 %C New York
@@ -3453,10 +3478,11 @@ Part 1: Protocol Specification
 %Q Institute of Electrical and Electronics Engineers
 %I IEEE Computer Society
 
+%K iso8802_2
 %K 802.2
 %L 802.2
 %A ANSI/IEEE
-%R ANSI/IEEE Std. 802.2-1998 [ISO/IEC 8802-2 : 1998]
+%R ANSI/IEEE Std. 802.2-1998 [ISO/IEC 8802-2:1998]
 %T IEEE Standard for Information Technology \(em Telecommunications and Information Exchange Between Systems \(em Local and Metropolitan Area Networks \(em Specific Requirements \(em Part 2: Logical Link Control
 %D May 7, 1998
 %C New York
@@ -3576,13 +3602,26 @@ Part 1: Protocol Specification
 %K iso8208
 %L ISO/IEC 8208
 %A ISO
-%R ISO/IEC 8208 : 2000
-%T Information Technology \- Data Communications \- X.25 Packet Layer Protocol For Data Terminal Equipment
+%R ISO/IEC 8208:2000
+%T Information Technology \(em Data Communications \(em X.25 Packet Layer Protocol For Data Terminal Equipment
 %J Fourth Edition
 %D November 1, 2000
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
+
+%K iso8880
+%L ISO/IEC 8880-2 [ITU-T X.610]
+%A ISO
+%R ISO/IEC 8880-2:1992
+%T Information Technology \(em Telecommunications and information exchange between systems \(em Protocol combinations to provide and support the OSI Network service \(em Part 2: Provision an support of the connection-mode Network Service
+%D September 10, 1992
+%C Geneva
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Also ITU-T Recommendation X.610.
 
 %K iso8881
 %L ISO 8881
@@ -3590,6 +3629,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
 %D 1989
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3597,19 +3637,33 @@ Part 1: Protocol Specification
 %K iso9542
 %L ISO/IEC 9542
 %A ISO
-%R ISO/IEC 9542 : 1988
-%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System to Intermediate System Routeing Exchange Protocol for use in Conjunction with the Protocol Routeing for Providing the Connectionless-Mode Network Service (ISO 8473)
+%R ISO/IEC 9542:1988
+%T Information Processing Systems \(em Telecommunications and Information Exchange between Systems \(em End System to Intermediate System Routeing Exchange Protocol for use in Conjunction with the Protocol Routeing for Providing the Connectionless-Mode Network Service (ISO 8473)
 %D 1988
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso9574
+%L ISO/IEC 9574 [ITU-T X.613]
+%A ISO
+%R ISO/IEC 9574:1992
+%T Information Technology \(em Provision of the OSI connection-mode network service by packet-mode terminal equipment connected to an Integrated Services Digital Network (ISDN)
+%D 1992
+%C Geneva
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Also ITU-T Recommendation X.613 (identical text).
+
 %K iso10028
 %L ISO/IEC 10028
 %A ISO
-%R ISO/IEC 10028 : 1993
-%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Definition of the Relaying Functions of a Network Layer Intermeidate System
+%R ISO/IEC 10028:1993
+%T Information Processing Systems \(em Telecommunications and Information Exchange between Systems \(em Definition of the Relaying Functions of a Network Layer Intermediate System
 %D 1993
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3617,9 +3671,10 @@ Part 1: Protocol Specification
 %K iso10177
 %L ISO/IEC 10177
 %A ISO
-%R ISO/IEC 10177 : 1993
+%R ISO/IEC 10177:1993
 %T Information technlology \(em Telecommunications and information excahnge between systems \(em Provision of the connection-mode Network internal layer service by intermediate systems using ISO/IEC 8208, the X.25 Packet Layer Protocol
 %D 1993
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3627,12 +3682,38 @@ Part 1: Protocol Specification
 %K iso10030
 %L ISO/IEC 10030
 %A ISO
-%R ISO/IEC 10030 : 1995
-%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System Routeing Information Exchange Protocol for use in conjunction with ISO/IEC 8878
+%R ISO/IEC 10030:1995
+%T Information Processing Systems \(em Telecommunications and Information Exchange between Systems \(em End System Routeing Information Exchange Protocol for use in conjunction with ISO/IEC 8878
 %D 1995
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
+%O Also ITU-T Recommendation X.116 (similar text).
+
+%K iso10588
+%L ISO/IEC 10588
+%A ISO
+%R ISO/IEC 10588:1992 [ITU-T Rec. X.613]
+%T Information Technology \(em Use of the X.25 Packet Layer Protocol in conjunction with X.21/X.21 bis to provide the OSI connection-mode network service
+%D September 10, 1992
+%C Geneva
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Also ITU-T Recommendation X.613 (identical text).
+
+%K iso10732
+%L ISO/IEC 10732
+%A ISO
+%R ISO/IEC 10732:1992 [ITU-T Rec. X.614]
+%T Information Technology \(em Use of the X.25 Packet Layer Protocol to provide the OSI connection-mode network service over the telephone network
+%D September 10, 1992
+%C Geneva
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Also ITU-T Recommendation X.614 (identical text).
 
 %K x115
 %L X.115
@@ -3661,9 +3742,10 @@ Part 1: Protocol Specification
 %K iso10038
 %L ISO/IEC 10038
 %A ISO
-%R ISO/IEC 10038 : 1993
+%R ISO/IEC 10038:1993
 %T Information Technlology \(em Telecommunications and information exchange between systems \(em Local area networks Media access control (MAC) bridges
 %D 1993
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3672,9 +3754,10 @@ Part 1: Protocol Specification
 %K iso10039
 %L ISO/IEC 10039
 %A ISO
-%R ISO/IEC 10039 : 1991
+%R ISO/IEC 10039:1991
 %T Information technology \(em Telecommunications and information exchange between systems \(em Local area networks \(em Medium Access Control (MAC) service definition
 %D 1991
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3683,9 +3766,10 @@ Part 1: Protocol Specification
 %K iso1580203
 %L ISO/IEC 15802-3
 %A ISO
-%R ISO/IEC 15802-3 : 1998
+%R ISO/IEC 15802-3:1998
 %T Information technlology \(em Telecommunications and information exchange between systems \(em Local and metropolitan area networks Common specifications \(em Part 3: Media Access Contrl (MAC) Bridges
 %D 1998
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3694,9 +3778,10 @@ Part 1: Protocol Specification
 %K iso10589
 %L ISO/IEC 10589
 %A ISO
-%R ISO/IEC 10589 : 1992
-%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Intermediate System to Intermediate System Intra-Domain Routeing Routine Information Exchange Protocol for use in conjunction wht the Protocol for Providing the Connectionless-Mode Network Service (ISO 8473)
+%R ISO/IEC 10589:1992
+%T Information Processing Systems \(em Telecommunications and Information Exchange between Systems \(em Intermediate System to Intermediate System Intra-Domain Routeing Routine Information Exchange Protocol for use in conjunction wht the Protocol for Providing the Connectionless-Mode Network Service (ISO 8473)
 %D 1992
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -3704,17 +3789,19 @@ Part 1: Protocol Specification
 %K iso10747
 %L ISO/IEC 10747
 %A ISO
-%R ISO/IEC 10747 : 1992
-%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Protocol for Exchange of Inter-Domain Routeing Information Amoung Intermediate Systems to Support Forwarding of ISO 8473 PDUs
+%R ISO/IEC 10747:1992
+%T Information Processing Systems \(em Telecommunications and Information Exchange between Systems \(em Protocol for Exchange of Inter-Domain Routeing Information Amoung Intermediate Systems to Support Forwarding of ISO 8473 PDUs
 %D 1992
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso8824_1
 %K x680
 %L X.680
 %A ITU
-%R ITU-T Recommendation X.680 [ISO/IEC 8824-1 : 1994]
+%R ITU-T Recommendation X.680 [ISO/IEC 8824-1:1994]
 %T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Specification of Basic Notation
 %D July 1994
 %C Geneva
@@ -3723,10 +3810,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.680/
 
+%K iso8824_2
 %K x681
 %L X.681
 %A ITU
-%R ITU-T Recommendation X.681 [ISO/IEC 8824-2 : 1994]
+%R ITU-T Recommendation X.681 [ISO/IEC 8824-2:1994]
 %T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Information Object Specification
 %D July 1994
 %C Geneva
@@ -3735,10 +3823,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.681/
 
+%K iso8824_3
 %K x682
 %L X.682
 %A ITU
-%R ITU-T Recommendation X.682 [ISO/IEC 8824-3 : 1994]
+%R ITU-T Recommendation X.682 [ISO/IEC 8824-3:1994]
 %T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Constraint Specification
 %D July 1994
 %C Geneva
@@ -3747,10 +3836,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.682/
 
+%K iso8824_4
 %K x683
 %L X.683
 %A ITU
-%R ITU-T Recommendation X.683 [ISO/IEC 8824-4 : 1994]
+%R ITU-T Recommendation X.683 [ISO/IEC 8824-4:1994]
 %T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): Parameterization of ASN.1 Specifications
 %D July 1994
 %C Geneva
@@ -3759,10 +3849,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.683/
 
+%K iso8825_1
 %K x690
 %L X.690
 %A ITU
-%R ITU-T Recommendation X.690 [ISO/IEC 8825-1 : 1994]
+%R ITU-T Recommendation X.690 [ISO/IEC 8825-1:1994]
 %T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): ASN.1 Encoding Rules: Specification of Basic Encoding Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER)
 %D July 1994
 %C Geneva
@@ -3771,10 +3862,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.690/
 
+%K iso8825_2
 %K x691
 %L X.691
 %A ITU
-%R ITU-T Recommendation X.691 [ISO/IEC 8825-2 : 1994]
+%R ITU-T Recommendation X.691 [ISO/IEC 8825-2:1994]
 %T Data Networks and Open System Communications \(em OSI Networking and System Aspects \(em Abstract Syntax Notation One (ASN.1): ASN.1 Encoding Rules: Specification of Packet Encoding Rules (PER)
 %D July 1994
 %C Geneva
@@ -3783,10 +3875,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.691/
 
+%K iso7498_1
 %K x200
 %L X.200
 %A ITU
-%R ITU-T Recommendation X.200 [ISO/IEC 7498-1 : 1994]
+%R ITU-T Recommendation X.200 [ISO/IEC 7498-1:1994]
 %T Information Technology \(em Open Systems Interconnection
 %D November 1993
 %C Geneva
@@ -3795,11 +3888,12 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.200/
 
+%K iso9545
 %K x207
 %L X.207
 %A ITU
-%R ITU-T Recommendation X.207 [ISO/IEC 9545 : 1993]
-%T Information Technology \(em Open Ssytems Interconnection \(em Application Layer Structure
+%R ITU-T Recommendation X.207 [ISO/IEC 9545:1993]
+%T Information Technology \(em Open Systems Interconnection \(em Application Layer Structure
 %D November 1993
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
@@ -3819,10 +3913,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.208/
 
+%K iso10731
 %K x210
 %L X.210
 %A ITU
-%R ITU-T Recommendation X.210 [ISO/IEC 10731 : 1994]
+%R ITU-T Recommendation X.210 [ISO/IEC 10731:1994]
 %T Information Technology \(em Open Systems Interconnection \(em Basic reference model: Conventions for the definition of OSI services
 %D November 1993
 %C Geneva
@@ -3831,10 +3926,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.210/
 
+%K iso8886
 %K x212
 %L X.212
 %A ITU
-%R ITU-Recommendation X.212 [ISO/IEC 8886 : 1995]
+%R ITU-Recommendation X.212 [ISO/IEC 8886:1995]
 %T Information Technology \(em Open Systems Interconnection \(em Data Link Service Definition
 %D November 1995
 %C Geneva
@@ -3843,6 +3939,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.212/
 
+%K iso8348
 %K x213
 %L X.213
 %A ITU
@@ -3855,10 +3952,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.213/
 
+%K iso8072
 %K x214
 %L X.214
 %A ITU
-%R ITU-T Recommendation X.214 [ISO/IEC 8072 : 1996]
+%R ITU-T Recommendation X.214 [ISO/IEC 8072:1996]
 %T Information Technology \(em Open Systems Interconnection \(em Transport service definition
 %D November 1995
 %C Geneva
@@ -3867,10 +3965,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.214/
 
+%K iso8326
 %K x215
 %L X.215
 %A ITU
-%R ITU-T Recommendation X.215 [ISO/IEC 8326 : 1996]
+%R ITU-T Recommendation X.215 [ISO/IEC 8326:1996]
 %C Geneva
 %D 1995
 %T Information Technology \(em Open Systems Interconnection \(em Session service definition
@@ -3879,10 +3978,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.215/
 
+%K iso8822
 %K x216
 %L X.216
 %A ITU
-%R ITU-T Recommendation X.216 [ISO/IEC 8822 : 1994]
+%R ITU-T Recommendation X.216 [ISO/IEC 8822:1994]
 %T Information Technology \(em Open Systems Interconnection \(em Presentation service definition
 %D 1994
 %C Geneva
@@ -3894,7 +3994,7 @@ Part 1: Protocol Specification
 %K x217
 %L X.217
 %A ITU
-%R ITU-T Recommendation X.217 [ISO/IEC 8649 : 1996]
+%R ITU-T Recommendation X.217 [ISO/IEC 8649:1996]
 %T Information Technology \(em Open Systems Interconnection \(em Service definition for the Association Control Service Element
 %D 1995
 %C Geneva
@@ -3903,6 +4003,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.217/
 
+%K iso9066
 %K x218
 %L X.218
 %A ITU
@@ -3915,6 +4016,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.218/
 
+%K iso9071_1
 %K x219
 %L X.219
 %A ITU
@@ -3939,6 +4041,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.222/
 
+%K iso8878
 %K x223
 %L X.223
 %A ITU
@@ -3951,6 +4054,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.223/
 
+%K iso8073
 %K x224
 %L X.224
 %A ITU
@@ -3963,9 +4067,10 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.224/
 
+%K iso8327_1
 %K x225
 %L X.225
-%R ITU-T Recommendation X.225 [ISO/IEC 8327-1 : 1996]
+%R ITU-T Recommendation X.225 [ISO/IEC 8327-1:1996]
 %A ITU
 %T Information Technology \(em Open Systems Interconnection \(em Connection-oriented session protocol: Protocol specification
 %D 1995
@@ -3975,10 +4080,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.225/
 
+%K iso8823_1
 %K x226
 %L X.226
 %A ITU
-%R ITU-T Recommendation X.226 [ISO/IEC 8823-1 : 1994]
+%R ITU-T Recommendation X.226 [ISO/IEC 8823-1:1994]
 %T Information Technology \(em Open Systems Interconnection \(em Connection-oriented presentation protocol: Protocol specification
 %D 1994
 %C Geneva
@@ -3987,6 +4093,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.226/
 
+%K iso8650_1
 %K x227
 %L X.227
 %A ITU
@@ -3999,6 +4106,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.227/
 
+%K iso9066_2
 %K x228
 %L X.228
 %A ITU
@@ -4012,6 +4120,7 @@ Part 1: Protocol Specification
 %O (Extract from Blue Book)
 %U http://www.itu.int/rec/T-REC-X.228/
 
+%K iso9072_2
 %K x229
 %L X.229
 %A ITU
@@ -4024,10 +4133,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.229/
 
+%K iso8473_1
 %K x233
 %L X.233
 %A ITU
-%R ITU-T Recommendation X.233 [ISO/IEC 8473-1 : 1993]
+%R ITU-T Recommendation X.233 [ISO/IEC 8473-1:1993]
 %T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Network Service: Protocol Specification
 %D November 1993
 %C Geneva
@@ -4036,10 +4146,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.233/
 
+%K iso8602
 %K x234
 %L X.234
 %A ITU
-%R ITU-T Recommendation X.234 [ISO/IEC 8602 : 1994]
+%R ITU-T Recommendation X.234 [ISO/IEC 8602:1994]
 %T Data Communication Networks \(em Information Technology \(em Protocol for Providing the Connectionless-mode Transport Service: Protocol Specification
 %D July 1994
 %C Geneva
@@ -4048,10 +4159,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.234/
 
+%K iso9548_1
 %K x235
 %L X.235
 %A ITU
-%R ITU-T Recommendation X.235 [ISO/IEC 9548-1 : 1995]
+%R ITU-T Recommendation X.235 [ISO/IEC 9548-1:1995]
 %T Information Technology \(em Open Systems Interconnection \(em Connectionless session protocol: Protocol specification
 %D 1995
 %C Geneva
@@ -4060,10 +4172,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.235/
 
+%K iso9576_1
 %K x236
 %L X.236
 %A ITU
-%R ITU-T Recommendation X.236 [ISO/IEC 9576-1 : 1995]
+%R ITU-T Recommendation X.236 [ISO/IEC 9576-1:1995]
 %T Information Technology \(em Open Systems Interconnection \(em Connectionless presentation protocol: Protocol specification
 %D 1995
 %C Geneva
@@ -4072,10 +4185,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.236/
 
+%K iso10035_1
 %K x237
 %L X.237
 %A ITU
-%R ITU-T Recommendation X.237 [ISO/IEC 10035-1 : 1995]
+%R ITU-T Recommendation X.237 [ISO/IEC 10035-1:1995]
 %C Geneva 
 %D 1995
 %T Information Technology \(em Open Systems Interconnection \(em Connectionless protocol for the Association Control Service Element: Protocol Specification
@@ -4122,7 +4236,7 @@ Part 1: Protocol Specification
 
 %K iso8473_2
 %L ISO 8473-2
-%R ISO/IEC 8473-2 : 1994
+%R ISO/IEC 8473-2:1994
 %A ISO/IEC
 %T Information Technology \(em Open Systems Interconnect \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the underlying service by an ISO/IEC 8802 Subnetwork
 %D 1994
@@ -4130,10 +4244,61 @@ Part 1: Protocol Specification
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso8880_2
+%K x610
+%L X.610
+%A ITU
+%R ITU-T Recommendation X.610 [ISO/IEC 8880-2:1992]
+%C Geneva
+%D September 1992
+%T Data communications networks \(em Provision and support of the OSI connection-mode network service.
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.610-199209-I/
+
+%K iso9547
+%K x612
+%L X.612
+%A ITU
+%R ITU-T Recommendation X.612 [ISO/IEC 9574:1992]
+%C Geneva
+%D September 1992
+%T Information Technology \(em Provision of the OSI connection-mode network service by packet-mode terminal equipment connected to an Integrated Services Digital Network (ISDN)
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.612-199209-I/
+
+%K x613
+%L X.613
+%A ITU
+%R ITU-T Recommendation X.613 [ISO/IEC 10588:1992]
+%C Geneva
+%D September 1992
+%T Information Technology \(em Use of the X.25 Packet Layer Protocol in conjunction with X.21/X.21 bis to provide the OSI connection-mode network service
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.613-199209-I/
+
+%K x614
+%L X.614
+%A ITU
+%R ITU-T Recommendation X.614 [ISO/IEC 10732:1992]
+%C Geneva
+%D September 1992
+%T Information Technology \(em Use of the X.25 Packet Layer Protocol to provide the OSI connection-mode network service over the telephone network
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.614-199209-I/
+
+%K iso8473_3
 %K x622
 %L X.622
 %A ITU
-%R ITU-T Recommendation X.622 [ISO/IEC 8473-3 : 1995]
+%R ITU-T Recommendation X.622 [ISO/IEC 8473-3:1995]
 %C Geneva
 %D July 1994
 %T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by an X.25 Subnetwork
@@ -4142,10 +4307,11 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.622/
 
+%K iso8473_4
 %K x623
 %L X.623
 %A ITU
-%R ITU-T Recommendation X.623 [ISO/IEC 8473-4 : 1995]
+%R ITU-T Recommendation X.623 [ISO/IEC 8473-4:1995]
 %C Geneva
 %D July 1994
 %T Information Technology \(em Open Systems Interconnection \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the Underlying Service by a Subnetwork that Provides the OSI Data Link Service
@@ -4166,6 +4332,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.625/
 
+%K iso11188_1
 %K x637
 %L X.637
 %A ITU
@@ -4178,6 +4345,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.637/
 
+%K iso11188_3
 %K x638
 %L X.638
 %A ITU
@@ -4190,6 +4358,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.638/
 
+%K iso11188_2
 %K x639
 %L X.639
 %A ITU
@@ -4238,6 +4407,7 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.711/
 
+%K iso10165_2
 %K x721
 %L X.721
 %A ITU
@@ -4250,11 +4420,12 @@ Part 1: Protocol Specification
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.721/
 
+%K iso10165_4
 %K x722
 %K GDMO
 %L X.722
 %A ITU
-%R ITU-T Recommendation X.722 [ISO/IEC 10165-4 : 1992]
+%R ITU-T Recommendation X.722 [ISO/IEC 10165-4:1992]
 %C Geneva
 %D January 1992
 %T Information Technology \(em Open Systems Interconnection \(em Structure of Management Information: Guidelines for the Definition of Managed Objects
@@ -4373,47 +4544,57 @@ Part 1: Protocol Specification
 %L ISO 3309
 %R ISO/IEC 3309:1988
 %A ISO/IEC
-%Q International Organization for Standardization
 %T Data Communication \(em High-Level Data Link Control Procedures \(em Frame Structure
 %D 1988
+%C Geneva
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso4335
 %L ISO 4335
 %R ISO/IEC 4335:1988
 %A ISO/IEC
-%Q International Organization for Standardization
 %T Data Communication \(em High-Level Data Link Control Procedures \(em Consolidation of Elements of Procedures
 %D 1988
+%C Geneva
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso7776
 %L ISO 7776
 %R ISO/IEC 7776:1995
 %A ISO/IEC
-%Q International Organization for Standardization
 %T Information technology \(em Telecommunications and information exchange between systems \(em High-level data link control procedures \(em Description of the X.25 LAPB-compatible DTE data link procedures
-%D July 1, 1995
 %J Second Edition
+%D July 1, 1995
+%C Geneva
 %I International Organization for Standardization
+%Q International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso8649
 %L ISO 8649
 %R ISO/IEC 8649:1988
 %A ISO/IEC
-%Q International Organization for Standardization
 %T Information Processing Systems \(em Open Systems Interconnection \(em Service Definition for the Association Control Service Element
 %D 1988
+%C Geneva
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso8650
 %L ISO 8650
 %R ISO/IEC 8650:1988
 %A ISO/IEC
-%Q International Organization for Standardization
 %T Information Processing Systems \(em Open Systems Interconnection \(em Protocol Specification for the Association Control Service Element
 %D 1988
+%C Geneva
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso8571_1
 %L ISO 8571-1
@@ -4421,6 +4602,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 1: General Introduction
 %D 1988
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4431,6 +4613,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition
 %D 1988
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4441,6 +4624,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 2: Vitual Filestore Definition \(em Amendment 1: Filestore Management
 %D 1992
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4451,6 +4635,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification
 %D 1988
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4461,6 +4646,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Processing Systems \(em Open Systems Interconnection \(em File Transfer, Access and Management \(em Part 4: File Protocol Specification \(em Amendment 1: Filestore Management
 %D 1992
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4471,6 +4657,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 1: Specification of ACSE \(em Presentation and session protocols for use by ROSE and CMISE
 %D 1992
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4481,6 +4668,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 3: CMISE/ROSE for AOM11 \(em Basic Management Communications
 %D 1992
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4491,6 +4679,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em International Standardized Profiles AOM1n OSI Management \(em Management Communications \(em Part 2: CMISE/ROSE for AOM12 \(em Enhanced Management Communications
 %D 1992
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4501,6 +4690,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4511,6 +4701,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4521,6 +4712,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Test Methods for Measuring Conformace to Open Systems Interconnection (OSI) Abstract Data Manipulation \(em Application Program Interface (API) [Language Independent]
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4530,6 +4722,7 @@ Part 1: Protocol Specification
 %R ISO/IEC 14363:1996
 %A ISO/IEC
 %D 1996
+%C Geneva
 %T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging \(em Application Program Interface (API) [Language Independent]
 %Q International Organization for Standardization
 %I International Organization for Standardization
@@ -4541,6 +4734,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Bindings for Application Program Interface (API)
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4551,6 +4745,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em MHS-Based Electronic Messagin C Language Interfaces \(em Binding for Application Program Interface (API)
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4561,6 +4756,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Test Methods for Measuring Conformance to Open Systems Interconnection (OSI) Abstract Data Manipulation C Language Interface \(em Binding for Application Program Interface (API)
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4571,6 +4767,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Test Methods for Measuring Conformance to MHS-Based Electronic Messaging C Language Interfaces \(em Binding for Application Program Interface (API)
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4581,6 +4778,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Directory Services \(em Application Program Interface (API) [Language Independent]
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4591,6 +4789,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Test Methods for Measuring Conformace to Directory Services \(em Application Program Interface (API) [Language Independent]
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4601,6 +4800,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Directory Services C Language Interfaces \(em Binding for Application Program Interface (API)
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4611,6 +4811,7 @@ Part 1: Protocol Specification
 %A ISO/IEC
 %T Information Technology \(em Test Methods for Measuring Conformance to Directory Services C Language Interface \(em Binding for Application Program Interface (API)
 %D 1996
+%C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
@@ -4782,9 +4983,9 @@ Part 1: Protocol Specification
 %C Boulder, Colorado
 %U http://publibn.boulder.ibm.com/
 
-%L AIXCPC
+%L AIXCPC51
 %R AIX\(rg 5L Version 5.1
-%K aixcpc
+%K aixcpc51
 %T AIX Communications Programming Concepts
 %D 2001
 %Q Internatonal Business Machines Corp.
@@ -6535,6 +6736,40 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1575.txt
+
+%K rfc1577
+%L RFC1577
+%R RFC 1577
+%A M. Laubach
+%T Classical IP and ARP over ATM
+%D January 1994
+%O (Obsoleted by RFC 2225) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1577.txt
+
+%K rfc1626
+%L RFC1626
+%R RFC 1626
+%A R. Atkinson
+%T Default IP MTU for use over ATM AAL5
+%D May 1994
+%O (Obsoleted by RFC 2225) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1626.txt
+
+%K rfc2225
+%L RFC2225
+%R RFC 2225
+%A M. Laubach
+%A J. Halpern
+%T Classical IP and ARM over ATM
+%D April 1998
+%O (Obsoletes by RFC 1577, RFC 1626) (Status: PROPOSED STANDARD)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc2225.txt
 
 %K rfc1095
 %L rfc 1095

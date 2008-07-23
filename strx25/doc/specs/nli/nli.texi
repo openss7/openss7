@@ -1,8 +1,8 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: nli.texi,v 0.9.2.4 2008-07-11 09:46:29 brian Exp $
+% @(#) $Id: nli.texi,v 0.9.2.5 2008-07-23 08:29:16 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,11 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-11 09:46:29 $ by $Author: brian $
+% Last Modified $Date: 2008-07-23 08:29:16 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename nli.info
 @include texi/args.texi
@@ -78,54 +78,54 @@
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
-This file documents the SpiderX.25 Network Layer Interface.
+This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release
-@value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
-Corporation}.  This specification was originally published by NRC Compten.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE} published by
+@uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
-Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
-Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org,Brian F. G. Bidulock} @*
+
+Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
 
 All Rights Reserved.
 
-Permission is granted to make and distribute verbatim copies of this manual
-provided the copyright notice and this permission notice are preserved on all
-copies.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @ignore
-Permission is granted to process this file through Tex and print the results,
-provided the printed document carries copying permission notice identical to
-this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-Permission to use, copy, modify, and distribute this documentation for any
-purpose and without fee is hereby granted, provided that the above copyright
-notice appears in all copies and that both that copyright notice and this
-permission notice appear in supporting documentation, and that the name OpenSS7
-Corporation not be use in advertising or publicity pertaining to distribution
-of the software without specific, written prior permission.  OpenSS7 Corporation
-makes no representations about the suitability of this documentation for any
-purpose.  It is provided ``as is'' without express or implied warranty.
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
 
-Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copying, provided the entire resulting
-derived work is distributed under the terms of a permission notice identical to
-this one.
-
-Permission is granted to copy and distribute translations of this manual into
-another language, under the above conditions for modified versions.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 @end ifinfo
 
 @include texi/args.texi
 @set MANUAL_TITLE Network Layer Interface
 @set MANUAL_TYPE Specification
 
-@ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
-@end ignore
 @titlepage
 @titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
@@ -140,12 +140,11 @@ another language, under the above conditions for modified versions.
 @sp 4
 @quotation
 @subheading Abstract
-This document is a @value{MANUAL_TITLE} containing technical details concerning
-the implementation of the @value{MANUAL_TITLE} for OpenSS7.  It contains
-recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the X.25
-Packet Layer Protocol (PLP) to these components as well as providing a basis for
-network layer control for other network protocols.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+X.25 Packet Layer Protocol (PLP) to these components as well as providing a basis for network layer
+control for other network protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -173,60 +172,54 @@ Unauthorized distribution or duplication is prohibited.
 
 @ignore
 @noindent
-This software and related documentation is protected by copyright and
-distributed under licenses restricting its use, copying, distribution and
-decompilation.  No part of this software or related documentation may be
-reproduced in any form by any means without the prior written authorization of
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
 the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the
-recipient will protect this information and keep it confidential, and will not
-disclose the information contained in this document without the written
-permission of its owner.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation
-for any reason, including but not limited to, conformity with standards
-promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or
-procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
-under no obligation to provide any feature listed herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} reserves the right to revise this software and
+documentation for any reason, including but not limited to, conformity with standards promulgated by
+various agencies, utilization of advances in the state of the technical arts, or the reflection of
+changes in the design of any techniques, or procedures embodied, described, or referred to herein.
+@uref{http://www.openss7.com/,,OpenSS7 Corporation} is under no obligation to provide any feature
+listed herein.
 @end ignore
 
 @noindent
-Permission to use, copy and distribute this documentation without modification,
-for any purpose and without fee or royalty is hereby granted, provided that both
-the above copyright notice and this permission notice appears in all copies and
-that the name of OpenSS7 Corporation not be used in advertising or publicity
-pertaining to distribution of this documentation or its contents without
-specific, written prior permission.  OpenSS7 Corporation makes no representation
-about the suitability of this documentation for any purpose.  It is provided
-``as is'' without express or implied warranty.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @subsubheading Notice:
 
 @noindent
-@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
-DOCUMENTATION INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
-CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR
-OTHER RIGHTS..  IN NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT,
-INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING
-FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
-OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF THIS
-DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
+@b{OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS DOCUMENTATION INCLUDING ALL
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.  IN
+NO EVENT SHALL OPENSS7 CORPORATION BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH ANY USE OF
+THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.}
 
 @sp 1
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation
-for any reason, including but not limited to, conformity with standards
-promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or
-procedures embodied, described, or referred to herein.  OpenSS7 Corporation is
-under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -235,7 +228,7 @@ under no obligation to provide any feature listed herein.
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
 @evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
@@ -245,25 +238,28 @@ under no obligation to provide any feature listed herein.
 @defcodeindex pr
 @c Define an index of primitive values
 @defcodeindex pv
-@c Define an index of primitive error values
-@defcodeindex pe
+@c @c Define an index of primitive error values
+@c @defcodeindex pe
 @c Define an index of protocol states
 @defcodeindex st
 @c Define an index of input-output controls
 @defcodeindex ct
 @c Define an index of manual pages.
 @defcodeindex mp
+@c Define an index of MIB objects.
+@defcodeindex mo
 
 @ifnottex
 @c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
-@syncodeindex pe cp
+@c @syncodeindex pe cp
 @syncodeindex st cp
 @syncodeindex mp cp
 @syncodeindex tp cp
 @syncodeindex vr cp
 @syncodeindex ct cp
+@syncodeindex mo cp
 @end ifnottex
 
 @include texi/macros.texi
@@ -271,28 +267,32 @@ under no obligation to provide any feature listed herein.
 
 @iftex
 
-@macro prim {name}
+@macro prim{name}
 @code{\name\}@prindex \name\
 @end macro
 
-@macro pval {name}
+@macro pval{name}
 @code{\name\}@pvindex \name\
 @end macro
 
-@macro perr {name}
-@code{\name\}@peindex \name\
-@end macro
+@c @macro perr{name}
+@c @code{\name\}@peindex \name\
+@c @end macro
 
-@macro psta {name}
+@macro psta{name}
 @code{\name\}@stindex \name\
 @end macro
 
-@macro parm {name}
+@macro parm{name}
 @code{\name\}@vrindex \name\
 @end macro
 
-@macro pioc {name}
+@macro pioc{name}
 @code{\name\}@ctindex \name\
+@end macro
+
+@macro mobj{name}
+@code{\name\}@moindex \name\
 @end macro
 
 @end iftex
@@ -309,9 +309,9 @@ under no obligation to provide any feature listed herein.
 @code{\name\}
 @end macro
 
-@macro perr{name}
-@code{\name\}
-@end macro
+@c @macro perr{name}
+@c @code{\name\}
+@c @end macro
 
 @macro psta{name}
 @code{\name\}
@@ -325,6 +325,10 @@ under no obligation to provide any feature listed herein.
 @code{\name\}
 @end macro
 
+@macro mobj{name}
+@code{\name\}
+@end macro
+
 @end ifnottex
 
 @ifnottex
@@ -334,10 +338,11 @@ under no obligation to provide any feature listed herein.
 
 @menu
 * Introduction::
-* Model of the Network Layer::
+* Model of the X.25 Packet Layer::
 * NLI Services::
 * NLI Message Primitives::
 * NLI Input-Output Controls::
+* NLI Management Information Base::
 * Allowable Sequence of NLI Primitives::
 @c * Precedence of NPI Primitives::
 @c * Guidelines for Protocol Independent NS Users::
@@ -350,7 +355,12 @@ under no obligation to provide any feature listed herein.
 * NLI Compatibility and Porting::
 * Glossary of NLI Terms and Acronyms::
 * References::
+@iftex
+* Indices::
+@end iftex
+@ifnottex
 * Index::
+@end ifnottex
 @end menu
 
 @iftex
@@ -358,54 +368,298 @@ under no obligation to provide any feature listed herein.
 @page
 @heading List of Figures
 @listoffloats Figure
-@page
-@heading List of Tables
-@listoffloats Table
+@c @page
+@c @heading List of Tables
+@c @listoffloats Table
 @end iftex
 
 @node Introduction
 @chapter Introduction
 
-The Network Layer Interface (NLI) was developed by Spider Systems, Ltd., (now a
-division of Emerson Power), and is widely available on many platforms.
-For example, @cite{AIX AIXlink/X.25}, @cite{HP-UX HP X.25/9000}, @cite{Solaris
-Solstice X.25} and @cite{SunLink X.25}, @cite{IRIX IRIS SX.25}, @cite{PT X.25}
-and @cite{SBE X.25} implement the Network Layer Interface (NLI).
+@menu
+* History::
+* Development::
+@end menu
 
-The Network Layer Interface (NLI) was designed to be used directly with standard
-@dfn{STREAMS} system calls and does not require the use of a cooperating user
-space shared library.  Applications program directly use the
-@command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)} and
-@command{putpmsg(2)} system calls.@footnote{See @manref{getmsg(2s)},
-@manref{getpmsg(2)}, @manref{putmsg(2s)} and @manref{putpmsg(2)} manual pages.}
-Nevertheless, user shared object libraries can easily be constructed using this
-@dfn{STREAMS} service primitive interface.
+The Network Layer Interface (NLI) was developed by Spider Systems, Ltd., (now a division of Emerson
+Power), and is widely available on many platforms.  For example, @cite{AIX AIXlink/X.25},
+@cite{HP-UX HP X.25/9000}, @cite{Solaris Solstice X.25} and @cite{SunLink X.25}, @cite{IRIX IRIS
+SX.25}, @cite{PT X.25} and @cite{SBE X.25} implement the Network Layer Interface (NLI).
+
+The Network Layer Interface (NLI) was designed to be used directly with standard @dfn{STREAMS}
+system calls and does not require the use of a cooperating user space shared library.  Applications
+programs directly use the @command{getmsg(2s)}, @command{getpmsg(2)}, @command{putmsg(2s)},
+@command{putpmsg(2)} and @command{ioctl(2)} system calls.@footnote{See @manref{getmsg(2s)},
+@manref{getpmsg(2)}, @manref{putmsg(2s)}, @manref{putpmsg(2)} and @manref{ioctl(2)} manual pages.}
+Nevertheless, user shared object libraries can easily be constructed using this @dfn{STREAMS}
+service primitive interface.
 
 The system header files that must be included when compiling user applications,
 or @dfn{STREAMS} drivers and modules that use the interface, are detailed in
 @ref{NLI Header Files}.
 
-A user library, @cite{libsx25}, is provided, not for interfacing to the message
-primitive service interface, but for providing various helper functions when
-using the @dfn{STREAMS} service interface.  This library is detailed in @ref{NLI
-Library}.
+A user library, @file{libsx25}, is provided, not for interfacing to the message primitive service
+interface, but for providing various helper functions when using the @dfn{STREAMS} service
+interface.  This library is detailed in @ref{NLI Library}.
 
-@node Model of the Network Layer
-@chapter Model of the Network Layer
-@cindex Data Structures
+@node History
+@section History
+
+The original @cite{UNIX@registeredsymbol{} System V Release 3.2} with the @cite{Network Service
+Utilities (NSU)} package, defined three levels of interface corresponding to boundaries of the
+@cite{OSI Model}, as follows:
+
+@table @dfn
+@item Transport Layer Inteface
+
+This interface later turned into the @cite{Transport Provider Interface (TPI)}
+that was standardized by @cite{UNIX International} and later standardized by the
+@cite{Open Group}.
+Two libraries existed in @cite{SVR 4} and @cite{X/Open}: the @dfn{Transport
+Layer Interface (TLI)} library from @cite{SVR 4} and the @dfn{X/Open Transport
+Interface (XTI)} library from the @cite{Open Group}.
+The @cite{Open Group} also standardized the XTI interface for X.25.
+
+@item Network Layer Interface
+
+This interface later turned into the @cite{Network Provider Interface (NPI)}
+that was standardized by @cite{UNIX International}, but was not standardized by
+the @cite{Open Group}.  The NPI was used for X.25 as well as CONS in accordance
+with X.223.
+No library was provided by @cite{SVR 4} for this interface; however,
+@uref{http://www.gcom.com/,,GCOM} specified an @dfn{NPI API Library} also
+provided by @uref{http://www.openss7.org/,,OpenSS7}.
+For X.25, @cite{Spider Systems, Ltd.} provided the @dfn{Network Layer Interface
+(NLI)} that is the subject of this specification.
+
+@item Link Layer Interface
+
+This interface later tunred into the @cite{Data Link Provider Inteface (DLPI)}
+that was standardized by @cite{UNIX International} and later standardized by the
+@cite{Open Group}.
+No library was provided by @cite{SVR 4} for this interface; however,
+@uref{http://www.gcom.com/,,GCOM} specifies a @dfn{DLPI API Library} also
+provided by
+@uref{http://www.openss7.org/,,OpenSS7}.
+For X.25, @cite{Spider Systems, Ltd.} provided the @dfn{Link Layer Interface
+(LLI)} that is the subject of a companion specification.
+@cite{Sun Microsystems} has recently specified a @dfn{DLPI Library} for
+@cite{Solaris 11} that is also provided by
+@uref{http://www.openss7.org/,,OpenSS7}.
+
+@item Media Access Control
+
+This interface was proposed by @cite{NCR Comten} as the @cite{Communications
+Device Interface (CDI)} that was not standardized.
+@cite{SVR 4} provided a @dfn{Media Access Control (MAC)} interface also
+supported by
+@uref{http://www.openss7.org/,,OpenSS7}.
+@cite{Spider Systems, Ltd.} X.25 does not directly use an interface at this
+level but, instead relies on access at the LLI.
+
+@item Wide Area Network
+
+This interface was proposed by @cite{NCR Comten} as the @cite{Communications
+Device Interface (CDI)} that was not standardized.
+For X.25, @cite{Spider Systems, Ltd.} provided the @dfn{Wide Area Network (WAN)
+Interface} that is the subject of a companion specification.
+
+@end table
+
+The @dfn{Network Layer Interface (NLI)} specified by @cite{Spider Systems, Ltd.}
+was the most widespread implementation of X.25 found on
+@cite{UNIX@registeredsymbol{}} and Unix-like systems.
+
+@node Development
+@section Development
+@cindex Spider Systems, Ltd.
+
+Although the @cite{Spider Systems, Ltd.} @dfn{Network Layer Interface (NLI)}
+that is the subject of this specification was and is still in widespread use for
+the implementation of X.25 on @cite{UNIX@registeredsymbol{}} and Unix-like
+systems, it must be stressed that this is a legacy interface.  It is provided by
+@uref{http://www.openss7.org/,,The OpenSS7 Project} only for the purpose of
+porting legacy applications, drivers and modules to @b{Linux}.  The following
+principles should be adhered to:
+
+@itemize
+
+@item
+The only formal standard interface for X.25 was specified by the @cite{Open
+Group} using the @dfn{X/Open Transport Interface}
+library, specified in reference @ref{XX25,,XX25}.
+This interface is supported by @uref{http://www.openss7.org/,,OpenSS7} using the
+XX25 module described in @ref{XX25 Module}.
+
+This interface alone should be used for new applications.
+
+@item
+For intermodule communications, the only industry standard interface for X.25
+was specified by @cite{UNIX International} as the @dfn{Network Provider
+Interface (NPI)} specified in reference @ref{NPI,,NPI}.  This interface is
+supported by @uref{http://www.openss7.org/,,OpenSS7} directly and using the NPI
+module described in @ref{NPI Conversion Module}.
+
+This interface alone should be used for new inter-module service interfaces.
+
+@item
+For applications interfaces and inter-module service interfaces for CONS
+(X.223), the only industry standard interface was specified by @cite{UNIX
+International} as the @dfn{Network Provider Interface (NPI)} specified in
+reference @ref{NPI,,NPI}.  This interface is supported by
+@uref{http://www.openss7.org/,,OpenSS7} directly and using the CON module
+described in @ref{CONS Module}.
+
+This interface alone should be used by OSI applications, drivers and modules.
+
+@item
+When porting legacy applications, drivers and modules to @b{Linux}, the
+@dfn{Network Layer Interface (NLI)} as specified in this document may be used
+both for application interface and for inter-module service interfaces.
+
+@end itemize
+
+Note that when porting legacy NLI applications to @b{Linux} using the interface
+specified in this document, that there are many variations in implementation of
+the @dfn{NLI} as modified by licensors of the @cite{Spider Systems, Ltd.}
+implementation.  These modifications are ofter incompatible.  Some of the
+incompatibilities are hidden by an X.25 utility library described in @ref{NLI
+Library}.
+@cindex Spider Systems, Ltd.
+
+@node Model of the X.25 Packet Layer
+@chapter Model of the X.25 Packet Layer
+@cindex Model of the X.25 packet layer
+@cindex STREAMS
+
+The @dfn{X.25 Packet Layer} provides the means to manage the operation of the
+X.25 network.  It is responsible for the routing and management of data exchange
+between network-user entities.
+
+The NLI defines the services provided by the X.25 packet layer to the X.25 user
+at the boundary between the X.25 packet layer and the X.25 user entity.  The
+interface consists of a set of messages defined as @dfn{STREAMS} messages that
+provide access to the X.25 packet layer services, and are transferred between
+the X.25 user entity and the X.25 packet layer provider.
+
+These messages are of two types: ones that originate from the X.25 user, and
+other that originate from the X.25 packet layer.  The messages that originate
+from the X.25 user make requests to the X.25 packet layer, or respone to an
+event of the X.25 packet layer.  The messages that originate from the X.25
+packet layer, are either confirmations of a request or are indications to the
+X.25 user that the event has occured.  @figref{1} shows the model of the NLI.
+
+@figuresized{nli_fig1,1,Model of the NLI,5.0in}
+
+The NLI allows the X.25 packet layer (as a @dfn{STREAMS} driver) to be
+configured with an X.25 user (as a @dfn{STREAMS} module) that conforms to the
+NLI.  An X.25 user can also be a user program that conforms to the NLI and
+accesses the X.25 packet layer using @manref{putmsg(2s)}, @manref{putpmsg(2)},
+@manref{getmsg(2s)}, @manref{getpmsg(2)}, and @manref{ioctl(2)} system calls.
 
 @node NLI Services
 @chapter NLI Services
-@cindex Listens
+@cindex NLI services
 
 @menu
+* NLI Modes::
 * NLI Commands::
 * NLI Data Structures::
 @end menu
 
+The features of the NLI are defined in termsof the services provided by the X.25
+packet layer, and the individual messages that may flow between the X.25 user
+and the X.25 packet layer.
+
+The services supported by the NLI are based on three related modes of
+communication, X.25 mode, non-X.25 mode, and CONS mode.
+
+@node NLI Modes
+@section NLI Modes
+@cindex NLI modes
+
+@subsubheading Packet Level Features
+
+@itemize
+@item permanent virtual circuits;
+@item extended packet sequence numbering;
+@item D-bit support;
+@item packet transmission;
+@item incoming calls barred;
+@item outgoing calls barred;
+@item one-way logical channel incoming;
+@item one-way logical channel outgoing;
+@item two-way logical channel;
+@item non-standard default packet sizes;
+@item non-standard default window sizes;
+@item default throughput class assignement;
+@item flow control parameter negotiation;
+@item throughput class negotiation;
+@item closed user group;
+@item bilateral closed user group;
+@item fast select;
+@item fast select acceptance;
+@item reverse charging;
+@item reverse charging acceptance;
+@item local charging prevention;
+@item network user identification selection;
+@item network user identification override;
+@item RPOA selection;
+@item called line address modification;
+@item call redirection;
+@item call deflection;
+@item transit delay;
+@item protection;
+@item priority;
+@item TOA/NPI addressing;
+@item programmable facilities.
+@end itemize
+
+@subsubheading X.25 Facilities
+
+@itemize
+@item fast select request;
+@item fast select with unrestricted response;
+@item fast select with restricted response;
+@item reverse charging;
+@item packet size negotiation;
+@item window size negotiation;
+@item closed user groups;
+@item bilateral closed user groups;
+@item network user identification;
+@item RPOA selection;
+@item called line address modification;
+@item call redirection;
+@item call charging;
+@item programmable facilities;
+@item DTE facility marker;
+@item extended address;
+@item throughput class;
+@item transit delay;
+@item expedited data;
+@item protection;
+@item priority;
+@item call user data;
+@item clear user data.
+@end itemize
+
+@subsubheading X.25 Operational Support
+
+@itemize
+@item Q-bit support for X.29 services;
+@item M-bit support for packet segmentation and reassembly;
+@item D-bit for data delivery confirmation;
+@item expedited data;
+@item call charging;
+@item called line address modification;
+@item call deflection;
+@item clear user data.
+@end itemize
+
+
 @node NLI Commands
 @section NLI Commands
-@cindex NLI Commands
+@cindex NLI commands
 
 @multitable @columnfractions 0.17 0.15 0.68
 @item Command @tab Description @tab Section
@@ -433,7 +687,7 @@ Library}.
 
 @node NLI Data Structures
 @section NLI Data Structures
-@cindex NLI Data Structures
+@cindex NLI data structures
 
 @menu
 * Addresses::
@@ -443,6 +697,11 @@ Library}.
 
 @node Addresses
 @subsection Addresses
+
+@menu
+* xaddrf::	    X.25 Address Format
+* lsapformat::	    LSAP Address Format
+@end menu
 
 In call requests and responses, it is necessary to specify the X.25 addresses
 associated with the connection.  These addresses consist of the called, calling
@@ -462,38 +721,44 @@ Points (LSAP); and,
 
 @end itemize
 
+@node xaddrf
+@subsubsection X.25 Address Format
+@cindex X.25 address format
+
 Addresses are represent using an @type{xaddrf} structure.  The @type{xaddrf}
 structure is formatted as follows:
 
 @example
 @group
+@verbatim
 #define NSAPMAXSIZE 20
 
-struct xaddrf @{
-    union @{
+struct xaddrf {
+    union {
         uint32_t link_id;
         uint32_t sn_id;
-    @};
+    };
     unsigned char aflags;
     struct lsapformat DTE_MAC;
     unsigned char nsap_len;
     unsigned char NSAP;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 The @type{xaddrf} structure contains the following members:
 
-@table @member
+@table @parm
 @item link_id
-Holds the link number as a @type{uint32_t}.  By default, @member{link_id} has a
-valud of @constant{0xFF}.  When @member{link_id} is @constant{0xFF}, Solstice
+Holds the link number as a @type{uint32_t}.  By default, @parm{link_id} has a
+valud of @samp{0xFF}.  When @parm{link_id} is @samp{0xFF}, Solstice
 X.25 attempts to match the valled address with an entry in a routing
 configuration file.  If it cannot find a match, it routes the call over the
 lowest numbered WAN link.
 @item sn_id
 
-Note that in some implementations, the @member{sn_id} field is
+Note that in some implementations, the @parm{sn_id} field is
 declared as @type{unsigned long}; however, this causes complications for 32-bit
 applications running over a 64-bit kernel: i.e., it requires that the data model
 of the application be known to the kernel module and conversions be supported.
@@ -503,12 +768,12 @@ Therefore, this field appears in the header file as the 32- vs.  64-bit agnostic
 Specifies the options required (or used) by the subnetwork to encode and
 interpret addresses.  It may have one of the following values:
 @multitable @columnfractions 0.15 0.1 0.6
-@item @pval{NSAP_ADDR} @tab @constant{0x00} @tab @member{NSAP} is OSI-encoded NSAP address.
-@item @pval{EXT_ADDR} @tab @constant{0x01} @tab @member{NSAP} is non-OSI-encoded extended address.
-@item @pval{PVC_LCI} @tab @constant{0x02} @tab @member{NSAP} is a PVC number.
-@item @pval{PVC_LCI} @tab @constant{0x02} @tab @member{DTE_MAC} is the LCI of a PVC.
+@item @pval{NSAP_ADDR} @tab @samp{0x00} @tab @parm{NSAP} is OSI-encoded NSAP address.
+@item @pval{EXT_ADDR} @tab @samp{0x01} @tab @parm{NSAP} is non-OSI-encoded extended address.
+@item @pval{PVC_LCI} @tab @samp{0x02} @tab @parm{NSAP} is a PVC number.
+@item @pval{PVC_LCI} @tab @samp{0x02} @tab @parm{DTE_MAC} is the LCI of a PVC.
 @end multitable
-When the @member{NSAP} field is empty, @member{aflags} takes the value zero
+When the @parm{NSAP} field is empty, @parm{aflags} takes the value zero
 (0).@footnote{See @manref{x25addr(5)}, @manref{stox25(3)}, @manref{x25tos(3)},
 and @manref{gexhostent(3)} manual pages for details about the X.25 address
 format.}
@@ -517,22 +782,40 @@ The DTE address, or LSAP as two BCD digits per byte, right justified, or the
 @pval{PVC_LCI} as three BCD digits with two digits per byte, right
 justified.
 Holds the DTE address, the Medium Access Control plus Service Access Point
-(MAC+SAP) address or the LCI.  This is binary.  The @type{lsapformat} structure
-is formatted as follows:.
+(MAC+SAP) address or the LCI.  This is binary. @xref{lsapformat}.
+@item nsap_len
+The length in semi-octets of the NSAP as two BCD digits per byte, right
+justified.
+This indicates the length of the NSAP, if any (and where appropriate), in
+semi-octets.
+@item NSAP
+The NSAP or address extension (see @parm{aflags}) as two BCD digitis per byte,
+right justified.
+This carries the NSAP or address extension (see field @parm{aflags}) when
+present as indicated by @parm{nsap_len}.  This is binary.
+@end table
+
+@node lsapformat
+@subsubsection LSAP Address Format
+@cindex LSAP address format
+
+The @type{lsapformat} structure is formatted as follows:.
 @example
 @group
+@verbatim
 #define LSAPMAXSIZE
 
-struct lsapformat @{
+struct lsapformat {
     unsigned char lsap_len;
     unsigned char lsap_add[LSAPMAXSIZE];
-@};
+};
+@end verbatim
 @end group
 @end example
 The fields in this structure are defined as follows:
-@table @member
+@table @parm
 @item lsap_len
-This gives the length of the DTE address, the MAC+SAP addres, or the LCI in
+This gives the length of the DTE address, the MAC+SAP address, or the LCI in
 semi-octets.  For example for Ethernet, the length is always 14 to indicate the
 MAC (12) plush SAP (2).  The SAP always follows the MAC address.  The DTE can be
 up to 15 decimal digits unless X.25(88) and Type Of Address/Numbering Plan
@@ -544,21 +827,41 @@ decimal digtis unless X.25(88) and TOA/NPI addressing is used, in which case it
 can be up to 17 decimal digits.  A @pval{PVC_LCI} is 3 digits long.
 @item lsap_add
 This holds the DTE, MAC+SAP or LCI, when present, as indicated by
-@member{lsap_len}.  This is binary.
+@parm{lsap_len}.  This is binary.
 The DTE address, LSAP or @pval{PVC_LCI} as two BCD digits per byte, right
 justified.
 @end table
-@item nsap_len
-The length in semi-octets of the NSAP as two BCD digits per byte, right
-justified.
-This indicates the length of the NSAP, if any (and where appropriate), in
-semi-octets.
-@item NSAP
-The NSAP or address extension (see @member{aflags}) as two BCD digitis per byte,
-right justified.
-This carries the NSAP or address extension (see field @member{aflags}) when
-present as indicated by @member{nsap_len}.  This is binary.
-@end table
+
+For TOA/NPI the TOA is:
+
+@multitable {0000}{0}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0000 @tab 0 @tab Network-dependent number or unknown.
+@item 0001 @tab 1 @tab International number.
+@item 0010 @tab 2 @tab National number.
+@item 0011 @tab 3 @tab Network specific number (for use in private networks).
+@item 0100 @tab 4 @tab Complementary address without main address.
+@item 0101 @tab 5 @tab Alternative address.
+@end multitable
+
+NPI for other than Alternative address is:
+
+@multitable {0000}{0}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0000 @tab 0 @tab Network-dependent number or unknown.
+@item 0001 @tab 1 @tab ITU-T Recommendation E.164 (digital).
+@item 0010 @tab 2 @tab ITU-T Recommendation E.164 (analog).
+@item 0011 @tab 3 @tab ITU-T Recommendation X.121.
+@item 0100 @tab 4 @tab ITU-T Recommendation F.69 (telex numbering plan).
+@item 0101 @tab 5 @tab Private number plan (for private use only).
+@end multitable
+
+NPI when TOA is Alternative Address is:
+
+@multitable {0000}{0}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item 0000 @tab 0 @tab Character string coding to ISO/IEC 646.
+@item 0001 @tab 1 @tab OSI NSAP address coded per X.213/ISO 8348.
+@item 0010 @tab 2 @tab MAC address per IEEE 802.2/ISO/IEC 8802:1998.
+@item 0011 @tab 3 @tab Internet Address per RFC 1166. (i.e. an IPv4 address).
+@end multitable
 
 @node CONS Quality of Service Parameters
 @subsection CONS Quality of Service Parameters
@@ -602,9 +905,10 @@ structure.  The @type{qosformat} structure is formatted as follows:
 
 @example
 @group
+@verbatim
 #define MAX_PROT 32
 
-struct qosformat @{
+struct qosformat {
     unsigned char reqtclass;
     unsigned char locthroughput;
     unsigned char remthroughput;
@@ -635,13 +939,14 @@ struct qosformat @{
     unsigned char reqexpedited;
     unsigned char reqackservice;
     struct extraformat xstras;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 The @type{qosformat} structure has the following members:
 
-@table @member
+@table @parm
 @item reqtclass
 When non-zero, conveys that throughput negotiation is selected.
 @item locthroughput
@@ -651,29 +956,29 @@ Contains the four-bit throughput encoding for the remote to local direction.
 @item reqminthruput
 When non-zero, conveys that minimum throughput negotiation is selected.
 @item locminthru
-When @member{reqminthruput} is non-zero, conveys the four-bit throughput
+When @parm{reqminthruput} is non-zero, conveys the four-bit throughput
 encoding for the local to remote direction.
 @item remminthru
-When @member{reqminthruput} is non-zero, conveys the four-bit throughput
+When @parm{reqminthruput} is non-zero, conveys the four-bit throughput
 encoding for the remote to local direction.
 @item reqtransitdelay
 When non-zero, conveys that target transit delay negotiation is selected.
 @item transitdelay
-When @member{reqtransitdelay} is non-zero, conveys the 16-bit value.  In a
+When @parm{reqtransitdelay} is non-zero, conveys the 16-bit value.  In a
 Connect Confirmation, the value of the selected transit delay is placed in this
 field and is non-zero.
 @item reqmaxtransitdelay
 When non-zero, conveys that maximum acceptable transit delay negotiation is
 selected.
 @item acceptable
-When @member{reqmaxtransitdelay} is non-zero, conveys the 16-bit value of the
+When @parm{reqmaxtransitdelay} is non-zero, conveys the 16-bit value of the
 maximum acceptable transit delay. 
 
 Note: Transit delay selection applies only to Connect Requests.  There is no
 transit dleay QOS parameter in a Connect Response.  The correct response when
 the indicated QOS is unattainable is to make a Disconnect Request.  In a Connect
 Confirmation, the value of the selected transit delay is placed in the
-@member{transitdelay} field when such negotiation takes place.
+@parm{transitdelay} field when such negotiation takes place.
 @item reqpriority
 When non-zero, conveys that data priority negotiation is selected.
 @item reqprtygain
@@ -681,13 +986,13 @@ When non-zero, conveys that gain priority negotiation is selected.
 @item reqprtykeep
 When non-zero, conveys that keep priority negotiation is selected.
 @item prtydata
-When @member{reqpriority} is non-zero, contains the 8-bit priority for
+When @parm{reqpriority} is non-zero, contains the 8-bit priority for
 sending data.
 @item prtygain
-When @member{reqprtygain} is non-zero, contains the 8-bit priority for
+When @parm{reqprtygain} is non-zero, contains the 8-bit priority for
 gaining a connection.
 @item prtykeep
-When @member{reqprtykeep} is non-zero, contains the 8-bit priority for
+When @parm{reqprtykeep} is non-zero, contains the 8-bit priority for
 keeping a connection.
 @item reqlowprtydata
 When non-zero, conveys that data low priority negotiation is selected.
@@ -699,15 +1004,15 @@ This field is only valid on Connect Requests/Indications.
 When non-zero, conveys that keep low priority negotiation is selected.
 This field is only valid on Connect Requests/Indications.
 @item lowprtydata
-When @member{reqlowprtydata} is non-zero, contains the 8-bit priority for
+When @parm{reqlowprtydata} is non-zero, contains the 8-bit priority for
 sending data.
 This field is only valid on Connect Requests/Indications.
 @item lowprtygain
-When @member{reqlowprtygain} is non-zero, contains the 8-bit priority to gain a
+When @parm{reqlowprtygain} is non-zero, contains the 8-bit priority to gain a
 connection.
 This field is only valid on Connect Requests/Indications.
 @item lowprtykeep
-When @member{reqlowprtykeep} is non-zero, contains the 8-bit priority to keep a
+When @parm{reqlowprtykeep} is non-zero, contains the 8-bit priority to keep a
 connection.
 This field is only valid on Connect Requests/Indications.
 @item protection_type
@@ -733,11 +1038,11 @@ facility was present in the incoming call packet, and that its use was requested
 
 Note: Negotiation is a CONS procedure.  When the facility is present and
 indicates non-use,  use cannot be negotiated by Connect Responses.  For a
-description of the use of the @member{CONS_call} field in Connect Requests and
+description of the use of the @parm{CONS_call} field in Connect Requests and
 Connect Responses, see @ref{Connect Request/Indication}, and @ref{Connect
 Response/Confirmation}.
 
-For incoming or outgoing non-CONS calls (denoted by the @member{CONS_call} flag
+For incoming or outgoing non-CONS calls (denoted by the @parm{CONS_call} flag
 set to zero (0)), Expedited Data negotiation is not required: interrupt data is
 always available in X.25.  This means that this field is ignored on Connect
 Requests and Responses for non-CONS calls.
@@ -799,6 +1104,7 @@ Non-OSI X.25 Facilities are defined in the @type{extraformat} structure.  The
 
 @example
 @group
+@verbatim
 #define MAX_NUI_LEN  64
 #define MAX_RPOA_LEN  8
 #define MAX_CUG_LEN   2
@@ -807,10 +1113,12 @@ Non-OSI X.25 Facilities are defined in the @type{extraformat} structure.  The
 #define MAX_CD_LEN   MAX_TARRIFS * 4
 #define MAX_SC_LEN   MAX_TARRIFS * 4
 #define MAX_MU_LEN   16
+@end verbatim
 @end group
 
 @group
-struct extraformat @{
+@verbatim
+struct extraformat {
     unsigned char fastselreq;
     unsigned char restrictresponse;
     unsigned char reversecharges;
@@ -841,13 +1149,14 @@ struct extraformat @{
     unsigned char cg_fac_len;
     unsigned char cd_fac_len;
     unsigned char fac_field[MAX_FAC_LEN];
-@};
+};
+@end verbatim
 @end group
 @end example
 
 The @type{extraformat} structure has the following members:
 
-@table @member
+@table @parm
 @item fastselreq
 For non-OSI services (e.g. X.29), if the X.25 facility fast select is to be
 requested or indicated, this field is non-zero.  For CONS, the use of fast
@@ -872,18 +1181,20 @@ of zero or more of the following values:
 The field is defined as follows:
 @example
 @group
+@verbatim
 #define NEGOT_PKT       0x01
 #define NEGOT_WIN       0x02
 #define ASSERT_HWM      0x04
+@end verbatim
 @end group
 @end example
 The field is used for two reasons:
 @enumerate
 @item The X.25 software always indicates the values of the window and packet
-sizes operating on the virtual circuit.  The field @member{pwoptions} for an
+sizes operating on the virtual circuit.  The field @parm{pwoptions} for an
 incoming call indicates whether these values are negotiable.
 @item In Connect Request/Response message, the NLI user can set
-@member{nsdulimit}, the limit value for packet concatentation by the X.25 level,
+@parm{nsdulimit}, the limit value for packet concatentation by the X.25 level,
 to a value different from the limit in the subnetwork configuration database.
 It is not a negotiable option, so whatever the user requests is used.
 @end enumerate
@@ -900,21 +1211,21 @@ The default value, @pval{DEF_X25_WIN}, is two (2).
 When non-zero, contains the remote to local direction window size.
 The default value, @pval{DEF_X25_WIN}, is two (2).
 @item nsdulimit
-When non-zero, and the appropriate bit is set in the @member{pwoptions} field,
+When non-zero, and the appropriate bit is set in the @parm{pwoptions} field,
 this field is used as the specified concatentaiton limit.
 @item nui_len
 Valid in Connect Requests and Connect Responses, when non-zero, specifies the
-length of the @member{nui_field} in octets.  The Network User Identification
+length of the @parm{nui_field} in octets.  The Network User Identification
 facility is not available on 1980 X.25 networks.
 @item nui_field
-Contains the Network User Identification (NUI) octets of length @member{nui_len}.
+Contains the Network User Identification (NUI) octets of length @parm{nui_len}.
 @item rpoa_len
 Valid in Connect Requests only.  When non-zero, the RPOA DNIC information is
-suppplied in the @member{rpoa_field} field and the semi-octets in the field are
+suppplied in the @parm{rpoa_field} field and the semi-octets in the field are
 of this length.
 @item rpoa_field
 Contains the Recognized Private Operating Agency (RPOA) semi-octets of length
-@member{rpoa_len}.
+@parm{rpoa_len}.
 @item cug_type
 Valid in Connect Requests and Connect Indications only, this field, when
 non-zero, is 1 for Closed User Group (CUG) and 2 for Bilateral CUG (two members
@@ -930,15 +1241,15 @@ When non-zero in a Connect Request of Connect Indication, call charging is
 requested; in a Disconnect Indication of Disconnect Confirmation, the
 six fields below will give the charging information.
 @item chg_cd_len
-When non-zero, conveys the length of the @member{chg_cd_field} field.
+When non-zero, conveys the length of the @parm{chg_cd_field} field.
 @item chg_cd_field
 Conveys the call duration.
 @item chg_sc_len
-When non-zero, conveys the length of the @member{chg_sc_field} field.
+When non-zero, conveys the length of the @parm{chg_sc_field} field.
 @item chg_sc_field
 Conveys the segment count.
 @item chg_mu_len
-When non-zero, conveys the length of the @member{chg_mu_field} field.
+When non-zero, conveys the length of the @parm{chg_mu_field} field.
 @item chg_mu_field
 Conveys the monetary unit.
 @item called_add_mod
@@ -946,11 +1257,11 @@ When non-zero, conveys the reason value for call modification.
 @item call_redirect
 When non-zero, conveys the reason for call redirection.
 @item called
-When @member{call_redirect} is non-zero, conveys the orignalling called DTE
+When @parm{call_redirect} is non-zero, conveys the orignalling called DTE
 address.
 @item call_deflect
 Valid in the Disconnect Request and Disconnect Indication, when non-zero,
-conveys the reason for call deflection.  The @member{deflected} field in the
+conveys the reason for call deflection.  The @parm{deflected} field in the
 Disconnect Request or Indication conveys the DTE address, and if required, the
 NSAP address to which the call is to be deflected.
 @item x_fac_len
@@ -966,7 +1277,7 @@ Valid in Connect Requests and Connect Indiciations only,
 when non-zero, provides the length of the explicit facility encoded strings for
 non-X.25 facilities for the called network.
 @item fac_field
-When @member{x_fac_len}, @member{cg_fac_len} or @member{cd_fac_len} are
+When @parm{x_fac_len}, @parm{cg_fac_len} or @parm{cd_fac_len} are
 non-zero, contains the X.25 facilities, non-X.25 facilities for the calling
 network, and/or non-X.25 facilities for the called network.
 
@@ -979,7 +1290,7 @@ appropriate marker is inserted before the supplied facilities.
 
 @node NLI Message Primitives
 @chapter NLI Message Primitives
-@cindex NLI Message Primitives
+@cindex NLI message primitives
 
 @menu
 * Connect Request/Indication::
@@ -1003,7 +1314,7 @@ appropriate marker is inserted before the supplied facilities.
 @page
 @node Connect Request/Indication
 @section Connect Request/Indication
-@cindex Connect Request/Indication
+@cindex Connect request/indication
 
 @subheading Format
 
@@ -1017,7 +1328,8 @@ The @type{xcallf} structure is formatted as follows:
 
 @example
 @group
-struct xcallf @{
+@verbatim
+struct xcallf {
     unsigned char xl_type;
     unsigned char xl_command;
     int conn_id;
@@ -1026,7 +1338,8 @@ struct xcallf @{
     struct xaddrf calledaddr;
     struct xaddrf callingaddr;
     struct qosformat qos;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1044,7 +1357,7 @@ containing the Call User Data (CUD) when supplied.
 
 The @type{xcallf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -1063,7 +1376,7 @@ used.  When zero, this field indicates that X.25 procedures are to be used.
 QOS parameters can be negotiated by the peer or left at default values.  When
 non-zero, this field specifies or indicates that QOS parameters are being
 negotiated by the NS user or NS user peer and the pertinent ranges are provided
-in the @member{qos} member.  When zero, this field specifies and indicates that
+in the @parm{qos} member.  When zero, this field specifies and indicates that
 default values are to be used for the NS user or were indicated by the NS user
 peer.
 @item calledaddr
@@ -1097,7 +1410,7 @@ primitive of the NPI; the Connect Indication, the @prim{N_CONN_IND}.
 @page
 @node Connect Response/Confirmation
 @section Connect Response/Confirmation
-@cindex Connect Response/Confirmation
+@cindex Connect response/confirmation
 
 @subheading Format
 
@@ -1111,7 +1424,8 @@ The @type{xccnff} structure is formatted as follows:
 
 @example
 @group
-struct xccnff @{
+@verbatim
+struct xccnff {
     unsigned char xl_type;
     unsigned char xl_command;
     int conn_id;
@@ -1119,7 +1433,8 @@ struct xccnff @{
     unsigned char negotiate_qos;
     struct xaddrf responder;
     struct qosformat rqos;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1137,7 +1452,7 @@ containing the Call User Data (CUD) when supplied.
 
 The @type{xccnff} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -1155,7 +1470,7 @@ used.  When zero, this field indicates that X.25 procedures are to be used.
 QOS parameters can be negotiated by the peer or left at default values.  When
 non-zero, this field specifies or indicates that QOS parameters are being
 negotiated by the NS user or NS user peer and the pertinent ranges are provided
-in the @member{rqos} member.  When zero, this field specifies and indicates that
+in the @parm{rqos} member.  When zero, this field specifies and indicates that
 default values are to be used for the NS user or were indicated by the NS user
 peer.
 @item responder
@@ -1197,13 +1512,15 @@ The @type{xdataf} structure is formatted as follows:
 
 @example
 @group
-struct xdataf @{
+@verbatim
+struct xdataf {
     unsigned char xl_type;
     unsigned char xl_command;
     unsigned char More;
     unsigned char setDbit;
     unsigned char setQbit;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1220,7 +1537,7 @@ containing the local or remote NS user data (NSDU).
 
 The @type{xdataf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_DAT}.
 @item xl_command
@@ -1258,7 +1575,7 @@ The Data message primitive is equivalent to the @prim{N_DATA_REQ} and
 @page
 @node Data Acknowledgement
 @section Data Acknowledgement
-@cindex Data Acknowledgement
+@cindex Data acknowledgement
 
 @subheading Format
 
@@ -1271,10 +1588,12 @@ The @type{xdatacf} structure is formatted as follows:
 
 @example
 @group
-struct xdatacf @{
+@verbatim
+struct xdatacf {
     unsigned char xl_type;
     unsigned char xl_command;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1290,7 +1609,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{xdatacf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_DAT}.
 @item xl_command
@@ -1314,12 +1633,12 @@ requested acknowledgement.
 For CONS calls, if receipt acknowledgement was negotiated on the connection,
 then an acknowledgement is pending for each Data primitive conveyed.  However,
 to be compatible with previous releases of the NPI, the value of the
-@member{reqackservice} field in the @member{qos} structure can be set to request
+@parm{reqackservice} field in the @parm{qos} structure can be set to request
 that the D-bit signifies receipt confirmation by the remote DTE only, thus
 ensuring that no acknowledgements are expected or given.
 
-For non-CONS calls, only when the @member{reqackservice} field in the
-@member{qos} structure has been set to the appropriate value will the Data
+For non-CONS calls, only when the @parm{reqackservice} field in the
+@parm{qos} structure has been set to the appropriate value will the Data
 Acknolwedgement procedures apply for an D-bit Data requested or indicated.
 Otherwise, no acknowledgement is expected or given.
 
@@ -1331,7 +1650,7 @@ The Data Acknowledgement message primitive is equivalent to the
 @page
 @node Expedited Data
 @section Expedited Data
-@cindex Expedited Data
+@cindex Expedited data
 
 @subheading Format
 
@@ -1345,10 +1664,12 @@ The @type{xedataf} structure is formatted as follows:
 
 @example
 @group
-struct xedataf @{
+@verbatim
+struct xedataf {
     unsigned char xl_type;
     unsigned char xl_command;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1371,7 +1692,7 @@ before another expedited data unit can be requested or indicated.
 
 The @type{xedataf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_DAT}.
 @item xl_command
@@ -1397,7 +1718,7 @@ The Expedited Data message primitive is equivalent to the
 @page
 @node Expedited Data Acknowledgement
 @section Expedited Data Acknowledgement
-@cindex Expedited Data Acknowledgement
+@cindex Expedited data acknowledgement
 
 @subheading Format
 
@@ -1410,10 +1731,12 @@ The @type{xedatacf} structure is formatted as follows:
 
 @example
 @group
-struct xedatacf @{
+@verbatim
+struct xedatacf {
     unsigned char xl_type;
     unsigned char xl_command;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1429,7 +1752,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{xedatacf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_DAT}.
 @item xl_command
@@ -1455,7 +1778,7 @@ NPI.
 @page
 @node Reset Request/Indication
 @section Reset Request/Indication
-@cindex Reset Request/Indication
+@cindex Reset request/indication
 
 @subheading Format
 
@@ -1468,14 +1791,16 @@ The @type{xrstf} structure is formatted as follows:
 
 @example
 @group
-struct xrstf @{
+@verbatim
+struct xrstf {
     unsigned char xl_type;
     unsigned char xl_command;
     unsigned char originator;
     unsigned char reason;
     unsigned char cause;
     unsigned char diag;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1488,17 +1813,17 @@ The control part of the message consists of one @msg{M_PROTO} message block, and
 contains the @type{xrstf} structure.
 There is no data part (@msg{M_DATA} message blocks) associated with this message primitive.
 
-The X.25 cause and diagnostic octets, @member{cause} and @member{diag}, are
-conveyrs, as well as the CONS @member{originator} and @member{reason} codes,
-which are mapped from the @member{cause} and @member{diag}.  A Reset Request
-on a non-CONS call can specify a non-zero @member{cause} code.  This has
+The X.25 cause and diagnostic octets, @parm{cause} and @parm{diag}, are
+conveyrs, as well as the CONS @parm{originator} and @parm{reason} codes,
+which are mapped from the @parm{cause} and @parm{diag}.  A Reset Request
+on a non-CONS call can specify a non-zero @parm{cause} code.  This has
 no effect for a CONS call.
 
 @subheading Parameters
 
 The @type{xrstf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -1515,20 +1840,20 @@ diagnostic.  This field can have one of the following values:
 @item reason
 For a CONS call, contains the CONS reason, mapped from the X.25 cause and
 diagnostic.
-This field can have one of the following values when the @member{originator} is
+This field can have one of the following values when the @parm{originator} is
 @pval{NS_PROVIDER}:
 @multitable @columnfractions 0.26 0.08 0.52
 @item Constant @tab Value @tab Description
 @item @pval{NS_RUNSPECIFIED} @tab 233 @tab Unspecified reason.
 @item @pval{NS_RCONGESTION} @tab 234 @tab Congestion.
 @end multitable
-The field can have the following values when the @member{originator} is
+The field can have the following values when the @parm{originator} is
 @pval{NS_USER}:
 @multitable @columnfractions 0.26 0.08 0.52
 @item Constant @tab Value @tab Description
 @item @pval{NS_RESYNC} @tab 250 @tab Resynchronization.
 @end multitable
-The field can have the following values when the @member{originator} is
+The field can have the following values when the @parm{originator} is
 @pval{NS_UNKNOWN}:
 @multitable @columnfractions 0.26 0.08 0.52
 @item Constant @tab Value @tab Description
@@ -1562,7 +1887,7 @@ of the NPI; the Reset Indication, @prim{N_RESET_IND}.
 @page
 @node Reset Response/Confirmation
 @section Reset Response/Confirmation
-@cindex Reset Response/Confirmation
+@cindex Reset response/confirmation
 
 @subheading Format
 
@@ -1575,10 +1900,12 @@ The @type{xrscf} structure is formatted as follows:
 
 @example
 @group
-struct xrscf @{
+@verbatim
+struct xrscf {
     unsigned char xl_type;
     unsigned char xl_command;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1595,7 +1922,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{xrscf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -1621,7 +1948,7 @@ of the NPI; the Reset Confirmation, @prim{N_RESET_CON}.
 @page
 @node Disconnect Request/Indication
 @section Disconnect Request/Indication
-@cindex Disconnect Request/Indication
+@cindex Disconnect request/indication
 
 @subheading Format
 
@@ -1636,7 +1963,8 @@ The @type{xdiscf} structure is formatted as follows:
 
 @example
 @group
-struct xdiscf @{
+@verbatim
+struct xdiscf {
     unsigned char xl_type;
     unsigned char xl_command;
     unsigned char originator;
@@ -1648,7 +1976,8 @@ struct xdiscf @{
     struct xaddrf responder;
     struct xaddrf deflected;
     struct qosformat qos;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1663,17 +1992,17 @@ contains the @type{xdiscf} structure.
 The data part of the message consists of zero or one @msg{M_DATA} message blocks
 containing the Clear User Data (CUD) when supplied.
 
-The X.25 cause and diagnostic octets, @member{cause} and @member{diag}, are
-presented, as well as the CONS @member{originator} and @member{reason} codes
+The X.25 cause and diagnostic octets, @parm{cause} and @parm{diag}, are
+presented, as well as the CONS @parm{originator} and @parm{reason} codes
 mapped from the X.25 cause and diagnostic.  A Disconnect Request for a non-CONS
-call can specify a non-zero @member{cause} code.  This has no effect for a CONS
+call can specify a non-zero @parm{cause} code.  This has no effect for a CONS
 call.
 
 @subheading Parameters
 
 The @type{xdiscf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -1691,7 +2020,7 @@ This field can have one of the following values:
 @item reason
 For a CONS call, contains the CONS reason, mapped from the X.25 cause and
 diagnostic.
-This field can have one of the following values when the @member{originator} is
+This field can have one of the following values when the @parm{originator} is
 @pval{NS_PROVIDER}:
 @multitable @columnfractions 0.26 0.08 0.52
 @item Constant @tab Value @tab Description
@@ -1705,7 +2034,7 @@ This field can have one of the following values when the @member{originator} is
 @item @pval{NS_NSAPTUNREACHABLE} @tab 232 @tab Reject, NSAP unreachable, transient.
 @item @pval{NS_NSAPPUNREAHCABLE} @tab 235 @tab Reject, NSAP unreachable, permanent.
 @end multitable
-The field can have the following values when the @member{originator} is
+The field can have the following values when the @parm{originator} is
 @pval{NS_USER}:
 @multitable @columnfractions 0.26 0.08 0.52
 @item Constant @tab Value @tab Description
@@ -1726,7 +2055,7 @@ Conveys the X.25 cause octet associated with the disconnect.
 Conveys the X.25 diagnostic octet associated with the disconnect.
 @item conn_id
 When a Disconnect Request is used to refuse and incoming connection, this field
-contains the @member{conn_id} from the corresponding Connect Indication message
+contains the @parm{conn_id} from the corresponding Connect Indication message
 primitive.
 @item indicated_qos
 When non-zero, conveys that facilities and quality of service paraemters are
@@ -1736,7 +2065,7 @@ Conveys the responding address.  This is the local responding address in a
 Disconnect Request used to refuse an incoming call, and a remote
 responding address in a Disconnect Indication refusing an outgoing call.
 @item deflected
-When the @member{call_deflect} field of the associated @member{qos} structure is
+When the @parm{call_deflect} field of the associated @parm{qos} structure is
 non-zero, this field conveys the deflected address.  The deflected address is
 the address of the remote station to which the call is being deflected.  This is
 set by the NS user when deflecting a call with a Disconnect Request refusing an
@@ -1783,7 +2112,7 @@ The Disconnect Request message primitive is equivalent to the
 @page
 @node Disconnect Confirmation
 @section Disconnect Confirmation
-@cindex Disconnect Confirmation
+@cindex Disconnect confirmation
 
 @subheading Format
 
@@ -1796,12 +2125,14 @@ The @type{xdcnff} structure is formatted as follows:
 
 @example
 @group
-struct xdcnff @{
+@verbatim
+struct xdcnff {
     unsigned char xl_type;
     unsigned char xl_command;
     unsigned char indicated_qos;
     struct qosformat qos;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1818,7 +2149,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{xdcnff} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -1847,7 +2178,7 @@ The Disconnect Confirmation message primitive has no equivalent in NPI.
 @page
 @node Abort Indication
 @section Abort Indication
-@cindex Abort Indication
+@cindex Abort indication
 
 @subheading Format
 
@@ -1860,10 +2191,12 @@ The @type{xabortf} structure is formatted as follows:
 
 @example
 @group
-struct xabortf @{
+@verbatim
+struct xabortf {
     unsigned char xl_type;
     unsigned char xl_command;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1883,7 +2216,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{xabortf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -1908,7 +2241,7 @@ The Abort Indication message primitive is equivalent to the
 @page
 @node Listen Request/Response
 @section Listen Request/Response
-@cindex Listen Request/Response
+@cindex Listen request/response
 
 @subheading Format
 
@@ -1922,12 +2255,14 @@ The @type{xlistenf} structure is formatted as follows:
 
 @example
 @group
-struct xlistenf @{
+@verbatim
+struct xlistenf {
     unsigned char xl_type;
     unsigned char xl_command;
     int lmax;
     int l_result;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1935,20 +2270,22 @@ The @msg{M_DATA} message blocks are formatted as follows:
 
 @example
 @group
-struct lcud @{
+@verbatim
+struct lcud {
     unsigned char l_cumode;
     unsigned char l_culength; /* octets */
     unsigned char l_cubytes[0];
     /* followed by l_culength bytes */
-@};
-struct ladd @{
+};
+struct ladd {
     unsigned char l_mode;
     unsigned char l_type;
     unsigned char l_length; /* semi-octets */
     unsigned char l_add[0];
     /* followed by ((l_length+1)>>1) bytes
        containing l_length semi-octets. */
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -1993,7 +2330,7 @@ non-privileged listens.
 
 The @type{xlistenf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -2014,7 +2351,7 @@ to a non-zero value.
 
 The @msg{M_DATA} portion of the message contains the following members:
 
-@table @member
+@table @parm
 @item l_cumode
 Specifies the type of matching.
 This field can have one of the following values:
@@ -2029,12 +2366,12 @@ This field can have one of the following values:
 @end multitable
 Notes:
 @enumerate
-@item When the @member{l_cumode} is set to @pval{X25_DONTCARE}, the
-@member{l_culength} and @member{l_cubytes} fields are ommitted from the
+@item When the @parm{l_cumode} is set to @pval{X25_DONTCARE}, the
+@parm{l_culength} and @parm{l_cubytes} fields are ommitted from the
 @msg{M_DATA} message block.
 @end enumerate
 @item l_culength
-Specifies the length of the @member{l_cubytes} field in octets.
+Specifies the length of the @parm{l_cubytes} field in octets.
 @item l_cubytes
 Contains the bytes to be matched against the Call User Data (CUD).
 @item l_mode
@@ -2051,11 +2388,11 @@ This field can have one of the following values:
 @end multitable
 Notes:
 @enumerate
-@item When the @member{l_mode} is set to @pval{X25_DONTCARE}, the
-@member{l_type}, @member{l_length} and @member{l_add} fields are ommitted from
+@item When the @parm{l_mode} is set to @pval{X25_DONTCARE}, the
+@parm{l_type}, @parm{l_length} and @parm{l_add} fields are ommitted from
 the @msg{M_DATA} message block.
-@item When the @member{l_mode} is set to @pval{X25_PATTERN}, the
-@member{l_add} field can contain the wilcard digits @samp{*} and @samp{?} that
+@item When the @parm{l_mode} is set to @pval{X25_PATTERN}, the
+@parm{l_add} field can contain the wilcard digits @samp{*} and @samp{?} that
 have the same effect as these characters in regular expressions: that is,
 @samp{*} represents zero or more characters of any value, and @samp{?}
 represents single character of any value.  The @samp{*} character is represented
@@ -2070,8 +2407,8 @@ This field can have one of the following values:
 @item @pval{X25_NSAP} @tab 2 @tab Contains a CONS NSAP address.
 @end multitable
 @item l_length
-Specifies the length of the @member{l_add} field in semi-octets.  That is, the
-length of the @member{l_add} field in octets is: @samp{((l_length+1)>>1)}.  The
+Specifies the length of the @parm{l_add} field in semi-octets.  That is, the
+length of the @parm{l_add} field in octets is: @samp{((l_length+1)>>1)}.  The
 maximum length for a DTE address is 15 or 17 semi-octets (that is, 8 or 9
 octets) depending upon whether TOA/NPI addressing is used.  The maximum length
 for an NSAP address is 20 semi-octets (that is, 10 octets).
@@ -2082,10 +2419,10 @@ Each semi-octet is a BCD representation.  That is, digits in the range @samp{0} 
 @samp{9} are represented by @code{0x0} through @code{0x9} in the semi-octet
 position.  The first digit occupies the high order nibble of the first octet;
 the second digit, the low order nibble of the first octet; the third digit, the
-high order nibble of the second octet; and so on.  If @member{l_length} is odd,
+high order nibble of the second octet; and so on.  If @parm{l_length} is odd,
 the low order nibble of the last octet is ignored.
 
-When the @member{l_mode} field is @pval{X25_PATTERN}, a semi-octet of
+When the @parm{l_mode} field is @pval{X25_PATTERN}, a semi-octet of
 @code{0xF} represents a @samp{*} wildcard, and a semi-octet of @code{0xE}
 represents a @samp{?} wildcard.
 @end table
@@ -2108,7 +2445,7 @@ The Listen Request message primitive is equivalent to the
 @page
 @node Extended Listen Request/Response
 @section Extended Listen Request/Response
-@cindex Extended Listen Request/Response
+@cindex Extended listen request/response
 
 @subheading Format
 
@@ -2123,12 +2460,14 @@ The @type{xlistenf} structure is formatted as follows:
 
 @example
 @group
-struct xlistenf @{
+@verbatim
+struct xlistenf {
     unsigned char xl_type;
     unsigned char xl_command;
     int lmax;
     int l_result;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -2136,26 +2475,28 @@ The @msg{M_DATA} message blocks are formatted as follows:
 
 @example
 @group
-struct lcud @{
+@verbatim
+struct lcud {
     unsigned char l_cumode;
     unsigned char l_culength; /* octets */
     unsigned char l_cubytes[0];
     /* followed by l_culength bytes */
-@};
-struct lsn @{
+};
+struct lsn {
     unsigned char l_snmode;
     unsigned char l_snlen;
     unsigned char l_snid[0];
     /* followed by l_snlen bytes */
-@};
-struct ladd @{
+};
+struct ladd {
     unsigned char l_mode;
     unsigned char l_type;
     unsigned char l_length; /* semi-octets */
     unsigned char l_add[0];
     /* followed by ((l_length+1)>>1) bytes
        containing l_length semi-octets. */
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -2172,7 +2513,7 @@ containing the call user data and address of interest.
 
 The @type{xlistenf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -2193,7 +2534,7 @@ to a non-zero value.
 
 The @msg{M_DATA} portion of the message contains the following members:
 
-@table @member
+@table @parm
 @item l_cumode
 Specifies the type of matching.
 This field can have one of the following values:
@@ -2208,12 +2549,12 @@ This field can have one of the following values:
 @end multitable
 Notes:
 @enumerate
-@item When the @member{l_cumode} is set to @pval{X25_DONTCARE}, the
-@member{l_culength} and @member{l_cubytes} fields are ommitted from the
+@item When the @parm{l_cumode} is set to @pval{X25_DONTCARE}, the
+@parm{l_culength} and @parm{l_cubytes} fields are ommitted from the
 @msg{M_DATA} message block.
 @end enumerate
 @item l_culength
-Specifies the length of the @member{l_cubytes} field in octets.
+Specifies the length of the @parm{l_cubytes} field in octets.
 @item l_cubytes
 Contains the bytes to be matched against the Call User Data (CUD).
 @item l_snmode
@@ -2230,8 +2571,8 @@ This field can have one of the following values:
 @end multitable
 Notes:
 @enumerate
-@item When the @member{l_mode} is set to @pval{X25_DONTCARE}, the
-@member{l_snlen} and @member{l_snid} fields are ommitted from
+@item When the @parm{l_mode} is set to @pval{X25_DONTCARE}, the
+@parm{l_snlen} and @parm{l_snid} fields are ommitted from
 the @msg{M_DATA} message block.
 @end enumerate
 @item l_snlen
@@ -2250,8 +2591,8 @@ This field can have one of the following values:
 @end multitable
 Notes:
 @enumerate
-@item When the @member{l_mode} is set to @pval{X25_DONTCARE}, the
-@member{l_type}, @member{l_length} and @member{l_add} fields are ommitted from
+@item When the @parm{l_mode} is set to @pval{X25_DONTCARE}, the
+@parm{l_type}, @parm{l_length} and @parm{l_add} fields are ommitted from
 the @msg{M_DATA} message block.
 @end enumerate
 @item l_type
@@ -2262,8 +2603,8 @@ This field can have one of the following values:
 @item @pval{X25_NSAP} @tab 2 @tab Contains a CONS NSAP address.
 @end multitable
 @item l_length
-Specifies the length of the @member{l_add} field in semi-octets.  That is, the
-length of the @member{l_add} field in octets is: @samp{((l_length+1)>>1)}.  The
+Specifies the length of the @parm{l_add} field in semi-octets.  That is, the
+length of the @parm{l_add} field in octets is: @samp{((l_length+1)>>1)}.  The
 maximum length for a DTE address is 15 or 17 semi-octets (that is, 8 or 9
 octets) depending upon whether TOA/NPI addressing is used.  The maximum length
 for an NSAP address is 20 semi-octets (that is, 10 octets).
@@ -2290,7 +2631,7 @@ The Extended Listen Request message primitive is equivalent to the
 @page
 @node Listen Cancel Request/Response
 @section Listen Cancel Request/Response
-@cindex Listen Cancel Request/Response
+@cindex Listen cancel request/response
 
 @subheading Format
 
@@ -2304,11 +2645,13 @@ The @type{xcanlisf} structure is formatted as follows:
 
 @example
 @group
-struct xcanlisf @{
+@verbatim
+struct xcanlisf {
     unsigned char xl_type;
     unsigned char xl_command;
     int c_result;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -2328,7 +2671,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{xcanlisf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -2358,7 +2701,7 @@ The Listen Cancel Request message primitive is equivalent to the
 @page
 @node PVC Attach
 @section PVC Attach
-@cindex PVC Attach
+@cindex PVC attach
 
 @subheading Format
 
@@ -2371,19 +2714,21 @@ The @type{pvcattf} structure is formatted as follows:
 
 @example
 @group
-struct pvcattf @{
+@verbatim
+struct pvcattf {
     unsigned char xl_type;
     unsigned char xl_command;
     unsigned short lci;
-    union @{
+    union {
         uint32_t link_id;
         uint32_t sn_id;
-    @};
+    };
     unsigned char reqackservice;
     unsigned char reqnsdulimit;
     int nsdulimit;
     int result_code;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -2401,7 +2746,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{pvcattf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -2412,7 +2757,7 @@ Conveys the logical channel identifier (LCI) of the PVC.
 Conveys the link identifier for the PVC.  This is a Solstice X.25 specific
 field.
 
-The @member{link_id} and @member{sn_id} fields are equivalent, with a slightly
+The @parm{link_id} and @parm{sn_id} fields are equivalent, with a slightly
 different name and format for Solstice X.25.
 @item sn_id
 Conveys the subnetwork identifier for the PVC.  This is the non-Solstice X.25
@@ -2438,10 +2783,10 @@ data acknowledgement is received or sent for each D-bit data packet sent or
 received over the X.25 NLI service interface.
 @item reqnsdulimit
 When non-zero, conveys that an NSDU concantenation limit is asserted and the
-@member{nsdulimit} field is valid.
+@parm{nsdulimit} field is valid.
 @item nsdulimit
 When non-zero, conveys the packet concatenation limit for NSDUs when the
-@member{reqnsdulimit} field is also non-zero.
+@parm{reqnsdulimit} field is also non-zero.
 @item result_code
 When the PVC Attach message primitive is used by the NS provider to acknowledge
 a previous PVC Attach message primitive issued by the NS user, this field is
@@ -2486,7 +2831,7 @@ The PVC Attach message primitive is equivalent to the
 @page
 @node PVC Detach
 @section PVC Detach
-@cindex PVC Detach
+@cindex PVC detach
 
 @subheading Format
 
@@ -2499,11 +2844,13 @@ The @type{pvcdetf} structure is formatted as follows:
 
 @example
 @group
-struct pvcdetf @{
+@verbatim
+struct pvcdetf {
     unsigned char xl_type;
     unsigned char xl_command;
     int reason_code;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -2519,7 +2866,7 @@ There is no data part (@msg{M_DATA} message blocks) associated with this message
 
 The @type{pvcdetf} structure contains the following members:
 
-@table @member
+@table @parm
 @item xl_type
 Always @prim{XL_CTL}.
 @item xl_command
@@ -2574,11 +2921,11 @@ The PVC Detach message primitive is equivalent to the
 
 @node Input-Output Control Data Structures
 @section Input-Output Control Data Structures
-@cindex Input-Output Control Data Structures
+@cindex Input-output control data structures
 
 @node Input-Output Control Commands
 @section Input-Output Control Commands
-@cindex Input-Output Control Commands
+@cindex Input-output control commands
 
 @menu
 * N_snident::
@@ -2604,31 +2951,38 @@ The PVC Detach message primitive is equivalent to the
 @end menu
 
 @multitable @columnfractions .2 .8
-@item @pioc{N_snident} @tab -
+@item @pioc{N_snident} @tab - Configure a newly linked driver.  Also @pioc{N_linkent} on Sun.
 @item @pioc{N_snmode} @tab -
-@item @pioc{N_snconfig} @tab -
-@item @pioc{N_snread} @tab -
-@item @pioc{N_getstats} @tab -
-@item @pioc{N_zerostats} @tab -
-@item @pioc{N_putpvcmap} @tab -
-@item @pioc{N_getpvcmap} @tab -
-@item @pioc{N_getVCstatus} @tab -
+@item @pioc{N_snconfig} @tab - Configure wlcfg database for a subnetwork.  Also @pioc{N_linkconfig} on Sun.
+@item @pioc{N_snread} @tab - Also @pioc{N_linkread} on Sun.
+@item @pioc{N_getstats} @tab - read X.25 global (multiplexer) statistics.
+@item @pioc{N_zerostats} @tab - reset X.25 global (multiplexer) statistics.
+@item @pioc{N_putpvcmap} @tab - change per VC packet and window sizes.
+@item @pioc{N_getpvcmap} @tab - get default packet and window sizes.
+@item @pioc{N_getVCstatus} @tab - get per VC state and statistics.
+@item @pioc{N_getVCstats} @tab - get per VC statistics.  Sun only.
 @item @pioc{N_getnliversion} @tab -
-@item @pioc{N_traceon} @tab -
-@item @pioc{N_traceoff} @tab -
+@item @pioc{N_getoneVCstats} @tab - get status and statisics for VC associated with the current stream.  Sun only.
+@item @pioc{N_traceon} @tab - start packet level tracing.
+@item @pioc{N_traceoff} @tab - stop packet level tracing.
 @item @pioc{N_nuimsg} @tab -
-@item @pioc{N_nuiput} @tab -
-@item @pioc{N_nuidel} @tab -
-@item @pioc{N_nuiget} @tab -
-@item @pioc{N_nuimget} @tab -
-@item @pioc{N_nuireset} @tab -
-@item @pioc{N_zeroVCstats} @tab -
+@item @pioc{N_nuiput} @tab - store a set of NUI mappings.
+@item @pioc{N_nuidel} @tab - delete specific NUI mapping.
+@item @pioc{N_nuiget} @tab - read specific NUI mapping.
+@item @pioc{N_nuimget} @tab - read all NUI mappings.
+@item @pioc{N_nuireset} @tab - delete all NUI mappings.
+@item @pioc{N_zeroVCstats} @tab - reset per VC statistics.
 @item @pioc{N_putx32map} @tab -
 @item @pioc{N_getx32map} @tab -
-@item @pioc{N_getSNIDstats} @tab -
-@item @pioc{N_zeroSNIDstats} @tab -
+@item @pioc{N_getSNIDstats} @tab - retrieve per subnetwork statistics.  Also @pioc{N_getlinkstats} on Sun.
+@item @pioc{N_zeroSNIDstats} @tab - reset per subnetwork statistics.
 @item @pioc{N_setQOSDATPRI} @tab -
 @item @pioc{N_resetQOSDATPRI} @tab -
+@item @pioc{N_X25_ADD_ROUTE} @tab - add a new route or update an existing route.  Sun only.
+@item @pioc{N_X25_FLUSH_ROUTE} @tab - clear all entries from the routing table.  Sun only.
+@item @pioc{N_X25_GET_ROUTE} @tab - obtain routing information for a specific address.  Sun only.
+@item @pioc{N_GET_NEXT_ROUTE} @tab - obtain routing information for next route in the routing table. Sun only.
+@item @pioc{N_RM_ROUTE} @tab - remove a specific route.  Sun only.
 @end multitable
 
 @page
@@ -2638,7 +2992,7 @@ The PVC Detach message primitive is equivalent to the
 The @pioc{N_snident} input-output control identifies the subnetwork.  This is
 performed by indicating the lower multiplex identifier returned from the
 @pioc{I_LINK} @cite{STREAMS} operation and assigning a subnetwork identifier and
-a @member{dl_sap} and @member{dl_max_conind} to bind.
+a @parm{dl_sap} and @parm{dl_max_conind} to bind.
 
 @subsubheading Format
 
@@ -2647,12 +3001,14 @@ The argument to the @pioc{N_snident} input-output control is a pointer to a
 
 @example
 @group
-struct xll_reg @{
+@verbatim
+struct xll_reg {
     uint32_t snid;
     uint32_t lmuxid;
     uint16_t dl_sap;
     uint16_t dl_max_conind;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -2660,7 +3016,7 @@ struct xll_reg @{
 
 The @type{xll_reg} structure contains the following members:
 
-@table @member
+@table @parm
 @item snid
 Specifies the subnetwork identifier to assign to the data link.
 @item lmuxid
@@ -2676,8 +3032,8 @@ Specifies the maximum number of connection indications to bind to the Stream.
 @subsection N_snmode
 
 The @pioc{N_snmode} input-output control adjusts only the subscription mode
-bits.  When @member{rd_wr} is set to read, the subscription mode bits (see the
-@member{SUB_MODES} member in the @type{wlcfg} structure) are read; when set to
+bits.  When @parm{rd_wr} is set to read, the subscription mode bits (see the
+@parm{SUB_MODES} member in the @type{wlcfg} structure) are read; when set to
 write, the mode bits are written.
 
 @subsubheading Format
@@ -2687,11 +3043,13 @@ The argument to the @pioc{N_snmode} input-output control is a pointer to a
 
 @example
 @group
-struct snoptformat @{
+@verbatim
+struct snoptformat {
     uint32_t U_SN_ID;
     uint16_t newSUB_MODES;
     uint8_t rd_wr;
-@};
+};
+@end verbatim
 @end group
 @end example
 
@@ -2699,7 +3057,7 @@ struct snoptformat @{
 
 The @type{snoptformat} structure contains the following members:
 
-@table @member
+@table @parm
 @item U_SN_ID
 Specifies the subnetwork identifier of the data link whose modes are to be read
 or written.
@@ -2738,7 +3096,8 @@ The argument to the @pioc{N_snconfig} input-output control is a pointer to a
 @type{wlcfg} structure, formatted as follows:
 
 @example
-struct wlcfg @{
+@verbatim
+struct wlcfg {
     uint32_t U_SN_ID;
     uint8_t NET_MODE;
     uint8_t X25_VSN;
@@ -2790,7 +3149,7 @@ struct wlcfg @{
     uint8_t remminthclass;
     uint8_t CUG_CONTROL;
     uint16_t SUB_MODES;
-    struct @{
+    struct {
         uint16_t SNMODES;
         uint8_t intl_addr_recogn;
         uint8_t intl_prioritised;
@@ -2804,16 +3163,17 @@ struct wlcfg @{
         uint8_t thclass_type;
         uint8_t thclass_wmap[16];
         uint8_t thclass_pmap[16];
-    @} psdn_local;
+    } psdn_local;
     struct lsapformat local_address;
-@};
+};
+@end verbatim
 @end example
 
 @subsubheading Parameters
 
 The @type{wlcfg} structure contains the following members:
 
-@table @member
+@table @parm
 @item U_SN_ID
 @item NET_MODE
 @item X25_VSN
@@ -2866,7 +3226,7 @@ The @type{wlcfg} structure contains the following members:
 @item CUG_CONTROL
 @item SUB_MODES
 @item psdn_local
-@table @member
+@table @parm
 @item SNMODES
 @item intl_addr_recogn
 @item intl_prioritised
@@ -2916,7 +3276,7 @@ buffer aread containing 101 32-bit unsigned integer values.
 
 The buffer area contains 101 32-bit unsigned integer values as follows:
 
-@multitable {000}{@member{LNeednotneeded_g}}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@multitable {000}{@parm{LNeednotneeded_g}}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
 @item 0 @tab cll_in_g @tab Calls received and indicated.
 @item 1 @tab cll_out_g @tab Calls sent.
 @item 2 @tab caa_in_g @tab Calls established outgoing.
@@ -3046,34 +3406,38 @@ immediately before resetting the statistics to zero.
 
 @example
 @group
-struct pvcmapf @{
+@verbatim
+struct pvcmapf {
     int first_ent;
     int num_ent;
     struct pvcconf entries[0];
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @example
 @group
-struct pvcconf @{
+@verbatim
+struct pvcconf {
     uint32_t sn_id;
     uint16_t lci;
     uint8_t locpacket;
     uint8_t rempacket;
     uint8_t locwsize;
     uint8_t remwsize;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item first_ent
 @item num_ent
 @item entries
-@table @member
+@table @parm
 @item sn_id
 @item lci
 @item locpacket
@@ -3095,17 +3459,20 @@ struct pvcconf @{
 
 @example
 @group
-struct vcstatusf @{
+@verbatim
+struct vcstatusf {
     int first_ent;
     int num_ent;
     struct vcinfo vc;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @example
 @group
-struct vcinfo @{
+@verbatim
+struct vcinfo {
     struct xaddrf rem_addr;
     struct xaddrf loc_addr;
     uint32_t xu_ident;
@@ -3117,17 +3484,18 @@ struct vcinfo @{
     uint8_t call_direction;
     uint8_t vctype;
     uint32_t perVC_stats[27];
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item first_ent
 @item num_ent
 @item vc
-@table @member
+@table @parm
 @item rem_addr
 @item loc_addr
 @item xu_ident
@@ -3178,15 +3546,17 @@ struct vcinfo @{
 
 @example
 @group
-struct nliformat @{
+@verbatim
+struct nliformat {
     unsigned char version;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item version
 @end table
 
@@ -3223,18 +3593,20 @@ struct nliformat @{
 
 @example
 @group
-struct nui_put @{
+@verbatim
+struct nui_put {
     char prim_class;
     char op;
     struct nuiformat nuid;
     struct facformat nuifacility;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item prim_class
 Always @pval{NUI_MSG}.
 @item op
@@ -3251,17 +3623,19 @@ Always @pval{NUI_PUT}.
 
 @example
 @group
-struct nui_del @{
+@verbatim
+struct nui_del {
     char prim_class;
     char op;
     struct nuiformat nuid;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item prim_class
 Always @pval{NUI_MSG}.
 @item op
@@ -3277,18 +3651,20 @@ Always @pval{NUI_DEL}.
 
 @example
 @group
-struct nui_get @{
+@verbatim
+struct nui_get {
     char prim_class;
     char op;
     struct nuiformat nuid;
     struct facformat nuifacility;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item prim_class
 Always @pval{NUI_MSG}.
 @item op
@@ -3305,23 +3681,25 @@ Always @pval{NUI_GET}.
 
 @example
 @group
-struct nui_mget @{
+@verbatim
+struct nui_mget {
     char prim_class;
     char op;
     unsigned int first_ent;
     unsigned int last_ent;
     unsigned int num_ent;
-    union @{
+    union {
         char buf[0];
         struct nui_addr entries[0];
-    @};
-@};
+    };
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item prim_class
 Always @pval{NUI_MSG}.
 @item op
@@ -3341,16 +3719,18 @@ Always @pval{NUI_MGET}.
 
 @example
 @group
-struct nui_reset @{
+@verbatim
+struct nui_reset {
     char prim_class;
     char op;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item prim_class
 Always @pval{NUI_MSG}.
 @item op
@@ -3377,17 +3757,19 @@ Always @pval{NUI_RESET}.
 
 @example
 @group
-struct persnidstats @{
+@verbatim
+struct persnidstats {
     uint32_t snid;
     int32_t network_state;
     uint32_t mon_array[59];
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item snid
 @item network_state
 @item mon_array
@@ -3465,16 +3847,18 @@ struct persnidstats @{
 
 @example
 @group
-struct qosdatpri @{
+@verbatim
+struct qosdatpri {
     int32_t band;
     uint32_t tx_window;
-@};
+};
+@end verbatim
 @end group
 @end example
 
 @subsubheading Parameters
 
-@table @member
+@table @parm
 @item band
 @item tx_window;
 @end table
@@ -3483,6 +3867,964 @@ struct qosdatpri @{
 @node N_resetQOSDATPRI
 @subsection N_resetQOSDATPRI
 
+@node NLI Management Information Base
+@chapter NLI Management Information Base
+
+The @file{OPENSS7-X25-MIB} provides the following tables:
+
+@menu
+* x25PLEConfigTable::	X.25 Packet Layer Entity (PLE) Configuration Table
+* x25PLEProfileTable::	X.25 Packet Layer Entity (PLE) Profile Table
+* x25PLEStateTable::	X.25 Packet Layer Entity (PLE) State Table
+* x25PLEStatsTable::	X.25 Packet Layer Entity (PLE) Statistics Table
+* x25VCConfigTable::	X.25 Virtual Circuit (VC) Configuration Table
+* x25VCProfileTable::	X.25 Virtual Circuit (VC) Profile Table
+* x25VCStatsTable::	X.25 Virtual Circuit (VC) Statistics Table
+* x25PVCConfigTable::	X.25 Permanent Virtual Circuit (PVC) Configuration Table
+* x25SVCConfigTable::	X.25 Switched Virtual Circuit (SVC) Configuration Table
+@end menu
+
+@iftex
+@itemize
+@item @ref{x25PLEConfigTable}.
+@item @ref{x25PLEProfileTable}.
+@item @ref{x25PLEStateTable}.
+@item @ref{x25PLEStatsTable}.
+@item @ref{x25VCConfigTable}.
+@item @ref{x25VCProfileTable}.
+@item @ref{x25VCStatsTable}.
+@item @ref{x25PVCConfigTable}.
+@item @ref{x25SVCConfigTable}.
+@end itemize
+@end iftex
+
+@ifhtml
+@multitable {x25PLEProfileTable:}{X.25 Permanent Virtual Circuit (PVC) Configuration Table}
+@item @ref{x25PLEConfigTable}: @tab X.25 Packet Layer Entity (PLE) Configuration Table
+@item @ref{x25PLEProfileTable}: @tab X.25 Packet Layer Entity (PLE) Profile Table
+@item @ref{x25PLEStateTable}: @tab X.25 Packet Layer Entity (PLE) State Table
+@item @ref{x25PLEStatsTable}: @tab X.25 Packet Layer Entity (PLE) Statistics Table
+@item @ref{x25VCConfigTable}: @tab X.25 Virtual Circuit (VC) Configuration Table
+@item @ref{x25VCProfileTable}: @tab X.25 Virtual Circuit (VC) Profile Table
+@item @ref{x25VCStatsTable}: @tab X.25 Virtual Circuit (VC) Statistics Table
+@item @ref{x25PVCConfigTable}: @tab X.25 Permanent Virtual Circuit (PVC) Configuration Table
+@item @ref{x25SVCConfigTable}: @tab X.25 Switched Virtual Circuit (SVC) Configuration Table
+@end multitable
+@end ifhtml
+
+@ifplaintext
+@multitable {x25PLEProfileTable:}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item x25PLEConfigTable: @tab X.25 Packet Layer Entity (PLE) Config Table
+@item x25PLEProfileTable: @tab X.25 Packet Layer Entity (PLE) Profile Table
+@item x25PLEStateTable: @tab X.25 Packet Layer Entity (PLE) State Table
+@item x25PLEStatsTable: @tab X.25 Packet Layer Entity (PLE) Stats Table
+@item x25VCConfigTable: @tab X.25 Virtual Circuit (VC) Config Table
+@item x25VCProfileTable: @tab X.25 Virtual Circuit (VC) Profile Table
+@item x25VCStatsTable: @tab X.25 Virtual Circuit (VC) Stats Table
+@item x25PVCConfigTable: @tab X.25 Permanent Virtual Circuit (PVC) Config Table
+@item x25SVCConfigTable: @tab X.25 Switched Virtual Circuit (SVC) Config Table
+@end multitable
+@end ifplaintext
+
+
+@node x25PLEConfigTable
+@section X.25 Packet Layer Entity (PLE) Configuration Table
+
+The @dfn{X.25 Packet Layer Entity (PLE) Configuration Table},
+@mobj{x25PLEConfigTable}, is a table that provides specific configuration
+information for various @dfn{X.25 Packet Layer Entities}.
+
+Provides a table of X.25 Packet Layer Protocol (PLP) Entities.  Each X.25 Packet
+Layer Entity corresponds to an X.25 DTE or DCE over which permanent virtual
+circuits exist or virtual calls can be placed.  ITU-T Rec. X.283 | ISO/IEC 10733.
+Each entry corresponds to an instance of an x25PLE managed object, which
+represents a DTE, DCE or DXE X.25 packet layer entity, from which permanent
+virtual circuits are formed or virtual calls are established.  ITU-T Rec. X.283
+| ISO/IEC 10733.
+
+@table @mobj
+
+@item x25PLEConfigIndex
+Provides and index for the PLE configuration entry.
+
+@item x25PLEConfigProtocolVersionSupported
+The protocol versions of ISO8208 available on the PLE interface.
+
+@item x25PLEConfigLocalDTEAddress
+The full DTE address of this PLE expressed as an X.121, X.31, etc. address.
+
+@item x25PLEConfigInterfaceMode
+The DCE/DTE mode in which the interface is currently operating.
+
+@multitable {dCE(1)}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item dTE(0) @tab -@ Data Terminal Equiment
+@item dCE(1) @tab -@ Data Circuit-terminating Equipment
+@item dXE(2) @tab -@ Data eXchange Equipment (DTE/DCE)
+@end multitable
+
+@item x25PLEConfigDefaultThroughputClass
+The default throughput class value currently agreed with the DCE.  This may be
+the normal default, or may have been changed as a result of the use of the
+defaultThroughputClassAssignment facility.
+
+@item x25PLEConfigFlowControlNegotiationPermitted
+Indicates whether flow control parameter negotiation is permitted.  When this
+has the value @samp{true(1)}, the use of flow control parameter negotiation (by
+specifying values for the window and packet size in call request and accept
+packets) is permitted.  When it has the value @samp{false(2)}, no such values
+shall be specified in call request and accept packets, and any values specified
+in a Profile or via an internal interface shall be ignored.
+
+@item x25PLEConfigCallDeflectionSubscription
+Indicates whether call deflection has been subscribed to.  When this has value
+@samp{true(1)}, call deflection has been subscribed to.  Otherwise it has the
+value @samp{false(2)}.
+
+@item x25PLEConfigMaxActiveCalls
+The maximum number of active circuits permitted on this PLE.  When the NULL
+value (zero (0)) is specified, the maximum number of active circuits shall be
+limited only by the resources available to the entity.
+
+@item x25PLEConfigRestartTime
+Value for @dfn{Timer T20 (Restart Request Response Timer)} in centiseconds.
+Note that the default timer is ultimately dependent upon the underlying data
+link provider type.
+
+@item x25PLEConfigDefaultPacketSizeIncoming
+The default value of the packet size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the @cite{ISO/IEC 8208} or @cite{ITU-T Rec. X.25} default
+value of @samp{128}.  Any other value indicates the value agreed by the
+nonstandard default packet size facility.
+
+@item x25PLEConfigDefaultPacketSizeOutgoing
+The default value of the packet size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the @cite{ISO/IEC 8208} or @cite{ITU-T Rec. X.25} default
+value of @samp{128}.  Any other value indicates the value agreed by the
+nonstandard default packet size facility.
+
+@item x25PLEConfigDefaultWindowSizeIncoming
+The default value of the window size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the @cite{ISO/IEC 8208} or @cite{ITU-T Rec X.25} default
+value of @samp{2}.  Any other value indicates the value agreed by the
+nonstandard default window sizes facility.
+
+@item x25PLEConfigDefaultWindowSizeOutgoing
+The default value of the window size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the @cite{ISO/IEC 8208} or @cite{ITU-T Rec X.25} default
+value of @samp{2}.  Any other value indicates the value agreed by the
+nonstandard default window sizes facility.
+
+@item x25PLEConfigMinimumRecallTimer
+Minimum time in centiseconds before recall permitted.  This timer determines the
+minimum interval (in centiseconds) which shall elapse following an unsuccessful
+first call attempt before a subsequent call attempt is permitted.
+
+@item x25PLEConfigRestartCount
+Value for @dfn{Count R20 (Restart Request Retransmission Count)}.
+
+@item x25PLEConfigSN-ServiceProvider
+Distinguished name of the subnetwork (SN) service provider Managed Object.  This
+attribute identifies the subnetwork entity to be used to support the linkage,
+when enabled.  The subnetwork service provider may be in the data link layer, or
+it may be in the network layer (for example when operating @cite{ISO 8473} over
+the @cite{ISO 8208 SNDCF}).@footnote{@cite{ISO/IEC 10733 : sN-ServiceProvider.}}
+
+@item x25PLEConfigSN-SA-P
+Distinguished name of the service provider SA-P Managed Object (if present).
+This is obtained via an internal interface when the linkage is enabled.  The
+sN-SA-P may be a relationship to a SA-P Managed Object in the data link layer,
+or it may be a relationship to another Managed Object within the network layer
+which is not a SA-P Managed Object.  For example, when operating @cite{ISO 8473}
+over the @cite{ISO 8208 SNDCF}, it is a relationship to the same x25PLE Managed
+Object which is pointed to by the sN-ServiceProvider
+Attribute.@footnote{@cite{ISO/IEC 10733 : sN-SA-P.}}
+
+@item x25PLEConfigLogicalChannelAssignmentsPVC
+Represents the logical channel assignments of this PLE, expressed as a
+four-tuple where the values represent the set (with maximum permitted
+cardinality (@code{LIC - 1}), minimum required cardinality of zero) of PVC
+channels (with a maximum value (@code{LIC - 1}), and minimum value 1) assigned,
+the incoming channel range, the two-way channel range, the outgoing channel
+range, respectively.
+
+The presence of each of the ranges shall be optional.  Absence of a particular
+range shall signify that there are no channels of that type assigned.  Within
+each range, the low value shall be less than or equal to the high value, and
+there shall be no value in any set or range which is greater than or equal to a
+value in a subsequent range when ordered as above.
+
+This attribute is subject to the rules for logical assignments described in
+@cite{ISO/IEC 8208 clause 3.7}.  it is understood that the Highest Permanent
+Channel (HPC) is defined by the Lowest Incoming Channel (LIC) value minus one.
+
+The @type{OCTET STRING} is encoded as two octets, most significant octet
+followed by least significant octet, where each pair of octets represents
+another channel number from @samp{1..4095} (but less than LIC), the logical
+channel number to which a Permanent Virtual Circuit (PVC) has been
+assigned.@footnote{@cite{ISO/IEC 10733 : logicalChannelAssignments, ISO/IEC 8208
+clause 3.7.}}
+
+@item x25PLEConfigLogicalChannelAssignmentsLIC
+The lowest incoming logical channel in the incoming logical channel range.  When
+set to zero (0), or the same value as the highest incoming logical channel, it
+indicates that there is no incoming logical channel range and the highest
+incoming logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+@cite{ISO/IEC 8208 clause 3.7}.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEConfigLogicalChannelAssignmentsHIC
+The highest incoming logical channel in the incoming logical channel range.
+When set to zero (0), or the same value as the lowest incoming logical channel,
+it indicates that there is no incoming logical channel range and the lowest
+incoming logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+@cite{ISO/IEC 8208 clause 3.7}.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEConfigLogicalChannelAssignmentsL2W
+The lowest two-way logical channel in the two-way logical channel range.  When
+set to zero (0), or to the same value as the highest two-way logical channel, it
+indicates that there is no two-way logical channel range and the highest two-way
+logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+@cite{ISO/IEC 8208 clause 3.7}.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEConfigLogicalChannelAssignmentsH2W
+The highest two-way logical channel in the two-way logical channel range.  When
+set to zero (0), or to the same value as the lowest two-way logical channel, it
+indicates that there is no two-way logical channel range and the lowest two-way
+logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+@cite{ISO/IEC 8208 clause 3.7}.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEConfigLogicalChannelAssignmentsLOG
+The lowest outgoing logical channel in the outgoing logical channel range.  When
+set to zero (0), or to the  same value as the highest outgoing logical channel,
+it indicates that there is no outgoing channel range and the highest outgoing
+logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+@cite{ISO/IEC 8208 clause 3.7}.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEConfigLogicalChannelAssignmentsHOG
+The highest outgoing logical channel in the outgoing logical channel range.
+When set to zero (0), or to the same value as the lowest outgoing logical
+channel, it indicates that there is no outgoing logical channel range and the
+lowest outgoing logical channel is otherwise ignored.
+
+This value is subject to the rules for logical channel assignments described in
+@cite{ISO/IEC 8208 clause 3.7}.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEConfigPacketSequencing
+
+The modulo of the packet sequence number space.  Expressed as an integer.
+@cite{ISO/IEC 8208} only requires support for at least one of the two values
+@samp{8} and @samp{128}, but it is possible that some future revision may extend
+the range.@footnote{It has already been extended to @samp{32768}.} A system is
+only required to support the setting of values which are also required by the
+protocol standard.  A system shall return an error when an attempt is made to
+set the value to a value which is not supported by that
+system.@footnote{@cite{ISO/IEC 10733 : packetSequencing.}}
+
+@multitable {2147483648}{m}{Modulo 2147483648}{31 bits}
+@item 8 @tab - @tab Modulo 8 @tab 3 bits
+@item 128 @tab - @tab Modulo 128 @tab 7 bits
+@item 32768 @tab - @tab Modulo 32768 @tab 15 bits
+@c @item 2147483648 @tab - @tab Modulo 2147483648 @tab 31 bits
+@end multitable
+
+@item x25PLEConfigPLEClientMOName
+The Distinguished name of the client Managed Object.  Note that this will either
+be a Transport Layer Managed Object or a CLNS Managed
+Object.@footnote{@cite{ISO/IEC 10733 : pLEClientMOName.}}
+
+@item x25PLEConfigRegistrationRequestTime
+Value for @dfn{Timer T28 (Registration Request Timer)} in
+centiseconds.@footnote{@cite{ISO/IEC 10733 : regsitrationRequestTime.}}
+
+@item x25PLEConfigRegistrationRequestCount
+Value for @dfn{Count R28 (Registration Request Count)}.@footnote{@cite{ISO/IEC
+10733 : registrationRequestCount.}}
+
+@item x25PLEConfigRegistrationPermitted
+When @samp{true(1)}, the use of on-line facility registration is permitted.
+Otherwise, the value is @samp{false(2)}.@footnote{@cite{ISO/IEC 10733 :
+registrationPermitted.}}
+
+@end table
+
+@node x25PLEProfileTable
+@section X.25 Packet Layer Entity (PLE) Profile Table
+
+The @dfn{Packet Layer Entity (PLE) Profile Table},
+@mobj{x25PLEProfileTable}, is a table that provides a common set of
+X.25 packet layer entity (PLE) configuration parameters organized into a
+referencable profile.
+
+This table provides profiles for the x25PLE.  These profiles are not created nor
+deleted by management stations; however, their values may be altered.  Each
+entry in the table consists of a separate profile.  The managed element may
+choose to use profile values when creating instances of x25PLEs (entries in the
+@mobj{x25PLEConfig} table.@footnote{@cite{ITU-T Rec. X.283 | ISO/IEC 10733.}}
+
+Each entry in the table provides a separate profile identified by the
+@mobj{x25PLEProfileName} which consists of a @mobj{DisplayString} used to
+identify the profile.  The agent or implementation may used specific profiles to
+create instances of x25PLEs.  Management stations may not create nor delete
+entries in this table, however, the values associated with a given profile may
+be altered.@footnote{@cite{ITU-T Rec.  X.283 | ISO/IEC 10733.}}
+
+@table @mobj
+@item x25PLEProfileName
+
+@item x25PLEProfileLocalDTEAddress
+
+@item x25PLEProfileInterfaceMode
+The DCE/DTE mode in which the interface is currently
+operating.@footnote{@cite{ISO/IEC 10733 : interfaceMode.}}
+
+@multitable {dCE(1)}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item dTE(0) @tab - @tab Data Terminating Equipment (DTE)
+@item dCE(1) @tab - @tab Data Circuit-terminating Equipment (DCE)
+@item dXE(2) @tab - @tab Data eXchange Equipment (DTE/DCE)
+@end multitable
+
+@item x25PLEProfileDefaultThroughputClass
+The default throughput class value currently agreed with the DCE.  This may be
+the normal default, or may have been changed as a result of the use of the
+defaultThroughputClassAssignment facility.
+
+@item x25PLEProfileFlowControlNegotiationPermitted
+Indicates whether flow control parameter negotiation is permitted.  When this
+has the value @samp{true(1)}, the use of flow control parameter negotiation (by
+specifying values for the window and packet size in call request and accept
+packets) is permitted.  When it has the value @samp{false(2)}, no such values
+shall be specified in call request and accept packets, and any values specified
+in a Profile or via an internal interface shall be
+ignored.@footnote{@cite{ISO/IEC 10733 : flowControlNegotiationPermitted.}}
+
+@item x25PLEProfileCallDeflectionSubscription
+Indicates whether call deflection has been subscribed to.  When this has value
+@samp{true(1)}, call deflection has been subscribed to.@footnote{@cite{ISO/IEC
+10733 : callDeflectionSubscription.}}
+
+@item x25PLEProfileMaxActiveCircuits
+The maximum number of active circuits permitted on this PLE.  When the NULL
+value (zero (0)) is specified, the maximum number of active circuits shall be
+limited only by the resources available to the entity.@footnote{@cite{ISO/IEC
+10733 : maxActiveCalls.}}
+
+@item x25PLEProfileRestartTime
+Value for @dfn{Timer T20 (Restart Request Response Timer)} in centiseconds.  Note that
+the default timer is ultimately dependent upon the underlying data link provider
+type.@footnote{@cite{ISO/IEC 10733 : restartTime.}}
+
+@item x25PLEProfileDefaulPacketSizeIncoming
+The default value of the packet size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the ISO 8208 default value of 128.  Any other value
+indicates the value agreed by the nonstandard default packet size
+facility.@footnote{@cite{ISO/IEC 10733 : defaultPacketSize, ITU-T Rec.  X.283 :
+defaultPacketSizes.}}
+
+@item x25PLEProfileDefaulPacketSizeOutgoing
+The default value of the packet size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the ISO/IEC 8208  or ITU-T Rec. X.25 default value of 128.
+Any other value indicates the value agreed by the nonstandard default packet
+size facility.@footnote{@cite{ISO/IEC 10733 : defaultPacketSize, ITU-T Rec.
+X.283 : defaultPacketSizes.}}
+
+@item x25PLEProfileDefaultWindowSizeIncoming
+The default value of the window size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the ISO/IEC 8208 or ITU-T Rec X.25 default value of 2.  Any
+other value indicates the value agreed by the nonstandard default window sizes
+facility.@footnote{@cite{ISO/IEC 10733 : defaultWindowSize, ITU-T Rec.  X.283 :
+defaultWindowSizes.}}
+
+@item x25PLEProfileDefaultWindowSizeOutgoing
+The default value of the window size parameter for this DTE.  A value of NULL
+(zero (0)) indicates the ISO/IEC 8208 or ITU-T Rec X.25 default value of 2.  Any
+other value indicates the value agreed by the nonstandard default window sizes
+facility.@footnote{@cite{ISO/IEC 10733 : defaultWindowSize, ITU-T Rec.  X.283 :
+defaultWindowSizes.}}
+
+@item x25PLEProfileMinimumRecallTimer
+Minimum time in centiseconds before recall permitted.  This timer determines the
+minimum interval (in centiseconds) which shall elapse following an unsuccessful
+first call attempt before a subsequent call attempt is
+permitted.@footnote{@cite{ISO/IEC 10733 : minimumRecallTime.}}
+
+@item x25PLEProfileRestartCount
+Value for @dfn{Count R20 (Restart Request Retransmission
+Count)}.@footnote{@cite{ISO/IEC 10733 : restartCount.}}
+
+@item x25PLEProfileSN-ServiceProvider
+Distinguished name of the subnetwork (SN) service provider Managed Object.  This
+attribute identifies the subnetwork entity to be used to support the linkage,
+when enabled.  The subnetwork service provider may be in the data link layer, or
+it may be in the network layer (for example when operating ISO 8473 over the ISO
+8208 SNDCF).@footnote{@cite{ISO/IEC 10733 : sN-ServiceProvider.}}
+
+@item x25PLEProfileSN-SA-P
+Distinguished name of the service provider SA-P Managed Object (if present).
+This is obtained via an internal interface when the linkage is enabled.  The
+sN-SA-P may be a relationship to a SA-P Managed Object in the data link layer,
+or it may be a relationship to another Managed Object within the network layer
+which is not a SA-P Managed Object.  For example, when operating ISO 8473 over
+the ISO 8208 SNDCF, it is a relationship to the same x25PLE Managed Object which
+is pointed to by the sN-ServiceProvider Attribute.@footnote{@cite{ISO/IEC 10733
+: sN-SA-P.}}
+
+@item x25PLEProfileLogicalChannelAssignementsPVC
+Represents the logical channel assignments of this PLE, expressed as a
+four-tuple where the values represent the set (with maximum permitted
+cardinality (LIC - 1), minimum required cardinality of zero) of PVC channels
+(with a maximum value (LIC - 1), and minimum value 1) assigned, the incoming
+channel range, the two-way channel range, the outgoing channel range,
+respectively.
+
+The presence of each of the ranges shall be optional.  Absence of a particular
+range shall signify that there are no channels of that type assigned.  Within
+each range, the low value shall be less than or equal to the high value, and
+there shall be no value in any set or range which is greater than or equal to a
+value in a subsequent range when ordered as above.
+
+This attribute is subject to the rules for logical assignments described in
+ISO/IEC 8208 clause 3.7.  it is understood that the Highest Permanent Channel
+(HPC) is defined by the Lowest Incoming Channel (LIC) value minus one.
+
+The OCTET STRING is encoded as two octets, most significant octet followed by
+least significant octet, where each pair of octets represents another channel
+number from 1..4095 (but less than LIC), the logical channel number to which a
+Permanent Virtual Circuit (PVC) has been assigned.@footnote{@cite{ISO/IEC 10733
+: logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEProfileLogicalChannelAssignementsLIC
+The lowest incoming logical channel in the incoming logical channel range.  When
+set to zero (0), or the same value as the highest incoming logical channel, it
+indicates that there is no incoming logical channel range and the highest
+incoming logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+ISO/IEC 8208 clause 3.7.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEProfileLogicalChannelAssignementsHIC
+The highest incoming logical channel in the incoming logical channel range.
+When set to zero (0), or the same value as the lowest incoming logical channel,
+it indicates that there is no incoming logical channel range and the lowest
+incoming logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+ISO/IEC 8208 clause 3.7.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEProfileLogicalChannelAssignementsL2W
+The lowest two-way logical channel in the two-way logical channel range.  When
+set to zero (0), or to the same value as the highest two-way logical channel, it
+indicates that there is no two-way logical channel range and the highest two-way
+logical channel is ignored.
+
+This value is subject to the rules for logical channel assignments described in
+ISO/IEC 8208 clause 3.7.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEProfileLogicalChannelAssignementsH2W
+The highest two-way logical channel in the two-way logical channel range.  When
+set to zero (0), or to the same value as the lowest two-way logical channel, it
+indicates that there is no two-way logical channel range and the lowest two-way
+logical channel is ignored.
+         
+This value is subject to the rules for logical channel assignments described in
+ISO/IEC 8208 clause 3.7.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEProfileLogicalChannelAssignementsLOG
+The lowest outgoing logical channel in the outgoing logical channel range.  When
+set to zero (0), or to the  same value as the highest outgoing logical channel,
+it indicates that there is no outgoing channel range and the highest outgoing
+logical channel is ignored.
+         
+This value is subject to the rules for logical channel assignments described in
+ISO/IEC 8208 clause 3.7.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEProfileLogicalChannelAssignementsHOG
+The highest outgoing logical channel in the outgoing logical channel range.
+When set to zero (0), or to the same value as the lowest outgoing logical
+channel, it indicates that there is no outgoing logical channel range and the
+lowest outgoing logical channel is otherwise ignored.
+
+This value is subject to the rules for logical channel assignments described in
+ISO/IEC 8208 clause 3.7.@footnote{@cite{ISO/IEC 10733 ;
+logicalChannelAssignments, ISO/IEC 8208 clause 3.7.}}
+
+@item x25PLEProfilePacketSequencing
+The module of the packet sequence number space.  Expressed as an integer.
+ISO/IEC 8208 only requires support for at least one of the two values 8 and 128,
+but it is possible that some future revision may extend the range.  A system is
+only required to support the setting of values which are also required by the
+protocol standard.  A system shall return an error when an attempt is made to
+set the value to a value which is not supported by that
+system.@footnote{@cite{ISO/IEC 10733 : packetSequencing.}}
+
+@item x25PLEProfileRegistrationRequestTime
+Value for @dfn{Timer T28 (Registration Request Timer)} in
+centiseconds.@footnote{@cite{ISO/IEC 10733 : regsitrationRequestTime.}}
+
+@item x25PLEProfileRegistrationRequestCount
+Value for @dfn{Count R28 (Registration Request Count)}.@footnote{@cite{ISO/IEC
+10733 : registrationRequestCount.}}
+
+@item x25PLEProfileRegistrationPermitted
+When @samp{true(1)}, the use of online facility registration is
+permitted.@footnote{@cite{ISO/IEC 10733 : registrationPermitted.}}
+
+@end table
+
+@node x25PLEStateTable
+@section X.25 Packet Layer Entity (PLE) State Table
+
+The @dfn{X.25 Packet Layer Entity (PLE) State Table},
+@mobj{x25PLEStateTable}, is a table that provides the current states for various
+X.25 packet layer entities.
+
+The @mobj{x25PLEStateTable} provides state information for each x25PLE object
+which are represented by the rows in the table.  Each row corresponds to an X.25
+Packet Layer Entity.@footnote{@cite{ITU-T Rec. X.283 | ISO/IEC 10733, ITU-T Rec.
+X.721 | ISO/IEC 10165-2.}}
+
+The @mobj{x25PLEStateEntry} provides an entry in the X.25 Packet Layer Entity
+state table which provides the state information for a single packet layer
+entity as indicated by the index into the table.@footnote{@cite{ITU-T Rec. X.283
+| ISO/IEC 10733, ITU-T Rec.  X.721 | ISO/IEC 10165-2.}}
+
+@table @mobj
+
+@item x25PLEStateIndex
+Provides an index for the PLE state table.
+
+@item x25PLEStateAdministrativeState
+Provides the administrative state of the PLE following the AdministrativeState
+textual convention of the @file{OPENSS7-SMI-MIB} module.@footnote{@cite{ITU-T
+Rec.  X.721 | ISO/IEC 10165-2 administrativeState.}}
+
+@item x25PLEStateOperationalState
+Provides the operational state of the PLE following the OperationalState textual
+convention of the @file{OPENSS7-SMI-MIB} module.@footnote{@cite{ITU-T Rec. X.721
+| ISO/IEC 10165-2 operationalState.}}
+
+@item x25PLEStateUsageState
+Provides the usage status of the PLE following the UsageStatus textual
+convention of the @file{OPENSS7-SMI-MIB} module.@footnote{@cite{ITU-T Rec. X.721
+| ISO/IEC 10165-2 usageStatus.}}
+
+@item x25PLEStateProceduralStatus
+Provides the procedural status of the PLE following the ProceduralStatus textual
+convention of the @file{OPENSS7-SMI-MIB} module.@footnote{@cite{ITU-T Rec. X.721
+| ISO/IEC 10165-2 proceduralStatus.}}
+
+@item x25PLEStateAlarmStatus
+Provides the alarm status of the PLE following the AlarmStatus textual
+convention of the @file{OPENSS7-SMI-MIB} module.@footnote{@cite{ITU-T Rec. X.721
+| ISO/IEC 10165-2 alarmStatus.}}
+
+@end table
+
+@node x25PLEStatsTable
+@section X.25 Packet Layer Entity (PLE) Statistics Table
+
+The @dfn{X.25 Packet Layer Entity (PLE) Statistics Table},
+@prim{x25PLEStatsTable}, is a table that provides statistics for various X.25
+packet layer entities.
+
+The @mobj{x25PLEStatsTable} provides statistics and counts for each X25PLE
+object which are represented by the rows in the table.  Each row corresponds to
+an X.25 Packet Layer Entity.@footnote{@cite{ITU-T Rec. X.283 | ISO/IEC 10733.}}
+
+An entry in the @mobj{x25PLEStatsTable}.  Each row or entry provides statistics
+for one X.25 Packet Layer Entity.  Rows cannot be created or deleted by
+management stations.@footnote{@cite{ITU-T Rec. X.283 | ISO/IEC 10733.}}
+
+@table @mobj
+
+@item x25PLEStatsIndex
+
+@item x25PLEStatsOctetsSentCounter
+This corresponds to the ISO/IEC 8208 Octets Sent attribute.  Note that the DMI
+definition is in terms of user data octets.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsOctetsReceivedCounter
+This corresponds to the ISO/IEC 8208 Octets Received attribute.  Note that the
+DMI definition is in terms of user data octets.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsDataPacketsSent
+Counter of the total number of data packets sent.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsDataPacketsReceived
+
+@item x25PLEStatsCallAttempts
+Counter of the total number of data packets received.@footnote{@cite{ISO/IEC
+10733 : octetsSentCounter.}}
+
+@item x25PLEStatsCallsConnected
+Counter of the total number of calls which have reached the open
+state.@footnote{@cite{ISO/IEC 10733 : octetsSentCounter.}}
+
+@item x25PLEStatsProviderInitiatedDisconnects
+Counter for the provider initiated disconnect events which generate
+communications alarm notifications.@footnote{@cite{ISO/IEC 10733 :
+providerInitiatedDisconnects.}}
+
+@item x25PLEStatsCallTimeouts
+Counter of the number of times timer @dfn{T21} expiry is experienced by the PLE.
+@footnote{@cite{ISO/IEC 10733 : octetsSentCounter.}}
+
+@item x25PLEStatsClearTimeouts
+Counter of the number of times timer @dfn{T23} expiry is experienced by the PLE.
+ISO/IEC 10733 : clearTimeouts.
+
+@item x25PLEStatsRemotelyInitiatedResets
+Counter associated with the remotely initiated reset event which generates a
+communications alarm notification.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsDataRetransmissionTimerExpires
+Counter of the number of expires of timer @dfn{T25}.  Returns zero if the option
+is not implemented.@footnote{@cite{ISO/IEC 10733 : octetsSentCounter.}}
+
+@item x25PLEStatsProviderInitiatedResets
+Counter associated with the provider initiated reset event which generates a
+communication alarm notification.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsResetTimeouts
+Counter of the number of timer @dfn{T22} expires experienced by the
+PLE.@footnote{@cite{ISO/IEC 10733 : octetsSentCounter.}}
+
+@item x25PLEStatsRemotelyInitiatedRestarts
+Counter of the number of remotely initiated restarts.  This is the total number
+of remotely initiated (including provider initiated) restarts experienced by the
+PLE, excluding the restart associated with bringing up the PLE interface.
+@footnote{@cite{ISO/IEC 10733 : octetsSentCounter.}}
+
+@item x25PLEStatsRestartCountsExceeded
+Counter associated with the restart count exceeded event which generate a
+communication alarm notification.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsProtocolErrorsDetectedLocally
+Counter associated with the protocol error detected locally event which
+generates a communications alarm notification.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsProtocolErrorsAccusedOf
+Counter associated wtih the accused of protocol error event which generates
+communications alarm notification.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsCallEstablishmentRetryCountsExceeded
+Counter associated with the call establishment retry count exceeded event which
+generates a communications alarm notification.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@item x25PLEStatsClearCountsExceeded
+Counter associated with the clear count exceeded event which generates a
+communications alarm notification.@footnote{@cite{ISO/IEC 10733 :
+octetsSentCounter.}}
+
+@end table
+
+@node x25VCConfigTable
+@section X.25 Virtual Circuit (VC) Configuration Table
+
+The @dfn{X.25 Virtual Circuit (VC) Configuration Table},
+@mobj{x25VCConfigTable}, is a table that provides specific configuration
+information for various virtual circuits (VC) belonging to the various X.25
+packet layer entities (PLE).
+
+@table @mobj
+@item x25VCConfigId
+ITU-T Rec. X.283 | ISO/IEC 10742.
+@item x25VCConfigChannel
+ITU-T Rec. X.283 | ISO/IEC 10742.
+@item x25VCConfigPacketSizeIncoming
+The incoming packet size for this VC.  In the case of a profile entry, it is the
+proposed value of the incoming packet size to be used when establishing the
+virtual call, expressed in octets.  The value NULL (or zero (0)) indicates that
+the default incoming packet size as indicated by the
+x25PLEConfigDefaultPacketSizeIncoming attribute of the containing x25PLE entry),
+is to be used.  In the case of a non-profile entry, it is the actual packet size
+in use for the VC.  ITU-T Rec. X.283 | ISO/IEC 10742.
+@item x25VCConfigPacketSizeOutgoing
+The outgoing packet size for this VC.  In the case of a profile entry, it is the
+proposed value of the outgoing packet size to be used when establishing the
+virtual call, expressed in octets.  The value NULL (or zero (0)) indicates that
+the default outgoing packet size as indicated by the
+x25PLEConfigDefaultPacketSizeOutgoing attribute of the containing x25PLE etnry),
+is to be used.  Int he case of a non-profile entry, it is the actual packet size
+in used for the VC.  ITU-T Rec. X.283 | ISO/IEC 10742.
+@item x25VCConfigWindowSizeIncoming
+The actual incoming window size in use for this VC.  ITU-T Rec. X.283 | ISO/IEC
+10742.
+@item x25VCConfigWindowSizeOutgoing
+The actual outgoing window size in use for this VC.  ITU-T Rec. X.283 | ISO/IEC
+10742.
+@item x25VConfigThroughputClassIncoming
+The incoming throughput class in use or to be used.  For a profile, this is the
+throughput class to be proposed.  For a non-profile it is the actual throughput
+class in use.  For Virtual Calls this is the result of negotiation.  ITU-T Rec.
+X.283 | ISO/IEC 10742.
+@item x25VConfigThroughputClassOutgoing
+The outgoing throughput class in use or to be used.  For a profile, this is the
+throughput class to be proposed.  For a non-profile it is the actual throughput
+class in use.  For Virtual Calls this is the result of negotiation.  ITU-T Rec.
+X.283 | ISO/IEC 10742.
+@end table
+
+@node x25VCProfileTable
+@section X.25 Virtual Circuit (VC) Profile Table
+
+The @dfn{X.25 Virtual Circuit (VC) Profile Table}
+@mobj{x25VCProfileTable}, is a table that provides a common set of virtual
+circuit (VC) configuration parameters organized into a referencable profile.
+
+This managed object exists in order to permit the values of various parameters
+of a virtual call to be specified in advance by management.  When a virtual call
+is to be established, the values of all the parameters to be used can be
+identified by specifying an instance of this Managed Object.  However it is permitted for
+values specified by other means (for example, across and internal user
+interface) to override the values supplied in the profile.  There may be
+multiple entries in this table.  ISO/IEC 10733 : virtualCall.
+
+@table @mobj
+@item x25VCProfileId
+ISO/IEC 10733.
+@item x25VCProfileProposedPacketSizeIncoming
+The proposed value of the packet size parameter to be used when establishing the
+virtual call, expressed in octets.  The value of NULL (zero (0)) indicates that
+the default packet size (as indicated by the defaultPacketSize attribute of the
+containing X.25 PLE Managed Object), is to be used.  ISO/IEC 10733.
+@item x25VCProfileProposedPacketSizeOutgoing
+The proposed value of the packet size parameter to be used when establishing the
+virtual call, expressed in octets.  The value of NULL (zero (0)) indicates that
+the default packet size (as indicated by the defaultPacketSize attribute of the
+containing X.25 PLE Managed Object), is to be used.  ISO/IEC 10733.
+@item x25VCProfileProposedWindowSizeIncoming
+The proposed value of the window size parameter to be used when establishing the
+virtual call.  The value of NULL (zero (0)) indicates that the default window
+size (as indicated by the defaultWindowSize attribute of the containing X.25 PLE
+Managed Object), is to be used.  ISO/IEC 10733.
+@item x25VCProfileProposedWindowSizeOutgoing
+The proposed value of the window size parameter to be used when establishing the
+virtual call.  The value of NULL (zero (0)) indicates that the default window
+size (as indicated by the defaultWindowSize attribute of the containing X.25 PLE
+Managed Object), is to be used.  ISO/IEC 10733.
+@item x25VCProfileAcceptReverseCharging
+When @samp{false(2)}, an incoming call requesting reverse charging shall not be
+accepted.  ISO/IEC 10733.
+@item x25VCProfileProposeReverseCharging
+When @samp{true(1)}, an outgoing call shall be initiated requesting reverse charging.
+ISO/IEC 10733.
+@item x25VCProfileFastSelect
+Type of fast select to be used for the call.  This specifies that one of 'fast
+select', 'fast select with restricted response', or no fast select facility is
+to be used for the call.  Includes a value 'not specified' which indicates that
+no preference is expressed.  ISO/IEC 10733.
+@multitable {fastSelectWithRestrictedResponse(2)}{xxxxxxxxxxxxxxxxxxxxxxxxxx}
+@item notSpecified(0) @tab Unspecified or unknown.
+@item fastSelect(1) @tab Fast Select with unrestricted response.
+@item fastSelectWithRestrictedResponse(2) @tab Fast Select with restricted response.
+@item noFastSelect(3) @tab No fast select.
+@end multitable
+@item x25VCProfileCallTime
+Value for @dfn{Timer T21 (Call Request Response Timer)} in centiseconds.  ISO/IEC
+10733.
+@item x25VCProfileResetTime
+The value for @dfn{Timer T22 (Reset Request Response Timer)} in centiseconds.  ISO/IEC
+10733.
+@item x25VCProfileClearTime
+Value for @dfn{Timer T23 (Clear Request Response Timer)} in centiseconds.  ISO/IEC
+10733.
+@item x25VCProfileInterruptTime
+Value for @dfn{Timer T26 (Interrupt Response Timer)} in centiseconds.  ISO/IEC 10733.
+@item x25VCProfileResetCount
+Value for @dfn{Count R22 (Reset Request Retransmission Count).}  ISO/IEC 10733.
+@item x25VCProfileClearCount
+Value for @dfn{Count R23 (Clear Request Retransmission Count).}  ISO/IEC 10733.
+@item x25VCProfileWindowTime
+Value for Timer 24 (Window Status Transmission Timer) in centiseconds.
+
+Valid when implemented and using the optional window rotation recovery
+procedures at a receiving DTE as described in Clause 11.2.2 of ISO/IEC 8208 (2nd
+Edition).  ISO/IEC 10733, ISO/IEC 8208 clause 11.2.2.
+@item x25VCProfileDataRetransmissionTime
+Default for @dfn{Timer T25 (Window Rotation Timer)} in centiseconds.
+
+Valid when implemented and using the operation transmitting window rotation
+recovery procedures at a transmitting DTE as described in Clause 11.2.1 of
+ISO/IEC 8208 (2nd Edition).  ISO/IEC 10733.
+@item x25VCProfileDataRetransmissionCount
+Value for @dfn{Count R25 (Data Packet Retransmission Count)}.
+
+Valid when implemented and using the operation transmitting window rotation
+recovery procedures at a transmitting DTE as described in Clause 11.2.1 of
+ISO/IEC 8208 (2nd Edition).  ISO/IEC 10733.
+@item x25VCProfileRejectTime
+Value for @dfn{Timer T27 (Reject Response Timer)} in centiseconds.
+
+Valid when the optional packet retransmission procedures are implemented and
+used.  ISO/IEC 10733.
+@item x25VCProfileRejectCount
+Value for @dfn{Count R27 (Reject Retransmission Count)}.
+
+Valid when the optional packet retransmission procedures are implemented and
+used.  ISO/IEC 10733.
+@end table
+
+@node x25VCStatsTable
+@section X.25 Virtual Circuit (VC) Statistics Table
+
+The @dfn{X.25 Virtual Circuit (VC) Statistics Table},
+@prim{x25VCStatsTable}, is a table that provides statistics for various virtual
+circuits (VC) belonging to the various X.25 packet layer entities (PLE).
+
+@table @mobj
+@item x25VCStatsIndex
+ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsChannel
+ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsOctetsSentCounter
+ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsOctetsReceivedCounter
+ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsDataPacketsSent
+Counter of the total number of data packets sent by the PLE or over the PVC/VC.
+ITU-T Rec. X.283 | ISO/IEC 10733 dataPacketsSent.
+@item x25VCStatsDataPacketsReceived
+Counter of the total number of data packets received by the PLE or over the
+PVC/VC.  ITU-T Rec. X.283 | ISO/IEC 10733 dataPacketsReceived.
+@item x25VCStatsProviderInitiatedDisconnects
+Counter for the provider initiated disconnect events which generate
+communication alarm notifications.  ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsRemotelyInitiatedResets
+Counter associated with the remotely initiated reset event which generates a
+communication alarm notification.  ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsDataRetranmissionTimerExpiries
+Counter of the number of expires of timer @dfn{T25}.  Returns zero if the option is
+not implemented.  ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsProviderInitiatedResets
+Counter associated with the provider initiated reset event which generates a
+communication alarm notification.  ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsResetTimeouts
+Counter of the number of timer @dfn{T22} expiries experienced by the PLE or over the
+PVC/VC.  ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsRemotelyInitiatedRestarts
+Counter of the number of remotely initiated restarts.  This is the total number
+of remotely initiated (including provider initiated) restarts experienced by the
+PLE, including the restart associated with bringing up the PDE interface.  ITU-T
+Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsInterruptPacketsSent
+Counter of the number of interrupt packets sent by the PLE or over the PVC/VC.
+ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsInterruptPacketsReceived
+Counter of the number of interrupt packets received by the PLE or over the
+PVC/VC.  ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsInterruptTimerExpiries
+Counter of the number of expiries of timer @dfn{T26} experienced by the PLE or over
+the PVC/VC.  ITU-T Rec. X.283 | ISO/IEC 10733.
+@item x25VCStatsX25SegmentsSent
+Value for count of X.25 Segments Received.  ITU-T Rec. X.283 | but not ISO/IEC
+10733.
+@item x25VCStatsX25SegmentsReceived
+Value for count of X.25 Segments Sent.  ITU-T Rec. X.283 | but not ISO/IEC
+10733.
+@end table
+
+@node x25PVCConfigTable
+@section X.25 Permanent Virtual Circuit (PVC) Configuration Tableh
+
+The @dfn{X.25 Permanent Virtual Circuit (PVC) Configuration Table},
+@mobj{x25PVCConfigTable}, is a table that provides specific configuration
+information for permanent virtual circuits (PVC) belonging to the various X.25
+packet layer entities (PLE).
+
+An entry exists for each Permanent Virtual Circuit.  It may be both created and
+deleted by management stations.  
+
+For DTEs, when an entry is created, the protocol machine shall be reinitialized
+and a reset PDU shall be transmitted with a cause code of DTE originated
+(encoded as 00000000) and a diagnostic code of DTE operational (161) shall be
+transmitted.  When the entry is deleted, the protocol machine shall be
+reinitialized and a reset PDU with cause code of DTE originated (encoded as
+00000000) and a diagnostic code of DTE not operational (162) shall be
+transmitted.
+
+For DCEs, when an entry is created, the protocol machine shall be re-initialized
+and a reset PDU shall be transmitted.  A cause code of remote DTE Operational
+(encoded as X000 1001) or Network Operational (encoded as X000 1111) may, for
+example, be included.  When the entry is deleted the protocol machine shall be
+reinitialized and a reset PDU shall be transmitted.  A cause code of Out of
+Order (encoded as X000 0001) or Network Out of Order (encoded as X001 1101) may,
+for example, be included.
+
+ITU-T Rec. X.283 | ISO/IEC 10742.
+
+@itemize
+@item x25PVCConfigId
+@item x25PVCConfigChannel
+@item x25PVCConfigRowStatus
+@end itemize
+
+@node x25SVCConfigTable
+@section X.25 Switched Virtual Circuit (SVC) Configuration Table
+
+The @dfn{X.25 Switched Virtual Circuit (SVC) Configuration Table},
+@mobj{x25PVCConfigTable}, is a table that provides specific configuration
+information for switched virtual circuits (SVC) belonging to the various X.25
+packet layer entities (PLE).
+
+@table @mobj
+@item x25SVCConfigId
+@item x25SVCConfigChannel
+@item x25SVCConfigDirection
+The direction (incoming(0) or outgoing(1)) of the call.  ISO/IEC 10733 :
+direction.
+@item x25SVCConfigRemoteDTEAddress
+The DTE Address of the remote DTE.  In the case of an outgoing call, this is the
+remote DTE address from the called address of the transmitted call request
+packet.  In the case of an incoming call, it is the calling address from the
+received call request packet.  ISO/IEC 10733 remoteDTEAddress.
+@item x25SVCConfigThroughputClass
+The actual through class in used for the call.  For SVCs this is the result of
+negotiation.  ISO/IEC 10733 : throughputClass.
+@item x25SVCConfigRedirectReason
+The reason for call redirect.  The zero value indicates that the call was not
+redirected.  ISO/IEC 10733 : redirectReason.
+@item x25SVCConfigOriginallyCalledAddress
+The originally called address.  ISO/IEC 10733 : originallyCalledAddress.
+@item x25SVCConfigCallingAddressExtension
+The contents of the calling address extension field.
+
+In the OSI context, this will always be an NSAP address but in other uses it may
+not.  In any case, it may be null, for example, when used by ISO 8473.
+@item x25SVCConfigCalledAddressExtension
+The contents of the called address extension field.
+
+In the OSI context, this will always be an NSAP address but in other uses it may
+not.  In any case, it may be null, for example, when used by ISO 8473.
+@end table
 
 @node Allowable Sequence of NLI Primitives
 @chapter Allowable Sequence of NLI Primitives
@@ -3497,15 +4839,15 @@ struct qosdatpri @{
 
 @node Opening a Connection
 @section Opening a Connection
-@cindex Opening a Connection
+@cindex Opening a connection
 
 @node Data Transfer
 @section Data Transfer
-@cindex Data Transfer
+@cindex Data transfer
 
 @node Closing a Connection
 @section Closing a Connection
-@cindex Closing a Connection
+@cindex Closing a connection
 
 @node Listening
 @section Listening
@@ -3513,7 +4855,7 @@ struct qosdatpri @{
 
 @node PVC Operation
 @section PVC Operation
-@cindex PVC Operation
+@cindex PVC operation
 
 @c @node Precedence of NPI Primitives
 @c @chapter Precedence of NPI Primitives
@@ -3527,8 +4869,16 @@ struct qosdatpri @{
 @node NLI Header Files
 @appendix NLI Header Files
 
+@menu
+* x25_proto.h::		X.25 Protocol Primitive Header
+* x25_control.h::	X.25 Input-Output Control Header
+@end menu
+
 Applications using the Network Layer Interface (NLI) need to include several
 system header files:
+
+@node x25_proto.h
+@section X.25 Protocol Primitive Header
 
 @table @file
 @item <errno.h>
@@ -3537,6 +4887,32 @@ system header files:
 @item <sys/stropts.h>
 @item <sys/snet/x25_proto.h>
 @end table
+
+Note that on @cite{IRIS SX.25} this file is located in @file{<sys/snet/x25_proto.h>}.
+Note that on @cite{Solaris X.25} this file is located in @file{<sys/netx25/x25_proto.h>}.
+
+@smallformat
+@verbatiminclude x25_proto.h
+@end smallformat
+
+@node x25_control.h
+@section X.25 Input-Output Control Header
+
+@table @file
+@item <errno.h>
+@item <sys/types.h>
+@item <sys/ioctl.h>
+@item <sys/stropts.h>
+@item <sys/snet/x25_proto.h>
+@item <sys/snet/x25_control.h>
+@end table
+
+Note that on @cite{IRIS SX.25} this file is located in @file{<sys/snet/x25_control.h>}.
+Note that on @cite{Solaris X.25} this file is located in @file{<sys/netx25/x25_control.h>}.
+
+@smallformat
+@verbatiminclude x25_control.h
+@end smallformat
 
 @node NLI Library
 @appendix NLI Library
@@ -3561,14 +4937,14 @@ drivers, pseudo-device drivers, and pushable modules that complement the X.25
 Packet Layer Protocol driver that provides the Network Layer Interface at it
 upper layer.
 
-@figuresized{nli_figc1,1,NLI Drivers and Modules,5.5in}
+@figuresized{nli_figc1,C-1,NLI Drivers and Modules,5.5in}
 
-@figref{1} illustrates the @dfn{STREAMS} multiplexing drivers, pseudo-device
+@figref{C-1} illustrates the @dfn{STREAMS} multiplexing drivers, pseudo-device
 drivers, and pushable modules, and their organization.
 
 @node NLI Multiplexing Driver
 @section NLI Multiplexing Driver
-@cindex NLI Multiplexing Driver
+@cindex NLI multiplexing driver
 
 The NLI @dfn{STREAMS} multiplexing driver implements the X.25 Packet Layer
 Protocol (PLP)
@@ -3608,32 +4984,32 @@ simply @file{/dev/x25}.  @cite{AIXlink/X.25} calls the driver
 @file{/dev/x25pckt}.
 
 The @dfn{STREAMS} @file{/dev/x25-plp} multiplexing pseudo-device driver is
-illustrated in @figref{1}.
+illustrated in @figref{C-1}.
 
 @node NLI Conversion Module
 @section NLI Conversion Module
-@cindex NLI Conversion Module
+@cindex NLI conversion module
 
 Many Spider-based implementations of X.25 will call this multiplexing driver
 @file{s_nli3}.
 
-The @dfn{STREAMS} @file{s_nli3} pushable module is illustrated in @figref{1}.
+The @dfn{STREAMS} @file{s_nli3} pushable module is illustrated in @figref{C-1}.
 
 @node NPI Conversion Module
 @section NPI Conversion Module
-@cindex NPI Conversion Module
+@cindex NPI conversion module
 
 Many Spider-based implementations of X.25 will call this pushable module
 @file{s_npi}.  @cite{AIXlink/X.25} calls the module @file{npi}.
 
 The @dfn{STREAMS} @file{s_npi} and @file{npi} pushable modules are illustrated
-in @figref{1}.
+in @figref{C-1}.
 
 @node CONS Module
 @section CONS Module
-@cindex CONS Module
+@cindex CONS module
 
-The @dfn{STREAMS} @file{s_cons} pushable module is illustrated in @figref{1}.
+The @dfn{STREAMS} @file{s_cons} pushable module is illustrated in @figref{C-1}.
 @footnote{``@cite{Open Group CAE Specification: Network Provider Interface (NPI)
 Specification, Revision 2.0.0, Draft 2, August 17, 1992, (Parisppany, New
 Jersey), UNIX International, Inc., UNIX International Press}.'' Available from
@@ -3641,9 +5017,9 @@ Jersey), UNIX International, Inc., UNIX International Press}.'' Available from
 
 @node XX25 Module
 @section XX25 Module
-@cindex XX25 Module
+@cindex XX25 module
 
-The @dfn{STREAMS} @file{s_xx25} pushable module is illustrated in @figref{1}.
+The @dfn{STREAMS} @file{s_xx25} pushable module is illustrated in @figref{C-1}.
 
 The XX25 specification@footnote{``@cite{X/Open CAE Specification: X.25
 Programming Interface using XTI (XX25), No. c411, November 1995, (Berkshire, UK), X/Open,
@@ -3657,7 +5033,7 @@ Open Group Publication}.''  Available from
 
 @node IXE Multiplexing Driver
 @section IXE Multiplexing Driver
-@cindex IXE Multiplexing Driver
+@cindex IXE multiplexing driver
 
 The @dfn{IXE} module provides Internet Protocol over X.25 Encapsulation (IXE) per
 RFC 877 and RFC 1356.  The protocol module provides an @pval{DL_IPX25} MAC
@@ -3667,14 +5043,14 @@ represents an X.25 PVC or VC.  Each upper multiiplex Stream represents a
 @pval{DL_IPX25} connectionless data link Stream.
 
 The @dfn{STREAMS} @file{/dev/ixe} multiplexing driver is illustrated in
-@figref{1}.
+@figref{C-1}.
 
 @node IP Multiplexing Driver
 @section IP Multiplexing Driver
-@cindex IP Multiplexing Driver
+@cindex IP multiplexing driver
 
 The @dfn{STREAMS} @file{/dev/ip} multiplexing pseudo-device driver is
-illustrated in @figref{1}.
+illustrated in @figref{C-1}.
 
 @node NLI Utilities
 @appendix NLI Utilities
@@ -4596,7 +5972,7 @@ documentation.  @xref{References}.
 
 @node LAPB Template File
 @section LAPB Template File
-@cindex LAPB Template File
+@cindex LAPB template file
 
 @subheading Name
 @file{lapbtemplate} --- Link Access Protocol (Balanced) File Format
@@ -4624,70 +6000,70 @@ configuration information:
 
 @enumerate
 
-@item @pval{N2_VAL} is the maximum number of times that a protocol data unit
+@item @var{N2_VAL} is the maximum number of times that a protocol data unit
 (PDU) is set following the expiry of the acknowlegement timer, the P-bit timer,
 or the reject timer.  It also limits the number of times an RR with the P-bit
 set is sent when remote busy is true and the busy timer expires.
 
-@item @pval{T1_VAL} is the time during which the LAPB expects to receive an
+@item @var{T1_VAL} is the time during which the LAPB expects to receive an
 acknowledgement to an outstanding I-PDU or an expected response to a sent
 UI-PDU.  The value is in units of 0.1 seconds (deciseconds).
 
-@item @pval{TPF_VAL} is the time during which the LAPB expectes to receive a
+@item @var{TPF_VAL} is the time during which the LAPB expectes to receive a
 PDU with the F-bit set to 1 in response to a command with the P-bit set to 1.
 The value should be less than the acknowledgement timer.  The value is in units
 of 0.1 seconds (deciseconds).
 
-@item @pval{TREJ_VAL} is the time interval during which the LAPB expects to
+@item @var{TREJ_VAL} is the time interval during which the LAPB expects to
 receive a reply to a sent REJ DPU.  The value is in units of 0.1 seconds
 (deciseconds).
 
-@item @pval{TBUSY_VAL} is the time interval during which the LAPB waits for an
+@item @var{TBUSY_VAL} is the time interval during which the LAPB waits for an
 indication of the clearance of a busy condition at the other LAPB.  The value
 is in units of 0.1 seconds (deciseconds).
 
-@item @pval{IDLE_VAL} is the time interval during which the LAPB expects to
+@item @var{IDLE_VAL} is the time interval during which the LAPB expects to
 receive a PDU from the other LAPB.  If it expires then the P/F cycle is
 intiated which may result in link disconnection.  The value is in units of 0.1
 seconds (decicseconds).
 
-@item @pval{ACK_DELAY} is the maximum delay in 0.1 second units before
+@item @var{ACK_DELAY} is the maximum delay in 0.1 second units before
 transmitting a delayed RR.  This must be considerably less that the
-acknowledgement timer value, @pval{T1_VAL}.
+acknowledgement timer value, @var{T1_VAL}.
 
-@item @pval{NOTACK_MAX} is the maximuum number of unacknowledged receive I PDUs
+@item @var{NOTACK_MAX} is the maximuum number of unacknowledged receive I PDUs
 before the RR acknowledging them all must be sent.
 
-@item @pval{LOC_WIND} is the number of unacknowledged I PDUs that may be sent.
+@item @var{LOC_WIND} is the number of unacknowledged I PDUs that may be sent.
 
-@item @pval{LOC_PROBE} is the position before the window is closed at which an
+@item @var{LOC_PROBE} is the position before the window is closed at which an
 I PDU is sent with the P-bit set to solicit an acknowledgement from the
 receiver.
 
-@item @pval{MAX_I_LEN} is the maximum isze of a LAPB I-frame.  LAPB requires
+@item @var{MAX_I_LEN} is the maximum isze of a LAPB I-frame.  LAPB requires
 all incoming I-frames above a certain size to be rejected by a FRMR.  This
 parameter specifies the maximum size.  It is constructured as the sum of the
 maximum X.25 data size, the X.25 protocol length and the LAPB protocol length.
 
-@item @pval{IGN_UA_ERROR} define whether or not to ignore any UA frams
+@item @var{IGN_UA_ERROR} define whether or not to ignore any UA frams
 received, when the connection is in ERROR state.  The value is @samp{1} for
 @var{true} and @samp{0} for @var{false}.  The defalt value is @var{false}.
 
-@item @pval{FRMR_FRMR_ERROR} defines whether or not to re-transmit a frame
+@item @var{FRMR_FRMR_ERROR} defines whether or not to re-transmit a frame
 reject if a frame reject is received, when the connection is in @psta{ERROR}
 state.  The value is @samp{1} for @var{true} and @samp{0} for @var{false}.  The
 default value is @var{false}.
 
-@item @pval{FRMR_INVRSP_ERROR} defines whether or not  to transmit a frame
+@item @var{FRMR_INVRSP_ERROR} defines whether or not  to transmit a frame
 reject if an invalid frame response is received, when the connection is in
 @psta{ERROR} state.  The value is @samp{1} for @var{true} and @samp{0} for
 @var{false}.  The default value is @var{false}.
 
-@item @pval{SFRAME_PBIT} defines whether or not to send a frame reject if an
+@item @var{SFRAME_PBIT} defines whether or not to send a frame reject if an
 S-frame is received without the P-bit set.  The value is @samp{1} for
 @var{true}a nd @samp{0} for @var{false}.  The default value is @var{false}.
 
-@item @pval{NO_DM_ADM} defines whether or not to send a @psta{DM} on entry to
+@item @var{NO_DM_ADM} defines whether or not to send a @psta{DM} on entry to
 @psta{ADM} state after an N2 count expiry.  The value is @samp{1} for
 @var{true} and @samp{0} for @var{false}.  The default value is @var{false}.
 
@@ -4697,11 +6073,11 @@ The following two fields are optional extensions:
 
 @enumerate 17
 
-@item @pval{IGN_DM_ERROR} defines whether or not to ignore DM frames received,
+@item @var{IGN_DM_ERROR} defines whether or not to ignore DM frames received,
 when the connection is in @psta{ERROR} state.  The value is @samp{1} for
 @var{true} and @samp{0} for @var{false}.  The default value is false.
 
-@item @pval{SABM_IN_X32} defines the action to take when a SABM is received in
+@item @var{SABM_IN_X32} defines the action to take when a SABM is received in
 X.32 setup.  The value is @samp{1} for @var{true} and @samp{0} for @var{false}.
 The default value is @var{false}.
 
@@ -4734,10 +6110,10 @@ implementations based on @cite{Spider X.25}, such as @cite{AIXlink/X.25},
 defines 18 lines, where the first 16 lines are compatible with other
 implementations and the last additional two lines are optional.
 
-@item @cite{PT X.25} documents the @pval{SABM_IN_X32} LAPB template field but
-not the @pval{IGN_DM_ERROR} LAPB template field.  @cite{Solstice X.25} and
-@cite{IRIS SX.25} do not document either the @pval{IGN_DM_ERROR} nor
-@pval{SABM_IN_X32} LAPB template fields.
+@item @cite{PT X.25} documents the @var{SABM_IN_X32} LAPB template field but
+not the @var{IGN_DM_ERROR} LAPB template field.  @cite{Solstice X.25} and
+@cite{IRIS SX.25} do not document either the @var{IGN_DM_ERROR} nor
+@var{SABM_IN_X32} LAPB template fields.
 
 @end itemize
 
@@ -4754,7 +6130,7 @@ The @file{lapbtemplate} file format first appeared in @cite{Spider X.25}.
 @page
 @node LLC2 Template File
 @section LLC2 Template File
-@cindex LLC2 Template File
+@cindex LLC2 template file
 
 @subheading Name
 @file{llc2template} --- Logical Link Control Type 2 File Format
@@ -4781,52 +6157,52 @@ information.
 
 @enumerate
 
-@item @pval{N2_VAL}
+@item @var{N2_VAL}
 is the maximum number of times that a Protocol Data Unit (PDU) is sent
 following the expiry of the acknowledgement timer, the P-bit timer, or the
 reject timer.  This parameter also limits the number of times an RR is sent
 with the P-bit set when remote busy is true and the busy timer expires.
 
-@item @pval{T1_VAL}
+@item @var{T1_VAL}
 is the time interval during which the LLC2 expects to receive an
 acknowledgement to an outstanding I-PDU or an expected response to a sent
 UI-PDU.  The value is in units of 0.1 seconds.
 
-@item @pval{TPF_VAL}
+@item @var{TPF_VAL}
 is the time during which the LLC2 expects to receive a PDU with the F-bit set
 to 1 in response to a command with the P-bit set to 1.  The value should be
 less than that specified for the akcnowledgement timer.  The value is in units
 of 0.1 seconds.
 
-@item @pval{TREJ_VAL}
+@item @var{TREJ_VAL}
 is the time interval during which the LLC2 expects to receive a reply to a sent
 REJ PDU.  The value is in units of 0.1 seconds.
 
-@item @pval{TBUSY_VAL}
+@item @var{TBUSY_VAL}
 is the timer interval during which the LLC2 waits for an indication of the
 clearance of busy condition at the other LLC2.  The value is in units of 0.1
 seconds.
 
-@item @pval{TIDLE_VAL}
+@item @var{TIDLE_VAL}
 is the time interval during which the LLC2 expects to receive a PDU from the
 other LLC2.  The value is in units of 0.1 seconds.
 
-@item @pval{ACK_DELAY}
+@item @var{ACK_DELAY}
 is the RR delay time.  This is the time interval for which the LLC2 will
 withhold acknowledgements of unacknowledged received I-PDUs.  The value is in
 units of 0.1 seconds.
 
-@item @pval{NOTACK_MAX}
+@item @var{NOTACK_MAX}
 is the maximum number of unacknowledged received I-frames.
 
-@item @pval{TX_WINDOW}
+@item @var{TX_WINDOW}
 is the transmit window (if no XID received).
 
-@item @pval{TX_PROBE}
+@item @var{TX_PROBE}
 is the position before the window is closed at which an I-PDU is sent with the
 P-bit set to solicit an acknowledgement from the receiver.
 
-@item @pval{MAX_I_LEN}
+@item @var{MAX_I_LEN}
 is the maximum size of an LLC2 I-frame.  LLC2 requires all incoming I-frames
 above a certain size to be rejected by a FRMR.  This parameter specifies the
 maximum size of data that may bereceived starint from the LLC2 protocol header.
@@ -4836,14 +6212,14 @@ protool header length + LLC2 protocol header length).  In an SNA network, it
 is constructed as (maximum SNA data length + SNA request header length + SNA
 transmission header length + LLC2 protocol header length).
 
-@item @pval{XID_WINDOW}
+@item @var{XID_WINDOW}
 is the XID window size (receive window), when the remote window size is unknown
 or zero.
 
-@item @pval{XID_NDUP}
+@item @var{XID_NDUP}
 is the duplicate MAC XID count (0 means no test).
 
-@item @pval{XID_TDUP}
+@item @var{XID_TDUP}
 is the duplicate MAC XID time.  The value is in units of 0.1 seconds.
 
 @end enumerate
@@ -4892,7 +6268,7 @@ The @file{llc2template} file format first appeared in @cite{Spider X.25}.
 @page
 @node NUI Mapping File
 @section NUI Mapping File
-@cindex NUI Mapping File
+@cindex NUI mapping file
 
 @subheading Name
 @subheading Description
@@ -4905,7 +6281,7 @@ The @file{llc2template} file format first appeared in @cite{Spider X.25}.
 @page
 @node PAD Entries File
 @section PAD Entries File
-@cindex PAD Entries File
+@cindex PAD entries file
 
 @subheading Name
 @subheading Description
@@ -4918,7 +6294,7 @@ The @file{llc2template} file format first appeared in @cite{Spider X.25}.
 @page
 @node X.25 Template File
 @section X.25 Template File
-@cindex X.25 Template File
+@cindex X.25 template file
 
 @subheading Name
 
@@ -4950,7 +6326,7 @@ following configuration information:
 @enumerate
 
 @item
-@pval{NET_MODE}
+@var{NET_MODE}
 determines the various characteristics of the network protocol.  Valid values
 are integers, as specified below, that refers to the networks listed:
 
@@ -4967,10 +6343,10 @@ are integers, as specified below, that refers to the networks listed:
 @end multitable
 
 @item
-@pval{X25_VERSION}
+@var{X25_VERSION}
 determines the version of the X.25 protocol that is being used over the
 network.  Valid values are integers, as specified below.  Note that a
-@pval{NET_MODE} of @pval{X25_LLC} will override any value in this field to 1984
+@var{NET_MODE} of @var{X25_LLC} will override any value in this field to 1984
 (or later).
 
 @multitable {2004}{m}{indicates 2004}
@@ -4988,7 +6364,7 @@ network.  Valid values are integers, as specified below.  Note that a
 @end multitable
 
 @item
-@pval{L3PLPMODE}
+@var{L3PLPMODE}
 indicates the DTE/DCE nature of the link.  Valid value are integers, as
 specified below.  Note that DXE operation is per ISO
 8208.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
@@ -5000,78 +6376,78 @@ specified below.  Note that DXE operation is per ISO
 @end multitable
 
 @item
-@pval{LPC}
-is the lowest LCI for Permanent Virtual Circuits (PVC).  @pval{LPC} and
-@pval{HPC} define the range of LCI that are assigned to PVC.  This range cannot
+@var{LPC}
+is the lowest LCI for Permanent Virtual Circuits (PVC).  @var{LPC} and
+@var{HPC} define the range of LCI that are assigned to PVC.  This range cannot
 overlap with the other defined ranges.  Setting this value to zero and
-@pval{HPC} to zero specifies that there are no PVC.
+@var{HPC} to zero specifies that there are no PVC.
  Valid values contain 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 
 @item
-@pval{HPC}
-is the highest LCI for PVC.  @pval{LPC} and @pval{HPC} define the range of LCI
+@var{HPC}
+is the highest LCI for PVC.  @var{LPC} and @var{HPC} define the range of LCI
 that are assigned to PVC.  This range cannot overlap with the other defined
-ranges.  @pval{LPC} and @pval{HPC} set to zero means no PVC.
+ranges.  @var{LPC} and @var{HPC} set to zero means no PVC.
 Valid values contain 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 
 @item
-@pval{LIC}
+@var{LIC}
 is the lowest incoming (IC) VC.
-@pval{LIC} and @pval{HIC} define the range of LCI that are assigned to incoming call circuits.
+@var{LIC} and @var{HIC} define the range of LCI that are assigned to incoming call circuits.
 This range cannot overlap with the other defined ranges.
-@pval{LIC} and @pval{HIC} zero means no IC VC.
+@var{LIC} and @var{HIC} zero means no IC VC.
 Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 
 @item
-@pval{HIC}
+@var{HIC}
 is the highest IC VC.
-@pval{LIC} and @pval{HIC} define the range of LCI that are assigned to incoming call circuits.
+@var{LIC} and @var{HIC} define the range of LCI that are assigned to incoming call circuits.
 This range cannot overlap.
-@pval{LIC} and @pval{HIC} zero means no IC VC.
+@var{LIC} and @var{HIC} zero means no IC VC.
 Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 
 @item
-@pval{LTC}
+@var{LTC}
 is the lowest two-way (TW) VC.
-@pval{LTC} and @pval{HTC} define the LCI that are assigned to two-way call circuits.
+@var{LTC} and @var{HTC} define the LCI that are assigned to two-way call circuits.
 This range cannot overlap.
-@pval{LTC} and @pval{HTC} zero means no TW VC.
+@var{LTC} and @var{HTC} zero means no TW VC.
 Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 
 @item
-@pval{HTC}
+@var{HTC}
 is the highest TW VC.
-@pval{LTC} and @pval{HTC} define the LCI that are assigned to two-way call circuits.
+@var{LTC} and @var{HTC} define the LCI that are assigned to two-way call circuits.
 This range cannot overlap.
-@pval{LTC} and @pval{HTC} zero means no TW VC.
+@var{LTC} and @var{HTC} zero means no TW VC.
 Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 j
 @item
-@pval{LOC}
+@var{LOC}
 is the lowest outgoing (OG) VC.
-@pval{LOC} and @pval{HOC} define the range assigned to outgoing call circuits.
+@var{LOC} and @var{HOC} define the range assigned to outgoing call circuits.
 This range cannot overlap.
-@pval{LOC} and @pval{HOC} zero means no OG VC.
+@var{LOC} and @var{HOC} zero means no OG VC.
 Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 
 @item
-@pval{HOC}
+@var{HOC}
 is the highest OG VC.
-@pval{LOC} and @pval{HOC} define the range assigned to outgoing call circuits.
+@var{LOC} and @var{HOC} define the range assigned to outgoing call circuits.
 This range cannot overlap.
-@pval{LOC} and @pval{HOC} zero means no OG VC.
+@var{LOC} and @var{HOC} zero means no OG VC.
 Use 3 hexadecimal digits @samp{000} through @samp{FFF}.
 Leading zeros are optional.
 j
 @item
-@pval{THISGFI}
+@var{THISGFI}
 indicates which Modulo operates on the network.  It can have one of three
 integer values.
 
@@ -5083,7 +6459,7 @@ integer values.
 @end multitable
 
 @item
-@pval{LOCMAXPKTSIZE}
+@var{LOCMAXPKTSIZE}
 is the maximum acceptable packet size for sent packets.
 The value is the logarithm, base two, of the packet size.  Valid values are in
 the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
@@ -5094,7 +6470,7 @@ The value should be less than the maximum LAPB I-frame size, N2, see
 @manref{lltune(8)}.
 
 @item
-@pval{REMMAXPKTSIZE}
+@var{REMMAXPKTSIZE}
 is the maximum acceptable packet size for received packets.
 The value is the logarithm, base two, of the packet size.  Valid values are in
 the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
@@ -5105,7 +6481,7 @@ The value should be less than the maximum LAPB I-frame size, N2, see
 @manref{lltune(8)}.
 
 @item
-@pval{LOCDEFPKTSIZE}
+@var{LOCDEFPKTSIZE}
 is the default packet size for sent packets.
 The value is the logarithm, base two, of the packet size.  Valid values are in
 the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
@@ -5116,7 +6492,7 @@ When specified as 7 (128 octets), negotiation of the non-standard default
 packet size facility will neither be initiated nor rejected.
 
 @item
-@pval{REMDEFPKTSIZE}
+@var{REMDEFPKTSIZE}
 is the default packet size for received packets.
 The value is the logarithm, base two, of the packet size.  Valid values are in
 the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
@@ -5127,25 +6503,17 @@ When specified as 7 (128 octets), negotiation of the non-standard default
 packet size facility will neither be initiated nor rejected.
 
 @item
-@pval{LOCMAXWSIZE}
+@var{LOCMAXWSIZE}
 The value must be greater than one and less than the modulus value.
 The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
 
 @item
-@pval{REMMAXWSIZE}
+@var{REMMAXWSIZE}
 The value must be greater than one and less than the modulus value.
 The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
 
 @item
-@pval{LOCDEFWSIZE}
-The value must be greater than one and less than the modulus value.
-The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
-When specified as 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768, the
-non-standard default window size facility will neither be initiated nor
-rejected.
-
-@item
-@pval{REMDEFWSIZE}
+@var{LOCDEFWSIZE}
 The value must be greater than one and less than the modulus value.
 The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
 When specified as 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768, the
@@ -5153,13 +6521,21 @@ non-standard default window size facility will neither be initiated nor
 rejected.
 
 @item
-@pval{MAXNSDULEN}
+@var{REMDEFWSIZE}
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+When specified as 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768, the
+non-standard default window size facility will neither be initiated nor
+rejected.
 
 @item
-@pval{ACKDELAY}
+@var{MAXNSDULEN}
 
 @item
-@pval{T20VALUE}
+@var{ACKDELAY}
+
+@item
+@var{T20VALUE}
 (Restart Request Response Timer)
 is the time period that the DTE will await a restart confirmation or restart
 indication following issuing a request request.
@@ -5167,7 +6543,7 @@ The timeout value should not be less than 180 seconds.
 The value is in integral units of deciseconds (0.1 seconds), so an interval of
 180 seconds is specified as 1800 (deciseconds).
 
-@pval{T10VALUE}
+@var{T10VALUE}
 (Restart Indication Response Timer)
 is the equivalient timer for the DCE, and defines the time period that the DCE
 will wait for a restart confirmation or restart request after having issued a
@@ -5177,7 +6553,7 @@ The value is in integral units of deciseconds (0.1 seconds), so an interval of
 60 seconds is specified as 600 (deciseconds).
 
 @item
-@pval{T21VALUE}
+@var{T21VALUE}
 (Call Request Response Timer)
 is the time period that the DTE will await a call connected or clear
 indication having issued a call request.
@@ -5185,7 +6561,7 @@ The timeout value should not be less than 200 seconds.
 The value is in integral units of deciseconds (0.1 seconds), so an interval of
 200 seconds is specified as 2000 (deciseconds).
 
-@pval{T11VALUE}
+@var{T11VALUE}
 (Incoming Call Response Timer)
 is the equivalent timer for the DCE, and defines the time period that the DCE
 will wait for a call accepted, clear request or call request after having
@@ -5195,7 +6571,7 @@ The value is in integral units of deciseconds (0.1 seconds), so an interval of
 180 seconds is specified as 1800 (deciseconds).
 
 @item
-@pval{T22VALUE}
+@var{T22VALUE}
 (Reset Request Response Timer)
 is the time period that the DTE will await a reset confirmation or reset
 indication having issued a reset request.
@@ -5203,7 +6579,7 @@ The timeout value should not be less than 180 seconds.
 The value is in integral units of deciseconds (0.1 seconds), so an interval of
 180 seconds is specified as 1800 (deciseconds).
 
-@pval{T12VALUE}
+@var{T12VALUE}
 (Reset Indication Response Timer)
 is the equivalent timer for the DCE, and defines the time period that the DCE
 will wait for a reset confirmation or request request after having issued a
@@ -5213,7 +6589,7 @@ The value is in integral units of deciseconds (0.1 seconds), so an interval of
 60 seconds is specified as 600 (deciseconds).
 
 @item
-@pval{T23VALUE}
+@var{T23VALUE}
 (Clear Request Response Timer)
 is the time period that the DTE will await a clear confirmation or clear
 indication having issued a clear request.
@@ -5221,7 +6597,7 @@ The timeout value should not be less than 180 seconds.
 The value is in integral units of deciseconds (0.1 seconds), so an interval of
 180 seconds is specified as 1800 (deciseconds).
 
-@pval{T13VALUE}
+@var{T13VALUE}
 (Clear Indication Response Timer)
 is the equivalent timer for the DCE, and defines the time period that the DCE
 will wait for a clear confirmation or clear request following issuing a clear
@@ -5231,10 +6607,10 @@ The value is in integral units of deciseconds (0.1 seconds), so an interval of
 60 seconds is specified as 600 (deciseconds).
 
 @item
-@pval{TVALUE}
+@var{TVALUE}
 
 @item
-@pval{T25VALUE}
+@var{T25VALUE}
 (Window Rotation Timer)
 is the time period that the DTE will await acknowledgement of all outstanding
 data packets having trasnmitted the last available data packet or the window
@@ -5247,7 +6623,7 @@ Note that this T25 timer is only needed if the associated
 procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 11.2.1.} is used.
 
 @item
-@pval{T26VALUE}
+@var{T26VALUE}
 (Interrupt Response Timer)
 is the time period that the DTE will await an interrupt confirmation having
 issued an interrupt.
@@ -5256,37 +6632,37 @@ The value is in integral units of deciseconds (0.1 seconds), so an interval of
 180 seconds is specified as 1800 (deciseconds).
 
 @item
-@pval{IDLEVALUE}
+@var{IDLEVALUE}
 
 @item
-@pval{CONNECTVALUE}
+@var{CONNECTVALUE}
 
 @item
-@pval{R20VALUE}
+@var{R20VALUE}
 (Restart Request Retransmission Count) is the number of times that a restart
 request will be re-issued, and T20 restarted, upon expiry of timer T20.
 This value has a default of 1 and a minimum of 1.
 
 @item
-@pval{R22VALUE}
+@var{R22VALUE}
 (Reset Request Retransmission Count) is the number of times that a reset
 request will be re-issued, and T22 restarted, upon expiry of timer T22.
 This value has a default of 1 and a minimum of 1.
 
 @item
-@pval{R23VALUE}
+@var{R23VALUE}
 (Clear Request Retransmission Count) is the number of times that a clear
 request will be re-issued, and T23 retstarted, upon expiry of timer T23.
 This value has a default of 1 and a minimum of 1.
 
 @item
-@pval{LOCALDELAY}
+@var{LOCALDELAY}
 
 @item
-@pval{ACCESSDELAY}
+@var{ACCESSDELAY}
 
 @item
-@pval{LOCMAXTHCLASS}
+@var{LOCMAXTHCLASS}
 is the local maximum throughput class.
 The value is an integer number from 3 to 44.
 
@@ -5297,7 +6673,7 @@ through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
 listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
 
 @item
-@pval{REMMAXTHCLASS}
+@var{REMMAXTHCLASS}
 is the remote maximum throughput class.
 The value is an integer number from 3 to 44.
 
@@ -5308,7 +6684,7 @@ through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
 listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
 
 @item
-@pval{LOCDEFTHCLASS}
+@var{LOCDEFTHCLASS}
 is the local default throughput class.
 The value is an integer number from 3 to 44.
 
@@ -5319,7 +6695,7 @@ through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
 listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
 
 @item
-@pval{REMDEFTHCLASS}
+@var{REMDEFTHCLASS}
 is the remote default throughput class.
 The value is an integer number from 3 to 44.
 
@@ -5330,7 +6706,7 @@ through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
 listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
 
 @item
-@pval{LOCMINTHCLASS}
+@var{LOCMINTHCLASS}
 is the local minimum throughput class.
 The value is an integer number from 3 to 44.
 
@@ -5341,7 +6717,7 @@ through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
 listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
 
 @item
-@pval{REMMINTHCLASS}
+@var{REMMINTHCLASS}
 is the remote minimum throughput class.
 The value is an integer number from 3 to 44.
 
@@ -5352,7 +6728,7 @@ through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
 listed in Table 20b of ISO/EIC 8208:2000.@footnote{@xref{ISO8208,,ISO/IEC 8208}.}
 
 @item
-@pval{SUB_CUG}
+@var{SUB_CUG}
 (Closed User Group)
 is the index to the closed user group selected for the virtual
 call in the form of two to four decimal digits.  Indexes to the close user
@@ -5360,13 +6736,13 @@ group at different DXE interfaces may be different.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_PREF}
+@var{SUB_PREF}
 (Preferential Closed User Group).  When the DTE belongs to more than one
 closed user group, a preferential closed user group must be specified.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_CUGOA}
+@var{SUB_CUGOA}
 (Closed User Group with Outgoing Access)
 is the index to the closed user group selected for the virtual call in the
 form of two to four decimal digits.  Indexes to the close user group at
@@ -5374,7 +6750,7 @@ different DXE interfaces may be different.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_CUGIA}
+@var{SUB_CUGIA}
 (Closed User Group with Incoming Access)
 is the index to the closed user group selected for the virtual call in the
 form of two to four decimal digits.  Indexes to the close user group at
@@ -5382,31 +6758,31 @@ different DXE interfaces may be different.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{CUG_FORMAT}
+@var{CUG_FORMAT}
 (Number of Closed User Groups Subscribed) defines the maximum number of closed
 user groups to which the DTE is subscribed.  The value is in the range 0 to
 100 for basic and in the range 101 to 10000 for extended.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{BAR_CUG_IN}
+@var{BAR_CUG_IN}
 (Closed User Group Incoming Calls Barred) is a user option that bars incoming
 calls containing the closed user group facility.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_EXTENDED}
+@var{SUB_EXTENDED}
 (Extended Call Packets)
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{BAR_EXTENDED}
+@var{BAR_EXTENDED}
 (Extended Call Packets Barred) is a user option that bars incoming calls
 containing flow control negotiation facilities.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_FSELECT}
+@var{SUB_FSELECT}
 (Fast Select Acceptance) is an optional user facility agreed for a period of
 time.  This user facility, if subscribed to, authorizes the DCE to transmit to
 the DTE incoming calls that request the fast select facility.  In the absence
@@ -5417,7 +6793,7 @@ response.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_FSRRESP}
+@var{SUB_FSRRESP}
 (Fast Select Acceptance) is an optional user facility agreed for a period of
 time.  This user facility, if subscribed to, authorizes the DCE to transmit to
 the DTE incoming calls that request the fast select facility.  In the absence
@@ -5428,7 +6804,7 @@ response.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_REVCHARGE}
+@var{SUB_REVCHARGE}
 (Reverse Charging Acceptance) is an optional user facility agree for a period
 of time for virtual calls.  This user facility, if subscribed to, authorizes
 the DCE to transmit to the DTE incoming calls that request the reverse
@@ -5437,7 +6813,7 @@ to the DTE incoming calls that request the reverse charging facility.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_LOC_CHG_PREV}
+@var{SUB_LOC_CHG_PREV}
 (Local Charging Prevention)
 is an optional user faciltiy agreed for a period of time for virtual calls.
 This user facility, if subscribed to, authorizes the DCE to prevent the
@@ -5450,7 +6826,7 @@ will apply reverse charging to this call.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{BAR_INCALL}
+@var{BAR_INCALL}
 (Incoming Calls Barred) determines whether the optional user facility is
 agreed for a period of time.  This facility applies to all logical channels
 used at the DTE/DCE interface for virtual calls.  This user facility, if
@@ -5462,7 +6838,7 @@ only in cases where the called DTE address is the address of the calling DTE.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{BAR_OUTCALL}
+@var{BAR_OUTCALL}
 (Outgoing Calls Barred) determines whether the optional user facilty is agreed
 for a period of time.  This facility applies to all logical channels used at
 the DTE/DCE interface for virtual calls.  This user facility, if subscribed
@@ -5472,7 +6848,7 @@ calls retain their full duplex capability.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_TOA_NPI_FMT}
+@var{SUB_TOA_NPI_FMT}
 (TOA/NPI Address) is an optional user facility agreed for a period of time for
 virtual calls.  When this facility is subscribed to, the DCE and DTE shall
 transmit call set-up and clearing packets only using the TOA/NPI address
@@ -5480,13 +6856,13 @@ format.  In this case, addresses in facilities are also in TOA/NPI format.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{BAR_TOA_NPI_FMT}
+@var{BAR_TOA_NPI_FMT}
 (TOA/NPI Address Incoming Calls Barred) is a user option that bars incoming
 calls containing TOA/NPI addresses.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{SUB_NUI_OVERRIDE}
+@var{SUB_NUI_OVERRIDE}
 (NUI Override) is an optional user facility agreed for a period of time for
 virtual calls.  When this facility is subscribed to, one or more network user
 identifiers are also agreed for a period of time.  Associated with each
@@ -5500,58 +6876,58 @@ the duration of the particular call to which it applies.
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{ACC_NODIAG}
+@var{ACC_NODIAG}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{USE_DIAG}
+@var{USE_DIAG}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{CCITT_CLEAR_LEN}
+@var{CCITT_CLEAR_LEN}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{BAR_DIAG}
+@var{BAR_DIAG}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{DISC_NS_DIAG}
+@var{DISC_NS_DIAG}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{ACC_HEX_ADD}
+@var{ACC_HEX_ADD}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{BAR_NONPRIV_LISTEN}
+@var{BAR_NONPRIV_LISTEN}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{INTL_ADDR_REGION}
+@var{INTL_ADDR_REGION}
 
 @item
-@pval{INTL_PRIORITISED}
+@var{INTL_PRIORITISED}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{DNIC}
+@var{DNIC}
 The value is 4 hexadecimal digits.
 
 @item
-@pval{PRTY_ENCODE_CONTROL}
+@var{PRTY_ENCODE_CONTROL}
 The value is an integer decimal number.
 
 @item
-@pval{PRTY_PKT_FORCED_VAL}
+@var{PRTY_PKT_FORCED_VAL}
 The value is an integer decimal number.
 
 @item
-@pval{SRC_ADDR_CONTROL}
+@var{SRC_ADDR_CONTROL}
 The value is an integer decimal number.
 
 @item
-@pval{DBIT_ACCEPT_IND}
+@var{DBIT_ACCEPT_IND}
 
 @multitable {0}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
 @item 0 @tab - @tab leave the D-bit set and pass the packet on,
@@ -5560,7 +6936,7 @@ The value is an integer decimal number.
 @end multitable
 
 @item
-@pval{DBIT_ACCEPT_OUT}
+@var{DBIT_ACCEPT_OUT}
 
 @multitable {0}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
 @item 0 @tab - @tab leave the D-bit set and pass the packet on,
@@ -5569,7 +6945,7 @@ The value is an integer decimal number.
 @end multitable
 
 @item
-@pval{DBIT_DATA_IN}
+@var{DBIT_DATA_IN}
 
 @multitable {0}{m}{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
 @item 0 @tab - @tab leave the D-bit set and pass the packet on,
@@ -5578,7 +6954,7 @@ The value is an integer decimal number.
 @end multitable
 
 @item
-@pval{DBIT_DATA_OUT}
+@var{DBIT_DATA_OUT}
 defines the action to taken when the local user sends a data packet with the
 D-bit set, but the remote party has not indicated D-bit support.  It can have
 one of the following values:
@@ -5596,19 +6972,19 @@ The following are optional extension parameters:
 @enumerate 77
 
 @item
-@pval{THCLASS_NEG_TO_DEF}
+@var{THCLASS_NEG_TO_DEF}
 The value is @samp{Y} for use and @samp{N} for non-use.
 
 @item
-@pval{THCLASS_TYPE}
+@var{THCLASS_TYPE}
 The value is an integer decimal number.
 
 @item
-@pval{TH_WMAP}
+@var{TH_WMAP}
 The value is 16 decimal numbers, 0 to 255, separated by @samp{.}.
 
 @item
-@pval{TH_PMAP}
+@var{TH_PMAP}
 The value is 16 decimal numbers, 0 to 255, separated by @samp{.}.
 
 @end enumerate
@@ -5625,7 +7001,7 @@ The following parameters, therefore, are the extensions specific to the
 @enumerate 81
 
 @item
-@pval{T24VALUE}
+@var{T24VALUE}
 (Window Status Transmission Timer)
 is the time period that the DTE will wait without sending a window status
 packet (a packet with a P(R): RR, RNR, DATA or REJECT).
@@ -5637,7 +7013,7 @@ Note that this T24 timer is only needed if the associated
 procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 11.2.2.} is used.
 
 @item
-@pval{T27VALUE}
+@var{T27VALUE}
 (Reject Response Timer)
 is the time period that the DTE will await a data retransmission after
 issuing a reject.
@@ -5649,7 +7025,7 @@ Note that this T27 timer is only needed if the associated
 procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 13.4.} is used.
 
 @item
-@pval{T28VALUE}
+@var{T28VALUE}
 (Registration Request Response Timer)
 is the time period that the DTE will await a registration confirmation or
 diagnostic packet having issued a registration request.
@@ -5661,7 +7037,7 @@ Note that this T28 timer is only needed if the associated
 procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 13.1.} is used.
 
 @item
-@pval{R25VALUE}
+@var{R25VALUE}
 (Data Packet Retransmission Count) is the number of times that a data packet
 will be retransmitted, and T25 restarted, upon expiry of T25.
 This value has a default of 0.
@@ -5671,7 +7047,7 @@ Note that R25 is only needed if the associated
 procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 11.2.1.} is used.
 
 @item
-@pval{R27VALUE}
+@var{R27VALUE}
 (Reject Retransmission Count) is the number of times that a reject is
 reissued, and T27 restarted, upon expiry of T27.
 This value has a default of 0.
@@ -5681,7 +7057,7 @@ Note that R27 is only needed if the associated
 procedure@footnote{@xref{ISO8208,,ISO/IEC 8208}, Section 13.4.} is used.
 
 @item
-@pval{R28VALUE}
+@var{R28VALUE}
 (Registration Request Retransmission Count) is the number of times a
 registration request will be reissued, and T28 restarted, upon expiry of T28.
 This value has a default of 1.
@@ -5724,7 +7100,7 @@ with the following compatibility considerations:
 @item
 @cite{@value{PACKAGE_TITLE}}
 fairly much ignores the setting of the
-@pval{NET_MODE} and @pval{X25_VERSION}
+@var{NET_MODE} and @var{X25_VERSION}
 parameters.
 The
 @cite{@value{PACKAGE_TITLE}}
@@ -5750,21 +7126,21 @@ the default (180 seconds) will be assumed.
 
 @item
 No other implementation documents support for the retransmission of reject
-messages and the associated @pval{T27} and @pval{R27} parameter values.
+messages and the associated @var{T27} and @var{R27} parameter values.
 @cite{@value{PACKAGE_TITLE}}
 supports these as extensions (line 82 and line 85).  If these lines are not
 present, defaults (60 seconds and 0 retransmission) will be assumed.
 
 @item
 Most implementations do not document support for the On-Line Registration
-facilities, and the associated @pval{T28} and @pval{R28} parameter values.
+facilities, and the associated @var{T28} and @var{R28} parameter values.
 @cite{@value{PACKAGE_TITLE}}
 supports these as extensions (line 83 and line 86).  If these lines are not
 present, defaults (300 seconds and 1 retransmission) will be assumed.
 
 @item
-All implementations document support for a @pval{T25} timer, but no other
-implementation documents support the @pval{R25} parameter value.
+All implementations document support for a @var{T25} timer, but no other
+implementation documents support the @var{R25} parameter value.
 @cite{@value{PACKAGE_TITLE}}
 supports this as an extension (line 84).  If this line is not present,
 the default (zero (0) retransmissions) will be assumed.
@@ -5796,7 +7172,7 @@ The @file{x25template} file format first appeared in @cite{Spider X.25}.
 @page
 @node X.25 Host Entries File
 @section X.25 Host Entries File
-@cindex X.25 Host Entries File
+@cindex X.25 host entries file
 
 @subheading Name
 @subheading Description
@@ -5809,7 +7185,7 @@ The @file{x25template} file format first appeared in @cite{Spider X.25}.
 @page
 @node PVC Mapping File
 @section PVC Mapping File
-@cindex PVC Mapping File
+@cindex PVC mapping file
 
 @subheading Name
 @subheading Description
@@ -5822,7 +7198,7 @@ The @file{x25template} file format first appeared in @cite{Spider X.25}.
 @page
 @node XOS Template File
 @section XOS Template File
-@cindex XOS Template File
+@cindex XOS template file
 
 @subheading Name
 @subheading Description
@@ -5835,7 +7211,7 @@ The @file{x25template} file format first appeared in @cite{Spider X.25}.
 @page
 @node XOT Template File
 @section XOT Template File
-@cindex XOT Template File
+@cindex XOT template file
 
 @subheading Name
 @subheading Description
@@ -5865,7 +7241,7 @@ provided by @cite{@value{PACKAGE_TITLE}} solely for compatibility with
 applications, drivers and modules developed to operate on implementations based
 on @cite{Spider X.25} and is intended to ease the porting of legacy
 applications to @cite{Linux}.  New projects must use the standard @cite{X.25}
-@cite{NPI}@footnote{@xref{NPI}} or @cite{XX25}@footnote{@xref{XX25}.}
+@cite{NPI}@footnote{@xref{NPI}.} or @cite{XX25}@footnote{@xref{XX25}.}
 intefaces, with the preference being for the latter which is a @cite{Open
 Group} standard.@footnote{The @i{Network Provider Interface (NPI)} is not an
 @cite{Open Group} standard, but is only a @cite{UNIX International} published
@@ -6034,19 +7410,19 @@ See also, @manref{s_npi(4)}.
 @cite{@value{PACKAGE_TITLE}} provides support for this module. 
 See also, @manref{s_nli3(4)}.
 
-@item @cite{Solstice X.25} documents the @member{link_id} field in a number of
-data structures where other implementations document an @member{sn_id} field.
-Also, it documents that the @code{0xFF} setting of the @member{link_id} field is
+@item @cite{Solstice X.25} documents the @parm{link_id} field in a number of
+data structures where other implementations document an @parm{sn_id} field.
+Also, it documents that the @code{0xFF} setting of the @parm{link_id} field is
 special in that is causes a database to be consulted for the appropriate link or
 subnetwork and, failing that, uses the lowest numbered WAN port.
 
-@cite{@value{PACKAGE_TITLE}} declares the @member{link_id} and @member{sn_id} in
+@cite{@value{PACKAGE_TITLE}} declares the @parm{link_id} and @parm{sn_id} in
 these structures as members of an anonymous union to be compatible with both
 approaches, and also supports the special @code{0xFF} value of the field.
 @xref{Addresses}, and @ref{PVC Attach}.
 
-@item @cite{Solstice X.25} documents support for the @pval{X25_PATTERN}
-setting for the @member{l_mode} field of the Listen Request/Response message
+@item @cite{Solstice X.25} documents support for the @var{X25_PATTERN}
+setting for the @parm{l_mode} field of the Listen Request/Response message
 primitive.
 
 @cite{@value{PACKAGE_TITLE}} also supports this pattern matching mode in support
@@ -6060,33 +7436,76 @@ X.25}.  @xref{Listen Request/Response}.
 
 @multitable @columnfractions 0.15 0.85
 @item @dfn{ANSI} @tab American National Standards Institute
-@item @dfn{CCITT} @tab Old name for ITU-T
+@item @dfn{CCITT} @tab The International Telegraph and Telephone Consutative Committee, old name for ITU-T
 @item @dfn{CONS} @tab Connection-Oriented Network Service
+@item @dfn{CUD} @tab Call User Data
+@item @dfn{DCE} @tab Data Circuit-terminating Equipment
+@item @dfn{DDN} @tab Defence Data Network
+@item @dfn{DLPI} @tab Data Link Provider Interface
+@item @dfn{DLSAP} @tab Destination Link Service Access Point
+@item @dfn{DNIC} @tab Data Network Identification Code
+@item @dfn{DSAP} @tab Destination Service Access Point
+@item @dfn{DTE} @tab Data Terminal Equipment 
 @item @dfn{ENSDU} @tab Expedited Network Service Data Unit
 @item @dfn{ETSI} @tab European Telecommunications Standards Institute
+@item @dfn{HDLC} @tab High-Level Data Link Control
 @item @dfn{IEEE} @tab Institute of Electrical and Electronics Engineers
+@item @dfn{IP} @tab Internet Protocol
+@item @dfn{ISO} @tab International Organization for Standardization
 @item @dfn{ITU} @tab International Telecommunications Union
 @item @dfn{ITU-T} @tab ITU Telecom Sector
+@item @dfn{LAN} @tab Local Area Network
+@item @dfn{LAPB} @tab Link Access Procedure (Balanced), ISO/IEC 7776
+@item @dfn{LAPD} @tab Link Access Procedure D-Channel, Q.921
+@item @dfn{LAPF} @tab Link Access Procedure Frame Mode, Q.922
+@item @dfn{LAP} @tab Link Access Procedure
 @item @dfn{LCI} @tab Logical Channel Identifier
 @item @dfn{LLC1} @tab Logical Link Control Type 1
 @item @dfn{LLC2} @tab Logical Link Control Type 2
+@item @dfn{LLC3} @tab Logical Link Control Type 3
 @item @dfn{LLC} @tab Logical Link Control
+@item @dfn{LLI} @tab Logical Link Inteface
+@item @dfn{LSAP} @tab Link Service Access Point
 @item @dfn{MAC} @tab Media Access Control
 @item @dfn{NLI} @tab Network Layer Interface
 @item @dfn{NPDU} @tab Network Protocol Data Unit
+@item @dfn{NPI} @tab Network Provider Interface
+@item @dfn{NPI} @tab Numbering Plan Indicator
 @item @dfn{NSAP} @tab Network Service Access Point
 @item @dfn{NSDU} @tab Network Service Data Unit
 @item @dfn{NSP} @tab Network Service Provider
 @item @dfn{NS} @tab Network Service
 @item @dfn{NSU} @tab Network Service User
+@item @dfn{NUI} @tab Network User Information
+@item @dfn{PAD} @tab Packet Assembler/Disassembler
+@item @dfn{PDN} @tab Public Data Network
 @item @dfn{PDU} @tab Protocol Data Unit
+@item @dfn{PLP} @tab Packet Layer Protocol
+@item @dfn{PPA} @tab Physical Point of Attachment
+@item @dfn{PSDN} @tab Public Switched Data Network
+@item @dfn{PSTN} @tab Public Switch Telephone Network
 @item @dfn{PVC} @tab Permanent Virtual Circuit
+@item @dfn{QOS} @tab Quality of Service
+@item @dfn{RPOA} @tab Recognized Private Operating Agency
 @item @dfn{SAP} @tab Service Access Point
 @item @dfn{SDU} @tab Service Data Unit
+@item @dfn{SLSAP} @tab Source Link Service Access Point
+@item @dfn{SNPA} @tab Subnetwork Point of Attachment
+@item @dfn{SSAP} @tab Source Service Access Point
+@item @dfn{SVC} @tab Switched Virtual Circuit
+@item @dfn{TLI} @tab Transport Layer Interface
+@item @dfn{TOA/NPI} @tab Type of Address/Numbering Plan Indicator
+@item @dfn{TOA} @tab Type of Address
+@item @dfn{TPI} @tab Transport Provider Interface
 @item @dfn{VC} @tab Virtual Circuit
+@item @dfn{WAN} @tab Wide Area Network
 @item @dfn{X.121} @tab ITU-T Recommendation X.121
 @item @dfn{X.25} @tab ITU-T Recommendation X.25
-@item @dfn{X.29} @tab ITU-T Recommendation X.29
+@item @dfn{X.28} @tab ITU-T Recommendation X.28
+@item @dfn{X.3} @tab ITU-T Recommendation X.3
+@item @dfn{X.75} @tab ITU-T Recommendation X.75
+@item @dfn{XX25} @tab X.25 Programming Inteface using XTI
+@item @dfn{XXX} @tab X.3, X.28, X.29
 @end multitable
 
 @node References
@@ -6191,6 +7610,9 @@ T-REC-X.21bis}.
 @item [X.25] @anchor{X.25} @tab @b{ITU-T Recommendation X.25}.
 @url{http://www.itu.int/rec/T-REC-X.25/en/, T-REC-X.25}.
 
+@item [X.75] @anchor{X.75} @tab @b{ITU-T Recommendation X.75}.
+@url{http://www.itu.int/rec/T-REC-X.75/en/, T-REC-X.75}.
+
 @item [X.29] @anchor{X.29} @tab @b{ITU-T Recommendation X.29}.
 @url{http://www.itu.int/rec/T-REC-X.29/en/, T-REC-X.29}.
 
@@ -6203,11 +7625,15 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 
 @ifnotplaintext
 @c skip indexes for plain text (regex search works better)
-@node Index
-@unnumbered Index
+@iftex
+@node Indices
+@unnumbered Indices
+@end iftex
 
 @ifnottex
 @c concatenate indices for html and info
+@node Index
+@unnumbered Index
 @printindex cp
 @end ifnottex
 
@@ -6219,8 +7645,9 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 * Primitive Structure and Type Index::
 * Primitive Structure Field Index::
 * Primitive Values Index::
-* Primitive Error Values Index::
+@c * Primitive Error Values Index::
 * Input-Output Control Index::
+* MIB Object Index::
 * Manual Page Index::
 @end menu
 
@@ -6253,15 +7680,20 @@ Open Group Publication. [ISBN: 1-85912-136-5].
 @section Primitive Values Index
 @printindex pv
 
-@page
-@node Primitive Error Values Index
-@section Primitive Error Values Index
-@printindex pe
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
 
 @page
 @node Input-Output Control Index
 @section Input-Output Control Index
 @printindex ct
+
+@page
+@node MIB Object Index
+@section MIB Object Index
+@printindex mo
 
 @page
 @node Manual Page Index
