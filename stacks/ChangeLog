@@ -1,3 +1,8 @@
+2008-07-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strss7.refs: update references
+	* doc/specs/mtpi/mtpi.texi: corrections
+
 2008-07-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated documentation

@@ -1,3 +1,12 @@
+2008-07-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: corrections for 2.6.18-92.1.6.el5 kernel
+	* doc/man/strinet.refs: update references
+	* doc/papers/testresults.tex: correct typos
+	* src/drivers/rawip.c: corrections for 2.6.18-92.1.6.el5 kernel
+	* src/drivers/tcp.c: corrections for 2.6.18-92.1.6.el5 kernel
+	* src/drivers/udp.c: corrections for 2.6.18-92.1.6.el5 kernel
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strinet.refs: update references

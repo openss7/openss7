@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-X25-PLP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 00:02:04 $
+-- @(#) $RCSfile: OPENSS7-X25-PLP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:08 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 00:02:04 $ by $Author: brian $
+-- Last Modified $Date: 2008-07-23 08:29:08 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-X25-PLP-MIB.mib,v $
+-- Revision 0.9.2.4  2008-07-23 08:29:08  brian
+-- - updated references and support for 2.6.18-92.1.6.el5 kernel
+--
 -- Revision 0.9.2.3  2008-04-29 00:02:04  brian
 -- - updated headers for release
 --
@@ -137,17 +140,226 @@ NetworkAddress ::= TEXTUAL-CONVENTION
         ""
     SYNTAX      OCTET STRING (SIZE(0..20))
 
-x25PLPNotifications OBJECT IDENTIFIER
-    ::= { x25-PLP-MIB 0 }
+ -- top level organization of the MIB
 
-x25PLPObjects OBJECT IDENTIFIER
-    ::= { x25-PLP-MIB 1 }
+x25PLPNotifications	OBJECT IDENTIFIER ::= { x25-PLP-MIB	 0 }
+x25PLPObjects		OBJECT IDENTIFIER ::= { x25-PLP-MIB	 1 }
+x25PLPConform		OBJECT IDENTIFIER ::= { x25-PLP-MIB	 2 }
 
-x25PLPTables OBJECT IDENTIFIER
-    ::= { x25PLPObjects 1 }
+x25PLPTables		OBJECT IDENTIFIER ::= { x25PLPObjects	 1 }
+x25PLPScalars		OBJECT IDENTIFIER ::= { x25PLPObjects	 2 }
+x25PLPNotifs		OBJECT IDENTIFIER ::= { x25PLPObjects	 3 }
+x25PLPOids		OBJECT IDENTIFIER ::= { x25PLPObjects	 4 }
 
-x25PLEConfig OBJECT IDENTIFIER
-    ::= { x25PLPTables 1 }
+x25PLEConfig		OBJECT IDENTIFIER ::= { x25PLPTables	 1 }
+x25PLEProfile		OBJECT IDENTIFIER ::= { x25PLPTables	 2 }
+x25PLEState		OBJECT IDENTIFIER ::= { x25PLPTables	 3 }
+x25PLEStats		OBJECT IDENTIFIER ::= { x25PLPTables	 4 }
+x25VCConfig		OBJECT IDENTIFIER ::= { x25PLPTables	 5 }
+x25VCProfile		OBJECT IDENTIFIER ::= { x25PLPTables	 6 }
+x25VCStats		OBJECT IDENTIFIER ::= { x25PLPTables	 7 }
+x25PVCConfig		OBJECT IDENTIFIER ::= { x25PLPTables	 8 }
+x25SVCConfig		OBJECT IDENTIFIER ::= { x25PLPTables	 9 }
+
+x25PLPCompliances	OBJECT IDENTIFIER ::= { x25PLPConform	 1 }
+x25PLPGroups		OBJECT IDENTIFIER ::= { x25PLPConform	 2 }
+
+-- 1.3.6.1.4.1.29591.1.1
+-- +-(yy)
+--   |-(0) x25PLPNotifications
+--   |-(1) x25PLPObjects
+--   | |-(1) x25PLPTables
+--   | | |-(1) x25PLEConfig
+--   | | | +-(1) x25PLEConfigTable
+--   | | |   +-(1) x25PLEConfigEntry
+--   | | |     |--( 1) x25PLEConfigIndex
+--   | | |     |--( 2) x25PLEConfigProtocolVersionSupported
+--   | | |     |--( 3) x25PLEConfigLocalDTEAddress
+--   | | |     |--( 4) x25PLEConfigInterfaceMode
+--   | | |     |--( 5) x25PLEConfigDefaultThroughputClass
+--   | | |     |--( 6) x25PLEConfigFlowControlNegotiationPermitted
+--   | | |     |--( 7) x25PLEConfigCallDeflectionSubscription
+--   | | |     |--( 8) x25PLEConfigMaxActiveCalls
+--   | | |     |--( 9) x25PLEConfigRestartTime
+--   | | |     |--(10) x25PLEConfigDefaultPacketSizeIncoming
+--   | | |     |--(11) x25PLEConfigDefaultPacketSizeOutgoing
+--   | | |     |--(12) x25PLEConfigDefaultWindowSizeIncoming
+--   | | |     |--(13) x25PLEConfigDefaultWindowSizeOutgoing
+--   | | |     |--(14) x25PLEConfigMinimumRecallTimer
+--   | | |     |--(15) x25PLEConfigRestartCount
+--   | | |     |--(16) x25PLEConfigSN-ServiceProvider
+--   | | |     |--(17) x25PLEConfigSN-SA-P
+--   | | |     |--(18) x25PLEConfigLogicalChannelAssignmentsPVC
+--   | | |     |--(19) x25PLEConfigLogicalChannelAssignmentsLIC
+--   | | |     |--(20) x25PLEConfigLogicalChannelAssignmentsHIC
+--   | | |     |--(21) x25PLEConfigLogicalChannelAssignmentsL2W
+--   | | |     |--(22) x25PLEConfigLogicalChannelAssignmentsH2W
+--   | | |     |--(23) x25PLEConfigLogicalChannelAssignmentsLOG
+--   | | |     |--(24) x25PLEConfigLogicalChannelAssignmentsHOG
+--   | | |     |--(25) x25PLEConfigPacketSequencing
+--   | | |     |--(26) x25PLEConfigPLEClientMOName
+--   | | |     |--(27) x25PLEConfigRegistrationRequestTime
+--   | | |     |--(28) x25PLEConfigRegistrationRequestCount
+--   | | |     +--(29) x25PLEConfigRegistrationPermitted
+--   | | |
+--   | | |-(2) x25PLEProfile
+--   | | | +-(1) x25PLEProfileTable
+--   | | |   +-(1) x25PLEProfileEntry
+--   | | |     |--( 1) x25PLEProfileName
+--   | | |     |--( 2) x25PLEProfileLocalDTEAddress
+--   | | |     |--( 3) x25PLEProfileInterfaceMode
+--   | | |     |--( 4) x25PLEProfileDefaultThroughputClass
+--   | | |     |--( 5) x25PLEProfileFlowControlNegotiationPermitted
+--   | | |     |--( 6) x25PLEProfileCallDeflectionSubscription
+--   | | |     |--( 7) x25PLEProfileMaxActiveCircuits
+--   | | |     |--( 8) x25PLEProfileRestartTime
+--   | | |     |--( 9) x25PLEProfileDefaulPacketSizeIncoming
+--   | | |     |--(10) x25PLEProfileDefaulPacketSizeOutgoing
+--   | | |     |--(11) x25PLEProfileDefaultWindowSizeIncoming
+--   | | |     |--(12) x25PLEProfileDefaultWindowSizeOutgoing
+--   | | |     |--(13) x25PLEProfileMinimumRecallTimer
+--   | | |     |--(14) x25PLEProfileRestartCount
+--   | | |     |--(15) x25PLEProfileSN-ServiceProvider
+--   | | |     |--(16) x25PLEProfileSN-SA-P
+--   | | |     |--(17) x25PLEProfileLogicalChannelAssignementsPVC
+--   | | |     |--(18) x25PLEProfileLogicalChannelAssignementsLIC
+--   | | |     |--(19) x25PLEProfileLogicalChannelAssignementsHIC
+--   | | |     |--(20) x25PLEProfileLogicalChannelAssignementsL2W
+--   | | |     |--(21) x25PLEProfileLogicalChannelAssignementsH2W
+--   | | |     |--(22) x25PLEProfileLogicalChannelAssignementsLOG
+--   | | |     |--(23) x25PLEProfileLogicalChannelAssignementsHOG
+--   | | |     |--(24) x25PLEProfilePacketSequencing
+--   | | |     |--(25) x25PLEProfileRegistrationRequestTime
+--   | | |     |--(26) x25PLEProfileRegistrationRequestCount
+--   | | |     +--(27) x25PLEProfileRegistrationPermitted
+--   | | |
+--   | | |-(3) x25PLEState
+--   | | | +-(1) x25PLEStateTable
+--   | | |   +-(1) x25PLEStateEntry
+--   | | |     |--( 1) x25PLEStateIndex
+--   | | |     |--( 2) x25PLEStateAdministrativeState
+--   | | |     |--( 3) x25PLEStateOperationalState
+--   | | |     |--( 4) x25PLEStateUsageState
+--   | | |     |--( 5) x25PLEStateProceduralStatus
+--   | | |     +--( 6) x25PLEStateAlarmStatus
+--   | | |
+--   | | |-(4) x25PLEStats
+--   | | | +-(1) x25PLEStatsTable
+--   | | |   +-(1) x25PLEStatsEntry
+--   | | |     |--( 1) x25PLEStatsIndex
+--   | | |     |--( 2) x25PLEStatsOctetsSentCounter
+--   | | |     |--( 3) x25PLEStatsOctetsReceivedCounter
+--   | | |     |--( 4) x25PLEStatsDataPacketsSent
+--   | | |     |--( 5) x25PLEStatsDataPacketsReceived
+--   | | |     |--( 6) x25PLEStatsCallAttempts
+--   | | |     |--( 7) x25PLEStatsCallsConnected
+--   | | |     |--( 8) x25PLEStatsProviderInitiatedDisconnects
+--   | | |     |--( 9) x25PLEStatsCallTimeouts
+--   | | |     |--(10) x25PLEStatsClearTimeouts
+--   | | |     |--(11) x25PLEStatsRemotelyInitiatedResets
+--   | | |     |--(12) x25PLEStatsDataRetransmissionTimerExpires
+--   | | |     |--(13) x25PLEStatsProviderInitiatedResets
+--   | | |     |--(14) x25PLEStatsResetTimeouts
+--   | | |     |--(15) x25PLEStatsRemotelyInitiatedRestarts
+--   | | |     |--(16) x25PLEStatsRestartCountsExceeded
+--   | | |     |--(17) x25PLEStatsProtocolErrorsDetectedLocally
+--   | | |     |--(18) x25PLEStatsProtocolErrorsAccusedOf
+--   | | |     |--(19) x25PLEStatsCallEstablishmentRetryCountsExceeded
+--   | | |     +--(20) x25PLEStatsClearCountsExceeded
+--   | | |
+--   | | |-(5) x25VCConfig
+--   | | | +-(1) x25VCConfigTable
+--   | | |   +-(1) x25VCConfigEntry
+--   | | |     |--( 1) x25VCConfigId
+--   | | |     |--( 2) x25VCConfigChannel
+--   | | |     |--( 3) x25VCConfigPacketSizeIncoming
+--   | | |     |--( 4) x25VCConfigPacketSizeOutgoing
+--   | | |     |--( 5) x25VCConfigWindowSizeIncoming
+--   | | |     |--( 6) x25VCConfigWindowSizeOutgoing
+--   | | |     |--( 7) x25VConfigThroughputClassIncoming
+--   | | |     +--( 8) x25VConfigThroughputClassOutgoing
+--   | | |
+--   | | |-(6) x25VCProfile
+--   | | | +-(1) x25VCProfileTable
+--   | | |   +-(1) x25VCProfileEntry
+--   | | |     |--( 1) x25VCProfileId
+--   | | |     |--( 2) x25VCProfileProposedPacketSizeIncoming
+--   | | |     |--( 3) x25VCProfileProposedPacketSizeOutgoing
+--   | | |     |--( 4) x25VCProfileProposedWindowSizeIncoming
+--   | | |     |--( 5) x25VCProfileProposedWindowSizeOutgoing
+--   | | |     |--( 6) x25VCProfileAcceptReverseCharging
+--   | | |     |--( 7) x25VCProfileProposeReverseCharging
+--   | | |     |--( 8) x25VCProfileFastSelect
+--   | | |     |--( 9) x25VCProfileCallTime
+--   | | |     |--(10) x25VCProfileResetTime
+--   | | |     |--(11) x25VCProfileClearTime
+--   | | |     |--(12) x25VCProfileInterruptTime
+--   | | |     |--(13) x25VCProfileResetCount
+--   | | |     |--(14) x25VCProfileClearCount
+--   | | |     |--(15) x25VCProfileWindowTime
+--   | | |     |--(16) x25VCProfileDataRetransmissionTime
+--   | | |     |--(17) x25VCProfileDataRetransmissionCount
+--   | | |     |--(18) x25VCProfileRejectTime
+--   | | |     +--(19) x25VCProfileRejectCount
+--   | | |
+--   | | |-(7) x25VCStats
+--   | | | +-(1) x25VCStatsTable
+--   | | |   +-(1) x25VCStatsEntry
+--   | | |     |--( 1) x25VCStatsIndex
+--   | | |     |--( 2) x25VCStatsChannel
+--   | | |     |--( 3) x25VCStatsOctetsSentCounter
+--   | | |     |--( 4) x25VCStatsOctetsReceivedCounter
+--   | | |     |--( 5) x25VCStatsDataPacketsSent
+--   | | |     |--( 6) x25VCStatsDataPacketsReceived
+--   | | |     |--( 7) x25VCStatsProviderInitiatedDisconnects
+--   | | |     |--( 8) x25VCStatsRemotelyInitiatedResets
+--   | | |     |--( 9) x25VCStatsDataRetranmissionTimerExpiries
+--   | | |     |--(10) x25VCStatsProviderInitiatedResets
+--   | | |     |--(11) x25VCStatsResetTimeouts
+--   | | |     |--(12) x25VCStatsRemotelyInitiatedRestarts
+--   | | |     |--(13) x25VCStatsInterruptPacketsSent
+--   | | |     |--(14) x25VCStatsInterruptPacketsReceived
+--   | | |     |--(15) x25VCStatsInterruptTimerExpiries
+--   | | |     |--(16) x25VCStatsX25SegmentsSent
+--   | | |     +--(17) x25VCStatsX25SegmentsReceived
+--   | | |
+--   | | |-(8) x25PVCConfig
+--   | | | +-(1) x25PVCConfigTable
+--   | | |   +-(1) x25PVCConfigEntry
+--   | | |     |--( 1) x25PVCConfigId
+--   | | |     |--( 2) x25PVCConfigChannel
+--   | | |     +--( 3) x25PVCConfigRowStatus
+--   | | |
+--   | | +-(9) x25SVCConfig
+--   | |   +-(1) x25SVCConfigTable
+--   | |     +-(1) x25SVCConfigEntry
+--   | |       |--( 1) x25SVCConfigId
+--   | |       |--( 2) x25SVCConfigChannel
+--   | |       |--( 3) x25SVCConfigDirection
+--   | |       |--( 4) x25SVCConfigRemoteDTEAddress
+--   | |       |--( 5) x25SVCConfigThroughputClass
+--   | |       |--( 6) x25SVCConfigRedirectReason
+--   | |       |--( 7) x25SVCConfigOriginallyCalledAddress
+--   | |       |--( 8) x25SVCConfigCallingAddressExtension
+--   | |       +--( 9) x25SVCConfigCalledAddressExtension
+--   | |
+--   | |-(2) x25PLPScalars
+--   | |-(3) x25PLPNotifs
+--   | +-(4) x25PLPOids
+--   |
+--   +-(2) x25PLPConform
+--     |-(1) x25PLPCompliances
+--     | +-(1) x25PLPBasicCompliance
+--     |
+--     +-(2) x25PLPGroups
+--       |-(1) x25PLEConfigGroup
+--       |-(2) x25PLEProfileGroup
+--       |-(3) x25PLEStateGroup
+--       |-(4) x25PLEStatsGroup
+--       |-(5) x25VCConfigGroup
+--       |-(6) x25VCProfileGroup
+--       |-(7) x25VCStatsGroup
+--       +-(8) x25PVCConfigGroup
 
 x25PLEConfigTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25PLEConfigEntry
@@ -155,7 +367,7 @@ x25PLEConfigTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Provides a table of X.25 Packet Layer Protocol (PLP) Entities.  
-         Each X.25 Packet Layer Entity corresponsds to an X.25 DTE or 
+         Each X.25 Packet Layer Entity corresponds to an X.25 DTE or 
          DCE over which permanent virtual circuits exist or virtual 
          calls can be placed."
     REFERENCE   
@@ -214,7 +426,7 @@ x25PLEConfigIndex OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        "Provides and index for the PLE configuraiton entry."
+        "Provides and index for the PLE configuration entry."
     ::= { x25PLEConfigEntry 1 }
 
 x25PLEConfigProtocolVersionSupported OBJECT-TYPE
@@ -413,7 +625,7 @@ x25PLEConfigSN-ServiceProvider OBJECT-TYPE
         "Distinguished name of the subnetwork (SN) service provider MO.  
          This attribute identifies the subnetwork entity to be used to 
          support the linkage, when enabled.  The subnetwork service 
-         provider may be in the datalink layer, or it may be in the 
+         provider may be in the data link layer, or it may be in the 
          network layer (for example when operating ISO 8473 over the ISO 
          8208 SNDCF)."
     REFERENCE   
@@ -428,7 +640,7 @@ x25PLEConfigSN-SA-P OBJECT-TYPE
         "Distinguished name of the service provider SA-P MO (if 
          present).  THis is obtained via an internal interface when the 
          linkage is enabled.  The sN-SA-P may be a relationship to a 
-         SA-P MO in the datalink layer, or it may be a relationship to 
+         SA-P MO in the data link layer, or it may be a relationship to 
          another Managed Object within the network layer which is not a 
          SA-P MO.  For example, when operating ISO 8473 over the ISO 
          8208 SNDCF, it is a relationship to the same x25PLE MO which is 
@@ -442,22 +654,22 @@ x25PLEConfigLogicalChannelAssignmentsPVC OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Represents the logical channel assigments of this PLE, 
+        "Represents the logical channel assignments of this PLE, 
          expressed as a four-tuple where the values represent the set 
          (with maximum permitted cardinality (LIC - 1), minimum required 
          cardinality of zero) of PVC channels (with a maximum value (LIC 
-         - 1), and minmum value 1) assigned, the incoming channel range, 
+         - 1), and minimum value 1) assigned, the incoming channel range, 
          the two-way channel range, the outgoing channel range, 
          respectively.
          
-         The presence of each of the rangest shall be optional.  Absense 
+         The presence of each of the ranges shall be optional.  Absence 
          of a particular range shall signify that there are no channels 
          of that type assigned.  Within each range, the low value shall 
          be less than or equal to the high value, and there shall be no 
          value in any set or range which is greater than or equal to a 
          value in a subsequent range when ordered as above.
          
-         This attribute is subject to the rules for logical assignements 
+         This attribute is subject to the rules for logical assignments 
          described in ISO/IEC 8208 clause 3.7.  it is understood that 
          the Highest Permanent Channel (HPC) is defined by the Lowest 
          Incoming Channel (LIC) value minus one.
@@ -637,15 +849,12 @@ x25PLEConfigRegistrationPermitted OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "When true, the use of online facility registration is 
+        "When true, the use of on-line facility registration is 
          permitted."
     REFERENCE   
         "ISO/IEC 10733 : registrationPermitted."
     DEFVAL      { false }
     ::= { x25PLEConfigEntry 29 }
-
-x25PLEProfile OBJECT IDENTIFIER
-    ::= { x25PLPTables 2 }
 
 x25PLEProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25PLEProfileEntry
@@ -655,7 +864,7 @@ x25PLEProfileTable OBJECT-TYPE
         "This table provides profiles for the x25PLE.  These profiles 
          are not created nor deleted by management stations; however, 
          their values may be altered.  Each entry in the table consists 
-         of a separate profile.  The managemed element may choose to use 
+         of a separate profile.  The managed element may choose to use 
          profile values when creating instances of x25PLEs (entries in 
          the x25PLEConfig table."
     REFERENCE   
@@ -785,7 +994,7 @@ x25PLEProfileMaxActiveCircuits OBJECT-TYPE
     DESCRIPTION 
         "The maximum number of active circuits permitted on this PLE.  
          When the NULL value (zero (0)) is specified, the maximum number 
-         of active circuits shall be likmited only by the resources 
+         of active circuits shall be limited only by the resources 
          available to the entity."
     REFERENCE   
         "ISO/IEC 10733 : maxActiveCalls."
@@ -899,7 +1108,7 @@ x25PLEProfileSN-ServiceProvider OBJECT-TYPE
         "Distinguished name of the subnetwork (SN) service provider MO.  
          This attribute identifies the subnetwork entity to be used to 
          support the linkage, when enabled.  The subnetwork service 
-         provider may be in the datalink layer, or it may be in the 
+         provider may be in the data link layer, or it may be in the 
          network layer (for example when operating ISO 8473 over the ISO 
          8208 SNDCF)."
     REFERENCE   
@@ -914,7 +1123,7 @@ x25PLEProfileSN-SA-P OBJECT-TYPE
         "Distinguished name of the service provider SA-P MO (if 
          present).  THis is obtained via an internal interface when the 
          linkage is enabled.  The sN-SA-P may be a relationship to a 
-         SA-P MO in the datalink layer, or it may be a relationship to 
+         SA-P MO in the data link layer, or it may be a relationship to 
          another Managed Object within the network layer which is not a 
          SA-P MO.  For example, when operating ISO 8473 over the ISO 
          8208 SNDCF, it is a relationship to the same x25PLE MO which is 
@@ -928,22 +1137,22 @@ x25PLEProfileLogicalChannelAssignementsPVC OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Represents the logical channel assigments of this PLE, 
+        "Represents the logical channel assignments of this PLE, 
          expressed as a four-tuple where the values represent the set 
          (with maximum permitted cardinality (LIC - 1), minimum required 
          cardinality of zero) of PVC channels (with a maximum value (LIC 
-         - 1), and minmum value 1) assigned, the incoming channel range, 
+         - 1), and minimum value 1) assigned, the incoming channel range, 
          the two-way channel range, the outgoing channel range, 
          respectively.
          
-         The presence of each of the rangest shall be optional.  Absense 
+         The presence of each of the ranges shall be optional.  Absence 
          of a particular range shall signify that there are no channels 
          of that type assigned.  Within each range, the low value shall 
          be less than or equal to the high value, and there shall be no 
          value in any set or range which is greater than or equal to a 
          value in a subsequent range when ordered as above.
          
-         This attribute is subject to the rules for logical assignements 
+         This attribute is subject to the rules for logical assignments 
          described in ISO/IEC 8208 clause 3.7.  it is understood that 
          the Highest Permanent Channel (HPC) is defined by the Lowest 
          Incoming Channel (LIC) value minus one.
@@ -1119,9 +1328,6 @@ x25PLEProfileRegistrationPermitted OBJECT-TYPE
     DEFVAL      { false }
     ::= { x25PLEProfileEntry 27 }
 
-x25PLEState OBJECT IDENTIFIER
-    ::= { x25PLPTables 3 }
-
 x25PLEStateTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25PLEStateEntry
     MAX-ACCESS  not-accessible
@@ -1172,7 +1378,7 @@ x25PLEStateAdministrativeState OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "Provides the administrativee state of the PLE following the 
+        "Provides the administrative state of the PLE following the 
          AdministrativeState textual convention of the OPENSS7-SMI-MIB 
          module."
     REFERENCE   
@@ -1224,9 +1430,6 @@ x25PLEStateAlarmStatus OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 alarmStatus."
     ::= { x25PLEStateEntry 6 }
-
-x25PLEStats OBJECT IDENTIFIER
-    ::= { x25PLPTables 4 }
 
 x25PLEStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25PLEStatsEntry
@@ -1430,7 +1633,7 @@ x25PLEStatsRemotelyInitiatedRestarts OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Counter of the number of remotely initiated restarts.  This is 
-         the total number of remotely intitiated (including provider 
+         the total number of remotely initiated (including provider 
          initiated) restarts experienced by the PLE, excluding the 
          restart associated with bringing up the PLE interface."
     REFERENCE   
@@ -1492,9 +1695,6 @@ x25PLEStatsClearCountsExceeded OBJECT-TYPE
     REFERENCE   
         "ISO/IEC 10733 : octetsSentCounter."
     ::= { x25PLEStatsEntry 20 }
-
-x25VCConfig OBJECT IDENTIFIER
-    ::= { x25PLPTables 5 }
 
 x25VCConfigTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25VCConfigEntry
@@ -1626,9 +1826,6 @@ x25VConfigThroughputClassOutgoing OBJECT-TYPE
         "ITU-T Rec. X.283 | ISO/IEC 10742."
     ::= { x25VCConfigEntry 8 }
 
-x25VCProfile OBJECT IDENTIFIER
-    ::= { x25PLPTables 6 }
-
 x25VCProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25VCProfileEntry
     MAX-ACCESS  not-accessible
@@ -1644,7 +1841,7 @@ x25VCProfileEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        "This managed objecte exsts in order to permit the values of 
+        "This managed object exists in order to permit the values of 
          various parameters of a virtual call to be specified in advance 
          by management.  When a virtual call is to be established, the 
          values of all the parameters to be used can be identified by 
@@ -1694,9 +1891,9 @@ x25VCProfileProposedPacketSizeIncoming OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "The proposed value of the packet size paraemter to be used when 
+        "The proposed value of the packet size parameter to be used when 
          establishing the virtual call, expressed in octets.  The value 
-         of NULL (zero (0)) indicatest that the default packet size (as 
+         of NULL (zero (0)) indicates that the default packet size (as 
          indicated by the defaultPacketSize attribute of the containing 
          X.25 PLE MO), is to be used."
     REFERENCE   
@@ -1708,9 +1905,9 @@ x25VCProfileProposedPacketSizeOutgoing OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "The proposed value of the packet size paraemter to be used when 
+        "The proposed value of the packet size parameter to be used when 
          establishing the virtual call, expressed in octets.  The value 
-         of NULL (zero (0)) indicatest that the default packet size (as 
+         of NULL (zero (0)) indicates that the default packet size (as 
          indicated by the defaultPacketSize attribute of the containing 
          X.25 PLE MO), is to be used."
     REFERENCE   
@@ -1882,8 +2079,8 @@ x25VCProfileDataRetransmissionTime OBJECT-TYPE
     DESCRIPTION 
         "Default for Timer T25 (Window Rotation Timer) in centiseconds.
          
-         Valid when implemented and using the operation tranmitting 
-         window rotation recovery procedures at a tranmitting DTE as 
+         Valid when implemented and using the operation transmitting 
+         window rotation recovery procedures at a transmitting DTE as 
          described in Clause 11.2.1 of ISO/IEC 8208 (2nd Edition)."
     REFERENCE   
         "ISO/IEC 10733."
@@ -1897,8 +2094,8 @@ x25VCProfileDataRetransmissionCount OBJECT-TYPE
     DESCRIPTION 
         "Value for count R25 (Data Packet Retransmission Count).
          
-         Valid when implemented and using the operation tranmitting 
-         window rotation recovery procedures at a tranmitting DTE as 
+         Valid when implemented and using the operation transmitting 
+         window rotation recovery procedures at a transmitting DTE as 
          described in Clause 11.2.1 of ISO/IEC 8208 (2nd Edition)."
     REFERENCE   
         "ISO/IEC 10733."
@@ -1913,7 +2110,7 @@ x25VCProfileRejectTime OBJECT-TYPE
     DESCRIPTION 
         "Value for Timer T27 (Reject Response Timer) in centiseconds.
          
-         Valid when the optional packet retranmission procedures are 
+         Valid when the optional packet retransmission procedures are 
          implemented and used."
     REFERENCE   
         "ISO/IEC 10733."
@@ -1927,15 +2124,12 @@ x25VCProfileRejectCount OBJECT-TYPE
     DESCRIPTION 
         "Value for count R27 (Reject Retransmission Count).
          
-         Valid when the optional packet retranmission procedures are 
+         Valid when the optional packet retransmission procedures are 
          implemented and used."
     REFERENCE   
         "ISO/IEC 10733."
     DEFVAL      { 0 }
     ::= { x25VCProfileEntry 19 }
-
-x25VCStats OBJECT IDENTIFIER
-    ::= { x25PLPTables 7 }
 
 x25VCStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25VCStatsEntry
@@ -2078,8 +2272,8 @@ x25VCStatsProviderInitiatedResets OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        "Counter associated with the provider intiiated reset event 
-         which generates a communcation alarm notification."
+        "Counter associated with the provider initiated reset event 
+         which generates a communication alarm notification."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733."
     ::= { x25VCStatsEntry 10 }
@@ -2161,9 +2355,6 @@ x25VCStatsX25SegmentsReceived OBJECT-TYPE
         "ITU-T Rec. X.283 | but not ISO/IEC 10733."
     ::= { x25VCStatsEntry 17 }
 
-x25PVCConfig OBJECT IDENTIFIER
-    ::= { x25PLPTables 8 }
-
 x25PVCConfigTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25PVCConfigEntry
     MAX-ACCESS  not-accessible
@@ -2188,14 +2379,14 @@ x25PVCConfigEntry OBJECT-TYPE
          diagnostic code of DTE operational (161) shall be transmitted.  
          When the entry is deleted, the protocol machine shall be 
          reinitialized and a reset PDU with cause code of DTE originated 
-         (ecnoded as 00000000) and a diagnostic code of DTE not 
+         (encoded as 00000000) and a diagnostic code of DTE not 
          operational (162) shall be transmitted.
          
-         For DCEs, when an entry is created, the prtocol machine shall 
+         For DCEs, when an entry is created, the protocol machine shall 
          be re-initialized and a reset PDU shall be transmitted.  A 
-         cause code of remote DTE Operational (econded as X000 1001) or 
+         cause code of remote DTE Operational (encoded as X000 1001) or 
          Network Operational (encoded as X000 1111) may, for example, be 
-         included.  When the entry is deteled the protocol machine shall 
+         included.  When the entry is deleted the protocol machine shall 
          be reinitialized and a reset PDU shall be transmitted.  A cause 
          code of Out of Order (encoded as X000 0001) or Network Out of 
          Order (encoded as X001 1101) may, for example, be included."
@@ -2233,9 +2424,6 @@ x25PVCConfigRowStatus OBJECT-TYPE
     DESCRIPTION 
         ""
     ::= { x25PVCConfigEntry 3 }
-
-x25SVCConfig OBJECT IDENTIFIER
-    ::= { x25PLPTables 9 }
 
 x25SVCConfigTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF X25SVCConfigEntry
@@ -2365,24 +2553,6 @@ x25SVCConfigCalledAddressExtension OBJECT-TYPE
          other uses it may not.  In any case, it may be null, for 
          example, when used by ISO 8473."
     ::= { x25SVCConfigEntry 9 }
-
-x25PLPScalars OBJECT IDENTIFIER
-    ::= { x25PLPObjects 2 }
-
-x25PLPNotifs OBJECT IDENTIFIER
-    ::= { x25PLPObjects 3 }
-
-x25PLPOids OBJECT IDENTIFIER
-    ::= { x25PLPObjects 4 }
-
-x25PLPConform OBJECT IDENTIFIER
-    ::= { x25-PLP-MIB 2 }
-
-x25PLPCompliances OBJECT IDENTIFIER
-    ::= { x25PLPConform 1 }
-
-x25PLPGroups OBJECT IDENTIFIER
-    ::= { x25PLPConform 2 }
 
 x25PLEConfigGroup OBJECT-GROUP
     OBJECTS     { x25PLEConfigProtocolVersionSupported, 
@@ -2554,7 +2724,7 @@ x25PVCConfigGroup OBJECT-GROUP
 x25PLPBasicCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        "Proivdes basic compliance for this module."
+        "Provides basic compliance for this module."
 
     MODULE      -- this module
 

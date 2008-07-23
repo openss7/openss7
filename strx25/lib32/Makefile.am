@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 21:22:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-07-23 08:29:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 21:22:39 $ by $Author: brian $
+# Last Modified $Date: 2008-07-23 08:29:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -85,7 +85,7 @@ libsx25_la_SOURCES		= $(top_srcdir)/src/lib/sx25/padent.c \
 				  $(top_srcdir)/src/include/netx25/x25_control.h \
 				  $(top_srcdir)/src/include/netx25/x25_proto.h \
 				  $(top_srcdir)/src/include/netx25/xnetdb.h
-libsx25_la_DEPENDENCIES		= $(top_srcdir)/src/lib/sx25/xnsl.VERSION
+libsx25_la_DEPENDENCIES		= $(top_srcdir)/src/lib/sx25/sx25.VERSION
 libsx25_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sx25/sx25.VERSION \
 				  $(STREAMS_LDFLAGS32) $(STREAMS_LDADD32) $(MACHINE_FLAGS)
@@ -111,6 +111,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-07-23 08:29:17  brian
+# - updated references and support for 2.6.18-92.1.6.el5 kernel
+#
 # Revision 0.9.2.1  2008-05-03 21:22:39  brian
 # - updates for release
 #

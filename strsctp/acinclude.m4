@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2008-04-28 23:13:19 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-07-23 08:29:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 23:13:19 $ by $Author: brian $
+# Last Modified $Date: 2008-07-23 08:29:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -380,7 +380,7 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #include <net/tcp.h>
     ])
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu nf_reset ip_dst_output \
-			ip_route_output_key __in_dev_get_rcu synchronize_net], [], [], [
+			ip_route_output_key __in_dev_get_rcu synchronize_net skb_transport_header], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1249,6 +1249,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.76  2008-07-23 08:29:09  brian
+# - updated references and support for 2.6.18-92.1.6.el5 kernel
+#
 # Revision 0.9.2.75  2008-04-28 23:13:19  brian
 # - updated headers for release
 #

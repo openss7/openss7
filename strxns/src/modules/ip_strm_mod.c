@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-25 11:39:33 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:33 $ by $Author: brian $
+ Last Modified $Date: 2008-07-23 08:29:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.28  2008-07-23 08:29:19  brian
+ - updated references and support for 2.6.18-92.1.6.el5 kernel
+
  Revision 0.9.2.27  2008-04-25 11:39:33  brian
  - updates to AGPLv3
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-25 11:39:33 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-25 11:39:33 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $";
 
 #include <sys/os7/compat.h>
 
@@ -113,7 +116,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.27 $) $Date: 2008-04-25 11:39:33 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -189,6 +192,7 @@ STATIC struct streamtab ip_to_streams_info = {
 };
 
 #if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
 	return skb->tail;
@@ -244,6 +248,7 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
 	skb_reset_mac_header(skb);
 	skb->mac.raw += offset;
 }
+#endif				/* !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER */
 #endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /************************************************************************

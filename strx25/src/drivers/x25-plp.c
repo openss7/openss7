@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:25 $ by $Author: brian $
+ Last Modified $Date: 2008-07-23 08:29:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 0.9.2.4  2008-07-23 08:29:17  brian
+ - updated references and support for 2.6.18-92.1.6.el5 kernel
+
  Revision 0.9.2.3  2008-06-18 16:45:25  brian
  - widespread updates
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $";
 
 /*
  * This is a multiplexing driver for the X.25 Packet Layer Protocol (PLP).  It
@@ -96,7 +99,7 @@ static char const ident[] =
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP DRIVER FOR LINUX FAST-STREAMS"
 #define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STERAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $"
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $"
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"
@@ -231,6 +234,126 @@ struct dl {
 		dl_info_ack_t info;
 	} proto;
 	struct qosformat qosformat;	/* defaults for link */
+};
+
+/* Structure representing an X.25 PLE */
+struct x25_ple {
+	struct dl *dl;
+	struct {
+		uint8_t gfi;		/* General Format Identifier */
+		struct {
+			/* registration facilities */
+			uint8_t nonneg[1];	/* Non-negotiable facilities. */
+			uint8_t avail[2];	/* Facilitiy availability. */
+			uint8_t anytime[2];	/* Negotiable anytime. */
+			uint8_t idle[1];	/* Negotiable while idle. */
+			struct {
+				uint8_t ic; /* Incoming non-standard default packet size */
+				uint8_t og; /* Outgoing non-standard default packet size */
+			} ndps;
+			struct {
+				uint8_t ic; /* Incoming non-standard default window size */
+				uint8_t og; /* Outgoing non-standard default window size */
+			} ndws;
+			struct {
+				uint8_t ic; /* Incoming default throughput class */
+				uint8_t og; /* Outgoing default throughput class */
+			} dtca;
+			/* Logical Channel Type Ranges */
+			struct {
+				/* Incoming Range */
+				struct {
+					uint16_t l;	/* LIC */
+					uint16_t h;	/* HIC */
+				} ic;
+				/* Two-way Range */
+				struct {
+					uint16_t l;	/* LTC */
+					uint16_t h;	/* HTC */
+				} tc;
+				/* Outgoing Range */
+				struct {
+					uint16_t l;	/* LOC */
+					uint16_t h;	/* HOC */
+				} oc;
+			} lca;
+		} fac;
+		/* Procedural time intervals (msec). */
+		union {
+			struct {
+				uint32_t t10;
+				uint32_t t11;
+				uint32_t t12;
+				uint32_t t13;
+				uint32_t t14;
+				uint32_t t15;
+				uint32_t t16;
+				uint32_t t17;
+				uint32_t t18;
+			};
+			struct {
+				uint32_t t20;
+				uint32_t t21;
+				uint32_t t22;
+				uint32_t t23;
+				uint32_t t24;
+				uint32_t t25;
+				uint32_t t26;
+				uint32_t t27;
+				uint32_t t28;
+			};
+		} times;
+		/* Retransmission counts. */
+		union {
+			struct {
+				uint32_t r10;
+				uint32_t r11;
+				uint32_t r12;
+				uint32_t r13;
+				uint32_t r14;
+				uint32_t r15;
+				uint32_t r16;
+				uint32_t r17;
+				uint32_t r18;
+			};
+			struct {
+				uint32_t r20;
+				uint32_t r21;
+				uint32_t r22;
+				uint32_t r23;
+				uint32_t r24;
+				uint32_t r25;
+				uint32_t r26;
+				uint32_t r27;
+				uint32_t r28;
+			};
+		} counts;
+	} proto;
+	/* Timer buffers for mi_timer. */
+	union {
+		struct {
+			mblk_t *t10;
+			mblk_t *t11;
+			mblk_t *t12;
+			mblk_t *t13;
+			mblk_t *t14;
+			mblk_t *t15;
+			mblk_t *t16;
+			mblk_t *t17;
+			mblk_t *t18;
+		};
+		struct {
+			mblk_t *t20;
+			mblk_t *t21;
+			mblk_t *t22;
+			mblk_t *t23;
+			mblk_t *t24;
+			mblk_t *t25;
+			mblk_t *t26;
+			mblk_t *t27;
+			mblk_t *t28;
+		};
+	} timers;
 };
 
 static caddr_t nl_opens = NULL;
@@ -2281,12 +2404,540 @@ dl_get_statistics_req(struct dl *dl, queue_t *q, mblk_t *msg)
  * --------------------------------------------------------------------------
  */
 
+#define REG_NONNEG  0x06    /* 00000110 - Non-negotiable facilities */
+#define REG_AVAIL   0x46    /* 01000110 - Availability of facilities */
+#define REG_ANYTIME 0x45    /* 01000101 - Negotiated any time */
+#define REG_IDLE    0x05    /* 00000101 - Negotiated with no VCs */
+#define REG_NDPS    0x42    /* 01000010 - Nonstd Default Packet Sizes */
+#define REG_NDWSB   0x43    /* 01000011 - Nonstd Default Window Sizes Basic */
+#define REG_NDWSE   0xd5    /* 11010101 - Nonstd Default Window Sizes Extended */
+#define REG_DTCAB   0x02    /* 00000010 - Default Tput Class Assign Basic */
+#define REG_DTCAE   0x4c    /* 01001100 - Default Tput Class Assign Extended */
+#define REG_LCTR    0xd8    /* 11001000 - Logical Channel Type Ranges */
+#define REG_MARKER  0x00    /* 00000000 - Marker */
+
+#define REGF_NONNEG	(1<<0)
+#define REGF_AVAIL	(1<<1)
+#define REGF_ANYTIME	(1<<2)
+#define REGF_IDLE	(1<<3)
+#define REGF_NDPS	(1<<4)
+#define REGF_NDWSB	(1<<5)
+#define REGF_NDWSE	(1<<6)
+#define REGF_DTCAB	(1<<7)
+#define REGF_DTCAE	(1<<8)
+#define REGF_LCTR	(1<<9)
+#define REGF_MARKER	(1<<10)
+
+/**
+ * x25_snd_regreq:- send a registration request
+ * @q: the active queue
+ * @xp: the X.25 Packet Layer Entity for which to send the request.
+ * @facilities: a bit mask of the facilities for which changes are to be
+ *	requested.
+ */
+static int
+x25_snd_regreq(queue_t *q, struct x25_ple *xp, uint32_t facilities)
+{
+	int size = 0;
+	mblk_t *mp;
+
+	if (unlikely(!canputnext(xp->dl->oq)))
+		return (-EBUSY);
+	switch (xp->proto.gfi) {
+	default:
+	case 1:
+	case 2:
+		size += 6;
+		break;
+	case 3:
+		size += 7;
+		break;
+	}
+	if (facilities & REGF_NONNEG)
+		size += 2;
+	if (facilities & REGF_AVAIL)
+		size += 3;
+	if (facilities & REGF_ANYTIME)
+		size += 3;
+	if (facilities & REGF_IDLE)
+		size += 2;
+	if (facilities & REGF_NDPS)
+		size += 2;
+	if (facilities & REGF_NDWSB)
+		size += 2;
+	if (facilities & REGF_NDWSE)
+		size += 3;
+	if (facilities & REGF_DTCAB)
+		size += 2;
+	if (facilities & REGF_DTCAE)
+		size += 3;
+	if (facilities & REGF_LCTR)
+		size += 13;
+	if (facilities & REGF_MARKER)
+		size += 2;
+	if (unlikely((mp = mi_allocb(q, size, BPRI_MED)) == NULL))
+		return (-ENOBUFS);
+	switch (xp->proto.gif) {
+		uint8_t ic, og;
+
+	default:
+	case 1:
+	case 2:
+		mp->b_wptr++ = (xp->proto.gfi << 4) | 0;
+		mp->b_wptr++ = 0x00;
+		mp->b_wptr++ = 0xF3;	/* REGISTRATION REQUEST */
+		mp->b_wptr++ = 0x00;
+		mp->b_wptr++ = size - 6;
+		break;
+	case 3:
+		mp->b_wptr++ = 0x30;
+		mp->b_wptr++ = 0x30;
+		mp->b_wptr++ = 0x00;
+		mp->b_wptr++ = 0xF3;	/* REGISTRATION REQUEST */
+		mp->b_wptr++ = 0x00;
+		mp->b_wptr++ = size - 7;
+		break;
+	}
+	if (facilities & REGF_NONNEG) {
+		mp->b_wptr++ = REG_NONNEG;
+		mp->b_wptr++ = xp->proto.fac.nonneg[0];
+	}
+	if (facilities & REGF_AVAIL) {
+		mp->b_wptr++ = REG_AVAIL;
+		mp->b_wptr++ = xp->proto.fac.avail[0];
+		mp->b_wptr++ = xp->proto.fac.avail[1];
+	}
+	if (facilities & REGF_ANYTIME) {
+		mp->b_wptr++ = REG_ANYTIME;
+		mp->b_wptr++ = xp->proto.fac.anytime[0];
+		mp->b_wptr++ = xp->proto.fac.anytime[1];
+	}
+	if (facilities & REGF_IDLE) {
+		mp->b_wptr++ = REG_IDLE;
+		mp->b_wptr++ = xp->proto.fac.idle[0];
+	}
+	if (facilities & REGF_NDPS) {
+		ic = xp->proto.fac.ndps.ic;
+		og = xp->proto.fac.ndps.og;
+		mp->b_wptr++ = REG_NDPS;
+		mp->b_wptr++ = (ic << 4) | og;
+	}
+	if (facilities & REGF_NDWSB) {
+		ic = xp->proto.fac.ndws.ic;
+		og = xp->proto.fac.ndws.og;
+		mp->b_wptr++ = REG_NDWSB;
+		mp->b_wptr++ = (ic << 4) | og;
+	}
+	if (facilities & REGF_NDWSE) {
+		mp->b_wptr++ = REG_NDSWE;
+		mp->b_wptr++ = xp->proto.fac.ndws.ic;
+		mp->b_wptr++ = xp->proto.fac.ndws.og;
+	}
+	if (facilities & REGF_DTCAB) {
+		ic = xp->proto.fac.dtca.ic;
+		og = xp->proto.fac.dtca.og;
+		mp->b_wptr++ = REG_DTCAB;
+		mp->b_wptr++ = (ic << 4) | og;
+	}
+	if (facilities & REGF_DTCAE) {
+		mp->b_wptr++ = REG_DTCAE;
+		mp->b_wptr++ = xp->proto.fac.dtca.ic;
+		mp->b_wptr++ = xp->proto.fac.dtca.og;
+	}
+	if (facilities & REGF_LCTR) {
+		mp->b_wptr++ = REG_LCTR;
+		mp->b_wptr++ = (xp->proto.lca.ic.l >> 8) & 0x0F;
+		mp->b_wptr++ = (xp->proto.lca.ic.l >> 0) & 0xFF;
+		mp->b_wptr++ = (xp->proto.lca.ic.h >> 8) & 0x0F;
+		mp->b_wptr++ = (xp->proto.lca.ic.h >> 0) & 0xFF;
+		mp->b_wptr++ = (xp->proto.lca.tc.l >> 8) & 0x0F;
+		mp->b_wptr++ = (xp->proto.lca.tc.l >> 0) & 0xFF;
+		mp->b_wptr++ = (xp->proto.lca.tc.h >> 8) & 0x0F;
+		mp->b_wptr++ = (xp->proto.lca.tc.h >> 0) & 0xFF;
+		mp->b_wptr++ = (xp->proto.lca.oc.l >> 8) & 0x0F;
+		mp->b_wptr++ = (xp->proto.lca.oc.l >> 0) & 0xFF;
+		mp->b_wptr++ = (xp->proto.lca.oc.h >> 8) & 0x0F;
+		mp->b_wptr++ = (xp->proto.lca.oc.h >> 0) & 0xFF;
+	}
+	if (facilities & REGF_MARKER) {
+		mp->b_wptr++ = REG_MARKER;
+		mp->b_wptr++ = 0x00;
+	}
+	putnext(xp->dl->oq, mp);
+	mi_timer(xp->timers.t28, xp->proto.times.t28);
+	return (0);
+}
+
 /*
  * --------------------------------------------------------------------------
  *
  * X.25 RECEIVED MESSAGES
  *
  * --------------------------------------------------------------------------
+ */
+
+static int
+x25_rcv_regcon(queue_t *q, struct x25_ple *xp, mblk_t *mp)
+{
+	uint8_t gfi, cause, diag, dtelen, dxelen, reglen, pi, rid, cls;
+	uint16_t lcn;
+	unsigned char p = mp->b_rptr;
+	int changed = 0;
+
+	if (unlikely(MBLKSIZE(mp) < 1))
+		goto discard;
+	gfi = (p[0] >> 4);
+	if (unlikely(gfi != xp->proto.gfi))
+		goto discard;
+	switch (gfi) {
+	case 1:
+	case 2:
+		if (unlikely(MBLKSIZE(mp) < 7))
+			goto discard;
+		lcn = ((p[0] & 0x0f) << 8) | p[1];
+		pi = p[2];
+		cause = p[3];
+		diag = p[4];
+		dtelen = (p[5] >> 4) & 0x0f;
+		dxelen = (p[5] >> 0) & 0x0f;
+		reglen = p[6];
+		p += 7;
+		break;
+	case 3:
+		if (unlikely(MBLKSIZE(mp) < 8))
+			goto discard;
+		if (unlikely((p[0] & 0x0f) != 0))
+			goto discard;
+		gfi = (p[1] >> 4);
+		if (unlikely(gfi != 3))
+			goto discard;
+		lcn = ((p[1] & 0x0f) << 8) | p[2];
+		cause = p[4];
+		diag = p[5];
+		dtelen = (p[6] >> 4) & 0x0f;
+		dxelen = (p[6] >> 0) & 0x0f;
+		reglen = p[7];
+		p += 8;
+		break;
+	default:
+		goto discard;
+	}
+	if (unlikely(lcn != 0))
+		goto discard;
+	if (unlikely(pi != 0xF7))
+		goto discard;
+	if (unlikely(dtelen != 0 || dxelen != 0))
+		goto discard;
+	if (unlikely(mp->b_wptr != p + reglen))
+		goto discard;
+	if (unlikely(reglen > 109))
+		goto discard;
+	while (p < mp->b_wptr) {
+		rid = p[0];
+		cls = (rid >> 6) & 0x3;
+		if (unlikely(mp->b_wptr < p + 2 + cls))
+			goto discard;
+		switch (rid) {
+			uint8_t ic, og;
+
+		case REG_NONNEG:
+			/* Non-negotiable facilities. */
+			if (xp->proto.fac.nonneg[0] != p[1]) {
+				xp->proto.fac.nonneg[0] = p[1];
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_AVAIL:
+			/* Available facilities. */
+			if (xp->proto.fac.avail[0] != p[1]) {
+				xp->proto.fac.avail[0] = p[1];
+				changed = 1;
+			}
+			if (xp->proto.fac.avail[1] != p[2]) {
+				xp->proto.fac.avail[1] = p[2];
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_ANYTIME:
+			/* Facilities negotiated anytime. */
+			if (xp->proto.fac.anytime[0] != p[1]) {
+				xp->proto.fac.anytime[0] = p[1];
+				changed = 1;
+			}
+			if (xp->proto.fac.anytime[1] != p[2]) {
+				xp->proto.fac.anytime[1] = p[2];
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_IDLE:
+			/* Facilities negotiated when idle. */
+			if (xp->proto.fac.idle[0] != p[1]) {
+				xp->proto.fac.idle[0] = p[1];
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_NDPS:
+			/* Non-standard Default Packet Sizes. */
+			ic = (p[1] >> 4) & 0x0f;
+			if (xp->proto.fac.ndps.ic != ic) {
+				xp->proto.fac.ndps.ic = ic;
+				changed = 1;
+			}
+			og = (p[1] >> 0) & 0x0f;
+			if (xp->proto.fac.ndps.og != og) {
+				xp->proto.fac.ndps.og = og;
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_NDWSB:
+			/* Non-standard Default Window Sizes (Basic). */
+			ic = (p[1] >> 4) & 0x0f;
+			if (xp->proto.fac.ndws.ic != ic) {
+				xp->proto.fac.ndws.ic = ic;
+				changed = 1;
+			}
+			og = (p[1] >> 0) & 0x0f;
+			if (xp->proto.fac.ndws.og != og) {
+				xp->proto.fac.ndws.og = og;
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_NDWSE:
+			/* Non-standard Default Window Sizes (Extended). */
+			ic = p[1];
+			if (xp->proto.fac.ndws.ic != p[1]) {
+				xp->proto.fac.ndws.ic = p[1];
+				changed = 1;
+			}
+			og = p[2];
+			if (xp->proto.fac.ndws.og != p[2]) {
+				xp->proto.fac.ndws.og = p[2];
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_DTCAB:
+			/* Default Throughput Class Assignment (Basic). */
+			ic = (p[1] >> 4) & 0x0f;
+			if (xp->proto.fac.dtca.ic != ic) {
+				xp->proto.fac.dtca.ic = ic;
+				changed = 1;
+			}
+			og = (p[1] >> 0) & 0x0f;
+			if (xp->proto.fac.dtca.og != og) {
+				xp->proto.fac.dtca.og = og;
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_DTCAE:
+			/* Default Throughput Class Assignment (Extended). */
+			ic = p[1];
+			if (xp->proto.fac.dtca.ic != p[1]) {
+				xp->proto.fac.dtca.ic = p[1];
+				changed = 1;
+			}
+			og = p[2];
+			if (xp->proto.fac.dtca.og != p[2]) {
+				xp->proto.fac.dtca.og = p[2];
+				changed = 1;
+			}
+			p += 2 + cls;
+			continue;
+		case REG_LCTR:
+		{
+			uint16_t lic, hic, ltc, htc, loc, hoc;
+
+			/* Logical Channel Type Ranges. */
+			if (unlikely(mp->b_wptr < p + 13))
+				goto discard;
+			lic = ((p[1] << 8) & 0x0f) | p[2];
+			hic = ((p[3] << 8) & 0x0f) | p[4];
+			ltc = ((p[5] << 8) & 0x0f) | p[6];
+			htc = ((p[7] << 8) & 0x0f) | p[8];
+			loc = ((p[9] << 8) & 0x0f) | p[10];
+			hoc = ((p[11] << 8) & 0x0f) | p[12];
+			xp->proto.fac.lca.ic.l = lic;
+			xp->proto.fac.lca.ic.h = hic;
+			xp->proto.fac.lca.tc.l = ltc;
+			xp->proto.fac.lca.tc.h = htc;
+			xp->proto.fac.lca.oc.l = loc;
+			xp->proto.fac.lca.oc.h = hoc;
+			p += 13;
+			continue;
+		}
+		case REG_MARKER:
+			/* Registration Marker. */
+			p += 2;
+			break;
+		default:
+			/* Skip by class. */
+			switch (cls) {
+			case 0:	/* class A */
+			case 1:	/* class B */
+			case 2:	/* class C */
+				p += 2 + cls;	/* skip */
+				continue;
+			case 3:	/* class D */
+				p += 2 + cls;
+				/* cannot continue */
+				break;
+			}
+		}
+		break;
+	}
+	/* need to send notifications to management if something changed. */
+      discard:
+	freemsg(mp);
+	return (0);
+}
+
+/*
+ * --------------------------------------------------------------------------
+ *
+ * X.25 PROTOCOL STATE MACHINE
+ *
+ * --------------------------------------------------------------------------
+ */
+
+/*
+ * ISO/IEC 8208: 2000
+ *
+ * 13.1 On-line Facility Registration:
+ *
+ * On-inline Facility Registration is an optional user facility agreed to for
+ * a period of tim eby the DTE and DXE.  This user faciltiy, if subscribed to,
+ * permits a DTE at any time to request registration of optional user
+ * facilities and/or to obtain the current values of such facilities as
+ * understood by the interfacing DXE.
+ *
+ * In a DTE/DTE environment, separate agreement to use the facility is rquired
+ * for each direction of registration-procedure initiation.  For initiate of
+ * the registration procedure in a given direction, use of this facility
+ * permits the initiating DTE to transmit REGISTRATION REQUEST packets and
+ * requires the responding DTE to process received REGISTRATION REQUEST
+ * packets as described below.  In a DTE/DCE environment, the DTE is always
+ * the initiator of the registration procedure while the DCE is always the
+ * responder.
+ *
+ * NOTE -- The 1996 version of Recommendation X.25 has deleted the
+ * registration procedure.
+ *
+ * 13.1.1 Generat procedures for On-lin Facility Registration
+ *
+ * This subclause described the general procedures for using the On-line
+ * Facility Registration Facility.  The registration procedure itself does not
+ * affect the state of any logical channel.  Specific procedures depend on the
+ * faciltiy to be negotiated and are discussed in 13.1.2.
+ *
+ * 13.1.1.1  Requesting faciltiy registration
+ *
+ * This subclause applies to a DTE only when it acts as an initiator for the
+ * registration procedure.
+ *
+ * A DTE requests registration of optional user facilities and/or obtains the
+ * current values of optional user facilities, as applicable, by transmitting
+ * across the DTE/DXE interface a REGISTRATION REQUEST packet and by starting
+ * the Registration Request Response Timer (T28).
+ *
+ * A REGISTRATION REQUEST packet may be sent without attempting to register
+ * any optional user facilities (i.e. without a Registration Field) to obtain
+ * the current values of the applicable optional user facilities or to avoid
+ * requesting facilities or values of facilities that are not available.
+ *
+ * Having sent a REGSITRATION REQUEST packet, the DTE should wait for the
+ * REGISTRATION CONFIRMATION packet before expiration of T28 after transmision
+ * of a REGISTRATION REQUEST packet is considered an error.  The registration
+ * procedure is retried up to a maximum number of times R28.  After this, the
+ * Packet Layer notifies the appropriate entity that it has not received a
+ * confirmation of the registration procedure.
+ *
+ * See also:
+ *
+ * -- REGISTRATION REQUEST packet format (12.9.1 and figure 28);
+ * -- Receiving a response to facility registration (13.1.1.3);
+ * -- Registration Request Response Timer (T28) (table 26);
+ * -- Registration Request Retransmission Count (R28) (table 27).
+ *
+ * 13.1.1.2  Processing a facility registration request
+ *
+ * This subclause applies to a DTE only in a DTE/DTE environment when it acts
+ * as a responder for the registration profcedure.  It always applies to a DCE
+ * when the registration procedure is used.
+ *
+ * The DCE or DTE receive a REGISTRATION REQUEST packet (even if the packet
+ * has no Registration Field) will, as a result, report the availability and
+ * the current values of all optional user facilities applicable to the
+ * interface by transmitting across the DTE/DXE interface a REGISTRATION
+ * COMFIRMATION packet.  Optional user facilities that are not subject to the
+ * registration procedure will not be reported in the REGISTRATION
+ * CONFIRMATION packet.  The REGISTRATION CONFIUGRATION packet also contains
+ * an appropriate cause code.
+ *
+ * When a REGISTRATION CONFIRMATION packet is returned, the facilities values
+ * indicated in the packet are in effect for any subsequent Virtual Calls.
+ * The values of certain facilities can be modified only when there are no
+ * existing Virtual Calls (i.e., all logical channels used for Virtual Calls
+ * are in the READY state -- p1).  When these facilities take effect and when
+ * there is one or more Permanent Virtual Circuits at the DTE/DXE interface, a
+ * restart procedure is intiiated.  In a DTE/DCE environment, the DCE
+ * transmits a RESTART INDICATION packet with a cause indicating
+ * "Registration/Cancellation Confirmed" and the diagnostic "No Additional
+ * Information."  A RESET INDICATION packet is also transmitted by the DCE
+ * across the remote DTE/DCE interface with the cause "Remote DTE Operational"
+ * and the diagnostic "No Additional Information".  In a DTE/DTE environment,
+ * the DTE transmitting the REGISTRATION CONFIRMATION packet also transmits a
+ * RESTART REQUEST packet with a cause indicating "DTE Originated" and the
+ * diagnostic "Registration/Cancellation Confirmed".
+ *
+ * If the DCE or DTE cannot make all of the modifications requested in the
+ * REGISTRATION REQEUST packet, then it will not alter the values of some
+ * facilities.  Circumstances in which all of the modifications requested
+ * cannot be made include:
+ *
+ * a) conflict in facilities settings (e.g., requesting the Reverse Charging
+ *    Acceptance Facility when the Local Charging Prevention Facility is in
+ *    effect); and
+ *
+ * b) when the interface has at least one Virtual Call established wen
+ *    attempting to negotiate those facilities that require all Virtual
+ *    Call logical channels to be in the READY state (p1); this includes the
+ *    collision of an INCOMING CALL packet and a REGISTRATION REQUEST packet.
+ *
+ * If the requested value of a particular facilitiy is not permitted, then the
+ * DCE or DTE will report in the REGISTRATION CONFIRMATION packet:
+ *
+ * a) if the facility has a boolean value, the value permitted;
+ *
+ * b) if the facility has a numeric value and the requested value is greater
+ *    than the maximum-permitted value of that facility, the maximum-permitted
+ *    value; or
+ *
+ * c) if the facility has a numeric value and the requested value is less than
+ *    the minimum-permitted value of that facility, the minimum-permitted
+ *    value.
+ *
+ * NOTE -- The values in the REGISTRATION CONFIRMATION packet represent the
+ * current values in effect.
+ *
+ * If, in a DTE/DTE enviroment, a DTE receives a REGISTRATION REQUEST packet
+ * after having transmitted its own REGSITRATION REQUEST packet, then the
+ * registration procedure is considered cancelled with no effect and no
+ * REGISTRATIOn CONFIRMATION packet is returned.  The DTE may transmit another
+ * REGISTRATION REQUEST packet after some randomly-chosen time delay.
+ *
+ * See also:
+ *
+ * -- REGISTRATION CONFIRMATION pcaket format (12.9.2 and figure 29);
+ * -- Facilities that can be modified only when all Virtual Calls are in the
+ *    READY state (13.1.2.5);
+ * -- Restart procedures (clause 4).
  */
 
 /*

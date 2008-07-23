@@ -1,3 +1,7 @@
+2008-07-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/sigtran.refs: update references
+
 2008-07-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: documentation updates
@@ -24,8 +28,8 @@
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/drafts/fixup: more portable
-	* sigtran/doc/drafts/idrefs: update references
-	* sigtran/doc/man/sigtran.refs: update references
+	* doc/drafts/idrefs: update references
+	* doc/man/sigtran.refs: update references
 
 2008-05-05  Brian Bidulock  <bidulock@openss7.org>
 

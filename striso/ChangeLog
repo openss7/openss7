@@ -1,3 +1,9 @@
+2008-07-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/striso.refs: updates
+	* src/mibs/OPENSS7-X25-PLP-MIB.mib: updates
+	* src/snmp/mibs/OPENSS7-X25-PLP-MIB.mib: updates
+
 2008-07-01  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: updates

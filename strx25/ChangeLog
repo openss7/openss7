@@ -1,3 +1,14 @@
+2008-07-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strx25.refs: updated references
+	* doc/specs/lli/lli.texi: documentation updates
+	* doc/specs/nli/Makefile.am: documentation updates
+	* doc/specs/nli/nli.texi: documentation updates
+	* doc/specs/nli/nli_figc1.fig: documentation updates
+	* doc/specs/wan/wan.texi: documentation updates
+	* lib32/Makefile.am: updates
+	* src/drivers/x25-plp.c: updates
+
 2008-07-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man3/SX25.3.man: added manual page

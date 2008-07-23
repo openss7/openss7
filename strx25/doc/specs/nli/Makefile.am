@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-01 12:31:07 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-23 08:29:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-01 12:31:07 $ by $Author: brian $
+# Last Modified $Date: 2008-07-23 08:29:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,6 +80,7 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 FIG_FIGS		= \
+			nli_fig1.fig \
 			nli_figc1.fig
 
 TBL_TBLS		=
@@ -95,6 +96,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.5  2008-07-23 08:29:16  brian
+# - updated references and support for 2.6.18-92.1.6.el5 kernel
+#
 # Revision 0.9.2.4  2008-07-01 12:31:07  brian
 # - updated man pages, drafts, specs, header files
 #

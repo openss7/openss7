@@ -1,3 +1,11 @@
+2008-07-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: support for 2.6.18-92.1.6.el5 kernel
+	* src/drivers/ldl.c: support for 2.6.18-92.1.6.el5 kernel
+	* src/drivers/np_ip.c: support for 2.6.18-92.1.6.el5 kernel
+	* src/modules/ip_strm_mod.c: support for 2.6.18-92.1.6.el5 kernel
+	* doc/man/strxns.refs: updated references
+
 2008-07-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/specs/dlpi/dlpi.texi: formatting updates

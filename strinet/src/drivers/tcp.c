@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:57 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:57 $ by $Author: brian $
+ Last Modified $Date: 2008-07-23 08:29:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.27  2008-07-23 08:29:05  brian
+ - updated references and support for 2.6.18-92.1.6.el5 kernel
+
  Revision 0.9.2.26  2008-05-05 15:34:57  brian
  - be strict with MORE_data and DATA_flag
 
@@ -132,10 +135,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:57 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:57 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -214,7 +217,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:57 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -328,6 +331,7 @@ MODULE_STATIC struct streamtab tpi_info = {
 };
 
 #if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
 static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
 {
 	return skb->tail;
@@ -388,6 +392,7 @@ static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
 	skb_reset_mac_header(skb);
 	skb->mac.raw += offset;
 }
+#endif				/* !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER */
 #endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /*

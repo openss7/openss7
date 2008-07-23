@@ -1,3 +1,9 @@
+2008-07-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: updates for 2.6.18-92.1.6.el5 kernel
+	* src/drivers/sctp2.c: updates for 2.6.18-92.1.6.el5 kernel
+	* doc/man/strsctp.refs: update references
+
 2008-06-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strsctp.refs: update references
