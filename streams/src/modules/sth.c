@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/25 22:41:21 $ by $Author: brian $
+ Last Modified $Date: 2008/07/25 23:07:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.198  2008/07/25 23:07:01  brian
+ - document and fix bug 019, no test case, tested no regressions
+
  Revision 0.9.2.197  2008/07/25 22:41:21  brian
  - fix and test for BUG 018, read data before hangup
 
@@ -251,10 +254,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -356,7 +359,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -2586,6 +2589,8 @@ __strwaitioctl(struct stdata *sd, unsigned long *timeo, int access)
 			set_current_state(TASK_UNINTERRUPTIBLE);
 #endif
 			srlock(sd);
+			if (unlikely((err = straccess(sd, access)) != 0))
+				break;
 		}
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -2696,6 +2701,8 @@ __strwaitiocack(struct stdata *sd, unsigned long *timeo, int access)
 			set_current_state(TASK_UNINTERRUPTIBLE);
 #endif
 			srlock(sd);
+			if (unlikely((err = straccess(sd, access)) != 0))
+				break;
 		} while (1);
 	}
 #if defined HAVE_KFUNC_FINISH_WAIT
@@ -4642,6 +4649,7 @@ strsendmread(struct stdata *sd, const unsigned long len)
 		b->b_datap->db_type = M_READ;
 		*((unsigned long *) b->b_rptr) = len;
 		b->b_wptr = b->b_rptr + sizeof(len);
+		srlock(sd);
 		if (likely((err = straccess(sd, FREAD)) == 0)) {
 			_ctrace(strput(sd, b));
 			_trace();
@@ -4649,7 +4657,8 @@ strsendmread(struct stdata *sd, const unsigned long len)
 			freemsg(b);
 		}
 	} else {
-		if (likely((err = straccess_rlock(sd, FNDELAY)) == 0))	/* XXX: why FNDELAY? */
+		srlock(sd);
+		if (likely((err = straccess(sd, FREAD)) == 0))
 			err = -ENOSR;
 	}
 	return (err);
