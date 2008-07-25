@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.17 2008-04-28 12:54:00 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.18 2008/07/25 22:41:19 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,18 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-28 12:54:00 $ by $Author: brian $
+@c Last Modified $Date: 2008/07/25 22:41:19 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 018.  2008-07-25T01:15:26+0000
+
+Previous fix didn't work too good: returning [EAGAIN] when hung-up on getmsg(), getpmsg(), read(),
+readv() instead of 0 and terminal end of file.  This caused a regression on four or five test cases.
+
+@emph{*fixed*} in @command{streams-0.9.2.4}
+
 @item 017.  2008-04-10T15:17:30+0000
 
 When M_DATA is sent upstream followed by M_HANGUP, read(2s) is returning zero (0) and not permitting
@@ -66,8 +73,8 @@ operate as normal following a hangup until all data is read and then return zero
 
 The difficulty is that when waking up from a read sleep or when entering read the hangup condition
 was generating an internal ESTRPIPE error.  This was altered so that ESTRPIPE is only returned
-during the hangup condition after the read queue has been tested and the caller is about to sleep
-on read.
+during the hangup condition after the read queue has been tested and the caller is about to sleep on
+read.
 
 A test case needs to be generated for this case, but the fix has been implemented.
 
@@ -75,8 +82,8 @@ A test case needs to be generated for this case, but the fix has been implemente
 
 @item 016.  2007-11-14T17:23:57+0000
 
-Read is blocking when data has been read an O_NONBLOCK and O_NDELAY unset and RFILL unset in
-non-SVR4 mode.  This violates POSIX specifications.
+Read is blocking when data has been read, O_NONBLOCK and O_NDELAY unset, RFILL unset, in non-SVR4
+mode.  This violates POSIX specifications.
 
 A test case needs to be generated for this case and the fix needs to be implemented.
 
@@ -151,11 +158,11 @@ released.
 
 When loosening SMP locking, found a bug in the QWANTR handling in getq() and back-enabling in
 flushq() and flushband().  Both of these were generating false back-enables.  The getq() was
-generating a @emph{lot} of false back-enables.  Whenever getq() found an empty queue it was not
-only setting QWANTR, but it was back-enabling the queue.  The result is that if service procedures
-are used exclusively (that is, qi_put() always does a putq()), getq() would generate a false
-back-enable for each message.  Also, the enabled queue would generate another false back-enable.
-Significant performance gains should be noticed.
+generating a @emph{lot} of false back-enables.  Whenever getq() found an empty queue it was not only
+setting QWANTR, but it was back-enabling the queue.  The result is that if service procedures are
+used exclusively (that is, qi_put() always does a putq()), getq() would generate a false back-enable
+for each message.  Also, the enabled queue would generate another false back-enable.  Significant
+performance gains should be noticed.
 
 @emph{*fixed*} in @command{streams-0.9.2.3}
 
@@ -196,9 +203,9 @@ J@'er@'emy
 @ifnottex
 Jérémy
 @end ifnottex
-Compostella pointed out error in clone.c.  When an automatic clone minor device was unregistered,
-it was unregistering the modid instead of the major number.  This was not noticed because all
-OpenSS7 drivers have the same modid as major number (strconf does this automatically).
+Compostella pointed out error in clone.c.  When an automatic clone minor device was unregistered, it
+was unregistering the modid instead of the major number.  This was not noticed because all OpenSS7
+drivers have the same modid as major number (strconf does this automatically).
 
 @emph{*fixed*} in @command{streams-0.9.2.2}
 
@@ -217,8 +224,8 @@ Compostella pointed out syntax error in strsched.c that kept synqs from compilin
 @item 002. 2006-09-24T20:02:00+0000
 
 Discovered asynchronous thread cancellation inconsistencies in libLiS libpLiS by inspection during
-documentation.  isastream(2), fattach(2) were not performing proper asynchronous thread
-cancellation suppression so that these function contained a cancellation point when the should not.
+documentation.  isastream(2), fattach(2) were not performing proper asynchronous thread cancellation
+suppression so that these function contained a cancellation point when the should not.
 
 @emph{*fixed*} in @command{streams-0.7a.6.rc3}
 
