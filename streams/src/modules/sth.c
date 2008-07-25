@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.196 $) $Date: 2008-04-28 12:54:06 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008/07/25 22:41:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.197  2008/07/25 22:41:21  brian
+ - fix and test for BUG 018, read data before hangup
+
  Revision 0.9.2.196  2008-04-28 12:54:06  brian
  - update file headers for release
 
@@ -248,10 +251,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.196 $) $Date: 2008-04-28 12:54:06 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.196 $) $Date: 2008-04-28 12:54:06 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -353,7 +356,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.196 $) $Date: 2008-04-28 12:54:06 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.197 $) $Date: 2008/07/25 22:41:21 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4934,6 +4937,9 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 
       restart:
 	if (unlikely((mp = strgetq(sd, q, flags, band)) == NULL)) {
+		/* check hangup blocking criteria */
+		if (unlikely((err = straccess(sd, FREAD)) != 0))
+			return ERR_PTR(err);
 		/* about to block, generate M_READ(9) if required */
 		if (likely(mread > 0) && likely(test_bit(STRMREAD_BIT, &sd->sd_flag))) {
 			if (unlikely((err = strsendmread(sd, mread)) != 0))
