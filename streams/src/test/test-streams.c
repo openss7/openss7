@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2008/07/25 22:41:27 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008/07/26 01:52:20 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/25 22:41:27 $ by $Author: brian $
+ Last Modified $Date: 2008/07/26 01:52:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.73  2008/07/26 01:52:20  brian
+ - document, fix and test case for bug 016
+
  Revision 0.9.2.72  2008/07/25 22:41:27  brian
  - fix and test for BUG 018, read data before hangup
 
@@ -291,9 +294,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2008/07/25 22:41:27 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008/07/26 01:52:20 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2008/07/25 22:41:27 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008/07/26 01:52:20 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2489,6 +2492,15 @@ int
 preamble_0_2(int child)
 {
 	if (!test_fd[child] && test_open(child, devname, O_NONBLOCK | O_WRONLY) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
+preamble_0_3(int child)
+{
+	if (!test_fd[child] && test_open(child, devname, O_RDWR) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	state++;
 	return __RESULT_SUCCESS;
@@ -5904,7 +5916,7 @@ struct test_stream test_2_9_15 = { &preamble_2, &test_case_2_9_15, &postamble_2 
 #define name_case_2_9_16_1 "Perform streamio I_SETSIG - S_ERROR."
 #define sref_case_2_9_16_1 sref_case_2_9
 #define desc_case_2_9_16_1 "\
-Check that SIGPOLL for S_ERROR is generated when an asyncrhonous read\n\
+Check that SIGPOLL for S_ERROR is generated when an asynchronous read\n\
 error reaches the Stream head."
 
 int
@@ -5936,7 +5948,7 @@ struct test_stream test_2_9_16_1 = { &preamble_2, &test_case_2_9_16_1, &postambl
 #define name_case_2_9_16_2 "Perform streamio I_SETSIG - S_ERROR."
 #define sref_case_2_9_16_2 sref_case_2_9
 #define desc_case_2_9_16_2 "\
-Check that SIGPOLL for S_ERROR is generated when an asyncrhonous write\n\
+Check that SIGPOLL for S_ERROR is generated when an asynchronous write\n\
 error reaches the Stream head."
 
 int
@@ -5968,7 +5980,7 @@ struct test_stream test_2_9_16_2 = { &preamble_2, &test_case_2_9_16_2, &postambl
 #define name_case_2_9_16_3 "Perform streamio I_SETSIG - S_ERROR."
 #define sref_case_2_9_16_3 sref_case_2_9
 #define desc_case_2_9_16_3 "\
-Check that SIGPOLL for S_ERROR is generated when an asyncrhonous error\n\
+Check that SIGPOLL for S_ERROR is generated when an asynchronous error\n\
 reaches the Stream head."
 
 int
@@ -7542,7 +7554,7 @@ struct test_stream test_2_16_3_1 = { &preamble_6_2_2, &test_case_2_16_3_1, &post
 #define desc_case_2_16_3_2 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted  on a Stream (fdi.fildes) that\n\
-has received an asyncrhonous EPROTO read error."
+has received an asynchronous EPROTO read error."
 
 int
 test_case_2_16_3_2(int child)
@@ -7578,7 +7590,7 @@ struct test_stream test_2_16_3_2 = { &preamble_6_2_2, &test_case_2_16_3_2, &post
 #define desc_case_2_16_4_1 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fildes) that has\n\
-received an asyncrhonous EPROTO write error."
+received an asynchronous EPROTO write error."
 
 int
 test_case_2_16_4_1(int child)
@@ -7613,7 +7625,7 @@ struct test_stream test_2_16_4_1 = { &preamble_6_2_3, &test_case_2_16_4_1, &post
 #define desc_case_2_16_4_2 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fdi.fildes) that\n\
-has received an asyncrhonous EPROTO write error."
+has received an asynchronous EPROTO write error."
 
 int
 test_case_2_16_4_2(int child)
@@ -7648,7 +7660,7 @@ struct test_stream test_2_16_4_2 = { &preamble_6_2_3, &test_case_2_16_4_2, &post
 #define desc_case_2_16_5_1 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fildes) that has\n\
-received an asyncrhonous EPROTO error."
+received an asynchronous EPROTO error."
 
 int
 test_case_2_16_5_1(int child)
@@ -7683,7 +7695,7 @@ struct test_stream test_2_16_5_1 = { &preamble_6_2_4, &test_case_2_16_5_1, &post
 #define desc_case_2_16_5_2 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fdi.fildes) that\n\
-has received an asyncrhonous EPROTO error."
+has received an asynchronous EPROTO error."
 
 int
 test_case_2_16_5_2(int child)
@@ -13252,7 +13264,7 @@ struct test_stream test_3_1_2 = { &preamble_2_2, &test_case_3_1_2, &postamble_2 
 #define desc_case_3_1_3 "\
 Check that read() can be performed on a Stream.  Checks that EAGAIN is\n\
 returned when read() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error (and non-blocking operation is set)."
+asynchronous EPROTO write error (and non-blocking operation is set)."
 
 int
 test_case_3_1_3(int child)
@@ -13277,7 +13289,7 @@ struct test_stream test_3_1_3 = { &preamble_2_3, &test_case_3_1_3, &postamble_2 
 #define desc_case_3_1_4 "\
 Check that read() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when read() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_1_4(int child)
@@ -13670,6 +13682,63 @@ struct test_stream test_3_1_11_3 = { &preamble_test_case_3_1_11_3, &test_case_3_
 #define test_case_3_1_11_3_stream_0 (&test_3_1_11_3)
 #define test_case_3_1_11_3_stream_1 (NULL)
 #define test_case_3_1_11_3_stream_2 (NULL)
+
+#define tgrp_case_3_1_11_4 test_group_3_1
+#define numb_case_3_1_11_4 "3.1.11.4"
+#define name_case_3_1_11_4 "Perform read - RNORM."
+#define sref_case_3_1_11_4 sref_case_3_1
+#define desc_case_3_1_11_4 "\
+Check that read() can be performed on a Stream.  Check that if some\n\
+data is read in byte-mode (RNORM) and no more data is immediately\n\
+available, in blocking mode, that a short read results."
+
+int
+preamble_test_case_3_1_11_4(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0_3(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_3_1_11_4(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+struct test_stream test_3_1_11_4 = { &preamble_test_case_3_1_11_4, &test_case_3_1_11_4, &postamble_0 };
+
+#define test_case_3_1_11_4_stream_0 (&test_3_1_11_4)
+#define test_case_3_1_11_4_stream_1 (NULL)
+#define test_case_3_1_11_4_stream_2 (NULL)
 
 #define tgrp_case_3_1_12_1 test_group_3_1
 #define numb_case_3_1_12_1 "3.1.12.1"
@@ -14383,7 +14452,7 @@ struct test_stream test_3_2_2 = { &preamble_2_2, &test_case_3_2_2, &postamble_2 
 #define desc_case_3_2_3 "\
 Check that readv() can be performed on a Stream.  Checks that EAGAIN is\n\
 returned when readv() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error (and non-blocking operation is set)."
+asynchronous EPROTO write error (and non-blocking operation is set)."
 
 int
 test_case_3_2_3(int child)
@@ -14412,7 +14481,7 @@ struct test_stream test_3_2_3 = { &preamble_2_3, &test_case_3_2_3, &postamble_2 
 #define desc_case_3_2_4 "\
 Check that readv() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when readv() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_2_4(int child)
@@ -15618,7 +15687,7 @@ struct test_stream test_3_5_1 = { &preamble_2_6, &test_case_3_5_1, &postamble_2 
 #define desc_case_3_5_2 "\
 Check that getmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when getmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_5_2(int child)
@@ -16863,7 +16932,7 @@ struct test_stream test_3_6_1 = { &preamble_2_6, &test_case_3_6_1, &postamble_2 
 #define desc_case_3_6_2 "\
 Check that getpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when getpmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_6_2(int child)
@@ -18392,7 +18461,7 @@ struct test_stream test_3_7_1 = { &preamble_2_1, &test_case_3_7_1, &postamble_2 
 #define desc_case_3_7_2 "\
 Check that putmsg() can be performed on a Stream.  Checks that putmsg()\n\
 can be successfully performed on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_7_2(int child)
@@ -18431,7 +18500,7 @@ struct test_stream test_3_7_2 = { &preamble_2_2, &test_case_3_7_2, &postamble_2 
 #define desc_case_3_7_3 "\
 Check that putmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error."
+asynchronous EPROTO write error."
 
 int
 test_case_3_7_3(int child)
@@ -18470,7 +18539,7 @@ struct test_stream test_3_7_3 = { &preamble_2_3, &test_case_3_7_3, &postamble_2 
 #define desc_case_3_7_4 "\
 Check that putmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_7_4(int child)
@@ -19171,7 +19240,7 @@ struct test_stream test_3_8_1 = { &preamble_2_1, &test_case_3_8_1, &postamble_2 
 #define desc_case_3_8_2 "\
 Check that putpmsg() can be performed on a Stream.  Checks that putpmsg()\n\
 can be successfully performed on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_8_2(int child)
@@ -19212,7 +19281,7 @@ struct test_stream test_3_8_2 = { &preamble_2_2, &test_case_3_8_2, &postamble_2 
 #define desc_case_3_8_3 "\
 Check that putpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putpmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error."
+asynchronous EPROTO write error."
 
 int
 test_case_3_8_3(int child)
@@ -19253,7 +19322,7 @@ struct test_stream test_3_8_3 = { &preamble_2_3, &test_case_3_8_3, &postamble_2 
 #define desc_case_3_8_4 "\
 Check that putpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putpmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_8_4(int child)
@@ -21793,6 +21862,8 @@ struct test_case {
 	test_case_3_1_11_2_stream_0, test_case_3_1_11_2_stream_1, test_case_3_1_11_2_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_1_11_3, tgrp_case_3_1_11_3, NULL, name_case_3_1_11_3, NULL, desc_case_3_1_11_3, sref_case_3_1_11_3, {
 	test_case_3_1_11_3_stream_0, test_case_3_1_11_3_stream_1, test_case_3_1_11_3_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_1_11_4, tgrp_case_3_1_11_4, NULL, name_case_3_1_11_4, NULL, desc_case_3_1_11_4, sref_case_3_1_11_4, {
+	test_case_3_1_11_4_stream_0, test_case_3_1_11_4_stream_1, test_case_3_1_11_4_stream_2}, &begin_sanity, &end_sanity, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_1_12_1, tgrp_case_3_1_12_1, NULL, name_case_3_1_12_1, NULL, desc_case_3_1_12_1, sref_case_3_1_12_1, {
 	test_case_3_1_12_1_stream_0, test_case_3_1_12_1_stream_1, test_case_3_1_12_1_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_1_12_2, tgrp_case_3_1_12_2, NULL, name_case_3_1_12_2, NULL, desc_case_3_1_12_2, sref_case_3_1_12_2, {

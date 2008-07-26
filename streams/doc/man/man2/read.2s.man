@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: read.2s.man,v 0.9.2.15 2008-04-28 12:53:39 brian Exp $
+.\" @(#) $Id: read.2s.man,v 0.9.2.16 2008/07/26 01:52:14 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 12:53:39 $ by $Author: brian $
+.\" Last Modified $Date: 2008/07/26 01:52:14 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: read.2s.man,v $
+.\" Revision 0.9.2.16  2008/07/26 01:52:14  brian
+.\" - document, fix and test case for bug 016
+.\"
 .\" Revision 0.9.2.15  2008-04-28 12:53:39  brian
 .\" - update file headers for release
 .\"
@@ -824,7 +827,7 @@ also says that in byte-stream mode a zero-length message terminates the read but
 already been transferred that the zero-length message is placed back on the read queue.
 .IP
 .I SVR 4
-ways that in byte-stream mode the STREAM reads up to
+says that in byte-stream mode the STREAM reads up to
 .I nbytes
 of data, or a zero-length message is encountered.
 .I SVR 4
@@ -879,7 +882,7 @@ transforms the
 .BR M_READ (9)
 message into a
 .BR M_DATA (9)
-message containing the requeste data if there is a data available.  (Otherwise, it presumably
+message containing the requested data if there is a data available.  (Otherwise, it presumably
 discards the
 .BR M_READ (9)
 message!)

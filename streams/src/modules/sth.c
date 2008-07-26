@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/25 23:07:01 $ by $Author: brian $
+ Last Modified $Date: 2008/07/26 01:52:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.199  2008/07/26 01:52:15  brian
+ - document, fix and test case for bug 016
+
  Revision 0.9.2.198  2008/07/25 23:07:01  brian
  - document and fix bug 019, no test case, tested no regressions
 
@@ -254,10 +257,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -359,7 +362,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.198 $) $Date: 2008/07/25 23:07:01 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -4942,7 +4945,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 	    ssize_t mread)
 {
 	mblk_t *mp = NULL;
-	int err = 0, error = likely(mread > 0) ? -ERESTARTSYS : -EINTR;
+	int err = 0, error = likely(mread > 0) ? -ERESTARTSYS : -EINTR, first = (mread > 0), mode;
 
       restart:
 	if (unlikely((mp = strgetq(sd, q, flags, band)) == NULL)) {
@@ -4954,12 +4957,17 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 			if (unlikely((err = strsendmread(sd, mread)) != 0))
 				return ERR_PTR(err);
 			/* could already have a response, reenter */
+			strfailure_read();
 			mread = 0;
 			goto restart;
 		}
+		mode = sd->sd_rdopt & RMODEMASK;
 		/* about to block, check nodelay - always block in read fill mode. */
-		if (likely(f_flags & FNDELAY))
-			if (unlikely(!(sd->sd_rdopt & RFILL))) {
+		if (likely(mode != RFILL)) {
+			/* don't block if blocking not permitted */
+			/* don't block in byte-mode if data already read */
+			if (likely(f_flags & FNDELAY)
+			    || (likely(mode == RNORM) && unlikely(!first))) {
 				if (mread > 0) {
 					strfailure_read();
 					/* could already have messages */
@@ -4968,6 +4976,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 				}
 				return ERR_PTR(-EAGAIN);
 			}
+		}
 
 		mp = __strwaitgetq(sd, q, flags, band, error);
 
