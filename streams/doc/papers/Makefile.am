@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-11 16:58:36 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008/07/26 18:59:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-11 16:58:36 $ by $Author: brian $
+# Last Modified $Date: 2008/07/26 18:59:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -84,6 +84,10 @@ PLOT_PLOTS = \
 	$(PAPER_PREFIX)_cos5_delay.plot \
 	$(PAPER_PREFIX)_cos5_perf.plot \
 	$(PAPER_PREFIX)_cos5_thrput.plot \
+	$(PAPER_PREFIX)_cos52_comp.plot \
+	$(PAPER_PREFIX)_cos52_delay.plot \
+	$(PAPER_PREFIX)_cos52_perf.plot \
+	$(PAPER_PREFIX)_cos52_thrput.plot \
 	$(PAPER_PREFIX)_suse_comp.plot \
 	$(PAPER_PREFIX)_suse_delay.plot \
 	$(PAPER_PREFIX)_suse_perf.plot \
@@ -110,6 +114,7 @@ $(PAPER_PREFIX)_nb_comp.fig $(PAPER_PREFIX)_nb_delay.fig $(PAPER_PREFIX)_nb_perf
 $(PAPER_PREFIX)_rh7_comp.fig $(PAPER_PREFIX)_rh7_delay.fig $(PAPER_PREFIX)_rh7_perf.fig $(PAPER_PREFIX)_rh7_thrput.fig: $(PAPER_PREFIX)_rh7.dat
 $(PAPER_PREFIX)_smp_comp.fig $(PAPER_PREFIX)_smp_delay.fig $(PAPER_PREFIX)_smp_perf.fig $(PAPER_PREFIX)_smp_thrput.fig: $(PAPER_PREFIX)_smp.dat
 $(PAPER_PREFIX)_cos5_comp.fig $(PAPER_PREFIX)_cos5_delay.fig $(PAPER_PREFIX)_cos5_perf.fig $(PAPER_PREFIX)_cos5_thrput.fig: $(PAPER_PREFIX)_cos5.dat
+$(PAPER_PREFIX)_cos52_comp.fig $(PAPER_PREFIX)_cos52_delay.fig $(PAPER_PREFIX)_cos52_perf.fig $(PAPER_PREFIX)_cos52_thrput.fig: $(PAPER_PREFIX)_cos52.dat
 $(PAPER_PREFIX)_suse_comp.fig $(PAPER_PREFIX)_suse_delay.fig $(PAPER_PREFIX)_suse_perf.fig $(PAPER_PREFIX)_suse_thrput.fig: $(PAPER_PREFIX)_suse.dat
 $(PAPER_PREFIX)_u704_comp.fig $(PAPER_PREFIX)_u704_delay.fig $(PAPER_PREFIX)_u704_perf.fig $(PAPER_PREFIX)_u704_thrput.fig: $(PAPER_PREFIX)_u704.dat
 $(PAPER_PREFIX)_ubuntu_comp.fig $(PAPER_PREFIX)_ubuntu_delay.fig $(PAPER_PREFIX)_ubuntu_perf.fig $(PAPER_PREFIX)_ubuntu_thrput.fig: $(PAPER_PREFIX)_ubuntu.dat
@@ -121,6 +126,7 @@ PLOT_DATS = \
 	$(PAPER_PREFIX)_rh7.dat \
 	$(PAPER_PREFIX)_smp.dat \
 	$(PAPER_PREFIX)_cos5.dat \
+	$(PAPER_PREFIX)_cos52.dat \
 	$(PAPER_PREFIX)_suse.dat \
 	$(PAPER_PREFIX)_u704.dat \
 	$(PAPER_PREFIX)_ubuntu.dat
@@ -137,6 +143,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.10  2008/07/26 18:59:20  brian
+# - added new data for CentOS 5.2
+#
 # Revision 0.9.2.9  2008-04-11 16:58:36  brian
 # - removed deprecated NEXUSWARE support
 #

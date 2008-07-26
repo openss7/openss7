@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: piperesults.tex,v 0.9.2.6 2008-04-28 12:54:00 brian Exp $
+%% @(#) $Id: piperesults.tex,v 0.9.2.7 2008/07/26 18:59:20 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2008-04-28 12:54:00 $ by $Author: brian $
+%% Last Modified $Date: 2008/07/26 18:59:20 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -163,7 +163,7 @@
 	{\large \textsl{Experiment Test Results for Linux}}}
 \author{Brian F. G. Bidulock\thanks{bidulock@openss7.org}\\
 	OpenSS7 Corporation}
-\date{June 16, 2007}
+\date{July 26, 2008\thanks{Original edition June 16, 2007}}
 \maketitle
 
 \begin{abstract}
@@ -1094,6 +1094,7 @@ Distribution & Kernel\\
 \hline
 Fedora Core 6 & 2.6.20-1.2933.fc6\\
 CentOS 5 & 2.6.18-8-el5\\
+CentOS 5.2 & 2.6.18-92.1.6.el5.centos.plus\\
 \end{tabular}\\[1.0ex]
 \normalsize
 
@@ -1237,6 +1238,111 @@ illustrates the improvement over Linux legacy pipes of \textsl{Linux Fast-STREAM
 pipes.  The improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is significant:
 improvements range from a 100\% increase in performance at large write sizes, to a 175\% increase in
 performance at lower write sizes.  \textsl{LiS} again drags in at -75\%.
+
+\end{description}
+
+\subsubsection[CentOS 5.2 (x86\_64)]{CentOS 5.2 (x86\_64)}
+
+CentOS 5.2 is the most recent full release CentOS distribution.  This distribute sports a
+2.6.18-92.1.6.el5.centos.plus kernel with the latest patches.  This is the \texttt{x86\_64}
+distribution with recent updates.
+
+This is a test result set that was updated July 26, 2008.  The additional options, \texttt{-H},
+\texttt{-M}, \texttt{-F} and \texttt{-w} were added to the \texttt{perftest\_script} command line.
+Also, \texttt{streams-0.9.2.4} was tested.
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_cos52_perf}
+\caption[CentOS 5.2 on Daisy Performance]{CentOS 5.2 on Daisy Performance}
+\label{figure:cos52perf}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_cos52_delay}
+\caption[CentOS 5.2 on Daisy Delay]{CentOS 5.2 on Daisy Delay}
+\label{figure:cos52delay}
+\end{figure}
+
+\begin{figure}[p]
+\includegraphics[width=\columnwidth]{perftest_cos52_thrput}
+\caption[CentOS 5.2 on Daisy Throughput]{CentOS 5.2 on Daisy Throughput}
+\label{figure:cos52thrput}
+\end{figure}
+
+\begin{figure}[pt]
+\includegraphics[width=\columnwidth]{perftest_cos52_comp}
+\caption[CentOS 5.2 on Daisy Comparison]{CentOS 5.2 on Daisy Comparison}
+\label{figure:cos52comp}
+\end{figure}
+
+\begin{description}
+
+\item[Performance.]
+
+\textit{Figure \ref{figure:cos52perf}}
+illustrates the performance of \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a range of
+write sizes.  As can be see from \textit{Figure \ref{figure:cos52perf}}, the performance of
+\textsl{Linux Fast-STREAMS} STREAMS-based pipes is superior across the entire
+range of write sizes.  The performance of \textsl{Linux Fast-STREAMS} is significantly greater (by a
+factor of 4 through 7) than Linux legacy pipes at smaller write sizes.
+
+The performance boost experienced by \textsl{Linux Fast-STREAMS} at write sizes beneath 128 is
+primariliy due to the write coallescing feature (hold feature) of the Stream head combined with the
+fact that the fast-buffer sizes for \texttt{x86\_64} is 128 bytes.
+The performance boost experienced across the entire range is primarily due to the read-fill option
+combined with full-sized reads.
+
+Note that it was not possible to get \textsl{LiS} running on this kernel.
+
+\item[Delay.]
+
+\textit{Figure \ref{figure:cos52delay}}
+illustrates the average write delay for \textsl{Linux Fast-STREAMS} and Linux legacy pipes across a
+range of write sizes.  Again the slope appears to be similar for both
+implementations if a little bit erratic.
+The intercept for \textsl{Linux Fast-STREAMS} is again much superior than \textsl{Linux} legacy
+pipes.
+
+Again, the delay drop experienced by \textsl{Linux Fast-STREAMS} at write sizes beneath 128 is
+primariliy due to the write coallescing feature (hold feature) of the Stream head combined with the
+fact that the fast-buffer sizes for \texttt{x86\_64} is 128 bytes.
+The delay drop experienced across the entire range is primarily due to the read-fill option
+combined with full-sized reads.
+
+Note that it was not possible to get \textsl{LiS} running on this kernel.
+
+\item[Throughput.]
+
+\textit{Figure \ref{figure:cos52thrput}}
+illustrates the throughput experienced by \textsl{Linux Fast-STREAMS} and Linux legacy
+pipes across a range of write sizes.
+As can be seen from \textit{Figure \ref{figure:cos52thrput}},
+all implementations exhibit strong power function characteristics, indicating structure and
+robustness for each implementation.
+
+Again, the throughput increase experienced by \textsl{Linux Fast-STREAMS} at write sizes beneath 128 is
+primariliy due to the write coallescing feature (hold feature) of the Stream head combined with the
+fact that the fast-buffer sizes for \texttt{x86\_64} is 128 bytes.
+The throughput increase experienced across the entire range is primarily due to the read-fill option
+combined with full-sized reads.
+
+Note that it was not possible to get \textsl{LiS} running on this kernel.
+
+\item[Improvement.]
+
+\textit{Figure \ref{figure:cos52comp}}
+illustrates the improvement over Linux legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based
+pipes.  The improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is significant:
+improvements range from a 100\% increase in performance at large write sizes, to a staggering 400\%
+increase in performance at lower write sizes.
+
+Again, the improvements experienced by \textsl{Linux Fast-STREAMS} at write sizes beneath 128 is
+primariliy due to the write coallescing feature (hold feature) of the Stream head combined with the
+fact that the fast-buffer sizes for \texttt{x86\_64} is 128 bytes.
+The improvements experienced across the entire range is primarily due to the read-fill option
+combined with full-sized reads.
+
+Note that it was not possible to get \textsl{LiS} running on this kernel.
 
 \end{description}
 
@@ -1506,11 +1612,12 @@ scheduling and flow control model. (Note that this is in fitting with the statem
 4.2BSD pipes being implemented with UNIX domain sockets for \textit{"performance reasons"}
 \cite[]{bsd}.)
 
-\item \textit{Linux Fast-STREAMS adequately exploits parallelisms on SMP.}
+\item \textit{Linux Fast-STREAMS is superior at exploiting parallelisms on SMP.}
 
 Contrary to the preconception that STREAMS must be slower due to complex locking and synchronization
 mechanisms, \textsl{Linux Fast-STREAMS} performed as well on SMP (hyperthreaded) machines as on UP
-machines and still outperformed legacy Linux pipes with over 100\% improvements at all write sizes.
+machines and strongly outperformed legacy Linux pipes with 100\% improvements at all write sizes and
+a staggering 400\% at smaller write sizes.
 
 \item \textit{STREAMS-based pipes are fast.}
 
@@ -1654,7 +1761,7 @@ fi
 Following are the raw data points captured using the \textsl{perftest\_script} benchmarking script:
 
 \textit{Table \ref{table:fc6data}} lists the raw data from the \texttt{perftest} program that was
-used in preparing graphs for Fedora Core 6 (i386) on Porky.
+used in preparing graphs for FC6 (i386) on Porky.
 
 \textit{Table \ref{table:centosdata}} lists the raw data from the \texttt{perftest} program that was
 used in preparing graphs for CentOS 4 on Porky.
@@ -1668,13 +1775,19 @@ used in preparing graphs for Ubuntu 6.10 on Porky.
 \textit{Table \ref{table:rh7data}} lists the raw data from the \texttt{perftest} program that was
 used in preparing graphs for RedHat 7.2 on Pumbah.
 
-\textit{Table \ref{table:smpdata}} lists the raw data from the \texttt{perftest} program that was
-used in preparing graphs for Fedora Core 6 (x86\_64) HT on Daisy.
+\textit{Table \ref{table:smpdata}} lists the raw data from \texttt{perftest}, used in preparing
+graphs for Fedora Core 6 (x86\_64) HT on Daisy.
 
-\textit{Table \ref{table:nbdata}} lists the raw data from the \texttt{perftest} program that was
-used in preparing graphs for SuSE 10.0 OSS on Mspiggy.
+\textit{Table \ref{table:cos5data}} lists the raw data from \texttt{perftest}, used in preparing
+graphs for CentOS 5 (x86\_64) HT on Daisy.
 
-\begin{table}[hp]
+\textit{Table \ref{table:cos52data}} lists the raw data from \texttt{perftest}, used in preparing
+graphs for CentOS 5.2 (x86\_64) HT on Daisy.
+
+\textit{Table \ref{table:nbdata}} lists the raw data from \texttt{perftest}, used in preparing
+graphs for SuSE 10.0 OSS on Mspiggy.
+
+\begin{table}[h]
 \footnotesize
 \setlength{\tabcolsep}{0.3em}
 \setlength{\arraycolsep}{0.3em}
@@ -1705,7 +1818,7 @@ Size & LiS & STREAMS & Linux\\
 \normalsize
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h]
 \footnotesize
 \setlength{\tabcolsep}{0.3em}
 \setlength{\arraycolsep}{0.3em}
@@ -1736,7 +1849,7 @@ Size & LiS & STREAMS & Linux\\
 \normalsize
 \end{table}
 
-\begin{table}[hp]
+\begin{table}[h]
 \footnotesize
 \setlength{\tabcolsep}{0.3em}
 \setlength{\arraycolsep}{0.3em}
@@ -1857,6 +1970,69 @@ Size & LiS & STREAMS & Linux\\
 \end{center}
 \caption{Raw data for Fedora Core 6 on Daisy}
 \label{table:smpdata}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\setlength{\tabcolsep}{0.3em}
+\setlength{\arraycolsep}{0.3em}
+\begin{center}
+\begin{tabular}{rrr}\\
+\hline
+Size & STREAMS & Linux\\
+\hline
+\hline
+1 & 232029 & 262762\\
+2 & 221413 & 224493\\
+4 & 217800 & 294765\\
+8 & 206325 & 284109\\
+16 & 194132 & 252365\\
+32 & 200675 & 347247\\
+64 & 198463 & 290958\\
+128 & 210551 & 280954\\
+256 & 168482 & 270703\\
+512 & 164051 & 198930\\
+1024 & 154924 & 197374\\
+2048 & 138744 & 101038\\
+4096 & 116291 & 70827\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Raw data for CentOS 5 on Daisy}
+\label{table:cos5data}
+\normalsize
+\end{table}
+
+\begin{table}[hp]
+\footnotesize
+\setlength{\tabcolsep}{0.3em}
+\setlength{\arraycolsep}{0.3em}
+\begin{center}
+\begin{tabular}{rrr}\\
+\hline
+Size & STREAMS & Linux\\
+\hline
+\hline
+1 & 693675 & 133714\\
+2 & 677583 & 192987\\
+4 & 652141 & 137415\\
+8 & 617148 & 153168\\
+16 & 544888 & 127430\\
+32 & 430115 & 193361\\
+64 & 322424 & 118036\\
+128 & 221081 & 143728\\
+256 & 187469 & 110754\\
+512 & 185642 & 102351\\
+1024 & 174350 & 103238\\
+2048 & 155567 & 106183\\
+4096 & 130076 & 77321\\
+8192 & 68071 & 62987\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Raw data for CentOS 5.2 on Daisy}
+\label{table:cos52data}
 \normalsize
 \end{table}
 
