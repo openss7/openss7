@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strinet.texi,v 0.9.2.27 2008-04-28 22:52:08 brian Exp $
+% @(#) $Id: strinet.texi,v 0.9.2.28 2008/07/27 08:49:20 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-28 22:52:08 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:49:20 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -412,6 +412,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strinet.texi,v $
+Revision 0.9.2.28  2008/07/27 08:49:20  brian
+- no invariant sections, more libtool ignores
+
 Revision 0.9.2.27  2008-04-28 22:52:08  brian
 - updated headers for release
 

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: osr61.texi,v 0.9.2.8 2008-04-25 11:50:44 brian Exp $
+% @(#) $Id: osr61.texi,v 0.9.2.9 2008/07/27 08:48:49 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-25 11:50:44 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:48:49 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -409,6 +409,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: osr61.texi,v $
+Revision 0.9.2.9  2008/07/27 08:48:49  brian
+- no invariant sections, more libtool ignores
+
 Revision 0.9.2.8  2008-04-25 11:50:44  brian
 - updates to AGPLv3
 

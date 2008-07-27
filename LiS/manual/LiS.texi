@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.27 2008-04-29 08:33:23 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.28 2008/07/27 08:48:39 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-29 08:33:23 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:48:39 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -404,6 +404,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.28  2008/07/27 08:48:39  brian
+- no invariant sections, more libtool ignores
+
 Revision 1.1.6.27  2008-04-29 08:33:23  brian
 - update headers for Affero release
 

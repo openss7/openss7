@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 0.9.2.18 2008-04-28 12:54:00 brian Exp $
+% @(#) $Id: SPG2.texi,v 0.9.2.19 2008/07/27 08:49:16 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-28 12:54:00 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:49:16 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -554,6 +554,9 @@ package.
 @smallexample
 
 $Log: SPG2.texi,v $
+Revision 0.9.2.19  2008/07/27 08:49:16  brian
+- no invariant sections, more libtool ignores
+
 Revision 0.9.2.18  2008-04-28 12:54:00  brian
 - update file headers for release
 

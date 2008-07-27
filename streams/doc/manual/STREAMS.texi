@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.42 2008-04-28 12:54:00 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.43 2008/07/27 08:49:17 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-28 12:54:00 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:49:17 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -421,6 +421,9 @@ package.
 @smallexample
 
 $Log: STREAMS.texi,v $
+Revision 0.9.2.43  2008/07/27 08:49:17  brian
+- no invariant sections, more libtool ignores
+
 Revision 0.9.2.42  2008-04-28 12:54:00  brian
 - update file headers for release
 
