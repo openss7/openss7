@@ -1,3 +1,13 @@
+2008-07-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* doc/manual/strtty.texi: no invariant sections for debian
+	* m4/.cvsignore: more libtool files to ignore
+
 2008-07-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strtty.refs: update references

@@ -1,3 +1,8 @@
+2008-07-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/.cvsignore: more libtool files to ignore
+	* manual/LiS.texi: no invariant sections for debian
+
 2008-07-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* man/lis.refs: updated references

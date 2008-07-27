@@ -343,7 +343,7 @@ Affero General Public License}).  Please note, however, that there are different
 manual pages and some of the documentation (derived from publications and other sources).  Consult
 the permission notices contained in the documentation for more information.
 
-This manual is released under the @cite{FDL} (@pxref{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxref{GNU Free Documentation License}) with no
 sections invariant.
 
 @node Abstract
@@ -562,7 +562,7 @@ License}).  Please note, however, that there are different licensing terms for t
 some of the documentation (derived from publications and other sources).  Consult the permission
 notices contained in the documentation for more information.
 
-This manual is released under the @cite{FDL} (@pxref{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxref{GNU Free Documentation License}) with no
 sections invariant.
 @end ignore
 

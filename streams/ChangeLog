@@ -1,3 +1,16 @@
+2008-07-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updates for release
+	* NEWS: updates for release
+	* README: updates for release
+	* README-cvs: updates for release
+	* THANKS: updates for release
+	* doc/manual/SPG.texi: no invariant sections for debian
+	* doc/manual/SPG2.texi: no invariant sections for debian
+	* doc/manual/STREAMS.texi: no invariant sections for debian
+	* doc/manual/STREAMS_FAQ.texi: no invariant sections for debian
+	* m4/.cvsignore: more libtool files to ignore
+
 2008-07-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man2/read.2s.man: sp corrections

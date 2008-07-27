@@ -286,7 +286,7 @@ manual pages and some of the documentation (derived from X/Open publications and
 Consult the permission notices contained in the documentation for more information.
 
 This document, is released under the @cite{GNU Free Documentation License} (@pxref{GNU Free
-Documentation License}) with all sections invariant.
+Documentation License}) with no sections invariant.
 
 @subsection Abstract
 @cindex document abstract

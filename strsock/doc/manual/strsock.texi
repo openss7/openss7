@@ -347,7 +347,7 @@ Also note that parts of this software, as identified in @refman{Possible BSD Sou
 derived from software developed by the @cite{University of California, Berkeley} covered under the
 @cite{Combined USL BSD License} (@pxrefman{BSD/USL Combined License}).
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.
 
 @node Abstract
@@ -578,7 +578,7 @@ Also note that parts of this software, as identified in @refman{Possible BSD Sou
 derived from software developed by the @cite{University of California, Berkeley} covered under the
 @cite{Combined USL BSD License} (@pxrefman{BSD/USL Combined License}).
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.
 @end ignore
 

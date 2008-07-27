@@ -347,7 +347,7 @@ some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and U
 publications and other sources).  Consult the permission notices contained in the documentation for
 more information.
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.
 
 @node Abstract
@@ -537,7 +537,7 @@ some of the documentation (derived from OpenGroup@footnote{Formerly X/Open and U
 publications and other sources).  Consult the permission notices contained in the documentation for
 more information.
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.
 @end ignore
 
