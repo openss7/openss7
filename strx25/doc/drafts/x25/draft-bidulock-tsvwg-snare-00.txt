@@ -3,9 +3,9 @@
 
 Network Working Group                                        B. Bidulock
 INTERNET-DRAFT                                       OpenSS7 Corporation
-Intended Status: INFORMATIONAL                               May 7, 2008
+Intended Status: INFORMATIONAL                             June 18, 2008
 
-Expires in November 2008
+Expires in December 2008
 
 
 
@@ -36,7 +36,7 @@ Status of this Memo
     The list of Internet-Draft Shadow Directories can be accessed at
   http://www.ietf.org/shadow.html.
 
-    This Internet-Draft will expire in November 2008.
+    This Internet-Draft will expire in December 2008.
 
 Copyright
 
@@ -57,7 +57,7 @@ Contents
 
 B. Bidulock                    Version 0.0                        Page 1
 
-Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+Internet Draft         SNARE over UDP (SNARE-UDP)          June 18, 2008
 
 1.  Introduction
 
@@ -115,7 +115,7 @@ Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
 
 B. Bidulock                    Version 0.0                        Page 2
 
-Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+Internet Draft         SNARE over UDP (SNARE-UDP)          June 18, 2008
 
 
 0.  Change History
@@ -131,7 +131,10 @@ Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
 
 Change Log
 
-    $Log$
+    $Log: draft-bidulock-tsvwg-snare-00.me,v $
+    Revision 0.9.2.1  2008-06-13 06:43:52  brian
+    - added files
+
 
 
 
@@ -146,7 +149,7 @@ Change Log
       Service for ITU-T Applications," ITU-T Recommendation X.223
       [ISO/IEC 8878], ITU-T Telecommunication Standardization Sector of
       ITU, Geneva (November 1993).  (Previously "CCITT Recommendation")
-      <http://www.itu.int/>
+      <http://www.itu.int/rec/T-REC-X.223/>
 
   [RFC1613]  "Cisco Systems X.25 over TCP (XOT)," RFC 1613, The Internet
       Society (May 1994).  (Status: INFORMATIONAL) (Defines TCP port
@@ -168,12 +171,9 @@ Normative References
 
 
 
-
-
-
 B. Bidulock                    Version 0.0                        Page 3
 
-Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+Internet Draft         SNARE over UDP (SNARE-UDP)          June 18, 2008
 
 
 Acknowledgements
@@ -195,7 +195,7 @@ Author's Addresses
 
 
 
-  This draft expires November 2008.
+  This draft expires December 2008.
 
 
 
@@ -231,7 +231,7 @@ Author's Addresses
 
 B. Bidulock                    Version 0.0                        Page 4
 
-Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+Internet Draft         SNARE over UDP (SNARE-UDP)          June 18, 2008
 
 
                           Table of Contents
@@ -289,7 +289,7 @@ Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
 
 B. Bidulock                    Version 0.0                        Page 5
 
-Internet Draft         SNARE over UDP (SNARE-UDP)            May 7, 2008
+Internet Draft         SNARE over UDP (SNARE-UDP)          June 18, 2008
 
 Intellectual Property
 

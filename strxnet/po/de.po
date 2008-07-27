@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: strxnet 0.9.2.9.rc3\n"
 "Report-Msgid-Bugs-To: bugs@openss7.org\n"
-"POT-Creation-Date: 2008-07-01 07:32-0600\n"
+"POT-Creation-Date: 2008-07-23 15:12-0600\n"
 "PO-Revision-Date: 2004-01-06 18:11-0700\n"
 "Last-Translator: Brian Bidulock <bidulock@openss7.org>\n"
 "Language-Team: German <de@li.org>\n"
@@ -306,7 +306,7 @@ msgstr ""
 #. TRANS nc_error(3) variable.  The last netconfig(3) or netpath(3) operation was
 #. TRANS successful.
 #.
-#: src/lib/netselect.c:695
+#: src/lib/netselect.c:698
 #, fuzzy
 msgid "no error"
 msgstr "Erfolgreich"
@@ -314,7 +314,7 @@ msgstr "Erfolgreich"
 #. TRANS Corresponds to the NC_NOMEM constant.  Out of memory.  Memory could not be
 #. TRANS allocated to complete the last netconfig(3) or netpath(3) operation.
 #.
-#: src/lib/netselect.c:700
+#: src/lib/netselect.c:703
 msgid "out of memory"
 msgstr ""
 
@@ -322,14 +322,14 @@ msgstr ""
 #. TRANS endnetconfig(3), or endnetpath(3) function was called out of order: that
 #. TRANS is, before setnetconfig(3) or setnetpath(3) was called.
 #.
-#: src/lib/netselect.c:706
+#: src/lib/netselect.c:709
 msgid "routine called out of order"
 msgstr ""
 
 #. TRANS Corresponds to the NC_OPENFAIL constant.  The /etc/netconfig file could
 #. TRANS not be opened for reading.  %1$s is the name of the /etc/netconfig file.
 #.
-#: src/lib/netselect.c:711
+#: src/lib/netselect.c:714
 #, c-format
 msgid "could not open %s"
 msgstr ""
@@ -342,7 +342,7 @@ msgstr ""
 #. TRANS is the name of the /etc/netconfig file.  %2$d is the field number.  %3$d
 #. TRANS is the line number.
 #.
-#: src/lib/netselect.c:721
+#: src/lib/netselect.c:724
 #, c-format
 msgid "syntax error in %s: field %d of line %d"
 msgstr ""
@@ -351,7 +351,7 @@ msgstr ""
 #. TRANS argument to the getnetconfigent(3) subroutine was not found in any entry
 #. TRANS in the /etc/netconfig file.  %1$s is the name of the /etc/netconfig file.
 #.
-#: src/lib/netselect.c:727
+#: src/lib/netselect.c:730
 #, c-format
 msgid "netid not found in %s"
 msgstr ""
@@ -362,7 +362,7 @@ msgstr ""
 #. TRANS /etc/netconfig file contains no entries.  %1$s is the name of the
 #. TRANS /etc/netconfig file.
 #.
-#: src/lib/netselect.c:735
+#: src/lib/netselect.c:738
 #, c-format
 msgid "no more entries in %s"
 msgstr ""
@@ -372,7 +372,7 @@ msgstr ""
 #. TRANS situation should not occur and represents a bug in the library.  %1$d is
 #. TRANS the decimal value of the unknown error number.
 #.
-#: src/lib/netselect.c:742
+#: src/lib/netselect.c:745
 #, fuzzy, c-format
 msgid "unknown error number %d"
 msgstr "Erfolgreich"
@@ -380,14 +380,14 @@ msgstr "Erfolgreich"
 #. TRANS Corresponds to the ND_TRY_AGAIN constant.  This is a fatal error in the
 #. TRANS sense that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:736
+#: src/lib/netdir.c:739
 msgid "n2a: non-authoritative host not found"
 msgstr ""
 
 #. TRANS Corresponds to the ND_NO_RECOVERY constant.  This is a fatal error in the
 #. TRANS sense that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:741
+#: src/lib/netdir.c:744
 msgid "n2a: non-recoverable error"
 msgstr ""
 
@@ -395,27 +395,27 @@ msgstr ""
 #. TRANS error in the sense that name-to-address mapping translations will stop at
 #. TRANS this point.
 #.
-#: src/lib/netdir.c:747
+#: src/lib/netdir.c:750
 msgid "n2a: no data record of requested type"
 msgstr ""
 
 #. TRANS Corresponds to the ND_BADARG constant.  This is a fatal error in the sense
 #. TRANS that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:752
+#: src/lib/netdir.c:755
 msgid "n2a: bad arguments passed to routine"
 msgstr ""
 
 #. TRANS Corresponds to the ND_NOMEM constant.  This is a fatal error in the sense
 #. TRANS that name-to-address mapping translations will stop at this point.
 #.
-#: src/lib/netdir.c:757
+#: src/lib/netdir.c:760
 msgid "n2a: memory allocation failed"
 msgstr ""
 
 #. TRANS Corresponds to the ND_OK constant.  This is not an error.
 #.
-#: src/lib/netdir.c:761
+#: src/lib/netdir.c:764
 msgid "n2a: successful completion"
 msgstr ""
 
@@ -423,7 +423,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:767
+#: src/lib/netdir.c:770
 msgid "n2a: hostname not found"
 msgstr ""
 
@@ -431,7 +431,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:773
+#: src/lib/netdir.c:776
 msgid "n2a: service name not found"
 msgstr ""
 
@@ -439,7 +439,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.  %1$s is a dlerror(3) string.
 #.
-#: src/lib/netdir.c:779
+#: src/lib/netdir.c:782
 #, c-format
 msgid "n2a: symbol missing in shared object: %s"
 msgstr ""
@@ -448,7 +448,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.  %1$s is a dlerror(3) string.
 #.
-#: src/lib/netdir.c:785
+#: src/lib/netdir.c:788
 #, c-format
 msgid "n2a: could not open shared object: %s"
 msgstr ""
@@ -457,7 +457,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:791
+#: src/lib/netdir.c:794
 msgid "n2a: access denied for shared object"
 msgstr ""
 
@@ -465,7 +465,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:797
+#: src/lib/netdir.c:800
 msgid "n2a: attempt to free unknown object"
 msgstr ""
 
@@ -473,7 +473,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:803
+#: src/lib/netdir.c:806
 msgid "n2a: unknown option passed"
 msgstr ""
 
@@ -481,7 +481,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:809
+#: src/lib/netdir.c:812
 msgid "n2a: control operation failed"
 msgstr ""
 
@@ -489,7 +489,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:815
+#: src/lib/netdir.c:818
 msgid "n2a: system error"
 msgstr ""
 
@@ -497,7 +497,7 @@ msgstr ""
 #. TRANS the sense that name-to-address mapping translations will contrinue at this
 #. TRANS point.
 #.
-#: src/lib/netdir.c:821
+#: src/lib/netdir.c:824
 msgid "n2a: conversion not possible"
 msgstr ""
 
@@ -505,7 +505,7 @@ msgstr ""
 #. TRANS sense that name-to-address mapping translations will contrinue at this
 #. TRANS point. %1$d is the error number.
 #.
-#: src/lib/netdir.c:827
+#: src/lib/netdir.c:830
 #, fuzzy, c-format
 msgid "n2a: unknown error %d"
 msgstr "Erfolgreich"

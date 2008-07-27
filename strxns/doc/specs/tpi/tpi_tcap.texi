@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: tpi_tcap.texi,v 0.9.2.10 2008-04-28 18:38:35 brian Exp $
+% @(#) $Id: tpi_tcap.texi,v 0.9.2.11 2008-07-11 00:18:14 brian Exp $
 %
 % =========================================================================
 %
@@ -54,14 +54,17 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-28 18:38:35 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 00:18:14 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 @c %**start of header
 @setfilename tpi_tcap.info
-@settitle TPI-TCAP
+@include texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Corrigendum for TCAP Conformance
+@settitle @value{MANUAL_TITLE}
 @c %**end of header
 
 @dircategory OpenSS7
@@ -70,15 +73,22 @@
 @end direntry
 
 @include texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Corrigendum for TCAP Conformance
 
+@comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the TCAP Corrigendum to the Transaction Provider Interface.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release
+@value{PACKAGE_RELEASE} published by @uref{http://www.openss7.com/,OpenSS7
+Corporation}.
+
 
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
 
 All Rights Reserved.
 
@@ -93,22 +103,33 @@ this one except for the removal of this paragraph (this paragraph not being
 relevant to the printed manual).
 
 @end ignore
+Permission to use, copy, modify, and distribute this documentation for any
+purpose and without fee is hereby granted, provided that the above copyright
+notice appears in all copies and that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name UNIX
+International not be used in advertising or publicity pertaining to distribution
+of the software without specific, written prior permission. UNIX International
+makes no representations about the suitability of this documentation for any
+purpose. It is provided ``as is'' without express or implied warranty.
+
 Permission is granted to copy and distribute modified versions of this manual
-under the conditions for verbatim copyring, provided the entire resulting
-derived work is distributed under the terms of a permission notice identical to
-this one.
+under the conditions for verbatim copying, provided the entire resulting derived
+work is distributed under the terms of a permission notice identical to this
+one.
 
 Permission is granted to copy and distribute translations of this manual into
 another language, under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
+@set MANUAL_TITLE Transport Provider Interface
+@set MANUAL_TYPE Corrigendum for TCAP Conformance
 
-@shorttitlepage TPI Corrigendum for TCAP Conformance
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
 @titlepage
-@titlefont{Transaction Provider Interface}
+@titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
-@title Corrigendum for TCAP Conformance
+@title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
@@ -119,7 +140,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-@subsubheading Published by
+@subsubheading Published by:
 @noindent
 @uref{http://www.openss7.com/,OpenSS7 Corporation} @*
 1469 Jefferys Crescent @*
@@ -129,6 +150,7 @@ Canada @*
 @noindent
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
 
 @noindent
 All Rights Reserved.
@@ -166,31 +188,101 @@ or the performance or implementation of the contents thereof.}
 @everyheading @thistitle @| @thisfile @| @thischaptername
 @evenheading @thischapter @| @| @thisfile
 @oddheading @thistitle @| @| @thischaptername
-@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
-@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@everyfooting Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Rel. @value{PACKAGE_RELEASE}
 @oddfooting @value{PACKAGE_DATE} @| @| @thispage
 @end iftex
 @page
 
 @c Define an index of primitives
-@defindex pr
+@defcodeindex pr
 @c Define an index of primitive values
-@defindex pv
+@defcodeindex pv
+@c Define an index of primitive error values
+@defcodeindex pe
 @c Define an index of protocol states
-@defindex st
+@defcodeindex st
+@c Define an index of input-output controls
+@defcodeindex ct
+@c Define an index of manual pages.
+@defcodeindex mp
 
+@ifnottex
+@c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
+@syncodeindex pe cp
+@syncodeindex st cp
+@syncodeindex mp cp
 @syncodeindex tp cp
 @syncodeindex vr cp
+@syncodeindex ct cp
+@end ifnottex
 
-@defcodeindex mp
 @include texi/macros.texi
 @include texi/versions.texi
 
+@iftex
+
+@macro prim {name}
+@code{\name\}@prindex \name\
+@end macro
+
+@macro pval {name}
+@code{\name\}@pvindex \name\
+@end macro
+
+@macro perr {name}
+@code{\name\}@peindex \name\
+@end macro
+
+@macro psta {name}
+@code{\name\}@stindex \name\
+@end macro
+
+@macro parm {name}
+@code{\name\}@vrindex \name\
+@end macro
+
+@macro pioc {name}
+@code{\name\}@ctindex \name\
+@end macro
+
+@end iftex
+
+@ifnottex
+@c skip deep indexing for plain text, html and info
+@c it messes up column with maximums (texinfo bug)
+
+@macro prim{name}
+@code{\name\}
+@end macro
+
+@macro pval{name}
+@code{\name\}
+@end macro
+
+@macro perr{name}
+@code{\name\}
+@end macro
+
+@macro psta{name}
+@code{\name\}
+@end macro
+
+@macro parm{name}
+@code{\name\}
+@end macro
+
+@macro pioc{name}
+@code{\name\}
+@end macro
+
+@end ifnottex
+
 @ifnottex
 @node Top
-@top Transaction Provider Interface --- Corrigendum for TCAP Conformance
+@top Transaction Provider Interface---Corrigendum for TCAP Conformance
 @end ifnottex
 
 @menu
@@ -204,6 +296,16 @@ or the performance or implementation of the contents thereof.}
 * References::
 * Index::
 @end menu
+
+@iftex
+@c insert list of figures and tables for printed manuals
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
 
 @node Preface
 @unnumbered Preface
@@ -1139,21 +1241,74 @@ An identifier of a particular physical medium over which communication transpire
 @item ITU-T Recommendation Q.771, (Geneva, 1993), ``Signalling System No. 7 --- Functional description of transaction capabilities,'' (White Book).
 @end enumerate
 
+@ifnotplaintext
+@c skip indexes for plain text (regex search works better)
 @node Index
 @unnumbered Index
 
+@ifnottex
+@c concatenate indices for html and info
+@printindex cp
+@end ifnottex
+
+@iftex
+@menu
+* Concept Index::
+* Protocol State Index::
+* Primitive Index::
+* Primitive Structure and Type Index::
+* Primitive Structure Field Index::
+* Primitive Values Index::
+* Primitive Error Values Index::
+* Input-Output Control Index::
+* Manual Page Index::
+@end menu
+
+@node Concept Index
+@section Concept Index
 @printindex cp
 
-@c @section Primitive Index
+@page
+@node Protocol State Index
+@section Protocol State Index
+@printindex st
 
-@c @printindex pr
+@page
+@node Primitive Index
+@section Primitive Index
+@printindex pr
 
-@c @section Primitive Structure and Type Index
-@c @printindex tp
+@page
+@node Primitive Structure and Type Index
+@section Primitive Structure and Type Index
+@printindex tp
 
-@c @section Primitive Structure Field Index
+@page
+@node Primitive Structure Field Index
+@section Primitive Structure Field Index
+@printindex vr
 
-@c @printindex vr
+@page
+@node Primitive Values Index
+@section Primitive Values Index
+@printindex pv
+
+@page
+@node Primitive Error Values Index
+@section Primitive Error Values Index
+@printindex pe
+
+@page
+@node Input-Output Control Index
+@section Input-Output Control Index
+@printindex ct
+
+@page
+@node Manual Page Index
+@section Manual Page Index
+@printindex mp
+@end iftex
+@end ifnotplaintext
 
 @page
 @shortcontents
