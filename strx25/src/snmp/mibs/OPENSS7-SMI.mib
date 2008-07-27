@@ -1,0 +1,168 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-SMI.mib,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008/04/29 07:11:22 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2008/04/29 07:11:22 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-SMI.mib,v $
+-- Revision 0.9.2.10  2008/04/29 07:11:22  brian
+-- - updating headers for release
+--
+-- Revision 0.9.2.8  2008-04-28 12:54:08  brian
+-- - update file headers for release
+--
+-- Revision 0.9.2.7  2008-04-28 09:43:07  brian
+-- - update headers for release
+--
+-- Revision 0.9.2.6  2008-01-24 17:40:57  brian
+-- - updated mibs
+--
+-- Revision 0.9.2.5  2008/01/14 16:55:12  brian
+-- - updated mibs
+--
+-- Revision 0.9.2.4  2008/01/14 13:01:07  brian
+-- - updated mibs
+--
+-- Revision 0.9.2.3  2008/01/10 19:55:43  brian
+-- - updating mibs
+--
+-- Revision 0.9.2.2  2007/12/15 20:19:14  brian
+-- - updates
+--
+-- =============================================================================
+
+OPENSS7-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+openss7 MODULE-IDENTITY
+    LAST-UPDATED "200709250000Z"
+    ORGANIZATION 
+        "OpenSS7 Corporation"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-Mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "Top level OpenSS7 MIB Module."
+    REVISION    "200709250000Z"
+    DESCRIPTION 
+        "First revision of this MIB."
+    ::= { enterprises 29591 } -- 29591 assigned by IANA
+
+-- Uppermost arcs of the OpenSS7 tree.
+
+-- openss7MIBs OBJECT-IDENTITY
+--     STATUS current
+--     DESCRIPTION
+--  "This is the arc under which OpenSS7 MIBS are defined."
+--     ::= { openss7 1 }
+
+openss7Modules OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is the arc under which individual MIB modules are 
+         registered."
+    ::= { openss7 1 }
+
+openss7Capabilities OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is the arc under which OpenSS7 agent capabilities are 
+         registered."
+    ::= { openss7 2 }
+
+openss7Ms OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Management Systems."
+    ::= { openss7 9 }
+
+openss7MsFunction OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Management Systems Function."
+    ::= { openss7Ms 2 }
+
+openss7MsSmi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Management Systems System Management Information."
+    ::= { openss7Ms 3 }
+
+openss7Q OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q-Series Specs."
+    ::= { openss7 17 }
+
+openss7Q751 OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"ITU-T Q.751 Specs."
+    ::= { openss7Q 751 }
+
+openss7Q825 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.825 Specs."
+    ::= { openss7Q 825 }
+
+END -- end of module OPENSS7-SMI.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

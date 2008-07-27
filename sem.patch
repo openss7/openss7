@@ -1,0 +1,11 @@
+--- strcompat/src/kernel/liscompat.c.orig	Mon May 26 08:16:30 2008
++++ strcompat/src/kernel/liscompat.c	Fri Jul 11 07:32:02 2008
+@@ -2520,7 +2520,7 @@
+ 	lis_semaphore_t *lsem;
+ 	lsem = WARN(kmem_zalloc(sizeof(lis_semaphore_t), KM_NOSLEEP));
+ 	if (lsem != NULL)
+-		init_MUTEX((struct semaphore *) lsem->sem_mem);
++		sema_init((struct semaphore *) lsem->sem_mem, count);
+ 	return lsem;
+ }
+ 

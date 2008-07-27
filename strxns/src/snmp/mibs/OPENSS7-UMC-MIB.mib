@@ -1,0 +1,1734 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-UMC-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/04/29 07:11:23 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2008/04/29 07:11:23 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-UMC-MIB.mib,v $
+-- Revision 0.9.2.4  2008/04/29 07:11:23  brian
+-- - updating headers for release
+--
+-- Revision 0.9.2.3  2008/01/14 16:55:13  brian
+-- - updated mibs
+--
+-- Revision 0.9.2.2  2008/01/13 00:12:54  brian
+-- - added updated CDR mib
+--
+-- Revision 0.9.2.1  2008/01/10 19:55:43  brian
+-- - updating mibs
+--
+-- =============================================================================
+
+OPENSS7-UMC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7MsFunction
+        FROM OPENSS7-SMI
+    ControlStatus, ObjectInstance, OperationalState, ProceduralStatus, 
+    SimpleNameType, logId, logRecordId
+        FROM OPENSS7-SMI-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, TimeTicks
+        FROM SNMPv2-SMI
+    AutonomousType, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+umcMIB MODULE-IDENTITY
+    LAST-UPDATED "200801071407Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "This is a basic MIB module providing definitions of objects 
+         based on TMN (ITU-T Rec. X.742 (1995) | ISO/IEC 10164-2 : 
+         1995)."
+    REVISION    "200801071407Z"
+    DESCRIPTION 
+        "First release of this module."
+    ::= { openss7MsFunction 10 }
+
+
+TimePeriod ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION 
+        "Provides the number of units of a time period.  The is an 
+         integral number of time units as specified by an associated 
+         time units syntax.  This textual convention replaceds the 
+         syntax from X.739 MetricModule.TimePeriod as follows:
+         
+         TimePeriod ::= CHOICE {
+         	days [0] INTEGER,
+         	hours [1] INTEGER,
+         	minutes [2] INTEGER,
+         	seconds [3] INTEGER,
+         	milliSeconds [4] INTEGER,
+         	microSeconds [5] INTEGER,
+         	nanoSeconds [6] INTEGER,
+         	picoSeconds [7] INTEGER }
+         
+         Because nanoseconds and picoseconds are not practical time 
+         durations, this syntax is implemented using the TimeInterval 
+         textual convention from the SNMPv2-TC module, which can specify 
+         periods of greater than one year and as small as 10 
+         milliseconds."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         UsageMetering.TimePeriod imported from:
+         ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
+         MetricModule.TimePeriod."
+    SYNTAX      TimeTicks
+
+Induced ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of a set of induced reporting triggers 
+         for use in control objects and notifications.  The 
+         specification is set-valued and can contain the following:
+         
+         - start: a usage report is generated by a referenced data 
+           object whenever a start metering action is performed on the 
+           object;
+         
+         - suspend: a usage report is generated by a referenced data 
+           object whenever a suspend metering action is performed on 
+           the object;
+         
+         - resume: a usage report is generated by a referenced data 
+           object whenever a resume metering action is performed on the 
+           object;
+         
+         - delete: a usage report is generated by a referenced data 
+           object as the object is deleted;
+         
+         - disabled: a usage report is generated by a referenced data 
+           object when the object moves to the diabled operational 
+           state;
+         
+         - enabled: a usage rerport is generated by a referenced data 
+           object when the object moves to the enabled operational 
+           state.
+           
+         Not all values are applicable to all control and data objects."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995, 
+         UsageMetering.Induced."
+    SYNTAX      BITS { start(0), suspend(1), resume(2), delete(3), 
+                    disabled(4), enabled(5) }
+
+ReportingEvent ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of a set of event reporting triggers 
+         for use in control objects and notifications.  The 
+         specification is set-valued and can contain the following:
+         
+         - registration: A usage report is generated on an event 
+           indicating detection of the service requestor by the service 
+           provider has occurred.  For example, a telephony user picks 
+           up the handset and listens to dial tone.
+         
+         - request: A usage report is generated on an event indicating 
+           input generated by the requester such as dialld or keyed 
+           destination, input of account code or input of feature 
+           activation code.
+         
+         - accept: A usage report is generated on an event indicating 
+           response to a previous request such as the distant end 
+           responding, connection to a remote computer application or 
+           activation of a feature.  Note that this also covers the case 
+           where the responding party might not be the same as that 
+           which the requestor originally asked for - the call being 
+           diverted, for example.
+         
+         - complete: A usage report is generated on an event indicating 
+           the completion of the provided service such as the remote end 
+           clearing, or the completion fo a remote application.
+         
+         - corresponding: A usage report is generated on an event 
+           indicating data for correlation of usage metering records to 
+           provide a service transaction record - for example, the X.400 
+           message identifier.
+         
+         - bulk: A usage report is generated on an event indicating the 
+           availability of non-event related usage measurement, that is, 
+           usage measured independent of individual transactions - for 
+           example, the volume usage over a given period on a permanent 
+           virtual circuit.
+         
+         - interruption: A usage report is generated on an event 
+           indicating abnormal events during the accounting metering 
+           activity, such as notification of a clock change having 
+           occured during the service utilization being measured.
+         
+         Not all values are applicable to all control and data objects."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995, 
+         UsageMetering.ReportingEvent."
+    SYNTAX      BITS { registration(0), request(1), accept(2), 
+                    complete(3), corresponding(4), bulk(5), 
+                    interruption(6) }
+
+ReportingTriggers ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the type of reporting trigger, or 
+         set of types of reporting triggers."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995, 
+         UsageMetering.ReportingTriggers."
+    SYNTAX      BITS { periodic(0), induced(1), event(2), stimulus(3) }
+
+UsageReportInfo ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the usage information to replace the following ASN.1 
+         syntax from X.742:
+         
+         UMF-USAGE ::= DMI-TYPE-IDENTIFIER
+         UsageInfo ::= SEQUENCE {
+            serviceType UMF-USAGE.&id( {UsageInfoSet }),
+            usageData UMF-USAGE.&Value( { UsageInfoSet } { @.serviceType }) }
+         UsageInfoSet UMF-USAGE ::= {
+            ... }
+         
+         The octet string is a BER encoding for the UsageInfo syntax 
+         presented above."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995, 
+         UsageMetering.UsageInfo."
+    SYNTAX      OCTET STRING
+
+PossibleDataErrors ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Specifies a data errors object to replace the following ASN.1 
+         syntax from X.742:
+         
+         DataErrors ::= CHOICE {
+            possibleErrors SET OF PossibleError,
+            noProblem NULL }
+         PossibleError ::= OBJECT IDENTIFIER
+         
+         The octet string is a BER encoding of the DataErrors type from 
+         X.742."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995, 
+         UsageMetering.DataErrors."
+    SYNTAX      OBJECT IDENTIFIER
+
+ProviderIdentifier ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Specifies a provider identifier to replace the following ASN.1 
+         syntax from X.742:
+         
+         ProviderId ::= CHOICE {
+             objectReference [1] ObjectInstance,
+             textualName [2] GraphicString,
+             serviceSpecific [3] ServiceSpecificId,
+             unknown [4] NULL }
+         UMF-SERVICE ::= DMI-TYPE-IDENTIFIER
+         ServiceSpecificId ::= SEQUENCE {
+             service UMF-SERVICE.&id( {ServiceSpecificSet }),
+             serviceSpecificId UMF-SERVICE.&Value( { ServiceSpecificSet } { @.service }) }
+         ServiceSpecificSet UMF-SERVICE ::= {
+             ... }
+         
+         The first octet indciates the contents of the remaining octets.  
+         The first octet can have values:
+         
+         - objectReference [1], the remaining octets are a coded as a 
+           ObjectInstance;
+         - textualName [2], the remaining octets are coded as a 
+           DisplayString;
+         - serviceSpecific [3], the remaining octets are coded as the 
+           BER encoding of the ServiceSpecificId."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995, 
+         UsageMetering.ProviderId."
+    SYNTAX      OCTET STRING
+
+AuditReportInfo ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Specifies audit information to replace the following ASN.1 
+         syntax from X.742:
+         
+         UMF-AUDIT ::= DMI-TYPE-IDENTIFIER
+         AuditInfo ::= SEQUENCE {
+            service UMF-AUDIT.&id( {AuditInfoSet }),
+            auditDetails UMF-AUDIT.&Value( { AuditInfoSet } { @.service }) }
+         AuditInfoSet UMF-AUDIT ::= {
+            ... }
+         
+         The octet string is an opaque encoding of the AuditInfo syntax 
+         presented above."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995, 
+         UsageMetering.AuditInfo."
+    SYNTAX      OCTET STRING
+
+ActionArgument ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of an action object that can be used 
+         to perform start, suspend and resume actions on data objects 
+         associated with the object whose syntax clause has this textual 
+         convention.  The MAX-ACCESS clause of the object containing 
+         this syntax should be write-only.  The DESCRIPTION clause 
+         should identify the referenced data objects that will be 
+         affected by the action.  A corresponding object with the 
+         ActionResponse textual convention in its SYNTAX clause can be 
+         used to retrieve the response to the action.
+         
+         - start: The start metering action allows a manager to start or 
+           to restart accounting for usage, recording and reporting of 
+           usage information for instances of usage metering data.  The 
+           effect of a start is to initialize or re-initialize usage 
+           parameter avalues for all identifier, related data objects.  
+           And in addition it removes the suspended value from the 
+           control status attribute of the corresponding data objects, 
+           where this value is present.
+         
+         - suspend: The suspend metering action allows a manager to hold 
+           the value of the usage parameter for a selected instance (or 
+           set of object instances) of usage metering data so that its 
+           value may remain unchanged.  This action addes the suspended 
+           value of the control status attribute of the corresponding 
+           data objects.
+         
+         - resume: The resume metering action allows a manager to resume 
+           accounting for usage for a selected instance (or set of 
+           object instances) of usage metering data so that its value 
+           may record usage.  This action removes the suspended value 
+           from the control status attribute of the corresponding data 
+           objects.  Unlike the start metering action the resume 
+           metering action does not re-initialize usage parameters.
+         
+         Start metering, suspend metering and resume metering actions 
+         can reference one or more data objects which are subject to 
+         usage metering control (as indicated in the corresponding data 
+         object reference list).  The confirmed action response 
+         indicates those data objects upon which the action was 
+         successfully performed, those where the outcome was 
+         unsuccessful and those where the outcome was indeterminate.
+         
+         These actions can cause the corresponding data objects to emit 
+         notifications containing usage data information if a value of 
+         the reporting triggers attribute references the corresponding 
+         action."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995,
+         startMetering, suspendMetering, resumeMetering actions, 
+         UsageMetering.ActionArgument request syntax."
+    SYNTAX      INTEGER { resume(1), start(2), suspend(3) }
+
+ActionResponse ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a speciification of an action response object that can 
+         be used to retrieve the response of an associated action 
+         performed by writing to a corresponding object with the 
+         ActionArgument textual convention in its SYNTAX clause.  The 
+         MAX-ACCESS clause of the object containing this syntax should 
+         be read-only.  The DESCRIPTION clause should identify the 
+         referenced data objects and the meaning of the response with 
+         respect to those data objects.
+         
+         - success: When present, the action was successful for at least 
+           one of the rereferenced data objects.
+         
+         - failure: When present, the action failed for at least on of 
+           the referernced data objects.
+         
+         - indeterminate: When present, the action was indeterminate for 
+           at least on of the data objects."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995,
+         startMetering, suspendMetering, resumeMetering actions, 
+         UsageMetering.ActionResponse reply syntax."
+    SYNTAX      BITS { success(0), failed(1), indeterminate(2) }
+
+DeniedMeteringAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of an error response object that can 
+         be used to retrieve the error response of an associated action 
+         preformed by writing to a corresponding object with the 
+         ActionArgument textual convention in its SYNTAX clause.  The 
+         MAX-ACCESS clause of the object containing this syntax should 
+         be read-only.  The DESCRIPTION clause should identify the 
+         referenced data objects and the meaning of the response with 
+         respect to those data objects.
+         
+         - can not start: When present, indicates that the start action 
+           performed on at least one of the referenced data objects 
+           failed because the object had a terminating procedural 
+           status.
+         
+         - can not suspend: When present, indicates that the suspend 
+           action performed on at least one of the referenced data 
+           objects failed because the object had a terminating 
+           procedural status.
+         
+         - can not resume: When present, indicates that the resume 
+           action performed on at least one of the referenced data 
+           objects failed because the object had a terminating 
+           procedural status."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995,
+         startMetering, suspendMetering, resumeMetering actions, 
+         deniedMeteringAction parameter."
+    SYNTAX      BITS { canNotStart(0), canNotSuspend(1), canNotResume(2) }
+
+umcNotifications OBJECT IDENTIFIER
+    ::= { umcMIB 0 }
+
+umcObjects OBJECT IDENTIFIER
+    ::= { umcMIB 1 }
+
+umcScalars OBJECT IDENTIFIER
+    ::= { umcObjects 1 }
+
+umcTables OBJECT IDENTIFIER
+    ::= { umcObjects 2 }
+
+usageMeteringRecord OBJECT IDENTIFIER
+    ::= { umcTables 1 }
+
+usageMeteringRecordTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsageMeteringRecordEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         usageMeteringRecord MO."
+    ::= { usageMeteringRecord 1 }
+
+usageMeteringRecordEntry OBJECT-TYPE
+    SYNTAX      UsageMeteringRecordEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         The usageMeteringRecordEntry is derived from an 
+         evenLogRecordEntry which is derived from a logRecordEntry which 
+         is contained by a logEntry.  Therefore the logId identifies the 
+         logEntry in the logTable and the logRecordId identifies 
+         corresponding logRecordEntry and eventLogRecordEntry.
+         
+         Note that a logRecordEntry can be deleted explicitly by 
+         management.  If the logRecordEntry corresponding to this record 
+         is deleted, this record is also deleted."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         usageMeteringRecord MO."
+    INDEX       { logId, logRecordId }
+    ::= { usageMeteringRecordTable 1 }
+
+UsageMeteringRecordEntry ::= SEQUENCE {
+    usageMeteringRecordAccountableObjectReference   ObjectInstance,
+    usageMeteringRecordUsageInfo                    UsageReportInfo,
+    usageMeteringRecordDataErrors                   PossibleDataErrors,
+    usageMeteringRecordProviderId                   ProviderIdentifier,
+    usageMeteringRecordAuditInfo                    AuditReportInfo
+}
+
+usageMeteringRecordAccountableObjectReference OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         accountableObjectReference attribute."
+    ::= { usageMeteringRecordEntry 1 }
+
+usageMeteringRecordUsageInfo OBJECT-TYPE
+    SYNTAX      UsageReportInfo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 usageInfo 
+         attribute."
+    ::= { usageMeteringRecordEntry 2 }
+
+usageMeteringRecordDataErrors OBJECT-TYPE
+    SYNTAX      PossibleDataErrors
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 dataErrors 
+         attribute."
+    ::= { usageMeteringRecordEntry 3 }
+
+usageMeteringRecordProviderId OBJECT-TYPE
+    SYNTAX      ProviderIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 provideId 
+         attribute."
+    ::= { usageMeteringRecordEntry 4 }
+
+usageMeteringRecordAuditInfo OBJECT-TYPE
+    SYNTAX      AuditReportInfo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute provides the storage for audit information which 
+         is included in the usage metering record in order to enable a 
+         guarantee of completeness of all usage metering data provided"
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 auditInfo 
+         attribute."
+    ::= { usageMeteringRecordEntry 5 }
+
+usageMeteringControlObject OBJECT IDENTIFIER
+    ::= { umcTables 2 }
+
+usageMeteringControlObjectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsageMeteringControlObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "When an instance of usage metering control has been created to 
+         account for usage of a named resource, it controls the 
+         behaviour of related instances of usage metering data through 
+         its reportingTriggers attribute.  These identify the internal 
+         events which will cause a usageReport notification to be 
+         generated within a controlled instance of usage metering data. 
+         The triggers may be time related, e.g. as in the case of time 
+         related units, they may be determined by operations performed 
+         upon the control object e.g.  suspend or resume metering, they 
+         may be determined by the accountable events as described in 
+         8.2.3 or they may be externally specified. When the associated 
+         accountable objects requires no further usage to be metered and 
+         there are no more instances of data objects, the instance of 
+         usage metering control may be deleted."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         usageMeteringControlObject MO."
+    ::= { usageMeteringControlObject 1 }
+
+usageMeteringControlObjectEntry OBJECT-TYPE
+    SYNTAX      UsageMeteringControlObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The usage metering control allows a managing system to: control 
+         the collection of usage data from an accountable object, start 
+         and stop the collection through management operations; identify 
+         which usage data can be collected, and under what circumstances 
+         they are to be reported.
+         
+         Usage metering control specifies the events that will cause 
+         usage metering to be reported.  They include periodic events 
+         makring the passave of time for which a resource is in use and 
+         specified sitimuli relating to other aspects of resource use.  
+         Reporting may also occur as a result of usage metering control 
+         actions.
+         
+         A managed object dedicated to the control of usage metering is 
+         termed a usage metering control object (for short:
+         control object). The generic usage metering control object can 
+         be specialized to form usage metering control object
+         classes for specific resources. Other managed objects, which 
+         also exhibit usage metering control properties can be
+         defined using packages of usage metering control 
+         characteristics.  These objects are formed by using and 
+         specializing the various template definitions provided."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         usageMeteringControlObject MO."
+    INDEX       { controlObjectId }
+    ::= { usageMeteringControlObjectTable 1 }
+
+UsageMeteringControlObjectEntry ::= SEQUENCE {
+    controlObjectId                         SimpleNameType,
+    controlObjectOperationalState           OperationalState,
+    controlObjectReportingTriggers          ReportingTriggers,
+    controlObjectReportingTriggersPeriodic  TimePeriod,
+    controlObjectReportingTriggersInduced   Induced,
+    controlObjectReportingTriggersEvent     ReportingEvent,
+    controlObjectReportingTriggersSimulus   AutonomousType,
+    controlObjectMeteringAction             ActionArgument,
+    controlObjectMeteringResponse           ActionResponse,
+    controlObjectDeniedMeteringAction       DeniedMeteringAction,
+    controlObjectStartNotification          TruthValue,
+    controlObjectControlNotification        TruthValue,
+    controlObjectEntryStatus                RowStatus
+}
+
+controlObjectId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The control object identifier specifies an attribute for naming 
+         the control object."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         controlObjectId attribute."
+    ::= { usageMeteringControlObjectEntry 1 }
+
+controlObjectOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "
+         The operational state is that specified in CCITT Rec. X.731 | 
+         ISO/IEC 10164-2.  It provides an indication of the operability 
+         of the usage metering control.  If different packages 
+         containing the same state attribute are combined into one 
+         object, in which case the resulting object will according to 
+         CCITT Rec. X.720 | ISO/IEC 10165-1 contain only one attribute 
+         of that type, then such a specification shall ensure that the 
+         behaviour of the attribute in the combined object does not 
+         contradict the behaviour of the attribute as specified in any 
+         of the original packages.
+         
+         Corollary: Metering control capabilities can only be included 
+         in the accountable object if the combined objects operational 
+         state can be specified with at most one value, otherwise the 
+         accountable object and the control object shall be specified as 
+         separate objects."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         controlObjectId attribute."
+    ::= { usageMeteringControlObjectEntry 2 }
+
+controlObjectReportingTriggers OBJECT-TYPE
+    SYNTAX      ReportingTriggers
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Given a set of events, which result in some defined activity 
+         with respect to metering of resource usage, the event will lead 
+         either to the update of meter information (recording triggers) 
+         or to the generation of usage report notifications (reporting 
+         triggers).  Triggering events may be of three kinds: initiated 
+         at regular time intervals, induced as the result of a usage 
+         metering action (both locally and externally induced), and 
+         initiated by identified external stimuli.
+         
+         The reporting triggers attribute specifies the events which 
+         will cause usage information to be reported.
+         
+         These events may be of the following kinds:
+         
+         1) Periodically scheduled in time  Typically these are 
+            appropriate when the units of usage are time
+            based or volume based;
+         
+         2) Induced as a result of usage metering action (e.g. upon the 
+            resumption of accounting for usage (see 8.1.4), upon a 
+            change in the operational state of the control object or 
+            upon deletion of a data object;
+         
+         3) Result from an identified external stimulus (e.g. as 
+            specified in an extension to or specialization of the 
+            objects and attributes specified herein)."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         controlObjectId attribute."
+    ::= { usageMeteringControlObjectEntry 3 }
+
+controlObjectReportingTriggersPeriodic OBJECT-TYPE
+    SYNTAX      TimePeriod
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the period of time in centiseconds.  When specified 
+         as zero (0), it indicates that the periodic reporting trigger 
+         is not used."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 ASN.1 
+         ReportingTriggers.TimePeriod."
+    DEFVAL      { 0 }
+    ::= { usageMeteringControlObjectEntry 4 }
+
+controlObjectReportingTriggersInduced OBJECT-TYPE
+    SYNTAX      Induced
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify a set of induced reporting triggers.  The syntax is 
+         set-valued and can contain the following:
+         
+         - start(0), report triggered on start metering action;
+         - suspend(1), report triggered on suspend metering action;
+         - resume(2), report triggered on resume metering action;
+         - delete(3), report triggered on object deletion;
+         - disabled(4), report triggered on disabled operational state;
+         - enabled(5), report triggered on enabled operations state.
+         
+         Not all values are applicable to all controls or referenced 
+         data objects."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 ASN.1 
+         ReportingTriggers.Induced."
+    ::= { usageMeteringControlObjectEntry 5 }
+
+controlObjectReportingTriggersEvent OBJECT-TYPE
+    SYNTAX      ReportingEvent
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify a set of event reporting triggers.  The syntax is 
+         set-valued and can contain the following:
+         
+         - registration(0), registration data is available (e.g.  IAM);
+         - request(1), request data is available (e.g. SAM or ACM);
+         - accept(2), accepting data is available (e.g. on CPG or ANM);
+         - complete(3), terminating data is available (e.g. REL);
+         - corresponding(4), corresponding data is available (e.g. RLC);
+         - bulk(5), bulk data is available (e.g. mid-call long-duration 
+           partial);
+         - interruption(6), interruption data is available (e.g. RST).
+         
+         The applicability of each of these values must be specified by 
+         a specialization, together with the exact semantics of the 
+         values used.
+         
+         NOTE  All of events from 8.2.3 have been included in this 
+         enumerated type for the sake of completeness. It does not imply 
+         that specializations need to assign semantics to all of them. 
+         In particular the values corresponding(4) and bulk(5) may not 
+         be required in certain specializations."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 ASN.1 
+         ReportingEvent."
+    DEFVAL      { {} }
+    ::= { usageMeteringControlObjectEntry 6 }
+
+controlObjectReportingTriggersSimulus OBJECT-TYPE
+    SYNTAX      AutonomousType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify a reporting trigger based on an identified stimuls.  
+         The syntax is an object identifier that identifies the external 
+         stimulus.  This vaule is read-only after creation.  That is, to 
+         change this value the entry status must not be in the inService 
+         state."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 ASN.1 
+         ReportingTrigger.stimulus."
+    ::= { usageMeteringControlObjectEntry 7 }
+
+controlObjectMeteringAction OBJECT-TYPE
+    SYNTAX      ActionArgument
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column provides an action object.  By writing start(2), 
+         suspend(3) or resume(1) to this object, a management station 
+         explicitly requests a startMetering, suspendMetering or 
+         resumeMetering action on all data objects referenced by this 
+         control object.  The response can be obtained by reading the 
+         controlObjectMeteringResponse and, if the action failed, the 
+         controlObjectDeniedMeteringAction column."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         startMetering, suspendMetering, resumeMetering actions."
+    ::= { usageMeteringControlObjectEntry 8 }
+
+controlObjectMeteringResponse OBJECT-TYPE
+    SYNTAX      ActionResponse
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This column provides an overall response to a metering action 
+         effected by writing to the controlObjectMeteringAction column.  
+         
+         If the action response contains success(0), it indicates that 
+         the action was successful for some data object; failed(1), the 
+         action failed for some data object; indeterminate(2),  the 
+         action was indeterminate for some data object.
+         
+         The dataObjectReferenceMeteringResponse can be examined for 
+         each data object to determine the specific response for that 
+         data object."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         startMetering, suspendMetering, resumeMetering actions."
+    ::= { usageMeteringControlObjectEntry 9 }
+
+controlObjectDeniedMeteringAction OBJECT-TYPE
+    SYNTAX      DeniedMeteringAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This error is returned if the usage metering control object 
+         received a request to start metering or suspend metering or 
+         resume metering for some data object that has the value of 
+         terminating for the procedural status.
+         
+         The dataObjectReferenceDeniedMeteringAction can be examined for 
+         each data object to determine the specific error for that 
+         object."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         deniedMeteringAction parameter."
+    ::= { usageMeteringControlObjectEntry 10 }
+
+controlObjectStartNotification OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to true(1) if there is a requirement to advise managers 
+         other than the one generating the action of the outcome of the 
+         action and meteringStart package is supported.  This has the 
+         same effect as incluing the startNotification package.
+         
+         If the data objects do not support the start action, the 
+         setting of this object is ignored and will always read 
+         false(2).  When data objects support the start action, and an 
+         action is performed by writing start(2) to the 
+         controlObjectMeteringAction or the 
+         dataObjectReferenceMeterincAction columns, a meteringStart 
+         notification is issued."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         startNotification package."
+    ::= { usageMeteringControlObjectEntry 11 }
+
+controlObjectControlNotification OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to true(1) if there is a requirement to advise managers 
+         other than the one generating the action of the outcome of the 
+         action and the meteringControl package is supported.  This has 
+         the same effect as including the controlNotification package.
+         
+         If the data objects do not support the suspend and resume 
+         actions, the setting of this object is ignored and will always 
+         read false(2).  When data objects support the suspend and 
+         resume actions, and an action is performed by writing 
+         suspend(3) or resume(1) to the controlObjectMeteringAction, or 
+         the dataObjectReferenceMeteringAction, columns a 
+         meteringSuspend or meteringResume notification is issued."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         controlNotification package."
+    ::= { usageMeteringControlObjectEntry 12 }
+
+controlObjectEntryStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may explicitly 
+         create and delete entries in this table."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         usageMeteringControlObject-system NB.
+         STD 58, SNMPv2-TC, RowStatus."
+    ::= { usageMeteringControlObjectEntry 13 }
+
+accountableObjectsReference OBJECT IDENTIFIER
+    ::= { umcTables 3 }
+
+accountableObjectsReferenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AccountableObjectsReferenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table is a side table of a usageMeteringControlobjectEntry 
+         that provide the accountableObjectsReferenceList."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         accountableObjectsReferenceList attribute."
+    ::= { accountableObjectsReference 1 }
+
+accountableObjectsReferenceEntry OBJECT-TYPE
+    SYNTAX      AccountableObjectsReferenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The accountable object reference list is a read-only, set 
+         valued attribute whose values reference the accountable objects 
+         for which usage control is provided. This attribute is settable 
+         at creation time."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         accountableObjectsReferenceList attribute."
+    INDEX       { controlObjectId, accoutableObjectReferenced }
+    ::= { accountableObjectsReferenceTable 1 }
+
+AccountableObjectsReferenceEntry ::= SEQUENCE {
+    accoutableObjectReferenced              ObjectInstance,
+    accountableObjectReferenceEntryStatus   RowStatus
+}
+
+accoutableObjectReferenced OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a reference to an accountable object as an index into 
+         this table.  Accountable objects whose object instance 
+         identifiers appear in this table belong to the 
+         accoutableObjectsReferenceList for the indexed control object."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         accountableObjectsReferenceList attribute."
+    ::= { accountableObjectsReferenceEntry 1 }
+
+accountableObjectReferenceEntryStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete entries from this table.  Creation of entries 
+         effectively adds the entries to the 
+         accountableObjectsReferencedList, deleting entries deletes the 
+         objects from the list."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         accountableObjectsReferenceList attribute.
+         STD 58, SNMPv2-TC RowStatus."
+    ::= { accountableObjectsReferenceEntry 2 }
+
+dataObjectsReference OBJECT IDENTIFIER
+    ::= { umcTables 4 }
+
+dataObjectsReferenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DataObjectsReferenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table is a side table of a usageMeteringControlobjectEntry 
+         that provide the dataObjectsReferenceList."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         dataObjectsReferenceList attribute."
+    ::= { dataObjectsReference 1 }
+
+dataObjectsReferenceEntry OBJECT-TYPE
+    SYNTAX      DataObjectsReferenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The data object reference list is a read-only, set valued 
+         attribute whose values reference the data objects for which 
+         usage control is provided. It is a property of the system 
+         implementing the data object reference list that it shall be 
+         capable of introducing a new value into the set upon the 
+         creation of a new data object and of removing a value from the 
+         set upon the deletion of a data object."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         dataObjectsReferenceList attribute."
+    INDEX       { controlObjectId, dataObjectReferenced }
+    ::= { dataObjectsReferenceTable 1 }
+
+DataObjectsReferenceEntry ::= SEQUENCE {
+    dataObjectReferenced                        ObjectInstance,
+    dataObjectReferenceMeteringAction           ActionArgument,
+    dataObjectReferenceMeteringResponse         ActionResponse,
+    dataObjectReferenceDeniedMeteringAction     DeniedMeteringAction
+}
+
+dataObjectReferenced OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a reference to a data object as an index into this 
+         table.  Data objects whose object instance identifiers appear 
+         in this table belong to the dataObjectsReferenceList for the 
+         indexed control object."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         dataObjectsReferenceList attribute."
+    ::= { dataObjectsReferenceEntry 1 }
+
+dataObjectReferenceMeteringAction OBJECT-TYPE
+    SYNTAX      ActionArgument
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby actions can be performed on this 
+         data object.  By writing start(2), suspend(3) or resume(1) to 
+         this object, management station explicitly requests a 
+         startMetering, suspendMetering or resumeMetering action on the 
+         data object indexed by this entry.  The response can be 
+         obtained by reading the dataObjectMeteringResponse and, if the 
+         action failed, the dataObjectDeniedMeteringAction columns of 
+         this entry."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         startMetering, suspendMetering, resumeMetering actions."
+    ::= { dataObjectsReferenceEntry 2 }
+
+dataObjectReferenceMeteringResponse OBJECT-TYPE
+    SYNTAX      ActionResponse
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This column provides the data object specific response to a 
+         metering action effected by writing to the 
+         controlObjectMeteringAction column of the control object, or to 
+         the dataObjectReferenceMeteringAction column of this entry.
+         
+         If the action response contains success(0), it indicates that 
+         the action was successfor for this data object; failed(1), the 
+         action failed for this data object; indeterminate(2), the 
+         action was indeterminate for this data object.  Only one value 
+         will be present."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         startMetering, suspendMetering, resumeMetering actions."
+    ::= { dataObjectsReferenceEntry 3 }
+
+dataObjectReferenceDeniedMeteringAction OBJECT-TYPE
+    SYNTAX      DeniedMeteringAction
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This error is returned if the usage metering control object 
+         received a request to start metering or suspend metering or 
+         resume metering for this data object and the data object had 
+         the value of terminating for its procedural status."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         deniedMeteringAction parameter."
+    ::= { dataObjectsReferenceEntry 4 }
+
+usageMeteringDataObject OBJECT IDENTIFIER
+    ::= { umcTables 5 }
+
+usageMeteringDataObjectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsageMeteringDataObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The data object reports usage metering data when triggered by 
+         or on the occurrence of events identified in the 
+         reportingTriggers attribute in the associated control object"
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         usageMeteringDataObject MO."
+    ::= { usageMeteringDataObject 1 }
+
+usageMeteringDataObjectEntry OBJECT-TYPE
+    SYNTAX      UsageMeteringDataObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "
+         Usage metering data represent the accounted use of a resource. 
+         They contain information identifying the user, the service
+         being provided, a measure of the quantity used together with 
+         other qualifying data.
+         
+         Usage data relating to an accountable object can be obtained:
+         
+         a) by the inclusion of usage metering data parameters in a 
+            usage metering defined notification;
+         
+         b) by the use of the GET operation to get corresponding meter 
+            data attribute values.
+         
+         A notification containing usage data is obtained on a 
+         predefined basis by identifying triggering events. Triggering 
+         events are represented as part of usage metering control.
+         
+         A managed object dedicated to the provision of accounting 
+         management data is termed a usage metering data object (for
+         short: data object). The generic data object can be specialized 
+         to form data object classes for specific resources. Other
+         managed objects, which also exhibit usage metering properties 
+         can be defined using packages of usage metering
+         characteristics. These objects are formed by using and 
+         specializing the various template definitions provided by this
+         Recommendation | International Standard. Only the generic 
+         behaviour of these properties is defined in this
+         Recommendation | International Standard. An object providing 
+         usage metering data shall be specified to include the
+         identity of the user (see Table 2 in 8.2.3.1) and possibly 
+         other attributes relating to the instance of use that is being
+         metered."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         usageMeteringDataObject MO."
+    INDEX       { dataObjectId }
+    ::= { usageMeteringDataObjectTable 1 }
+
+UsageMeteringDataObjectEntry ::= SEQUENCE {
+    dataObjectId                            SimpleNameType,
+    dataObjectAccountableObjectReference    ObjectInstance,
+    dataObjectUsageInfo                     UsageReportInfo,
+    dataObjectDataErrors                    PossibleDataErrors,
+    dataObjectProviderId                    ProviderIdentifier,
+    dataObjectControlStatus                 ControlStatus,
+    dataObjectProceduralStatus              ProceduralStatus,
+    dataObjectAuditInfo                     AuditReportInfo
+}
+
+dataObjectId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 dataObjectId 
+         attribute."
+    ::= { usageMeteringDataObjectEntry 1 }
+
+dataObjectAccountableObjectReference OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         accountableObjectReference attribute."
+    ::= { usageMeteringDataObjectEntry 2 }
+
+dataObjectUsageInfo OBJECT-TYPE
+    SYNTAX      UsageReportInfo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 usageInfo 
+         attribute."
+    ::= { usageMeteringDataObjectEntry 3 }
+
+dataObjectDataErrors OBJECT-TYPE
+    SYNTAX      PossibleDataErrors
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 dataErrors 
+         attribute."
+    ::= { usageMeteringDataObjectEntry 4 }
+
+dataObjectProviderId OBJECT-TYPE
+    SYNTAX      ProviderIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 providerId 
+         attribute."
+    ::= { usageMeteringDataObjectEntry 5 }
+
+dataObjectControlStatus OBJECT-TYPE
+    SYNTAX      ControlStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If the data meter is in a suspended condition, the control 
+         status takes the value suspended. This status value is removed 
+         when the data object is carrying out usage metering after being 
+         started or resumed. When a request is made (either explicitly 
+         or implicitly) for the data object to be deleted and, where the 
+         reporting triggers specify that this is a situation which will 
+         lead to a usage report notification, the data object shall take 
+         a procedural status value of terminating until the required 
+         notification has been generated"
+    REFERENCE   
+        "ITU-T Rec. X.721 | ISO/IEC 10165-2 controlStatus attribute."
+    ::= { usageMeteringDataObjectEntry 6 }
+
+dataObjectProceduralStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If the data meter is in a suspended condition, the control 
+         status takes the value suspended. This status value is removed 
+         when the data object is carrying out usage metering after being 
+         started or resumed. When a request is made (either explicitly 
+         or implicitly) for the data object to be deleted and, where the 
+         reporting triggers specify that this is a situation which will 
+         lead to a usage report notification, the data object shall take 
+         a procedural status value of terminating until the required 
+         notification has been generated"
+    REFERENCE   
+        "ITU-T Rec. X.721 | ISO/IEC 10165-2 proceduralStatus attribute."
+    ::= { usageMeteringDataObjectEntry 7 }
+
+dataObjectAuditInfo OBJECT-TYPE
+    SYNTAX      AuditReportInfo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 auditInfo 
+         attribute."
+    ::= { usageMeteringDataObjectEntry 8 }
+
+umcNotifs OBJECT IDENTIFIER
+    ::= { umcObjects 3 }
+
+accountableObjectReference OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides a reference to an accountable object instances for use 
+         in notifications.  This object is used both to include a single 
+         accountable object reference in the notification as well as 
+         placed multiply in the notification to indicate the accountable 
+         reference objects list."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         accountableObjectReference."
+    ::= { umcNotifs 1 }
+
+notificationCause OBJECT-TYPE
+    SYNTAX      ReportingTriggers
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the cause of a notification by 
+         identifying the trigger that generated the report.  This object 
+         must be followed by one of the notificationCausePeriodic, 
+         notificationCause"
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         notificationCause."
+    ::= { umcNotifs 2 }
+
+notificationCausePeriodic OBJECT-TYPE
+    SYNTAX      TimePeriod
+    UNITS       "seconds"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When notificationCause contains periodic, this object is 
+         included in the notification following the notificationCause."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         notificationCause."
+    ::= { umcNotifs 3 }
+
+notificationCauseInduced OBJECT-TYPE
+    SYNTAX      Induced
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When notificationCause contains induced, this object is 
+         included in the notification following the notificationCause."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         notificationCause."
+    ::= { umcNotifs 4 }
+
+notificationCauseEvent OBJECT-TYPE
+    SYNTAX      ReportingEvent
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When notificationCause contains event, this object is included 
+         in the notification following the notificationCause."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         notificationCause."
+    ::= { umcNotifs 5 }
+
+notificationCauseSimulus OBJECT-TYPE
+    SYNTAX      AutonomousType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When notificationCause contains stimulus, this object is 
+         included in the notification following the notificationCause."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         notificationCause."
+    ::= { umcNotifs 6 }
+
+reportingTriggers OBJECT-TYPE
+    SYNTAX      ReportingTriggers
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the cause of a notification by 
+         identifying the trigger that generated the report.  This object 
+         must be followed by one of the reportingTriggersPeriodic, 
+         reportingTriggers"
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         reportingTriggers."
+    ::= { umcNotifs 7 }
+
+reportingTriggersPeriodic OBJECT-TYPE
+    SYNTAX      TimePeriod
+    UNITS       "seconds"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When reportingTriggers contains periodic, this object is 
+         included in the notification following the reportingTriggers."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         reportingTriggers."
+    ::= { umcNotifs 8 }
+
+reportingTriggersInduced OBJECT-TYPE
+    SYNTAX      Induced
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When reportingTriggers contains induced, this object is 
+         included in the notification following the reportingTriggers."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         reportingTriggers."
+    ::= { umcNotifs 9 }
+
+reportingTriggersEvent OBJECT-TYPE
+    SYNTAX      ReportingEvent
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When reportingTriggers contains event, this object is included 
+         in the notification following the reportingTriggers."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         reportingTriggers."
+    ::= { umcNotifs 10 }
+
+reportingTriggersSimulus OBJECT-TYPE
+    SYNTAX      AutonomousType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "When reportingTriggers contains stimulus, this object is 
+         included in the notification following the reportingTriggers."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         reportingTriggers."
+    ::= { umcNotifs 11 }
+
+usageInfo OBJECT-TYPE
+    SYNTAX      UsageReportInfo
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the usageReport notification."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 usageInfo."
+    ::= { umcNotifs 12 }
+
+auditInfo OBJECT-TYPE
+    SYNTAX      AuditReportInfo
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides and object for use in the usageReport notification."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 auditInfo."
+    ::= { umcNotifs 13 }
+
+dataErrors OBJECT-TYPE
+    SYNTAX      PossibleDataErrors
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the usageReport notification."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 dataErrors."
+    ::= { umcNotifs 14 }
+
+providerId OBJECT-TYPE
+    SYNTAX      ProviderIdentifier
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the usageReport notification."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 providerId."
+    ::= { umcNotifs 15 }
+
+actionResponse OBJECT-TYPE
+    SYNTAX      ActionResponse
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the meteringResumed, 
+         meteringStarted and meteringSuspended notifications.
+         
+         When success(0) is included in the set-value the object should 
+         be followed by one or more actionResponseSuccess objects 
+         indicating the data objects for which the action was 
+         successful.
+         
+         When failed(1) is included in the set-value the object should 
+         be followed by one or more actionResponseFailed objects 
+         indicating the data objects for which the action failed.
+         
+         When indeterminate(2) is included in the set-value the object 
+         should be followed by one or more actionResponseIndeterminate 
+         objects indicating the data objects for which the action was 
+         indereminate."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         actionResponse."
+    ::= { umcNotifs 17 }
+
+actionResponseSuccess OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the meteringResumed, 
+         meteringStarted and meteringSuspended notifications."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         ActionResponse.success."
+    ::= { umcNotifs 18 }
+
+actionResponseFailed OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the meteringResumed, 
+         meteringStarted and meteringSuspended notifications."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         ActionResponse.failed."
+    ::= { umcNotifs 19 }
+
+actionResponseIndeterminate OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the meteringResumed, 
+         meteringStarted and meteringSuspended notifications."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         ActionResponse.indeterminate."
+    ::= { umcNotifs 20 }
+
+dataObjectReference OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides an object for use in the meteringResumed, 
+         meteringStarted and meteringSuspended notifications.  This 
+         object is placed one or more times in the notification to 
+         provide the data objects reference list."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         dataObjectsReferenceList attribute."
+    ::= { umcNotifs 21 }
+
+umcOids OBJECT IDENTIFIER
+    ::= { umcObjects 4 }
+
+umcConformance OBJECT IDENTIFIER
+    ::= { umcMIB 2 }
+
+umcCompliances OBJECT IDENTIFIER
+    ::= { umcConformance 1 }
+
+umcGroups OBJECT IDENTIFIER
+    ::= { umcConformance 2 }
+
+usageReport NOTIFICATION-TYPE
+    OBJECTS     { accountableObjectReference, notificationCause, 
+                  usageInfo, dataErrors }
+    STATUS      current
+    DESCRIPTION 
+        "On the occurrence of an event specified by the reporting 
+         triggers attribute within an object containing usage metering 
+         control or the usage metering control object, the usage 
+         metering data objects or the objects which contain a 
+         meteringDataInfo package, generates a usageReport notification. 
+         The notification cause field of the usageReport notification 
+         service supplies the value of the reportingTriggers attribute 
+         which caused the notification to occur.
+         
+         The usageMeterTime is the current time if metering of usage is 
+         taking place. If metering of usage has been suspended or the 
+         instance of usage metering data has been deleted, then the 
+         usageMeterTime value is the usageStoppedTime.
+         
+         Given a set of events, which result in some defined activity 
+         with respect to metering of resource usage, the event will lead 
+         either to the update of meter information (recording triggers) 
+         or to the generation of usage report notifications (reporting 
+         triggers).  Triggering events may be of three kinds: initiated 
+         at regular time intervals, induced as the result of a usage 
+         metering action (both locally and externally induced), and 
+         initiated by identified external stimuli.
+         
+         When notificationCause contains periodic, the 
+         notificationCausePeriodic object must be added to the 
+         notification; induced, notificationCauseInduced; event, 
+         notificationCauseEvent; and, stimulus, 
+         notificationCauseStimulus."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 usageReport 
+         N."
+    ::= { umcNotifications 1 }
+
+meteringResumed NOTIFICATION-TYPE
+    OBJECTS     { actionResponse }
+    STATUS      current
+    DESCRIPTION 
+        "A meteringResumed notification is generated when the resume 
+         action completes without error.
+         
+         When the mandatory actionResponse contains success, one or more 
+         actionResponseSuccess objects must be included following the 
+         actionResponse object to indicate the referenced data object 
+         for which the action was successful; failed, one or more 
+         actionResponseFailed objects; and, indeterminate, one or more 
+         actionResponseIdeterminate objects.
+         
+         When the objectional reportingTriggers object is included and 
+         contains periodic, the reportingTriggersPeriodic object must be 
+         included following the reportingTriggers object; induced, 
+         reportingTriggersInduced; event, reportingTriggersEvent; and, 
+         stimulus, reportingTriggersStimulus.
+         
+         Multiple accountableObjectReference objects can be included to 
+         represent the optional accountable objects reference list.
+         
+         Multiple dataObjectReference objects canbe included to 
+         represent the optional data objects referenced list."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         meteringResumed N."
+    ::= { umcNotifications 2 }
+
+meteringStarted NOTIFICATION-TYPE
+    OBJECTS     { actionResponse }
+    STATUS      current
+    DESCRIPTION 
+        "A meteringStarted notification is generated when the start 
+         action completes without error.
+         
+         When the mandatory actionResponse contains success, one or more 
+         actionResponseSuccess objects must be included following the 
+         actionResponse object to indicate the referenced data object 
+         for which the action was successful; failed, one or more 
+         actionResponseFailed objects; and, indeterminate, one or more 
+         actionResponseIdeterminate objects.
+         
+         When the objectional reportingTriggers object is included and 
+         contains periodic, the reportingTriggersPeriodic object must be 
+         included following the reportingTriggers object; induced, 
+         reportingTriggersInduced; event, reportingTriggersEvent; and, 
+         stimulus, reportingTriggersStimulus.
+         
+         Multiple accountableObjectReference objects can be included to 
+         represent the optional accountable objects reference list.
+         
+         Multiple dataObjectReference objects canbe included to 
+         represent the optional data objects referenced list."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         meteringStarted N."
+    ::= { umcNotifications 3 }
+
+meteringSuspended NOTIFICATION-TYPE
+    OBJECTS     { actionResponse }
+    STATUS      current
+    DESCRIPTION 
+        "A meteringSuspended notification is generated when the suspend 
+         action completes without error.
+         
+         When the mandatory actionResponse contains success, one or more 
+         actionResponseSuccess objects must be included following the 
+         actionResponse object to indicate the referenced data object 
+         for which the action was successful; failed, one or more 
+         actionResponseFailed objects; and, indeterminate, one or more 
+         actionResponseIdeterminate objects.
+         
+         When the objectional reportingTriggers object is included and 
+         contains periodic, the reportingTriggersPeriodic object must be 
+         included following the reportingTriggers object; induced, 
+         reportingTriggersInduced; event, reportingTriggersEvent; and, 
+         stimulus, reportingTriggersStimulus.
+         
+         Multiple accountableObjectReference objects can be included to 
+         represent the optional accountable objects reference list.
+         
+         Multiple dataObjectReference objects canbe included to 
+         represent the optional data objects referenced list."
+    REFERENCE   
+        "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995 
+         meteringSuspended N."
+    ::= { umcNotifications 4 }
+
+umcParameterGroup OBJECT-GROUP
+    OBJECTS     { accountableObjectReference, notificationCause, 
+                  notificationCausePeriodic, notificationCauseInduced, 
+                  notificationCauseEvent, notificationCauseSimulus, 
+                  reportingTriggers, reportingTriggersPeriodic, 
+                  reportingTriggersInduced, reportingTriggersEvent, 
+                  reportingTriggersSimulus, usageInfo, auditInfo, 
+                  dataErrors, providerId, actionResponse, 
+                  actionResponseSuccess, actionResponseFailed, 
+                  actionResponseIndeterminate, dataObjectReference }
+    STATUS      current
+    DESCRIPTION 
+        "The parameter group."
+    ::= { umcGroups 1 }
+
+umcNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { usageReport, meteringResumed, meteringStarted, 
+                  meteringSuspended }
+    STATUS      current
+    DESCRIPTION 
+        "The notifications."
+    ::= { umcGroups 2 }
+
+umcUsageMeteringRecordGroup OBJECT-GROUP
+    OBJECTS     { usageMeteringRecordAccountableObjectReference, 
+                  usageMeteringRecordUsageInfo, 
+                  usageMeteringRecordDataErrors, 
+                  usageMeteringRecordProviderId, 
+                  usageMeteringRecordAuditInfo }
+    STATUS      current
+    DESCRIPTION 
+        "The usage metering record group."
+    ::= { umcGroups 3 }
+
+umcControlObjectGroup OBJECT-GROUP
+    OBJECTS     { controlObjectOperationalState, 
+                  controlObjectReportingTriggers, 
+                  controlObjectReportingTriggersPeriodic, 
+                  controlObjectReportingTriggersInduced, 
+                  controlObjectReportingTriggersEvent, 
+                  controlObjectReportingTriggersSimulus, 
+                  controlObjectMeteringAction, 
+                  controlObjectMeteringResponse, 
+                  controlObjectDeniedMeteringAction, 
+                  controlObjectStartNotification, 
+                  controlObjectControlNotification, 
+                  controlObjectEntryStatus, 
+                  accountableObjectReferenceEntryStatus }
+    STATUS      current
+    DESCRIPTION 
+        "The control object group."
+    ::= { umcGroups 4 }
+
+umcDataObjectGroup OBJECT-GROUP
+    OBJECTS     { dataObjectReferenceMeteringAction, 
+                  dataObjectReferenceMeteringResponse, 
+                  dataObjectReferenceDeniedMeteringAction, 
+                  dataObjectAccountableObjectReference, 
+                  dataObjectUsageInfo, dataObjectDataErrors, 
+                  dataObjectProviderId, dataObjectControlStatus, 
+                  dataObjectProceduralStatus, dataObjectAuditInfo }
+    STATUS      current
+    DESCRIPTION 
+        "The data object group."
+    ::= { umcGroups 5 }
+
+umcCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the UMC MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { umcUsageMeteringRecordGroup, 
+                  umcControlObjectGroup, umcDataObjectGroup }
+
+        GROUP   umcNotificationGroup
+        DESCRIPTION   
+              "Necessary for notifications."
+
+        GROUP   umcParameterGroup
+        DESCRIPTION   
+              "Necessary for notifications."
+
+    ::= { umcCompliances 1 }
+
+END -- end of module OPENSS7-UMC-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:-,\f\b\:· fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

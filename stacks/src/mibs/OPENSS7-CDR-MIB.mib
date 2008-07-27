@@ -1,0 +1,3230 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-CDR-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/04/29 07:11:21 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2008/04/29 07:11:21 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-CDR-MIB.mib,v $
+-- Revision 0.9.2.4  2008/04/29 07:11:21  brian
+-- - updating headers for release
+--
+-- Revision 0.9.2.3  2008/01/14 16:55:12  brian
+-- - updated mibs
+--
+-- Revision 0.9.2.2  2008/01/13 00:12:53  brian
+-- - added updated CDR mib
+--
+-- Revision 0.9.2.1  2008/01/10 19:55:42  brian
+-- - updating mibs
+--
+-- =============================================================================
+
+OPENSS7-CDR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, TEXTUAL-CONVENTION,
+    enterprises
+	FROM SNMPv2-SMI
+    RowStatus, StorageType
+	FROM SNMPv2-TC
+    NetworkPointCode
+	FROM OPENSS7-SS7-TC
+    SimpleNameType, logId, logRecordId
+	FROM OPENSS7-SMI-MIB
+    controlObjectId
+	FROM OPENSS7-UMC-MIB
+    openss7
+	FROM OPENSS7-SMI;
+
+cdrMIB MODULE-IDENTITY
+    LAST-UPDATED
+	"200801071554Z"
+    ORGANIZATION
+	"The OpenSS7 Project"
+    CONTACT-INFO
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Edmonton, Alberta T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 E-mail: bidulock@openss7.org"
+    DESCRIPTION
+	"This is a basic MIB module providing definitions of objects 
+	 based on ITU-T Rec. Q.825 (1998)."
+    ::= { openss7Q 825 }
+
+-- top level organization of the MIB
+
+cdrNotifications		OBJECT IDENTIFIER ::= { cdrMIB		 0 }
+cdrScalars			OBJECT IDENTIFIER ::= { cdrMIB		 1 }
+cdrTables			OBJECT IDENTIFIER ::= { cdrMIB		 2 }
+cdrConformance			OBJECT IDENTIFIER ::= { cdrMIB		 3 }
+
+blockGeneratingLog		OBJECT IDENTIFIER ::= { cdrTables	 1 }
+callDetailData			OBJECT IDENTIFIER ::= { cdrTables  	 2 }
+callDetailLogRecord		OBJECT IDENTIFIER ::= { cdrTables	 3 }
+fileGeneratingLog		OBJECT IDENTIFIER ::= { cdrTables	 4 }
+simpleUsageMeteringControl	OBJECT IDENTIFIER ::= { cdrTables	 5 }
+configurableSimpleUsageMeteringControl OBJECT IDENTIFIER ::= { cdrTables 6 }
+
+cdrCompliances			OBJECT IDENTIFIER ::= { cdrConformance   1 }
+cdrGroups			OBJECT IDENTIFIER ::= { cdrConformance   2 }
+
+-- (1.3.5.1.4.1.29591.17.825) crdMIB
+-- |__(0) cdrNotifications
+-- |  |__( 1) blockRecordNotification
+-- |  |__( 2) callDetailRecordNotification
+-- |  |__( 3) fileCreationNotification
+-- |
+-- |__(1) cdrScalars
+-- |  |__( 1) fileName
+-- |  |__( 2) reasonForOutput
+-- |  |__( 3) sequenceNumber
+-- |
+-- |__(2) cdrTables
+-- |  |__(1) blockGeneratingLog
+-- |  |  |__(1) blockGeneratingLogTable
+-- |  |     |__(1) blockGeneratingLogEntry
+-- |  |        |__( 1) blockGeneratingLogMaxBlockSize
+-- |  |        |__( 2) blockGeneratingLogMaxTimeInterval
+-- |  |        |__( 3) blockGeneratingLogStorageType
+-- |  |        |__( 4) blockGeneratingLogRowStatus
+-- |  |
+-- |  |__(2) callDetailData
+-- |  |  |__(1) callDetailDataTable
+-- |  |     |__(1) callDetailDataEntry
+-- |  |        |__( 1) callDetailDataId
+-- |  |
+-- |  |__(3) callDetailLogRecord
+-- |  |  |__(1) callDetailLogRecordTable
+-- |  |     |__(1) callDetailLogRecordEntry
+-- |  |        |__( 1) networkProviderId
+-- |  |        |__( 2) recordType
+-- |  |        |__( 3) seizureTime
+-- |  |        |__( 4) answerTime
+-- |  |        |__( 5) partialTime
+-- |  |        |__( 6) eventTime
+-- |  |        |__( 7) callingPartyNumber
+-- |  |        |__( 8) calledPartyNumber
+-- |  |        |__( 9) redirectingNumber
+-- |  |        |__(10) redirectionNumber
+-- |  |        |__(11) originalCalledNumber
+-- |  |        |__(12) callingPartyNumberNotScreened
+-- |  |        |__(13) operatorSpecific1Number
+-- |  |        |__(14) operatorSpecific2Number
+-- |  |        |__(15) operatorSpecific3Number
+-- |  |        |__(16) bearerService
+-- |  |        |__(17) serviceUser
+-- |  |        |__(18) callIdentificationNumber
+-- |  |        |__(19) supplementaryServices
+-- |  |        |__(20) immediateNotificationForUsageMetering
+-- |  |        |__(21) cause
+-- |  |        |__(22) personalUserId
+-- |  |        |__(23) chargedParticipant
+-- |  |        |__(24) chargedDirectoryNumber
+-- |  |        |__(25) percentageToBeBilled
+-- |  |        |__(26) accountCodeInput
+-- |  |        |__(27) iNServiceCode
+-- |  |        |__(28) queueTimeStamp
+-- |  |        |__(29) queueDuration
+-- |  |        |__(30) serviceSpecificINInformation
+-- |  |        |__(31) partialRecordNumber
+-- |  |        |__(32) partialRecordReason
+-- |  |        |__(33) exchangeInfo
+-- |  |        |__(34) relatedCallNumber
+-- |  |        |__(35) cDRPurpose
+-- |  |        |__(36) physicalLineCode
+-- |  |        |__(37) receivedDigits
+-- |  |        |__(38) operatorSpecific1AdditionalNumber
+-- |  |        |__(39) operatorSpecific2AdditionalNumber
+-- |  |        |__(40) operatorSpecific3AdditionalNumber
+-- |  |        |__(41) callingPartyCategory
+-- |  |        |__(42) callingPartyType
+-- |  |        |__(43) chargingInformation
+-- |  |        |__(44) progress
+-- |  |        |__(45) accessDelivery
+-- |  |        |__(46) trunkGroupOutgoing
+-- |  |        |__(47) trunkGroupIncoming
+-- |  |        |__(48) fallbackBearerService
+-- |  |        |__(49) teleservice
+-- |  |        |__(50) conversationTime
+-- |  |        |__(51) durationTimeACM
+-- |  |        |__(52) durationTimeBAnswer
+-- |  |        |__(53) durationTimeNoBAnswer
+-- |  |        |__(54) uUInfo
+-- |  |        |__(55) standardExtensions
+-- |  |        |__(56) recordExtensions
+-- |  |        |__(57) bPartyCategory
+-- |  |        |__(58) iSUPPreferred
+-- |  |        |__(59) networkManagementControls
+-- |  |        |__(60) glare
+-- |  |        |__(61) recordId
+-- |  |        |__(62) dataValidity
+-- |  |        |__(63) callStatus
+-- |  |        |__(64) carrierId
+-- |  |        |__(65) dPC
+-- |  |        |__(66) oPC
+-- |  |
+-- |  |__(4) fileGeneratingLog
+-- |  |  |__(1) fileGeneratingLogTable
+-- |  |     |__(1) fileGeneratingLogEntry
+-- |  |        |__( 1) timesOfDay
+-- |  |        |__( 2) periodicTrigger
+-- |  |        |__( 3) fileGeneratingLogStorageType
+-- |  |        |__( 4) fileGeneratingLogEntryStatus
+-- |  |
+-- |  |__(5) simpleUsageMeteringControl
+-- |  |  |__(1) simpleUsageMeteringControlTable
+-- |  |     |__(1) simpleUsageMeteringControlEntry
+-- |  |        |__( 1) creationTriggerList
+-- |  |        |__( 2) simpleUsageMeteringControlEntryStatus
+-- |  |
+-- |  |__(6) configurableSimpleUsageMeteringControl
+-- |     |__(1) configurableSimpleUsageMeteringControlTable
+-- |        |__(1) configurableSimpleUsageMeteringControlEntry
+-- |           |__( 1) samplingRate
+-- |           |__( 2) configurationMask
+-- |           |__( 3) configurableSimpleUsgeMeteringControlEntryStatus
+-- |
+-- |__(3) cdrConformance
+--    |__(1) cdrComplicances
+--    |__(2) cdrGroups
+
+-- =============================================================================
+
+FileName ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Name of a file.  This should be the name of a file, possibly 
+	 including the complete path to the file on the managed system, 
+	 limited to 128 characters."
+    SYNTAX OCTET STRING(SIZE(1..128))
+
+ReasonForOutput ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Specifies the reason for output of a record, block or 
+	 generation of a file.  This may be one of:
+
+	 - absoluteTimeEvent(0), file was generated because the rotation 
+	   time was reached;
+
+	 - maxBlockSizeReached(1), block was generated as a result of 
+	   the maximum block size being reached on a blockGeneratingLog;
+
+	 - maxTimeIntervalElapsed(2), block was generated as a result of 
+	   the maimum time interval elapsing on a blockGeneratingLog;
+
+	 - internalSizeLimitReached(3), block or file was generated as a 
+	   result of internal size limitations;
+
+	 - oSAction(4), block or file was generated at the request of 
+	   the operations management."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.ReasonForOutput."
+    SYNTAX INTEGER {
+	absoluteTimeEvent(0),
+	maxBlockSizeReached(1),
+	maxTimeIntervalElapsed(2),
+	internalSizeLimitReached(3),
+	oSAction(4) }
+
+RecordType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the type of CRD record.  The type 
+	 can be one of the following values:
+
+	 - call(0), the CDR record is a call record;
+	 - supplServiceInputRecord(1), the CDR record is a supplementary 
+	   service input record."
+    REFERENCE
+	"ITU-T Rec. Q.825, Q825-CDR-ASN1Module.RecordType."
+    SYNTAX INTEGER {
+	call(0),
+	supplServiceInputRecord(1) }
+
+StartTimeStamp ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The first octet of the 8 octet string represents the type of 
+	 timestamp as follows:
+
+	 - answerTime(0),
+	 - seizureTime(1),
+	 - partialTime(2),
+	 - eventTime(3),
+
+	 For call records, a choice between seizure time or answer time 
+	 is dependent on the occurence of B-answer (ANM).  Partial time 
+	 is used for partial records.
+
+	 The remaining octets are coded YYMMDDHHmmSSCC (Year, Month, 
+	 Day, Hour, Minute, Second, Centisecond), each field one digit, 
+	 two digits per octet, the digits 0 through 9 encoded as '0000'B 
+	 to '1001'B, first digit in the least significant 4 bits."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.StartTimeStamp."
+    SYNTAX OCTET STRING(SIZE(8))
+
+StartDateTime ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x1x-1x-1x 1x:1x:1x.1x"
+    STATUS current
+    DESCRIPTION
+	"The date and time coded YYYYMMDDHHmmSSCC (Year, Month, Day, 
+	 Hour, Minute, Second, Centisecond), each field one digit, two 
+	 digits per octet, the digits 0 through 9 encoded as '0000'B to 
+	 '1001'B, first digit in the most significant 4 bits."
+    REFERENCE
+	"ITU-T Rec. Q.825, Q825-CDR-ASN1Module.StartDateTime."
+    SYNTAX OCTET STRING(SIZE(0|8))
+
+Number ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:1x:3x-3x-4x"
+    STATUS current
+    DESCRIPTION
+	"This type is used to represent a number for addressing 
+	 purposes. It is composed of:
+
+	 a) one octet for odd/even indicator and nature of address 
+	 indicator:
+
+	    bits 8: Odd/even indicator
+	     0 even number of address signals
+	     1 odd number of address signals
+	    bits 7654321: Nature of address indicator
+	     0000000 spare
+	     0000001 subscriber number
+	     0000010 unknown
+	     0000011 national (significant) number
+	     0000100 international number
+	     0000101 (
+	     to      ( spare
+	     1101111 (
+	     1110000 (
+	     to      ( reserved for national use
+	     1111110 (
+	     1111111 spare
+
+	 b) one octet for numbering plan indicator:
+
+	    bits 765: numbering plan indicator
+	     000 spare
+	     001 ISDN (Telephony) Number Plan (ITU-T Rec. 
+		 E.164)
+	     010 spare
+	     011 data numbering plan (ITU-T Rec. X.121)
+	     100 telex numbering plan (ITU-T Rec. F.69)
+	     101 reserved for national use
+	     110 reserved for national use
+	     111 spare
+
+	 c) digits of the address encoded as TBCD String:
+	     The following octets representing digits of an address 
+	     encoded as a TBCD-STRING.
+
+	     TBCD-STRING ::= OCTETSTRING
+
+	     This type (Telephony Binary Coded Decimal String) is used 
+	     to represent dig its from 0 through 9, *, #, a, b, c, two 
+	     digits per octet, each digit encoded 0000 to 1001 (0 to 9), 
+	     1010 (*) 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end 
+		  of pulsing signal-ST); 0000 is used as a filler when 
+		  there is an odd number of digits.  The most 
+		  significant address signal is sent first. Subsequent 
+		  address signals are sent in successive 4-bit fields."
+    REFERENCE
+	"ITU-T Rec. Q.825, Q825-CDR-ASN1Module.Number."
+    SYNTAX OCTET STRING (SIZE(1..15))
+
+CallingPartyNumber ::= Number
+CalledPartyNumber ::= Number
+RedirectingNumber ::= Number
+RedirectionNumber ::= Number
+OriginalCalledNumber ::= Number
+CallingPartyNumberNotScreened ::= Number
+OperatorSpecific1Number ::= Number
+OperatorSpecific2Number ::= Number
+OperatorSpecific3Number ::= Number
+
+BearerService ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The first octet in the string indicates the bearer service 
+	 capability as follows:
+
+	 - speech(0), speech;
+
+	 - audio3dot1kHZ(1), 3.1 kHz audio;
+
+	 - uni64(2), universal 64 kbps without inband tones and 
+	   announcements;
+
+	 - uni64withTA(3), universal 64 kbps with inband tones and 
+	   announcements;
+
+	 - multipleRate(4), multirate Nx64 kbpx where N(2..30) is in the 
+	   second octet;
+
+	 - packetModeBch(5), B-Channel packet mode.
+
+	 When the first octet is multipleRate(4), the second octet is 
+	 present and contains the multiplier (2..30) indicating the 
+	 number of channels.  Otherwise, the octet string must contain 
+	 only one octet or the second octet must be coded to one (1)."
+    REFERENCE
+	"ITU-T Rec. Q.825, Q825-CDR-ASN1Module.BearerService."
+    SYNTAX OCTET STRING(SIZE(1..2))
+
+ParticipantType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of a participant in the call by 
+	 identifying the number related to the particpant."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) Q825-CDR-ASN1Module ParticipantType."
+    SYNTAX INTEGER {
+	callingPartyNumber(0),
+	calledPartyNumber(1),
+	redirectingNumber(2),
+	redirectionNumber(3),
+	originalCalledNumber(4),
+	callingPartyNumberNotScreened(5),
+	operatorSpecific1Number(6),
+	operatorSpecific2Number(7),
+	operatorSpecific3Number(8),
+	operator(9),
+	unknown(10) }
+
+ServiceUser ::= ParticipantType
+
+CallIdentificationNumber ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Octet string identifying the call."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.CallIdentificationNumber."
+    SYNTAX OCTET STRING
+
+
+SupplementaryServiceCode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides specification of a supplementary service using a 
+	 two-octet service code."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.SupplementaryServiceCode."
+    SYNTAX OCTET STRING(SIZE(2))
+
+SupplementaryAction ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This is a single octet string, the sole octet of that 
+	 identifies the action associated with a supplementary service.   
+	 The octet contains one of the following values:
+
+	 provision(0), withdrawal(1), registration(2), erasure(3), 
+	 activation(4), deactivation(5), invocation(6), disabling(7), 
+	 interrogation(8)."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.SupplementaryAction."
+    SYNTAX OCTET STRING(SIZE(1))
+
+Duration ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION
+	"Specifies a time duration in centiseconds."
+	 -- why not use TimeInterval?
+    REFERENCE
+	"ITU-T Rec. Q.825, Q825-CDR-ASN1Module.Duration."
+    SYNTAX OCTET STRING(SIZE(1..3)) -- centiseconds (max about 46 hours)
+
+SupplementaryService ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d:1d:*d*:*x*"
+    STATUS current
+    DESCRIPTION
+	"An octet string representing a supplementary service.  This is 
+	 the concatenation of a SupplementaryServiceCode, followed by a 
+	 1 octet SupplementaryAction, followed by a 1 octet length 
+	 indicator and a Duration, followed by a 1 octet length 
+	 indicator and MangementExtensions."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.SupplementaryService."
+    SYNTAX OCTET STRING(SIZE(3..255))
+
+SupplementaryServices ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d:1d:*d*:*x*,"
+    STATUS current
+    DESCRIPTION
+	"An octet string representing a list of supplementary services.  
+	 This is a list of concetenations of a single octet length 
+	 indicator and a SupplementaryService octet string."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.SupplementaryServices."
+    SYNTAX OCTET STRING(SIZE(4..256))
+
+ImmediateNotification ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of whether the call record is to be 
+	 delivered immediately for notification (bypassing block 
+	 generating logs) for the purpose of usage metrics."
+    REFERENCE
+	"ITU-T Rec. Q.825, 
+	 Q825-CDR-ASN1Module.ImmediateNotification."
+    SYNTAX INTEGER {
+	    false(0),
+	    true(1) }
+
+Location ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the location of a network event 
+	 (cause value or supplementary service location)."
+    REFERENCE
+	"ITU-T Rec. Q.825, Q825-CDR-ASN1Module.Location."
+    SYNTAX INTEGER {
+	user(0),
+	localUserPrivateNetwork(1),
+	localUserPublicNetwork(2),
+	transitNetwork(3),
+	remoteUserPublicNetwork(4),
+	remoteUsePrivateNetwork(5),
+	internationalNetwork(7),
+	beyondInterworkPoint(10) }
+
+Cause ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:1x"
+    STATUS current
+    DESCRIPTION
+	"Specifies the Q.850 cause code which is a one-octet CauseValue 
+	 (0..255) and a one octet Location code where the location code 
+	 can have one of the following values:
+
+	 - user(0), error occured at the user;
+
+	 - localUserPrivateNetwork(1), error occured at the local user 
+	   of a private network;
+
+	 - localUserPublicNetwork(2), error occured at the local user of 
+	   a public network;
+
+	 - transitNetwork(3), error occured in a transit network;
+
+	 - remoteUserPublicNetwork(4), error occured at the remote user 
+	   of a private network;
+
+	 - remoteUsePrivateNetwork(5), error occured at the remote user 
+	   of a public network;
+
+	 - internationalNetwork(7), error occured in the international 
+	   network;
+
+	 - beyondInterworkPoint(10), error occured beyond an 
+	   interworking point."
+    REFERENCE
+	"ITU-T Rec. Q.825, Q825-CDR-ASN1Module.Cause."
+    SYNTAX OCTET STRING(SIZE(2))
+
+PersonalUserId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:3x-3x-4x"
+    STATUS current
+    DESCRIPTION
+	"This type is used to represent the Personal User Id.  For UMT 
+	 the Personal User Id is defined according to E.212 as an 
+	 International Mobile Station Identity (IMSI). Accordingly only 
+	 numerical characters (0-9) are used.
+
+	 The PersonalNumber type does however not exclude the use of 
+	 other formats. These formats can be indicated in the numbering 
+	 plan indicator.
+
+	 The type is composed of:
+
+	 a) one octet for odd/even indicator and numbering plan 
+	 indicator:
+
+	    bits 8: Odd/even indicator
+	     0 even number of address signals
+	     1 odd number of address signals
+
+	    bits 765: numbering plan indicator
+	     000 E.212 (IMSEI)
+	     001 ISDN (Telephony) Number Plan (ITU-T Rec. 
+		 E.164)
+	     010 spare
+	     011 spare
+	     100 spare
+
+	 b) digits of the address encoded as TBCD String:
+	    The following octets representing the personal number 
+	    encoded as a TBCD-STRING.
+
+	    TBCD-STRING ::= OCTET STRING
+
+	    This type (Telephony Binary Coded Decimal String) is used to 
+	    represent digits from 0 through 9, *, #, a, b, c, two digits 
+	    per octet, each digit encoded 0000 to 1001 (0 to 9), 1010 
+	    (*), 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of 
+	    pulsing signal-ST); 0000 is used as a filler when there is 
+	    an odd number of digits.  The most significant address 
+	    signal is sent first. Subsequent ad dress signals are sent 
+	    in successive 4-bit fields."
+    SYNTAX OCTET STRING(SIZE(1..10))
+
+ChargedParticipant ::= ParticipantType
+
+ChargedDirectoryNumber ::= Number
+
+PercentageToBeBilled ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the percentage to be billed to a 
+	 specified participant.  The value ranges from 0 to 99 percent.  
+	 The field is not necessary if 100% is being billed to a party."
+    SYNTAX INTEGER(0..99)
+
+INServiceCode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Specifies a two-octet service code for an IN service."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.INServiceCode."
+    SYNTAX OCTET STRING(SIZE(2))
+
+ServiceSpecificINInformation ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Service specific intelligent network information."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module 
+	 ServiceSpecificINInformation."
+    SYNTAX OCTET STRING
+
+PartialRecordNumber ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides specification of a partial record number in the range 
+	 from (0..255) indicating the partial record generated for the 
+	 same call."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.PartialGeneration."
+    SYNTAX INTEGER(0..255)
+
+PartialRecordReason ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides specifications of the reason for generation of a 
+	 partial record, and has a value of:
+
+	 - timeLimit(0), used for long duration calls;
+
+	 - serviceChange(1), generated because a service aspect has 
+	   changed;
+
+	 - overflow(2), generated because of overflow;
+
+	 - networkInternalReasons(3), generated due to internal network 
+	   conditions;
+
+	 - lastCDR(4), generated because it is a closing (the last) CDR;
+
+	 - timeChange(5), generated because of a changed in the system 
+	   clock."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.PartialGeneration."
+    SYNTAX INTEGER {
+	timeLimit(0),
+	serviceChange(1),
+	overflow(2),
+	networkInternalReasons(3),
+	lastCDR(4),
+	timeChange(5) }
+
+ExchangeInfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This is a display string containing an ExchangeID string 
+	 SIZE(1..11) not conntaining a colon ':', followed by an 
+	 optional colon ':' and SoftwareVersion string SIZE(1..12).  The 
+	 colon ':' is not present if the SoftwareVersion string is not 
+	 present and must be present when the SoftwareVersion string is 
+	 present."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.ExchangeInfo."
+    SYNTAX OCTET STRING(SIZE(1..24))
+
+NetworkProviderId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the network provider as a 1 to 11 
+	 character DisplayString."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.NetworkProviderId."
+    SYNTAX OCTET STRING(SIZE(1..11))
+
+RelatedCallNumber ::= CallIdentificationNumber
+
+CDRPurpose ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the purpose for generating a CDR."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.CDRPurpose."
+    SYNTAX BITS {
+	usagemetering(0),
+	analysis(1) }
+
+PhysicalLineCode ::= OCTET STRING
+
+ReceivedDigits ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This type is used to represent digits input by the subscriber.  
+	 It is composed of:
+
+	 a) one octet for odd/even indicator:
+
+	    bits 8: Odd/even indicator
+		0 even number of address signals
+		1 odd number of address signals
+
+	 b) digits of the address encoded as TBCD String
+	    The following octets representing the received digits 
+	    encoded as a TBCD-STRING.
+
+	    TBCD-STRING ::= OCTET STRING
+
+	    This type (Telephony Binary Coded Decimal String) is used to 
+	    represent digits from 0 through 9, *, #, a, b, c, two digits 
+	    per octet, each digit encoded 0000 to 1001 (0 to 9), 1010 
+	    (*), 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end of 
+	    pulsing signal-ST); 0000 is used as a filler when there is 
+	    an odd number of digits.  The most significant address 
+	    signal is sent first. Subsequent address signals are sent in 
+	    successive 4-bit fields."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.ReceivedDigits."
+    SYNTAX OCTET STRING(SIZE(1..18))
+
+OperatorSpecific1AdditionalNumber ::= OCTET STRING
+OperatorSpecific2AdditionalNumber ::= OCTET STRING
+OperatorSpecific3AdditionalNumber ::= OCTET STRING
+
+AdditionalParticipantInfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specificat of additional participant information.  
+	 This is a list of each of a PhysicalLineCode string, a 
+	 ReceivedDigits string, OperatorSpecific1AdditionalNumber 
+	 string, OperatorSpecific2AdditionalNumber string and 
+	 OperatorSpecific3AdditionalNumber string; each preceded by a 
+	 length indicator octet indicating the length of the component."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.AdditionalParticipantInfo."
+    SYNTAX OCTET STRING(SIZE(5..256))
+
+PartyCategory ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"A single octet containing the party category as coded  in ITU-T 
+	 Rec. Q.763 or ANSI T1.116.3."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998)."
+    SYNTAX OCTET STRING(SIZE(1))
+
+CallingPartyCategory ::= PartyCategory
+
+CallingPartyType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the calling party type.
+
+	 The Calling party Type is defined as:
+
+	 - analogue(0), Analogue;
+
+	 - customerLink(1), T1 or E1 PSTN digital access;
+
+	 - basicAccess(2), Basic Access;
+
+	 - primaryRateAccess(3), Primary Rate Access."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.CallingPartyType."
+    SYNTAX INTEGER {
+	analogue(0),
+	customerLink(1),
+	basicAccess(2),
+	primaryRateAccess(3) }
+
+NumberOfUnits ::= INTEGER (0..16777215)
+
+RecordedCurrencyMultiplier ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of a multiplier to be applied to a 
+	 currency to obtain a currency charge unit."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.Multiplier"
+    SYNTAX INTEGER {
+	oneThousandth(0),
+	oneHundredth(1),
+	oneTenth(2),
+	one(3),
+	ten(4),
+	hundred(5),
+	thousand(6) }
+
+RecordedCurrencyAmount ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The first octet in the string ist he RecordedCurrencyMultiplier 
+	 and the remaining 1..3 octets are the number of units 
+	 associated with the currency amount."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.RecordedCurrency amount component."
+    SYNTAX OCTET STRING(SIZE(2..4))
+
+RecordedCurrencyCurrency ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.RecordedCurrency currency component."
+    SYNTAX OCTET STRING(SIZE(1..10))
+
+RecordedCurrency ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The first octet indicates whether the following octets are:
+
+	 - currency [0], a RecordedCurrencyCurrency or a 
+	 - amount [1], a RecordedCurrencyAmount.
+
+	 The remaining octets in the string are either a recorded 
+	 currency currency or amount octet string."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.RecordedCurrency."
+    SYNTAX OCTET STRING(SIZE(2..11))
+
+RecordedUnits ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides specification of recorded units.  The first octet is 
+	 the units type (1..16) or zero (0) if no unit type is 
+	 indicated, followed by 1..3 octets indicating the number of 
+	 units."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.RecordedUnits"
+    SYNTAX OCTET STRING(SIZE(0|4))
+
+RecordedUnitsList ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides specification of a list of recorded units.  The octet 
+	 string is a simple concatentation of all of the RecordedUnits 
+	 octet strings that make up the list."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.RecordedUnitsList"
+    SYNTAX OCTET STRING(SIZE(4..256)) -- in multiples of 4
+
+ChargingInformation ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The first octet determines the contents of the remaining 
+	 octets.  The first octet may be one of:
+
+	 - recordedCurrency [0], remaining octets contain a 
+	   RecordedCurrency;
+
+	 - recordedUnitsList [1], remaining octets contain a 
+	   RecordedUnitsList;
+
+	 - freeOfCharge [2], there are no more octets;
+
+	 - changeInfoNotAvailable [3], there are no more octets."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.ChangingInformation."
+    SYNTAX OCTET STRING
+
+ProgressDescription ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.ProgressDescription."
+    SYNTAX INTEGER {
+	notEndToEndISDN(1),
+	nonISDNDestination(2),
+	nonISDNOrigination(3),
+	returnedToISDN(4),
+	interworkingServiceChange(5),
+	inBandInfo(8) }
+
+ProgressLocation ::= Location
+
+Progress ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of progress.
+
+	 The first octet contains the ProgressDescription that can be 
+	 one of the following values:
+
+	 - notEndToEndISDN(1),
+	 - nonISDNDestination(2),
+	 - nonISDNOrigination(3),
+	 - returnedToISDN(4),
+	 - interworkingServiceChange(5),
+	 - inBandInfo(8),
+
+	 The second onctet contains the Location that can be one of the 
+	 following values:
+
+	 - user(0),
+	 - localUserPrivateNetwork(1),
+	 - localUserPublicNetwork(2),
+	 - transitNetwork(3),
+	 - remoteUserPublicNetwork(4),
+	 - remoteUsePrivateNetwork(5),
+	 - internationalNetwork(7),
+	 - beyondInterworkPoint(10)."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.Progress."
+    SYNTAX OCTET STRING(SIZE(2))
+
+AccessDelivery ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the access delivery method:
+
+	 - setupMessageGenerated(0), when present indicates the a set-up 
+	   message was generated; otherwise, no set-up message was 
+	   generated."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.AccessDelivery."
+    SYNTAX BITS {
+	setupMessageGenerated(0) }
+
+TrunkGroupId ::= SimpleNameType
+TrunkGroupOutgoing ::= TrunkGroupId
+TrunkGroupIncoming ::= TrunkGroupId
+
+FallbackBearerService ::= BearerService
+
+Teleservice ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a speicfiication of the Teleservice according to ITU-T 
+	 Rec. Q.763 or ANSI T1.116.3 coding."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.Teleservice."
+    SYNTAX OCTET STRING(SIZE(1))
+
+ConversationTime ::= Duration
+DurationTimeACM ::= Duration
+DurationTimeANM ::= Duration
+DurationTimeNoANM ::= Duration
+
+CallDuration ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the call duration for answered 
+	 calls.
+
+	 If no partial records are generated this attribute contains the 
+	 time consumption from B-answer to termination time. For partial 
+	 call records the first record contains the time consumption 
+	 from B-answer until reporting time. The intermediate partial 
+	 records contain the time consumption since the previous 
+	 reporting. The final partial record contains the time 
+	 consumption from the previous reporting until termination time.  
+	 The call is considered terminated when communication between 
+	 the parties is no longer possible.
+
+	 The octet string consists of the concatenation of groups of 4 
+	 octets, where the first octet in the group  identifies the 
+	 duration type and the following 3 octets in the group contain 
+	 the duration in centiseconds.  The first octet of each group is 
+	 interpreted as follows:
+
+	 - conversationTime [0], the duration is a ConversationTime;
+	 - durationTimeACM [1], the duration is a DurationTimeACM;
+	 - durationTimeB-ans [2], the duration is a DurationTimeANM;
+	 - durationTimeNoANM [3], the duration is a DurationTimeNoANM."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.CallDuration."
+    SYNTAX OCTET STRING(0..16) -- multiples of 4
+
+UUInfo ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The octet string is a group of 1..3 groups representing the 
+	 UUxInfo for group 1, 2 and/or 3.  Each group begins with a 
+	 group number octet (1..3) indicating the group and a length 
+	 octet (4..16) in multiples of 4 indicating the length of the 
+	 remaining fields in the group.  The group octet is intepreted 
+	 as follows:
+
+	- uu1Info [0] UUxInfo OPTIONAL;
+	- uu2Info [1] UUxInfo OPTIONAL;
+	- uu3Info [2] UUxInfo OPTIONAL.
+
+	 The remaining fields in the group contsist of groupings of 4 
+	 octets, where the first octet in the group indicates the type 
+	 of count and the last three octets in the group indicate the 
+	 count.  The type of count octet is interpreted as follows:
+
+	 - receivedMessages [0] Count OPTIONAL;
+	 - transmittedMessages [1] Count OPTIONAL;
+	 - receivedOctets [2] Count OPTIONAL;
+	 - transmittedOctets [3] Count OPTIONAL."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.UUInfo."
+    SYNTAX OCTET STRING(0..54)
+
+StandardExtensions ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Standards extensions in opaque form."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.StandardExtensions."
+    SYNTAX OCTET STRING
+
+RecordExtensions ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Record extensions in opaque form."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.RecordExtensions."
+    SYNTAX OCTET STRING
+
+ISUPPreferred ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of a preference for the use of ISUP 
+	 signalling."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.ISUPPreferred."
+    SYNTAX INTEGER {
+	preferred(0),
+	notrequired(1),
+	required(2),
+	notapplicable(3) }
+
+NetworkManagementControls ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the Traffic Network Management 
+	 control that has been applied to a call."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.NetworkManagementControls."
+    SYNTAX INTEGER {
+	acc(0),
+	adc(1),
+	cancelFrom(2),
+	cancelRerouted(3),
+	cancelTo(4),
+	destinationCodeControl(5),
+	scr(6),
+	skip(7),
+	tarfrom(8),
+	tarto(9) }
+
+Glare ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the presence or absence of glare 
+	 condition."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.Glare."
+    SYNTAX INTEGER {
+	absent(0),
+	present(1) }
+
+RecordId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"The record Id is a sequence number that is incremented for each 
+	 logged CDR, it is generated by the log."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.RecordId."
+    SYNTAX INTEGER (0..16777215)
+
+DataValidity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a mechanism whereby NEs can specify that a problem was 
+	 encountered in the generation of the CDR and can have one of 
+	 the following values:
+
+	 - possibleduplicated(0), the CDR is possibly duplicated;
+	 - requireddatamissing(1), the CDR is missing some required 
+	   data;
+	 - other(2), another problem has occurred making the CDR 
+	   suspsect."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.DataValidity."
+    SYNTAX INTEGER {
+	possibleduplicated(0),
+	requireddatamissing(1),
+	other(2) }
+
+CallStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of whether a call was answered or 
+	 not."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.CallStatus."
+    SYNTAX INTEGER {
+	answered(0),
+	notanswered(1) }
+
+CarrierId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"This is a DisplayString of 1..11 octets in length that 
+	 specifies the identity of the selected carrier."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.CarrierId."
+    SYNTAX OCTET STRING (SIZE(1..11))
+
+-- =============================================================================
+--
+-- Objects for notifications
+--
+-- =============================================================================
+
+fileName OBJECT-TYPE
+    SYNTAX FileName
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+	"Provides the file name of a generated file.  Used with the 
+	 fileCreationNotification INFORM message."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.FileName."
+    ::= { cdrScalars 1 }
+
+reasonForOutput OBJECT-TYPE
+    SYNTAX ReasonForOutput
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+	"Provides the reason for output for use with notifications.  
+	 This may be one of:
+
+	 - absoluteTimeEvent(0), file was generated because the rotation 
+	   time was reached;
+	 - maxBlockSizeReached(1), block was generated as a result of 
+	   the maximum block size being reached on a blockGeneratingLog;
+	 - maxTimeIntervalElapsed(2), block was generated as a result of 
+	   the maimum time interval elapsing on a blockGeneratingLog;
+	 - internalSizeLimitReached(3), block or file was generated as a 
+	   result of internal size limitations;
+	 - oSAction(4), block or file was generated at the request of 
+	   the operations management."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.ReasonForOutput."
+    ::= { cdrScalars 2 }
+
+sequenceNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+	"The sequence number of the record block."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.sequenceNumber."
+    ::= { cdrScalars 3 }
+
+
+
+
+-- =============================================================================
+
+blockRecordNotification NOTIFICATION-TYPE
+    OBJECTS {
+	exchangeInfo,
+	sequenceNumber,
+	reasonForOutput,
+	recordType,
+	bearerService,
+	serviceUser,
+	callIdentificationNumber
+    }
+    STATUS current
+    DESCRIPTION
+	"This notification is emitted whenever one of the triggering 
+	 events described in the object class template occurs. The 
+	 notification consists of a concatenation of the content of the 
+	 call detail records currently contained in the blockingLog; 
+	 i.e. the call detail records without the record overhead (Log 
+	 Record Id, Managed Object Class and Instance and Logging Time).
+	 
+
+	 The block header consists of the following mandatory fields:
+
+	    exchangeInfo, sequenceNumber, reasonForOutput.
+
+	 These are followed by at least one set of:
+
+	    recordType, bearerService, serviceUser, 
+	    callIdentificationNumber;
+
+	 followed be additional fields described under the 
+	 callDetailRecordNotification.  Additional records can be 
+	 appended beginning with the recordType of the next record."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) : blockRecordNotification"
+    ::= { cdrNotifications 1 }
+
+callDetailRecordNotification NOTIFICATION-TYPE
+    OBJECTS {
+	recordType,
+	bearerService,
+	serviceUser,
+	callIdentificationNumber
+    }
+    STATUS current
+    DESCRIPTION
+	"This notification is issued to transmit a call detail record.  
+	 The immediate notification may be used by the Event Forwarding 
+	 Discriminator to select records requiring real time handling by 
+	 the OS. Remaining attributes can be used to further filter the 
+	 information in the record content.
+
+	 Mandatory objects are:
+	 
+	    recordType, bearerService, serviceUser, 
+	    callIdentificationNumber.
+
+	 When marked for immediate forwarding, the following should be 
+	 present:
+
+	    immediateNotificationForUsageMetering.
+
+	 These objects are followed by all of the following that are 
+	 available:
+
+	    callingPartyNumber, calledPartyNumber, redirectingNumber, 
+	    originalCalledNumber, callingPartyNumberNotScreened, 
+	    operatorSpecific1Number, operatorSpecific2Number, 
+	    operatorSpecific3Number.
+
+	 For complete Call Records - the following are included:
+
+	    seizureTime, answerTime.
+
+	 For partial Call Records - the following are included:
+
+	    partialTime, partialRecordNumber, partialRecordReason.
+
+	 Supplementary Service Input Recoreds - the following are 
+	 included:
+
+	    eventTime, supplementaryServices.
+
+	 For all records, the following are included when available and 
+	 requested:
+
+	    supplementaryServices, personalUserId, chargedParticipant, 
+	    chargedDirectoryNumber, percentageToBeBilled, 
+	    accountCodeInput, iNServiceCode, queueTimeStamp, 
+	    queueDuration.
+
+	 The notification may include whenever available, requested and 
+	 applicable:
+
+	    cause, exchangeInfo, relatedCallNumber, cDRPurpose, 
+	    physicalLineCode, receivedDigits, 
+	    operatorSpecific1AdditionalNumber, 
+	    operatorSpecific2AdditionalNumber, 
+	    operatorSpecific3AdditionalNumber, callingPartyCategory, 
+	    callingPartyType, chargingInformation, progress, 
+	    accessDelivery, trunkGroupOutgoing, trunkGroupIncoming, 
+	    fallbackBearerService, teleservice, conversationTime, 
+	    durationTimeACM, durationTimeBAnswer, durationTimeNoBAnswer, 
+	    uUInfo, bPartyCategory, iSUPPreferred, 
+	    networkManagementControls, glare, recordId, dataValidity, 
+	    callStatus, carrierId, dPC, oPC.
+
+	 Two extension fields are available for additional extensions 
+	 and may be included in any record:
+
+	    standardExtensions, recordExtensions.
+
+	 See the descriptions for each of the fields for more 
+	 information."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) : fileCreationNotification"
+    ::= { cdrNotifications 2 }
+
+fileCreationNotification NOTIFICATION-TYPE
+    OBJECTS {
+	fileName,
+	reasonForOutput
+    }
+    STATUS current
+    DESCRIPTION
+	"This notification is emitted whenever the fileGenerating Log 
+	 creates a new file in order to let the managing system know 
+	 that the file is available for retrieval.  It provides the file 
+	 name on the managed system and the reason for output."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) : fileCreationNotification"
+    ::= { cdrNotifications 3 }
+
+
+-- =============================================================================
+
+blockGeneratingLogTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BlockGeneratingLogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	"This log is considered to be infinite and therefore it does not 
+	 have to instantiate the finite-log size package from its 
+	 superclass log. The blocking-log stores all records that 
+	 satisfy its discriminator construct. The log provides the value 
+	 (sequence number) for the 'recordId' (field of CDR). An 
+	 instance of this log emits the block record notification when 
+	 any of the following events occurs:
+
+	 - the number of records in the log becomes equal to the maximum 
+	   block size,
+
+	 - the time interval elapsed since the first record currently 
+	   contained in the log exceeds the value maxTimeInterval 
+	   attribute,
+
+	 - an internal system limitation has been exceeded, including 
+	   the blocking log itself overflowing.
+
+	 Upon emitting the block record notification all records stored 
+	 in the blocking log are deleted and the log is ready to store 
+	 new records. Because of the self-emptying nature of this log, 
+	 any log-full action may be selected and the behavior of the log 
+	 will not change."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998)"
+    ::= { blockGeneratingLog 1 }
+
+blockGeneratingLogEntry OBJECT-TYPE
+    SYNTAX BlockGeneratingLogEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	"Entries in this table generate a blockRecordNotification."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998)"
+    INDEX { logId } -- derived from logEntry
+    ::= { blockGeneratingLogTable 1 }
+
+BlockGeneratingLogEntry ::=
+    SEQUENCE {
+	blockGeneratingLogMaxBlockSize
+	    INTEGER,
+	blockGeneratingLogMaxTimeInterval
+	    INTEGER,
+	blockGeneratingLogStorageType
+	    StorageType,
+	blockGeneratingLogRowStatus
+	    RowStatus
+    }
+
+blockGeneratingLogMaxBlockSize OBJECT-TYPE
+    SYNTAX INTEGER (0..32767)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"The value of this attribute specifies the maximum number of 
+	 CDRs that may be contained in the blockRecordNotification 
+	 emitted by the blockGeneratingLog. If the value '0' is entered, 
+	 it means that this output trigger is not used."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) maxBlockSize attribute."
+    ::= { blockGeneratingLogEntry 1 }
+
+blockGeneratingLogMaxTimeInterval OBJECT-TYPE
+    SYNTAX INTEGER (0..32767)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"The value of this attribute specifies the maximum time interval 
+	 that may elapse from receipt of the first record currently in 
+	 the log to the time at which a blockRecordNotification must be 
+	 emitted. This value, therefore, specifies the maximum latency 
+	 with which near-real-time CDR data will be transmitted to the 
+	 upstream system. If the value '0' is entered, it means that 
+	 this output trigger is not used."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) maxTimeInteval attribute."
+    ::= { blockGeneratingLogEntry 2 }
+
+blockGeneratingLogStorageType OBJECT-TYPE
+    SYNTAX StorageType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Specifies whether the log is transient or permanent:
+
+	 - volatile - transient logs may be defined for performing 
+	   specific studies and if the agent system reboots the study 
+	   should not be reapplied (it may have been the cause of the 
+	   reboot);
+
+	 - nonVolatile - permanent logs are for normal CDR generation 
+	   for the purposes of billing or permanent usage studies."
+    REFERENCE
+	"STD 58, SNMPv2-TC StorageType."
+    ::= { blockGeneratingLogEntry 3 }
+
+blockGeneratingLogRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a mechanism whereby management stations may create or 
+	 delete entries in this table.  Entries cannot be created in 
+	 this table unless a corresponding entry alredy exists in the 
+	 logTable for the corresponding logId."
+    REFERENCE
+	"STD 58, SNMPv2-TC RowStatus."
+    ::= { blockGeneratingLogEntry 4 }
+
+-- =============================================================================
+
+callDetailDataTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CallDetailDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This managed object class emits the CDR notification for 
+	 telecommunication events selected by the control object. (The 
+	 selection is made based on either one or the combination of the 
+	 simpleUsageMeteringControl object and 
+	 configurableSimpleUsageMeteringControl object. No management 
+	 operations are permitted on this object class. A CDR 
+	 notification is sent out if one of the following events occurs:
+
+	 - termination of a service;
+	 - change of service e.g. due to change of charging conditions;
+	 - reaching a volume threshold;
+	 - at regular intervals during a practical service transaction; 
+	 - supplementary service input.
+
+	 Additional conditions that cause call detail record 
+	 notification for analysis purposes such as quality of service 
+	 measurement, fraud detection or traffic management are:
+
+	 - denial of a service;
+	 - change of observed service quality;
+	 - reaching a quality threshold;
+	 - call failures."
+    REFERENCE
+	"ITU-T Rec. Q825 (1998), callDetailData MO."
+    ::= { callDetailData 1 }
+
+callDetailDataEntry OBJECT-TYPE
+    SYNTAX CallDetailDataEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"callDetailData objects are created and deleted implicitly, that 
+	 is, they are created and deleted upon the occurrence of defined 
+	 trigger events and are not explicitly manipulated by a managing 
+	 system; i.e. a manager cannot perform any operations on 
+	 instances of this object class. To support recording data in a 
+	 callDetailData object two sets of triggers coming from the 
+	 control objects are defined:
+
+	 - Creation Triggers: events that cause creation of a 
+	   callDetailData object, these triggers are defined as part of 
+	   the control object.
+
+	 - Termination Triggers: events that cause deletion of a 
+	   callDetailData object.  Currently the termination is implicit 
+	   as part of the data object behaviour.  Deletion occurs upon 
+	   completion of usage data collection for that instance of 
+	   service.
+
+	 CDR notifications are emitted in response to reporting triggers 
+	 (ITU-T Rec. X.742) that are also defined as part of 
+	 the control objects.
+	 
+	 Entries in this table generate a callDetailRecordNotification 
+	 when a reporting trigger has fired."
+    REFERENCE
+	"ITU-T Rec. Q825 (1998), callDetailData MOC."
+    INDEX { callDetailDataId } -- index
+    ::= { callDetailDataTable 1 }
+
+CallDetailDataEntry ::=
+    SEQUENCE {
+	callDetailDataId
+	    SimpleNameType -- index
+    }
+
+-- =============================================================================
+
+callDetailLogRecordTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CallDetailLogRecordEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class describes the layout of a log record created 
+	 for each single call detail record notification."
+    ::= { callDetailLogRecord 1 }
+
+callDetailLogRecordEntry OBJECT-TYPE
+    SYNTAX CallDetailLogRecordEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    INDEX { logId,	    -- countained by eventLog
+	    logRecordId }   -- derived from eventLogRecord
+    ::= { callDetailLogRecordTable 1 }
+
+CallDetailLogRecordEntry ::=
+    SEQUENCE {
+	networkProviderId
+	    NetworkProviderId,
+	recordType
+	    RecordType,
+	seizureTime
+	    StartDateTime,
+	answerTime
+	    StartDateTime,
+	partialTime
+	    StartDateTime,
+	eventTime
+	    StartDateTime,
+	callingPartyNumber
+	    CallingPartyNumber,
+	calledPartyNumber
+	    CalledPartyNumber,
+	redirectingNumber
+	    RedirectingNumber,
+	redirectionNumber
+	    RedirectionNumber,
+	originalCalledNumber
+	    OriginalCalledNumber,
+	callingPartyNumberNotScreened
+	    CallingPartyNumberNotScreened,
+	operatorSpecific1Number
+	    OperatorSpecific1Number,
+	operatorSpecific2Number
+	    OperatorSpecific2Number,
+	operatorSpecific3Number
+	    OperatorSpecific3Number,
+	bearerService
+	    BearerService,
+	serviceUser
+	    ServiceUser,
+	callIdentificationNumber
+	    CallIdentificationNumber,
+	supplementaryServices
+	    SupplementaryServices,
+	immediateNotificationForUsageMetering
+	    ImmediateNotification,
+	cause
+	    Cause,
+	personalUserId
+	    PersonalUserId,
+	chargedParticipant
+	    ChargedParticipant,
+	chargedDirectoryNumber
+	    ChargedDirectoryNumber,
+	percentageToBeBilled
+	    PercentageToBeBilled,
+	accountCodeInput
+	    AccountCodeInput,
+	iNServiceCode
+	    INServiceCode,
+	queueTimeStamp
+	    StartDateTime,
+	queueDuration
+	    Duration,
+	serviceSpecificINInformation
+	    ServiceSpecificINInformation,
+	partialRecordNumber
+	    PartialRecordNumber,
+	partialRecordReason
+	    PartialRecordReason,
+	exchangeInfo
+	    ExchangeInfo,
+	relatedCallNumber
+	    RelatedCallNumber,
+	cDRPurpose
+	    CDRPurpose,
+	physicalLineCode
+	    PhysicalLineCode,
+	receivedDigits
+	    ReceivedDigits,
+	operatorSpecific1AdditionalNumber
+	    OperatorSpecific1AdditionalNumber,
+	operatorSpecific2AdditionalNumber
+	    OperatorSpecific2AdditionalNumber,
+	operatorSpecific3AdditionalNumber
+	    OperatorSpecific3AdditionalNumber,
+	callingPartyCategory
+	    CallingPartyCategory,
+	callingPartyType
+	    CallingPartyType,
+	chargingInformation
+	    ChargingInformation,
+	progress
+	    Progress,
+	accessDelivery
+	    AccessDelivery,
+	trunkGroupOutgoing
+	    TrunkGroupOutgoing,
+	trunkGroupIncoming
+	    TrunkGroupIncoming,
+	fallbackBearerService
+	    FallbackBearerService,
+	teleservice
+	    Teleservice,
+	conversationTime
+	    ConversationTime,
+	durationTimeACM
+	    DurationTimeACM,
+	durationTimeBAnswer
+	    DurationTimeANM,
+	durationTimeNoBAnswer
+	    DurationTimeNoANM,
+	uUInfo
+	    UUInfo,
+	standardExtensions
+	    StandardExtensions,
+	recordExtensions
+	    RecordExtensions,
+	bPartyCategory
+	    PartyCategory,
+	iSUPPreferred
+	    ISUPPreferred,
+	networkManagementControls
+	    NetworkManagementControls,
+	glare
+	    Glare,
+	recordId
+	    RecordId,
+	dataValidity
+	    DataValidity,
+	callStatus
+	    CallStatus,
+	carrierId
+	    CarrierId,
+	dPC
+	    NetworkPointCode,
+	oPC
+	    NetworkPointCode
+    }
+
+networkProviderId OBJECT-TYPE
+    SYNTAX NetworkProviderId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the network provider identifier as an administrative 
+	 string.  If there is only one network provider, this string is 
+	 null."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.networkProviderId."
+    ::= { callDetailLogRecordEntry 1 }
+
+recordType OBJECT-TYPE
+    SYNTAX RecordType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element indicates the type of the CDR and it 
+	 also indicates the way some of the CDR elements are used."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.recordType."
+    ::= { callDetailLogRecordEntry 2 }
+
+seizureTime OBJECT-TYPE
+    SYNTAX StartDateTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the seizure time.  This is the time at which the 
+	 origination was seized (off-hook, trunk seizure), when the 
+	 exchange is ready to receive digits.  For transit calls the 
+	 start time stamp (seizure) will relate to the first message 
+	 received (e.g. IAM or SAM).
+
+	 Date and time values shall be derived from the exchange clock.  
+	 This attribute includes year, month, day, hour minute and 
+	 second and centisecond."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.StartTimeStamp.seizureTime."
+    ::= { callDetailLogRecordEntry 3 }
+
+answerTime OBJECT-TYPE
+    SYNTAX StartDateTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the answer time.  This is the time at which the call 
+	 was answered (e.g. ANM received).  If no B-Answer is received, 
+	 the value will be the null string.
+
+	 Date and time values shall be derived from the exchange clock.  
+	 This attribute includes year, month, day, hour minute and 
+	 second and centisecond."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.StartTimeStamp.answerTime."
+    ::= { callDetailLogRecordEntry 4 }
+
+partialTime OBJECT-TYPE
+    SYNTAX StartDateTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the partial record start time.  This is the same as 
+	 the end time (reporting time) of the previous partial CDR.
+
+	 Date and time values shall be derived from the exchange clock.  
+	 This attribute includes year, month, day, hour minute and 
+	 second and centisecond.
+
+	 For partial outputs the start date time is the end time when 
+	 the previous output was made."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.StartTimeStamp.partialTime."
+    ::= { callDetailLogRecordEntry 5 }
+
+eventTime OBJECT-TYPE
+    SYNTAX StartDateTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the event time for a supplementary service record.  
+	 When the CDR is generated by an event concerning a 
+	 supplementary service not related to a call, then this object 
+	 contains the time stamp for the event.  Otherwise, this  object 
+	 contains a null string.
+
+	 Date and time values shall be derived from the exchange clock.  
+	 This attribute includes year, month, day, hour minute and 
+	 second and centisecond."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), 
+	 Q825-CDR-ASN1Module.StartTimeStamp.eventTime."
+    ::= { callDetailLogRecordEntry 6 }
+
+callingPartyNumber OBJECT-TYPE
+    SYNTAX CallingPartyNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the telephone number of the calling 
+	 party.
+
+	 The calling party will, for non-UPT calls, be identical to the 
+	 calling party user. For call type calls and when subscribing to 
+	 either MSN or DDI the information element indicates the 
+	 screened and verified number for transfer towards the called 
+	 subscriber. This attribute contains the default number if the 
+	 exchange is requested to use that number for transfer towards 
+	 the called subscriber. If the CDR is generated due to an event 
+	 concerning a supplementary service then this attribute contains 
+	 the telephone number of the subscriber that caused the event.
+
+	 It should be noted that in the case of an exchange with a 
+	 diverted call, the subscriber for which the CDR is generated is 
+	 indicated by the redirecting number."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 7 }
+
+calledPartyNumber OBJECT-TYPE
+    SYNTAX CalledPartyNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the telephone number of the called 
+	 subscriber if the CDR is generated due to a call.
+
+	 If the CDR is generated due to activation or invocation of the 
+	 diversion supplementary service, then attribute contains the 
+	 telephone number of the diverted-to number. In special cases 
+	 this attribute may contain the translated number. This would be 
+	 the case when abbreviated dialling is used. As an option, this 
+	 information element may also include information to indicate 
+	 the Numbering Plan Identification (NPI) and the Type Of Number 
+	 (TON) of the called party number."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 8 }
+
+redirectingNumber OBJECT-TYPE
+    SYNTAX RedirectingNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the telephone number of the party who 
+	 has redirected the call. This is the information, when using 
+	 ISUP, that is sent in the forward direction when a call is 
+	 redirected, indicating the number from which the call was 
+	 diverted. This number is identical to the original called 
+	 number for a single diversion. In the case of a diverted call 
+	 the Service User will be indicated by the redirecting number."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 9 }
+
+redirectionNumber OBJECT-TYPE
+    SYNTAX RedirectionNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the telephone number of the party that 
+	 the call must be forwarded to. This is the information, when 
+	 using ISUP, that is sent in the backward direction indicating 
+	 the number towards which the call must be re-routed or has been 
+	 forwarded. The redirection number is identical to the 
+	 diverted-to number which can be either a forwarded to number or 
+	 a deflected to number."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 10 }
+
+originalCalledNumber OBJECT-TYPE
+    SYNTAX OriginalCalledNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"This information element shall contain the telephone number of 
+	 the original called party. This is the information, when using 
+	 ISUP, that is sent in the forward direction when a call is 
+	 redirected and identifies the original called party."
+    ::= { callDetailLogRecordEntry 11 }
+
+callingPartyNumberNotScreened OBJECT-TYPE
+    SYNTAX CallingPartyNumberNotScreened
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains an additional user-provided, not 
+	 screened telephone number of the calling party if the CDR is 
+	 generated due to a call.
+
+	 This attribute is relevant in connection with users subscribing 
+	 to the special arrangement according to e.g. the CLIP 
+	 supplementary service."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 12 }
+
+operatorSpecific1Number OBJECT-TYPE
+    SYNTAX OperatorSpecific1Number
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains operator defined participant 
+	 information and is used when the elements defined elsewhere are 
+	 not adequate."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 13 }
+
+operatorSpecific2Number OBJECT-TYPE
+    SYNTAX OperatorSpecific2Number
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains operator defined participant 
+	 information and is used when the elements defined elsewhere are 
+	 not adequate."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 14 }
+
+operatorSpecific3Number OBJECT-TYPE
+    SYNTAX OperatorSpecific3Number
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains operator defined participant 
+	 information and is used when the elements defined elsewhere are 
+	 not adequate."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 15 }
+
+bearerService OBJECT-TYPE
+    SYNTAX BearerService
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the bearer capability information for a 
+	 call or an event concerning a supplementary service. This 
+	 attribute exists only for ISDN calls."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) bearerService attribute."
+    ::= { callDetailLogRecordEntry 16 }
+
+serviceUser OBJECT-TYPE
+    SYNTAX ServiceUser
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute provides information of the party whose use of 
+	 resources has been accounted for. The information provided in 
+	 this element is a pointer to the party number provided 
+	 elsewhere in the record. In the case where e.g. the CDR is 
+	 generated on a transit exchange and no calling party number is 
+	 available, this element will indicate that the service user is 
+	 unknown."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) serviceUser attribute."
+    ::= { callDetailLogRecordEntry 17 }
+
+callIdentificationNumber OBJECT-TYPE
+    SYNTAX CallIdentificationNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"An identification number that identifies the call. All records 
+	 produced for the same call have the same call identification 
+	 number.
+
+	 With the call identification number it is possible to link 
+	 partial outputs, outputs due to supplementary services during 
+	 the call and to discriminate between simultaneous call 
+	 establishments. If a global call reference is received through 
+	 signalling, this can be used as call identification number thus 
+	 allowing the correlation of CDRs generated for the same call in 
+	 different NEs. If no global call reference is signalled in the 
+	 network, the call identification will only have local 
+	 significance."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) callIdentificationNumber attribute."
+    ::= { callDetailLogRecordEntry 18 }
+
+supplementaryServices OBJECT-TYPE
+    SYNTAX SupplementaryServices -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains information about the use of one or 
+	 more supplementary services. Information about the use of one 
+	 or more supplementary service is only possible in connection 
+	 with a call record type. Each supplementary service is included 
+	 as a SEQUENCE OF SupplementaryService.
+
+	 Each SupplementaryService construct contains relevant 
+	 information about the use of a supplementary service.  The 
+	 attribute contains a service code identifying the supplementary 
+	 service and an addition information about the action taken. An 
+	 optional time stamp is provided for time dependent charging of 
+	 supplementary services.  The time stamp is a duration time 
+	 relative to the startTimeStamp and is recorded in centisecond.
+
+	 For each service code information is provided indicating the 
+	 action taken. The following actions are defined:
+
+	 - Provision of supplementary service;
+	 - Withdrawal of supplementary service;
+	 - Registration of supplementary service;
+	 - Erasure of supplementary service;
+	 - Activation of supplementary service;
+	 - Deactivation of supplementary service;
+	 - Invocation of supplementary service;
+	 - Disabling of supplementary service;
+	 - Interrogation of supplementary service;
+
+	 If provided by the network, actions can be made on 
+	 supplementary service by the operator. In such a case the 
+	 service user element in the CDR will indicate the operator as 
+	 the initiator of the action.
+
+	 In the case of functional signalling on ISDN further 
+	 information of the supplementary service usage is provided by 
+	 the optional functional information field.  This field contains 
+	 a set of 'management extensions' as defined by ITU-T 
+	 Rec. X.721."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) supplementaryServices attribute."
+    ::= { callDetailLogRecordEntry 19 }
+
+immediateNotificationForUsageMetering OBJECT-TYPE
+    SYNTAX ImmediateNotification -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute shall contain an indication that the record 
+	 requires immediate data transfer to the OS. This standard does 
+	 not specify if this indication is due to a subscriber action or 
+	 contained in the user data. This attribute may be used to 
+	 define the filter of an event forwarding discriminator."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) immediateNotificationForUsageMetering 
+	     attribute."
+    ::= { callDetailLogRecordEntry 20 }
+
+cause OBJECT-TYPE
+    SYNTAX Cause -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute indicates the cause and location value for the 
+	 termination of the call. For ISDN/ISUP, it will contain ITU-T 
+	 Rec. Q.850 cause values (sent or received). For 
+	 analogue call, or intra-switch call, the agent will provide the 
+	 best mapping corresponding to the cause value of Q.850."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) cause attribute."
+    ::= { callDetailLogRecordEntry 21 }
+
+personalUserId OBJECT-TYPE
+    SYNTAX PersonalUserId -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This element has only relevance when UPT calls are made. It is 
+	 a network requirement that the provided international personal 
+	 User Identity is unique and verified by the network."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) cause iNServiceInfo attribute, 
+	     personalUserId component."
+    ::= { callDetailLogRecordEntry 22 }
+
+chargedParticipant OBJECT-TYPE
+    SYNTAX ParticipantType -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element shall contain the participant, i.e.  
+	 calling, called, redirecting, redirection or original called 
+	 party, to be charged for the usage."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) cause iNServiceInfo attribute, 
+	     chargedParticpant component."
+    ::= { callDetailLogRecordEntry 23 }
+
+chargedDirectoryNumber OBJECT-TYPE
+    SYNTAX ChargedDirectoryNumber -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element shall contain the charged directory 
+	 number in the case where the number cannot be indicated by the 
+	 charged participant element."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) cause iNServiceInfo attribute, 
+	     chargedDirectoryNumber component."
+    ::= { callDetailLogRecordEntry 24 }
+
+percentageToBeBilled OBJECT-TYPE
+    SYNTAX PercentageToBeBilled -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element shall contain the percentage to be 
+	 billed in the case where normal billing rules are not 
+	 followed."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 25 }
+
+accountCodeInput OBJECT-TYPE
+    SYNTAX AccountCodeInput -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element shall contain the code to which 
+	 accounting is to be referred and input by the subscriber.  
+	 Examples of use are authorisation code, PI, bank account, PV 
+	 code or credit card number to be used for billing."
+    REFERENCE
+	""
+    ::= { callDetailLogRecordEntry 26 }
+
+iNServiceCode OBJECT-TYPE
+    SYNTAX INServiceCode -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the IN service code."
+    REFERENCE
+	"ITU-T Q.825 (1998) iNServiceCode attribute."
+    ::= { callDetailLogRecordEntry 27 }
+
+queueTimeStamp OBJECT-TYPE
+    SYNTAX StartDateTime -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides a time stamp of the time that the call enterered a 
+	 queue."
+    REFERENCE
+	"ITU-T Q.825 (1998) queueInfo attribute."
+    ::= { callDetailLogRecordEntry 28 }
+
+queueDuration OBJECT-TYPE
+    SYNTAX Duration -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides the duration of time that the call spent in the queue."
+    REFERENCE
+	"ITU-T Q.825 (1998) queueInfo attribute."
+    ::= { callDetailLogRecordEntry 29 }
+
+serviceSpecificINInformation OBJECT-TYPE
+    SYNTAX ServiceSpecificINInformation -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Provides IN service specific information."
+    REFERENCE
+	"ITU-T Q.825 (1998),
+	     Q825-CDR-ASN1Module.ServiceSpecificINInformation."
+    ::= { callDetailLogRecordEntry 30 }
+
+partialRecordNumber OBJECT-TYPE
+    SYNTAX PartialRecordNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Note that in Q.825 this field is the 'number' subfield of the 
+	 partialGeneration component of the cdrRecord."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), partialGeneration attribute."
+    ::= { callDetailLogRecordEntry 31 }
+
+partialRecordReason OBJECT-TYPE
+    SYNTAX PartialRecordReason
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"Note that in Q.825 this field is the 'reason' subfield of the 
+	 partialGeneration component of the cdrRecord."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998), partialGeneration attribute."
+    ::= { callDetailLogRecordEntry 32 }
+
+exchangeInfo OBJECT-TYPE
+    SYNTAX ExchangeInfo -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the exchange identity. By means of the 
+	 exchange identity it is always possible to identify the 
+	 exchange where a specific CDR was generated. In addition to the 
+	 identity of the exchange, additional information can be added 
+	 to indicate the program version of the originator. This 
+	 information is provided to assist in interpreting the CDR when 
+	 new software releases, that affect the CDR format, are 
+	 introduced in the network. When all records to be transferred 
+	 originate from the same exchange, this information can 
+	 optionally be provided in the file header."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) exchangeInfo attribute."
+    ::= { callDetailLogRecordEntry 33 }
+
+relatedCallNumber OBJECT-TYPE
+    SYNTAX RelatedCallNumber -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the Call identification number of an 
+	 associated call record. This number is used for associating 
+	 different call records generated in the same exchange."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) relatedCallNumber attribute."
+    ::= { callDetailLogRecordEntry 34 }
+
+cDRPurpose OBJECT-TYPE
+    SYNTAX CDRPurpose -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute provides information to the OS on the reason for 
+	 triggering of the record. In most networks the OS will be aware 
+	 of the triggering conditions of the network and hence this 
+	 information will not be required."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) cDRPurpose attribute."
+    ::= { callDetailLogRecordEntry 35 }
+
+physicalLineCode OBJECT-TYPE
+    SYNTAX PhysicalLineCode -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element shall be used to identify the physical 
+	 line used by the calling subscriber. This element is used for 
+	 customer care purposes and is only relevant in the case where 
+	 multiple lines are used by a common directory number."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) physicalLineCode attribute."
+    ::= { callDetailLogRecordEntry 36 }
+
+receivedDigits OBJECT-TYPE
+    SYNTAX ReceivedDigits -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the digits dialled by the subscriber or 
+	 sent by the subscriber terminal. Normally this information is 
+	 only included for customer care purposes. It should however be 
+	 noted that the use of functional signalling in ISDN as well as 
+	 requirements to restrict this information will require operator 
+	 or manufacturer specific coding of this element.  Alternatively 
+	 functional information should be included in the supplementary 
+	 service field."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) receivedDigits attribute."
+    ::= { callDetailLogRecordEntry 37 }
+
+operatorSpecific1AdditionalNumber OBJECT-TYPE
+    SYNTAX OperatorSpecific1AdditionalNumber -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains operator defined additional participant 
+	 information and is used when the elements defined elsewhere are 
+	 not adequate."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) 
+	 operatorSpecifc1AdditioanlNumber attribute."
+    ::= { callDetailLogRecordEntry 38 }
+
+operatorSpecific2AdditionalNumber OBJECT-TYPE
+    SYNTAX OperatorSpecific2AdditionalNumber -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains operator defined additional participant 
+	 information and is used when the elements defined elsewhere are 
+	 not adequate."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) 
+	 operatorSpecifc2AdditioanlNumber attribute."
+    ::= { callDetailLogRecordEntry 39 }
+
+operatorSpecific3AdditionalNumber OBJECT-TYPE
+    SYNTAX OperatorSpecific3AdditionalNumber -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains operator defined additional participant 
+	 information and is used when the elements defined elsewhere are 
+	 not adequate."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) 
+	 operatorSpecifc3AdditioanlNumber attribute."
+    ::= { callDetailLogRecordEntry 40 }
+
+callingPartyCategory OBJECT-TYPE
+    SYNTAX CallingPartyCategory -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the calling subscriber category. This 
+	 information may also be related to the redirecting party for a 
+	 forwarded call."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) callingPartyCategory 
+	 attribute."
+    ::= { callDetailLogRecordEntry 41 }
+
+callingPartyType OBJECT-TYPE
+    SYNTAX CallingPartyType -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element shall contain the calling subscriber 
+	 type. This information may also be related to the redirecting 
+	 party for a forwarded call.
+
+	 The Calling party Type is defined as:
+
+	 - analogue(0), Analogue;
+
+	 - customerLink(1), T1 or E1 PSTN digital access;
+
+	 - basicAccess(2), Basic Access;
+
+	 - primaryRateAccess(3), Primary Rate Access."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) callingPartyType attribute."
+    ::= { callDetailLogRecordEntry 42 }
+
+chargingInformation OBJECT-TYPE
+    SYNTAX ChargingInformation -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the charging information generated by 
+	 an NE which is capable of charging. This information can either 
+	 be passed on to the billing application or in the case where 
+	 the NE calculates charging information for presentation to the 
+	 user, this information can be used to compare the values 
+	 generated by the off-line charging application. The attribute 
+	 contains the charged amount either in recorded currency or call 
+	 charge units."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) chargingInformation 
+	 attribute."
+    ::= { callDetailLogRecordEntry 43 }
+
+progress OBJECT-TYPE
+    SYNTAX Progress -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute describes an event which has occurred during the 
+	 life of a call.  The attribute contains a location value as 
+	 well as the progress description.  Progress information can be 
+	 used e.g. for determining whether the subscriber shall be 
+	 charged for the use of a supplementary service towards a non- 
+	 ISDN user. Only the Progress indicator received from the far 
+	 end is of relevance and should be used. In the case where more 
+	 than one value is received only the last Progress indicator is 
+	 used."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) progress attribute."
+    ::= { callDetailLogRecordEntry 44 }
+
+accessDelivery OBJECT-TYPE
+    SYNTAX AccessDelivery -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the Access delivery information which 
+	 indicates if the call has been delivered to the called 
+	 subscriber. Normally the value is derived from the ISUP 
+	 signalling. In the case of local calls, where no ISUP 
+	 signalling is used, a similar value shall be adopted. Access 
+	 delivery can be used for statistical purposes or to determine 
+	 whether the charged subscriber should be charged with call 
+	 attempt charge or not."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) accessDelivery attribute."
+    ::= { callDetailLogRecordEntry 45 }
+
+trunkGroupOutgoing OBJECT-TYPE
+    SYNTAX TrunkGroupOutgoing -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the symbolic name of the trunk that is 
+	 used by the outgoing call as seen from the NE.  If the called 
+	 subscriber is a local subscriber then this information is not 
+	 relevant."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) trunkGroupOutgoing 
+	 attribute."
+    ::= { callDetailLogRecordEntry 46 }
+
+trunkGroupIncoming OBJECT-TYPE
+    SYNTAX TrunkGroupIncoming -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the symbolic name of the trunk that is 
+	 used by the incoming call as seen by the NE. If the calling 
+	 subscriber is a local subscriber then this information element 
+	 is not relevant."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) trunkGroupIncoming 
+	 attribute."
+    ::= { callDetailLogRecordEntry 47 }
+
+fallbackBearerService OBJECT-TYPE
+    SYNTAX FallbackBearerService -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the fallback bearer capability 
+	 information for a call or an event concerning a supplementary 
+	 service. This indicator is only provided when, in the case of 
+	 fallback, the bearer service is not identical to the initial 
+	 requested service."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) fallbackBearerService 
+	 attribute."
+    ::= { callDetailLogRecordEntry 48 }
+
+teleservice OBJECT-TYPE
+    SYNTAX Teleservice -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This information element shall contain the high layer 
+	 compatibility information for a call or an event concerning a 
+	 supplementary service.
+
+	 This information element is only relevant in connection with 
+	 ISDN."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) teleservice attribute."
+    ::= { callDetailLogRecordEntry 49 }
+
+conversationTime OBJECT-TYPE
+    SYNTAX ConversationTime -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the time consumption from B-answer or 
+	 equivalent. The call is considered terminated when 
+	 communication between the parties is no longer possible."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) conversationTime attribute."
+    ::= { callDetailLogRecordEntry 50 }
+
+durationTimeACM OBJECT-TYPE
+    SYNTAX DurationTimeACM -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the time consumption from seizure time 
+	 until received ACM. This attribute is only included if ACM is 
+	 received."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) durationTimeACM attribute."
+    ::= { callDetailLogRecordEntry 51 }
+
+durationTimeBAnswer OBJECT-TYPE
+    SYNTAX DurationTimeANM -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the time consumption from the seizure 
+	 time until received BAnswer. This attribute is included if 
+	 B-Answer is received."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) durationTimeB-Answer 
+	 attribute."
+    ::= { callDetailLogRecordEntry 52 }
+
+durationTimeNoBAnswer OBJECT-TYPE
+    SYNTAX DurationTimeNoANM -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the time consumption from the seizure 
+	 time to termination time when no B-Answer is received."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) durationTimeNoB-Answer 
+	 attribute."
+    ::= { callDetailLogRecordEntry 53 }
+
+uUInfo OBJECT-TYPE
+    SYNTAX UUInfo -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute shall contain the User-to-User info data 
+	 counter. The counter shall indicate the total number of octets 
+	 or elements transmitted or received by the subscriber using the 
+	 User-to-user signalling supplementary service. Separate 
+	 counters can be assigned to the 3 different User-to-user 
+	 signalling services."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) uUInfo attribute."
+    ::= { callDetailLogRecordEntry 54 }
+
+standardExtensions OBJECT-TYPE
+    SYNTAX StandardExtensions -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute shall contain standardized extensions that are 
+	 added to the standard usage metering record.  This field 
+	 contains a set of 'management extensions' as defined in ITU-T 
+	 Rec. X.721."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) standardExtensions 
+	 attribute."
+    ::= { callDetailLogRecordEntry 55 }
+
+recordExtensions OBJECT-TYPE
+    SYNTAX RecordExtensions -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute shall contain information elements that network 
+	 operators and/or manufacturers have added to the standard usage 
+	 metering record. This information element contains a set of 
+	 'management extensions' as defined in ITU-T Rec. 
+	 X.721."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) recordExtensions attribute."
+    ::= { callDetailLogRecordEntry 56 }
+
+bPartyCategory OBJECT-TYPE
+    SYNTAX PartyCategory -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the called subscriber category."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) b-PartyCategory attribute."
+    ::= { callDetailLogRecordEntry 57 }
+
+iSUPPreferred OBJECT-TYPE
+    SYNTAX ISUPPreferred -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute indicates if an ISUP preference was requested.  
+	 For ISUP, this attribute contains the ISUP Preference Indicator 
+	 field of Forwarding Call Call Indicator parameter defined in 
+	 ITU-T Rec. Q.763. If ISUP is not used this attribute 
+	 is set not applicable."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) iSUPPreferred attribute."
+    ::= { callDetailLogRecordEntry 58 }
+
+networkManagementControls OBJECT-TYPE
+    SYNTAX NetworkManagementControls -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute indicates which Traffic Network Management 
+	 control has affected the call. This means that calls which are 
+	 blocked by a traffic control will be taken into account. A call 
+	 is affected by a Traffic Network Management control if the 
+	 normal call routing process has been altered by a Traffic 
+	 Network Management control."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) networkManagementControls 
+	 attribute."
+    ::= { callDetailLogRecordEntry 59 }
+
+glare OBJECT-TYPE
+    SYNTAX Glare -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute indicates if a glare condition was encountered 
+	 even if it does not cause the call to fail."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) glare attribute."
+    ::= { callDetailLogRecordEntry 60 }
+
+recordId OBJECT-TYPE
+    SYNTAX RecordId -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute is used for audit trail purposes to check if all 
+	 logged CDRs are transferred to the OS. It is a sequential 
+	 number."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) recordId attribute."
+    ::= { callDetailLogRecordEntry 61 }
+
+dataValidity OBJECT-TYPE
+    SYNTAX DataValidity -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute indicates that the NE is having problems and 
+	 that the content of the generated CDR is not reliable. This 
+	 indication enables the OS to take the necessary actions on the 
+	 collected CDRs."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) dataValidity attribute."
+    ::= { callDetailLogRecordEntry 62 }
+
+callStatus OBJECT-TYPE
+    SYNTAX CallStatus -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute identifies whether the call is answered or not.  
+	 A call is considered answered if ANM or its equivalent has been 
+	 received."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) callStatus attribute."
+    ::= { callDetailLogRecordEntry 63 }
+
+carrierId OBJECT-TYPE
+    SYNTAX CarrierId -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute contains the carrier Id to which the call is 
+	 sent."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) carrierId attribute."
+    ::= { callDetailLogRecordEntry 64 }
+
+dPC OBJECT-TYPE
+    SYNTAX NetworkPointCode -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute is used for analysis purpose. It contains the 
+	 destination point code."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) dPC attribute."
+    ::= { callDetailLogRecordEntry 65 }
+
+oPC OBJECT-TYPE
+    SYNTAX NetworkPointCode -- OPTIONAL
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"This attribute is used for analysis purpose. It contains the 
+	 originating point code of the failed call."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) oPC attribute."
+    ::= { callDetailLogRecordEntry 66 }
+
+-- =============================================================================
+
+TimesOfDay ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of the time of day at which the log 
+	 will be rotated daily.  HHmm (Hours, Minutes) each field one 
+	 digit, two digits per octet, the digits 
+	 0 through 9 encoded as 0000 to 1001 'hstring', 1st digit in the 
+	   LSB."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998),
+	     Q825-CDR-ASN1Module.TimesOfDay."
+    SYNTAX OCTET STRING(SIZE(0|2))
+
+Period ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of a period by indicating the elapsed 
+	 time in minutes."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998),
+	     Q825-CDR-ASN1Module.Period."
+    SYNTAX INTEGER (0..512)
+
+fileGeneratingLogTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FileGeneratingLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This log is used to create files that can be exchanged using an 
+	 appropriate file transfer protocol. The log provides the value 
+	 (sequence number) for the precordId (field of the CDR). The 
+	 action create file is used to generate the file to be 
+	 exchanged. The file created consists of a concatenation of the 
+	 content of the call detail records; i.e. the call detail 
+	 records without the record overhead (Record Id, Managed Object 
+	 Class and Instance and Logging Time).  To avoid duplication of 
+	 CDRs, logging of blockedRecord notifications emitted by the 
+	 blocking log should be excluded by configuration of the file 
+	 generating loggs discriminator construct.  Files may also be 
+	 created due to internal trigger events. One such internal 
+	 trigger is based on time of day. The records are deleted after 
+	 successful copying of the records to the file."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) fileGeneratingLog MO."
+    ::= { fileGeneratingLog 1 }
+
+fileGeneratingLogEntry OBJECT-TYPE
+    SYNTAX FileGeneratingLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"Creating may use automatic instance naming.  Deleting a log 
+	 deletes its contents."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) fileGeneratingLog MO."
+    INDEX { logId } -- derived from log
+    ::= { fileGeneratingLogTable 1 }
+
+-- ACTIONS createFile
+
+FileGeneratingLogEntry ::=
+    SEQUENCE {
+	timesOfDay
+	    TimesOfDay,
+	periodicTrigger
+	    Period,
+	fileGeneratingLogStorageType
+	    StorageType,
+	fileGeneratingLogEntryStatus
+	    RowStatus
+    }
+
+timesOfDay OBJECT-TYPE
+    SYNTAX TimesOfDay
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"This attribute specifies the times at which the log will 
+	 automatically generate a file.  When specified as the null 
+	 octet string, the file will not be generated daily."
+    REFERENCE
+	"ITU-T Recommneation Q.825 (1998) timesOfDay attribute."
+    DEFVAL      { "" }
+    ::= { fileGeneratingLogEntry 1 }
+
+periodicTrigger OBJECT-TYPE
+    SYNTAX Period
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"This attribute defines the periodic interval at which the file 
+	 should be created.  If specified as zero (0), the file will not 
+	 be created periodically."
+    REFERENCE
+	"ITU-T Recommneation Q.825 (1998) periodicTrigger attribute."
+    DEFVAL      { 0 }
+    ::= { fileGeneratingLogEntry 2 }
+
+fileGeneratingLogStorageType OBJECT-TYPE
+    SYNTAX StorageType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of whether the fileGeneratingLog entry 
+	 is volatile or nonVolatile.  volatile file generating logs may 
+	 be useful for generating logs for analysis based on usage 
+	 detail."
+    REFERENCE
+	"STD 58, SNMPv2-TC, StorageType."
+    DEFVAL      { nonVolatile }
+    ::= { fileGeneratingLogEntry 3 }
+
+fileGeneratingLogEntryStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+	"Provides a mechanism whereby management station may create or 
+	 delete entries in this table.  Entries for the same logId index 
+	 must already exist in the logTable before the entry may be 
+	 created in this table.  When entries are deleted, all contained 
+	 logRecords are deleted."
+    REFERENCE
+	"STD 58, SNMPv2-TC, RowStatus."
+    DEFVAL      { active }
+    ::= { fileGeneratingLogEntry 4 }
+
+
+-- =============================================================================
+
+CreationTriggerList ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides a specification of a creation trigger list for 
+	 creating usage meters.  Each octet in the string has one of the 
+	 following values:
+
+	 - seizure(0), triggered when the originating trunk is siezed;
+
+	 - firstDigitReceived(1), triggered when the first digit is 
+	   received from the origination;
+
+	 - aCMReceived(2), triggered when the ACM (last digit) is 
+	   received;
+
+	 - aNMReceived(3), triggered when an ANM is received from the 
+	   termination;
+
+	 - supplementaryServiceInvocation(4), triggered when a 
+	   supplementary service is invoked;
+
+	 - supplementaryServiceInput(5), triggered when a supplementary 
+	   service input occurs.
+
+	 aCMreceived(2) is defined as the receipt of ACM for an external 
+	 call. In the case of a terminating exchange the event ACM 
+	 received will occur when the ACM is normally generated. This is 
+	 either when a B-subscriber port is free (early ACM) or when a 
+	 B-subscriber terminal is free (late ACM).  The choice between 
+	 early and late ACM is a network option in the terminating 
+	 network.  For local calls a corresponding time shall be used."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998),
+	     Q825-CDR-ASN1Module.CreationTriggerList."
+    SYNTAX BITS {
+	seizure(0),
+	firstDigitReceived(1),
+	aCMReceived(2),
+	aNMReceived(3),
+	supplementaryServiceInvocation(4),
+	supplementaryServiceInput(5) }
+
+simpleUsageMeteringControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SimpleUsageMeteringControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"simpleUsageMeteringControl object class allows the definition 
+	 of different types of triggers for usage metering recording.  
+	 One of the defined reporting triggers requires periodic 
+	 reporting and can be used to transfer partial service usage 
+	 data to a log or remote OS for long duration service usage.  
+	 Another type of trigger is determined by the occurrence of a 
+	 particular event during usage of the service, e.g. completion 
+	 of usage. This object class fully supports the requirements for 
+	 usage metering. If only Usage Metering application is required, 
+	 then simpleUsageMeteringControl object class shall be used.  
+	 This object class controls the generation of CDRs in the NE.  
+	 CDRs are actually produced if the transaction fulfils the 
+	 conditions defined in the creationTriggerList attribute.  If 
+	 the creationTriggerList is empty, no CDR will be generated.  
+	 The value of the time period in reportingTriggers defines the 
+	 time interval between partial records. No attribute value 
+	 change notification is sent by this object when data object 
+	 reference list is changed and no attribute change value 
+	 reflects this data object reference list."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) simpleUsageMeteringControl MO."
+    ::= { simpleUsageMeteringControl 1 }
+
+simpleUsageMeteringControlEntry OBJECT-TYPE
+    SYNTAX SimpleUsageMeteringControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"When deleted, the contained objects are deleted."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) simpleUsageMeteringControl MOC."
+    INDEX { controlObjectId } -- shared index
+	-- derived from usageMeteringControlObject X.742
+    ::= { simpleUsageMeteringControlTable 1 }
+
+SimpleUsageMeteringControlEntry ::=
+    SEQUENCE {
+	creationTriggerList
+	    CreationTriggerList,
+	simpleUsageMeteringControlEntryStatus
+	    RowStatus
+    }
+
+creationTriggerList OBJECT-TYPE
+    SYNTAX CreationTriggerList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"This attribute consists of a list of values that specify the 
+	 conditions that will lead to the creation of Call Detail data 
+	 objects. Triggers can be call related (Seizure or first digit 
+	 or ACM received or ANM received) and non-call related 
+	 (supplementary service invocation and/or input). When multiple 
+	 triggers are present, the recording process is activated by the 
+	 first recordable event"
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) creationTriggerList 
+	 attribute."
+    ::= { simpleUsageMeteringControlEntry 1 }
+
+simpleUsageMeteringControlEntryStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"Managment stations may delete entries in this table.  All of 
+	 the contained mesaures are deleted when the entry is deleted."
+    REFERENCE
+	"STD 58, SNMPv2-TC, RowStatus"
+    ::= { simpleUsageMeteringControlEntry 2 }
+
+
+-- =============================================================================
+
+ConfigurationMask ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+	"Provides specification of a configuration mask that determines 
+	 which additional data will be included in the CDR notification 
+	 emitted by the CDR object for QoS, Fraud and Traffic Network 
+	 Management purpose.  The characteristic 'additional' is with 
+	 reference to the data already included in the notification for 
+	 the purpose of usage metering.
+
+	 The mask is set-valued and may contain the following:
+
+	 - exchangeInfo(0), the exchangeInfo object is included in the 
+	   notification;
+
+	 - relatedCallNumber(1), the releatedCallNumber object is 
+	   included in the notification;
+
+	 - additionalParticipantInfo(2), the physicalLineCode, 
+	   receivedDigits, operatorSpecific1AdditionalNumber, 
+	   operatorSpecific2AdditionalNumber and 
+	   operatorSpecific3AdditionalNumber objects are included in the 
+	   notification;
+
+	 - callingPartyCategory(3), the callingPartyCategory object is 
+	   included in the notification;
+
+	 - callingPartyType(4), the callingPartyType object is included 
+	   in the notification;
+
+	 - progress(5), the progress object is included in the 
+	   notification;
+
+	 - accessDelivery(6), the accessDelivery object is included in 
+	   the notification;
+
+	 - trunkGroupOutgoing(7), the trunkGroupOutgoing object is 
+	   included in the notification;
+
+	 - trunkGroupIncoming(8), the trunkGroupIncoming object is 
+	   included in the notification;
+
+	 - teleservice(9), the teleservice object is included in the 
+	   notification;
+
+	 - standardExtensions(10), the standardExtensions object is 
+	   included in the notification;
+
+	 - recordExtensions(11), the recordExtensions object is included 
+	   in the notification;
+
+	 - bpartyCategory(12), the bPartyCategory object is included in 
+	   the notification;
+
+	 - iSUPPrefferred(13), the iSUPPreferred object is included in 
+	   the notification;
+
+	 - networkManagementControls(14), the networkManagementControls 
+	   object is included in the notification;
+
+	 - glare(15), the glare object is included in the notification.
+	 "
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998),
+	     Q825-CDR-ASN1Module.ConfigurationMask"
+    SYNTAX BITS {
+	exchangeInfo(0),
+	relatedCallNumber(1),
+	additionalParticipantInfo(2),
+	callingPartyCategory(3),
+	callingPartyType(4),
+	progress(5),
+	accessDelivery(6),
+	trunkGroupOutgoing(7),
+	trunkGroupIncoming(8),
+	teleservice(9),
+	standardExtensions(10),
+	recordExtensions(11),
+	bpartyCategory(12),
+	iSUPPrefferred(13),
+	networkManagementControls(14),
+	glare(15) }
+
+configurableSimpleUsageMeteringControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ConfigurableSimpleUsageMeteringControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	"This object class is used if Analysis function is required.  
+	 configurableSimpleUsageMeteringControl object allows sampling 
+	 rate and allows configuration of all the optional parameters, 
+	 as defined by configurationMask, to be included in the Call 
+	 Detail Notification. The object class controls the creation of 
+	 call Detail Data objects based on the creationTriggerList, and 
+	 the samplingRate. The configurationMask together will control 
+	 the additional data to be included in the CDR notification 
+	 emitted by the CDR object for QoS, Fraud and Traffic Network 
+	 Management purpose. The characteristic additional is with 
+	 reference to the data already included in the notification for 
+	 the purpose of usage metering"
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) 
+	 configurableSimpleUsageMeteringControl MOC."
+    ::= { configurableSimpleUsageMeteringControl 1 }
+
+configurableSimpleUsageMeteringControlEntry OBJECT-TYPE
+    SYNTAX ConfigurableSimpleUsageMeteringControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) 
+	 configurableSimpleUsageMeteringControl MO."
+    INDEX { controlObjectId } -- shared index
+	-- derived from simpleUsageMeteringControlObject
+    ::= { configurableSimpleUsageMeteringControlTable 1 }
+
+ConfigurableSimpleUsageMeteringControlEntry ::=
+    SEQUENCE {
+	samplingRate
+	    INTEGER,
+	configurationMask
+	    ConfigurationMask,
+	configurableSimpleUsgeMeteringControlEntryStatus
+	    RowStatus
+    }
+
+samplingRate OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"This attribute indicates that every n-th callDetailData will be 
+	 flagged for analysis purpose and all subsequent CDRs emitted 
+	 will indicate Analysis in the cDRPurpose."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) samplingRate attribute."
+    ::= { configurableSimpleUsageMeteringControlEntry 1 }
+
+configurationMask OBJECT-TYPE
+    SYNTAX ConfigurationMask
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"This object specifies the additional information to be included 
+	 in the Call Detail Notification.  The configuraiton mask will 
+	 contro the additional data to be included in the CDR 
+	 notification emitted by the CDR object for QoS, Fraud and 
+	 Traffic Network Management purpose.  The characteristic 
+	 'additional' is with reference to the data already included in 
+	 the notification for the purpose of usage metering."
+    REFERENCE
+	"ITU-T Rec. Q.825 (1998) configurationMask  
+	 attribute."
+    ::= { configurableSimpleUsageMeteringControlEntry 2 }
+
+
+configurableSimpleUsgeMeteringControlEntryStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	"Provides a mechanism whereby management stations may delete 
+	 entries in this table."
+    REFERENCE
+	"STD58, SNMPv2-TC, RowStatus"
+    ::= { configurableSimpleUsageMeteringControlEntry 3 }
+
+
+-- =============================================================================
+
+-- sequence		::= IMPLICIT [5] OCTET STRING(SIZE(0..5))
+--  see sequenceNumber
+-- origdate		::= IMPLICIT [6] OCTET STRING(SIZE(0..8))
+-- origtime		::= IMPLICIT [7] OCTET STRING(SIZE(0..6))
+--  see seizureTime
+-- discdate		::= IMPLICIT [8] OCTET STRING(SIZE(0..8))
+-- disctime		::= IMPLICIT [9] OCTET STRING(SIZE(0..6))
+--  see seizureTime, answerTime, durationTimeNoBAnswer, conversationTime
+-- anstime		::= IMPLICIT [10] OCTET STRING(SIZE(0..6))
+--  see answerTime
+-- duration		::= IMPLICIT [11] OCTET STRING(SIZE(0..8))
+--  see conversationTime
+-- seizetime		::= IMPLICIT [12] OCTET STRING(SIZE(0..8))
+--  see durationTimeNoBAnswer, durationTimeBAnswer
+-- trkseltime		::= IMPLICIT [13] OCTET STRING(SIZE(0..6)) NO
+--  see durationTimeNoBAnswer, durationTimeBAnswer
+-- digcoltime		::= IMPLICIT [14] OCTET STRING(SIZE(0..6)) NO
+--  see durationTimeACM
+-- anstype		::= IMPLICIT [15] OCTET STRING(SIZE(0..2))
+-- uaq			::= IMPLICIT [16] OCTET STRING(SIZE(0..1))
+-- disctype		::= IMPLICIT [17] OCTET STRING(SIZE(0..1))
+--  see networkMangementControls, glare
+-- udq		::= IMPLICIT [18] OCTET STRING(SIZE(0..1))
+-- billable		::= IMPLICIT [19] OCTET STRING(SIZE(0..1)) NO
+-- nobillrc		::= IMPLICIT [20] OCTET STRING(SIZE(0..2)) NO
+-- cic		::= IMPLICIT [21] OCTET STRING(SIZE(0..4))
+--  see carrierId
+-- ani		::= IMPLICIT [22] OCTET STRING(SIZE(0..15))
+--  see chargedDirectoryNumber
+-- clgptyno		::= IMPLICIT [23] OCTET STRING(SIZE(0..15))
+--  see callingPartyNumber, callingPartyNumberNotScreened
+-- calledno		::= IMPLICIT [24] OCTET STRING(SIZE(0..18))
+--  see calledPartyNumber
+-- dialedno		::= IMPLICIT [25] OCTET STRING(SIZE(0..25))
+--  see originalCalledNumber
+-- outpulsedno		::= IMPLICIT [26] OCTET STRING(SIZE(0..18))
+-- thirdptyno		::= IMPLICIT [27] OCTET STRING(SIZE(0..10)) NO
+--  see redirectingNumber
+-- univacc		::= IMPLICIT [28] OCTET STRING(SIZE(0..10)) NO
+-- egcalledno		::= IMPLICIT [29] OCTET STRING(SIZE(0..24))
+-- authcode		::= IMPLICIT [30] OCTET STRING(SIZE(0..8)) NO
+-- acctcd		::= IMPLICIT [31] OCTET STRING(SIZE(0..12)) NO
+--  see accountCodeInput
+-- billnum		::= IMPLICIT [32] OCTET STRING(SIZE(0..25))
+--  see chargedDirectoryNumber
+-- pindigs		::= IMPLICIT [33] OCTET STRING(SIZE(0..4)) NO
+-- portedno		::= IMPLICIT [34] OCTET STRING(SIZE(0..28)) NO
+-- switchid		::= IMPLICIT [35] OCTET STRING(SIZE(0..3))
+-- origtrk		::= IMPLICIT [36] OCTET STRING(SIZE(0..4))
+--  see trunkGroupIncoming
+-- clsorigtrk		::= IMPLICIT [37] OCTET STRING(SIZE(0..2)) NO
+--  see trunkGroupIncoming
+-- origmem		::= IMPLICIT [38] OCTET STRING(SIZE(0..10))
+--  see trunkGroupIncoming
+-- termtrk		::= IMPLICIT [39] OCTET STRING(SIZE(0..4))
+--  see trunkGroupOutgoing
+-- clstermtrk		::= IMPLICIT [40] OCTET STRING(SIZE(0..2)) NO
+--  see trunkGroupOutgoing
+-- termmem		::= IMPLICIT [41] OCTET STRING(SIZE(0..10))
+--  see trunkGroupOutgoing
+-- finswitch		::= IMPLICIT [42] OCTET STRING(SIZE(0..3))
+-- fintrk		::= IMPLICIT [43] OCTET STRING(SIZE(0..4))
+--  see trunkGroupOutgoing
+-- ltoffset		::= IMPLICIT [44] OCTET STRING(SIZE(0..2))
+-- infodigs		::= IMPLICIT [45] OCTET STRING(SIZE(0..3))
+--  see callingPartyCategory
+-- carsel		::= IMPLICIT [46] OCTET STRING(SIZE(0..2))
+-- anisuffix		::= IMPLICIT [47] OCTET STRING(SIZE(0..3))
+--  see callingPartyCategory
+-- ctrlrec		::= IMPLICIT [48] OCTET STRING(SIZE(0..1)) NO
+-- abauth		::= IMPLICIT [49] OCTET STRING(SIZE(0..1))
+-- opart		::= IMPLICIT [50] OCTET STRING(SIZE(0..4))
+-- cnpredig		::= IMPLICIT [51] OCTET STRING(SIZE(0..2))
+-- ucn		::= IMPLICIT [52] OCTET STRING(SIZE(0..1))
+-- calltype		::= IMPLICIT [53] OCTET STRING(SIZE(0..2)) NO
+-- billtype		::= IMPLICIT [54] OCTET STRING(SIZE(0..2)) NO
+-- divcode		::= IMPLICIT [55] OCTET STRING(SIZE(0..7)) NO
+-- callarea		::= IMPLICIT [56] OCTET STRING(SIZE(0..4)) NO
+-- tpart		::= IMPLICIT [57] OCTET STRING(SIZE(0..3))
+-- rteguide		::= IMPLICIT [58] OCTET STRING(SIZE(0..1)) NO
+-- rteno		::= IMPLICIT [59] OCTET STRING(SIZE(0..2))
+-- finstatus		::= IMPLICIT [60] OCTET STRING(SIZE(0..3)) NO
+-- lnpchk		::= IMPLICIT [61] OCTET STRING(SIZE(0..1))
+-- ulnpchk		::= IMPLICIT [62] OCTET STRING(SIZE(0..1))
+-- daycount		::= IMPLICIT [63] OCTET STRING(SIZE(0..1)) NO
+-- reccd		::= IMPLICIT [64] OCTET STRING(SIZE(0..4))
+--  see softwareVersion
+-- timechg		::= IMPLICIT [65] OCTET STRING(SIZE(0..1))
+--  see partialRecordReason
+-- origampm		::= IMPLICIT [66] OCTET STRING(SIZE(0..1))
+-- discampm		::= IMPLICIT [67] OCTET STRING(SIZE(0..1))
+-- rltcdr		::= IMPLICIT [68] OCTET STRING(SIZE(0..1))
+-- origoprt		::= IMPLICIT [69] OCTET STRING(SIZE(0..4))
+-- predig		::= IMPLICIT [70] OCTET STRING(SIZE(0..1))
+-- trtmtcd		::= IMPLICIT [71] OCTET STRING(SIZE(0..3))
+--  see cause
+-- compcode		::= IMPLICIT [72] OCTET STRING(SIZE(0..2))
+-- origlrn		::= IMPLICIT [73] OCTET STRING(SIZE(0..10))
+--  see operatorSpecific1Number
+-- termlrn		::= IMPLICIT [74] OCTET STRING(SIZE(0..10)) NO
+--  see operatorSpecific2Number
+-- acctv		::= IMPLICIT [75] OCTET STRING(SIZE(0..1))
+-- cosove		::= IMPLICIT [76] OCTET STRING(SIZE(0..1))
+-- presind		::= IMPLICIT [77] OCTET STRING(SIZE(0..1))
+--  see callingPartyNumber, callingPartyNumberNotScreened
+-- relcause		::= IMPLICIT [78] OCTET STRING(SIZE(0..3))
+--  see cause
+-- rtetab		::= IMPLICIT [79] OCTET STRING(SIZE(0..2))
+-- jurisinf		::= IMPLICIT [80] OCTET STRING(SIZE(0..6)) NO
+-- origlata		::= IMPLICIT [81] OCTET STRING(SIZE(0..5))
+-- termlata		::= IMPLICIT [82] OCTET STRING(SIZE(0..5))
+-- origeo		::= IMPLICIT [83] OCTET STRING(SIZE(0..11))
+-- termeo		::= IMPLICIT [84] OCTET STRING(SIZE(0..11))
+-- origocn		::= IMPLICIT [85] OCTET STRING(SIZE(0..4))
+-- termocn		::= IMPLICIT [86] OCTET STRING(SIZE(0..4))
+-- origstate		::= IMPLICIT [87] OCTET STRING(SIZE(0..2))
+-- termstate		::= IMPLICIT [88] OCTET STRING(SIZE(0..2))
+-- otrkcls		::= IMPLICIT [89] OCTET STRING(SIZE(0..4))
+-- ftrkcls		::= IMPLICIT [90] OCTET STRING(SIZE(0..4))
+-- dufcgt		::= IMPLICIT [91] OCTET STRING(SIZE(0..6))
+-- dufcharge		::= IMPLICIT [92] OCTET STRING(SIZE(0..7)) NO
+-- dufratecls		::= IMPLICIT [93] OCTET STRING(SIZE(0..1))
+-- dufmsgtype		::= IMPLICIT [94] OCTET STRING(SIZE(0..1))
+-- dufclstype		::= IMPLICIT [95] OCTET STRING(SIZE(0..3))
+-- duforigtermid	::= IMPLICIT [96] OCTET STRING(SIZE(0..1))
+-- origdur		::= IMPLICIT [97] OCTET STRING(SIZE(0..10))
+--   see durationTimeACM, durationTimeBAnswer, conversationTime, 
+--       durationTimeNoBAnswer
+-- globcallid		::= IMPLICIT [98] OCTET STRING(SIZE(0..22))
+--   see callIdentificationNumber
+-- recsource		::= IMPLICIT [99] OCTET STRING(SIZE(0..3))
+--  see exchangeInfo
+
+-- =============================================================================
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:-,\f\b\:· fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
