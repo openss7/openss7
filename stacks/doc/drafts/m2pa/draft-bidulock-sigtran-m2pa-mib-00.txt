@@ -331,7 +331,7 @@ Change History
   finalized.
 
   $Log: draft-bidulock-sigtran-m2pa-mib-00.txt,v $
-  Revision 0.9.2.1  2004/03/16 07:05:21  brian
+  Revision 0.9.2.1  2004-03-16 07:05:21  brian
   - Added older drafts in pdf and txt form.
 
   Revision 0.9  2004/02/17 09:40:47  brian

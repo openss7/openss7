@@ -1,39 +1,39 @@
-                                                                                
-                                  _____________                                 
-                                 |             |                                
-                                 | user level  |                                
-                                 |  transport  |                                
-                                 |    user     |                                
-                                 |_____________|                                
-                                 |             |                                
-                                 |  transport  |                                
-                                 |  interface  |                                
-                                 |   library   |                                
-                                 |_____________|                                
-                                        ^                                       
-                                        |                                       
-                    --------------------V-------------------                    
-                                   UNIX kernel                                  
-                    ........................................                    
-                                 Stream mechanism                               
-                    ........................................                    
-                                   |         ^                                  
-                                   |         |                                  
-                               ____V_________|____                              
-                              |                   |                             
-                              |transport interface|                             
-                              |library cooperating|                             
-                              |streams module     |                             
-                              |___________________|                             
-                                   |         |                                  
-                                   |         |                                  
-                                   |     <---|------  full duplex               
-                                   |         |           stream                 
-                               ____V_________|____                              
-                              |                   |                             
-                              |    kernel level   |                             
-                              |     transport     |                             
-                              |      provider     |                             
-                              |                   |                             
-                              |___________________|                             
-                                                                                
+                                                                        
+                              _____________                             
+                             |             |                            
+                             | user level  |                            
+                             |  transport  |                            
+                             |    user     |                            
+                             |_____________|                            
+                             |             |                            
+                             |  transport  |                            
+                             |  interface  |                            
+                             |   library   |                            
+                             |_____________|                            
+                                    ^                                   
+                                    |                                   
+                --------------------V-------------------                
+                               UNIX kernel                              
+                ........................................                
+                             Stream mechanism                           
+                ........................................                
+                               |         ^                              
+                               |         |                              
+                           ____V_________|____                          
+                          |                   |                         
+                          |transport interface|                         
+                          |library cooperating|                         
+                          |streams module     |                         
+                          |___________________|                         
+                               |         |                              
+                               |         |                              
+                               |     <---|------  full duplex           
+                               |         |           stream             
+                           ____V_________|____                          
+                          |                   |                         
+                          |    kernel level   |                         
+                          |     transport     |                         
+                          |      provider     |                         
+                          |                   |                         
+                          |___________________|                         
+                                                                        

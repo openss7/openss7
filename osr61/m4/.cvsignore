@@ -41,3 +41,4 @@ intl.m4
 intldir.m4
 lock.m4
 visibility.m4
+intlmacosx.m4

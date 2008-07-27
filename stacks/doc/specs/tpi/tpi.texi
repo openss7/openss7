@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: tpi.texi,v 0.9.2.17 2008-07-11 09:36:14 brian Exp $
+% @(#) $Id: tpi.texi,v 0.9.2.18 2008-07-11 09:40:27 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-11 09:36:14 $ by $Author: brian $
+% Last Modified $Date: 2008-07-11 09:40:27 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -589,7 +589,7 @@ struct T_info_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type.
+Where @parm{PRIM_type} indicates the primitive type.
 
 This primitive requires the transport provider to generate one of the following
 acknowledgements upon receipt of the primitive and that the transport user wait
@@ -636,17 +636,17 @@ struct T_bind_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type.  @member{ADDR_length} is
+Where @parm{PRIM_type} indicates the primitive type.  @parm{ADDR_length} is
 the length@footnote{All lengths, offsets, and sizes in all structures refer to
 the number of bytes.} of the protocol address to be bound to the stream and
-@member{ADDR_offset} is the offset from the beginning of the @msg{M_PROTO} block
-where the protocol address begins.  @member{CONIND_number}@footnote{This field
+@parm{ADDR_offset} is the offset from the beginning of the @msg{M_PROTO} block
+where the protocol address begins.  @parm{CONIND_number}@footnote{This field
 should be ignored by those providing a connectionless transport service.} is the
 requested number of connect indications@footnote{If the number of outstanding
-connect indications equals @member{CONIND_number}, the transport provider need
+connect indications equals @parm{CONIND_number}, the transport provider need
 not discard further incoming connect indications, but may chose to queue them
 internally until the number of outstanding connect indications drops below
-@member{CONIND_number}.} allowed to be outstanding by the transport provider for
+@parm{CONIND_number}.} allowed to be outstanding by the transport provider for
 the specified protocol address.  The proper alignment of the address in the
 @msg{M_PROTO} message block is not guaranteed.  The address in the @msg{M_PROTO}
 message block is however, aligned the same as it was received from the transport
@@ -719,7 +719,7 @@ struct T_unbind_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type.
+Where @parm{PRIM_type} indicates the primitive type.
 
 This primitive requires the transport provider to generate the following
 acknowledgements upon receipt of the primitive and that the transport user must
@@ -771,12 +771,12 @@ struct T_optmgmt_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type.  @member{OPT_length} is
+Where @parm{PRIM_type} indicates the primitive type.  @parm{OPT_length} is
 the length of the protocol options associated with the primitive and
-@member{OPT_offset} is the offset from the beginning of the @msg{M_PROTO} block
+@parm{OPT_offset} is the offset from the beginning of the @msg{M_PROTO} block
 where the options begin.  The proper alignment of the options is not guaranteed.
 The options are however, aligned the same as it was received from the transport
-user.  @member{MGMT_flags} are the flags which define the request made by the
+user.  @parm{MGMT_flags} are the flags which define the request made by the
 transport user. The allowable flags are:
 
 @table @pval
@@ -856,7 +856,7 @@ struct T_addr_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type. This primitive requires
+Where @parm{PRIM_type} indicates the primitive type. This primitive requires
 the transport provider to generate one of the following acknowledgements upon
 receipt of the primitive, and the transport user must wait for the
 acknowledgement before issuing any other primitives:
@@ -921,7 +921,7 @@ struct T_info_ack {
 
 where the fields of this message have the following meanings:
 
-@table @member
+@table @parm
 
 @item PRIM_type
 This indicates the primitive type.
@@ -1017,9 +1017,9 @@ the new primitives @prim{T_ADDR_REQ} and @prim{T_ADDR_ACK}.
 The following rules apply when the type of service is @pval{T_CLTS}:
 
 @itemize ---
-@item The @member{ETSDU_size}, @member{CDATA_size} and @member{DDATA_size}
+@item The @parm{ETSDU_size}, @parm{CDATA_size} and @parm{DDATA_size}
 fields should be @samp{-2}.
-@item The @member{TSDU_size} should equal the @member{TIDU_size}.
+@item The @parm{TSDU_size} should equal the @parm{TIDU_size}.
 @end itemize
 
 @node T_BIND_ACK
@@ -1048,10 +1048,10 @@ struct T_bind_ack {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type.  @member{ADDR_length} is
+Where @parm{PRIM_type} indicates the primitive type.  @parm{ADDR_length} is
 the length of the protocol address that was bound to the stream and
-@member{ADDR_offset} is the offset from the beginning of the @msg{M_PCPROTO}
-block where the protocol address begins. @member{CONIND_number}@footnote{This
+@parm{ADDR_offset} is the offset from the beginning of the @msg{M_PCPROTO}
+block where the protocol address begins. @parm{CONIND_number}@footnote{This
 field doesn't apply to connectionless transport providers.} is the accepted
 number of connect indications allowed to be outstanding by the transport
 provider for the specified protocol address. The proper alignment of the address
@@ -1062,7 +1062,7 @@ the stream:
 
 @itemize ---
 
-@item If the @member{ADDR_length} field in the @prim{T_BIND_REQ} primitive is
+@item If the @parm{ADDR_length} field in the @prim{T_BIND_REQ} primitive is
 @samp{0}, then the transport provider must assign a transport protocol address
 to the user.
 
@@ -1073,7 +1073,7 @@ specified address, it must return an error.
 
 @end itemize
 
-The following rules apply to negotiating the @member{CONIND_number} argument:
+The following rules apply to negotiating the @parm{CONIND_number} argument:
 
 @itemize ---
 
@@ -1089,17 +1089,17 @@ negotiated accepted number of maximum connect requests greater than zero. If a
 stream has already bound itself to the given protocol address with a value
 greater than zero, the transport provider must return an error.
 
-@item If a stream with @member{CONIND_number} greater than zero is used to
+@item If a stream with @parm{CONIND_number} greater than zero is used to
 accept a connection, the stream will be found busy during the duration of that
 connection and no other streams may be bound to that protocol address with a
-@member{CONIND_number} greater than zero. This will prevent more than one stream
+@parm{CONIND_number} greater than zero. This will prevent more than one stream
 bound to the identical protocol address from accepting connect indications.
 
-@item A stream requesting a @member{CONIND_number} of zero should always be
+@item A stream requesting a @parm{CONIND_number} of zero should always be
 legal. This indicates to the transport provider that the stream is to be used to
 request connections only.
 
-@item A stream with a negotiated @member{CONIND_number} greater than zero may
+@item A stream with a negotiated @parm{CONIND_number} greater than zero may
 generate connect requests or accept connect indications.
 
 @end itemize
@@ -1129,37 +1129,37 @@ struct T_optmgmt_ack {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type.  @member{OPT_length} is
+Where @parm{PRIM_type} indicates the primitive type.  @parm{OPT_length} is
 the length of the protocol options associated with the primitive and
-@member{OPT_offset} is the offset from the beginning of the @msg{M_PCPROTO}
+@parm{OPT_offset} is the offset from the beginning of the @msg{M_PCPROTO}
 block where the options begin. The proper alignment of the options is not
 guaranteed.
 
-@member{MGMT_flags} should be the same as those specified in the
+@parm{MGMT_flags} should be the same as those specified in the
 @prim{T_OPTMGMT_REQ} primitive with any additional flags as specified below.
 
 The following rules apply to the @prim{T_OPTMGMT_ACK} primitive.
 
 @itemize ---
 
-@item If the value of @member{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
 is @pval{T_DEFAULT}, the provider should return the default provider options
 without changing the existing options associated with the stream.
 
-@item If the value of @member{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
 is @pval{T_CHECK}, the provider should return the options as specified in the
 @prim{T_OPTMGMT_REQ} primitive along with the additional flags @pval{T_SUCCESS}
 or @pval{T_FAILURE} which indicate to the user whether the specified options are
 supportable by the provider. The provider should not change any existing options
 associated with the stream.
 
-@item If the value of @member{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
 is @pval{T_NEGOTIATE}, the provider should set and negotiate the option as
 specified by the following rules:
 
 @itemize ---
 
-@item If the @member{OPT_length} field of the @prim{T_OPTMGMT_REQ} primitive is
+@item If the @parm{OPT_length} field of the @prim{T_OPTMGMT_REQ} primitive is
 @samp{0}, then the transport provider is to set and return the default options
 associated with the stream in the @prim{T_OPTMGMT_ACK} primitive.
 
@@ -1171,11 +1171,11 @@ the user's responsibility to check the negotiated options returned in the
 
 @end itemize
 
-@item If the value of @member{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
 is @pval{T_CURRENT}, the provider should return the current options that are
 currently associated with the stream.
 
-@item If the value of @member{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
+@item If the value of @parm{MGMT_flags} in the @prim{T_OPTMGMT_REQ} primitive
 is either @pval{T_NEGOTIATE} or @pval{T_CHECK} and the transport provider cannot
 support the requested flag, an error is to be returned.
 
@@ -1211,11 +1211,11 @@ struct T_error_ack {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive.  @member{ERROR_prim}
-identifies the primitive type that caused the error and @member{TLI_error}
-contains the Transport Level Interface error code.  @member{UNIX_error} contains
+Where @parm{PRIM_type} identifies the primitive.  @parm{ERROR_prim}
+identifies the primitive type that caused the error and @parm{TLI_error}
+contains the Transport Level Interface error code.  @parm{UNIX_error} contains
 the @cite{UNIX@registeredsymbol{}} System error code. This may only be non zero
-if @member{TLI_error} is equal to @perr{TSYSERR}.  The following Transport Level
+if @parm{TLI_error} is equal to @perr{TSYSERR}.  The following Transport Level
 Interface error codes are allowed to be returned:
 
 @table @perr
@@ -1289,7 +1289,7 @@ struct T_ok_ack {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive.  @member{CORRECT_prim}
+Where @parm{PRIM_type} identifies the primitive.  @parm{CORRECT_prim}
 contains the successfully received primitive type.
 
 @node T_ADDR_ACK
@@ -1319,12 +1319,12 @@ struct T_addr_ack {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} indicates the primitive type.  @member{LOCADDR_length}
+Where @parm{PRIM_type} indicates the primitive type.  @parm{LOCADDR_length}
 is the length of the protocol address that was bound to the stream and
-@member{LOCADDR_offset} is the offset from the beginning of the @msg{M_PCPROTO}
+@parm{LOCADDR_offset} is the offset from the beginning of the @msg{M_PCPROTO}
 block where the protocol address begins. If the stream is in the data transfer
-state, @member{REMADDR_length} is the length of the protocol address of the
-remote transport entity and @member{REMADDR_offset} is the offset from the
+state, @parm{REMADDR_length} is the length of the protocol address of the
+remote transport entity and @parm{REMADDR_offset} is the offset from the
 beginning of the @msg{M_PCPROTO} block where the protocol address begins.
 
 The following rules apply:
@@ -1332,11 +1332,11 @@ The following rules apply:
 @itemize ---
 
 @item If the interface is in any state but @psta{T_DATA_XFER}, the values
-returned for @member{REMADDR_length} and @member{REMADDR_offset} must be
+returned for @parm{REMADDR_length} and @parm{REMADDR_offset} must be
 @samp{0}.
 
 @item If the interface is in the @psta{T_UNINIT} or @psta{T_UNBND} state, the
-values returned for @member{LOCADDR_length} and @member{LOCADDR_offset} must be
+values returned for @parm{LOCADDR_length} and @parm{LOCADDR_offset} must be
 @samp{0}.
 
 @end itemize
@@ -1389,10 +1389,10 @@ struct T_conn_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{DEST_length} is
-the length of the destination address and @member{DEST_offset} is the offset
+Where @parm{PRIM_type} identifies the primitive type.  @parm{DEST_length} is
+the length of the destination address and @parm{DEST_offset} is the offset
 from the beginning of the @msg{M_PROTO} message block where the destination
-address begins.  Similarly, @member{OPT_length} and @member{OPT_offset} describe
+address begins.  Similarly, @parm{OPT_length} and @parm{OPT_offset} describe
 the location of the requested options associated with the primitive.  The proper
 alignment of the destination address and options in the @msg{M_PROTO} message
 block is not guaranteed.@footnote{The information located by the defined
@@ -1477,15 +1477,15 @@ struct T_conn_res {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{QUEUE_ptr}
+Where @parm{PRIM_type} identifies the primitive type.  @parm{QUEUE_ptr}
 identifies the transport provider queue pair (i.e.  read queue pointer) which
 should be used to accept the connect request. This queue pointer should map onto
 a stream which is already bound to a protocol address but if the stream is not
 bound, the transport provider must bind it to the same protocol address that was
 bound to the stream on which the connection indication arrived.
-@member{OPT_length} is the length of the responding options and
-@member{OPT_offset} is the offset from the beginning of the @msg{M_PROTO}
-message block where the responding options begin.  @member{SEQ_number} is the
+@parm{OPT_length} is the length of the responding options and
+@parm{OPT_offset} is the offset from the beginning of the @msg{M_PROTO}
+message block where the responding options begin.  @parm{SEQ_number} is the
 sequence number which identifies the connection to be responded to.  The proper
 alignment of the options in the @msg{M_PROTO} message block is not guaranteed.
 The options in the @msg{M_PROTO} message block are, however, aligned the same as
@@ -1566,10 +1566,10 @@ struct T_discon_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{SEQ_number}
+Where @parm{PRIM_type} identifies the primitive type.  @parm{SEQ_number}
 identifies the outstanding connect indication that is to by denied. If the
 disconnect request is disconnecting an already existing connection, then the
-value of @member{SEQ_number} will be ignored.
+value of @parm{SEQ_number} will be ignored.
 
 This primitive requires the transport provider to generate the following
 acknowledgement upon receipt of the primitive, and the transport user must wait
@@ -1635,7 +1635,7 @@ struct T_data_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{MORE_flag} when
+Where @parm{PRIM_type} identifies the primitive type.  @parm{MORE_flag} when
 greater than zero, indicates that the next @prim{T_DATA_REQ} primitive is also
 part of this transport service data unit.
 
@@ -1700,7 +1700,7 @@ struct T_exdata_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type. @member{MORE_flag} when
+Where @parm{PRIM_type} identifies the primitive type. @parm{MORE_flag} when
 greater than zero indicates that the next @prim{T_EXDATA_REQ} primitive is also
 part of this expedited transport service data unit.
 
@@ -1748,7 +1748,7 @@ struct T_ordrel_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.
+Where @parm{PRIM_type} identifies the primitive type.
 
 This primitive does not require any acknowledgements, although it may generate a
 fatal error. This is indicated via a @msg{M_ERROR} message type which results in
@@ -1810,11 +1810,11 @@ struct T_conn_ind {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{SRC_length} is
-the length of the source address and @member{SRC_offset} is the offset from the
+Where @parm{PRIM_type} identifies the primitive type.  @parm{SRC_length} is
+the length of the source address and @parm{SRC_offset} is the offset from the
 beginning of the @msg{M_PROTO} message block where the source address begins.
-Similarly, @member{OPT_length} and @member{OPT_offset} describe the location of
-the requested options associated with the primitive.  @member{SEQ_number} should
+Similarly, @parm{OPT_length} and @parm{OPT_offset} describe the location of
+the requested options associated with the primitive.  @parm{SEQ_number} should
 bean unique number other than @samp{-1} to identify the connect indication. The
 proper alignment of the source address and options in the @msg{M_PROTO} message
 block is not guaranteed.
@@ -1844,11 +1844,11 @@ struct T_conn_con {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{RES_length} is
+Where @parm{PRIM_type} identifies the primitive type.  @parm{RES_length} is
 the length of the responding address that the connection was accepted on and
-@member{RES_offset} is the offset from the beginning of the @msg{M_PROTO}
+@parm{RES_offset} is the offset from the beginning of the @msg{M_PROTO}
 message block where the responding address begins.  Similarly,
-@member{OPT_length} and @member{OPT_offset} describe the size and location of
+@parm{OPT_length} and @parm{OPT_offset} describe the size and location of
 the confirmed options associated with the primitive.  The proper alignment of
 the responding address and options in the @msg{M_PROTO} message block is not
 guaranteed.
@@ -1876,11 +1876,11 @@ struct T_discon_ind {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type and
-@member{DISCON_reason} is the reason for disconnect.  The reason codes are
-protocol specific.  @member{SEQ_number} is the sequence number which identifies
+Where @parm{PRIM_type} identifies the primitive type and
+@parm{DISCON_reason} is the reason for disconnect.  The reason codes are
+protocol specific.  @parm{SEQ_number} is the sequence number which identifies
 which connect indication was denied, or it is @samp{-1} if the provider is
-disconnecting an existing connection.  The @member{SEQ_number} is only
+disconnecting an existing connection.  The @parm{SEQ_number} is only
 meaningful when this primitive is sent to a passive user who has the
 corresponding connect indication outstanding. It allows the transport user to
 identify which of its outstanding connect indications is associated with the
@@ -1911,7 +1911,7 @@ struct T_data_ind {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{MORE_flag},
+Where @parm{PRIM_type} identifies the primitive type.  @parm{MORE_flag},
 when greater than zero, indicates that the next @prim{T_DATA_IND} primitive is
 also part of this transport service data unit.  If a TSDU spans multiple
 @prim{T_DATA_IND} message blocks, then an ETSDU may be placed in between two
@@ -1945,7 +1945,7 @@ struct T_exdata_ind {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{MORE_flag},
+Where @parm{PRIM_type} identifies the primitive type.  @parm{MORE_flag},
 when greater than zero, indicates that the next @prim{T_EXDATA_IND} primitive is
 also part of this expedited transport service data unit.
 
@@ -1969,7 +1969,7 @@ struct T_ordrel_ind {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.
+Where @parm{PRIM_type} identifies the primitive type.
 
 @page
 @node Connectionless-Mode Transport Primitives
@@ -2011,10 +2011,10 @@ struct T_unitdata_req {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{DEST_length} is
-the length of the destination address and @member{DEST_offset} is the offset
+Where @parm{PRIM_type} identifies the primitive type.  @parm{DEST_length} is
+the length of the destination address and @parm{DEST_offset} is the offset
 from the beginning of the @msg{M_PROTO} message block where the destination
-address begins.  Similarly, @member{OPT_length} and @member{OPT_offset} describe
+address begins.  Similarly, @parm{OPT_length} and @parm{OPT_offset} describe
 the location of the requested options associated with the primitive.  The proper
 alignment of the destination address and options in the @msg{M_PROTO} message
 block is not guaranteed.  The destination address and options in the
@@ -2077,10 +2077,10 @@ struct T_unitdata_ind {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type.  @member{SRC_length} is
-the length of the source address and @member{SRC_offset} is the offset from the
+Where @parm{PRIM_type} identifies the primitive type.  @parm{SRC_length} is
+the length of the source address and @parm{SRC_offset} is the offset from the
 beginning of the @msg{M_PROTO} message block where the source address begins.
-Similarly, @member{OPT_length} and @member{OPT_offset} describe the location of
+Similarly, @parm{OPT_length} and @parm{OPT_offset} describe the location of
 the requested options associated with the primitive. The proper alignment of the
 source address and options in the @msg{M_PROTO} message block is not guaranteed.
 
@@ -2109,12 +2109,12 @@ struct T_uderror_ind {
 @end verbatim
 @end smallexample
 
-Where @member{PRIM_type} identifies the primitive type. @member{DEST_length} is
-the length of the destination address and @member{DEST_offset} is the offset
+Where @parm{PRIM_type} identifies the primitive type. @parm{DEST_length} is
+the length of the destination address and @parm{DEST_offset} is the offset
 from the beginning of the @msg{M_PROTO} message block where the destination
-address begins.  Similarly, @member{OPT_length} and @member{OPT_offset} describe
+address begins.  Similarly, @parm{OPT_length} and @parm{OPT_offset} describe
 the location of the requested options associated with the primitive.
-@member{ERROR_type} defines the protocol dependent error code. The proper
+@parm{ERROR_type} defines the protocol dependent error code. The proper
 alignment of the destination address and options in the @msg{M_PROTO} message
 block is not guaranteed.
 

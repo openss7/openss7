@@ -975,7 +975,7 @@ IANA Considerations
 0.0.0.  Change Log
 
     $Log: draft-bidulock-sigtran-m2ua-ss7test-02.txt,v $
-    Revision 0.9.2.2  2006/06/27 09:56:30  brian
+    Revision 0.9.2.2  2006-06-27 09:56:30  brian
     - rereleased drafts
 
     Revision 0.9.2.5  2006/06/27 09:41:12  brian

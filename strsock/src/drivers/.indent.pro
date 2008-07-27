@@ -109,3 +109,7 @@
 -Tdl_long
 -Tdl_ulong
 -Tdl_ushort
+-Tdlpi_handle_t
+-Tdlpi_notifyid_t
+-Tdlpi_notifyfunc_t
+-Tdlpi_walkfunc_t

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,14 +46,11 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-23 08:29:17 $ by $Author: brian $
+ Last Modified $Date: 2008-06-18 16:45:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
- Revision 0.9.2.4  2008-07-23 08:29:17  brian
- - updated references and support for 2.6.18-92.1.6.el5 kernel
-
  Revision 0.9.2.3  2008-06-18 16:45:25  brian
  - widespread updates
 
@@ -65,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $";
 
 /*
  * This is a multiplexing driver for the X.25 Packet Layer Protocol (PLP).  It
@@ -99,7 +96,7 @@ static char const ident[] =
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP DRIVER FOR LINUX FAST-STREAMS"
 #define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STERAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-07-23 08:29:17 $"
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:25 $"
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"
@@ -2758,17 +2755,35 @@ x25_rcv_regcon(queue_t *q, struct x25_ple *xp, mblk_t *mp)
 			if (unlikely(mp->b_wptr < p + 13))
 				goto discard;
 			lic = ((p[1] << 8) & 0x0f) | p[2];
+			if (xp->proto.fac.lca.ic.l != lic) {
+				xp->proto.fac.lca.ic.l = lic;
+				changed = 1;
+			}
 			hic = ((p[3] << 8) & 0x0f) | p[4];
+			if (xp->proto.fac.lca.ic.h != hic) {
+				xp->proto.fac.lca.ic.h = hic;
+				changed = 1;
+			}
 			ltc = ((p[5] << 8) & 0x0f) | p[6];
+			if (xp->proto.fac.lca.tc.l != ltc) {
+				xp->proto.fac.lca.tc.l = ltc;
+				changed = 1;
+			}
 			htc = ((p[7] << 8) & 0x0f) | p[8];
+			if (xp->proto.fac.lca.tc.h != htc) {
+				xp->proto.fac.lca.tc.h = htc;
+				changed = 1;
+			}
 			loc = ((p[9] << 8) & 0x0f) | p[10];
+			if (xp->proto.fac.lca.oc.l != loc) {
+				xp->proto.fac.lca.oc.l = loc;
+				changed = 1;
+			}
 			hoc = ((p[11] << 8) & 0x0f) | p[12];
-			xp->proto.fac.lca.ic.l = lic;
-			xp->proto.fac.lca.ic.h = hic;
-			xp->proto.fac.lca.tc.l = ltc;
-			xp->proto.fac.lca.tc.h = htc;
-			xp->proto.fac.lca.oc.l = loc;
-			xp->proto.fac.lca.oc.h = hoc;
+			if (xp->proto.fac.lca.oc.h != hoc) {
+				xp->proto.fac.lca.oc.h = hoc;
+				changed = 1;
+			}
 			p += 13;
 			continue;
 		}

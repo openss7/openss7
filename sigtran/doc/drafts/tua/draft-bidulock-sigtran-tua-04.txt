@@ -8569,7 +8569,7 @@ Internet Draft       SS7 TCAP-User Adaptation Layer        June 18, 2006
 Change Log
 
     $Log: draft-bidulock-sigtran-tua-04.txt,v $
-    Revision 0.9.2.2  2006/06/27 09:56:33  brian
+    Revision 0.9.2.2  2006-06-27 09:56:33  brian
     - rereleased drafts
 
     Revision 0.9.2.6  2006/06/27 09:41:13  brian
