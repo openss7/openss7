@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strnsl.texi,v 0.9.2.9 2008-04-28 22:11:47 brian Exp $
+% @(#) $Id: strnsl.texi,v 0.9.2.10 2008/07/27 08:49:34 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-28 22:11:47 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:49:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -421,6 +421,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strnsl.texi,v $
+Revision 0.9.2.10  2008/07/27 08:49:34  brian
+- no invariant sections, more libtool ignores
+
 Revision 0.9.2.9  2008-04-28 22:11:47  brian
 - updated headers for release
 

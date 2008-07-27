@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strisdn.texi,v 0.9.2.6 2008-04-29 00:48:58 brian Exp $
+% @(#) $Id: strisdn.texi,v 0.9.2.7 2008/07/27 08:49:27 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-29 00:48:58 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:49:27 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,6 +402,9 @@ package.
 @smallexample
 
 $Log: strisdn.texi,v $
+Revision 0.9.2.7  2008/07/27 08:49:27  brian
+- no invariant sections, more libtool ignores
+
 Revision 0.9.2.6  2008-04-29 00:48:58  brian
 - updated headers for release
 

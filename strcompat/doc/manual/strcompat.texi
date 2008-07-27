@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strcompat.texi,v 0.9.2.18 2008-04-28 16:47:06 brian Exp $
+% @(#) $Id: strcompat.texi,v 0.9.2.19 2008/07/27 08:49:06 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-28 16:47:06 $ by $Author: brian $
+% Last Modified $Date: 2008/07/27 08:49:06 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -406,6 +406,9 @@ package.
 @smallexample
 
 $Log: strcompat.texi,v $
+Revision 0.9.2.19  2008/07/27 08:49:06  brian
+- no invariant sections, more libtool ignores
+
 Revision 0.9.2.18  2008-04-28 16:47:06  brian
 - updates for release
 
