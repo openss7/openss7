@@ -1,0 +1,2208 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-LAPB-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/29 23:10:21 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2007/12/29 23:10:21 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-LAPB-MIB.mib,v $
+-- Revision 0.9.2.2  2007/12/29 23:10:21  brian
+-- - updating mibs
+--
+-- Revision 0.9.2.1  2007/12/15 20:16:52  brian
+-- - added new mib files
+--
+-- =============================================================================
+
+OPENSS7-LAPB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	enterprises
+		FROM SNMPv2-SMI
+	Counter32,
+	DisplayString,
+	Gauge32,
+	RowPointer, 
+	RowStatus,
+	TimeInterval,
+	TimeStamp,
+	TruthValue,
+	Unsigned32
+		FROM SNMPv2-TC
+	attributeValueChange,
+	communicationsAlarm,
+	objectCreation,
+	objectDeletion,
+	objectInstance
+		FROM OPENSS7-TMN-SMI
+	AdministrativeState, 
+	AlarmStatus,
+	OperationalState,
+	ProceduralStatus,
+	SimpleNameType,
+	UsageState
+		FROM OPENSS7-TMN-TC;
+
+openss7		OBJECT IDENTIFIER ::= { enterprises 29591 }
+openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
+openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
+
+lapb-MIB MODULE-IDENTITY
+	LAST-UPDATED
+		"200712170903Z"
+	ORGANIZATION
+		"The OpenSS7 Project"
+	CONTACT-INFO
+		"Brian Bidulock
+		 OpenSS7 Corporation
+		 1469 Jefferys Crescent
+		 Edmonton, Alberta  T6L 6T1
+		 CANADA
+		 Tel: +1 780 490 1141
+		 Fax: +1 780 490 1241
+		 Mob: +1 780 953 0557
+		 mailto:bidulock@openss7.org"
+	DESCRIPTION
+		"Provides a management information base for X.25 LAPB 
+		 based on ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { openss7Modules yy }
+
+ -- top level origanization of the MIB
+
+lapbNotifications	OBJECT IDENTIFIER ::= { lapb-MIB	 0 }
+lapbObjects		OBJECT IDENTIFIER ::= { lapb-MIB	 1 }
+lapbConformance		OBJECT IDENTIFIER ::= { lapb-MIB	 2 }
+
+lapbTables		OBJECT IDENTIFIER ::= { lapbObjects	 1 }
+lapbScalars		OBJECT IDENTIFIER ::= { lapbObjects	 2 }
+lapbNotifs		OBJECT IDENTIFIER ::= { lapbObjects	 3 }
+lapbOids		OBJECT IDENTIFIER ::= { lapbObjects	 4 }
+
+lapbGroups		OBJECT IDENTIFIER ::= { lapbConformance	 1 }
+lapbCompliances		OBJECT IDENTIFIER ::= { lapbConformance	 2 }
+
+lAPBDLE			OBJECT IDENTIFIER ::= { lapbTables	 1 }
+dLSAP			OBJECT IDENTIFIER ::= { lapbTables	 2 }
+sLPPM			OBJECT IDENTIFIER ::= { lapbTables	 3 }
+sLPConnection		OBJECT IDENTIFIER ::= { lapbTables	 4 }
+sLPConnectionIVMO	OBJECT IDENTIFIER ::= { lapbTables	 5 }
+
+lapbGlobals		OBJECT IDENTIFIER ::= { lapbScalars	 1 }
+lapbDefaults		OBJECT IDENTIFIER ::= { lapbScalars	 2 }
+
+sLPConnectionDefaults	OBJECT IDENTIFIER ::= { lapbDefaults	 1 }
+
+-- 1.3.6.1.4.1.29591.1.1
+-- +нн(yy)
+--    |нн(0) lapbNotifications
+--    |нн(1) lapbObjects
+--    |  |нн(1) lapbTables
+--    |  |  |нн(1) lAPBDLE
+--    |  |  |  +нн(1) lAPBDLETable
+--    |  |  |     +нн(1) lAPBDLEEntry
+--    |  |  |        |нн( 1) lAPBDLEcommunicationsEntityId
+--    |  |  |        |нн( 2) lAPBDLElocalSapNames
+--    |  |  |        |нн( 3) lAPBDLEoperationalState
+--    |  |  |        |нн( 4) lAPBDLEproviderEntityNames
+--    |  |  |        |нн( 5) lAPBDLEmT1Timer
+--    |  |  |        |нн( 6) lAPBDLEmT3Timer
+--    |  |  |        |нн( 7) lAPBDLEmW
+--    |  |  |        |нн( 8) lAPBDLEmXSend
+--    |  |  |        |нн( 9) lAPBDLEmXReceive
+--    |  |  |        |нн(10) lAPBDLEmT2Timer
+--    |  |  |        |нн(11) lAPBDLEreceivedMlpResets
+--    |  |  |        |нн(12) lAPBDLEtimesMT1Expired
+--    |  |  |        |нн(13) lAPBDLEIframesReassignments
+--    |  |  |        |нн(14) lAPBDLEmlpFramesReceived
+--    |  |  |        |нн(15) lAPBDLEmlpFramesSent
+--    |  |  |        |нн(16) lAPBDLEmlpFramesOutsideWindowGuard
+--    |  |  |        |нн(17) lAPBDLEreceivedMlpFramesInGuardRegion
+--    |  |  |        +нн(18) lAPBDLERowStatus
+--    |  |  |
+--    |  |  |нн(2) dLSAP
+--    |  |  |  +нн(1) dLSAPTable
+--    |  |  |     +нн(1) dLSAPEntry
+--    |  |  |        |нн( 1) dLSAPsapId
+--    |  |  |        |нн( 2) dLSAPsap1Address
+--    |  |  |        |нн( 3) dLSAPuserEntityNames
+--    |  |  |        +нн( 4) dLSAPRowStatus
+--    |  |  |
+--    |  |  |нн(3) sLPPM
+--    |  |  |  +нн(1) sLPPMTable
+--    |  |  |     +нн(1) sLPPMEntry
+--    |  |  |        |нн( 1) sLPPMcoProtocolMachineId
+--    |  |  |        |нн( 2) sLPPMoperationalState
+--    |  |  |        |нн( 3) sLPPMadministrativeState
+--    |  |  |        +нн( 4) sLPPMRowStatus
+--    |  |  |
+--    |  |  |нн(4) sLPConnection
+--    |  |  |  +нн(1) sLPConnectionTable
+--    |  |  |     +нн(1) sLPConnectionEntry
+--    |  |  |        |нн( 1) sLPConnectionConnectionId
+--    |  |  |        |нн( 2) sLPConnectionUnderlyingConnectionNames
+--    |  |  |        |нн( 3) sLPConnectionSupportedConnectionNames
+--    |  |  |        |нн( 4) sLPConnectionInterfaceType
+--    |  |  |        |нн( 5) sLPConnectionK
+--    |  |  |        |нн( 6) sLPConnectionN1
+--    |  |  |        |нн( 7) sLPConnectionN2
+--    |  |  |        |нн( 8) sLPConnectionSequenceModulus
+--    |  |  |        |нн( 9) sLPConnectionT1Timer
+--    |  |  |        |нн(10) sLPConnectionT2Timer
+--    |  |  |        |нн(11) sLPConnectionFCSErrorsReceived
+--    |  |  |        |нн(12) sLPConnectionFRMRsReceived
+--    |  |  |        |нн(13) sLPConnectionFRMRsSent
+--    |  |  |        |нн(14) sLPConnectionIFrameDataOctetsReceived
+--    |  |  |        |нн(15) sLPConnectionIFrameDataOctetsSent
+--    |  |  |        |нн(16) sLPConnectionIFramesReceived
+--    |  |  |        |нн(17) sLPConnectionIFramesSent
+--    |  |  |        |нн(18) sLPConnectionPollsReceived
+--    |  |  |        |нн(19) sLPConnectionREJsReceived
+--    |  |  |        |нн(20) sLPConnectionREJsSent
+--    |  |  |        |нн(21) sLPConnectionRNRsReceived
+--    |  |  |        |нн(22) sLPConnectionRNRsSent
+--    |  |  |        |нн(23) sLPConnectionSABMsReceived
+--    |  |  |        |нн(24) sLPConnectionSABMsSent
+--    |  |  |        |нн(25) sLPConnectionProtocolState
+--    |  |  |        |нн(26) sLPConnectionTimesT1Expired
+--    |  |  |        |нн(27) sLPConnectionT3Timer
+--    |  |  |        |нн(28) sLPConnectionTimesT3Expired
+--    |  |  |        |нн(29) sLPConnectionT4Timer
+--    |  |  |        |нн(30) sLPConnectionTimesT4Expired
+--    |  |  |        |нн(31) sLPConnectionAbnormalLinkDisconnectsReceived
+--    |  |  |        |нн(32) sLPConnectionAbnormalLinkDisconnectsSent
+--    |  |  |        |нн(33) sLPConnectionLinkResetsReceived
+--    |  |  |        |нн(34) sLPConnectionLinkResetsSent
+--    |  |  |        |нн(35) sLPConnectionTimesN2Reached
+--    |  |  |        |нн(36) sLPConnectionAdministrativeState
+--    |  |  |        |нн(37) sLPConnectionOperationalState
+--    |  |  |        |нн(38) sLPConnectionUsageState
+--    |  |  |        |нн(39) sLPConnectionProceduralStatus
+--    |  |  |        |нн(40) sLPConnectionAlarmStatus
+--    |  |  |        +нн(41) sLPConnectionRowStatus
+--    |  |  |
+--    |  |  +нн(5) sLPConnectionIVMO
+--    |  |     +нн(1) sLPConnectionIVMOTable
+--    |  |        +нн(1) sLPConnectionIVMOEntry
+--    |  |           |нн( 1) sLPConnectionIVMOid
+--    |  |           |нн( 2) sLPConnectionIVMOinterfaceType
+--    |  |           |нн( 3) sLPConnectionIVMOk
+--    |  |           |нн( 4) sLPConnectionIVMOn1
+--    |  |           |нн( 5) sLPConnectionIVMOn2
+--    |  |           |нн( 6) sLPConnectionIVMOsequenceModulus
+--    |  |           |нн( 7) sLPConnectionIVMOt1Timer
+--    |  |           |нн( 8) sLPConnectionIVMOt2Timer
+--    |  |           |нн( 9) sLPConnectionIVMOt3Timer
+--    |  |           |нн(10) sLPConnectionIVMOt4Timer
+--    |  |           +нн(11) sLPConnectionIVMORowStatus
+--    |  |
+--    |  |нн(2) lapbScalars
+--    |  |  |нн(1) lapbGlobals
+--    |  |  |  +нн(1) lapbDiscontinuityTime
+--    |  |  |
+--    |  |  +нн(2) lapbDefaults
+--    |  |     +нн(1) sLPConnectionDefaults
+--    |  |        |нн( 1) sLPConnectionDefaultInterfaceType
+--    |  |        |нн( 2) sLPConnectionDefaultK
+--    |  |        |нн( 3) sLPConnectionDefaultN1
+--    |  |        |нн( 4) sLPConnectionDefaultN2
+--    |  |        |нн( 5) sLPConnectionDefaultSequenceModulus
+--    |  |        |нн( 6) sLPConnectionDefaultT1Timer
+--    |  |        |нн( 7) sLPConnectionDefaultT2Timer
+--    |  |        |нн( 8) sLPConnectionDefaultT3Timer
+--    |  |        +нн( 9) sLPConnectionDefaultT4Timer
+--    |  |
+--    |  |нн(3) lapbNotifs
+--    |  |  +нн(1) fRMR
+--    |  |
+--    |  +нн(4) lapbOids
+--    |
+--    +нн(2) lapbConformance
+--       |нн(1) lapbComplicanes
+--       +нн(2) lapbGroups
+
+
+-- =====================================================================
+--
+-- Notification parameters.
+
+fRMR OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	accessible-for-notify
+	STATUS		current
+	DESCRIPTION
+		"Provides a parameter containing the FRMR frame for use 
+		 as additional information with the communicationsAlarm 
+		 issued for an sLPConnection table entry when 
+		 specificProblems has the value fRMRReceived."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMR."
+	::= { lapbNotifs 1 }
+
+-- =====================================================================
+--
+-- Specific Problems for use with TMN alarms.
+
+lapbSpecificProblems OBJECT IDENTIFIER ::=
+	{ joint-iso-itu-t(3) datalink-layer(15) standardSpecificExtension(0) specificProblems(11) }
+
+fRMRReceived OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as the value of the 
+		 specificProblems parameter in the communicationsAlarm 
+		 notification issued for an sLPConnection or 
+		 lLCConnection2 table entry.  It indicates that an FRMR 
+		 was received.  The FRMR frame itself is include in the 
+		 fRMR parameter provided as additional information for 
+		 the communicationsAlarm notification.
+		 
+		 A FRMR frame was received.  The received FRMR frame is 
+		 reported as additionalInformation in the notification, 
+		 using the fRMR parameter.  THe significance 
+		 sub-parameter shall be set as described above.
+		 
+		 The probableCause parameter is set to 
+		 communicationsProtocolError.  This value, fRMRReceived, 
+		 shall be reported in the specificProblems parameter.  
+		 In addition, the reason why the frame was sent is also 
+		 returned in specificProblems.
+		 
+		 The perceivedSeverity parameter is set to the value 
+		 Minor.  A subsequent communicationsAlarm with a 
+		 preceivedSeverity of Cleared is not generated.  No 
+		 other parameters are used."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReceived."
+	::= { lapbSpecificProblems fRMRReceived(5) }
+
+fRMRReasons OBJECT IDENTIFIER ::= { lapbSpecificProblems fRMRReasons(6) }
+
+fRMRReasonsControlFieldUndefinedOrUnimplemented OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was an 
+		 undefined or unimplemented control field."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
+		 fRMRReasonsControlFieldUndefinedOrUnimplemented."
+	::= { lapbSpecificProblems fRMRReasons(6) controlFieldUndefinedOrUnimplemented(1) }
+
+fRMRReasonsFormatError OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was a 
+		 format error."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
+		 fRMRReasonsFormatError."
+	::= { lapbSpecificProblems fRMRReasons(6) formatError(2) }
+
+fRMRReasonsInfoFieldLengthGreaterThanMaximum OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was 
+		 that the information field length was greater than the 
+		 maximum."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
+		 fRMRReasonsInfoFieldLengthGreaterThanMaximum."
+	::= { lapbSpecificProblems fRMRReasons(6) 
+	infoFieldLengthGreaterThanMaximum(3) }
+
+fRMRReasonsInvalidNR OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was 
+		 that the NR included in the command was invalid."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReasonsInvalidNR."
+	::= { lapbSpecificProblems fRMRReasons(6) invalidNR(4) }
+
+fRMRReasonsNonSpecific OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as an additional value of 
+		 the specificProblems parameter in the 
+		 communicationsAlarm notification issued for an 
+		 sLPConnection or lLCConnection2 table entry.  It 
+		 indicates that the reason for receiving the FRMR was 
+		 unknown or unspecified."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReasonsNonSpecific."
+	::= { lapbSpecificProblems fRMRReasons(6) nonSpecific(5) }
+
+
+-- Oids for use with specific errorIds for use with processingFailure 
+-- for error on activate, but will be used with processingErrorAlarm 
+-- instead.
+
+lapbErrors OBJECT IDENTIFIER ::=
+	{ joint-iso-itu-t(3) datalink-layer(15) standardSpecificExtensions(0) action(9) activate(1) errors(1) }
+
+activateFailure OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as the value of the 
+		 probableCause parameter in the processingErrorAlarm 
+		 notification issued for an sLPConnection table entry.  
+		 It indicates that the processing error was a failure to 
+		 activate the sLPConnection.  The perceivedSeverity for 
+		 the processingErrorAlarm is Minor."
+	::= { lapbErrors processingFailure(1) }
+
+activateFailureInsufficientResources OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as the value of the 
+		 specificProblems parameter in the processingErrorAlarm 
+		 notification issued for an sLPConnection table entry.  
+		 It indicates that the reason for the activation failure 
+		 was insufficient resources."
+	::= { activateFailure insufficientResources(1) }
+
+activateFailureProviderDoesNotExist OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as the value of the 
+		 specificProblems parameter in the processingErrorAlarm 
+		 notification issued for an sLPConnection table entry.  
+		 It indicates that the reason for the activation failure 
+		 was that the specified provider does not exist."
+	::= { activateFailure providerDoesNotExist(2) }
+
+activateFailureProviderNotAvailable OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as the value of the 
+		 specificProblems parameter in the processingErrorAlarm 
+		 notification issued for an sLPConnection table entry.  
+		 It indicates that the reason for the activation failure 
+		 was that the specified provider is not available for 
+		 activation."
+	::= { activateFailure providerNotAvailable(3) }
+
+activateFailureRequiredServiceNotAvailable OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as the value of the 
+		 specificProblems parameter in the processingErrorAlarm 
+		 notification issued for an sLPConnection table entry.  
+		 It indicates that the reason for the activation failure 
+		 was that an underlying service required for activation 
+		 is not available."
+	::= { activateFailure requiredServiceNotAvailable(4) }
+
+activateFailureSystemSpecific OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"This object identity is used as the value of the 
+		 specificProblems parameter in the processingErrorAlarm 
+		 notification issued for an sLPConnection table entry.  
+		 It indicates that the reason for the activation is 
+		 system specific."
+	::= { activateFailure systemSpecific(5) }
+
+-- =====================================================================
+--
+-- Scalars
+
+lapbDiscontinuityTime OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the time since the last reboot at which a 
+		 discontinuity in counters and gauges occurred possibly 
+		 resulting in the reset of counters and gauges to zero."
+	REFERENCE
+		"SMIv2"
+	::= { lapbGlobals 1 }
+
+--
+-- Scalars
+--
+-- The following scalars define the default values to be used for 
+-- the initial value of entries in the sLPConnectionTable.  These 
+-- defaults satisfy two purposes: to provide default values for the 
+-- new entries in the sLPConnectionIVMOTable and to provide initial 
+-- values for entries in the sLPConnectionTable if there is no 
+-- corresponding subordinate sLPConnectionIVMO entry.
+
+sLPConnectionDefaultInterfaceType OBJECT-TYPE
+	SYNTAX		INTEGER { dTE(0), dCE(1) }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the 
+		 sLPConnectionInterfaceType element of the 
+		 sLPConnectionTable and the default value for the 
+		 sLPConnectionIVMOinterfaceType element of the 
+		 sLPConnectionIVMOTable.  When set by a management 
+		 station, the value set should persist across agent and 
+		 system reboots.  The DEFVAL, therefore, is only 
+		 applicable when this default has never been set by a 
+		 management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	DEFVAL		{ dTE(0) }
+	::= { sLPConnectionDefaults 1 }
+
+sLPConnectionDefaultK OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the sLPConnectionK 
+		 element of the sLPConnectionTable and the default value 
+		 for the sLPConnectionIVMOk element of the 
+		 sLPConnectionIVMOTable.  When set by a management 
+		 station, the value set should persist across agent and 
+		 system reboots.  The DEFVAL, therefore, is only 
+		 applicable when this default has never been set by a 
+		 management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 2 }
+
+sLPConnectionDefaultN1 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the sLPConnectionN1 
+		 element of the sLPConnectionTable and a default value 
+		 for the sLPConnectionIVMOn1 element of the 
+		 sLPConnectionIVMOTable.  When set by a management 
+		 station, the value set should persist across agent and 
+		 system reboots.  The DEFVAL, therefore, is only 
+		 applicable when this default has never been set by a 
+		 management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 3 }
+
+sLPConnectionDefaultN2 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the sLPConnectionN2 
+		 element of the sLPConnectionTable and the default value 
+		 for the sLPConnectionIVMOn2 element of the 
+		 sLPConnectionIVMOTable.  When set by a management 
+		 station, the value set should persist across agent and 
+		 system reboots.  The DEFVAL, therefore, is only 
+		 applicable when this default has never been set by a 
+		 management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 4 }
+
+sLPConnectionDefaultSequenceModulus OBJECT-TYPE
+	SYNTAX		INTEGER(8|128)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the 
+		 sLPConnectionModulus element of the sLPConnectionTable 
+		 and the default value for the sLPConnectionIVMOModulus 
+		 element of the sLPConnectionIVMOTable.  When set by a 
+		 management station, the value set should persist across 
+		 agent and system reboots.  The DEFVAL, therefore, is 
+		 only applicable when this default has never been set by 
+		 a management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 5 }
+
+sLPConnectionDefaultT1Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the 
+		 sLPConnectionT1Timer element of the sLPConnectionTable 
+		 and the default value for the sLPConnectionIVMOt1Timer 
+		 element of the sLPConnectionIVMOTable.  When set by a 
+		 management station, the value set should persist across 
+		 agent and system reboots.  The DEFVAL, therefore, is 
+		 only applicable when this default has never been set by 
+		 a management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 6 }
+
+sLPConnectionDefaultT2Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the 
+		 sLPConnectionT2Timer element of the sLPConnectionTable 
+		 and the default value of the sLPConnectionIVMOt2Timer 
+		 element of the sLPConnectionIVMOTable.  When set by a 
+		 management station, the value set should persist across 
+		 agent and system reboots.  The DEFVAL, therefore, is 
+		 only applicable when this default has never been set by 
+		 a management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 7 }
+
+sLPConnectionDefaultT3Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the 
+		 sLPConnectionT3Timer element of the sLPConnectionTable 
+		 and the default value of the sLPConnectionIVMOt3Timer 
+		 element of the sLPConnectionIVMOTable.  When set by a 
+		 management station, the value set should persist across 
+		 agent and system reboots.  The DEFVAL, therefore, is 
+		 only applicable when this default has never been set by 
+		 a management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 8 }
+
+sLPConnectionDefaultT4Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial value for the 
+		 sLPConnectionT4Timer element of the sLPConnectionTable 
+		 and the default value of the sLPConnectionIVMOt4Timer 
+		 element of the sLPConnectionIVMOTable.  When set by a 
+		 management station, the value set should persist across 
+		 agent and system reboots.  The DEFVAL, therefore, is 
+		 only applicable when this default has never been set by 
+		 a management station."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionDefaults 9 }
+
+
+-- =====================================================================
+
+lAPBDLETable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF LAPBDLEEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The LAPB data link entity managed object.  There may be 
+		 multiple instances of the lLAPBDLE managed object in a 
+		 system.  Systems not supporting the LAPB data link 
+		 procedures defined in ISO/IEC 7776 are not required to 
+		 support the lAPBDLE and contained managed objects.
+		 
+		 The lAPBDLE managed object has a conditional mlp 
+		 package.  There may be multiple instances of lAPBDLE MO 
+		 in a system, both with and without the mlp package.  
+		 For those instances in which the package is absent, the 
+		 mlp procedures do not apply and the lAPBDLE MO may 
+		 contain at most on sLPPM MO.  For those instances in 
+		 which the package is present, the mlp proceudres do 
+		 apply and the lAPBDLE MO may contain multiplex 
+		 instances of sLPPM MO.
+		 
+		 A lAPBDLE MO may contain at most one dLSAP MO.  The 
+		 value of the sap1Address atribute is of no 
+		 significance.  The cardinality of the userEntityNames 
+		 attribute is limited to one.
+
+		 A lAPBDLE MO may be created and deleted explicitly by 
+		 management operation or created and deleted 
+		 automatically as a part of system operation.
+
+		 When the lAPBDLE MO is operable, the operationalState 
+		 shall have the value 'enabled'; otherwise, it shall 
+		 have the value 'disabled'.  Transitions of 
+		 operationalState shall be reported using the 
+		 stateChange notification."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 lAPBDLE MOC."
+	::= { lAPBDLE 1 }
+
+lAPBDLEEntry OBJECT-TYPE
+	SYNTAX		LAPBDLEEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This entiry is derived from the datalinkEntity and uses 
+		 the same primary index."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 lAPBDLE MOC."
+	INDEX	{
+			lAPBDLEcommunicationsEntityId
+		}
+	::= { lAPBDLETable 1 }
+
+LAPBDLEEntry ::=
+	SEQUENCE { 
+		-- X.723 communicationsEntity inherited attributes:
+		lAPBDLEcommunicationsEntityId
+			SimpleNameType,
+		lAPBDLElocalSapNames
+			RowPointer,
+		lAPBDLEoperationalState
+			OperationalState,
+		-- X.282 datalinkEntity inherited attributes:
+		lAPBDLEproviderEntityNames
+			RowPointer,
+		-- X.282 lAPBDLE attributes:
+		-- mLP-P package
+		lAPBDLEmT1Timer
+			TimeInterval,
+		lAPBDLEmT3Timer
+			TimeInterval,
+		lAPBDLEmW
+			INTEGER,
+		lAPBDLEmXSend
+			INTEGER,
+		lAPBDLEmXReceive
+			INTEGER,
+		-- mT2-P package
+		lAPBDLEmT2Timer
+			TimeInterval,
+		-- mLP-Counters-P package
+		lAPBDLEreceivedMlpResets
+			Counter32,
+		lAPBDLEtimesMT1Expired
+			Counter32,
+		lAPBDLEIframesReassignments
+			Counter32,
+		lAPBDLEmlpFramesReceived
+			Counter32,
+		lAPBDLEmlpFramesSent
+			Counter32,
+		lAPBDLEmlpFramesOutsideWindowGuard
+			Counter32,
+		lAPBDLEreceivedMlpFramesInGuardRegion
+			Counter32,
+		--
+		lAPBDLERowStatus
+			RowStatus
+	}
+
+-- X.723 communicationsEntity inherited attributes:
+lAPBDLEcommunicationsEntityId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible -- index
+	STATUS		current
+	DESCRIPTION	""
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntityId."
+	::= { lAPBDLEEntry 1 }
+
+lAPBDLElocalSapNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The localSapNames attribute identifies the providing 
+		 entitie's SAP objects.  In the case of the lAPBDLE, the 
+		 localSapNames identifies the physicalSAP of the 
+		 phsyicalEntity object which is providing service to the 
+		 lAPBDLE."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 localSapNames."
+	::= { lAPBDLEEntry 2 }
+
+lAPBDLEoperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the operational state of the data link entity 
+		 following the OperationalState textual convention of 
+		 the OPENSS7-TMN-TC module."
+	REFERENCE
+		"ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState."
+	::= { lAPBDLEEntry 3 }
+
+-- X.282 datalinkEntity inherited attributes:
+lAPBDLEproviderEntityNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The providerEntityNames attribute identifies the 
+		 entities providing service to this datalinkEntity.  In 
+		 the case of the LAPB data link entity, lAPBDLE, the 
+		 provider entity is a physicalEntity.  At most one 
+		 physicalEntity  can provide service to an lAPBDLE 
+		 without the mlp package; multiple physicalEntities 
+		 provide service to a lAPBDLE with the mlp package; only  
+		 one lAPBDLE can be provided service by a 
+		 physicalEntity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 providerEntityNames."
+	::= { lAPBDLEEntry 4 }
+
+-- X.282 lAPBDLE attributes:
+-- mLP-P package
+--
+-- Additional properties of an lAPBDLE MO, present when mlp procedures 
+-- supported.
+
+lAPBDLEmT1Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter MT1 (lost frame 
+		 timer).  This value is ignored and will default to zero 
+		 if multiple single link protocol protocol machines are 
+		 not assigned to this LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, ISO/IEC 7776."
+	::= { lAPBDLEEntry 5 }
+
+lAPBDLEmT3Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter MT3 (mlp reset 
+		 confirmation timer).  This value is ignored and will 
+		 default to zero if multiple single link protocol 
+		 protocol machines are not assigned to this LAPB data 
+		 link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, ISO/IEC 7776."
+	::= { lAPBDLEEntry 6 }
+
+lAPBDLEmW OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"MLP window size.  This value is ignored and will 
+		 default to zero if multiple single link protocol 
+		 protocol machines are not assigned to this LAPB data 
+		 link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, ISO/IEC 7776."
+	::= { lAPBDLEEntry 7 }
+
+lAPBDLEmXSend OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Receive MLP window in the Guard Region.  This value is 
+		 ignored and will default to zero if multiple single 
+		 link protocol protocol machines are not assigned to 
+		 this LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, ISO/IEC 7776."
+	::= { lAPBDLEEntry 8 }
+
+lAPBDLEmXReceive OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Receive MLP window in the Guard Region.  This value is 
+		 ignored and will default to zero if multiple single 
+		 link protocol protocol machines are not assigned to 
+		 this LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, ISO/IEC 7776."
+	::= { lAPBDLEEntry 9 }
+
+-- mT2-P package
+-- 
+-- Additional properties present when MLP and the mT2 timer is supported.
+
+lAPBDLEmT2Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	UNITS		"seconds"
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter MT2 (group busy 
+		 timer).  This value is ignored and will default to zero 
+		 if multiple single link protocol protocol machines are 
+		 not assigned to this LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, ISO/IEC 7776."
+	::= { lAPBDLEEntry 10 }
+
+-- mLP-Counters-P package
+--
+-- Additional properties present when ITU-T DCE mode operation is 
+-- supported.
+
+lAPBDLEreceivedMlpResets OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Count of the number of received MLP Resets.  This value 
+		 will always return zero if multiple single link 
+		 protocol protocol machines are not assigned to this 
+		 LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, receivedMlpResets."
+	::= { lAPBDLEEntry 11 }
+
+lAPBDLEtimesMT1Expired OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Count of the number of lost multilink frames.  This 
+		 value will always return zero if multiple single link 
+		 protocol protocol machines are not assigned to this 
+		 LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, timesMT1Expired."
+	::= { lAPBDLEEntry 12 }
+
+lAPBDLEIframesReassignments OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Count of the number of reassignments of IFrames on 
+		 another slp.  This value will always return zero if 
+		 multiple single link protocol protocol machines are not 
+		 assigned to this LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, iFrameReassignments."
+	::= { lAPBDLEEntry 13 }
+
+lAPBDLEmlpFramesReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Count of the total number of MLP frames received.  This 
+		 value will always return zero if multiple single link 
+		 protocol protocol machines are not assigned to this 
+		 LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, mlpFramesReceived."
+	::= { lAPBDLEEntry 14 }
+
+lAPBDLEmlpFramesSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Count of the total number of MLP frames sent.  This 
+		 value will always return zero if multiple single link 
+		 protocol protocol machines are not assigned to this 
+		 LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, mlpFramesSent."
+	::= { lAPBDLEEntry 15 }
+
+lAPBDLEmlpFramesOutsideWindowGuard OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Count of the total number of MLP frames outwide the 
+		 window guard that have been received.  This value will 
+		 always return zero if multiple single link protocol 
+		 protocol machines are not assigned to this LAPB data 
+		 link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, 
+		 mlpFramesOutsideWindowGuard."
+	::= { lAPBDLEEntry 16 }
+
+lAPBDLEreceivedMlpFramesInGuardRegion OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Count of the number of MLP frames received in the Guard 
+		 Region.  This value will always return zero if multiple 
+		 single link protocol protocol machines are not assigned 
+		 to this LAPB data link entity."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, 
+		 receivedMlpFramesInGuardRegion."
+	::= { lAPBDLEEntry 17 }
+
+--
+lAPBDLERowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, to create and delete conceptual rows 
+		 in this table."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, STD 58, SNMPv2-TC 
+		 RowStatus."
+	::= { lAPBDLEEntry 18 }
+
+-- =====================================================================
+
+dLSAPTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF DLSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The data link service access point managed object.  The 
+		 dLSAP managed object class is used to represent a 
+		 service access point at which services are provided by 
+		 a data link entity to the user entity.  Instances of 
+		 the dLSAP managed object class are contained within 
+		 instances of subclasses derived from the datalinkEntity 
+		 managed object class.  Constraints on the number of 
+		 contained dLSAP MOs and any specific semantics of the 
+		 attributes are given as part of the definition of the 
+		 containing data link entity managed object class.
+
+		 A dLSAP managed object may be created and deleted 
+		 explicitly by management operation or created and 
+		 deleted automatically as part of system operation, e.g. 
+		 when a user of the data link layer service requests and 
+		 is granted use of the service.  The mechanism by which 
+		 this happens is a local matter and not subject to OSI 
+		 standardization.
+
+		 A lAPBDLE MO may contain at most one dLSAP MO.  The 
+		 value of the sap1Address atribute is of no 
+		 significance.  The cardinality of the userEntityNames 
+		 attribute is limited to one."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 dLSAP."
+	::= { dLSAP 1 }
+
+dLSAPEntry OBJECT-TYPE
+	SYNTAX		DLSAPEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 dLSAP."
+	INDEX	{
+			lAPBDLEcommunicationsEntityId, -- shared index
+			dLSAPsapId -- index
+		}
+	::= { dLSAPTable 1 }
+
+DLSAPEntry ::=
+	SEQUENCE {
+		-- X.723 sap1 inherited attributes:
+		dLSAPsapId
+			SimpleNameType,
+		dLSAPsap1Address
+			Unsigned32,
+		dLSAPuserEntityNames
+			RowPointer,
+		--
+		dLSAPRowStatus
+			RowStatus
+	}
+
+-- X.723 sap1 inherited attributes:
+dLSAPsapId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"
+		 In the OpenSS7 STREAMS implementation, this is either 
+		 the clone device, /dev/streams/clone/lapb, where lapb 
+		 is the name of the device driver to open to establish a 
+		 dlSAP and sap1Address is the Physical Point of 
+		 Attachment to which to attach the dLSAP; or, a Style II 
+		 device, /dev/streams/lapb/yyyy, where yyyy is the minor 
+		 device instance name or number associated with the 
+		 sap1Address and the lAPBDLE."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 sapId."
+	::= { dLSAPEntry 1 }
+
+dLSAPsap1Address OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"A LAPB data link entity may contain at most one dLSAP 
+		 managed object.  The value of the sap1Address attribute 
+		 is of no significance.  The sap1Address is dependent on 
+		 the underlying provider.  In this case, the sap1Address 
+		 is the Physical Point of Attachment associated with the 
+		 data circuit over which the LAPB data link is 
+		 established."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1Address."
+	::= { dLSAPEntry 2 }
+
+dLSAPuserEntityNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This indicates the entry in a table which represents 
+		 the user of the dLSAP.  When there is no user 
+		 associated with the dLSAP or the user of the dLSAP is 
+		 unknown, this will have the value zeroDotZero."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames."
+	::= { dLSAPEntry 3 }
+--
+dLSAPRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, may create or delete conceptual rows 
+		 in this table.
+
+		 The dLSAP-datalinkEntity-Management name binding 
+		 applies when a dLSAP managed object (or an isntance of 
+		 a subclass of the dLSAP MO class) is created by 
+		 management as a subordinate object of a datalinkEntity 
+		 managed object (or subclasses), or deleted by 
+		 management."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 
+		 dLSAP-datalinkEntity-management, STD 58, SNMPv2-TC 
+		 RowStatus."
+	::= { dLSAPEntry 4 }
+
+-- =====================================================================
+
+sLPPMTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SLPPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The LAPB single link protoocol machine managed object.  
+		 The sLPPM managed object represents the operation of 
+		 the LAPB data link layer protocol machine described in 
+		 ISO/IEC 7776 over a single physical link.  An sLPPM 
+		 managed object may contain at most one sLPConnection MO 
+		 and one or more sLPConnectionIVMO.
+		 
+		 An sLPPM MO may be crated and deleted explicitly by 
+		 management operation or created and deleted 
+		 automatically a part of system oepration.
+		 
+		 When the sLPPM MO is operable, the operationalState 
+		 shall have the value 'enabled'; otherwise, it shall 
+		 have the value 'disabled'.  Transitions of 
+		 operationalState shall be reported using the 
+		 stateChange notification.
+		 
+		 Creation of an entry in this table will be notified 
+		 with the objectCreation notification of the 
+		 OPENSS7-TMN-SMI module and the sourceIndicator 
+		 parameter indicating the source of the creation.
+		 
+		 Deletion of a entry in this table will be notified with 
+		 the objectDeletion notification of the OPENSS7-TMN-SMI 
+		 module with the sourceIndicator parameter indicate the 
+		 source of the deletion.
+		 
+		 An activate and deactivate action is defined for these 
+		 managed objects in TMN; howere, these actions are 
+		 mimiced by adding an administrativeState element."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 sLPPM MOC."
+	::= { sLPPM 1 }
+
+sLPPMEntry OBJECT-TYPE
+	SYNTAX		SLPPMEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The sLPPM MO is contained by a lAPBDLE MO.  The name 
+		 binding which applies when a sLPPM managed object (or 
+		 an instance of a subclass of the sLPPM MO class) can be 
+		 created by management as a subordinate object of a 
+		 lAPBDLE managed object (or subclass), and deleted by 
+		 management."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 sLPPM MOC."
+	INDEX	{
+			lAPBDLEcommunicationsEntityId, -- shared index
+			sLPPMcoProtocolMachineId -- index
+		}
+	::= { sLPPMTable 1 }
+
+SLPPMEntry ::=
+	SEQUENCE {
+		-- X.723 coProtocolMachine inherited attributes:
+		sLPPMcoProtocolMachineId
+			SimpleNameType,
+		sLPPMoperationalState
+			OperationalState,
+		-- Added attribute to mimic activate/deactiveate 
+		-- actions:
+		sLPPMadministrativeState
+			AdministrativeState,
+		sLPPMRowStatus
+			RowStatus
+	}
+
+-- X.723 coProtocolMachine inherited attributes:
+sLPPMcoProtocolMachineId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 coProtocolMachineId."
+	::= { sLPPMEntry 1 }
+
+sLPPMoperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Indicates the operational state of the single link 
+		 protocol protocol machine following the 
+		 OperationalState textual convention of the 
+		 OPENSS7-TMN-TC module.
+
+		 When the sLPPM MO is operable, the operationalState 
+		 shall have the value 'enabled'; otherwise, it shall 
+		 have the value 'disabled'.  Transitions of 
+		 operationalState shall be reported using the 
+		 stateChange notification."
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5 operationalState."
+	::= { sLPPMEntry 2 }
+
+-- Added attribute to mimic activate/deactiveate actions:
+sLPPMadministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations may 
+		 activate, set to locked(), or deactivate, set to 
+		 unlocked(), the single link protocol protocol machine.  
+		 This has the effect of activating or deactivating the 
+		 data link."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 activate and 
+		 deactivate ACTIONS."
+	::= { sLPPMEntry 3 }
+
+sLPPMRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, may create and delete conceptual rows 
+		 in this table.
+		 
+		 The name binding which applies when a sLPPM managed 
+		 object (or an instance of a subclass of the sLPPM MO 
+		 class) can be created by management as a subordinate 
+		 object of a lAPBDLE managed object (or subclass), and 
+		 deleted by management.
+		 
+		 When a lAPBDLE only support SLP, at most one instance 
+		 of a sLPPM can exist for a given lAPBDLE.  When a 
+		 lAPBDLE supports MLP, multiple instances of sLPPM can 
+		 exist for a given lAPBDLE."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 
+		 sLPPM-lAPBDLE-Management, STD 58, SNMPv2-TC RowStatus."
+	::= { sLPPMEntry 4 }
+
+-- =====================================================================
+
+sLPConnectionTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SLPConnectionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The LAPB single link protocol connection managed 
+		 object.  The sLPConnection mnaged object represents the 
+		 local view of a connection between LAPB DLEs over a 
+		 single physical link.  This table provides the 
+		 configuration, state and statistics for a given LAPB 
+		 connection which is associated with a specific LAPB 
+		 interface.  An sLPConnection MO is created 
+		 automatically as a part of system operation.  An 
+		 sLPConnection MO may be deleted automatically as part 
+		 of system operation or may be deleted as a result of 
+		 the deactivate or delete management operations.  An 
+		 sLPConnectionIVMO may be used as the source of initial 
+		 values of attributes of an sLPConnection MO.
+		 
+		 The LAPB Single Link Protocol Machine managed object 
+		 The sLPPM managed object represents the operation of 
+		 the LAPB Data Link layer protocol machine described in 
+		 ISO/IEC 7776 over a single physical link.  An sLPPM 
+		 managed object may contain at most one sLPConnection MO 
+		 and one or more sLPConnectionIVMO.
+
+		 Entries in this table support a 'deactivate' action.
+		"
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 sLPConnection MOC."
+	::= { sLPConnection 1 }
+
+sLPConnectionEntry OBJECT-TYPE
+	SYNTAX		SLPConnectionEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is an entry in the state table representing a 
+		 single LAPB data link connection.
+
+		 This table entry provides detailed statistics for a 
+		 given LAPB connection associatedw with a given LAPB 
+		 interface.
+		 "
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 sLPConnection MOC."
+	INDEX	{
+			sLPConnectionConnectionId
+		}
+	::= { sLPConnectionTable 1 }
+
+SLPConnectionEntry ::=
+	SEQUENCE {
+		-- X.723 singlePeerConnection inherited attributes
+		sLPConnectionConnectionId
+			SimpleNameType,
+		sLPConnectionUnderlyingConnectionNames
+			RowPointer,
+		-- X.723 singlePeerConnection singlePeerConnectionP2 package
+		sLPConnectionSupportedConnectionNames
+			RowPointer,
+		-- X.282 sLPConnection attributes:
+		-- mandatory commonSLPconnection-P package
+		sLPConnectionInterfaceType
+			INTEGER,
+		sLPConnectionK
+			INTEGER,
+		sLPConnectionN1
+			INTEGER,
+		sLPConnectionN2
+			INTEGER,
+		sLPConnectionSequenceModulus
+			INTEGER,
+		sLPConnectionT1Timer
+			TimeInterval,
+		sLPConnectionT2Timer
+			TimeInterval,
+		-- mandatory sLPConnection-P package
+		sLPConnectionFCSErrorsReceived
+			Counter32,
+		sLPConnectionFRMRsReceived
+			Counter32,
+		sLPConnectionFRMRsSent
+			Counter32,
+		sLPConnectionIFrameDataOctetsReceived
+			Counter32,
+		sLPConnectionIFrameDataOctetsSent
+			Counter32,
+		sLPConnectionIFramesReceived
+			Counter32,
+		sLPConnectionIFramesSent
+			Counter32,
+		sLPConnectionPollsReceived
+			Counter32,
+		sLPConnectionREJsReceived
+			Counter32,
+		sLPConnectionREJsSent
+			Counter32,
+		sLPConnectionRNRsReceived
+			Counter32,
+		sLPConnectionRNRsSent
+			Counter32,
+		sLPConnectionSABMsReceived
+			Counter32,
+		sLPConnectionSABMsSent
+			Counter32,
+		sLPConnectionProtocolState
+			INTEGER,
+		sLPConnectionTimesT1Expired
+			Counter32,
+		-- conditional t3IVMO-P package
+		sLPConnectionT3Timer
+			TimeInterval,
+		sLPConnectionTimesT3Expired
+			Counter32,
+		-- conditional t4IVMO-P package
+		sLPConnectionT4Timer
+			TimeInterval,
+		sLPConnectionTimesT4Expired
+			Counter32,
+		--
+		sLPConnectionAbnormalLinkDisconnectsReceived
+			Counter32,
+		sLPConnectionAbnormalLinkDisconnectsSent
+			Counter32,
+		sLPConnectionLinkResetsReceived
+			Counter32,
+		sLPConnectionLinkResetsSent
+			Counter32,
+		sLPConnectionTimesN2Reached
+			Counter32,
+		--
+		sLPConnectionAdministrativeState
+			AdministrativeState,
+		sLPConnectionOperationalState
+			OperationalState,
+		sLPConnectionUsageState
+			UsageState,
+		sLPConnectionProceduralStatus
+			ProceduralStatus,
+		sLPConnectionAlarmStatus
+			AlarmStatus,
+		sLPConnectionRowStatus
+			RowStatus
+	}
+
+-- X.723 singlePeerConnection inherited attributes
+sLPConnectionConnectionId OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5"
+	::= { sLPConnectionEntry 1 }
+
+
+sLPConnectionUnderlyingConnectionNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DEFVAL		{ zeroDotZero }
+	DESCRIPTION
+		"The underlying connection names for the sLPConnection 
+		 are constrained to a cardinality of one.  This will 
+		 contain the underlying connection name associated with 
+		 the connection.  The underlying connection name is a 
+		 RowPointer to an entry in the physicalConnection table 
+		 from the OPENSS7-PHY-MIB module.  The entry corresponds 
+		 to the channel on the physical dataCircuit which 
+		 provides the communications facility.
+		 "
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5"
+	::= { sLPConnectionEntry 2 }
+
+-- X.723 singlePeerConnection singlePeerConnectionP2 package
+sLPConnectionSupportedConnectionNames OBJECT-TYPE
+	SYNTAX		RowPointer
+	MAX-ACCESS	read-create
+	STATUS		current
+	DEFVAL		{ zeroDotZero }
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5"
+	::= { sLPConnectionEntry 3 }
+
+-- X.282 sLPConnection attributes:
+-- mandatory commonSLPconnection-P package
+sLPConnectionInterfaceType OBJECT-TYPE
+	SYNTAX		INTEGER { dTE(0), dCE(1) }
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Determines the address mode used by the local DTE."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, interfaceType."
+	::= { sLPConnectionEntry 4 }
+
+
+sLPConnectionK OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter k.  The maximum 
+		 number of sequentially numbered I frames that a DTE may 
+		 have outstanding (i.e. unacknowledged) at any fiven 
+		 time."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, k."
+	::= { sLPConnectionEntry 5 }
+
+
+sLPConnectionN1 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter N1.  The maximum 
+		 number of bits in an I frame (excluding flags and 0 
+		 bits inserted for transparency."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, n1."
+	::= { sLPConnectionEntry 6 }
+
+
+sLPConnectionN2 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter N2.  The maximum 
+		 number of attempts that shall be made to complete the 
+		 successful transmission of a frame."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, n2."
+	::= { sLPConnectionEntry 7 }
+
+
+sLPConnectionSequenceModulus OBJECT-TYPE
+	SYNTAX		INTEGER(8|128)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Determines basic (modulo 8) or extended (modulo 128) 
+		 operation."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, sequenceModulus."
+	::= { sLPConnectionEntry 8 }
+
+
+sLPConnectionT1Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter Timer T1.  Unit is 
+		 centiseconds."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, t1Timer."
+	::= { sLPConnectionEntry 9 }
+
+
+sLPConnectionT2Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter T2.  Units is 
+		 centiseconds."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, t2Timer."
+	::= { sLPConnectionEntry 10 }
+
+
+-- mandatory sLPConnection-P package
+sLPConnectionFCSErrorsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of frames received with a bad 
+		 checksum."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, fCSErrorsReceived."
+	::= { sLPConnectionEntry 11 }
+
+sLPConnectionFRMRsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of FRMR frames received."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, fRMRsReceived."
+	::= { sLPConnectionEntry 12 }
+
+
+sLPConnectionFRMRsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of FRMR frames sent."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, fRMRsSent."
+	::= { sLPConnectionEntry 13 }
+
+
+sLPConnectionIFrameDataOctetsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter Total number of data octets received in I 
+		 frames.  Only data octets in new I frames are counted, 
+		 i.e. retransmitted frames that are received do not 
+		 cause the counter to be incremented."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, 
+		 iFrameDataOctetsReceived."
+	::= { sLPConnectionEntry 14 }
+
+
+sLPConnectionIFrameDataOctetsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of data octets sent in I frames.  
+		 Only data octets in new I frames are counted, i.e., 
+		 retransmitted frames that are sent do not cause the 
+		 counter to be incremented."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, iFrameDataOctetsSent."
+	::= { sLPConnectionEntry 15 }
+
+
+sLPConnectionIFramesReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of I frames received.  Only new 
+		 I frames are counted, i.e. retransmitted frames that 
+		 are received do not cause the counter to be 
+		 incremented."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, iFramesReceived."
+	::= { sLPConnectionEntry 16 }
+
+
+sLPConnectionIFramesSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of I frame sent.  Only new I 
+		 frames are counted, i.e., retransmitted frames that are 
+		 sent do not cause the counter to be incremented."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, iFramesSent."
+	::= { sLPConnectionEntry 17 }
+
+
+sLPConnectionPollsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of command frames received with 
+		 P-bit set."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, pollsReceived."
+	::= { sLPConnectionEntry 18 }
+
+
+sLPConnectionREJsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of REJ frames received."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, rEJsReceived."
+	::= { sLPConnectionEntry 19 }
+
+
+sLPConnectionREJsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of REJ frames sent."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, rEJsSent."
+	::= { sLPConnectionEntry 20 }
+
+sLPConnectionRNRsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter Total number of RNR frames received."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, rNRsReceived."
+	::= { sLPConnectionEntry 21 }
+
+sLPConnectionRNRsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of RNR frames sent."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, rNRsSent."
+	::= { sLPConnectionEntry 22 }
+
+sLPConnectionSABMsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of SABM/SABME frames received."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, sABMsReceived."
+	::= { sLPConnectionEntry 23 }
+
+sLPConnectionSABMsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of SABM/SABME frames sent."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, sABMsSent."
+	::= { sLPConnectionEntry 24 }
+
+sLPConnectionProtocolState OBJECT-TYPE
+	SYNTAX		INTEGER {
+				disconnectedPhase(0),
+				linkdisconnection-phase(1),
+				link-set-up-phase(2),
+				information-Transfer-phase(3),
+				frame-Reject-condition(4),
+				busy-condition(5),
+				sent-Reject-condition(6),
+				system-Parameters-and-error-recovery(7)
+			}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Local state of a LAPB (SLP) connection."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, sLPProtocolState."
+	::= { sLPConnectionEntry 25 }
+
+sLPConnectionTimesT1Expired OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of times the local Timer T1 
+		 expired."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, timesT1Expired."
+	::= { sLPConnectionEntry 26 }
+
+-- conditional t3IVMO-P package
+sLPConnectionT3Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter or ITU-T X.25 
+		 mandatory parameter T3.  Unit is centiseconds."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, t3Timer."
+	::= { sLPConnectionEntry 27 }
+
+sLPConnectionTimesT3Expired OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of times local Timer T3 expired."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, timesT3Expired."
+	::= { sLPConnectionEntry 28 }
+
+-- conditional t4IVMO-P package
+sLPConnectionT4Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Value of the ISO/IEC 7776 parameter T4.  The maximum 
+		 time a DTE or a DCE will allow without frames being 
+		 exchangd on the data link.  Units is centiseconds."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, t4Timer."
+	::= { sLPConnectionEntry 29 }
+
+sLPConnectionTimesT4Expired OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of times local Timer T4 expired."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742, timesT4Expired."
+	::= { sLPConnectionEntry 30 }
+
+--
+sLPConnectionAbnormalLinkDisconnectsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of received abnormal Link 
+		 Disconnects."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionEntry 31 }
+
+sLPConnectionAbnormalLinkDisconnectsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of sent abnormal Link 
+		 Disconnects."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionEntry 32 }
+
+sLPConnectionLinkResetsReceived OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of received Link Resets."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionEntry 33 }
+
+sLPConnectionLinkResetsSent OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of sent Link Resets."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionEntry 34 }
+
+sLPConnectionTimesN2Reached OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Counter.  Total number of times N2 was reached."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionEntry 35 }
+
+--
+sLPConnectionAdministrativeState OBJECT-TYPE
+	SYNTAX		AdministrativeState
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides the X.731 administrative status of the LAPB 
+		 connection.  When locked(0), the LAPB connection is 
+		 administratively prohibitted from forming and when 
+		 set to locked(0) will be abruptly disconnected if 
+		 already formed.  When unlocked(1) the LAPB connection 
+		 is administratively permitted to form.  When set to
+		 shuttingDown(2), the LAPB connection will be gracefully 
+		 withdrawn from service and will enter the locked(0) 
+		 state when shut down."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742,
+			 ITU-T Rec. X.721 (1992)."
+	::= { sLPConnectionEntry 36 }
+
+sLPConnectionOperationalState OBJECT-TYPE
+	SYNTAX		OperationalState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the X.731 operational state of this LAPB 
+		 connection.
+
+		 When the sLPPM MO is operable, the operationalState 
+		 shall have the value 'enabled'; otherwise it shall have 
+		 the value 'disabled'.  Transitions of operationalState 
+		 shall be reported using the stateChange notification 
+		 with the RowPointer for the corresponding entry as the 
+		 objectInstance value and the old and new values of the 
+		 attribute as additional information."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742,
+			 ITU-T Rec. X.721 (1992)."
+	::= { sLPConnectionEntry 37 }
+
+sLPConnectionUsageState OBJECT-TYPE
+	SYNTAX		UsageState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the X.731 usage state of this LAPB connection.  
+		 When idle(0), the LABP connection is not currently in 
+		 use (although it may still be formed).  When active(1), 
+		 the resource is being used and has sufficient spare 
+		 operating capacity to provide for additional users 
+		 simultaneously.  When busy(2), the resource is in use, 
+		 but it has no spare capacity to provide additional 
+		 users at this instant."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742,
+			 ITU-T Rec. X.721 (1992)."
+	::= { sLPConnectionEntry 38 }
+
+sLPConnectionProceduralStatus OBJECT-TYPE
+	SYNTAX		ProceduralStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the X.731 procedural status of this LAPB 
+		 connection.  The procedural status contains 
+		 initializationRequired(0) when the LAPB requires 
+		 initiation action to form or reform a connection.  It 
+		 contains notInitialized(1) when the LAPB connection is 
+		 in disconnected mode (ADM); initializing(2) when 
+		 forming connection (SABM) and terminating(3) when 
+		 disconnecting (DISC)."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742,
+			 ITU-T Rec. X.721 (1992)."
+	::= { sLPConnectionEntry 39 }
+
+sLPConnectionAlarmStatus OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Provides the alarm status of this LAPB connection.
+
+		 The sLPConnection entry may issue a communicationsAlarm 
+		 notification using the RowPointer of the corresponding 
+		 entry in the objectInstance parameter of the 
+		 communicationsAlarm.
+
+		 The probableCause is fRMRReceived.  The 
+		 specificProblems is one of:
+
+		 - fRMRReasonsControlFieldUndefinedOrUnimplemented,
+		 - fRMRReasonsFormatError,
+		 - fRMRReasonsInfoFieldLengthGreaterThanMaximum,
+		 - fRMRReasonsInvalidNR,
+		 - fRMRReasonsNonSpecific.
+
+		 The perceivedSeverity parameter is set to the value 
+		 Minor.  A subsequent communicationsAlarm with a 
+		 perceivedSeverity of Cleared is not generated.  Alarms 
+		 must be cleared by management stations using the 
+		 sLPConnectionAlarmStatus or locally.
+
+		 The fRMR parameter containing the received frame is 
+		 included in the additionalInformation.  No other 
+		 parameters are used."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742,
+			 ITU-T Rec. X.721 (1992)."
+	::= { sLPConnectionEntry 40 }
+
+sLPConnectionRowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convetion of the 
+		 SNMPv2-TC module, may create or delete conceptual rows 
+		 in this table.
+		 
+		 Whenever entries are created in this table, whether 
+		 explicitly by a management station or automatically as 
+		 a part of system operation, an objectCreation 
+		 notification is issued with the RowPointer 
+		 corresponding to the created entry contained in the 
+		 objectInstance parameter of the notification and the 
+		 read-create access attributes as additional 
+		 information.
+
+		 Whenever entries are deleted from this table, whether 
+		 explicitly by a management station or automatically as 
+		 a part of system operation, an objectDeletion 
+		 notification is issued with the RowPointer 
+		 corresponding to the deleted etnry contained in the 
+		 objectInstance parameter of the notification and the 
+		 accessible attributes as additional information.
+		 
+		 An sLPConnection MO is created automatically as part of 
+		 a system operation.  When created, an objectCreation 
+		 notification is generated.
+		 
+		 An sLPConnection MO may be deleted automatically as a 
+		 part of system operation or may be deleted as a result 
+		 of the deactivate or delete management operations.  
+		 When deleted, an objectDeletion notification is 
+		 generated.
+		 "
+	REFERENCE
+		"STD 58, SNMPv2-TC RowStatus."
+	::= { sLPConnectionEntry 41 }
+
+
+-- =====================================================================
+
+sLPConnectionIVMOTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SLPConnectionIVMOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 sLPConnectionIVMO MOC."
+	::= { sLPConnectionIVMO 1 }
+
+sLPConnectionIVMOEntry OBJECT-TYPE
+	SYNTAX		SLPConnectionIVMOEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742 sLPConnectionIVMO MOC."
+	INDEX	{
+			sLPConnectionConnectionId -- shared index
+		}
+	::= { sLPConnectionIVMOTable 1 }
+
+SLPConnectionIVMOEntry ::=
+	SEQUENCE {
+		sLPConnectionIVMOid
+			SimpleNameType,
+		sLPConnectionIVMOinterfaceType
+			INTEGER,
+		sLPConnectionIVMOk
+			INTEGER,
+		sLPConnectionIVMOn1
+			INTEGER,
+		sLPConnectionIVMOn2
+			INTEGER,
+		sLPConnectionIVMOsequenceModulus
+			INTEGER,
+		sLPConnectionIVMOt1Timer
+			TimeInterval,
+		sLPConnectionIVMOt2Timer
+			TimeInterval,
+		sLPConnectionIVMOt3Timer
+			TimeInterval,
+		sLPConnectionIVMOt4Timer
+			TimeInterval,
+		sLPConnectionIVMORowStatus
+			RowStatus
+	}
+
+sLPConnectionIVMOid OBJECT-TYPE
+	SYNTAX		SimpleNameType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 1 }
+
+sLPConnectionIVMOinterfaceType OBJECT-TYPE
+	SYNTAX		INTEGER { dTE(0), dCE(1) }
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default interface type for this profile.  The 
+		 default is the value of sLPConnectionDefaultInterfaceType."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 2 }
+
+sLPConnectionIVMOk OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default k value for this profile.  The default 
+		 is the value of sLPConnectionDefaultK."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 3 }
+
+sLPConnectionIVMOn1 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default n1 value for this profile.  The 
+		 default is the value of sLPConnectionDefaultN1."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 4 }
+
+sLPConnectionIVMOn2 OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default n2 value for this profile.  The 
+		 default is the value of sLPConnectionDefaultN2."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 5 }
+
+sLPConnectionIVMOsequenceModulus OBJECT-TYPE
+	SYNTAX		INTEGER(8|128)
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default sequence modulus for this profile.  
+		 The default is the value of 
+		 sLPConnectionDefaultSequenceModulus."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 6 }
+
+sLPConnectionIVMOt1Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial t1Timer value for this 
+		 profile.  The default is the value of 
+		 sLPConnectionDefaultT1Timer."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 7 }
+
+sLPConnectionIVMOt2Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial t2Timer value for this 
+		 profile.  The default is the value of 
+		 sLPConnectionDefaultT2Timer."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 8 }
+
+sLPConnectionIVMOt3Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial t3Timer value for this 
+		 profile.  The default is the value of 
+		 sLPConnectionDefaultT3Timer."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 9 }
+
+sLPConnectionIVMOt4Timer OBJECT-TYPE
+	SYNTAX		TimeInterval
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Sets the default initial t4Timer value for this 
+		 profile.  The default is the value of 
+		 sLPConnectionDefaultT4Timer."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 10 }
+
+sLPConnectionIVMORowStatus OBJECT-TYPE
+	SYNTAX		RowStatus
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Provides a mechanism whereby management stations, 
+		 following the RowStatus textual convention of the 
+		 SNMPv2-TC module, may create or destroy conceptual rows 
+		 in this table."
+	REFERENCE
+		"ITU-T Rec. X.282 | ISO/IEC 10742."
+	::= { sLPConnectionIVMOEntry 11 }
+
+-- =====================================================================
+
+-- =====================================================================
+
+-- =====================================================================
+
+-- =====================================================================
+
+-- =====================================================================
+
+-- =====================================================================
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8

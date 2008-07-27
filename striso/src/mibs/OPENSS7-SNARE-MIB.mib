@@ -1,0 +1,262 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-SNARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+	FROM OPENSS7-SMI
+    AdministrativeState, OperationalState, SimpleNameType
+	FROM OPENSS7-SMI-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+	FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+	FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+	FROM SNMPv2-TC;
+
+snare-MIB MODULE-IDENTITY
+    LAST-UPDATED    "200807132239Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+	"This MIB provides configuration and status information for an 
+	 End-System (ES) or Intermediate-System (IS) accessing or 
+	 providing a Sub-Network Address Resolution Entity (SNARE) in 
+	 accordance with ISO/IEC 10030."
+    REVISION	    "200807132239Z"
+    DESCRIPTION
+	"First release of this module."
+    ::= { openss7Modules 31 }
+
+
+snare OBJECT IDENTIFIER
+    ::= { snareTables 1 }
+
+snareTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SnareEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snare 1 }
+
+snareEntry OBJECT-TYPE
+    SYNTAX	SnareEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareTable 1 }
+
+SnareEntry ::= SEQUENCE {
+    snareProtocolVersionsSupported	BITS,
+}
+
+snareProtocolVersionsSupported OBJECT-TYPE
+    SYNTAX	BITS {
+		    iso10030(1),
+		    x116(2),
+		}
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"Provides a mask of protocol version supported.  Currently 
+	 specified protocol versions include:
+	 
+	 - iso10030(1), ISO/IEC 10030 : 1995,
+	 - x116(2), ITU-T Rec. X.116, 1996
+
+	 The bit for each supported version is set and the bit for each 
+	 unsupported version is clear."
+    REVISION
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareTable 1 }
+
+
+snareAddressDiscovery OBJECT IDENTIFIER
+    ::= { snareTables 2 }
+
+snareAddressDiscoveryTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SnareAddressDiscoveryEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareAddressDiscovery 1 }
+
+snareAddressDiscoveryEntry OBJECT-TYPE
+    SYNTAX	SnareAddressDiscoveryEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareAddressDiscoveryTable 1 }
+
+SnareAddressDiscoveryEntry ::= SEQUENCE {
+}
+
+
+snareConfigSubset OBJECT IDENTIFIER
+    ::= { snareTables 3 }
+
+snareConfigSubsetTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SnareConfigSubsetEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareConfigSubset 1 }
+
+snareConfigSubsetEntry OBJECT-TYPE
+    SYNTAX	SnareConfigSubsetEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareConfigSubsetTable 1 }
+
+SnareConfigSubsetEntry ::= SEQUENCE {
+    snareCSRequestTime			Integer32,
+}
+
+snareCSRequestTime OBJECT-TYPE
+    SYNTAX	Integer32(0..255)
+    UNITS	"seconds"
+    MAX-ACCESS	read-create
+    STATUS	current
+    DESCRIPTION
+	"The Request Time parameter indicates the time that the SNARE 
+	 will wait for requests from a system (ES or IS) with which it 
+	 has a connection established, or may indicate that it will wait 
+	 an unlimited time.
+	 
+	 If a time greater than Request Time elapses after receipt of an 
+	 ESH PDU without receipt of an ENC PDU or another ESH PDU, the 
+	 SNARE shall clear the call with cause code 0 and diagnostic 
+	 code 242.  If a time greater than Request Time elapses afeter 
+	 transmission of an SRN PDU without receipt of an ECQ PDU, the 
+	 SNARE shall clear the call with a cause code of 0 and a 
+	 diagnostic code 242.  If a time greater than Request Time 
+	 elapses before after transmission of an SCC PDU and before 
+	 receipt of another ECQ PDU, the SNARE shall clea the call with 
+	 a cause value code 0 and diagnostic code 242.
+	 
+	 Specifies the valueof the Request Time in seconds in the range 
+	 1..255 second.  The value of zero (0) specifies that there is 
+	 no limit on the request time.  The default value is 60 seconds."
+    REFERENCE
+	"ISO/IEC 10030 11.1.1.1 | ITU-T Rec. X.116"
+    DEFVAL	{ 60 }
+    ::{ snareConfigSubsetEntry 1 }
+
+snareNet OBJECT IDENTIFIER
+    ::= { snareTables 4 }
+
+snareNetTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SnareNetEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareNet 1 }
+
+snareNetEntry OBJECT-TYPE
+    SYNTAX	SnareNetEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	"ISO/IEC 10030 | ITU-T Rec. X.116"
+    ::= { snareNetTable 1 }
+
+SnareNetEntry ::= SEQUENCE {
+    snareNetHoldingTime
+    snareNetQueryLimit
+    snareNetRequestTime
+    snareNetNotificationRequired
+    snareNetAddressHodingTime
+}
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+

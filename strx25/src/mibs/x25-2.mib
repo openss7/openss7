@@ -1,0 +1,640 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=62 nocin nosi sts=4 sw=4
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-X25-PLP-MIB DEFINTIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, AlarmStatus, OperationalState, ProceduralStatus, 
+    SimpleNameType, UsageState
+        FROM OPENSS7-SMI-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter64, Counter32, Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    RowPointer, RowStatus, TEXTUAL-CONVENTION, TimeInterval, TruthValue
+        FROM SNMPv2-TC;
+
+x25PLPMIB MODULE-IDENTITY
+    LAST-UPDATED "200807121128Z"
+    ORGANIZATION
+	"The OpenSS7 Project"
+    CONTACT-INFO
+	"Brian Bidulock
+	 OpenSS7 Corporation
+	 1469 Jefferys Crescent
+	 Edmonton, Alberta T6L 6T1
+	 CANADA
+	 Tel: +1 780 490 1141
+	 Fax: +1 780 490 1241
+	 Mob: +1 780 953 0557
+	 E-mail: bidulock@openss7.org"
+    DESCRIPTION
+	"This is an enhanced MIB module that provides 
+	 definition of an array of X.25 Packet Layer Protocol 
+	 (PLP) subsystem managed objects in accordance with 
+	 ITU-T Rec. X.25 | ISO/IEC 8208 and the managed object 
+	 classes of ITU-T Rec. X.283 | ISO/IEC 
+	 10733."
+    REVISION	"200807121128Z"
+    DESCRIPTION
+	"First release of this module."
+    ::= { openss7Modules 3 }
+
+x25PLPNotifications OBJECT IDENTIFIER
+    ::= { x25PLPMIB 0 }
+
+x25PLPObjects OBJECT IDENTIFIER
+    ::= { x25PLPMIB 1 }
+
+x25PLPTables OBJECT IDENTIFIER
+    ::= { x25PLPObjects 1 }
+
+x25PLE OBJECT IDENTIFIER
+    ::= { x25PLPtables 1 }
+
+x25PLETable OBJECT-TYPE
+    SYNTAX	SEQUENCE of X25PLEEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { x25PLE 1 }
+
+x25PLEEntry OBJECT-TYPE
+    SYNTAX	X25PLEEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX	{ }
+    ::= { x25PLETable 1 }
+
+X25PLEEntry ::= SEQUENCE {
+    x25PLEId						SimpleNameType,
+    x25PLEOperationalState				OperationalState,
+    x25PLEAdministrativeState				AdministrativeState,
+    x25PLEProtocolVersionsSupported			ProtocolVersion,
+    x25PLELocalDTEAddress				DTEAddress,
+    x25PLEInterfaceMode					InterfaceMode,
+--  x25PLEDefaultThroughputClasses
+    x25PLEDefaultThroughputClassIncoming		ThroughputClass, -- DCE
+    x25PLEDefaultThroughputClassOutgoing		ThroughputClass, -- DCE
+    x25PLEFlowControlParameterNegotiation		TruthValue,
+--  x25PLEDefaultPacketSizes
+    x25PLEDefaultPacketSizeIncoming			PacketSize,
+    x25PLEDefaultPacketSizeOutgoing			PacketSize,
+--  x25PLEDefaultWindowSizes
+    x25PLEDefaultWindowSizeIncoming			WindowSize,
+    x25PLEDefaultWindowSizeOutgoing			WindowSize,
+    x25PLEThroughputClassNegotation			TruthValue, -- not 10733
+    x25PLESNServiceProvider				RowPointer,
+    x25PLESNSAP						RowPointer,
+--  x25PLELogicalChannelAssignments
+    x25PLELogicalChannelAssignmentHPV			LogicalChannel,
+    x25PLELogicalChannelAssignmentLPV			LogicalChannel,
+    x25PLELogicalChannelAssignmentHIC			LogicalChannel,
+    x25PLELogicalChannelAssignmentLIC			LogicalChannel,
+    x25PLELogicalChannelAssignmentHTW			LogicalChannel,
+    x25PLELogicalChannelAssignmentLTW			LogicalChannel,
+    x25PLELogicalChannelAssignmentHOG			LogicalChannel,
+    x25PLELogicalChannelAssignmentLOG			LogicalChannel,
+-- ***************************************************************************
+    -- COMBIND and sorted
+-- ***************************************************************************
+    x25PLECallAttempts					Counter64, -- TCX
+    x25PLECallsConnected				Counter64, -- TCX
+    x25PLEDataPacketsReceived				Counter64, -- TCX
+    x25PLEDataPacketsSent				Counter64, -- TCX
+    x25PLEOctetsReceivedCounter				Counter64, -- TCX
+    x25PLEOctetsSentCounter				Counter64, -- TCX
+    x25PLEProfile					RowPointer, -- TCX
+    x25PLEProviderInitiatedDisconnects			Counter64, -- TCX
+    x25PLEProviderInitiatedResets			Counter64, -- TCX
+    x25PLERemotelyInitiatedResets			Counter64, -- TCX
+    x25PLERemotelyInitiatedRestarts			Counter64, -- TCX
+    x25PLEResetTimeouts					Counter64, -- TCX
+    x25PLERowStatus					RowStatus, -- TCX
+    x25PLECallDeflectionSubscription			TruthValue, -- TC
+    x25PLEExtendedPacketSequenceNumbering		Modulo, -- TC
+    x25PLECallEstablishmentRetryCountsExceeded		Counter64, -- TX
+    x25PLECallTimeouts					Counter64, -- TX
+    x25PLEClearCountsExceeded				Counter64, -- TX
+    x25PLEClearTimeouts					Counter64, -- TX
+    x25PLEDataRetransmissionTimerExpiries		Counter64, -- TX
+    x25PLEMaxActiveCircuits				MaxActiveCircuits, -- TX
+    x25PLEMinimumRecallTimer				TimeInterval, -- TX
+    x25PLEProtocolErrorsAccusedOf			Counter64, -- TX
+    x25PLEProtocolErrorsDetectedLocally			Counter64, -- TX
+    x25PLERestartCountsExceeded				Counter64, -- TX
+    x25PLERestartTime					TimeInterval, -- X
+    x25PLECallRequestResponseTimer			TimeInterval, -- T
+    x25PLEClearRequestResponseTimer			TimeInterval, -- T
+    x25PLEClearRequestRetransmissionCount		INTEGER, -- T
+    x25PLEDataPacketRetransmissionCount			INTEGER, -- T
+    x25PLEInterruptResponseTimer			TimeInterval, -- T
+    x25PLEPacketSequencing				INTEGER, -- T
+    x25PLERegistrationPermitted				TruthValue, -- T
+    x25PLERegistrationRequestResponseTimer		TimeInterval, -- T
+    x25PLERegistrationRequestRetransmissionCount	INTEGER, -- T
+    x25PLERejectResponseTimer				TimeInterval, -- T
+    x25PLERejectRetransmissionTimer			TimeInterval, -- T
+    x25PLEResetRequestResponseTimer			TimeInterval, -- T
+    x25PLEResetRequestRetransmissionCount		INTEGER, -- T
+    x25PLERestartCount					INTEGER, -- T
+    x25PLERestartRequestResponseTimer			TimeInterval, -- T
+    x25PLERestartRequestRetranmissionCount		INTEGER, -- T
+    x25PLEWindowRotationTimer				TimeInterval, -- T
+    x25PLEWindowStatusTransmissionTimer			TimeInterval, -- T
+    x25PLEBilateralCUG					TruthValue, -- C
+    x25PLEBilateralCUGWithOutgoingAccess		TruthValue, -- C
+    x25PLECallRedirection				TruthValue, -- C
+    x25PLEChargingInformation				TruthValue, -- C
+    x25PLEClearIndication				TimeInterval, -- C
+    x25PLECUG						TruthValue, -- C
+    x25PLECUGWithIncomingAccess				TruthValue, -- C
+    x25PLECUGWithOutgoingAccess				TruthValue, -- C
+    x25PLEDBitModification				TruthValue, -- C
+    x25PLEDefaultThroughputClassSubscription		TruthValue, -- C
+    x25PLEDefaultThroughputClassSupported		ThroughputClaasSupport, -- C
+    x25PLEFastSelectAcceptance				TruthValue, -- C
+    x25PLEHuntGroup					TruthValue, -- C
+    x25PLEIncomingCallBarredWithinCUG			TruthValue, -- C
+    x25PLEIncomingCallsBarred				TruthValue, -- C
+    x25PLEIncomingCall					TimeInterval, -- C
+    x25PLEInterruptPacketsReceived			Counter64, -- C
+    x25PLEInterruptPacketsSent				Counter64, -- C
+    x25PLELocalChargingPrevention			TruthValue, -- C
+    x25PLENonStandardDefaultPacketSizeIncoming		PacketSize, -- C
+    x25PLENonStandardDefaultPacketSizeMaximum		PacketSize, -- C
+    x25PLENonStandardDefaultPacketSizeOutgoing		PacketSize, -- C
+    x25PLENonStandardDefaultPacketSizeSubscription	TruthValue, -- C
+    x25PLENonStandardDefaultWindowSizeIncoming		WindowSize, -- C
+    x25PLENonStandardDefaultWindowSizeMaximum		INTEGER, -- C
+    x25PLENonStandardDefaultWindowSizeOutgoing		WindowSize, -- C
+    x25PLENonStandardDefaultWindowSizeSubscription	TruthValue, -- C
+    x25PLENUIOverride					TruthValue, -- C
+    x25PLENUISubscription				TruthValue, -- C
+    x25PLEOneWayLogicalChannelIncoming			TruthValue, -- C
+    x25PLEOneWayLogicalChannelOutgoing			TruthValue, -- C
+    x25PLEOnlineFacilityRegistration			TruthValue, -- C
+    x25PLEOutgoingCallBarredWithinCUG			TruthValue, -- C
+    x25PLEOutgoingCallsBarred				TruthValue, -- C
+    x25PLEPacketRetransmission				TruthValue, -- C
+    x25PLEPLEClientMOName				Counter64, -- C
+    x25PLEResetIndication				TimeInterval, -- C
+    x25PLERestartIndication				TimeInterval, -- C
+    x25PLEReverseChargingAcceptance			TruthValue, -- C
+    x25PLEROASubscription				TruthValue, -- C
+    x25PLEX25SegmentsReceived				Counter64, -- C
+    x25PLEX25SegmentsSent				Counter64, -- C
+-- ***************************************************************************
+    -- COMBINED from x25PLE-DTE, x25PLE-DCE and x25PLE(-DXE)
+    x25PLECallDeflectionSubscription			TruthValue, -- TC
+    x25PLECallRequestResponseTimer			TimeInterval, -- T
+    x25PLEExtendedPacketSequenceNumbering		Modulo, -- TC
+    x25PLEMaxActiveCircuits				MaxActiveCircuits, -- TX
+    x25PLERestartTime					TimeInterval, -- X
+    x25PLEMinimumRecallTimer				TimeInterval, -- TX
+    x25PLEResetRequestResponseTimer			TimeInterval, -- T
+    x25PLERestartRequestRetranmissionCount		INTEGER, -- T
+    x25PLERestartRequestResponseTimer			TimeInterval, -- T
+    x25PLEClearRequestResponseTimer			TimeInterval, -- T
+    x25PLEInterruptResponseTimer			TimeInterval, -- T
+    x25PLEResetRequestRetransmissionCount		INTEGER, -- T
+    x25PLEClearRequestRetransmissionCount		INTEGER, -- T
+    x25PLERestartCount					INTEGER, -- T
+    x25PLEPacketSequencing				INTEGER, -- T
+    x25PLECallAttempts					Counter64, -- TCX
+    x25PLEProtocolErrorsDetectedLocally			Counter64, -- TX
+    x25PLEProtocolErrorsAccusedOf			Counter64, -- TX
+    x25PLECallEstablishmentRetryCountsExceeded		Counter64, -- TX
+    x25PLEOctetsReceivedCounter				Counter64, -- TCX
+    x25PLEOctetsSentCounter				Counter64, -- TCX
+    x25PLECallTimeouts					Counter64, -- TX
+    x25PLECallsConnected				Counter64, -- TCX
+    x25PLECUG						TruthValue, -- C
+    x25PLEFastSelectAcceptance				TruthValue, -- C
+    x25PLEIncomingCallsBarred				TruthValue, -- C
+    x25PLEOneWayLogicalChannelOutgoing			TruthValue, -- C
+    x25PLEOutgoingCallsBarred				TruthValue, -- C
+    x25PLEClearCountsExceeded				Counter64, -- TX
+    x25PLEClearTimeouts					Counter64, -- TX
+    x25PLEDataPacketsReceived				Counter64, -- TCX
+    x25PLEDataPacketsSent				Counter64, -- TCX
+    x25PLEInterruptPacketsReceived			Counter64, -- C
+    x25PLEInterruptPacketsSent				Counter64, -- C
+    x25PLEDataRetransmissionTimerExpiries		Counter64, -- TX
+    x25PLEProviderInitiatedResets			Counter64, -- TCX
+    x25PLEProviderInitiatedDisconnects			Counter64, -- TCX
+    x25PLERemotelyInitiatedResets			Counter64, -- TCX
+    x25PLERemotelyInitiatedRestarts			Counter64, -- TCX
+    x25PLEResetTimeouts					Counter64, -- TCX
+    x25PLERestartCountsExceeded				Counter64, -- TX
+    x25PLEX25SegmentsReceived				Counter64, -- C
+    x25PLEX25SegmentsSent				Counter64, -- C
+    x25PLEWindowStatusTransmissionTimer			TimeInterval, -- T
+    x25PLEWindowRotationTimer				TimeInterval, -- T
+    x25PLEDataPacketRetransmissionCount			INTEGER, -- T
+    x25PLERejectResponseTimer				TimeInterval, -- T
+    x25PLERejectRetransmissionTimer			TimeInterval, -- T
+    x25PLERegistrationRequestResponseTimer		TimeInterval, -- T
+    x25PLERegistrationRequestRetransmissionCount	INTEGER, -- T
+    x25PLERegistrationPermitted				TruthValue, -- T
+    x25PLEBilateralCUG					TruthValue, -- C
+    x25PLEBilateralCUGWithOutgoingAccess		TruthValue, -- C
+    x25PLECallRedirection				TruthValue, -- C
+    x25PLEChargingInformation				TruthValue, -- C
+    x25PLECUGWithIncomingAccess				TruthValue, -- C
+    x25PLECUGWithOutgoingAccess				TruthValue, -- C
+    x25PLEDBitModification				TruthValue, -- C
+    x25PLEDefaultThroughputClassSubscription		TruthValue, -- C
+    x25PLEDefaultThroughputClassSupported		ThroughputClaasSupport, -- C
+    x25PLEHuntGroup					TruthValue, -- C
+    x25PLEIncomingCallBarredWithinCUG			TruthValue, -- C
+    x25PLELocalChargingPrevention			TruthValue, -- C
+    x25PLENonStandardDefaultPacketSizeSubscription	TruthValue, -- C
+    x25PLENonStandardDefaultPacketSizeMaximum		PacketSize, -- C
+    x25PLENonStandardDefaultPacketSizeIncoming		PacketSize, -- C
+    x25PLENonStandardDefaultPacketSizeOutgoing		PacketSize, -- C
+    x25PLENonStandardDefaultWindowSizeSubscription	TruthValue, -- C
+    x25PLENonStandardDefaultWindowSizeMaximum		INTEGER, -- C
+    x25PLENonStandardDefaultWindowSizeIncoming		WindowSize, -- C
+    x25PLENonStandardDefaultWindowSizeOutgoing		WindowSize, -- C
+    x25PLENUIOverride					TruthValue, -- C
+    x25PLENUISubscription				TruthValue, -- C
+    x25PLEOneWayLogicalChannelIncoming			TruthValue, -- C
+    x25PLEOnlineFacilityRegistration			TruthValue, -- C
+    x25PLEOutgoingCallBarredWithinCUG			TruthValue, -- C
+    x25PLEPacketRetransmission				TruthValue, -- C
+    x25PLEReverseChargingAcceptance			TruthValue, -- C
+    x25PLEROASubscription				TruthValue, -- C
+    x25PLEClearIndication				TimeInterval, -- C
+    x25PLEIncomingCall					TimeInterval, -- C
+    x25PLEResetIndication				TimeInterval, -- C
+    x25PLERestartIndication				TimeInterval, -- C
+    x25PLEPLEClientMOName				Counter64, -- C
+    x25PLEProfile					RowPointer, -- TCX
+    x25PLERowStatus					RowStatus, -- TCX
+-- ***************************************************************************
+    -- From: x25PLE-DTE
+--- DTE x25PLECallDeflectionSubscription			TruthValue,
+--- DTE x25PLECallRequestResponseTimer			TimeInterval,
+--- DTE x25PLEExtendedPacketSequenceNumbering		Modulo,
+--- DTE x25PLEMaxActiveCircuits				MaxActiveCircuits,
+--- DTE x25PLEMinimumRecallTimer				TimeInterval,
+--- DTE x25PLEResetRequestResponseTimer			TimeInterval,
+--- DTE x25PLERestartRequestRetranmissionCount		INTEGER,
+--- DTE x25PLERestartRequestResponseTimer		TimeInterval,
+--- DTE x25PLEClearRequestResponseTimer			TimeInterval,
+--- DTE x25PLEInterruptResponseTimer			TimeInterval,
+--- DTE x25PLEResetRequestRetransmissionCount		INTEGER,
+--- DTE x25PLEClearRequestRetransmissionCount		INTEGER,
+--- DTE x25PLECallAttempts				Counter64,
+--- DTE x25PLEProtocolErrorsDetectedLocally		Counter64,
+--- DTE x25PLEProtocolErrorsAccusedOf			Counter64,
+--- DTE x25PLECallEstablishmentRetryCountsExceeded	Counter64,
+    -- PACKAGE dTEX25PLECounters-P
+--- DTE x25PLEOctetsReceivedCounter			Counter64,
+--- DTE x25PLEOctetsSentCounter				Counter64,
+--- DTE x25PLECallTimeouts				Counter64,
+--- DTE x25PLECallsConnected				Counter64,
+--- DTE x25PLEClearCountsExceeded			Counter64,
+--- DTE x25PLEClearTimeouts				Counter64,
+--- DTE x25PLEDataPacketsReceived			Counter64,
+--- DTE x25PLEDataPacketsSent				Counter64,
+--- DTE x25PLEDataRetransmissionTimerExpiries		Counter64,
+--- DTE x25PLEProviderInitiatedResets			Counter64,
+--- DTE x25PLEProviderInitiatedDisconnects		Counter64,
+--- DTE x25PLERemotelyInitiatedResets			Counter64,
+--- DTE x25PLERemotelyInitiatedRestarts			Counter64,
+--- DTE x25PLEResetTimeouts				Counter64,
+--- DTE x25PLERestartCountsExceeded			Counter64,
+    -- PACKAGE receivingWindowRotationRecoveryProcedures-P
+--- DTE x25PLEWindowStatusTransmissionTimer		TimeInterval,
+    -- PACKAGE transmittingWindowRotationRecoveryProcedures-P
+--- DTE x25PLEWindowRotationTimer			TimeInterval,
+--- DTE x25PLEDataPacketRetransmissionCount		INTEGER,
+    -- PACKAGE packetRetransmissionProcedures-P
+--- DTE x25PLERejectResponseTimer			TimeInterval,
+--- DTE x25PLERejectRetransmissionTimer			TimeInterval,
+    -- PACAKGE onlineRegistration-P
+--- DTE x25PLERegistrationRequestResponseTimer		TimeInterval,
+--- DTE x25PLERegistrationRequestRetransmissionCount	INTEGER,
+--- DTE x25PLERegistrationPermitted			TruthValue,
+    -- Miscellaneous conversion
+--- DTE x25PLEProfile					RowPointer,
+--- DTE x25PLERowStatus					RowStatus,
+    -- From: x25PLE-DCE
+--- DCE x25PLECallAttempts				Counter64,
+--- DCE x25PLECallsConnected				Counter64,
+--- DCE x25PLECUG					TruthValue,
+--- DCE x25PLEFastSelectAcceptance			TruthValue,
+--- DCE x25PLEIncomingCallsBarred			TruthValue,
+--- DCE x25PLEOneWayLogicalChannelOutgoing		TruthValue,
+--- DCE x25PLEOutgoingCallsBarred			TruthValue,
+    -- dCECommonVirtualCircuitCounters-P
+--- DCE x25PLEDataPacketsReceived			Counter64,
+--- DCE x25PLEDataPacketsSent				Counter64,
+--- DCE x25PLEInterruptPacketsReceived			Counter64,
+--- DCE x25PLEInterruptPacketsSent			Counter64,
+--- DCE x25PLEOctetsReceivedCounter			Counter64,
+--- DCE x25PLEOctetsSentCounter				Counter64,
+--- DCE x25PLEProviderInitiatedDisconnects		Counter64,
+--- DCE x25PLEProviderInitiatedResets			Counter64,
+--- DCE x25PLERemotelyInitiatedRestarts			Counter64,
+--- DCE x25PLERemotelyInitiatedResets			Counter64,
+--- DCE x25PLEResetTimeouts				Counter64,
+--- DCE x25PLEX25SegmentsReceived			Counter64,
+--- DCE x25PLEX25SegmentsSent				Counter64,
+    -- dCEX25PLEFacilities-P
+--- DCE x25PLEBilateralCUG				TruthValue,
+--- DCE x25PLEBilateralCUGWithOutgoingAccess		TruthValue,
+--- DCE x25PLECallDeflectionSubscription			TruthValue,
+--- DCE x25PLECallRedirection				TruthValue,
+--- DCE x25PLEChargingInformation			TruthValue,
+--- DCE x25PLECUGWithIncomingAccess			TruthValue,
+--- DCE x25PLECUGWithOutgoingAccess			TruthValue,
+--- DCE x25PLEDBitModification				TruthValue,
+--  x25PLEDefaultThroughputClassesAssignment
+--- DCE x25PLEDefaultThroughputClassSubscription		TruthValue,
+--- DCE x25PLEDefaultThroughputClassSupported		ThroughputClaasSupport,
+--- DCE x25PLEDefaultThroughputClassIncoming		ThroughputClass,
+--- DCE x25PLEDefaultThroughputClassOutgoing		ThroughputClass,
+--- DCE x25PLEExtendedPacketSequenceNumbering		Modulo,
+--- DCE x25PLEHuntGroup					TruthValue,
+--- DCE x25PLEIncomingCallBarredWithinCUG		TruthValue,
+--- DCE x25PLELocalChargingPrevention			TruthValue,
+--  x25PLENonStandardDefaultPacketSizes
+--- DCE x25PLENonStandardDefaultPacketSizeSubscription	TruthValue,
+--- DCE x25PLENonStandardDefaultPacketSizeMaximum	PacketSize,
+--- DCE x25PLENonStandardDefaultPacketSizeIncoming	PacketSize,
+--- DCE x25PLENonStandardDefaultPacketSizeOutgoing	PacketSize,
+--  x25PLENonStandardDefaultWindowSizes
+--- DCE x25PLENonStandardDefaultWindowSizeSubscription	TruthValue,
+--- DCE x25PLENonStandardDefaultWindowSizeMaximum	INTEGER,
+--- DCE x25PLENonStandardDefaultWindowSizeIncoming	WindowSize,
+--- DCE x25PLENonStandardDefaultWindowSizeOutgoing	WindowSize,
+--- DCE x25PLENUIOverride				TruthValue,
+--- DCE x25PLENUISubscription				TruthValue,
+--- DCE x25PLEOneWayLogicalChannelIncoming		TruthValue,
+--- DCE x25PLEOnlineFacilityRegistration			TruthValue,
+--- DCE x25PLEOutgoingCallBarredWithinCUG		TruthValue,
+--- DCE x25PLEPacketRetransmission			TruthValue,
+--- DCE x25PLEReverseChargingAcceptance			TruthValue,
+--- DCE x25PLEROASubscription				TruthValue,
+    -- dCEX25PLETimers-P
+--- DCE x25PLEClearIndication				TimeInterval,
+--- DCE x25PLEIncomingCall				TimeInterval,
+--- DCE x25PLEResetIndication				TimeInterval,
+--- DCE x25PLERestartIndication				TimeInterval,
+    -- Miscellaneous conversion
+--- DCE x25PLEProfile					RowPointer,
+--- DCE x25PLERowStatus					RowStatus,
+    -- From: ISO/IEC 10733 x25PLE
+--  x25PLEInterfaceMode					InterfaceMode,
+--- DXE x25PLEMaxActiveCircuits				MaxActiveCircuits,
+--- DXE x25PLERestartTime					TimeInterval,
+--- DXE x25PLEMinimumRecallTimer				TimeInterval,
+--- DXE x25PLERestartCount					INTEGER,
+--- DXE x25PLEPacketSequencing				INTEGER,
+    --
+--- DXE x25PLECallAttempts					Counter64,
+--- DXE x25PLEProtocolErrorsDetectedLocally			Counter64,
+--- DXE x25PLEProtocolErrorsAccusedOf			Counter64,
+--- DXE x25PLECallEstablishmentRetryCountsExceeded		Counter64,
+    -- PACKAGE imaginary dXEX25PLECounters-P
+--- DXE x25PLEOctetsReceivedCounter				Counter64,
+--- DXE x25PLEOctetsSentCounter				Counter64,
+--- DXE x25PLECallTimeouts					Counter64,
+--- DXE x25PLECallsConnected				Counter64,
+--- DXE x25PLEClearTimeouts					Counter64,
+--- DXE x25PLEDataPacketsReceived				Counter64,
+--- DXE x25PLEDataPacketsSent				Counter64,
+--- DXE x25PLEDataRetransmissionTimerExpiries		Counter64,
+--- DXE x25PLEProviderInitiatedResets			Counter64,
+--- DXE x25PLEProviderInitiatedDisconnects			Counter64,
+--- DXE x25PLERemotelyInitiatedResets			Counter64,
+--- DXE x25PLERemotelyInitiatedRestarts			Counter64,
+--- DXE x25PLEResetTimeouts					Counter64,
+--- DXE x25PLERestartCountsExceeded				Counter64,
+    --
+--- DXE x25PLEClearCountsExceeded				Counter64,
+--- DXE x25PLEPLEClientMOName				Counter64,
+}
+
+x25PLEIVMO OBJECT IDENTIFIER
+    ::= { x25PLPtables 2 }
+
+x25PLEIVMOTable OBJECT-TYPE
+    SYNTAX	SEQUENCE of X25PLEIVMOEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { x25PLEIVMO 1 }
+
+x25PLEIVMOEntry OBJECT-TYPE
+    SYNTAX	X25PLEIVMOEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX	{ }
+    ::= { x25PLEIVMOTable 1 }
+
+X25PLEIVMOEntry ::= SEQUENCE {
+}
+
+x25VC OBJECT IDENTIFIER
+    ::= { x25PLPtables 3 }
+
+x25VCTable OBJECT-TYPE
+    SYNTAX	SEQUENCE of X25VCEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { x25VC 1 }
+
+x25VCEntry OBJECT-TYPE
+    SYNTAX	X25VCEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX	{ }
+    ::= { x25VCTable 1 }
+
+X25VCEntry ::= SEQUENCE {
+}
+
+x25PVC OBJECT IDENTIFIER
+    ::= { x25PLPtables 4 }
+
+x25PVCTable OBJECT-TYPE
+    SYNTAX	SEQUENCE of X25PVCEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { x25PVC 1 }
+
+x25PVCEntry OBJECT-TYPE
+    SYNTAX	X25PVCEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX	{ }
+    ::= { x25PVCTable 1 }
+
+X25PVCEntry ::= SEQUENCE {
+}
+
+x25SVC OBJECT IDENTIFIER
+    ::= { x25PLPtables 5 }
+
+x25SVCTable OBJECT-TYPE
+    SYNTAX	SEQUENCE of X25SVCEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { x25SVC 1 }
+
+x25SVCEntry OBJECT-TYPE
+    SYNTAX	X25SVCEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX	{ }
+    ::= { x25SVCTable 1 }
+
+X25SVCEntry ::= SEQUENCE {
+}
+
+x25SVCIVMO OBJECT IDENTIFIER
+    ::= { x25PLPtables 6 }
+
+x25SVCIVMOTable OBJECT-TYPE
+    SYNTAX	SEQUENCE of X25SVCIVMOEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    ::= { x25SVCIVMO 1 }
+
+x25SVCIVMOEntry OBJECT-TYPE
+    SYNTAX	X25SVCIVMOEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	""
+    REFERENCE
+	""
+    INDEX	{ }
+    ::= { x25SVCIVMOTable 1 }
+
+X25SVCIVMOEntry ::= SEQUENCE {
+}
+
+x25PLPScalars OBJECT IDENTIFIER
+    ::= { x25PLPObjects 2 }
+
+x25PLPNotifs OBJECT IDENTIFIER
+    ::= { x25PLPObjects 3 }
+
+x25PLPOids OBJECT IDENTIFIER
+    ::= { x25PLPObjects 4 }
+
+x25PLPConform OBJECT IDENTIFIER
+    ::= { x25PLPMIB 2 }
+
+x25PLPCompliances OBJECT IDENTIFIER
+    ::= { x25PLPConform 1 }
+
+x25PLPGroups OBJECT IDENTIFIER
+    ::= { x25PLPConform 2 }
+
+END
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=62 nocin nosi sts=4 sw=4
+
