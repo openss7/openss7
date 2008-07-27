@@ -2457,6 +2457,7 @@ stacks/doc/specs/tpi/tpi.info-3
 stacks/doc/specs/tpi/tpi_tcap.info
 stacks/doc/specs/tri/Makefile.in
 stacks/doc/specs/tri/tri.info
+stacks/doc/wiki/*
 stacks/INSTALL
 stacks/intl/*
 stacks/libltdl/*
@@ -2666,6 +2667,7 @@ strcompat/scripts/missing
 strcompat/scripts/texinfo.tex
 strcompat/src/include/Makefile.in
 strcompat/src/include/sys/uw7/stream.h.orig
+strcompat/src/kernel/liscompat.c.orig
 strcompat/src/Makefile.in
 strcompat/tags
 strcompat/tests/Makefile.in
@@ -2917,6 +2919,7 @@ streams/Makefile.in
 streams/MANUAL
 streams/memcmp.c
 streams/NEWS
+streams/perftest_script2
 streams/PROBLEMS
 streams/README
 streams/README-alpha
@@ -2936,6 +2939,7 @@ streams/src/mibs/.cvsignore
 streams/src/mibs/old2/defaults/
 streams/src/mibs/old2/defaults/
 streams/src/mibs/old2/defaults/
+streams/src/mibs/old2/defaults/*
 streams/src/mibs/strApshTable_data_access.o
 streams/src/mibs/strApshTable_data_get.o
 streams/src/mibs/strApshTable_data_set.o
@@ -2968,7 +2972,9 @@ streams/src/mibs/strStatsTable.o
 streams/src/mibs/strStatsTable_subagent.o
 streams/src/modules/.cvsignore
 streams/src/modules/sth.c.old
+streams/src/modules/sth.now.c
 streams/src/modules/sth.old.c
+streams/src/modules/sth.rel.c
 streams/src/snmp/strMIB_openss7.c
 streams/src/snmp/strMIB_openss7.h
 streams/src/snmp/strMIB_simple.c
