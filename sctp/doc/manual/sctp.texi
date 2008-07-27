@@ -339,7 +339,7 @@ publications and other sources).  Consult the permission notices contained in th
 more information.
 
 This manual, is released under the @cite{GNU Free Documentation License} (@pxrefman{GNU Free
-Documentation License}) with all sections invariant.
+Documentation License}) with no sections invariant.
 
 @node Abstract
 @unnumberedsec Abstract
@@ -600,7 +600,7 @@ some of the documentation (derived from X/Open publications and other sources). 
 permission notices contained in the documentation for more information.
 
 This manual is released under the @cite{GNU Free Documentation License} (@pxrefman{GNU Free
-Documentation License}) with all sections invariant.
+Documentation License}) with no sections invariant.
 @end ignore
 
 @node Overview

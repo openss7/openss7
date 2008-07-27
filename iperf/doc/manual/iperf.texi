@@ -390,7 +390,7 @@ more information.
 Also note that portions of this software is derived from software developed by the @cite{University
 of Illinois} covered under the @cite{UI License} (@pxrefman{University of Illinois License}).
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.
 
 @node Abstract
@@ -612,7 +612,7 @@ more information.
 Also note that portions of this software is derived from software developed by the @cite{University
 of Illinois} covered under the @cite{UI License} (@pxrefman{University of Illinois License}).
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.
 @end ignore
 

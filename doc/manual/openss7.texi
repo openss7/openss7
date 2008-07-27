@@ -343,7 +343,7 @@ License}).  Please note, however, that there are different licensing terms for s
 sub-packages included in this master package.  Consult the permission notices contained in the
 documentation of each sub-package for more information.
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.  Some of the manuals and documentation contained in the sub-packages are
 released under different terms.  Please consult the manual contained in each sub-package for more
 information.
@@ -617,7 +617,7 @@ License}).  Please note, however, that there are different licensing terms for s
 sub-packages included in this master package.  Consult the permission notices contained in the
 documentation of each sub-package for more information.
 
-This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with all
+This manual is released under the @cite{FDL} (@pxrefman{GNU Free Documentation License}) with no
 sections invariant.  Some of the manuals and documentation contained in the sub-packages are
 released under different terms.  Please consult the manual contained in each sub-package for more
 information.
