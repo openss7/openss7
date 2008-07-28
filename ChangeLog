@@ -1,3 +1,7 @@
+2008-07-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/install.texi: updates to CVS build tools
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/openss7.texi: no invariant sections for debian
