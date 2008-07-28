@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-DL-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:40 $
+-- @(#) $RCSfile: OPENSS7-DL-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/07/28 08:51:39 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +46,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-06-18 16:45:40 $ by $Author: brian $
+-- Last Modified $Date: 2008/07/28 08:51:39 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-DL-MIB.mib,v $
+-- Revision 0.9.2.4  2008/07/28 08:51:39  brian
+-- - SNMP updates
+--
 -- Revision 0.9.2.3  2008-06-18 16:45:40  brian
 -- - widespread updates
 --
@@ -62,7 +65,7 @@
 --
 -- =============================================================================
 
-OPENSS7-OSI-MIB DEFINITIONS ::= BEGIN
+OPENSS7-DL-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     openss7Modules
@@ -14765,6 +14768,6 @@ osiTotalCompliance MODULE-COMPLIANCE
 
     ::= { osiCompliances 1 }
 
-END -- end of module OPENSS7-OSI-MIB.
+END -- end of module OPENSS7-DL-MIB.
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
