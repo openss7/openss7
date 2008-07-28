@@ -1,7 +1,7 @@
 %% -*- tex -*- vim: ft=tex tw=78 nocin nosi
 %% =========================================================================
 %%
-%% @(#) $Id: piperesults.tex,v 0.9.2.7 2008/07/26 18:59:20 brian Exp $
+%% @(#) $Id: piperesults.tex,v 0.9.2.8 2008/07/28 12:25:17 brian Exp $
 %%
 %% =========================================================================
 %%
@@ -53,7 +53,7 @@
 %% 
 %% =========================================================================
 %%
-%% Last Modified $Date: 2008/07/26 18:59:20 $ by $Author: brian $
+%% Last Modified $Date: 2008/07/28 12:25:17 $ by $Author: brian $
 %%
 %% =========================================================================
 
@@ -1333,7 +1333,7 @@ Note that it was not possible to get \textsl{LiS} running on this kernel.
 \textit{Figure \ref{figure:cos52comp}}
 illustrates the improvement over Linux legacy pipes of \textsl{Linux Fast-STREAMS} STREAMS-based
 pipes.  The improvement of \textsl{Linux Fast-STREAMS} over Linux legacy pipes is significant:
-improvements range from a 100\% increase in performance at large write sizes, to a staggering 400\%
+improvements range from a 100\% increase in performance at large write sizes, to a staggering 500\%
 increase in performance at lower write sizes.
 
 Again, the improvements experienced by \textsl{Linux Fast-STREAMS} at write sizes beneath 128 is
@@ -1617,7 +1617,7 @@ scheduling and flow control model. (Note that this is in fitting with the statem
 Contrary to the preconception that STREAMS must be slower due to complex locking and synchronization
 mechanisms, \textsl{Linux Fast-STREAMS} performed as well on SMP (hyperthreaded) machines as on UP
 machines and strongly outperformed legacy Linux pipes with 100\% improvements at all write sizes and
-a staggering 400\% at smaller write sizes.
+a staggering 500\% at smaller write sizes.
 
 \item \textit{STREAMS-based pipes are fast.}
 
@@ -2046,19 +2046,20 @@ Size & STREAMS & Linux\\
 Size & LiS & STREAMS & Linux\\
 \hline
 \hline
-1 & 53119 & 614186 & 120757\\
-2 & 53066 & 611735 & 119166\\
-4 & 53289 & 603726 & 121366\\
-8 & 53216 & 547847 & 120595\\
-16 & 53254 & 528422 & 118542\\
-32 & 52952 & 468888 & 117535\\
-64 & 52499 & 441368 & 116674\\
-128 & 50065 & 400486 & 115725\\
-256 & 49348 & 392344 & 114541\\
-512 & 49297 & 380014 & 113128\\
-1024 & 48598 & 345346 & 104937\\
-2048 & 48274 & 275962 & 104450\\
-4096 & 47004 & 203886 & 94279\\
+1 & 690896 & 114253\\
+2 & 662870 & 107000\\
+4 & 639931 & 128916\\
+8 & 596668 & 114321\\
+16 & 520846 & 124913\\
+32 & 427005 & 132284\\
+64 & 321028 & 105085\\
+128 & 212760 & 103989\\
+256 & 177236 & 71573\\
+512 & 173048 & 58217\\
+1024 & 163703 & 66249\\
+2048 & 154194 & 64369\\
+4096 & 134026 & 63115\\
+8192 & 66860 & 55217\\
 \hline
 \end{tabular}
 \end{center}
