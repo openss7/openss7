@@ -1,3 +1,9 @@
+2008-07-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/mib2c.openss7.conf: updates to mib builder
+	* src/snmp/strMIB.c: agent corrections
+	* src/snmp/strMIB.h: agent corrections
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
