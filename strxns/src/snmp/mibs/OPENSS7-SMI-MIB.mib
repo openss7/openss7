@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SMI-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:22 $
+-- @(#) $RCSfile: OPENSS7-SMI-MIB.mib,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/07/28 08:51:42 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 07:11:22 $ by $Author: brian $
+-- Last Modified $Date: 2008/07/28 08:51:42 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SMI-MIB.mib,v $
+-- Revision 0.9.2.6  2008/07/28 08:51:42  brian
+-- - SNMP updates
+--
 -- Revision 0.9.2.5  2008-04-29 07:11:22  brian
 -- - updating headers for release
 --
@@ -1724,14 +1727,14 @@ timeDomainViolationType OBJECT-IDENTITY
          timeDomainViolationType."
     ::= { smi2Notifications 15 }
 
--- communicationsInformationType OBJECT-IDENTITY
---     STATUS      current
---     DESCRIPTION 
---         "The event type for the communicationsInformation notification."
---     REFERENCE   
---         "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
---          communicationInformation."
---     ::= { smi2Notifications 16 }
+communicationsInformationType OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The event type for the communicationsInformation notification."
+    REFERENCE   
+        "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+         communicationInformation."
+    ::= { smi2Notifications 16 }
 
 smiObjects OBJECT IDENTIFIER
     ::= { smiMIB 1 }
@@ -3414,52 +3417,52 @@ tmnRelationshipChangeDefinition OBJECT-TYPE
          relationshipChangeDefinition."
     ::= { smiNotifObjects 25 }
 
--- tmnInformationType OBJECT-TYPE
---     SYNTAX      InformationType
---     MAX-ACCESS  accessible-for-notify
---     STATUS      current
---     DESCRIPTION 
---         "This is the information type of an information event in 
---          accordacne with the TMN SMI definitions.  It is an required 
---          parameter of the communicationInformation notification. It 
---          contains an object identity which indicates the information 
---          type of the event in according with the InformationType textual 
---          convention.
---          
---          The meaning and purpose of object identifiers that are used to 
---          populate this parameter for the communicationsInformation 
---          notification must be specified in the DESCRIPTION clause of an 
---          OBJECT-IDENTITY macro defining the object identifiers 
---          associated with the information type.  The precise conditions 
---          under which the event is notified must also be defined in the 
---          DESCRIPTION clause whenever the value is used to raise generic 
---          information notifications such as the communicationsInformation 
---          notification.  When used with a specific notification, the use 
---          of the information type parameter must be defined inthe 
---          NOTIFICATION-TYPE macro's DESCRIPTION clause.
---          
---          In all cases, the object identifier defined by the 
---          corresponding standard (i.e. TMN specification) should be used 
---          as specified in the corresponding standard.  Private values of 
---          the information type may also be defined in OBJECT-IDENTITY 
---          macros within a private or enterprise module definition.  Where 
---          possible, however, a standard value should be used."
---     REFERENCE   
---         "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
---          informationType."
---     ::= { smiNotifObjects 26 }
--- 
--- tmnInformationData OBJECT-TYPE
---     SYNTAX      InformationData
---     MAX-ACCESS  accessible-for-notify
---     STATUS      current
---     DESCRIPTION 
---         "This is the information data for an information notification 
---          following the InformationData textual convention."
---     REFERENCE   
---         "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
---          informationData."
---     ::= { smiNotifObjects 27 }
+tmnInformationType OBJECT-TYPE
+    SYNTAX      InformationType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the information type of an information event in 
+         accordacne with the TMN SMI definitions.  It is an required 
+         parameter of the communicationInformation notification. It 
+         contains an object identity which indicates the information 
+         type of the event in according with the InformationType textual 
+         convention.
+         
+         The meaning and purpose of object identifiers that are used to 
+         populate this parameter for the communicationsInformation 
+         notification must be specified in the DESCRIPTION clause of an 
+         OBJECT-IDENTITY macro defining the object identifiers 
+         associated with the information type.  The precise conditions 
+         under which the event is notified must also be defined in the 
+         DESCRIPTION clause whenever the value is used to raise generic 
+         information notifications such as the communicationsInformation 
+         notification.  When used with a specific notification, the use 
+         of the information type parameter must be defined inthe 
+         NOTIFICATION-TYPE macro's DESCRIPTION clause.
+         
+         In all cases, the object identifier defined by the 
+         corresponding standard (i.e. TMN specification) should be used 
+         as specified in the corresponding standard.  Private values of 
+         the information type may also be defined in OBJECT-IDENTITY 
+         macros within a private or enterprise module definition.  Where 
+         possible, however, a standard value should be used."
+    REFERENCE   
+        "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+         informationType."
+    ::= { smiNotifObjects 26 }
+
+tmnInformationData OBJECT-TYPE
+    SYNTAX      InformationData
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "This is the information data for an information notification 
+         following the InformationData textual convention."
+    REFERENCE   
+        "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+         informationData."
+    ::= { smiNotifObjects 27 }
 
 smiOids OBJECT IDENTIFIER
     ::= { smiObjects 4 }
@@ -5607,38 +5610,38 @@ timeDomainViolation NOTIFICATION-TYPE
          timeDomainViolation NOTIFICATION."
     ::= { smiNotifications 15 }
 
--- communicationsInformation NOTIFICATION-TYPE
---     OBJECTS     { tmnObjectInstance, tmnInformationType }
---     STATUS      current
---     DESCRIPTION 
---         "This notification may be used to report the occurrence of 
---          events pertaining to the normal operation of a managed object. 
---          These are informational events; important enough to report, but 
---          not requiring any further action by a manager.  Faults and 
---          abnormal conditions (which may require manager action) shall be 
---          reported using the event types defined in CCITT Rec.  X.733 
---          (1992) | ISO/IEC 10164-4:1992.
---          
---          The communicationsInformation notification is modelled on the 
---          TMN notification of the same name.
---          
---          The first paraemter of the communicationInformation 
---          notification is the information type, which is an object 
---          identifier defined with the OBJECT-IDENTITY macro.  The 
---          information type identifies the event.
---          
---          Beacuse its value is defined by an OBJECT-IDENTITY macro, the 
---          DESCRIPTION clause in that macro defining an information type 
---          should clearly identify the purpose of the event notification, 
---          when it is geenrtated, ahd how any information data refines the 
---          information type.  This makes this information available to 
---          managers via the MIB generating the alarms.  When a generic 
---          value is not used, the information type should be defined 
---          within the MIB module that issues them."
---     REFERENCE   
---         "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
---          communicationInformation"
---     ::= { smiNotifications 16 }
+communicationsInformation NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance, tmnInformationType }
+    STATUS      current
+    DESCRIPTION 
+        "This notification may be used to report the occurrence of 
+         events pertaining to the normal operation of a managed object. 
+         These are informational events; important enough to report, but 
+         not requiring any further action by a manager.  Faults and 
+         abnormal conditions (which may require manager action) shall be 
+         reported using the event types defined in CCITT Rec.  X.733 
+         (1992) | ISO/IEC 10164-4:1992.
+         
+         The communicationsInformation notification is modelled on the 
+         TMN notification of the same name.
+         
+         The first paraemter of the communicationInformation 
+         notification is the information type, which is an object 
+         identifier defined with the OBJECT-IDENTITY macro.  The 
+         information type identifies the event.
+         
+         Beacuse its value is defined by an OBJECT-IDENTITY macro, the 
+         DESCRIPTION clause in that macro defining an information type 
+         should clearly identify the purpose of the event notification, 
+         when it is geenrtated, ahd how any information data refines the 
+         information type.  This makes this information available to 
+         managers via the MIB generating the alarms.  When a generic 
+         value is not used, the information type should be defined 
+         within the MIB module that issues them."
+    REFERENCE   
+        "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 : 1993, 
+         communicationInformation"
+    ::= { smiNotifications 16 }
 
 smiMandatoryParametersGroup OBJECT-GROUP
     OBJECTS     { tmnObjectInstance, tmnNotificationIdentifier, 
@@ -5665,12 +5668,12 @@ smiConditionalParametersGroup OBJECT-GROUP
         "A collection of conditional notification parameters."
     ::= { smiGroups 2 }
 
--- smiOptionalParametersGroup OBJECT-GROUP
---     OBJECTS     { tmnInformationType, tmnInformationData }
---     STATUS      current
---     DESCRIPTION 
---         "A collection of optional notification parameters."
---     ::= { smiGroups 3 }
+smiOptionalParametersGroup OBJECT-GROUP
+    OBJECTS     { tmnInformationType, tmnInformationData }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of optional notification parameters."
+    ::= { smiGroups 3 }
 
 smiMandatoryNotificationsGroup NOTIFICATION-GROUP
     NOTIFICATIONS { attributeValueChange, communicationsAlarm, 

@@ -1,3 +1,13 @@
+2008-07-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/snmp/.cvsignore: SNMP updates
+	* src/snmp/makestubs: SNMP updates
+	* src/snmp/mibs/OPENSS7-DL-MIB.mib: SNMP updates
+	* src/snmp/mibs/OPENSS7-LAPB-MIB.mib: SNMP updates
+	* src/snmp/mibs/OPENSS7-LLC2-MIB.mib: SNMP updates
+	* src/snmp/mibs/OPENSS7-SMI-MIB.mib: SNMP updates
+	* src/snmp/mibs/OPENSS7-TMN-SMI.mib: SNMP updates
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

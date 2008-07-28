@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-LAPB-MIB.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/12/29 23:10:21 $
+-- @(#) $RCSfile: OPENSS7-LAPB-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/07/28 08:51:41 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,11 +46,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2007/12/29 23:10:21 $ by $Author: brian $
+-- Last Modified $Date: 2008/07/28 08:51:41 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-LAPB-MIB.mib,v $
+-- Revision 0.9.2.3  2008/07/28 08:51:41  brian
+-- - SNMP updates
+--
 -- Revision 0.9.2.2  2007/12/29 23:10:21  brian
 -- - updating mibs
 --
@@ -81,8 +84,8 @@ IMPORTS
 	communicationsAlarm,
 	objectCreation,
 	objectDeletion,
-	objectInstance
-		FROM OPENSS7-TMN-SMI
+	tmnObjectInstance
+		FROM OPENSS7-SMI-MIB
 	AdministrativeState, 
 	AlarmStatus,
 	OperationalState,
@@ -95,7 +98,7 @@ openss7		OBJECT IDENTIFIER ::= { enterprises 29591 }
 openss7MIBs	OBJECT IDENTIFIER ::= { openss7 1 }
 openss7Modules	OBJECT IDENTIFIER ::= { openss7MIBs 1 }
 
-lapb-MIB MODULE-IDENTITY
+lapbMIB MODULE-IDENTITY
 	LAST-UPDATED
 		"200712170903Z"
 	ORGANIZATION
@@ -113,13 +116,13 @@ lapb-MIB MODULE-IDENTITY
 	DESCRIPTION
 		"Provides a management information base for X.25 LAPB 
 		 based on ITU-T Rec. X.282 | ISO/IEC 10742."
-	::= { openss7Modules yy }
+	::= { openss7Modules 22 }
 
  -- top level origanization of the MIB
 
-lapbNotifications	OBJECT IDENTIFIER ::= { lapb-MIB	 0 }
-lapbObjects		OBJECT IDENTIFIER ::= { lapb-MIB	 1 }
-lapbConformance		OBJECT IDENTIFIER ::= { lapb-MIB	 2 }
+lapbNotifications	OBJECT IDENTIFIER ::= { lapbMIB	 0 }
+lapbObjects		OBJECT IDENTIFIER ::= { lapbMIB	 1 }
+lapbConformance		OBJECT IDENTIFIER ::= { lapbMIB	 2 }
 
 lapbTables		OBJECT IDENTIFIER ::= { lapbObjects	 1 }
 lapbScalars		OBJECT IDENTIFIER ::= { lapbObjects	 2 }
@@ -290,8 +293,8 @@ fRMR OBJECT-TYPE
 --
 -- Specific Problems for use with TMN alarms.
 
-lapbSpecificProblems OBJECT IDENTIFIER ::=
-	{ joint-iso-itu-t(3) datalink-layer(15) standardSpecificExtension(0) specificProblems(11) }
+lapbSpecificProblems OBJECT IDENTIFIER ::= { lapbOids }
+--	{ joint-iso-itu-t(3) datalink-layer(15) standardSpecificExtension(0) specificProblems(11) }
 
 fRMRReceived OBJECT-IDENTITY
 	STATUS		current
@@ -323,7 +326,7 @@ fRMRReceived OBJECT-IDENTITY
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReceived."
 	::= { lapbSpecificProblems fRMRReceived(5) }
 
-fRMRReasons OBJECT IDENTIFIER ::= { lapbSpecificProblems fRMRReasons(6) }
+fRMRReasons OBJECT IDENTIFIER ::= { lapbOids fRMRReasons(6) }
 
 fRMRReasonsControlFieldUndefinedOrUnimplemented OBJECT-IDENTITY
 	STATUS		current
@@ -337,7 +340,7 @@ fRMRReasonsControlFieldUndefinedOrUnimplemented OBJECT-IDENTITY
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
 		 fRMRReasonsControlFieldUndefinedOrUnimplemented."
-	::= { lapbSpecificProblems fRMRReasons(6) controlFieldUndefinedOrUnimplemented(1) }
+	::= { fRMRReasons controlFieldUndefinedOrUnimplemented(1) }
 
 fRMRReasonsFormatError OBJECT-IDENTITY
 	STATUS		current
@@ -351,7 +354,7 @@ fRMRReasonsFormatError OBJECT-IDENTITY
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
 		 fRMRReasonsFormatError."
-	::= { lapbSpecificProblems fRMRReasons(6) formatError(2) }
+	::= { fRMRReasons formatError(2) }
 
 fRMRReasonsInfoFieldLengthGreaterThanMaximum OBJECT-IDENTITY
 	STATUS		current
@@ -366,8 +369,7 @@ fRMRReasonsInfoFieldLengthGreaterThanMaximum OBJECT-IDENTITY
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 
 		 fRMRReasonsInfoFieldLengthGreaterThanMaximum."
-	::= { lapbSpecificProblems fRMRReasons(6) 
-	infoFieldLengthGreaterThanMaximum(3) }
+	::= { fRMRReasons infoFieldLengthGreaterThanMaximum(3) }
 
 fRMRReasonsInvalidNR OBJECT-IDENTITY
 	STATUS		current
@@ -380,7 +382,7 @@ fRMRReasonsInvalidNR OBJECT-IDENTITY
 		 that the NR included in the command was invalid."
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReasonsInvalidNR."
-	::= { lapbSpecificProblems fRMRReasons(6) invalidNR(4) }
+	::= { fRMRReasons invalidNR(4) }
 
 fRMRReasonsNonSpecific OBJECT-IDENTITY
 	STATUS		current
@@ -393,15 +395,15 @@ fRMRReasonsNonSpecific OBJECT-IDENTITY
 		 unknown or unspecified."
 	REFERENCE
 		"ITU-T Rec. X.282 | ISO/IEC 10742 ASN.1 fRMRReasonsNonSpecific."
-	::= { lapbSpecificProblems fRMRReasons(6) nonSpecific(5) }
+	::= { fRMRReasons nonSpecific(5) }
 
 
 -- Oids for use with specific errorIds for use with processingFailure 
 -- for error on activate, but will be used with processingErrorAlarm 
 -- instead.
 
-lapbErrors OBJECT IDENTIFIER ::=
-	{ joint-iso-itu-t(3) datalink-layer(15) standardSpecificExtensions(0) action(9) activate(1) errors(1) }
+lapbErrors OBJECT IDENTIFIER ::= { lapbOids activate(1) errors(1) }
+--	{ joint-iso-itu-t(3) datalink-layer(15) standardSpecificExtensions(0) action(9) activate(1) errors(1) }
 
 activateFailure OBJECT-IDENTITY
 	STATUS		current
