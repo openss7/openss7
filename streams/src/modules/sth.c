@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/26 01:52:15 $ by $Author: brian $
+ Last Modified $Date: 2008/07/28 11:13:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.200  2008/07/28 11:13:47  brian
+ - another go at bug 019
+
  Revision 0.9.2.199  2008/07/26 01:52:15  brian
  - document, fix and test case for bug 016
 
@@ -257,10 +260,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -362,7 +365,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.199 $) $Date: 2008/07/26 01:52:15 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -921,6 +924,8 @@ strschedule_read(void)
 #endif
 }
 
+streams_noinline streams_fastcall int straccess_noinline(struct stdata *sd, int access);
+
 /**
  * strfailure_write - failure to write immediately
  *
@@ -942,24 +947,25 @@ strschedule_read(void)
  * This differs from strschedule_write() above that is called just before a blocking process
  * schedules, even if it has awoken and found the blocking condition to be remaining.
  */
-STATIC streams_inline streams_fastcall __hot_in void
-strfailure_write(void)
+STATIC streams_inline streams_fastcall __hot_in int
+strfailure_write(struct stdata *sd)
 {
 //#ifndef CONFIG_SMP
 //#ifdef CONFIG_STREAMS_RT_KTHREADS
 #if 1
-	{
-		struct strthread *t = this_thread;
+	struct strthread *t = this_thread;
 
-		/* try to avoid context switch */
-		set_task_state(t->proc, TASK_INTERRUPTIBLE);
-		/* before every sleep -- saves a context switch */
-		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED 
-											 */
-			return;
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
+	/* before every sleep -- saves a context switch */
+	if (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {	/* PROFILED */
+		srunlock(sd);
 		// set_current_state(TASK_RUNNING);
 		runqueues();
+		srlock(sd);
+		return straccess_noinline(sd, FWRITE);
 	}
+	return (0);
 #endif
 }
 
@@ -983,24 +989,25 @@ strfailure_write(void)
  * This differs from strschedule_read() above that is called just before a blocking process
  * schedules, even if it has awoken and found the blocking condition to be remaining.
  */
-STATIC streams_inline streams_fastcall __hot_out void
-strfailure_read(void)
+STATIC streams_inline streams_fastcall __hot_out int
+strfailure_read(struct stdata *sd)
 {
 //#ifndef CONFIG_SMP
 //#ifdef CONFIG_STREAMS_RT_KTHREADS
 #if 1
-	{
-		struct strthread *t = this_thread;
+	struct strthread *t = this_thread;
 
-		/* try to avoid context switch */
-		set_task_state(t->proc, TASK_INTERRUPTIBLE);
-		/* before every sleep -- saves a context switch */
-		if (likely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0))	/* PROFILED 
-											 */
-			return;
+	/* try to avoid context switch */
+	set_task_state(t->proc, TASK_INTERRUPTIBLE);
+	/* before every sleep -- saves a context switch */
+	if (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) != 0)) {	/* PROFILED */
+		srunlock(sd);
 		// set_current_state(TASK_RUNNING);
 		runqueues();
+		srlock(sd);
+		return straccess_noinline(sd, FREAD);
 	}
+	return (0);
 #endif
 }
 
@@ -3552,10 +3559,11 @@ strputpmsg_common(struct stdata *sd, const int f_flags, const struct strbuf *ctl
 			goto done;
 		if (unlikely(f_flags & FNDELAY) && likely(!test_bit(STRNDEL_BIT, &sd->sd_flag))) {
 			/* avoid context switch */
-			strfailure_write();
-			if (likely(bcanputnext(q, band)))
-				goto done;
-			err = -EAGAIN;
+			if (likely((err = strfailure_write(sd)) == 0)) {
+				if (likely(bcanputnext(q, band)))
+					goto done;
+				err = -EAGAIN;
+			}
 			goto error;
 		}
 		if (unlikely((err = __strwaitband(sd, q, band)) != 0))
@@ -4956,8 +4964,10 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 		if (likely(mread > 0) && likely(test_bit(STRMREAD_BIT, &sd->sd_flag))) {
 			if (unlikely((err = strsendmread(sd, mread)) != 0))
 				return ERR_PTR(err);
+		      reenter:
 			/* could already have a response, reenter */
-			strfailure_read();
+			if (unlikely((err = strfailure_read(sd)) != 0))
+				return ERR_PTR(err);
 			mread = 0;
 			goto restart;
 		}
@@ -4968,12 +4978,8 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
 			/* don't block in byte-mode if data already read */
 			if (likely(f_flags & FNDELAY)
 			    || (likely(mode == RNORM) && unlikely(!first))) {
-				if (mread > 0) {
-					strfailure_read();
-					/* could already have messages */
-					mread = 0;
-					goto restart;
-				}
+				if (mread > 0)
+					goto reenter;
 				return ERR_PTR(-EAGAIN);
 			}
 		}

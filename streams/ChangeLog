@@ -1,5 +1,7 @@
 2008-07-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/sth.c: traded one lock for another, fix bug 019
+
 	* src/snmp/mib2c.openss7.conf: updates to mib builder
 	* src/snmp/strMIB.c: agent corrections
 	* src/snmp/strMIB.h: agent corrections
