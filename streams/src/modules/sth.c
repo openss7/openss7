@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/28 11:13:47 $ by $Author: brian $
+ Last Modified $Date: 2008/07/29 17:27:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.201  2008/07/29 17:27:58  brian
+ - typo in conditional
+
  Revision 0.9.2.200  2008/07/28 11:13:47  brian
  - another go at bug 019
 
@@ -260,10 +263,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -365,7 +368,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.200 $) $Date: 2008/07/28 11:13:47 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -958,15 +961,15 @@ strfailure_write(struct stdata *sd)
 	/* try to avoid context switch */
 	set_task_state(t->proc, TASK_INTERRUPTIBLE);
 	/* before every sleep -- saves a context switch */
-	if (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) == 0)) {	/* PROFILED */
+	if (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) != 0)) {	/* PROFILED */
 		srunlock(sd);
 		// set_current_state(TASK_RUNNING);
 		runqueues();
 		srlock(sd);
 		return straccess_noinline(sd, FWRITE);
 	}
-	return (0);
 #endif
+	return (0);
 }
 
 /**
@@ -1007,8 +1010,8 @@ strfailure_read(struct stdata *sd)
 		srlock(sd);
 		return straccess_noinline(sd, FREAD);
 	}
-	return (0);
 #endif
+	return (0);
 }
 
 STATIC streams_inline streams_fastcall __hot_write void
