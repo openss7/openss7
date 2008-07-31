@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.16 2008-04-28 16:47:12 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.17 2008-07-31 17:31:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:12 $ by $Author: brian $
+ Last Modified $Date: 2008-07-31 17:31:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsun.h,v $
+ Revision 0.9.2.17  2008-07-31 17:31:03  brian
+ - fixed clobbered correction to MBLKIN
+
  Revision 0.9.2.16  2008-04-28 16:47:12  brian
  - updates for release
 
@@ -77,7 +80,7 @@
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -177,7 +180,7 @@ MBLKTAIL(mblk_t *mp)
 __SUN_EXTERN_INLINE long
 MBLKIN(mblk_t *mp, ssize_t off, size_t len)
 {
-	return ((off >= 0) && (mp->b_rptr + off + len < mp->b_wptr));
+	return ((off >= 0) && (mp->b_rptr + off + len <= mp->b_wptr));
 }
 #ifndef MBLKIN
 #define MBLKIN MBLKIN
