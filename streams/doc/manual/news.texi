@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.40 2008-04-28 12:54:00 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.41 2008-07-31 17:28:19 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-28 12:54:00 $ by $Author: brian $
+@c Last Modified $Date: 2008-07-31 17:28:19 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -125,6 +125,18 @@ Improvements to common build process for embedded and cross-compile targets.
 
 @item
 Support for flex 2.5.33  in maintainer mode.
+
+@item
+Higher performance and updated performance paper.
+
+@item
+Fixed two POSIX compilance quirks and one soft-lockup when using M_READ.  See
+BUGS in the release for more information.
+
+@item
+Added workaround for use of crash().
+
+@item
 
 @end itemize
 

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.19 2008/07/25 23:07:00 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.20 2008-07-31 17:28:19 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,24 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008/07/25 23:07:00 $ by $Author: brian $
+@c Last Modified $Date: 2008-07-31 17:28:19 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 020.  2008-07-31T04:59:41+0000
+
+Not really a bug (for @cite{STREAMS}), but when the @file{streams.ko} kernel
+module is loaded, the @command{crash()} debugger will not debug a running
+kernel because it finds the @command{runqueues()} exported function in the
+@file{streams.ko} module instead of the the static one from the kernel.  This
+has been temporarily renamed by macro to @command{srunqueues()} (notice the
+leading @samp{s}) until @command{crash()} learns to do the rigth think an
+check that the symbol it looks up comes from the kernel instead of a kernel
+module.
+
+@emph{*workaround*} in @command{streams-0.9.2.4}
+
 @item 019.  2008-07-25T22:41:47+0000
 
 When M_READ was being issued by the Stream Head downstream an srlock() imbalance in strsendmread()

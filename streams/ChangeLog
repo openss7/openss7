@@ -1,3 +1,11 @@
+2008-07-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added manpage link for new symbol
+	* doc/manual/bugs.texi: documented workaround
+	* doc/manual/news.texi: updated release notes
+	* include/sys/streams/strsubr.h: defined runqueues to srunqueues
+	* doc/man/man9/srunqueues.9.man: added manpage link for new symbol
+
 2008-07-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/sth.c: typo in conditional
