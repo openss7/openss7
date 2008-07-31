@@ -731,7 +731,12 @@ store_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("mxMIB", "storing data...  "));
 
-	StorageTmp = mxMIBStorage;
+	refresh_mxMIB();
+
+	if ((StorageTmp = mxMIBStorage) == NULL) {
+		DEBUGMSGTL(("mxMIB", "error.\n"));
+		return SNMPERR_GENERR;
+	}
 
 	(void) tmpint;
 
@@ -746,6 +751,7 @@ store_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	snmpd_store_config(line);
 	/* } */
+	DEBUGMSGTL(("mxMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1072,6 +1078,8 @@ store_mxSpanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("mxSpanTable", "storing data...  "));
 
+	refresh_mxSpanTable();
+
 	for (hcindex = mxSpanTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxSpanTable_data *) hcindex->data;
 
@@ -1319,6 +1327,8 @@ store_mxChanTable(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("mxChanTable", "storing data...  "));
 
+	refresh_mxChanTable();
+
 	for (hcindex = mxChanTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxChanTable_data *) hcindex->data;
 
@@ -1449,6 +1459,8 @@ store_mxXconTable(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("mxXconTable", "storing data...  "));
 
+	refresh_mxXconTable();
+
 	for (hcindex = mxXconTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxXconTable_data *) hcindex->data;
 
@@ -1577,6 +1589,8 @@ store_mxBertTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mxBertTable", "storing data...  "));
+
+	refresh_mxBertTable();
 
 	for (hcindex = mxBertTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxBertTable_data *) hcindex->data;
@@ -1707,6 +1721,8 @@ store_mxNearEndCurrentTable(int majorID, int minorID, void *serverarg, void *cli
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mxNearEndCurrentTable", "storing data...  "));
+
+	refresh_mxNearEndCurrentTable();
 
 	for (hcindex = mxNearEndCurrentTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxNearEndCurrentTable_data *) hcindex->data;
@@ -1861,6 +1877,8 @@ store_mxNearEndIntervalTable(int majorID, int minorID, void *serverarg, void *cl
 
 	DEBUGMSGTL(("mxNearEndIntervalTable", "storing data...  "));
 
+	refresh_mxNearEndIntervalTable();
+
 	for (hcindex = mxNearEndIntervalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxNearEndIntervalTable_data *) hcindex->data;
 
@@ -2013,6 +2031,8 @@ store_mxNearEndTotalTable(int majorID, int minorID, void *serverarg, void *clien
 
 	DEBUGMSGTL(("mxNearEndTotalTable", "storing data...  "));
 
+	refresh_mxNearEndTotalTable();
+
 	for (hcindex = mxNearEndTotalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxNearEndTotalTable_data *) hcindex->data;
 
@@ -2159,6 +2179,8 @@ store_mxFarEndCurrentTable(int majorID, int minorID, void *serverarg, void *clie
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mxFarEndCurrentTable", "storing data...  "));
+
+	refresh_mxFarEndCurrentTable();
 
 	for (hcindex = mxFarEndCurrentTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxFarEndCurrentTable_data *) hcindex->data;
@@ -2308,6 +2330,8 @@ store_mxFarEndIntervalTable(int majorID, int minorID, void *serverarg, void *cli
 
 	DEBUGMSGTL(("mxFarEndIntervalTable", "storing data...  "));
 
+	refresh_mxFarEndIntervalTable();
+
 	for (hcindex = mxFarEndIntervalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxFarEndIntervalTable_data *) hcindex->data;
 
@@ -2454,6 +2478,8 @@ store_mxFarEndTotalTable(int majorID, int minorID, void *serverarg, void *client
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("mxFarEndTotalTable", "storing data...  "));
+
+	refresh_mxFarEndTotalTable();
 
 	for (hcindex = mxFarEndTotalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct mxFarEndTotalTable_data *) hcindex->data;

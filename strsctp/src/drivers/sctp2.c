@@ -1372,7 +1372,7 @@ struct sctpchdr {
 #ifdef HAVE_KMEMB_STRUCT_SK_BUFF_H_SH
 #define SCTP_SKB_SH(__skb)	((__skb)->h.sh)
 #else
-#define SCTP_SKB_SH(__skb)	((struct sctphdr *)(skb_network_header(__skb)))
+#define SCTP_SKB_SH(__skb)	((struct sctphdr *)(skb_transport_header(__skb)))
 #endif
 #define SCTP_SKB_SH_SRCE(__skb)	(SCTP_SKB_SH(__skb)->srce)
 #define SCTP_SKB_SH_DEST(__skb)	(SCTP_SKB_SH(__skb)->dest)

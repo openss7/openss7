@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TMN-SMI.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:22 $
+-- @(#) $RCSfile: OPENSS7-TMN-SMI.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.11 $) $Date: 2008-07-28 08:51:42 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 07:11:22 $ by $Author: brian $
+-- Last Modified $Date: 2008-07-28 08:51:42 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TMN-SMI.mib,v $
+-- Revision 0.9.2.11  2008-07-28 08:51:42  brian
+-- - SNMP updates
+--
 -- Revision 0.9.2.10  2008-04-29 07:11:22  brian
 -- - updating headers for release
 --
@@ -3680,6 +3683,7 @@ enhancedCurrentAlarmSummaryControlEntry OBJECT-TYPE
 		"ITU-T Rec. Q.821 (2000) 
 		 enhancedCurrentAlarmSummaryControl."
 	INDEX	{
+		    enhancedCurrentAlarmSummaryControlId
 		}
 	::= { enhancedCurrentAlarmSummaryControlTable 1 }
 
@@ -4064,8 +4068,17 @@ Log ::=
 
 logDurationTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF LogDurationEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+	    ""
+	REFERENCE
+	    ""
+
 logDurationEntry OBJECT-TYPE
 	SYNTAX		LogDurationEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
 	INDEX	{
 			logId -- shared index
 		}

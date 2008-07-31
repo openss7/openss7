@@ -384,7 +384,12 @@ store_x400pMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("x400pMIB", "storing data...  "));
 
-	StorageTmp = x400pMIBStorage;
+	refresh_x400pMIB();
+
+	if ((StorageTmp = x400pMIBStorage) == NULL) {
+		DEBUGMSGTL(("x400pMIB", "error.\n"));
+		return SNMPERR_GENERR;
+	}
 
 	(void) tmpint;
 
@@ -396,6 +401,7 @@ store_x400pMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	snmpd_store_config(line);
 	/* } */
+	DEBUGMSGTL(("x400pMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -544,6 +550,8 @@ store_x400pSyncTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x400pSyncTable", "storing data...  "));
+
+	refresh_x400pSyncTable();
 
 	for (hcindex = x400pSyncTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x400pSyncTable_data *) hcindex->data;
@@ -740,6 +748,8 @@ store_x400pCardTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("x400pCardTable", "storing data...  "));
+
+	refresh_x400pCardTable();
 
 	for (hcindex = x400pCardTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct x400pCardTable_data *) hcindex->data;

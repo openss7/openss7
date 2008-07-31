@@ -177,22 +177,27 @@ int term_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_phyMIB;
 void parse_phyMIB(const char *, char *);
 SNMPCallback store_phyMIB;
+void refresh_phyMIB(void);
 
 FindVarMethod var_physicalEntityTable;
 void parse_physicalEntityTable(const char *, char *);
 SNMPCallback store_physicalEntityTable;
+void refresh_physicalEntityTable(void);
 
 FindVarMethod var_physicalSAPTable;
 void parse_physicalSAPTable(const char *, char *);
 SNMPCallback store_physicalSAPTable;
+void refresh_physicalSAPTable(void);
 
 FindVarMethod var_dataCircuitTable;
 void parse_dataCircuitTable(const char *, char *);
 SNMPCallback store_dataCircuitTable;
+void refresh_dataCircuitTable(void);
 
 FindVarMethod var_physicalConnectionTable;
 void parse_physicalConnectionTable(const char *, char *);
 SNMPCallback store_physicalConnectionTable;
+void refresh_physicalConnectionTable(void);
 
 WriteMethod write_physicalSAPRowStatus;
 WriteMethod write_dataCircuitBitErrorsThreshold;

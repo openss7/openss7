@@ -57,20 +57,43 @@
 --
 -- =============================================================================
 
-OPENSS7-X25-PLP-MIB DEFINTIONS ::= BEGIN
+OPENSS7-X25-PLP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     openss7Modules
-        FROM OPENSS7-SMI
-    AdministrativeState, AlarmStatus, OperationalState, ProceduralStatus, 
-    SimpleNameType, UsageState
-        FROM OPENSS7-SMI-MIB
-    MODULE-COMPLIANCE, OBJECT-GROUP
-        FROM SNMPv2-CONF
-    Counter64, Counter32, Integer32, MODULE-IDENTITY, OBJECT-TYPE
-        FROM SNMPv2-SMI
-    RowPointer, RowStatus, TEXTUAL-CONVENTION, TimeInterval, TruthValue
-        FROM SNMPv2-TC;
+	FROM OPENSS7-SMI
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE, 
+    enterprises
+	FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    Counter64,
+    Counter32,
+    Integer32,
+    DisplayString,
+    Gauge32,
+    RowPointer,
+    RowStatus, 
+    TimeInterval,
+    TimeStamp,
+    TruthValue, 
+    Unsigned32
+	FROM SNMPv2-TC
+    attributeValueChange,
+    communicationsAlarm,
+    objectCreation,
+    objectDeletion,
+    tmnObjectInstance
+	FROM OPENSS7-SMI-MIB
+    AdministrativeState, 
+    OperationalState,
+    SimpleNameType,
+    UsageState
+	FROM OPENSS7-TMN-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+	FROM SNMPv2-CONF;
 
 x25PLPMIB MODULE-IDENTITY
     LAST-UPDATED "200807121128Z"
@@ -171,13 +194,13 @@ InterfaceMode ::= TEXTUAL-CONVENTION
 	   Circuit-termnating equipment (DCE) and is valid only 
 	   for ISO/IEC 8208 operation.
 	"
+    REFERENCE
+	"ITU-T Rec. X.25, ITU-T Rec. X.75, ISO/IEC 8208."
     SYNTAX	INTEGER {
 	dTE(0),
 	dCE(1),
 	dTEasDCE(2)
     }
-    REFERENCE
-	"ITU-T Rec. X.25, ITU-T Rec. X.75, ISO/IEC 8208."
 
 FastSelect ::= TEXTUAL-CONVENTION
     STATUS	current
@@ -219,7 +242,7 @@ Modulo ::= TEXTUAL-CONVENTION
 MaxActiveCircuits ::= TEXTUAL-CONVENTION
     STATUS	current
     DESCRIPTION
-	""
+	"T"
     SYNTAX	INTEGER (0..4096)
 
 DTEAddress ::= TEXTUAL-CONVENTION
@@ -632,10 +655,10 @@ RedirectReason ::= TEXTUAL-CONVENTION
 	 Notification (CRCDN) and Called Line Address Modified 
 	 Notification (CLAMN) facilities are not supported by 
 	 the 1980 version of X.25, x2580(8)."
-    SYNTAX      Integer32 (0..127)
     REFERENCE
 	"ITU-T Rec. X.25 Table 7-5/X.25.
 	 ITU-T Rec. X.7, Clause 6.3.9., 6.4.4."
+    SYNTAX      Integer32 (0..127)
 
 NetworkAddress ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -1267,7 +1290,7 @@ x25PLEPacketSequenceNumbering OBJECT-TYPE
 	 circuits, the modulo is established by subscription."
     REFERENCE
 	""
-    ::= { x25PLEEntry xx }
+    ::= { x25PLEEntry 11 }
 
 --  x25PLEDefaultPacketSizes
 x25PLEDefaultPacketSizeIncoming OBJECT-TYPE
@@ -1306,7 +1329,7 @@ x25PLEDefaultPacketSizeIncoming OBJECT-TYPE
 	     defaultPacketSizes.
 	 ISO/IEC 8208 : 2000, 16.2.2.5 Non-standard default 
 	     packet sizes."
-    ::= { x25PLEEntry 11 }
+    ::= { x25PLEEntry 12 }
 
 x25PLEDefaultPacketSizeOutgoing OBJECT-TYPE
     SYNTAX	PacketSize
@@ -1346,7 +1369,7 @@ x25PLEDefaultPacketSizeOutgoing OBJECT-TYPE
 	     defaultPacketSizes.
 	 ISO/IEC 8208 : 2000, 16.2.2.5 Non-standard default 
 	     packet sizes."
-    ::= { x25PLEEntry 12 }
+    ::= { x25PLEEntry 13 }
 
 --  x25PLEDefaultWindowSizes
 x25PLEDefaultWindowSizeIncoming OBJECT-TYPE
@@ -1390,7 +1413,7 @@ x25PLEDefaultWindowSizeIncoming OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE, 
 	     defaultWindowSizes."
-    ::= { x25PLEEntry 13 }
+    ::= { x25PLEEntry 14 }
 
 x25PLEDefaultWindowSizeOutgoing OBJECT-TYPE
     SYNTAX	WindowSize
@@ -1433,7 +1456,7 @@ x25PLEDefaultWindowSizeOutgoing OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE, 
 	     defaultWindowSizes."
-    ::= { x25PLEEntry 14 }
+    ::= { x25PLEEntry 15 }
 
 --  x25PLEDefaultThroughputClasses
 x25PLEDefaultThroughputClassIncoming OBJECT-TYPE
@@ -1478,7 +1501,7 @@ x25PLEDefaultThroughputClassIncoming OBJECT-TYPE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE, 
 	     defaultThroughputClasses."
     DEFVAL	{ 0 } -- default(0)
-    ::= { x25PLEEntry 15 }
+    ::= { x25PLEEntry 16 }
 
 x25PLEDefaultThroughputClassOutgoing OBJECT-TYPE
     SYNTAX	ThroughputClass
@@ -1522,7 +1545,7 @@ x25PLEDefaultThroughputClassOutgoing OBJECT-TYPE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE.
 	     defaultThroughputClasses."
     DEFVAL	{ 0 } -- default(0)
-    ::= { x25PLEEntry 16 }
+    ::= { x25PLEEntry 17 }
 
 x25PLESNServiceProvider OBJECT-TYPE
     SYNTAX	RowPointer
@@ -1532,7 +1555,7 @@ x25PLESNServiceProvider OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
-    ::= { x25PLEEntry 17 }
+    ::= { x25PLEEntry 18 }
 
 x25PLESNSAP OBJECT-TYPE
     SYNTAX	RowPointer
@@ -1542,7 +1565,7 @@ x25PLESNSAP OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
-    ::= { x25PLEEntry 18 }
+    ::= { x25PLEEntry 19 }
 
 --  x25PLELogicalChannelAssignments
 x25PLELogicalChannelAssignmentHIC OBJECT-TYPE
@@ -1590,7 +1613,7 @@ x25PLELogicalChannelAssignmentHIC OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
     DEFVAL	{ 0 }
-    ::= { x25PLEEntry 19 }
+    ::= { x25PLEEntry 20 }
 
 x25PLELogicalChannelAssignmentLIC OBJECT-TYPE
     SYNTAX	LogicalChannelNumber
@@ -1636,7 +1659,7 @@ x25PLELogicalChannelAssignmentLIC OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
     DEFVAL	{ 0 }
-    ::= { x25PLEEntry 20 }
+    ::= { x25PLEEntry 21 }
 
 x25PLELogicalChannelAssignmentHTC OBJECT-TYPE
     SYNTAX	LogicalChannelNumber
@@ -1683,7 +1706,7 @@ x25PLELogicalChannelAssignmentHTC OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
     DEFVAL	{ 0 }
-    ::= { x25PLEEntry 21 }
+    ::= { x25PLEEntry 22 }
 
 x25PLELogicalChannelAssignmentLTC OBJECT-TYPE
     SYNTAX	LogicalChannelNumber
@@ -1729,7 +1752,7 @@ x25PLELogicalChannelAssignmentLTC OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
     DEFVAL	{ 0 }
-    ::= { x25PLEEntry 22 }
+    ::= { x25PLEEntry 23 }
 
 x25PLELogicalChannelAssignmentHOC OBJECT-TYPE
     SYNTAX	LogicalChannelNumber
@@ -1775,7 +1798,7 @@ x25PLELogicalChannelAssignmentHOC OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
     DEFVAL	{ 0 }
-    ::= { x25PLEEntry 23 }
+    ::= { x25PLEEntry 24 }
 
 x25PLELogicalChannelAssignmentLOC OBJECT-TYPE
     SYNTAX	LogicalChannelNumber
@@ -1821,7 +1844,7 @@ x25PLELogicalChannelAssignmentLOC OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE."
     DEFVAL	{ 0 }
-    ::= { x25PLEEntry 24 }
+    ::= { x25PLEEntry 25 }
 
 
 x25PLEIVMO OBJECT IDENTIFIER
@@ -2810,7 +2833,7 @@ X25PLEDCEEntry ::= SEQUENCE {
     -- Direct Call ? X.7 6.3.6
     -- TOA/NPI Address Subscription ? X.7 6.3.10
     -- Inter-network Call Redirection and Deflection Prevention Subscription ? X.7 6.4.3.1
-    -- Reverse Charging Prevention ? X.7 ------ doesn't exist
+    -- Reverse Charging Prevention ? X.7 - doesn't exist
     -- Secure Dial-back ? X.7 6.6.8
 }
 
@@ -3844,7 +3867,7 @@ x25PLEDCERestartCount OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.25, Annex D, Table D.1/X.25."
     DEFVAL	{ 1 } -- one retransmission
-    ::= { x25PLEDCEEntry xx }
+    ::= { x25PLEDCEEntry 39 }
 
 x25PLEDCEIncomingCall OBJECT-TYPE
     SYNTAX	TimeInterval
@@ -3863,7 +3886,7 @@ x25PLEDCEIncomingCall OBJECT-TYPE
 	     incomingCall.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Timer T11."
     DEFVAL	{ 18000 } -- 180 seconds
-    ::= { x25PLEDCEEntry 39 }
+    ::= { x25PLEDCEEntry 40 }
 
 x25PLEDCECallCount OBJECT-TYPE
     SYNTAX	INTEGER
@@ -3879,7 +3902,7 @@ x25PLEDCECallCount OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.25, Annex D, Table D.1/X.25."
     DEFVAL	{ 0 } -- zero retransmission
-    ::= { x25PLEDCEEntry xx }
+    ::= { x25PLEDCEEntry 41 }
 
 x25PLEDCEResetIndication OBJECT-TYPE
     SYNTAX	TimeInterval
@@ -3897,7 +3920,7 @@ x25PLEDCEResetIndication OBJECT-TYPE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DCE,
 	     resetIndication.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Timer T12."
-    ::= { x25PLEDCEEntry 40 }
+    ::= { x25PLEDCEEntry 42 }
 
 x25PLEDCEResetCount OBJECT-TYPE
     SYNTAX	INTEGER
@@ -3913,7 +3936,7 @@ x25PLEDCEResetCount OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.25, Annex D, Table D.1/X.25."
     DEFVAL	{ 1 } -- one retranmission
-    ::= { x25PLEDCEEntry xx }
+    ::= { x25PLEDCEEntry 43 }
 
 x25PLEDCEClearIndication OBJECT-TYPE
     SYNTAX	TimeInterval
@@ -3932,7 +3955,7 @@ x25PLEDCEClearIndication OBJECT-TYPE
 	     clearIndication.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Timer T13."
     DEFVAL	{ 6000 } -- 60 seconds
-    ::= { x25PLEDCEEntry 41 }
+    ::= { x25PLEDCEEntry 44 }
 
 x25PLEDCEClearCount OBJECT-TYPE
     SYNTAX	INTEGER
@@ -3948,7 +3971,7 @@ x25PLEDCEClearCount OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.25, Annex D, Table D.1/X.25."
     DEFVAL	{ 1 } -- one retranmission
-    ::= { x25PLEDCEEntry xx }
+    ::= { x25PLEDCEEntry 45 }
 
 -- Miscellaneous conversion
 x25PLEDCEProfile OBJECT-TYPE
@@ -3959,7 +3982,7 @@ x25PLEDCEProfile OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DCE."
-    ::= { x25PLEDCEEntry 42 }
+    ::= { x25PLEDCEEntry 46 }
 
 x25PLEDCERowStatus OBJECT-TYPE
     SYNTAX	RowStatus
@@ -3969,7 +3992,7 @@ x25PLEDCERowStatus OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DCE."
-    ::= { x25PLEDCEEntry 43 }
+    ::= { x25PLEDCEEntry 47 }
 
 
 x25PLEDXE OBJECT IDENTIFIER
@@ -5811,7 +5834,7 @@ x25PVCDTELogicalChannel OBJECT-TYPE
 
 -- Miscellaneous
 x25PVCDTERowStatus OBJECT-TYPE
-    SYNTAX	RowStatus,
+    SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
@@ -5877,7 +5900,7 @@ X25PVCDCEEntry ::= SEQUENCE {
 }
 
 x25PVCDCELogicalChannel OBJECT-TYPE
-    SYNTAX	LogicalChannelNumber,
+    SYNTAX	LogicalChannelNumber
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
@@ -5902,7 +5925,7 @@ x25PVCDCEChargingDirection OBJECT-TYPE
     ::= { x25PVCDCEEntry 2 }
 
 x25PVCDCEOperationalState OBJECT-TYPE
-    SYNTAX	OperationalState,
+    SYNTAX	OperationalState
     MAX-ACCESS	read-only
     STATUS	current
     DESCRIPTION
@@ -5916,7 +5939,7 @@ x25PVCDCEOperationalState OBJECT-TYPE
     ::= { x25PVCDCEEntry 3 }
 
 x25PVCDCERemoteDTEAddress OBJECT-TYPE
-    SYNTAX	DTEAddress,
+    SYNTAX	DTEAddress
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
@@ -5936,7 +5959,7 @@ x25PVCDCERemoteDTEAddress OBJECT-TYPE
     ::= { x25PVCDCEEntry 4 }
 
 x25PVCDCERemoteLogicalChannel OBJECT-TYPE
-    SYNTAX	LogicalChannelNumber,
+    SYNTAX	LogicalChannelNumber
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
@@ -5948,7 +5971,7 @@ x25PVCDCERemoteLogicalChannel OBJECT-TYPE
 
 -- Miscellaneous
 x25PVCDCERowStatus OBJECT-TYPE
-    SYNTAX	RowStatus,
+    SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
@@ -6010,7 +6033,7 @@ x25PVCDXELogicalChannel OBJECT-TYPE
 
 -- Miscellanous
 x25PVCDXERowStatus OBJECT-TYPE
-    SYNTAX	RowStatus,
+    SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
@@ -6196,7 +6219,7 @@ x25SVCIVMORowStatus OBJECT-TYPE
 
 
 x25SVCIVMODTE OBJECT IDENTIFIER
-    ::= { x25PLPTables xx }
+    ::= { x25PLPTables 17 }
 
 x25SVCIVMODTETable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25SVCIVMODTEEntry
@@ -6206,7 +6229,7 @@ x25SVCIVMODTETable OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { x25PLPIVMODTE 1 }
+    ::= { x25SVCIVMODTE 1 }
 
 x25SVCIVMODTEEntry OBJECT-TYPE
     SYNTAX	X25SVCIVMODTEEntry
@@ -6220,7 +6243,7 @@ x25SVCIVMODTEEntry OBJECT-TYPE
 		    x25PLEId,	    -- shared index (CONTAINED BY)
 		    x25SVCIVMOId    -- shared index (DERIVED FROM)
 		}
-    ::= { x25PLPIVMODTETable 1 }
+    ::= { x25SVCIVMODTETable 1 }
 
 X25SVCIVMODTEEntry ::= SEQUENCE {
     x25SVCIVMODTECallTime		TimeInterval,
@@ -6254,7 +6277,7 @@ x25SVCIVMODTECallTime OBJECT-TYPE
 	     callRequestResponseTimer.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Timer T21."
     DEFVAL	{ 20000 } -- 200 seconds
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 1 }
 
 x25SVCIVMODTEResetTime OBJECT-TYPE
     SYNTAX	TimeInterval
@@ -6270,7 +6293,7 @@ x25SVCIVMODTEResetTime OBJECT-TYPE
 	     resetRequestResponseTimer.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Timer T22"
     DEFVAL	{ 18000 } -- 180 seconds
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 2 }
 
 x25SVCIVMODTEResetCount OBJECT-TYPE
     SYNTAX	INTEGER
@@ -6286,7 +6309,7 @@ x25SVCIVMODTEResetCount OBJECT-TYPE
 	     resetRequestRetransmissionCount.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Count R22."
     DEFVAL	{ 1 }
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 3 }
 
 x25SVCIVMODTEInterruptTime OBJECT-TYPE
     SYNTAX	TimeInterval
@@ -6302,7 +6325,7 @@ x25SVCIVMODTEInterruptTime OBJECT-TYPE
 	     interruptResponseTimer.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Timer T26."
     DEFVAL	{ 18000 } -- 180 seconds
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 4 }
 
 x25SVCIVMODTEClearTime OBJECT-TYPE
     SYNTAX	TimeInterval
@@ -6318,7 +6341,7 @@ x25SVCIVMODTEClearTime OBJECT-TYPE
 	     clearRequestResponseTimer.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Timer T23."
     DEFVAL	{ 18000 } -- 180 seconds
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 5 }
 
 x25SVCIVMODTEClearCount OBJECT-TYPE
     SYNTAX	INTEGER
@@ -6333,7 +6356,7 @@ x25SVCIVMODTEClearCount OBJECT-TYPE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DTE 
 	     clearRequestRetransmissionCount.
 	 ITU-T Rec. X.25 | ISO/IEC 8208 : Count R23."
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 6 }
 
 -- PACKAGE receivingWindowRotationRecoveryProcedures-P
 x25SVCIVMODTEWindowTime OBJECT-TYPE
@@ -6345,7 +6368,7 @@ x25SVCIVMODTEWindowTime OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DTE 
 	     windowStatusTransmissionTimer."
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 7 }
 
 -- PACKAGE transmittingWindowRotationRecoveryProcedures-P
 x25SVCIVMODTEDataTime OBJECT-TYPE
@@ -6357,7 +6380,7 @@ x25SVCIVMODTEDataTime OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DTE 
 	     windowRotationTimer."
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 8 }
 
 x25SVCIVMODTEDataCount OBJECT-TYPE
     SYNTAX	INTEGER
@@ -6368,7 +6391,7 @@ x25SVCIVMODTEDataCount OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DTE 
 	     dataPacketRetransmissionCount."
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 9 }
 
 -- PACKAGE packetRetransmissionProcedures-P
 x25SVCIVMODTERejectTime OBJECT-TYPE
@@ -6380,7 +6403,7 @@ x25SVCIVMODTERejectTime OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DTE 
 	     rejectResponseTimer."
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 10 }
 
 x25SVCIVMODTERejectCount OBJECT-TYPE
     SYNTAX	INTEGER
@@ -6391,7 +6414,7 @@ x25SVCIVMODTERejectCount OBJECT-TYPE
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : x25PLE-DTE 
 	     rejectRetransmissionCount."
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 11 }
 
 x25SVCIVMODTERowStatus OBJECT-TYPE
     SYNTAX	RowStatus
@@ -6401,10 +6424,10 @@ x25SVCIVMODTERowStatus OBJECT-TYPE
 	""
     REFERENCE
 	""
-    ::= { x25SVCIVMODTEEntry xx }
+    ::= { x25SVCIVMODTEEntry 12 }
 
 x25SVCIVMODXE OBJECT IDENTIFIER
-    ::= { x25PLPTables 17 }
+    ::= { x25PLPTables 18 }
 
 x25SVCIVMODXETable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25SVCIVMODXEEntry
@@ -6414,7 +6437,7 @@ x25SVCIVMODXETable OBJECT-TYPE
 	""
     REFERENCE
 	"ITU-T Rec. X.283 | ISO/IEC 10733 : virtualCallIVMO."
-    ::= { x25PLPIVMODXE 1 }
+    ::= { x25SVCIVMODXE 1 }
 
 x25SVCIVMODXEEntry OBJECT-TYPE
     SYNTAX	X25SVCIVMODXEEntry
@@ -6428,7 +6451,7 @@ x25SVCIVMODXEEntry OBJECT-TYPE
 		    x25PLEId,	    -- shared index (CONTAINED BY)
 		    x25SVCIVMOId    -- shared index (DERIVED FROM)
 		}
-    ::= { x25PLPIVMODXETable 1 }
+    ::= { x25SVCIVMODXETable 1 }
 
 X25SVCIVMODXEEntry ::= SEQUENCE {
     x25SVCIVMODXECallTime		TimeInterval,
@@ -6573,7 +6596,7 @@ x25SVCIVMODXERowStatus OBJECT-TYPE
 
 
 x25SVCDTE OBJECT IDENTIFIER
-    ::= { x25PLPTables 18 }
+    ::= { x25PLPTables 19 }
 
 x25SVCDTETable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25SVCDTEEntry
@@ -6870,7 +6893,7 @@ x25SVCDTECalledAddressExtension OBJECT-TYPE
 
 
 x25SVCDCE OBJECT IDENTIFIER
-    ::= { x25PLPTables 19 }
+    ::= { x25PLPTables 20 }
 
 x25SVCDCETable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25SVCDCEEntry
@@ -7078,7 +7101,7 @@ x25SVCDCETransitDelaySelectionAndIndication OBJECT-TYPE
 
 
 x25SVCDXE OBJECT IDENTIFIER
-    ::= { x25PLPTables 20 }
+    ::= { x25PLPTables 21 }
 
 x25SVCDXETable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25SVCDXEEntry
@@ -7353,7 +7376,7 @@ x25SVCDXECalledAddressExtension OBJECT-TYPE
 
 
 x25DSC OBJECT IDENTIFIER
-    ::= { x25PLPTables 21 }
+    ::= { x25PLPTables 22 }
 
 x25DSCTable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25DSCEntry
@@ -7519,7 +7542,7 @@ x25DSCSegmentsReceived OBJECT-TYPE
 
 
 x25PLEDTEStats OBJECT IDENTIFIER
-    ::= { x25PLPTables 22 }
+    ::= { x25PLPTables 23 }
 
 x25PLEDTEStatsTable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25PLEDTEStatsEntry
@@ -7842,7 +7865,7 @@ x25PLEDTEStatsClearCountsExceeded OBJECT-TYPE
 
 
 x25PLEDCEStats OBJECT IDENTIFIER
-    ::= { x25PLPTables 23 }
+    ::= { x25PLPTables 24 }
 
 x25PLEDCEStatsTable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25PLEDCEStatsEntry
@@ -8093,7 +8116,7 @@ x25PLEDCEStatsX25SegmentsSent OBJECT-TYPE
 
 
 x25PLEDXEStats OBJECT IDENTIFIER
-    ::= { x25PLPTables 24 }
+    ::= { x25PLPTables 25 }
 
 x25PLEDXEStatsTable OBJECT-TYPE
     SYNTAX	SEQUENCE OF X25PLEDXEStatsEntry

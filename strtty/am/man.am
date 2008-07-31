@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008/06/09 09:20:01 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008/07/29 02:14:09 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/06/09 09:20:01 $ by $Author: brian $
+## Last Modified $Date: 2008/07/29 02:14:09 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -354,10 +354,11 @@ if COMPRESS_MANPAGES
 ##
 post-manpages:
 	@$(NORMAL_INSTALL)
-	@for ext in .gz .bz2 ; do \
+	@for ext in .gz .bz2 .lzma ; do \
 		case $$ext in \
-			(.gz)  COMPRESS='$(GZIP_CMD)'  ; COMPRESS_ENV="GZIP='$(GZIP)'" ;; \
-			(.bz2) COMPRESS='$(BZIP2_CMD)' ; COMPRESS_ENV="BZIP2='$(BZIP2)'" ;; \
+			(.gz)   COMPRESS='$(GZIP_CMD)'  ; COMPRESS_ENV="GZIP='$(GZIP)'" ;; \
+			(.bz2)  COMPRESS='$(BZIP2_CMD)' ; COMPRESS_ENV="BZIP2='$(BZIP2)'" ;; \
+			(.lzma) COMPRESS='$(LZMA_CMD)'  ; COMPRESS_ENV="LZMA='$(LZMA)'" ;; \
 		esac ; \
 		if test -n "`find $(DESTDIR)$(mandir) -name \"*$$ext\" 2>/dev/null`" -o -n "$(INSTALL_STRIP_FLAG)" ; then \
 			if test -n "$$COMPRESS" -a -x "$$COMPRESS" ; then \
@@ -444,10 +445,11 @@ post-manpages:
 ##
 postun-manpages:
 	@$(NORMAL_UNINSTALL)
-	@for ext in .gz .bz2 ; do \
+	@for ext in .gz .bz2 .lzma ; do \
 		case $$ext in \
-			(.gz)  COMPRESS='$(GZIP_CMD)'  ; COMPRESS_ENV="GZIP='$(GZIP)'" ;; \
-			(.bz2) COMPRESS='$(BZIP2_CMD)' ; COMPRESS_ENV="BZIP2='$(BZIP2)'" ;; \
+			(.gz)   COMPRESS='$(GZIP_CMD)'  ; COMPRESS_ENV="GZIP='$(GZIP)'" ;; \
+			(.bz2)  COMPRESS='$(BZIP2_CMD)' ; COMPRESS_ENV="BZIP2='$(BZIP2)'" ;; \
+			(.lzma) COMPRESS='$(LZMA_CMD)'  ; COMPRESS_ENV="LZMA='$(LZMA)'" ;; \
 		esac ; \
 		if test -n "`find $(DESTDIR)$(mandir) -name \"*$$ext\" 2>/dev/null`" ; then \
 			if test -n "$$COMPRESS" ; then \
@@ -626,6 +628,9 @@ EXTRA_DIST		+= \
 ## =============================================================================
 ##
 ## $Log: man.am,v $
+## Revision 0.9.2.66  2008/07/29 02:14:09  brian
+## - more lzma compression additions
+##
 ## Revision 0.9.2.65  2008/06/09 09:20:01  brian
 ## - more substitutions
 ##
