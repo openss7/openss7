@@ -1,5 +1,5 @@
-OpenSS7 Master Package -- read me first file.  2008-07-01
-$Id: README,v 0.9.2.43 2008-07-11 09:58:07 brian Exp $
+OpenSS7 Master Package -- read me first file.  2008-07-30
+$Id: README,v 0.9.2.44 2008-07-31 17:33:43 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 Master Package
 =======================
 
-Package openss7-0.9.2.G was released under AGPLv3 2008-07-01.
+Package openss7-0.9.2.G was released under AGPLv3 2008-07-30.
 
 This is the `OpenSS7 Master Package' package.  It consists of a master
 package that contains all other OpenSS7 Project package releases.  Use
@@ -50,7 +50,7 @@ well.
  Release
 --------
 
-This is the `openss7-0.9.2.G' package, released 2008-07-01.  This
+This is the `openss7-0.9.2.G' package, released 2008-07-30.  This
 `0.9.2.G' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:

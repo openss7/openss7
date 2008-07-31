@@ -1,5 +1,5 @@
-OpenSS7 XNS Networking -- read me CVS file.  2008-07-23
-$Id: README-cvs,v 0.9.2.45 2008/07/27 08:50:01 brian Exp $
+OpenSS7 XNS Networking -- read me CVS file.  2008-07-30
+$Id: README-cvs,v 0.9.2.46 2008-07-31 17:33:53 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -38,17 +38,19 @@ requires tools not normally distributed with the other releases.
 
 The build host requires the following GNU tools:
 
-   * `autoconf 2.61'
+   * `m4 1.4.11'
 
-   * `automake 1.10'
+   * `autoconf 2.62'
 
-   * `libtool 1.5.22'
+   * `automake 1.10.1'
 
-   * `gettext 0.16.1'
+   * `libtool 2.2.4'
 
-   * `bison 2.3'
+   * `gettext 0.17'
 
    * `flex 2.5.33'
+
+   * `bison 2.3'
 
 Most desktop development GNU/Linux distributions wil have these tools;
 however, some non-development or server-style installations might not
@@ -58,21 +60,22 @@ Also, these tools can be acquired from the FSF website
 (http://www.fsf.org/) in the free software directory, and also at the
 following locations:
 
-   * autoconf-2.61
-     (http://www.openss7.org/tarballs/autoconf-2.61.tar.bz2)
+   * m4-1.4.11 (http://www.openss7.org/tarballs/m4-1.4.11.tar.bz2)
 
-   * automake-1.10
-     (http://www.openss7.org/tarballs/automake-1.10.tar.bz2)
+   * autoconf-2.62
+     (http://www.openss7.org/tarballs/autoconf-2.62.tar.bz2)
 
-   * libtool-1.5.22
-     (http://www.openss7.org/tarballs/libtool-1.5.22.tar.gz)
+   * automake-1.10.1
+     (http://www.openss7.org/tarballs/automake-1.10.1.tar.bz2)
 
-   * gettext-0.16.1
-     (http://www.openss7.org/tarballs/gettext-0.16.1.tar.gz)
+   * libtool-2.2.4
+     (http://www.openss7.org/tarballs/libtool-2.2.4.tar.gz)
 
-   * bison-2.3 (http://www.openss7.org/tarballs/bison-2.3.tar.bz2)
+   * gettext-0.17 (http://www.openss7.org/tarballs/gettext-0.17.tar.gz)
 
    * flex-2.5.33 (http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2)
+
+   * bison-2.3 (http://www.openss7.org/tarballs/bison-2.3.tar.bz2)
 
 It should be stressed that, in particular, the `autoconf(1)', and
 `automake(1)', must be at version releases `2.61' and `1.10'.  _The
@@ -89,7 +92,7 @@ documentation tools:
 
    * `tetex 3.0'
 
-   * `texinfo 4.8'
+   * `texinfo 4.12'
 
    * `transfig 3.2.5'
 

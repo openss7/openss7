@@ -1,5 +1,5 @@
-Linux Fast-STREAMS -- history of user visible changes.  2008-07-28
-$Id: NEWS,v 0.9.2.73 2008/07/27 08:49:08 brian Exp $
+Linux Fast-STREAMS -- history of user visible changes.  2008-07-30
+$Id: NEWS,v 0.9.2.74 2008-07-31 17:33:47 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -43,6 +43,11 @@ Major features since the last public release are as follows:
      cross-compile targets.
 
    - Support for flex 2.5.33  in maintainer mode.
+
+   - Higher performance and updated performance paper.
+
+   - Fixed two POSIX compilance quirks and one soft-lockup when using
+     M_READ.  See BUGS in the release for more information.
 
 
 _This is a public stable production grade release of the package: it
