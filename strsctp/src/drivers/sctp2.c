@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-23 08:29:10 $ by $Author: brian $
+ Last Modified $Date: 2008-07-31 17:40:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.79  2008-07-31 17:40:17  brian
+ - SNMP updates
+
  Revision 0.9.2.78  2008-07-23 08:29:10  brian
  - updated references and support for 2.6.18-92.1.6.el5 kernel
 
@@ -170,10 +173,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -191,7 +194,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-07-23 08:29:10 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
