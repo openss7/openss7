@@ -3036,6 +3036,8 @@ streams/src/snmp/strMIB_simple.c
 streams/src/snmp/strMIB_simple.h
 streams/src/snmp/strMIB_storage.c
 streams/src/snmp/strMIB_storage.h
+streams/src/snmp/strMIB.tree
+streams/src/snmp/strMIB.tree
 streams/stat.c
 streams/strnlen.c
 streams/strtod.c
@@ -4069,6 +4071,11 @@ strx25/po/quot.sed
 strx25/po/remove-potcdate.sin
 strx25/po/Rules-quot
 strx25/scripts/ltmain.sh
+strx25/src/mibs/.index
+strx25/src/snmp/makestubs
+strx25/src/snmp/mibs/.index
+strx25/src/snmp/x25MIB_openss7.c
+strx25/src/snmp/x25MIB_openss7.h
 strxnet/ABOUT-NLS
 strxnet/aclocal.m4
 strxnet/AUTHORS
@@ -4278,7 +4285,16 @@ strxns/src/include/Makefile.in
 strxns/src/lib/libdlpi/.cvsignore
 strxns/src/lib/libdlpi/mapfile-vers
 strxns/src/Makefile.in
+strxns/src/snmp/lapbMIB_openss7.c
+strxns/src/snmp/lapbMIB_openss7.h
+strxns/src/snmp/lapbMIB.tree
+strxns/src/snmp/llcMIB_openss7.c
+strxns/src/snmp/llcMIB_openss7.h
+strxns/src/snmp/llcMIB.tree
 strxns/src/snmp/mibs/.index
+strxns/src/snmp/osiMIB_openss7.c
+strxns/src/snmp/osiMIB_openss7.h
+strxns/src/snmp/osiMIB.tree
 strxns/tags
 strxns/tests/Makefile.in
 strxns/TODO
