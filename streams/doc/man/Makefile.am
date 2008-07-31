@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2008-04-28 12:53:38 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2008-07-31 17:28:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 12:53:38 $ by $Author: brian $
+# Last Modified $Date: 2008-07-31 17:28:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1283,6 +1283,7 @@ man_MANS = \
 	man9/rmvb.9 \
 	man9/rmvq.9 \
 	man9/runqueues.9 \
+	man9/srunqueues.9 \
 	man9/Strinfo.9 \
 	man9/sd_get.9 \
 	man9/sd_put.9 \
@@ -2432,6 +2433,7 @@ dist_noinst_MANS = \
 	man9/rmvb.9.man \
 	man9/rmvq.9.man \
 	man9/runqueues.9.man \
+	man9/srunqueues.9.man \
 	man9/Strinfo.9.man \
 	man9/sd_get.9.man \
 	man9/sd_put.9.man \
@@ -2525,6 +2527,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.93  2008-07-31 17:28:19  brian
+# - workaround for runqueues for crash(8)
+#
 # Revision 0.9.2.92  2008-04-28 12:53:38  brian
 # - update file headers for release
 #
