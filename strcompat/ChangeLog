@@ -1,3 +1,7 @@
+2008-07-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/sun/strsun.h: fix clobbered fix to MBLKIN
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
