@@ -221,14 +221,17 @@ int term_x400pMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_x400pMIB;
 void parse_x400pMIB(const char *, char *);
 SNMPCallback store_x400pMIB;
+void refresh_x400pMIB(void);
 
 FindVarMethod var_x400pSyncTable;
 void parse_x400pSyncTable(const char *, char *);
 SNMPCallback store_x400pSyncTable;
+void refresh_x400pSyncTable(void);
 
 FindVarMethod var_x400pCardTable;
 void parse_x400pCardTable(const char *, char *);
 SNMPCallback store_x400pCardTable;
+void refresh_x400pCardTable(void);
 
 WriteMethod write_x400pSyncSpanId;
 WriteMethod write_x400pSyncRowStatus;

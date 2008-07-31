@@ -70,7 +70,12 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
-all: basic storage openss7
+all: openss7
+
+check: strMIB.tree
+
+strMIB.tree: mibs/OPENSS7-STREAMS-MIB.mib
+	snmptranslate -Tp OPENSS7-STREAMS-MIB::strMIB 2>&1 | tee $@
 
 basic: strMIB_simple.c strMIB_simple.h
 
@@ -105,3 +110,4 @@ clean:
 	rm -f strMIB_simple.[ch]~
 	rm -f strMIB_storage.[ch]~
 	rm -f strMIB_openss7.[ch]~
+	rm -f strMIB.tree

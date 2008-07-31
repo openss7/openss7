@@ -427,7 +427,12 @@ store_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("phyMIB", "storing data...  "));
 
-	StorageTmp = phyMIBStorage;
+	refresh_phyMIB();
+
+	if ((StorageTmp = phyMIBStorage) == NULL) {
+		DEBUGMSGTL(("phyMIB", "error.\n"));
+		return SNMPERR_GENERR;
+	}
 
 	(void) tmpint;
 
@@ -439,6 +444,7 @@ store_phyMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	snmpd_store_config(line);
 	/* } */
+	DEBUGMSGTL(("phyMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -600,6 +606,8 @@ store_physicalEntityTable(int majorID, int minorID, void *serverarg, void *clien
 
 	DEBUGMSGTL(("physicalEntityTable", "storing data...  "));
 
+	refresh_physicalEntityTable();
+
 	for (hcindex = physicalEntityTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct physicalEntityTable_data *) hcindex->data;
 
@@ -723,6 +731,8 @@ store_physicalSAPTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("physicalSAPTable", "storing data...  "));
+
+	refresh_physicalSAPTable();
 
 	for (hcindex = physicalSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct physicalSAPTable_data *) hcindex->data;
@@ -911,6 +921,8 @@ store_dataCircuitTable(int majorID, int minorID, void *serverarg, void *clientar
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dataCircuitTable", "storing data...  "));
+
+	refresh_dataCircuitTable();
 
 	for (hcindex = dataCircuitTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dataCircuitTable_data *) hcindex->data;
@@ -1111,6 +1123,8 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("physicalConnectionTable", "storing data...  "));
+
+	refresh_physicalConnectionTable();
 
 	for (hcindex = physicalConnectionTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct physicalConnectionTable_data *) hcindex->data;

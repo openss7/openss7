@@ -552,46 +552,57 @@ int term_mxMIB(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_mxMIB;
 void parse_mxMIB(const char *, char *);
 SNMPCallback store_mxMIB;
+void refresh_mxMIB(void);
 
 FindVarMethod var_mxSpanTable;
 void parse_mxSpanTable(const char *, char *);
 SNMPCallback store_mxSpanTable;
+void refresh_mxSpanTable(void);
 
 FindVarMethod var_mxChanTable;
 void parse_mxChanTable(const char *, char *);
 SNMPCallback store_mxChanTable;
+void refresh_mxChanTable(void);
 
 FindVarMethod var_mxXconTable;
 void parse_mxXconTable(const char *, char *);
 SNMPCallback store_mxXconTable;
+void refresh_mxXconTable(void);
 
 FindVarMethod var_mxBertTable;
 void parse_mxBertTable(const char *, char *);
 SNMPCallback store_mxBertTable;
+void refresh_mxBertTable(void);
 
 FindVarMethod var_mxNearEndCurrentTable;
 void parse_mxNearEndCurrentTable(const char *, char *);
 SNMPCallback store_mxNearEndCurrentTable;
+void refresh_mxNearEndCurrentTable(void);
 
 FindVarMethod var_mxNearEndIntervalTable;
 void parse_mxNearEndIntervalTable(const char *, char *);
 SNMPCallback store_mxNearEndIntervalTable;
+void refresh_mxNearEndIntervalTable(void);
 
 FindVarMethod var_mxNearEndTotalTable;
 void parse_mxNearEndTotalTable(const char *, char *);
 SNMPCallback store_mxNearEndTotalTable;
+void refresh_mxNearEndTotalTable(void);
 
 FindVarMethod var_mxFarEndCurrentTable;
 void parse_mxFarEndCurrentTable(const char *, char *);
 SNMPCallback store_mxFarEndCurrentTable;
+void refresh_mxFarEndCurrentTable(void);
 
 FindVarMethod var_mxFarEndIntervalTable;
 void parse_mxFarEndIntervalTable(const char *, char *);
 SNMPCallback store_mxFarEndIntervalTable;
+void refresh_mxFarEndIntervalTable(void);
 
 FindVarMethod var_mxFarEndTotalTable;
 void parse_mxFarEndTotalTable(const char *, char *);
 SNMPCallback store_mxFarEndTotalTable;
+void refresh_mxFarEndTotalTable(void);
 
 WriteMethod write_mxSpanDevice;
 WriteMethod write_mxSpanEquipmentId;

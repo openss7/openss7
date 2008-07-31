@@ -57,7 +57,7 @@
 --
 -- =============================================================================
 
-OPENSS7-X25-PLP-MIB DEFINTIONS ::= BEGIN
+OPENSS7-X25-PLP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     openss7Modules
@@ -111,7 +111,7 @@ x25PLE OBJECT IDENTIFIER
     ::= { x25PLPtables 1 }
 
 x25PLETable OBJECT-TYPE
-    SYNTAX	SEQUENCE of X25PLEEntry
+    SYNTAX	SEQUENCE OF X25PLEEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -128,7 +128,7 @@ x25PLEEntry OBJECT-TYPE
 	""
     REFERENCE
 	""
-    INDEX	{ }
+    INDEX	{ x25PLEId }
     ::= { x25PLETable 1 }
 
 X25PLEEntry ::= SEQUENCE {
@@ -488,7 +488,7 @@ x25PLEIVMO OBJECT IDENTIFIER
     ::= { x25PLPtables 2 }
 
 x25PLEIVMOTable OBJECT-TYPE
-    SYNTAX	SEQUENCE of X25PLEIVMOEntry
+    SYNTAX	SEQUENCE OF X25PLEIVMOEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -515,7 +515,7 @@ x25VC OBJECT IDENTIFIER
     ::= { x25PLPtables 3 }
 
 x25VCTable OBJECT-TYPE
-    SYNTAX	SEQUENCE of X25VCEntry
+    SYNTAX	SEQUENCE OF X25VCEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -542,7 +542,7 @@ x25PVC OBJECT IDENTIFIER
     ::= { x25PLPtables 4 }
 
 x25PVCTable OBJECT-TYPE
-    SYNTAX	SEQUENCE of X25PVCEntry
+    SYNTAX	SEQUENCE OF X25PVCEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -569,7 +569,7 @@ x25SVC OBJECT IDENTIFIER
     ::= { x25PLPtables 5 }
 
 x25SVCTable OBJECT-TYPE
-    SYNTAX	SEQUENCE of X25SVCEntry
+    SYNTAX	SEQUENCE OF X25SVCEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
@@ -596,7 +596,7 @@ x25SVCIVMO OBJECT IDENTIFIER
     ::= { x25PLPtables 6 }
 
 x25SVCIVMOTable OBJECT-TYPE
-    SYNTAX	SEQUENCE of X25SVCIVMOEntry
+    SYNTAX	SEQUENCE OF X25SVCIVMOEntry
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION

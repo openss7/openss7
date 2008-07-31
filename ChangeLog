@@ -1,3 +1,9 @@
+2008-07-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/openss7.am: add lzma to distribution formats
+	* am/man.am: use lzma compression if available
+	* m4/man.m4: use lzma compression if available
+
 2008-07-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/install.texi: updates to CVS build tools

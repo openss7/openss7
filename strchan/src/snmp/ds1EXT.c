@@ -611,7 +611,12 @@ store_ds1EXT(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("ds1EXT", "storing data...  "));
 
-	StorageTmp = ds1EXTStorage;
+	refresh_ds1EXT();
+
+	if ((StorageTmp = ds1EXTStorage) == NULL) {
+		DEBUGMSGTL(("ds1EXT", "error.\n"));
+		return SNMPERR_GENERR;
+	}
 
 	(void) tmpint;
 
@@ -623,6 +628,7 @@ store_ds1EXT(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	snmpd_store_config(line);
 	/* } */
+	DEBUGMSGTL(("ds1EXT", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -829,6 +835,8 @@ store_dsx1ConfigTable(int majorID, int minorID, void *serverarg, void *clientarg
 
 	DEBUGMSGTL(("dsx1ConfigTable", "storing data...  "));
 
+	refresh_dsx1ConfigTable();
+
 	for (hcindex = dsx1ConfigTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1ConfigTable_data *) hcindex->data;
 
@@ -989,6 +997,8 @@ store_dsx1CurrentTable(int majorID, int minorID, void *serverarg, void *clientar
 
 	DEBUGMSGTL(("dsx1CurrentTable", "storing data...  "));
 
+	refresh_dsx1CurrentTable();
+
 	for (hcindex = dsx1CurrentTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1CurrentTable_data *) hcindex->data;
 
@@ -1121,6 +1131,8 @@ store_dsx1IntervalTable(int majorID, int minorID, void *serverarg, void *clienta
 
 	DEBUGMSGTL(("dsx1IntervalTable", "storing data...  "));
 
+	refresh_dsx1IntervalTable();
+
 	for (hcindex = dsx1IntervalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1IntervalTable_data *) hcindex->data;
 
@@ -1250,6 +1262,8 @@ store_dsx1TotalTable(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("dsx1TotalTable", "storing data...  "));
 
+	refresh_dsx1TotalTable();
+
 	for (hcindex = dsx1TotalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1TotalTable_data *) hcindex->data;
 
@@ -1373,6 +1387,8 @@ store_dsx1FarEndCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dsx1FarEndCurrentTable", "storing data...  "));
+
+	refresh_dsx1FarEndCurrentTable();
 
 	for (hcindex = dsx1FarEndCurrentTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1FarEndCurrentTable_data *) hcindex->data;
@@ -1526,6 +1542,8 @@ store_dsx1FarEndIntervalTable(int majorID, int minorID, void *serverarg, void *c
 
 	DEBUGMSGTL(("dsx1FarEndIntervalTable", "storing data...  "));
 
+	refresh_dsx1FarEndIntervalTable();
+
 	for (hcindex = dsx1FarEndIntervalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1FarEndIntervalTable_data *) hcindex->data;
 
@@ -1661,6 +1679,8 @@ store_dsx1FarEndTotalTable(int majorID, int minorID, void *serverarg, void *clie
 
 	DEBUGMSGTL(("dsx1FarEndTotalTable", "storing data...  "));
 
+	refresh_dsx1FarEndTotalTable();
+
 	for (hcindex = dsx1FarEndTotalTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1FarEndTotalTable_data *) hcindex->data;
 
@@ -1777,6 +1797,8 @@ store_dsx1FracTable(int majorID, int minorID, void *serverarg, void *clientarg)
 
 	DEBUGMSGTL(("dsx1FracTable", "storing data...  "));
 
+	refresh_dsx1FracTable();
+
 	for (hcindex = dsx1FracTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1FracTable_data *) hcindex->data;
 
@@ -1872,6 +1894,8 @@ store_dsx1ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 	struct header_complex_index *hcindex;
 
 	DEBUGMSGTL(("dsx1ChanMappingTable", "storing data...  "));
+
+	refresh_dsx1ChanMappingTable();
 
 	for (hcindex = dsx1ChanMappingTableStorage; hcindex != NULL; hcindex = hcindex->next) {
 		StorageTmp = (struct dsx1ChanMappingTable_data *) hcindex->data;

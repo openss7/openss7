@@ -238,42 +238,52 @@ int term_ds1(int majorID, int minorID, void *serverarg, void *clientarg);
 FindVarMethod var_ds1;
 void parse_ds1(const char *, char *);
 SNMPCallback store_ds1;
+void refresh_ds1(void);
 
 FindVarMethod var_dsx1ConfigTable;
 void parse_dsx1ConfigTable(const char *, char *);
 SNMPCallback store_dsx1ConfigTable;
+void refresh_dsx1ConfigTable(void);
 
 FindVarMethod var_dsx1CurrentTable;
 void parse_dsx1CurrentTable(const char *, char *);
 SNMPCallback store_dsx1CurrentTable;
+void refresh_dsx1CurrentTable(void);
 
 FindVarMethod var_dsx1IntervalTable;
 void parse_dsx1IntervalTable(const char *, char *);
 SNMPCallback store_dsx1IntervalTable;
+void refresh_dsx1IntervalTable(void);
 
 FindVarMethod var_dsx1TotalTable;
 void parse_dsx1TotalTable(const char *, char *);
 SNMPCallback store_dsx1TotalTable;
+void refresh_dsx1TotalTable(void);
 
 FindVarMethod var_dsx1FarEndCurrentTable;
 void parse_dsx1FarEndCurrentTable(const char *, char *);
 SNMPCallback store_dsx1FarEndCurrentTable;
+void refresh_dsx1FarEndCurrentTable(void);
 
 FindVarMethod var_dsx1FarEndIntervalTable;
 void parse_dsx1FarEndIntervalTable(const char *, char *);
 SNMPCallback store_dsx1FarEndIntervalTable;
+void refresh_dsx1FarEndIntervalTable(void);
 
 FindVarMethod var_dsx1FarEndTotalTable;
 void parse_dsx1FarEndTotalTable(const char *, char *);
 SNMPCallback store_dsx1FarEndTotalTable;
+void refresh_dsx1FarEndTotalTable(void);
 
 FindVarMethod var_dsx1FracTable;
 void parse_dsx1FracTable(const char *, char *);
 SNMPCallback store_dsx1FracTable;
+void refresh_dsx1FracTable(void);
 
 FindVarMethod var_dsx1ChanMappingTable;
 void parse_dsx1ChanMappingTable(const char *, char *);
 SNMPCallback store_dsx1ChanMappingTable;
+void refresh_dsx1ChanMappingTable(void);
 
 WriteMethod write_dsx1LineType;
 WriteMethod write_dsx1LineCoding;

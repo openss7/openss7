@@ -768,8 +768,10 @@ _dlpi_arptype(uint mactype)
 		return (ARPHRD_ETHER);	/* Ethernet 10Mbps */
 	case DL_100BT:		/* 100 Base T */
 		return (ARPHRD_ETHER);	/* Ethernet 10Mbps */
+#ifdef ARPHRD_INFINIBAND
 	case DL_IB:		/* Infiniband */
 		return (ARPHRD_INFINIBAND);
+#endif
 	case DL_FRAME:		/* Frame Relay LAPF */
 		return (ARPHRD_DLCI);	/* Frame Relay DLCI */
 	case DL_MPFRAME:	/* Multi-protocol over Frame Relay */

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008/07/29 02:14:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/07/29 02:14:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -100,7 +100,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     AC_MSG_CHECKING([for manpage compression])
     AC_ARG_ENABLE([compress-manpages],
 	AS_HELP_STRING([--disable-compress-manpages],
-	    [compress manpages with gzip or bzip2 or leave them uncompressed.
+	    [compress manpages with gzip, bzip2 or lzma or leave them uncompressed.
 	    @<:@default=yes@:>@]),
 	[enable_compress_manpages="$enableval"],
 	[enable_compress_manpages='yes'])
@@ -122,6 +122,13 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
 	AC_PATH_PROG([BZIP2_CMD], [bzip2], [${am_missing_run}bzip2],
 		     [$PATH:/usr/local/bin:/usr/bin:/bin])
+	AC_ARG_VAR([LZMA], [Lzma default compression options @<:@default=--best@:>@])
+	if test -z "$LZMA"; then
+	    LZMA='-f9v'
+	fi
+	AC_ARG_VAR([LZMA_CMD], [Lzma compression command @<:@default=lzma@:>@])
+	AC_PATH_PROG([GZIP_CMD], [lzma], [${am_missing_run}lzma],
+		     [$PATH:/usr/local/bin:/usr/bin:/bin])
     fi
     AC_ARG_VAR([MAKEWHATIS], [Makewhatis command])
     AC_PATH_PROG([MAKEWHATIS], [makewhatis], [/usr/sbin/makewhatis],
@@ -141,6 +148,9 @@ AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: man.m4,v $
+# Revision 0.9.2.17  2008/07/29 02:14:10  brian
+# - more lzma compression additions
+#
 # Revision 0.9.2.16  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

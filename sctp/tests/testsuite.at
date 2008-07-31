@@ -228,7 +228,7 @@ function build_options() {
     local options=
     if test :${at_OPTIONS:-notset} = :notset
     then
-	if test $at_verbose = echo ; then options='--verbose=5' ; else options='--again' ; fi
+	if test :$at_verbose != :: ; then options='--verbose=5' ; else options='--again' ; fi
 	if test $at_arg_given_fast = : ; then options="$options --fast $at_arg_fast" ; fi
 	if test $at_arg_given_messages = : ; then options="$options --messages" ; fi
 	if test $at_arg_given_quiet = : ; then options="$options --quiet" ; fi
