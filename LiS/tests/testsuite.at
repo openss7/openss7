@@ -1,7 +1,7 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.4.12 $) $Date: 2008-04-29 08:33:25 $
+dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.4.13 $) $Date: 2008-07-31 17:35:26 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
@@ -61,7 +61,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2008-04-29 08:33:25 $ by $Author: brian $
+dnl Last Modified $Date: 2008-07-31 17:35:26 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -170,9 +170,11 @@ function stop_traceerr() {
     then
 	if check_root
 	then
+	    # try shutting down snmpd
+	    [[ -x /etc/init.d/snmpd  ]] && /etc/init.d/snmpd  stop >/dev/null 2>&1 || :
 	    # try shutting down loggers
-	    [[ -x /etc/init.d/strace ]] && /etc/init.d/strace stop >/dev/null 2>&1
-	    [[ -x /etc/init.d/strerr ]] && /etc/init.d/strerr stop >/dev/null 2>&1
+	    [[ -x /etc/init.d/strace ]] && /etc/init.d/strace stop >/dev/null 2>&1 || :
+	    [[ -x /etc/init.d/strerr ]] && /etc/init.d/strerr stop >/dev/null 2>&1 || :
 	    at_STOPPED=yes
 	    return 0
 	else
@@ -271,6 +273,9 @@ m4_include([testsuite-thrtst.at])
 dnl ==========================================================================
 dnl
 dnl $Log: testsuite.at,v $
+dnl Revision 1.1.4.13  2008-07-31 17:35:26  brian
+dnl - also stop snmp daemon to detect leakage
+dnl
 dnl Revision 1.1.4.12  2008-04-29 08:33:25  brian
 dnl - update headers for Affero release
 dnl
