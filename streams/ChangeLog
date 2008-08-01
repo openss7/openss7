@@ -1,3 +1,8 @@
+2008-08-01  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: documented backenable BUG 021
+	* src/kernel/strutil.c: fix for BUG 021
+
 2008-07-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: added manpage link for new symbol

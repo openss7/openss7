@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2008-04-28 12:54:06 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-08-01 22:37:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008-08-01 22:37:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.156  2008-08-01 22:37:36  brian
+ - document BUG 021 and implemented fix
+
  Revision 0.9.2.155  2008-04-28 12:54:06  brian
  - update file headers for release
 
@@ -153,10 +156,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2008-04-28 12:54:06 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-08-01 22:37:36 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2008-04-28 12:54:06 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-08-01 22:37:36 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -3657,7 +3660,7 @@ flushq(register queue_t *q, int flag)
 	mblk_t *mp = NULL, **mpp = &mp;
 	unsigned long pl;
 	int q_nband;
-	unsigned long back[(NBAND >> 3) / sizeof(unsigned long)];
+	unsigned long back[(NBAND >> 3) / sizeof(unsigned long)] = { 0, };
 
 	assert(q);
 	assert(flag == FLUSHDATA || flag == FLUSHALL);
