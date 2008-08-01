@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.20 2008-07-31 17:28:19 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.21 2008-08-01 22:37:36 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,21 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-07-31 17:28:19 $ by $Author: brian $
+@c Last Modified $Date: 2008-08-01 22:37:36 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 021.  2008-08-01T22:32:08+0000
+
+When flushing queues the backenable bits were not being initialized to zero in
+__flushq(), resulting in back-enabling of bands (or the normal queue) was
+being performed depending on the uninitialized values in the backenable bit
+array.  This only affected I_SETSIG signals for SWRNORM and SWBAND, and the only when flushing
+queues.  Fix properly initializes the backenable array.
+
+@emph{*fixed*} in @command{streams-0.9.2.4}
+
 @item 020.  2008-07-31T04:59:41+0000
 
 Not really a bug (for @cite{STREAMS}), but when the @file{streams.ko} kernel
