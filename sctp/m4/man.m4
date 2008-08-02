@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008/07/29 02:14:10 $
+# @(#) $RCSfile: man.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.18 $) $Date: 2008-08-02 05:06:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/07/29 02:14:10 $ by $Author: brian $
+# Last Modified $Date: 2008-08-02 05:06:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,7 +127,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	    LZMA='-f9v'
 	fi
 	AC_ARG_VAR([LZMA_CMD], [Lzma compression command @<:@default=lzma@:>@])
-	AC_PATH_PROG([GZIP_CMD], [lzma], [${am_missing_run}lzma],
+	AC_PATH_PROG([LZMA_CMD], [lzma], [${am_missing_run}lzma],
 		     [$PATH:/usr/local/bin:/usr/bin:/bin])
     fi
     AC_ARG_VAR([MAKEWHATIS], [Makewhatis command])
@@ -148,6 +148,9 @@ AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: man.m4,v $
+# Revision 0.9.2.18  2008-08-02 05:06:15  brian
+# - make LZMA compression detected
+#
 # Revision 0.9.2.17  2008/07/29 02:14:10  brian
 # - more lzma compression additions
 #

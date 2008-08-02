@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-08-02 05:06:15 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008-08-02 05:06:15 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -87,11 +87,23 @@ if MAINTAINER_MODE
 ## fragment that we do include, regardless of maintainer mode.
 ##
 
+if WITH_LZMA
 archive_files	= \
 		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
 		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2 \
+		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma
+archvie_signs	= \
+		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc \
+		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc \
+		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma.asc
+else
+archive_files	= \
+		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
+		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
+archive_signs	= \
 		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc \
 		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc
+endif
 
 ##
 # creates the package directory
@@ -104,13 +116,12 @@ RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR)
 # Otherwise, we will not move files into the release directory if they already exist there unless
 # force has been specified or a force release target has been invoked.
 ##
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2::
+$(archive_files)::
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
 	test "$@" -ef "$$f" && exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
-		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; } ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGS) -- $$f ; } ; \
 	test "$@" -ef "$$f" && exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
 		$(ECHO) "cp -f -- $$f $@" ; \
@@ -139,9 +150,7 @@ $(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 ##
 # Triggers make dist and signing if necessary.
 ##
-release-archives: \
-    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
-    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
+release-archives: $(archive_files)
 ##
 # This is a suffix rule for signing anything.  First we check if the signature file exists and has
 # a correct signature.  If it does, we merely touch the signature file.  Otherwise we use gpg to
@@ -170,6 +179,18 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
 	else touch "$@" ; fi
 
+if WITH_LZMA
+$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma.asc:: \
+$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma
+	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1 ; then \
+		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
+		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
+		pass="$(GNUPGPASS)" ; pass="$${pass:+ --batch }" ; \
+		pipe="$(GNUPGPASS)" ; pipe="$${pipe:+$(ECHO) "$$pipe" |}" ; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
+	else touch "$@" ; fi
+endif
 
 #! release-sign-archives:
 #!     This target is like `release-archives', except that it also signs the
@@ -181,13 +202,12 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
 #!
 #!     Signature files will be named:
 #!         @PACKAGE@-@VERSION@.tar.gz.asc and @PACKAGE@-@VERSION@.tar.bz2.asc
+#!         @PACKAGE@-@VERSION@.tar.lzma.asc
 #!
 #!     These files will be moved to the package distribution directory
 #!     @PACKAGE_DISTDIR@ with the plaintext archives.
 #!
-release-sign-archives: \
-    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc \
-    $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc
+release-sign-archives: $(archive_signs)
 
 RELEASE			+= all-release-archives
 RELEASE_SIGN		+= all-release-sign-archives
@@ -209,7 +229,8 @@ release-clean-archives: distclean-archives
 RELEASE_CLEAN_LOCAL	+= release-clean-archives
 
 RELEASECLEANFILES	+= $(DIST_ARCHIVES) \
-			   $(archive_files)
+			   $(archive_files) \
+			   $(archvie_signs)
 
 ALL_RECURSIVE_TARGETS	+= all-dist all-release-archives all-release-sign-archives
 
@@ -222,6 +243,9 @@ EXTRA_DIST		+= .pkgrelease \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.30  2008-08-02 05:06:15  brian
+## - make LZMA compression detected
+##
 ## Revision 0.9.2.29  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##

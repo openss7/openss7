@@ -1,3 +1,10 @@
+2008-08-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/archive.am: make LZMA compression optional
+	* am/openss7.am: make LZMA compression optional
+	* m4/man.m4: correction
+	* m4/openss7.m4: make LZMA compression optional
+
 2008-07-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/openss7.am: add lzma to distribution formats
