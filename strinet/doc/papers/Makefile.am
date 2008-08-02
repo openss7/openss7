@@ -178,6 +178,7 @@ EXTRA_DIST += \
 	xtios.fig \
 	udp.fig \
 	testresults.tex \
+	testresults.bib \
 	testresults.css \
 	org.css
 

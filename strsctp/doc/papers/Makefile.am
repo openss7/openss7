@@ -160,6 +160,7 @@ EXTRA_DIST += \
 	xtios.fig \
 	sctp.fig \
 	sctpresults.tex \
+	sctpresults.bib \
 	sctpresults.css \
 	org.css
 
