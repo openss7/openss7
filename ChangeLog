@@ -1,5 +1,8 @@
 2008-08-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* am/papers.am: depdendency tracking now on by default
+	* am/info.am: depdendency tracking now on by default
+
 	* am/archive.am: make LZMA compression optional
 	* am/openss7.am: make LZMA compression optional
 	* m4/man.m4: correction
