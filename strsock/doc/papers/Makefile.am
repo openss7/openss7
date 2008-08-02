@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 22:33:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-08-02 07:27:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,13 +45,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 22:33:30 $ by $Author: brian $
+# Last Modified $Date: 2008-08-02 07:27:51 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
-
-include ../../am/papers.am
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -81,9 +79,23 @@ CSSS = \
 ## DEVELOPMENT
 endif
 
+include ../../am/papers.am
+
+EXTRA_DIST += \
+	  bsdnet.fig \
+	  sockmod.fig \
+	  sock.fig \
+	  streamsnet.fig \
+	  sockets.fig \
+	  sockimp.tex \
+	  org.css
+
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2008-08-02 07:27:51  brian
+# - autoconf 2.62 does not like variables in EXTRA_DIST
+#
 # Revision 0.9.2.8  2008-04-28 22:33:30  brian
 # - updated headers for release
 #
