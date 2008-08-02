@@ -1,3 +1,8 @@
+2008-08-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: documented SELinux issues
+	* tests/testsuite-inet_tcp.at: expect failures when Enforcing
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

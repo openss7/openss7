@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.3 2008-04-28 22:52:08 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.4 2008-08-02 03:02:01 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,12 +53,18 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-28 22:52:08 $ by $Author: brian $
+@c Last Modified $Date: 2008-08-02 03:02:01 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
-@item 2007-03-05T01:24:13-0700
+@item 003.  2008-08-02T02:58:49+0000
+Some test cases are failing for the TCP driver when SELinux is set for Enforcing.  Either the
+STREAMS kernel threads kstream/0, etc. need to be permitted or SELinux must be set to Permissive or
+Disabled.  Conditions were added to the testsuite to expect failures on 30 specific tests when
+SELinux is set to Enforcing.
+
+@item 002.  2007-03-05T01:24:13-0700
 RPMs built on 2.4 kernels have using the @samp{%dev} construct for RPM instead of installing devices
 using the init scripts.  RPM complains loudly because the dev package defines some of the same iBCS
 devices (e.g. @file{/dev/ipip}) as we are attempting to install.  In the meantime, use --force.
