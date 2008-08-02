@@ -1,3 +1,7 @@
+2008-08-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* tests/testsuite.at.in: do not include test-usage for now
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
