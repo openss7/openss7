@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-07-26 18:59:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-08-02 07:25:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-26 18:59:20 $ by $Author: brian $
+# Last Modified $Date: 2008-08-02 07:25:41 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
-
-include ../../am/papers.am
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -140,9 +138,71 @@ CSSS = \
 ## DEVELOPMENT
 endif
 
+include ../../am/papers.am
+
+EXTRA_DIST += \
+	perftest_centos_comp.plot \
+	perftest_centos_delay.plot \
+	perftest_centos_perf.plot \
+	perftest_centos_thrput.plot \
+	perftest_fc6_comp.plot \
+	perftest_fc6_delay.plot \
+	perftest_fc6_perf.plot \
+	perftest_fc6_thrput.plot \
+	perftest_nb_comp.plot \
+	perftest_nb_delay.plot \
+	perftest_nb_perf.plot \
+	perftest_nb_thrput.plot \
+	perftest_rh7_comp.plot \
+	perftest_rh7_delay.plot \
+	perftest_rh7_perf.plot \
+	perftest_rh7_thrput.plot \
+	perftest_smp_comp.plot \
+	perftest_smp_delay.plot \
+	perftest_smp_perf.plot \
+	perftest_smp_thrput.plot \
+	perftest_cos5_comp.plot \
+	perftest_cos5_delay.plot \
+	perftest_cos5_perf.plot \
+	perftest_cos5_thrput.plot \
+	perftest_cos52_comp.plot \
+	perftest_cos52_delay.plot \
+	perftest_cos52_perf.plot \
+	perftest_cos52_thrput.plot \
+	perftest_suse_comp.plot \
+	perftest_suse_delay.plot \
+	perftest_suse_perf.plot \
+	perftest_suse_thrput.plot \
+	perftest_u704_comp.plot \
+	perftest_u704_delay.plot \
+	perftest_u704_perf.plot \
+	perftest_u704_thrput.plot \
+	perftest_ubuntu_comp.plot \
+	perftest_ubuntu_delay.plot \
+	perftest_ubuntu_perf.plot \
+	perftest_ubuntu_thrput.plot \
+	perftest_centos.dat \
+	perftest_fc6.dat \
+	perftest_nb.dat \
+	perftest_rh7.dat \
+	perftest_smp.dat \
+	perftest_cos5.dat \
+	perftest_cos52.dat \
+	perftest_suse.dat \
+	perftest_u704.dat \
+	perftest_ubuntu.dat \
+	legacypipe.fig \
+	streamspipe.fig \
+	socketpipe.fig \
+	piperesults.tex \
+	org.css
+
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2008-08-02 07:25:41  brian
+# - autoconf 2.62 does not like variables in EXTRA_DIST
+#
 # Revision 0.9.2.10  2008-07-26 18:59:20  brian
 # - added new data for CentOS 5.2
 #
