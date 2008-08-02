@@ -99,8 +99,6 @@ FIG_FIGS = \
 	xtios.fig \
 	udp.fig
 
-NAME = testresults
-
 $(PAPER_PREFIX)_centos_comp.fig $(PAPER_PREFIX)_centos_delay.fig $(PAPER_PREFIX)_centos_perf.fig $(PAPER_PREFIX)_centos_thrput.fig: $(PAPER_PREFIX)_centos.dat
 $(PAPER_PREFIX)_fc6_comp.fig $(PAPER_PREFIX)_fc6_delay.fig $(PAPER_PREFIX)_fc6_perf.fig $(PAPER_PREFIX)_fc6_thrput.fig: $(PAPER_PREFIX)_fc6.dat
 $(PAPER_PREFIX)_nb_comp.fig $(PAPER_PREFIX)_nb_delay.fig $(PAPER_PREFIX)_nb_perf.fig $(PAPER_PREFIX)_nb_thrput.fig: $(PAPER_PREFIX)_nb.dat
@@ -123,10 +121,7 @@ PLOT_DATS = \
 	$(PAPER_PREFIX)_ubuntu.dat
 
 LATEXS = \
-     $(NAME).tex
-
-CSSS = \
-     org.css
+     testresults.tex
 
 ## DEVELOPMENT
 endif
@@ -183,6 +178,7 @@ EXTRA_DIST += \
 	xtios.fig \
 	udp.fig \
 	testresults.tex \
+	testresults.css \
 	org.css
 
 # =============================================================================

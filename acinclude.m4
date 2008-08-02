@@ -351,7 +351,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
 		[with_STRBCM="$withval"],
-		[with_STRBCM='yes'])
+		[with_STRBCM='no'])
     AC_CACHE_CHECK([for sub-package strbcm],[os7_cv_strbcm_dir],[dnl
 	    os7_cv_strbcm_dir=''
 	    for dir in $srcdir/strbcm $srcdir/strbcm-* ; do
