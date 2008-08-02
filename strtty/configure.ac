@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-07-01 13:02:22 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-08-02 23:25:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-01 13:02:22 $ by $Author: brian $
+# Last Modified $Date: 2008-08-02 23:25:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strtty],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.13 $) $Date: 2008-07-01 13:02:22 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.14 $) $Date: 2008-08-02 23:25:10 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -79,6 +79,10 @@ dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
 fi
+dnl
+dnl force default from older autoconf/automake when not specified by caller
+dnl
+enable_dependency_tracking="${enable_dependency_tracking:-no}"
 
 AC_USE_SYSTEM_EXTENSIONS
 
@@ -192,6 +196,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.14  2008-08-02 23:25:10  brian
+# - restore dependency defaults from old autoconf/automake
+#
 # Revision 0.9.2.13  2008-07-01 13:02:22  brian
 # - gettext updates and references updates
 #
