@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-07-23 08:29:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-08-02 07:26:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-23 08:29:09 $ by $Author: brian $
+# Last Modified $Date: 2008-08-02 07:26:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -789,6 +789,7 @@ dnl 	fi
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
+    _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
 dnl
 dnl These are SCTP-only checks
 dnl
@@ -1249,6 +1250,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.77  2008-08-02 07:26:44  brian
+# - recent Fedora kernel does not export secure_tcp_sequence_number
+#
 # Revision 0.9.2.76  2008-07-23 08:29:09  brian
 # - updated references and support for 2.6.18-92.1.6.el5 kernel
 #
