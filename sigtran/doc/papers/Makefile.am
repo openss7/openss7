@@ -77,6 +77,7 @@ include ../../am/papers.am
 
 EXTRA_DIST += \
 	sigtranimp.tex \
+	sigtranimp.bib \
 	sigtranimp.css \
 	sockets.fig \
 	xtios.fig \

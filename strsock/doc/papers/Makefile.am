@@ -85,6 +85,7 @@ EXTRA_DIST += \
 	  streamsnet.fig \
 	  sockets.fig \
 	  sockimp.tex \
+	  sockimp.bib \
 	  sockimp.css \
 	  org.css
 

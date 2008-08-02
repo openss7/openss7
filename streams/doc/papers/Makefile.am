@@ -190,6 +190,7 @@ EXTRA_DIST += \
 	streamspipe.fig \
 	socketpipe.fig \
 	piperesults.tex \
+	piperesults.bib \
 	piperesults.css \
 	org.css
 
