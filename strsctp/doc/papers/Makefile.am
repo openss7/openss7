@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 23:13:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-08-02 07:27:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,13 +45,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 23:13:22 $ by $Author: brian $
+# Last Modified $Date: 2008-08-02 07:27:21 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
-
-include ../../am/papers.am
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -123,9 +121,58 @@ CSSS = \
 ## DEVELOPMENT
 endif
 
+include ../../am/papers.am
+
+EXTRA_DIST += \
+	netperf_centos_comp.plot \
+	netperf_centos_delay.plot \
+	netperf_centos_perf.plot \
+	netperf_centos_thrput.plot \
+	netperf_fc6_comp.plot \
+	netperf_fc6_delay.plot \
+	netperf_fc6_perf.plot \
+	netperf_fc6_thrput.plot \
+	netperf_nb_comp.plot \
+	netperf_nb_delay.plot \
+	netperf_nb_perf.plot \
+	netperf_nb_thrput.plot \
+	netperf_rh7_comp.plot \
+	netperf_rh7_delay.plot \
+	netperf_rh7_perf.plot \
+	netperf_rh7_thrput.plot \
+	netperf_smp_comp.plot \
+	netperf_smp_delay.plot \
+	netperf_smp_perf.plot \
+	netperf_smp_thrput.plot \
+	netperf_suse_comp.plot \
+	netperf_suse_delay.plot \
+	netperf_suse_perf.plot \
+	netperf_suse_thrput.plot \
+	netperf_u704_comp.plot \
+	netperf_u704_delay.plot \
+	netperf_u704_perf.plot \
+	netperf_u704_thrput.plot \
+	netperf_centos.dat \
+	netperf_fc6.dat \
+	netperf_nb.dat \
+	netperf_rh7.dat \
+	netperf_smp.dat \
+	netperf_cos5.dat \
+	netperf_suse.dat \
+	netperf_u704.dat \
+	netperf_ubuntu.dat \
+	sockets.fig \
+	xtios.fig \
+	sctp.fig \
+	sctpresults.tex \
+	org.css
+
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2008-08-02 07:27:21  brian
+# - autoconf 2.62 does not like variables in EXTRA_DIST
+#
 # Revision 0.9.2.8  2008-04-28 23:13:22  brian
 # - updated headers for release
 #
