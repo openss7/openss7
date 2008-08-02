@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 01:52:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-08-02 07:24:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,13 +45,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 01:52:17 $ by $Author: brian $
+# Last Modified $Date: 2008-08-02 07:24:41 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
-
-include ../../am/papers.am
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -80,9 +78,21 @@ CSSS = \
 ## DEVELOPMENT
 endif
 
+include ../../am/papers.am
+
+EXTRA_DIST += \
+	sigtranimp.tex \
+	sockets.fig \
+	xtios.fig \
+	sctp.fig \
+	org.css
+
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2008-08-02 07:24:41  brian
+# - autoconf 2.62 does not like variables in EXTRA_DIST
+#
 # Revision 0.9.2.7  2008-04-29 01:52:17  brian
 # - updated headers for release
 #
