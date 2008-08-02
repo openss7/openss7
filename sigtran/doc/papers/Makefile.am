@@ -65,15 +65,10 @@ FIG_FIGS = \
 	xtios.fig \
 	sctp.fig
 
-NAME = sigtranimp
-
 PLOT_DATS =
 
 LATEXS = \
-     $(NAME).tex
-
-CSSS = \
-     org.css
+     sigtranimp.tex
 
 ## DEVELOPMENT
 endif
@@ -82,6 +77,7 @@ include ../../am/papers.am
 
 EXTRA_DIST += \
 	sigtranimp.tex \
+	sigtranimp.css \
 	sockets.fig \
 	xtios.fig \
 	sctp.fig \

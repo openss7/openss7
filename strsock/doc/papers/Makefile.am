@@ -71,10 +71,7 @@ PLOT_DATS =
 
 
 LATEXS = \
-     $(NAME).tex
-
-CSSS = \
-     org.css
+     sockimp.tex
 
 ## DEVELOPMENT
 endif
@@ -88,6 +85,7 @@ EXTRA_DIST += \
 	  streamsnet.fig \
 	  sockets.fig \
 	  sockimp.tex \
+	  sockimp.css \
 	  org.css
 
 # =============================================================================

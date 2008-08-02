@@ -1,4 +1,4 @@
-OpenSS7 IPERF Utility -- read me first file.  2008-05-04
+OpenSS7 IPERF Utility -- read me first file.  2008-08-02
 $Id: README,v 1.1.1.2.2.29 2008-05-04 16:16:30 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 IPERF Utility
 ======================
 
-Package iperf-2.0.8 was released under AGPLv3 2008-05-04.
+Package iperf-2.0.8 was released under AGPLv3 2008-08-02.
 
 `Iperf' is a general purpose tool for measuring bandwidth and
 performance of the `Internet Protocol' suite.  The `OpenSS7 Modified
@@ -56,7 +56,7 @@ but should build and install for other architectures as well.
  Release
 --------
 
-This is the `iperf-2.0.8' package, released 2008-05-04.  This `2.0.8'
+This is the `iperf-2.0.8' package, released 2008-08-02.  This `2.0.8'
 release, and the latest version, can be obtained from the download area
 (http://www.openss7.org/download.html) of The OpenSS7 Project website
 using a command such as:
@@ -76,10 +76,10 @@ more detailed history of implementation changes.  The `TODO' file lists
 features not yet implemented and other outstanding items.
 
 Please see the `INSTALL', `INSTALL-iperf' and `README-make', files (or
-see `Installation', in the manual) for installation instructions.
+see `Installation',in the manual) for installation instructions.
 
 When working from `cvs(1)' or `git(1)', please see the `README-cvs',
-file (or see `Downloading from CVS', in the manual).  An abbreviated
+file (or see `Downloading from CVS',in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 3 of
@@ -105,7 +105,7 @@ Prerequisites for the OpenSS7 IPERF Utility package are as follows:
      compiling out-of-tree kernel modules.  Most recent `Linux'
      distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
-     `Compatibility', in the manual.
+     `Compatibility',in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
@@ -189,9 +189,9 @@ proceed as follows:
 See `README-make' for additional specialized make targets.
 
 For custom applications, see the `INSTALL' and `INSTALL-iperf' files or
-the see `Installation', in the manual, as listed below.  If you
-encounter troubles, see `Troubleshooting', in the manual, before
-issuing a bug report.
+the see `Installation',in the manual, as listed below.  If you
+encounter troubles, see `Troubleshooting',in the manual, before issuing
+a bug report.
 
  Brief Installation Instructions
 --------------------------------
@@ -274,7 +274,7 @@ Then the build directory and tarball can be simply removed:
 -----------------------------------
 
 More detailed installation instructions can be found in the
-`Installation', in the manual, contained in the distribution in `text',
+`Installation',in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
      $> cd ../iperf-2.0.8
@@ -293,14 +293,14 @@ Project' website at:
 
 ---------- Footnotes ----------
 
-(1) See `GNU/Linux Distributions', in the manual, for more information.
+(1) See `GNU/Linux Distributions',in the manual, for more information.
 
 (2) If you are using a Debian release, please make sure to install the
 groff extension package (`groff_ext'), as it contains the `refer' or
 `grefer' commands necessary for including references in the manual
 pages.
 
-(3) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
+(3) Please see `Problem Reports',in the manual, or the file `PROBLEMS'
 in the release directory for more information on filing a proper
 "Problem Report".
 
