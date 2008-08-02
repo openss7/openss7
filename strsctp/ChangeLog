@@ -1,3 +1,9 @@
+2008-08-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile.am: no variables in EXTRA_DIST
+	* acinclude.m4: secure_tcp_sequence_number not exported
+	* src/drivers/sctp_hooks.h.in: secure_tcp_sequence_number not exported
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release
