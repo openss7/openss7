@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008/08/03 07:59:21 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-08-03 08:03:59 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/08/03 07:59:21 $ by $Author: brian $
+## Last Modified $Date: 2008-08-03 08:03:59 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -222,6 +222,9 @@ distclean-archives:
 DISTCLEAN_LOCAL		+= distclean-archives
 
 DISTCLEANFILES		+= $(DIST_ARCHIVES)
+if WITH_LZMA
+DISTCLEANFILES		+= $(distdir).tar.lzma
+endif
 
 #! release-clean-archives:
 #!     This target will clean the release archives and signature files from the
@@ -234,6 +237,9 @@ RELEASE_CLEAN_LOCAL	+= release-clean-archives
 RELEASECLEANFILES	+= $(DIST_ARCHIVES) \
 			   $(archive_files) \
 			   $(archive_signs)
+if WITH_LZMA
+RELEASECLEANFILES	+= $(distdir).tar.lzma
+endif
 
 ALL_RECURSIVE_TARGETS	+= all-dist all-release-archives all-release-sign-archives
 
@@ -246,6 +252,9 @@ EXTRA_DIST		+= .pkgrelease \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.33  2008-08-03 08:03:59  brian
+## - how to clean lzma archives
+##
 ## Revision 0.9.2.32  2008/08/03 07:59:21  brian
 ## - how to make lzma archives
 ##
