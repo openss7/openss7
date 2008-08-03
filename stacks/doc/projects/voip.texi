@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: voip.texi,v 0.9.2.18 2008-04-29 07:10:36 brian Exp $
+% @(#) $Id: voip.texi,v 0.9.2.19 2008-08-03 06:03:29 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-04-29 07:10:36 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 06:03:29 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: voip.texi,v $
+% Revision 0.9.2.19  2008-08-03 06:03:29  brian
+% - protected agains texinfo commands in log entries
+%
 % Revision 0.9.2.18  2008-04-29 07:10:36  brian
 % - updating headers for release
 %
@@ -429,8 +432,11 @@ Project} website for a current version.
 @subsubsection Version Control
 
 @smallexample
-
+@verbatim
 $Log: voip.texi,v $
+Revision 0.9.2.19  2008-08-03 06:03:29  brian
+- protected agains texinfo commands in log entries
+
 Revision 0.9.2.18  2008-04-29 07:10:36  brian
 - updating headers for release
 
@@ -485,7 +491,7 @@ Revision 0.9.2.2  2005/01/24 11:57:53  brian
 Revision 0.9.2.1  2004/11/05 00:41:06  brian
 - Added HLR and VoIP HLDs and Applications Notes.
 
-
+@end verbatim
 @end smallexample
 @end ignore
 
