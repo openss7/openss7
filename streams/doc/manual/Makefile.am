@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-04-10 23:24:13 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-08-03 02:43:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 23:24:13 $ by $Author: brian $
+# Last Modified $Date: 2008-08-03 02:43:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,13 +73,27 @@ STREAMS_TEXINFOS	= \
 			  modules.texi \
 			  utilities.texi \
 			  bugs.texi \
-			  texi/fdl.texi \
 			  texi/agpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
+			  texi/fdl.texi \
 			  texi/gpl3.texi \
-			  texi/quick.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
 			  texi/install.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
 			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
 			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
@@ -97,24 +111,78 @@ STREAMS_FAQ_TEXINFOS	= \
 
 SPG2_TEXINFOS		= \
 			  texi/agpl3.texi \
-			  texi/gpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
 			  texi/fdl.texi \
+			  texi/gpl3.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
+			  texi/install.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
+			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 SPG_TEXINFOS		= \
 			  texi/agpl3.texi \
-			  texi/gpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
 			  texi/fdl.texi \
+			  texi/gpl3.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
+			  texi/install.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
+			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 porting_TEXINFOS	= \
 			  texi/agpl3.texi \
-			  texi/gpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
 			  texi/fdl.texi \
+			  texi/gpl3.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
+			  texi/install.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
+			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
@@ -216,6 +284,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.58  2008-08-03 02:43:58  brian
+# - passing distcheck on wilbur
+#
 # Revision 0.9.2.57  2008-04-10 23:24:13  brian
 # - distribute agpl3.texi
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-07-23 08:29:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-08-03 02:44:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-23 08:29:16 $ by $Author: brian $
+# Last Modified $Date: 2008-08-03 02:44:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,6 +59,8 @@ if DEVELOPMENT
 info_TEXINFOS		+= nli.texi
 
 nli_TEXINFOS		= \
+			  x25_control.h \
+			  x25_proto.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
@@ -96,6 +98,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2008-08-03 02:44:04  brian
+# - passing distcheck on wilbur
+#
 # Revision 0.9.2.5  2008-07-23 08:29:16  brian
 # - updated references and support for 2.6.18-92.1.6.el5 kernel
 #

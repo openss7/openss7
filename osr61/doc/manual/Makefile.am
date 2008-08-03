@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-10 23:24:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-08-03 02:43:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-10 23:24:09 $ by $Author: brian $
+# Last Modified $Date: 2008-08-03 02:43:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,15 +68,26 @@ osr61_TEXINFOS		= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/fdl.texi \
-			  texi/gpl.texi \
 			  texi/agpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
+			  texi/fdl.texi \
 			  texi/gpl3.texi \
-			  texi/quick.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
 			  texi/install.texi \
-			  texi/testsuite.texi \
+			  texi/isode.texi \
 			  texi/lesser.texi \
 			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
 			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -102,6 +113,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2008-08-03 02:43:53  brian
+# - passing distcheck on wilbur
+#
 # Revision 0.9.2.7  2008-04-10 23:24:09  brian
 # - distribute agpl3.texi
 #
