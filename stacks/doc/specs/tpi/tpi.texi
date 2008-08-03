@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: tpi.texi,v 0.9.2.18 2008-07-11 09:40:27 brian Exp $
+% @(#) $Id: tpi.texi,v 0.9.2.19 2008-08-03 05:05:18 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-07-11 09:40:27 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 05:05:18 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -356,8 +356,9 @@ obligation to provide any feature listed herein.
 @c Define an index of manual pages.
 @defcodeindex mp
 
-@ifnottex
-@c concatenate indices for text, html and info
+@c frags out automake
+@c @ifnottex
+@c @c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
 @syncodeindex pe cp
@@ -366,7 +367,7 @@ obligation to provide any feature listed herein.
 @syncodeindex tp cp
 @syncodeindex vr cp
 @syncodeindex ct cp
-@end ifnottex
+@c @end ifnottex
 
 @include texi/macros.texi
 @include texi/versions.texi
@@ -2398,75 +2399,75 @@ stream read queue.} write and read queues.
 
 @ifnotplaintext
 @c skip indexes for plain text (regex search works better)
-@iftex
-@node Indices
-@unnumbered Indices
-@end iftex
+@c @iftex
+@c @node Index
+@c @unnumbered Index
+@c @end iftex
 
-@ifnottex
-@c concatenate indices for html and info
+@c @ifnottex
+@c @c concatenate indices for html and info
 @node Index
 @unnumbered Index
 @printindex cp
-@end ifnottex
+@c @end ifnottex
 
-@iftex
-@menu
-* Concept Index::
-* Protocol State Index::
-* Primitive Index::
-* Primitive Structure and Type Index::
-* Primitive Structure Field Index::
-* Primitive Values Index::
-* Primitive Error Values Index::
-* Input-Output Control Index::
-* Manual Page Index::
-@end menu
-
-@node Concept Index
-@section Concept Index
-@printindex cp
-
-@page
-@node Protocol State Index
-@section Protocol State Index
-@printindex st
-
-@page
-@node Primitive Index
-@section Primitive Index
-@printindex pr
-
-@page
-@node Primitive Structure and Type Index
-@section Primitive Structure and Type Index
-@printindex tp
-
-@page
-@node Primitive Structure Field Index
-@section Primitive Structure Field Index
-@printindex vr
-
-@page
-@node Primitive Values Index
-@section Primitive Values Index
-@printindex pv
-
-@page
-@node Primitive Error Values Index
-@section Primitive Error Values Index
-@printindex pe
-
-@page
-@node Input-Output Control Index
-@section Input-Output Control Index
-@printindex ct
-
-@page
-@node Manual Page Index
-@section Manual Page Index
-@printindex mp
-@end iftex
+@c @iftex
+@c @menu
+@c * Concept Index::
+@c * Protocol State Index::
+@c * Primitive Index::
+@c * Primitive Structure and Type Index::
+@c * Primitive Structure Field Index::
+@c * Primitive Values Index::
+@c * Primitive Error Values Index::
+@c * Input-Output Control Index::
+@c * Manual Page Index::
+@c @end menu
+@c 
+@c @node Concept Index
+@c @section Concept Index
+@c @printindex cp
+@c 
+@c @page
+@c @node Protocol State Index
+@c @section Protocol State Index
+@c @printindex st
+@c 
+@c @page
+@c @node Primitive Index
+@c @section Primitive Index
+@c @printindex pr
+@c 
+@c @page
+@c @node Primitive Structure and Type Index
+@c @section Primitive Structure and Type Index
+@c @printindex tp
+@c 
+@c @page
+@c @node Primitive Structure Field Index
+@c @section Primitive Structure Field Index
+@c @printindex vr
+@c 
+@c @page
+@c @node Primitive Values Index
+@c @section Primitive Values Index
+@c @printindex pv
+@c 
+@c @page
+@c @node Primitive Error Values Index
+@c @section Primitive Error Values Index
+@c @printindex pe
+@c 
+@c @page
+@c @node Input-Output Control Index
+@c @section Input-Output Control Index
+@c @printindex ct
+@c 
+@c @page
+@c @node Manual Page Index
+@c @section Manual Page Index
+@c @printindex mp
+@c @end iftex
 @end ifnotplaintext
 
 @page
