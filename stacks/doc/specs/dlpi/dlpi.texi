@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: dlpi.texi,v 0.9.2.19 2008-08-03 05:05:14 brian Exp $
+% @(#) $Id: dlpi.texi,v 0.9.2.20 2008-08-03 05:05:21 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-08-03 05:05:14 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 05:05:21 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -359,7 +359,7 @@ obligation to provide any feature listed herein.
 
 @c frags out automake
 @c @ifnottex
-@c concatenate indices for text, html and info
+@c @c concatenate indices for text, html and info
 @syncodeindex pr cp
 @syncodeindex pv cp
 @syncodeindex pe cp

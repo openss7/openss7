@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.12 $) $Date: 2008-08-02 23:15:20 $
+# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.14 $) $Date: 2008-08-03 02:41:22 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-02 23:15:20 $ by $Author: brian $
+## Last Modified $Date: 2008-08-03 02:41:22 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -90,10 +90,24 @@ CSSS	= $(LATEXS:%.tex=%.css)
 		-norooted -antialias_text -antialias -white -image_type png \
 		-scalable_fonts `echo $< | sed -e 's,.*/,,'`
 
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+##
+# Only build docs in maintainer mode, don't build what we don't distribute.
+##
 dvi-local: tex-am bibs-am dats-am plots-am $(DVIS)
 ps-local: tex-am bibs-am dats-am plots-am $(PSS)
 pdf-local: tex-am bibs-am dats-am plots-am $(PDFS)
 html-local: tex-am bibs-am dats-am plots-am $(CSSS) $(HTMLS)
+## MAINTAINER_MODE
+else
+## !MAINTAINER_MODE
+dvi-local:
+ps-local:
+pdf-local:
+html-local:
+## !MAINTAINER_MODE
+endif
 
 if DEVELOPMENT
 ## DEVELOPMENT
@@ -280,8 +294,6 @@ MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps
 
 .SECONDARY: $(IMG_EPSS) $(IMG_PNGS)
 
-if MAINTAINER_MODE
-## MAINTAINER_MODE
 if AMDEP
 ## AMDEP
 $(DVIS)		: %.dvi  : %.tex $(IMG_EPSS)
@@ -296,8 +308,6 @@ else
 #$(PDFS)	: %.pdf  : %.tex $(IMG_PDFS)
 #$(HTMLS)	: %.html : %.tex $(IMG_PNGS)
 ## !AMDEP
-endif
-## MAINTAINER_MODE
 endif
 
 EXTRA_DIST	+= $(LATEXS) $(BIBTEXS) $(PLOT_PLOTS) $(PLOT_DATS) $(FIG_FIGS) $(PNG_PNGS) $(PS_PSS)
@@ -642,6 +652,12 @@ endif
 ## =============================================================================
 ##
 ## $Log: papers.am,v $
+## Revision 0.9.2.14  2008-08-03 02:41:22  brian
+## - latest info.am and papers.am
+##
+## Revision 0.9.2.13  2008-08-03 00:54:19  brian
+## - need deps in non-maintainer mode
+##
 ## Revision 0.9.2.12  2008-08-02 23:15:20  brian
 ## - dependency tracking now on by default
 ##
