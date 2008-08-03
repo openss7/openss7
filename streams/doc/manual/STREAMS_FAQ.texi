@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo noautoindent nocindent nosmartindent
 % =========================================================================
 %
-% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.14 2008/07/27 08:49:17 brian Exp $
+% @(#) $Id: STREAMS_FAQ.texi,v 0.9.2.15 2008-08-03 06:03:37 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008/07/27 08:49:17 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 06:03:37 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -347,8 +347,11 @@ package.
 @subsubsection Version Control
 
 @smallexample
-
+@verbatim
 $Log: STREAMS_FAQ.texi,v $
+Revision 0.9.2.15  2008-08-03 06:03:37  brian
+- protected agains texinfo commands in log entries
+
 Revision 0.9.2.14  2008/07/27 08:49:17  brian
 - no invariant sections, more libtool ignores
 
@@ -423,7 +426,7 @@ Revision 0.9.2.34  2005/09/16 03:06:02  brian
 
 Revision 0.9.2.33  2005/09/15 13:02:52  brian
 - added new graphics and updates
-
+@end verbatim
 @end smallexample
 
 @subsubsection ISO 9000 Compliance

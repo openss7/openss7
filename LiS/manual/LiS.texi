@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.28 2008/07/27 08:48:39 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.29 2008-08-03 06:03:26 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008/07/27 08:48:39 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 06:03:26 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -402,8 +402,11 @@ package.
 @unnumberedsubsec Version Control
 
 @smallexample
-
+@verbatim
 $Log: LiS.texi,v $
+Revision 1.1.6.29  2008-08-03 06:03:26  brian
+- protected agains texinfo commands in log entries
+
 Revision 1.1.6.28  2008/07/27 08:48:39  brian
 - no invariant sections, more libtool ignores
 
@@ -555,7 +558,7 @@ Revision 1.1.2.1  2003-12-15 16:38:03 -0700  brian
 
 Revision 1.1  2003-12-15 16:38:03 -0700  brian
 file LiS.texi was initially added on branch LIS-2-16-16-autoconf.
-
+@end verbatim
 @end smallexample
 
 @unnumberedsubsec ISO 9000 Compliance

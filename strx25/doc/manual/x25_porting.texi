@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: x25_porting.texi,v 0.9.2.1 2008-06-13 06:43:55 brian Exp $
+% @(#) $Id: x25_porting.texi,v 0.9.2.2 2008-08-03 06:03:41 brian Exp $
 %
 % =========================================================================
 %
@@ -53,11 +53,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-06-13 06:43:55 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 06:03:41 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: x25_porting.texi,v $
+% Revision 0.9.2.2  2008-08-03 06:03:41  brian
+% - protected agains texinfo commands in log entries
+%
 % Revision 0.9.2.1  2008-06-13 06:43:55  brian
 % - added files
 %
@@ -423,10 +426,14 @@ A current version of this manual is normally distributed with the
 @unnumberedsubsec Version Control
 
 @smallexample
+@verbatim
 $Log: x25_porting.texi,v $
+Revision 0.9.2.2  2008-08-03 06:03:41  brian
+- protected agains texinfo commands in log entries
+
 Revision 0.9.2.1  2008-06-13 06:43:55  brian
 - added files
-
+@end verbatim
 @end smallexample
 
 @unnumberedsubsec ISO 9000 Compliance

@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: mtpi.texi,v 0.9.2.6 2008-08-03 05:05:15 brian Exp $
+% @(#) $Id: mtpi.texi,v 0.9.2.7 2008-08-03 06:03:31 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008-08-03 05:05:15 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 06:03:31 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -443,8 +443,11 @@ Only the texinfo or roff source is controlled.  A printed (or postscript) versio
 is an @strong{UNCONTROLLED VERSION}.
 
 @smallexample
-
+@verbatim
 $Log: mtpi.texi,v $
+Revision 0.9.2.7  2008-08-03 06:03:31  brian
+- protected agains texinfo commands in log entries
+
 Revision 0.9.2.6  2008-08-03 05:05:15  brian
 - conditional @syncodeindex frags out automake, fails distcheck
 
@@ -462,7 +465,7 @@ Revision 0.9.2.2  2007/08/14 12:17:00  brian
 
 Revision 0.9.2.1  2007/06/27 08:42:19  brian
 - added MTPI spec document
-
+@end verbatim
 @end smallexample
 
 @node Introduction

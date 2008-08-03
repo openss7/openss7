@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: sigtran.texi,v 0.9.2.8 2008/07/27 08:48:55 brian Exp $
+% @(#) $Id: sigtran.texi,v 0.9.2.9 2008-08-03 06:03:28 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2008/07/27 08:48:55 $ by $Author: brian $
+% Last Modified $Date: 2008-08-03 06:03:28 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -400,8 +400,11 @@ package.
 @unnumberedsubsec Version Control
 
 @smallexample
-
+@verbatim
 $Log: sigtran.texi,v $
+Revision 0.9.2.9  2008-08-03 06:03:28  brian
+- protected agains texinfo commands in log entries
+
 Revision 0.9.2.8  2008/07/27 08:48:55  brian
 - no invariant sections, more libtool ignores
 
@@ -426,7 +429,7 @@ Revision 0.9.2.2  2006/12/31 13:37:38  brian
 Revision 0.9.2.1  2006/10/16 10:42:45  brian
 - added new package files
 
-
+@end verbatim
 @end smallexample
 
 @unnumberedsubsec ISO 9000 Compliance
