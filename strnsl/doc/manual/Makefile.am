@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-28 22:11:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-08-03 02:44:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 22:11:46 $ by $Author: brian $
+# Last Modified $Date: 2008-08-03 02:44:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,14 +68,27 @@ strnsl_TEXINFOS		= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/fdl.texi \
 			  texi/agpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
+			  texi/fdl.texi \
 			  texi/gpl3.texi \
-			  texi/sunrpc.texi \
-			  texi/quick.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
 			  texi/install.texi \
-			  texi/testsuite.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
 			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
@@ -83,9 +96,27 @@ strnsl_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 libxnsl_TEXINFOS	= \
-			  texi/fdl.texi \
 			  texi/agpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
+			  texi/fdl.texi \
 			  texi/gpl3.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
+			  texi/install.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
+			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
@@ -111,6 +142,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.10  2008-08-03 02:44:00  brian
+# - passing distcheck on wilbur
+#
 # Revision 0.9.2.9  2008-04-28 22:11:46  brian
 # - updated headers for release
 #

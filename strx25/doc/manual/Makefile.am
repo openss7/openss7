@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-06-18 16:45:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-08-03 02:44:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-06-18 16:45:24 $ by $Author: brian $
+# Last Modified $Date: 2008-08-03 02:44:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,13 +69,27 @@ strx25_TEXINFOS		= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/fdl.texi \
 			  texi/agpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
+			  texi/fdl.texi \
 			  texi/gpl3.texi \
-			  texi/quick.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
 			  texi/install.texi \
-			  texi/testsuite.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
 			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
@@ -94,15 +108,27 @@ x25_porting_TEXINFOS	= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
+			  texi/agpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
+			  texi/fdl.texi \
+			  texi/gpl3.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
+			  texi/install.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
+			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
 			  texi/uidlpi.texi \
 			  texi/uinpi.texi \
-			  texi/fdl.texi \
-			  texi/agpl3.texi \
-			  texi/gpl3.texi \
-			  texi/quick.texi \
-			  texi/install.texi \
-			  texi/testsuite.texi \
-			  texi/lgpl3.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
+			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
@@ -127,6 +153,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.4  2008-08-03 02:44:03  brian
+# - passing distcheck on wilbur
+#
 # Revision 0.9.2.3  2008-06-18 16:45:24  brian
 # - widespread updates
 #

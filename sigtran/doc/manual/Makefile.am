@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-08-03 02:43:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 01:52:17 $ by $Author: brian $
+# Last Modified $Date: 2008-08-03 02:43:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -68,13 +68,26 @@ sigtran_TEXINFOS	= \
 			  todo.texi \
 			  tree.texi \
 			  bugs.texi \
-			  texi/fdl.texi \
 			  texi/agpl3.texi \
+			  texi/bsd.texi \
+			  texi/decmit.texi \
+			  texi/fdl12.texi \
+			  texi/fdl.texi \
 			  texi/gpl3.texi \
-			  texi/quick.texi \
+			  texi/gpl.texi \
+			  texi/hp.texi \
 			  texi/install.texi \
-			  texi/testsuite.texi \
+			  texi/isode.texi \
+			  texi/lesser.texi \
 			  texi/lgpl3.texi \
+			  texi/mit.texi \
+			  texi/quick.texi \
+			  texi/sunrpc.texi \
+			  texi/testsuite.texi \
+			  texi/uidlpi.texi \
+			  texi/uinpi.texi \
+			  texi/ui.texi \
+			  texi/uitpi.texi \
 			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -100,6 +113,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.9  2008-08-03 02:43:54  brian
+# - passing distcheck on wilbur
+#
 # Revision 0.9.2.8  2008-04-29 01:52:17  brian
 # - updated headers for release
 #
