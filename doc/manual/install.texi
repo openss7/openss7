@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.14 2008-04-11 16:58:13 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.15 2008-08-03 00:56:50 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-11 16:58:13 $ by $Author: brian $
+@c Last Modified $Date: 2008-08-03 00:56:50 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -275,12 +275,13 @@ the other releases.
 The build host requires the following GNU tools:
 
 @itemize
-@item @command{autoconf 2.61}
-@item @command{automake 1.10}
-@item @command{libtool 1.5.22}
-@item @command{gettext 0.16.1}
-@item @command{bison 2.3}
+@item @command{m4 1.4.11}
+@item @command{autoconf 2.62}
+@item @command{automake 1.10.1}
+@item @command{libtool 2.2.4}
+@item @command{gettext 0.17}
 @item @command{flex 2.5.33}
+@item @command{bison 2.3}
 @end itemize
 
 Most desktop development GNU/Linux distributions wil have these tools; however, some non-development
@@ -292,12 +293,13 @@ Also, these tools can be acquired from the @url{http://www.fsf.org/,FSF website}
 software directory, and also at the following locations:
 
 @itemize
-@item @url{http://www.openss7.org/tarballs/autoconf-2.61.tar.bz2,autoconf-2.61}
-@item @url{http://www.openss7.org/tarballs/automake-1.10.tar.bz2,automake-1.10}
-@item @url{http://www.openss7.org/tarballs/libtool-1.5.22.tar.gz,libtool-1.5.22}
-@item @url{http://www.openss7.org/tarballs/gettext-0.16.1.tar.gz,gettext-0.16.1}
-@item @url{http://www.openss7.org/tarballs/bison-2.3.tar.bz2,bison-2.3}
+@item @url{http://www.openss7.org/tarballs/m4-1.4.11.tar.bz2,m4-1.4.11}
+@item @url{http://www.openss7.org/tarballs/autoconf-2.62.tar.bz2,autoconf-2.62}
+@item @url{http://www.openss7.org/tarballs/automake-1.10.1.tar.bz2,automake-1.10.1}
+@item @url{http://www.openss7.org/tarballs/libtool-2.2.4.tar.gz,libtool-2.2.4}
+@item @url{http://www.openss7.org/tarballs/gettext-0.17.tar.gz,gettext-0.17}
 @item @url{http://www.openss7.org/tarballs/flex-2.5.33.tar.bz2,flex-2.5.33}
+@item @url{http://www.openss7.org/tarballs/bison-2.3.tar.bz2,bison-2.3}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
@@ -313,7 +315,7 @@ For building documentation, the build host also requires the following documenta
 @itemize
 @item @command{gs 8.15}
 @item @command{tetex 3.0}
-@item @command{texinfo 4.8}
+@item @command{texinfo 4.11}
 @item @command{transfig 3.2.5}
 @item @command{imagemagick 6.2.4}
 @item @command{groff 1.17.2}
