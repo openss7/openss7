@@ -1,4 +1,4 @@
-OpenSS7 STREAMS ISDN -- read me first file.  2008-08-02
+OpenSS7 STREAMS ISDN -- read me first file.  2008-08-03
 $Id: README,v 0.9.2.34 2008-08-02 16:42:27 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS ISDN
 =====================
 
-Package strisdn-0.9.2.4 was released under AGPLv3 2008-08-02.
+Package strisdn-0.9.2.4 was released under AGPLv3 2008-08-03.
 
 `OpenSS7 STREAMS ISDN' (strisdn) is an `OpenSS7 Project' implementation
 of a number of ISDN related components, including Q.920, Q.921, Q.931,
@@ -43,7 +43,7 @@ well.
  Release
 --------
 
-This is the `strisdn-0.9.2.4' package, released 2008-08-02.  This
+This is the `strisdn-0.9.2.4' package, released 2008-08-03.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
