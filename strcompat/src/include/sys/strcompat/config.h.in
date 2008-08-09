@@ -187,4 +187,7 @@
 /* Define if do_settimeofday takes struct timespec and returns int. */
 #undef HAVE_TIMESPEC_DO_SETTIMEOFDAY
 
+/* Define to 1 if the system has the type 'bool'. */
+#undef HAVE_KTYPE_BOOL
+
 #endif				/* __SYS_STRCOMPAT_CONFIG_H__ */
