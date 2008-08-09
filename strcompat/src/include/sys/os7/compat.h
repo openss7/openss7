@@ -72,11 +72,12 @@
 
 #define __OPTIMIZE__ 1
 
+#include "sys/strcompat/config.h"
+
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
 #endif
 
-#include "sys/strcompat/config.h"
 /*
  *  Unfortunately this is necessary for older non-rpm LIS releases.
  */
