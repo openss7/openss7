@@ -1093,7 +1093,7 @@ fi
 %{_libdir}/*.la
 %{_lib32dir}/*.so*
 %{_lib32dir}/*.la
-%{_localedir}/*
+#{_localedir}/*
 %endif
 
 %if %{FILES_libs}
@@ -1102,7 +1102,7 @@ fi
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
-%{_localedir}/*
+#{_localedir}/*
 %endif
 
 # ===========================================================================
@@ -1914,9 +1914,10 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
-# Revision 0.9.2.132  2008-07-06 14:58:17  brian
-# - improvements
-#
+
+* Sun Jul  6 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.132  2008-07-06 14:58:17  brian
+- improvements
 
 * Sun May  4 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.131  2008-05-04 16:17:00  brian
