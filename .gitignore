@@ -3413,6 +3413,7 @@ striso/scripts/missing
 striso/scripts/mkinstalldirs
 striso/scripts/texinfo.tex
 striso/scripts/ylwrap
+striso/src/gdmo/*
 striso/src/include/Makefile.in
 striso/src/Makefile.in
 striso/src/perl/EN300292.hh
