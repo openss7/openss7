@@ -97,97 +97,266 @@
  * #include "sys/strcompat/config.h".
  */
 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the AIX(R) 5L Version 5.1
+   release so that STREAMS drivers and modules written for AIX(R) 5L Version
+   5.1 will compile with Linux Fast STREAMS. When undefined, STREAMS drivers
+   and modules written for AIX(R) 5L Version 5.1 will require porting in more
+   respects. This symbol determines whether compatibility will be compiled and
+   linkable with Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_AIX
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the AIX(R) 5L Version 5.1
+   release so that STREAMS drivers and modules written for AIX(R) 5L Version
+   5.1 will compile with Linux Fast STREAMS. When undefined, STREAMS drivers
+   and modules written for AIX(R) 5L Version 5.1 will require porting in more
+   respects. This symbol determines whether compatibility will be compiled as
+   a loadable module to Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_AIX_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the HPUX(R) release so that
+   STREAMS drivers and modules written for HPUX(R) will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   HPUX(R) will require porting in more respects. This symbol determines
+   whether compatibility will be compiled and linkable with Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_HPUX
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the HPUX(R) release so that
+   STREAMS drivers and modules written for HPUX(R) will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   HPUX(R) will require porting in more respects. This symbol determines
+   whether compatibility will be compiled as a loadable module to Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_HPUX_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the IRIX(R) release so that
+   STREAMS drivers and modules written for IRIX(R) will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   IRIX(R) will require porting in more respects. This symbol determines
+   whether compatibility will be compiled and linkable with Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_IRIX
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the IRIX(R) release so that
+   STREAMS drivers and modules written for IRIX(R) will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   IRIX(R) will require porting in more respects. This symbol determines
+   whether compatibility will be compiled as a loadable module to Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_IRIX_MODULE
-
+ 
+/* When defined, Linux STREAMS will attempt to be as compatible as possible
+   (without replicating any bugs) with the LfS release so that STREAMS drivers
+   and modules written for LfS will compile with Linux STREAMS. When
+   undefined, STREAMS drivers and modules written for LfS will require porting
+   in more respects. This symbol determines whether compatibility will be
+   compiled and linkable with Linux STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_LFS
-
+ 
+/* When defined, Linux STREAMS will attempt to be as compatible as possible
+   (without replicating any bugs) with the LfS release so that STREAMS drivers
+   and modules written for LfS will compile with Linux STREAMS. When
+   undefined, STREAMS drivers and modules written for LfS will require porting
+   in more respects. This symbol determines whether compatibility will be
+   compiled as a loadable module to Linux STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_LFS_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the LiS release so that
+   STREAMS drivers and modules written for LiS will compile with Linux Fast
+   STREAMS. When undefined, STREAMS drivers and modules written for LiS will
+   require porting in more respects. This symbol determines whether
+   compatibility will be compiled and linkable with Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_LIS
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the LiS release so that
+   STREAMS drivers and modules written for LiS will compile with Linux Fast
+   STREAMS. When undefined, STREAMS drivers and modules written for LiS will
+   require porting in more respects. This symbol determines whether
+   compatibility will be compiled as a loadable module to Linux Fast-STREAMS.
+   */
 #undef CONFIG_STREAMS_COMPAT_LIS_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the MacOT(R) release so that
+   STREAMS drivers and modules written for MacOT(R) will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   MacOT(R) will require porting in more respects. This symbol determines
+   whether compatibility will be compiled and linkable with Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_MAC
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the MacOT(R) release so that
+   STREAMS drivers and modules written for MacOT(R) will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   MacOT(R) will require porting in more respects. This symbol determines
+   whether compatibility will be compiled as a loadable module to Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_MAC_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the Mentat Portable STREAMS
+   documentation so that STREAMS drivers and modules written for Mentat
+   Portable STREAMS will compile with Linux Fast STREAMS. When undefined,
+   STREAMS drivers and modules written for Mentat Portable STREAMS will
+   require porting in more respects. This symbol determines whether
+   compatibility will be compiled and linkable with Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_MPS
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the Mentat Portable STREAMS
+   documentation so that STREAMS drivers and modules written for Mentat
+   Portable STREAMS will compile with Linux Fast STREAMS. When undefined,
+   STREAMS drivers and modules written for Mentat Portable STREAMS will
+   require porting in more respects. This symbol determines whether
+   compatibility will be compiled as a loadable module to Linux Fast-STREAMS.
+   */
 #undef CONFIG_STREAMS_COMPAT_MPS_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the OpenSS7 docs so that
+   STREAMS drivers and modules written to OpenSS7 specs will compile with
+   Linux Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   OpenSS7 will require porting in more respects. This symbol determines
+   whether compatibility will be compiled and linkable with Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_OS7
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the OpenSS7 docs so that
+   STREAMS drivers and modules written to OpenSS7 specs will compile with
+   Linux Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   OpenSS7 will require porting in more respects. This symbol determines
+   whether compatibility will be compiled as a loadable module to Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_OS7_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the OSF(R)/1.2 release so that
+   STREAMS drivers and modules written for OSF(R)/1.2 will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   OSF(R)/1.2 will require porting in more respects. This symbol determines
+   whether compatibility will be compiled and linkable with Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_OSF
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the OSF(R)/1.2 release so that
+   STREAMS drivers and modules written for OSF(R)/1.2 will compile with Linux
+   Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   OSF(R)/1.2 will require porting in more respects. This symbol determines
+   whether compatibility will be compiled as a loadable module to Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_OSF_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the Solaris(R) 8 release so
+   that STREAMS drivers and modules written for Solaris(R) 8 will compile with
+   Linux Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   Solaris(R) 8 will require porting in more respects. This symbol determines
+   whether compatibility will be compiled and linkable with Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_SUN
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the Solaris(R) 8 release so
+   that STREAMS drivers and modules written for Solaris(R) 8 will compile with
+   Linux Fast STREAMS. When undefined, STREAMS drivers and modules written for
+   Solaris(R) 8 will require porting in more respects. This symbol determines
+   whether compatibility will be compiled as a loadable module to Linux
+   Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_SUN_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the UNIX(R) SVR 3.2 docs so
+   that STREAMS drivers and modules written to UNIX(R) SVR 3.2 specs will
+   compile with Linux Fast STREAMS. When undefined, STREAMS drivers and
+   modules written for UNIX(R) SVR 3.2 will require porting in more respects.
+   This symbol determines whether compatibility will be compiled and linkable
+   with Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_SVR3
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the UNIX(R) SVR 3.2 docs so
+   that STREAMS drivers and modules written to UNIX(R) SVR 3.2 specs will
+   compile with Linux Fast STREAMS. When undefined, STREAMS drivers and
+   modules written for UNIX(R) SVR 3.2 will require porting in more respects.
+   This symbol determines whether compatibility will be compiled as a loadable
+   module to Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_SVR3_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the UNIX(R) SVR 4.2 MP docs so
+   that STREAMS drivers and modules written to UNIX(R) SVR 4.2 MP specs will
+   compile with Linux Fast STREAMS. When undefined, STREAMS drivers and
+   modules written for UNIX(R) SVR 4.2 MP will require porting in more
+   respects. This symbol determines whether compatibility will be compiled and
+   linkable with Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_SVR4
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the UNIX(R) SVR 4.2 MP docs so
+   that STREAMS drivers and modules written to UNIX(R) SVR 4.2 MP specs will
+   compile with Linux Fast STREAMS. When undefined, STREAMS drivers and
+   modules written for UNIX(R) SVR 4.2 MP will require porting in more
+   respects. This symbol determines whether compatibility will be compiled as
+   a loadable module to Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_SVR4_MODULE
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the UnixWare(R) 7 release so
+   that STREAMS drivers and modules written for UnixWare(R) 7 will compile
+   with Linux Fast STREAMS. When undefined, STREAMS drivers and modules
+   written for UnixWare(R) 7 will require porting in more respects. This
+   symbol determines whether compatibility will be compiled and linkable with
+   Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_UW7
-
+ 
+/* When defined, Linux Fast STREAMS will attempt to be as compatible as
+   possible (without replicating any bugs) with the UnixWare(R) 7 release so
+   that STREAMS drivers and modules written for UnixWare(R) 7 will compile
+   with Linux Fast STREAMS. When undefined, STREAMS drivers and modules
+   written for UnixWare(R) 7 will require porting in more respects. This
+   symbol determines whether compatibility will be compiled as a loadable
+   module to Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_UW7_MODULE
-
-/* If the addresses for the necessary symbols above are defined, then define
-   this to include fattach/fdetach support. */
-#undef HAVE_KERNEL_FATTACH_SUPPORT
-
-/* If the addresses for the necessary symbols above are defined, then define
-   this to include pipe support. */
-#undef HAVE_KERNEL_PIPE_SUPPORT
-
+ 
 /* Define to 1 if kernel function pci_dac_dma_sync_single() exists. */
 #undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
-
+ 
 /* Define to 1 if kernel function to_kdev_t() exists. */
 #undef HAVE_KFUNC_TO_KDEV_T
-
+ 
 /* Define to 1 if you have the <linux/hardirq.h> header file. */
 #undef HAVE_KINC_LINUX_HARDIRQ_H
-
+ 
 /* Define to 1 if you have the <linux/security.h> header file. */
 #undef HAVE_KINC_LINUX_SECURITY_H
-
+ 
 /* Define to 1 if you have the <linux/utsrelease.h> header file. */
 #undef HAVE_KINC_LINUX_UTSRELEASE_H
-
-/* Define to 1 if the system has the type 'paddr_t'. */
-#undef HAVE_KTYPE_PADDR_T
-
+ 
+/* Define to 1 if kernel macro MOD_DEC_USE_COUNT() exists. */
+#undef HAVE_KTYPE_BOOL
+ 
 /* Define to 1 if the system has the type 'irqreturn_t'. */
 #undef HAVE_KTYPE_IRQRETURN_T
-
+ 
 /* Define to 1 if the system has the type 'irq_handler_t'. */
 #undef HAVE_KTYPE_IRQ_HANDLER_T
-
-/* Define to 1 if 'irq_handler_t' takes 2 arguments. */
-#undef HAVE_KTYPE_IRQ_HANDLER_2ARGS
-
+ 
+/* Define to 1 if the system has the type 'paddr_t'. */
+#undef HAVE_KTYPE_PADDR_T
+ 
 /* Define if do_settimeofday takes struct timespec and returns int. */
 #undef HAVE_TIMESPEC_DO_SETTIMEOFDAY
-
-/* Define to 1 if the system has the type 'bool'. */
-#undef HAVE_KTYPE_BOOL
 
 #endif				/* __SYS_STRCOMPAT_CONFIG_H__ */

@@ -102,7 +102,7 @@
  * @{ */
 
 #ifndef __SYS_STROPTS_H__
-//#warning "Do no include sys/streams/stropts.h directly, include sys/stropts.h instead."
+#warning "Do not include sys/streams/stropts.h directly, include sys/stropts.h instead."
 #endif
 
 #ifndef HAVE_LINUX_FAST_STREAMS

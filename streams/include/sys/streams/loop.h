@@ -70,7 +70,7 @@
 /* This file can be processed with doxygen(1). */
 
 #ifndef __SYS_LOOP_H__
-#warning "Do no include sys/streams/loop.h directly, include sys/loop.h instead."
+#warning "Do not include sys/streams/loop.h directly, include sys/loop.h instead."
 #endif
 
 #ifndef __KERNEL__

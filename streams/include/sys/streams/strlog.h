@@ -85,7 +85,7 @@
 /* This file can be processed with doxygen(1). */
 
 #ifndef __SYS_STRLOG_H__
-#warning "Do no include sys/streams/strlog.h directly, include sys/strlog.h instead."
+#warning "Do not include sys/streams/strlog.h directly, include sys/strlog.h instead."
 #endif
 
 #include <stdarg.h>

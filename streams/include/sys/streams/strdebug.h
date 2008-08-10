@@ -68,7 +68,7 @@
 #ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.46 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRDEBUG_H__
-#warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
+#warning "Do not include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
 #endif
 
 #ifndef __KERNEL__

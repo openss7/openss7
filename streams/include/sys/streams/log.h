@@ -70,7 +70,7 @@
 /* This file can be processed with doxygen(1). */
 
 #ifndef __SYS_LOG_H__
-#warning "Do no include sys/streams/log.h directly, include sys/log.h instead."
+#warning "Do not include sys/streams/log.h directly, include sys/log.h instead."
 #endif
 
 #ifndef __KERNEL__
