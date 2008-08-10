@@ -97,7 +97,7 @@
 /* This file can be processed with doxygen(1). */
 
 #ifndef __SYS_TESTMOD_H__
-#warning "Do no include sys/streams/testmod.h directly, include sys/testmod.h instead."
+#warning "Do not include sys/streams/testmod.h directly, include sys/testmod.h instead."
 #endif
 
 /**

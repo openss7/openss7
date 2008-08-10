@@ -68,7 +68,7 @@
 #ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_DKI_H__
-#warning "Do no include sys/streams/dki.h directly, include sys/dki.h instead."
+#warning "Do not include sys/streams/dki.h directly, include sys/dki.h instead."
 #endif
 
 #ifndef __KERNEL__

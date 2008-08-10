@@ -79,6 +79,10 @@
 
 #ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
+#ifndef __SYS_STROPTS32_H__
+#warning "Do not include sys/streams/stropts32.h directly, include sys/stropts32.h instead."
+#endif
+
 /* This file can be processed with doxygen(1). */
 
 struct bandinfo32 {

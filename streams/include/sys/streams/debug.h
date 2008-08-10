@@ -68,7 +68,7 @@
 #ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_DEBUG_H__
-#warning "Do no include sys/streams/debug.h directly, include sys/debug.h instead."
+#warning "Do not include sys/streams/debug.h directly, include sys/debug.h instead."
 #endif
 
 #ifndef __KERNEL__

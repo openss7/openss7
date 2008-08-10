@@ -77,7 +77,7 @@
 #ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_KMEM_H__
-#warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."
+#warning "Do not include sys/streams/kmem.h directly, include sys/kmem.h instead."
 #endif
 
 #ifndef __KERNEL__

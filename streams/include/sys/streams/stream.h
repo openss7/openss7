@@ -133,7 +133,7 @@
 #ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.103 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
-#warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
+#warning "Do not include sys/streams/stream.h directly, include sys/stream.h instead."
 #endif
 
 #ifndef __KERNEL__

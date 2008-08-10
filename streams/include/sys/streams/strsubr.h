@@ -125,7 +125,7 @@
 #ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.87 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
-#warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
+#warning "Do not include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
 #endif
 
 #ifndef __KERNEL__
@@ -449,7 +449,7 @@ struct strinfo {
 	rwlock_t si_rwlock;		/* lock for these entries */
 	atomic_t si_cnt;		/* count of entries in the list */
 	int si_hwl;			/* high water level for entries */
-#if defined CONFIG_STREAMS_DEBUG || defined CONFIG_STREAMS_MNTSPECFS
+#ifdef CONFIG_STREAMS_DEBUG
 	struct list_head si_head;	/* entries in the list */
 #endif
 };

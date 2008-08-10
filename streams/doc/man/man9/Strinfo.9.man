@@ -113,7 +113,7 @@ struct strinfo {
     rwlock_t si_rwlock;        /* lock for these entries */
     atomic_t si_cnt;           /* count of entries in the list */
     int si_hwl;                /* high water level for entries */
-#if defined CONFIG_STREAMS_DEBUG || defined CONFIG_STREAMS_MNTSPECFS
+#ifdef CONFIG_STREAMS_DEBUG
     struct list_head si_head;  /* entries in list */
 #endif
 } Strinfo[DYN_SIZE] ____cacheline_aligned;

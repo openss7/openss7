@@ -68,10 +68,10 @@
  *
  * This file needs to include any autoconf definitions that are used by
  * installed header files.  This file will be installed in
- * /usr/include/strtty/sys/strtty/config.h to be included by header files
- * installed in /usr/include/strtty/ with an include line something like:
+ * /usr/include/osr61/sys/osr61/config.h to be included by header files
+ * installed in /usr/include/osr61/ with an include line something like:
  *
- * #include "sys/strtty/config.h".
+ * #include "sys/osr61/config.h".
  */
 
 #endif				/* __SYS_OSR61_CONFIG_H__ */

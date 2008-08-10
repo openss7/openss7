@@ -80,7 +80,7 @@
 #ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.29 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
-#warning "Do no include sys/streams/strconf.h directly, include sys/strconf.h instead."
+#warning "Do not include sys/streams/strconf.h directly, include sys/strconf.h instead."
 #endif
 
 #ifndef __KERNEL__

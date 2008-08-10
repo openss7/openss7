@@ -5020,7 +5020,7 @@ clear_shinfo(struct shinfo *sh)
 	struct queinfo *qu = &sh->sh_queinfo;
 
 	bzero(sh, sizeof(*sh));
-#if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
+#ifdef CONFIG_STREAMS_DEBUG
 	INIT_LIST_HEAD(&sh->sh_list);
 #endif
 	sd->sd_rdopt = RNORM | RPROTNORM;
@@ -5097,7 +5097,7 @@ allocstr(void)
 			qsi->si_hwl = atomic_read(&qsi->si_cnt);
 		rq->q_flag = QSHEAD | QUSE | QREADR;
 		wq->q_flag = QSHEAD | QUSE;
-#if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
+#ifdef CONFIG_STREAMS_DEBUG
 		write_lock(&ssi->si_rwlock);
 		list_add_tail(&sh->sh_list, &ssi->si_head);
 		write_unlock(&ssi->si_rwlock);
@@ -5129,7 +5129,7 @@ __freestr(struct stdata *sd)
 	list_del_init(&qu->qu_list);
 	write_unlock(&qsi->si_rwlock);
 #endif
-#if defined(CONFIG_STREAMS_DEBUG) || defined (CONFIG_STREAMS_MNTSPECFS)
+#ifdef CONFIG_STREAMS_DEBUG
 	write_lock(&ssi->si_rwlock);
 	list_del_init(&sh->sh_list);
 	write_unlock(&ssi->si_rwlock);
@@ -5340,7 +5340,7 @@ str_init_caches(void)
 	struct cacheinfo *ci = Cacheinfo;
 
 	for (j = 0; j < DYN_SIZE; j++, si++, ci++) {
-#if defined CONFIG_STREAMS_DEBUG || defined CONFIG_STREAMS_MNTSPECFS
+#ifdef CONFIG_STREAMS_DEBUG
 		INIT_LIST_HEAD(&si->si_head);
 #endif
 		rwlock_init(&si->si_rwlock);

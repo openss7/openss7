@@ -94,113 +94,43 @@
  * #include "sys/streams/config.h".
  */
 
+/* Use this macro like fastcall. It is set to an attribute with the number of
+   parameters passed in registers to STREAMS callouts (qi_putp, qi_srvp,
+   qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
+   number of parameters passed in registers to zero. Otherwise, it defaults to
+   the CONFIG_REPARM setting for the kernel. */
 #if defined __i386__ || defined __x86_64__ || defined __k8__
 #undef streamscall
 #else
 #define streamscall
 #endif
 
+/* Use this macro like FASTCALL(). It is set to an attribute with the number
+   of parameters passed in registers to STREAMS callouts (qi_putp, qi_srvp,
+   qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
+   number of parameters passed in registers to zero. Otherwise, it defaults to
+   the CONFIG_REPARM setting for the kernel. */
 #if defined __i386__ || defined __x86_64__ || defined __k8__
 #undef STREAMSCALL
 #else
 #define STREAMSCALL(__x) __x
 #endif
 
-#undef CONFIG_STREAMS
-
-#undef CONFIG_STREAMS_MODULE
-
-#undef CONFIG_STREAMS_DO_STATS
-
-#undef CONFIG_STREAMS_OVERRIDE_FIFOS
-
-/* Required by sys/strsubr.h in streams package. */
+/* Define to perform internal structure tracking within the STREAMS executive
+   as well as to provide additional /proc filesystem files for examining
+   internal structures. */
 #undef CONFIG_STREAMS_DEBUG
 
-/* Required by sys/strsubr.h in streams package. */
-#undef CONFIG_STREAMS_SYNCQS
-
-/* Required by one header file in strcompat package */
-#undef CONFIG_STREAMS_NOIRQ
-
-/* Required by several header files in streams packages and one
-   in strcompat package. */
+/* Defined when Linux Fast-STREAMS was compiled for LiS Binary Compatibility.
+   */
 #undef CONFIG_STREAMS_LIS_BCM
 
-#undef HAVE_KFUNC_PROCESS_GROUP
+/* When defined Linux Fast-STREAMS will include support for synchronization
+   queues and levels. */
+#undef CONFIG_STREAMS_SYNCQS
 
-#undef HAVE_KFUNC_TO_KDEV_T
-
-#undef HAVE_KINC_LINUX_HARDIRQ_H
-
-#undef HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
-
-#undef HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
-
-#undef HAVE_KFUNC_READ_TRYLOCK
-
-#undef HAVE_KMACRO_READ_TRYLOCK
-
-#if defined HAVE_KFUNC_READ_TRYLOCK || defined HAVE_KMACRO_READ_TRYLOCK
-#define HAVE_READ_TRYLOCK 1
-#endif
-
-#undef HAVE_TIMESPEC_DO_SETTIMEOFDAY
-
-#undef HAVE___WAKE_UP_SYNC_ADDR
-
-#undef HAVE___WAKE_UP_SYNC_EXPORT
-
-#undef HAVE_KFUNC_WRITE_TRYLOCK
-
-#undef HAVE_KMACRO_WRITE_TRYLOCK
-#if defined HAVE_KFUNC_WRITE_TRYLOCK || defined HAVE_KMACRO_WRITE_TRYLOCK
-#define HAVE_WRITE_TRYLOCK 1
-#endif
-
-#undef HAVE_KFUNC_INTERRUPTIBLE_SLEEP_ON
-
-#undef HAVE_KFUNC_SLEEP_ON
-
-#undef HAVE_KFUNC_SLEEP_ON_TIMEOUT
-
-#undef HAVE_KFUNC_PCIBIOS_FIND_CLASS
-
-#undef HAVE_KFUNC_PCIBIOS_FIND_DEVICE
-
-#undef HAVE_KFUNC_PCIBIOS_INIT
-
-#undef HAVE_KFUNC_PCIBIOS_PRESENT
-
-#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_BYTE
-
-#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_DWORD
-
-#undef HAVE_KFUNC_PCIBIOS_READ_CONFIG_WORD
-
-#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_BYTE
-
-#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_DWORD
-
-#undef HAVE_KFUNC_PCIBIOS_WRITE_CONFIG_WORD
-
-#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
-
-#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_CPU
-
-#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE_FOR_DEVICE
-
-#undef HAVE_KFUNC_PCI_DMA_SYNC_SG
-
-#undef HAVE_KFUNC_PCI_DMA_SYNC_SINGLE
-
-#undef HAVE_KFUNC_PCI_FIND_CLASS
-
-#undef HAVE_KTYPE_KMEM_CACHE_T_P
-#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
-#define kmem_cachep_t kmem_cache_t *
-#else
-#define kmem_cachep_t struct kmem_cache *
-#endif
+/* This kmem_cache_t is deprecated in recent 2.6.20 kernels. When it is
+   deprecated, define this to struct kmem_cache *. */
+#undef kmem_cachep_t
 
 #endif				/* __SYS_STREAMS_CONFIG_H__ */

@@ -80,7 +80,7 @@
 #ident "@(#) $RCSfile: sad.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_SAD_H__
-#warning "Do no include sys/streams/sad.h directly, include sys/sad.h instead."
+#warning "Do not include sys/streams/sad.h directly, include sys/sad.h instead."
 #endif
 
 /* This file can be processed with doxygen(1). */
