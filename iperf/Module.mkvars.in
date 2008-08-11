@@ -1,0 +1,249 @@
+# vim: ft=make
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# -----------------------------------------------------------------------------
+#
+# $Log$
+# =============================================================================
+
+#
+# @configure_input@
+#
+
+ACLOCAL = @ACLOCAL@
+AMTAR = @AMTAR@
+AP_AUTOPR = @AP_AUTOPR@
+AP_CONFIG = @AP_CONFIG@
+AP_DISTRIBUTION = @AP_DISTRIBUTION@
+AP_SCRIPT = @AP_SCRIPT@
+AUTOCONF = @AUTOCONF@
+AUTOHEADER = @AUTOHEADER@
+AUTOMAKE = @AUTOMAKE@
+AWK = @AWK@
+BESTZIP = @BESTZIP@
+BIBTEX = @BIBTEX@
+BZIP2 = @BZIP2@
+BZIP2_CMD = @BZIP2_CMD@
+CC = @CC@
+CCDEPMODE = @CCDEPMODE@
+CFLAGS = @CFLAGS@
+CONFIG_SITE = @CONFIG_SITE@
+CONVERT = @CONVERT@
+CPP = @CPP@
+CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
+CYGPATH_W = @CYGPATH_W@
+DEB_BUILD_ARCH = @DEB_BUILD_ARCH@
+DEB_BUILD_GNU_CPU = @DEB_BUILD_GNU_CPU@
+DEB_BUILD_GNU_SYSTEM = @DEB_BUILD_GNU_SYSTEM@
+DEB_BUILD_GNU_TYPE = @DEB_BUILD_GNU_TYPE@
+DEB_HOST_ARCH = @DEB_HOST_ARCH@
+DEB_HOST_GNU_CPU = @DEB_HOST_GNU_CPU@
+DEB_HOST_GNU_SYSTEM = @DEB_HOST_GNU_SYSTEM@
+DEB_HOST_GNU_TYPE = @DEB_HOST_GNU_TYPE@
+DEFS = @DEFS@
+DEPDIR = @DEPDIR@
+DPKG = @DPKG@
+DPKG_BUILDPACKAGE = @DPKG_BUILDPACKAGE@
+DPKG_SOURCE = @DPKG_SOURCE@
+DVI2PS = @DVI2PS@
+DVIPDF = @DVIPDF@
+ECHO_C = @ECHO_C@
+ECHO_N = @ECHO_N@
+ECHO_T = @ECHO_T@
+EGREP = @EGREP@
+EPSTOPDF = @EPSTOPDF@
+EXEEXT = @EXEEXT@
+FIG2DEV = @FIG2DEV@
+GNUPGHOME = @GNUPGHOME@
+GNUPGUSER = @GNUPGUSER@
+GNUPLOT = @GNUPLOT@
+GPG = @GPG@
+GREP = @GREP@
+GZIP = @GZIP@
+GZIP_CMD = @GZIP_CMD@
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LATEX = @LATEX@
+LATEX2HTML = @LATEX2HTML@
+LDFLAGS = @LDFLAGS@
+LIBOBJS = @LIBOBJS@
+LIBS = @LIBS@
+LTLIBOBJS = @LTLIBOBJS@
+LZMA = @LZMA@
+LZMA_CMD = @LZMA_CMD@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+MAKEWHATIS = @MAKEWHATIS@
+MKDIR_P = @MKDIR_P@
+OBJEXT = @OBJEXT@
+PACKAGE = @PACKAGE@
+PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
+PACKAGE_DATE = @PACKAGE_DATE@
+PACKAGE_DEBEPOCH = @PACKAGE_DEBEPOCH@
+PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
+PACKAGE_DEBRELEASE = @PACKAGE_DEBRELEASE@
+PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
+PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
+PACKAGE_EPOCH = @PACKAGE_EPOCH@
+PACKAGE_LCNAME = @PACKAGE_LCNAME@
+PACKAGE_NAME = @PACKAGE_NAME@
+PACKAGE_RELEASE = @PACKAGE_RELEASE@
+PACKAGE_RPMDIST = @PACKAGE_RPMDIST@
+PACKAGE_RPMEPOCH = @PACKAGE_RPMEPOCH@
+PACKAGE_RPMEXTRA = @PACKAGE_RPMEXTRA@
+PACKAGE_RPMEXTRA2 = @PACKAGE_RPMEXTRA2@
+PACKAGE_RPMOPTIONS = @PACKAGE_RPMOPTIONS@
+PACKAGE_RPMRELEASE = @PACKAGE_RPMRELEASE@
+PACKAGE_SHORTTITLE = @PACKAGE_SHORTTITLE@
+PACKAGE_STRING = @PACKAGE_STRING@
+PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_TITLE = @PACKAGE_TITLE@
+PACKAGE_UCNAME = @PACKAGE_UCNAME@
+PACKAGE_VERSION = @PACKAGE_VERSION@
+PATH_SEPARATOR = @PATH_SEPARATOR@
+PDFLATEX = @PDFLATEX@
+PIC = @PIC@
+PKGINCL = @PKGINCL@
+PS2EPSI = @PS2EPSI@
+PSLATEX = @PSLATEX@
+PTHREAD_CC = @PTHREAD_CC@
+PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
+PTHREAD_LIBS = @PTHREAD_LIBS@
+RANLIB = @RANLIB@
+REFER = @REFER@
+RPM = @RPM@
+RPMBUILD = @RPMBUILD@
+SET_MAKE = @SET_MAKE@
+SHELL = @SHELL@
+SOELIM = @SOELIM@
+STRIP = @STRIP@
+STRIP_BEGIN = @STRIP_BEGIN@
+STRIP_DUMMY = @STRIP_DUMMY@
+STRIP_END = @STRIP_END@
+TBL = @TBL@
+VERSION = @VERSION@
+WEB100_CFLAGS = @WEB100_CFLAGS@
+WEB100_CONFIG = @WEB100_CONFIG@
+WEB100_LIBS = @WEB100_LIBS@
+abs_builddir = @abs_builddir@
+abs_srcdir = @abs_srcdir@
+abs_top_builddir = @abs_top_builddir@
+abs_top_srcdir = @abs_top_srcdir@
+ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
+acx_pthread_config = @acx_pthread_config@
+am__include = @am__include@
+am__leading_dot = @am__leading_dot@
+am__quote = @am__quote@
+am__tar = @am__tar@
+am__untar = @am__untar@
+bindir = @bindir@
+build = @build@
+build_alias = @build_alias@
+build_cpu = @build_cpu@
+build_os = @build_os@
+build_vendor = @build_vendor@
+builddir = @builddir@
+cache_file = @cache_file@
+cross_compiling = @cross_compiling@
+datadir = @datadir@
+datarootdir = @datarootdir@
+debbuilddir = @debbuilddir@
+docdir = @docdir@
+dvidir = @dvidir@
+exec_prefix = @exec_prefix@
+host = @host@
+host_alias = @host_alias@
+host_cpu = @host_cpu@
+host_os = @host_os@
+host_vendor = @host_vendor@
+htmldir = @htmldir@
+includedir = @includedir@
+infodir = @infodir@
+install_sh = @install_sh@
+lib32dir = @lib32dir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localedir = @localedir@
+localstatedir = @localstatedir@
+mandir = @mandir@
+mkdir_p = @mkdir_p@
+oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
+pkglib32dir = @pkglib32dir@
+pkglibexec32dir = @pkglibexec32dir@
+prefix = @prefix@
+program_transform_name = @program_transform_name@
+psdir = @psdir@
+rootdir = @rootdir@
+rpmbuilddir = @rpmbuilddir@
+rpmdir = @rpmdir@
+sbindir = @sbindir@
+sharedstatedir = @sharedstatedir@
+sourcedir = @sourcedir@
+specdir = @specdir@
+srcdir = @srcdir@
+srcrpmdir = @srcrpmdir@
+sysconfdir = @sysconfdir@
+target = @target@
+target_alias = @target_alias@
+target_cpu = @target_cpu@
+target_os = @target_os@
+target_vendor = @target_vendor@
+top_build_prefix = @top_build_prefix@
+top_builddir = @top_builddir@
+top_srcdir = @top_srcdir@
+topdir = @topdir@
