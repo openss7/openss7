@@ -969,7 +969,7 @@ fi
 %defattr(-,root,root)
 %dir %{_kmoduledir}/%{base}
 %attr(644,root,root) %{_kmoduledir}/modules.%{base}
-%{_kmoduledir}/%{base}/*
+%{_kmoduledir}/%{base}/*.o*
 %endif
 
 %if %{FILES_ko_modules}
@@ -977,7 +977,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_kmoduledir}/%{base}
-%{_kmoduledir}/%{base}/*
+%{_kmoduledir}/%{base}/*.ko*
 %endif
 
 # ===========================================================================
@@ -985,7 +985,12 @@ fi
 
 Summary:        %{title} core kernel module symbol versions.
 Group:          System Environment/Kernel
+%if %{FILES_modules}
 Prefix:         %{_includedir}/%{name}/%{kernel_version}
+%endif
+%if %{FILES_ko_modules}
+Prefix:         %{_kmoduledir}
+%endif
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -1026,6 +1031,13 @@ PACKAGE INSTEAD.  DO NOT REPORT BUGS.
 %defattr(-,root,root)
 %dir %{_includedir}/%{name}/%{kernel_version}
 %{_includedir}/%{name}/%{kernel_version}/*
+%endif
+
+%if %{FILES_ko_modules}
+%files %{info_name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_kmoduledir}/%{base}/Module*
 %endif
 
 # don't include package for FILES_ko_modules
