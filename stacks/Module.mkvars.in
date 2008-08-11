@@ -1,0 +1,546 @@
+# vim: ft=make
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# -----------------------------------------------------------------------------
+#
+# $Log$
+# =============================================================================
+
+#
+# @configure_input@
+#
+
+ACLOCAL = @ACLOCAL@
+ALLOCA = @ALLOCA@
+AMTAR = @AMTAR@
+AP_AUTOPR = @AP_AUTOPR@
+AP_CONFIG = @AP_CONFIG@
+AP_DISTRIBUTION = @AP_DISTRIBUTION@
+AP_SCRIPT = @AP_SCRIPT@
+AR = @AR@
+AUTOCONF = @AUTOCONF@
+AUTOHEADER = @AUTOHEADER@
+AUTOM4TE = @AUTOM4TE@
+AUTOMAKE = @AUTOMAKE@
+AUTOTEST = @AUTOTEST@
+AWK = @AWK@
+BESTZIP = @BESTZIP@
+BIBTEX = @BIBTEX@
+BUILD_INCLUDED_LIBINTL = @BUILD_INCLUDED_LIBINTL@
+BZIP2 = @BZIP2@
+BZIP2_CMD = @BZIP2_CMD@
+CATOBJEXT = @CATOBJEXT@
+CC = @CC@
+CCAS = @CCAS@
+CCASDEPMODE = @CCASDEPMODE@
+CCASFLAGS = @CCASFLAGS@
+CCDEPMODE = @CCDEPMODE@
+CFLAGS = @CFLAGS@
+CFLAG_VISIBILITY = @CFLAG_VISIBILITY@
+CHAN_CPPFLAGS = @CHAN_CPPFLAGS@
+CHAN_LDADD = @CHAN_LDADD@
+CHAN_LDADD32 = @CHAN_LDADD32@
+CHAN_LDFLAGS = @CHAN_LDFLAGS@
+CHAN_LDFLAGS32 = @CHAN_LDFLAGS32@
+CHAN_MANPATH = @CHAN_MANPATH@
+CHAN_MODFLAGS = @CHAN_MODFLAGS@
+CHAN_MODMAP = @CHAN_MODMAP@
+CHAN_SYMVER = @CHAN_SYMVER@
+CHAN_VERSION = @CHAN_VERSION@
+CHKCONFIG = @CHKCONFIG@
+COMPRESS_KERNEL_MODULES = @COMPRESS_KERNEL_MODULES@
+CONFIG_SITE = @CONFIG_SITE@
+CONVERT = @CONVERT@
+CPP = @CPP@
+CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
+CXXDEPMODE = @CXXDEPMODE@
+CXXFLAGS = @CXXFLAGS@
+CYGPATH_W = @CYGPATH_W@
+DATADIRNAME = @DATADIRNAME@
+DEB_BUILD_ARCH = @DEB_BUILD_ARCH@
+DEB_BUILD_GNU_CPU = @DEB_BUILD_GNU_CPU@
+DEB_BUILD_GNU_SYSTEM = @DEB_BUILD_GNU_SYSTEM@
+DEB_BUILD_GNU_TYPE = @DEB_BUILD_GNU_TYPE@
+DEB_HOST_ARCH = @DEB_HOST_ARCH@
+DEB_HOST_GNU_CPU = @DEB_HOST_GNU_CPU@
+DEB_HOST_GNU_SYSTEM = @DEB_HOST_GNU_SYSTEM@
+DEB_HOST_GNU_TYPE = @DEB_HOST_GNU_TYPE@
+DEFS = @DEFS@
+DEPDIR = @DEPDIR@
+DEPMOD = @DEPMOD@
+DOXYGEN = @DOXYGEN@
+DOXY_CONFIG_INPUT = @DOXY_CONFIG_INPUT@
+DOXY_CONFIG_STRIP_FROM_INC_PATH = @DOXY_CONFIG_STRIP_FROM_INC_PATH@
+DPKG = @DPKG@
+DPKG_BUILDPACKAGE = @DPKG_BUILDPACKAGE@
+DPKG_SOURCE = @DPKG_SOURCE@
+DSYMUTIL = @DSYMUTIL@
+DUMPBIN = @DUMPBIN@
+DVI2PS = @DVI2PS@
+DVIPDF = @DVIPDF@
+ECHO_C = @ECHO_C@
+ECHO_N = @ECHO_N@
+ECHO_T = @ECHO_T@
+EGREP = @EGREP@
+EPSTOPDF = @EPSTOPDF@
+EXEEXT = @EXEEXT@
+EXPOSED_SYMBOLS = @EXPOSED_SYMBOLS@
+FGREP = @FGREP@
+FIG2DEV = @FIG2DEV@
+GENCAT = @GENCAT@
+GENKSYMS = @GENKSYMS@
+GENKSYMS_SMP_PREFIX = @GENKSYMS_SMP_PREFIX@
+GETTEXT_MACRO_VERSION = @GETTEXT_MACRO_VERSION@
+GLIBC2 = @GLIBC2@
+GLIBC21 = @GLIBC21@
+GMSGFMT = @GMSGFMT@
+GMSGFMT_015 = @GMSGFMT_015@
+GNUPGHOME = @GNUPGHOME@
+GNUPGUSER = @GNUPGUSER@
+GNUPLOT = @GNUPLOT@
+GPG = @GPG@
+GREP = @GREP@
+GZIP = @GZIP@
+GZIP_CMD = @GZIP_CMD@
+HAVE_ASPRINTF = @HAVE_ASPRINTF@
+HAVE_POSIX_PRINTF = @HAVE_POSIX_PRINTF@
+HAVE_SNPRINTF = @HAVE_SNPRINTF@
+HAVE_VISIBILITY = @HAVE_VISIBILITY@
+HAVE_WPRINTF = @HAVE_WPRINTF@
+INET_CPPFLAGS = @INET_CPPFLAGS@
+INET_LDADD = @INET_LDADD@
+INET_LDADD32 = @INET_LDADD32@
+INET_LDFLAGS = @INET_LDFLAGS@
+INET_LDFLAGS32 = @INET_LDFLAGS32@
+INET_MANPATH = @INET_MANPATH@
+INET_MODFLAGS = @INET_MODFLAGS@
+INET_MODMAP = @INET_MODMAP@
+INET_SYMVER = @INET_SYMVER@
+INET_VERSION = @INET_VERSION@
+INSSERV = @INSSERV@
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INSTOBJEXT = @INSTOBJEXT@
+INTLBISON = @INTLBISON@
+INTLLIBS = @INTLLIBS@
+INTLOBJS = @INTLOBJS@
+INTL_LIBTOOL_SUFFIX_PREFIX = @INTL_LIBTOOL_SUFFIX_PREFIX@
+INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+ISDN_CPPFLAGS = @ISDN_CPPFLAGS@
+ISDN_LDADD = @ISDN_LDADD@
+ISDN_LDADD32 = @ISDN_LDADD32@
+ISDN_LDFLAGS = @ISDN_LDFLAGS@
+ISDN_LDFLAGS32 = @ISDN_LDFLAGS32@
+ISDN_MANPATH = @ISDN_MANPATH@
+ISDN_MODFLAGS = @ISDN_MODFLAGS@
+ISDN_MODMAP = @ISDN_MODMAP@
+ISDN_SYMVER = @ISDN_SYMVER@
+ISDN_VERSION = @ISDN_VERSION@
+ISO_CPPFLAGS = @ISO_CPPFLAGS@
+ISO_LDADD = @ISO_LDADD@
+ISO_LDADD32 = @ISO_LDADD32@
+ISO_LDFLAGS = @ISO_LDFLAGS@
+ISO_LDFLAGS32 = @ISO_LDFLAGS32@
+ISO_MANPATH = @ISO_MANPATH@
+ISO_MODFLAGS = @ISO_MODFLAGS@
+ISO_MODMAP = @ISO_MODMAP@
+ISO_SYMVER = @ISO_SYMVER@
+ISO_VERSION = @ISO_VERSION@
+KERNEL_BLDFLAGS = @KERNEL_BLDFLAGS@
+KERNEL_CFLAGS = @KERNEL_CFLAGS@
+KERNEL_CPPFLAGS = @KERNEL_CPPFLAGS@
+KERNEL_EXPSYMTAB = @KERNEL_EXPSYMTAB@
+KERNEL_LDFLAGS = @KERNEL_LDFLAGS@
+KERNEL_MODFLAGS = @KERNEL_MODFLAGS@
+KERNEL_NOVERSION = @KERNEL_NOVERSION@
+KGENKSYMS = @KGENKSYMS@
+LATEX = @LATEX@
+LATEX2HTML = @LATEX2HTML@
+LD = @LD@
+LDCONFIG = @LDCONFIG@
+LDFLAGS = @LDFLAGS@
+LEX = @LEX@
+LEXLIB = @LEXLIB@
+LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
+LFS_VERSION = @LFS_VERSION@
+LIBICONV = @LIBICONV@
+LIBINTL = @LIBINTL@
+LIBMULTITHREAD = @LIBMULTITHREAD@
+LIBOBJS = @LIBOBJS@
+LIBPTH = @LIBPTH@
+LIBPTH_PREFIX = @LIBPTH_PREFIX@
+LIBS = @LIBS@
+LIBTHREAD = @LIBTHREAD@
+LIBTOOL = @LIBTOOL@
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
+LIPO = @LIPO@
+LIS_VERSION = @LIS_VERSION@
+LN_S = @LN_S@
+LSMOD = @LSMOD@
+LSOF = @LSOF@
+LTLIBC = @LTLIBC@
+LTLIBICONV = @LTLIBICONV@
+LTLIBINTL = @LTLIBINTL@
+LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
+LTLIBOBJS = @LTLIBOBJS@
+LTLIBPTH = @LTLIBPTH@
+LTLIBTHREAD = @LTLIBTHREAD@
+LZMA = @LZMA@
+LZMA_CMD = @LZMA_CMD@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+MAKEWHATIS = @MAKEWHATIS@
+MKDIR_P = @MKDIR_P@
+MODPOST = @MODPOST@
+MODPOST_CACHE = @MODPOST_CACHE@
+MODPOST_INPUTS = @MODPOST_INPUTS@
+MODPOST_MODDIR = @MODPOST_MODDIR@
+MODPOST_MODVER = @MODPOST_MODVER@
+MODPOST_OPTIONS = @MODPOST_OPTIONS@
+MODPOST_SCRIPT = @MODPOST_SCRIPT@
+MODPOST_SYSMAP = @MODPOST_SYSMAP@
+MODPOST_SYSVER = @MODPOST_SYSVER@
+MODPROBE = @MODPROBE@
+MODVERSIONS_H = @MODVERSIONS_H@
+MSGFMT = @MSGFMT@
+MSGFMT_015 = @MSGFMT_015@
+MSGMERGE = @MSGMERGE@
+NM = @NM@
+NMEDIT = @NMEDIT@
+NSL_CPPFLAGS = @NSL_CPPFLAGS@
+NSL_LDADD = @NSL_LDADD@
+NSL_LDADD32 = @NSL_LDADD32@
+NSL_LDFLAGS = @NSL_LDFLAGS@
+NSL_LDFLAGS32 = @NSL_LDFLAGS32@
+NSL_MANPATH = @NSL_MANPATH@
+NSL_MODFLAGS = @NSL_MODFLAGS@
+NSL_MODMAP = @NSL_MODMAP@
+NSL_SYMVER = @NSL_SYMVER@
+NSL_VERSION = @NSL_VERSION@
+OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
+PACKAGE = @PACKAGE@
+PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
+PACKAGE_DATE = @PACKAGE_DATE@
+PACKAGE_DEBEPOCH = @PACKAGE_DEBEPOCH@
+PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
+PACKAGE_DEBRELEASE = @PACKAGE_DEBRELEASE@
+PACKAGE_DEBTOPDIR = @PACKAGE_DEBTOPDIR@
+PACKAGE_DISTDIR = @PACKAGE_DISTDIR@
+PACKAGE_EPOCH = @PACKAGE_EPOCH@
+PACKAGE_KNUMBER = @PACKAGE_KNUMBER@
+PACKAGE_KVERSION = @PACKAGE_KVERSION@
+PACKAGE_LCNAME = @PACKAGE_LCNAME@
+PACKAGE_NAME = @PACKAGE_NAME@
+PACKAGE_RELEASE = @PACKAGE_RELEASE@
+PACKAGE_RPMDIST = @PACKAGE_RPMDIST@
+PACKAGE_RPMEPOCH = @PACKAGE_RPMEPOCH@
+PACKAGE_RPMEXTRA = @PACKAGE_RPMEXTRA@
+PACKAGE_RPMEXTRA2 = @PACKAGE_RPMEXTRA2@
+PACKAGE_RPMOPTIONS = @PACKAGE_RPMOPTIONS@
+PACKAGE_RPMRELEASE = @PACKAGE_RPMRELEASE@
+PACKAGE_SHORTTITLE = @PACKAGE_SHORTTITLE@
+PACKAGE_STRING = @PACKAGE_STRING@
+PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_TITLE = @PACKAGE_TITLE@
+PACKAGE_UCNAME = @PACKAGE_UCNAME@
+PACKAGE_VERSION = @PACKAGE_VERSION@
+PATH_SEPARATOR = @PATH_SEPARATOR@
+PDFLATEX = @PDFLATEX@
+PERL_LDADD = @PERL_LDADD@
+PERL_LDADD32 = @PERL_LDADD32@
+PERL_LDFLAGS = @PERL_LDFLAGS@
+PERL_LDFLAGS32 = @PERL_LDFLAGS32@
+PIC = @PIC@
+PKGINCL = @PKGINCL@
+PKG_INCLUDES = @PKG_INCLUDES@
+PKG_LDS = @PKG_LDS@
+PKG_MANPATH = @PKG_MANPATH@
+PKG_MODFLAGS = @PKG_MODFLAGS@
+POSUB = @POSUB@
+POW_LIB = @POW_LIB@
+PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
+PS2EPSI = @PS2EPSI@
+PSLATEX = @PSLATEX@
+RANLIB = @RANLIB@
+REFER = @REFER@
+RPM = @RPM@
+RPMBUILD = @RPMBUILD@
+SCTP_CPPFLAGS = @SCTP_CPPFLAGS@
+SCTP_LDADD = @SCTP_LDADD@
+SCTP_LDADD32 = @SCTP_LDADD32@
+SCTP_LDFLAGS = @SCTP_LDFLAGS@
+SCTP_LDFLAGS32 = @SCTP_LDFLAGS32@
+SCTP_MANPATH = @SCTP_MANPATH@
+SCTP_MODFLAGS = @SCTP_MODFLAGS@
+SCTP_MODMAP = @SCTP_MODMAP@
+SCTP_SYMVER = @SCTP_SYMVER@
+SCTP_VERSION = @SCTP_VERSION@
+SED = @SED@
+SET_MAKE = @SET_MAKE@
+SHELL = @SHELL@
+SNMP_LDADD = @SNMP_LDADD@
+SNMP_LDADD32 = @SNMP_LDADD32@
+SNMP_LDFLAGS = @SNMP_LDFLAGS@
+SNMP_LDFLAGS32 = @SNMP_LDFLAGS32@
+SOCK_CPPFLAGS = @SOCK_CPPFLAGS@
+SOCK_LDADD = @SOCK_LDADD@
+SOCK_LDADD32 = @SOCK_LDADD32@
+SOCK_LDFLAGS = @SOCK_LDFLAGS@
+SOCK_LDFLAGS32 = @SOCK_LDFLAGS32@
+SOCK_MANPATH = @SOCK_MANPATH@
+SOCK_MODFLAGS = @SOCK_MODFLAGS@
+SOCK_MODMAP = @SOCK_MODMAP@
+SOCK_SYMVER = @SOCK_SYMVER@
+SOCK_VERSION = @SOCK_VERSION@
+SOELIM = @SOELIM@
+STRCOMP_CPPFLAGS = @STRCOMP_CPPFLAGS@
+STRCOMP_LDADD = @STRCOMP_LDADD@
+STRCOMP_LDADD32 = @STRCOMP_LDADD32@
+STRCOMP_LDFLAGS = @STRCOMP_LDFLAGS@
+STRCOMP_LDFLAGS32 = @STRCOMP_LDFLAGS32@
+STRCOMP_MANPATH = @STRCOMP_MANPATH@
+STRCOMP_MODFLAGS = @STRCOMP_MODFLAGS@
+STRCOMP_MODMAP = @STRCOMP_MODMAP@
+STRCOMP_SYMVER = @STRCOMP_SYMVER@
+STRCOMP_VERSION = @STRCOMP_VERSION@
+STRCONF = @STRCONF@
+STRCONF_BPKGDIR = @STRCONF_BPKGDIR@
+STRCONF_CONFIG = @STRCONF_CONFIG@
+STRCONF_CONFIGS = @STRCONF_CONFIGS@
+STRCONF_CONFMOD = @STRCONF_CONFMOD@
+STRCONF_DRVCONF = @STRCONF_DRVCONF@
+STRCONF_INPUT = @STRCONF_INPUT@
+STRCONF_MAJBASE = @STRCONF_MAJBASE@
+STRCONF_MAKEDEV = @STRCONF_MAKEDEV@
+STRCONF_MIDBASE = @STRCONF_MIDBASE@
+STRCONF_MINORSZ = @STRCONF_MINORSZ@
+STRCONF_MKNODES = @STRCONF_MKNODES@
+STRCONF_MODCONF = @STRCONF_MODCONF@
+STRCONF_PACKAGE = @STRCONF_PACKAGE@
+STRCONF_PKGRULE = @STRCONF_PKGRULE@
+STRCONF_SCRIPT = @STRCONF_SCRIPT@
+STRCONF_STEM = @STRCONF_STEM@
+STRCONF_STRLOAD = @STRCONF_STRLOAD@
+STRCONF_STSETUP = @STRCONF_STSETUP@
+STREAMS_CPPFLAGS = @STREAMS_CPPFLAGS@
+STREAMS_LDADD = @STREAMS_LDADD@
+STREAMS_LDADD32 = @STREAMS_LDADD32@
+STREAMS_LDFLAGS = @STREAMS_LDFLAGS@
+STREAMS_LDFLAGS32 = @STREAMS_LDFLAGS32@
+STREAMS_MANPATH = @STREAMS_MANPATH@
+STREAMS_MODFLAGS = @STREAMS_MODFLAGS@
+STREAMS_MODMAP = @STREAMS_MODMAP@
+STREAMS_SYMVER = @STREAMS_SYMVER@
+STREAMS_VERSION = @STREAMS_VERSION@
+STRIP = @STRIP@
+STRMAKENODES = @STRMAKENODES@
+TBL = @TBL@
+USER_CFLAGS = @USER_CFLAGS@
+USER_CPPFLAGS = @USER_CPPFLAGS@
+USER_LDFLAGS = @USER_LDFLAGS@
+USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
+USE_NLS = @USE_NLS@
+VERSION = @VERSION@
+WINDRES = @WINDRES@
+WOE32 = @WOE32@
+WOE32DLL = @WOE32DLL@
+X25_CPPFLAGS = @X25_CPPFLAGS@
+X25_LDADD = @X25_LDADD@
+X25_LDADD32 = @X25_LDADD32@
+X25_LDFLAGS = @X25_LDFLAGS@
+X25_LDFLAGS32 = @X25_LDFLAGS32@
+X25_MANPATH = @X25_MANPATH@
+X25_MODFLAGS = @X25_MODFLAGS@
+X25_MODMAP = @X25_MODMAP@
+X25_SYMVER = @X25_SYMVER@
+X25_VERSION = @X25_VERSION@
+XGETTEXT = @XGETTEXT@
+XGETTEXT_015 = @XGETTEXT_015@
+XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
+XNS_CPPFLAGS = @XNS_CPPFLAGS@
+XNS_LDADD = @XNS_LDADD@
+XNS_LDADD32 = @XNS_LDADD32@
+XNS_LDFLAGS = @XNS_LDFLAGS@
+XNS_LDFLAGS32 = @XNS_LDFLAGS32@
+XNS_MANPATH = @XNS_MANPATH@
+XNS_MODFLAGS = @XNS_MODFLAGS@
+XNS_MODMAP = @XNS_MODMAP@
+XNS_SYMVER = @XNS_SYMVER@
+XNS_VERSION = @XNS_VERSION@
+XTI_CPPFLAGS = @XTI_CPPFLAGS@
+XTI_LDADD = @XTI_LDADD@
+XTI_LDADD32 = @XTI_LDADD32@
+XTI_LDFLAGS = @XTI_LDFLAGS@
+XTI_LDFLAGS32 = @XTI_LDFLAGS32@
+XTI_MANPATH = @XTI_MANPATH@
+XTI_MODFLAGS = @XTI_MODFLAGS@
+XTI_MODMAP = @XTI_MODMAP@
+XTI_SYMVER = @XTI_SYMVER@
+XTI_VERSION = @XTI_VERSION@
+YACC = @YACC@
+YFLAGS = @YFLAGS@
+abs_builddir = @abs_builddir@
+abs_srcdir = @abs_srcdir@
+abs_top_builddir = @abs_top_builddir@
+abs_top_srcdir = @abs_top_srcdir@
+ac_ct_CC = @ac_ct_CC@
+ac_ct_CXX = @ac_ct_CXX@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
+am__include = @am__include@
+am__leading_dot = @am__leading_dot@
+am__quote = @am__quote@
+am__tar = @am__tar@
+am__untar = @am__untar@
+bindir = @bindir@
+build = @build@
+build_alias = @build_alias@
+build_cpu = @build_cpu@
+build_os = @build_os@
+build_vendor = @build_vendor@
+builddir = @builddir@
+cache_file = @cache_file@
+configdir = @configdir@
+cross_compiling = @cross_compiling@
+datadir = @datadir@
+datarootdir = @datarootdir@
+debbuilddir = @debbuilddir@
+docdir = @docdir@
+doxy_abs_builddir = @doxy_abs_builddir@
+doxy_abs_srcdir = @doxy_abs_srcdir@
+doxy_incs = @doxy_incs@
+doxy_inputs = @doxy_inputs@
+doxydir = @doxydir@
+dvidir = @dvidir@
+exec_prefix = @exec_prefix@
+host = @host@
+host_alias = @host_alias@
+host_cpu = @host_cpu@
+host_os = @host_os@
+host_vendor = @host_vendor@
+htmldir = @htmldir@
+includedir = @includedir@
+infodir = @infodir@
+initrddir = @initrddir@
+install_sh = @install_sh@
+kallsyms = @kallsyms@
+karch = @karch@
+kbase = @kbase@
+kboot = @kboot@
+kbuilddir = @kbuilddir@
+kconfig = @kconfig@
+kernel_headers = @kernel_headers@
+kernel_image = @kernel_image@
+kernel_source = @kernel_source@
+kext = @kext@
+kmachdir = @kmachdir@
+kmajor = @kmajor@
+kmarch = @kmarch@
+kminor = @kminor@
+kmoddir = @kmoddir@
+kmoduledir = @kmoduledir@
+kmodver = @kmodver@
+knumber = @knumber@
+kpatch = @kpatch@
+krelease = @krelease@
+ksrcdir = @ksrcdir@
+ksyms = @ksyms@
+ksysmap = @ksysmap@
+kversion = @kversion@
+kzip = @kzip@
+lib32dir = @lib32dir@
+lib_abs_builddir = @lib_abs_builddir@
+lib_abs_srcdir = @lib_abs_srcdir@
+libdir = @libdir@
+libexecdir = @libexecdir@
+localedir = @localedir@
+localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
+mandir = @mandir@
+mkdir_p = @mkdir_p@
+modutildir = @modutildir@
+oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
+pkglib32dir = @pkglib32dir@
+pkglibexec32dir = @pkglibexec32dir@
+prefix = @prefix@
+preloads = @preloads@
+program_transform_name = @program_transform_name@
+psdir = @psdir@
+rootdir = @rootdir@
+rpmbuilddir = @rpmbuilddir@
+rpmdir = @rpmdir@
+sbindir = @sbindir@
+sharedstatedir = @sharedstatedir@
+snmpdlmod32dir = @snmpdlmod32dir@
+snmpdlmod64dir = @snmpdlmod64dir@
+snmpdlmoddir = @snmpdlmoddir@
+snmpmibdir = @snmpmibdir@
+sourcedir = @sourcedir@
+specdir = @specdir@
+srcdir = @srcdir@
+srcrpmdir = @srcrpmdir@
+sysconfdir = @sysconfdir@
+target = @target@
+target_alias = @target_alias@
+target_cpu = @target_cpu@
+target_os = @target_os@
+target_vendor = @target_vendor@
+top_build_prefix = @top_build_prefix@
+top_builddir = @top_builddir@
+top_srcdir = @top_srcdir@
+topdir = @topdir@
