@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.39 2008-04-28 16:47:10 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.40 2008-08-11 22:23:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: compat.h,v $
+ Revision 0.9.2.40  2008-08-11 22:23:16  brian
+ - rationalization of header files
+
  Revision 0.9.2.39  2008-04-28 16:47:10  brian
  - updates for release
 
@@ -68,7 +71,7 @@
 #ifndef __LOCAL_COMPAT_H__
 #define __LOCAL_COMPAT_H__
 
-#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.39 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.40 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #define __OPTIMIZE__ 1
 

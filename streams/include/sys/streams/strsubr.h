@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.87 2008-07-31 17:28:19 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.88 2008-08-11 22:23:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-31 17:28:19 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.88  2008-08-11 22:23:18  brian
+ - rationalization of header files
+
  Revision 0.9.2.87  2008-07-31 17:28:19  brian
  - workaround for runqueues for crash(8)
 
@@ -122,7 +125,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.87 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.88 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do not include sys/streams/strsubr.h directly, include sys/strsubr.h instead."

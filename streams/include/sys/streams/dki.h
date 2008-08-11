@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dki.h,v 0.9.2.20 2008-04-28 12:54:02 brian Exp $
+ @(#) $Id: dki.h,v 0.9.2.21 2008-08-11 22:23:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dki.h,v $
+ Revision 0.9.2.21  2008-08-11 22:23:17  brian
+ - rationalization of header files
+
  Revision 0.9.2.20  2008-04-28 12:54:02  brian
  - update file headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __SYS_STREAMS_DKI_H__
 #define __SYS_STREAMS_DKI_H__ 1
 
-#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dki.h,v $ $Name:  $($Revision: 0.9.2.21 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_DKI_H__
 #warning "Do not include sys/streams/dki.h directly, include sys/dki.h instead."
