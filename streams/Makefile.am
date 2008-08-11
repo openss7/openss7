@@ -125,6 +125,8 @@ if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= strmib
 endif
 
+dist_bin_SCRIPTS		= scripts/modpost.sh scripts/modsyms.sh
+
 dist_sbin_SCRIPTS		=
 if CONFIG_STREAMS_LOG
 dist_sbin_SCRIPTS		+= src/util/strclean
@@ -1028,13 +1030,20 @@ endif
 ## INSTALL_INITSCRIPTS
 endif
 
-dist_snmpmib_DATA		= src/snmp/mibs/OPENSS7-MIB.mib \
+dist_snmpmib_DATA		= 
+
+if WITH_SNMP_AGENT
+## WITH_SNMP_AGENT
+dist_snmpmib_DATA		+= \
+				  src/snmp/mibs/OPENSS7-MIB.mib \
 				  src/snmp/mibs/OPENSS7-SMI.mib \
 				  src/snmp/mibs/OPENSS7-TC.mib \
 				  src/snmp/mibs/OPENSS7-TMN-SMI.mib \
 				  src/snmp/mibs/OPENSS7-TMN-TC.mib \
 				  src/snmp/mibs/OPENSS7-STREAMS-MIB.mib \
 				  src/snmp/mibs/OPENSS7-STREAMS-EXT-MIB.mib
+## WITH_SNMP_AGENT
+endif
 
 ## PKG_BUILD_INDEP
 endif
