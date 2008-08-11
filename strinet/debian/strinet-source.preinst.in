@@ -58,7 +58,7 @@
 # on the host and remove any info entries that might later conflict with our entries.  We treat
 # every fresh installation like an upgrade from non-deb install.
 #
-function install_util_preinst() { :
+function install_source_preinst() { :
     #
     # Look for old source trees and symbolic links hanging around.
     #
@@ -83,7 +83,7 @@ function install_util_preinst() { :
 # supposed to do.  This is not as extensive as the non-deb install since we do not have to check
 # that package files are removed and we don't have to check for things from non-deb versions.
 #
-function upgrade_util_preinst() { :
+function upgrade_source_preinst() { :
     #
     # Make sure that symbolic link was removed.
     #
