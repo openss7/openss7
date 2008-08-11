@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.60 $) $Date: 2008-04-29 08:33:11 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.61 $) $Date: 2008-08-11 22:27:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+# Last Modified $Date: 2008-08-11 22:27:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1748,6 +1748,9 @@ AC_DEFUN([_LIS_STRCONF], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.61  2008-08-11 22:27:17  brian
+# - added makefile variables for modules to acinclude
+#
 # Revision 1.1.6.60  2008-04-29 08:33:11  brian
 # - update headers for Affero release
 #
