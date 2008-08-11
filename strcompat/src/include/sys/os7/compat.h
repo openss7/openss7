@@ -72,7 +72,7 @@
 
 #define __OPTIMIZE__ 1
 
-#include "sys/strcompat/config.h"
+#include <sys/strcompat/config.h>
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>

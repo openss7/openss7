@@ -153,6 +153,13 @@ nobase_nodist_pkginclude_HEADERS = \
 	sys/$(PACKAGE)/version.h
 #	sys/$(PACKAGE)/modversions.h
 
+kpkgincludedir = $(pkgincludedir)/$(kversion)
+
+nobase_nodist_kpkginclude_HEADERS = \
+	sys/$(PACKAGE)/config.h \
+	sys/$(PACKAGE)/version.h
+#	sys/$(PACKAGE)/modversions.h
+
 if PERFORM_CHECKS
 ## PERFORM_CHECKS
 dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_headers
