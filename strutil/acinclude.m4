@@ -100,7 +100,8 @@ AC_DEFUN([AC_UTIL], [dnl
 		     debian/strutil-source.preinst
 		     debian/strutil-util.preinst
 		     src/util/modutils/strutil
-		     src/include/sys/strutil/version.h])
+		     src/include/sys/strutil/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

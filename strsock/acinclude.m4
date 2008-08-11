@@ -105,7 +105,8 @@ AC_DEFUN([AC_SOCK], [dnl
 		     debian/strsock-util.preinst
 		     src/util/modutils/strsock
 		     src/util/sysconfig/strsock
-		     src/include/sys/strsock/version.h])
+		     src/include/sys/strsock/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

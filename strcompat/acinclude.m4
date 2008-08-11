@@ -99,7 +99,8 @@ AC_DEFUN([AC_COMPAT], [dnl
 		     debian/strcompat-source.preinst
 		     debian/strcompat-util.preinst
 		     src/util/modutils/strcompat
-		     src/include/sys/strcompat/version.h])
+		     src/include/sys/strcompat/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

@@ -111,7 +111,8 @@ AC_DEFUN([AC_ISDN], [dnl
 		     debian/strisdn-util.preinst
 		     src/util/modutils/strisdn
 		     src/util/sysconfig/strisdn
-		     src/include/sys/strisdn/version.h])
+		     src/include/sys/strisdn/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

@@ -94,7 +94,8 @@ AC_DEFUN([AC_SCTP], [dnl
 		     debian/sctp-init.prerm
 		     debian/sctp-lib.preinst
 		     debian/sctp-source.preinst
-		     debian/sctp-util.preinst])
+		     debian/sctp-util.preinst
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

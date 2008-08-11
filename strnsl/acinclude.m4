@@ -102,7 +102,8 @@ AC_DEFUN([AC_XNSL], [dnl
 		     debian/strnsl-lib.preinst
 		     debian/strnsl-source.preinst
 		     debian/strnsl-util.preinst
-		     src/include/sys/strnsl/version.h])
+		     src/include/sys/strnsl/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

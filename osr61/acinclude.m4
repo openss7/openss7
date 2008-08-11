@@ -104,7 +104,8 @@ AC_DEFUN([AC_OSR61], [dnl
 		     debian/osr61-source.preinst
 		     debian/osr61-util.preinst
 		     src/util/modutils/osr61
-		     src/include/sys/osr61/version.h])
+		     src/include/sys/osr61/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

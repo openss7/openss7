@@ -114,7 +114,8 @@ AC_DEFUN([AC_VOIP], [dnl
 		     debian/strvoip-util.preinst
 		     src/util/modutils/strvoip
 		     src/util/sysconfig/strvoip
-		     src/include/sys/strvoip/version.h])
+		     src/include/sys/strvoip/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

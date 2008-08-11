@@ -101,7 +101,8 @@ AC_DEFUN([AC_TTY], [dnl
 		     debian/strtty-util.preinst
 		     src/util/modutils/strtty
 		     src/util/sysconfig/strtty
-		     src/include/sys/strtty/version.h])
+		     src/include/sys/strtty/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

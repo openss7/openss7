@@ -117,7 +117,8 @@ AC_DEFUN([AC_SS7], [dnl
 		     debian/strss7-util.preinst
 		     tests/testsuite.at
 		     src/util/modutils/strss7
-		     src/include/sys/strss7/version.h])
+		     src/include/sys/strss7/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

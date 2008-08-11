@@ -113,7 +113,8 @@ AC_DEFUN([AC_SIGTRAN], [dnl
 		     debian/sigtran-util.preinst
 		     src/util/modutils/sigtran
 		     src/util/sysconfig/sigtran
-		     src/include/sys/sigtran/version.h])
+		     src/include/sys/sigtran/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
