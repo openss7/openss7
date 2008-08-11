@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 0.9.2.16 2008-04-28 12:54:02 brian Exp $
+ @(#) $Id: cmn_err.h,v 0.9.2.17 2008-08-11 22:23:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cmn_err.h,v $
+ Revision 0.9.2.17  2008-08-11 22:23:17  brian
+ - rationalization of header files
+
  Revision 0.9.2.16  2008-04-28 12:54:02  brian
  - update file headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __SYS_STREAMS_CMN_ERR_H__
 #define __SYS_STREAMS_CMN_ERR_H__ 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_CMN_ERR_H__
 #warning "Do not include sys/streams/cmn_err.h directly, include sys/cmn_err.h instead."

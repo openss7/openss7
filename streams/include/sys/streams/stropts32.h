@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stropts32.h,v 0.9.2.7 2008-04-28 12:54:02 brian Exp $
+ @(#) $Id: stropts32.h,v 0.9.2.8 2008-08-11 22:23:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts32.h,v $
+ Revision 0.9.2.8  2008-08-11 22:23:18  brian
+ - rationalization of header files
+
  Revision 0.9.2.7  2008-04-28 12:54:02  brian
  - update file headers for release
 
@@ -77,7 +80,7 @@
 #ifndef __SYS_STREAMS_STROPTS32_H__
 #define __SYS_STREAMS_STROPTS32_H__
 
-#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts32.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STROPTS32_H__
 #warning "Do not include sys/streams/stropts32.h directly, include sys/stropts32.h instead."

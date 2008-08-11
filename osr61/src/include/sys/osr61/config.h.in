@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.2 2007/08/14 09:06:50 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.3 2008-08-11 22:23:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 09:06:50 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 0.9.2.3  2008-08-11 22:23:15  brian
+ - rationalization of header files
+
  Revision 0.9.2.2  2007/08/14 09:06:50  brian
  - GPLv3 header update
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_OSR61_CONFIG_H__
 #define __SYS_OSR61_CONFIG_H__
 
-#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  * @configure_input@

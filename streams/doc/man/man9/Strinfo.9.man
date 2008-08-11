@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: Strinfo.9.man,v 0.9.2.2 2008-04-28 12:53:47 brian Exp $
+.\" @(#) $Id: Strinfo.9.man,v 0.9.2.3 2008-08-11 22:23:17 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 12:53:47 $ by $Author: brian $
+.\" Last Modified $Date: 2008-08-11 22:23:17 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: Strinfo.9.man,v $
+.\" Revision 0.9.2.3  2008-08-11 22:23:17  brian
+.\" - rationalization of header files
+.\"
 .\" Revision 0.9.2.2  2008-04-28 12:53:47  brian
 .\" - update file headers for release
 .\"

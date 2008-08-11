@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: debug.h,v 0.9.2.12 2008-04-28 12:54:02 brian Exp $
+ @(#) $Id: debug.h,v 0.9.2.13 2008-08-11 22:23:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: debug.h,v $
+ Revision 0.9.2.13  2008-08-11 22:23:17  brian
+ - rationalization of header files
+
  Revision 0.9.2.12  2008-04-28 12:54:02  brian
  - update file headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __SYS_STREAMS_DEBUG_H__
 #define __SYS_STREAMS_DEBUG_H__
 
-#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_DEBUG_H__
 #warning "Do not include sys/streams/debug.h directly, include sys/debug.h instead."

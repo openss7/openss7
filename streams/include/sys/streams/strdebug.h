@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.46 2008-04-28 12:54:02 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.47 2008-08-11 22:23:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strdebug.h,v $
+ Revision 0.9.2.47  2008-08-11 22:23:18  brian
+ - rationalization of header files
+
  Revision 0.9.2.46  2008-04-28 12:54:02  brian
  - update file headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.46 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.47 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do not include sys/streams/strdebug.h directly, include sys/strdebug.h instead."

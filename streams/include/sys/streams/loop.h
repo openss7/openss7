@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: loop.h,v 0.9.2.7 2008-04-28 12:54:02 brian Exp $
+ @(#) $Id: loop.h,v 0.9.2.8 2008-08-11 22:23:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:02 $ by $Author: brian $
+ Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.h,v $
+ Revision 0.9.2.8  2008-08-11 22:23:18  brian
+ - rationalization of header files
+
  Revision 0.9.2.7  2008-04-28 12:54:02  brian
  - update file headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __SYS_STREAMS_LOOP_H__
 #define __SYS_STREAMS_LOOP_H__
 
-#ident "@(#) $RCSfile: loop.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: loop.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
