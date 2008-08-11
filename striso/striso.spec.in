@@ -1313,7 +1313,8 @@ fi
 #{_pkglibexecdir}/*tst
 #{_pkglibexec32dir}/*test*
 #{_pkglibexec32dir}/*tst
-%{?PATH_snmp32:%{PATH_snmp32}}
+%{?PATH_snmp:%{PATH_snmp}}
+#{?PATH_snmp32:%{PATH_snmp32}}
 %endif
 
 %if %{FILES_tools}
