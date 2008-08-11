@@ -226,7 +226,8 @@ install-modules: $(KERNEL_MODULES) Module.mkvars
 	@$(ECHO) "Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
-	@list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; for p in $$list ; do \
+	some=no ; \
+	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; for p in $$list ; do \
 		if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
 			$(ECHO) "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
@@ -240,14 +241,17 @@ install-modules: $(KERNEL_MODULES) Module.mkvars
 			$(ECHO) "$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 			$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
 		fi ; \
-	done
-	@list='Module.mkvars Modules.map Module.symvers' ; for f in $$list ; do \
-		if test -f $$f ; then \
-			b=`basename $$f` ; \
-			$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b" ; \
-			$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b ; \
-		fi ; \
-	done
+		some=yes ; \
+	done ; \
+	if test :"$$some" = :yes ; then \
+		list='Module.mkvars Modules.map Module.symvers' ; for f in $$list ; do \
+			if test -f $$f ; then \
+				b=`basename $$f` ; \
+				$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b" ; \
+				$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b ; \
+			fi ; \
+		done ; \
+	fi
 
 ##
 # This target creates symbolic links from the boot subdirectory to the appropriate kernel module.
