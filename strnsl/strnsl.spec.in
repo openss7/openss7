@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strnsl.spec.in,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-05-04 16:16:48 $
+# @(#) $RCSfile: strnsl.spec.in,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-08-11 22:24:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-04 16:16:48 $ by $Author: brian $
+# Last Modified $Date: 2008-08-11 22:24:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2248,6 +2248,9 @@ external SNMP management tools.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strnsl.spec.in,v $
+# Revision 0.9.2.23  2008-08-11 22:24:04  brian
+# - handle snmp in spec files
+#
 # Revision 0.9.2.22  2008-05-04 16:16:48  brian
 # - changes and corrections for release
 #
