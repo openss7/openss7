@@ -475,6 +475,52 @@ TAGS_FILES = $(DIST_SOURCES)
 # endif
 
 ##
+# Some like cscope, so this will build a cscope database
+##
+
+CSCOPE = cscope
+CSCOPE_FILES = $(DIST_SOURCES)
+CSCOPEFLAGS = -b
+CSCOPE_ARGS =
+
+cscope-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	     test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) cscope); \
+	done
+
+cscope-files-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	     test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) CSCOPEFILES='$(CSCOPEFILES)' cscope-files); \
+	done
+
+cscope: CSCOPE
+
+CSCOPE: cscope.files cscope-recursive cscope.out
+
+cscope.files:
+	list='$(SOURCES) $(HEADERS) $(CSCOPE_FILES)'; \
+	echo "-k -p5 -q" > $@ ; \
+	for i in $$list; do \
+		if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
+	done | $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+		END { if (nonempty) { for (i in files) print i; }; }' >> $@
+	$(MAKE) $(AM_MAKEFLAGS) CSCOPEFILES="`/bin/pwd`/cscope.files" cscope-files-recursive
+
+cscope.out: cscope.files
+	$(CSCOPE) $(CSCOPEFLAGS) $(AM_CSCOPEFLAGS) $(CSCOPE_ARGS) || :
+
+cscope-files: cscope-files-recursive
+	list='$(SOURCES) $(HEADERS) $(CSCOPE_FILES)'; \
+	test -z '$(CSCOPEFILES)' || \
+	for i in $$list; do \
+		if test -f "$$i"; then echo `/bin/pwd`/$$i; else echo $(srcdir)/$$i; fi; \
+	done | $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
+		END { if (nonempty) { for (i in files) print i; }; }' >> $(CSCOPEFILES)
+
+MY_PHONY		+= cscope cscope-recursive cscope-files cscope-files-recursive CSCOPE
+DISTCLEANFILES		+= cscope.files cscope.out cscope.in.out cscope.po.out
+
+##
 # A rule to generate an ifnames.log file
 ##
 ifnames:
