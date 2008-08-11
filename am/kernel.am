@@ -222,7 +222,7 @@ STRIP_KERNEL_MODULES	= $(STRIP) --strip-debug
 # if rpm is going to perform stripping; however, an execute flag must be set on the modules to get
 # RH rpms to strip them.
 ##
-install-modules: $(KERNEL_MODULES)
+install-modules: $(KERNEL_MODULES) Module.mkvars
 	@$(ECHO) "Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
@@ -239,6 +239,13 @@ install-modules: $(KERNEL_MODULES)
 		if test -n "$(COMPRESS_KERNEL_MODULES)" ; then \
 			$(ECHO) "$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 			$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
+		fi ; \
+	done
+	@list='Module.mkvars Modules.map Module.symvers' ; for f in $$list ; do \
+		if test -f $$f ; then \
+			b=`basename $$f` ; \
+			$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b" ; \
+			$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b ; \
 		fi ; \
 	done
 
@@ -564,6 +571,10 @@ uninstall-modules:
 	@$(NORMAL_UNINSTALL)
 	@list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| |g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext)$(kzip) |g'` ; for p in $$list ; do \
 		$(ECHO_C)$(LIBTOOL) --mode=uninstall rm -f -- "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
+	done
+	@list='Module.mkvars Modules.map Module.symvers' ; for f in $$list ; do \
+		$(ECHO) "rm -f -- $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
+		rm -f -- $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f ; \
 	done
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)" || :
 
