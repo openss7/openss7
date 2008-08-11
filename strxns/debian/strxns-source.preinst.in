@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns-source.preinst.in,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 11:46:42 $
+# @(#) $RCSfile: strxns-source.preinst.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-08-11 22:24:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:42 $ by $Author: brian $
+# Last Modified $Date: 2008-08-11 22:24:29 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -104,6 +104,9 @@ subpkg=source
 # =============================================================================
 #
 # $Log: strxns-source.preinst.in,v $
+# Revision 0.9.2.6  2008-08-11 22:24:29  brian
+# - correct debian source packages
+#
 # Revision 0.9.2.5  2008-04-28 11:46:42  brian
 # - adjust headers for release
 #
