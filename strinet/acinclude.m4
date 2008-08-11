@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-07-23 08:29:04 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-08-11 22:27:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-23 08:29:04 $ by $Author: brian $
+# Last Modified $Date: 2008-08-11 22:27:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1123,6 +1123,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.83  2008-08-11 22:27:21  brian
+# - added makefile variables for modules to acinclude
+#
 # Revision 0.9.2.82  2008-07-23 08:29:04  brian
 # - updated references and support for 2.6.18-92.1.6.el5 kernel
 #

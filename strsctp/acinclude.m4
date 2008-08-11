@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-08-02 07:26:44 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-08-11 22:27:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-02 07:26:44 $ by $Author: brian $
+# Last Modified $Date: 2008-08-11 22:27:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1251,6 +1251,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.78  2008-08-11 22:27:22  brian
+# - added makefile variables for modules to acinclude
+#
 # Revision 0.9.2.77  2008-08-02 07:26:44  brian
 # - recent Fedora kernel does not export secure_tcp_sequence_number
 #
