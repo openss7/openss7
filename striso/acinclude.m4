@@ -110,7 +110,8 @@ AC_DEFUN([AC_ISO], [dnl
 		     debian/striso-source.preinst
 		     debian/striso-util.preinst
 		     src/util/modutils/striso
-		     src/include/sys/striso/version.h])
+		     src/include/sys/striso/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

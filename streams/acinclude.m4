@@ -103,7 +103,8 @@ AC_DEFUN([AC_LFS], [dnl
 		     debian/streams-source.preinst
 		     debian/streams-util.preinst
 		     src/util/modutils/streams
-		     include/sys/streams/version.h])
+		     include/sys/streams/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

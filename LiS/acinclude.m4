@@ -99,7 +99,8 @@ AC_DEFUN([AC_LIS], [dnl
 		     debian/lis-source.preinst
 		     debian/lis-util.preinst
 		     util/modutils/lis
-		     include/sys/LiS/version.h])
+		     include/sys/LiS/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

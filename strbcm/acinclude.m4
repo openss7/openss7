@@ -101,7 +101,8 @@ AC_DEFUN([AC_BCM], [dnl
 		     debian/strbcm-util.preinst
 		     src/util/modutils/strbcm
 		     src/util/sysconfig/strbcm
-		     src/include/sys/strbcm/version.h])
+		     src/include/sys/strbcm/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

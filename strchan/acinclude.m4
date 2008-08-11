@@ -112,7 +112,8 @@ AC_DEFUN([AC_CHAN], [dnl
 		     debian/strchan-util.preinst
 		     src/util/modutils/strchan
 		     src/util/sysconfig/strchan
-		     src/include/sys/strchan/version.h])
+		     src/include/sys/strchan/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

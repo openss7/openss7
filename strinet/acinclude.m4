@@ -106,7 +106,8 @@ AC_DEFUN([AC_INET], [dnl
 		     debian/strinet-source.preinst
 		     debian/strinet-util.preinst
 		     src/util/modutils/strinet
-		     src/include/sys/strinet/version.h])
+		     src/include/sys/strinet/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

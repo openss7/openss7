@@ -106,7 +106,8 @@ AC_DEFUN([AC_SCTP], [dnl
 		     debian/strsctp-source.preinst
 		     debian/strsctp-util.preinst
 		     src/util/modutils/strsctp
-		     src/include/sys/strsctp/version.h])
+		     src/include/sys/strsctp/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

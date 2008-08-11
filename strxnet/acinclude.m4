@@ -103,7 +103,8 @@ AC_DEFUN([AC_XNET], [dnl
 		     debian/strxnet-source.preinst
 		     debian/strxnet-util.preinst
 		     src/util/modutils/strxnet
-		     src/include/sys/strxnet/version.h])
+		     src/include/sys/strxnet/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

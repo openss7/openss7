@@ -109,7 +109,8 @@ AC_DEFUN([AC_X25], [dnl
 		     debian/strx25-source.preinst
 		     debian/strx25-util.preinst
 		     src/util/modutils/strx25
-		     src/include/sys/strx25/version.h])
+		     src/include/sys/strx25/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"

@@ -102,7 +102,8 @@ AC_DEFUN([AC_XNS], [dnl
 		     debian/strxns-source.preinst
 		     debian/strxns-util.preinst
 		     src/util/modutils/strxns
-		     src/include/sys/strxns/version.h])
+		     src/include/sys/strxns/version.h
+		     Module.mkvars])
     _LDCONFIG
     USER_CPPFLAGS="$CPPFLAGS"
     USER_CFLAGS="$CFLAGS"
