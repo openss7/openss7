@@ -1827,38 +1827,39 @@ if [ $1 = 1 ] ; then : # fresh install
     # At the end of a fresh install we need to rebuild the netconfig database, but only if the
     # netconfig database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
     d="${t}.d"
-    recalc='yes'
     if [ -f $t ] ; then
         if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            recalc='no'
+            t="${a}"
         fi
     fi
-    if [ $recalc = "yes" ] ; then
-        echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-        found='no'
-        files="$d/*"
-        for f in $files ; do
-            if [ -f $f -a $f = "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        for f in $files ; do
-            if [ -f $f -a $f != "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        if [ $found = "no" ] ; then
-            rm -f $t $t.tmp
-        else
-            mv -f $t.tmp $t
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
         fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
     fi
 %endif
 %if %{have_sock2path}
@@ -1916,38 +1917,39 @@ if [ $1 = 2 ] ; then : # upgrade
     # At the end of an upgrade we need to rebuild the netconfig database, but only if the netconfig
     # database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
     d="${t}.d"
-    recalc='yes'
     if [ -f $t ] ; then
         if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            recalc='no'
+            t="${a}"
         fi
     fi
-    if [ $recalc = "yes" ] ; then
-        echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-        found='no'
-        files="$d/*"
-        for f in $files ; do
-            if [ -f $f -a $f = "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        for f in $files ; do
-            if [ -f $f -a $f != "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        if [ $found = "no" ] ; then
-            rm -f $t $t.tmp
-        else
-            mv -f $t.tmp $t
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
         fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
     fi
 %endif
 %if %{have_sock2path}
@@ -2018,38 +2020,39 @@ if [ $1 = 0 ] ; then : # final removal
     # After going away altogether, we want to rebuild the netconfig database, but only if the
     # netconfig database was built by use or does not exist.
     t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
     d="${t}.d"
-    recalc='yes'
     if [ -f $t ] ; then
         if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            recalc='no'
+            t="${a}"
         fi
     fi
-    if [ $recalc = "yes" ] ; then
-        echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-        found='no'
-        files="$d/*"
-        for f in $files ; do
-            if [ -f $f -a $f = "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        for f in $files ; do
-            if [ -f $f -a $f != "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        if [ $found = "no" ] ; then
-            rm -f $t $t.tmp
-        else
-            mv -f $t.tmp $t
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
         fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
     fi
 %endif
 %if %{have_sock2path}
@@ -2141,38 +2144,39 @@ b loop' $prel_new > $prel_tmp
     # After going doing an upgrade we want to rebuild the netconfig database, but only if the
     # netconfig database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
     d="${t}.d"
-    recalc='yes'
     if [ -f $t ] ; then
         if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            recalc='no'
+            t="${a}"
         fi
     fi
-    if [ $recalc = "yes" ] ; then
-        echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-        found='no'
-        files="$d/*"
-        for f in $files ; do
-            if [ -f $f -a $f = "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        for f in $files ; do
-            if [ -f $f -a $f != "$d/strnsl" ] ; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-                esac
-            fi
-        done
-        if [ $found = "no" ] ; then
-            rm -f $t $t.tmp
-        else
-            mv -f $t.tmp $t
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
         fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
     fi
 %endif
 %if %{have_sock2path}
@@ -2196,7 +2200,7 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %config(noreplace) %{_configdir}/*
@@ -2210,7 +2214,7 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %config(noreplace) %{_configdir}/*
@@ -2223,7 +2227,7 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %{?modules:%config(noreplace) %{_modutildir}/*}
@@ -2235,7 +2239,7 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %endif
