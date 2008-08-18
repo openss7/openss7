@@ -9,16 +9,16 @@
 #
 # See netconfig(5) for more information.
 #
-# <netid> <semantics>   <flag> <family>  <proto> <device>       <n2alibs>
-# ------- ------------- ------ --------- ------- -------------- ----------------
-udp6      tpi_clts      v      inet6     udp     -               -
-tcp6      tpi_cots_ord  v      inet6     tcp     -               -
-udp       tpi_clts      v      inet      udp     -               -
-tcp       tpi_cots_ord  v      inet      tcp     -               -
-rawip     tpi_raw       -      inet      -       -               -
-local     tpi_cots_ord  -      loopback  -       -               -
-unix      tpi_cots_ord  -      loopback  -       -               -
-# ------- ------------- ------ --------- ------- -------------- ----------------
+### <netid> <semantics>   <flag> <family>  <proto> <device>       <n2alibs>
+### ------- ------------- ------ --------- ------- -------------- ----------------
+##udp6      tpi_clts      v      inet6     udp     -               -
+##tcp6      tpi_cots_ord  v      inet6     tcp     -               -
+##udp       tpi_clts      v      inet      udp     -               -
+##tcp       tpi_cots_ord  v      inet      tcp     -               -
+##rawip     tpi_raw       -      inet      -       -               -
+##local     tpi_cots_ord  -      loopback  -       -               -
+##unix      tpi_cots_ord  -      loopback  -       -               -
+### ------- ------------- ------ --------- ------- -------------- ----------------
 
 ##
 # Lines beginning with a '#' (after an arbitraty amount of whitespace)

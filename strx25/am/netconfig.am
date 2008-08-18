@@ -1,4 +1,4 @@
-## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor tw=80
 ## =============================================================================
 ## 
 # @(#) $RCSfile: netconfig.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.11 $) $Date: 2008-04-28 09:30:19 $
@@ -73,21 +73,31 @@ install-netconfig: src/util/sysconfig/netconfig
 	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/netconfig.d/@PACKAGE_LCNAME@
 
 ##
-# If the /etc/netconfig file exists after we have place the /etc/netconfig.d subdirectory entry,
-# then check if it is one we built.  If it is, simply empty it a start again, otherwise if it is not
-# one we built it likely belongs to the libtirpc package so do not calculate a new one.  If there
-# are no entries in the /etc/netconfig.d subdirectory, assume that we are being removed.
-# any /etc/netconfig.tirpc file back to place.  Note that if nothing really gets installed in the
-# /etc/netconfig.d subdirectory, calling this has no overall effect.
+# If the /etc/netconfig file exists after we have placed the /etc/netconfig.d
+# subdirectory entry, then check if it is one we built.  If it is, simply empty
+# it and start again, otherwise if it is not one we built it likely belongs to
+# the libtirpc package so do not calculate a new one: use the netconfig.xnsl
+# name instead.  If /etc/netconfig.xnsl already exists, use this alternate file
+# in preference to /etc/netconfig.  Also, if this is an rpm, dpkg or target
+# installation, use the alternate file name to avoid clobbering the nfs4 file
+# during final installation.  If there are no entries in the /etc/netconfig.d
+# subdirectory, assume that we are being removed.  Note that if nothing really
+# gets installed in the /etc/netconfig.d subdirectory, calling this has no
+# overall effect.
 ##
 
 post-netconfig:
 	@$(ECHO) "Making $@ in `pwd`"
 	@t="$(DESTDIR)$(sysconfdir)/netconfig" ; \
+	a="$(DESTDIR)$(sysconfdir)/netconfig.xnsl" ; \
 	d="$(DESTDIR)$(sysconfdir)/netconfig.d" ; \
 	if test -e $$t ; then \
 		if ! grep '^# Generated from netconfig.d' $$t >/dev/null 2>&1 ; then \
-			exit 0 ; \
+			t="$$a" ; \
+		fi ; \
+	else \
+		if test -e $$a -o -n '$(DESTDIR)'; then \
+			t="$$a" ; \
 		fi ; \
 	fi ; \
 	$(ECHO) "$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $$t.tmp" ; \
@@ -119,6 +129,10 @@ post-netconfig:
 	else \
 		$(ECHO) "mv -f $$t.tmp $$t" ; \
 		mv -f $$t.tmp $$t ; \
+	fi ; \
+	if test "$$t" != "$$a" ; then \
+		$(ECHO) "rm -f $$a" ; \
+		rm -f $$a ; \
 	fi
 
 uninstall-netconfig:
@@ -185,4 +199,4 @@ EXTRA_DIST		+= src/util/sysconfig/netconfig
 ## - rules for configuration files
 ##
 ## =============================================================================
-## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor tw=80
