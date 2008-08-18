@@ -1,4 +1,4 @@
-OpenSS7 STREAMS SCTP -- read me first file.  2008-08-08
+OpenSS7 STREAMS SCTP -- read me first file.  2008-08-16
 $Id: README,v 0.9.2.51 2008-08-11 22:23:41 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS SCTP
 =====================
 
-Package strsctp-0.9.2.9 was released under AGPLv3 2008-08-08.
+Package strsctp-0.9.2.9 was released under AGPLv3 2008-08-16.
 
 `OpenSS7 STREAMS SCTP' (`strsctp') is an `OpenSS7 Project'
 implementation of Stream Control Transmission Protocol (SCTP - RFC
@@ -55,7 +55,7 @@ well.
  Release
 --------
 
-This is the `strsctp-0.9.2.9' package, released 2008-08-08.  This
+This is the `strsctp-0.9.2.9' package, released 2008-08-16.  This
 `0.9.2.9' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
