@@ -5098,8 +5098,8 @@ allocstr(void)
 		atomic_inc(&qsi->si_cnt);
 		if (atomic_read(&qsi->si_cnt) > qsi->si_hwl)
 			qsi->si_hwl = atomic_read(&qsi->si_cnt);
-		rq->q_flag = QSHEAD | QUSE | QREADR;
-		wq->q_flag = QSHEAD | QUSE;
+		rq->q_flag = QSHEAD | QWANTR | QUSE | QREADR;
+		wq->q_flag = QSHEAD | QWANTR | QUSE;
 #ifdef CONFIG_STREAMS_DEBUG
 		write_lock(&ssi->si_rwlock);
 		list_add_tail(&sh->sh_list, &ssi->si_head);
