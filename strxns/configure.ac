@@ -55,7 +55,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.61])
+AC_PREREQ([2.62])
 AC_INIT([strxns],[0.9.2],[bugs@openss7.org])
 AC_REVISION([$Name:  $($Revision: 0.9.2.39 $) $Date: 2008-08-02 23:25:11 $])
 
