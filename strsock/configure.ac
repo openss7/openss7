@@ -55,7 +55,7 @@
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.61])
+AC_PREREQ([2.62])
 AC_INIT([strsock],[0.9.2],[bugs@openss7.org])
 AC_REVISION([$Name:  $($Revision: 0.9.2.16 $) $Date: 2008-08-02 23:25:10 $])
 
@@ -106,7 +106,7 @@ AC_PROG_YACC
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AC_SUBST([LIBTOOL_DEPS])
-AM_GNU_GETTEXT_VERSION([0.16.1])
+AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT
 
 dnl
