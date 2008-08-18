@@ -495,16 +495,20 @@ __nsl_tsd_free(void *buf)
 }
 
 static void
+__nsl_tsd_key_create(void)
+{
+	pthread_key_create(&__nsl_tsd_key, __nsl_tsd_free);
+}
+
+static struct __nsl_tsd *
 __nsl_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __nsl_tsd *tsdp;
 
-	ret = pthread_key_create(&__nsl_tsd_key, __nsl_tsd_free);
-	buf = malloc(sizeof(struct __nsl_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__nsl_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__nsl_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 /**
@@ -518,8 +522,12 @@ __nsl_tsd_alloc(void)
 static struct __nsl_tsd *
 __nsl_get_tsd(void)
 {
-	pthread_once(&__nsl_tsd_once, __nsl_tsd_alloc);
-	return (struct __nsl_tsd *) pthread_getspecific(__nsl_tsd_key);
+	struct __nsl_tsd *tsdp;
+
+	pthread_once(&__nsl_tsd_once, __nsl_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__nsl_tsd_key)) == NULL))
+		tsdp = __nsl_tsd_alloc();
+	return (tsdp);
 };
 
 int *
@@ -1050,20 +1058,20 @@ __nsl_nc_sperror(void)
 		case NC_NOERROR:
 		case NC_NOMEM:
 		case NC_NOSET:
-			(void) strncpy(errbuf, __nsl_nc_errlist[idx], NCERR_BUFSZ);
+			(void) strncpy(errbuf, gettext(__nsl_nc_errlist[idx]), NCERR_BUFSZ);
 			break;
 		case NC_OPENFAIL:
 		case NC_NOTFOUND:
 		case NC_NOMOREENTRIES:
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], NETCONFIG);
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), NETCONFIG);
 			break;
 		case NC_BADLINE:
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], NETCONFIG,
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), NETCONFIG,
 					tsd->fieldnum, tsd->linenum);
 			break;
 		default:
 			idx = NC_ERROR_MAX;
-			(void) snprintf(errbuf, NCERR_BUFSZ, __nsl_nc_errlist[idx], err);
+			(void) snprintf(errbuf, NCERR_BUFSZ, gettext(__nsl_nc_errlist[idx]), err);
 			break;
 		}
 	}
@@ -1828,15 +1836,15 @@ __nsl_netdir_sperror(void)
 		case ND_FAILCTRL:
 		case ND_SYSTEM:
 		case ND_NOCONVERT:
-			(void) strncpy(errbuf, __nsl_nd_errlist[idx], NDERR_BUFSZ);
+			(void) strncpy(errbuf, gettext(__nsl_nd_errlist[idx]), NDERR_BUFSZ);
 			break;
 		case ND_NOSYM:
 		case ND_OPEN:
-			(void) snprintf(errbuf, NDERR_BUFSZ, __nsl_nd_errlist[idx], dlerror());
+			(void) snprintf(errbuf, NDERR_BUFSZ, gettext(__nsl_nd_errlist[idx]), dlerror());
 			break;
 		default:
 			idx = ND_ERROR_MAX - ND_ERROR_OFS;
-			(void) snprintf(errbuf, NDERR_BUFSZ, __nsl_nd_errlist[idx], err);
+			(void) snprintf(errbuf, NDERR_BUFSZ, gettext(__nsl_nd_errlist[idx]), err);
 			break;
 		}
 	}

@@ -280,23 +280,31 @@ __xnet_tsd_free(void *buf)
 }
 
 static void
+__xnet_tsd_key_create(void)
+{
+	pthread_key_create(&__xnet_tsd_key, __xnet_tsd_free);
+}
+
+static struct __xnet_tsd *
 __xnet_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __xnet_tsd *tsdp;
 
-	ret = pthread_key_create(&__xnet_tsd_key, __xnet_tsd_free);
-	buf = malloc(sizeof(struct __xnet_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__xnet_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__xnet_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 static struct __xnet_tsd *
 __xnet_get_tsd(void)
 {
-	pthread_once(&__xnet_tsd_once, __xnet_tsd_alloc);
-	return (struct __xnet_tsd *) pthread_getspecific(__xnet_tsd_key);
+	struct __xnet_tsd *tsdp;
+
+	pthread_once(&__xnet_tsd_once, __xnet_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__xnet_tsd_key)) == NULL))
+		tsdp = __xnet_tsd_alloc();
+	return (tsdp);
 };
 
 /** @brief #t_errno location function.

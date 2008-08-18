@@ -385,17 +385,22 @@ __apli_tsd_free(void *buf)
 	free(buf);
 }
 
-static void
+struct void
+__apli_tsd_key_create(void)
+{
+	pthread_key_create(&__apli_tsd_key, __apli_tsd_free);
+}
+
+
+static struct __apli_tsd *
 __apli_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __apli_tsd *tsdp;
 
-	ret = pthread_key_create(&__apli_tsd_key, __apli_tsd_free);
-	buf = malloc(sizeof(struct __apli_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__apli_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(sizeof(*tsdp)));
+	bzero(tsdp, sizeof(*tsdp));
+	pthread_setspecific(__apli_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 /**
@@ -409,8 +414,12 @@ __apli_tsd_alloc(void)
 static struct __apli_tsd *
 __apli_get_tsd(void)
 {
-	pthread_once(&__apli_tsd_once, __apli_tsd_alloc);
-	return (struct __apli_tsd *) pthread_getspecific(__apli_tsd_key);
+	struct __apli_tsd *tsdp;
+
+	pthread_once(&__apli_tsd_once, __apli_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__apli_tsd_key)) == NULL))
+		tsdp = __apli_tsd_alloc();
+	return (tsdp);
 };
 
 /** @brief #ap_errno location function.

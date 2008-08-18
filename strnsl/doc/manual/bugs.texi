@@ -1,4 +1,4 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
 @c @(#) $Id: bugs.texi,v 0.9.2.6 2008-04-28 22:11:46 brian Exp $
@@ -58,7 +58,16 @@
 @c =========================================================================
 
 @table @code
-@item 2007-06-20T15:22:19-0600
+@item 003.  2008-08-17T03:42:23+0000
+
+The
+xnsl
+library was discovered to contain a thread-safety bug caused by newer behaviour of pthread_once()
+causing the library to core dump when used on recent implementations of pthreads (nptl).
+
+@emph{*fixed*} in @command{strnsl-0.9.2.4}.
+
+@item 002.  2007-06-20T15:22:19-0600
 The libtirpc package for current releases of GNU/Linux including NFS4 has usurped a broken
 /etc/netconfig file for use by its broken implementation of TI-RPC.  So when strnsl and more
 importantly the strinet package installs its /etc/netconfig entries, the libtirpc package breaks.
@@ -70,7 +79,7 @@ Fixed in the current release: the actual fix involves not calculating the /etc/n
 the /etc/netconfig.d subdirectory entries when an /etc/netconfig file exists that we have not
 generated.
 
-@item 2007-03-05T01:21:21-0700
+@item 001.  2007-03-05T01:21:21-0700
 RPMs built on 2.4 kernels install the @samp{include strnsl} line to @file{modules.conf} when there
 is no such directory installed by any of the rpms.  This means that @command{depmod} complains
 loudly about the missing directory.  This was fixed for the current release.

@@ -58,6 +58,17 @@
 @c =========================================================================
 
 @table @code
+@item 006.  2008-08-17T03:42:23+0000
+
+The
+xnet
+library was discovered to contain a thread-safety bug caused by newer behaviour of pthread_once()
+causing the library to core dump when used on recent implementations of pthreads (nptl).
+
+The xnet library is no longer normally compiled as part of the @file{strss7} package.
+
+@emph{*fixed*} in @command{strss7-0.9a.8}.
+
 @item 005.  2007-07-21T17:15:02-0600
 
 It was discovered that recent kernel on RHAS4 are defining irq_handler_t but

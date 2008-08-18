@@ -199,23 +199,31 @@ __dlpi_tsd_free(void *buf)
 }
 
 static void
+__dlpi_tsd_key_create(void)
+{
+	pthread_key_create(&__dlpi_tsd_key, __dlpi_tsd_free);
+}
+
+static struct __dlpi_tsd *
 __dlpi_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __dlpi_tsd *tsdp;
 
-	ret = pthread_key_create(&__dlpi_tsd_key, __dlpi_tsd_free);
-	buf = malloc(sizeof(struct __dlpi_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__dlpi_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__dlpi_tsd_key, tsdp);
+	return (tsdp);
 }
 
 static struct __dlpi_tsd *
 __dlpi_get_tsd(void)
 {
-	pthread_once(&__dlpi_tsd_once, __dlpi_tsd_alloc);
-	return (struct __dlpi_tsd *) pthread_getspecific(__dlpi_tsd_key);
+	struct __dlpi_tsd *tsdp;
+
+	pthread_once(&__dlpi_tsd_once, __dlpi_tsd_key_create);
+	if (unlikely((tsdp =  (typeof(tsdp)) pthread_getspecific(__dlpi_tsd_key)) == NULL))
+		tsdp = __dlpi_tsd_alloc();
+	return (tsdp);
 }
 
 /** @brief #dlerrno location function.
