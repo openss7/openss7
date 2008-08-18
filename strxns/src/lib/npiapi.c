@@ -261,23 +261,31 @@ __npi_tsd_free(void *buf)
 }
 
 static void
+__npi_tsd_key_create(void)
+{
+	pthread_key_create(&__npi_tsd_key, __npi_tsd_free);
+}
+
+static struct __npi_tsd *
 __npi_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __npi_tsd *tsdp;
 
-	ret = pthread_key_create(&__npi_tsd_key, __npi_tsd_free);
-	buf = malloc(sizeof(struct __npi_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__npi_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__npi_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 static struct __npi_tsd *
 __npi_get_tsd(void)
 {
-	pthread_once(&__npi_tsd_once, __npi_tsd_alloc);
-	return (struct __npi_tsd *) pthread_getspecific(__npi_tsd_key);
+	struct __npi_tsd *tsdp;
+
+	pthread_once(&__npi_tsd_once, __npi_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__npi_tsd_key)) == NULL))
+		tsdp = __npi_tsd_alloc();
+	return (tsdp);
 }
 
 /** @brief #nerrno location function.

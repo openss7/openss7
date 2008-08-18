@@ -172,23 +172,31 @@ __sockpath_tsd_free(void *buf)
 }
 
 static void
+__sockpath_tsd_key_create(void)
+{
+	pthread_key_create(&__sockpath_tsd_key, __sockpath_tsd_free);
+}
+
+static struct __sockpath_tsd *
 __sockpath_tsd_alloc(void)
 {
-	int ret;
-	char *buf;
+	struct __sockpath_tsd *tsdp;
 
-	ret = pthread_key_create(&__sockpath_tsd_key, __sockpath_tsd_free);
-	buf = malloc(sizeof(struct __sockpath_tsd));
-	memset(buf, 0, sizeof(*buf));
-	ret = pthread_setspecific(__sockpath_tsd_key, (void *) buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__sockpath_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 static struct __sockpath_tsd *
 __sockpath_get_tsd(void)
 {
-	pthread_once(&__sockpath_tsd_once, __sockpath_tsd_alloc);
-	return (struct __sockpath_tsd *) pthread_getspecific(__sockpath_tsd_key);
+	struct __sockpath_tsd *tsdp;
+
+	pthread_once(&__sockpath_tsd_once, __sockpath_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__sockpath_tsd_key)) == NULL))
+		tsdp = __sockpath_tsd_alloc();
+	return (tsdp);
 }
 
 int *

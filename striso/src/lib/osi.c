@@ -179,16 +179,20 @@ __osi_tsd_free(void *buf)
 }
 
 static void
+__osi_tsd_key_create(void)
+{
+	pthread_key_create(&__osi_tsd_key, __osi_tsd_free);
+}
+
+static struct __osi_tsd *
 __osi_tsd_alloc(void)
 {
-	int ret;
-	char *buf;
+	struct __osi_tsd *tsdp;
 
-	ret = pthread_key_create(&__osi_tsd_key, __osi_tsd_free);
-	buf = malloc(sizeof(struct __osi_tsd));
-	memset(buf, 0, sizeof(*buf));
-	ret = pthread_setspecific(__osi_tsd_key, (void *) buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__osi_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 /** @internal
@@ -199,8 +203,12 @@ __osi_tsd_alloc(void)
 static struct __osi_tsd *
 __osi_get_tsd(void)
 {
-	pthread_once(&__osi_tsd_once, __osi_tsd_alloc);
-	return (struct __osi_tsd *) pthread_getspecific(__osi_tsd_key);
+	struct __osi_tsd *tsdp;
+
+	pthread_once(&__osi_tsd_once, __osi_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__osi_tsd_key)) == NULL))
+		tsdp = __osi_tsd_alloc();
+	return (tsdp);
 };
 
 /*

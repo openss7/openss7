@@ -188,23 +188,31 @@ __cdi_tsd_free(void *buf)
 }
 
 static void
+__cdi_tsd_key_create(void)
+{
+	pthread_key_create(&__cdi_tsd_key, __cdi_tsd_free);
+}
+
+static struct __cdi_tsd *
 __cdi_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __cdi_tsd *tsdp;
 
-	ret = pthread_key_create(&__cdi_tsd_key, __cdi_tsd_free);
-	buf = malloc(sizeof(struct __cdi_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__cdi_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__cdi_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 static struct __cdi_tsd *
 __cdi_get_tsd(void)
 {
-	pthread_once(&__cdi_tsd_once, __cdi_tsd_alloc);
-	return (struct __cdi_tsd *) pthread_getspecific(__cdi_tsd_key);
+	struct __cdi_tsd *tsdp;
+
+	pthread_once(&__cdi_tsd_once, __cdi_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__cdi_tsd_key)) == NULL))
+		tsdp = __cdi_tsd_alloc();
+	return (tsdp);
 }
 
 /** @brief #cerrno location function.

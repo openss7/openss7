@@ -168,16 +168,20 @@ __xap_tsd_free(void *buf)
 }
 
 static void
+__xap_tsd_key_create(void)
+{
+	pthread_key_create(&__xap_tsd_key, __xap_tsd_free);
+}
+
+static struct __xap_tsd *
 __xap_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __xap_tsd *tsdp;
 
-	ret = pthread_key_create(&__xap_tsd_key, __xap_tsd_free);
-	buf = malloc(sizeof(struct __xap_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__xap_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__xap_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 /** @internal
@@ -189,8 +193,12 @@ __xap_tsd_alloc(void)
 static struct __xap_tsd *
 __xap_get_tsd(void)
 {
+	struct __xap_tsd *tsdp;
+
 	pthread_once(&__xap_tsd_once, __xnet_tsd_alloc);
-	return (struct __xap_tsd *) pthread_getspecific(__xap_tsd_key);
+	if (unlikely((tsdp = pthread_getspecific(__xap_tsd_key)) == NULL))
+		tsdp = __xap_tsd_alloc();
+	return (tsdp);
 }
 
 /** @brief #aperrno location function.

@@ -495,16 +495,20 @@ __nsl_tsd_free(void *buf)
 }
 
 static void
+__nsl_tsd_key_create(void)
+{
+	pthread_key_create(&__nsl_tsd_key, __nsl_tsd_free);
+}
+
+static struct __nsl_tsd *
 __nsl_tsd_alloc(void)
 {
-	int ret;
-	void *buf;
+	struct __nsl_tsd *tsdp;
 
-	ret = pthread_key_create(&__nsl_tsd_key, __nsl_tsd_free);
-	buf = malloc(sizeof(struct __nsl_tsd));
-	bzero(buf, sizeof(*buf));
-	ret = pthread_setspecific(__nsl_tsd_key, buf);
-	return;
+	tsdp = (typeof(tsdp)) malloc(sizeof(*tsdp));
+	memset(tsdp, 0, sizeof(*tsdp));
+	pthread_setspecific(__nsl_tsd_key, (void *) tsdp);
+	return (tsdp);
 }
 
 /**
@@ -518,8 +522,12 @@ __nsl_tsd_alloc(void)
 static struct __nsl_tsd *
 __nsl_get_tsd(void)
 {
-	pthread_once(&__nsl_tsd_once, __nsl_tsd_alloc);
-	return (struct __nsl_tsd *) pthread_getspecific(__nsl_tsd_key);
+	struct __nsl_tsd *tsdp;
+
+	pthread_once(&__nsl_tsd_once, __nsl_tsd_key_create);
+	if (unlikely((tsdp = (typeof(tsdp)) pthread_getspecific(__nsl_tsd_key)) == NULL))
+		tsdp = __nsl_tsd_alloc();
+	return (tsdp);
 };
 
 int *
