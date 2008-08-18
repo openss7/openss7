@@ -2501,6 +2501,7 @@ stacks/m4/iconv.m4
 stacks/m4/intdiv0.m4
 stacks/m4/intldir.m4
 stacks/m4/intl.m4
+stacks/m4/intlmacosx.m4
 stacks/m4/intmax.m4
 stacks/m4/inttypes_h.m4
 stacks/m4/inttypes.m4
@@ -3353,6 +3354,7 @@ striso/m4/iconv.m4
 striso/m4/intdiv0.m4
 striso/m4/intldir.m4
 striso/m4/intl.m4
+striso/m4/intlmacosx.m4
 striso/m4/intmax.m4
 striso/m4/inttypes_h.m4
 striso/m4/inttypes.m4
@@ -3514,6 +3516,7 @@ strnsl/m4/iconv.m4
 strnsl/m4/intdiv0.m4
 strnsl/m4/intldir.m4
 strnsl/m4/intl.m4
+strnsl/m4/intlmacosx.m4
 strnsl/m4/intmax.m4
 strnsl/m4/inttypes_h.m4
 strnsl/m4/inttypes.m4
@@ -3847,6 +3850,7 @@ strsock/m4/iconv.m4
 strsock/m4/intdiv0.m4
 strsock/m4/intldir.m4
 strsock/m4/intl.m4
+strsock/m4/intlmacosx.m4
 strsock/m4/intmax.m4
 strsock/m4/inttypes_h.m4
 strsock/m4/inttypes.m4
@@ -4013,6 +4017,7 @@ strvoip/scripts/install-sh
 strvoip/scripts/ltmain.sh
 strvoip/scripts/missing
 strvoip/scripts/texinfo.tex
+strx25/ABOUT-NLS
 strx25/doc/manual/strx25.info
 strx25/doc/manual/x25_porting.info
 strx25/doc/specs/lli/lli.info
@@ -4029,6 +4034,7 @@ strx25/m4/iconv.m4
 strx25/m4/intdiv0.m4
 strx25/m4/intldir.m4
 strx25/m4/intl.m4
+strx25/m4/intlmacosx.m4
 strx25/m4/intmax.m4
 strx25/m4/inttypes_h.m4
 strx25/m4/inttypes.m4
@@ -4070,6 +4076,8 @@ strx25/po/Makevars.template
 strx25/po/quot.sed
 strx25/po/remove-potcdate.sin
 strx25/po/Rules-quot
+strx25/po/strx25.pot
+strx25/scripts/config.rpath
 strx25/scripts/ltmain.sh
 strx25/src/mibs/.index
 strx25/src/snmp/makestubs
@@ -4116,6 +4124,7 @@ strxnet/m4/iconv.m4
 strxnet/m4/intdiv0.m4
 strxnet/m4/intldir.m4
 strxnet/m4/intl.m4
+strxnet/m4/intlmacosx.m4
 strxnet/m4/intmax.m4
 strxnet/m4/inttypes_h.m4
 strxnet/m4/inttypes.m4
