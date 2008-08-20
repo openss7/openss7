@@ -1,3 +1,18 @@
+2008-08-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* configure.ac: requirements for autoconf and gettext versions
+	* strx25.spec.in: update changelog, netconfig generation
+	* debian/control.in: updated kernel packages
+	* debian/mscript_header.in: add files variables
+	* debian/rules.in: add SNMP and newnet info package
+	* debian/strx25-init.postinst.in: add netconfig and sock2path
+	* debian/strx25-init.preinst.in: add netconfig and sock2path
+	* po/strx25.pot: update translation file
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

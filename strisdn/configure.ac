@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-08-02 23:25:09 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-02 23:25:09 $ by $Author: brian $
+# Last Modified $Date: 2008-08-20 10:56:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.62])
 AC_INIT([strisdn],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.12 $) $Date: 2008-08-02 23:25:09 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:46 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -196,6 +196,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.13  2008-08-20 10:56:46  brian
+# - fixes and build updates from newnet trip
+#
 # Revision 0.9.2.12  2008-08-02 23:25:09  brian
 # - restore dependency defaults from old autoconf/automake
 #

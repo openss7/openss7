@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $
+ @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-08-20 10:56:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:33:33 $ by $Author: brian $
+ Last Modified $Date: 2008-08-20 10:56:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockpath.c,v $
+ Revision 0.9.2.6  2008-08-20 10:56:56  brian
+ - fixes and build updates from newnet trip
+
  Revision 0.9.2.5  2008-04-28 22:33:33  brian
  - updated headers for release
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $"
+#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-08-20 10:56:56 $"
 
 static char const ident[] =
-    "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $";
+    "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-08-20 10:56:56 $";
 
 /* This file can be processed with doxygen(1). */
 

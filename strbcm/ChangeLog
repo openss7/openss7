@@ -1,3 +1,11 @@
+2008-08-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: requirements for autoconf and gettext versions
+	* strbcm.spec.in: update changelog, netconfig generation
+	* debian/control.in: updated kernel packages
+	* debian/mscript_header.in: add files variables
+	* debian/rules.in: add SNMP and newnet info package
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

@@ -1,3 +1,19 @@
+2008-08-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release files
+	* NEWS: updated release files
+	* README: updated release files
+	* README-cvs: updated release files
+	* THANKS: updated release files
+	* configure.ac: requirements for autoconf and gettext versions
+	* strss7.spec.in: update changelog, netconfig generation
+	* debian/control.in: updated kernel packages
+	* debian/mscript_header.in: add files variables
+	* debian/rules.in: add SNMP and newnet info package
+	* doc/manual/bugs.texi: document pthread_once() bug
+	* po/de.po: updated translated text
+	* src/lib/libxnet/xnet.c: correct pthread_once() bug
+
 2008-08-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* tests/testsuite.at.in: do not include test-usage for now

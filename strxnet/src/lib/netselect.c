@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:41 $
+ @(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-08-20 10:57:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/11 00:23:41 $ by $Author: brian $
+ Last Modified $Date: 2008-08-20 10:57:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netselect.c,v $
+ Revision 0.9.2.8  2008-08-20 10:57:03  brian
+ - fixes and build updates from newnet trip
+
  Revision 0.9.2.7  2008/07/11 00:23:41  brian
  - gettext declarations
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:41 $"
+#ident "@(#) $RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-08-20 10:57:03 $"
 
 static char const ident[] =
-    "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/07/11 00:23:41 $";
+    "$RCSfile: netselect.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-08-20 10:57:03 $";
 
 /* This file can be processed with doxygen(1). */
 

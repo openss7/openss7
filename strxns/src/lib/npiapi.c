@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npiapi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/07/08 16:57:33 $
+ @(#) $RCSfile: npiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/08 16:57:33 $ by $Author: brian $
+ Last Modified $Date: 2008-08-20 10:57:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npiapi.c,v $
+ Revision 0.9.2.7  2008-08-20 10:57:05  brian
+ - fixes and build updates from newnet trip
+
  Revision 0.9.2.6  2008/07/08 16:57:33  brian
  - updated libraries and manual pages
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npiapi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/07/08 16:57:33 $"
+#ident "@(#) $RCSfile: npiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $"
 
 static char const ident[] =
-    "$RCSfile: npiapi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/07/08 16:57:33 $";
+    "$RCSfile: npiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $";
 
 /*
  * This is an OpenSS7 implemetnation of the GCOM npiapi library.  It builds

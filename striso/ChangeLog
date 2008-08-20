@@ -1,3 +1,21 @@
+2008-08-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* README-cvs: update release files
+	* THANKS: update release files
+	* configure.ac: requirements for autoconf and gettext versions
+	* striso.spec.in: update changelog, netconfig generation
+	* debian/control.in: updated kernel packages
+	* debian/mscript_header.in: add files variables
+	* debian/rules.in: add SNMP and newnet info package
+	* debian/striso-init.postinst.in: add netconfig and sock2path
+	* debian/striso-init.preinst.in: add netconfig and sock2path
+	* src/lib/osi.c: correct pthread_once() bug
+	* src/lib/apli/apli.c: correct pthread_once() bug
+	* src/lib/xap/xap.c: correct pthread_once() bug
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

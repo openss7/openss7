@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:01 $
+ @(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:56:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:01 $ by $Author: brian $
+ Last Modified $Date: 2008-08-20 10:56:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: apli.c,v $
+ Revision 0.9.2.5  2008-08-20 10:56:48  brian
+ - fixes and build updates from newnet trip
+
  Revision 0.9.2.4  2008-04-29 00:02:01  brian
  - updated headers for release
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:01 $"
+#ident "@(#) $RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:56:48 $"
 
-static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 00:02:01 $";
+static char const ident[] = "$RCSfile: apli.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:56:48 $";
 
 /* This file can be processed with doxygen(1). */
 
