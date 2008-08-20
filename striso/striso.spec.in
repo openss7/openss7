@@ -2259,12 +2259,14 @@ external SNMP management tools.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: striso.spec.in,v $
-# Revision 0.9.2.26  2008-08-11 22:24:04  brian
-# - handle snmp in spec files
-#
-# Revision 0.9.2.25  2008-05-04 16:16:46  brian
-# - changes and corrections for release
-#
+
+* Mon Aug 11 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.26  2008-08-11 22:24:04  brian
+- handle snmp in spec files
+
+* Sun May  4 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.25  2008-05-04 16:16:46  brian
+- changes and corrections for release
 
 * Tue Apr 29 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.24  2008-04-29 00:01:53  brian

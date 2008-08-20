@@ -187,7 +187,7 @@ libCHANmods_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER
 libCHANmods_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libCHANmods_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-$(libCHANmods_a_OBJECTS):	$(libCHANmods_a_DEPENDENCIES)
+$(libCHANmods_a_OBJECTS):	$(libCHANmods_a_SOURCES) $(libCHANmods_a_DEPENDENCIES)
 
 EXTRA_libCHANdrvs_a_SOURCES	=
 libCHANdrvs_a_SOURCES		=
@@ -195,7 +195,7 @@ libCHANdrvs_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER
 libCHANdrvs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_EXPSYMTAB)
 libCHANdrvs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
-$(libCHANdrvs_a_OBJECTS):	$(libCHANdrvs_a_DEPENDENCIES)
+$(libCHANdrvs_a_OBJECTS):	$(libCHANdrvs_a_SOURCES) $(libCHANdrvs_a_DEPENDENCIES)
 
 EXTRA_KERNEL_MODULES		+= 
 
@@ -220,7 +220,7 @@ EXTRA_SCRIPTS			+= scripts/missing2
 ## Rules for building kernel objects
 ##
 KERNEL_OBJECTS			= $(libCHANlink_a_OBJECTS) $(libCHANmods_a_OBJECTS) $(libCHANdrvs_a_OBJECTS) $(ADDON_OBJS)
-KERNEL_MODULES			= $(libCHANmods_a_OBJECTS) $(libCHANdrvs_a_OBJECTS) $(ADDON_MODS)
+KERNEL_MODULES			= $(libCHANlink_a_OBJECTS) $(libCHANmods_a_OBJECTS) $(libCHANdrvs_a_OBJECTS) $(ADDON_MODS)
 KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
@@ -365,6 +365,12 @@ include am/release.am
 ## Rules for doxygen documentation.
 ##
 include am/doxy.am
+
+##
+## Rules for SNMP modules.
+##
+#SNMPORDER			= 01
+#include am/snmp.am
 
 EXTRA_DIST			+= \
 				  debian/README.Debian \

@@ -703,9 +703,10 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 0.9.2.81  2008-05-04 16:16:30  brian
-# - changes and corrections for release
-#
+
+* Sun May  4 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.81  2008-05-04 16:16:30  brian
+- changes and corrections for release
 
 * Mon Apr 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.80  2008-04-28 07:41:04  brian

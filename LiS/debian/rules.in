@@ -103,6 +103,10 @@ pkglibdir = $(libdir)/$(PACKAGE)
 pkgincludedir = $(includedir)/$(PACKAGE)
 pkglibexecdir = $(libexecdir)/$(PACKAGE)
 
+snmpmibdir = $(datarootdir)/snmp/mibs
+snmpdlmoddir = $(libdir)/snmp/dlmod
+snmpconfdir = $(sysconfdir)/snmp
+
 export DEB_HOST_ARCH
 export DH_VERBOSE = 1
 export DH_COMPAT = 4
@@ -159,15 +163,24 @@ control	+= debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
 
 control	+= debian/$(PACKAGE_LCNAME)-$(core_name).install
 
-debian/$(PACKAGE_LCNAME)-$(core_name).install:
-	( [ ! -d $(debtmpdir)$(kmoduledir) ] || echo '$(debtmpdir)$(kmoduledir)/*' ) \
-	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
+@WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-$(core_name).install:
+@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(kmoduledir) ] || echo '$(debtmpdir)$(kmoduledir)/modules.$(base)' ; \
+@WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/*.o' ) \
+@WITH_KO_MODULES_FALSE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-@WITH_KO_MODULES_FALSE@control	+= debian/$(PACKAGE_LCNAME)-$(info_name).install
+@WITH_KO_MODULES_TRUE@debian/$(PACKAGE_LCNAME)-$(core_name).install:
+@WITH_KO_MODULES_TRUE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/*.ko' ) \
+@WITH_KO_MODULES_TRUE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-debian/$(PACKAGE_LCNAME)-$(info_name).install:
-	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ) \
-	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
+control	+= debian/$(PACKAGE_LCNAME)-$(info_name).install
+
+@WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-$(info_name).install:
+@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ) \
+@WITH_KO_MODULES_FALSE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
+
+@WITH_KO_MODULES_TRUE@debian/$(PACKAGE_LCNAME)-$(info_name).install:
+@WITH_KO_MODULES_TRUE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/Module*' ) \
+@WITH_KO_MODULES_TRUE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 #
 #   Libraries:
@@ -260,14 +273,16 @@ control	+= debian/$(PACKAGE_LCNAME)-util.install
 debian/$(PACKAGE_LCNAME)-util.install:
 	( [ ! -d $(debtmpdir)$(bindir) ]	|| echo '$(debtmpdir)$(bindir)/*' ; \
 	  [ ! -d $(debtmpdir)$(sbindir) ]	|| echo '$(debtmpdir)$(sbindir)/*' ; \
-	  [ ! -d $(debtmpdir)$(pkglibexecdir) ]	|| echo '$(debtmpdir)$(pkglibexecdir)/*' ) \
+	  [ ! -d $(debtmpdir)$(pkglibexecdir) ]	|| echo '$(debtmpdir)$(pkglibexecdir)/*' ; \
+	  [ ! -d $(debtmpdir)$(snmpdlmoddir) ]  || echo '$(debtmpdir)$(snmpdlmoddir)/*' ) \
 	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 @INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.install
 
 debian/$(PACKAGE_LCNAME)-init.install:
-	( [ ! -d $(debtmpdir)$(configdir) ] || echo '$(debtmpdir)$(configdir)/*' ; \
-	  [ ! -d $(debtmpdir)$(initrddir) ] || echo '$(debtmpdir)$(initrddir)/*' ) \
+	( [ ! -d $(debtmpdir)$(configdir) ]   || echo '$(debtmpdir)$(configdir)/*' ; \
+	  [ ! -d $(debtmpdir)$(initrddir) ]   || echo '$(debtmpdir)$(initrddir)/*' ; \
+	  [ ! -d $(debtmpdir)$(snmpconfdir) ] || echo '$(debtmpdir)$(snmpconfdir)/*' ) \
 	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 control	+= debian/$(PACKAGE_LCNAME)-init.modules
@@ -282,6 +297,12 @@ debian/$(PACKAGE_LCNAME)-init.modules:
 
 debian/$(PACKAGE_LCNAME)-init.%.sh:
 	[ ! -f util/init/$*.sh ] || cp -f -- util/init/$*.sh $@
+
+#control += debian/$(PACKAGE_LCNAME)-mibs.install
+
+debian/$(PACKAGE_LCNAME)-mibs.install:
+	( [ ! -d $(debtmpdir)$(snmpmibdir) ] || echo '$(debtmpdir)$(snmpmibdir)/*' ) \
+	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 cache_file=$(debbuilddir)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
 csite_file=$(debbuilddir)/$(DEB_HOST_ARCH)-config.site
@@ -392,7 +413,7 @@ binary-common:
 binary-lis:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(core_name) binary-common
-@WITH_KO_MODULES_FALSE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(info_name) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(info_name) binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-util binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lib binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
@@ -417,6 +438,7 @@ binary-indep: install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-init binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-dev binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-doc binary-common
+#	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-mibs binary-common
 @WITH_K_PACKAGE_TRUE@	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-source binary-common
 #	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
 

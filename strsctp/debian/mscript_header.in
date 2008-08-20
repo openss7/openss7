@@ -68,6 +68,13 @@ modules=`echo " ${KERNEL_MODULES} " | sed -r -e 's| [^[:space:]]*/| |g;s| stream
 preloads=`echo " ${KERNEL_PRELOADS} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
 libraries=
 tools="strsctp_mknod test-sctp test-sctp_n test-sctp_nc test-sctp_ns test-sctp_t"
+infofiles=
+initfiles=
+conffiles=
+mibfiles=
+snmpmods=
+netconfig=${base}
+sock2path=${base}
 
 # @configure_input@
 # =============================================================================

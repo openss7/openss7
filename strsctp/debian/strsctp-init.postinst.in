@@ -95,6 +95,71 @@ configure_preloads() { :
     fi
 }
 
+configure_netconfig() { :
+    #
+    # At the end of a fresh install we need to rebuild the netconfig database, but only if the
+    # netconfig database was build by us or does not exist.
+    #
+    if [ "x$netconfig" != x ] ; then
+	t="$sysconfdir/netconfig"
+	a="${t}.xnsl"
+	d="${t}.d"
+	if [ -f $t ] ; then
+	    if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+		t="${a}"
+	    fi
+	fi
+	echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > ${t}.tmp
+	found='no'
+	files="$d/*"
+	for f in $files ; do
+	    if [ -f $f -a $f = "$d/strnsl" ] ; then
+		case $f in
+		    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> ${t}.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+	for f in $files ; do
+	    if [ -f $f -a $f != "$d/strnsl" ] ; then
+		case $f in
+		    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> ${t}.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+	if [ "$found" = "no" ] ; then
+	    rm -f $t ${t}.tmp
+	else
+	    mv -f ${t}.tmp $t
+	fi
+	if [ "$t" != "$a" ] ; then
+	    rm -f $a
+	fi
+    fi
+}
+
+configure_sock2path() { :
+    #
+    # At the end of a fresh install, we need to rebuild the sock2path database.
+    #
+    if [ "x$sock2path" != x ] ; then
+	t="$sysconfdir/sock2path"
+	cp -f -b --suffix=.dpkg-save -- /dev/null $t
+	for f in "${t}.d/*" ; do
+	    if [ -f $f ] ; then
+		case $f in
+		    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
+		esac
+	    fi
+	done
+    fi
+}
+
 #
 # We are configuring the installed package.
 #
@@ -105,6 +170,8 @@ configure_init_postinst() { :
     #
     @WITH_KO_MODULES_FALSE@configure_modconf
     configure_preloads
+    configure_netconfig
+    configure_sock2path
     #
     # Note that init scripts are handled by debhelper additions to this script.
     #
