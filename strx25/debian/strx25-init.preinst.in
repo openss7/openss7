@@ -154,7 +154,7 @@ function install_init_preinst() { :
 		fi
 	    done
 	    chmod --reference=$conf_fil -- $conf_new
-	    cp -f -b --suffix=.rpmsave -- $conf_new $conf_fil
+	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_fil
 	    rm -f -- $conf_new
 	fi
     done
@@ -166,7 +166,7 @@ function install_init_preinst() { :
 	sed -e '\|^[[:space:]]*streams|d' $prel_new > $prel_tmp
 	mv -f -- $prel_tmp $prel_new
 	chmod --reference=$prel_fil -- $prel_new
-	cp -f -b --suffix=.rpmsave -- $prel_new $prel_fil
+	cp -f -b --suffix=.dpkg-save -- $prel_new $prel_fil
 	rm -f -- $prel_new
     fi
     #

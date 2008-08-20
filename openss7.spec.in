@@ -2067,9 +2067,10 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.78  2008-05-04 16:16:29  brian
-# - changes and corrections for release
-#
+
+* Sun May  4 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.78  2008-05-04 16:16:29  brian
+- changes and corrections for release
 
 * Mon Apr 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.77  2008-04-28 07:41:02  brian

@@ -1744,12 +1744,14 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.109  2008-08-11 22:24:00  brian
-# - handle snmp in spec files
-#
-# Revision 0.9.2.108  2008-05-04 16:16:33  brian
-# - changes and corrections for release
-#
+
+* Mon Aug 11 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.109  2008-08-11 22:24:00  brian
+- handle snmp in spec files
+
+* Sun May  4 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.108  2008-05-04 16:16:33  brian
+- changes and corrections for release
 
 * Tue Apr 29 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.107  2008-04-29 08:49:49  brian

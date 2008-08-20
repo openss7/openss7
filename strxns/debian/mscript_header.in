@@ -66,8 +66,13 @@ STRCONF_MAJBASE=@STRCONF_MAJBASE@
 
 modules=`echo " ${KERNEL_MODULES} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
 preloads=`echo " ${KERNEL_PRELOADS} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
-libraries=
-tools="strxns_mknod ldlconfig ldltest"
+libraries="dlpi"
+tools="${base}_mknod ldlconfig ldltest"
+infofiles="${base} cdi dlpi npi"
+initfiles="${base}"
+conffiles="${name}.conf"
+mibfiles=
+snmpmods=
 
 # @configure_input@
 # =============================================================================

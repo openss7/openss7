@@ -1603,15 +1603,15 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     fi
     AC_SUBST([krelease])
     case "$target_vendor" in
-	(debian)
-	    kernel_image='kernel-image'
-	    kernel_source='kernel-source'
-	    kernel_headers='kernel-headers'
-	    ;;
-	(ubuntu)
-	    kernel_image='linux-image'
-	    kernel_source='linux-source'
-	    kernel_headers='linux-headers'
+dnl	(debian) dnl only old debian 2.4 kernels
+dnl	    kernel_image='kernel-image-${kversion}'
+dnl	    kernel_source='kernel-source-${kmajor}-${kminor}'
+dnl	    kernel_headers='kernel-headers-${kmajor}-${kminor}'
+dnl	    ;;
+	(debian|ubuntu)
+	    kernel_image="linux-image-${kversion}"
+	    kernel_source="linux-source-${kversion}"
+	    kernel_headers="linux-headers-${kversion}"
 	    ;;
 	(*)
 	    kernel_image='kernel'

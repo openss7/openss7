@@ -58,6 +58,15 @@
 @c =========================================================================
 
 @table @code
+@item 004.  2008-08-20T06:02:09+0000
+
+To permit the xnsl library to be used on systems with the broken libtirpc package, we now place the
+file in /etc/netconfig.xnsl instead of /etc/netconfig where the broken libtirpc package for
+GNU/Linux expects a broken /etc/netconfig configuration file.  The library has been adjusted to
+first look for /etc/netconfig.xnsl before looking for /etc/netconfig.
+
+@emph{*fixed*} in @command{strnsl-0.9.2.4}.
+
 @item 003.  2008-08-17T03:42:23+0000
 
 The
