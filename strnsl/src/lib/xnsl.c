@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-28 22:11:49 $
+ @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:56:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:11:49 $ by $Author: brian $
+ Last Modified $Date: 2008-08-20 10:56:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnsl.c,v $
+ Revision 0.9.2.5  2008-08-20 10:56:52  brian
+ - fixes and build updates from newnet trip
+
  Revision 0.9.2.4  2008-04-28 22:11:49  brian
  - updated headers for release
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-28 22:11:49 $"
+#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:56:52 $"
 
 static char const ident[] =
-    "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-28 22:11:49 $";
+    "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:56:52 $";
 
 /* This file cannot be processed with doxygen. */
 
@@ -2349,10 +2352,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.4 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.5 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.4 $)
- * @date \$Date: 2008-04-28 22:11:49 $
+ * @version \$Name:  $(\$Revision: 0.9.2.5 $)
+ * @date \$Date: 2008-08-20 10:56:52 $
  *
  * @}
  */

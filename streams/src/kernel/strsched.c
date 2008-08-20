@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2008-08-11 22:23:18 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-08-20 10:56:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
+ Last Modified $Date: 2008-08-20 10:56:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.172  2008-08-20 10:56:44  brian
+ - fixes and build updates from newnet trip
+
  Revision 0.9.2.171  2008-08-11 22:23:18  brian
  - rationalization of header files
 
@@ -198,10 +201,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2008-08-11 22:23:18 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-08-20 10:56:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2008-08-11 22:23:18 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-08-20 10:56:44 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

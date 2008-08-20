@@ -1,3 +1,17 @@
+2008-08-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* configure.ac: requirements for autoconf and gettext versions
+	* osr61.spec.in: update changelog, netconfig generation
+	* debian/control.in: updated kernel packages
+	* debian/mscript_header.in: add files variables
+	* debian/osr61-init.postinst.in: add netconfig and sock2path
+	* debian/osr61-init.preinst.in: add netconfig and sock2path
+	* debian/rules.in: add SNMP and newnet info package
+
 2008-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updates for release

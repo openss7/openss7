@@ -1,3 +1,11 @@
+2008-08-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* configure.ac: updated autoconf and gettext required versions
+	* openss7.spec.in: updated changelog
+	* am/netconfig.am: build netconfig.xnsl file instead
+	* debian/mscript_header.in: add additional files
+	* m4/kernel.m4: handle newer debian better
+
 2008-08-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/papers.am: depdendency tracking now on by default

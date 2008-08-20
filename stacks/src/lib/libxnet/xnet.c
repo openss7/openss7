@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:50 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:50 $ by $Author: brian $
+ Last Modified $Date: 2008-08-20 10:56:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnet.c,v $
+ Revision 0.9.2.13  2008-08-20 10:56:39  brian
+ - fixes and build updates from newnet trip
+
  Revision 0.9.2.12  2008-05-05 15:34:50  brian
  - be strict with MORE_data and DATA_flag
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:50 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:39 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:50 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:39 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -6184,10 +6187,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.12 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.13 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.12 $)
-  * @date \$Date: 2008-05-05 15:34:50 $
+  * @version \$Name:  $(\$Revision: 0.9.2.13 $)
+  * @date \$Date: 2008-08-20 10:56:39 $
   */
 
 /** @} */

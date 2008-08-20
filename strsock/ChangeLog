@@ -1,3 +1,18 @@
+2008-08-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* README-cvs: update release files
+	* THANKS: update release files
+	* configure.ac: requirements for autoconf and gettext versions
+	* strsock.spec.in: update changelog, netconfig generation
+	* debian/control.in: updated kernel packages
+	* debian/mscript_header.in: add files variables
+	* debian/rules.in: add SNMP and newnet info package
+	* doc/manual/bugs.texi: document pthread_once() bug
+	* src/lib/sockpath.c: correct pthread_once() bug
+
 2008-08-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/Makefile.am: no variables in EXTRA_DIST
