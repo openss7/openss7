@@ -1,3 +1,9 @@
+2008-08-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* strxnet.spec.in: build changes for release
+	* debian/rules.in: build changes for release
+	* po/de.po: build changes for release
+
 2008-08-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: update release files

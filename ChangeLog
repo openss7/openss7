@@ -1,3 +1,11 @@
+2008-08-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: release file updates
+	* NEWS: release file updates
+	* README: release file updates
+	* README-cvs: release file updates
+	* THANKS: release file updates
+
 2008-08-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: updated autoconf and gettext required versions
