@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.31 $) $Date: 2008-08-20 10:56:32 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.32 $) $Date: 2008-08-28 02:37:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-20 10:56:32 $ by $Author: brian $
+# Last Modified $Date: 2008-08-28 02:37:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -175,7 +175,8 @@ control	+= debian/$(PACKAGE_LCNAME)-$(core_name).install
 control	+= debian/$(PACKAGE_LCNAME)-$(info_name).install
 
 @WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-$(info_name).install:
-@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ) \
+@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ; \
+@WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/Module*' ) \
 @WITH_KO_MODULES_FALSE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
 @WITH_KO_MODULES_TRUE@debian/$(PACKAGE_LCNAME)-$(info_name).install:
@@ -480,6 +481,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.32  2008-08-28 02:37:39  brian
+# - build and release file updates for release
+#
 # Revision 1.1.4.31  2008-08-20 10:56:32  brian
 # - fixes and build updates from newnet trip
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2008-08-20 10:56:45 $
+# @(#) $RCSfile: strinet.spec.in,v $ $Name:  $($Revision: 0.9.2.143 $) $Date: 2008-08-28 02:37:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-20 10:56:45 $ by $Author: brian $
+# Last Modified $Date: 2008-08-28 02:37:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1031,9 +1031,7 @@ Group:          System Environment/Kernel
 %if %{FILES_modules}
 Prefix:         %{_includedir}/%{name}/%{kernel_version}
 %endif
-%if %{FILES_ko_modules}
 Prefix:         %{_kmoduledir}
-%endif
 Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
@@ -1072,6 +1070,7 @@ This package applies to core kernel modules
 %defattr(-,root,root)
 %dir %{_includedir}/%{name}/%{kernel_version}
 %{_includedir}/%{name}/%{kernel_version}/*
+%{_kmoduledir}/%{base}/Module*
 %endif
 
 %if %{FILES_ko_modules}
@@ -2262,9 +2261,13 @@ external SNMP management tools.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strinet.spec.in,v $
-# Revision 0.9.2.142  2008-08-20 10:56:45  brian
-# - fixes and build updates from newnet trip
+# Revision 0.9.2.143  2008-08-28 02:37:45  brian
+# - build and release file updates for release
 #
+
+* Wed Aug 20 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.142  2008-08-20 10:56:45  brian
+- fixes and build updates from newnet trip
 
 * Mon Aug 11 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.141  2008-08-11 22:24:03  brian
