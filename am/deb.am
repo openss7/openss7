@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-08-20 18:43:23 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008-08-20 18:43:23 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -198,7 +198,7 @@ each-deb: $(debian_dir_stamp)
 #	( cd $(debian_dir) ; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
 
 ##
-# This below is pretty obfuscated, but it is what we need to rebujild a deb once for LiS and another
+# This below is pretty obfuscated, but it is what we need to rebuild a deb once for LiS and another
 # time for Linux Fast-STREAMS.  When we drop LiS support, this can be cleaned out.  This uses the
 # sneaky GNU make trick that per-target variables can be defined for the target and its dependents,
 # in our case the single build target.  Packages that do not build for STREAMS should define
@@ -237,6 +237,17 @@ chg-deb:
 #!
 debs: lis-deb lfs-deb one-deb noa-deb chg-deb
 
+# Another sneaky trick
+all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+
 #! csig:
 #!     This target signs the .dsc file.  You will be prompted for a password,
 #!     unless to specify it to make with the GNUPGPASS variable.
@@ -259,16 +270,30 @@ csig:
 		fi ; \
 	done
 
-# Another sneaky trick
-all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+#! reupload:
+#!	This target searches out a list of kernel names from the
+#!	@DESTDIR@/lib/modules directory and builds debs for those kernels and
+#!	for each of a set of architectures given in the AM_DEBTARGETS variable
+#!	to make.  This is a convenience target for building a group of debs on a
+#!	given build machine.
+#!
+reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+reupload:
+	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; \
+	targets="$(ARCH) $(AM_DEBTARGETS)" ; \
+	for t in $$targets ;  do \
+		for k in $$kernels ; do \
+			k=`basename $$k` ; \
+			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" lis-deb lfs-deb one-deb" ; \
+				$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" lis-deb lfs-deb one-deb || :; \
+			fi ; \
+		done ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" lis-deb lfs-deb one-deb" ; \
+		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" lis-deb lfs-deb one-deb|| :; \
+	done ; \
+	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb chg-deb" ; \
+	$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb chg-deb || :
 
 RELEASE			+= all-dsc all-lis-deb all-lfs-deb all-one-deb all-noa-deb all-chg-deb
 RELEASE_SIGN		+= all-sigs all-csig
@@ -298,8 +323,8 @@ RELEASECLEANFILES	+= $(debian_cache_files) \
 			   $(debtop_change_files) \
 			   $(debtop_binary_files)
 
-MY_PHONY		+= dsc debs each-deb one-deb lis-deb lfs-deb noa-deb sigs csig
-ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-lis-deb all-lfs-deb all-noa-deb all-chg-deb all-sigs all-csig
+MY_PHONY		+= dsc debs each-deb one-deb lis-deb lfs-deb noa-deb sigs csig reupload
+ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-lis-deb all-lfs-deb all-noa-deb all-chg-deb all-sigs all-csig all-reupload
 
 endif
 ## BUILD_DPKG
@@ -317,6 +342,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.85  2008-08-20 18:43:23  brian
+## - better rebuild targets
+##
 ## Revision 0.9.2.84  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##

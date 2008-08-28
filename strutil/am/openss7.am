@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2008-08-11 22:24:43 $
+# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.130 $) $Date: 2008-08-20 18:43:23 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-11 22:24:43 $ by $Author: brian $
+## Last Modified $Date: 2008-08-20 18:43:23 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -658,7 +658,7 @@ release-clean: release-clean-recursive release-clean-am
 ##
 LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log distcheck.log \
 		  rpms.log sign.log srpm.log resign.log dsc.log sigs.log debs.log csig.log \
-		  uninstall.log release.log release-sign.log rebuild.log remove.log
+		  uninstall.log release.log release-sign.log rebuild.log reupload.log remove.log
 
 #!
 #! Logging targets:
@@ -726,6 +726,9 @@ SUFFIXES = $(MY_SUFFIXES)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.130  2008-08-20 18:43:23  brian
+## - better rebuild targets
+##
 ## Revision 0.9.2.129  2008-08-11 22:24:43  brian
 ## - cscope target and kernel information for external builds
 ##
