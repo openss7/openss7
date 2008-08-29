@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: release.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: release.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-08-29 00:46:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008-08-29 00:46:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -81,7 +81,8 @@ if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
 $(top_srcdir)/AUTHORS: MANUAL
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- authors.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -89,11 +90,12 @@ $(top_srcdir)/AUTHORS: MANUAL
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|^ Authors|,\|^ Quick|!d;\| Quick|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|^ Authors|,\|^ Quick|!d;\| Quick|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/README | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/BUGS: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- defects.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -101,11 +103,12 @@ $(top_srcdir)/BUGS: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|^[0-9].[0-9] Bugs|,\|^[0-9].[0-9] Schedule|!d;\|^[0-9].[0-9] Schedule|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|^[0-9].[0-9] Bugs|,\|^[0-9].[0-9] Schedule|!d;\|^[0-9].[0-9] Schedule|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/LICENSES: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- licenses.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -113,11 +116,12 @@ $(top_srcdir)/LICENSES: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|^ Licenses|,\|^ Indices|!d;\|^ Indices|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|^ Licenses|,\|^ Indices|!d;\|^ Indices|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- problem reports.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -125,11 +129,12 @@ $(top_srcdir)/PROBLEMS: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|[0-9].[0-9] Problem Reports|,\|^ Licenses|!d;\|^ Licenses|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|[0-9].[0-9] Problem Reports|,\|^ Licenses|!d;\|^ Licenses|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- history of user visible changes.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -137,11 +142,12 @@ $(top_srcdir)/NEWS: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|[0-9].[0-9] Release Notes|,\|[0-9].[0-9] Maturity|!d;\|[0-9].[0-9] Maturity|,$$d' | sed -e '1,3d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|[0-9].[0-9] Release Notes|,\|[0-9].[0-9] Maturity|!d;\|[0-9].[0-9] Maturity|,$$d' | sed -e '1,3d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/THANKS: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- acknowledgements.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -149,11 +155,12 @@ $(top_srcdir)/THANKS: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|^ Acknowledgements|,\|^ Authors|!d;\| Authors|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|^ Acknowledgements|,\|^ Authors|!d;\| Authors|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/TODO: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- things to do.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -161,11 +168,12 @@ $(top_srcdir)/TODO: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|[0-9].[0-9] Schedule|,\|[0-9].[0-9] History|!d;\|[0-9].[0-9] History|,$$d' | sed -e '1,3d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|[0-9].[0-9] Schedule|,\|[0-9].[0-9] History|!d;\|[0-9].[0-9] History|,$$d' | sed -e '1,3d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/README: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me first file.  $(PACKAGE_DATE)" > $@ ; \
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -173,11 +181,12 @@ $(top_srcdir)/README: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>" >> $@ ; \
 	 $(ECHO) "See the end for copying conditions (for this file)." >> $@ ; \
 	 $(ECHO) -e "\f" >> $@ ; \
-	 cat MANUAL | sed -e '\|Quick Start Guide|,\|Introduction|!d;\|Introduction|,$$d' | sed -e '1,3d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|Quick Start Guide|,\|Introduction|!d;\|Introduction|,$$d' | sed -e '1,3d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/README-cvs: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ;\
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ;\
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- read me CVS file.  $(PACKAGE_DATE)" > $@ ;\
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -187,12 +196,13 @@ $(top_srcdir)/README-cvs: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) -e "\f" >> $@ ;\
 	 $(ECHO) "The following is an extract from the manual to assist CVS developers:" >> $@ ;\
 	 $(ECHO) "" >> $@ ;\
-	 cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Downloading from CVS|,\|^[0-9].[0-9] Configuration|!d;\|^[0-9].[0-9] Configuration|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Downloading from CVS|,\|^[0-9].[0-9] Configuration|!d;\|^[0-9].[0-9] Configuration|,$$d' >> $@ ;\
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
 $(top_srcdir)/README-alpha: MANUAL $(top_srcdir)/AUTHORS
-	@$(ECHO) "Creating $@ from the MANUAL..." ;\
-	 reltype=`grep '^This software is' MANUAL | cut -f4 '-d '` ; \
+	@if test -f MANUAL ; then d= ; else d='$(top_srcdir)/' ; fi ; \
+	 $(ECHO) "Creating $@ from the MANUAL..." ;\
+	 reltype=`grep '^This software is' $${d}MANUAL | cut -f4 '-d '` ; \
 	 idline="\$$Id\$$" ; if test -e $@ ; then if grep '^\$$Id' $@ >/dev/null 2>&1 ; then idline=`grep '^\$$Id' $@ | head -1` ; fi ; fi ; \
 	 $(ECHO) "$(PACKAGE_TITLE) -- $$reltype release introduction.  $(PACKAGE_DATE)" > $@ ;\
 	 $(ECHO) "$$idline" >> $@ ; \
@@ -209,15 +219,15 @@ $(top_srcdir)/README-alpha: MANUAL $(top_srcdir)/AUTHORS
 	 $(ECHO) "" >> $@ ;\
 	 $(ECHO) "The following is an extract from the Installation and Reference Manual:" >> $@ ;\
 	 $(ECHO) "" >> $@ ;\
-	 cat MANUAL | sed -e '\|^[0-9].[0-9] Bugs|,\|^[0-9].[0-9] Schedule|!d;\|^[0-9].[0-9] Schedule|,$$d' >> $@ ;\
+	 cat $${d}MANUAL | sed -e '\|^[0-9].[0-9] Bugs|,\|^[0-9].[0-9] Schedule|!d;\|^[0-9].[0-9] Schedule|,$$d' >> $@ ;\
 	 case $$reltype in \
-		 (pre-alpha)  cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Pre-Alpha Releases|,\|^[0-9].[0-9].[0-9] Alpha Releases|!d;\|^[0-9].[0-9].[0-9] Alpha Releases|,$$d' >> $@ ;; \
-		 (alpha)      cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Alpha Releases|,\|^[0-9].[0-9].[0-9] Beta Releases|!d;\|^[0-9].[0-9].[0-9] Beta Releases|,$$d' >> $@ ;; \
-		 (beta)       cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Beta Releases|,\|^[0-9].[0-9].[0-9] Gamma Releases|!d;\|^[0-9].[0-9].[0-9] Gamma Releases|,$$d' >> $@ ;; \
-		 (gamma)      cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Gamma Releases|,\|^[0-9].[0-9].[0-9] Production Releases|!d;\|^[0-9].[0-9].[0-9] Production Releases|,$$d' >> $@ ;; \
-		 (production) cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Production Releases|,\|^[0-9].[0-9].[0-9] Unstable Releases|!d;\|^[0-9].[0-9].[0-9] Unstable Releases|,$$d' >> $@ ;; \
-		 (unstable)   cat MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Unstable Releases|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
-		 (*)          cat MANUAL | sed -e '\|^[0-9].[0-9] Maturity|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
+		 (pre-alpha)  cat $${d}MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Pre-Alpha Releases|,\|^[0-9].[0-9].[0-9] Alpha Releases|!d;\|^[0-9].[0-9].[0-9] Alpha Releases|,$$d' >> $@ ;; \
+		 (alpha)      cat $${d}MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Alpha Releases|,\|^[0-9].[0-9].[0-9] Beta Releases|!d;\|^[0-9].[0-9].[0-9] Beta Releases|,$$d' >> $@ ;; \
+		 (beta)       cat $${d}MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Beta Releases|,\|^[0-9].[0-9].[0-9] Gamma Releases|!d;\|^[0-9].[0-9].[0-9] Gamma Releases|,$$d' >> $@ ;; \
+		 (gamma)      cat $${d}MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Gamma Releases|,\|^[0-9].[0-9].[0-9] Production Releases|!d;\|^[0-9].[0-9].[0-9] Production Releases|,$$d' >> $@ ;; \
+		 (production) cat $${d}MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Production Releases|,\|^[0-9].[0-9].[0-9] Unstable Releases|!d;\|^[0-9].[0-9].[0-9] Unstable Releases|,$$d' >> $@ ;; \
+		 (unstable)   cat $${d}MANUAL | sed -e '\|^[0-9].[0-9].[0-9] Unstable Releases|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
+		 (*)          cat $${d}MANUAL | sed -e '\|^[0-9].[0-9] Maturity|,\|^[0-9].[0-9] Bugs|!d;\|^[0-9].[0-9] Bugs|,$$d' >> $@ ;; \
 	 esac ; \
 	 cat $(top_srcdir)/AUTHORS | sed -e '\|^-----$$|,$$!d' >> $@
 
@@ -250,6 +260,9 @@ EXTRA_DIST			+= AUTHORS \
 ## =============================================================================
 ##
 ## $Log: release.am,v $
+## Revision 0.9.2.18  2008-08-29 00:46:11  brian
+## - use release manual if possible
+##
 ## Revision 0.9.2.17  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##
