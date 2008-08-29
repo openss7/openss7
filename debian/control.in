@@ -4,11 +4,11 @@ Priority: optional
 Maintainer: Brian F. G. Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
-Package: @PACKAGE_LCNAME@-lis-core-@kversion@-@krelease@
+Package: @PACKAGE_LCNAME@-lis-core
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@
+Provides: @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@, @PACKAGE_LCNAME@-lis-core-@kversion@-@krelease@
 Conflicts: streams-core, @PACKAGE_LCNAME@-streams-core
 Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for Linux
@@ -17,11 +17,11 @@ Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
  for which they were compiled: applies to kernel version @kversion@ and requires
  a Linux Fast-STREAMS package compiled for the same kernel.
 
-Package: @PACKAGE_LCNAME@-streams-core-@kversion@-@krelease@
+Package: @PACKAGE_LCNAME@-streams-core
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-streams-core, @PACKAGE_LCNAME@-streams-core-@kversion@
+Provides: @PACKAGE_LCNAME@-streams-core, @PACKAGE_LCNAME@-streams-core-@kversion@, @PACKAGE_LCNAME@-streams-core-@kversion@-@krelease@
 Conflicts: LiS-core, @PACKAGE_LCNAME@-lis-core
 Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
