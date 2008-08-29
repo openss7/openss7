@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.164 $) $Date: 2008-08-20 10:26:57 $
+# @(#) $RCSfile: kernel.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.165 $) $Date: 2008-08-29 05:57:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-20 10:26:57 $ by $Author: brian $
+# Last Modified $Date: 2008-08-29 05:57:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1602,16 +1602,16 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	krelease=
     fi
     AC_SUBST([krelease])
-    case "$target_vendor" in
-dnl	(debian) dnl only old debian 2.4 kernels
-dnl	    kernel_image='kernel-image-${kversion}'
-dnl	    kernel_source='kernel-source-${kmajor}-${kminor}'
-dnl	    kernel_headers='kernel-headers-${kmajor}-${kminor}'
-dnl	    ;;
-	(debian|ubuntu)
+    case "$target_vendor-$kmajor.$kminor" in
+	(debian-2.4|ubuntu-2.4)
+	    kernel_image="kernel-image-${kversion}"
+	    kernel_source="kernel-source-${kmajor}-${kminor}"
+	    kernel_headers="kernel-headers-${kmajor}-${kminor}"
+	    ;;
+	(debian-2.6|ubuntu-2.6)
 	    kernel_image="linux-image-${kversion}"
-	    kernel_source="linux-source-${kversion}"
-	    kernel_headers="linux-headers-${kversion}"
+	    kernel_source="linux-source-${kmajor}.${kminor}"
+	    kernel_headers="linux-headers-${kmajor}.${kminor}"
 	    ;;
 	(*)
 	    kernel_image='kernel'
@@ -2616,6 +2616,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.165  2008-08-29 05:57:16  brian
+# - remove kernel dependency from debian control file
+#
 # Revision 0.9.2.164  2008-08-20 10:26:57  brian
 # - updates to common files from newnet
 #
