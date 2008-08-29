@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-08-20 18:43:23 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-08-29 06:46:08 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-20 18:43:23 $ by $Author: brian $
+## Last Modified $Date: 2008-08-29 06:46:08 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -194,7 +194,7 @@ AM_BINARY_TARGET = binary-arch
 ##
 each-deb: $(debian_dir_stamp)
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
-	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
+	( cd $(debian_dir) ; DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
 #	( cd $(debian_dir) ; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
 
 ##
@@ -342,6 +342,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.86  2008-08-29 06:46:08  brian
+## - add kernel version to build
+##
 ## Revision 0.9.2.85  2008-08-20 18:43:23  brian
 ## - better rebuild targets
 ##
