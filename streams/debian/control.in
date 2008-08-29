@@ -3,16 +3,16 @@ Section: devel
 Priority: optional
 Maintainer: Brian F. G. Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
-Build-Depends: @kernel_source@ | @kernel_headers@,
+Build-Depends: kernel-source-2-4 | kernel-headers-2-4 | linux-source-2.6 | linux-headers-2.6,
  gcc (>= 2.95.3), groff (>= 1.17.2), groff-base (>= 1.17.2),
  gzip (>= 1.3.2), texinfo (>= 4.0), tetex-base (>=1.0),
  tetex-bin (>=1.0), tetex-extra (>=1.0), gs (>= 6.51)
 
-Package: @PACKAGE_LCNAME@-core-@kversion@
+Package: @PACKAGE_LCNAME@-core
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-core, STREAMS-core, STREAMS-core-@kversion@
+Provides: STREAMS-core, STREAMS-core-@kversion@, @PACKAGE_LCNAME@-core-@kversion@
 Conflicts: STREAMS-core, STREAMS-core-@kversion@
 Replaces: STREAMS-core, STREAMS-core-@kversion@
 Depends: @kernel_image@ (= @krelease@),
@@ -24,11 +24,11 @@ Description: Core kernel modules for @PACKAGE_TITLE@
  @PACKAGE_TITLE@.  These binaries are heavily tied to the kernel for
  which they were compiled: applies to kernel version @kversion@.
 
-Package: @PACKAGE_LCNAME@-info-@kversion@
+Package: @PACKAGE_LCNAME@-info
 Architecture: any
 Section: base
 Priority: optional
-Provides: STREAMS-info, @PACKAGE_LCNAME@-info
+Provides: STREAMS-info, @PACKAGE_LCNAME@-info-@kversion@
 Depends: @kernel_image@ (= @krelease@)
 Description: Kernel module versions for @PACKAGE_TITLE@
  Kernel modules symbol information for development of kernel modules

@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-08-28 02:37:40 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-08-29 06:13:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-28 02:37:40 $ by $Author: brian $
+# Last Modified $Date: 2008-08-29 06:13:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -115,11 +115,11 @@ base = @PACKAGE_LCNAME@
 title = @PACKAGE_TITLE@
 stitle = @PACKAGE_SHORTTITLE@
 
-kernel_version=@kversion@
+kernel_version=$(kversion)
 kernel_number=$(shell echo $(kversion) | sed -e s',-.*$,,')
 kernel_release=$(shell echo $(kversion) | sed -e s',-,.,g')
-core_name = core-$(kernel_version)
-info_name = info-$(kernel_version)
+core_name = core
+info_name = info
 
 @WITH_KO_MODULES_TRUE@with_ko_modules = 1
 @WITH_KO_MODULES_FALSE@with_ko_modules = 0
@@ -462,6 +462,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.33  2008-08-29 06:13:58  brian
+# - remove kernel dependency from debian control file
+#
 # Revision 0.9.2.32  2008-08-28 02:37:40  brian
 # - build and release file updates for release
 #
