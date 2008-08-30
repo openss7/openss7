@@ -67,9 +67,9 @@ debtmpdir = debian/tmp
 PACKAGE_DEBOPTIONS = @PACKAGE_DEBOPTIONS@
 
 rootdir = @rootdir@
-kversion = @kversion@
-krelease = @krelease@
-kmoduledir = @kmoduledir@
+kversion = $(shell uname -r)
+#krelease = @krelease@
+kmoduledir = $(rootdir)/lib/modules/$(kversion)
 
 prefix = @prefix@
 exec_prefix = @exec_prefix@
