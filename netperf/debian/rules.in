@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-04 16:16:31 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-08-31 07:19:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-04 16:16:31 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 07:19:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,14 +113,12 @@ stitle = @PACKAGE_SHORTTITLE@
 
 control =
 
-debian/$(PACKAGE_LCNAME)-core.preinst \
-debian/$(PACKAGE_LCNAME)-core.postinst \
-debian/$(PACKAGE_LCNAME)-core.prerm \
-debian/$(PACKAGE_LCNAME)-core.postrm \
-debian/$(PACKAGE_LCNAME)-lib.preinst:
-	$(MAKE) $@
+#debian/$(PACKAGE_LCNAME)-core.preinst \
+#debian/$(PACKAGE_LCNAME)-core.postinst \
+#debian/$(PACKAGE_LCNAME)-core.prerm \
+#debian/$(PACKAGE_LCNAME)-core.postrm:
+#	$(MAKE) $@
 
-#debian/$(PACKAGE_LCNAME)-%-lib.preinst #
 #debian/$(PACKAGE_LCNAME)-%-$(core_name).preinst \
 #debian/$(PACKAGE_LCNAME)-%-$(core_name).postinst \
 #debian/$(PACKAGE_LCNAME)-%-$(core_name).prerm \
@@ -132,9 +130,22 @@ debian/$(PACKAGE_LCNAME)-lib.preinst:
 #		echo "cp -f -- $$d$$f $@" ; \
 #		cp -f -- $$d$$f $@ ; \
 #	}
+
 #
 #   Libraries:
 #
+
+#debian/$(PACKAGE_LCNAME)-lib.preinst:
+#	$(MAKE) $@
+
+#debian/$(PACKAGE_LCNAME)-%-lib.preinst:
+#	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,'` ; \
+#	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
+#	test "$@" -ef "$$d$$f" && exit 0 ; \
+#	test -f "$@" -a "$@" -nt "$$d$$f" || { \
+#		echo "cp -f -- $$d$$f $@" ; \
+#		cp -f -- $$d$$f $@ ; \
+#	}
 
 #control	+= debian/$(PACKAGE_LCNAME)-streams-lib.preinst
 #control	+= debian/$(PACKAGE_LCNAME)-lis-lib.preinst
@@ -384,6 +395,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.32  2008-08-31 07:19:35  brian
+# - adjust rules for non-kernel-version named core and info files
+#
 # Revision 0.9.2.31  2008-05-04 16:16:31  brian
 # - changes and corrections for release
 #
