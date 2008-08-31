@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-08-30 20:49:07 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-08-31 07:19:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-30 20:49:07 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 07:19:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -132,25 +132,23 @@ makedev = @STRCONF_MAKEDEV@
 
 control =
 
-debian/$(PACKAGE_LCNAME)-core.preinst \
-debian/$(PACKAGE_LCNAME)-core.postinst \
-debian/$(PACKAGE_LCNAME)-core.prerm \
-debian/$(PACKAGE_LCNAME)-core.postrm \
-debian/$(PACKAGE_LCNAME)-lib.preinst:
-	$(MAKE) $@
+#debian/$(PACKAGE_LCNAME)-core.preinst \
+#debian/$(PACKAGE_LCNAME)-core.postinst \
+#debian/$(PACKAGE_LCNAME)-core.prerm \
+#debian/$(PACKAGE_LCNAME)-core.postrm:
+#	$(MAKE) $@
 
-debian/$(PACKAGE_LCNAME)-%-lib.preinst \
-debian/$(PACKAGE_LCNAME)-%-$(core_name).preinst \
-debian/$(PACKAGE_LCNAME)-%-$(core_name).postinst \
-debian/$(PACKAGE_LCNAME)-%-$(core_name).prerm \
-debian/$(PACKAGE_LCNAME)-%-$(core_name).postrm:
-	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,;s,$(core_name),core,;s,$(info_name),info,'` ; \
-	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
-	test "$@" -ef "$$d$$f" && exit 0 ; \
-	test -f "$@" -a "$@" -nt "$$d$$f" || { \
-		echo "cp -f -- $$d$$f $@" ; \
-		cp -f -- $$d$$f $@ ; \
-	}
+#debian/$(PACKAGE_LCNAME)-%-$(core_name).preinst \
+#debian/$(PACKAGE_LCNAME)-%-$(core_name).postinst \
+#debian/$(PACKAGE_LCNAME)-%-$(core_name).prerm \
+#debian/$(PACKAGE_LCNAME)-%-$(core_name).postrm:
+#	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,;s,$(core_name),core,;s,$(info_name),info,'` ; \
+#	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
+#	test "$@" -ef "$$d$$f" && exit 0 ; \
+#	test -f "$@" -a "$@" -nt "$$d$$f" || { \
+#		echo "cp -f -- $$d$$f $@" ; \
+#		cp -f -- $$d$$f $@ ; \
+#	}
 
 #
 #   Core kernel modules:
@@ -193,6 +191,18 @@ control	+= debian/$(PACKAGE_LCNAME)-lis-$(info_name).install
 #
 #   Libraries:
 #
+
+debian/$(PACKAGE_LCNAME)-lib.preinst:
+	$(MAKE) $@
+
+debian/$(PACKAGE_LCNAME)-%-lib.preinst:
+	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,'` ; \
+	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
+	test "$@" -ef "$$d$$f" && exit 0 ; \
+	test -f "$@" -a "$@" -nt "$$d$$f" || { \
+		echo "cp -f -- $$d$$f $@" ; \
+		cp -f -- $$d$$f $@ ; \
+	}
 
 control	+= debian/$(PACKAGE_LCNAME)-streams-lib.preinst
 control	+= debian/$(PACKAGE_LCNAME)-lis-lib.preinst
@@ -490,6 +500,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.37  2008-08-31 07:19:41  brian
+# - adjust rules for non-kernel-version named core and info files
+#
 # Revision 0.9.2.36  2008-08-30 20:49:07  brian
 # - update release files
 #
