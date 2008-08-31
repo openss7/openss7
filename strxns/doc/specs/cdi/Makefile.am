@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 03:31:01 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-08-31 06:57:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 03:31:01 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,8 +63,10 @@ cdi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 if MAINTAINER_MODE
+if AMDEP
 cdi_TEXINFOS		+= \
 			  texi/args.texi
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -162,6 +164,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.3  2008-08-31 06:57:23  brian
+# - do not customize docs unless maintainer modes and dependency tracking
+#
 # Revision 0.9.2.2  2007/08/14 03:31:01  brian
 # - GPLv3 header update
 #

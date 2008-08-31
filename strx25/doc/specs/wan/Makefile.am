@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 12:16:24 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-08-31 06:57:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-01 12:16:24 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,10 +64,10 @@ wan_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/fdl.texi
 
 if MAINTAINER_MODE
-
+if AMDEP
 wan_TEXINFOS		+= \
 			   texi/args.texi
-
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -98,6 +98,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-08-31 06:57:21  brian
+# - do not customize docs unless maintainer modes and dependency tracking
+#
 # Revision 0.9.2.1  2008-07-01 12:16:24  brian
 # - added manual pages, specs and conversion modules
 #

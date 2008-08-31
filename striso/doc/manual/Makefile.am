@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-08-03 02:44:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-08-31 06:57:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-03 02:44:00 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -97,8 +97,10 @@ striso_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 if MAINTAINER_MODE
+if AMDEP
 striso_TEXINFOS		+= \
 			  texi/args.texi
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -114,6 +116,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.16  2008-08-31 06:57:18  brian
+# - do not customize docs unless maintainer modes and dependency tracking
+#
 # Revision 0.9.2.15  2008-08-03 02:44:00  brian
 # - passing distcheck on wilbur
 #

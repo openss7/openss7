@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/11/06 12:54:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-08-31 06:57:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/11/06 12:54:57 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,12 +64,10 @@ ss_TEXINFOS		= \
 			$(top_srcdir)/scripts/texi/fdl.texi
 
 if MAINTAINER_MODE
-## MAINTAINER_MODE
-
+if AMDEP
 ss_TEXINFOS		+= \
 			texi/args.texi
-
-## MAINTAINER_MODE
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -97,6 +95,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.2  2008-08-31 06:57:10  brian
+# - do not customize docs unless maintainer modes and dependency tracking
+#
 # Revision 0.9.2.1  2007/11/06 12:54:57  brian
 # - added more top-level documentation
 #

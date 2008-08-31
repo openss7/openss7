@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-03 02:44:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-08-31 06:57:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-03 02:44:02 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -96,8 +96,10 @@ strsock_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 if MAINTAINER_MODE
+if AMDEP
 strsock_TEXINFOS	+= \
 			  texi/args.texi
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -113,6 +115,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.14  2008-08-31 06:57:19  brian
+# - do not customize docs unless maintainer modes and dependency tracking
+#
 # Revision 0.9.2.13  2008-08-03 02:44:02  brian
 # - passing distcheck on wilbur
 #
