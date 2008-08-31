@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-04-29 07:10:35 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-08-31 06:57:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 07:10:35 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,6 +80,7 @@ sg_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 if MAINTAINER_MODE
+if AMDEP
 lab_TEXINFOS		+= \
 			  texi/args.texi
 hlr_TEXINFOS		+= \
@@ -90,6 +91,7 @@ cnam_TEXINFOS		+= \
 			  texi/args.texi
 sg_TEXINFOS		+= \
 			  texi/args.texi
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -240,6 +242,9 @@ include ../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.26  2008-08-31 06:57:12  brian
+## - do not customize docs unless maintainer modes and dependency tracking
+##
 ## Revision 0.9.2.25  2008-04-29 07:10:35  brian
 ## - updating headers for release
 ##

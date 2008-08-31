@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-08-03 02:44:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-31 06:57:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-03 02:44:04 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,10 +66,10 @@ nli_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/fdl.texi
 
 if MAINTAINER_MODE
-
+if AMDEP
 nli_TEXINFOS		+= \
 			   texi/args.texi
-
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -98,6 +98,9 @@ include ../../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2008-08-31 06:57:20  brian
+# - do not customize docs unless maintainer modes and dependency tracking
+#
 # Revision 0.9.2.6  2008-08-03 02:44:04  brian
 # - passing distcheck on wilbur
 #

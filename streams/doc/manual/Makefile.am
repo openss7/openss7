@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-08-03 02:43:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-08-31 06:57:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-03 02:43:58 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -188,6 +188,7 @@ porting_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 if MAINTAINER_MODE
+if AMDEP
 STREAMS_TEXINFOS	+= \
 			  texi/args.texi
 STREAMS_FAQ_TEXINFOS	+= \
@@ -198,6 +199,7 @@ SPG_TEXINFOS		+= \
 			  texi/args.texi
 porting_TEXINFOS	+= \
 			  texi/args.texi
+endif
 endif
 
 
@@ -284,6 +286,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.59  2008-08-31 06:57:16  brian
+# - do not customize docs unless maintainer modes and dependency tracking
+#
 # Revision 0.9.2.58  2008-08-03 02:43:58  brian
 # - passing distcheck on wilbur
 #

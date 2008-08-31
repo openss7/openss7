@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2008-04-29 07:10:37 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-08-31 06:57:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 07:10:37 $ by $Author: brian $
+# Last Modified $Date: 2008-08-31 06:57:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,8 +64,10 @@ dlpi_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
 if MAINTAINER_MODE
+if AMDEP
 dlpi_TEXINFOS		+= \
 			  texi/args.texi
+endif
 endif
 
 EXTRA_info_TEXINFOS	= \
@@ -146,6 +148,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.19  2008-08-31 06:57:23  brian
+## - do not customize docs unless maintainer modes and dependency tracking
+##
 ## Revision 0.9.2.17  2008-04-29 07:10:37  brian
 ## - updating headers for release
 ##
