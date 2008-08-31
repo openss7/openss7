@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.59 $) $Date: 2008-08-03 02:41:22 $
+# @(#) $RCSfile: info.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.60 $) $Date: 2008-08-31 06:53:21 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-03 02:41:22 $ by $Author: brian $
+## Last Modified $Date: 2008-08-31 06:53:21 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -97,17 +97,24 @@ FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
 FIG_JPGS = $(FIG_FIGS:%.fig=%.jpg)
 FIG_TXTS = $(FIG_FIGS:%.fig=%.txt)
 
+MY_SECONDARY	+= $(FIG_PSS) $(FIG_EPSS) $(FIG_PDFS) $(FIG_PNGS) $(FIG_JPGS) $(FIG_TXTS)
+
 MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps .txt
 
 $(FIG_PSS) : %.ps  : %.fig ; $(FIG2DEV) -L  ps -p dummy $< $@ || $(CONVERT) $< $@
 $(FIG_EPSS): %.eps : %.fig ; $(FIG2DEV) -L eps -p dummy $< $@ || $(CONVERT) $< $@
 $(FIG_PDFS): %.pdf : %.fig ; $(FIG2DEV) -L pdf -p dummy $< $@ || $(CONVERT) $< $@
-$(FIG_PNGS): %.png : %.eps ; $(CONVERT) -antialias $< $@
 $(FIG_JPGS): %.jpg : %.eps ; $(CONVERT) -antialias $< $@
 $(FIG_TXTS): txts-am
+if MAINTAINER_MODE
+if AMDEP
+$(FIG_PNGS): %.png : %.eps ; $(CONVERT) -antialias $< $@
+endif
+endif
 
 txts-am:
-	@ txts="$(FIG_TXTS) $(PNG_TXTS) $(PS_TXTS)" ; for i in $$txts ; do \
+	@$(ECHO) "Making $@ in `pwd`"
+	@txts="$(FIG_TXTS) $(PNG_TXTS) $(PS_TXTS)" ; for i in $$txts ; do \
 		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
 			if test -f $(srcdir)/$$i ; then \
 				$(ECHO) "cp -pf $(srcdir)/$$i $$i" ; \
@@ -126,17 +133,24 @@ TBL_PNGS = $(TBL_TBLS:%.tbl=%.png)
 TBL_JPGS = $(TBL_TBLS:%.tbl=%.jpg)
 TBL_TXTS = $(TBL_TBLS:%.tbl=%.txt)
 
+MY_SECONDARY	+= $(TBL_PSS) $(TBL_EPSS) $(TBL_PDFS) $(TBL_PNGS) $(TBL_JPGS) $(TBL_TXTS)
+
 .tbl.dvi: ; groff -t -Tdvi -ms $< > $@ || :
 
 $(TBL_PSS)  : %.ps  : %.tbl ; groff -t -Tps -ms $< > $@ 2>/dev/null || :
 $(TBL_EPSS) : %.eps : %.ps  ; $(PS2EPSI) $< $@ || $(CONVERT) $< $@
 $(TBL_PDFS) : %.pdf : %.eps ; $(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
-$(TBL_PNGS) : %.png : %.eps ; $(CONVERT) -antialias $< $@
 $(TBL_JPGS) : %.jpg : %.eps ; $(CONVERT) -antialias $< $@
 $(TBL_TXTS) : %.txt : %.tbl ; ( $(ECHO) ""; ( groff -t -Tascii -ms -P-b -P-c -P-u -P-o $< 2>/dev/null || groff -t -Tascii -ms -P-b -P-u -P-o $< ) | sed -e '/^[[:space:]]*$$/d'; $(ECHO) "" ) > $@
+if MAINTAINER_MODE
+if AMDEP
+$(TBL_PNGS) : %.png : %.eps ; $(CONVERT) -antialias $< $@
+endif
+endif
 
 pngs-am:
-	@ pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
+	@$(ECHO) "Making $@ in `pwd`"
+	@pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
 		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
 			if test -f $(srcdir)/$$i ; then \
 				$(ECHO) "cp -pf $(srcdir)/$$i $$i" ; \
@@ -154,6 +168,8 @@ PNG_PDFS = $(PNG_PNGS:%.png=%.pdf)
 PNG_JPGS = $(PNG_PNGS:%.png=%.jpg)
 PNG_TXTS = $(PNG_PNGS:%.png=%.txt)
 
+MY_SECONDARY	+= $(PNG_PSS) $(PNG_EPSS) $(PNG_PDFS) $(PNG_JPGS) $(PNG_TXTS)
+
 $(PNG_PSS)  : %.ps  : %.png ; $(CONVERT) -density 144 $< $@
 $(PNG_EPSS) : %.eps : %.ps  ; $(PS2EPSI) $< $@ || $(CONVERT) $< $@
 $(PNG_PDFS) : %.pdf : %.eps ; $(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
@@ -168,12 +184,17 @@ PS_PNGS = $(PS_PSS:%.ps=%.png)
 PS_JPGS = $(PS_PSS:%.ps=%.jpg)
 PS_TXTS = $(PS_PSS:%.ps=%.txt)
 
+MY_SECONDARY	+= $(PS_EPSS) $(PS_PDFS) $(PS_PNGS) $(PS_JPGS) $(PS_TXTS)
+
 $(PS_EPSS): %.eps : %.ps  ; $(PS2EPSI) $< $@ || $(CONVERT) $< $@
 $(PS_PDFS): %.pdf : %.eps ; $(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
-$(PS_PNGS): %.png : %.eps ; $(CONVERT) -antialias $< $@
 $(PS_JPGS): %.jpg : %.eps ; $(CONVERT) -antialias $< $@
-
 $(PS_TXTS): txts-am
+if MAINTAINER_MODE
+if AMDEP
+$(PS_PNGS): %.png : %.eps ; $(CONVERT) -antialias $< $@
+endif
+endif
 
 IMG_EPSS = $(FIG_EPSS) $(TBL_EPSS) $(PNG_EPSS) $(PS_EPSS)
 IMG_PDFS = $(FIG_PDFS) $(TBL_PDFS) $(PNG_PDFS) $(PS_PDFS)
@@ -186,8 +207,10 @@ IMG_JPGS = $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
 # pretty much assume you have some GNU tools around...
 # also, automake misses dependencies for ps files
 ##
-MY_SECONDARY	+= $(IMG_JPGS) $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS)
+MY_SECONDARY	+= $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS) $(IMG_JPGS)
 
+if MAINTAINER_MODE
+## MAINTAINER_MODE
 if AMDEP
 ## AMDEP
 $(DVIS)      : %.dvi  : %.texi $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
@@ -205,19 +228,21 @@ else
 # to be rebuilt  we really only want to rebuild documentation in maintainer
 # mode
 ##
-$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS)
-$(PSS)       : %.ps   : %.dvi  $(IMG_EPSS)
-$(PDFS)      : %.pdf  : %.texi $(IMG_PDFS)
-$(HTMLS)     : %.html : %.texi $(IMG_PNGS)
-$(TXTS)	     : %.txt  : %.texi $(IMG_TXTS)
-$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
+#$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS)
+#$(PSS)       : %.ps   : %.dvi  $(IMG_EPSS)
+#$(PDFS)      : %.pdf  : %.texi $(IMG_PDFS)
+#$(HTMLS)     : %.html : %.texi $(IMG_PNGS)
+#$(TXTS)	     : %.txt  : %.texi $(IMG_TXTS)
+#$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
 ## !AMDEP
+endif
+## MAINTAINER_MODE
 endif
 
 ##
 # Don't distribute .ps manuals, they are way too big, no dvis or sgmls either
 ##
-EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(FIG_FIGS) $(FIG_TXTS) $(TBL_TBLS) $(PNG_PNGS) $(PS_PSS)
+EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(TBL_TBLS) $(FIG_FIGS) $(PNG_PNGS) $(PS_PSS)
 EXTRA_DIST	+= $(PDFS)
 EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS)
 EXTRA_DIST	+= $(TXTS)
@@ -235,7 +260,7 @@ $(INFO_DEPS) : %.info : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
 ## AMDEP
 else
 ## !AMDEP
-$(INFO_DEPS) : %.info : %.texi
+#$(INFO_DEPS) : %.info : %.texi
 ## !AMDEP
 endif
 ## MAINTAINER_MODE
@@ -363,7 +388,8 @@ UNINSTALL_LOCAL		+= uninstall-pngs
 # files out of the source directory.
 ##
 
-MY_PHONY		+= txts-am pngs-am install-pngs uninstall-pngs
+MY_PHONY		+= txts-am pngs-am
+MY_PHONY		+= install-pngs uninstall-pngs
 
 CLEAN_LOCAL		+= clean-txt clean-sgml clean-figs clean-tbls clean-pngs clean-pss clean-texi
 
@@ -392,6 +418,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 0.9.2.60  2008-08-31 06:53:21  brian
+## - keep from building docs normally
+##
 ## Revision 0.9.2.59  2008-08-03 02:41:22  brian
 ## - latest info.am and papers.am
 ##

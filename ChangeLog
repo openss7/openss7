@@ -1,3 +1,9 @@
+2008-08-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/info.am: keep from building docs normally
+	* am/openss7.am: keep from building docs normally
+	* am/papers.am: keep from building docs normally
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: release file updates

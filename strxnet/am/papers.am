@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.14 $) $Date: 2008-08-03 02:41:22 $
+# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.15 $) $Date: 2008-08-31 06:53:21 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-03 02:41:22 $ by $Author: brian $
+## Last Modified $Date: 2008-08-31 06:53:21 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -187,7 +187,7 @@ PLOT_PDFS = $(PLOT_PLOTS:%.plot=%.pdf)
 PLOT_PNGS = $(PLOT_PLOTS:%.plot=%.png)
 PLOT_GIFS = $(PLOT_PLOTS:%.plot=%.gif)
 
-#MY_INTERMEDIATE	+= $(PLOT_FIGS) $(PLOT_PSS) $(PLOT_PDFS) $(PLOT_GIFS)
+MY_SECONDARY	+= $(PLOT_FIGS) $(PLOT_PSS) $(PLOT_EPSS) $(PLOT_PDFS) $(PLOT_PNGS) $(PLOT_GIFS)
 
 .plot.fig: ; $(GNUPLOT) $<
 
@@ -201,7 +201,7 @@ FIG_PDFS = $(FIG_FIGS:%.fig=%.pdf)
 FIG_PNGS = $(FIG_FIGS:%.fig=%.png)
 FIG_GIFS = $(FIG_FIGS:%.fig=%.gif)
 
-#MY_INTERMEDIATE	+= $(FIG_PSS) $(FIG_EPSS) $(FIG_PDFS) $(FIG_GIFS)
+MY_SECONDARY	+= $(FIG_PSS) $(FIG_EPSS) $(FIG_PDFS) $(FIG_PNGS) $(FIG_GIFS)
 
 .fig.ps :; $(FIG2DEV) -L  ps -p dummy -e -g '#ffffff' -b 0 $< $@
 .fig.eps:; $(FIG2DEV) -L eps -p dummy -e -g '#ffffff' -b 0 $< $@
@@ -212,8 +212,12 @@ FIG_GIFS = $(FIG_FIGS:%.fig=%.gif)
 #$(FIG_PDFS) $(PLOT_PDFS): %.pdf : %.fig ; $(FIG2DEV) -L pdf -p dummy -e -g '#ffffff' -b 0 $< $@
 
 .fig.gif:; $(FIG2DEV) -L gif -g '#c0d0f0' -t '#c0d0f0' -b 15 -S 2 $< $@
-.gif.png:; $(CONVERT) -background '#c0d0f0' -transparent '#c0d0f0' -mattecolor '#ffffff' -interlace Line $< $@
 .gif.jpg:; $(CONVERT) -background '#c0d0f0' -transparent '#c0d0f0' -mattecolor '#ffffff' $< $@
+if MAINTAINER_MODE
+if AMDEP
+.gif.png:; $(CONVERT) -background '#c0d0f0' -transparent '#c0d0f0' -mattecolor '#ffffff' -interlace Line $< $@
+endif
+endif
 
 #$(FIG_GIFS) : %.gif : %.fig ; $(FIG2DEV) -L gif -g '#c0d0f0' -t '#c0d0f0' -b 0 -S 2 $< $@
 #$(PLOT_GIFS): %.gif : %.fig ; $(FIG2DEV) -L gif -g 'white' -b 15 -S 2 $< $@
@@ -238,7 +242,7 @@ PNG_PSS  = $(PNG_PNGS:%.png=%.ps)
 PNG_EPSS = $(PNG_PNGS:$.png=%.eps)
 PNG_PDFS = $(PNG_PNGS:$.png=%.pdf)
 
-#MY_INTERMEDIATE	+= $(PNG_PSS) $(PNG_EPSS) $(PNG_PDFS)
+MY_SECONDARY	+= $(PNG_PSS) $(PNG_EPSS) $(PNG_PDFS)
 
 .png.ps :; $(CONVERT) -density 144 $< $@
 .ps.eps :; $(PS2EPSI) $< $@ || $(CONVERT) $< $@
@@ -269,7 +273,7 @@ PS_EPSS = $(PS_PSS:%.ps=%.eps)
 PS_PDFS = $(PS_PSS:%.ps=%.pdf)
 PS_PNGS = $(PS_PSS:%.ps=%.png)
 
-#MY_INTERMEDIATE	+= $(PS_EPSS) $(PS_PDFS)
+MY_SECONDARY	+= $(PS_EPSS) $(PS_PDFS) $(PS_PNGS)
 
 #.ps.eps :; $(PS2EPSI) $< $@ || $(CONVERT) $< $@
 #.eps.pdf:; $(EPSTOPDF) --outfile=$@ $< || $(CONVERT) $< $@
@@ -286,14 +290,12 @@ IMG_EPSS = $(PLOT_EPSS) $(FIG_EPSS) $(PNG_EPSS) $(PS_EPSS)
 IMG_PDFS = $(PLOT_PDFS) $(FIG_PDFS) $(PNG_PDFS) $(PS_PDFS)
 IMG_PNGS = $(PLOT_PNGS) $(FIG_PNGS) $(PNG_PNGS) $(PS_PNGS)
 
-#MY_SECONDARY	+= $(IMG_EPSS) $(IMG_PNGS)
+MY_SECONDARY	+= $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS)
 
 MY_SUFFIXES	+= .fig .eps .pdf .png .jpg .ps
 
-.INTERMEDIATE: $(IMG_PDFS) $(PLOT_FIGS)
-
-.SECONDARY: $(IMG_EPSS) $(IMG_PNGS)
-
+if MAINTAINER_MODE
+## MAINTAINER_MODE
 if AMDEP
 ## AMDEP
 $(DVIS)		: %.dvi  : %.tex $(IMG_EPSS)
@@ -308,6 +310,8 @@ else
 #$(PDFS)	: %.pdf  : %.tex $(IMG_PDFS)
 #$(HTMLS)	: %.html : %.tex $(IMG_PNGS)
 ## !AMDEP
+endif
+## MAINTAINER_MODE
 endif
 
 EXTRA_DIST	+= $(LATEXS) $(BIBTEXS) $(PLOT_PLOTS) $(PLOT_DATS) $(FIG_FIGS) $(PNG_PNGS) $(PS_PSS)
@@ -544,11 +548,16 @@ install-html-am: $(HTMLS) install-html-local
 		fi; \
 	done
 
-install-epss: $(IMG_EPSS)
-
 install-pngs: $(IMG_PNGS)
+	@$(NORMAL_INSTALL)
+	test -z "$(htmldir)" || $(MKDIR_P) "$(DESTDIR)$(htmldir)"
+	@list='$(IMG_PNGS)'; for p in $$list ; do \
+		if test -f "$$p" ; then d=; else d="$(srcdir)/"; fi; \
+		f=$(am__strip_dir) \
+		echo "$(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(htmldir)/$$f'"; \
+		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(htmldir)/$$f"; \
+	done
 
-INSTALL_DATA_LOCAL	+= install-epss
 INSTALL_HTML_LOCAL	+= install-pngs
 
 uninstall-dvi: uninstall-dvi-am
@@ -595,13 +604,18 @@ uninstall-html-am:
 		rm -rf "$(DESTDIR)$(htmldir)/$$f"; \
 	done
 
-uninstall-epss:
-
 uninstall-pngs:
+	@$(NORMAL_UNINSTALL)
+	@list='$(IMG_PNGS)';  for p in $$list ; do \
+		f=$(am__strip_dir) \
+		echo "rm -f '$(DESTDIR)$(htmldir)/$$f'"; \
+		rm -f "$(DESTDIR)$(htmldir)/$$f"; \
+	done
 
-UNINSTALL_LOCAL		+= uninstall-epss uninstall-pngs
+UNINSTALL_LOCAL		+= uninstall-pngs
 
-MY_PHONY		+= tex-am bibs-am dats-am plots-am figs-am pps-am pngs-am
+MY_PHONY		+= tex-am bibs-am dats-am plots-am figs-am pss-am pngs-am
+MY_PHONY		+= install-pngs uninstall-pngs
 
 CLEAN_LOCAL		+= clean-dvi \
 			   clean-ps \
@@ -652,6 +666,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: papers.am,v $
+## Revision 0.9.2.15  2008-08-31 06:53:21  brian
+## - keep from building docs normally
+##
 ## Revision 0.9.2.14  2008-08-03 02:41:22  brian
 ## - latest info.am and papers.am
 ##
