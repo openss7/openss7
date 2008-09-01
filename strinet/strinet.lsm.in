@@ -23,6 +23,7 @@ Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
 			4M @PACKAGE@-@VERSION@.tar.gz
 			3M @PACKAGE@-@VERSION@.tar.bz2
+			2M @PACKAGE@-@VERSION@.tar.lzma
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
 			3M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
