@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-08-29 06:46:08 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-09-01 08:33:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-29 06:46:08 $ by $Author: brian $
+## Last Modified $Date: 2008-09-01 08:33:37 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -235,7 +235,7 @@ chg-deb:
 #!     @PACKAGE_LCNAME@-*_@VERSION@-@PACKAGE_DEBRELEASE@_*.deb, where the stars indicate the subpackage and
 #!     the architecture.
 #!
-debs: lis-deb lfs-deb one-deb noa-deb chg-deb
+debs: noa-deb lis-deb lfs-deb one-deb chg-deb
 
 # Another sneaky trick
 all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
@@ -279,7 +279,9 @@ csig:
 #!
 reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 reupload:
-	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; \
+	@$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb chg-deb" ; \
+	$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb chg-deb || :; \
+	kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(ARCH) $(AM_DEBTARGETS)" ; \
 	for t in $$targets ;  do \
 		for k in $$kernels ; do \
@@ -291,11 +293,9 @@ reupload:
 		done ; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" lis-deb lfs-deb one-deb" ; \
 		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" lis-deb lfs-deb one-deb|| :; \
-	done ; \
-	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb chg-deb" ; \
-	$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb chg-deb || :
+	done
 
-RELEASE			+= all-dsc all-lis-deb all-lfs-deb all-one-deb all-noa-deb all-chg-deb
+RELEASE			+= all-dsc all-noa-deb all-lis-deb all-lfs-deb all-one-deb all-chg-deb
 RELEASE_SIGN		+= all-sigs all-csig
 RELEASE_DIRECTORIES	+= 
 
@@ -342,6 +342,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.87  2008-09-01 08:33:37  brian
+## - build no architecture first
+##
 ## Revision 0.9.2.86  2008-08-29 06:46:08  brian
 ## - add kernel version to build
 ##
