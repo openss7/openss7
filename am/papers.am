@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: papers.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.15 $) $Date: 2008-08-31 06:53:21 $
+# @(#) $RCSfile: papers.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-01 07:15:53 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-31 06:53:21 $ by $Author: brian $
+## Last Modified $Date: 2008-09-01 07:15:53 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -497,7 +497,7 @@ install-dvi-am: $(DVIS)
 	test -z "$(dvidir)" || $(MKDIR_P) "$(DESTDIR)$(dvidir)"
 	@list='$(DVIS)'; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(dvidir)/$$f'"; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(dvidir)/$$f"; \
 	done
@@ -510,7 +510,7 @@ install-ps-am: $(PSS)
 	test -z "$(psdir)" || $(MKDIR_P) "$(DESTDIR)$(psdir)"
 	@list='$(PSS)'; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(psdir)/$$f"; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(psdir)/$$f"; \
 	done
@@ -523,7 +523,7 @@ install-pdf-am: $(PDFS)
 	test -z "$(pdfdir)" || $(MKDIR_P) "$(DESTDIR)$(pdfdir)"
 	@list='$(PDFS)' ; for p in $$list; do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(pdfdir)/$$f'"; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(pdfdir)/$$f"; \
 	done
@@ -536,7 +536,7 @@ install-html-am: $(HTMLS) install-html-local
 	test -z "$(htmldir)" || $(MKDIR_P) "$(DESTDIR)$(htmldir)"
 	@list='$(HTMLS)'; for p in $$list; do \
 		if test -f "$$p" || test -d "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		if test -d "$$d$$p"; then \
 			echo " $(MKDIR_P) '$(DESTDIR)$(htmldir)/$$f'"; \
 			$(MKDIR_P) "$(DESTDIR)$(htmldir)/$$f" || exit 1; \
@@ -553,7 +553,7 @@ install-pngs: $(IMG_PNGS)
 	test -z "$(htmldir)" || $(MKDIR_P) "$(DESTDIR)$(htmldir)"
 	@list='$(IMG_PNGS)'; for p in $$list ; do \
 		if test -f "$$p" ; then d=; else d="$(srcdir)/"; fi; \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo "$(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(htmldir)/$$f'"; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(htmldir)/$$f"; \
 	done
@@ -566,7 +566,7 @@ uninstall-dvi-am:
 	@$(ECHO) "Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(DVIS)'; for p in $$list; do \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo " rm -f '$(DESTDIR)$(dvidir)/$$f'"; \
 		rm -f "$(DESTDIR)$(dvidir)/$$f"; \
 	done
@@ -577,7 +577,7 @@ uninstall-ps-am:
 	@$(ECHO) "Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(PSS)'; for p in $$list; do \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo " rm -f '$(DESTDIR)$(psdir)/$$f'"; \
 		rm -f "$(DESTDIR)$(psdir)/$$f"; \
 	done
@@ -588,7 +588,7 @@ uninstall-pdf-am:
 	@$(ECHO) "Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(PDFS)'; for p in $$list; do \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo " rm -f '$(DESTDIR)$(pdfdir)/$$f'"; \
 		rm -f "$(DESTDIR)$(pdfdir)/$$f"; \
 	done
@@ -599,7 +599,7 @@ uninstall-html-am:
 	@$(ECHO) "Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@list='$(HTMLS)'; for p in $$list; do \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo " rm -rf '$(DESTDIR)$(htmldir)/$$f'"; \
 		rm -rf "$(DESTDIR)$(htmldir)/$$f"; \
 	done
@@ -607,7 +607,7 @@ uninstall-html-am:
 uninstall-pngs:
 	@$(NORMAL_UNINSTALL)
 	@list='$(IMG_PNGS)';  for p in $$list ; do \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo "rm -f '$(DESTDIR)$(htmldir)/$$f'"; \
 		rm -f "$(DESTDIR)$(htmldir)/$$f"; \
 	done
@@ -666,6 +666,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: papers.am,v $
+## Revision 0.9.2.16  2008-09-01 07:15:53  brian
+## - cannot rely on am__strip_dir being defined
+##
 ## Revision 0.9.2.15  2008-08-31 06:53:21  brian
 ## - keep from building docs normally
 ##
