@@ -19,10 +19,11 @@ Keywords:		SS7 SIGTRAN ISDN H323 VoIP
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			17M @PACKAGE@-@VERSION@.tar.gz
-			15M @PACKAGE@-@VERSION@.tar.bz2
+			27M @PACKAGE@-@VERSION@.tar.gz
+			25M @PACKAGE@-@VERSION@.tar.bz2
+			16M @PACKAGE@-@VERSION@.tar.lzma
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			15M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			25M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,

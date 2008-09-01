@@ -22,10 +22,11 @@ Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ tarballs/
-			2M @PACKAGE@-@VERSION@.tar.gz
-			2M @PACKAGE@-@VERSION@.tar.bz2
+			6M @PACKAGE@-@VERSION@.tar.gz
+			6M @PACKAGE@-@VERSION@.tar.bz2
+			5M @PACKAGE@-@VERSION@.tar.lzma
 Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
-			2M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			6M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
 			Requires: Linux kernel 2.4 or 2.6,
