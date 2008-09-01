@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.96 $) $Date: 2008-08-28 02:16:09 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.97 $) $Date: 2008-09-01 08:33:37 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-28 02:16:09 $ by $Author: brian $
+## Last Modified $Date: 2008-09-01 08:33:37 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -281,7 +281,7 @@ noa-rpm:
 #!     disabled with the option `--disable-arch', or the later with the option
 #!     `--disable-indep', passed to `configure'.
 #!
-rpms: lis-rpm lfs-rpm one-rpm noa-rpm
+rpms: noa-rpm lis-rpm lfs-rpm one-rpm
 
 # Another sneaky trick
 all-one-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
@@ -317,7 +317,9 @@ sign srpm-sign: $(redhat_src_file)
 #!
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
-	@kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; \
+	@$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm" ; \
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :; \
+	kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
 	for t in $$targets ;  do \
 		for k in $$kernels ; do \
@@ -329,9 +331,7 @@ rebuild:
 		done ; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm|| :; \
-	done ; \
-	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm" ; \
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :
+	done
 
 #! resign:
 #!     This target will search out and sign, with a GPG signature, the source
@@ -425,6 +425,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.97  2008-09-01 08:33:37  brian
+## - build no architecture first
+##
 ## Revision 0.9.2.96  2008-08-28 02:16:09  brian
 ## - comment typos
 ##
