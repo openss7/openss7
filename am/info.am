@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.60 $) $Date: 2008-08-31 06:53:21 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-09-01 07:15:53 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-31 06:53:21 $ by $Author: brian $
+## Last Modified $Date: 2008-09-01 07:15:53 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -366,7 +366,7 @@ install-pngs: $(IMG_PNGS)
 	test -z "$(htmldir)" || $(MKDIR_P) "$(DESTDIR)$(htmldir)"
 	@list='$(IMG_PNGS)'; for p in $$list ; do \
 		if test -f "$$p" ; then d=; else d="$(srcdir)/"; fi; \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo "$(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(htmldir)/$$f'"; \
 		$(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(htmldir)/$$f"; \
 	done
@@ -376,7 +376,7 @@ INSTALL_HTML_LOCAL	+= install-pngs
 uninstall-pngs:
 	@$(NORMAL_UNINSTALL)
 	@list='$(IMG_PNGS)';  for p in $$list ; do \
-		f=$(am__strip_dir) \
+		f=`echo $$p | sed -e 's,.*/,,'`; \
 		echo "rm -f '$(DESTDIR)$(htmldir)/$$f'"; \
 		rm -f "$(DESTDIR)$(htmldir)/$$f"; \
 	done
@@ -418,6 +418,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 0.9.2.61  2008-09-01 07:15:53  brian
+## - cannot rely on am__strip_dir being defined
+##
 ## Revision 0.9.2.60  2008-08-31 06:53:21  brian
 ## - keep from building docs normally
 ##
