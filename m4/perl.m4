@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/09/03 06:47:56 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-03 06:58:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/03 06:47:56 $ by $Author: brian $
+# Last Modified $Date: 2008-09-03 06:58:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -259,7 +259,7 @@ AC_DEFUN([_PERL_CHECK_LIBS32], [dnl
 		    AC_MSG_CHECKING([for perl 32-bit ldflags...  $perl_dir])
 		    if test -r $perl_dir/libperl.so -o -r $perl_dir/libperl.a
 		    then
-			perl_cv_ldflags32="${perl_cv_ldflags32:--m32 }${perl_cv_ldflags32}${perl_cv_ldflags32:+ }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
+			perl_cv_ldflags32="${perl_cv_ldflags32}${perl_cv_ldflags32:+ }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
 			AC_MSG_RESULT([yes])
 		    else
 			AC_MSG_RESULT([no])
@@ -400,6 +400,9 @@ AC_DEFUN([_PERL_], [dnl
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 0.9.2.5  2008-09-03 06:58:35  brian
+# - fix typo
+#
 # Revision 0.9.2.4  2008/09/03 06:47:56  brian
 # - search available library paths
 #
