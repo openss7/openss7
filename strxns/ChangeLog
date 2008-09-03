@@ -1,3 +1,8 @@
+2008-09-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: documented TOS range restriction
+	* src/drivers/np_ip.c: fixed TOS range restriction
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxns.spec.in: build changes for release
