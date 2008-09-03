@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-07-23 08:29:19 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-23 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2008/09/03 06:26:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.50  2008/09/03 06:26:29  brian
+ - fixed TOS option management restriction
+
  Revision 0.9.2.49  2008-07-23 08:29:19  brian
  - updated references and support for 2.6.18-92.1.6.el5 kernel
 
@@ -218,10 +221,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-07-23 08:29:19 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-07-23 08:29:19 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -281,8 +284,8 @@ static char const ident[] =
 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.49 $) $Date: 2008-07-23 08:29:19 $"
+#define NP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -6614,7 +6617,7 @@ np_alloc_priv(queue_t *q, struct np **npp, int type, dev_t *devp, cred_t *crp)
 		np->qor.ttl.ttl_min_value = 1;
 		np->qor.ttl.ttl_max_value = 255;
 		np->qor.tos.tos_min_value = 0;
-		np->qor.tos.tos_max_value = 15;
+		np->qor.tos.tos_max_value = 255;
 		np->qor.mtu.mtu_min_value = 536;
 		np->qor.mtu.mtu_max_value = 65535;
 		/* link into master list */
