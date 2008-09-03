@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2008-09-03 05:22:41 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/09/03 06:47:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-03 05:22:41 $ by $Author: brian $
+# Last Modified $Date: 2008/09/03 06:47:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -132,16 +132,16 @@ AC_DEFUN([_PERL_CHECK_LIBS], [dnl
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
 	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'CORE' -type d | sort -r`
+		perl_dirs=`find $perl_dir -name 'CORE' -type d | sort -r | uniq`
 		for perl_dir in $perl_dirs ; do
 		    AC_MSG_CHECKING([for perl native ldflags...  $perl_dir])
 		    if test -r $perl_dir/libperl.so -o -r $perl_dir/libperl.a
 		    then
-			perl_cv_ldflags="-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
+			perl_cv_ldflags="${perl_cv_ldflags}${perl_cv_ldflags:+ }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
 			AC_MSG_RESULT([yes])
-			break 2
+		    else
+			AC_MSG_RESULT([no])
 		    fi
-		    AC_MSG_RESULT([no])
 		done
 	    fi
 	done
@@ -221,7 +221,7 @@ AC_DEFUN([_PERL_CHECK_LIBS], [dnl
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
 	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'DynaLoader' -type d | sort -r`
+		perl_dirs=`find $perl_dir -name 'DynaLoader' -type d | sort -r | uniq`
 		for perl_dir in $perl_dirs ; do
 		    AC_MSG_CHECKING([for perl native ldadd...  $perl_dir])
 		    if test -r $perl_dir/DynaLoader.a
@@ -254,16 +254,16 @@ AC_DEFUN([_PERL_CHECK_LIBS32], [dnl
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
 	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'CORE' -type d | sort -r`
+		perl_dirs=`find $perl_dir -name 'CORE' -type d | sort -r | uniq`
 		for perl_dir in $perl_dirs ; do
 		    AC_MSG_CHECKING([for perl 32-bit ldflags...  $perl_dir])
 		    if test -r $perl_dir/libperl.so -o -r $perl_dir/libperl.a
 		    then
-			perl_cv_ldflags32="-m32 -L$perl_dir -Wl,-rpath -Wl,$perl_dir"
+			perl_cv_ldflags32="${perl_cv_ldflags32:--m32 }${perl_cv_ldflags32}${perl_cv_ldflags32:+ }-L$perl_dir -Wl,-rpath -Wl,$perl_dir"
 			AC_MSG_RESULT([yes])
-			break 2
+		    else
+			AC_MSG_RESULT([no])
 		    fi
-		    AC_MSG_RESULT([no])
 		done
 	    fi
 	done
@@ -341,7 +341,7 @@ AC_DEFUN([_PERL_CHECK_LIBS32], [dnl
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
 	    if test -d "$perl_dir" ; then
-		perl_dirs=`find $perl_dir -name 'DynaLoader' -type d | sort -r`
+		perl_dirs=`find $perl_dir -name 'DynaLoader' -type d | sort -r | uniq`
 		for perl_dir in $perl_dirs ; do
 		    AC_MSG_CHECKING([for perl 32-bit ldadd...  $perl_dir])
 		    if test -r $perl_dir/DynaLoader.a
@@ -400,6 +400,9 @@ AC_DEFUN([_PERL_], [dnl
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 0.9.2.4  2008/09/03 06:47:56  brian
+# - search available library paths
+#
 # Revision 0.9.2.3  2008-09-03 05:22:41  brian
 # - handle SuSE stupid perl packaging
 #
