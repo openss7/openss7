@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-03 05:22:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-03 05:22:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -116,13 +116,18 @@ AC_DEFUN([_PERL_CHECK_HEADERS], [dnl
 # =============================================================================
 # _PERL_CHECK_LIBS
 # -----------------------------------------------------------------------------
+# SuSE went and stuck the 64-bit perl libraries in the 32-bit library directory,
+# so look there too.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_PERL_CHECK_LIBS], [dnl
     # need to get LDFLAGS with the library path of libperl.so or libperl.a.
     AC_CACHE_CHECK([for perl native ldflags], [perl_cv_ldflags], [dnl
 	perl_cv_ldflags=
 	eval "perl_search_path=\"
 	    ${DESTDIR}${rootdir}${libdir}/perl5/
-	    ${DESTDIR}${libdir}/perl5/\""
+	    ${DESTDIR}${libdir}/perl5/
+	    ${DESTDIR}${rootdir}/usr/lib/perl5/
+	    ${DESTDIR}/usr/lib/perl5/\""
 	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
@@ -209,7 +214,9 @@ AC_DEFUN([_PERL_CHECK_LIBS], [dnl
 	perl_cv_ldadd=
 	eval "perl_search_path=\"
 	    ${DESTDIR}${rootdir}${libdir}/perl5/
-	    ${DESTDIR}${libdir}/perl5/\""
+	    ${DESTDIR}${libdir}/perl5/
+	    ${DESTDIR}${rootdir}/usr/lib/perl5/
+	    ${DESTDIR}/usr/lib/perl5/\""
 	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
@@ -393,6 +400,9 @@ AC_DEFUN([_PERL_], [dnl
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 0.9.2.3  2008-09-03 05:22:41  brian
+# - handle SuSE stupid perl packaging
+#
 # Revision 0.9.2.2  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
