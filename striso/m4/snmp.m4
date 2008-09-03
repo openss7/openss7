@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.7 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: snmp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.8 $) $Date: 2008-09-03 07:13:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-03 07:13:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -352,7 +352,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 	if test ":${ac_cv_lib32_netsnmp_main:-no}" = :yes
 	then
 	    AC_CHECK_LIB32([netsnmphelpers], [main], [], [dnl
-		AC_MSG_ERROR([
+		AC_MSG_WARN([
 ***
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmphelpers.  Most likely you need to install the
@@ -360,7 +360,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lnetsnmpagent -lnetsnmpmibs])
 	    AC_CHECK_LIB32([netsnmpagent], [main], [], [dnl
-		AC_MSG_ERROR([
+		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmpagent.  Most likely you need to install the
@@ -368,7 +368,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** --without-snmp-agent or --without-snmp to configure.
 *** ]) ], [-lnetsnmpmibs])
 	    AC_CHECK_LIB32([netsnmpmibs], [main], [], [dnl
-		AC_MSG_ERROR([
+		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libnetsnmpmibs.  Most likely you need to install the
@@ -377,7 +377,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** ]) ])
 	else
 	    AC_CHECK_LIB32([snmp], [main], [], [dnl
-		AC_MSG_ERROR([
+		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libsnmp.  Most likely you need to install the net-snmp
@@ -385,7 +385,7 @@ AC_DEFUN([_SNMP_CHECK_LIBS32], [dnl
 *** --without-snmp-agent or --without-snmp to configure.
 *** ]) ])
 	    AC_CHECK_LIB32([ucdagent], [main], [], [dnl
-		AC_MSG_ERROR([
+		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libucdagent.  Most likely you need to install the net-snmp
@@ -396,7 +396,7 @@ int allow_severity = 0;
 int deny_severity = 0;
 ])
 	    AC_CHECK_LIB32([ucdmibs], [main], [], [dnl
-		AC_MSG_ERROR([
+		AC_MSG_WARN([
 *** 
 *** Compiling 32-bit SNMP agents requires the 32-bit library
 *** libucdmibs.  Most likely you need to install the net-snmp or
@@ -473,6 +473,9 @@ AC_DEFUN([_SNMP_], [dnl
 # =============================================================================
 #
 # $Log: snmp.m4,v $
+# Revision 0.9.2.8  2008-09-03 07:13:53  brian
+# - only warn about missing SNMP 32-bit libs
+#
 # Revision 0.9.2.7  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
