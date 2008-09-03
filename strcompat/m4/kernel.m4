@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.165 $) $Date: 2008-08-29 05:57:16 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2008/09/03 01:43:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-29 05:57:16 $ by $Author: brian $
+# Last Modified $Date: 2008/09/03 01:43:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1431,15 +1431,17 @@ dnl
 	    linux_cv_k_machdir="${ksrcdir}/arch/${linux_cv_k_mach}"
 	fi
 	if test :"${linux_cv_k_machdir:-no}" != :no -a \
-	    \( ! -d "$linux_cv_k_machdir" -o ! -f "$linux_cv_k_machdir/Makefile" \)
+	    \( ! -d "$linux_cv_k_machdir" -o ! \
+		\( -f "$linux_cv_k_machdir/Makefile" \
+		-o -f "$linux_cv_k_machdir/defconfig" \) \)
 	then
 	    AC_MSG_ERROR([
 ***
 *** Kernel machine directory:
 ***     "$linux_cv_k_machdir"
-*** does not exist, or there is no Makefile in the directory.  Specify
-*** the correct kernel machine directory using the --with-k-machdir
-*** option to configure before attempting again.
+*** does not exist, or there is no Makefile or defconfig file in the
+*** directory.  Specify the correct kernel machine directory using the
+*** --with-k-machdir option to configure before attempting again.
 *** ])
 	fi ])
     kmachdir="$linux_cv_k_machdir"
@@ -2616,6 +2618,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.166  2008/09/03 01:43:10  brian
+# - might not be Makefile in kmarch directory
+#
 # Revision 0.9.2.165  2008-08-29 05:57:16  brian
 # - remove kernel dependency from debian control file
 #
