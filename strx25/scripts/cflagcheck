@@ -1,7 +1,7 @@
 #!/usr/bin/make -skf
 # =============================================================================
 # 
-# @(#) $RCSfile: cflagcheck,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.9 $) $Date: 2008-09-03 08:23:59 $
+# @(#) $RCSfile: cflagcheck,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-09-03 09:04:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,27 +46,28 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-03 08:23:59 $ by $Author: brian $
+# Last Modified $Date: 2008-09-03 09:04:43 $ by $Author: brian $
 #
 # =============================================================================
 
 KERNEL_TOPDIR ?= /usr/src/linux
 KERNEL_CONFIG = /usr/src/linux/.config
+KCONFIG_CONFIG = $(KERNEL_CONFIG)
 
 .SILENT:
 
 .DEFAULT: cflag-check
 
 cflag-check:
-	@if test -n '$(KERNEL_CFLAGS)' ; then \
-		echo '$(KERNEL_CFLAGS)' | sed -e 's|^$(KERNEL_CPPFLAGS) ||' ; \
+	@if test -n '$(KBUILD_CFLAGS)' ; then \
+		echo '$(KBUILD_CFLAGS)' | sed -e 's|^$(KBUILD_CPPFLAGS) ||' ; \
 	else \
 		echo '$(CFLAGS)' | sed -e 's|^$(CPPFLAGS) ||' ; \
 	fi
 
 cppflag-check:
-	@if test -n '$(KERNEL_CPPFLAGS)' ; then \
-		echo '$(KERNEL_CPPFLAGS)' ; \
+	@if test -n '$(KBUILD_CPPFLAGS)' ; then \
+		echo '$(KBUILD_CPPFLAGS)' ; \
 	else \
 		echo "$(CPPFLAGS)" ; \
 	fi
@@ -91,7 +92,7 @@ flag-check:
 	-echo "OBJDUMP='$(OBJDUMP)'"
 	-:
 	-echo "HOSTCC='$(HOSTCC)'"
-	-echo "HOSTCFLAGS='$(HOSTCFLAGS)"
+	-echo "HOSTCFLAGS='$(HOSTCFLAGS)'"
 	-echo "GENKSYMS='$(GENKSYMS)'"
 	-echo "DEPMOD='$(DEPMOD)'"
 	-echo "KALLSYMS='$(KALLSYMS)'"
@@ -101,9 +102,12 @@ flag-check:
 	-echo "AWK='$(AWK)'"
 	-echo "RPM='$(RPM)'"
 	-:
-	-if test -n '$(KERNEL_CFLAGS)' ; then echo '$(KERNEL_CFLAGS)' ; else echo '$(CFLAGS)' ; fi
-	-if test -n '$(KERNEL_CPPFLAGS)' ; then echo '$(KERNEL_CPPFLAGS)' ; else echo '$(CPPFLAGS)' ; fi
-	-if test -n '$(KERNEL_AFLAGS)' ; then echo '$(KERNEL_AFLAGS)' ; else echo '$(AFLAGS)' ; fi
+	-if test -n '$(KBUILD_CFLAGS)' ; then echo "CFLAGS='$(KBUILD_CFLAGS)'" ; else echo "CFLAGS='$(CFLAGS)'" ; fi
+	-if test -n '$(KBUILD_CPPFLAGS)' ; then echo "CPPFLAGS='$(KBUILD_CPPFLAGS)'" ; else echo "CPPFLAGS='$(CPPFLAGS)'" ; fi
+	-if test -n '$(KBUILD_AFLAGS)' ; then echo "AFLAGS='$(KBUILD_AFLAGS)'" ; else echo "AFLAGS='$(AFLAGS)'" ; fi
+
+env:
+	@env
 
 
 #include $(KERNEL_CONFIG)
@@ -113,6 +117,9 @@ include $(KERNEL_TOPDIR)/Makefile
 # =============================================================================
 #
 # $Log: cflagcheck,v $
+# Revision 0.9.2.10  2008-09-03 09:04:43  brian
+# - handle new kernel makefile flags
+#
 # Revision 0.9.2.9  2008-09-03 08:23:59  brian
 # - handle newer names for kernel flags
 #
