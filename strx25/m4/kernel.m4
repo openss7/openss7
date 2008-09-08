@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2008/09/03 01:43:10 $
+# @(#) $RCSfile: kernel.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.167 $) $Date: 2008-09-08 04:37:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/03 01:43:10 $ by $Author: brian $
+# Last Modified $Date: 2008-09-08 04:37:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1435,16 +1435,13 @@ dnl
 		\( -f "$linux_cv_k_machdir/Makefile" \
 		-o -f "$linux_cv_k_machdir/defconfig" \) \)
 	then
-	    AC_MSG_ERROR([
-***
-*** Kernel machine directory:
-***     "$linux_cv_k_machdir"
-*** does not exist, or there is no Makefile or defconfig file in the
-*** directory.  Specify the correct kernel machine directory using the
-*** --with-k-machdir option to configure before attempting again.
-*** ])
+	    linux_cv_k_machdir=no
 	fi ])
-    kmachdir="$linux_cv_k_machdir"
+    kmachdir=
+    if test :"${linux_cv_k_machdir:-no}" != :no
+    then
+	kmachdir="$linux_cv_k_machdir"
+    fi
     AC_SUBST([kmachdir])dnl
 ])# _LINUX_CHECK_KERNEL_MACHDIR
 # =========================================================================
@@ -1471,7 +1468,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 	    then
 		eval "k_config_search_path=\"
 		    ${ksrcdir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config
-		    ${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}
+		    ${kmachdir:+${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}}
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
@@ -1481,7 +1478,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}${rootdir}/boot/config-${kversion}
 		    ${DESTDIR}${rootdir}/boot/config
 		    ${kbuilddir}/.config
-		    ${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}
+		    ${kmachdir:+${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}}
 		    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
@@ -1494,7 +1491,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 	    else
 		eval "k_config_search_path=\"
 		    ${ksrcdir}/configs/kernel-${knumber}-${karch}${kboot:+-}${kboot}.config
-		    ${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}
+		    ${kmachdir:+${kboot:+${kmachdir}/defconfig${kboot:+-}${kboot}}}
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}${rootdir}/usr/src/kernel-headers-${kversion}/.config
@@ -1502,7 +1499,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}${rootdir}/usr/src/linux-${kbase}-obj/${kmarch}/${kboot}/.config
 		    ${DESTDIR}${rootdir}/usr/src/linux-obj/.config
 		    ${kbuilddir}/.config
-		    ${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}
+		    ${kmachdir:+${kboot:-${kmachdir}/defconfig${kboot:+-}${kboot}}}
 		    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/.config
 		    ${DESTDIR}/usr/src/kernels/${kversion}/.config
 		    ${DESTDIR}/usr/src/kernel-headers-${kversion}/.config
@@ -2618,6 +2615,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.167  2008-09-08 04:37:28  brian
+# - machine defaults do not exist on recent kernels
+#
 # Revision 0.9.2.166  2008/09/03 01:43:10  brian
 # - might not be Makefile in kmarch directory
 #
