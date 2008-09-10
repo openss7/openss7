@@ -1,29 +1,29 @@
 2008-09-10  Brian Bidulock  <bidulock@openss7.org>
 
-	* openss7.spec.in: correct list macro quotation
-	* LiS/LiS.spec.in: correct list macro quotation
-	* iperf/iperf.spec.in: correct list macro quotation
-	* netperf/netperf.spec.in: correct list macro quotation
-	* osr61/osr61.spec.in: correct list macro quotation
-	* sctp/sctp.spec.in: correct list macro quotation
-	* sigtran/sigtran.spec.in: correct list macro quotation
-	* stacks/strss7.spec.in: correct list macro quotation
-	* strbcm/strbcm.spec.in: correct list macro quotation
-	* strchan/strchan.spec.in: correct list macro quotation
-	* strcompat/strcompat.spec.in: correct list macro quotation
-	* streams/streams.spec.in: correct list macro quotation
-	* strinet/strinet.spec.in: correct list macro quotation
-	* strisdn/strisdn.spec.in: correct list macro quotation
-	* striso/striso.spec.in: correct list macro quotation
-	* strnsl/strnsl.spec.in: correct list macro quotation
-	* strsctp/strsctp.spec.in: correct list macro quotation
-	* strsock/strsock.spec.in: correct list macro quotation
-	* strtty/strtty.spec.in: correct list macro quotation
-	* strutil/strutil.spec.in: correct list macro quotation
-	* strvoip/strvoip.spec.in: correct list macro quotation
-	* strx25/strx25.spec.in: correct list macro quotation
-	* strxnet/strxnet.spec.in: correct list macro quotation
-	* strxns/strxns.spec.in: correct list macro quotation
+	* openss7.spec.in: correct list macro quotation, init scripts
+	* LiS/LiS.spec.in: correct list macro quotation, init scripts
+	* iperf/iperf.spec.in: correct list macro quotation, init scripts
+	* netperf/netperf.spec.in: correct list macro quotation, init scripts
+	* osr61/osr61.spec.in: correct list macro quotation, init scripts
+	* sctp/sctp.spec.in: correct list macro quotation, init scripts
+	* sigtran/sigtran.spec.in: correct list macro quotation, init scripts
+	* stacks/strss7.spec.in: correct list macro quotation, init scripts
+	* strbcm/strbcm.spec.in: correct list macro quotation, init scripts
+	* strchan/strchan.spec.in: correct list macro quotation, init scripts
+	* strcompat/strcompat.spec.in: correct list macro quotation, init scripts
+	* streams/streams.spec.in: correct list macro quotation, init scripts
+	* strinet/strinet.spec.in: correct list macro quotation, init scripts
+	* strisdn/strisdn.spec.in: correct list macro quotation, init scripts
+	* striso/striso.spec.in: correct list macro quotation, init scripts
+	* strnsl/strnsl.spec.in: correct list macro quotation, init scripts
+	* strsctp/strsctp.spec.in: correct list macro quotation, init scripts
+	* strsock/strsock.spec.in: correct list macro quotation, init scripts
+	* strtty/strtty.spec.in: correct list macro quotation, init scripts
+	* strutil/strutil.spec.in: correct list macro quotation, init scripts
+	* strvoip/strvoip.spec.in: correct list macro quotation, init scripts
+	* strx25/strx25.spec.in: correct list macro quotation, init scripts
+	* strxnet/strxnet.spec.in: correct list macro quotation, init scripts
+	* strxns/strxns.spec.in: correct list macro quotation, init scripts
 
 2008-09-08  Brian Bidulock  <bidulock@openss7.org>
 
