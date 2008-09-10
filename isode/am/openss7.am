@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.131 $) $Date: 2008-08-31 06:53:21 $
+# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.132 $) $Date: 2008-09-04 06:13:09 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-31 06:53:21 $ by $Author: brian $
+## Last Modified $Date: 2008-09-04 06:13:09 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -512,9 +512,12 @@ cscope.out: cscope.files
 
 cscope-files: cscope-files-recursive
 	list='$(SOURCES) $(HEADERS) $(CSCOPE_FILES)'; \
+	s=`(cd $(srcdir); /bin/pwd)`; b=`/bin/pwd`; \
 	test -z '$(CSCOPEFILES)' || \
 	for i in $$list; do \
-		if test -f "$$i"; then echo `/bin/pwd`/$$i; else echo $(srcdir)/$$i; fi; \
+		if test -f "$$i"; then d="$$b/"; else d="$$s/"; fi; \
+		case "$$i" in /*) d=;; esac; \
+		echo "$$d$$i"; \
 	done | $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
 		END { if (nonempty) { for (i in files) print i; }; }' >> $(CSCOPEFILES)
 
@@ -732,6 +735,9 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.132  2008-09-04 06:13:09  brian
+## - better cscope generation
+##
 ## Revision 0.9.2.131  2008-08-31 06:53:21  brian
 ## - keep from building docs normally
 ##

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.91 2008-08-02 16:39:10 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.92 2008-09-10 03:50:09 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-08-02 16:39:10 $ by $Author: brian $
+@c Last Modified $Date: 2008-09-10 03:50:09 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -695,31 +695,42 @@ distribution installed versions.
 For building documentation, the build host also requires the following documentation tools:
 
 @itemize
-@item @command{gs 8.15}
-@item @command{tetex 3.0}
-@item @command{texinfo 4.11}
-@item @command{transfig 3.2.5}
-@item @command{imagemagick 6.2.4}
-@item @command{groff 1.17.2}
-@item @command{gnuplot 3.7}
-@item @command{latex2html 1.71}
+@item @command{gs 6.51} or @command{ghostscript 6.51}, or newer.
+@item @command{tetex 3.0} or @command{texlive 2007}, or newer.
+@item @command{texinfo 4.11}, but not @command{texinfo 4.12}.
+@item @command{transfig 3.2.3d} or newer.
+@item @command{imagemagick 5.3.8} or @command{ImageMagick 5.3.8}, or newer.
+@item @command{groff 1.17.2} or newer.
+@item @command{gnuplot 3.7} or newer.
+@item @command{latex2html 1.62} or newer.
 @end itemize
 
 Most desktop GNU/Linux distributions will have these tools; however, some server-style installations
 (e.g. @cite{Ubuntu}-server, @cite{SLES 9} or @cite{Fedora 6 or 7}) will not and they must be
 installed separately.@footnote{In particular, for @cite{CentOS}, @cite{Fedora
 6 or 7}, the @command{tetex-latex} and @command{gnuplot} packages must be loaded as well.  Note also
-that the @command{latex2html} used to be part of the textex package (or subpackages) but is now
-often packaged on its own.}
+that the @command{latex2html} used to be part of the @command{textex} package (or subpackages) but
+is now often packaged on its own.  Recent distributions such as SUSE 11.0 and Fedora 9 use the
+@command{texlive} package instead of the @command{tetex} package.}
 
-For uncooked manual pages, the entire @manpage{groff(1)} package is required on @cite{Debian} and
-@cite{Ubuntu} systems (the base package does not include @manpage{grefer(1)} which is used extensively by
-uncooked manual pages).  The following will get what you need:
+Note that @command{texinfo 4.12} must not be used as it breaks the build process.
+
+For uncooked manual pages, the entire @manpage{groff(1)} package is required on older @cite{Debian} and
+@cite{Ubuntu} systems (the base package did not include @manpage{grefer(1)} which is used extensively by
+uncooked manual pages).  The following will get what you need on older systems:
 
 @cartouche
 @example
 Debian: % apt-get install groff_ext
 Ubuntu: % apt-get install groff
+@end example
+@end cartouche
+
+On newer systems, simply:
+
+@cartouche
+@example
+% apt-get install groff
 @end example
 @end cartouche
 

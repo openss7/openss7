@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: modpost.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.24 $) $Date: 2008-04-28 09:23:10 $
+# @(#) $RCSfile: modpost.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.25 $) $Date: 2008-09-04 06:02:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:23:10 $ by $Author: brian $
+# Last Modified $Date: 2008-09-04 06:02:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ modename="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: modpost.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.24 $) $Date: 2008-04-28 09:23:10 $'
+ident='$RCSfile: modpost.sh,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.25 $) $Date: 2008-09-04 06:02:28 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -569,6 +569,10 @@ add_this_module() {
     cat<<_ACEOF
 
 #undef unix
+
+#ifndef __attribute_used__
+#define __attribute_used__ __used
+#endif
 
 #define KBUILD_MODNAME $1
 
@@ -1121,6 +1125,9 @@ exit $retval
 # =============================================================================
 #
 # $Log: modpost.sh,v $
+# Revision 0.9.2.25  2008-09-04 06:02:28  brian
+# - corrections for recent 2.6.25.4 kernels
+#
 # Revision 0.9.2.24  2008-04-28 09:23:10  brian
 # - updated script headers for release
 #
