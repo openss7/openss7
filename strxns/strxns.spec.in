@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2008-09-10 17:44:48 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2008-09-10 20:46:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 17:44:48 $ by $Author: brian $
+# Last Modified $Date: 2008-09-10 20:46:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1787,6 +1787,15 @@ if [ $1 = 1 ] ; then : # fresh install
         rm -f -- $prel_new
     fi
 %endif
+%if %{have_initscripts}
+    # This is the end of a fresh install, add init scripts if we can
+    list="%{initfiles}" ; for i in $list ; do
+        # Find the best working init script installation tool
+        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue
+        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue
+        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
+    done
+%endif
 fi
 if [ $1 = 2 ] ; then : # upgrade
 %if %{have_oldmods}
@@ -1826,7 +1835,7 @@ if [ $1 = 2 ] ; then : # upgrade
     fi
 %endif
 %if %{have_initscripts}
-    # This is the end of a fresh install, add init scripts if we can
+    # This is the end of an upgrade, add init scripts if we can
     list="%{initfiles}" ; for i in $list ; do
         # Find the best working init script installation tool
         [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue
@@ -2025,9 +2034,13 @@ external SNMP management tools.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
-# Revision 0.9.2.136  2008-09-10 17:44:48  brian
-# - correct list macro quotation
+# Revision 0.9.2.137  2008-09-10 20:46:17  brian
+# - install init scripts on fresh install
 #
+
+* Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.136  2008-09-10 17:44:48  brian
+- correct list macro quotation
 
 * Thu Aug 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.135  2008-08-28 02:37:53  brian
