@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strnsl.spec.in,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-08-28 02:37:47 $
+# @(#) $RCSfile: strnsl.spec.in,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-10 17:44:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-28 02:37:47 $ by $Author: brian $
+# Last Modified $Date: 2008-09-10 17:44:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -889,7 +889,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         depmod -ae || :
 %if %{have_initscripts}
         # Running kernels do need init scripts run.
-        list='%{initfiles}' ; for i in $list ; do
+        list="%{initfiles}" ; for i in $list ; do
             if [ -f %_initrddir/$i ] ; then
                 /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
             fi
@@ -912,7 +912,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         # modules are running
 %if %{have_initscripts}
         # First lets try shutting down using any init script first in reverse order
-        list='%{initfiles}' ; for i in $list ; do
+        list="%{initfiles}" ; for i in $list ; do
             reverse="$i${reverse:+ $reverse}"
         done
         for i in $reverse ; do
@@ -1723,7 +1723,7 @@ if [ $arg = 1 ] ; then : # fresh install
     fi
 %endif
     # Fresh install, go looking for non-rpm initscripts and remove them.
-    list='%{initfiles}' ; for i in $list ; do
+    list="%{initfiles}" ; for i in $list ; do
         if [ -f %_initrddir/$i ] ; then
             # Find the best working init script removal tool
             [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
@@ -1783,7 +1783,7 @@ if [ $1 = 1 ] ; then : # fresh install
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
-        mods='%{preloads}' ; for m in $mods ; do
+        mods="%{preloads}" ; for m in $mods ; do
             ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new
               echo "$m" ) > $prel_tmp
             mv -f -- $prel_tmp $prel_new
@@ -1874,7 +1874,7 @@ if [ $1 = 2 ] ; then : # upgrade
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
-        mods='%{preloads}' ; for m in $mods ; do
+        mods="%{preloads}" ; for m in $mods ; do
             ( cat $repl_new ; echo "$m" ) > $prel_tmp
             mv -f -- $prel_tmp $prel_new
         done
@@ -1937,7 +1937,7 @@ if [ $1 = 2 ] ; then : # upgrade
 %endif
 %if %{have_initscripts}
     # This is the end of a fresh install, add init scripts if we can
-    list='%{initfiles}' ; for i in $list ; do
+    list="%{initfiles}" ; for i in $list ; do
         # Find the best working init script installation tool
         [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue
         [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue
@@ -1977,7 +1977,7 @@ if [ $1 = 0 ] ; then : # final removal
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
-        mods='%{preloads}' ; for m in $mods ; do
+        mods="%{preloads}" ; for m in $mods ; do
             sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
             mv -f -- $prel_tmp $prel_new
         done
@@ -2040,7 +2040,7 @@ if [ $1 = 0 ] ; then : # final removal
 %endif
 %if %{have_initscripts}
     # Uninstalling for good, remove init scripts if we can
-    list='%{initfiles}' ; for i in $list ; do
+    list="%{initfiles}" ; for i in $list ; do
         if [ -f %_initrddir/$i ] ; then
             # rpm is not too good about the order of removal
             /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
@@ -2092,7 +2092,7 @@ b loop' $conf_new > $conf_tmp
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
-        mods='%{preloads}' ; for m in $mods ; do
+        mods="%{preloads}" ; for m in $mods ; do
             # This groovy sed script just pulls out the first matching line and leaves the rest
             # untouched.
             sed -e '
@@ -2251,9 +2251,13 @@ external SNMP management tools.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strnsl.spec.in,v $
-# Revision 0.9.2.25  2008-08-28 02:37:47  brian
-# - build and release file updates for release
+# Revision 0.9.2.26  2008-09-10 17:44:45  brian
+# - correct list macro quotation
 #
+
+* Thu Aug 28 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.25  2008-08-28 02:37:47  brian
+- build and release file updates for release
 
 * Wed Aug 20 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.24  2008-08-20 10:56:51  brian
