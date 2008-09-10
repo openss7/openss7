@@ -526,6 +526,7 @@ if (n || f)
 #endif /* ANT_BRD_DBG */
 
 /* Issues related to local config reg params - wait states, etc. */
+#if 0
 static void
 CnvrtrBrd(unsigned long *a)
 {
@@ -596,6 +597,7 @@ CnvrtrBrd(unsigned long *a)
 #endif
 
 }
+#endif
 
 /***************************************************************************
  *        NAME: SetPciIo32Mode(port, flag)

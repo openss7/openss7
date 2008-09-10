@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.43 2008-08-11 22:23:17 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.44 2008-09-10 03:49:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-11 22:23:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.44  2008-09-10 03:49:43  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.43  2008-08-11 22:23:17  brian
  - rationalization of header files
 
@@ -83,7 +86,7 @@
 #ifndef __SYS_STREAMS_DDI_H__
 #define __SYS_STREAMS_DDI_H__ 1
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.43 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.44 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_DDI_H__
 #warning "Do not include sys/streams/ddi.h directly, include sys/ddi.h instead."
@@ -253,7 +256,8 @@ drv_usecwait(unsigned long usec)
 {
 	return (udelay(usec));
 }
-__STRUTIL_EXTERN_INLINE void
+
+static __inline__ void
 delay(unsigned long ticks)
 {
 	set_current_state(TASK_UNINTERRUPTIBLE);

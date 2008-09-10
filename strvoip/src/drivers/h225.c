@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 02:07:54 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: h225.c,v $
+ Revision 0.9.2.9  2008-09-10 03:49:59  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.8  2008-04-29 02:07:54  brian
  - updated headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $"
 
 static char const ident[] =
-    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $";
+    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -107,7 +110,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 02:07:54 $"
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14648,7 +14651,7 @@ h225_init_caches(void)
 {
 	if (!h225_cc_cachep
 	    && !(h225_cc_cachep =
-		 kmem_cache_create("h225_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_cc_cachep", DRV_NAME);
 		err = -ENOMEM;
@@ -14657,7 +14660,7 @@ h225_init_caches(void)
 		printd(("%s: initialized h225 cc structure cache\n", DRV_NAME));
 	if (!h225_cr_cachep
 	    && !(h225_cr_cachep =
-		 kmem_cache_create("h225_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_cr_cachep", DRV_NAME);
 		err = -ENOMEM;
@@ -14666,7 +14669,7 @@ h225_init_caches(void)
 		printd(("%s: initialized h225 cr structure cache\n", DRV_NAME));
 	if (!h225_ch_cachep
 	    && !(h225_ch_cachep =
-		 kmem_cache_create("h225_ch_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_ch_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_ch_cachep", DRV_NAME);
 		err = -ENOMEM;
@@ -14675,7 +14678,7 @@ h225_init_caches(void)
 		printd(("%s: initialized h225 ch structure cache\n", DRV_NAME));
 	if (!h225_tg_cachep
 	    && !(h225_tg_cachep =
-		 kmem_cache_create("h225_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_tg_cachep", DRV_NAME);
 		err = -ENOMEM;
@@ -14684,7 +14687,7 @@ h225_init_caches(void)
 		printd(("%s: initialized h225 fg structure cache\n", DRV_NAME));
 	if (!h225_fg_cachep
 	    && !(h225_fg_cachep =
-		 kmem_cache_create("h225_fg_cachep", sizeof(struct fg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_fg_cachep", sizeof(struct fg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_fg_cachep", DRV_NAME);
 		err = -ENOMEM;
@@ -14693,7 +14696,7 @@ h225_init_caches(void)
 		printd(("%s: initialized h225 fg structure cache\n", DRV_NAME));
 	if (!h225_eg_cachep
 	    && !(h225_eg_cachep =
-		 kmem_cache_create("h225_eg_cachep", sizeof(struct eg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_eg_cachep", sizeof(struct eg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_eg_cachep", DRV_NAME);
 		err = -ENOMEM;
@@ -14702,7 +14705,7 @@ h225_init_caches(void)
 		printd(("%s: initialized h225 eg structure cache\n", DRV_NAME));
 	if (!h225_xg_cachep
 	    && !(h225_xg_cachep =
-		 kmem_cache_create("h225_xg_cachep", sizeof(struct xg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_xg_cachep", sizeof(struct xg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_xg_cachep", DRV_NAME);
 		err = -ENOMEM;
@@ -14711,7 +14714,7 @@ h225_init_caches(void)
 		printd(("%s: initialized h225 xg structure cache\n", DRV_NAME));
 	if (!h225_dl_cachep
 	    && !(h225_dl_cachep =
-		 kmem_cache_create("h225_dl_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("h225_dl_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate h225_dl_cachep", DRV_NAME);
 		err = -ENOMEM;

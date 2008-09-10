@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:13 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop2.c,v $
+ Revision 0.9.2.19  2008-09-10 03:49:35  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.18  2008-04-29 07:11:13  brian
  - updating headers for release
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:13 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:35 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:13 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:35 $";
 
 #include <sys/os7/compat.h>
 
@@ -591,9 +594,10 @@ kmem_cachep_t s_cachep = NULL;
 static void
 s_init_caches(void)
 {
-	if (!(s_cachep) &&
-	    !(s_cachep = kmem_cache_create
-	      ("sscop_cachep", sizeof(sscop_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
+	if (!(s_cachep)
+	    && !(s_cachep =
+		 kmem_create_cache("sscop_cachep", sizeof(sscop_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)))
 		panic("%s:Cannot alloc s_cachep.\n", __FUNCTION__);
 	return;
 }

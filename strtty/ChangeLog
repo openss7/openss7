@@ -1,3 +1,9 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check new types and cache creation
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/pty.c: new cache creation
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strtty.spec.in: build changes for release

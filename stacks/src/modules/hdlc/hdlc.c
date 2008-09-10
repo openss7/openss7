@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:54 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-10 03:49:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:54 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.21  2008-09-10 03:49:21  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.20  2008-04-29 07:10:54  brian
  - updating headers for release
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:54 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-10 03:49:21 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:54 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-10 03:49:21 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -109,7 +112,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:54 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-10 03:49:21 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -274,7 +277,7 @@ hdlc_init_caches(void)
 {
 	if (!hdlc_priv_cachep
 	    && !(hdlc_priv_cachep =
-		 kmem_cache_create("hdlc_priv_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("hdlc_priv_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate hdlc_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);

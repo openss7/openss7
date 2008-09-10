@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 00:02:05 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.10  2008-09-10 03:49:51  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.9  2008-04-29 00:02:05  brian
  - updated headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 00:02:05 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 00:02:05 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -119,7 +122,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-04-29 00:02:05 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"
@@ -225,8 +228,8 @@ tcpns_init_caches(void)
 {
 	if (!tcpns_priv_cachep
 	    && !(tcpns_priv_cachep =
-		 kmem_cache_create(MOD_NAME, sizeof(struct tcpns), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+		 kmem_create_cache(MOD_NAME, sizeof(struct tcpns), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
+		 )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate tcpns_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);

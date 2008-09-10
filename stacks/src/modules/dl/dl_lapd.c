@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:52 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:52 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.24  2008-09-10 03:49:20  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-04-29 07:10:52  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:52 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:20 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:52 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:20 $";
 
 #include <sys/os7/compat.h>
 
@@ -101,7 +104,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:52 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:20 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3607,7 +3610,7 @@ lapd_init_caches(void)
 {
 	if (!dl_priv_cachep
 	    && !(dl_priv_cachep =
-		 kmem_cache_create("dl_priv_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("dl_priv_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate dl_priv_cachep", DRV_NAME);
 		lapd_term_caches();
@@ -3616,7 +3619,7 @@ lapd_init_caches(void)
 		printd(("%s: initialized dl priv structure cache\n", DRV_NAME));
 	if (!dl_link_cachep
 	    && !(dl_link_cachep =
-		 kmem_cache_create("dl_link_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("dl_link_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate dl_link_cachep", DRV_NAME);
 		lapd_term_caches();

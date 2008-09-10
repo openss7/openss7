@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-08-11 22:27:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-09-10 03:49:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-11 22:27:22 $ by $Author: brian $
+# Last Modified $Date: 2008-09-10 03:49:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -381,7 +381,8 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #include <net/tcp.h>
     ])
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu nf_reset ip_dst_output \
-			ip_route_output_key __in_dev_get_rcu synchronize_net skb_transport_header], [], [], [
+			ip_route_output_key __in_dev_get_rcu synchronize_net skb_transport_header \
+			], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -405,7 +406,7 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #include <linux/inetdevice.h>
     ])
     _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
-			struct inet_protocol,
+			uintptr_t, intptr_t, uchar, struct inet_protocol,
 			struct net_protocol], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -440,6 +441,63 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
     else
 	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
     fi
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel kmem_cache_create with 5 args],
+		       [linux_cv_kmem_cache_create_5_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+		    [[struct kmem_cache *(*my_autoconf_function_pointer)
+		      (const char *, size_t, size_t, unsigned long,
+		       void (*)(struct kmem_cache *, void *)) =
+		       &kmem_cache_create;]]) ],
+		[linux_cv_kmem_cache_create_5_args='yes'],
+		[linux_cv_kmem_cache_create_5_args='no'])
+	    ])
+	if test :$linux_cv_kmem_cache_create_5_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS], [1], [Define if
+		       function kmem_cache_create takes 4 arguments.])
+	fi
+	AH_VERBATIM([kmem_create_cache],
+[/* silly kernel developers */
+#ifdef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
+#define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5)
+#else
+#define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5,a6)
+#endif])dnl
+    ])
     _LINUX_CHECK_MACROS([rcu_read_lock], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -471,7 +529,8 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 			  struct net_protocol.no_policy,
 			  struct dst_entry.path,
 			  struct dst_entry.path,
-			  struct sk_buff.transport_header], [], [], [
+			  struct sk_buff.transport_header,
+			  struct net.dev_base_head], [], [], [
 #include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/types.h>
@@ -791,6 +850,169 @@ dnl 	fi
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
     _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
+    _LINUX_KERNEL_ENV([
+	AC_CACHE_CHECK([for ip_frag_mem with 1 arg],
+		       [linux_cv_ip_frag_mem_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[int (*my_autoconf_function_pointer)(struct net *)
+		    = &ip_frag_mem;]])
+		],
+		[linux_cv_ip_frag_mem_1_arg='yes'],
+		[linux_cv_ip_frag_mem_1_arg='no'])
+	])
+	if test :$linux_cv_ip_frag_mem_1_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_MEM_1_ARG], [1], [Define if function ip_frag_mem() takes 1
+		       argument.])
+	fi
+	AC_CACHE_CHECK([for ip_frag_mem with 0 args],
+		       [linux_cv_ip_frag_mem_0_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[int (*my_autoconf_function_pointer)(void)
+		    = &ip_frag_mem;]])
+		],
+		[linux_cv_ip_frag_mem_0_args='yes'],
+		[linux_cv_ip_frag_mem_0_args='no'])
+	])
+	if test :$linux_cv_ip_frag_mem_0_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_MEM_0_ARGS], [1], [Define if function ip_frag_mem() takes
+		       0 arguments.])
+	fi
+	AC_CACHE_CHECK([for ip_frag_nqueues with 1 arg],
+		       [linux_cv_ip_frag_nqueues_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[int (*my_autoconf_function_pointer)(struct net *)
+		    = &ip_frag_nqueues;]])
+		],
+		[linux_cv_ip_frag_nqueues_1_arg='yes'],
+		[linux_cv_ip_frag_nqueues_1_arg='no'])
+	])
+	if test :$linux_cv_ip_frag_nqueues_1_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG], [1], [Define if function ip_frag_nqueues()
+		       takes 1 argument.])
+	fi
+	AC_CACHE_CHECK([for ip_frag_nqueues with 0 args],
+		       [linux_cv_ip_frag_nqueues_0_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[int (*my_autoconf_function_pointer)(void)
+		    = &ip_frag_nqueues;]])
+		],
+		[linux_cv_ip_frag_nqueues_0_args='yes'],
+		[linux_cv_ip_frag_nqueues_0_args='no'])
+	])
+	if test :$linux_cv_ip_frag_nqueues_0_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS], [1], [Define if function ip_frag_nqueues()
+		       takes 0 arguments.])
+	fi
+	AC_CACHE_CHECK([for first_net_device with 1 arg],
+		       [linux_cv_first_net_device_1_arg], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[struct net_device *(*my_autoconf_function_pointer)(struct net *)
+		    = &first_net_device;]])
+		],
+		[linux_cv_first_net_device_1_arg='yes'],
+		[linux_cv_first_net_device_1_arg='no'])
+	])
+	if test :$linux_cv_first_net_device_1_arg = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG], [1], [Define if function
+		       first_net_device() takes 1 argument.])
+	fi
+	AC_CACHE_CHECK([for inet_addr_type with 2 args],
+		       [linux_cv_inet_addr_type_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[unsigned (*my_autoconf_function_pointer)(struct net *, __be32)
+		    = &inet_addr_type;]])
+		],
+		[linux_cv_inet_addr_type_2_args='yes'],
+		[linux_cv_inet_addr_type_2_args='no'])
+	])
+	if test :$linux_cv_inet_addr_type_2_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS], [1], [Define if function inet_addr_type()
+		       takes 2 arguments.])
+	fi
+	AC_CACHE_CHECK([for ip_route_output_key with 3 args],
+		       [linux_cv_ip_route_output_key_3_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[int (*my_autoconf_function_pointer)(struct net *, struct rtable **, struct
+		     flowi *) = &ip_route_output_key;]])
+		],
+		[linux_cv_ip_route_output_key_3_args='yes'],
+		[linux_cv_ip_route_output_key_3_args='no'])
+	])
+	if test :$linux_cv_ip_route_output_key_3_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS], [1], [Define if function inet_addr_type()
+		       takes 3 arguments.])
+	fi
+    ])
 dnl
 dnl These are SCTP-only checks
 dnl
@@ -1251,6 +1473,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.79  2008-09-10 03:49:52  brian
+# - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+#
 # Revision 0.9.2.78  2008-08-11 22:27:22  brian
 # - added makefile variables for modules to acinclude
 #

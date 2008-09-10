@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:18 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:18 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_x400p.c,v $
+ Revision 0.9.2.24  2008-09-10 03:49:36  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-04-29 07:11:18  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:18 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:36 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:18 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:36 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -118,7 +121,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:18 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:36 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2698,7 +2701,7 @@ xp_init_caches(void)
 {
 	if (!xp_priv_cachep
 	    && !(xp_priv_cachep =
-		 kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
@@ -2706,7 +2709,7 @@ xp_init_caches(void)
 		printd(("X400P-SS7: initialized device private structure cache\n"));
 	if (!xp_span_cachep
 	    && !(xp_span_cachep =
-		 kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_priv_cachep, NULL));
@@ -2715,7 +2718,7 @@ xp_init_caches(void)
 		printd(("X400P-SS7: initialized span private structure cache\n"));
 	if (!xp_card_cachep
 	    && !(xp_card_cachep =
-		 kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));
@@ -2725,7 +2728,7 @@ xp_init_caches(void)
 		printd(("X400P-SS7: initialized card private structure cache\n"));
 	if (!xp_xbuf_cachep
 	    && !(xp_xbuf_cachep =
-		 kmem_cache_create("xp_xbuf_cachep", 1024, 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("xp_xbuf_cachep", 1024, 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
 		kmem_cache_destroy(xchg(&xp_card_cachep, NULL));
 		kmem_cache_destroy(xchg(&xp_span_cachep, NULL));

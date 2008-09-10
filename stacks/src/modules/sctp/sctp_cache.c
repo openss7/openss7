@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:08 $
+ @(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:08 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_cache.c,v $
+ Revision 0.9.2.13  2008-09-10 03:49:32  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.12  2008-04-29 07:11:08  brian
  - updating headers for release
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:08 $"
+#ident "@(#) $RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:32 $"
 
 static char const ident[] =
-    "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:08 $";
+    "$RCSfile: sctp_cache.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:32 $";
 
 #define __NO_VERSION__
 
@@ -246,22 +249,22 @@ sctp_init_caches(void)
 {
 	if (!sctp_sctp_cachep
 	    && !(sctp_sctp_cachep =
-		 kmem_cache_create("sctp_sctp_cachep", sizeof(sctp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sctp_sctp_cachep", sizeof(sctp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL)))
 		panic("%s:Cannot alloc sctp_sctp_cachep.\n", __FUNCTION__);
 	if (!sctp_dest_cachep
 	    && !(sctp_dest_cachep =
-		 kmem_cache_create("sctp_dest_cachep", sizeof(sctp_daddr_t), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sctp_dest_cachep", sizeof(sctp_daddr_t), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s:Cannot alloc sctp_dest_cachep.\n", __FUNCTION__);
 	if (!sctp_srce_cachep
 	    && !(sctp_srce_cachep =
-		 kmem_cache_create("sctp_srce_cachep", sizeof(sctp_saddr_t), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sctp_srce_cachep", sizeof(sctp_saddr_t), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s:Cannot alloc sctp_srce_cachep.\n", __FUNCTION__);
 	if (!sctp_strm_cachep
 	    && !(sctp_strm_cachep =
-		 kmem_cache_create("sctp_strm_cachep", sizeof(sctp_strm_t), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sctp_strm_cachep", sizeof(sctp_strm_t), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s:Cannot alloc sctp_strm_cachep.\n", __FUNCTION__);
 	return;

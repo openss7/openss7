@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-31 17:40:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.80  2008-09-10 03:49:53  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.79  2008-07-31 17:40:17  brian
  - SNMP updates
 
@@ -173,10 +176,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -194,7 +197,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-07-31 17:40:17 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2441,27 +2444,27 @@ sctp_init_caches(void)
 {
 	if (!sctp_sctp_cachep
 	    && !(sctp_sctp_cachep =
-		 kmem_cache_create("sctp_sctp_cachep", sizeof(struct sctp), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sctp_sctp_cachep", sizeof(struct sctp), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s:Cannot alloc sctp_sctp_cachep.\n", __FUNCTION__);
 	if (!sctp_bind_cachep
 	    && !(sctp_bind_cachep =
-		 kmem_cache_create("sctp_bind_bucket", sizeof(struct sctp_bind_bucket), 0,
+		 kmem_create_cache("sctp_bind_bucket", sizeof(struct sctp_bind_bucket), 0,
 				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_bind cache.\n", __FUNCTION__);
 	if (!sctp_dest_cachep
 	    && !(sctp_dest_cachep =
-		 kmem_cache_create("sctp_daddr", sizeof(struct sctp_daddr), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sctp_daddr", sizeof(struct sctp_daddr), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_daddr cache.\n", __FUNCTION__);
 	if (!sctp_srce_cachep
 	    && !(sctp_srce_cachep =
-		 kmem_cache_create("sctp_saddr", sizeof(struct sctp_saddr), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sctp_saddr", sizeof(struct sctp_saddr), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_saddr cache.\n", __FUNCTION__);
 	if (!sctp_strm_cachep
 	    && !(sctp_strm_cachep =
-		 kmem_cache_create("sctp_strm", sizeof(struct sctp_strm), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sctp_strm", sizeof(struct sctp_strm), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s: Cannot alloc sctp_strm cache.\n", __FUNCTION__);
 	return;
@@ -3165,7 +3168,11 @@ STATIC struct sctp_daddr *
 __sctp_daddr_alloc(sctp_t * sp, uint32_t daddr, int *errp)
 {
 	struct sctp_daddr *sd;
+#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
 	int dat = inet_addr_type(daddr);
+#else
+	int dat = inet_addr_type(&init_net, daddr);
+#endif
 
 	assert(errp);
 	__ensure(sp, *errp = -EFAULT; return (NULL));
@@ -3182,7 +3189,12 @@ __sctp_daddr_alloc(sctp_t * sp, uint32_t daddr, int *errp)
 		return (NULL);
 	}
 #endif
-	if (sp->daddr && inet_addr_type(sp->daddr->daddr) != dat) {
+#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
+	if (sp->daddr && inet_addr_type(sp->daddr->daddr) != dat)
+#else
+	if (sp->daddr && inet_addr_type(&init_net, sp->daddr->daddr) != dat)
+#endif
+	{
 		*errp = -EADDRNOTAVAIL;
 		sctplogno(sp, "skipping incompatible %d.%d.%d.%d",
 			  (daddr >> 0) & 0xff, (daddr >> 8) & 0xff, (daddr >> 16) & 0xff,
@@ -3493,6 +3505,18 @@ sctp_alloc_sock_daddrs(sctp_t * sp, uint16_t dport, struct sockaddr_in *daddrs, 
  *  Allocate a Source Address
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  */
+#ifndef LOOPBACK
+#define LOOPBACK(x) ipv4_is_loopback(x)
+#endif
+#ifndef MULTICAST
+#define MULTICAST(x) ipv4_is_multicast(x)
+#endif
+#ifndef ZERONET
+#define ZERONET(x) ipv4_is_zeronet(x)
+#endif
+#ifndef LOCAL_MCAST
+#define LOCAL_MCAST(x) ipv4_is_local_multicast(x)
+#endif
 STATIC struct sctp_saddr *
 __sctp_saddr_alloc(sctp_t * sp, uint32_t saddr, int *errp)
 {
@@ -4198,6 +4222,9 @@ __sctp_bhash_unhash(struct sctp *sp)
  */
 
 #if !defined HAVE_DEV_BASE_HEAD_SYMBOL
+#if defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG
+#define first_net_device() first_net_device(&init_net)
+#else				/* defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG */
 static inline struct net_device *
 first_net_device(void)
 {
@@ -4208,6 +4235,7 @@ next_net_device(struct net_device *dev)
 {
 	return (dev->next);
 }
+#endif				/* defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG */
 #endif				/* !defined HAVE_DEV_BASE_HEAD_SYMBOL */
 
 /*
@@ -5400,6 +5428,9 @@ sctp_queue_xmit(struct sk_buff *skb)
 	ip_select_ident(iph, &rt->u.dst, NULL);
 #endif
 	ip_send_check(iph);
+#ifndef NF_IP_LOCAL_OUT
+#define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
+#endif
 #ifdef HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
 #else
@@ -24778,7 +24809,8 @@ t_build_check_options(const struct sctp *t, const unsigned char *ip, size_t ilen
 /*
    recreate this structure because it is used by an inline 
  */
-__u8 ip_tos2prio[16] = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
+typedef typeof(ip_tos2prio) ip_tos2prio_t;
+ip_tos2prio_t ip_tos2prio = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
 
 /*
  *  Process Options
@@ -29638,7 +29670,11 @@ sctp_rcv_ootb(mblk_t *mp)
 	struct iphdr *iph = SCTP_IPH(mp);
 	struct sctphdr *sh = SCTP_SH(mp);
 	struct sctpchdr *ch = SCTP_CH(mp);
+#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
 	int sat = inet_addr_type(iph->saddr);
+#else
+	int sat = inet_addr_type(&init_net, iph->saddr);
+#endif
 	struct sctp *sp;
 
 	if (sat != RTN_UNICAST && sat != RTN_LOCAL) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-05-05 15:34:51 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:51 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.10  2008-09-10 03:49:25  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.9  2008-05-05 15:34:51  brian
  - be strict with MORE_data and DATA_flag
 
@@ -123,10 +126,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-05-05 15:34:51 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-05-05 15:34:51 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -205,7 +208,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-05-05 15:34:51 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -6851,7 +6854,7 @@ tpi_init_caches(void)
 {
 	if (!tpi_priv_cachep &&
 	    !(tpi_priv_cachep =
-	      kmem_cache_create("tpi_priv_cachep", sizeof(struct tpi),
+	      kmem_create_cache("tpi_priv_cachep", sizeof(struct tpi),
 				0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		cmn_err(CE_PANIC, "%s: Cannot allocate tpi_priv_cachep", __FUNCTION__);
 	return;

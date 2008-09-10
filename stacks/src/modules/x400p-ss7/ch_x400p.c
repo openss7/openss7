@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:18 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:18 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_x400p.c,v $
+ Revision 0.9.2.22  2008-09-10 03:49:36  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.21  2008-04-29 07:11:18  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:18 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:36 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:18 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:36 $";
 
 #include <sys/os7/compat.h>
 
@@ -99,7 +102,7 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:18 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:36 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2625,10 +2628,10 @@ STATIC kmem_cachep_t ch_priv_cachep = NULL;
 STATIC int
 ch_init_caches(void)
 {
-	if (!ch_priv_cachep &&
-	    !(ch_priv_cachep =
-	      kmem_cache_create("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!ch_priv_cachep
+	    && !(ch_priv_cachep =
+		 kmem_create_cache("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", MOD_NAME);
 		return (-ENOMEM);
 	} else

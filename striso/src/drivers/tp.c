@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.19  2008-09-10 03:49:50  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.18  2008-04-29 00:02:00  brian
  - updated headers for release
 
@@ -114,10 +117,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -169,7 +172,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-04-29 00:02:00 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"
@@ -4650,7 +4653,7 @@ STATIC int
 tp_init_caches(void)
 {
 	if (tp_priv_cachep == NULL) {
-		tp_priv_cachep = kmem_cache_create("tp_priv_cachep", sizeof(tp_t), 0,
+		tp_priv_cachep = kmem_create_cache("tp_priv_cachep", sizeof(tp_t), 0,
 						   SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (tp_priv_cachep == NULL) {
 			cmn_err(CE_PANIC, "%s: Cannot allocate tp_priv_cachep", __FUNCTION__);
@@ -4660,7 +4663,7 @@ tp_init_caches(void)
 		printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	}
 	if (tp_link_cachep == NULL) {
-		tp_link_cachep = kmem_cache_create("tp_link_cachep", sizeof(tp_t), 0,
+		tp_link_cachep = kmem_create_cache("tp_link_cachep", sizeof(tp_t), 0,
 						   SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (tp_link_cachep == NULL) {
 			cmn_err(CE_PANIC, "%s: Cannot allocate tp_link_cachep", __FUNCTION__);

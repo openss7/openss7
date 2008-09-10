@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-08-01 22:37:36 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-09-10 03:49:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-01 22:37:36 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 0.9.2.157  2008-09-10 03:49:45  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.156  2008-08-01 22:37:36  brian
  - document BUG 021 and implemented fix
 
@@ -156,10 +159,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-08-01 22:37:36 $"
+#ident "@(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-09-10 03:49:45 $"
 
 static char const ident[] =
-    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-08-01 22:37:36 $";
+    "$RCSfile: strutil.c,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-09-10 03:49:45 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -4434,6 +4437,9 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(unsigned long *) value_p = jiffies;
 		return (0);
 	case PPGP:
+#if defined HAVE_KFUNC_TASK_PGRP_NR
+		*(pid_t *) value_p = task_pgrp_nr(current);
+#else
 #if defined HAVE_KFUNC_PROCESS_GROUP
 		*(pid_t *) value_p = process_group(current);
 #else
@@ -4441,6 +4447,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = current->pgrp;
 #else
 		*(pid_t *) value_p = current->signal->pgrp;
+#endif
 #endif
 #endif
 		return (0);
@@ -4451,6 +4458,9 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = current->pid;
 		return (0);
 	case PSID:
+#if defined HAVE_KFUNC_TASK_SESSION_NR
+		*(pid_t *) value_p = task_session_nr(current);
+#else
 #if defined HAVE_KFUNC_PROCESS_SESSION
 		*(pid_t *) value_p = process_session(current);
 #else
@@ -4458,6 +4468,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		*(pid_t *) value_p = current->session;
 #else
 		*(pid_t *) value_p = current->signal->session;
+#endif
 #endif
 #endif
 		return (0);

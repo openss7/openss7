@@ -1,3 +1,7 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/prerequisites.texi: adjust prerequisites
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strnsl.spec.in: build changes for release

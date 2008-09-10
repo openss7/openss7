@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:11:10 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt.c,v $
+ Revision 0.9.2.23  2008-09-10 03:49:33  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.22  2008-04-29 07:11:10  brian
  - updating headers for release
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:11:10 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:11:10 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -94,7 +97,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2008-04-29 07:11:10 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1414,7 +1417,7 @@ sdt_tx_buffer(queue_t *q, struct sdt *s)
 		for (mp = s->iq->q_first; mp; mp = mp->b_next) {
 			switch (mp->b_datap->db_type) {
 			case M_DATA:
-				if (sdt_tx_repeat == 0) {
+				if (sdt_tx_repeat(q, s, mp) == 0) {
 					dp = mp;
 					rmvq(s->iq, dp);
 				}
@@ -1422,7 +1425,7 @@ sdt_tx_buffer(queue_t *q, struct sdt *s)
 			case M_PROTO:
 				if (*((ulong *) mp->b_rptr) != SDT_DAEDT_TRANSMISSION_REQ)
 					continue;
-				if (sdt_tx_repeat == 0) {
+				if (sdt_tx_repeat(q, s, mp->b_cont) == 0) {
 					dp = mp->b_cont;
 					rmvq(s->iq, mp);
 					freeb(mp);
@@ -4262,7 +4265,7 @@ sdt_init_caches(void)
 {
 	if (!sdt_priv_cachep
 	    && !(sdt_priv_cachep =
-		 kmem_cache_create("sdt_priv_cachep", sizeof(struct sdt), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sdt_priv_cachep", sizeof(struct sdt), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate sdt_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);

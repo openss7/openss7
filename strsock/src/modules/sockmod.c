@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:33 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:33:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockmod.c,v $
+ Revision 0.9.2.12  2008-09-10 03:49:56  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.11  2008-04-28 22:33:33  brian
  - updated headers for release
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:33 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:33 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -132,7 +135,7 @@ static char const ident[] =
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:33 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"
@@ -251,10 +254,10 @@ static kmem_cachep_t smod_priv_cachep = NULL;
 static __unlikely int
 smod_init_caches(void)
 {
-	if (!smod_priv_cachep
-	    && !(smod_priv_cachep =
-		 kmem_cache_create(MOD_NAME, sizeof(struct smod), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!smod_priv_cachep &&
+	    !(smod_priv_cachep =
+	      kmem_create_cache(MOD_NAME, sizeof(struct smod), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate smod_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);

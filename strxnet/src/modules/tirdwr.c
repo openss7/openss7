@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.c,v 0.9.2.36 2008-05-05 15:35:03 brian Exp $
+ @(#) $Id: tirdwr.c,v 0.9.2.37 2008-09-10 03:50:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:35:03 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.37  2008-09-10 03:50:05  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.36  2008-05-05 15:35:03  brian
  - be strict with MORE_data and DATA_flag
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-05-05 15:35:03 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-05-05 15:35:03 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $";
 
 #include <sys/os7/compat.h>
 
@@ -107,7 +110,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-05-05 15:35:03 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -219,10 +222,10 @@ static kmem_cachep_t tirdwr_priv_cachep = NULL;
 static int
 tirdwr_init_caches(void)
 {
-	if (!tirdwr_priv_cachep
-	    && !(tirdwr_priv_cachep =
-		 kmem_cache_create(MOD_NAME, sizeof(tirdwr_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!tirdwr_priv_cachep &&
+	    !(tirdwr_priv_cachep =
+	      kmem_create_cache(MOD_NAME, sizeof(tirdwr_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate tirdwr_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);

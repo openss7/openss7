@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:49 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_tpi.c,v $
+ Revision 0.9.2.13  2008-09-10 03:49:18  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.12  2008-05-05 15:34:49  brian
  - be strict with MORE_data and DATA_flag
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:18 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -110,7 +113,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:18 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"
@@ -4378,7 +4381,7 @@ sdt_init_caches(void)
 {
 	if (!sdt_priv_cachep
 	    && !(sdt_priv_cachep =
-		 kmem_cache_create("sdt_priv_cachep", sizeof(struct sdt), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sdt_priv_cachep", sizeof(struct sdt), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate sdt_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);

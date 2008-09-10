@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hooks.h.in,v 0.9.2.12 2008-08-02 07:26:44 brian Exp $
+ @(#) $Id: sctp_hooks.h.in,v 0.9.2.13 2008-09-10 03:49:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 3 of the License.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-02 07:26:44 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_hooks.h.in,v $
+ Revision 0.9.2.13  2008-09-10 03:49:54  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.12  2008-08-02 07:26:44  brian
  - recent Fedora kernel does not export secure_tcp_sequence_number
 
@@ -61,7 +65,7 @@
 #ifndef __LOCAL_SCTP_HOOKS_H__
 #define __LOCAL_SCTP_HOOKS_H__
 
-#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2004 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that
@@ -113,7 +117,7 @@ int
 ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
 {
 	int (*func) (struct rtable ** rp, struct flowi * flp, struct sock * sk, int flags)
-	= (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
+	    = (typeof(func)) HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR;
 
 	return (*func) (rp, flp, sk, flags);
 }
@@ -169,12 +173,13 @@ int
 __ip_route_output_key(struct rtable **rp, const struct flowi *flp)
 {
 	int (*func) (struct rtable ** rp, const struct flowi * flp)
-	= (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
+	    = (typeof(func)) HAVE___IP_ROUTE_OUTPUT_KEY_ADDR;
 
 	return (*func) (rp, flp);
 }
 #endif
 
+#undef HAVE_KFUNC_DST_MTU
 #undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 #ifdef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 /* dst_pmtu should be already defined */
@@ -199,6 +204,8 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 }
 #endif
 
+#undef HAVE_KMEMB_STRUCT_NET_DEV_BASE_HEAD
+
 #undef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
 #ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
 static __inline__ int
@@ -212,7 +219,12 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 		.uli_u = {.ports = {.sport = 0,.dport = 0}}
 	};
 
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+#ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+	return ip_route_output_key(&init_net, rp, &fl);
+#else
 	return ip_route_output_key(rp, &fl);
+#endif
 }
 #endif
 
@@ -252,16 +264,36 @@ int snmp_get_info(char *buffer, char **start, off_t offset, int length);
 #define snmp_get_info (*((typeof(snmp_get_info) *) HAVE_SNMP_GET_INFO_ADDR))
 #endif
 
-#undef HAVE_IP_FRAG_NQUEUES_ADDR
+#undef HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG
+#ifdef HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG
+int ip_frag_nqueues(struct net *net);
+#else
+#undef HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS
+#ifdef HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS
+int ip_frag_nqueues(void);
+#else
 extern int ip_frag_nqueues;
+#endif
+#endif
 
+#undef HAVE_IP_FRAG_NQUEUES_ADDR
 #ifdef HAVE_IP_FRAG_NQUEUES_ADDR
 #define ip_frag_nqueues (*((typeof(ip_frag_nqueues) *)HAVE_IP_FRAG_NQUEUES_ADDR))
 #endif
 
-#undef HAVE_IP_FRAG_MEM_ADDR
+#undef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
+#ifdef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
+int ip_frag_mem(struct net *net);
+#else
+#undef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
+#ifdef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
+int ip_frag_mem(void);
+#else
 extern atomic_t ip_frag_mem;
+#endif
+#endif
 
+#undef HAVE_IP_FRAG_MEM_ADDR
 #ifdef HAVE_IP_FRAG_MEM_ADDR
 #define ip_frag_mem (*((typeof(ip_frag_mem) *)HAVE_IP_FRAG_MEM_ADDR))
 #endif
@@ -411,9 +443,9 @@ extern struct proto raw_prot;
 __u32
 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport)
 {
-	__u32 (*func)(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport)
-		= (typeof(func)) HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR;
-	return (*func)(saddr, daddr, sport, dport);
+	__u32(*func) (__u32 saddr, __u32 daddr, __u16 sport, __u16 dport)
+	    = (typeof(func)) HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR;
+	return (*func) (saddr, daddr, sport, dport);
 }
 #endif
 

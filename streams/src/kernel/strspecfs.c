@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.85  2008-09-10 03:49:44  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.84  2008-04-28 12:54:06  brian
  - update file headers for release
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -134,7 +137,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-04-28 12:54:06 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -311,6 +314,7 @@ STATIC struct vfsmount *specfs_mnt = NULL;
  *  -------------------------------------------------------------------------
  *  -------------------------------------------------------------------------
  */
+STATIC void spec_read_inode(struct inode *);
 
 BIG_STATIC struct inode *
 spec_snode(dev_t dev, struct cdevsw *cdev)
@@ -329,7 +333,11 @@ spec_snode(dev_t dev, struct cdevsw *cdev)
 		if (snode->i_state & I_NEW) {
 			/* just a way to pass another argument to read_inode() */
 			snode->i_private = cdev;
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE
 			sb->s_op->read_inode(snode);
+#else
+			spec_read_inode(snode);
+#endif
 			unlock_new_inode(snode);
 		}
 	}
@@ -1192,7 +1200,9 @@ spec_destroy_inode(struct inode *inode)
 STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 	.alloc_inode = spec_alloc_inode,
 	.destroy_inode = spec_destroy_inode,
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE
 	.read_inode = spec_read_inode,
+#endif
 #if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
 	.read_inode2 = spec_read_inode2,
 #endif					/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2 */
@@ -1379,7 +1389,11 @@ specfs_term_cache(void)
 }
 
 static void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 snode_init_once(void *data, kmem_cachep_t cachep, unsigned long flags)
+#else
+snode_init_once(kmem_cachep_t cachep, void *data)
+#endif
 {
 	struct inode *inode = (struct inode *) data;
 
@@ -1396,7 +1410,7 @@ static int
 specfs_init_cache(void)
 {
 	if (snode_cachep == NULL) {
-		snode_cachep = kmem_cache_create("snode_cache", sizeof(struct inode), 0,
+		snode_cachep = kmem_create_cache("snode_cache", sizeof(struct inode), 0,
 						 SLAB_HWCACHE_ALIGN, snode_init_once, NULL);
 		if (snode_cachep == NULL) {
 			printk(KERN_WARNING "%s: Cannot allocate snode_cache\n", __FUNCTION__);

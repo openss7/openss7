@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2008-08-11 22:27:21 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.152 $) $Date: 2008-09-10 03:49:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-11 22:27:21 $ by $Author: brian $
+# Last Modified $Date: 2008-09-10 03:49:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1095,7 +1095,7 @@ dnl
 			set_cpus_allowed yield \
 			prepare_to_wait prepare_to_wait_exclusive finish_wait \
 			compat_ptr register_ioctl32_conversion unregister_ioctl32_conversion \
-			simple_statfs], [:], [
+			simple_statfs task_pgrp_nr task_session_nr], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -1191,7 +1191,8 @@ dnl
 #include <asm/uaccess.h>
 #endif
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
+			uintptr_t, intptr_t, uchar], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1234,6 +1235,63 @@ dnl
     else
 	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
     fi
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel kmem_cache_create with 5 args],
+		       [linux_cv_kmem_cache_create_5_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+		    [[struct kmem_cache *(*my_autoconf_function_pointer)
+		      (const char *, size_t, size_t, unsigned long,
+		       void (*)(struct kmem_cache *, void *)) =
+		       &kmem_cache_create;]]) ],
+		[linux_cv_kmem_cache_create_5_args='yes'],
+		[linux_cv_kmem_cache_create_5_args='no'])
+	    ])
+	if test :$linux_cv_kmem_cache_create_5_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS], [1], [Define if
+		       function kmem_cache_create takes 4 arguments.])
+	fi
+	AH_VERBATIM([kmem_create_cache],
+[/* silly kernel developers */
+#ifdef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
+#define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5)
+#else
+#define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5,a6)
+#endif])dnl
+    ])
 dnl 
 dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
 dnl union u itself have been removed and a simple void pointer for filesystem
@@ -1250,6 +1308,7 @@ dnl
 			  struct super_block.u.generic_sbp,
 			  struct file_system_type.read_super,
 			  struct file_system_type.get_sb,
+			  struct super_operations.read_inode,
 			  struct super_operations.read_inode2,
 			  struct kstatfs.f_type,
 			  struct kobject.kref,
@@ -1294,7 +1353,7 @@ dnl
     AC_SUBST([at_ioctl_getmsg])dnl
     AM_CONDITIONAL(USING_IOCTL_GETPMSG_PUTPMSG, test :$at_ioctl_getmsg = :yes)dnl
 	_LINUX_KERNEL_SYMBOLS([ioctl32_hash_table, ioctl32_sem, compat_ptr])
-	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, is_current_pgrp_orphaned, kill_sl, kill_proc_info, kill_pgrp, send_group_sig_info, session_of_pgrp])
+	_LINUX_KERNEL_SYMBOLS([is_ignored, is_orphaned_pgrp, is_current_pgrp_orphaned, kill_sl, kill_proc_info, kill_pgrp, send_group_sig_info, session_of_pgrp, group_send_sig_info])
 	_LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
 	_LINUX_KERNEL_EXPORT_ONLY([path_lookup])
 	_LINUX_KERNEL_EXPORT_ONLY([raise_softirq])
@@ -1688,6 +1747,9 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.152  2008-09-10 03:49:43  brian
+# - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+#
 # Revision 0.9.2.151  2008-08-11 22:27:21  brian
 # - added makefile variables for modules to acinclude
 #

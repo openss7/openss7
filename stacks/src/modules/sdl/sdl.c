@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:09 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:09 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl.c,v $
+ Revision 0.9.2.24  2008-09-10 03:49:32  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-04-29 07:11:09  brian
  - updating headers for release
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:09 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:09 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $";
 
 #define _LFS_SOURCE	1
 //#define _SVR4_SOURCE	1
@@ -87,7 +90,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:09 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2136,7 +2139,7 @@ sdl_init_caches(void)
 {
 	if (!sdl_priv_cachep
 	    && !(sdl_priv_cachep =
-		 kmem_cache_create("sdl_priv_cachep", sizeof(struct sdl), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sdl_priv_cachep", sizeof(struct sdl), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate sdl_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);

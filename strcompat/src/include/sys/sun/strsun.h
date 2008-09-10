@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.17 2008-07-31 17:31:03 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.18 2008-09-10 03:49:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-31 17:31:03 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsun.h,v $
+ Revision 0.9.2.18  2008-09-10 03:49:42  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.17  2008-07-31 17:31:03  brian
  - fixed clobbered correction to MBLKIN
 
@@ -80,7 +83,7 @@
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -203,7 +206,7 @@ merror(queue_t *q, mblk_t *mp, int error)
 	mp->b_rptr[0] = mp->b_rptr[1] = error;
 	qreply(q, mp);
 }
-__SUN_EXTERN_INLINE void
+static __inline__ void
 mioc2ack(mblk_t *mp, mblk_t *db, size_t count, int rval)
 {
 	union ioctypes *iocp;
@@ -244,7 +247,7 @@ miocnak(queue_t *q, mblk_t *mp, int count, int error)
 	iocp->iocblk.ioc_error = error;
 	qreply(q, mp);
 }
-__SUN_EXTERN_INLINE mblk_t *
+static __inline__ mblk_t *
 mexchange(queue_t *q, mblk_t *mp, size_t size, int type, uint32_t primtype)
 {
 	if (unlikely(mp == NULL ||
@@ -311,7 +314,7 @@ msgsize(mblk_t *mp)
 	return s;
 }
 #endif
-__SUN_EXTERN_INLINE void
+static __inline__ void
 mcopymsg(mblk_t *mp, unsigned char *buf)
 {
 	mblk_t *bp;
@@ -328,7 +331,7 @@ mcopymsg(mblk_t *mp, unsigned char *buf)
 	freemsg(mp);
 	return;
 }
-__SUN_EXTERN_INLINE void
+static __inline__ void
 mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr)
 {
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;
@@ -345,7 +348,7 @@ mcopyin(mblk_t *mp, void *priv, size_t size, void *uaddr)
 	iocp->copyreq.cq_flag = 0;
 	mp->b_wptr = mp->b_rptr + sizeof(iocp->copyreq);
 }
-__SUN_EXTERN_INLINE void
+static __inline__ void
 mcopyout(mblk_t *mp, void *priv, size_t size, void *uaddr, mblk_t *dp)
 {
 	union ioctypes *iocp = (typeof(iocp)) mp->b_rptr;

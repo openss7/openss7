@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $
+ @(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-10 03:50:02 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:27 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdpmod.c,v $
+ Revision 0.9.2.3  2008-09-10 03:50:02  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.2  2008-06-18 16:45:27  brian
  - widespread updates
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#ident "@(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-10 03:50:02 $"
 
-static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $";
+static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-10 03:50:02 $";
 
 /*
  * This is a CD pipe module.  It pushes over one side of a STREAMS-based pipe
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2
 #define CDPMOD_DESCRIP	"HDLC PIPE MODULE FOR LINUX FAST-STREAMS"
 #define CDPMOD_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define CDPMOD_COPYRIGHT "Copyright (c) 1997-2008  OpenSS7 Corporaiton.  All Rights Reserved."
-#define CDPMOD_REVISION	"OpenSS7 $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#define CDPMOD_REVISION	"OpenSS7 $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-10 03:50:02 $"
 #define CDPMOD_DEVICE	"SVR 4.2MP CD PIPE Module (CDPMOD) for HDLC"
 #define CDPMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDPMOD_LICENSE	"GPL"
@@ -1531,6 +1534,10 @@ static __init int
 cdpmod_modinit(void)
 {
 	int err;
+
+	(void) cd_error_ind;
+	(void) cd_unitdata_ack;
+	(void) cd_bad_frame_ind;
 
 	cmn_err(CE_NOTE, MOD_BANNER);
 	if ((err = register_strmod(&cd_fmod)) < 0) {

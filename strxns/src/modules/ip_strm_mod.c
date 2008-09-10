@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-23 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.29  2008-09-10 03:50:08  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.28  2008-07-23 08:29:19  brian
  - updated references and support for 2.6.18-92.1.6.el5 kernel
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $";
 
 #include <sys/os7/compat.h>
 
@@ -116,7 +119,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.28 $) $Date: 2008-07-23 08:29:19 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -1584,12 +1587,16 @@ ip_strm_init(struct ism_dev *dev)
 	dev->mtu = IP_STRM_MTU;
 	dev->hard_start_xmit = ip_strm_xmit;
 	dev->do_ioctl = ip_strm_ioctl;
+#if defined HAVE_KMEMB_STRUCT_NET_DEVICE_HARD_HEADER
 	dev->hard_header = 0;
+#endif
 	dev->hard_header_len = 0;
 	dev->addr_len = 0;
 	dev->tx_queue_len = 100;
 	dev->type = ARPHRD_DLCI;	/* 0x0001 */
+#if defined HAVE_KMEMB_STRUCT_NET_DEVICE_REBUILD_HEADER
 	dev->rebuild_header = 0;
+#endif
 	dev->open = ip_strm_open;
 	dev->flags |= IFF_POINTOPOINT;
 #ifdef KERNEL_2_1

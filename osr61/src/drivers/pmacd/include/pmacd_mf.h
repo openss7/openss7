@@ -71,7 +71,7 @@ void              pmacd_returnMFToPool(pmacd_mfpool_t *mfPool,
 pmacd_mf_t        *pmacd_getMFFromPool(pmacd_mfpool_t *mfPool);
 
 
-extern inline BOOLEAN_T pmacd_initMfaQueue(pmacd_mfaqueue_t *queue,
+static inline BOOLEAN_T pmacd_initMfaQueue(pmacd_mfaqueue_t *queue,
 					    int size){
   ATOMIC_SET(queue->count, 0);
   queue->size  = size;

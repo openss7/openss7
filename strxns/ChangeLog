@@ -1,3 +1,23 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check new types, cache creation and net namespaces
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/dl.c: new cache creation
+	* src/drivers/dld_drv.c: new cache creation
+	* src/drivers/dld_str.c: new cache creation
+	* src/drivers/ip.c: new cache creation
+	* src/drivers/ip_hooks.h.in: handle net namespaces
+	* src/drivers/ip_to_dlpi.c: net namespaces
+	* src/drivers/ldl.c: new cache creation, net namespaces
+	* src/drivers/llc.c: new cache creation
+	* src/drivers/np.c: new cache creation
+	* src/drivers/np_ip.c: new cache creation, net namespaces
+	* src/lib/cdiapi.c: define OPEN_MAX
+	* src/lib/dlpiapi.c: define OPEN_MAX
+	* src/lib/npiapi.c: define OPEN_MAX
+	* src/lib/libdlpi/dlpi.c: define OPEN_MAX
+	* src/modules/ip_strm_mod.c: new cache creation, net namespaces
+
 2008-09-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: documented TOS range restriction

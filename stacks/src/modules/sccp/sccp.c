@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-29 07:11:05 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.28  2008-09-10 03:49:30  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.27  2008-04-29 07:11:05  brian
  - updating headers for release
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-29 07:11:05 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:30 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-29 07:11:05 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:30 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -132,7 +135,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-29 07:11:05 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:30 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -20096,7 +20099,7 @@ sccp_init_caches(void)
 {
 	if (!sccp_sc_cachep
 	    && !(sccp_sc_cachep =
-		 kmem_cache_create("sccp_sc_cachep", sizeof(struct sc), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_sc_cachep", sizeof(struct sc), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_sc_cachep", DRV_NAME);
 		goto failed_mt;
@@ -20104,7 +20107,7 @@ sccp_init_caches(void)
 		printd(("%s: initialized sc structure cache\n", DRV_NAME));
 	if (!sccp_na_cachep
 	    && !(sccp_na_cachep =
-		 kmem_cache_create("sccp_na_cachep", sizeof(struct na), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_na_cachep", sizeof(struct na), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_na_cachep", DRV_NAME);
 		goto failed_na;
@@ -20112,7 +20115,7 @@ sccp_init_caches(void)
 		printd(("%s: initialized na structure cache\n", DRV_NAME));
 	if (!sccp_cp_cachep
 	    && !(sccp_cp_cachep =
-		 kmem_cache_create("sccp_cp_cachep", sizeof(struct cp), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_cp_cachep", sizeof(struct cp), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_cp_cachep", DRV_NAME);
 		goto failed_cp;
@@ -20120,7 +20123,7 @@ sccp_init_caches(void)
 		printd(("%s: initialized cp structure cache\n", DRV_NAME));
 	if (!sccp_sp_cachep
 	    && !(sccp_sp_cachep =
-		 kmem_cache_create("sccp_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_sp_cachep", DRV_NAME);
 		goto failed_sp;
@@ -20128,7 +20131,7 @@ sccp_init_caches(void)
 		printd(("%s: initialized sp structure cache\n", DRV_NAME));
 	if (!sccp_sr_cachep
 	    && !(sccp_sr_cachep =
-		 kmem_cache_create("sccp_sr_cachep", sizeof(struct sr), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_sr_cachep", sizeof(struct sr), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_sr_cachep", DRV_NAME);
 		goto failed_rs;
@@ -20136,7 +20139,7 @@ sccp_init_caches(void)
 		printd(("%s: initialized rs structure cache\n", DRV_NAME));
 	if (!sccp_ss_cachep
 	    && !(sccp_ss_cachep =
-		 kmem_cache_create("sccp_ss_cachep", sizeof(struct ss), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_ss_cachep", sizeof(struct ss), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_ss_cachep", DRV_NAME);
 		goto failed_cr;
@@ -20144,7 +20147,7 @@ sccp_init_caches(void)
 		printd(("%s: initialized cr structure cache\n", DRV_NAME));
 	if (!sccp_rs_cachep
 	    && !(sccp_rs_cachep =
-		 kmem_cache_create("sccp_rs_cachep", sizeof(struct rs), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_rs_cachep", sizeof(struct rs), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_rs_cachep", DRV_NAME);
 		goto failed_rl;
@@ -20152,7 +20155,7 @@ sccp_init_caches(void)
 		printd(("%s: initialized rl structure cache\n", DRV_NAME));
 	if (!sccp_mt_cachep
 	    && !(sccp_mt_cachep =
-		 kmem_cache_create("sccp_mt_cachep", sizeof(struct mt), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sccp_mt_cachep", sizeof(struct mt), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sccp_mt_cachep", DRV_NAME);
 		goto failed_rt;

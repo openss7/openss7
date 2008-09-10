@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timer.h,v 0.9.2.14 2008-04-28 16:47:11 brian Exp $
+ @(#) $Id: timer.h,v 0.9.2.15 2008-09-10 03:49:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timer.h,v $
+ Revision 0.9.2.15  2008-09-10 03:49:41  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.14  2008-04-28 16:47:11  brian
  - updates for release
 
@@ -65,7 +68,7 @@
 #ifndef __OS7_TIMER_H__
 #define __OS7_TIMER_H__
 
-#ident "@(#) $RCSfile: timer.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: timer.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #define SS7_DECLARE_TIMER(__n,__o,__t,__c) \
 STATIC int __o ## _ ## __t ## _timeout(struct __o *); \
@@ -84,7 +87,7 @@ STATIC void __o ## _start_timer_ ## __t (struct __o * __o) \
 	ss7_start_timer((struct head *)__o, # __t, __n, &__o->timers.__t, &__o ## _ ## __t ## _expiry, __o->__c.__t); \
 } \
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_do_timeout(caddr_t data, const char *timer, const char *mod, toid_t *timeo,
 	       int (*to_fnc) (struct head *), void streamscall (*exp_func) (caddr_t))
 {
@@ -117,7 +120,7 @@ ss7_do_timeout(caddr_t data, const char *timer, const char *mod, toid_t *timeo,
 		*timeo = timeout(exp_func, data, 2);
 	}
 }
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_stop_timer(struct head *h, const char *timer, const char *mod, toid_t *timeo)
 {
 	toid_t to;

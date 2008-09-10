@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.17 2008-04-28 16:47:10 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.18 2008-09-10 03:49:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.18  2008-09-10 03:49:41  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.17  2008-04-28 16:47:10  brian
  - updates for release
 
@@ -110,7 +113,7 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -139,7 +142,7 @@
 
 #if defined(CONFIG_STREAMS_COMPAT_MPS) || defined(CONFIG_STREAMS_COMPAT_MPS_MODULE)
 
-__MPS_EXTERN_INLINE int
+static __inline__ int
 mi_bcmp(const void *s1, const void *s2, size_t len)
 {
 	return bcmp(s1, s2, len);
@@ -167,7 +170,7 @@ mi_alloc_sleep(size_t size, unsigned int pri)
 		*sp++ = size;
 	return (sp);
 }
-__MPS_EXTERN_INLINE caddr_t
+static __inline__ caddr_t
 mi_zalloc(size_t size)
 {
 	caddr_t memp;
@@ -176,7 +179,7 @@ mi_zalloc(size_t size)
 		bzero(memp, size);
 	return (memp);
 }
-__MPS_EXTERN_INLINE caddr_t
+static __inline__ caddr_t
 mi_zalloc_sleep(size_t size)
 {
 	caddr_t memp;

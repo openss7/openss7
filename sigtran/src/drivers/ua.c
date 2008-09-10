@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:49 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.13  2008-09-10 03:49:17  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.12  2008-05-05 15:34:49  brian
  - be strict with MORE_data and DATA_flag
 
@@ -89,13 +92,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-05 15:34:49 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -21261,56 +21264,56 @@ static int
 ua_init_caches(void)
 {
 	if (!ua_priv_cachep
-	    && !(ua_priv_cachep = kmem_cache_create("ua_priv_cachep", sizeof(union priv), 0,
+	    && !(ua_priv_cachep = kmem_create_cache("ua_priv_cachep", sizeof(union priv), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_priv_cachep", DRV_NAME);
 		goto enomem;
 	}
 	printd(("%s: initialized ua link structure cache\n", DRV_NAME));
 	if (!ua_link_cachep
-	    && !(ua_link_cachep = kmem_cache_create("ua_link_cachep", sizeof(union link), 0,
+	    && !(ua_link_cachep = kmem_create_cache("ua_link_cachep", sizeof(union link), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_link_cachep", DRV_NAME);
 		goto enomem;
 	}
 	printd(("%s: initialized ua link structure cache\n", DRV_NAME));
 	if (!ua_as_cachep
-	    && !(ua_as_cachep = kmem_cache_create("ua_as_cachep", sizeof(struct as), 0,
+	    && !(ua_as_cachep = kmem_create_cache("ua_as_cachep", sizeof(struct as), 0,
 						  SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_as_cachep", DRV_NAME);
 		goto enomem;
 	}
 	printd(("%s: initialized ua as structure cache\n", DRV_NAME));
 	if (!ua_ap_cachep
-	    && !(ua_ap_cachep = kmem_cache_create("ua_ap_cachep", sizeof(struct ap), 0,
+	    && !(ua_ap_cachep = kmem_create_cache("ua_ap_cachep", sizeof(struct ap), 0,
 						  SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_ap_cachep", DRV_NAME);
 		goto enomem;
 	}
 	printd(("%s: initialized ua ap structure cache\n", DRV_NAME));
 	if (!ua_gp_cachep
-	    && !(ua_gp_cachep = kmem_cache_create("ua_gp_cachep", sizeof(struct gp), 0,
+	    && !(ua_gp_cachep = kmem_create_cache("ua_gp_cachep", sizeof(struct gp), 0,
 						  SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_gp_cachep", DRV_NAME);
 		goto enomem;
 	}
 	printd(("%s: initialized ua gp structure cache\n", DRV_NAME));
 	if (!ua_sp_cachep
-	    && !(ua_sp_cachep = kmem_cache_create("ua_sp_cachep", sizeof(struct sp), 0,
+	    && !(ua_sp_cachep = kmem_create_cache("ua_sp_cachep", sizeof(struct sp), 0,
 						  SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_sp_cachep", DRV_NAME);
 		goto enomem;
 	}
 	printd(("%s: initialized ua sp structure cache\n", DRV_NAME));
 	if (!ua_np_cachep
-	    && !(ua_np_cachep = kmem_cache_create("ua_np_cachep", sizeof(struct np), 0,
+	    && !(ua_np_cachep = kmem_create_cache("ua_np_cachep", sizeof(struct np), 0,
 						  SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_np_cachep", DRV_NAME);
 		goto enomem;
 	}
 	printd(("%s: initialized ua np structure cache\n", DRV_NAME));
 	if (!ua_spp_cachep
-	    && !(ua_spp_cachep = kmem_cache_create("ua_spp_cachep", sizeof(struct spp), 0,
+	    && !(ua_spp_cachep = kmem_create_cache("ua_spp_cachep", sizeof(struct spp), 0,
 						   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ua_spp_cachep", DRV_NAME);
 		goto enomem;

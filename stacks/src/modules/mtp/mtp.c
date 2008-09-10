@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:52 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.27  2008-09-10 03:49:28  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.26  2008-05-05 15:34:52  brian
  - be strict with MORE_data and DATA_flag
 
@@ -98,10 +101,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -141,7 +144,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-05-05 15:34:52 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15680,7 +15683,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	int err;
 	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
 
-	if (mtp_get_state != TS_UNBND)
+	if (mtp_get_state(mtp) != TS_UNBND)
 		goto outstate;
 	mtp_set_state(mtp, TS_WACK_BREQ);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -21169,88 +21172,99 @@ mtp_init_caches(void)
 
 	if (!mtp_mt_cachep
 	    && !(mtp_mt_cachep =
-		 kmem_cache_create("mtp_mt_cachep", sizeof_struct_mt, 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_mt_cachep", sizeof_struct_mt, 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_mt_cachep", DRV_NAME);
 		goto failed_mt;
 	} else
 		printd(("%s: initialized mt structure cache\n", DRV_NAME));
 	if (!mtp_na_cachep
 	    && !(mtp_na_cachep =
-		 kmem_cache_create("mtp_na_cachep", sizeof(struct na), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_na_cachep", sizeof(struct na), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_na_cachep", DRV_NAME);
 		goto failed_na;
 	} else
 		printd(("%s: initialized sp structure cache\n", DRV_NAME));
 	if (!mtp_sp_cachep
 	    && !(mtp_sp_cachep =
-		 kmem_cache_create("mtp_sp_cachep", sizeof(struct sp), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_sp_cachep", DRV_NAME);
 		goto failed_sp;
 	} else
 		printd(("%s: initialized sp structure cache\n", DRV_NAME));
 	if (!mtp_rs_cachep
 	    && !(mtp_rs_cachep =
-		 kmem_cache_create("mtp_rs_cachep", sizeof(struct rs), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_rs_cachep", sizeof(struct rs), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_rs_cachep", DRV_NAME);
 		goto failed_rs;
 	} else
 		printd(("%s: initialized rs structure cache\n", DRV_NAME));
 	if (!mtp_cr_cachep
 	    && !(mtp_cr_cachep =
-		 kmem_cache_create("mtp_cr_cachep", sizeof(struct cr), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_cr_cachep", DRV_NAME);
 		goto failed_cr;
 	} else
 		printd(("%s: initialized cr structure cache\n", DRV_NAME));
 	if (!mtp_rl_cachep
 	    && !(mtp_rl_cachep =
-		 kmem_cache_create("mtp_rl_cachep", sizeof(struct rl), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_rl_cachep", sizeof(struct rl), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_rl_cachep", DRV_NAME);
 		goto failed_rl;
 	} else
 		printd(("%s: initialized rl structure cache\n", DRV_NAME));
 	if (!mtp_rt_cachep
 	    && !(mtp_rt_cachep =
-		 kmem_cache_create("mtp_rt_cachep", sizeof(struct rt), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_rt_cachep", sizeof(struct rt), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_rt_cachep", DRV_NAME);
 		goto failed_rt;
 	} else
 		printd(("%s: initialized rt structure cache\n", DRV_NAME));
 	if (!mtp_cb_cachep
 	    && !(mtp_cb_cachep =
-		 kmem_cache_create("mtp_cb_cachep", sizeof(struct cb), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_cb_cachep", sizeof(struct cb), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_cb_cachep", DRV_NAME);
 		goto failed_cb;
 	} else
 		printd(("%s: initialized cb structure cache\n", DRV_NAME));
 	if (!mtp_ls_cachep
 	    && !(mtp_ls_cachep =
-		 kmem_cache_create("mtp_ls_cachep", sizeof(struct ls), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_ls_cachep", sizeof(struct ls), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_ls_cachep", DRV_NAME);
 		goto failed_ls;
 	} else
 		printd(("%s: initialized ls structure cache\n", DRV_NAME));
 	if (!mtp_lk_cachep
 	    && !(mtp_lk_cachep =
-		 kmem_cache_create("mtp_lk_cachep", sizeof(struct lk), 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_lk_cachep", sizeof(struct lk), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_lk_cachep", DRV_NAME);
 		goto failed_lk;
 	} else
 		printd(("%s: initialized lk structure cache\n", DRV_NAME));
 	if (!mtp_sl_cachep
 	    && !(mtp_sl_cachep =
-		 kmem_cache_create("mtp_sl_cachep", sizeof_struct_sl, 0,
-				   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+		 kmem_create_cache("mtp_sl_cachep", sizeof_struct_sl, 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp_sl_cachep", DRV_NAME);
 		goto failed_sl;
 	} else

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $
+ @(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-20 10:57:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdiapi.c,v $
+ Revision 0.9.2.8  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.7  2008-08-20 10:57:05  brian
  - fixes and build updates from newnet trip
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $"
+#ident "@(#) $RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $";
+    "$RCSfile: cdiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $";
 
 /*
  * This is an OpenSS7 implementation of the GCOM cdiapi library.  It builds
@@ -252,6 +255,10 @@ struct __cdi_user {
 	pthread_rwlock_t cu_lock;
 	int cu_fd;
 };
+
+#ifndef OPEN_MAX
+#define OPEN_MAX 256
+#endif
 
 static struct __cdi_user *__cdi_fds[OPEN_MAX] = { NULL, };
 

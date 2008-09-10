@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.15 2008-04-28 16:47:10 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.16 2008-09-10 03:49:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufpool.h,v $
+ Revision 0.9.2.16  2008-09-10 03:49:41  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.15  2008-04-28 16:47:10  brian
  - updates for release
 
@@ -68,7 +71,7 @@
 #ifndef __OS7_BUFPOOL_H__
 #define __OS7_BUFPOOL_H__
 
-#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  *  -------------------------------------------------------------------------
@@ -97,7 +100,7 @@ typedef struct ss7_bufpool {
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -117,7 +120,7 @@ __ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 }
 
 /* if you need local irq or bottom half suppression, do it yourself */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 {
 	mblk_t *mp = NULL;
@@ -150,7 +153,7 @@ ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior)
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -165,7 +168,7 @@ __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 }
 
 /* if you need local irq or bottom half suppression, do it yourself */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	if (mp->b_datap->db_ref == 1 && mp->b_datap->db_size == FASTBUF &&
@@ -192,7 +195,7 @@ ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp)
 /*
    assumes bufpool is locked 
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -203,7 +206,7 @@ __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 	}
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
@@ -245,7 +248,7 @@ ss7_bufpool_init(struct ss7_bufpool *pool)
  *  Reserves n more FASTBUF sized blocks in the buffer pool and precharges
  *  those n blocks into the buffer pool.
  */
-__OS7_EXTERN_INLINE void
+static __inline__ void
 ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
 {
 	mblk_t *mp;
@@ -266,7 +269,7 @@ ss7_bufpool_reserve(struct ss7_bufpool *pool, int n)
  *  Releases reservation of n FASTBUF sized blocks.  We do not release them
  *  here, we wait for them to be used normally, or freed on termination.
  */
-__OS7_EXTERN_INLINE void
+static __inline__ void
 ss7_bufpool_release(struct ss7_bufpool *pool, int n)
 {
 	atomic_sub(n, &pool->reserve);
@@ -278,7 +281,7 @@ ss7_bufpool_release(struct ss7_bufpool *pool, int n)
  *  Terminate the buffer pool and free any blocks in the pool.
  */
 /* if you need local irq or bottom half suppression, do it yourself */
-__OS7_EXTERN_INLINE void
+static __inline__ void
 ss7_bufpool_term(struct ss7_bufpool *pool)
 {
 	spin_lock(&pool->lock);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.23 2008-08-11 22:23:17 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.24 2008-09-10 03:49:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-11 22:23:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 0.9.2.24  2008-09-10 03:49:43  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-08-11 22:23:17  brian
  - rationalization of header files
 
@@ -84,7 +87,7 @@
 #ifndef __SYS_STREAMS_CONFIG_H__
 #define __SYS_STREAMS_CONFIG_H__
 
-#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.24 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  * @configure_input@
@@ -135,5 +138,14 @@
 /* This kmem_cache_t is deprecated in recent 2.6.20 kernels. When it is
    deprecated, define this to struct kmem_cache *. */
 #undef kmem_cachep_t
+
+/* Define to 1 if the system has the type 'intptr_t'. */
+#undef HAVE_KTYPE_INTPTR_T
+
+/* Define to 1 if the system has the type 'uchar'. */
+#undef HAVE_KTYPE_UCHAR
+
+/* Define to 1 if the system has the type 'uintptr_t'. */
+#undef HAVE_KTYPE_UINTPTR_T
 
 #endif				/* __SYS_STREAMS_CONFIG_H__ */

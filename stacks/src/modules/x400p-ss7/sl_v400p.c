@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:18 $
+ @(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:18 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_v400p.c,v $
+ Revision 0.9.2.10  2008-09-10 03:49:37  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.9  2008-04-29 07:11:18  brian
  - updating headers for release
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:18 $"
+#ident "@(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $"
 
 static char const ident[] =
-    "$RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:18 $";
+    "$RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -137,7 +140,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:18 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -11040,34 +11043,34 @@ xp_term_caches(void)
 STATIC int
 xp_init_caches(void)
 {
-	if (!xp_priv_cachep &&
-	    !(xp_priv_cachep =
-	      kmem_cache_create("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!xp_priv_cachep
+	    && !(xp_priv_cachep =
+		 kmem_create_cache("xp_priv_cachep", sizeof(struct xp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_priv_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized device private structure cache\n", DRV_NAME));
-	if (!xp_span_cachep &&
-	    !(xp_span_cachep =
-	      kmem_cache_create("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!xp_span_cachep
+	    && !(xp_span_cachep =
+		 kmem_create_cache("xp_span_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_span_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized span private structure cache\n", DRV_NAME));
-	if (!xp_card_cachep &&
-	    !(xp_card_cachep =
-	      kmem_cache_create("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!xp_card_cachep
+	    && !(xp_card_cachep =
+		 kmem_create_cache("xp_card_cachep", sizeof(struct cd), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_card_cachep", __FUNCTION__);
 		goto error;
 	} else
 		printd(("%s: initialized card private structure cache\n", DRV_NAME));
-	if (!xp_xbuf_cachep &&
-	    !(xp_xbuf_cachep =
-	      kmem_cache_create("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN, NULL,
-				NULL))) {
+	if (!xp_xbuf_cachep
+	    && !(xp_xbuf_cachep =
+		 kmem_create_cache("xp_xbuf_cachep", X400P_EBUFNO * 1024, 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate xp_xbuf_cachep", __FUNCTION__);
 		goto error;
 	} else

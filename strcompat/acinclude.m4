@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-08-11 22:27:20 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-10 03:49:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-11 22:27:20 $ by $Author: brian $
+# Last Modified $Date: 2008-09-10 03:49:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -676,17 +676,16 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group process_session cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
-			pcibios_read_config_byte pcibios_read_config_dword \
-			pcibios_read_config_word pcibios_write_config_byte \
-			pcibios_write_config_dword pcibios_write_config_word \
-			pci_dac_dma_sync_single pci_dac_dma_sync_single_for_cpu \
-			pci_dac_dma_sync_single_for_device pci_dac_set_dma_mask \
-			pci_find_class pci_dma_sync_single pci_dma_sync_sg \
-			pci_dac_page_to_dma pci_dac_dma_to_page request_dma free_dma \
-			pci_dac_dma_to_offset pci_module_init vmalloc vfree \
-			sleep_on interruptible_sleep_on sleep_on_timeout \
-			read_trylock write_trylock atomic_add_return path_lookup \
-			MOD_DEC_USE_COUNT MOD_INC_USE_COUNT cli sti], [:], [
+			pcibios_read_config_byte pcibios_read_config_dword pcibios_read_config_word \
+			pcibios_write_config_byte pcibios_write_config_dword \
+			pcibios_write_config_word pci_dac_dma_sync_single \
+			pci_dac_dma_sync_single_for_cpu pci_dac_dma_sync_single_for_device \
+			pci_dac_set_dma_mask pci_dac_dma_supported pci_find_class \
+			pci_dma_sync_single pci_dma_sync_sg pci_dac_page_to_dma pci_dac_dma_to_page \
+			request_dma free_dma pci_dac_dma_to_offset pci_module_init vmalloc vfree \
+			sleep_on interruptible_sleep_on sleep_on_timeout read_trylock write_trylock \
+			atomic_add_return path_lookup MOD_DEC_USE_COUNT MOD_INC_USE_COUNT \
+			cli sti], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -782,7 +781,8 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <asm/uaccess.h>
 #endif
 ])
-    _LINUX_CHECK_TYPES([paddr_t, irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
+    _LINUX_CHECK_TYPES([paddr_t, irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
+			uintptr_t, intptr_t, uchar], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -878,6 +878,63 @@ my_autoconf_function_pointer1 = my_autoconf_function_pointer2;
     else
 	AC_DEFINE_UNQUOTED([kmem_cachep_t], [kmem_cache_t *])
     fi
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel kmem_cache_create with 5 args],
+		       [linux_cv_kmem_cache_create_5_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+		    [[struct kmem_cache *(*my_autoconf_function_pointer)
+		      (const char *, size_t, size_t, unsigned long,
+		       void (*)(struct kmem_cache *, void *)) =
+		       &kmem_cache_create;]]) ],
+		[linux_cv_kmem_cache_create_5_args='yes'],
+		[linux_cv_kmem_cache_create_5_args='no'])
+	    ])
+	if test :$linux_cv_kmem_cache_create_5_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS], [1], [Define if
+		       function kmem_cache_create takes 4 arguments.])
+	fi
+	AH_VERBATIM([kmem_create_cache],
+[/* silly kernel developers */
+#ifdef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
+#define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5)
+#else
+#define kmem_create_cache(a1,a2,a3,a4,a5,a6) kmem_cache_create(a1,a2,a3,a4,a5,a6)
+#endif])dnl
+    ])
 dnl 
 dnl In later kernels, the super_block.u.geneic_sbp and the filesystem specific
 dnl union u itself have been removed and a simple void pointer for filesystem
@@ -1191,6 +1248,9 @@ AC_DEFUN([_COMPAT_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.39  2008-09-10 03:49:40  brian
+# - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+#
 # Revision 0.9.2.38  2008-08-11 22:27:20  brian
 # - added makefile variables for modules to acinclude
 #

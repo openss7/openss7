@@ -1,3 +1,18 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: read_inode and new cache creation
+	* doc/manual/prerequisites.texi: adjusted prerequisites
+	* include/sys/streams/config.h.in: add types
+	* include/sys/streams/ddi.h: make inlines static
+	* include/sys/streams/stream.h: adjust types
+	* lib/libc/getmsg.c: strap out old definitions
+	* lib/libc/getpmsg.c: strap out old definitions
+	* src/kernel/strsched.c: new cache creation
+	* src/kernel/strspecfs.c: handle read_inode
+	* src/kernel/strutil.c: handle deprcated approaches
+	* src/modules/sth.c: change process control
+	* src/snmp/strMIB.c: add limits.h
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams.spec.in: build changes for release

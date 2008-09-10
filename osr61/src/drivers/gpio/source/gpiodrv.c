@@ -1310,7 +1310,11 @@ PRIVATE INT _gpio_readmemory(GPIO_DATA *dip, UINT count)
     * Copy the requested amount of memory into the message buffer to be
     * sent upstream.
     */
+#if 1
    memcpy_fromio(dip->buffer, vaddr, dip->bufsize);
+#else
+   __memcpy(dip->buffer, vaddr, dip->bufsize);
+#endif
 
    /* Release the virtual memory obtained earlier.  */
    _gpio_rlsvirtmem(vaddr, dip->bufsize, dip->address);
@@ -1347,7 +1351,11 @@ PRIVATE INT _gpio_writememory(GPIO_DATA *dip, UINT count)
    }
 
    /* Copy the requested amount from the message buffer into the memory.  */
+#if 1
    memcpy_toio(vaddr, dip->buffer, dip->bufsize);
+#else
+   __memcpy(vaddr, dip->buffer, dip->bufsize);
+#endif
 
    /* Release the virtual memory obtained earlier.  */
    _gpio_rlsvirtmem(vaddr, dip->bufsize, dip->address);
@@ -1385,7 +1393,11 @@ PRIVATE INT _gpio_mapboard(GPIO_MAPDATA *mdip, UINT count)
           return ENOMEM;
        }
        /* Copy the board id from the message buffer into the memory */
+#if 1
        memcpy_toio(vaddr, &(mdip->id),  sizeof(UCHAR));
+#else
+       __memcpy(vaddr, &(mdip->id),  sizeof(UCHAR));
+#endif
 
        /* Release the virtual memory obtained earlier */
        _gpio_rlsvirtmem(vaddr, sizeof(UCHAR), (mdip->address + 0xE0));

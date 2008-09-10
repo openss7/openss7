@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.17 $) $Date: 2008-04-29 08:33:15 $
+ @(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.18 $) $Date: 2008-09-10 03:49:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:15 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: linux-mdep.h,v $
+ Revision 1.1.1.7.4.18  2008-09-10 03:49:10  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 1.1.1.7.4.17  2008-04-29 08:33:15  brian
  - update headers for Affero release
 
@@ -63,7 +66,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.17 2008-04-29 08:33:15 brian Exp $
+ * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.18 2008-09-10 03:49:10 brian Exp $
  * Purpose         : provide kernel independence as much as possible
  *                 : This could be also considered to be en embryo for
  *                 : dki stuff,i.e. linux-dki
@@ -80,7 +83,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.17 $) $Date: 2008-04-29 08:33:15 $"
+#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.18 $) $Date: 2008-09-10 03:49:10 $"
 
 #ifdef __KERNEL__
 #include <linux/autoconf.h>
@@ -302,7 +305,7 @@ extern int lis_num_cpus;
 #undef gid
 typedef int o_uid_t;
 typedef int o_gid_t;
-typedef unsigned char uchar;
+//typedef unsigned char uchar;
 
 #if 1
 typedef struct cred {

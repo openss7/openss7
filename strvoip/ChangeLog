@@ -1,3 +1,10 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: new types and cache creation
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/h225.c: new cache creation
+	* src/modules/rtp.c: new cache creation
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strvoip.spec.in: build changes for release

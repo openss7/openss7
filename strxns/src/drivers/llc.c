@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 11:39:32 $
+ @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: llc.c,v $
+ Revision 0.9.2.5  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.4  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 11:39:32 $"
+#ident "@(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 11:39:32 $";
+    "$RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $";
 
 /*
  * This is a DL driver for LLC1, LLC2 and LLC3 connections over 802.2.  It
@@ -86,7 +89,7 @@ static char const ident[] =
 #include <sys/dlpi.h>
 
 #define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-25 11:39:32 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3267,7 +3270,7 @@ llcinit(void)
 	int err;
 
 	if (!(dl_priv_cachep =
-	      kmem_cache_create("dl_priv_cachep", mi_open_size(sizeof(struct dl)), 0,
+	      kmem_create_cache("dl_priv_cachep", mi_open_size(sizeof(struct dl)), 0,
 				SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_WARN, "%s: Could not allocate dl_priv_cachep\n", DRV_NAME);
 		return (-ENOMEM);

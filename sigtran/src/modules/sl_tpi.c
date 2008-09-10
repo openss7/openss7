@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-05-05 15:34:50 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:49:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:50 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.14  2008-09-10 03:49:18  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.13  2008-05-05 15:34:50  brian
  - be strict with MORE_data and DATA_flag
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-05-05 15:34:50 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:49:18 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-05-05 15:34:50 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:49:18 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -4669,9 +4672,9 @@ sl_daedt_transmission_request(queue_t *q)
 			int mlen = hlen + 2;
 			if (!sl->sdt.tb.q_count)
 				qenable(sl->wq);	/* back-enable */
-			if (mlen < hlen)
+			if (len < hlen)
 				goto dont_repeat;
-			if (mlen == hlen + 1 || mlen == hlen + 2) {
+			if (len == hlen + 1 || len == hlen + 2) {
 				int li, sio;
 				if (sl->option.popt & SS7_POPT_XSN) {
 					li = ((mp->b_rptr[5] << 8) | mp->b_rptr[4]) & 0x1ff;
@@ -4680,7 +4683,7 @@ sl_daedt_transmission_request(queue_t *q)
 					li = mp->b_rptr[2] & 0x3f;
 					sio = mp->b_rptr[3];
 				}
-				if (li != mlen - hlen)
+				if (li != len - hlen)
 					goto dont_repeat;
 				switch (sio) {
 				case LSSU_SIO:
@@ -8287,7 +8290,7 @@ sl_init_caches(void)
 {
 	if (!sl_priv_cachep
 	    && !(sl_priv_cachep =
-		 kmem_cache_create("sl_priv_cachep", sizeof(sl_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sl_priv_cachep", sizeof(sl_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate sl_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);

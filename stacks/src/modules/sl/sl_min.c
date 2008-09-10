@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:11 $
+ @(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_min.c,v $
+ Revision 0.9.2.27  2008-09-10 03:49:33  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.26  2008-04-29 07:11:11  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:11 $"
+#ident "@(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:33 $"
 
 char const ident[] =
-    "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:11 $";
+    "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:33 $";
 
 #include <sys/os7/compat.h>
 
@@ -94,7 +97,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MIN_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MIN_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:11 $"
+#define SL_MIN_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:33 $"
 #define SL_MIN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -303,15 +306,17 @@ STATIC int
 slm_init_caches(void)
 {
 	if (!slm_sl_cachep
-	    && !(slm_sl_cachep = kmem_cache_create("slm_sl_cachep", sizeof(struct sl), 0,
-						   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	    && !(slm_sl_cachep =
+		 kmem_create_cache("slm_sl_cachep", sizeof(struct sl), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate slm_sl_cachep", DRV_NAME);
 		goto error;
 	} else
 		printd(("%s: initialized slm sl structure cache\n", DRV_NAME));
 	if (!slm_ls_cachep
-	    && !(slm_ls_cachep = kmem_cache_create("slm_ls_cachep", sizeof(struct ls), 0,
-						   SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	    && !(slm_ls_cachep =
+		 kmem_create_cache("slm_ls_cachep", sizeof(struct ls), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate slm_ls_cachep", DRV_NAME);
 		goto error;
 	} else

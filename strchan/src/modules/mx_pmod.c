@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $
+ @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:57 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_pmod.c,v $
+ Revision 0.9.2.8  2008-09-10 03:49:40  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.7  2008-04-28 23:39:57  brian
  - updated headers for release
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $"
+#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $"
 
 static char const ident[] =
-    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $";
+    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $";
 
 /*
  *  This is MX-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -100,7 +103,7 @@ static char const ident[] =
 //#undef unfreezestr
 
 #define MX_DESCRIP	"MX (Multiplex) STREAMS PIPE MODULE."
-#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:57 $"
+#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2946,6 +2949,7 @@ mx_pmodinit(void)
 {
 	int err;
 
+	(void) mx_data_ind;
 	cmn_err(CE_NOTE, MOD_BANNER);
 	if ((err = register_strmod(&mx_fmod)) < 0) {
 		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, err);

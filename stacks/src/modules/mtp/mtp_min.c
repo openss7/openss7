@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:53 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:53 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_min.c,v $
+ Revision 0.9.2.24  2008-09-10 03:49:29  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-05-05 15:34:53  brian
  - be strict with MORE_data and DATA_flag
 
@@ -89,9 +92,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:53 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:53 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)
@@ -121,7 +124,7 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/tihdr.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:53 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -5766,7 +5769,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 	int err;
 	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
 
-	if (mtp_get_state != TS_UNBND)
+	if (mtp_get_state(mt) != TS_UNBND)
 		goto outstate;
 	mtp_set_state(mt, TS_WACK_BREQ);
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:13 $
+ @(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.10 $) $Date: 2008-09-10 03:49:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lislocks.c,v $
+ Revision 1.1.1.6.4.10  2008-09-10 03:49:10  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 1.1.1.6.4.9  2008-04-29 08:33:13  brian
  - update headers for Affero release
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:13 $"
+#ident "@(#) $RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.10 $) $Date: 2008-09-10 03:49:10 $"
 
-static char const ident[] = "$RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.9 $) $Date: 2008-04-29 08:33:13 $";
+static char const ident[] = "$RCSfile: lislocks.c,v $ $Name:  $($Revision: 1.1.1.6.4.10 $) $Date: 2008-09-10 03:49:10 $";
 
 /************************************************************************
 *                         LiS Locks                                     *
@@ -1527,7 +1530,7 @@ lis_init_locks(void)
 	spin_size = sizeof(*llock) - sizeof(llock->spin_lock_mem) + sizeof(spinlock_t);
 	size = sem_size > spin_size ? sem_size : spin_size;
 	lis_locks_cachep =
-	    kmem_cache_create("lis_locks_cache", size, 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+	    kmem_create_cache("lis_locks_cache", size, 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
 }
 
 void

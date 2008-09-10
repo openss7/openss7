@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.9 $) $Date: 2008-04-29 08:33:15 $
+ @(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2008-09-10 03:49:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:15 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strport.h,v $
+ Revision 1.1.1.3.4.10  2008-09-10 03:49:10  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 1.1.1.3.4.9  2008-04-29 08:33:15  brian
  - update headers for Affero release
 
@@ -62,7 +65,7 @@
  * <strport.h> --- Linux STREAMS portability declarations. 
  * Author          : gram & nemo
  * Created On      : Fri Mar 24 2:40:21 1995
- * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.9 2008-04-29 08:33:15 brian Exp $
+ * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.10 2008-09-10 03:49:10 brian Exp $
  * Last Modified By: David Grothe
  * Restrictions    : SHAREd items can be read/writen by usr
  *                 : EXPORTed items can only be read by usr
@@ -82,7 +85,7 @@
 #ifndef _STRPORT_H
 #define _STRPORT_H
 
-#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.9 $) $Date: 2008-04-29 08:33:15 $"
+#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2008-09-10 03:49:10 $"
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */
@@ -132,21 +135,30 @@
 #if defined(__KERNEL__) && !defined(_INTTYPES_H)
 #define _INTTYPES_H	1	/* kernel types.h is just as good */
 					/* with the addition of these */
-# if defined(_ASM_IA64_UNISTD_H)
-#  ifndef intptr_t
-typedef long _intptr_t;
 
-#  define intptr_t	_intptr_t
-#  endif
+#ifndef uchar
+#ifndef HAVE_KTYPE_UCHAR
+typedef unsigned char uchar;		/* idiots! */
+#endif
+
+#define uchar uchar
+#endif
+
+#ifndef uintptr_t
+#ifndef HAVE_KTYPE_UINTPTR_T
 typedef unsigned long uintptr_t;
-# else				/* _ASM_IA64_UNISTD_H */
-#  ifndef intptr_t
-typedef int _intptr_t;
+#endif
 
-#  define intptr_t	_intptr_t
-#  endif
-typedef unsigned int uintptr_t;
-# endif				/* _ASM_IA64_UNISTD_H */
+#define uintptr_t uintptr_t
+#endif
+
+#ifndef intptr_t
+#ifndef HAVE_KTYPE_INTPTR_T
+typedef long intptr_t;
+#endif
+
+#define intptr_t intptr_t
+#endif
 
 /*
  * Define some selected formatting phrases that we would have gotten

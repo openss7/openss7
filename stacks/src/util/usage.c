@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-30 14:05:06 $
+ @(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-30 14:05:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: usage.c,v $
+ Revision 0.9.2.6  2008-09-10 03:49:38  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.5  2008-04-30 14:05:06  brian
  - updates to pass make check target
 
@@ -68,9 +71,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-30 14:05:06 $"
+#ident "@(#) $RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:38 $"
 
-static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-30 14:05:06 $";
+static char const ident[] = "$RCSfile: usage.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:38 $";
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -585,7 +588,7 @@ unpack_unsigned(unsigned char **p, unsigned char *e, unsigned long long *val)
   *
   * This function unpacks BER BOOLEAN content octets.
   */
-static int
+static inline int
 unpack_boolean(unsigned char **p, unsigned char *e, bool *val)
 {
 	uint len;

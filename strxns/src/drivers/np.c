@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-25 11:39:32 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.17  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.16  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-25 11:39:32 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-25 11:39:32 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -143,7 +146,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2008-04-25 11:39:32 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -4507,7 +4510,7 @@ STATIC int
 np_init_caches(void)
 {
 	if (np_priv_cachep == NULL) {
-		np_priv_cachep = kmem_cache_create("np_priv_cachep", sizeof(struct np), 0,
+		np_priv_cachep = kmem_create_cache("np_priv_cachep", sizeof(struct np), 0,
 						   SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (np_priv_cachep == NULL) {
 			strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
@@ -4518,7 +4521,7 @@ np_init_caches(void)
 		strlog(DRV_ID, 0, LOG_DEBUG, SL_TRACE, "initialized driver priv structure cache");
 	}
 	if (np_link_cachep == NULL) {
-		np_link_cachep = kmem_cache_create("np_link_cachep", sizeof(struct np), 0,
+		np_link_cachep = kmem_create_cache("np_link_cachep", sizeof(struct np), 0,
 						   SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (np_link_cachep == NULL) {
 			strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,

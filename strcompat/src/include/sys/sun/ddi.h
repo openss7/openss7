@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.25 2008-04-28 16:47:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.26 2008-09-10 03:49:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:12 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.26  2008-09-10 03:49:41  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.25  2008-04-28 16:47:12  brian
  - updates for release
 
@@ -68,7 +71,7 @@
 #ifndef __SYS_SUN_DDI_H__
 #define __SYS_SUN_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.25 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.26 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_SUNDDI_H__
 #warning "Do not include sys/sun/ddi.h directly, include sys/sunddi.h instead."
@@ -100,7 +103,7 @@
 #if defined(CONFIG_STREAMS_COMPAT_SUN) || defined(CONFIG_STREAMS_COMPAT_SUN_MODULE)
 
 #ifdef LFS
-__SUN_EXTERN_INLINE cred_t *
+static __inline__ cred_t *
 ddi_get_cred(void)
 {
 	return (current_creds);
@@ -111,7 +114,7 @@ ddi_get_lbolt(void)
 {
 	return (jiffies);
 }
-__SUN_EXTERN_INLINE pid_t
+static __inline__ pid_t
 ddi_get_pid(void)
 {
 	return (current->pid);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:28 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.11  2008-09-10 03:49:55  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.10  2008-04-28 23:13:28  brian
  - updated headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $"
 
 static char const ident[] =
-    "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $";
+    "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -106,7 +109,7 @@ static char const ident[] =
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:13:28 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"
@@ -224,8 +227,8 @@ tpiperf_init_caches(void)
 {
 	if (!tpiperf_priv_cachep
 	    && !(tpiperf_priv_cachep =
-		 kmem_cache_create(MOD_NAME, sizeof(struct tpiperf), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+		 kmem_create_cache(MOD_NAME, sizeof(struct tpiperf), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
+		 )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate tpiperf_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);

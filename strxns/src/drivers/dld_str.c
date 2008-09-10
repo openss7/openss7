@@ -598,7 +598,7 @@ dld_str_init(void)
 	/*
 	 * Create dld_str_t object cache.
 	 */
-	str_cachep = kmem_cache_create("dld_str_cache", sizeof (dld_str_t),
+	str_cachep = kmem_create_cache("dld_str_cache", sizeof (dld_str_t),
 	    0, str_constructor, str_destructor, NULL, NULL, NULL, 0);
 	ASSERT(str_cachep != NULL);
 

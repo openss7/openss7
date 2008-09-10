@@ -27,7 +27,7 @@
 #define DM3_PLATFORM_VME        1
 #define DM3_PLATFORM_PCI        2
 
-#define MAX_INTERFACE_FUNCTION  80   //Was 64
+#define MAX_INTERFACE_FUNCTION  81   //Was 64
 #define MAX_OSAL_FUNC  		42
 #define MAX_DHAL_FUNC  		42
 

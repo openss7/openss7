@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $
+ @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:33:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socklib.c,v $
+ Revision 0.9.2.6  2008-09-10 03:49:56  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.5  2008-04-28 22:33:33  brian
  - updated headers for release
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $"
+#ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $"
 
 static char const ident[] =
-    "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $";
+    "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -167,6 +170,10 @@ struct _so_user {
 	struct netconfig *nc;		/* netconfig pointer */
 	struct si_udata info;		/* information structure */
 };
+
+#ifndef OPEN_MAX
+#define OPEN_MAX 256
+#endif
 
 static struct _so_user *_so_fds[OPEN_MAX] = { NULL, };
 

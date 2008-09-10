@@ -1,3 +1,9 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* scripts/missing2: more information in errors
+	* texi/install.texi: additional information
+
 2008-08-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/info.am: keep from building docs normally

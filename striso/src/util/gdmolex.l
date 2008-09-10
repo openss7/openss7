@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: gdmolex.l,v 0.9.2.6 2008-05-04 16:16:47 brian Exp $
+ @(#) $Id: gdmolex.l,v 0.9.2.7 2008-09-10 03:49:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-04 16:16:47 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gdmolex.l,v $
+ Revision 0.9.2.7  2008-09-10 03:49:51  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.6  2008-05-04 16:16:47  brian
  - changes and corrections for release
 
@@ -75,9 +78,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:47 $"
+#ident "@(#) $RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:51 $"
 
-static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:47 $";
+static char const ident[] = "$RCSfile: gdmolex.l,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:51 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -499,13 +502,15 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 
 /* ADDITIONAL CODE */
 
-static void dummy(void) {
-	(void) dummy;
+void dummy(void) {
 	(void) yyunput;
 	(void) yy_top_state;
 	(void) yy_push_state;
 #ifndef YY_FLEX_SUBMINOR_VERSION
 	(void) yy_flex_realloc;
+#endif
+#ifndef YY_NO_INPUT
+	(void) input;
 #endif
 }
 

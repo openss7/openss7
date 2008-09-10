@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:37 $
+ @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-04 16:16:37 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconf_lex.l,v $
+ Revision 0.9.2.7  2008-09-10 03:49:38  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.6  2008-05-04 16:16:37  brian
  - changes and corrections for release
 
@@ -75,9 +78,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:37 $"
+#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:38 $"
 
-static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-05-04 16:16:37 $";
+static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:38 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -660,11 +663,14 @@ OPTIONS		({OPTION})(","{OPTION})*
 
 /* ADDITIONAL CODE */
 
-static void dummy(void) {
+void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
 #ifndef YY_FLEX_SUBMINOR_VERSION
 	(void) yy_flex_realloc;
+#endif
+#ifndef YY_NO_INPUT
+	(void) input;
 #endif
 }
 
