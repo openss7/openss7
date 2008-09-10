@@ -1,3 +1,18 @@
+2008-09-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: instrument inet driver
+
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: types, cache creation and net namespaces
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/inet.c: new cache and types
+	* src/drivers/rawip.c: new cache and types
+	* src/drivers/tcp.c: new cache and types
+	* src/drivers/udp.c: new cache and types
+	* src/drivers/udp_hooks.h.in: handle net namespaces
+	* src/modules/tcpns.c: new cache and types
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strinet.spec.in: build changes for release
