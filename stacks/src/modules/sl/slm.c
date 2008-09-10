@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:11 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slm.c,v $
+ Revision 0.9.2.19  2008-09-10 03:49:33  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.18  2008-04-29 07:11:11  brian
  - updating headers for release
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:11 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $"
 
-static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:11 $";
+static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also supports M2UA.  It
@@ -107,7 +110,7 @@ static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.18 $
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:11 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -469,7 +472,7 @@ slm_init_caches(void)
 {
 	if (!slm_pp_cachep
 	    && !(slm_pp_cachep =
-		 kmem_cache_create("slm_pp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("slm_pp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate slm_pp_cachep", __FUNCTION__);
 		slm_term_caches();
@@ -478,7 +481,7 @@ slm_init_caches(void)
 		printd(("SLM: initialized pp structure cache\n"));
 	if (!slm_gp_cachep
 	    && !(slm_gp_cachep =
-		 kmem_cache_create("slm_gp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("slm_gp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate slm_gp_cachep", __FUNCTION__);
 		slm_term_caches();
@@ -487,7 +490,7 @@ slm_init_caches(void)
 		printd(("SLM: initialized gp structure cache\n"));
 	if (!slm_np_cachep
 	    && !(slm_np_cachep =
-		 kmem_cache_create("slm_np_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("slm_np_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate slm_np_cachep", __FUNCTION__);
 		slm_term_caches();
@@ -496,7 +499,7 @@ slm_init_caches(void)
 		printd(("SLM: initialized np structure cache\n"));
 	if (!slm_sp_cachep
 	    && !(slm_sp_cachep =
-		 kmem_cache_create("slm_sp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("slm_sp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate slm_sp_cachep", __FUNCTION__);
 		slm_term_caches();
@@ -505,7 +508,7 @@ slm_init_caches(void)
 		printd(("SLM: initialized sp structure cache\n"));
 	if (!slm_xp_cachep
 	    && !(slm_xp_cachep =
-		 kmem_cache_create("slm_xp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("slm_xp_cachep", sizeof(pp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate slm_xp_cachep", __FUNCTION__);
 		slm_term_caches();

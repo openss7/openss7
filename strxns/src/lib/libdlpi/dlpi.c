@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:57:05 $
+ @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:50:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-20 10:57:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.c,v $
+ Revision 0.9.2.6  2008-09-10 03:50:08  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.5  2008-08-20 10:57:05  brian
  - fixes and build updates from newnet trip
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:57:05 $"
+#ident "@(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:50:08 $"
 
 static char const ident[] =
-    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-08-20 10:57:05 $";
+    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:50:08 $";
 
 /* This file can be processed by doxygen(1). */
 
@@ -265,6 +268,10 @@ struct __dlpi_user {
 	uint du_notifications;		/**< active notifications */
 	uint du_timeout;
 };
+
+#ifndef OPEN_MAX
+#define OPEN_MAX 256
+#endif
 
 static dlpi_handle_t __dlpi_dhs[OPEN_MAX] = { NULL, };
 

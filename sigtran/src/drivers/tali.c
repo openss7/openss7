@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:21 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:21 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tali.c,v $
+ Revision 0.9.2.10  2008-09-10 03:49:17  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.9  2008-04-29 01:52:21  brian
  - updated headers for release
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:21 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:21 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $";
 
 #include <sys/os7/compat.h>
 
@@ -83,7 +86,7 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:21 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -305,43 +308,43 @@ STATIC int
 tali_init_caches(void)
 {
 	if (!(tali_pp_cachep))
-		if (!(tali_pp_cachep = kmem_cache_create("tali_pp_cachep", sizeof(pp_t),
+		if (!(tali_pp_cachep = kmem_create_cache("tali_pp_cachep", sizeof(pp_t),
 							 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 			goto tali_init_caches_failed;
 		else
 			tali_pp_cache_allocated = 1;
 	if (!(tali_xp_cachep))
-		if (!(tali_xp_cachep = kmem_cache_create("tali_xp_cachep", sizeof(xp_t),
+		if (!(tali_xp_cachep = kmem_create_cache("tali_xp_cachep", sizeof(xp_t),
 							 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 			goto tali_init_caches_failed;
 		else
 			tali_xp_cache_allocated = 1;
 	if (!(tali_gp_cachep))
-		if (!(tali_gp_cachep = kmem_cache_create("tali_gp_cachep", sizeof(gp_t),
+		if (!(tali_gp_cachep = kmem_create_cache("tali_gp_cachep", sizeof(gp_t),
 							 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 			goto tali_init_caches_failed;
 		else
 			tali_gp_cache_allocated = 1;
 	if (!(tali_sp_cachep))
-		if (!(tali_sp_cachep = kmem_cache_create("tali_sp_cachep", sizeof(sp_t),
+		if (!(tali_sp_cachep = kmem_create_cache("tali_sp_cachep", sizeof(sp_t),
 							 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 			goto tali_init_caches_failed;
 		else
 			tali_sp_cache_allocated = 1;
 	if (!(tali_as_cachep))
-		if (!(tali_as_cachep = kmem_cache_create("tali_as_cachep", sizeof(as_t),
+		if (!(tali_as_cachep = kmem_create_cache("tali_as_cachep", sizeof(as_t),
 							 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 			goto tali_init_caches_failed;
 		else
 			tali_as_cache_allocated = 1;
 	if (!(tali_ap_cachep))
-		if (!(tali_ap_cachep = kmem_cache_create("tali_ap_cachep", sizeof(ap_t),
+		if (!(tali_ap_cachep = kmem_create_cache("tali_ap_cachep", sizeof(ap_t),
 							 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 			goto tali_init_caches_failed;
 		else
 			tali_ap_cache_allocated = 1;
 	if (!(tali_np_cachep))
-		if (!(tali_np_cachep = kmem_cache_create("tali_np_cachep", sizeof(np_t),
+		if (!(tali_np_cachep = kmem_create_cache("tali_np_cachep", sizeof(np_t),
 							 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 			goto tali_init_caches_failed;
 		else

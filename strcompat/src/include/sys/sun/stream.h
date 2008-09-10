@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.17 2008-04-28 16:47:12 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.18 2008-09-10 03:49:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:12 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.18  2008-09-10 03:49:42  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.17  2008-04-28 16:47:12  brian
  - updates for release
 
@@ -109,7 +112,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -191,7 +194,7 @@ __SUN_EXTERN void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (que
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
 
-__SUN_EXTERN_INLINE mblk_t *
+static __inline__ mblk_t *
 mkiocb(unsigned int command)
 {
 	mblk_t *mp;

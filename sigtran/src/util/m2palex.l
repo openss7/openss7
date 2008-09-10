@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:35 $
+ @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-04 16:16:35 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2palex.l,v $
+ Revision 0.9.2.6  2008-09-10 03:49:19  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.5  2008-05-04 16:16:35  brian
  - changes and corrections for release
 
@@ -72,9 +75,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:35 $"
+#ident "@(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:19 $"
 
-static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-05-04 16:16:35 $";
+static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:19 $";
 
 #include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
@@ -434,11 +437,18 @@ SLC		"slc"|"signal[l]?ing-link-code"
 
 /* ADDITIONAL CODE */
 
-static void dummy(void) {
+void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
 #ifndef YY_FLEX_SUBMINOR_VERSION
 	(void) yy_flex_realloc;
+#endif
+#ifndef YY_NO_INPUT
+#   ifdef __cplusplus
+	(void) yyinput;
+#   else
+	(void) input;
+#   endif
 #endif
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:03 $
+ @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:03 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_mod.c,v $
+ Revision 0.9.2.5  2008-09-10 03:49:29  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.4  2008-04-29 07:11:03  brian
  - updating headers for release
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:03 $"
+#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $"
 
-static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:03 $";
+static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $";
 
 /*
  * MTP-MOD is a minimal MTP in the spirit of Q.710 but which also supports ANSI and other variants.
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/mtpi_ioctl.h>
 
 #define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS MODULE."
-#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:03 $"
+#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $"
 #define MT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4274,18 +4277,18 @@ mtp_init_caches(void)
 	size_t sizeof_struct_sl = mi_open_size(sizeof(struct sl));
 
 	(void) mtp_init_caches;
-	if (!mtp_mt_cachep &&
-	    !(mtp_mt_cachep =
-	      kmem_cache_create("mtp-mod:mtp_mt_cachep", sizeof_struct_mt, 0,
-				SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	if (!mtp_mt_cachep && !(mtp_mt_cachep =
+				kmem_create_cache("mtp-mod:mtp_mt_cachep", sizeof_struct_mt, 0,
+						  SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp-mod:mtp_mt_cachep", MOD_NAME);
 		goto failed_mt;
 	} else
 		cmn_err(CE_NOTE, "%s: initialized sl structure cache\n", MOD_NAME);
-	if (!mtp_sl_cachep &&
-	    !(mtp_sl_cachep =
-	      kmem_cache_create("mtp-mod:mtp_sl_cachep", sizeof_struct_sl, 0,
-				SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	if (!mtp_sl_cachep && !(mtp_sl_cachep =
+				kmem_create_cache("mtp-mod:mtp_sl_cachep", sizeof_struct_sl, 0,
+						  SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate mtp-mod:mtp_sl_cachep", MOD_NAME);
 		goto failed_sl;
 	} else
@@ -4404,6 +4407,43 @@ static __init int
 mtp_modinit(void)
 {
 	int err;
+
+	(void) mtp_ok_ack;
+	(void) mtp_bind_ack;
+	(void) mtp_addr_ack;
+	(void) mtp_info_ack;
+	(void) mtp_optmgmt_ack;
+	(void) mtp_transfer_ind;
+	(void) mtp_pause_ind;
+	(void) mtp_resume_ind;
+	(void) mtp_status_ind;
+	(void) mtp_restart_begins_ind;
+	(void) mtp_restart_complete_ind;
+	(void) lmi_info_req;
+	(void) lmi_attach_req;
+	(void) lmi_detach_req;
+	(void) lmi_enable_req;
+	(void) lmi_disable_req;
+	(void) sl_pdu_req;
+	(void) sl_emergency_req;
+	(void) sl_emergency_ceases_req;
+	(void) sl_start_req;
+	(void) sl_stop_req;
+	(void) sl_retrieve_bsnt_req;
+	(void) sl_retrieval_request_and_fsnc_req;
+	(void) sl_clear_buffers_req;
+	(void) sl_clear_rtb_req;
+	(void) sl_continue_req;
+	(void) sl_local_processor_outage_req;
+	(void) sl_resume_req;
+	(void) sl_congestion_discard_req;
+	(void) sl_congestion_accept_req;
+	(void) sl_no_congestion_req;
+	(void) sl_power_on_req;
+	(void) sl_optmgmt_req;
+	(void) sl_notify_req;
+	(void) mtp_init_caches;
+	(void) mtp_term_caches;
 
 	cmn_err(CE_NOTE, MOD_BANNER);
 	if ((err = register_strmod(&mt_fmod)) < 0) {

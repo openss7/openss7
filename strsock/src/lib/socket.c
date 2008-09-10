@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $
+ @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:33:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socket.c,v $
+ Revision 0.9.2.6  2008-09-10 03:49:56  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.5  2008-04-28 22:33:33  brian
  - updated headers for release
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $"
+#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $"
 
 static char const ident[] =
-    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:33 $";
+    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -221,6 +224,10 @@ struct _s_user {
 	pthread_rwlock_t lock;		/* lock for this structure */
 	struct si_udata info;		/* information structure */
 };
+
+#ifndef OPEN_MAX
+#define OPEN_MAX 256
+#endif
 
 static struct _s_user *_s_fds[OPEN_MAX] = { NULL, };
 
@@ -916,7 +923,7 @@ __sock_socketpair(int domain, int type, int protocol, int socket_vector[2])
 	int err, socks[2] = { -1, -1 };
 	struct _s_user *user1, *user2;
 	struct socksysreq args = {
-		{SO_SOCKPAIR, domain, type, protocol, (long) socket_vector,}
+		{SO_SOCKPAIR, domain, type, protocol, (long) socks,}
 	};
 
 	if (!(user1 = (struct _s_user *) malloc(sizeof(*user1))))
@@ -962,6 +969,8 @@ __sock_socketpair(int domain, int type, int protocol, int socket_vector[2])
 		_s_fds[socks[1]] = user2;
 	} else
 		_s_fds[socks[1]] = NULL;
+	socket_vector[0] = socks[0];
+	socket_vector[1] = socks[1];
 	return (0);
       badgetuser:
       badioctl:
@@ -1317,10 +1326,10 @@ __asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.5 $).
+ * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.6 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.5 $)
- * @date \$Date: 2008-04-28 22:33:33 $
+ * @version \$Name:  $(\$Revision: 0.9.2.6 $)
+ * @date \$Date: 2008-09-10 03:49:56 $
  *
  * @}
  */

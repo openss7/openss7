@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:12 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:12 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_sctp.c,v $
+ Revision 0.9.2.24  2008-09-10 03:49:34  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-04-29 07:11:12  brian
  - updating headers for release
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:12 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:34 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:12 $";
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:34 $";
 
 #include <sys/os7/compat.h>
 
@@ -98,7 +101,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:11:12 $"
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:34 $"
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2197,9 +2200,9 @@ kmem_cachep_t sdl_cachep = NULL;
 STATIC int
 sdl_init_caches(void)
 {
-	if (!sdl_cachep &&
-	    !(sdl_cachep = kmem_cache_create
-	      ("sdl_cachep", sizeof(sdl_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
+	if (!sdl_cachep
+	    && !(sdl_cachep =
+		 kmem_create_cache("sdl_cachep", sizeof(sdl_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		cmn_err(CE_PANIC, "%s: Cannot alloc sdl_cachep.", __FUNCTION__);
 	return (0);
 }

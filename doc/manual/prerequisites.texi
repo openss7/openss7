@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 0.9.2.10 2008-05-03 13:23:24 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 0.9.2.11 2008-09-10 03:49:11 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-05-03 13:23:24 $ by $Author: brian $
+@c Last Modified $Date: 2008-09-10 03:49:11 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -69,7 +69,7 @@ A fairly LSB compliant GNU/Linux distribution.@footnote{See @refman{GNU/Linux Di
 more information.}
 
 @item
-Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.22)
+Linux 2.4 or 2.6 kernel (2.4.10 - 2.4.27) or (2.6.3 - 2.6.25.4)
 
 @item
 glibc2 or better.
@@ -161,7 +161,7 @@ more information.}
 @item @tab @minus{}
 Linux 2.4 kernel (2.4.10 - 2.4.27), or
 @item @tab @minus{}
-Linux 2.6 kernel (2.6.3 - 2.6.22);
+Linux 2.6 kernel (2.6.3 - 2.6.25.4);
 @item @tab @minus{}
 glibc2 or better.
 @item @tab @minus{}

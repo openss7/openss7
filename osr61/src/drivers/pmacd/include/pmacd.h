@@ -248,25 +248,25 @@ typedef void irqreturn_t;
 #define pmacd_memcpy_KtoK(retCode, dest, src, size) { *(retCode)=0; memcpy((dest), (src), (size));}
 #define pmacd_memcpy_KtoU(retCode, dest, src, size) { *(retCode)=copy_to_user((dest), (src), (size));}
 
-extern inline pmacd_memaddress_t pmacd_malloc(int size){
+static inline pmacd_memaddress_t pmacd_malloc(int size){
   extern ATOMIC_T pmacd_dynamicMemoryUsage;
   ATOMIC_ADD(pmacd_dynamicMemoryUsage, size);
   return((pmacd_memaddress_t)kmalloc((size), GFP_ATOMIC));
 }
 
-extern inline void pmacd_free(void *memptr, int size){
+static inline void pmacd_free(void *memptr, int size){
   extern ATOMIC_T pmacd_dynamicMemoryUsage;
   ATOMIC_SUB(pmacd_dynamicMemoryUsage, size);
   kfree(memptr, size);
 }
 
-extern inline pmacd_memaddress_t pmacd_mallocPage(void){
+static inline pmacd_memaddress_t pmacd_mallocPage(void){
   extern ATOMIC_T pmacd_dynamicMemoryUsage;
   ATOMIC_ADD(pmacd_dynamicMemoryUsage, PMACD_PAGE_SIZE);
   return((pmacd_memaddress_t)__get_free_page(GFP_ATOMIC));
 }
 
-extern inline void pmacd_freePage(pmacd_memaddress_t memptr){
+static inline void pmacd_freePage(pmacd_memaddress_t memptr){
   extern ATOMIC_T pmacd_dynamicMemoryUsage;
   ATOMIC_SUB(pmacd_dynamicMemoryUsage, PMACD_PAGE_SIZE);
   free_page((unsigned long)memptr);
@@ -286,7 +286,7 @@ extern inline void pmacd_freePage(pmacd_memaddress_t memptr){
 // The page_order<12 is to bound the shifting in case of a bad byte
 // value.
 
-extern inline pmacd_memaddress_t pmacd_mallocPageBlock(int size){
+static inline pmacd_memaddress_t pmacd_mallocPageBlock(int size){
   extern ATOMIC_T pmacd_dynamicMemoryUsage;
   int page_order = 0;
   //int osize = size;
@@ -300,7 +300,7 @@ extern inline pmacd_memaddress_t pmacd_mallocPageBlock(int size){
   return(startAddr);
 }
 
-extern inline BOOLEAN_T pmacd_freePageBlock(pmacd_memaddress_t startAddr, int size){
+static inline BOOLEAN_T pmacd_freePageBlock(pmacd_memaddress_t startAddr, int size){
   extern ATOMIC_T pmacd_dynamicMemoryUsage;
   int page_order = 0;
 

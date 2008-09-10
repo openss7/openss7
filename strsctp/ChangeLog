@@ -1,3 +1,12 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check new types, cache creation and net namepsaces
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/sctp2.c: new cache creation and net namespaces
+	* src/drivers/sctp_cache.c: new cache creation
+	* src/drivers/sctp_hooks.h.in: net namespaces
+	* src/modules/tpiperf.c: new cache creation
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strsctp.spec.in: build changes for release

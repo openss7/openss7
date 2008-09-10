@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: allocb.h,v 0.9.2.15 2008-04-28 16:47:10 brian Exp $
+ @(#) $Id: allocb.h,v 0.9.2.16 2008-09-10 03:49:41 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: allocb.h,v $
+ Revision 0.9.2.16  2008-09-10 03:49:41  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.15  2008-04-28 16:47:10  brian
  - updates for release
 
@@ -65,7 +68,7 @@
 #ifndef __OS7_ALLOCB_H__
 #define __OS7_ALLOCB_H__
 
-#ident "@(#) $RCSfile: allocb.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: allocb.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -85,7 +88,7 @@
  * The expensive atomic exchanges here are for Linux STREAMS (LiS) that has horribly unsafe bufcall,
  * unbufcall and callback mechanisms.
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_bufsrv(long data)
 {
 	str_t *s;
@@ -131,7 +134,7 @@ ss7_bufsrv(long data)
  * exchanges here and in the callback function and why reference counting is performed on the
  * structure.
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_unbufcall(str_t * s)
 {
 	bufcall_id_t bid;
@@ -161,7 +164,7 @@ ss7_unbufcall(str_t * s)
  *  here and in the callback function and why reference counting is performed on the structure and
  *  queue pointers are checked for NULL.
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_bufcall(queue_t *q, size_t size, int prior)
 {
 	if (q) {
@@ -200,7 +203,7 @@ ss7_bufcall(queue_t *q, size_t size, int prior)
  *  here and in the callback function and why reference counting is performed on the structure and
  *  queue pointers are checked for NULL.
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ streamscall void
 ss7_esbbcall(queue_t *q, int prior)
 {
 	if (q) {
@@ -238,7 +241,7 @@ ss7_esbbcall(queue_t *q, int prior)
  *  with putq() from a put procedure or putbq() from a service procedure) and return.  The queue
  *  will be rescheduled with qenable() when the allocation could succeed.
  */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 ss7_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
@@ -266,7 +269,7 @@ ss7_allocb(queue_t *q, size_t size, int prior)
  *  procedure) and return.  The queue will be rescheduled with qenable() when the allocation could
  *  succeed.
  */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
@@ -291,7 +294,7 @@ ss7_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *fr
  *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
  *  qenable() when the duplication could succeed.
  */
-__OS7_EXTERN_INLINE streamscall int
+static __inline__ streamscall int
 ss7_pullupmsg(queue_t *q, mblk_t *mp, int size)
 {
 	if (pullupmsg(mp, size) != 0)
@@ -312,7 +315,7 @@ ss7_pullupmsg(queue_t *q, mblk_t *mp, int size)
  *  from a put procedure or putbq() from a service procedure) and return.  The queue will be
  *  rescheduled with qenable() when the duplication could succeed.
  */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 ss7_dupb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -336,7 +339,7 @@ ss7_dupb(queue_t *q, mblk_t *bp)
  *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
  *  qenable() when the duplication could succeed.
  */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 ss7_dupmsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -360,7 +363,7 @@ ss7_dupmsg(queue_t *q, mblk_t *bp)
  *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
  *  qenable() when the duplication could succeed.
  */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 ss7_copyb(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -384,7 +387,7 @@ ss7_copyb(queue_t *q, mblk_t *bp)
  *  procedure or putbq() from a service procedure) and return.  The queue will be rescheduled with
  *  qenable() when the duplication could succeed.
  */
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ streamscall mblk_t *
 ss7_copymsg(queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;

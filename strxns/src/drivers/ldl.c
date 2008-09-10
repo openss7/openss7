@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-23 08:29:19 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.44  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.43  2008-07-23 08:29:19  brian
  - updated references and support for 2.6.18-92.1.6.el5 kernel
 
@@ -94,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -133,7 +136,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.43 $) $Date: 2008-07-23 08:29:19 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -1153,6 +1156,9 @@ ndev_find(struct ldldev *dev)
 }
 
 #if !defined HAVE_DEV_BASE_HEAD_SYMBOL
+#if defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG
+#define first_net_device() first_net_device(&init_net)
+#else				/* defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG */
 static inline struct net_device *
 first_net_device(void)
 {
@@ -1163,6 +1169,7 @@ next_net_device(struct net_device *dev)
 {
 	return (dev->next);
 }
+#endif				/* defined HAVE_KFUNC_FIRST_NET_DEVICE_1_ARG */
 #endif				/* !defined HAVE_DEV_BASE_HEAD_SYMBOL */
 
 /*

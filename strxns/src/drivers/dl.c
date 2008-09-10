@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-25 11:39:31 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.14  2008-09-10 03:50:06  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.13  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-25 11:39:31 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-25 11:39:31 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $";
 
 /*
  *  This multiplexing driver is a master device driver for Data Link Provider streams prsenting a
@@ -129,7 +132,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2008-04-25 11:39:31 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -3949,7 +3952,7 @@ STATIC int
 dl_init_caches(void)
 {
 	if (dl_priv_cachep == NULL) {
-		dl_priv_cachep = kmem_cache_create("dl_priv_cachep", sizeof(struct dl), 0,
+		dl_priv_cachep = kmem_create_cache("dl_priv_cachep", sizeof(struct dl), 0,
 						   SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (dl_priv_cachep == NULL) {
 			strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,

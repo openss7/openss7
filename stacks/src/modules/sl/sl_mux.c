@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.30  2008-09-10 03:49:33  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.29  2008-04-29 07:11:11  brian
  - updating headers for release
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $"
 
 static char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -125,7 +128,7 @@ static char const ident[] =
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-04-29 07:11:11 $"
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corportation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -4890,6 +4893,7 @@ static struct devnode sl_m_node = {
 	.n_flag = 0,
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
+
 static __init int
 sl_muxinit(void)
 {
@@ -4897,7 +4901,7 @@ sl_muxinit(void)
 
 	cmn_err(CE_NOTE, DRV_BANNER);
 	if (!(sl_priv_cachep =
-	      kmem_cache_create("sl_priv_cachep", mi_open_size(sizeof(struct sl)), 0,
+	      kmem_create_cache("sl_priv_cachep", mi_open_size(sizeof(struct sl)), 0,
 				SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_WARN, "%s: could not create sl_priv_cachep\n", DRV_NAME);
 		err = -ENOMEM;

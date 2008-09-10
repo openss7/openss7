@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 12:54:03 $
+ @(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-10 03:49:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:03 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: getpmsg.c,v $
+ Revision 0.9.2.21  2008-09-10 03:49:44  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.20  2008-04-28 12:54:03  brian
  - update file headers for release
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 12:54:03 $"
+#ident "@(#) $RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-10 03:49:44 $"
 
 static char const ident[] =
-    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 12:54:03 $";
+    "$RCSfile: getpmsg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-10 03:49:44 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -100,6 +103,7 @@ __getpmsg_error(int fd)
 		errno = (ioctl(fd, I_ISASTREAM) == -1) ? ENOSTR : __olderrno;
 }
 
+#if 0
 /** @brief Old getpmsg() approach.
   * @param fd a file descriptor representing the Stream.
   * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
@@ -161,6 +165,7 @@ __old_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, 
 	}
 	return (err);
 }
+#endif
 
 /** @brief New getpmsg() approach.
   * @param fd a file descriptor representing the Stream.
@@ -257,6 +262,7 @@ __streams_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *b
 	return (err);
 }
 
+#if 0
 /** @brief Get a message from a Stream band.
   * @param fd a file descriptor representing the Stream.
   * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
@@ -276,7 +282,9 @@ __old_streams_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int 
 		__getpmsg_error(fd);
 	return (err);
 }
+#endif
 
+#if 0
 /** @brief Get a message from a Stream band.
   * @param fd a file descriptor representing the Stream.
   * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
@@ -307,6 +315,7 @@ __old_streams_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, in
 	pthread_setcanceltype(oldtype, NULL);
 	return (err);
 }
+#endif
 
 /** @brief Get a message from a Stream band.
   * @param fd a file descriptor representing the Stream.
@@ -334,6 +343,7 @@ int __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *ban
 int __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
     __attribute__ ((weak, alias("__streams_getpmsg_r")));
 
+#if 0
 /** @brief Get a message from a Stream band.
   * @param fd a file descriptor representing the Stream.
   * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
@@ -346,7 +356,9 @@ int __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *b
   */
 int __old_lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
     __attribute__ ((weak, alias("__old_streams_getpmsg")));
+#endif
 
+#if 0
 /** @brief Get a message from a Stream band.
   * @param fd a file descriptor representing the Stream.
   * @param ctlptr a pointer to a struct strbuf structure returning the control part of the message.
@@ -360,6 +372,7 @@ int __old_lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int 
 int __old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp,
 			int *flagsp)
     __attribute__ ((weak, alias("__old_streams_getpmsg_r")));
+#endif
 
 /** @fn int getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *datptr, int *bandp, int *flagsp)
   * @param fd a file descriptor representing the Stream.
@@ -373,9 +386,13 @@ int __old_lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *datptr, in
   * @version LIS_0.0 __old_lis_getpmsg_r()
   */
 __asm__(".symver __streams_getpmsg_r,getpmsg@@STREAMS_1.0");
+#if 0
 __asm__(".symver __old_streams_getpmsg_r,getpmsg@STREAMS_0.0");
+#endif
 __asm__(".symver __lis_getpmsg_r,getpmsg@LIS_1.0");
+#if 0
 __asm__(".symver __old_lis_getpmsg_r,getpmsg@LIS_0.0");
+#endif
 
 /** @} */
 

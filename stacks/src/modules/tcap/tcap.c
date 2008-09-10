@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:55 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.25  2008-09-10 03:49:35  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.24  2008-05-05 15:34:55  brian
  - be strict with MORE_data and DATA_flag
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -139,7 +142,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2008-05-05 15:34:55 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13819,6 +13822,10 @@ static int __init
 tcapinit(void)
 {
 	int err, mindex = 0;
+
+	(void) tcap_alloc_priv;
+	(void) tcap_free_priv;
+	(void) m_flush;
 
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 #if 0

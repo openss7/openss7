@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $
+ @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:16 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr_mod.c,v $
+ Revision 0.9.2.7  2008-09-10 03:49:36  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.6  2008-04-29 07:11:16  brian
  - updating headers for release
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $"
+#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $"
 
 static char const ident[] =
-    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $";
+    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $";
 
 /*
  * This is TR-MOD.  It is a simplified Transaction Interface (TRI) module for TCAP that can be
@@ -119,7 +122,7 @@ static char const ident[] =
 #include <ss7/tcap_ioctl.h>
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
-#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:11:16 $"
+#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4649,6 +4652,50 @@ static __init int
 tr_modinit(void)
 {
 	int err;
+
+	(void) tr_info_ack;
+	(void) tr_bind_ack;
+	(void) tr_ok_ack;
+	(void) tr_optmgmt_ack;
+	(void) tr_begin_ind;
+	(void) tr_begin_con;
+	(void) tr_cont_ind;
+	(void) tr_end_ind;
+	(void) tr_abort_ind;
+	(void) tr_notice_ind;
+	(void) sc_conn_req;
+	(void) sc_conn_res;
+	(void) sc_discon_req;
+	(void) sc_data_req;
+	(void) sc_exdata_req;
+	(void) sc_info_req;
+	(void) sc_bind_req;
+	(void) sc_unbind_req;
+	(void) sc_unitdata_req;
+	(void) sc_optmgmt_req;
+	(void) sc_datack_req;
+	(void) sc_reset_req;
+	(void) sc_reset_res;
+	(void) sc_inform_req;
+	(void) sc_coord_req;
+	(void) sc_coord_res;
+	(void) sc_state_req;
+	(void) tr_send_uni;
+	(void) tr_send_qwp;
+	(void) tr_send_qwop;
+	(void) tr_send_cwp;
+	(void) tr_send_cwop;
+	(void) tr_send_resp;
+	(void) tr_send_abort;
+	(void) tr_bind_req;
+	(void) tr_unbind_req;
+	(void) tr_optmgmt_req;
+	(void) tr_uni_req;
+	(void) tr_begin_req;
+	(void) tr_begin_res;
+	(void) tr_cont_req;
+	(void) tr_end_req;
+	(void) tr_abort_req;
 
 	cmn_err(CE_NOTE, MOD_BANNER);
 	if ((err = register_strmod(&tr_fmod)) < 0) {

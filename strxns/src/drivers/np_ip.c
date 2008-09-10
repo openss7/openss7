@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/09/03 06:26:29 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.51  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.50  2008/09/03 06:26:29  brian
  - fixed TOS option management restriction
 
@@ -221,10 +224,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -285,7 +288,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.50 $) $Date: 2008/09/03 06:26:29 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -1355,6 +1358,9 @@ np_ip_queue_xmit(struct sk_buff *skb)
 	ip_select_ident(iph, dst, NULL);
 #endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
+#ifndef NF_IP_LOCAL_OUT
+#define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
+#endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, ip_dst_output);
 #else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
@@ -6885,7 +6891,7 @@ STATIC __unlikely int
 np_init_caches(void)
 {
 	if (np_ip_priv_cachep == NULL) {
-		np_ip_priv_cachep = kmem_cache_create("np_ip_priv_cachep", sizeof(struct np), 0,
+		np_ip_priv_cachep = kmem_create_cache("np_ip_priv_cachep", sizeof(struct np), 0,
 						      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (np_ip_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate np_ip_priv_cachep", __FUNCTION__);
@@ -6896,7 +6902,7 @@ np_init_caches(void)
 	}
 	if (np_ip_prot_cachep == NULL) {
 		np_ip_prot_cachep =
-		    kmem_cache_create("np_ip_prot_cachep", sizeof(struct np_prot_bucket), 0,
+		    kmem_create_cache("np_ip_prot_cachep", sizeof(struct np_prot_bucket), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (np_ip_prot_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate np_ip_prot_cachep", __FUNCTION__);

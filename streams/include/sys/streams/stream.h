@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.104 2008-08-11 22:23:18 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.105 2008-09-10 03:49:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.105  2008-09-10 03:49:43  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.104  2008-08-11 22:23:18  brian
  - rationalization of header files
 
@@ -133,7 +136,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.104 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.105 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -154,19 +157,25 @@
 /* FIXME: Need to put these in autoconf */
 
 #ifndef uchar
+#ifndef HAVE_KTYPE_UCHAR
 typedef unsigned char uchar;		/* idiots! */
+#endif
 
 #define uchar uchar
 #endif
 
 #ifndef uintptr_t
+#ifndef HAVE_KTYPE_UINTPTR_T
 typedef unsigned long uintptr_t;
+#endif
 
 #define uintptr_t uintptr_t
 #endif
 
 #ifndef intptr_t
+#ifndef HAVE_KTYPE_INTPTR_T
 typedef long intptr_t;
+#endif
 
 #define intptr_t intptr_t
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:02 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:02 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.22  2008-09-10 03:49:28  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.21  2008-04-29 07:11:02  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:02 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:02 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $";
 
 #include <sys/os7/compat.h>
 
@@ -98,7 +101,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-29 07:11:02 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -6444,7 +6447,7 @@ mg_init_caches(void)
 {
 	if (!mg_priv_cachep
 	    && !(mg_priv_cachep =
-		 kmem_cache_create("mg_priv_cachep", sizeof(struct mg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("mg_priv_cachep", sizeof(struct mg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate mg_priv_cachep", DRV_NAME);
 		goto no_mg;
@@ -6452,7 +6455,7 @@ mg_init_caches(void)
 		printd(("%s: initialized mg private structure cache\n", DRV_NAME));
 	if (!se_priv_cachep
 	    && !(se_priv_cachep =
-		 kmem_cache_create("se_priv_cachep", sizeof(struct se), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("se_priv_cachep", sizeof(struct se), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate se_priv_cachep", DRV_NAME);
 		goto no_se;
@@ -6460,7 +6463,7 @@ mg_init_caches(void)
 		printd(("%s: initialized se private structure cache\n", DRV_NAME));
 	if (!lg_priv_cachep
 	    && !(lg_priv_cachep =
-		 kmem_cache_create("lg_priv_cachep", sizeof(struct lg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("lg_priv_cachep", sizeof(struct lg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate lg_priv_cachep", DRV_NAME);
 		goto no_lg;
@@ -6468,7 +6471,7 @@ mg_init_caches(void)
 		printd(("%s: initialized lg private structure cache\n", DRV_NAME));
 	if (!cn_priv_cachep
 	    && !(cn_priv_cachep =
-		 kmem_cache_create("cn_priv_cachep", sizeof(struct cn), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("cn_priv_cachep", sizeof(struct cn), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate cn_priv_cachep", DRV_NAME);
 		goto no_cn;
@@ -6476,7 +6479,7 @@ mg_init_caches(void)
 		printd(("%s: initialized cn private structure cache\n", DRV_NAME));
 	if (!ac_priv_cachep
 	    && !(ac_priv_cachep =
-		 kmem_cache_create("ac_priv_cachep", sizeof(struct ac), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("ac_priv_cachep", sizeof(struct ac), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ac_priv_cachep", DRV_NAME);
 		goto no_ac;
@@ -6484,7 +6487,7 @@ mg_init_caches(void)
 		printd(("%s: initialized ac private structure cache\n", DRV_NAME));
 	if (!ch_priv_cachep
 	    && !(ch_priv_cachep =
-		 kmem_cache_create("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("ch_priv_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate ch_priv_cachep", DRV_NAME);
 		goto no_ch;
@@ -6492,7 +6495,7 @@ mg_init_caches(void)
 		printd(("%s: initialized ch private structure cache\n", DRV_NAME));
 	if (!mx_priv_cachep
 	    && !(mx_priv_cachep =
-		 kmem_cache_create("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", DRV_NAME);
 		goto no_ch;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.c,v 0.9.2.36 2008-04-28 18:38:39 brian Exp $
+ @(#) $Id: timod.c,v 0.9.2.37 2008-09-10 03:50:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:39 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.37  2008-09-10 03:50:05  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.36  2008-04-28 18:38:39  brian
  - header updates for release
 
@@ -108,10 +111,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-04-28 18:38:39 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-04-28 18:38:39 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Revision 2 transport
@@ -141,7 +144,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-04-28 18:38:39 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -264,8 +267,9 @@ timod_init_caches(void)
 {
 	if (!timod_priv_cachep
 	    && !(timod_priv_cachep =
-		 kmem_cache_create(MOD_NAME, sizeof(struct timod), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+		 kmem_create_cache(MOD_NAME, sizeof(struct timod), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL)
+	    )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate timod_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);

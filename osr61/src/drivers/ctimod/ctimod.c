@@ -550,7 +550,8 @@ void ctimod_udelay(long delay) {
 
 int ctimod_unregister_chrdev(uint major, const char *name) {
 	ctimod_dbg("ctimod: unregister_chrdev \n");
-	return unregister_chrdev(major, name);
+	unregister_chrdev(major, name);
+	return (0);
 }
 
 struct page *ctimod_virt_to_page(ulong addr) {

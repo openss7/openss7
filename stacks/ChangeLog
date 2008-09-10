@@ -1,3 +1,67 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: new types, cache creation and net namespaces
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/modules/acb56/sdt_acb56.c: new cache creation
+	* src/modules/cd/cd.c: new cache creation
+	* src/modules/dl/dl_lapd.c: new cache creation
+	* src/modules/h225/h225.c: new cache creation
+	* src/modules/hdlc/hdlc.c: new cache creation
+	* src/modules/inet/inet.c: new cache creation and net namespaces
+	* src/modules/inet/rawip.c: new cache creation
+	* src/modules/inet/tcp.c: new cache creation
+	* src/modules/inet/udp.c: new cache creation
+	* src/modules/inet/udp_hooks.h.in: net namespaces
+	* src/modules/isdn/isdn.c: new cache creation
+	* src/modules/isup/isup.c: new cache creation
+	* src/modules/m2pa/m2pa_sl.c: new cache creation
+	* src/modules/m2ua/m2ua.c: new cache creation
+	* src/modules/mg/mg.c: new cache creation
+	* src/modules/mtp/mtp.c: new cache creation
+	* src/modules/mtp/mtp_min.c: error found by new compiler
+	* src/modules/mtp/mtp_mod.c: new cache creation
+	* src/modules/mx/mx_sdl.c: new cache creation
+	* src/modules/rtp/rtp.c: new cache creation
+	* src/modules/sccp/sccp.c: new cache creation
+	* src/modules/sctp/sctp2.c: new cache creation and net namespaces
+	* src/modules/sctp/sctp_cache.c: new cache creation
+	* src/modules/sctp/sctp_hooks.h.in: net namespaces
+	* src/modules/sdl/cdi_mod.c: new cache creation
+	* src/modules/sdl/sdl.c: new cache creation
+	* src/modules/sdl/sdlm.c: new cache creation
+	* src/modules/sdl/spm.c: new cache creation
+	* src/modules/sdt/sdt.c: new cache creation
+	* src/modules/sl/sl.c: new cache creation
+	* src/modules/sl/sl.new.c: new cache creation
+	* src/modules/sl/sl_min.c: new cache creation
+	* src/modules/sl/sl_mux.c: new cache creation
+	* src/modules/sl/slm.c: new cache creation
+	* src/modules/ss7ip/sdt_tpi.c: new cache creation
+	* src/modules/ss7ip/sl_tpi.c: new cache creation
+	* src/modules/ss7sctp/sdl_sctp.c: new cache creation
+	* src/modules/ss7sctp/sdt_sctp.c: new cache creation
+	* src/modules/sscop/sscop2.c: new cache creation
+	* src/modules/tali/tali.c: new cache creation
+	* src/modules/tcap/tcap.c: new cache creation
+	* src/modules/tcap/tr_mod.c: new cache creation
+	* src/modules/ti/timod.c: new cache creation
+	* src/modules/ti/tirdwr.c: new cache creation
+	* src/modules/x400p-ss7/ch_x400p.c: new cache creation
+	* src/modules/x400p-ss7/mx_x400p.c: new cache creation
+	* src/modules/x400p-ss7/sdl_x400p.c: new cache creation
+	* src/modules/x400p-ss7/sdt_x400p.c: new cache creation
+	* src/modules/x400p-ss7/sl_v400p.c: new cache creation
+	* src/modules/x400p-ss7/sl_x100p.c: new cache creation
+	* src/modules/x400p-ss7/sl_x400p.c: new cache creation
+	* src/modules/x400p-ss7/x100p-ss7.c: new cache creation
+	* src/modules/x400p-ss7/x400p-ss7.c: new cache creation
+	* src/modules/x400p-ss7/x400p_mx.c: new cache creation
+	* src/util/mtpconf_lex.l: new cache creation
+	* src/util/sdllex.l: new cache creation
+	* src/util/slconf_lex.l: new cache creation
+	* src/util/usage.c: new cache creation
+	* src/util/x400lex.l: new cache creation
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.spec.in: build changes for release

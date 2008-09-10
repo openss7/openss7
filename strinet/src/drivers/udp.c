@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008-09-10 03:49:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-23 08:29:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.71  2008-09-10 03:49:47  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.70  2008-07-23 08:29:06  brian
  - updated references and support for 2.6.18-92.1.6.el5 kernel
 
@@ -282,10 +285,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008-09-10 03:49:47 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008-09-10 03:49:47 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -367,7 +370,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-07-23 08:29:06 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008-09-10 03:49:47 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -4276,6 +4279,9 @@ tp_ip_queue_xmit(struct sk_buff *skb)
 	ip_select_ident(iph, dst, NULL);
 #endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
+#ifndef NF_IP_LOCAL_OUT
+#define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
+#endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, dst->dev, ip_dst_output);
 #else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
@@ -7058,7 +7064,11 @@ te_bind_req(queue_t *q, mblk_t *mp)
 			if (anum > 1)
 				goto error;
 		} else {
+#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
 			type = inet_addr_type(ADDR_buffer[i].sin_addr.s_addr);
+#else
+			type = inet_addr_type(&init_net, ADDR_buffer[i].sin_addr.s_addr);
+#endif
 			err = TNOADDR;
 			if (sysctl_ip_nonlocal_bind == 0
 			    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
@@ -9553,8 +9563,9 @@ STATIC __unlikely int
 tp_init_caches(void)
 {
 	if (udp_priv_cachep == NULL) {
-		udp_priv_cachep = kmem_cache_create("udp_priv_cachep", sizeof(struct tp), 0,
-						    SLAB_HWCACHE_ALIGN, NULL, NULL);
+		udp_priv_cachep =
+		    kmem_create_cache("udp_priv_cachep", sizeof(struct tp), 0,
+				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (udp_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate udp_priv_cachep", __FUNCTION__);
 			tp_term_caches();
@@ -9564,7 +9575,7 @@ tp_init_caches(void)
 	}
 	if (udp_prot_cachep == NULL) {
 		udp_prot_cachep =
-		    kmem_cache_create("udp_prot_cachep", sizeof(struct tp_prot_bucket), 0,
+		    kmem_create_cache("udp_prot_cachep", sizeof(struct tp_prot_bucket), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (udp_prot_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate udp_prot_cachep", __FUNCTION__);

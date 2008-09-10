@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:10 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.25  2008-09-10 03:49:33  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.24  2008-04-29 07:11:10  brian
  - updating headers for release
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:10 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:33 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:10 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:33 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -110,7 +113,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:10 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:33 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5859,8 +5862,8 @@ sl_init_caches(void)
 {
 	if (!sl_priv_cachep
 	    && !(sl_priv_cachep =
-		 kmem_cache_create("sl_priv_cachep", sizeof(struct sl), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+		 kmem_create_cache("sl_priv_cachep", sizeof(struct sl), 0, SLAB_HWCACHE_ALIGN,
+				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate sl_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);
 	} else

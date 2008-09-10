@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-05-05 15:34:51 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:51 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.12  2008-09-10 03:49:24  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.11  2008-05-05 15:34:51  brian
  - be strict with MORE_data and DATA_flag
 
@@ -198,10 +201,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-05-05 15:34:51 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:24 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-05-05 15:34:51 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:24 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -282,7 +285,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-05-05 15:34:51 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:24 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -9004,7 +9007,7 @@ STATIC __unlikely int
 tp_init_caches(void)
 {
 	if (raw_priv_cachep == NULL) {
-		raw_priv_cachep = kmem_cache_create("raw_priv_cachep", sizeof(struct tp), 0,
+		raw_priv_cachep = kmem_create_cache("raw_priv_cachep", sizeof(struct tp), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (raw_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate raw_priv_cachep", __FUNCTION__);
@@ -9015,7 +9018,7 @@ tp_init_caches(void)
 	}
 	if (raw_prot_cachep == NULL) {
 		raw_prot_cachep =
-		    kmem_cache_create("raw_prot_cachep", sizeof(struct tp_prot_bucket), 0,
+		    kmem_create_cache("raw_prot_cachep", sizeof(struct tp_prot_bucket), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (raw_prot_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate raw_prot_cachep", __FUNCTION__);

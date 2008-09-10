@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:48:59 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:48:59 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdn.c,v $
+ Revision 0.9.2.9  2008-09-10 03:49:49  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.8  2008-04-29 00:48:59  brian
  - updated headers for release
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:48:59 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:48:59 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -112,7 +115,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:48:59 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15015,7 +15018,7 @@ isdn_init_caches(void)
 {
 	if (!isdn_cc_cachep
 	    && !(isdn_cc_cachep =
-		 kmem_cache_create("isdn_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_cc_cachep", DRV_NAME);
 		goto no_cc;
@@ -15024,7 +15027,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized isdn cc structure cache\n", DRV_NAME));
 	if (!isdn_cr_cachep
 	    && !(isdn_cr_cachep =
-		 kmem_cache_create("isdn_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_cr_cachep", sizeof(struct cr), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_cr_cachep", DRV_NAME);
 		goto no_cr;
@@ -15032,7 +15035,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized isdn cr structure cache\n", DRV_NAME));
 	if (!isdn_ch_cachep
 	    && !(isdn_ch_cachep =
-		 kmem_cache_create("isdn_ch_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_ch_cachep", sizeof(struct ch), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_ch_cachep", DRV_NAME);
 		goto no_ch;
@@ -15040,7 +15043,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized isdn ch structure cache\n", DRV_NAME));
 	if (!isdn_tg_cachep
 	    && !(isdn_tg_cachep =
-		 kmem_cache_create("isdn_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_tg_cachep", DRV_NAME);
 		goto no_tg;
@@ -15048,7 +15051,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized isdn fg structure cache\n", DRV_NAME));
 	if (!isdn_fg_cachep
 	    && !(isdn_fg_cachep =
-		 kmem_cache_create("isdn_fg_cachep", sizeof(struct fg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_fg_cachep", sizeof(struct fg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_fg_cachep", DRV_NAME);
 		goto no_fg;
@@ -15056,7 +15059,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized isdn fg structure cache\n", DRV_NAME));
 	if (!isdn_eg_cachep
 	    && !(isdn_eg_cachep =
-		 kmem_cache_create("isdn_eg_cachep", sizeof(struct eg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_eg_cachep", sizeof(struct eg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_eg_cachep", DRV_NAME);
 		goto no_eg;
@@ -15064,7 +15067,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized isdn eg structure cache\n", DRV_NAME));
 	if (!isdn_xg_cachep
 	    && !(isdn_xg_cachep =
-		 kmem_cache_create("isdn_xg_cachep", sizeof(struct xg), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_xg_cachep", sizeof(struct xg), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_xg_cachep", DRV_NAME);
 		goto no_xg;
@@ -15072,7 +15075,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized isdn xg structure cache\n", DRV_NAME));
 	if (!isdn_dc_cachep
 	    && !(isdn_dc_cachep =
-		 kmem_cache_create("isdn_dc_cachep", sizeof(struct dc), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_dc_cachep", sizeof(struct dc), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_dc_cachep", DRV_NAME);
 		goto no_dc;
@@ -15080,7 +15083,7 @@ isdn_init_caches(void)
 		printd(("%s: initialized dc structure cache\n", DRV_NAME));
 	if (!isdn_dl_cachep
 	    && !(isdn_dl_cachep =
-		 kmem_cache_create("isdn_dl_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("isdn_dl_cachep", sizeof(struct dl), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate isdn_dl_cachep", DRV_NAME);
 		goto no_dl;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/29 17:27:58 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.202  2008-09-10 03:49:45  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.201  2008/07/29 17:27:58  brian
  - typo in conditional
 
@@ -263,10 +266,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -368,7 +371,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.201 $) $Date: 2008/07/29 17:27:58 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1050,6 +1053,9 @@ strcopyin(const void __user *from, void *to, size_t len)
 STATIC streams_fastcall pid_t
 str_task_session(struct task_struct *t)
 {
+#if defined HAVE_KFUNC_TASK_SESSION_NR
+	return (task_session_nr(t));
+#else
 #if defined HAVE_KFUNC_PROCESS_SESSION
 	return (process_session(t));
 #else
@@ -1059,11 +1065,15 @@ str_task_session(struct task_struct *t)
 	return (t->session);
 #endif
 #endif
+#endif
 }
 
 STATIC streams_fastcall pid_t
 str_task_pgrp(struct task_struct *t)
 {
+#if defined HAVE_KFUNC_TASK_PGRP_NR
+	return (task_pgrp_nr(t));
+#else
 #if defined HAVE_KFUNC_PROCESS_GROUP
 	return (process_group(t));
 #else
@@ -1071,6 +1081,7 @@ str_task_pgrp(struct task_struct *t)
 	return (t->signal->pgrp);
 #else
 	return (t->pgrp);
+#endif
 #endif
 #endif
 }
@@ -3639,6 +3650,11 @@ __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 #if defined HAVE_SEND_GROUP_SIG_INFO_ADDR
 	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) =
 	    (typeof(send_group_sig_info)) HAVE_SEND_GROUP_SIG_INFO_ADDR;
+#else
+#if defined HAVE_GROUP_SEND_SIG_INFO_ADDR
+	static int (*send_group_sig_info) (int, struct siginfo *, struct task_struct *) =
+	    (typeof(&group_send_sig_info)) HAVE_GROUP_SEND_SIG_INFO_ADDR;
+#endif
 #endif
 	struct task_struct *p;
 	int retval = -ESRCH;

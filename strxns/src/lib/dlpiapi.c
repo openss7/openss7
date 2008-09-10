@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $
+ @(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-20 10:57:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpiapi.c,v $
+ Revision 0.9.2.8  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.7  2008-08-20 10:57:05  brian
  - fixes and build updates from newnet trip
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $"
+#ident "@(#) $RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-08-20 10:57:05 $";
+    "$RCSfile: dlpiapi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:07 $";
 
 /*
  * This is an OpenSS7 implemetnation of the GCOM dlpiapi library.  It builds
@@ -263,6 +266,10 @@ struct __dlpi_user {
 	pthread_rwlock_t du_lock;
 	int du_fd;
 };
+
+#ifndef OPEN_MAX
+#define OPEN_MAX 256
+#endif
 
 static struct __dlpi_user *__dlpi_fds[OPEN_MAX] = { NULL, };
 

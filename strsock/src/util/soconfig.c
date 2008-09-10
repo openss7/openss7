@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:35 $
+ @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:33:35 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: soconfig.c,v $
+ Revision 0.9.2.6  2008-09-10 03:49:56  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.5  2008-04-28 22:33:35  brian
  - updated headers for release
 
@@ -86,13 +89,14 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:35 $"
+#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $"
 
 static char const ident[] =
-    "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:33:35 $";
+    "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-10 03:49:56 $";
 
 #define _XOPEN_SOURCE 600
 
+#include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>

@@ -1,3 +1,11 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check new types and cache creation
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/lib/xnet.c: define OPEN_MAX
+	* src/modules/timod.c: new cache creation
+	* src/modules/tirdwr.c: new cache creation
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxnet.spec.in: build changes for release

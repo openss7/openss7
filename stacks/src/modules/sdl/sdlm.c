@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:09 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:09 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdlm.c,v $
+ Revision 0.9.2.25  2008-09-10 03:49:32  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.24  2008-04-29 07:11:09  brian
  - updating headers for release
 
@@ -65,9 +68,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:09 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $"
 
-static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:09 $";
+static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -96,7 +99,7 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.24 
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-04-29 07:11:09 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -327,14 +330,14 @@ STATIC int
 sdlm_init_caches(void)
 {
 	if (!sdlm_dl_cachep
-	    && !(sdlm_dl_cachep = kmem_cache_create("sdlm_dl_cachep", sizeof(struct dl), 0,
+	    && !(sdlm_dl_cachep = kmem_create_cache("sdlm_dl_cachep", sizeof(struct dl), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sdlm_dl_cachep", DRV_NAME);
 		goto error;
 	} else
 		printd(("%s: initialized sdlm dl structure cache\n", DRV_NAME));
 	if (!sdlm_sd_cachep
-	    && !(sdlm_sd_cachep = kmem_cache_create("sdlm_sd_cachep", sizeof(struct sd), 0,
+	    && !(sdlm_sd_cachep = kmem_create_cache("sdlm_sd_cachep", sizeof(struct sd), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate sdlm_sd_cachep", DRV_NAME);
 		goto error;

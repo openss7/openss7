@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-29 00:02:00 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.18  2008-09-10 03:49:50  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.17  2008-04-29 00:02:00  brian
  - updated headers for release
 
@@ -129,10 +132,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-29 00:02:00 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-04-29 00:02:00 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $";
 
 /*
  *  This is an X.233 CLNS driver.
@@ -223,7 +226,7 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2008-04-29 00:02:00 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL"
@@ -1531,8 +1534,9 @@ STATIC int
 np_init_caches(void)
 {
 	if (np_priv_cachep == NULL) {
-		np_priv_cachep = kmem_cache_create("np_priv_cachep", sizeof(struct np), 0,
-						   SLAB_HWCACHE_ALIGN, NULL, NULL);
+		np_priv_cachep =
+		    kmem_create_cache("np_priv_cachep", sizeof(struct np), 0, SLAB_HWCACHE_ALIGN,
+				      NULL, NULL);
 		if (np_priv_cachep == NULL) {
 			strlog(DRV_ID, 0, LOG_WARNING, SL_WARN | SL_CONSOLE,
 			       "cannot allocate np_priv_cachep");

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:24 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:24 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.10  2008-09-10 03:49:18  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.9  2008-04-29 01:52:24  brian
  - updated headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:24 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:24 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:18 $";
 
 #define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -106,7 +109,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 01:52:24 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:18 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2155,7 +2158,7 @@ sdt_init_caches(void)
 {
 	if (!sdt_cachep
 	    && !(sdt_cachep =
-		 kmem_cache_create("sdt_cachep", sizeof(sdt_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
+		 kmem_create_cache("sdt_cachep", sizeof(sdt_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		cmn_err(CE_PANIC, "%s: Cannot alloc sdt_cachep.", __FUNCTION__);
 	return (0);
 }

@@ -1,3 +1,13 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check for type changes
+	* head/linux-mdep.c: correct types and cache creation
+	* head/linux/lislocks.c: correct cache creation
+	* head/linux/lismem.c: correct cache creation
+	* include/sys/strport.h: correct types
+	* include/sys/LiS/linux-mdep.h: correct types
+	* manual/prerequisites.texi: adjust prerequisites
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS.spec.in: build changes for release

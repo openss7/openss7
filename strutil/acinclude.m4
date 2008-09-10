@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-08-11 22:27:23 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-11 22:27:23 $ by $Author: brian $
+# Last Modified $Date: 2008-09-10 03:49:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -720,7 +720,8 @@ AC_DEFUN([_UTIL_CONFIG_KERNEL], [dnl
 #include <asm/uaccess.h>
 #endif
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
+    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *,
+			uintptr_t, intptr_t, uchar], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -956,6 +957,9 @@ AC_DEFUN([_UTIL_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.27  2008-09-10 03:49:58  brian
+# - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+#
 # Revision 0.9.2.26  2008-08-11 22:27:23  brian
 # - added makefile variables for modules to acinclude
 #

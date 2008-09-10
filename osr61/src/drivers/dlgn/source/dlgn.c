@@ -950,6 +950,15 @@ unsigned long arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9;
 }
 #endif
  
+#ifdef IRQF_DISABLED
+#undef SA_INTERRUPT
+#define SA_INTERRUPT IRQF_DISABLED
+#endif
+
+#ifdef IRQF_SHARED
+#undef SA_SHIRQ
+#define SA_SHIRQ IRQF_SHARED
+#endif
 
 /***********************************************************************
  * NAME: linux_config_blt_device

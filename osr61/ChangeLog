@@ -1,3 +1,16 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check for new cache creation
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/ctimod/ctimod.c: new compiler caught bug
+	* src/drivers/dlgn/source/antpci.c: comment out unused static
+	* src/drivers/dlgn/source/dlgn.c: define SA_INTERRUPT and SA_SHIRQ
+	* src/drivers/gpio/source/gpiodrv.c: avoid header file error in inline
+	* src/drivers/mercd/include/msd.h: compiler caught array bounds error
+	* src/drivers/pmacd/include/pmacd.h: handle new compiler warnings
+	* src/drivers/pmacd/include/pmacd_mf.h: handle new compiler warnings
+	* src/drivers/pmacd/include/pmacd_pmb.h: handle new compiler warnings
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* osr61.spec.in: build changes for release

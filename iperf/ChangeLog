@@ -1,3 +1,7 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/prerequisites.texi: adjust prerequisites
+
 2008-08-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* configure.ac: requirements for autoconf and gettext versions

@@ -1,3 +1,17 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check for new cache creation
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/m2ua.c: handle new cachek creation
+	* src/drivers/tali.c: handle new cachek creation
+	* src/drivers/ua.c: handle new cachek creation
+	* src/modules/m2pa_sl.c: handle new cachek creation
+	* src/modules/sdl_sctp.c: handle new cachek creation
+	* src/modules/sdt_sctp.c: handle new cachek creation
+	* src/modules/sdt_tpi.c: handle new cachek creation
+	* src/modules/sl_tpi.c: correct errors found by new compiler
+	* src/util/m2palex.l: correct errors found by new compiler
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* sigtran.spec.in: build changes for release

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:11:04 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:04 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_sdl.c,v $
+ Revision 0.9.2.20  2008-09-10 03:49:30  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.19  2008-04-29 07:11:04  brian
  - updating headers for release
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:11:04 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:30 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:11:04 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:30 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -110,7 +113,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:11:04 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:30 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2706,9 +2709,10 @@ STATIC kmem_cachep_t mx_priv_cachep = NULL;
 STATIC int
 mx_init_caches(void)
 {
-	if (!mx_priv_cachep &&
-	    !(mx_priv_cachep = kmem_cache_create
-	      ("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL, NULL))) {
+	if (!mx_priv_cachep
+	    && !(mx_priv_cachep =
+		 kmem_create_cache("mx_priv_cachep", sizeof(struct mx), 0, SLAB_HWCACHE_ALIGN, NULL,
+				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate mx_priv_cachep", MOD_NAME);
 		return (-ENOMEM);
 	} else

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:32 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:33:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.12  2008-09-10 03:49:55  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.11  2008-04-28 22:33:32  brian
  - updated headers for release
 
@@ -98,10 +101,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:32 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $"
 
 static char const ident[] =
-    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:32 $";
+    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -150,7 +153,7 @@ static char const ident[] =
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 22:33:32 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -1030,7 +1033,7 @@ ssys_init_caches(void)
 {
 	if (ssys_priv_cachep == NULL) {
 		ssys_priv_cachep =
-		    kmem_cache_create("ssys_priv_cachep", sizeof(struct ssys), 0,
+		    kmem_create_cache("ssys_priv_cachep", sizeof(struct ssys), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (ssys_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocation ssys_priv_cachep", __FUNCTION__);

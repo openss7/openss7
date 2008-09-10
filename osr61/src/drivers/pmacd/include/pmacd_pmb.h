@@ -199,7 +199,7 @@ typedef struct{
 // (This reverses the logic.  Capacity starts negative and is empty when the capacity
 //   is greater than zero)
 #ifdef ATOMIC_INC_AND_TEST_GREATER_ZERO
-extern inline BOOLEAN_T pmacd_tryPMBQueueDelMsgFromCapacity(pmacd_pmbqueue_t *queue){
+static inline BOOLEAN_T pmacd_tryPMBQueueDelMsgFromCapacity(pmacd_pmbqueue_t *queue){
   if(ATOMIC_INC_AND_TEST_GREATER_ZERO(queue->msgCapacity)){
     // Reached capacity. Remove increment.
     ATOMIC_DEC(queue->msgCapacity);
@@ -219,7 +219,7 @@ extern inline BOOLEAN_T pmacd_tryPMBQueueDelMsgFromCapacity(pmacd_pmbqueue_t *qu
 // 2.4 Kernels have ATOMIC_INC_AND_TEST_GREATER_ZERO
 // This starts with the capacity positive and follows the algorithm.
 #ifdef ATOMIC_ADD_NEGATIVE
-extern inline BOOLEAN_T pmacd_tryPMBQueueDelMsgFromCapacity(pmacd_pmbqueue_t *queue){
+static inline BOOLEAN_T pmacd_tryPMBQueueDelMsgFromCapacity(pmacd_pmbqueue_t *queue){
   if(ATOMIC_ADD_NEGATIVE((-1),queue->msgCapacity)){
     // Reached capacity. Remove increment.
     ATOMIC_DEC(queue->msgCapacity);

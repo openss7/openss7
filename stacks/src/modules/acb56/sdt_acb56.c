@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:10:49 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:49 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_acb56.c,v $
+ Revision 0.9.2.20  2008-09-10 03:49:20  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.19  2008-04-29 07:10:49  brian
  - updating headers for release
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:10:49 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:10:49 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -91,7 +94,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:10:49 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4622,7 +4625,7 @@ sdt_init_caches(void)
 {
 	if (!sdt_priv_cachep
 	    && !(sdt_priv_cachep =
-		 kmem_cache_create("sdt_priv_cachep", sizeof(sdt_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sdt_priv_cachep", sizeof(sdt_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate sdt_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);

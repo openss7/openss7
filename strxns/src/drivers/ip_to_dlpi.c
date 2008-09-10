@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:42 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_to_dlpi.c,v $
+ Revision 0.9.2.32  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.31  2007/08/15 05:35:42  brian
  - GPLv3 updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:50:07 $";
 
 #include <sys/os7/compat.h>
 
@@ -83,7 +86,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:50:07 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -1182,7 +1185,7 @@ ip2xinet_hw_tx(char *buf, int len, struct net_device *dev)
 	req = (dl_unitdata_req_t *) mp->b_rptr;
 	req->dl_primitive = DL_UNITDATA_REQ;
 	req->dl_dest_addr_length = 4;
-	req->dl_dest_addr_offset = DL_UNITDATA_REQ_SIZE + (int) &((struct iphdr *) 0)->daddr;
+	req->dl_dest_addr_offset = DL_UNITDATA_REQ_SIZE + (long) &((struct iphdr *) 0)->daddr;
 
 	/* Copy from buf to mp, make everything right, then send the stuff to xinet IF WE CAN.
 	   Could we use esballoc here? */
@@ -1251,6 +1254,7 @@ ip2xinet_stats(struct net_device *dev)
 	return &priv->stats;
 }
 
+#ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_REBUILD_HEADER
 int
 ip2xinet_rebuild_header(struct sk_buff *skb)
 {
@@ -1259,7 +1263,9 @@ ip2xinet_rebuild_header(struct sk_buff *skb)
 	// return arp_find(&(eth->h_dest),skb);
 	return arp_find(eth->h_dest, skb);
 }
+#endif
 
+#ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_HARD_HEADER
 /*
  * This function builds the hardware header from the source and destination
  * hardware addresses that were previousely retrieved, its job is to organise
@@ -1300,6 +1306,7 @@ ip2xinet_hard_header(struct sk_buff *skb, struct net_device *dev, unsigned short
 
 	return -dev->hard_header_len;
 }
+#endif				/* HAVE_KMEMB_STRUCT_NET_DEVICE_HARD_HEADER */
 
 /*
  * The "change_mtu" method is usually not needed.
@@ -1343,8 +1350,12 @@ ip2xinet_devinit(struct net_device *dev)
 	dev->do_ioctl = ip2xinet_ioctl;
 	dev->get_stats = ip2xinet_stats;
 	dev->change_mtu = ip2xinet_change_mtu;
+#ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_REBUILD_HEADER
 	dev->rebuild_header = ip2xinet_rebuild_header;
+#endif
+#ifdef HAVE_KMEMB_STRUCT_NET_DEVICE_HARD_HEADER
 	dev->hard_header = ip2xinet_hard_header;
+#endif
 	dev->hard_header_len = ETH_HLEN;
 	dev->flags |= IFF_NOARP;
 	dev->type = ARPHRD_ETHER;

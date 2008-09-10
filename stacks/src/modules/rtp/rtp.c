@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:05 $
+ @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rtp.c,v $
+ Revision 0.9.2.8  2008-09-10 03:49:30  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.7  2008-04-29 07:11:05  brian
  - updating headers for release
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:05 $"
+#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:30 $"
 
 static char const ident[] =
-    "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:05 $";
+    "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:30 $";
 
 /*
  *  This driver provides the functionality of an RTP (Realtime Transport
@@ -121,7 +124,7 @@ static char const ident[] =
 #define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:05 $"
+#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:30 $"
 #define RTP_DEVICE	"SVR 4.2 STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL"
@@ -332,7 +335,7 @@ rtp_init_caches(void)
 {
 	if (!rtp_open_cachep
 	    && !(rtp_open_cachep =
-		 kmem_cache_create("rtp_open_cachep", sizeof(struct rtp), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("rtp_open_cachep", sizeof(struct rtp), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate rtp_open_cachep", DRV_NAME);
 		rtp_term_caches();
@@ -341,7 +344,7 @@ rtp_init_caches(void)
 		printd(("%s: initialized rtp open structure cache\n", DRV_NAME));
 	if (!rtp_link_cachep
 	    && @(rtp_link_cachep =
-		 kmem_cache_create("rtp_link_cachep", sizeof(struct nip), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("rtp_link_cachep", sizeof(struct nip), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate rtp_link_cachep", DRV_NAME);
 		rtp_term_caches();

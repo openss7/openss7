@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.31 $) $Date: 2008-04-29 08:33:12 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.32 $) $Date: 2008-09-10 03:49:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:12 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: linux-mdep.c,v $
+ Revision 1.1.1.11.4.32  2008-09-10 03:49:09  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 1.1.1.11.4.31  2008-04-29 08:33:12  brian
  - update headers for Affero release
 
@@ -65,16 +68,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.31 $) $Date: 2008-04-29 08:33:12 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.32 $) $Date: 2008-09-10 03:49:09 $"
 
-static char const ident[] = "$RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.31 $) $Date: 2008-04-29 08:33:12 $";
+static char const ident[] = "$RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.32 $) $Date: 2008-09-10 03:49:09 $";
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.31 2008-04-29 08:33:12 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.32 2008-09-10 03:49:09 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -4371,7 +4374,7 @@ lis_thread_stop(pid_t pid)
 int
 lis_thread_runqueues(void *p)
 {
-	intptr_t cpu_id = (intptr_t) (long) p;
+	int cpu_id = (intptr_t) p;
 	int sig_cnt = 0;
 	unsigned long seconds = 0;
 	lis_semaphore_t *semp = &lis_runq_sems[cpu_id];
@@ -4994,10 +4997,10 @@ void
 lis_init_msg(void)
 {
 	lis_msgb_cachep =
-	    kmem_cache_create("LiS-msgb", sizeof(struct mdbblock), 0, SLAB_HWCACHE_ALIGN, NULL,
+	    kmem_create_cache("LiS-msgb", sizeof(struct mdbblock), 0, SLAB_HWCACHE_ALIGN, NULL,
 			      NULL);
 	if (!lis_msgb_cachep)
-		printk("lis_init_msg: lis_msgb_cachep is NULL. " "kmem_cache_create failed\n");
+		printk("lis_init_msg: lis_msgb_cachep is NULL. " "kmem_create_cache failed\n");
 }
 
 void
@@ -5068,13 +5071,13 @@ void
 lis_init_queues(void)
 {
 	lis_queue_cachep =
-	    kmem_cache_create("LiS-queue", sizeof(queue_t) * 2, 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+	    kmem_create_cache("LiS-queue", sizeof(queue_t) * 2, 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
 	lis_qsync_cachep =
-	    kmem_cache_create("LiS-qsync", sizeof(lis_q_sync_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+	    kmem_create_cache("LiS-qsync", sizeof(lis_q_sync_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
 	lis_qband_cachep =
-	    kmem_cache_create("LiS-qband", sizeof(qband_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+	    kmem_create_cache("LiS-qband", sizeof(qband_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
 	lis_head_cachep =
-	    kmem_cache_create("LiS-head", sizeof(stdata_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+	    kmem_create_cache("LiS-head", sizeof(stdata_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
 }
 
 void
@@ -5103,9 +5106,9 @@ lis_init_timers(int size)
 {
 #if defined(USE_KMEM_TIMER)
 	lis_timer_cachep =
-	    kmem_cache_create("lis_timer_cachep", size, 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
+	    kmem_create_cache("lis_timer_cachep", size, 0, SLAB_HWCACHE_ALIGN, NULL, NULL);
 	if (!lis_timer_cachep)
-		printk("lis_init_dki: lis_timer_cachep is NULL. " "kmem_cache_create failed\n");
+		printk("lis_init_dki: lis_timer_cachep is NULL. " "kmem_create_cache failed\n");
 #endif
 	lis_timer_size = size;
 }

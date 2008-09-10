@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:09 $
+ @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:09 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi_mod.c,v $
+ Revision 0.9.2.15  2008-09-10 03:49:32  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.14  2008-04-29 07:11:09  brian
  - updating headers for release
 
@@ -74,17 +77,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:09 $"
+#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $"
 
 static char const ident[] =
-    "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:09 $";
+    "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $";
 
 #include <sys/os7/compat.h>
 
 #include <sys/cdi.h>
 
 #define CDI_DESCRIP	"CDI SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:09 $"
+#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $"
 #define CDI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define CDI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -124,7 +127,7 @@ cd_init_caches(void)
 		if (!(cd_cachep = kmem_find_general_cachep(sizeof(cdi_t), GFP_ATOMIC)))
 			if (!
 			    (cd_cachep =
-			     kmem_cache_create("cd_cachep", sizeof(cdi_t), 0, SLAB_HWCACHE_ALIGN,
+			     kmem_create_cache("cd_cachep", sizeof(cdi_t), 0, SLAB_HWCACHE_ALIGN,
 					       NULL, NULL)))
 				panic("%s: Cannot allocate cd_cache\n", __FUNCTION__);
 	return;

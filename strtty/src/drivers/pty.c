@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-28 17:46:02 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 17:46:02 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.13  2008-09-10 03:49:57  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.12  2008-04-28 17:46:02  brian
  - updates for release
 
@@ -96,10 +99,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-28 17:46:02 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-28 17:46:02 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -124,7 +127,7 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-28 17:46:02 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -1126,7 +1129,7 @@ pty_init_caches(void)
 {
 	if (ptc_priv_cachep == NULL) {
 		ptc_priv_cachep =
-		    kmem_cache_create("ptc_priv_cachep", sizeof(struct ptc), 0,
+		    kmem_create_cache("ptc_priv_cachep", sizeof(struct ptc), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (ptc_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocation ptc_priv_cachep", __FUNCTION__);

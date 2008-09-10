@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.30 2008-04-28 16:47:12 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.31 2008-09-10 03:49:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:12 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.31  2008-09-10 03:49:42  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.30  2008-04-28 16:47:12  brian
  - updates for release
 
@@ -74,7 +77,7 @@
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.30 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.31 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -223,7 +226,7 @@ TRYLOCK(lock_t * lockp, pl_t pl)
 #ifdef UNLOCK
 #undef UNLOCK
 #endif
-__SVR4_EXTERN_INLINE void
+static __inline__ void
 UNLOCK(lock_t * lockp, pl_t pl)
 {
 	spin_unlock(lockp);
@@ -280,7 +283,7 @@ RW_WRLOCK(rwlock_t *lockp, pl_t pl)
 
 typedef struct semaphore sleep_t;
 
-__SVR4_EXTERN_INLINE sleep_t *
+static __inline__ sleep_t *
 SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag)
 {
 	sleep_t *lockp;
@@ -294,7 +297,7 @@ SLEEP_DEALLOC(sleep_t * lockp)
 {
 	kmem_free(lockp, sizeof(*lockp));
 }
-__SVR4_EXTERN_INLINE int
+static __inline__ int
 SLEEP_LOCKAVAIL(sleep_t * lockp)
 {
 	if (!down_trylock(lockp)) {
@@ -303,7 +306,7 @@ SLEEP_LOCKAVAIL(sleep_t * lockp)
 	}
 	return (0);
 }
-__SVR4_EXTERN_INLINE void
+static __inline__ void
 SLEEP_LOCK(sleep_t * lockp, int priority)
 {
 	down(lockp);
@@ -313,17 +316,17 @@ SLEEP_LOCKOWNED(sleep_t * lockp)
 {
 	return (1);
 }
-__SVR4_EXTERN_INLINE int
+static __inline__ int
 SLEEP_LOCK_SIG(sleep_t * lockp, int priority)
 {
 	return down_interruptible(lockp);
 }
-__SVR4_EXTERN_INLINE int
+static __inline__ int
 SLEEP_TRYLOCK(sleep_t * lockp)
 {
 	return (down_trylock(lockp) == 0);
 }
-__SVR4_EXTERN_INLINE void
+static __inline__ void
 SLEEP_UNLOCK(sleep_t * lockp)
 {
 	up(lockp);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:56 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:56 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.24  2008-09-10 03:49:26  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-04-29 07:10:56  brian
  - updating headers for release
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:56 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:56 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -119,7 +122,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-29 07:10:56 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -25892,59 +25895,59 @@ STATIC kmem_cachep_t isup_mtp_cachep = NULL;
 STATIC int
 isup_init_caches(void)
 {
-	if (!isup_cc_cachep
-	    && !(isup_cc_cachep =
-		 kmem_cache_create("isup_cc_cachep", sizeof(struct cc), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!isup_cc_cachep && !(isup_cc_cachep =
+				 kmem_create_cache("isup_cc_cachep", sizeof(struct cc), 0,
+						   SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate isup_cc_cachep", DRV_NAME);
 		goto no_cc;
 		return (-ENOMEM);
 	} else
 		printd(("%s: initialized isup cc structure cache\n", DRV_NAME));
-	if (!isup_tg_cachep
-	    && !(isup_tg_cachep =
-		 kmem_cache_create("isup_tg_cachep", sizeof(struct tg), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!isup_tg_cachep && !(isup_tg_cachep =
+				 kmem_create_cache("isup_tg_cachep", sizeof(struct tg), 0,
+						   SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate isup_tg_cachep", DRV_NAME);
 		goto no_tg;
 	} else
 		printd(("%s: initialized isup tg structure cache\n", DRV_NAME));
-	if (!isup_cg_cachep
-	    && !(isup_cg_cachep =
-		 kmem_cache_create("isup_cg_cachep", sizeof(struct cg), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!isup_cg_cachep && !(isup_cg_cachep =
+				 kmem_create_cache("isup_cg_cachep", sizeof(struct cg), 0,
+						   SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate isup_cg_cachep", DRV_NAME);
 		goto no_cg;
 	} else
 		printd(("%s: initialized isup tg structure cache\n", DRV_NAME));
-	if (!isup_ct_cachep
-	    && !(isup_ct_cachep =
-		 kmem_cache_create("isup_ct_cachep", sizeof(struct ct), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!isup_ct_cachep && !(isup_ct_cachep =
+				 kmem_create_cache("isup_ct_cachep", sizeof(struct ct), 0,
+						   SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate isup_ct_cachep", DRV_NAME);
 		goto no_ct;
 	} else
 		printd(("%s: initialized isup ct structure cache\n", DRV_NAME));
-	if (!isup_sr_cachep
-	    && !(isup_sr_cachep =
-		 kmem_cache_create("isup_sr_cachep", sizeof(struct sr), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!isup_sr_cachep && !(isup_sr_cachep =
+				 kmem_create_cache("isup_sr_cachep", sizeof(struct sr), 0,
+						   SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate isup_sr_cachep", DRV_NAME);
 		goto no_sr;
 	} else
 		printd(("%s: initialized isup sr structure cache\n", DRV_NAME));
-	if (!isup_sp_cachep
-	    && !(isup_sp_cachep =
-		 kmem_cache_create("isup_sp_cachep", sizeof(struct sp), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!isup_sp_cachep && !(isup_sp_cachep =
+				 kmem_create_cache("isup_sp_cachep", sizeof(struct sp), 0,
+						   SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate isup_sp_cachep", DRV_NAME);
 		goto no_sp;
 	} else
 		printd(("%s: initialized isup sp structure cache\n", DRV_NAME));
-	if (!isup_mtp_cachep
-	    && !(isup_mtp_cachep =
-		 kmem_cache_create("isup_mtp_cachep", sizeof(struct mtp), 0, SLAB_HWCACHE_ALIGN,
-				   NULL, NULL))) {
+	if (!isup_mtp_cachep && !(isup_mtp_cachep =
+				  kmem_create_cache("isup_mtp_cachep", sizeof(struct mtp), 0,
+						    SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_PANIC, "%s: did not allocate isup_mtp_cachep", DRV_NAME);
 		goto no_mtp;
 	} else

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:34:55 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:49:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:55 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.32  2008-09-10 03:49:34  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.31  2008-05-05 15:34:55  brian
  - be strict with MORE_data and DATA_flag
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:34:55 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:49:34 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-05-05 15:34:55 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:49:34 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -8625,7 +8628,7 @@ sl_init_caches(void)
 {
 	if (!sl_priv_cachep
 	    && !(sl_priv_cachep =
-		 kmem_cache_create("sl_priv_cachep", sizeof(sl_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("sl_priv_cachep", sizeof(sl_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: Cannot allocate sl_priv_cachep", __FUNCTION__);
 		return (-ENOMEM);

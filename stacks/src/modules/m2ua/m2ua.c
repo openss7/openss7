@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:52 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.24  2008-09-10 03:49:27  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.23  2008-05-05 15:34:52  brian
  - be strict with MORE_data and DATA_flag
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -104,7 +107,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-05-05 15:34:52 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -16011,7 +16014,7 @@ m2ua_init_caches(void)
 {
 	if (!m2ua_priv_cachep
 	    && !(m2ua_priv_cachep =
-		 kmem_cache_create("m2ua_priv_cachep", sizeof(priv_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_priv_cachep", sizeof(priv_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_priv_cachep", DRV_NAME);
 		goto enomem;
@@ -16019,7 +16022,7 @@ m2ua_init_caches(void)
 	printd(("%s: initialized m2ua link structure cache\n", DRV_NAME));
 	if (!m2ua_link_cachep
 	    && !(m2ua_link_cachep =
-		 kmem_cache_create("m2ua_link_cachep", sizeof(link_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_link_cachep", sizeof(link_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_link_cachep", DRV_NAME);
 		goto enomem;
@@ -16027,7 +16030,7 @@ m2ua_init_caches(void)
 	printd(("%s: initialized m2ua link structure cache\n", DRV_NAME));
 	if (!m2ua_as_cachep
 	    && !(m2ua_as_cachep =
-		 kmem_cache_create("m2ua_as_cachep", sizeof(as_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_as_cachep", sizeof(as_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_as_cachep", DRV_NAME);
 		goto enomem;
@@ -16035,7 +16038,7 @@ m2ua_init_caches(void)
 	printd(("%s: initialized m2ua as structure cache\n", DRV_NAME));
 	if (!m2ua_ap_cachep
 	    && !(m2ua_ap_cachep =
-		 kmem_cache_create("m2ua_ap_cachep", sizeof(ap_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_ap_cachep", sizeof(ap_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_ap_cachep", DRV_NAME);
 		goto enomem;
@@ -16043,7 +16046,7 @@ m2ua_init_caches(void)
 	printd(("%s: initialized m2ua ap structure cache\n", DRV_NAME));
 	if (!m2ua_gp_cachep
 	    && !(m2ua_gp_cachep =
-		 kmem_cache_create("m2ua_gp_cachep", sizeof(gp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_gp_cachep", sizeof(gp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_gp_cachep", DRV_NAME);
 		goto enomem;
@@ -16051,7 +16054,7 @@ m2ua_init_caches(void)
 	printd(("%s: initialized m2ua gp structure cache\n", DRV_NAME));
 	if (!m2ua_sp_cachep
 	    && !(m2ua_sp_cachep =
-		 kmem_cache_create("m2ua_sp_cachep", sizeof(sp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_sp_cachep", sizeof(sp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_sp_cachep", DRV_NAME);
 		goto enomem;
@@ -16059,7 +16062,7 @@ m2ua_init_caches(void)
 	printd(("%s: initialized m2ua sp structure cache\n", DRV_NAME));
 	if (!m2ua_np_cachep
 	    && !(m2ua_np_cachep =
-		 kmem_cache_create("m2ua_np_cachep", sizeof(np_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_np_cachep", sizeof(np_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_np_cachep", DRV_NAME);
 		goto enomem;
@@ -16067,7 +16070,7 @@ m2ua_init_caches(void)
 	printd(("%s: initialized m2ua np structure cache\n", DRV_NAME));
 	if (!m2ua_spp_cachep
 	    && !(m2ua_spp_cachep =
-		 kmem_cache_create("m2ua_spp_cachep", sizeof(spp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
+		 kmem_create_cache("m2ua_spp_cachep", sizeof(spp_t), 0, SLAB_HWCACHE_ALIGN, NULL,
 				   NULL))) {
 		cmn_err(CE_PANIC, "%s: did not allocate m2ua_spp_cachep", DRV_NAME);
 		goto enomem;

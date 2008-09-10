@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-23 08:29:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.28  2008-09-10 03:49:47  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.27  2008-07-23 08:29:05  brian
  - updated references and support for 2.6.18-92.1.6.el5 kernel
 
@@ -135,10 +138,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -217,7 +220,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-07-23 08:29:05 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -4517,6 +4520,9 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 	ip_select_ident(iph, &rt->u.dst, NULL);
 #endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
+#ifndef NF_IP_LOCAL_OUT
+#define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
+#endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
 #else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
@@ -5515,7 +5521,11 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		ADDR_buffer = (typeof(ADDR_buffer)) (mp->b_rptr + p->ADDR_offset);
 	}
 	add_in = (typeof(add_in)) ADDR_buffer;
+#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
 	type = inet_addr_type(add_in->sin_addr.s_addr);
+#else
+	type = inet_addr_type(&init_net, add_in->sin_addr.s_addr);
+#endif
 	err = TNOADDR;
 	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY
 	    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
@@ -6936,8 +6946,9 @@ tpi_init_caches(void)
 {
 	if (!tpi_priv_cachep &&
 	    !(tpi_priv_cachep =
-	      kmem_cache_create("tpi_priv_cachep", sizeof(struct tpi),
-				0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
+	      kmem_create_cache("tpi_priv_cachep", sizeof(struct tpi), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL)
+	    ))
 		cmn_err(CE_PANIC, "%s: Cannot allocate tpi_priv_cachep", __FUNCTION__);
 	return;
 }

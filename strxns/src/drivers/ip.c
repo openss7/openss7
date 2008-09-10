@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.43  2008-09-10 03:50:07  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.42  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
@@ -179,10 +182,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -235,7 +238,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-25 11:39:31 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -4843,7 +4846,7 @@ STATIC int
 npi_init_caches(void)
 {
 	if (npi_priv_cachep == NULL) {
-		npi_priv_cachep = kmem_cache_create("npi_priv_cachep", sizeof(struct np), 0,
+		npi_priv_cachep = kmem_create_cache("npi_priv_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate npi_priv_cachep", __FUNCTION__);
@@ -4853,7 +4856,7 @@ npi_init_caches(void)
 		printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	}
 	if (npi_bind_cachep == NULL) {
-		npi_bind_cachep = kmem_cache_create("npi_bind_cachep", sizeof(struct np), 0,
+		npi_bind_cachep = kmem_create_cache("npi_bind_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_bind_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate npi_bind_cachep", __FUNCTION__);
@@ -4863,7 +4866,7 @@ npi_init_caches(void)
 		printd(("%s: initialized driver bind structure cache\n", DRV_NAME));
 	}
 	if (npi_prot_cachep == NULL) {
-		npi_prot_cachep = kmem_cache_create("npi_prot_cachep", sizeof(struct np), 0,
+		npi_prot_cachep = kmem_create_cache("npi_prot_cachep", sizeof(struct np), 0,
 						    SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (npi_prot_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate npi_prot_cachep", __FUNCTION__);

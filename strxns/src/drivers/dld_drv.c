@@ -1103,7 +1103,7 @@ static void
 drv_secobj_init(void)
 {
 	rw_init(&drv_secobj_lock, NULL, RW_DEFAULT, NULL);
-	drv_secobj_cachep = kmem_cache_create("drv_secobj_cache",
+	drv_secobj_cachep = kmem_create_cache("drv_secobj_cache",
 	    sizeof (dld_secobj_t), 0, drv_secobj_ctor, NULL,
 	    NULL, NULL, NULL, 0);
 	drv_secobj_hash = mod_hash_create_extended("drv_secobj_hash",

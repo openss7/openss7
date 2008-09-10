@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.9 $) $Date: 2008-04-29 08:33:13 $
+ @(#) $RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.10 $) $Date: 2008-09-10 03:49:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lismem.c,v $
+ Revision 1.1.1.2.4.10  2008-09-10 03:49:10  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 1.1.1.2.4.9  2008-04-29 08:33:13  brian
  - update headers for Affero release
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.9 $) $Date: 2008-04-29 08:33:13 $"
+#ident "@(#) $RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.10 $) $Date: 2008-09-10 03:49:10 $"
 
-static char const ident[] = "$RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.9 $) $Date: 2008-04-29 08:33:13 $";
+static char const ident[] = "$RCSfile: lismem.c,v $ $Name:  $($Revision: 1.1.1.2.4.10 $) $Date: 2008-09-10 03:49:10 $";
 
 /************************************************************************
 *                        LiS Memory Interface                           *
@@ -149,7 +152,7 @@ lis_mem_init(void)
 
 		for (p = lis_slab_table; p->name != NULL; p++) {
 			p->cache_struct =
-			    kmem_cache_create(p->name, p->size, 0, SLAB_HWCACHE_ALIGN | CACHE_OPTS,
+			    kmem_create_cache(p->name, p->size, 0, SLAB_HWCACHE_ALIGN | CACHE_OPTS,
 					      NULL, NULL);
 		}
 	}

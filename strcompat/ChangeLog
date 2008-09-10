@@ -1,3 +1,18 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: new types and cache creation
+	* doc/manual/prerequisites.texi: ajdusted prerequisites
+	* src/include/sys/mps/ddi.h: make inlines static
+	* src/include/sys/os7/allocb.h: make inlines static
+	* src/include/sys/os7/bufpool.h: make inlines static
+	* src/include/sys/os7/timer.h: make inlines static
+	* src/include/sys/osf/ddi.h: make inlines static
+	* src/include/sys/sun/ddi.h: make inlines static
+	* src/include/sys/sun/stream.h: handle newer types
+	* src/include/sys/sun/strsun.h: make inlines static
+	* src/include/sys/svr4/ddi.h: make inlines static
+	* src/kernel/liscompat.c: strap out unsupported PCI function
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strcompat.spec.in: build changes for release

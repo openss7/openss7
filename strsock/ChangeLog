@@ -1,3 +1,13 @@
+2008-09-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: check new types and cache creation
+	* doc/manual/prerequisites.texi: adjust prerequisites
+	* src/drivers/socksys.c: cache creation
+	* src/lib/socket.c: handle compiler errors
+	* src/lib/socklib.c: define OPEN_MAX
+	* src/modules/sockmod.c: cache creation
+	* src/util/soconfig.c: include limits.h
+
 2008-08-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strsock.spec.in: build changes for release

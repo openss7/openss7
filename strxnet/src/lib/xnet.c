@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-08-20 10:57:03 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-10 03:50:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-20 10:57:03 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:50:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnet.c,v $
+ Revision 0.9.2.33  2008-09-10 03:50:05  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.32  2008-08-20 10:57:03  brian
  - fixes and build updates from newnet trip
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-08-20 10:57:03 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-10 03:50:05 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-08-20 10:57:03 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-10 03:50:05 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -382,6 +385,10 @@ struct _t_user {
 
 #ifndef T_ACK
 #define T_ACK (-2)		/**< for now */
+#endif
+
+#ifndef OPEN_MAX
+#define OPEN_MAX 256
 #endif
 
 static struct _t_user *_t_fds[OPEN_MAX] = { NULL, };
@@ -6187,10 +6194,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.32 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.33 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.32 $)
-  * @date \$Date: 2008-08-20 10:57:03 $
+  * @version \$Name:  $(\$Revision: 0.9.2.33 $)
+  * @date \$Date: 2008-09-10 03:50:05 $
   */
 
 /** @} */

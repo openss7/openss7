@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-04-29 08:49:52 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:49:52 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp.c,v $
+ Revision 0.9.2.45  2008-09-10 03:49:15  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.44  2008-04-29 08:49:52  brian
  - updated headers for Affero release
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-04-29 08:49:52 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-04-29 08:49:52 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -176,9 +179,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.44 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.45 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-04-29 08:49:52 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2145,28 +2148,28 @@ sctp_init_caches(void)
 #if STREAMS
 	if (!sctp_sctp_cachep
 	    && !(sctp_sctp_cachep =
-		 kmem_cache_create("sock_sctp_cachep", sizeof(struct sctp), 0, SLAB_HWCACHE_ALIGN,
+		 kmem_create_cache("sock_sctp_cachep", sizeof(struct sctp), 0, SLAB_HWCACHE_ALIGN,
 				   NULL, NULL)))
 		panic("%s:Cannot alloc sock_sctp_cachep.\n", __FUNCTION__);
 #endif				/* STREAMS */
 	if (!sctp_bind_cachep
 	    && !(sctp_bind_cachep =
-		 kmem_cache_create("sock_sctp_bind", sizeof(struct sctp_bind_bucket), 0,
+		 kmem_create_cache("sock_sctp_bind", sizeof(struct sctp_bind_bucket), 0,
 				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_bind cache.\n", __FUNCTION__);
 	if (!sctp_dest_cachep
 	    && !(sctp_dest_cachep =
-		 kmem_cache_create("sock_sctp_daddr", sizeof(struct sctp_daddr), 0,
+		 kmem_create_cache("sock_sctp_daddr", sizeof(struct sctp_daddr), 0,
 				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_daddr cache.\n", __FUNCTION__);
 	if (!sctp_srce_cachep
 	    && !(sctp_srce_cachep =
-		 kmem_cache_create("sock_sctp_saddr", sizeof(struct sctp_saddr), 0,
+		 kmem_create_cache("sock_sctp_saddr", sizeof(struct sctp_saddr), 0,
 				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_saddr cache.\n", __FUNCTION__);
 	if (!sctp_strm_cachep
 	    && !(sctp_strm_cachep =
-		 kmem_cache_create("sock_sctp_strm", sizeof(struct sctp_strm), 0,
+		 kmem_create_cache("sock_sctp_strm", sizeof(struct sctp_strm), 0,
 				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_strm cache.\n", __FUNCTION__);
 	return;

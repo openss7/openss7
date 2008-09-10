@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-08-20 10:56:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2008-09-10 03:49:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-20 10:56:44 $ by $Author: brian $
+ Last Modified $Date: 2008-09-10 03:49:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.173  2008-09-10 03:49:44  brian
+ - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
+
  Revision 0.9.2.172  2008-08-20 10:56:44  brian
  - fixes and build updates from newnet trip
 
@@ -201,10 +204,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-08-20 10:56:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2008-09-10 03:49:44 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-08-20 10:56:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2008-09-10 03:49:44 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -359,7 +362,11 @@ strblocking(void)
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 qbinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+qbinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -481,7 +488,11 @@ bput(qband_t **bp)
  *  keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 apinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+apinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -566,7 +577,11 @@ ap_put(struct apinfo *api)
  *  -------------------------------------------------------------------------
  */
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 devinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+devinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -669,7 +684,11 @@ EXPORT_SYMBOL_GPL(di_put);	/* include/sys/streams/strsubr.h */
  *  -------------------------------------------------------------------------
  */
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 mdlinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+mdlinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -776,7 +795,11 @@ queinfo_init(struct queinfo *qu)
 #endif
 }
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 queinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+queinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -949,7 +972,11 @@ qput(queue_t **qp)
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __hot_out void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 mdbblock_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+mdbblock_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {				/* IRQ DISABLED? */
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -1492,7 +1519,11 @@ term_freemblks(void)
  *  Keep the cache ctors and the object ctors and dtors close to each other.
  */
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+linkinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -1575,7 +1606,11 @@ EXPORT_SYMBOL_GPL(freelk);	/* include/sys/streams/strsubr.h */
  */
 
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 syncq_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+syncq_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -1780,7 +1815,11 @@ STATIC rwlock_t event_hash_lock = RW_LOCK_UNLOCKED;
 STATIC struct strevent *event_hash[EVENT_HASH_SIZE] __cacheline_aligned;
 STATIC int event_id = 1;		/* start odd */
 STATIC void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 seinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+seinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -5058,7 +5097,11 @@ clear_shinfo(struct shinfo *sh)
 	qu->qu_str = sd;
 }
 STATIC __unlikely void
+#ifndef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
 shinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
+shinfo_ctor(kmem_cachep_t cachep, void *obj)
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 {
 #if defined SLAB_CTOR_VERIFY && defined SLAB_CTOR_CONSTRUCTOR
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
@@ -5270,8 +5313,13 @@ STATIC struct cacheinfo {
 	size_t size;
 	size_t offset;
 	unsigned long flags;
+#ifdef HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS
+	void (*ctor) (kmem_cachep_t, void *);
+	void (*dtor) (kmem_cachep_t, void *);
+#else					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 	void (*ctor) (void *, kmem_cachep_t, unsigned long);
 	void (*dtor) (void *, kmem_cachep_t, unsigned long);
+#endif					/* HAVE_KFUNC_KMEM_CACHE_CREATE_5_ARGS */
 } Cacheinfo[DYN_SIZE] = {
 	{
 	"DYN_STREAM", sizeof(struct shinfo), 0, STREAMS_CACHE_FLAGS, &shinfo_ctor, NULL}, {
@@ -5357,7 +5405,7 @@ str_init_caches(void)
 		if (ci->size == 0)
 			continue;
 		si->si_cache =
-		    kmem_cache_create(ci->name, ci->size, ci->offset, ci->flags, ci->ctor,
+		    kmem_create_cache(ci->name, ci->size, ci->offset, ci->flags, ci->ctor,
 				      ci->dtor);
 		if (si->si_cache != NULL)
 			continue;
