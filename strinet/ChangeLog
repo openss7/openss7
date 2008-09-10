@@ -1,6 +1,7 @@
 2008-09-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: instrument inet driver
+	* src/drivers/inet.c: reworked write side procedures
 
 2008-09-08  Brian Bidulock  <bidulock@openss7.org>
 
