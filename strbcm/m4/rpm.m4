@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.66 $) $Date: 2008-07-23 19:14:41 $
+# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.67 $) $Date: 2008-09-12 05:23:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-23 19:14:41 $ by $Author: brian $
+# Last Modified $Date: 2008-09-12 05:23:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -235,7 +235,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
-			    (*)		rpm_cv_dist_extra2=".COS${dist_cvs_host_release}" ;;
+			    (*)		rpm_cv_dist_extra2=".COS${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (lineox)
@@ -243,7 +243,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
-			    (*)		rpm_cv_dist_extra2=".LEL${dist_cvs_host_release}" ;;
+			    (*)		rpm_cv_dist_extra2=".LEL${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (whitebox)
@@ -251,7 +251,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
-			    (*)		rpm_cv_dist_extra2=".WB${dist_cvs_host_release}" ;;
+			    (*)		rpm_cv_dist_extra2=".WB${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (fedora)
@@ -263,7 +263,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (5)		rpm_cv_dist_extra2=".FC5"	;;
 			    (6)		rpm_cv_dist_extra2=".FC6"	;;
 			    (7)		rpm_cv_dist_extra2=".fc7"	;;
-			    (*)		rpm_cv_dist_extra2=".fc${dist_cvs_host_release}" ;;
+			    (*)		rpm_cv_dist_extra2=".fc${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (redhat)
@@ -275,7 +275,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
 			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
 			    (5|5.?)	rpm_cv_dist_extra2=".EL5"	;;
-			    (*)		rpm_cv_dist_extra2=".RH${dist_cvs_host_release}" ;;
+			    (*)		rpm_cv_dist_extra2=".RH${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (mandrake)
@@ -315,6 +315,20 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	    (debian)	rpm_cv_dist_topdir='/usr/src/rpm'    ;;
 	    (ubuntu)	rpm_cv_dist_topdir='/usr/src/rpm'    ;;
 	    (*)		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;
+	esac
+    ])
+    AC_CACHE_CHECK([for rpm distribution subdirectory], [rpm_cv_dist_subdir], [dnl
+	case "$dist_cv_host_flavor" in
+	    (centos)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (lineox)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (whitebox)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (fedora)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (mandrake)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (redhat)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (suse)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (debian)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
+	    (ubuntu)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
+	    (*)
 	esac
     ])
     PACKAGE_RPMDIST="${dist_cv_host_distrib:-Unknown Linux} ${dist_cv_host_release:-Unknown}${dist_cv_host_codename:+ ($dist_cv_host_codename)}"
@@ -390,7 +404,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
-    rpm_tmp='$(PACKAGE_DISTDIR)/rpms'
+    # when building in place the default is simply rpms whereas when releasing
+    # to another directory, the default is based on the repo subdirectory name
+    if test :$PACKAGE_DISTDIR = :`pwd` ; then
+	rpm_tmp='$(PACKAGE_DISTDIR)/rpms'
+    else
+	rpm_tmp='$(PACKAGE_DISTDIR)/rpms/'"${rpm_cv_dist_subdir}"
+    fi
     AC_ARG_WITH([rpm-topdir],
 	AS_HELP_STRING([--with-rpm-topdir=DIR],
 	    [specify the rpm top directory.  @<:@default=PKG-DISTDIR/rpms@:>@]),
@@ -519,6 +539,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     if test :"${RPMBUILD:-no}" = :no ; then
 	RPMBUILD="$RPM"
     fi
+    AC_ARG_VAR([CREATEREPO], [Create repositry command])
+    AC_PATH_PROG([CREATEREPO], [createrepo], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test :"${CREATEREPO:-no}" = :no ; then
+	AC_MSG_WARN([Could not find createrepo program in PATH.])
+	CREATEREPO="${am_missing_run}createrepo"
+    fi
 dnl
 dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
 dnl but no rpm database and therefore cannot build rpm packages.
@@ -553,7 +580,10 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
-# Revision 0.9.2.66  2008-07-23 19:14:41  brian
+# Revision 0.9.2.67  2008-09-12 05:23:20  brian
+# - add repo subdirectories
+#
+# Revision 0.9.2.66  2008/07/23 19:14:41  brian
 # - indicates support to CentOS 5.2
 #
 # Revision 0.9.2.65  2008-04-28 09:41:03  brian
