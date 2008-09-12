@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.67 $) $Date: 2008-09-12 05:23:20 $
+# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.68 $) $Date: 2008-09-12 06:12:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-12 05:23:20 $ by $Author: brian $
+# Last Modified $Date: 2008-09-12 06:12:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -319,15 +319,15 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
     ])
     AC_CACHE_CHECK([for rpm distribution subdirectory], [rpm_cv_dist_subdir], [dnl
 	case "$dist_cv_host_flavor" in
-	    (centos)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
-	    (lineox)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
-	    (whitebox)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
-	    (fedora)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
-	    (mandrake)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
-	    (redhat)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
-	    (suse)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
-	    (debian)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
-	    (ubuntu)	rpm_cv_dist_subdir="dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
+	    (centos)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (lineox)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (whitebox)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (fedora)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (mandrake)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (redhat)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (suse)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (debian)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
+	    (ubuntu)	rpm_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
 	    (*)
 	esac
     ])
@@ -580,6 +580,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.68  2008-09-12 06:12:09  brian
+# - correction
+#
 # Revision 0.9.2.67  2008-09-12 05:23:20  brian
 # - add repo subdirectories
 #
