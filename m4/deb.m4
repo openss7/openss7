@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-13 03:48:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-13 03:48:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -109,12 +109,34 @@ AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
 # _DEB_DPKG_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP], [dnl
+    _DEB_DPKG_SETUP_DIST
 dnl _DEB_DPKG_SETUP_ARCH
 dnl _DEB_DPKG_SETUP_INDEP
     _DEB_DPKG_SETUP_TOPDIR
     _DEB_DPKG_SETUP_OPTIONS
     _DEB_DPKG_SETUP_BUILD
 ])# _DEB_DPKG_SETUP
+# =============================================================================
+
+# =============================================================================
+# _DEB_DPKG_SETUP_DIST
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_DPKG_SETUP_DIST], [dnl
+    AC_CACHE_CHECK([for deb distribution subdirectory], [deb_cv_dist_subdir], [dnl
+	case "$dist_cv_host_flavor" in
+	    (centos)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (lineox)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (whitebox)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (fedora)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (mandrake)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (redhat)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (suse)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_release:+/$dist_cv_host_release}" ;;
+	    (debian)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
+	    (ubuntu)	deb_cv_dist_subdir="$dist_cv_host_flavor${dist_cv_host_codename:+/$dist_cv_host_codename}" ;;
+	    (*)
+	esac
+    ])
+])# _DEB_DPKG_SETUP_DIST
 # =============================================================================
 
 # =============================================================================
@@ -161,7 +183,11 @@ AC_DEFUN([_DEB_DPKG_SETUP_INDEP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
-    deb_tmp='$(PACKAGE_DISTDIR)/debian'
+    if test :"$PACKAGE_DISTDIR" = :`pwd` ; then
+	deb_tmp='$(PACKAGE_DISTDIR)/debian'
+    else
+	deb_tmp='$(PACKAGE_DISTDIR)/debs/'"${deb_cv_dist_subdir}"
+    fi
     AC_ARG_WITH([deb-topdir],
 	AS_HELP_STRING([--with-deb-topdir=DIR],
 	    [specify the deb top directory.  @<:@default=PKG-DISTDIR/debian@:>@]),
@@ -335,6 +361,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.22  2008-09-13 03:48:33  brian
+# - repo subdirectories
+#
 # Revision 0.9.2.21  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
