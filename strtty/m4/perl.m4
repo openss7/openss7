@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-09-03 06:58:35 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/09/13 21:51:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-03 06:58:35 $ by $Author: brian $
+# Last Modified $Date: 2008/09/13 21:51:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -129,8 +129,14 @@ AC_DEFUN([_PERL_CHECK_LIBS], [dnl
 	    ${DESTDIR}${rootdir}/usr/lib/perl5/
 	    ${DESTDIR}/usr/lib/perl5/\""
 	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	perl_done=
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
+	    case " $perl_done " in
+		(* "$perl_dir" *) continue ;;
+		(*) ;;
+	    esac
+	    perl_done="${perl_done}${perl_done:+ }$perl_dir"
 	    if test -d "$perl_dir" ; then
 		perl_dirs=`find $perl_dir -name 'CORE' -type d | sort -r | uniq`
 		for perl_dir in $perl_dirs ; do
@@ -400,6 +406,9 @@ AC_DEFUN([_PERL_], [dnl
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 0.9.2.6  2008/09/13 21:51:07  brian
+# - avoid searching same perl directories
+#
 # Revision 0.9.2.5  2008-09-03 06:58:35  brian
 # - fix typo
 #
