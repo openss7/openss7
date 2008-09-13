@@ -1,6 +1,7 @@
 2008-09-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/rpm.m4: use repo subdirectories for distribution
+	* m4/deb.m4: use repo subdirectories for distribution
 
 2008-09-10  Brian Bidulock  <bidulock@openss7.org>
 
