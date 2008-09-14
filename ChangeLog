@@ -1,6 +1,7 @@
 2008-09-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/perl.m4: avoid repetative searching of same directories
+	* am/rpm.am: remove virtual package as well
 
 2008-09-12  Brian Bidulock  <bidulock@openss7.org>
 
