@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008/09/14 03:40:35 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-09-14 03:44:06 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/14 03:40:35 $ by $Author: brian $
+## Last Modified $Date: 2008-09-14 03:44:06 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -273,7 +273,7 @@ noa-rpm:
 #!     This target is responsible for generating all of the package binary rpms
 #!     for the architecture.  The binary rpms will be named:
 #!
-#!         @PACKAGE@-*-@VERSION@-@PACKAGE_RPMRELEASE@.*.rpm
+#!         @PACKAGE@-*@VERSION@-@PACKAGE_RPMRELEASE@.*.rpm
 #!
 #!     where the stars indicate the subpackage and the architecture.  Both the
 #!     architecture specific subpackages (binary objects) and the architecture
@@ -337,7 +337,7 @@ rebuild:
 #!     This target will search out and sign, with a GPG signature, the source
 #!     rpm, and all of the binary rpms for this package that can be found in the
 #!     package distribution directory.  This target will prompt for a GPG
-#!     password.  Automated or unattended builts can be acheived with the
+#!     password.  Automated or unattended builds can be acheived with the
 #!     `emake' expect script located here: `@abs_srcdir@/scripts/emake'.
 #!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
@@ -425,6 +425,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.99  2008-09-14 03:44:06  brian
+## - typos
+##
 ## Revision 0.9.2.98  2008/09/14 03:40:35  brian
 ## - consider virtual package for removal
 ##
