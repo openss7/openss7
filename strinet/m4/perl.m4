@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008/09/13 21:51:07 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008/09/14 02:59:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/13 21:51:07 $ by $Author: brian $
+# Last Modified $Date: 2008/09/14 02:59:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -133,7 +133,7 @@ AC_DEFUN([_PERL_CHECK_LIBS], [dnl
 	AC_MSG_RESULT([searching])
 	for perl_dir in $perl_search_path ; do
 	    case " $perl_done " in
-		(* "$perl_dir" *) continue ;;
+		(*" $perl_dir "*) continue ;;
 		(*) ;;
 	    esac
 	    perl_done="${perl_done}${perl_done:+ }$perl_dir"
@@ -406,6 +406,9 @@ AC_DEFUN([_PERL_], [dnl
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 0.9.2.7  2008/09/14 02:59:07  brian
+# - correction
+#
 # Revision 0.9.2.6  2008/09/13 21:51:07  brian
 # - avoid searching same perl directories
 #
