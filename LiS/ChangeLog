@@ -1,3 +1,7 @@
+2008-09-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* manual/install.texi: updated rpm macros description
+
 2008-09-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: check for type changes

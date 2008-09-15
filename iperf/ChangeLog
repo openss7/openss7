@@ -1,3 +1,7 @@
+2008-09-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/install.texi: updated rpm macros description
+
 2008-09-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/prerequisites.texi: adjust prerequisites
