@@ -110,9 +110,14 @@ redhat_directories	= $(topdir)/SOURCES $(sourcedir) \
 ##
 # Options for building source rpms.  We have separate fig and xpm macros from the binary rpms to
 # avoid warnings about the files being multiply included.  Another approach would be to name the
-# icons according to the individual package neames and avoid specific macros for them.
+# icons according to the individual package names and avoid specific macros for them.  We used to
+# build one source rpm for all distros, but this is becoming unworkable.  Now each source rpm is
+# distro specific.
 ##
 RPMSOPTS		= $(RPMOPTS) \
+			  --define "extrarelease $(PACKAGE_RPMEXTRA)" \
+			  --define "extrarelease2 $(PACKAGE_RPMEXTRA2)" \
+			  --define "distribution $(PACKAGE_RPMDIST) (contrib)" \
 			  --define "_gif_icon $(PACKAGE)-$(VERSION).gif" \
 			  --define "_xpm_icon $(PACKAGE)-$(VERSION).xpm"
 
