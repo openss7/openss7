@@ -1,3 +1,8 @@
+2008-09-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/texi/install.texi: update .rpmmacro recommendations
+	* doc/manual/texi/install.texi: update .rpmmacro recommendations
+
 2008-09-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/perl.m4: avoid repetative searching of same directories
