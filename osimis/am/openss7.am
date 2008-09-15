@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.132 $) $Date: 2008-09-04 06:13:09 $
+# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.133 $) $Date: 2008-09-15 08:54:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-04 06:13:09 $ by $Author: brian $
+## Last Modified $Date: 2008-09-15 08:54:28 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -230,8 +230,8 @@ $(MY_REVERSIVE_TARGETS):
 MY_PHONY	+= $(MY_REVERSIVE_TARGETS)
 
 ##
-## Like automake recursive targets, except that they do not execute in the current directory, only
-## subdirectories.
+## Like automake recursive targets, except that they do not execute in the current directory (unless
+## there are no subdirectories), only subdirectories.
 ##
 ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck all-install
 
@@ -242,21 +242,26 @@ $(ALL_RECURSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
-	list='$(subdirs)' ; \
-	for subdir in $$list ; do \
-		if test "$$subdir" = "." ; then continue ; fi ; \
-		$(ECHO) "Making $$target in $$subdir" ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
-			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-	done ; \
-	test -z "$$fail"
+	if test -z '$(subdirs)' ; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
+	else \
+		list='$(subdirs)' ; \
+		for subdir in $$list ; do \
+			if test "$$subdir" = "." ; then continue ; fi ; \
+			$(ECHO) "Making $$target in $$subdir" ; \
+			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
+			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+		done ; \
+		test -z "$$fail" ; \
+	fi
 
 MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
 
 ##
-## Like automake recursive targets, except that they do not execute in the current directory, and
-## operate on subdirectories in reverse order.
+## Like automake recursive targets, except that they do not execute in the current directory (unless
+## there are no subdirectories), and operate on subdirectories in reverse order.
 ##
 ALL_REVERSIVE_TARGETS = all-uninstall
 
@@ -265,17 +270,22 @@ $(ALL_REVERSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
-	list='' ; rev='$(subdirs)' ; for subdir in $$rev ; do \
-		list="$$subdir $$list" ; \
-	done ; \
-	for subdir in $$list ; do \
-		if test "$$subdir" = "." ; then continue ; fi ; \
-		$(ECHO) "Making $$target in $$subdir" ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
-			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-	done ; \
-	test -z "$$fail"
+	if test -z '$(subdirs)' ; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
+	else \
+		list='' ; rev='$(subdirs)' ; for subdir in $$rev ; do \
+			list="$$subdir $$list" ; \
+		done ; \
+		for subdir in $$list ; do \
+			if test "$$subdir" = "." ; then continue ; fi ; \
+			$(ECHO) "Making $$target in $$subdir" ; \
+			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
+			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
+				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
+		done ; \
+		test -z "$$fail" ; \
+	fi
 
 MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
 
@@ -735,6 +745,9 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.133  2008-09-15 08:54:28  brian
+## - build modifications
+##
 ## Revision 0.9.2.132  2008-09-04 06:13:09  brian
 ## - better cscope generation
 ##
