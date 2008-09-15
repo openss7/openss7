@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.4.31 2008-08-03 00:56:49 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.4.32 2008-09-15 18:01:58 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-08-03 00:56:49 $ by $Author: brian $
+@c Last Modified $Date: 2008-09-15 18:01:58 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -938,8 +938,6 @@ Following is an example of the @file{~/.rpmmacros} file that I use for rebuildin
 # RPM macros for building rpms
 #
 
-%_topdir /usr/src/openss7.rpms
-
 %vendor OpenSS7 Corporation
 %distribution OpenSS7
 %disturl http://www.openss7.org/
@@ -956,28 +954,12 @@ Following is an example of the @file{~/.rpmmacros} file that I use for rebuildin
 
 %_unpackaged_files_terminate_build 1
 %_missing_doc_files_terminate_build 1
-%_enable_debug_packages 1
+%_use_internal_dependency_generator 0
+%_repackage_all_erasures 0
+%_rollback_transaction_on_failure 0
 
-# 
-# Template for debug information sub-package.
-# with our little addition of release
-# 
-%debug_package \
-%ifnarch noarch\
-%global __debug_package 1\
-%package debug\
-Summary: Debug information for package %@{name@}\
-Group: Development/Debug\
-AutoReqProv: 0\
-%@{?fullrelease:Release: %@{fullrelease@}@}\
-%description debug\
-This package provides debug information for package %@{name@}.\
-Debug information is useful when developing applications that use this\
-package or when debugging this package.\
-%files debug -f debugfiles.list\
-%defattr(-,root,root)\
-%endif\
-%@{nil@}
+%configure2_5x %configure
+%make make
 
 @end smallexample
 @end cartouche
