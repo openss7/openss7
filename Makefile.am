@@ -161,6 +161,9 @@ MANUAL_FILE			= doc/manual/$(PACKAGE).txt
 
 include am/release.am
 
+RELEASE				+= release-lsm release-archives
+RELEASE_SIGN			+= release-sign-archives
+
 ##
 ## Rules for making doxygen documentation.
 ##

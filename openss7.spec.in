@@ -90,7 +90,7 @@
 %global kernel_version %{_kversion}
 %global kernel_source %(echo %{_kversion} | sed -r -e 's|BOOT$||;s|-?smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default$||')
 %global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
-%global kernel_release %(echo %{_kversion} | sed -e 's|-|.|g')
+%global kernel_release %(echo %{_kversion} | sed -e 's|-|_|g')
 %global kernel_fedora %(echo %{_kversion} | sed -r -e 's|.*FC[456].*$|1|;s|.*\.fc7$|1|;s|.*\.EL[45]?$|1|;s|.*\.el5$|1|;s|[^1].*$|0|')
 %global kernel_others %(echo %{_kversion} | sed -r -e 's|.*FC[456].*$|0|;s|.*\.fc7$|0|;s|.*\.EL[45]?$|0|;s|.*\.el5$|0|;s|[^0].*$|1|')
 %global core_name   core-%{_kversion}
@@ -382,6 +382,8 @@ ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
+Autoreq:        true
+Autoprov:       true
 # TODO: FC4 wants kernel-devel not kernel-source
 # older rpm can't handle nested ifs
 %if %{kernel_fedora}
@@ -442,7 +444,6 @@ BuildRequires:  /sbin/genksyms
 # to install documentation
 #BuildRequires: texinfo >= 4.0
 # find the rest automagically
-Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
@@ -652,8 +653,13 @@ package_source
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_kmoduledir}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %endif
@@ -666,21 +672,31 @@ Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 #Prereq:         /sbin/modprobe
 # SuSE puts lsof in /usr/bin
 Prereq:         lsof
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-kmod = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-kmdl = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmdl = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-kmod = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-kmdl = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-kmod = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-kmdl = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-modules = %{_kversion}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -927,22 +943,30 @@ fi
 
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_kmoduledir}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
 #Prereq:         /sbin/modprobe
 Prereq:         lsof
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmdl = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1201,10 +1225,11 @@ fi
 
 Summary:        %{title} core kernel module symbol versions.
 Group:          System Environment/Kernel
-Prefix:         %{_includedir}/%{name}/%{kernel_version}
-Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_includedir}/%{name}/%{kernel_version}
 Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-info = %{epoch}:%{version}-%{rpmrelease}
@@ -1241,14 +1266,15 @@ This package applies to core kernel modules
 
 Summary:        %{title} run-time libraries.
 Group:          System Environment/Libraries
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 Prefix:         %{_localedir}
 Obsoletes:      %{name}-libs
 Prereq:         /sbin/ldconfig
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
@@ -1307,12 +1333,13 @@ fi
 
 Summary:        %{title} headers, libs and docs.
 Group:          Development/System
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 Prefix:         %{_includedir}/%{name}
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
@@ -1350,6 +1377,10 @@ files and static libraries required to compile
 
 Summary:        %{title} admin utilities.
 Group:          System Environment/Base
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 Prefix:         %{_pkglibexecdir}
@@ -1358,9 +1389,6 @@ Prefix:         %{_pkglibexec32dir}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Obsoletes:      %{name}-utils
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
@@ -1426,14 +1454,15 @@ fi
 
 Summary:        %{title} devices.
 Group:          System Environment/Base
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Requires:       dev >= 3.3
 %if %{MAKE_devs}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Obsoletes:      %{name}-devs
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
@@ -1485,12 +1514,13 @@ fi
 
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_pkglibexecdir}
 Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
@@ -1519,15 +1549,16 @@ submitting problem reports to @PACKAGE_BUGREPORT@.
 
 Summary:        %{title} manpages, manuals and docs.
 Group:          Documentation
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
 #Prereq:         /sbin/install-info
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
@@ -1636,10 +1667,11 @@ fi
 
 Summary:        %{title} source package.
 Group:          Development/System
-Prefix:         %{_usrsrc}
-Autoreq:        true
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_usrsrc}
 Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
@@ -1669,6 +1701,10 @@ better to use the tarball or source rpm release.
 
 Summary:        %{title} init scripts and config files.
 Group:          System Environment/Base
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_configdir}
 Prefix:         %{_initrddir}
 Prefix:         %{_sysconfdir}
@@ -1678,9 +1714,6 @@ Prefix:         %{_modutildir}
 Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease2}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-inits
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
@@ -2076,9 +2109,10 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.82  2008-09-10 20:46:08  brian
-# - install init scripts on fresh install
-#
+
+* Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.82  2008-09-10 20:46:08  brian
+- install init scripts on fresh install
 
 * Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.81  2008-09-10 17:44:40  brian

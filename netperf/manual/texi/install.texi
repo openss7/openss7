@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.93 2008-09-15 07:02:22 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.94 2008-09-15 17:59:12 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-09-15 07:02:22 $ by $Author: brian $
+@c Last Modified $Date: 2008-09-15 17:59:12 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -958,14 +958,12 @@ Following is an example of the @file{~/.rpmmacros} file that I use for rebuildin
 
 %_unpackaged_files_terminate_build 1
 %_missing_doc_files_terminate_build 1
-%_enable_debug_packages 1
 %_use_internal_dependency_generator 0
 %_repackage_all_erasures 0
 %_rollback_transaction_on_failure 0
 
 %configure2_5x %configure
 %make make
-%debug_package %@{nil@}
 
 @end smallexample
 @end cartouche

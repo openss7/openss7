@@ -57,6 +57,7 @@
 %global BUILD_devel   1
 %global BUILD_tools   1
 %global BUILD_libs    0
+%global BUILD_debug   1
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  0
@@ -88,46 +89,52 @@
 #{expand: %%global have_configfiles %{?conffiles:1}%{!?conffiles:0}}
 
 # define new autoconf 2.60, 2.61 stuff
-%{!?_datarootdir:     %{expand: %%global _datarootdir     %%{_datadir}}}
-%{!?_docdir:          %{expand: %%global _docdir          %%{_datarootdir}/doc}}
-%{!?_htmldir:         %{expand: %%global _htmldir         %%{_docdir}}}
-%{!?_dvidir:          %{expand: %%global _dvidir          %%{_docdir}}}
-%{!?_pdfdir:          %{expand: %%global _pdfdir          %%{_docdir}}}
-%{!?_psdir:           %{expand: %%global _psdir           %%{_docdir}}}
-%{!?_localedir:       %{expand: %%global _localedir       %%{_datadir}/locale}}
-%{!?_configdir:       %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
-%{!?_modutildir:      %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
-%{!?_pkglibexecdir:   %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
+%{!?_datarootdir:       %{expand: %%global _datarootdir     %%{_datadir}}}
+%{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc}}
+%{!?_htmldir:           %{expand: %%global _htmldir         %%{_docdir}}}
+%{!?_dvidir:            %{expand: %%global _dvidir          %%{_docdir}}}
+%{!?_pdfdir:            %{expand: %%global _pdfdir          %%{_docdir}}}
+%{!?_psdir:             %{expand: %%global _psdir           %%{_docdir}}}
+%{!?_localedir:         %{expand: %%global _localedir       %%{_datadir}/locale}}
+%{!?_configdir:         %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
+%{!?_modutildir:        %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
+%{!?_pkglibexecdir:     %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
 %ifarch x86_64 ppc64 sparc64 ia64
-%{!?_lib32dir:        %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
-%{!?_pkglibexec32dir: %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
+%{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
+%{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
 %endif
 
 # because we only need to build the tools binaries once for each architecture,
 # but need to build the modules binaries once for each architecture and kernel
 # version, we accept the --with[out] options "modules" and "tools"
-#{?_without_modules:  %{expand: %%global BUILD_modules 0}}
-%{?_without_devel:    %{expand: %%global BUILD_devel   0}}
-#{?_without_tools:    %{expand: %%global BUILD_tools   0}}
-%{?_without_indep:    %{expand: %%global BUILD_noarch  0}}
-%{?_without_arch:     %{expand: %%global BUILD_arch    0}}
-%{?_without_public:   %{expand: %%global BUILD_source  0}}
-%{?_without_lis:      %{expand: %%global BUILD_lis     0}}
-%{?_without_lis:      %{expand: %%global BUILD_lfs     1}}
-%{?_without_lfs:      %{expand: %%global BUILD_lfs     0}}
-%{?_without_lfs:      %{expand: %%global BUILD_lis     1}}
+#{?_without_modules:    %{expand: %%global BUILD_modules 0}}
+%{?_without_devel:      %{expand: %%global BUILD_devel   0}}
+#{?_without_tools:      %{expand: %%global BUILD_tools   0}}
+%{?_without_indep:      %{expand: %%global BUILD_noarch  0}}
+%{?_without_arch:       %{expand: %%global BUILD_arch    0}}
+%{?_without_public:     %{expand: %%global BUILD_source  0}}
+%{?_without_lis:        %{expand: %%global BUILD_lis     0}}
+%{?_without_lis:        %{expand: %%global BUILD_lfs     1}}
+%{?_without_lfs:        %{expand: %%global BUILD_lfs     0}}
+%{?_without_lfs:        %{expand: %%global BUILD_lis     1}}
 
-#{?_with_devfs:       %{expand: %%global NEED_devs     0}}
-#{?_with_modules:     %{expand: %%global BUILD_modules 1}}
-%{?_with_devel:       %{expand: %%global BUILD_devel   1}}
-#{?_with_tools:       %{expand: %%global BUILD_tools   1}}
-%{?_with_indep:       %{expand: %%global BUILD_noarch  1}}
-%{?_with_arch:        %{expand: %%global BUILD_arch    1}}
-%{?_with_public:      %{expand: %%global BUILD_source  1}}
-%{?_with_lis:         %{expand: %%global BUILD_lis     1}}
-%{?_with_lis:         %{expand: %%global BUILD_lfs     0}}
-%{?_with_lfs:         %{expand: %%global BUILD_lfs     1}}
-%{?_with_lfs:         %{expand: %%global BUILD_lis     0}}
+#{?_with_devfs:         %{expand: %%global NEED_devs     0}}
+#{?_with_modules:       %{expand: %%global BUILD_modules 1}}
+%{?_with_devel:         %{expand: %%global BUILD_devel   1}}
+#{?_with_tools:         %{expand: %%global BUILD_tools   1}}
+%{?_with_indep:         %{expand: %%global BUILD_noarch  1}}
+%{?_with_arch:          %{expand: %%global BUILD_arch    1}}
+%{?_with_public:        %{expand: %%global BUILD_source  1}}
+%{?_with_lis:           %{expand: %%global BUILD_lis     1}}
+%{?_with_lis:           %{expand: %%global BUILD_lfs     0}}
+%{?_with_lfs:           %{expand: %%global BUILD_lfs     1}}
+%{?_with_lfs:           %{expand: %%global BUILD_lis     0}}
+
+%if %{BUILD_source}
+%global _enable_ksource_package  1
+%else
+%global _enable_ksource_package  0
+%endif
 
 # need manpage references unless otherwise specified
 %global NEED_manrefs  1
@@ -137,6 +144,15 @@
 
 %define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+
+%global debug_package %{nil}
+
+%{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
+
+%if %{_enable_debug_packages}
+%else
+%global BUILD_debug   0
+%endif
 
 %if %{BUILD_arch}
 %global BUILD_source  0
@@ -190,6 +206,7 @@
 %if %{BUILD_tools}
 %global FILES_libs          1
 %global FILES_libs32        1
+%global FILES_debug         1
 %global FILES_dev           1
 %global FILES_devlibs       1
 %global FILES_devlibs32     1
@@ -202,6 +219,7 @@
 %else
 %global FILES_libs          0
 %global FILES_libs32        0
+%global FILES_debug         0
 %global FILES_dev           0
 %global FILES_devlibs       0
 %global FILES_devlibs32     0
@@ -227,8 +245,10 @@
 %else
 %global FILES_modules       0
 %global FILES_ko_modules    0
+%global FILES_kern_debug    0
 %global FILES_libs          0
 %global FILES_libs32        0
+%global FILES_debug         0
 %global FILES_dev           0
 %global FILES_devlibs       0
 %global FILES_devlibs32     0
@@ -242,6 +262,21 @@
 %global FILES_doc           0
 %global FILES_doclibs       0
 %global FILES_source        0
+%endif
+
+%if %{BUILD_debug}
+%else
+%global FILES_kern_debug    0
+%global FILES_debug         0
+%endif
+
+%if %{FILES_kern_debug}
+%global FILES_debug         0
+%global __debug_package     1
+%endif
+
+%if %{FILES_debug}
+%global __debug_package     1
 %endif
 
 %if %{BUILD_libs}
@@ -284,7 +319,7 @@ Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
-Release:        @PACKAGE_RPMRELEASE@
+Release:        %{fullrelease}
 License:        AGPLv3
 Group:          System Environment/Kernel
 %{?url:URL:            %{url}}
@@ -295,6 +330,8 @@ ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
+Autoreq:        true
+Autoprov:       true
 
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 
@@ -329,6 +366,7 @@ BuildRequires:   strinet-devel >=   @INET_VERSION@%{?extrarelease2}
 %if %{_strsctp}
 BuildRequires:   strsctp-devel >= @STRSCTP_VERSION@%{?extrarelease2}
 %endif
+
 # these are some needs of the configure script
 # to manipulate manual pages:
 BuildRequires:  /usr/bin/groff
@@ -346,7 +384,6 @@ BuildRequires:  /usr/bin/gzip
 # to install documentation
 #BuildRequires: texinfo >= 4.0
 # find the rest automagically
-Autoreq:        true
 
 # ---------------------------------------------------------------------------
 %description
@@ -574,13 +611,15 @@ package_source
 %package %{_streams}
 Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
 Group:          System Environment/Base
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}
 Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease2}
@@ -643,13 +682,15 @@ fi
 
 Summary:        %{title} test utilities.
 Group:          System Environment/Base
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Prefix:         %{_pkglibexecdir}
 #Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
 Release:        %{fullrelease}
@@ -677,15 +718,17 @@ submitting problem reports to @PACKAGE_BUGREPORT@.
 
 Summary:        %{title} manpages, manuals and docs.
 Group:          Documentation
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
 #Prereq:         /sbin/install-info
-Autoreq:        true
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
@@ -775,7 +818,10 @@ fi
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
-#doc doc/drafts doc/papers doc/projects doc/specs
+#doc doc/specs
+#doc doc/drafts
+#doc doc/papers
+#doc doc/projects
 %doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes
 %{_infodir}/*
 %{manrefs}
@@ -791,7 +837,10 @@ fi
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
-#doc doc/drafts doc/papers doc/projects doc/specs
+#doc doc/specs
+#doc doc/drafts
+#doc doc/papers
+#doc doc/projects
 %doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes
 %{_infodir}/*
 %{manrefs}
@@ -804,10 +853,12 @@ fi
 
 Summary:        %{title} source package.
 Group:          Development/System
-Prefix:         %{_usrsrc}
-Autoreq:        true
+Version:        @VERSION@
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_usrsrc}
 Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
@@ -821,6 +872,13 @@ necessary for building the %{name} release.  It also includes
 the autoconf configuration utilities necessary to create and
 distribute this rpm.  To develop on the package, it would be
 better to use the tarball or source rpm release.
+
+
+
+Authors
+-------
+    Brian Bidulock, <bidulock@openss7.org>
+Distribution: %{distribution} (%{_target_cpu})
 
 %if %{FILES_source}
 %files source
@@ -836,9 +894,10 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 0.9.2.77  2008-09-10 20:46:09  brian
-# - install init scripts on fresh install
-#
+
+* Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.77  2008-09-10 20:46:09  brian
+- install init scripts on fresh install
 
 * Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.76  2008-09-10 17:44:41  brian
