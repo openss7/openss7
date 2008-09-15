@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-09-14 03:44:06 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.100 $) $Date: 2008-09-15 08:54:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-14 03:44:06 $ by $Author: brian $
+## Last Modified $Date: 2008-09-15 08:54:28 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -153,7 +153,7 @@ RPMBOPTS		= $(RPMOPTS) \
 ##
 RPMKOPTS		= $(RPMOPTS)
 
-redhatpkg		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)
+redhatpkg		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)
 redhat_dir		= $(rpmbuilddir)/$(PACKAGE)-$(VERSION)
 redhat_dir_stamp	= $(rpmbuilddir)/stamp-$(PACKAGE)-$(VERSION)
 redhat_src_file		= $(srcrpmdir)/$(redhatpkg).src.rpm
@@ -163,7 +163,9 @@ redhat_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
 redhat_img_files	= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 redhat_source_files	= $(redhat_spec_file) $(redhat_img_files) $(redhat_tar_file)
 redhat_binary_file	= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-redhat_binary_files	= $(rpmdir)/*/$(redhat_binary_file)
+redhat_module_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+redhat_binary_files	= $(rpmdir)/*/$(redhat_binary_file) \
+			  $(rpmdir)/*/$(redhat_module_file)
 redhat_cache_files	= $(rpmbuilddir)/*config.cache \
 			  $(rpmbuilddir)/*config.site \
 			  $(rpmbuilddir)/*modpost.cache
@@ -313,24 +315,34 @@ sign srpm-sign: $(redhat_src_file)
 #!     @DESTDIR@/lib/modules directory and builds rpms for those kernels and for
 #!     each of a set of architectures given in the AM_RPMTARGETS variable to
 #!     make.  This is a convenience target for building a group of rpms on a
-#!     given build machine.
+#!     given build machine.  This target will only rebuild packages for
+#!     architetures and kernels that do not already exist in the package
+#!     distribution directory.
 #!
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
-	@$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm" ; \
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :; \
-	kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; \
-	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; \
-	for t in $$targets ;  do \
-		for k in $$kernels ; do \
+	@rpms="`find $(rpmdir)/noarch -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm' 2>/dev/null`" ; \
+	if test -z "$$rpms" -o -n '$(FORCE)'; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :; \
+	fi ; \
+	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; for t in $$targets ;  do \
+		rpms="`find $(rpmdir)/$$t -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`" ; \
+		if test -z "$$rpms" -o -n '$(FORCE)'; then \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
+			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
+		fi ; \
+		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; for k in $$kernels ; do \
 			k=`basename $$k` ; \
 			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
+				ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'` ; \
+				rpms="`find $(rpmdir)/$$t -name 'kmod-$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`" ; \
+				if test -z "$$rpms" -o -n '$(FORCE)'; then \
+					$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
+					$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
+				fi ; \
 			fi ; \
 		done ; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm|| :; \
 	done
 
 #! resign:
@@ -342,11 +354,11 @@ rebuild:
 #!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
-	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' 2>/dev/null`" ; \
+	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module_file)' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild" ; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild ; \
-		rpms="`find $(rpmdir) -name '$(redhat_binary_file)' 2>/dev/null`" ; \
+		rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module_file)' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
 		fi ; \
@@ -425,6 +437,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.100  2008-09-15 08:54:28  brian
+## - build modifications
+##
 ## Revision 0.9.2.99  2008-09-14 03:44:06  brian
 ## - typos
 ##

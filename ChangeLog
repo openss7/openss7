@@ -2,6 +2,8 @@
 
 	* scripts/texi/install.texi: update .rpmmacro recommendations
 	* doc/manual/texi/install.texi: update .rpmmacro recommendations
+	* am/openss7.am: build all-recursive targets local if no subdirs
+	* am/rpm.am: only rebuild what is necessary
 
 2008-09-13  Brian Bidulock  <bidulock@openss7.org>
 
