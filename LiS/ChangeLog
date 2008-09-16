@@ -1,3 +1,7 @@
+2008-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* LiS.spec.in: support autoupdating kernel modules
+
 2008-09-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/install.texi: updated rpm macros description
