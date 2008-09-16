@@ -1,3 +1,7 @@
+2008-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* strinet.spec.in: support autoupdating kernel modules
+
 2008-09-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: instrument inet driver

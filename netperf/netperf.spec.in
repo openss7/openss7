@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-09-10 20:46:09 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-09-16 10:00:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 20:46:09 $ by $Author: brian $
+# Last Modified $Date: 2008-09-16 10:00:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -245,7 +245,6 @@
 %else
 %global FILES_modules       0
 %global FILES_ko_modules    0
-%global FILES_kern_debug    0
 %global FILES_libs          0
 %global FILES_libs32        0
 %global FILES_debug         0
@@ -266,13 +265,7 @@
 
 %if %{BUILD_debug}
 %else
-%global FILES_kern_debug    0
 %global FILES_debug         0
-%endif
-
-%if %{FILES_kern_debug}
-%global FILES_debug         0
-%global __debug_package     1
 %endif
 
 %if %{FILES_debug}
@@ -314,6 +307,12 @@
 %define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
 
 %global descripline %{title} is an OpenSS7 Modified version of HP Netperf.
+
+%if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
+%global descriptail %(echo -en '\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
+%else
+%global descriptail %{nil}
+%endif
 
 Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
 Name:           @PACKAGE@
@@ -401,6 +400,7 @@ SRPM builds the following binary packages:
 - %{name}-test -- test utilities.
 - %{name}-doc -- manpages, manuals and docs.
 - %{name}-source -- source package.
+%{descriptail}
 
 %prep
 # ---------------------------------------------------------------------------
@@ -635,6 +635,7 @@ SCTP sockets interface as well as OpenSS7 %{_STREAMS} STREAMS
 DLPI, XTI INET driver, and XTI SCTP driver.  The purpose of this
 binary package is to be able to perform comparison tests against
 TCP and SCTP.
+%{descriptail}
 
 %if %{have_tools}
 %pre %{_streams}
@@ -702,6 +703,7 @@ The %{name}-test binary package provides the autotest validation
 testsuites used for validating and troubleshooting the %{title}
 package.  It also includes the send-pr script for generating and
 submitting problem reports to @PACKAGE_BUGREPORT@.
+%{descriptail}
 
 %if %{FILES_test}
 %files test
@@ -726,12 +728,12 @@ Autoprov:       true
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
+#Prereq:         /sbin/install-info
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
-#Prereq:         /sbin/install-info
-Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -744,6 +746,7 @@ installation and reference manual.  Also included are extensive
 manual pages for the entire package, including manual pages for
 commands, administrative utilities, user interfaces, and kernel
 functions.
+%{descriptail}
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -859,9 +862,9 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_usrsrc}
-Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -872,13 +875,7 @@ necessary for building the %{name} release.  It also includes
 the autoconf configuration utilities necessary to create and
 distribute this rpm.  To develop on the package, it would be
 better to use the tarball or source rpm release.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_source}
 %files source
@@ -894,6 +891,9 @@ Distribution: %{distribution} (%{_target_cpu})
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 0.9.2.78  2008-09-16 10:00:19  brian
+# - support autoupdating kernel modules for various distros
+#
 
 * Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.77  2008-09-10 20:46:09  brian

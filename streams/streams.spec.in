@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2008-09-10 20:46:12 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-09-16 10:00:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 20:46:12 $ by $Author: brian $
+# Last Modified $Date: 2008-09-16 10:00:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -263,6 +263,25 @@
 #global _strvers @LIS_VERSION@%{?extrarelease2}
 #{expand: %%global _with_lis --with-lis}
 #endif
+
+%define corename() %1-core-%_kversion
+%define infoname() %1-info-%_kversion
+%define dbugname() %1-debug-%_kversion
+%global kmodules_version @VERSION@
+
+%if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
+%define corename() openss7-%1-kmp%kernel_flavor
+%define infoname() openss7-%1-kmp%kernel_flavor-devel
+%define dbugname() openss7-%1-kmp%kernel_flavor-debuginfo
+%global kmodules_version @VERSION@_%kernel_string
+%endif
+
+%if %(test '%_vendor' = 'redhat' && echo 1 || echo 0)
+%define corename() kmod-%1%kernel_flavor
+%define infoname() kmod-%1%kernel_flavor-devel
+%define dbugname() kmod-%1%kernel_flavor-debuginfo
+%global kmodules_version @VERSION@.%kernel_release
+%endif
 
 %if %{have_modules}
 %else
@@ -487,6 +506,12 @@
 
 %global descripline %{title} is an implementation of SVR 4.2 MP %{virtual} for Linux.
 
+%if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
+%global descriptail %(echo -en '\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
+%else
+%global descriptail %{nil}
+%endif
+
 Summary:        %{title} (SVR 4.2 MP %{virtual}).
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
@@ -565,45 +590,45 @@ BuildRequires:  /sbin/genksyms
 #BuildRequires: ghostscript >= 6.51
 # to install documentation
 #BuildRequires: texinfo >= 4.0
-# find the rest automagically
-Requires:  kmod-%{name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:  kmod-%{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-%if %{_enable_debug_packages}
-Requires:  kmod-%{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
-%endif
-Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
+
+Conflicts:      %{_conflict}
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
 %if %{_enable_ksource_package}
 Requires:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 %endif
-Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
 %if %{_enable_debug_packages}
+Requires:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
 %endif
-%{?_conflict:Conflicts:      %{_conflict}}
-Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
 
 # ---------------------------------------------------------------------------
 %description
 %{descripline}
 The %{name} package includes kernel modules, STREAMS
 drivers, modules, libraries, utilities, test programs, daemons,
-and development environment for the development and execution of 
-System V Release 4.2 MP %{virtual} modules and drivers developed 
+and development environment for the development and execution of
+System V Release 4.2 MP %{virtual} modules and drivers developed
 for Linux.
 This distribution is currently applicable to 2.4 and 2.6 kernels
 and is validated for ix86, x86_64, ppc and ppc64 architectures,
 but should build and install well for other architectures.
 This package includes the following binary packages:
 
- - kmod-%{name}%{kernel_flavor} -- core kernel modules.
- - kmod-%{name}%{kernel_flavor}-devel -- kernel module info.
- - kmod-%{name}%{kernel_flavor}-debuginfo -- kernel module debug info.
+ - %{corename %name} -- core kernel modules.
+ - %{infoname %name} -- kernel module info.
+ - %{dbugname %name} -- kernel module debug info.
  - %{name}-lib -- run-time libraries.
  - %{name}-util -- admin utilities.
  - %{name}-debuginfo -- debugging information.
@@ -614,13 +639,7 @@ This package includes the following binary packages:
  - %{name}-source -- source package.
  - %{name}-init -- init scripts and config files.
  - %{name}-mibs -- SNMP MIBs.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %prep
 # ---------------------------------------------------------------------------
@@ -862,17 +881,17 @@ Autoprov:       true
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
-Conflicts:      texinfo < 3.11
-%{?_conflict:Conflicts:      %{_conflict}-doc}
-%{?_conflict:Conflicts:      %{_conflict}-docs}
-Obsoletes:      %{name}-docs
 #Prereq:         /sbin/install-info
-%{?virtual:Provides:       %{virtual}-doc = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease}}
+Conflicts:      %{_conflict}-doc
+Conflicts:      %{_conflict}-docs
+Conflicts:      texinfo < 3.11
+Obsoletes:      %{name}-docs
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-doc = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -885,13 +904,7 @@ installation and reference manual.  Also included are extensive
 manual pages for the entire package, including manual pages for
 commands, administrative utilities, user interfaces, and kernel
 functions.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -1005,12 +1018,12 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_usrsrc}
-%{?virtual:Provides:       %{virtual}-source = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease}}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-source = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1021,13 +1034,7 @@ necessary for building the %{name} release.  It also includes
 the autoconf configuration utilities necessary to create and
 distribute this rpm.  To develop on the package, it would be
 better to use the tarball or source rpm release.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_source}
 %files source
@@ -1058,15 +1065,15 @@ Prefix:         %{_snmpconfdir}
 %if %{have_oldmods}
 Prefix:         %{_modutildir}
 %endif
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{_conflict}-init
 Obsoletes:      %{name}-inits
-%{?_conflict:Conflicts:      %{_conflict}-init}
-%{?virtual:Provides:       %{virtual}-init = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease}}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-init = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1076,13 +1083,7 @@ The %{name}-init binary package provides the Sys V init scripts
 and configuration files associated with the %{title} package.
 These init scripts load kernel modules, create devices, and
 apply system configuration customizations at boot.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %pre init
 # ---------------------------------------------------------------------------
@@ -1710,12 +1711,12 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_snmpmibdir}
-%{?virtual:Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease}}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1724,13 +1725,7 @@ Release:        %{fullrelease}
 The %{name}-mibs binary package provides SNMP MIB defintions
 for managing the %{title} package with
 external SNMP management tools.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_mibs}
 %files mibs
@@ -1750,16 +1745,16 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_pkglibexecdir}
+Conflicts:      %{_conflict}-test
+Conflicts:      %{_conflict}-tests
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
-%{?_conflict:Conflicts:      %{_conflict}-test}
-%{?_conflict:Conflicts:      %{_conflict}-tests}
-%{?virtual:Provides:       %{virtual}-test = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease}}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1769,13 +1764,7 @@ The %{name}-test binary package provides the autotest validation
 testsuites used for validating and troubleshooting the %{title}
 package.  It also includes the send-pr script for generating and
 submitting problem reports to @PACKAGE_BUGREPORT@.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_test}
 %files test
@@ -1797,19 +1786,19 @@ Version:        @VERSION@
 %{?_gif:Icon: %_gif}
 Autoreq:        true
 Autoprov:       true
-%{?_conflict:Conflicts:      %{_conflict}-dev}
-%{?_conflict:Conflicts:      %{_conflict}-devs}
+Conflicts:      %{_conflict}-dev
+Conflicts:      %{_conflict}-devs
 Requires:       dev >= 3.3
 %if %{MAKE_devs}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Obsoletes:      %{name}-devs
-%{?virtual:Provides:       %{virtual}-dev = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease}}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1822,13 +1811,7 @@ themselves.  On newer systems, this binary package includes the
 executable for creating devices from init scripts.
 
 The package is not required for devfs based systems.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{MAKE_devs}
 %post dev
@@ -1875,12 +1858,12 @@ Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 %endif
 Prefix:         %{_includedir}/%{name}
-%{?virtual:Provides:       %{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease}}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1891,13 +1874,7 @@ for static compilation, and headers files to develop
 %{title} modules and drivers.
 This also includes the header files and static libraries required
 to compile %{title} applications programs.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_devlibs32}
 %files devel
@@ -1941,14 +1918,14 @@ Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 %endif
 Prefix:         %{_localedir}
-Obsoletes:      %{name}-libs
 Prereq:         /sbin/ldconfig
-%{?virtual:Provides:       %{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease}}
+Obsoletes:      %{name}-libs
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1958,13 +1935,7 @@ The %{name}-lib binary package contains the run-time (shared
 object) libraries necessary to run applications programs and
 utilities developed for %{title}.  Also included are the libtool
 .la files describing the shared object libraries.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %pre lib
 # ---------------------------------------------------------------------------
@@ -2039,21 +2010,23 @@ Prefix:         %{_snmpdlmoddir}
 Prefix:         %{_snmpdlmod32dir}
 %endif
 %if %{FILES_snmp}
-Requires:       net-snmp
+#Requires:       net-snmp
 %endif
 %if %{FILES_snmp32}
-Requires:       net-snmp
+#Requires:       net-snmp
 %endif
+%if %{have_libraries}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Conflicts:      %{_conflict}-util
+Conflicts:      %{_conflict}-utils
 Obsoletes:      %{name}-utils
-%{?_conflict:Conflicts:      %{_conflict}-util}
-%{?_conflict:Conflicts:      %{_conflict}-utils}
-%{?virtual:Provides:       %{virtual}-util = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease}}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease2}}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -2064,13 +2037,7 @@ and configuration test utilities and commands associated with the
 %{title} package.
 Note that these utilities are needed for running the validation
 test suites contained in the %{name}-test binary package.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{have_tools}
 %pre util
@@ -2141,8 +2108,9 @@ Group:          Development/Debug
 Version:        @VERSION@
 AutoReq:        0
 AutoProv:       0
+Obsoletes:      %{name}-debug < %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-debug = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-debug = %{epoch}:%{version}-%{rpmrelease}}
+Provides:       %{virtual}-debug = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -2151,13 +2119,7 @@ Release:        %{fullrelease}
 This package provides debug information for package %{name}.
 Debug information is useful when developing applicaions that
 use this package or when debugging this package.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_debug}
 %files debuginfo
@@ -2168,7 +2130,7 @@ Distribution: %{distribution} (%{_target_cpu})
 %endif
 
 # ===========================================================================
-%package -n kmod-%{name}%{kernel_flavor}
+%package -n %{corename %name}
 
 Summary:        %{title} core kernel modules.
 Group:          System Environment/Kernel
@@ -2185,58 +2147,38 @@ Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %if %{NEED_devs}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 %endif
-%{?_conflict:Conflicts:      %{_conflict}-%{core_name}}
-%{?_conflict:Conflicts:      kmod-%{_conflict}%{kernel_flavor}}
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
 #Prereq:         /sbin/modprobe
 # SuSE puts lsof in /usr/bin
 Prereq:         lsof
-%{?virtual:Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}}
-%{?virtual:Provides:       %{virtual}-core = %{epoch}:%{version}-%{rpmrelease}}
-%{?virtual:Provides:       %{virtual}-kmod = %{epoch}:%{version}-%{rpmrelease}}
-%{?virtual:Provides:       %{virtual}-kmdl = %{epoch}:%{version}-%{rpmrelease}}
-%{?virtual:Provides:       kmod-%{virtual} = %{epoch}:%{version}-%{rpmrelease}}
-%{?virtual:Provides:       kernel-module-%{virtual} = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-core = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kernel-module-%{name} = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}}
-%{?virtual:Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}}
-%{?virtual:Provides:       %{virtual}-kmod = %{epoch}:%{version}-%{fullrelease}}
-%{?virtual:Provides:       %{virtual}-kmdl = %{epoch}:%{version}-%{fullrelease}}
-%{?virtual:Provides:       kmod-%{virtual} = %{epoch}:%{version}-%{fullrelease}}
-%{?virtual:Provides:       kernel-module-%{virtual} = %{epoch}:%{version}-%{fullrelease}}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name} = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}}
-%{?virtual:Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease2}}
-%{?virtual:Provides:       %{virtual}-kmod = %{epoch}:%{version}-%{fullrelease2}}
-%{?virtual:Provides:       %{virtual}-kmdl = %{epoch}:%{version}-%{fullrelease2}}
-%{?virtual:Provides:       kmod-%{virtual} = %{epoch}:%{version}-%{fullrelease2}}
-%{?virtual:Provides:       kernel-module-%{virtual} = %{epoch}:%{version}-%{fullrelease2}}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{corename %_conflict}
+Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{corename %virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{corename %virtual} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       kernel-modules = %{_kversion}
-Version:        @VERSION@_%{kernel_string}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n kmod-%{name}%{kernel_flavor}
+%description -n %{corename %name}
 %{descripline}
-The kmod-%{name}%{kernel_flavor} binary package contains the
+The %{corename %name} binary package contains the
 kernel modules that provide the Linux kernel SVR 4.2 MP
 %{virtual} facility.  This includes assorted basic %{virtual}
 drivers and modules such as pipes, fifos, echo, etc.  This
@@ -2246,15 +2188,9 @@ This package is heavily tied to the kernel for which it was compiled.
 This package applies to kernel version %{kernel_version}.  If
 you cannot find a binary package that matches your kernel, rebuild
 from the source rpm.
+%{descriptail}
 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
-
-%pre -n kmod-%{name}%{kernel_flavor}
+%pre -n %{corename %name}
 # ---------------------------------------------------------------------------
 arg="$1"
 function remove_depmods() {
@@ -2349,7 +2285,7 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
     fi
 fi
 
-%post -n kmod-%{name}%{kernel_flavor}
+%post -n %{corename %name}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -2373,7 +2309,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     fi
 fi
 
-%preun -n kmod-%{name}%{kernel_flavor}
+%preun -n %{corename %name}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -2419,7 +2355,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 
-%postun -n kmod-%{name}%{kernel_flavor}
+%postun -n %{corename %name}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
@@ -2476,7 +2412,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 fi
 
 %if %{FILES_modules}
-%files -n kmod-%{name}%{kernel_flavor}
+%files -n %{corename %name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_kmoduledir}/%{base}
@@ -2485,7 +2421,7 @@ fi
 %endif
 
 %if %{FILES_ko_modules}
-%files -n kmod-%{name}%{kernel_flavor}
+%files -n %{corename %name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_kmoduledir}/%{base}
@@ -2493,7 +2429,7 @@ fi
 %endif
 
 # ===========================================================================
-%package -n kmod-%{name}%{kernel_flavor}-devel
+%package -n %{infoname %name}
 
 Summary:        %{title} core kernel module symbol versions.
 Group:          System Environment/Kernel
@@ -2507,49 +2443,44 @@ Prefix:         %{_includedir}/%{name}/%{kernel_version}
 Prefix:         %{_kmoduledir}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-%{?virtual:Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}}
-%{?virtual:Provides:       %{virtual}-info = %{epoch}:%{version}-%{rpmrelease}}
-%{?virtual:Provides:       kmod-%{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-info = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease}}
-%{?virtual:Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease}}
-%{?virtual:Provides:       kmod-%{virtual}-devel = %{epoch}:%{version}-%{fullrelease}}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name}-devel = %{epoch}:%{version}-%{fullrelease}
-%{?virtual:Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}}
-%{?virtual:Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease2}}
-%{?virtual:Provides:       kmod-%{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name}-devel = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
-Version:        @VERSION@_%{kernel_string}
+Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-info < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n kmod-%{name}%{kernel_flavor}-devel
+%description -n %{infoname %name}
 %{descripline}
-The kmod-%{name}%{kernel_flavor}-devel binary package
+The %{infoname %name} binary package
 contains the kernel modules symbol information for development
 of additional %{virtual} kernel modules against the core kernel
-modules included in the kmod-%{name}%{kernel_flavor} binary
+modules included in the %{corename %name} binary
 package.  This package is heavily tied to the core kernel
 modules and kernel for which it was compiled.  This package
-applies to core kernel modules kmod-%{name}%{kernel_flavor}
+applies to core kernel modules %{corename %name}
 for kernel version %{_kversion}.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_modules}
-%files -n kmod-%{name}%{kernel_flavor}-devel
+%files -n %{infoname %name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_includedir}/%{name}/%{kernel_version}
@@ -2558,7 +2489,7 @@ Distribution: %{distribution} (%{_target_cpu})
 %endif
 
 %if %{FILES_ko_modules}
-%files -n kmod-%{name}%{kernel_flavor}-devel
+%files -n %{infoname %name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_kmoduledir}/%{base}/Module*
@@ -2567,35 +2498,35 @@ Distribution: %{distribution} (%{_target_cpu})
 # don't include package for FILES_ko_modules
 
 # ===========================================================================
-%package -n kmod-%{name}%{kernel_flavor}-debuginfo
+%package -n %{dbugname %name}
 
 Summary:        %{title} kernel module debug information.
 Group:          Development/Debug
 AutoReq:        0
 AutoProv:       0
-Provides:       kmod-%{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       kmod-%{virtual}-debuginfo = %{epoch}:%{version}-%{rpmrelease}}
-Provides:       %{name}-debug-%{_kversion} =  %{epoch}:%{version}-%{rpmrelease}
-%{?virtual:Provides:       %{virtual}-debug-%{_kversion} =  %{epoch}:%{version}-%{rpmrelease}}
-Version:        @VERSION@_%{kernel_string}
+Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n kmod-%{name}%{kernel_flavor}-debuginfo
+%description -n %{dbugname %name}
 %{descripline}
 This package provides debug information for package %{name}.
 Debug information is useful when developing applications that
 use this package or when debugging this package.
- 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_kern_debug}
-%files -n kmod-%{name}%{kernel_flavor}-debuginfo
+%files -n %{dbugname %name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
@@ -2606,6 +2537,9 @@ Distribution: %{distribution} (%{_target_cpu})
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
+# Revision 0.9.2.172  2008-09-16 10:00:23  brian
+# - support autoupdating kernel modules for various distros
+#
 
 * Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.171  2008-09-10 20:46:12  brian

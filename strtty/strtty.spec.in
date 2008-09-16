@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strtty.spec.in,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-10 20:46:15 $
+# @(#) $RCSfile: strtty.spec.in,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-16 10:00:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 20:46:15 $ by $Author: brian $
+# Last Modified $Date: 2008-09-16 10:00:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,7 +82,7 @@
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
 %global kernel_version %{_kversion}
-%global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;t;s,-?smp$,,;t;s,bigmem$,,;t;s,debug$,,;t;s,enterprise$,,;t;s,hugemem$,,;t;s,secure$,,;t;s,-i686-up-4GB$,,;t;s,-p3-smp-64GB$,,;t;s,-64GB-SMP,.SuSE,;t;s,-default$,,')
+%global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,')
 %global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
 %global kernel_release %(echo %{_kversion} | sed -e 's,-,.,g')
 %global kernel_string %(echo %{_kversion} | sed -e 's,-,_,g')
@@ -261,6 +261,25 @@
 %global _conflict streams
 %global _strvers @LIS_VERSION@%{?extrarelease2}
 %{expand: %%global _with_lis --with-lis}
+%endif
+
+%define corename() %1-core-%_kversion
+%define infoname() %1-info-%_kversion
+%define dbugname() %1-debug-%_kversion
+%global kmodules_version @VERSION@
+
+%if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
+%define corename() openss7-%1-kmp%kernel_flavor
+%define infoname() openss7-%1-kmp%kernel_flavor-devel
+%define dbugname() openss7-%1-kmp%kernel_flavor-debuginfo
+%global kmodules_version @VERSION@_%kernel_string
+%endif
+
+%if %(test '%_vendor' = 'redhat' && echo 1 || echo 0)
+%define corename() kmod-%1%kernel_flavor
+%define infoname() kmod-%1%kernel_flavor-devel
+%define dbugname() kmod-%1%kernel_flavor-debuginfo
+%global kmodules_version @VERSION@.%kernel_release
 %endif
 
 %if %{have_modules}
@@ -486,6 +505,12 @@
 
 %global descripline %{title} provides %{_STREAMS} STREAMS Terminals.
 
+%if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
+%global descriptail %(echo -en '\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
+%else
+%global descriptail %{nil}
+%endif
+
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} for Linux.
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
@@ -537,9 +562,9 @@ BuildRequires:  gcc = 2.95.3
 %endif
 BuildRequires: strcompat-devel = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %if %{without_ko_modules}
-BuildRequires: strcompat-%{info_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
+BuildRequires: %{infoname strcompat-%{_streams}} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %else
-BuildRequires: strcompat-%{core_name} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
+BuildRequires: %{corename strcompat-%{_streams}} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}
 %endif
 
 # these are some needs of the configure script
@@ -570,27 +595,27 @@ BuildRequires:  /sbin/genksyms
 #BuildRequires: ghostscript >= 6.51
 # to install documentation
 #BuildRequires: texinfo >= 4.0
-# find the rest automagically
-Requires:  kmod-%{name}-STREAMS = %{epoch}:%{version}-%{rpmrelease}
-Requires:  kmod-%{name}-STREAMS-devel = %{epoch}:%{version}-%{rpmrelease}
-%if %{_enable_debug_packages}
-Requires:  kmod-%{name}-STREAMS-debuginfo = %{epoch}:%{version}-%{rpmrelease}
-%endif
-Requires:       %{name}-STREAMS-lib = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-STREAMS-util = %{epoch}:%{version}-%{rpmrelease}
+
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{corename %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{infoname %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-%virtual-lib = %{epoch}:%{version}-%{rpmrelease}
+#Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-%virtual-util = %{epoch}:%{version}-%{rpmrelease}
 %if %{_enable_ksource_package}
 Requires:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 %endif
-Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
-#Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
 %if %{_enable_debug_packages}
-Requires:       %{name}-STREAMS-debuginfo = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
 %endif
-Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
 
 # ---------------------------------------------------------------------------
 %description
@@ -605,9 +630,9 @@ and is validated for ix86, x86_64, ppc and ppc64 architectures,
 but should build and install well for other architectures.
 This package includes the following binary packages:
 
- - kmod-%{name}-%{_streams}%{kernel_flavor} -- core kernel modules.
- - kmod-%{name}-%{_streams}%{kernel_flavor}-devel -- kernel module info.
- - kmod-%{name}-%{_streams}%{kernel_flavor}-debuginfo -- kernel module debug info.
+ - %{corename %name-%_streams} -- core kernel modules.
+ - %{infoname %name-%_streams} -- kernel module info.
+ - %{dbugname %name-%_streams} -- kernel module debug info.
  - %{name}-%{_streams}-lib -- run-time libraries.
  - %{name}-%{_streams}-util -- admin utilities.
  - %{name}-%{_streams}-debuginfo -- debugging information.
@@ -618,13 +643,7 @@ This package includes the following binary packages:
  - %{name}-source -- source package.
  - %{name}-init -- init scripts and config files.
 #- %{name}-mibs -- SNMP MIBs.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %prep
 # ---------------------------------------------------------------------------
@@ -818,12 +837,12 @@ Autoprov:       true
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
+#Prereq:         /sbin/install-info
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
-#Prereq:         /sbin/install-info
-Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -836,13 +855,7 @@ installation and reference manual.  Also included are extensive
 manual pages for the entire package, including manual pages for
 commands, administrative utilities, user interfaces, and kernel
 functions.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -956,9 +969,9 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_usrsrc}
-Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -969,13 +982,7 @@ necessary for building the %{name} release.  It also includes
 the autoconf configuration utilities necessary to create and
 distribute this rpm.  To develop on the package, it would be
 better to use the tarball or source rpm release.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_source}
 %files source
@@ -1009,9 +1016,9 @@ Prefix:         %{_modutildir}
 Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease2}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-inits
-Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1021,13 +1028,7 @@ The %{name}-init binary package provides the Sys V init scripts
 and configuration files associated with the %{title} package.
 These init scripts load kernel modules, create devices, and
 apply system configuration customizations at boot.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %pre init
 # ---------------------------------------------------------------------------
@@ -1657,12 +1658,9 @@ Autoprov:       true
 Prefix:         %{_snmpmibdir}
 %{?_strvers:Requires: %{_streams}-mibs = %version_of_or %{_streams}-mibs %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-mibs = %{_streams}-mibs}
-Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1671,13 +1669,7 @@ Release:        %{fullrelease}
 The %{name}-mibs binary package provides SNMP MIB defintions
 for managing the %{title} package with
 external SNMP management tools.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_mibs}
 %files mibs
@@ -1699,9 +1691,9 @@ Autoprov:       true
 Prefix:         %{_pkglibexecdir}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Obsoletes:      %{name}-tests
-Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1711,13 +1703,7 @@ The %{name}-test binary package provides the autotest validation
 testsuites used for validating and troubleshooting the %{title}
 package.  It also includes the send-pr script for generating and
 submitting problem reports to @PACKAGE_BUGREPORT@.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_test}
 %files test
@@ -1744,9 +1730,9 @@ Requires:       dev >= 3.3
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Obsoletes:      %{name}-devs
-Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1759,13 +1745,7 @@ themselves.  On newer systems, this binary package includes the
 executable for creating devices from init scripts.
 
 The package is not required for devfs based systems.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{MAKE_devs}
 %post dev
@@ -1812,9 +1792,9 @@ Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 %endif
 Prefix:         %{_includedir}/%{name}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1825,13 +1805,7 @@ for static compilation, and headers files to develop
 OpenSS7 %{_STREAMS} STREAMS %{stitle} applications.
 This also includes the header files and static libraries required
 to compile OpenSS7 %{_STREAMS} STREAMS %{stitle} applications programs.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_devlibs32}
 %files devel
@@ -1877,33 +1851,27 @@ Prefix:         %{_lib32dir}
 Prefix:         %{_localedir}
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
-Obsoletes:      %{name}-%{_streams}-libs
 Prereq:         /sbin/ldconfig
-Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-libs
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description %{_streams}-lib
 %{descripline}
-The %{name}-%{_streams}-lib package contains the run-time (shared
+The %{name}-%{_streams}-lib binary package contains the run-time (shared
 object) libraries necessary to run applications programs and
 utilities developed for %{title}.  Also included are the libtool
 .la files describing the shared object libraries.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %pre %{_streams}-lib
 # ---------------------------------------------------------------------------
@@ -1977,31 +1945,31 @@ Prefix:         %{_snmpdlmoddir}
 Prefix:         %{_snmpdlmoddir}
 Prefix:         %{_snmpdlmod32dir}
 %endif
-%if %{have_libraries}
-Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
-%endif
 %if %{FILES_snmp}
-Requires:       net-snmp
+#Requires:       net-snmp
 %endif
 %if %{FILES_snmp32}
-Requires:       net-snmp
+#Requires:       net-snmp
 %endif
 %{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
-Obsoletes:      %{name}-%{_streams}-utils
+%if %{have_libraries}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Conflicts:      %{name}-%{_conflict}-util
+Conflicts:      %{name}-%{_conflict}-utils
 Obsoletes:      %{name}-utils
-%{?_conflict:Conflicts:      %{name}-%{_conflict}-util}
-%{?_conflict:Conflicts:      %{name}-%{_conflict}-utils}
-Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-utils
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -2012,13 +1980,7 @@ and configuration test utilities and commands associated with the
 OpenSS7 %{_STREAMS} STREAMS %{stitle} package.
 Note that these utilities are needed for running the validation
 test suites contained in the %{name}-test binary package.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{have_tools}
 %pre %{_streams}-util
@@ -2074,6 +2036,7 @@ Group:          Development/Debug
 Version:        @VERSION@
 AutoReq:        0
 AutoProv:       0
+Obsoletes:      %{name}-debug < %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-debug = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-debug = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
@@ -2084,13 +2047,7 @@ Release:        %{fullrelease}
 This package provides debug information for package %{name}.
 Debug information is useful when developing applicaions that
 use this package or when debugging this package.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_debug}
 %files debuginfo
@@ -2101,7 +2058,7 @@ Distribution: %{distribution} (%{_target_cpu})
 %endif
 
 # ===========================================================================
-%package -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%package -n %{corename %name-%_streams}
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
@@ -2112,83 +2069,58 @@ Autoprov:       true
 Prefix:         %{_kmoduledir}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Requires:       strcompat-%{core_name} = %version_of_or strcompat-%{core_name} @STRCOMP_VERSION@%{?extrarelease2}
+Requires:       %{corename strcompat-%_streams} = %version_of_or %{corename strcompat-%_streams} @STRCOMP_VERSION@%{?extrarelease2}
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %if %{NEED_devs}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 %endif
-%{?_conflict:Conflicts:      %{name}-%{_conflict}-%{core_name}}
-%{?_conflict:Conflicts:      kmod-%{name}-%{_conflict}%{kernel_flavor}}
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
 #Prereq:         /sbin/modprobe
 # SuSE puts lsof in /usr/bin
 Prereq:         lsof
-Provides:       %{name}-%{virtual}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-core = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmod = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmdl = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name}-%{virtual} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmod = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmdl = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name}-%{_streams} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-core = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kernel-module-%{name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmod = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmdl = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmod = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmdl = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-core = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmod = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmdl = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-core = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmod = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmdl = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{corename %name-%_conflict}
+Conflicts:      %{corename %name-%_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{corename %name-%_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{corename %name-%_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{virtual}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{virtual}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name-%_streams} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{corename %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{corename %name-%_streams} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name-%virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{corename %name-%virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{corename %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       kernel-modules = %{_kversion}
-Version:        @VERSION@_%{kernel_string}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%description -n %{corename %name-%_streams}
 %{descripline}
-The kmod-%{name}-%{_streams}%{kernel_flavor} binary package contains the
+The %{corename %name-%_streams} binary package contains the
 kernel modules that provide the Linux kernel %{stitle}
 %{_STREAMS} STREAMS drivers and modules.  This includes assorted
 drivers and modules for additional protocol stacks such as XNS.
@@ -2196,17 +2128,11 @@ This package is heavily tied to the kernel for which it and the
 %{_STREAMS} STREAMS facility were compiled.  This package
 applies to kernel version %{kernel_version} and requires a
 %{_STREAMS} STREAMS package compiled for the same kernel.  If
-you cannot find a binary package that matches your kernel,
-rebuild from the source rpm.
+you cannot find a binary package that matches your kernel, rebuild
+from the source rpm.
+%{descriptail}
 
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
-
-%pre -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%pre -n %{corename %name-%_streams}
 # ---------------------------------------------------------------------------
 arg="$1"
 function remove_depmods() {
@@ -2301,7 +2227,7 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
     fi
 fi
 
-%post -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%post -n %{corename %name-%_streams}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -2325,7 +2251,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     fi
 fi
 
-%preun -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%preun -n %{corename %name-%_streams}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -2371,7 +2297,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 
-%postun -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%postun -n %{corename %name-%_streams}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
@@ -2428,7 +2354,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 fi
 
 %if %{FILES_modules}
-%files -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%files -n %{corename %name-%_streams}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_kmoduledir}/%{base}
@@ -2437,7 +2363,7 @@ fi
 %endif
 
 %if %{FILES_ko_modules}
-%files -n kmod-%{name}-%{_streams}%{kernel_flavor}
+%files -n %{corename %name-%_streams}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_kmoduledir}/%{base}
@@ -2445,7 +2371,7 @@ fi
 %endif
 
 # ===========================================================================
-%package -n kmod-%{name}-%{_streams}%{kernel_flavor}-devel
+%package -n %{infoname %name-%_streams}
 
 Summary:        %{title} core kernel module symbol versions.
 Group:          System Environment/Kernel
@@ -2459,58 +2385,63 @@ Prefix:         %{_includedir}/%{name}/%{kernel_version}
 Prefix:         %{_kmoduledir}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Provides:       %{name}-%{virtual}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-info = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name}-%{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-info = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name}-%{_streams}-devel = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-info = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-info = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name}-%{virtual}-devel = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-info = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name}-%{_streams}-devel = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
-Provides:       kmod-%{name}-devel = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-info = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name}-%{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-info = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name}-%{_streams}-devel = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kmod-%{name}-devel = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
-Version:        @VERSION@_%{kernel_string}
+Conflicts:      %{infoname %name-%_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{infoname %name-%_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{infoname %name-%_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-info < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-info < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{_streams}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name-%virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{infoname %name-%virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{infoname %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n kmod-%{name}-%{_streams}%{kernel_flavor}-devel
+%description -n %{infoname %name-%_streams}
 %{descripline}
-The kmod-%{name}-%{_streams}%{kernel_flavor} binary package
+The %{infoname %name-%_streams} binary package
 contains the kernel modules symbol information for development
 of additional %{_streams} kernel modules against the core kernel
-modules included in the kmod-%{name}-%{_streams}%{kernel_flavor} binary
+modules included in the %{corename %name-%_streams} binary
 package.  This package is heavily tied to the core kernel
 modules and kernel for which it was compiled.  This package
-applies to core kernel modules kmod-%{name}-%{_streams}%{kernel_flavor}
+applies to core kernel modules %{corename %name-%_streams}
 for kernel version %{_kversion}.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_modules}
-%files -n kmod-%{name}-%{_streams}%{kernel_flavor}-devel
+%files -n %{infoname %name-%_streams}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_includedir}/%{name}/%{kernel_version}
@@ -2519,7 +2450,7 @@ Distribution: %{distribution} (%{_target_cpu})
 %endif
 
 %if %{FILES_ko_modules}
-%files -n kmod-%{name}-%{_streams}%{kernel_flavor}-devel
+%files -n %{infoname %name-%_streams}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_kmoduledir}/%{base}/Module*
@@ -2528,35 +2459,38 @@ Distribution: %{distribution} (%{_target_cpu})
 # don't include package for FILES_ko_modules
 
 # ===========================================================================
-%package -n kmod-%{name}%{kernel_flavor}-debuginfo
+%package -n %{dbugname %name-%_streams}
 
 Summary:        %{title} kernel module debug information.
 Group:          Development/Debug
 AutoReq:        0
 AutoProv:       0
-Provides:       kmod-%{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kmod-%{virtual}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-debug-%{_kversion} =  %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-debug-%{_kversion} =  %{epoch}:%{version}-%{rpmrelease}
-Version:        @VERSION@_%{kernel_string}
+Conflicts:      %{dbugname %name-%_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{dbugname %name-%_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{dbugname %name-%_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n kmod-%{name}%{kernel_flavor}-debuginfo
+%description -n %{dbugname %name-%_streams}
 %{descripline}
 This package provides debug information for package %{name}.
 Debug information is useful when developing applications that
 use this package or when debugging this package.
-
-
-
-Authors
--------
-    Brian Bidulock, <bidulock@openss7.org>
-Distribution: %{distribution} (%{_target_cpu})
+%{descriptail}
 
 %if %{FILES_kern_debug}
-%files -n kmod-%{name}%{kernel_flavor}-debuginfo
+%files -n %{dbugname %name-%_streams}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
@@ -2567,6 +2501,9 @@ Distribution: %{distribution} (%{_target_cpu})
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strtty.spec.in,v $
+# Revision 0.9.2.27  2008-09-16 10:00:27  brian
+# - support autoupdating kernel modules for various distros
+#
 
 * Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.26  2008-09-10 20:46:15  brian

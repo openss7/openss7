@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.84 $) $Date: 2008-09-10 20:46:09 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.85 $) $Date: 2008-09-16 10:00:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 20:46:09 $ by $Author: brian $
+# Last Modified $Date: 2008-09-16 10:00:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,6 +58,7 @@
 %global BUILD_devel   1
 %global BUILD_tools   1
 %global BUILD_libs    1
+%global BUILD_debug   1
 %global BUILD_noarch  1
 %global BUILD_arch    1
 %global BUILD_source  0
@@ -78,15 +79,17 @@
 #    global _kversion on the rpmbuild command line
 #    global PACKAGE_KVERSION environment variable
 #    just let it default to `uname -r`
-#{!?_kversion: #{expand: ##global _kversion #(env | grep PACKAGE_KVERSION | sed -e 's|.*=||')}}
+#{!?_kversion: #{expand: ##global _kversion #(env | grep PACKAGE_KVERSION | sed -e 's,.*=,,')}}
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
 %global kernel_version %{_kversion}
-%global kernel_source %(echo %{_kversion} | sed -r -e 's|BOOT$||;s|-?smp$||;s|bigmem$||;s|debug$||;s|enterprise$||;s|hugemem$||;s|secure$||;s|-i686-up-4GB$||;s|-p3-smp-64GB$||;s|-64GB-SMP|.SuSE|;s|-default$||')
-%global kernel_number %(echo %{_kversion} | sed -e 's|-.*$||')
-%global kernel_release %(echo %{_kversion} | sed -e 's|-|_|g')
-%global kernel_fedora %(echo %{_kversion} | sed -r -e 's|.*FC[456].*$|1|;s|.*\.fc7$|1|;s|.*\.EL[45]?$|1|;s|.*\.el5$|1|;s|[^1].*$|0|')
-%global kernel_others %(echo %{_kversion} | sed -r -e 's|.*FC[456].*$|0|;s|.*\.fc7$|0|;s|.*\.EL[45]?$|0|;s|.*\.el5$|0|;s|[^0].*$|1|')
+%global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,')
+%global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
+%global kernel_release %(echo %{_kversion} | sed -e 's,-,.,g')
+%global kernel_string %(echo %{_kversion} | sed -e 's,-,_,g')
+%global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
+%global kernel_fedora %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[6789].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el5.*$,1,;t;s,.*$,0,')
+%global kernel_others %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[6789].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el5.*$,0,;t;s,.*$,1,')
 %global core_name   core-%{_kversion}
 %global info_name   info-%{_kversion}
 %global majbase     @STRCONF_MAJBASE@
@@ -106,8 +109,10 @@
 %global conffiles   streams.conf
 #global mibfiles
 #global snmpmods
+#global netconfig   %{base}
+#global sock2path   %{base}
 
-%{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
+%{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')}
 %{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
 %{expand: %%global have_modules     %{?modules:  1}%{!?modules:  0}}
 %{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
@@ -117,6 +122,8 @@
 %{expand: %%global have_configfiles %{?conffiles:1}%{!?conffiles:0}}
 %{expand: %%global have_mibfiles    %{?mibfiles: 1}%{!?mibfiles: 0}}
 %{expand: %%global have_snmpmods    %{?snmpmods: 1}%{!?snmpmods: 0}}
+%{expand: %%global have_netconfig   %{?netconfig:1}%{!?netconfig:0}}
+%{expand: %%global have_sock2path   %{?sock2path:1}%{!?sock2path:0}}
 
 %if %{without_ko_modules}
 # assume devs for older kernels
@@ -185,6 +192,12 @@
 %{?_with_snmp_agent:    %{expand: %%global BUILD_mibs    1}}
 %{?_with_snmp_agent:    %{expand: %%global BUILD_snmp    1}}
 
+%if %{BUILD_source}
+%global _enable_ksource_package  1
+%else
+%global _enable_ksource_package  0
+%endif
+
 # need manpage references unless otherwise specified
 %global NEED_manrefs  1
 
@@ -193,6 +206,15 @@
 
 %define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+
+%global debug_package %{nil}
+
+%{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
+
+%if %{_enable_debug_packages}
+%else
+%global BUILD_debug   0
+%endif
 
 %if %{BUILD_arch}
 %global BUILD_source  0
@@ -242,6 +264,25 @@
 #{expand: %%global _with_lis --with-lis}
 #endif
 
+%define corename() %1-core-%_kversion
+%define infoname() %1-info-%_kversion
+%define dbugname() %1-debug-%_kversion
+%global kmodules_version @VERSION@
+
+%if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
+%define corename() openss7-%1-kmp%kernel_flavor
+%define infoname() openss7-%1-kmp%kernel_flavor-devel
+%define dbugname() openss7-%1-kmp%kernel_flavor-debuginfo
+%global kmodules_version @VERSION@_%kernel_string
+%endif
+
+%if %(test '%_vendor' = 'redhat' && echo 1 || echo 0)
+%define corename() kmod-%1%kernel_flavor
+%define infoname() kmod-%1%kernel_flavor-devel
+%define dbugname() kmod-%1%kernel_flavor-debuginfo
+%global kmodules_version @VERSION@.%kernel_release
+%endif
+
 %if %{have_modules}
 %else
 %global BUILD_modules       0
@@ -266,9 +307,11 @@
 %if %{BUILD_modules}
 %global FILES_modules       1
 %global FILES_ko_modules    1
+%global FILES_kern_debug    1
 %else
 %global FILES_modules       0
 %global FILES_ko_modules    0
+%global FILES_kern_debug    0
 %global kernel_fedora       0
 %global kernel_others       0
 %endif
@@ -282,6 +325,7 @@
 %if %{BUILD_tools}
 %global FILES_libs          1
 %global FILES_libs32        1
+%global FILES_debug         1
 %global FILES_dev           1
 %global FILES_devlibs       1
 %global FILES_devlibs32     1
@@ -304,6 +348,7 @@
 %else
 %global FILES_libs          0
 %global FILES_libs32        0
+%global FILES_debug         0
 %global FILES_dev           0
 %global FILES_devlibs       0
 %global FILES_devlibs32     0
@@ -339,8 +384,10 @@
 %else
 %global FILES_modules       0
 %global FILES_ko_modules    0
+%global FILES_kern_debug    0
 %global FILES_libs          0
 %global FILES_libs32        0
+%global FILES_debug         0
 %global FILES_dev           0
 %global FILES_devlibs       0
 %global FILES_devlibs32     0
@@ -364,6 +411,21 @@
 %global FILES_ko_noinit     0
 %global FILES_noinit        0
 %global FILES_mibs          0
+%endif
+
+%if %{BUILD_debug}
+%else
+%global FILES_kern_debug    0
+%global FILES_debug         0
+%endif
+
+%if %{FILES_kern_debug}
+%global FILES_debug         0
+%global __debug_package     1
+%endif
+
+%if %{FILES_debug}
+%global __debug_package     1
 %endif
 
 %if %{BUILD_libs}
@@ -444,6 +506,12 @@
 
 %global descripline %{title} is a (poor) implementation of SVR 4 %{virtual} for Linux.
 
+%if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
+%global descriptail %(echo -en '\n\nTHE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES\nAND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS\nPACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}\nPACKAGE INSTEAD.  DO NOT REPORT BUGS.\n\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
+%else
+%global descriptail %{nil}
+%endif
+
 Summary:        %{title} (SVR 4 %{virtual}).
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
@@ -508,7 +576,7 @@ BuildRequires:  /usr/bin/gzip
 # when providing snmp agents, the following are required:
 #BuildRequires: lm_sensors-devel
 #BuildRequires: net-snmp-libs
-BuildRequires: net-snmp-devel
+#BuildRequires: net-snmp-devel
 %endif
 
 %if %{without_ko_modules}
@@ -523,50 +591,56 @@ BuildRequires:  /sbin/genksyms
 #BuildRequires: ghostscript >= 6.51
 # to install documentation
 #BuildRequires: texinfo >= 4.0
-# find the rest automagically
-Requires:       %{name}-core   = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-info   = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-lib    = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-util   = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-devel  = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-dev    = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-test   = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-doc    = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-init   = %{epoch}:%{version}-%{rpmrelease}
-#Requires:       %{name}-mibs   = %{epoch}:%{version}-%{rpmrelease}
+
 Conflicts:      %{_conflict}
-Provides:       %{name}
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
+%if %{_enable_ksource_package}
+Requires:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
+%endif
+%if %{_enable_debug_packages}
+Requires:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
+%endif
 
 # ---------------------------------------------------------------------------
 %description
 %{descripline}
-The %{name} package includes kernel modules, STREAMS drivers,
-modules, libraries, utilities, test programs, daemons, and
-development environment for the development and execution of
+The %{name} package includes kernel modules, STREAMS
+drivers, modules, libraries, utilities, test programs, daemons,
+and development environment for the development and execution of
 System V Release 4 %{virtual} modules and drivers developed
-for Linux.  This distribution is currently applicable to 2.4 and
-2.6 kernels and is validated for ix86, x86_64, ppc and ppc64
-architectures, but should build and install well for other
-architectures.  This package includes the following binary
-packages:
+for Linux.
+This distribution is currently applicable to 2.4 and 2.6 kernels
+and is validated for ix86, x86_64, ppc and ppc64 architectures,
+but should build and install well for other architectures.
+This package includes the following binary packages:
 
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
- - %{name}-%{core_name} -- core kernel modules.
- - %{name}-%{info_name} -- core kernel module symbol versions.
+ - %{corename %name} -- core kernel modules.
+ - %{infoname %name} -- kernel module info.
+ - %{dbugname %name} -- kernel module debug info.
  - %{name}-lib -- run-time libraries.
  - %{name}-util -- admin utilities.
+ - %{name}-debuginfo -- debugging information.
  - %{name}-devel -- headers, libs and docs.
  - %{name}-dev -- devices.
  - %{name}-test -- test utilities.
  - %{name}-doc -- manpages, manuals and docs.
  - %{name}-source -- source package.
  - %{name}-init -- init scripts and config files.
-#- %{name}-mibs -- SNMP MIBs.
+ - %{name}-mibs -- SNMP MIBs.
+%{descriptail}
 
 %prep
 # ---------------------------------------------------------------------------
@@ -762,759 +836,11 @@ package_source
 %endif
 
 # ===========================================================================
-%package %{core_name}
-
-Summary:        %{title} core kernel modules.
-Group:          System Environment/Kernel
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_kmoduledir}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
-#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-%if %{NEED_init}
-Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
-%endif
-Conflicts:      %{_conflict}-%{core_name}
-#Prereq:         /sbin/depmod
-#Prereq:         /sbin/lsmod
-#Prereq:         /sbin/insmod
-#Prereq:         /sbin/modprobe
-# SuSE puts lsof in /usr/bin
-Prereq:         lsof
-Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-core = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-kmod = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-kmdl = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-core = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-kmod = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-kmdl = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{virtual}-core = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{virtual}-kmod = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{virtual}-kmdl = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{core_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-core = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmod = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmdl = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-modules = %{_kversion}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{core_name}
-%{descripline}
-The %{name}-%{core_name} binary package contains the kernel
-modules that provide the Linux kernel SVR 4 %{virtual}
-facility.  This includes assorted basic %{virtual} drivers and
-modules such as pipes, fifos, echo, etc.  This binary package
-also includes modprobe configuration files for the associated
-kernel modules.  This package is heavily tied to the kernel for
-which it was compiled.  This package applies to kernel version
-%{kernel_version}.  If you cannot find a binary package that
-matches your kernel, rebuild from the source rpm.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
-%pre %{core_name}
-# ---------------------------------------------------------------------------
-arg="$1"
-function remove_depmods() {
-    local t
-    [ $# -gt 0 ] || return 0
-    echo "$*"
-    for t in $@ ; do
-        prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-        eval "remove_depmods \$$prereq"
-    done
-}
-if [ $arg = 1 ] ; then : # fresh install
-    # This is a fresh install of this version of kernel module.  Make sure that there are no non-rpm
-    # installed kernel modules hanging around for this kernel version.
-    list="%{modules}" ; modl_mods=
-    if [ -d %{_kmoduledir} ] ; then
-	for m in `find %{_kmoduledir} \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
-		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
-		case " $list " in (*" $b "*) ;; (*) continue ;; esac
-		echo "$m"
-		modl_mods="${modl_mods:+$modl_mods }$m"
-	done
-        if [ -n "$modl_mods" -a -f %{_kmoduledir}/modules.dep ] ; then
-            # First we can build a dependency tree from every dependency expression that can be
-            # found in the modules.dep file.
-            xtrace=`shopt -p -o | grep xtrace` ; set +x
-            dep= ; while read line ; do
-                case $line in
-                    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
-                            dep="${dep:+$dep }$line" ; continue ;;
-                    (*)	    dep="${dep:+$dep }$line" ;;
-                esac
-                [ -n "$dep" ] || continue;
-                set dummy $dep
-                if [ "${3+set}" = "set" ] ; then
-                    t=`echo $2 | sed -e 's|:$||'`
-                    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                    shift 2
-                    for p in $@ ; do
-                        prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                        eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
-                        eval "$target=\"\${$target:+\$$target }$p\""
-                    done
-                fi
-                dep=
-            done < %{_kmoduledir}/modules.dep
-            eval "$xtrace"
-        fi
-    fi
-    # remove conflicting and dependent modules
-    if [ -n "$modl_mods" ] ; then
-        rm -f -- $modl_mods
-        for m in $list ; do
-            prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-            eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
-            [ -n "$modl_deps" ] || continue
-            rm -f -- $modl_deps
-        done
-    fi
-fi
-if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
-    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # If we are upgrading and the upgrade is for the running kernel, or we are installing new on
-        # the running kernel, we have to worry about previous loaded modules for the old version or
-        # a non-rpm version.
-        mods="%{modules}" ; for m in $mods ; do
-            if ( lsmod | grep -q "^$m" ) ; then
-                # Module running, kick the stack.
-                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( lsmod | grep -q "^$m" ) ; then
-                    fdetach -a 2>/dev/null
-                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( lsmod | grep -q "^$m" ) ; then
-                        lsof | while read -a tokens; do
-                            if [ :"${tokens[4]}" = :"CHR" ]; then
-                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-                                if [ $major -eq %{majbase} ]; then
-                                    eval "kill -HUP ${tokens[1]}"
-                                fi
-                            fi
-                        done
-                        /sbin/sleep 5 # wait for processes to die and close streams
-                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( lsmod | grep -q "^$m" ) ; then
-                            echo "Cannot install or upgrade with $m module running." >&2
-                            exit 1
-                        fi
-                    fi
-                fi
-            fi
-        done
-    fi
-fi
-
-%post %{core_name}
-# ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # This is a running kernel, do a depmod on the modules directory for the running
-        # kernel.
-        depmod -ae || :
-%if %{have_initscripts}
-        # Running kernels do need init scripts run.
-        list="%{initfiles}" ; for i in $list ; do
-            if [ -f %_initrddir/$i ] ; then
-                /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
-            fi
-        done
-%endif
-    elif [ -r /boot/System.map-%{kernel_version} ] ; then
-        # Non-running kernels a depmod will be performed on boot by depmod anyway, but
-        # try one now.
-        UNAME_MACHINE=%{_target_cpu} \
-        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} || :
-        # Non-running kernels do not need init scripts run.
-    fi
-fi
-
-%preun %{core_name}
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # We are about to uninstall for good on a running kernel then we have to worry about which
-        # modules are running
-%if %{have_initscripts}
-        # First lets try shutting down using any init script first in reverse order
-        list="%{initfiles}" ; for i in $list ; do
-            reverse="$i${reverse:+ $reverse}"
-        done
-        for i in $reverse ; do
-            if [ -f %_initrddir/$i ] ; then
-                /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
-            fi
-        done
-%endif
-        mods="%{modules}" ; for m in $mods ; do
-            if ( lsmod | grep -q "^$m" ) ; then
-                # modules running, kick the stack
-                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( lsmod | grep -q "^$m" ) ; then
-                    fdetach -a
-                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( lsmod | grep -q "^$m" ) ; then
-                        lsof | while read -a tokens; do
-                            if [ :"${tokens[4]}" = :"CHR" ]; then
-                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-                                if [ $major -eq %{majbase} ]; then
-                                    eval "kill -KILL ${tokens[1]}"
-                                fi
-                            fi
-                        done
-                        /sbin/sleep 5 # wait for processes to die and close streams
-                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( lsmod | grep -q "^$m" ) ; then
-                            echo "Cannot uninstall with $m module running." >&2
-                            exit 1
-                        fi
-                    fi
-                fi
-            fi
-        done
-    fi
-fi
-
-%postun %{core_name}
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-    if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
-        # This is a running kernel, do a depmod on the modules directory for.
-        depmod -ae || :
-    elif [ -r /boot/System.map-%{kernel_version} ] ; then
-        # Non-running kernels a depmod will be performed on boot but depmod anyway.
-        UNAME_MACHINE=%{_target_cpu} \
-        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} || :
-    fi
-    if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
-        # One more kick at killing any loaded modules on uninstall, last stage of the upgrade on a
-        # running kernel for upgrade.
-        reboot='no'
-        mods="%{modules}" ; for m in $mods ; do
-            if ( lsmod | grep -q "^$m" ) ; then
-                # Modules running, kick the stack.
-                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( lsmod | grep -q "^$m" ) ; then
-                    fdetach -a
-                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( lsmod | grep -q "^$m" ) ; then
-                        insmod -ar "$m"
-                        lsof | while read -a tokens; do
-                            if [ :"${tokens[4]}" = :"CHR" ]; then
-                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-                                if [ $major -eq %{majbase} ]; then
-                                    if [ $1 = 0 ] ; then
-                                        # Extreme prejudice for removal.
-                                        eval "kill -KILL ${tokens[1]}"
-                                    else
-                                        # Try to get them to reload for upgrade.
-                                        eval "kill -HUP ${tokens[1]}"
-                                    fi
-                                fi
-                            fi
-                        done
-                        /sbin/sleep 5 # wait for processes to die and close streams
-                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( lsmod | grep -q "^$m" ) ; then
-                            echo "Error: modules may be still loaded" >&2
-                            lsmod | grep "^$m" >&2
-                            reboot='yes'
-                        fi
-                    fi
-                fi
-            fi
-        done
-        if [ "$reboot" = 'yes' ]; then
-            echo "you may have to reboot" >&2
-            exit 1
-        fi
-    fi
-fi
-
-%if %{FILES_modules}
-%files %{core_name}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_kmoduledir}/%{base}
-%attr(644,root,root) %{_kmoduledir}/modules.%{base}
-%{_kmoduledir}/%{base}/*.o*
-%endif
-
-%if %{FILES_ko_modules}
-%files %{core_name}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_kmoduledir}/%{base}
-%{_kmoduledir}/%{base}/*.ko*
-%endif
-
-# ===========================================================================
-%package %{info_name}
-
-Summary:        %{title} core kernel module symbol versions.
-Group:          System Environment/Kernel
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-%if %{FILES_modules}
-Prefix:         %{_includedir}/%{name}/%{kernel_version}
-%endif
-Prefix:         %{_kmoduledir}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
-#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-info = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-info = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{virtual}-info = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{info_name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-info = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}-core < %{epoch}:%{version}-%{fullrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{info_name}
-%{descripline}
-The %{name}-%{info_name} binary package contains the kernel
-modules symbol information for development of additional
-%{virtual} kernel modules against the core kernel modules
-included in the %{name}-core binary package.  This package is
-heavily tied to the core kernel modules and kernel for which it
-was compiled.  This package applies to core kernel modules
-%{name}-%{core_name} for kernel version %{_kversion}.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
-%if %{FILES_modules}
-%files %{info_name}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_includedir}/%{name}/%{kernel_version}
-%{_includedir}/%{name}/%{kernel_version}/*
-%{_kmoduledir}/%{base}/Module*
-%endif
-
-%if %{FILES_ko_modules}
-%files %{info_name}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_kmoduledir}/%{base}/Module*
-%endif
-
-# don't include package for FILES_ko_modules
-
-# ===========================================================================
-%package lib
-
-Summary:        %{title} run-time libraries.
-Group:          System Environment/Libraries
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_libdir}
-%if %{FILES_libs32}
-Prefix:         %{_lib32dir}
-%endif
-Prefix:         %{_localedir}
-Obsoletes:      %{name}-libs
-Prereq:         /sbin/ldconfig
-Provides:       %{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description lib
-%{descripline}
-The %{name}-lib binary package contains the run-time (shared
-object) libraries necessary to run applications programs and
-utilities developed for %{title}.  Also included are the libtool
-.la files describing the shared object libraries.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
-%pre lib
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
-    # See if there are any libraries hanging around from a non-rpm install.  If there are, just
-    # delete them.
-    libs="%{libraries}" ; for lib in $libs ; do
-        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
-        if [ -n "$old_libs" ] ; then
-            # Old libraries hanging around, delete them.
-            echo "warning: Deleting old non-rpm libraries $old_libs" >&2
-            rm -f $old_libs
-        fi
-    done
-fi
-
-%post lib
-# ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-    # After a fresh install or upgrade, do a load config.
-    /sbin/ldconfig
-fi
-
-%postun lib
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then
-    # Whether complete removal or upgrade, do a load config.
-    /sbin/ldconfig
-fi
-
-%if %{FILES_libs32}
-%files lib
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.so*
-%{_libdir}/*.la
-%{_lib32dir}/*.so*
-%{_lib32dir}/*.la
-#{_localedir}/*
-%endif
-
-%if %{FILES_libs}
-%files lib
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.so*
-%{_libdir}/*.la
-#{_localedir}/*
-%endif
-
-# ===========================================================================
-%package devel
-
-Summary:        %{title} headers, libs and docs.
-Group:          Development/System
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_libdir}
-%if %{FILES_devlibs32}
-Prefix:         %{_lib32dir}
-%endif
-Prefix:         %{_includedir}/%{name}
-Provides:       %{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description devel
-%{descripline}
-The %{name}-devel binary package contains library archives for
-static compilation, and headers files to develop %{title}
-modules and drivers.  This also includes the header files and
-static libraries required to compile %{title} applications
-programs.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
-%if %{FILES_devlibs32}
-%files devel
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.a
-%{_lib32dir}/*.a
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%endif
-
-%if %{FILES_devlibs}
-%files devel
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.a
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%endif
-
-%if %{FILES_dev}
-%files devel
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%endif
-
-# ===========================================================================
-%package util
-
-Summary:        %{title} admin utilities.
-Group:          System Environment/Base
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_bindir}
-Prefix:         %{_sbindir}
-Prefix:         %{_pkglibexecdir}
-%if %{FILES_tools32}
-Prefix:         %{_pkglibexec32dir}
-%endif
-%if %{FILES_snmp}
-Prefix:         %{_snmpdlmoddir}
-%endif
-%if %{FILES_snmp32}
-Prefix:         %{_snmpdlmoddir}
-Prefix:         %{_snmpdlmod32dir}
-%endif
-%if %{FILES_snmp}
-Requires:       net-snmp
-%endif
-%if %{FILES_snmp32}
-Requires:       net-snmp
-%endif
-Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}-utils
-Conflicts:      %{_conflict}-util
-Conflicts:      %{_conflict}-utils
-Provides:       %{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description util
-%{descripline}
-The %{name}-util binary package provides administrative and
-configuration test utilities and commands associated with the
-%{title} package.  Note that these utilities are needed for
-running the validation test suites contained in the %{name}-test
-binary package.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
-%if %{have_tools}
-%pre util
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ]; then : # fresh install
-    # This is a fresh install, look for old non-rpm tools.
-    tools="%{tools}" ; for tool in $tools ; do
-        location="`which $tool 2>/dev/null`"
-        while [ -n "$location" -a -x "$location" ] ; do
-            eval "rm -f $location"
-            location="`which $tool 2>/dev/null`"
-            while [ -n "$location" -a -x "$location" ] ; do
-                eval "rm -f $location"
-                location="`which $tool 2>/dev/null`"
-            done
-        done
-    done
-    # Old non-rpm distro puts some man pages in the wrong place, clean them out.
-    if [ -f /usr/man/man3/fattach.3 ] ; then
-        rm -f /usr/man/man3/fattach.3 2>/dev/null
-        rm -f /usr/man/man3/detach.3 2>/dev/null
-        rm -f /usr/man/man3/isastream.3 2>/dev/null
-        rmdir -p /usr/man/man3 2>/dev/null || :
-        rm -f /usr/man/man8/fattach.8 2>/dev/null
-        rm -f /usr/man/man8/fdetach.8 2>/dev/null
-        rmdir -p /usr/man/man8 2>/dev/null || :
-        rm -f /usr/man/man9/connld.9 2>/dev/null
-        rm -f /usr/man/man9/fifo.9 2>/dev/null
-        rm -f /usr/man/man9/pipemod.9 2>/dev/null
-        rmdir -p /usr/man/man9 2>/dev/null || :
-        rmdir -p /usr/man 2>/dev/null || :
-    fi
-fi
-%endif
-
-%if %{FILES_tools32}
-%files util
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_bindir}/*
-%{_sbindir}/*
-%{_pkglibexecdir}/*test*
-%{_pkglibexecdir}/*tst
-%{_pkglibexec32dir}/*test*
-%{_pkglibexec32dir}/*tst
-%{?PATH_snmp:%{PATH_snmp}}
-#{?PATH_snmp32:%{PATH_snmp32}}
-%endif
-
-%if %{FILES_tools}
-%files util
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_bindir}/*
-%{_sbindir}/*
-%{_pkglibexecdir}/*test*
-%{_pkglibexecdir}/*tst
-%{?PATH_snmp:%{PATH_snmp}}
-%endif
-
-# ===========================================================================
-%package dev
-
-Summary:        %{title} devices.
-Group:          System Environment/Base
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Conflicts:      %{_conflict}-dev
-Conflicts:      %{_conflict}-devs
-Requires:       dev >= 3.3
-%if %{MAKE_devs}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-%endif
-Obsoletes:      %{name}-devs
-Provides:       %{virtual}-dev = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description dev
-%{descripline}
-The %{name}-dev binary package contains the device definitions
-necessary to run applications programs and utilities developed
-for %{title}.  On older systems, this binary creates the devices
-themselves.  On newer systems, this binary package includes the
-executable for creating devices from init scripts.
-
-The package is not required for devfs based systems.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
-%if %{MAKE_devs}
-%post dev
-if [ $1 = 1 ] ; then : # fresh install
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
-    /usr/sbin/@STRMAKENODES@
-fi
-
-%preun dev
-if [ $1 = 0 ] ; then : # final removal
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
-    /usr/sbin/@STRMAKENODES@ --remove
-fi
-%endif
-
-%if %{FILES_makedev}
-%files dev
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%endif
-
-%if %{FILES_builddev}
-%files dev -f %{makedev}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%endif
-
-# ===========================================================================
-%package test
-
-Summary:        %{title} test utilities.
-Group:          System Environment/Base
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_pkglibexecdir}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}-tests
-Conflicts:      %{_conflict}-test
-Conflicts:      %{_conflict}-tests
-Provides:       %{virtual}-test = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description test
-%{descripline}
-The %{name}-test binary package provides the autotest validation
-testsuites used for validating and troubleshooting the %{title}
-package.  It also includes the send-pr script for generating and
-submitting problem reports to @PACKAGE_BUGREPORT@.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
-
-%if %{FILES_test}
-%files test
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_pkglibexecdir}/atlocal
-%{_pkglibexecdir}/testsuite*
-%{_pkglibexecdir}/send-pr
-%{_pkglibexecdir}/send-pr.config
-%endif
-
-# ===========================================================================
 %package doc
 
 Summary:        %{title} manpages, manuals and docs.
 Group:          Documentation
+Version:        @VERSION@
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Autoreq:        true
@@ -1522,17 +848,17 @@ Autoprov:       true
 Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
-Conflicts:      texinfo < 3.11
+#Prereq:         /sbin/install-info
 Conflicts:      %{_conflict}-doc
 Conflicts:      %{_conflict}-docs
+Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
-#Prereq:         /sbin/install-info
-Provides:       %{virtual}-doc = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-doc = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-doc = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1545,11 +871,7 @@ installation and reference manual.  Also included are extensive
 manual pages for the entire package, including manual pages for
 commands, administrative utilities, user interfaces, and kernel
 functions.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
+%{descriptail}
 
 %post doc
 # ---------------------------------------------------------------------------
@@ -1624,8 +946,10 @@ fi
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
+#doc doc/specs
+#doc doc/drafts
 #doc doc/papers
-#doc doc/drafts doc/papers doc/projects doc/specs
+#doc doc/projects
 %{_infodir}/*
 %{manrefs}
 %{manmacros}
@@ -1640,8 +964,10 @@ fi
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
 %doc manual
+#doc doc/specs
+#doc doc/drafts
 #doc doc/papers
-#doc doc/drafts doc/papers doc/projects doc/specs
+#doc doc/projects
 %{_infodir}/*
 %{manrefs}
 %{manmacros}
@@ -1653,17 +979,18 @@ fi
 
 Summary:        %{title} source package.
 Group:          Development/System
+Version:        @VERSION@
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_usrsrc}
-Provides:       %{virtual}-source = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-source = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-source = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1674,6 +1001,7 @@ necessary for building the %{name} release.  It also includes
 the autoconf configuration utilities necessary to create and
 distribute this rpm.  To develop on the package, it would be
 better to use the tarball or source rpm release.
+%{descriptail}
 
 %if %{FILES_source}
 %files source
@@ -1690,6 +1018,7 @@ better to use the tarball or source rpm release.
 
 Summary:        %{title} init scripts and config files.
 Group:          System Environment/Base
+Version:        @VERSION@
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Autoreq:        true
@@ -1704,14 +1033,14 @@ Prefix:         %{_snmpconfdir}
 Prefix:         %{_modutildir}
 %endif
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}-inits
 Conflicts:      %{_conflict}-init
-Provides:       %{virtual}-init = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-inits
+Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-init = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-init = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -1721,11 +1050,7 @@ The %{name}-init binary package provides the Sys V init scripts
 and configuration files associated with the %{title} package.
 These init scripts load kernel modules, create devices, and
 apply system configuration customizations at boot.
-
-THE %{name} PACKAGE VALIDATES POORLY ON MOST ARCHITECTURES
-AND DISTRIBUTIONS AND IS ESSENTIALLY UNUSABLE ON SMP.  THIS
-PACKAGE IS DEPRECATED.  YOU SHOULD BE USING THE %{_conflict}
-PACKAGE INSTEAD.  DO NOT REPORT BUGS.
+%{descriptail}
 
 %pre init
 # ---------------------------------------------------------------------------
@@ -1912,6 +1237,58 @@ if [ $1 = 1 ] ; then : # fresh install
         rm -f -- $prel_new
     fi
 %endif
+%if %{have_netconfig}
+    # At the end of a fresh install we need to rebuild the netconfig database, but only if the
+    # netconfig database was built by us or does not exist.
+    t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+%endif
+%if %{have_sock2path}
+    # At the end of a fresh install we need to rebuild the sock2path database.
+    t="%_sysconfdir/sock2path"
+    cp -f -b --suffix=.rpmsave -- /dev/null $t
+    for f in "${t}.d/*" ; do
+        if [ -f $f ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
+            esac
+        fi
+    done
+%endif
 %if %{have_initscripts}
     # This is the end of a fresh install, add init scripts if we can
     list="%{initfiles}" ; for i in $list ; do
@@ -1958,6 +1335,58 @@ if [ $1 = 2 ] ; then : # upgrade
         cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
         rm -f -- $prel_new
     fi
+%endif
+%if %{have_netconfig}
+    # At the end of an upgrade we need to rebuild the netconfig database, but only if the netconfig
+    # database was built by us or does not exist.
+    t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+%endif
+%if %{have_sock2path}
+    # At the end of an upgrade we need to rebuild the sock2path database.
+    t="%_sysconfdir/sock2path"
+    cp -f -b --suffix=.rpmsave -- /dev/null $t
+    for f in "${t}.d/*" ; do
+        if [ -f $f ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
+            esac
+        fi
+    done
 %endif
 %if %{have_initscripts}
     # This is the end of an upgrade, add init scripts if we can
@@ -2009,6 +1438,58 @@ if [ $1 = 0 ] ; then : # final removal
         cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
         rm -f -- $prel_new
     fi
+%endif
+%if %{have_netconfig}
+    # After going away altogether, we want to rebuild the netconfig database, but only if the
+    # netconfig database was built by use or does not exist.
+    t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+%endif
+%if %{have_sock2path}
+    # After going away altogether, we want to rebuild the sock2path database.
+    t="%_sysconfdir/sock2path"
+    cp -f -b --suffix=.rpmsave -- /dev/null $t
+    for f in "${t}.d/*" ; do
+        if [ -f $f ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
+            esac
+        fi
+    done
 %endif
 %if %{have_initscripts}
     # Uninstalling for good, remove init scripts if we can
@@ -2082,6 +1563,58 @@ b loop' $prel_new > $prel_tmp
         rm -f -- $prel_new
     fi
 %endif
+%if %{have_netconfig}
+    # After going doing an upgrade we want to rebuild the netconfig database, but only if the
+    # netconfig database was built by us or does not exist.
+    t="%_sysconfdir/netconfig"
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+%endif
+%if %{have_sock2path}
+    # After going doing an upgrade we want to rebuild the sock2path database.
+    t="%_sysconfdir/sock2path"
+    cp -f -b --suffix=.rpmsave -- /dev/null $t
+    for f in "${t}.d/*" ; do
+        if [ -f $f ] ; then
+            case $f in
+                (*.rpmsave|*.rpmnew) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
+            esac
+        fi
+    done
+%endif
 fi
 
 %if %{FILES_init}
@@ -2090,6 +1623,9 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %config(noreplace) %{_configdir}/*
 %config(noreplace) %{_modutildir}/*
 %{_initrddir}/*
@@ -2101,6 +1637,9 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %config(noreplace) %{_configdir}/*
 %{_initrddir}/*
 %endif
@@ -2111,6 +1650,9 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %{?modules:%config(noreplace) %{_modutildir}/*}
 %endif
 
@@ -2120,6 +1662,9 @@ fi
 %defattr(-,root,root)
 %{?PATH_snmpconf:%{PATH_snmpconf}}
 %{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %endif
 
 # ===========================================================================
@@ -2127,17 +1672,18 @@ fi
 
 Summary:        %{title} SNMP MIBs.
 Group:          Development/System
+Version:        @VERSION@
 %{?_xpm:Icon: %_xpm}
 %{?_gif:Icon: %_gif}
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_snmpmibdir}
-Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-mibs = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -2146,6 +1692,7 @@ Release:        %{fullrelease}
 The %{name}-mibs binary package provides SNMP MIB defintions
 for managing the %{title} package with
 external SNMP management tools.
+%{descriptail}
 
 %if %{FILES_mibs}
 %files mibs
@@ -2155,9 +1702,811 @@ external SNMP management tools.
 %endif
 
 # ===========================================================================
+%package test
+
+Summary:        %{title} test utilities.
+Group:          System Environment/Base
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_pkglibexecdir}
+Conflicts:      %{_conflict}-test
+Conflicts:      %{_conflict}-tests
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+Obsoletes:      %{name}-tests
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-test = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description test
+%{descripline}
+The %{name}-test binary package provides the autotest validation
+testsuites used for validating and troubleshooting the %{title}
+package.  It also includes the send-pr script for generating and
+submitting problem reports to @PACKAGE_BUGREPORT@.
+%{descriptail}
+
+%if %{FILES_test}
+%files test
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_pkglibexecdir}/atlocal
+%{_pkglibexecdir}/testsuite*
+%{_pkglibexecdir}/send-pr
+%{_pkglibexecdir}/send-pr.config
+%endif
+
+# ===========================================================================
+%package dev
+
+Summary:        %{title} devices.
+Group:          System Environment/Base
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Conflicts:      %{_conflict}-dev
+Conflicts:      %{_conflict}-devs
+Requires:       dev >= 3.3
+%if %{MAKE_devs}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Obsoletes:      %{name}-devs
+Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-dev = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description dev
+%{descripline}
+The %{name}-dev binary package contains the device definitions
+necessary to run applications programs and utilities developed
+for %{title}.  On older systems, this binary creates the devices
+themselves.  On newer systems, this binary package includes the
+executable for creating devices from init scripts.
+
+The package is not required for devfs based systems.
+%{descriptail}
+
+%if %{MAKE_devs}
+%post dev
+if [ $1 = 1 ] ; then : # fresh install
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    /usr/sbin/@STRMAKENODES@
+fi
+
+%preun dev
+if [ $1 = 0 ] ; then : # final removal
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    /usr/sbin/@STRMAKENODES@ --remove
+fi
+%endif
+
+%if %{FILES_makedev}
+%files dev
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%endif
+
+%if %{FILES_builddev}
+%files dev -f %{makedev}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%endif
+
+# ===========================================================================
+%package devel
+
+Summary:        %{title} headers, libs and docs.
+Group:          Development/System
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_libdir}
+%if %{FILES_devlibs32}
+Prefix:         %{_lib32dir}
+%endif
+Prefix:         %{_includedir}/%{name}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description devel
+%{descripline}
+The %{name}-devel binary package contains library archives
+for static compilation, and headers files to develop
+%{title} modules and drivers.
+This also includes the header files and static libraries required
+to compile %{title} applications programs.
+%{descriptail}
+
+%if %{FILES_devlibs32}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.a
+%{_lib32dir}/*.a
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%endif
+
+%if %{FILES_devlibs}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.a
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%endif
+
+%if %{FILES_dev}
+%files devel
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*
+%endif
+
+# ===========================================================================
+%package lib
+
+Summary:        %{title} run-time libraries.
+Group:          System Environment/Libraries
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_libdir}
+%if %{FILES_libs32}
+Prefix:         %{_lib32dir}
+%endif
+Prefix:         %{_localedir}
+Prereq:         /sbin/ldconfig
+Obsoletes:      %{name}-libs
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description lib
+%{descripline}
+The %{name}-lib binary package contains the run-time (shared
+object) libraries necessary to run applications programs and
+utilities developed for %{title}.  Also included are the libtool
+.la files describing the shared object libraries.
+%{descriptail}
+
+%pre lib
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ] ; then : # fresh install
+    # See if there are any libraries hanging around from a non-rpm install.  If there are, just
+    # delete them.
+    libs="%{libraries}" ; for lib in $libs ; do
+        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
+        if [ -n "$old_libs" ] ; then
+            # Old libraries hanging around, delete them.
+            echo "warning: Deleting old non-rpm libraries $old_libs" >&2
+            rm -f $old_libs
+        fi
+    done
+fi
+
+%post lib
+# ---------------------------------------------------------------------------
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+    # After a fresh install or upgrade, do a load config.
+    /sbin/ldconfig
+fi
+
+%postun lib
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then
+    # Whether complete removal or upgrade, do a load config.
+    /sbin/ldconfig
+fi
+
+%if %{FILES_libs32}
+%files lib
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.so*
+%{_libdir}/*.la
+%{_lib32dir}/*.so*
+%{_lib32dir}/*.la
+#{_localedir}/*
+%endif
+
+%if %{FILES_libs}
+%files lib
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_libdir}/*.so*
+%{_libdir}/*.la
+#{_localedir}/*
+%endif
+
+# ===========================================================================
+%package util
+
+Summary:        %{title} admin utilities and test programs.
+Group:          System Environment/Base
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_bindir}
+Prefix:         %{_sbindir}
+Prefix:         %{_pkglibexecdir}
+%if %{FILES_tools32}
+Prefix:         %{_pkglibexec32dir}
+%endif
+%if %{FILES_snmp}
+Prefix:         %{_snmpdlmoddir}
+%endif
+%if %{FILES_snmp32}
+Prefix:         %{_snmpdlmoddir}
+Prefix:         %{_snmpdlmod32dir}
+%endif
+%if %{FILES_snmp}
+#Requires:       net-snmp
+%endif
+%if %{FILES_snmp32}
+#Requires:       net-snmp
+%endif
+%if %{have_libraries}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Conflicts:      %{_conflict}-util
+Conflicts:      %{_conflict}-utils
+Obsoletes:      %{name}-utils
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description util
+%{descripline}
+The %{name}-util binary package provides administrative
+and configuration test utilities and commands associated with the
+%{title} package.
+Note that these utilities are needed for running the validation
+test suites contained in the %{name}-test binary package.
+%{descriptail}
+
+%if %{have_tools}
+%pre util
+# ---------------------------------------------------------------------------
+if [ $1 = 1 ]; then : # fresh install
+    # This is a fresh install, look for old non-rpm tools.
+    tools="%{tools}" ; for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+            eval "rm -f $location"
+            location="`which $tool 2>/dev/null`"
+            while [ -n "$location" -a -x "$location" ] ; do
+                eval "rm -f $location"
+                location="`which $tool 2>/dev/null`"
+            done
+        done
+    done
+    # Old non-rpm distro puts some man pages in the wrong place, clean them out.
+    if [ -f /usr/man/man3/fattach.3 ] ; then
+        rm -f /usr/man/man3/fattach.3 2>/dev/null
+        rm -f /usr/man/man3/detach.3 2>/dev/null
+        rm -f /usr/man/man3/isastream.3 2>/dev/null
+        rmdir -p /usr/man/man3 2>/dev/null || :
+        rm -f /usr/man/man8/fattach.8 2>/dev/null
+        rm -f /usr/man/man8/fdetach.8 2>/dev/null
+        rmdir -p /usr/man/man8 2>/dev/null || :
+        rm -f /usr/man/man9/connld.9 2>/dev/null
+        rm -f /usr/man/man9/fifo.9 2>/dev/null
+        rm -f /usr/man/man9/pipemod.9 2>/dev/null
+        rmdir -p /usr/man/man9 2>/dev/null || :
+        rmdir -p /usr/man 2>/dev/null || :
+    fi
+fi
+%endif
+
+%if %{FILES_tools32}
+%files util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_bindir}/*
+%{_sbindir}/*
+#{_pkglibexecdir}/gdmo
+%{_pkglibexecdir}/*test*
+%{_pkglibexecdir}/*tst
+%{_pkglibexec32dir}/*test*
+%{_pkglibexec32dir}/*tst
+%{?PATH_snmp:%{PATH_snmp}}
+#{?PATH_snmp32:%{PATH_snmp32}}
+%endif
+
+%if %{FILES_tools}
+%files util
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_bindir}/*
+%{_sbindir}/*
+#{_pkglibexecdir}/gdmo
+%{_pkglibexecdir}/*test*
+%{_pkglibexecdir}/*tst
+%{?PATH_snmp:%{PATH_snmp}}
+%endif
+
+# ===========================================================================
+%package debuginfo
+
+Summary:        %{title} debug information.
+Group:          Development/Debug
+Version:        @VERSION@
+AutoReq:        0
+AutoProv:       0
+Obsoletes:      %{name}-debug < %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-debug = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-debug = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description debuginfo
+%{descripline}
+This package provides debug information for package %{name}.
+Debug information is useful when developing applicaions that
+use this package or when debugging this package.
+%{descriptail}
+
+%if %{FILES_debug}
+%files debuginfo
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
+%{_usrsrc}/debug
+%endif
+
+# ===========================================================================
+%package -n %{corename %name}
+
+Summary:        %{title} core kernel modules.
+Group:          System Environment/Kernel
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+Prefix:         %{_kmoduledir}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
+%if %{NEED_init}
+Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+%endif
+%if %{NEED_devs}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+%endif
+#Prereq:         /sbin/depmod
+#Prereq:         /sbin/lsmod
+#Prereq:         /sbin/insmod
+#Prereq:         /sbin/modprobe
+# SuSE puts lsof in /usr/bin
+Prereq:         lsof
+Conflicts:      %{corename %_conflict}
+Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{corename %virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{corename %virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description -n %{corename %name}
+%{descripline}
+The %{corename %name} binary package contains the
+kernel modules that provide the Linux kernel SVR 4
+%{virtual} facility.  This includes assorted basic %{virtual}
+drivers and modules such as pipes, fifos, echo, etc.  This
+binary package also includes modprobe configuration files for
+the associated kernel modules.
+This package is heavily tied to the kernel for which it was compiled.
+This package applies to kernel version %{kernel_version}.  If
+you cannot find a binary package that matches your kernel, rebuild
+from the source rpm.
+%{descriptail}
+
+%pre -n %{corename %name}
+# ---------------------------------------------------------------------------
+arg="$1"
+function remove_depmods() {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+        prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+        eval "remove_depmods \$$prereq"
+    done
+}
+if [ $arg = 1 ] ; then : # fresh install
+    # This is a fresh install of this version of kernel module.  Make sure that there are no non-rpm
+    # installed kernel modules hanging around for this kernel version.
+    list="%{modules}" ; modl_mods=
+    if [ -d %{_kmoduledir} ] ; then
+	for m in `find %{_kmoduledir} \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
+		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
+		case " $list " in (*" $b "*) ;; (*) continue ;; esac
+		echo "$m"
+		modl_mods="${modl_mods:+$modl_mods }$m"
+	done
+        if [ -n "$modl_mods" -a -f %{_kmoduledir}/modules.dep ] ; then
+            # First we can build a dependency tree from every dependency expression that can be
+            # found in the modules.dep file.
+            xtrace=`shopt -p -o | grep xtrace` ; set +x
+            dep= ; while read line ; do
+                case $line in
+                    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
+                            dep="${dep:+$dep }$line" ; continue ;;
+                    (*)	    dep="${dep:+$dep }$line" ;;
+                esac
+                [ -n "$dep" ] || continue;
+                set dummy $dep
+                if [ "${3+set}" = "set" ] ; then
+                    t=`echo $2 | sed -e 's|:$||'`
+                    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+                    shift 2
+                    for p in $@ ; do
+                        prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+                        eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
+                        eval "$target=\"\${$target:+\$$target }$p\""
+                    done
+                fi
+                dep=
+            done < %{_kmoduledir}/modules.dep
+            eval "$xtrace"
+        fi
+    fi
+    # remove conflicting and dependent modules
+    if [ -n "$modl_mods" ] ; then
+        rm -f -- $modl_mods
+        for m in $list ; do
+            prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+            eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+            [ -n "$modl_deps" ] || continue
+            rm -f -- $modl_deps
+        done
+    fi
+fi
+if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
+    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+        # If we are upgrading and the upgrade is for the running kernel, or we are installing new on
+        # the running kernel, we have to worry about previous loaded modules for the old version or
+        # a non-rpm version.
+        mods="%{modules}" ; for m in $mods ; do
+            if ( lsmod | grep -q "^$m" ) ; then
+                # Module running, kick the stack.
+                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( lsmod | grep -q "^$m" ) ; then
+                    fdetach -a 2>/dev/null
+                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( lsmod | grep -q "^$m" ) ; then
+                        lsof | while read -a tokens; do
+                            if [ :"${tokens[4]}" = :"CHR" ]; then
+                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
+                                if [ $major -eq %{majbase} ]; then
+                                    eval "kill -HUP ${tokens[1]}"
+                                fi
+                            fi
+                        done
+                        /sbin/sleep 5 # wait for processes to die and close streams
+                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                        if ( lsmod | grep -q "^$m" ) ; then
+                            echo "Cannot install or upgrade with $m module running." >&2
+                            exit 1
+                        fi
+                    fi
+                fi
+            fi
+        done
+    fi
+fi
+
+%post -n %{corename %name}
+# ---------------------------------------------------------------------------
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+        # This is a running kernel, do a depmod on the modules directory for the running
+        # kernel.
+        depmod -ae || :
+%if %{have_initscripts}
+        # Running kernels do need init scripts run.
+        list="%{initfiles}" ; for i in $list ; do
+            if [ -f %_initrddir/$i ] ; then
+                /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
+            fi
+        done
+%endif
+    elif [ -r /boot/System.map-%{kernel_version} ] ; then
+        # Non-running kernels a depmod will be performed on boot by depmod anyway, but
+        # try one now.
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} || :
+        # Non-running kernels do not need init scripts run.
+    fi
+fi
+
+%preun -n %{corename %name}
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+        # We are about to uninstall for good on a running kernel then we have to worry about which
+        # modules are running
+%if %{have_initscripts}
+        # First lets try shutting down using any init script first in reverse order
+        list="%{initfiles}" ; for i in $list ; do
+            reverse="$i${reverse:+ $reverse}"
+        done
+        for i in $reverse ; do
+            if [ -f %_initrddir/$i ] ; then
+                /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
+            fi
+        done
+%endif
+        mods="%{modules}" ; for m in $mods ; do
+            if ( lsmod | grep -q "^$m" ) ; then
+                # modules running, kick the stack
+                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( lsmod | grep -q "^$m" ) ; then
+                    fdetach -a
+                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( lsmod | grep -q "^$m" ) ; then
+                        lsof | while read -a tokens; do
+                            if [ :"${tokens[4]}" = :"CHR" ]; then
+                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
+                                if [ $major -eq %{majbase} ]; then
+                                    eval "kill -KILL ${tokens[1]}"
+                                fi
+                            fi
+                        done
+                        /sbin/sleep 5 # wait for processes to die and close streams
+                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                        if ( lsmod | grep -q "^$m" ) ; then
+                            echo "Cannot uninstall with $m module running." >&2
+                            exit 1
+                        fi
+                    fi
+                fi
+            fi
+        done
+    fi
+fi
+
+%postun -n %{corename %name}
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+    if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+        # This is a running kernel, do a depmod on the modules directory for.
+        depmod -ae || :
+    elif [ -r /boot/System.map-%{kernel_version} ] ; then
+        # Non-running kernels a depmod will be performed on boot but depmod anyway.
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} || :
+    fi
+    if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
+        # One more kick at killing any loaded modules on uninstall, last stage of the upgrade on a
+        # running kernel for upgrade.
+        reboot='no'
+        mods="%{modules}" ; for m in $mods ; do
+            if ( lsmod | grep -q "^$m" ) ; then
+                # Modules running, kick the stack.
+                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                if ( lsmod | grep -q "^$m" ) ; then
+                    fdetach -a
+                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                    if ( lsmod | grep -q "^$m" ) ; then
+                        insmod -ar "$m"
+                        lsof | while read -a tokens; do
+                            if [ :"${tokens[4]}" = :"CHR" ]; then
+                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
+                                if [ $major -eq %{majbase} ]; then
+                                    if [ $1 = 0 ] ; then
+                                        # Extreme prejudice for removal.
+                                        eval "kill -KILL ${tokens[1]}"
+                                    else
+                                        # Try to get them to reload for upgrade.
+                                        eval "kill -HUP ${tokens[1]}"
+                                    fi
+                                fi
+                            fi
+                        done
+                        /sbin/sleep 5 # wait for processes to die and close streams
+                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
+                        if ( lsmod | grep -q "^$m" ) ; then
+                            echo "Error: modules may be still loaded" >&2
+                            lsmod | grep "^$m" >&2
+                            reboot='yes'
+                        fi
+                    fi
+                fi
+            fi
+        done
+        if [ "$reboot" = 'yes' ]; then
+            echo "you may have to reboot" >&2
+            exit 1
+        fi
+    fi
+fi
+
+%if %{FILES_modules}
+%files -n %{corename %name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_kmoduledir}/%{base}
+%attr(644,root,root) %{_kmoduledir}/modules.%{base}
+%{_kmoduledir}/%{base}/*.o*
+%endif
+
+%if %{FILES_ko_modules}
+%files -n %{corename %name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_kmoduledir}/%{base}
+%{_kmoduledir}/%{base}/*.ko*
+%endif
+
+# ===========================================================================
+%package -n %{infoname %name}
+
+Summary:        %{title} core kernel module symbol versions.
+Group:          System Environment/Kernel
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        true
+Autoprov:       true
+%if %{FILES_modules}
+Prefix:         %{_includedir}/%{name}/%{kernel_version}
+%endif
+Prefix:         %{_kmoduledir}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
+Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-info < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description -n %{infoname %name}
+%{descripline}
+The %{infoname %name} binary package
+contains the kernel modules symbol information for development
+of additional %{virtual} kernel modules against the core kernel
+modules included in the %{corename %name} binary
+package.  This package is heavily tied to the core kernel
+modules and kernel for which it was compiled.  This package
+applies to core kernel modules %{corename %name}
+for kernel version %{_kversion}.
+%{descriptail}
+
+%if %{FILES_modules}
+%files -n %{infoname %name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%dir %{_includedir}/%{name}/%{kernel_version}
+%{_includedir}/%{name}/%{kernel_version}/*
+%{_kmoduledir}/%{base}/Module*
+%endif
+
+%if %{FILES_ko_modules}
+%files -n %{infoname %name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{_kmoduledir}/%{base}/Module*
+%endif
+
+# don't include package for FILES_ko_modules
+
+# ===========================================================================
+%package -n %{dbugname %name}
+
+Summary:        %{title} kernel module debug information.
+Group:          Development/Debug
+AutoReq:        0
+AutoProv:       0
+Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease}
+Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease2}
+Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{rpmrelease}
+Version:        %{kmodules_version}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description -n %{dbugname %name}
+%{descripline}
+This package provides debug information for package %{name}.
+Debug information is useful when developing applications that
+use this package or when debugging this package.
+%{descriptail}
+
+%if %{FILES_kern_debug}
+%files -n %{dbugname %name}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
+%{_usrsrc}/debug
+%endif
+
+# ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.85  2008-09-16 10:00:18  brian
+# - support autoupdating kernel modules for various distros
+#
 
 * Wed Sep 10 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.84  2008-09-10 20:46:09  brian
@@ -2949,7 +3298,7 @@ external SNMP management tools.
 - Corrections to pre and post handling on core modules
 
 * Mon Dec 15 2003 Brian Bidulock <bidulock@openss7.org>
-- Revision 1.1.2.11 
+- Revision 1.1.2.11
 - Added texinfo docs and logos.
 
 * Sat Dec 13 2003 Brian Bidulock <bidulock@openss7.org>
