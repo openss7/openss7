@@ -1,3 +1,8 @@
+2008-09-16  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/rpm.am: updates to rpm spec files
+	* m4/rpm.m4: updates to rpm spec files
+
 2008-09-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/install.texi: update .rpmmacro recommendations

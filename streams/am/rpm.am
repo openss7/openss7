@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2008-09-15 08:54:28 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2008-09-16 09:47:47 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-15 08:54:28 $ by $Author: brian $
+## Last Modified $Date: 2008-09-16 09:47:47 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -115,9 +115,6 @@ redhat_directories	= $(topdir)/SOURCES $(sourcedir) \
 # distro specific.
 ##
 RPMSOPTS		= $(RPMOPTS) \
-			  --define "extrarelease $(PACKAGE_RPMEXTRA)" \
-			  --define "extrarelease2 $(PACKAGE_RPMEXTRA2)" \
-			  --define "distribution $(PACKAGE_RPMDIST) (contrib)" \
 			  --define "_gif_icon $(PACKAGE)-$(VERSION).gif" \
 			  --define "_xpm_icon $(PACKAGE)-$(VERSION).xpm"
 
@@ -158,7 +155,7 @@ RPMBOPTS		= $(RPMOPTS) \
 ##
 RPMKOPTS		= $(RPMOPTS)
 
-redhatpkg		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)
+redhatpkg		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)
 redhat_dir		= $(rpmbuilddir)/$(PACKAGE)-$(VERSION)
 redhat_dir_stamp	= $(rpmbuilddir)/stamp-$(PACKAGE)-$(VERSION)
 redhat_src_file		= $(srcrpmdir)/$(redhatpkg).src.rpm
@@ -168,9 +165,23 @@ redhat_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
 redhat_img_files	= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 redhat_source_files	= $(redhat_spec_file) $(redhat_img_files) $(redhat_tar_file)
 redhat_binary_file	= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-redhat_module_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+##
+# There are several forms (currently) for automatic loadable module files:
+#
+#  kernel-module-$$(foo)[-$$(flavor)]
+#  kmod-$$(foo)[-$$(flavor)]
+#  $$(foo)-kmod[-$$(flavor)]
+#  $$(vendor)-$$(driver)-kmp[-$$(flavor)]
+##
+redhat_module0_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+redhat_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+redhat_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+redhat_module3_file	= openss7-$(PACKAGE)*-kmp-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 redhat_binary_files	= $(rpmdir)/*/$(redhat_binary_file) \
-			  $(rpmdir)/*/$(redhat_module_file)
+			  $(rpmdir)/*/$(redhat_module0_file) \
+			  $(rpmdir)/*/$(redhat_module1_file) \
+			  $(rpmdir)/*/$(redhat_module2_file) \
+			  $(rpmdir)/*/$(redhat_module3_file)
 redhat_cache_files	= $(rpmbuilddir)/*config.cache \
 			  $(rpmbuilddir)/*config.site \
 			  $(rpmbuilddir)/*modpost.cache
@@ -359,11 +370,11 @@ rebuild:
 #!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
-	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module_file)' 2>/dev/null`" ; \
+	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module0_file)'-o -name '$(redhat_module1_file)' -o -name '$(redhat_module2_file)' -o -name '$(redhat_module3_file)' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild" ; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild ; \
-		rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module_file)' 2>/dev/null`" ; \
+		rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module0_file)'-o -name '$(redhat_module1_file)' -o -name '$(redhat_module2_file)' -o -name '$(redhat_module3_file)' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
 		fi ; \
@@ -442,6 +453,12 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.102  2008-09-16 09:47:47  brian
+## - updates to rpmspec files
+##
+## Revision 0.9.2.101  2008-09-15 21:03:48  brian
+## - make distro specific SRPMs
+##
 ## Revision 0.9.2.100  2008-09-15 08:54:28  brian
 ## - build modifications
 ##

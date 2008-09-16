@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.68 $) $Date: 2008-09-12 06:12:09 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-09-16 09:47:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-12 06:12:09 $ by $Author: brian $
+# Last Modified $Date: 2008-09-16 09:47:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -447,17 +447,17 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_CACHE_CHECK([for rpm RPMS directory], [rpm_cv_rpmdir], [dnl
 	rpm_cv_rpmdir='$(topdir)/RPMS'
     ])
-    rpmdir=$rpm_cv_rpmdir
+    rpmdir="$rpm_cv_rpmdir"
     AC_SUBST([rpmdir])dnl
     AC_CACHE_CHECK([for rpm SRPMS directory], [rpm_cv_srcrpmdir], [dnl
-	rpm_cv_srcrpmdir='$(topdir)/SRPMS'
+	rpm_cv_srcrpmdir='$(PACKAGE_DISTDIR)/rpms/SRPMS'
     ])
-    srcrpmdir=$rpm_cv_srcrpmdir
+    srcrpmdir="$rpm_cv_srcrpmdir"
     AC_SUBST([srcrpmdir])dnl
     AC_CACHE_CHECK([for rpm SPECS directory], [rpm_cv_specdir], [dnl
-	rpm_cv_specdir='$(PACKAGE_DISTDIR)'
+	rpm_cv_specdir='$(PACKAGE_DISTDIR)/rpms/SPECS'
     ])
-    specdir=$rpm_cv_specdir
+    specdir="$rpm_cv_specdir"
     AC_SUBST([specdir])dnl
 ])# _RPM_SPEC_SETUP_TOPDIR
 # =============================================================================
@@ -580,6 +580,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.69  2008-09-16 09:47:47  brian
+# - updates to rpmspec files
+#
 # Revision 0.9.2.68  2008-09-12 06:12:09  brian
 # - correction
 #
