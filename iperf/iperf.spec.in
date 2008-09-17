@@ -126,8 +126,8 @@
 %{?_without_cooked_manpages: %{expand: %%global NEED_manrefs 0}}
 %{?_with_cooked_manpages:    %{expand: %%global NEED_manrefs 1}}
 
-%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+%global oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+%global newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 
 %if %{BUILD_arch}
 %global BUILD_source  0
@@ -237,13 +237,19 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
-%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
+%global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1|')}%{nil}
+%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "%%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')}%{nil}
 
 %global descripline %{title} is an OpenSS7 Modified version of the DAST Iperf package.
 
+%if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
+%global descriptail %(echo -en '\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
+%else
+%global descriptail %{nil}
+%endif
+
 # doesn't work well with this spec file
-%define _unpackaged_files_terminate_build 0
+%global _unpackaged_files_terminate_build 0
 
 Summary:        %{title} for OpenSS7 SCTP
 Name:           @PACKAGE@
@@ -360,8 +366,8 @@ fi
 %define cache_file %{_builddir}/%{_target_platform}-config.cache
 %define csite_file %{_builddir}/%{_target_platform}-config.site
 
-%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
-%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
+%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|') %{nil}
+%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|') %{nil}
 
 ./configure \
     ${CC+CC="${CC}"} \

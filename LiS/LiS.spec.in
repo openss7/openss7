@@ -65,10 +65,23 @@
 %global BUILD_test    1
 %global BUILD_devs    1
 %global MAKE_devs     0
+%global WANT_devs     1
 #global BUILD_lis     0
 #global BUILD_lfs     0
 %global BUILD_mibs    1
 %global BUILD_snmp    1
+
+#global NEED_compat   0
+#global NEED_xns      0
+#global NEED_xnet     0
+#global NEED_inet     0
+#global NEED_sctp     0
+#global NEED_chan     0
+#global NEED_x25      0
+#global NEED_iso      0
+#global NEED_isdn     0
+#global NEED_ss7      0
+#global NEED_sigtran  0
 
 #ifnarch noarch
 #global BUILD_lfs     1
@@ -103,40 +116,50 @@
 %global modules     streams streams-pipemod streams-sad streams-liskmod streams-connld streams-mtdrv
 %global preloads    streams
 %global libraries   %{name} p%{name}
+#global locales     %{nil}
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
 %global infofiles   %{name}
 %global initfiles   streams
 %global conffiles   streams.conf
-#global mibfiles
-#global snmpmods
+%global testfiles   @(*test*|*tst)
+#global mibfiles    *.mib
+#global snmpmods    
+#global gdmos       %{nil}
 #global netconfig   %{base}
 #global sock2path   %{base}
+%global manual      manual
+#global specs       doc/specs
+#global drafts      doc/drafts
+#global papers      doc/papers
+#global projects    doc/projects
+%global license     AGPLv3/GPLv3
 
-%{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')}
-%{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
-%{expand: %%global have_modules     %{?modules:  1}%{!?modules:  0}}
-%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
-%{expand: %%global have_tools       %{?tools:    1}%{!?tools:    0}}
-%{expand: %%global have_infofiles   %{?infofiles:1}%{!?infofiles:0}}
-%{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
-%{expand: %%global have_configfiles %{?conffiles:1}%{!?conffiles:0}}
-%{expand: %%global have_mibfiles    %{?mibfiles: 1}%{!?mibfiles: 0}}
-%{expand: %%global have_snmpmods    %{?snmpmods: 1}%{!?snmpmods: 0}}
-%{expand: %%global have_netconfig   %{?netconfig:1}%{!?netconfig:0}}
-%{expand: %%global have_sock2path   %{?sock2path:1}%{!?sock2path:0}}
+%global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')
+%global have_preloads    %{?preloads: 1}%{!?preloads: 0}
+%global have_modules     %{?modules:  1}%{!?modules:  0}
+%global have_libraries   %{?libraries:1}%{!?libraries:0}
+%global have_tools       %{?tools:    1}%{!?tools:    0}
+%global have_infofiles   %{?infofiles:1}%{!?infofiles:0}
+%global have_initscripts %{?initfiles:1}%{!?initfiles:0}
+%global have_configfiles %{?conffiles:1}%{!?conffiles:0}
+%global have_mibfiles    %{?mibfiles: 1}%{!?mibfiles: 0}
+%global have_snmpmods    %{?snmpmods: 1}%{!?snmpmods: 0}
+%global have_gdmofiles   %{?gdmos:    1}%{!?gdmos:    0}
+%global have_netconfig   %{?netconfig:1}%{!?netconfig:0}
+%global have_sock2path   %{?sock2path:1}%{!?sock2path:0}
 
 %if %{without_ko_modules}
-# assume devs for older kernels
-%global NEED_devs     1
+# assume devs for older kernels (except for strinet which has conflict with dev package)
+%global NEED_devs     %{WANT_devs}
 %global NEED_init     1
-%{expand: %%global have_oldmods  %{?modules:1}%{!?modules:0}}
-%{expand: %%global have_newmods  0}
+%global have_oldmods  %{?modules:1}%{!?modules:0}
+%global have_newmods  0
 %else
 # assume no devs for newer kernels
 %global NEED_devs     0
 %global NEED_init     0
-%{expand: %%global have_oldmods  0}
-%{expand: %%global have_newmods  %{?modules:1}%{!?modules:0}}
+%global have_oldmods  0
+%global have_newmods  %{?modules:1}%{!?modules:0}
 %endif
 
 # define new autoconf 2.60, 2.61 stuff
@@ -204,8 +227,8 @@
 %{?_without_cooked_manpages: %{expand: %%global NEED_manrefs 0}}
 %{?_with_cooked_manpages:    %{expand: %%global NEED_manrefs 1}}
 
-%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+%global oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+%global newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 
 %global debug_package %{nil}
 
@@ -221,8 +244,8 @@
 %endif
 
 %if %{NEED_devs}
-%{expand: %%global BUILD_devs    %newrpm}
-%{expand: %%global MAKE_devs     %oldrpm}
+%global BUILD_devs    %newrpm
+%global MAKE_devs     %oldrpm
 %else
 %global BUILD_devs    0
 %global MAKE_devs     0
@@ -252,7 +275,7 @@
 #global _kmodext streams
 #global _conflict LiS
 #global _strvers @LFS_VERSION@%{?extrarelease2}
-#{expand: %%global _with_lfs --with-lfs}
+#global _with_lfs --with-lfs
 #endif
 #if %{BUILD_lis}
 #global _STREAMS LiS
@@ -261,25 +284,25 @@
 %global _kmodext lis
 %global _conflict streams
 #global _strvers @LIS_VERSION@%{?extrarelease2}
-#{expand: %%global _with_lis --with-lis}
+#global _with_lis --with-lis
 #endif
 
-%define corename() %1-core-%_kversion
-%define infoname() %1-info-%_kversion
-%define dbugname() %1-debug-%_kversion
+%global corename() %1-core-%_kversion%{nil}
+%global infoname() %1-info-%_kversion%{nil}
+%global dbugname() %1-debug-%_kversion%{nil}
 %global kmodules_version @VERSION@
 
 %if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
-%define corename() openss7-%1-kmp%kernel_flavor
-%define infoname() openss7-%1-kmp%kernel_flavor-devel
-%define dbugname() openss7-%1-kmp%kernel_flavor-debuginfo
+%global corename() openss7-%1-kmp%kernel_flavor%{nil}
+%global infoname() openss7-%1-kmp%kernel_flavor-devel%{nil}
+%global dbugname() openss7-%1-kmp%kernel_flavor-debuginfo%{nil}
 %global kmodules_version @VERSION@_%kernel_string
 %endif
 
 %if %(test '%_vendor' = 'redhat' && echo 1 || echo 0)
-%define corename() kmod-%1%kernel_flavor
-%define infoname() kmod-%1%kernel_flavor-devel
-%define dbugname() kmod-%1%kernel_flavor-debuginfo
+%global corename() kmod-%1%kernel_flavor%{nil}
+%global infoname() kmod-%1%kernel_flavor-devel%{nil}
+%global dbugname() kmod-%1%kernel_flavor-debuginfo%{nil}
 %global kmodules_version @VERSION@.%kernel_release
 %endif
 
@@ -345,6 +368,7 @@
 %global FILES_snmp          %{BUILD_snmp}
 %global FILES_snmp32        %{BUILD_snmp}
 %global FILES_virtual       1
+%global FILES_base          1
 %else
 %global FILES_libs          0
 %global FILES_libs32        0
@@ -368,6 +392,7 @@
 %global FILES_snmp          0
 %global FILES_snmp32        0
 %global FILES_virtual       0
+%global FILES_base          0
 %endif
 
 %if %{BUILD_devel}
@@ -411,6 +436,7 @@
 %global FILES_ko_noinit     0
 %global FILES_noinit        0
 %global FILES_mibs          0
+%global FILES_base          0
 %endif
 
 %if %{BUILD_debug}
@@ -501,8 +527,8 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
-%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
+%global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1|')}%{nil}
+%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "%%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')}%{nil}
 
 %global descripline %{title} is a (poor) implementation of SVR 4 %{virtual} for Linux.
 
@@ -516,15 +542,14 @@ Summary:        %{title} (SVR 4 %{virtual}).
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
-Release:        %{fullrelease}
-License:        AGPLv3/GPLv3
+Release:        %{rpmrelease}
+License:        %{license}
 Group:          System Environment/Kernel
 %{?url:URL:            %{url}}
 %{?_xpm_icon:Icon:           %{_xpm_icon}}
 %{?_gif_icon:Icon:           %{_gif_icon}}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
-#Source:         ftp://ftp.gcom.com/pub/linux/src/%{name}/%{name}-%{version}.tgz
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
 %{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
@@ -592,27 +617,10 @@ BuildRequires:  /sbin/genksyms
 # to install documentation
 #BuildRequires: texinfo >= 4.0
 
-Conflicts:      %{_conflict}
+%{?_conflict:Conflicts:      %{_conflict}}
 Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
-%if %{_enable_ksource_package}
-Requires:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
-%endif
-%if %{_enable_debug_packages}
-Requires:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
-%endif
 
 # ---------------------------------------------------------------------------
 %description
@@ -678,8 +686,8 @@ fi
 %define csite_file %{_builddir}/%{_target_platform}-config.site
 %define mpost_file %{_builddir}/%{_target_platform}-%{kernel_version}-modpost.cache
 
-%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
-%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
+%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')%{nil}
+%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')%{nil}
 
 ./configure \
     ${CC+CC="${CC}"} \
@@ -829,8 +837,88 @@ package_source
 
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
+# ===========================================================================
+%package %{_target_cpu}
+
+Summary:        %{title} virtual package.
+Group:          System Environment/Base
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        0
+Autoprov:       0
+%{?_conflict:Conflicts:      %{_conflict}-%{_target_cpu}}
+Obsoletes:      %{name}-%{_target_cpu}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+#Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
+%if %{_enable_ksource_package}
+Requires:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
+%endif
+%if %{_enable_debug_packages}
+Requires:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
+%endif
+Provides:       %{name}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_target_cpu} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_target_cpu}
+%{descripline}
+The %{name}-%{_target_cpu} binary package is a virtual package that depends
+on all %{name} subpackages for the %{_target_cpu} architecture.  Installing
+this package installs all necessary subpackages for the %{_target_cpu}
+architecture.
+%{descriptail}
+
 %if %{FILES_virtual}
-%files
+%files %{_target_cpu}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%endif
+
+# ===========================================================================
+%package base
+
+Summary:        %{title} base package.
+Group:          System Environment/Base
+Version:        @VERSION@
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        0
+Autoprov:       0
+%{?_conflict:Conflicts:      %{_conflict}}
+%{?_conflict:Conflicts:      %{_conflict}-base}
+Provides:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description base
+%{descripline}
+The %{name}-base binary package is a virtual package upon which all other
+%{name} subpackages depend architecture.  Removing this package removes all
+subpackages.
+%{descriptail}
+
+%if %{FILES_base}
+%files base
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %endif
@@ -849,10 +937,13 @@ Prefix:         %{_docdir}
 Prefix:         %{_infodir}
 Prefix:         %{_mandir}
 #Prereq:         /sbin/install-info
-Conflicts:      %{_conflict}-doc
-Conflicts:      %{_conflict}-docs
+%{?_conflict:Conflicts:      %{_conflict}-doc}
+%{?_conflict:Conflicts:      %{_conflict}-docs}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
@@ -945,11 +1036,12 @@ fi
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
-%doc manual
-#doc doc/specs
-#doc doc/drafts
-#doc doc/papers
-#doc doc/projects
+%{?manual:%doc %{manual}}
+%{?specs:%doc %{specs}}
+%{?drafts:%doc %{drafts}}
+%{?papers:%doc %{papers}}
+%{?projects:%doc %{projects}}
+%doc %{name}-%{version}.lsm
 %{_infodir}/*
 %{manrefs}
 %{manmacros}
@@ -963,11 +1055,12 @@ fi
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm
-%doc manual
-#doc doc/specs
-#doc doc/drafts
-#doc doc/papers
-#doc doc/projects
+%{?manual:%doc %{manual}}
+%{?specs:%doc %{specs}}
+%{?drafts:%doc %{drafts}}
+%{?papers:%doc %{papers}}
+%{?projects:%doc %{projects}}
+%doc %{name}-%{version}.lsm
 %{_infodir}/*
 %{manrefs}
 %{manmacros}
@@ -985,6 +1078,9 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_usrsrc}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
@@ -1032,9 +1128,12 @@ Prefix:         %{_snmpconfdir}
 %if %{have_oldmods}
 Prefix:         %{_modutildir}
 %endif
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-Conflicts:      %{_conflict}-init
+%{?_conflict:Conflicts:      %{_conflict}-init}
 Obsoletes:      %{name}-inits
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
@@ -1678,6 +1777,9 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_snmpmibdir}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
@@ -1712,10 +1814,13 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_pkglibexecdir}
-Conflicts:      %{_conflict}-test
-Conflicts:      %{_conflict}-tests
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+%{?_conflict:Conflicts:      %{_conflict}-test}
+%{?_conflict:Conflicts:      %{_conflict}-tests}
 Obsoletes:      %{name}-tests
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
@@ -1753,13 +1858,16 @@ Version:        @VERSION@
 %{?_gif:Icon: %_gif}
 Autoreq:        true
 Autoprov:       true
-Conflicts:      %{_conflict}-dev
-Conflicts:      %{_conflict}-devs
+%{?_conflict:Conflicts:      %{_conflict}-dev}
+%{?_conflict:Conflicts:      %{_conflict}-devs}
+Obsoletes:      %{name}-devs
 Requires:       dev >= 3.3
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 %if %{MAKE_devs}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %endif
-Obsoletes:      %{name}-devs
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
@@ -1825,6 +1933,9 @@ Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 %endif
 Prefix:         %{_includedir}/%{name}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
@@ -1885,8 +1996,11 @@ Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 %endif
 Prefix:         %{_localedir}
-Prereq:         /sbin/ldconfig
 Obsoletes:      %{name}-libs
+Prereq:         /sbin/ldconfig
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
@@ -1941,7 +2055,7 @@ fi
 %{_libdir}/*.la
 %{_lib32dir}/*.so*
 %{_lib32dir}/*.la
-#{_localedir}/*
+%{?locales:%{_localedir}/*}
 %endif
 
 %if %{FILES_libs}
@@ -1950,7 +2064,7 @@ fi
 %defattr(-,root,root)
 %{_libdir}/*.so*
 %{_libdir}/*.la
-#{_localedir}/*
+%{?locales:%{_localedir}/*}
 %endif
 
 # ===========================================================================
@@ -1976,18 +2090,21 @@ Prefix:         %{_snmpdlmoddir}
 Prefix:         %{_snmpdlmoddir}
 Prefix:         %{_snmpdlmod32dir}
 %endif
+%{?_conflict:Conflicts:      %{_conflict}-util}
+%{?_conflict:Conflicts:      %{_conflict}-utils}
+Obsoletes:      %{name}-utils
 %if %{FILES_snmp}
 #Requires:       net-snmp
 %endif
 %if %{FILES_snmp32}
 #Requires:       net-snmp
 %endif
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 %if %{have_libraries}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 %endif
-Conflicts:      %{_conflict}-util
-Conflicts:      %{_conflict}-utils
-Obsoletes:      %{name}-utils
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
@@ -2040,17 +2157,29 @@ if [ $1 = 1 ]; then : # fresh install
 fi
 %endif
 
+# inet wants to install its own devices
+%if %{WANT_devs}
+%else
+%post %{_streams}-util
+if [ $1 = 1 ] ; then : # fresh install
+    /usr/sbin/inet_mkdev
+fi
+
+%preun %{_streams}-util
+if [ $1 = 0 ] ; then : # final removal
+    /usr/sbin/inet_rmdev
+fi
+%endif
+
 %if %{FILES_tools32}
 %files util
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{_bindir}/*
 %{_sbindir}/*
-#{_pkglibexecdir}/gdmo
-%{_pkglibexecdir}/*test*
-%{_pkglibexecdir}/*tst
-%{_pkglibexec32dir}/*test*
-%{_pkglibexec32dir}/*tst
+%{?gdmos:%{_pkglibexecdir}/gdmo}
+%{?testfiles:%{_pkglibexecdir}/%{testfiles}}
+%{?testfiles:%{_pkglibexec32dir}/%{testfiles}}
 %{?PATH_snmp:%{PATH_snmp}}
 #{?PATH_snmp32:%{PATH_snmp32}}
 %endif
@@ -2061,9 +2190,8 @@ fi
 %defattr(-,root,root)
 %{_bindir}/*
 %{_sbindir}/*
-#{_pkglibexecdir}/gdmo
-%{_pkglibexecdir}/*test*
-%{_pkglibexecdir}/*tst
+%{?gdmos:%{_pkglibexecdir}/gdmo}
+%{?testfiles:%{_pkglibexecdir}/%{testfiles}}
 %{?PATH_snmp:%{PATH_snmp}}
 %endif
 
@@ -2076,6 +2204,9 @@ Version:        @VERSION@
 AutoReq:        0
 AutoProv:       0
 Obsoletes:      %{name}-debug < %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-debug = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-debug = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
@@ -2106,36 +2237,66 @@ Group:          System Environment/Kernel
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_kmoduledir}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
-#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-%if %{NEED_init}
-Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
-%endif
+%{?_conflict:Conflicts:      %{corename %_conflict}}
+%{?_conflict:Conflicts:      %{corename %_conflict} = %{epoch}:%{kmodules_version}-%{fullrelease}}
+%{?_conflict:Conflicts:      %{corename %_conflict} = %{epoch}:%{kmodules_version}-%{fullrelease2}}
+%{?_conflict:Conflicts:      %{corename %_conflict} = %{epoch}:%{kmodules_version}-%{rpmrelease}}
+%{?_conflict:Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease}}
+%{?_conflict:Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease2}}
+%{?_conflict:Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{rpmrelease}}
+Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
 #Prereq:         /sbin/modprobe
 # SuSE puts lsof in /usr/bin
 Prereq:         lsof
-Conflicts:      %{corename %_conflict}
-Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease}
-Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{fullrelease2}
-Conflicts:      %{corename %_conflict} = %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
+%if %{NEED_init}
+Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+%endif
+%if %{NEED_devs}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{corename %virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{corename %virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{corename %virtual} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{corename %virtual} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{corename %virtual} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kernel-modules = %{_kversion}
+Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}  = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
@@ -2408,25 +2569,56 @@ Autoprov:       true
 Prefix:         %{_includedir}/%{name}/%{kernel_version}
 %endif
 Prefix:         %{_kmoduledir}
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
-#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease}
-Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease2}
-Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+%{?_conflict:Conflicts:      %{infoname %_conflict}}
+%{?_conflict:Conflicts:      %{infoname %_conflict} = %{epoch}:%{kmodules_version}-%{fullrelease}}
+%{?_conflict:Conflicts:      %{infoname %_conflict} = %{epoch}:%{kmodules_version}-%{fullrelease2}}
+%{?_conflict:Conflicts:      %{infoname %_conflict} = %{epoch}:%{kmodules_version}-%{rpmrelease}}
+%{?_conflict:Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease}}
+%{?_conflict:Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{fullrelease2}}
+%{?_conflict:Conflicts:      %{infoname %_conflict} = %{epoch}:%{version}-%{rpmrelease}}
 Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-info < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-modules = %{_kversion}
+Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{infoname %virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{infoname %virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{infoname %virtual} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       kernel-modules = %{_kversion}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
@@ -2471,13 +2663,26 @@ Summary:        %{title} kernel module debug information.
 Group:          Development/Debug
 AutoReq:        0
 AutoProv:       0
-Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease}
-Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease2}
-Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{rpmrelease}
+%{?_conflict:Conflicts:      %{dbugname %_conflict}}
+%{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{kmodules_version}-%{fullrelease}}
+%{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{kmodules_version}-%{fullrelease2}}
+%{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{kmodules_version}-%{rpmrelease}}
+%{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease}}
+%{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease2}}
+%{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{rpmrelease}}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       kernel-modules = %{_kversion}
+Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{dbugname %virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{dbugname %virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{dbugname %virtual} = %{epoch}:%{version}-%{rpmrelease}
