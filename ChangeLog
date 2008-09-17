@@ -5,6 +5,7 @@
 	  also allow suppression of lzma archives
 	* am/archive.am: place source in tarballs directory for remote build
 	* am/deb.am: take tarballs from tardir
+	* am/lsm.am: must use tardir too
 
 2008-09-16  Brian Bidulock  <bidulock@openss7.org>
 
