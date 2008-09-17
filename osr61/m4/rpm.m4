@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.69 $) $Date: 2008-09-16 09:47:47 $
+# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.70 $) $Date: 2008-09-17 05:53:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-16 09:47:47 $ by $Author: brian $
+# Last Modified $Date: 2008-09-17 05:53:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -433,7 +433,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_SUBST([topdir])dnl
     # set defaults for the rest
     AC_CACHE_CHECK([for rpm SOURCES directory], [rpm_cv_sourcedir], [dnl
-	rpm_cv_sourcedir='$(PACKAGE_DISTDIR)'
+	if test :$PACKAGE_DISTDIR = :`pwd` ; then
+	    rpm_cv_sourcedir='$(PACKAGE_DISTDIR)'
+	else
+	    rpm_cv_sourcedir='$(PACKAGE_DISTDIR)/tarballs'
+	fi
     ])
     sourcedir="$rpm_cv_sourcedir"
     AC_SUBST([sourcedir])dnl
@@ -580,6 +584,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.70  2008-09-17 05:53:03  brian
+# - place source in tarballs directory for remote build
+#
 # Revision 0.9.2.69  2008-09-16 09:47:47  brian
 # - updates to rpmspec files
 #
