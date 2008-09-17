@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-08-02 05:06:15 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-09-17 12:06:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-02 05:06:15 $ by $Author: brian $
+# Last Modified $Date: 2008-09-17 12:06:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -454,6 +454,7 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_PKG_EPOCH
     _OPENSS7_OPTIONS_PKG_RELEASE
     _OPENSS7_OPTIONS_PKG_DISTDIR
+    _OPENSS7_OPTIONS_PKG_TARDIR
     _OPENSS7_OPTIONS_PKG_ARCH
     _OPENSS7_OPTIONS_PKG_INDEP
 ])# _OPENSS7_OPTIONS
@@ -625,6 +626,42 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_DISTDIR], [dnl
     PACKAGE_DISTDIR="$pkg_cv_distdir"
     AC_SUBST([PACKAGE_DISTDIR])dnl
 ])# _OPENSS7_OPTIONS_PKG_DISTDIR
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_PKG_TARDIR
+# -----------------------------------------------------------------------------
+# When building in place the default is simply the current directory, whereas
+# when releasing to another directory, the default is based on the repo
+# subdirectory name (tarballs).
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_TARDIR], [dnl
+    if test :$PACKAGE_DISTDIR = :`pwd` ; then
+	pkg_tmp='$(PACKAGE_DISTDIR)'
+    else
+	pkg_tmp='$(PACKAGE_DISTDIR)/tarballs'
+    fi
+    AC_ARG_WITH([pkg-tardir],
+	AS_HELP_STRING([--with-pkg-tardir=DIR],
+	    [specify the tarball directory.  @<:@default=PKG-DISTDIR/tarballs@:>@]),
+	[with_pkg_tardir="$withval"],
+	[with_pkg_tardir="$pkg_tmp"])
+    AC_CACHE_CHECK([for pkg tardir], [pkg_cv_tardir], [dnl
+	case :"${with_pkg_tardir:-default}" in
+	    (:no|:NO)
+		pkg_cv_tardir="$pkg_tmp"
+		;;
+	    (:yes|:YES|:default|:DEFAULT)
+		pkg_cv_tardir="$pkg_cv_distdir"
+		;;
+	    (*)
+		pkg_cv_tardir="$with_pkg_tardir"
+		;;
+	esac
+    ])
+    tardir="$pkg_cv_tardir"
+    AC_SUBST([tardir])dnl
+])# _OPENSS7_OPTIONS_PKG_TARDIR
 # =============================================================================
 
 # =============================================================================
@@ -818,9 +855,17 @@ AC_DEFUN([_OPENSS7_MISSING], [dnl
 # =============================================================================
 # _OPENSS7_BESTZIP
 # -----------------------------------------------------------------------------
+# Building lzma archives is very, very, very slow.  Use this option to suppress
+# the building of lzma archives, even on systems that support lzma.
+# -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_BESTZIP], [dnl
     AC_CHECK_PROG([BESTZIP], [lzma], [lzma], [bzip2])
-    AM_CONDITIONAL([WITH_LZMA], [test :$BESTZIP = :lzma])dnl
+    AC_ARG_WITH([lmza],
+	AS_HELP_STRING([--without-lzma],
+	    [do not create lzma archives @<:@default=yes@:>@]),
+	[with_lzma="${withval:-$BESTZIP}"],
+	[with_lzma="bzip2"])
+    AM_CONDITIONAL([WITH_LZMA], [test ":$with_lzma" = :lzma])dnl
 ])# _OPENSS7_BESTZIP
 # =============================================================================
 
@@ -834,6 +879,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.62  2008-09-17 12:06:02  brian
+# - tarballs directory and LZMA suppression
+#
 # Revision 0.9.2.61  2008-08-02 05:06:15  brian
 # - make LZMA compression detected
 #
