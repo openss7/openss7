@@ -1,3 +1,7 @@
+2008-09-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/rpm.m4: place source in tarballs directory for remote build
+
 2008-09-16  Brian Bidulock  <bidulock@openss7.org>
 
 	* am/rpm.am: updates to rpm spec files
