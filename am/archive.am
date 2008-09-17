@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-08-03 08:03:59 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-09-17 12:06:02 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-08-03 08:03:59 $ by $Author: brian $
+## Last Modified $Date: 2008-09-17 12:06:02 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -89,29 +89,30 @@ if MAINTAINER_MODE
 
 if WITH_LZMA
 archive_files	= \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2 \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.gz \
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2 \
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.lzma
 archive_signs	= \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma.asc
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.gz.asc \
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2.asc \
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.lzma.asc
 
 $(distdir).tar.lzma:: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 	@test ":$(FORCE)" != :force -a -f "$@" || $(MAKE) $(AM_MAKEFLAGS) dist-lzma
 else
 archive_files	= \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.gz \
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 archive_signs	= \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc \
-		$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.gz.asc \
+		$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2.asc
 endif
 
 ##
 # creates the package directory
 ##
-RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR)
+RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR) \
+			   $(tardir)
 
 ##
 # Note that sometimes the package distribution directory is the current build directory.  This is
@@ -141,7 +142,7 @@ $(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 #!     This target creates the distribution archive files if they have not
 #!     already been created.  This not only runs the `dist' target, but also
 #!     copies the files to the distribution directory, which in this case is
-#!     @PACKAGE_DISTDIR@.
+#!     @tardir@.
 #!
 #!     The files generated are named:
 #!         @PACKAGE@-@VERSION@.tar.gz and @PACKAGE@-@VERSION@.tar.bz2
@@ -160,8 +161,8 @@ release-archives: $(archive_files)
 # generate a detached signature.  Redirect output to avoid gpg problems with existing files.  We
 # pipe in an environment variable for automated builds.
 ##
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz.asc:: \
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
+$(tardir)/$(PACKAGE)-$(VERSION).tar.gz.asc:: \
+$(tardir)/$(PACKAGE)-$(VERSION).tar.gz
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1 ; then \
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
@@ -171,8 +172,8 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.gz
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null" ; \
 	else touch "$@" ; fi
 
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2.asc:: \
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
+$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2.asc:: \
+$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1 ; then \
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
@@ -183,8 +184,8 @@ $(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.bz2
 	else touch "$@" ; fi
 
 if WITH_LZMA
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma.asc:: \
-$(PACKAGE_DISTDIR)/$(PACKAGE)-$(VERSION).tar.lzma
+$(tardir)/$(PACKAGE)-$(VERSION).tar.lzma.asc:: \
+$(tardir)/$(PACKAGE)-$(VERSION).tar.lzma
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1 ; then \
 		user="$(GNUPGUSER)" ; user="$${user:+ -u }$$user" ; \
 		home="$(GNUPGHOME)" ; home="$${home:+ --homedir }$$home" ; \
@@ -208,7 +209,7 @@ endif
 #!         @PACKAGE@-@VERSION@.tar.lzma.asc
 #!
 #!     These files will be moved to the package distribution directory
-#!     @PACKAGE_DISTDIR@ with the plaintext archives.
+#!     @tardir@ with the plaintext archives.
 #!
 release-sign-archives: $(archive_signs)
 
@@ -228,7 +229,7 @@ endif
 
 #! release-clean-archives:
 #!     This target will clean the release archives and signature files from the
-#!     package distribution directory @PACKAGE_DISTDIR@.
+#!     package distribution directory @tardir@.
 #!
 release-clean-archives: distclean-archives
 
@@ -252,6 +253,9 @@ EXTRA_DIST		+= .pkgrelease \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.34  2008-09-17 12:06:02  brian
+## - tarballs directory and LZMA suppression
+##
 ## Revision 0.9.2.33  2008-08-03 08:03:59  brian
 ## - how to clean lzma archives
 ##

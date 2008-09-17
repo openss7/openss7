@@ -1,6 +1,9 @@
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/rpm.m4: place source in tarballs directory for remote build
+	* m4/openss7.m4: place source in tarballs directory for remote build
+	  also allow suppression of lzma archives
+	* am/archive.am: place source in tarballs directory for remote build
 
 2008-09-16  Brian Bidulock  <bidulock@openss7.org>
 
