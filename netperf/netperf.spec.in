@@ -19,9 +19,10 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License along
-# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+# 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -142,8 +143,8 @@
 %{?_without_cooked_manpages: %{expand: %%global NEED_manrefs 0}}
 %{?_with_cooked_manpages:    %{expand: %%global NEED_manrefs 1}}
 
-%define oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%define newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
+%global oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+%global newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 
 %global debug_package %{nil}
 
@@ -303,8 +304,8 @@
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
-%define requires_prov() %(LANG_ALL="C" rpm -q --provides %4 --qf "%1 %2 %3 %{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1 %2|')
-%define version_of_or() %(LANG_ALL="C" rpm -q --provides %1 --qf "%{EPOCH}:%{VERSION}-%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')
+%global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1|')}%{nil}
+%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "%%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')}%{nil}
 
 %global descripline %{title} is an OpenSS7 Modified version of HP Netperf.
 
@@ -318,7 +319,7 @@ Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
-Release:        %{fullrelease}
+Release:        %{rpmrelease}
 License:        AGPLv3
 Group:          System Environment/Kernel
 %{?url:URL:            %{url}}
@@ -437,8 +438,8 @@ fi
 %define cache_file %{_builddir}/%{_target_platform}-config.cache
 %define csite_file %{_builddir}/%{_target_platform}-config.site
 
-%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')
-%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')
+%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|') %{nil}
+%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|') %{nil}
 
 ./configure \
     ${CC+CC="${CC}"} \
@@ -618,8 +619,8 @@ Autoreq:        true
 Autoprov:       true
 Prefix:         %{_bindir}
 Prefix:         %{_sbindir}
-%{?_strvers:Requires: %{_streams}-lib = %version_of_or %{_streams}-lib %{_strvers}}
-%{!?_strvers:%requires_prov Requires: %{_streams}-lib = %{_streams}-lib}
+%{?_strvers:Requires: %{_streams}-lib >= %version_of_or %{_streams}-lib %{_strvers}}
+%{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
 Provides:       %{name}
 Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease2}
