@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: striso.spec.in,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-16 10:00:24 $
+# @(#) $RCSfile: striso.spec.in,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-17 06:03:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-16 10:00:24 $ by $Author: brian $
+# Last Modified $Date: 2008-09-17 06:03:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2824,6 +2824,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: striso.spec.in,v $
+# Revision 0.9.2.32  2008-09-17 06:03:21  brian
+# - much improved spec files ready for repo building
+#
 # Revision 0.9.2.31  2008-09-16 10:00:24  brian
 # - support autoupdating kernel modules for various distros
 #
