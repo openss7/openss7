@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-09-17 05:53:03 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008/09/18 09:11:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-17 05:53:03 $ by $Author: brian $
+# Last Modified $Date: 2008/09/18 09:11:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -552,9 +552,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
     fi
 dnl
 dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
-dnl but no rpm database and therefore cannot build rpm packages.
+dnl but no rpm database and therefore cannot build rpm packages.  But it can build
+dnl src.rpms.
 dnl
     AM_CONDITIONAL([BUILD_RPMS], [test :"${ac_cv_path_RPMBUILD:-no}" != :no -a -d /var/lib/rpm])dnl
+    AM_CONDITIONAL([BUILD_SRPMS], [test :"${ac_cv_path_RPMBUILD:-no}" != :no])dnl
 ])# _RPM_SPEC_SETUP_BUILD
 # =============================================================================
 
@@ -584,6 +586,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.71  2008/09/18 09:11:01  brian
+# - add more rpm stuff for debian
+#
 # Revision 0.9.2.70  2008-09-17 05:53:03  brian
 # - place source in tarballs directory for remote build
 #

@@ -1,6 +1,8 @@
 2008-09-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/openss7.m4: another LZMZ tweak
+	* m4/rpm.m4: add more rpm stuff to do on debian systems with rpm
+	* am/rpm.am: add more rpm stuff to do on debian systems with rpm
 
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
