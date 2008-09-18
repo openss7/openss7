@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.102 $) $Date: 2008-09-16 09:47:47 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008/09/18 09:11:00 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-16 09:47:47 $ by $Author: brian $
+## Last Modified $Date: 2008/09/18 09:11:00 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -62,16 +62,6 @@ if MAINTAINER_MODE
 ## For better speed when building package binaries, we skip these rules to invoke package building.
 ## There is not (yet) a need to build packages when building packages...  We use maintainer mode to
 ## distinguish whether these rules are necessary or not.
-##
-
-if BUILD_RPMS
-
-##
-## When packaging for debian builds, it became a little obvious that we have probably been misusing
-## RPM release numbers.  Because we *are* the upstream package provider, we should probably be
-## incrementing the upstream version number with each release rather than the RPM version number.
-## For debian, we are leaving the debian version number at 0 to make this terribly clear.  We should
-## probably only release with RPM release number 1 and increment a patch number instead.
 ##
 
 ##
@@ -392,9 +382,23 @@ resign: sign
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
 	fi
 
-RELEASE			+= all-srpm all-noa-rpm all-lis-rpm all-lfs-rpm all-one-rpm
+if BUILD_SRPMS
+## BUILD_SRPMS
+
+RELEASE			+= all-srpm
 RELEASE_SIGN		+= all-sign all-resign
 RELEASE_DIRECTORIES	+= $(redhat_directories)
+
+if BUILD_RPMS
+## BUILD_RPMS
+
+RELEASE			+= all-noa-rpm all-lis-rpm all-lfs-rpm all-one-rpm
+
+## BUILD_RPMS
+endif
+
+## BUILD_SRPMS
+endif
 
 ##
 # Because the build directory is in the autoconf top build directory on the local machine, it needs
@@ -408,7 +412,9 @@ distclean-rpm:
 		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || : ; \
 	fi
 
+if BUILD_SRPMS
 DISTCLEAN_LOCAL		+= distclean-rpm
+endif
 
 DISTCLEANFILES		+= $(redhat_cache_files) \
 			   $(redhat_dir_stamp)
@@ -425,7 +431,9 @@ release-clean-rpm: distclean-rpm
 		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || : ; \
 	fi
 
+if BUILD_SRPMS
 RELEASE_CLEAN_LOCAL	+= release-clean-rpm
+endif
 
 RELEASECLEANFILES	+= $(redhat_cache_files) \
 			   $(redhat_dir_stamp) \
@@ -439,9 +447,6 @@ MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm noa-rpm sign srpm-sign r
 ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-noa-rpm all-sign all-rebuild all-resign
 
 endif
-## BUILD_RPMS
-
-endif
 ## MAINTAINER_MODE
 
 EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
@@ -453,6 +458,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.103  2008/09/18 09:11:00  brian
+## - add more rpm stuff for debian
+##
 ## Revision 0.9.2.102  2008-09-16 09:47:47  brian
 ## - updates to rpmspec files
 ##
