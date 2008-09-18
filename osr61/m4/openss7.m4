@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.63 $) $Date: 2008-09-18 07:51:45 $
+# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.64 $) $Date: 2008-09-18 08:05:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-18 07:51:45 $ by $Author: brian $
+# Last Modified $Date: 2008-09-18 08:05:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -874,7 +874,7 @@ AC_DEFUN([_OPENSS7_BESTZIP], [dnl
 		enable_lzma="${enableval:-no}" ;;
 	 esac],
 	[enable_lzma='no'])
-    AC_MSG_RESULT([${enable_lzma:-no}]
+    AC_MSG_RESULT([${enable_lzma:-no}])
     AM_CONDITIONAL([WITH_LZMA], [test ":$enable_lzma" = :lzma])dnl
 ])# _OPENSS7_BESTZIP
 # =============================================================================
@@ -889,6 +889,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.64  2008-09-18 08:05:07  brian
+# - typo
+#
 # Revision 0.9.2.63  2008-09-18 07:51:45  brian
 # - another LZMA tweak
 #
