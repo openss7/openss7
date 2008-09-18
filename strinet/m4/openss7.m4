@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.62 $) $Date: 2008-09-17 12:06:02 $
+# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.63 $) $Date: 2008-09-18 07:51:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-17 12:06:02 $ by $Author: brian $
+# Last Modified $Date: 2008-09-18 07:51:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -856,16 +856,26 @@ AC_DEFUN([_OPENSS7_MISSING], [dnl
 # _OPENSS7_BESTZIP
 # -----------------------------------------------------------------------------
 # Building lzma archives is very, very, very slow.  Use this option to suppress
-# the building of lzma archives, even on systems that support lzma.
+# the building of lzma archives, even on systems that support lzma, unless
+# explicitly requested.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_BESTZIP], [dnl
     AC_CHECK_PROG([BESTZIP], [lzma], [lzma], [bzip2])
-    AC_ARG_WITH([lmza],
-	AS_HELP_STRING([--without-lzma],
-	    [do not create lzma archives @<:@default=yes@:>@]),
-	[with_lzma="${withval:-$BESTZIP}"],
-	[with_lzma="bzip2"])
-    AM_CONDITIONAL([WITH_LZMA], [test ":$with_lzma" = :lzma])dnl
+    AC_MSG_CHECKING([for pkg lzma archive creation])
+    AC_ARG_ENABLE([lmza],
+	AS_HELP_STRING([--enable-lzma],
+	    [create lzma archives @<:@default=no@:>@]),
+	[case "${enableval:-yes}" in
+	    (no|NO|false|FALSE|default|DEFAULT)
+		enable_lzma='no' ;;
+	    (yes|YES|true|TRUE)
+		enable_lzma=$BESTZIP ;;
+	    (*)
+		enable_lzma="${enableval:-no}" ;;
+	 esac],
+	[enable_lzma='no'])
+    AC_MSG_RESULT([${enable_lzma:-no}]
+    AM_CONDITIONAL([WITH_LZMA], [test ":$enable_lzma" = :lzma])dnl
 ])# _OPENSS7_BESTZIP
 # =============================================================================
 
@@ -879,6 +889,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.63  2008-09-18 07:51:45  brian
+# - another LZMA tweak
+#
 # Revision 0.9.2.62  2008-09-17 12:06:02  brian
 # - tarballs directory and LZMA suppression
 #
