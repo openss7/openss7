@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-09-17 12:06:02 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008/09/18 09:32:38 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-17 12:06:02 $ by $Author: brian $
+## Last Modified $Date: 2008/09/18 09:32:38 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -111,8 +111,7 @@ endif
 ##
 # creates the package directory
 ##
-RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR) \
-			   $(tardir)
+RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR) $(tardir)
 
 ##
 # Note that sometimes the package distribution directory is the current build directory.  This is
@@ -253,6 +252,9 @@ EXTRA_DIST		+= .pkgrelease \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.35  2008/09/18 09:32:38  brian
+## - do not duplicate entries
+##
 ## Revision 0.9.2.34  2008-09-17 12:06:02  brian
 ## - tarballs directory and LZMA suppression
 ##
