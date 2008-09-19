@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.109 $) $Date: 2008-09-19 09:56:57 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.110 $) $Date: 2008-09-19 10:40:53 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-19 09:56:57 $ by $Author: brian $
+## Last Modified $Date: 2008-09-19 10:40:53 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -155,7 +155,7 @@ rpm_spec_file		= $(specdir)/$(PACKAGE)-$(VERSION).spec
 rpm_img_files		= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 rpm_source_files	= $(rpm_spec_file) $(rpm_img_files) $(rpm_tar_file)
 rpm_binary_file		= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-rpm_srpm_link		= $(rpmdir)/SRPMS
+rpm_link_file		= $(topdir)/SRPMS/$(rpmpkg).src.rpm
 ##
 # There are several forms (currently) for automatic loadable module files:
 #
@@ -187,19 +187,6 @@ RELEASE_DIRECTORIES	+= $(topdir)
 RPMXOPTS		=
 
 RPMTARGET		= $(target)
-
-##
-# These perambulations force the link to be symbolic
-##
-$(rpm_srpm_link): $(srcrpmdir)
-	@if test -L $@ ; then $(ECHO) "rm -f -- $@"; rm -f -- $@; fi; \
-	b='$(rpmdir)'; case $$b in (/*) ;; (*) b=`(cd $$b; pwd)` ;; esac; \
-	t='$(srcrpmdir)'; case $$t in (/*) ;; (*) t=`(cd $$t; pwd)` ;; esac; \
-	c='$(topdir)'; case $$c in (/*) ;; (*) c=`(cd $$c; pwd)` ;; esac; \
-	b=`echo "$$b/" | sed -e "s,$$c/,,;s,[^/]*/,../,g"`; \
-	t=`echo "$$t" | sed -e "s,$$c/,,"`; \
-	d=`echo $$b$$t | sed -e 's,//,/,g'`; \
-	$(ECHO) "(cd $(rpmdir); ln -sf $$d .)"; (cd $(rpmdir); ln -sf $$d .)
 
 #!
 #! RPM Build Targets:
@@ -239,6 +226,17 @@ $(rpm_spec_file) $(rpm_img_files)::
 		cp -f -- $$d$$f $@ ; \
 	}
 
+$(rpm_link_file)::
+	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
+	test "$@" -ef "$$f" && exit 0 ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
+	test "$@" -ef "$$f" && exit 0 ; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
+		$(ECHO) "cp -f --link -- $$f $@" ; \
+		cp -f --link -- $$f $@ ; }
+
 ##
 # This builds an SRPM for the current target.
 ##
@@ -260,7 +258,7 @@ $(rpm_src_file): $(rpm_source_files)
 #!     This target generates the source rpm for the package (without signing the
 #!     source rpm).  The source rpm will be named: @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.srpm
 #!
-srpm: $(rpm_src_file) $(rpm_srpm_link)
+srpm: $(rpm_src_file) $(rpm_link_file)
 
 ##
 # This is the type of thing that needs to be included in the master makefile to build rpms for the
@@ -318,7 +316,7 @@ all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 #!     required.  Automated or unattended builds can be acheived by using
 #!     the `emake' expect script, included in `@abs_srcdir@/scripts/emake'.
 #!
-sign srpm-sign: $(rpm_src_file) $(rpm_srpm_link)
+sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || : ; \
@@ -455,7 +453,7 @@ RELEASECLEANFILES	+= $(rpm_cache_files) \
 			   $(rpm_sig_file) \
 			   $(rpm_binary_files) \
 			   $(rpm_hdist_files) \
-			   $(rpm_srpm_link)
+			   $(rpm_link_file)
 
 MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm noa-rpm sign srpm-sign rebuild resign
 ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-noa-rpm all-sign all-rebuild all-resign
@@ -472,6 +470,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.110  2008-09-19 10:40:53  brian
+## - different approach to SRPMs
+##
 ## Revision 0.9.2.109  2008-09-19 09:56:57  brian
 ## - last correction
 ##
