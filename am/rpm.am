@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-09-19 09:44:16 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-09-19 09:45:59 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-19 09:44:16 $ by $Author: brian $
+## Last Modified $Date: 2008-09-19 09:45:59 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -192,7 +192,7 @@ RPMTARGET		= $(target)
 # These perambulations force the link to be symbolic
 ##
 $(rpm_srpm_link): $(srcrpmdir)
-	@if test -l $@ ; then $(ECHO) "rm -f -- $@"; rm -f -- $@; fi; \
+	@if test -L $@ ; then $(ECHO) "rm -f -- $@"; rm -f -- $@; fi; \
 	b='$(rpmdir)';  case $$b in (/*) ;; (*) b=`(cd $$b; pwd)` ;; esac; \
 	t='$(srpmdir)'; case $$t in (/*) ;; (*) t=`(cd $$t; pwd)` ;; esac; \
 	c='$(topdir)';  case $$c in (/*) ;; (*) c=`(cd $$c; pwd)` ;; esac; \
@@ -472,6 +472,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.108  2008-09-19 09:45:59  brian
+## - one more time
+##
 ## Revision 0.9.2.107  2008-09-19 09:44:16  brian
 ## - another correction
 ##
