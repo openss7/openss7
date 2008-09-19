@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-19 05:18:45 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-19 06:19:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-19 05:18:45 $ by $Author: brian $
+# Last Modified $Date: 2008-09-19 06:19:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -130,7 +130,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_DIST], [dnl
 		deb_cv_dist_subdir="$dist_cv_host_flavor/$dist_cv_host_codename/$dist_cv_host_cpu" ;;
 	esac
 	if test -n "$deb_cv_dist_subdir"; then
-	    deb_cv_dist_subdir=`echo "$deb_cv_dist_subdir' | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
+	    deb_cv_dist_subdir=`echo "$deb_cv_dist_subdir" | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
 	fi
     ])
 ])# _DEB_DPKG_SETUP_DIST
@@ -358,6 +358,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.24  2008-09-19 06:19:38  brian
+# - typo
+#
 # Revision 0.9.2.23  2008-09-19 05:18:45  brian
 # - separate repo directory by architecture
 #
