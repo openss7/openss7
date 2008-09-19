@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-09-19 09:45:59 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-09-19 09:56:57 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-19 09:45:59 $ by $Author: brian $
+## Last Modified $Date: 2008-09-19 09:56:57 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -193,9 +193,9 @@ RPMTARGET		= $(target)
 ##
 $(rpm_srpm_link): $(srcrpmdir)
 	@if test -L $@ ; then $(ECHO) "rm -f -- $@"; rm -f -- $@; fi; \
-	b='$(rpmdir)';  case $$b in (/*) ;; (*) b=`(cd $$b; pwd)` ;; esac; \
-	t='$(srpmdir)'; case $$t in (/*) ;; (*) t=`(cd $$t; pwd)` ;; esac; \
-	c='$(topdir)';  case $$c in (/*) ;; (*) c=`(cd $$c; pwd)` ;; esac; \
+	b='$(rpmdir)'; case $$b in (/*) ;; (*) b=`(cd $$b; pwd)` ;; esac; \
+	t='$(srcrpmdir)'; case $$t in (/*) ;; (*) t=`(cd $$t; pwd)` ;; esac; \
+	c='$(topdir)'; case $$c in (/*) ;; (*) c=`(cd $$c; pwd)` ;; esac; \
 	b=`echo "$$b/" | sed -e "s,$$c/,,;s,[^/]*/,../,g"`; \
 	t=`echo "$$t" | sed -e "s,$$c/,,"`; \
 	d=`echo $$b$$t | sed -e 's,//,/,g'`; \
@@ -472,6 +472,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.109  2008-09-19 09:56:57  brian
+## - last correction
+##
 ## Revision 0.9.2.108  2008-09-19 09:45:59  brian
 ## - one more time
 ##
