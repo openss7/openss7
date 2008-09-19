@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-09-19 05:18:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-19 05:18:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -603,6 +603,14 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	if test -z "$dist_cv_host_cpu" -a ":${dist_cv_host_issue_file:-no}" != :no ; then
 	    dist_cv_host_cpu=$(dist_get_cpu "$(cat $dist_cv_host_issue_file | grep 'Linux\|Fedora' | head -1)")
 	fi
+	# if performing an RPM build, RPM tells us
+	if test -z "$dist_cv_host_cpu" -a :"${RPM_ARCH+set}" = :set ; then
+	    dist_cv_host_cpu="$RPM_ARCH"
+	fi
+	# if performing an DPKG build, DPKG tells us
+	if test -z "$dist_cv_host_cpu" -a :"${DEB_HOST_ARCH+set}" = :set ; then
+	    dist_cv_host_cpu="$DEB_HOST_ARCH"
+	fi
 	# cannot get the cpu from the compiler
 	if test -z "$dist_cv_host_cpu" ; then dist_cv_host_cpu=$host_cpu ; fi
     ])
@@ -741,6 +749,9 @@ AC_DEFUN([_DISTRO_], [dnl
 # =============================================================================
 #
 # $Log: dist.m4,v $
+# Revision 0.9.2.34  2008-09-19 05:18:45  brian
+# - separate repo directory by architecture
+#
 # Revision 0.9.2.33  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
