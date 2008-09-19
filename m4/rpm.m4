@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2008-09-19 05:18:45 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-09-19 06:19:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-19 05:18:45 $ by $Author: brian $
+# Last Modified $Date: 2008-09-19 06:19:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -325,7 +325,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_subdir="$dist_cv_host_flavor/$dist_cv_host_codename/$dist_cv_host_cpu" ;;
 	esac
 	if test -n "$rpm_cv_dist_subdir"; then
-	    rpm_cv_dist_subdir=`echo "$rpm_cv_dist_subdir' | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
+	    rpm_cv_dist_subdir=`echo "$rpm_cv_dist_subdir" | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
 	fi
     ])
     PACKAGE_RPMDIST="${dist_cv_host_distrib:-Unknown Linux} ${dist_cv_host_release:-Unknown}${dist_cv_host_codename:+ ($dist_cv_host_codename)}"
@@ -583,6 +583,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.73  2008-09-19 06:19:38  brian
+# - typo
+#
 # Revision 0.9.2.72  2008-09-19 05:18:45  brian
 # - separate repo directory by architecture
 #
