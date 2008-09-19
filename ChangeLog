@@ -4,6 +4,7 @@
 	* m4/deb.m4: add arch specific subdirectory, subdir lowercase
 	* m4/rpm.m4: add arch specific subdirectory, subdir lowercase
 	* m4/dist.m4: use rpm or dpkg environment when necessary
+	* am/rpm.am: symbolic link SRPMS into distribution directories
 
 2008-09-18  Brian Bidulock  <bidulock@openss7.org>
 

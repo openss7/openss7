@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008/09/18 09:11:00 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.104 $) $Date: 2008-09-19 08:07:16 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/18 09:11:00 $ by $Author: brian $
+## Last Modified $Date: 2008-09-19 08:07:16 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -91,7 +91,7 @@ RPMOPTS			= $(PACKAGE_RPMOPTIONS) \
 # Note that we created the usual rpm directories as well.  This is because rpm sometimes complains
 # if directories do not exist directly under topdir.
 ##
-redhat_directories	= $(topdir)/SOURCES $(sourcedir) \
+rpm_directories		= $(topdir)/SOURCES $(sourcedir) \
 			  $(topdir)/BUILD   $(rpmbuilddir) \
 			  $(topdir)/RPMS    $(rpmdir) \
 			  $(topdir)/SRPMS   $(srcrpmdir) \
@@ -145,16 +145,17 @@ RPMBOPTS		= $(RPMOPTS) \
 ##
 RPMKOPTS		= $(RPMOPTS)
 
-redhatpkg		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)
-redhat_dir		= $(rpmbuilddir)/$(PACKAGE)-$(VERSION)
-redhat_dir_stamp	= $(rpmbuilddir)/stamp-$(PACKAGE)-$(VERSION)
-redhat_src_file		= $(srcrpmdir)/$(redhatpkg).src.rpm
-redhat_sig_file		= $(srcrpmdir)/$(redhatpkg).src.rpm
-redhat_tar_file		= $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
-redhat_spec_file	= $(specdir)/$(PACKAGE)-$(VERSION).spec
-redhat_img_files	= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
-redhat_source_files	= $(redhat_spec_file) $(redhat_img_files) $(redhat_tar_file)
-redhat_binary_file	= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpmpkg			= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)
+rpm_dir			= $(rpmbuilddir)/$(PACKAGE)-$(VERSION)
+rpm_dir_stamp		= $(rpmbuilddir)/stamp-$(PACKAGE)-$(VERSION)
+rpm_src_file		= $(srcrpmdir)/$(rpmpkg).src.rpm
+rpm_sig_file		= $(srcrpmdir)/$(rpmpkg).src.rpm
+rpm_tar_file		= $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
+rpm_spec_file		= $(specdir)/$(PACKAGE)-$(VERSION).spec
+rpm_img_files		= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
+rpm_source_files	= $(rpm_spec_file) $(rpm_img_files) $(rpm_tar_file)
+rpm_binary_file		= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpm_srpm_link		= $(rpmdir)/SRPMS
 ##
 # There are several forms (currently) for automatic loadable module files:
 #
@@ -163,16 +164,16 @@ redhat_binary_file	= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEX
 #  $$(foo)-kmod[-$$(flavor)]
 #  $$(vendor)-$$(driver)-kmp[-$$(flavor)]
 ##
-redhat_module0_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-redhat_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-redhat_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-redhat_module3_file	= openss7-$(PACKAGE)*-kmp-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-redhat_binary_files	= $(rpmdir)/*/$(redhat_binary_file) \
-			  $(rpmdir)/*/$(redhat_module0_file) \
-			  $(rpmdir)/*/$(redhat_module1_file) \
-			  $(rpmdir)/*/$(redhat_module2_file) \
-			  $(rpmdir)/*/$(redhat_module3_file)
-redhat_cache_files	= $(rpmbuilddir)/*config.cache \
+rpm_module0_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpm_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpm_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpm_module3_file	= openss7-$(PACKAGE)*-kmp-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpm_binary_files	= $(rpmdir)/*/$(rpm_binary_file) \
+			  $(rpmdir)/*/$(rpm_module0_file) \
+			  $(rpmdir)/*/$(rpm_module1_file) \
+			  $(rpmdir)/*/$(rpm_module2_file) \
+			  $(rpmdir)/*/$(rpm_module3_file)
+rpm_cache_files		= $(rpmbuilddir)/*config.cache \
 			  $(rpmbuilddir)/*config.site \
 			  $(rpmbuilddir)/*modpost.cache
 
@@ -187,6 +188,13 @@ RPMXOPTS		=
 
 RPMTARGET		= $(target)
 
+$(rpm_srpm_link): $(srcrpmdir)
+	@if test -l $@ ; then \
+		$(ECHO) "rm -f -- $@"; \
+		rm -f -- $@; \
+	fi; \
+	$(ECHO) "ln -sf $(srcrpmdir) $(rpmdir)"; \
+	ln -sf $(srcrpmdir) $(rpmdir)
 
 #!
 #! RPM Build Targets:
@@ -200,7 +208,7 @@ RPMTARGET		= $(target)
 #! options.  We always use release number 1.  You can use release numbers
 #! above 1.
 #!
-$(redhat_tar_file)::
+$(rpm_tar_file)::
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
@@ -213,7 +221,7 @@ $(redhat_tar_file)::
 		cp -f -- $$d$$f $@ ; \
 	}
 
-$(redhat_spec_file) $(redhat_img_files)::
+$(rpm_spec_file) $(rpm_img_files)::
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
@@ -239,22 +247,22 @@ $(redhat_spec_file) $(redhat_img_files)::
 # distribution.
 ##
 
-$(redhat_src_file): $(redhat_source_files)
-	$(MAKE) $(AM_MAKEFLAGS) -- $(redhat_directories)
+$(rpm_src_file): $(rpm_source_files)
+	$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories)
 	$(RPMBUILD) -bs $(SRPMFLAGS) $(RPMSOPTS) --target $(target) -- $<
 
 #! srpm:
 #!     This target generates the source rpm for the package (without signing the
 #!     source rpm).  The source rpm will be named: @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.srpm
 #!
-srpm: $(redhat_src_file)
+srpm: $(rpm_src_file) $(rpm_srpm_link)
 
 ##
 # This is the type of thing that needs to be included in the master makefile to build rpms for the
 # current target, we also build any defined AM_RPMTARGETS
 ##
-each-rpm: $(redhat_spec_file) $(redhat_source_files)
-	$(MAKE) $(AM_MAKEFLAGS) -- $(redhat_directories)
+each-rpm: $(rpm_spec_file) $(rpm_source_files)
+	$(MAKE) $(AM_MAKEFLAGS) -- $(rpm_directories)
 	$(RPMBUILD) -bb $(RPMFLAGS) $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_RPMFLAGS) --target $(RPMTARGET) -- $< || :
 
 ##
@@ -305,7 +313,7 @@ all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 #!     required.  Automated or unattended builds can be acheived by using
 #!     the `emake' expect script, included in `@abs_srcdir@/scripts/emake'.
 #!
-sign srpm-sign: $(redhat_src_file)
+sign srpm-sign: $(rpm_src_file) $(rpm_srpm_link)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
 		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || : ; \
@@ -360,11 +368,11 @@ rebuild:
 #!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
-	@rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module0_file)'-o -name '$(redhat_module1_file)' -o -name '$(redhat_module2_file)' -o -name '$(redhat_module3_file)' 2>/dev/null`" ; \
+	@rpms="`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)'-o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`" ; \
 	if test -z "$$rpms" ; then \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild" ; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild ; \
-		rpms="`find $(rpmdir) -name '$(redhat_binary_file)' -o -name '$(redhat_module0_file)'-o -name '$(redhat_module1_file)' -o -name '$(redhat_module2_file)' -o -name '$(redhat_module3_file)' 2>/dev/null`" ; \
+		rpms="`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)'-o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`" ; \
 		if test -z "$$rpms" ; then \
 			exit 1 ; \
 		fi ; \
@@ -387,7 +395,7 @@ if BUILD_SRPMS
 
 RELEASE			+= all-srpm
 RELEASE_SIGN		+= all-sign all-resign
-RELEASE_DIRECTORIES	+= $(redhat_directories)
+RELEASE_DIRECTORIES	+= $(rpm_directories)
 
 if BUILD_RPMS
 ## BUILD_RPMS
@@ -407,17 +415,17 @@ endif
 # to do this too.  The same is true for build files.
 ##
 distclean-rpm:
-	@if test -f $(redhat_spec_file) ; then \
-		echo '$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || :' ; \
-		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || : ; \
+	@if test -f $(rpm_spec_file) ; then \
+		echo '$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :' ; \
+		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || : ; \
 	fi
 
 if BUILD_SRPMS
 DISTCLEAN_LOCAL		+= distclean-rpm
 endif
 
-DISTCLEANFILES		+= $(redhat_cache_files) \
-			   $(redhat_dir_stamp)
+DISTCLEANFILES		+= $(rpm_cache_files) \
+			   $(rpm_dir_stamp)
 
 ##
 # Removing the sources and the spec file is removing from the distribution directory which, if
@@ -426,22 +434,23 @@ DISTCLEANFILES		+= $(redhat_cache_files) \
 # cycle).  Therefore we provide a special set of release targets for this purpose.
 ##
 release-clean-rpm: distclean-rpm
-	@if test -f $(redhat_spec_file) ; then \
-		echo '$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || :' ; \
-		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(redhat_spec_file) || : ; \
+	@if test -f $(rpm_spec_file) ; then \
+		echo '$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :' ; \
+		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || : ; \
 	fi
 
 if BUILD_SRPMS
 RELEASE_CLEAN_LOCAL	+= release-clean-rpm
 endif
 
-RELEASECLEANFILES	+= $(redhat_cache_files) \
-			   $(redhat_dir_stamp) \
-			   $(redhat_source_files) \
-			   $(redhat_src_file) \
-			   $(redhat_sig_file) \
-			   $(redhat_binary_files) \
-			   $(redhat_hdist_files)
+RELEASECLEANFILES	+= $(rpm_cache_files) \
+			   $(rpm_dir_stamp) \
+			   $(rpm_source_files) \
+			   $(rpm_src_file) \
+			   $(rpm_sig_file) \
+			   $(rpm_binary_files) \
+			   $(rpm_hdist_files) \
+			   $(rpm_srpm_link)
 
 MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm noa-rpm sign srpm-sign rebuild resign
 ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-noa-rpm all-sign all-rebuild all-resign
@@ -458,6 +467,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.104  2008-09-19 08:07:16  brian
+## - symbolic link SRPMS
+##
 ## Revision 0.9.2.103  2008/09/18 09:11:00  brian
 ## - add more rpm stuff for debian
 ##
