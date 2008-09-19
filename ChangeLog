@@ -1,3 +1,7 @@
+2008-09-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/deb.am: copy ddeb and udeb files too
+
 2008-09-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/openss7.m4: another LZMZ tweak
