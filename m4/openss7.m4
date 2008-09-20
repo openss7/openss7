@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-09-20 11:17:14 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008-09-20 23:06:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-20 11:17:14 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 23:06:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -906,7 +906,7 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
 	       [MD5 sum command. @<:@default=md5sum@:>@])
     AC_PATH_PROG([MD5SUM], [md5sum], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$MD5SUM"; then
+    if test :"${MD5SUM:-no}" = :no; then
 	AC_MSG_WARN([Could not find md5sum program in PATH.])
 	MD5SUM="${am_missing3_run}md5sum"
 	#enable_repo_tar=no
@@ -915,7 +915,7 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
 	       [SHA1 sum command. @<:@default=sha1sum@:>@])
     AC_PATH_PROG([SHA1SUM], [sha1sum], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$SHA1SUM"; then
+    if test :"${SHA1SUM:-no}" = :no; then
 	AC_MSG_WARN([Could not find sha1sum program in PATH.])
 	SHA1SUM="${am_missing3_run}sha1sum"
 	#enable_repo_tar=no
@@ -924,7 +924,7 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
 	       [SHA256 sum command. @<:@default=sha256sum@:>@])
     AC_PATH_PROG([SHA256SUM], [sha256sum], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$SHA256SUM"; then
+    if test :"${SHA256SUM:-no}" = :no; then
 	AC_MSG_WARN([Could not find sha256sum program in PATH.])
 	SHA256SUM="${am_missing3_run}sha256sum"
 	#enable_repo_tar=no
@@ -970,6 +970,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.66  2008-09-20 23:06:08  brian
+# - corrections
+#
 # Revision 0.9.2.65  2008-09-20 11:17:14  brian
 # - build system updates
 #
