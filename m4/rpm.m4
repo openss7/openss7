@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2008-09-20 12:15:24 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-09-20 23:06:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-20 12:15:24 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 23:06:08 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -554,7 +554,7 @@ dnl
 	       [Rpm command. @<:@default=rpm@:>@])
     AC_PATH_PROG([RPM], [rpm], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$RPM"; then
+    if test :"${RPM:-no}" = :no; then
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
 		(centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
@@ -571,7 +571,7 @@ dnl
 	       [Rpm build command. @<:@default=rpmbuild@:>@])
     AC_PATH_PROG([RPMBUILD], [rpmbuild], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$RPMBUILD"; then
+    if test :"${RPMBUILD:-no}" = :no; then
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
 		(centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
@@ -604,7 +604,7 @@ dnl
 	       [Create repomd repository command. @<:@default=createrepo@:>@])
     AC_PATH_PROG([CREATEREPO], [createrepo], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$CREATEREPO"; then
+    if test :"${CREATEREPO:-no}" = :no; then
 	if test ":$enable_rpms" = :yes; then
 	    AC_MSG_WARN([Could not find createrepo program in PATH.])
 	else
@@ -628,7 +628,7 @@ dnl
 	       [Create YaST package descriptions command.  @<:@default=create_package_descr@:>@])
     AC_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$CREATE_PACKAGE_DESCR"; then
+    if test :"${CREATE_PACKAGE_DESCR:-no}" = :no; then
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
 		(suse)
@@ -675,6 +675,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.76  2008-09-20 23:06:08  brian
+# - corrections
+#
 # Revision 0.9.2.75  2008-09-20 12:15:24  brian
 # - typo
 #

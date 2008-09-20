@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.25 $) $Date: 2008-09-20 11:17:14 $
+# @(#) $RCSfile: deb.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.26 $) $Date: 2008-09-20 23:06:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-20 11:17:14 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 23:06:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -286,7 +286,7 @@ dnl
 	       [dpkg command. @<:@default=dpkg@:>@])
     AC_PATH_PROG([DPKG], [dpkg], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$DPKG"; then
+    if test :"${DPKG:-no}" = :no; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
 	    AC_MSG_WARN([Could not find dpkg program in PATH.])
@@ -298,7 +298,7 @@ dnl
 	       [dpkg-source command. @<:@default=dpkg-source@:>@])
     AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$DPKG_SOURCE"; then
+    if test :"${DPKG_SOURCE:-no}" = :no; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
 	    AC_MSG_WARN([Could not find dpkg-source program in PATH.])
@@ -310,7 +310,7 @@ dnl
 	       [dpkg-buildpackage command. @<:@default=dpkg-buildpackage@:>@])
     AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$DPKG_BUILDPACKAGE"; then
+    if test :"${DPKG_BUILDPACKAGE:-no}" = :no; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
 	    AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
@@ -334,7 +334,7 @@ dnl
 	       [apt-ftparchive command. @<:@default=apt-ftparchive@:>@])
     AC_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "-z $APT_FTPARCHIVE"; then
+    if test :"${APT_FTPARCHIVE:-no}" = :no; then
 	if test ":$enable_dpkg" = :yes; then
 	    case "$target_vendor" in
 		(debian|ubuntu)
@@ -353,7 +353,7 @@ dnl
 	       [dpkg-scansources command. @<:@default=dpkg-scansources@:>@])
     AC_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "-z $DPKG_SCANSOURCES"; then
+    if test :"${DPKG_SCANSOURCES:-no}" = :no; then
 	if test ":$enable_dpkg" = :yes; then
 	    case "$target_vendor" in
 		(debian|ubuntu)
@@ -372,7 +372,7 @@ dnl
 	       [dpkg-scanpackages command])
     AC_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$DPKG_SCANPACKAGES"; then
+    if test :"${DPKG_SCANPACKAGES:-no}" = :no; then
 	if test ":$enable_dpkg" = :yes; then
 	    case "$target_vendor" in
 		(debian|ubuntu)
@@ -391,7 +391,7 @@ dnl
 	       [dpkg-deb command])
     AC_PATH_PROG([DPKG_DEB], [dpkg-deb], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test -z "$DPKG_DEB"; then
+    if test :"${DPKG_DEB:-no}" = :no; then
 	if test ":$enable_dpkg" = :yes; then
 	    case "$target_vendor" in
 		(debian|ubuntu)
@@ -460,6 +460,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.26  2008-09-20 23:06:07  brian
+# - corrections
+#
 # Revision 0.9.2.25  2008-09-20 11:17:14  brian
 # - build system updates
 #
