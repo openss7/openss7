@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.35 $) $Date: 2008-08-31 07:19:35 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 1.1.4.36 $) $Date: 2008-09-20 10:59:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 07:19:35 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 10:59:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -239,7 +239,7 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 control	+= debian/$(PACKAGE_LCNAME)-doc.manpages
 
 debian/$(PACKAGE_LCNAME)-doc.manpages:
-	( [ ! -d $(debtmpdir)/$(mandir) ] || \
+	( [ ! -d $(debtmpdir)$(mandir) ] || \
 	    find $(debtmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
 
 @COOKED_MANPAGES_FALSE@control	+= debian/$(PACKAGE_LCNAME)-doc.install
@@ -404,7 +404,7 @@ binary-common:
 	dh_fixperms -v
 	dh_makeshlibs -v
 	dh_installdeb -v
-	dh_shlibdeps -v -X.ko -X.o -L lis-lib -l debian/lis-lib/usr/lib
+	dh_shlibdeps -v -X.ko -X.o -L lis-lib -l `pwd`/debian/lis-lib/usr/lib
 	dh_gencontrol -v
 	dh_md5sums -v
 	dh_builddeb -v
@@ -479,6 +479,9 @@ get-orig-source:
 
 # =============================================================================
 # $Log: rules.in,v $
+# Revision 1.1.4.36  2008-09-20 10:59:40  brian
+# - correction for ubuntu
+#
 # Revision 1.1.4.35  2008-08-31 07:19:35  brian
 # - adjust rules for non-kernel-version named core and info files
 #
