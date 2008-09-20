@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-09-19 06:19:38 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2008-09-20 11:17:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-19 06:19:38 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 11:17:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -523,37 +523,129 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
 # _RPM_SPEC_SETUP_BUILD
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_BUILD], [dnl
-    AC_ARG_VAR([RPM], [Rpm command])
+dnl
+dnl These environment variables are precious.
+dnl
+    AC_ARG_VAR([RPM_SOURCE_DIR], [RPM source directory.])
+    AC_ARG_VAR([RPM_BUILD_DIR], [RPM build directory.])
+    AC_ARG_VAR([RPM_OPT_FLAGS], [RPM optimization cflags.])
+    AC_ARG_VAR([RPM_ARCH], [RPM architecture.])
+    AC_ARG_VAR([RPM_OS], [RPM operating system.])
+    AC_ARG_VAR([RPM_DOC_DIR], [RPM documentation directory.])
+    AC_ARG_VAR([RPM_PACKAGE_NAME], [RPM package name.])
+    AC_ARG_VAR([RPM_PACKAGE_VERSION], [RPM package version.])
+    AC_ARG_VAR([RPM_PACKAGE_RELEASE], [RPM package release.])
+    AC_ARG_VAR([RPM_BUILD_ROOT], [RPM installation root.])
+    AC_ARG_VAR([PKG_CONFIG_PATH], [RPM configuration path.])
+dnl
+dnl These commands are needed to perform RPM package builds.
+dnl
+    AC_ARG_ENABLE([rpms],
+	AS_HELP_STRING([--disable-rpms],
+	    [disable building of rpms.  @<:@default=auto@:>@]),
+	[enable_rpms="$enableval"],
+	[enable_rpms=yes])
+    AC_ARG_ENABLE([srpms],
+	AS_HELP_STRING([--disable-srpms],
+	    [disable building of srpms.  @<:@default=auto@:>@]),
+	[enable_srpms="$enableval"],
+	[enable_srpms=yes])
+    AC_ARG_VAR([RPM],
+	       [Rpm command. @<:@default=rpm@:>@])
     AC_PATH_PROG([RPM], [rpm], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${RPM:-no}" = :no ; then
-	AC_MSG_WARN([Could not find rpm program in PATH.])
-	RPM="${am_missing_run}rpm"
+    if test -z "$RPM"; then
+	if test ":$enable_rpms" = :yes; then
+	    case "$target_vendor" in
+		(centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
+		AC_MSG_WARN([Could not find rpm program in PATH.])
+		;;
+	    esac
+	fi
+	RPM="${am_missing3_run}rpm"
+	enable_rpms=no
+    else
+	RPMBUILD=$RPM
     fi
-    AC_ARG_VAR([RPMBUILD], [Build rpms command])
+    AC_ARG_VAR([RPMBUILD],
+	       [Rpm build command. @<:@default=rpmbuild@:>@])
     AC_PATH_PROG([RPMBUILD], [rpmbuild], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${RPMBUILD:-${RPM:-no}}" = :no ; then
-	AC_MSG_WARN([Could not find rpmbuild program in PATH.])
-	RPMBUILD="${am_missing_run}rpmbuild"
-    fi
-    if test :"${RPMBUILD:-no}" = :no ; then
-	RPMBUILD="$RPM"
-    fi
-    AC_ARG_VAR([CREATEREPO], [Create repositry command])
-    AC_PATH_PROG([CREATEREPO], [createrepo], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${CREATEREPO:-no}" = :no ; then
-	AC_MSG_WARN([Could not find createrepo program in PATH.])
-	CREATEREPO="${am_missing_run}createrepo"
+    if test -z "$RPMBUILD"; then
+	if test ":$enable_rpms" = :yes; then
+	    case "$target_vendor" in
+		(centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
+		AC_MSG_WARN([Could not find rpmbuild program in PATH.])
+		;;
+	    esac
+	fi
+	RPMBUILD="${am_missing3_run}rpmbuild"
+	enable_srpms=no
     fi
 dnl
 dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
 dnl but no rpm database and therefore cannot build rpm packages.  But it can build
 dnl src.rpms.
 dnl
-    AM_CONDITIONAL([BUILD_RPMS], [test :"${ac_cv_path_RPMBUILD:-no}" != :no -a -d /var/lib/rpm])dnl
-    AM_CONDITIONAL([BUILD_SRPMS], [test :"${ac_cv_path_RPMBUILD:-no}" != :no])dnl
+    if test ! -d /var/lib/rpm; then
+	enable_rpms=no
+    fi
+    AM_CONDITIONAL([BUILD_RPMS], [test ":$enable_rpms" = :yes])dnl
+    AM_CONDITIONAL([BUILD_SRPMS], [test ":$enable_srpms" = :yes])dnl
+dnl
+dnl These commands are needed to create RPM (e.g. YUM) repositories.
+dnl
+    AC_ARG_ENABLE([repo-yum],
+	AS_HELP_STRING([--disable-repo-yum],
+	    [disable yum repo construction.  @<:@default=auto@:>@]),
+	[enable_repo_yum="$enableval"],
+	[enable_repo_yum=yes])
+    AC_ARG_VAR([CREATEREPO],
+	       [Create repomd repository command. @<:@default=createrepo@:>@])
+    AC_PATH_PROG([CREATEREPO], [createrepo], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$CREATEREPO"; then
+	if test ":$enable_rpms" = :yes; then
+	    AC_MSG_WARN([Could not find createrepo program in PATH.])
+	else
+	    enable_repo_yum=no
+	fi
+	CREATEREPO="${am_missing3_run}createrepo"
+    fi
+    AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$enable_repo_yum" = :yes])dnl
+    repodir="$topdir/repodata"
+    AC_SUBST([repodir])dnl
+
+dnl
+dnl These commands can be used to create YaST repositories.
+dnl
+    AC_ARG_ENABLE([repo-yast],
+	AS_HELP_STRING([--disable-repo-yast],
+	    [disable yast repo construction.  @<:@default=auto@:>@]),
+	[enable_repo_yast="$enableval"],
+	[enable_repo_yast=yes])
+    AC_ARG_VAR([CREATE_PACKAGE_DESCR],
+	       [Create YaST package descriptions command.  @<:@default=create_package_descr@:>@])
+    AC_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$CREATE_PACKAGE_DESCR"; then
+	if test ":$enable_rpms" = :yes; then
+	    case "$target_vendor" in
+		(suse)
+		AC_MSG_WARN([Could not find create_package_descr program in PATH.])
+		;;
+		(*)
+		enable_repo_yast=no
+		;;
+	    esac
+	else
+	    enable_repo_yast=no
+	fi
+	CREATE_PACKAGE_DESCR="${am_missing3_run}create_package_descr"
+    fi
+    AM_CONDITIONAL([BUILD_REPO_YAST], [test ":$enable_repo_yast" = :yes])dnl
+    yastdir="$topdir"
+    AC_SUSBT([yastdir])dnl
 ])# _RPM_SPEC_SETUP_BUILD
 # =============================================================================
 
@@ -565,10 +657,10 @@ AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
     if test :"${enable_public:-yes}" != :yes ; then
 	PACKAGE="${PACKAGE_TARNAME}"
-	VERSION="bin-${PACKAGE_VERSION}.${PACKAGE_RELEASE}"
+	VERSION="bin-${PACKAGE_VERSION}.${PACKAGE_RELEASE}${PACKAGE_PATCHLEVEL}"
     else
 	PACKAGE="${PACKAGE_TARNAME}"
-	VERSION="${PACKAGE_VERSION}.${PACKAGE_RELEASE}"
+	VERSION="${PACKAGE_VERSION}.${PACKAGE_RELEASE}${PACKAGE_PATCHLEVEL}"
     fi
 ])# _RPM_SPEC_OUTPUT
 # =============================================================================
@@ -583,6 +675,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.74  2008-09-20 11:17:14  brian
+# - build system updates
+#
 # Revision 0.9.2.73  2008-09-19 06:19:38  brian
 # - typo
 #

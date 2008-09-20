@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.64 $) $Date: 2008-09-18 08:05:07 $
+# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.65 $) $Date: 2008-09-20 11:17:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-18 08:05:07 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 11:17:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -144,7 +144,8 @@ Corporation at a fee.  See http://www.openss7.com/
     _OPENSS7_OPTIONS
     _OPENSS7_CACHE
     _OPENSS7_OPTIONS_CFLAGS
-    _OPENSS7_MISSING
+    _OPENSS7_MISSING2
+    _OPENSS7_MISSING3
     _OPENSS7_BESTZIP
     AC_SUBST([cross_compiling])dnl
 ])# _OPENSS7_PACKAGE
@@ -453,6 +454,7 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_GPG
     _OPENSS7_OPTIONS_PKG_EPOCH
     _OPENSS7_OPTIONS_PKG_RELEASE
+    _OPENSS7_OPTIONS_PKG_PATCHLEVEL
     _OPENSS7_OPTIONS_PKG_DISTDIR
     _OPENSS7_OPTIONS_PKG_TARDIR
     _OPENSS7_OPTIONS_PKG_ARCH
@@ -598,6 +600,26 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_RELEASE], [dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RELEASE], ["$PACKAGE_RELEASE"], [The Package
 	Release. This defaults to Custom.])
 ])# _OPENSS7_OPTIONS_PKG_RELEASE
+# =========================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_PKG_PATCHLEVEL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_PATCHLEVEL], [dnl
+    AC_MSG_CHECKING([for pkg patch level])
+    AC_ARG_WITH([pkg-patchlevel],
+	AS_HELP_STRING([--with-pkg-patchlevel=@<:@PATCHLEVEL@:>@],
+	    [specify the PATCHLEVEL for the package files.  @<:@default=date@:>@]),
+	[if test :$with_pkg_patchlevel = :no; then with_pkg_patchlevel=
+	 else with_pkg_patchlevel=`date -uI | sed -e 's,-,,g'`
+	 fi],
+	[with_pkg_patchlevel=])
+    AC_MSG_RESULT([$with_pkg_patchlevel])
+    PACKAGE_PATCHLEVEL=${with_pkg_patchlevel:+.$with_pkg_patchlevel}
+    AC_SUBST([PACKAGE_PATCHLEVEL])
+    AC_DEFINE_UNQUOTED([PACKAGE_PATCHLEVEL], ["$PACKAGE_PATCHLEVEL"], [The
+	Package Patch Level.  This defaults to null.])
+])# _OPENSS7_OPTIONS_PKG_PATCHLEVEL
 # =========================================================================
 
 # =============================================================================
@@ -803,9 +825,9 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
 # =============================================================================
 
 # =============================================================================
-# _OPENSS7_MISSING
+# _OPENSS7_MISSING2
 # -----------------------------------------------------------------------------
-AC_DEFUN([_OPENSS7_MISSING], [dnl
+AC_DEFUN([_OPENSS7_MISSING2], [dnl
     test x"${MISSING2+set}" = xset || MISSING2="\${SHELL} $am_aux_dir/missing2"
     if eval "$MISSING2 --run true" ; then
 	am_missing2_run="$MISSING2 --run "
@@ -813,43 +835,102 @@ AC_DEFUN([_OPENSS7_MISSING], [dnl
 	am_missing2_run=
 	AC_MSG_WARN(['missing2' script is too old or missing])
     fi
-    AC_ARG_VAR([LATEX], [Latex command.])
+    AC_ARG_VAR([LATEX],
+	       [Latex command. @<:@default=latex@:>@])
     AC_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([PSLATEX], [PS Latex command.])
+    AC_ARG_VAR([PSLATEX],
+	       [PS Latex command. @<:@default=pslatex@:>@])
     AC_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([PDFLATEX], [PDF Latex command.])
+    AC_ARG_VAR([PDFLATEX],
+	       [PDF Latex command. @<:@default=pdflatex@:>@])
     AC_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([BIBTEX], [BibTeX command.])
+    AC_ARG_VAR([BIBTEX],
+	       [BibTeX command. @<:@default=bibtex@:>@])
     AC_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([LATEX2HTML], [LaTeX to HTML command.])
+    AC_ARG_VAR([LATEX2HTML],
+	       [LaTeX to HTML command. @<:@default=latex2html@:>@])
     AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([DVI2PS], [DVI to PS command.])
+    AC_ARG_VAR([DVI2PS],
+	       [DVI to PS command. @<:@default=dvips@:>@])
     AC_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([DVIPDF], [DVI to PDF command.])
+    AC_ARG_VAR([DVIPDF],
+	       [DVI to PDF command. @<:@default=dvipdf@:>@])
     AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([GNUPLOT], [GNU plot command.])
+    AC_ARG_VAR([GNUPLOT],
+	       [GNU plot command. @<:@default=gnuplot@:>@])
     AC_PATH_PROG([GNUPLOT], [gnuplot], [${am_missing2_run}gnuplot],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([FIG2DEV], [Fig to graphics format command.])
+    AC_ARG_VAR([FIG2DEV],
+	       [Fig to graphics format command. @<:@default=fig2dev@:>@])
     AC_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([CONVERT], [Graphics format conversion command.])
+    AC_ARG_VAR([CONVERT],
+	       [Graphics format conversion command. @<:@default=convert@:>@])
     AC_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([PS2EPSI], [PS to EPSI conversion command.])
+    AC_ARG_VAR([PS2EPSI],
+	       [PS to EPSI conversion command. @<:@default=ps2epsi@:>@])
     AC_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-    AC_ARG_VAR([EPSTOPDF], [EPS to PDF conversion command.])
+    AC_ARG_VAR([EPSTOPDF],
+	       [EPS to PDF conversion command. @<:@default=epstopdf@:>@])
     AC_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf],
 		 [$PATH:/usr/local/bin:/usr/bin:/bin])
-])# _OPENSS7_MISSING
+])# _OPENSS7_MISSING2
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_MISSING3
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_MISSING3], [dnl
+    test x"${MISSING3+set}" = xset || MISSING3="\${SHELL} $am_aux_dir/missing3"
+    if eval "$MISSING3 --run true" ; then
+	am_missing3_run="$MISSING3 --run "
+    else
+	am_missing3_run=
+	AC_MSG_WARN(['missing3' script is too old or missing])
+    fi
+    AC_ARG_ENABLE([repo-tar],
+	AS_HELP_STRING([--disable-repo-tar],
+	    [disable tar repo construction.  @<:@default=auto@:>@]),
+	[enable_repo_tar="$enableval"],
+	[enable_repo_tar=yes])
+    AC_ARG_VAR([MD5SUM],
+	       [MD5 sum command. @<:@default=md5sum@:>@])
+    AC_PATH_PROG([MD5SUM], [md5sum], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$MD5SUM"; then
+	AC_MSG_WARN([Could not find md5sum program in PATH.])
+	MD5SUM="${am_missing3_run}md5sum"
+	#enable_repo_tar=no
+    fi
+    AC_ARG_VAR([SHA1SUM],
+	       [SHA1 sum command. @<:@default=sha1sum@:>@])
+    AC_PATH_PROG([SHA1SUM], [sha1sum], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$SHA1SUM"; then
+	AC_MSG_WARN([Could not find sha1sum program in PATH.])
+	SHA1SUM="${am_missing3_run}sha1sum"
+	#enable_repo_tar=no
+    fi
+    AC_ARG_VAR([SHA256SUM],
+	       [SHA256 sum command. @<:@default=sha256sum@:>@])
+    AC_PATH_PROG([SHA256SUM], [sha256sum], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$SHA256SUM"; then
+	AC_MSG_WARN([Could not find sha256sum program in PATH.])
+	SHA256SUM="${am_missing3_run}sha256sum"
+	#enable_repo_tar=no
+    fi
+    AM_CONDITIONAL([BUILD_REPO_TAR], [test ":$enable_repo_tar" = :yes])dnl
+])# _OPENSS7_MISSING3
 # =============================================================================
 
 # =============================================================================
@@ -889,6 +970,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.65  2008-09-20 11:17:14  brian
+# - build system updates
+#
 # Revision 0.9.2.64  2008-09-18 08:05:07  brian
 # - typo
 #

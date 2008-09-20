@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.112 $) $Date: 2008-09-19 10:50:43 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.113 $) $Date: 2008-09-20 11:17:13 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-19 10:50:43 $ by $Author: brian $
+## Last Modified $Date: 2008-09-20 11:17:13 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -192,7 +192,7 @@ RPMTARGET		= $(target)
 #! RPM Build Targets:
 #! ------------------
 #!
-#! On rpm systems, or systems sporting rpm packaging tools, the following i
+#! On rpm systems, or systems sporting rpm packaging tools, the following
 #! targets are used to generate rpm release packages.  The epoch and release
 #! number can be controlled by the contents of the .rpmepoch and .rpmrelease
 #! files, or with the --with-rpm-epoch=EPOCH and --with-rpm-release=RELEASE
@@ -201,41 +201,41 @@ RPMTARGET		= $(target)
 #! above 1.
 #!
 $(rpm_tar_file)::
-	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
+	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
-	} ;  \
-	d= ; test -f $$f || d='$(srcdir)/' ; \
-	test "$@" -ef "$$d$$f" && exit 0 ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; \
+	};  \
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test "$@" -ef "$$d$$f" && exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
-		$(ECHO) "cp -f -- $$d$$f $@" ; \
-		cp -f -- $$d$$f $@ ; \
+		$(ECHO) "cp -f -- $$d$$f $@"; \
+		cp -f -- $$d$$f $@; \
 	}
 
 $(rpm_spec_file) $(rpm_img_files)::
-	@f=`$(ECHO) "$@" | sed -e 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'` ; \
+	@f=`$(ECHO) "$@" | sed -e 's|^.*/||;s|$(PACKAGE)-$(VERSION)|$(PACKAGE_TARNAME)|'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f ; \
-	} ;  \
-	d= ; test -f $$f || d='$(srcdir)/' ; \
-	test "$@" -ef "$$d$$f" && exit 0 ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; \
+	};  \
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test "$@" -ef "$$d$$f" && exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
-		$(ECHO) "cp -f -- $$d$$f $@" ; \
-		cp -f -- $$d$$f $@ ; \
+		$(ECHO) "cp -f -- $$d$$f $@"; \
+		cp -f -- $$d$$f $@; \
 	}
 
 $(rpm_link_file)::
-	@f=$(srcrpmdir)/`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
-	test "$@" -ef "$$f" && exit 0 ; \
+	@f=$(srcrpmdir)/`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
+	test "$@" -ef "$$f" && exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f" ; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f ; } ; \
-	test "$@" -ef "$$f" && exit 0 ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' -- $$f; }; \
+	test "$@" -ef "$$f" && exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
-		$(ECHO) "cp -f --link -- $$f $@" ; \
-		cp -f --link -- $$f $@ ; }
+		$(ECHO) "cp -f --link -- $$f $@"; \
+		cp -f --link -- $$f $@; }
 
 ##
 # This builds an SRPM for the current target.
@@ -317,9 +317,9 @@ all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 #!     the `emake' expect script, included in `@abs_srcdir@/scripts/emake'.
 #!
 sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
-	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
-		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<" ; \
-		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || : ; \
+	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<"; \
+		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || :; \
 	fi
 
 ##
@@ -338,28 +338,28 @@ sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
 #!
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
-	@rpms="`find $(rpmdir)/noarch -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm' 2>/dev/null`" ; \
+	@rpms="`find $(rpmdir)/noarch -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm' 2>/dev/null`"; \
 	if test -z "$$rpms" -o -n '$(FORCE)'; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm" ; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm"; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :; \
-	fi ; \
-	targets="$(RPMTARGET) $(AM_RPMTARGETS)" ; for t in $$targets ;  do \
-		rpms="`find $(rpmdir)/$$t -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`" ; \
+	fi; \
+	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; for t in $$targets;  do \
+		rpms="`find $(rpmdir)/$$t -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`"; \
 		if test -z "$$rpms" -o -n '$(FORCE)'; then \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
 			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
-		fi ; \
-		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`" ; for k in $$kernels ; do \
-			k=`basename $$k` ; \
-			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile ; then \
-				ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'` ; \
-				rpms="`find $(rpmdir)/$$t -name 'kmod-$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`" ; \
+		fi; \
+		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; for k in $$kernels; do \
+			k=`basename $$k`; \
+			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile; then \
+				ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+				rpms="`find $(rpmdir)/$$t -name 'kmod-$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`"; \
 				if test -z "$$rpms" -o -n '$(FORCE)'; then \
-					$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm" ; \
+					$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
 					$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
-				fi ; \
-			fi ; \
-		done ; \
+				fi; \
+			fi; \
+		done; \
 	done
 
 #! resign:
@@ -371,26 +371,26 @@ rebuild:
 #!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
-	@rpms="`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)'-o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`" ; \
-	if test -z "$$rpms" ; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild" ; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild ; \
-		rpms="`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)'-o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`" ; \
-		if test -z "$$rpms" ; then \
-			exit 1 ; \
-		fi ; \
-	fi ; \
-	unsigned_rpms= ; \
-	for rpm in $$rpms ; do \
-		if ! $(RPM) -K -- $$rpm 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
-			unsigned_rpms="$$unsigned_rpms $$rpm" ; \
+	@rpms="`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)'-o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`"; \
+	if test -z "$$rpms"; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild; \
+		rpms="`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)'-o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`"; \
+		if test -z "$$rpms"; then \
+			exit 1; \
+		fi; \
+	fi; \
+	unsigned_rpms=; \
+	for rpm in $$rpms; do \
+		if ! $(RPM) -K -- $$rpm 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
+			unsigned_rpms="$$unsigned_rpms $$rpm"; \
 		else \
-			$(ECHO) "D: existing gpg sig in $$rpm" ; \
-		fi ; \
-	done ; \
-	if test ":$$unsigned_rpms" != : ; then \
-		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms" ; \
-		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms ; \
+			$(ECHO) "D: existing gpg sig in $$rpm"; \
+		fi; \
+	done; \
+	if test ":$$unsigned_rpms" != :; then \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms"; \
+		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms; \
 	fi
 
 if BUILD_SRPMS
@@ -418,9 +418,9 @@ endif
 # to do this too.  The same is true for build files.
 ##
 distclean-rpm:
-	@if test -f $(rpm_spec_file) ; then \
-		echo '$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :' ; \
-		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || : ; \
+	@if test -f $(rpm_spec_file); then \
+		echo '$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :'; \
+		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :; \
 	fi
 
 if BUILD_SRPMS
@@ -437,9 +437,9 @@ DISTCLEANFILES		+= $(rpm_cache_files) \
 # cycle).  Therefore we provide a special set of release targets for this purpose.
 ##
 release-clean-rpm: distclean-rpm
-	@if test -f $(rpm_spec_file) ; then \
-		echo '$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :' ; \
-		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || : ; \
+	@if test -f $(rpm_spec_file); then \
+		echo '$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :'; \
+		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :; \
 	fi
 
 if BUILD_SRPMS
@@ -458,6 +458,198 @@ RELEASECLEANFILES	+= $(rpm_cache_files) \
 MY_PHONY		+= srpm rpms each-rpm one-rpm lis-rpm lfs-rpm noa-rpm sign srpm-sign rebuild resign
 ALL_RECURSIVE_TARGETS	+= all-srpm all-rpms all-one-rpm all-lis-rpm all-lfs-rpm all-noa-rpm all-sign all-rebuild all-resign
 
+if BUILD_RPMS
+
+if BUILD_REPO_YUM
+
+##
+## The following builds repomd repositories.
+##
+
+RELEASE_DIRECTORIES	+= $(repodir)
+
+repomd_files		= $(repodir)/repomd.xml \
+			  $(repodir)/primary.xml.gz \
+			  $(repodir)/filelists.xml.gz \
+			  $(repodir)/other.xml.gz
+
+repomd_group		= $(repodir)/comp.xml
+
+#!
+#! YUM Build Targets:
+#! ------------------
+#!
+#! On rpm systems, or systems supporting rpm packaging tools and repomd
+#! repository metadata creation tools, the following targets are used to
+#! manage repomd source repository meta data files.
+#!
+$(repomd_group)::
+	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test -f "$$d$$f" || { \
+		touch $$f; exit 0; \
+	}; \
+	test "$@" -ef "$$d$$f" && exit 0; \
+	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$d$$f" \) || { \
+		$(ECHO) "cp -f -- $$d$$f $@"; \
+		cp -f -- $$d$$f $@; \
+	}
+
+#! repo-yum:
+#!     Create (or recreate) the meta data files for a yum (repomd) repository in
+#!     the package distribution directory, @repodir@/.
+#!     When executed with root privilege, it will also place a local
+#!     installation source (@PACKAGE_LCNAME@-media) in the /etc/yum.repo.d/
+#!     directory on the target machine in the @PACKAGE_LCNAME@.repo file.
+#!
+repo-yum:
+	@f=`$(ECHO) $(repomd_group) | sed -e 's|^.*/||'`; \
+	d=; test -f $$f || d='$(srcdir)/'; \
+	g=; test -f "$$d$$f" && { g="-g $$d$$f" }; \
+	$(ECHO) "$(CREATEREPO) $(REPOFLAGS) $$g $(rpmdir)"; \
+	$(CREATEREPO) $(REPOFLAGS) $$g $(rpmdir)
+
+#! repo-clean-yum:
+#!     Cleans the meta data files for a yum (repomd) repository from the package
+#!     distribution directory, @repodir@/.
+#!
+repo-clean-yum:
+
+REPO			+= repo-yum
+REPO_SIGN		+= repo-sign-yum
+REPO_CLEAN		+= repo-clean-yum
+REPOCLEANFILES		+= $(repomd_files) $(repomd_group)
+
+MY_PHONY		+= repo-yum repo-clean-yum
+
+RELEASE			+= repo-yum
+RELEASE_SIGN		+= repo-sign-yum
+RELEASE_CLEAN_LOCAL	+= repo-clean-yum
+RELEASECLEANFILES	+= $(repomd_files) $(repomd_group)
+
+endif
+## BUILD_REPO_YUM
+
+if BUILD_REPO_YAST
+
+##
+## The following builds yast repositories.
+##
+
+#!
+#! YaST Build Targets:
+#! -------------------
+#!
+#! On rpm systems, or systems supporting rpm packaging tools and YaST install
+#! source repository creation tools, the following targets are used to manage
+#! YaST install source repository meta data files.
+#!
+$(yastdir)/media.1/media:
+	@p=`$(RPM) --showrc | grep '\<packager\>' | sed -e 's,.*\<packager\>[[:space:]]*,,;s[[:space:]]*$$,,' 2>/dev/null`; \
+	if test -z "$$p"; then p='Unknown'; fi; \
+	$(ECHO) "( echo \"$$p\"; date +%Y%m%d%H%M%S; echo '1') >>$@"; \
+	( echo "$$p"; date +%Y%m%d%H%M%S; echo '1') >>$@
+
+$(yastdir)/content:
+	@v=`$(RPM) --showrc | grep '\<vendor\>' | sed -e 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	if test -z "$$v"; then v='Unknown'; fi; \
+	( \
+		echo "PRODUCT $(PACKAGE_TITLE)"; \
+		echo "VERSION $(PACAKGE_VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)"; \
+		echo "VENDOR $$v"; \
+		echo "LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_STITLE))"; \
+		echo "ARCH.i686 i686 i586 i486 i386 noarch"; \
+		echo "ARCH.i586 i586 i486 i386 noarch"; \
+		echo "ARCH.x86_64 x86_64 noarch"; \
+		echo "DEFAULTBASE i586"; \
+		echo "DESCRDIR setup/descr"; \
+		echo "DATADIR RPMS"; \
+	) >>$@
+
+$(yastdir)/content.asc:: \
+$(yastdir)/content
+	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+	else touch "$@"; fi
+
+$(yastdir)/content.key:
+	@user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@
+
+yast_meta_files		= $(yastdir)/media.1/media \
+			  $(yastdir)/content \
+			  $(yastdir)/content.asc \
+			  $(yastdir)/content.key
+
+yast_desc_files		= $(yastdir)/setup/descr/packages
+
+##
+# Each directory needs a directory.yast file so that YaST can determine the (visible) contents of
+# the directory when using http or where the directory cannot be listed otherwise.
+##
+
+am__yast_skipfiles = (^|/)(\.[^/]*|directory.yast|INDEX.gz|ARCHIVE.gz|ls-LR.gz|MD5SUMS(.meta)?|SHA1SUMS(.meta)?|md5sum.txt)
+
+repo-yast-listings:
+	( echo "$(yastdir)"; find . -follow -type d ) | while read d; do \
+		p=`echo "$$d" | sed -e 's,.*/,,'`; \
+		case "$$p" in (RCS|CVS|.*) continue;; esac; \
+		( cd -- "$$d"; \
+			ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' > directory.yast; \
+			ls -LR  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c > ls-LR.gz; \
+			ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c > INDEX.gz; \
+		); \
+	done
+
+repo-yast-listings-clean:
+	@$(ECHO) "Making $@ in `pwd`"; test -n '$(yastdir)' || exit 1; \
+	find $(yastdir) -follow -name 'directory.yast' | while read f; do \
+		$(ECHO) "rm -f -- $$f"; \
+		rm -f -- $$f; \
+	done
+
+
+#! repo-yast:
+#! 	Create (or recreate) the meta data files for a YaST2 repository in the
+#! 	package distribution directory, @topdir@/.
+#! 	When executed with root privilege, it will also place a local
+#! 	installation source for use by YaST on the build system.
+#!
+repo-yast: $(yast_meta_files)
+	( cd $(yastdir); create_package_descr -d RPMS/ )
+	$(MAKE) $(AM_MAKEFLAGS) repo-yast-listings
+
+#! repo-clean-yast:
+#!     Cleans the meta data files for a YaST2 repository from the package
+#!     distribution directory, @topdir@/.
+#!
+repo-clean-yast:
+
+REPO			+= repo-yast
+REPO_SIGN		+= repo-sign-yast
+REPO_CLEAN		+= repo-clean-yast
+REPOCLEANFILES		+= $(yast_meta_files) $(yast_desc_files)
+
+MY_PHONY		+= repo-yast repo-yast-listings repo-clean-yast
+
+RELEASE			+= repo-yast
+RELEASE_SIGN		+= repo-sign-yast
+RELEASE_CLEAN_LOCAL	+= repo-clean-yast
+RELEASECLEANFILES	+= $(yast_meta_files) $(yast_desc_files)
+
+endif
+## BUILD_REPO_YAST
+
+endif
+## BUILD_RPMS
+
 endif
 ## MAINTAINER_MODE
 
@@ -470,6 +662,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.113  2008-09-20 11:17:13  brian
+## - build system updates
+##
 ## Revision 0.9.2.112  2008-09-19 10:50:43  brian
 ## - more corrections
 ##
