@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.90 $) $Date: 2008-09-20 11:17:13 $
+# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.91 $) $Date: 2008-09-20 22:57:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-20 11:17:13 $ by $Author: brian $
+## Last Modified $Date: 2008-09-20 22:57:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -280,14 +280,14 @@ csig:
 #!
 reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 reupload:
-	@debs="`find $(debdir) -name '' 2>/dev/null`"; \
+	@debs="`find $(debdir) -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_all.*deb' 2>/dev/null`"; \
 	if test -z "$$debs" -o -n '$(FORCE)'; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb chg-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb chg-deb || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
 	fi; \
 	targets="$(ARCH) $(AM_DEBTARGETS)"; for t in $$targets;  do \
 		test "$$t" = 'noarch' -o "$$t" = 'all' && continue; \
-		debs="`find $(debdir)/binary-$$t -name '' 2>/dev/null`"; \
+		debs="`find $(debdir)/binary-$$t -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_$$t.*deb' 2>/dev/null`"; \
 		if test -z "$$debs" -o -n '$(FORCE)'; then \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
 			$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" lis-deb lfs-deb one-deb|| :; \
@@ -296,14 +296,18 @@ reupload:
 			k=`basename $$k`; \
 			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile; then \
 				ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
-				debs="`find $(debdir)/binary-$$t -name '' 2>/dev/null`"; \
+				debs="`find $(debdir)/binary-$$t -name '$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_$$t.*deb' 2>/dev/null`"; \
 				if test -z "$$debs" -o -n '$(FORCE)'; then \
 					$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
 					$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" lis-deb lfs-deb one-deb || :; \
 				fi; \
 			fi; \
 		done; \
-	done
+	done; \
+	if test -z "$$debs" -o -n '$(FORCE)'; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb || :; \
+	fi; \
 
 distclean-deb:
 	rm -rf $(debian_dir)
@@ -469,6 +473,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.91  2008-09-20 22:57:14  brian
+## - correct reupload target
+##
 ## Revision 0.9.2.90  2008-09-20 11:17:13  brian
 ## - build system updates
 ##
