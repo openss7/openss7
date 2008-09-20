@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.86 $) $Date: 2008-09-17 06:03:15 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.87 $) $Date: 2008-09-20 11:01:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-17 06:03:15 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 11:01:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -849,25 +849,23 @@ Autoreq:        0
 Autoprov:       0
 %{?_conflict:Conflicts:      %{_conflict}-%{_target_cpu}}
 Obsoletes:      %{name}-%{_target_cpu}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
-#Requires:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{corename %name} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
+#Requires:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %if %{_enable_ksource_package}
-Requires:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %if %{_enable_debug_packages}
-Requires:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Provides:       %{name}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease2}
@@ -941,9 +939,7 @@ Prefix:         %{_mandir}
 %{?_conflict:Conflicts:      %{_conflict}-docs}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
@@ -1078,9 +1074,7 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_usrsrc}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
@@ -1130,9 +1124,7 @@ Prefix:         %{_modutildir}
 %endif
 %{?_conflict:Conflicts:      %{_conflict}-init}
 Obsoletes:      %{name}-inits
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
@@ -1777,9 +1769,7 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 Prefix:         %{_snmpmibdir}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
@@ -1817,9 +1807,7 @@ Prefix:         %{_pkglibexecdir}
 %{?_conflict:Conflicts:      %{_conflict}-test}
 %{?_conflict:Conflicts:      %{_conflict}-tests}
 Obsoletes:      %{name}-tests
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
@@ -1862,9 +1850,7 @@ Autoprov:       true
 %{?_conflict:Conflicts:      %{_conflict}-devs}
 Obsoletes:      %{name}-devs
 Requires:       dev >= 3.3
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 %if %{MAKE_devs}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 %endif
@@ -1933,9 +1919,7 @@ Prefix:         %{_libdir}
 Prefix:         %{_lib32dir}
 %endif
 Prefix:         %{_includedir}/%{name}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
@@ -1998,9 +1982,7 @@ Prefix:         %{_lib32dir}
 Prefix:         %{_localedir}
 Obsoletes:      %{name}-libs
 Prereq:         /sbin/ldconfig
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
@@ -2099,9 +2081,7 @@ Obsoletes:      %{name}-utils
 %if %{FILES_snmp32}
 #Requires:       net-snmp
 %endif
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 %if %{have_libraries}
 Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 %endif
@@ -2204,9 +2184,7 @@ Version:        @VERSION@
 AutoReq:        0
 AutoProv:       0
 Obsoletes:      %{name}-debug < %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{name}-debug = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{virtual}-debug = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
@@ -2254,9 +2232,7 @@ Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 Prereq:         lsof
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %endif
@@ -2582,9 +2558,7 @@ Obsoletes:      %{name}-info < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       kernel-modules = %{_kversion}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
@@ -2670,9 +2644,7 @@ AutoProv:       0
 %{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease}}
 %{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{fullrelease2}}
 %{?_conflict:Conflicts:      %{dbugname %_conflict} = %{epoch}:%{version}-%{rpmrelease}}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 Provides:       kernel-modules = %{_kversion}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
@@ -2709,6 +2681,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.87  2008-09-20 11:01:00  brian
+# - corrections to requires
+#
 # Revision 1.1.6.86  2008-09-17 06:03:15  brian
 # - much improved spec files ready for repo building
 #
