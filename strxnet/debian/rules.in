@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-01 04:13:43 $
+# @(#) $RCSfile: rules.in,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-20 10:59:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-01 04:13:43 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 10:59:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -257,7 +257,7 @@ debian/$(PACKAGE_LCNAME)-doc.docs:
 control	+= debian/$(PACKAGE_LCNAME)-doc.manpages
 
 debian/$(PACKAGE_LCNAME)-doc.manpages:
-	( [ ! -d $(debtmpdir)/$(mandir) ] || \
+	( [ ! -d $(debtmpdir)$(mandir) ] || \
 	    find $(debtmpdir)$(mandir) \( -type f -or -type l \) -name '*.[1-9]*' ) > $@
 
 @COOKED_MANPAGES_FALSE@control	+= debian/$(PACKAGE_LCNAME)-doc.install
@@ -419,7 +419,7 @@ binary-common:
 	dh_fixperms -v
 	dh_makeshlibs -v
 	dh_installdeb -v
-	dh_shlibdeps -v -X.ko -X.o -L strxnet-lib -l debian/strxnet-lib/usr/lib
+	dh_shlibdeps -v -X.ko -X.o -L strxnet-lib -l `pwd`/debian/strxnet-lib/usr/lib
 	dh_gencontrol -v
 	dh_md5sums -v
 	dh_builddeb -v
@@ -500,6 +500,9 @@ get-orig-source:
 # =============================================================================
 #
 # $Log: rules.in,v $
+# Revision 0.9.2.38  2008-09-20 10:59:46  brian
+# - correction for ubuntu
+#
 # Revision 0.9.2.37  2008-09-01 04:13:43  brian
 # - correct rules for core names
 #
