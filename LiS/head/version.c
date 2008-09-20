@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: version.c,v $ $Name:  $($Revision: 1.1.1.17.4.9 $) $Date: 2008-04-29 08:33:13 $
+ @(#) $RCSfile: version.c,v $ $Name:  $($Revision: 1.1.1.17.4.10 $) $Date: 2008-09-20 11:13:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-20 11:13:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: version.c,v $
+ Revision 1.1.1.17.4.10  2008-09-20 11:13:17  brian
+ - added patch level
+
  Revision 1.1.1.17.4.9  2008-04-29 08:33:13  brian
  - update headers for Affero release
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: version.c,v $ $Name:  $($Revision: 1.1.1.17.4.9 $) $Date: 2008-04-29 08:33:13 $"
+#ident "@(#) $RCSfile: version.c,v $ $Name:  $($Revision: 1.1.1.17.4.10 $) $Date: 2008-09-20 11:13:17 $"
 
-static char const ident[] = "$RCSfile: version.c,v $ $Name:  $($Revision: 1.1.1.17.4.9 $) $Date: 2008-04-29 08:33:13 $";
+static char const ident[] = "$RCSfile: version.c,v $ $Name:  $($Revision: 1.1.1.17.4.10 $) $Date: 2008-09-20 11:13:17 $";
 
 /************************************************************************
 *                        Version File                                   *
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: version.c,v $ $Name:  $($Revision: 1.1.1.
 #include <linux/module.h>
 #include <linux/init.h>
 
-char lis_version[] = PACKAGE_VERSION "." PACKAGE_RELEASE;
+char lis_version[] = PACKAGE_VERSION "." PACKAGE_RELEASE PACKAGE_PATCHLEVEL;
 char lis_date[] = PACKAGE_DATE;
 
 /*

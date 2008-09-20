@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dl2.c,v 0.9.2.8 2008-04-25 11:39:31 brian Exp $
+ @(#) $Id: dl2.c,v 0.9.2.9 2008-09-20 11:13:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
+ Last Modified $Date: 2008-09-20 11:13:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl2.c,v $
+ Revision 0.9.2.9  2008-09-20 11:13:18  brian
+ - added patch level
+
  Revision 0.9.2.8  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-25 11:39:31 $"
+#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-20 11:13:18 $"
 
 static char const ident[] =
-    "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-25 11:39:31 $";
+    "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-20 11:13:18 $";
 
 /*
  *  This is a multiplexing driver use to support linking DL streams.  When DL streams are linked
@@ -112,7 +115,7 @@ static char const ident[] =
 #include <linux/netdevice.h>
 #define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-25 11:39:31 $"
+#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-20 11:13:18 $"
 #define ND_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -136,8 +139,8 @@ MODULE_LICENSE(ND_LICENSE);
 MODULE_ALIAS("streams-nd");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-"
-	       PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+		PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
