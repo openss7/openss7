@@ -1,7 +1,7 @@
 # vim: ft=make
 # =============================================================================
 # 
-# @(#) $RCSfile: Module.mkvars.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-08-11 22:25:06 $
+# @(#) $RCSfile: Module.mkvars.in,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-20 11:04:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-11 22:25:06 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 11:04:52 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Module.mkvars.in,v $
+# Revision 0.9.2.2  2008-09-20 11:04:52  brian
+# - added package patchlevel
+#
 # Revision 0.9.2.1  2008-08-11 22:25:06  brian
 # - added makefile variables for modules
 #
@@ -268,6 +271,7 @@ PACKAGE_KNUMBER = @PACKAGE_KNUMBER@
 PACKAGE_KVERSION = @PACKAGE_KVERSION@
 PACKAGE_LCNAME = @PACKAGE_LCNAME@
 PACKAGE_NAME = @PACKAGE_NAME@
+PACKAGE_PATCHLEVEL = @PACKAGE_PATCHLEVEL@
 PACKAGE_RELEASE = @PACKAGE_RELEASE@
 PACKAGE_RPMDIST = @PACKAGE_RPMDIST@
 PACKAGE_RPMEPOCH = @PACKAGE_RPMEPOCH@
