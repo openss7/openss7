@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-19 06:19:38 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-20 11:17:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-19 06:19:38 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 11:17:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -205,6 +205,8 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     ])
     PACKAGE_DEBTOPDIR="$deb_cv_topdir"
     AC_SUBST([PACKAGE_DEBTOPDIR])dnl
+    debdir='$(PACKAGE_DEBTOPDIR)'
+    AC_SUBST([debdir])dnl
     AC_CACHE_CHECK([for deb BUILD directory], [deb_cv_builddir], [dnl
 	# debbuilddir needs to be absolute: always build in the top build
 	# directory on the local machine
@@ -265,39 +267,9 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
 # _DEB_DPKG_SETUP_BUILD
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
-    AC_ARG_VAR([DPKG], [dpkg command])
-    AC_PATH_PROG([DPKG], [dpkg], [],
-		 [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG:-no}" = :no ; then
-	case "$target_vendor" in
-	    (debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg program in PATH.])
-		;;
-	esac
-	DPKG="${am_missing_run}dpkg"
-    fi
-    AC_ARG_VAR([DPKG_SOURCE], [dpkg-source command])
-    AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [],
-		 [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG_SOURCE:-no}" = :no ; then
-	case "$target_vendor" in
-	    (debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg-source program in PATH.])
-		;;
-	esac
-	DPKG_SOURCE="${am_missing_run}dpkg-source"
-    fi
-    AC_ARG_VAR([DPKG_BUILDPACKAGE], [dpkg-buildpackage command])
-    AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [],
-		 [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DPKG_BUILDPACKAGE:-no}" = :no ; then
-	case "$target_vendor" in
-	    (debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
-		;;
-	esac
-	DPKG_BUILDPACKAGE="${am_missing_run}dpkg-buildpackage"
-    fi
+dnl
+dnl These environment variables are precious
+dnl
     AC_ARG_VAR([DEB_BUILD_ARCH], [Debian build architecture])
     AC_ARG_VAR([DEB_BUILD_GNU_CPU], [Debian build cpu])
     AC_ARG_VAR([DEB_BUILD_GNU_SYSTEM], [Debian build os])
@@ -306,7 +278,137 @@ AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
     AC_ARG_VAR([DEB_HOST_GNU_CPU], [Debian host/target cpu])
     AC_ARG_VAR([DEB_HOST_GNU_SYSTEM], [Debian host/target os])
     AC_ARG_VAR([DEB_HOST_GNU_TYPE], [Debian host/target alias])
-    AM_CONDITIONAL([BUILD_DPKG], [test :"${ac_cv_path_DPKG_SOURCE:-no}" != :no -a :"${ac_cv_path_DPKG_BUILDPACKAGE:-no}" != :no])dnl
+dnl
+dnl These commands are needed to perform DPKG package builds.
+dnl
+    BUILD_DPKG=no
+    AC_ARG_VAR([DPKG],
+	       [dpkg command. @<:@default=dpkg@:>@])
+    AC_PATH_PROG([DPKG], [dpkg], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$DPKG"; then
+	case "$target_vendor" in
+	    (debian|ubuntu)
+	    AC_MSG_WARN([Could not find dpkg program in PATH.])
+	    ;;
+	esac
+	DPKG="${am_missing3_run}dpkg"
+    fi
+    AC_ARG_VAR([DPKG_SOURCE],
+	       [dpkg-source command. @<:@default=dpkg-source@:>@])
+    AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$DPKG_SOURCE"; then
+	case "$target_vendor" in
+	    (debian|ubuntu)
+	    AC_MSG_WARN([Could not find dpkg-source program in PATH.])
+	    ;;
+	esac
+	DPKG_SOURCE="${am_missing3_run}dpkg-source"
+    fi
+    AC_ARG_VAR([DPKG_BUILDPACKAGE],
+	       [dpkg-buildpackage command. @<:@default=dpkg-buildpackage@:>@])
+    AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$DPKG_BUILDPACKAGE"; then
+	case "$target_vendor" in
+	    (debian|ubuntu)
+	    AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
+	    ;;
+	esac
+	DPKG_BUILDPACKAGE="${am_missing3_run}dpkg-buildpackage"
+    fi
+    case :$ac_cv_path_DPKG_SOURCE:$ac_cv_path_DPKG_BUILDPACKAGE in
+	(::*|::|*:) ;; (*) BUILD_DPKG=yes ;;
+    esac
+    AM_CONDITIONAL([BUILD_DPKG], [test :$BUILD_DPKG = :yes])dnl
+dnl
+dnl These commands are needed to create DPKG (e.g. APT) repositories.
+dnl
+    AC_ARG_ENABLE([repo-apt],
+	AS_HELP_STRING([--disable-repo-apt],
+	    [disable apt repo construction.  @<:@default=auto@:>@]),
+	[enable_repo_apt="$enableval"],
+	[enable_repo_apt=yes])
+    AC_ARG_VAR([APT_FTPARCHIVE],
+	       [apt-ftparchive command. @<:@default=apt-ftparchive@:>@])
+    AC_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test "-z $APT_FTPARCHIVE"; then
+	if test ":$enable_dpkg" = :yes; then
+	    case "$target_vendor" in
+		(debian|ubuntu)
+		AC_MSG_WARN([Could not find apt-ftparchive program in PATH.])
+		;;
+		(*)
+		enable_repo_apt=no
+		;;
+	    esac
+	else
+	    enable_repo_apt=no
+	fi
+	APT_FTPARCHIVE="${am_missing3_run}apt-ftparchive"
+    fi
+    AC_ARG_VAR([DPKG_SCANSOURCES],
+	       [dpkg-scansources command. @<:@default=dpkg-scansources@:>@])
+    AC_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test "-z $DPKG_SCANSOURCES"; then
+	if test ":$enable_dpkg" = :yes; then
+	    case "$target_vendor" in
+		(debian|ubuntu)
+		AC_MSG_WARN([Could not find dpkg-scansources program in PATH.])
+		;;
+		(*)
+		enable_repo_apt=no
+		;;
+	    esac
+	else
+	    enable_repo_apt=no
+	fi
+	DPKG_SCANSOURCES="${am_missing3_run}dpkg-scansources"
+    fi
+    AC_ARG_VAR([DPKG_SCANPACKAGES],
+	       [dpkg-scanpackages command])
+    AC_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$DPKG_SCANPACKAGES"; then
+	if test ":$enable_dpkg" = :yes; then
+	    case "$target_vendor" in
+		(debian|ubuntu)
+		AC_MSG_WARN([Could not find dpkg-scanpackages program in PATH.])
+		;;
+		(*)
+		enable_repo_apt=no
+		;;
+	    esac
+	else
+	    enable_repo_apt=no
+	fi
+	DPKG_SCANPACKAGES="${am_missing3_run}dpkg-scanpackages"
+    fi
+    AC_ARG_VAR([DPKG_DEB],
+	       [dpkg-deb command])
+    AC_PATH_PROG([DPKG_DEB], [dpkg-deb], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    if test -z "$DPKG_DEB"; then
+	if test ":$enable_dpkg" = :yes; then
+	    case "$target_vendor" in
+		(debian|ubuntu)
+		AC_MSG_WARN([Could not find dpkg-deb program in PATH.])
+		;;
+		(*)
+		enable_repo_apt=no
+		;;
+	    esac
+	else
+	    enable_repo_apt=no
+	fi
+	DPK_DEB="${am_missing3_run}dpkg-deb"
+    fi
+    AM_CONDITIONAL([BUILD_REPO_APT], [test ":$enable_repo_apt" = :yes])
+    aptdir='$(PACKAGE_DEBTOPDIR)'
+    AC_SUBST([aptdir])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
 
@@ -358,6 +460,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.25  2008-09-20 11:17:14  brian
+# - build system updates
+#
 # Revision 0.9.2.24  2008-09-19 06:19:38  brian
 # - typo
 #

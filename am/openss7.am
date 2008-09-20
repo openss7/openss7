@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.133 $) $Date: 2008-09-15 08:54:28 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.134 $) $Date: 2008-09-20 11:17:13 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-15 08:54:28 $ by $Author: brian $
+## Last Modified $Date: 2008-09-20 11:17:13 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -77,6 +77,7 @@ CHECK_LOCAL		=
 INSTALLCHECK_LOCAL	=
 DISTCHECK_HOOK		=
 RELEASE_CLEAN_LOCAL	=
+UPDATE_CLEAN_LOCAL	=
 
 PRE_INSTALL_AM		=
 POST_INSTALL_AM		=
@@ -103,6 +104,8 @@ CLEANFILES		=
 DISTCLEANFILES		=
 MAINTAINERCLEANFILES	=
 RELEASECLEANFILES	=
+UPDATECLEANFILES	=
+REPOCLEANFILES		=
 
 ##
 # Accumulate extras until the end.
@@ -123,15 +126,27 @@ MY_PHONY		=
 MY_PRECIOUS		=
 MY_INTERMEDIATE		=
 MY_SECONDARY		=
+MY_RECURSIVE_TARGETS	=
+MY_REVERSIVE_TARGETS	=
 
 dist_noinst_SCRIPTS	=
 
 AM_INSTALLCHECK_STD_OPTIONS_EXEMPT =
 
-RELEASE			=
 RELEASE_FILES		=
+
+RELEASE			=
 RELEASE_SIGN		=
 RELEASE_DIRECTORIES	=
+
+UPDATE			=
+UPDATE_SIGN		=
+UPDATE_DIRECTORIES	=
+
+REPO			=
+REPO_SIGN		=
+REPO_CLEAN		=
+REPO_DIRECTORIES	=
 
 FORCED_TARGETS		=
 FORCE			=
@@ -140,34 +155,6 @@ $(FORCED_TARGETS): FORCE = force
 $(FORCED_TARGETS): forced-% : %
 
 MY_PHONY		+= $(FORCED_TARGETS)
-
-$(RELEASE_DIRECTORIES)::
-	@test -d $@ || { $(ECHO) " $(mkdir_p) $@" ; $(mkdir_p) $@ ; }
-	
-release: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
-release: $(RELEASE_DIRECTORIES) $(RELEASE)
-
-release-files-am: $(RELEASE_FILES)
-
-release-clean-local:
-	@$(ECHO) "Making $@ in `pwd`"
-	@targets="$(RELEASE_CLEAN_LOCAL)" ; for target in $$targets ; do \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
-	done
-
-release-clean-am: release-clean-local
-	@$(ECHO) "Making $@ in `pwd`"
-	@if test -n "$(RELEASECLEANFILES)" ; then \
-		$(ECHO) "rm -f -- $(RELEASECLEANFILES)" ; \
-		rm -f -- $(RELEASECLEANFILES) ; \
-	fi
-
-MY_PHONY	+= release $(RELEASE)
-MY_PHONY	+= release-files-am release-files
-MY_PHONY	+= release-sign $(RELEASE_SIGN)
-MY_PHONY	+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
-FORCED_TARGETS	+= forced-release
 
 if MAINTAINER_MODE
 MAINTAINER_MODE = yes
@@ -178,24 +165,22 @@ endif
 ##
 ## Like automake recursive targets, but mine.
 ##
-MY_RECURSIVE_TARGETS = release-files-recursive
-
 $(MY_RECURSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
-	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
-	target=`$(ECHO) $@ | sed s/-recursive//` ; \
-	list='$(SUBDIRS)' ; for subdir in $$list ; do \
-	     if test "$$subdir" = "." ; then dot_seen=yes ; fi ; \
-	done ; \
-	if test "$$dot_seen" = "no" ; then list="$$list ." ; fi ; \
-	for subdir in $$list ; do \
-		case " m4 intl po " in *" $$subdir "*) continue ;; esac ; \
-		$(ECHO) "Making $$target in $$subdir" ; \
-		if test "$$subdir" = "." ; then local="$$target-am" ; else local="$$target" ; fi ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local) \
-			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-	done ; \
+	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
+	target=`$(ECHO) $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	     if test "$$subdir" = "."; then dot_seen=yes; fi; \
+	done; \
+	if test "$$dot_seen" = "no"; then list="$$list ."; fi; \
+	for subdir in $$list do \
+		case " m4 intl po " in *" $$subdir "*) continue ;; esac; \
+		$(ECHO) "Making $$target in $$subdir"; \
+		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
 	test -z "$$fail"
 
 MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
@@ -204,27 +189,25 @@ MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
 ## Like automake recursive targets, except that they execute subdirectories in the reverse order.
 ## We also try to override uninstall-recursive.  Automake will probably complain violently.
 ##
-MY_REVERSIVE_TARGETS = release-clean-recursive
-
 $(MY_REVERSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
-	@set fnord $$MAKEFLAGS ; amf=$$2 ; dot_seen=no ; \
-	target=`$(ECHO) $@ | sed s/-recursive//` ; \
-	list='' ; rev='$(SUBDIRS)' ; for subdir in $$rev ; do \
-	     	if test "$$subdir" = "." ; then dot_seen=yes ; fi ; \
-		list="$$subdir $$list" ; \
-	done ; \
-	if test "$$dot_seen" = "no" ; then list=". $$list" ; fi ; \
-	for subdir in $$list ; do \
+	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
+	target=`$(ECHO) $@ | sed s/-recursive//`; \
+	list=''; rev='$(SUBDIRS)'; for subdir in $$rev; do \
+	     	if test "$$subdir" = "."; then dot_seen=yes; fi; \
+		list="$$subdir $$list"; \
+	done; \
+	if test "$$dot_seen" = "no"; then list=". $$list"; fi; \
+	for subdir in $$list; do \
 		case " m4 intl po " in *" $$subdir "*) \
-			if test "$$target" = "remove" ; then target='uninstall' ; else continue ; fi ;; \
-		esac ; \
-		echo "Making $$target in $$subdir" ; \
-		if test "$$subdir" = "." ; then local="$$target-am" ; else local="$$target" ; fi ; \
-		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local)" ; \
-		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$local) \
-			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-	done ; \
+			if test "$$target" = "remove"; then target='uninstall'; else continue; fi ;; \
+		esac; \
+		echo "Making $$target in $$subdir"; \
+		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
 	test -z "$$fail"
 
 MY_PHONY	+= $(MY_REVERSIVE_TARGETS)
@@ -236,25 +219,26 @@ MY_PHONY	+= $(MY_REVERSIVE_TARGETS)
 ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck all-install
 
 ALL_EXPORT_OPTS =
+ALL_USTAMP_EXPT = USTAMP=`test -z '$(USTAMP)' && echo $$(pwd)/update-stamp || echo '$(USTAMP)'`
 
-$(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+$(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)' $(ALL_USTAMP_EXPT)
 $(ALL_RECURSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
-	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
-	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
-	if test -z '$(subdirs)' ; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
+	@set fnord $$MAKEFLAGS; amf=$$2; \
+	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
+	if test -z '$(subdirs)'; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	else \
-		list='$(subdirs)' ; \
-		for subdir in $$list ; do \
-			if test "$$subdir" = "." ; then continue ; fi ; \
-			$(ECHO) "Making $$target in $$subdir" ; \
-			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
-			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
-				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-		done ; \
-		test -z "$$fail" ; \
+		list='$(subdirs)'; \
+		for subdir in $$list; do \
+			if test "$$subdir" = "."; then continue; fi; \
+			$(ECHO) "Making $$target in $$subdir"; \
+			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
+				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+		done; \
+		test -z "$$fail"; \
 	fi
 
 MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
@@ -265,26 +249,26 @@ MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
 ##
 ALL_REVERSIVE_TARGETS = all-uninstall
 
-$(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+$(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)' $(ALL_USTAMP_EXPT)
 $(ALL_REVERSIVE_TARGETS):
 	@$(ECHO) "Making $@ in `pwd`"
-	@set fnord $$MAKEFLAGS ; amf=$$2 ; \
-	target=`$(ECHO) $@ | sed -e 's|^all-||'` ; \
-	if test -z '$(subdirs)' ; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target" ; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target ; \
+	@set fnord $$MAKEFLAGS; amf=$$2; \
+	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
+	if test -z '$(subdirs)'; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	else \
-		list='' ; rev='$(subdirs)' ; for subdir in $$rev ; do \
-			list="$$subdir $$list" ; \
-		done ; \
-		for subdir in $$list ; do \
-			if test "$$subdir" = "." ; then continue ; fi ; \
-			$(ECHO) "Making $$target in $$subdir" ; \
-			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target)" ; \
-			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target) \
-				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac ; \
-		done ; \
-		test -z "$$fail" ; \
+		list=''; rev='$(subdirs)'; for subdir in $$rev; do \
+			list="$$subdir $$list"; \
+		done; \
+		for subdir in $$list; do \
+			if test "$$subdir" = "."; then continue; fi; \
+			$(ECHO) "Making $$target in $$subdir"; \
+			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
+				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+		done; \
+		test -z "$$fail"; \
 	fi
 
 MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
@@ -386,6 +370,31 @@ uninstall-mans-am: $(UNINSTALL_MANS_AM)
 MY_PHONY	+= mans mans-am install-mans install-mans-am uninstall-mans uninstall-mans-am
 
 MY_RECURSIVE_TARGETS	+= mans-recursive install-mans-recursive uninstall-mans-recursive
+
+#!
+#! Development Targets:
+#! --------------------
+#!
+#! Development targets provide for the generation of auxilliary files for use
+#! with programming development tools such as vim, emacs and cscope.  These
+#! targets are available always as they can assist in debugging during simple
+#! compilation as well as during maintainer mode.
+#!
+#! tags ctags:
+#!     These are standard automake targets that generate tags files in the build
+#!     and source directories for emacs and vim.  An example of the use of these
+#!     is as follows:  Suppose that the package is configured and a compile is
+#!     attempted as follows:
+#!
+#!     $> wget http://www.openss7.org/tarballs/@PACKAGE_TARNAME@-@VERSION@.tar.bz2
+#!     $> tar xjf @PACKAGE_TARNAME@-@VERSION@.tar.bz2
+#!     $> pushd @PACKAGE_TARNAME@-@VERSION@
+#!     $> ./configure      # successful
+#!     $> make             # some error is generated causing compile to fail
+#!     $> make tags ctags
+#!     $> vim +:make       # vim will jump to failing line in source file
+#!
+tags ctags:
 
 ##
 # Have the makefile regenerate libtool if necessary
@@ -504,13 +513,22 @@ cscope-files-recursive:
 	     test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) CSCOPEFILES='$(CSCOPEFILES)' cscope-files); \
 	done
 
+#! cscope:
+#!     cscope(1) is a powerful tool for crossreferencing function calls and
+#!     declarations in C source files.  This target generates the necessary
+#!     cscope auxillary files in each subdirectory necessary to use cscope from
+#!     any point the package in the same manner as tags files above.  Try:
+#!
+#!     $> make cscope; cscope
+#!     $> make cscope; vim '+:cs add cscope.out'
+#!
 cscope: CSCOPE
 
 CSCOPE: cscope.files cscope-recursive cscope.out
 
 cscope.files:
 	list='$(SOURCES) $(HEADERS) $(CSCOPE_FILES)'; \
-	echo "-k -p5 -q" > $@ ; \
+	echo "-k -p5 -q" > $@; \
 	for i in $$list; do \
 		if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	done | $(AWK) '{ files[$$0] = 1; nonempty = 1; } \
@@ -622,6 +640,53 @@ remove: remove-recursive remove-am
 MY_REVERSIVE_TARGETS	+= remove-recursive
 MY_PHONY		+= remove remove-am
 
+$(REPO_DIRECTORIES)::
+	@test -d $@ || { $(ECHO) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+
+#! Repository targets:
+#! -------------------
+#!
+#! The following target is used to create the appropriate repositories in the
+#! package distribution directory.  It is good for finalizing builds and
+#! additions to the package repository, which is what I use it for.  This target
+#! only needs to be invoked from the topmost package.
+#!
+#! repo:
+#!     Build (or rebuild) all of the auxilliary and meta-data files in the
+#!     package distribution directory necessary to create repomd, yast, yum, apt
+#!     and tar repositories as appropriate for the current distribution.  The
+#!     targets invoked by this target are also invoked by the `release' target
+#!     at the end of packaging the distribution directory.
+repo: $(REPO_DIRECTORIES) $(REPO)
+
+MY_PHONY		+= repo $(REPO)
+FORCED_TARGETS		+= forced-repo forced-repo.log
+
+#! repo-sign:
+#!     Sign all of the auxillary and meta-data files in the package distribution
+#!     directory necessary to authenticate the meta-data for the repomd, yast,
+#!     yum, apt and tar repositories as appropriate for the current
+#!     distribution.  Should the auxillary or meta-data files not yet exist,
+#!     they will be created by invoking the `repo' target automatically.  The
+#!     targets invoked by this target are also invoked by the `release-sign'
+#!     target at the end of packaging the distribution directory and signing
+#!     packages.
+#!
+repo-sign: $(REPO_DIRECTORIES) $(REPO_SIGN)
+
+FORCED_TARGETS		+= forced-repo-sign forced-repo-sign.log
+MY_PHONY		+= repo-sign $(REPO_SIGN)
+
+#! repo-clean:
+#!     The targets invoked by this target are also invoked by the
+#!     `release-clean' target at the end of removal of distribution packages.
+#!
+repo-clean: $(REPO_CLEAN)
+
+MY_PHONY		+= repo-clean $(REPO_CLEAN)
+
+$(RELEASE_DIRECTORIES)::
+	@test -d $@ || { $(ECHO) " $(mkdir_p) $@"; $(mkdir_p) $@; }
 
 #!
 #! Release Targets:
@@ -630,7 +695,8 @@ MY_PHONY		+= remove remove-am
 #! The following are targets used to generate complete releases into the package
 #! distribution directory.  These are good for unattended and NFS builds, which
 #! is what I use them for.  Also, when building from atop multiple packages,
-#! these targets also recurse down through each package.
+#! these targets also recurse down through each package.  They may also be used
+#! from within the individual subpackage.
 #!
 #! release:
 #!     Build all of the things necessary to generate a release.  On an rpm
@@ -643,12 +709,19 @@ MY_PHONY		+= remove remove-am
 #!     The release target will not regenerate any files that already exist in
 #!     the package distribution directory.  This forced target will.
 #!
-release: $(RELEASE)
+release: $(RELEASE_DIRECTORIES) $(RELEASE)
+
+MY_PHONY		+= release $(RELEASE)
+FORCED_TARGETS		+= forced-release
 
 #! release-files:
-#!	This target automagically updates release files when in maintainer mode.
+#!     This target automagically updates release files when in maintainer mode.
 #!
 release-files: release-files-recursive
+release-files-am: $(RELEASE_FILES)
+
+MY_RECURSIVE_TARGETS 	+= release-files-recursive
+MY_PHONY		+= release-files-am release-files
 
 #! release-sign:
 #!     You will be prompted for a password, unless to specify it to make with
@@ -659,7 +732,10 @@ release-files: release-files-recursive
 #!     The release-sign target will not regenerate any files that already exist
 #!     in the package distribution directory.  This forced target will.
 #!
-release-sign: $(RELEASE_SIGN)
+release-sign: $(RELEASE_DIRECTORIES) $(RELEASE_SIGN)
+
+MY_PHONY		+= release-sign $(RELEASE_SIGN)
+FORCED_TARGETS		+= forced-release-sign
 
 #! release-clean:
 #!     This target will remove all distribution files for the current package
@@ -667,12 +743,111 @@ release-sign: $(RELEASE_SIGN)
 #!
 release-clean: release-clean-recursive release-clean-am
 
+release-clean-local:
+	@$(ECHO) "Making $@ in `pwd`"
+	@targets="$(RELEASE_CLEAN_LOCAL)"; for target in $$targets; do \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
+	done
+
+release-clean-am: release-clean-local
+	@$(ECHO) "Making $@ in `pwd`"
+	@if test -n "$(RELEASECLEANFILES)"; then \
+		$(ECHO) "rm -f -- $(RELEASECLEANFILES)"; \
+		rm -f -- $(RELEASECLEANFILES); \
+	fi
+
+MY_REVERSIVE_TARGETS	+= release-clean-recursive
+MY_PHONY		+= release-clean-am release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
+
+$(UPDATE_DIRECTORIES)::
+	@test -d $@ || { $(ECHO) " $(mkdir_p) $@"; $(mkdir_p) $@; }
+
+#! Update Targets:
+#! ---------------
+#!
+#! The following are tagets used to update complete releases into and existing
+#! package distribution directory.  These are good for unattended NFS builds,
+#! which is what I use them for.  Also, when building from atop multiple
+#! packages, these targets also recurse down through each package.  They may
+#! also be used from within the individual subpackage.  The difference between
+#! these targets and the Release Targets is that these targets will not disrupt
+#! the existing distribution.
+#!
+$(USTAMP)::
+	@test ! -f $@ || exit 0
+	echo `date -uIseconds` > $@
+	touch $@
+
+#! update:
+#!     Build all of the things necessary to generate an update.  Updates consist
+#!     of updating components in existing release packages.  This is primarily
+#!     for generating kernel module binary packages for a newly released kernel.
+#!     In these instances, no source packages are changed and only binary
+#!     packages corresponding to the new kernel are affected.  Nevertheless, if
+#!     source packages do not exist for the newly released subpackage, they will
+#!     be created.
+#!
+#! forced-update:
+#!     The `update' target will not regenerate any files that already exist in
+#!     the package distribution directory that were created by this update run.
+#!     This forced target will.
+#!
+update: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE)
+
+FORCED_TARGETS		+= forced-update
+MY_PHONY		+= update $(UPDATE)
+
+#! update-sign:
+#!     Standard input will be prompted for a password, unless you specify it to
+#!     make with the GNUPGPASS variable.  For unattended or non-interactive builds
+#!     with signing, you can do that as: 'make GNUPGPASS=mypasswd update-sign'
+#!
+#! forced-update-sign:
+#!     The `update-sign' target will not regenerate or sign any files that
+#!     already exist in the package distribution directory or have already been
+#!     signed.  This forced target will both regenerate and resign.
+#!
+update-sign: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE_SIGN)
+
+FORCED_TARGETS		+= forced-update-sign
+MY_PHONY		+= update-sign $(UPDATE_SIGN)
+
+#! update-clean:
+#!     This target will remove all update files for the current package from the
+#!     package distribution directories.
+#!
+update-clean: update-clean-recursive update-clean-am
+
+update-clean-local:
+	@$(ECHO) "Making $@ in `pwd`"
+	@targets="$(UPDATE_CLEAN_LOCAL)"; for target in $$targets; do \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
+	done
+
+update-clean-am: update-clean-local
+	@$(ECHO) "Making $@ in `pwd`"
+	@list="$(UPDATECLEANFILES)"; newlist=update-stamp; for f in $$list; do \
+		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
+			newlist="$$f $$newlist"; \
+		fi; \
+	done; \
+	if test -n "$$newlist"; then \
+		$(ECHO) "rm -f -- $$newlist"; \
+		rm -f -- $$newlist; \
+	fi
+
+MY_REVERSIVE_TARGETS 	+= update-clean-recursive
+MY_PHONY		+= update-clean-am update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
+
 ##
 ## Some logging targets for the head makefile targets.
 ##
 LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log distcheck.log \
 		  rpms.log sign.log srpm.log resign.log dsc.log sigs.log debs.log csig.log \
-		  uninstall.log release.log release-sign.log rebuild.log reupload.log remove.log
+		  uninstall.log release.log release-sign.log rebuild.log reupload.log remove.log \
+		  repo.log repo-sign.log update.log update-sign.log
 
 #!
 #! Logging targets:
@@ -690,29 +865,30 @@ LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log di
 #!
 #! First the common ones:
 #!
-#! 	compile.log, check.log, install.log, installcheck.log, uninstall.log,
-#! 	remove.log
+#!     compile.log, check.log, install.log, installcheck.log, uninstall.log,
+#!     remove.log
 #!
 #! and the maintainer mode ones:
 #!
-#! 	dist.log, distcheck.log, srpm.log, rpms.log, sign.log, rebuild.log,
-#! 	resign.log, release.log, release-sign.log
+#!     dist.log, distcheck.log, srpm.log, rpms.log, sign.log, rebuild.log,
+#!     resign.log, release.log, release-sign.log, repo.log, repo-sign.log,
+#!     update.log, update-sign.log
 #!
 #! If you want to add one, simply add it to LOGGING_TARGETS in Makefile.am
 #!
 $(LOGGING_TARGETS): FORCE
 	@$(ECHO) "Making $@ in `pwd`"
-	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'` ; \
-	if test -n '$(AP_AUTOPR)' ; then sendpr='$(AP_AUTOPR)' ; else sendpr='false' ; fi ; \
-	{ $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) $$target || \
-	{ exec 1>/dev/stdout ; $$sendpr --batch --config=$(AP_CONFIG) --target="$@" ; } ; } 2>&1 \
+	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'`; \
+	if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
+	{ $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target || \
+	{ exec 1>/dev/stdout; $$sendpr --batch --config=$(AP_CONFIG) --target="$@"; }; } 2>&1 \
 	| tee $@
 
 configure.log: FORCE
 	@$(ECHO) "Making $@ in `pwd`"
-	@if test -n '$(AP_AUTOPR)' ; then sendpr='$(AP_AUTOPR)' ; else sendpr='false' ; fi ; \
+	@if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
 	{ (cd $(top_builddir); ./config.status --recheck; ./config.status) || \
-	{ exec 1>/dev/stdout ; $$sendpr --batch --config=$(AP_CONFIG) --target="$@" ; } ; } 2>&1 \
+	{ exec 1>/dev/stdout; $$sendpr --batch --config=$(AP_CONFIG) --target="$@"; }; } 2>&1 \
 	| tee $@
 
 FORCE:
@@ -745,6 +921,9 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.134  2008-09-20 11:17:13  brian
+## - build system updates
+##
 ## Revision 0.9.2.133  2008-09-15 08:54:28  brian
 ## - build modifications
 ##

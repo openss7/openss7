@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: autotest.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: autotest.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.11 $) $Date: 2008-09-20 11:17:13 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008-09-20 11:17:13 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -61,7 +61,8 @@ package.m4: $(top_srcdir)/configure
 		$(ECHO) 'm4_define([AT_PACKAGE_TARNAME], [@PACKAGE@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_VERSION], [@VERSION@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_RELEASE], [@PACKAGE_RELEASE@])'; \
-		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@.@PACKAGE_RELEASE@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_PATCHLEVEL], [@PACKAGE_PATCHLEVEL@])'; \
+		$(ECHO) 'm4_define([AT_PACKAGE_STRING], [@PACKAGE_STRING@.@PACKAGE_RELEASE@@PACKAGE_PATCHLEVEL@])'; \
 		$(ECHO) 'm4_define([AT_PACKAGE_BUGREPORT], [@PACKAGE_BUGREPORT@])'; \
 	) > $@
 
@@ -166,6 +167,9 @@ MY_PHONY		+= all-testsuite installcheck-testsuite clean-testsuite $(INSTALLCHECK
 ## =============================================================================
 ##
 ## $Log: autotest.am,v $
+## Revision 0.9.2.11  2008-09-20 11:17:13  brian
+## - build system updates
+##
 ## Revision 0.9.2.10  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##

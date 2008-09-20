@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.46 $) $Date: 2008-04-28 09:41:04 $
+# @(#) $RCSfile: strconf.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.47 $) $Date: 2008-09-20 11:17:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:04 $ by $Author: brian $
+# Last Modified $Date: 2008-09-20 11:17:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -452,6 +452,7 @@ VERSION="$VERSION"
 PACKAGE_TARNAME="$PACKAGE_TARNAME"
 PACKAGE_VERSION="$PACKAGE_VERSION"
 PACKAGE_RELEASE="$PACKAGE_RELEASE"
+PACKAGE_PATCHLEVEL="$PACKAGE_PATCHLEVEL"
 STRCONF="$STRCONF"
 STRCONF_STEM="$STRCONF_STEM"
 STRCONF_SCRIPT="$STRCONF_SCRIPT"
@@ -505,6 +506,9 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: strconf.m4,v $
+# Revision 0.9.2.47  2008-09-20 11:17:14  brian
+# - build system updates
+#
 # Revision 0.9.2.46  2008-04-28 09:41:04  brian
 # - updated headers for release
 #
