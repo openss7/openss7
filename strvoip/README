@@ -1,5 +1,5 @@
-OpenSS7 STREAMS VOIP -- read me first file.  2008-08-31
-$Id: README,v 0.9.2.40 2008-09-06 08:09:20 brian Exp $
+OpenSS7 STREAMS VOIP -- read me first file.  2008-09-20
+$Id: README,v 0.9.2.41 2008-09-21 10:55:44 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS VOIP
 =====================
 
-Package strvoip-0.9.2.4 was released under AGPLv3 2008-08-31.
+Package strvoip-0.9.2.4 was released under AGPLv3 2008-09-20.
 
 The `OpenSS7 STREAMS VOIP' package includes kernel modules, `SVR 4.2'
 "STREAMS" drivers, modules, libraries, utilities, test programs,
@@ -28,7 +28,7 @@ well.
  Release
 --------
 
-This is the `strvoip-0.9.2.4' package, released 2008-08-31.  This
+This is the `strvoip-0.9.2.4' package, released 2008-09-20.  This
 `0.9.2.4' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -81,7 +81,7 @@ Prerequisites for the OpenSS7 STREAMS VOIP package are as follows:
 
          - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.22);
+         - Linux 2.6 kernel (2.6.3 - 2.6.25.4);
          - glibc2 or better.
          - GNU groff (for man pages).(2)
          - GNU texinfo (for info files).
