@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2008/09/21 22:16:30 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2008-09-21 22:18:25 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/21 22:16:30 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 22:18:25 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -670,7 +670,7 @@ RELEASECLEANFILES	+= $(repomd_files) $(repomd_group)
 
 UPDATE			+= repo-yum
 UPDATE_SIGN		+= repo-sign-yum
-UPDATE_CLEAN_FILES	+= repo-yum repo-sign-yum
+UPDATE_CLEAN_LOCAL	+= repo-yum repo-sign-yum
 UPDATECLEANFILES	+=
 
 endif
@@ -813,6 +813,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.121  2008-09-21 22:18:25  brian
+## - typo
+##
 ## Revision 0.9.2.120  2008/09/21 22:16:30  brian
 ## - more update target work
 ##
