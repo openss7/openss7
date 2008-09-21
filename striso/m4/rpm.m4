@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.78 $) $Date: 2008-09-21 07:10:07 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008/09/21 14:09:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-21 07:10:07 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 14:09:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -618,7 +618,7 @@ dnl
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test ":${CREATE_PACKAGE_DESCR:-no}" = :no; then
 	if test ":$enable_rpms" = :yes; then
-	    if ":$target_vendor" = :suse; then
+	    if test ":$target_vendor" = :suse; then
 		AC_MSG_WARN([Could not find create_package_descr program in PATH.])
 	    else enable_repo_yast=no; fi
 	else enable_repo_yast=no; fi
@@ -656,6 +656,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.79  2008/09/21 14:09:33  brian
+# - correction
+#
 # Revision 0.9.2.78  2008-09-21 07:10:07  brian
 # - environment passed to rpm and dpkg cannot be precious
 #
