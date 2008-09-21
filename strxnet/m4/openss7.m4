@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2008/09/21 07:45:43 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008/09/21 11:27:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/21 07:45:43 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 11:27:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -614,10 +614,17 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_PATCHLEVEL], [dnl
     AC_ARG_WITH([pkg-patchlevel],
 	AS_HELP_STRING([--with-pkg-patchlevel=@<:@PATCHLEVEL@:>@],
 	    [specify the PATCHLEVEL for the package files.  @<:@default=date@:>@]),
-	[if test :$with_pkg_patchlevel = :no; then with_pkg_patchlevel=
-	 else with_pkg_patchlevel=`date -uI | sed -e 's,-,,g'`
+	[if test :$with_pkg_patchlevel = :no
+	 then with_pkg_patchlevel=
+	 fi
+	 if test :$with_pkg_patchlevel = :
+	 then with_pkg_patchlevel=`date -uI | sed -e 's,-,,g'`
 	 fi],
-	[with_pkg_patchlevel=])
+	[if test -r .pkgpatchlevel ; then d= ; else d="$srcdir/" ; fi
+	 if test -r ${d}.pkgpatchlevel
+	 then with_pkg_patchlevel="`cat ${d}.pkgpatchlevel`"
+	 else with_pkg_patchlevel=
+	 fi])
     AC_MSG_RESULT([$with_pkg_patchlevel])
     PACKAGE_PATCHLEVEL=${with_pkg_patchlevel:+.$with_pkg_patchlevel}
     AC_SUBST([PACKAGE_PATCHLEVEL])
@@ -974,6 +981,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.69  2008/09/21 11:27:12  brian
+# - add patch level detection
+#
 # Revision 0.9.2.68  2008/09/21 07:45:43  brian
 # - typo
 #
