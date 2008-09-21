@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.41 $) $Date: 2008-09-21 13:50:06 $
+# @(#) $RCSfile: archive.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.42 $) $Date: 2008-09-21 14:17:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 13:50:06 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 14:17:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -457,12 +457,16 @@ endif
 ## MAINTAINER_MODE
 endif
 
-EXTRA_DIST		+= .pkgrelease \
+EXTRA_DIST		+= .pkgpatchlevel \
+			   .pkgrelease \
 			   .pkgepoch
 
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.42  2008-09-21 14:17:27  brian
+## - distribute patch level
+##
 ## Revision 0.9.2.41  2008-09-21 13:50:06  brian
 ## - updating update targets
 ##
