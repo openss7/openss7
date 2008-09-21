@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2008/09/21 22:16:30 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-21 22:24:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/21 22:16:30 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 22:24:40 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -361,7 +361,7 @@ UPDATECLEANFILES	+= $(debian_cache_files) \
 ## the update stamp, and force is applied, remove and recreate the DSC.
 ##
 update-dscs:
-	for f in '$(debtop_dsc_file)'; do \
+	for f in "$(debtop_dsc_file)"; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
 			g=`echo "$$f" | sed -e 's,^$(debdir),$(debian_dir),'`; \
 			$(ECHO) "rm -f -- \"$$f\" \"$$g\""; rm -f -- "$$f" "$$g"; \
@@ -543,6 +543,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.97  2008-09-21 22:24:40  brian
+## - corrections
+##
 ## Revision 0.9.2.96  2008/09/21 22:16:30  brian
 ## - more update target work
 ##
