@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.122 $) $Date: 2008-09-21 22:24:40 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.123 $) $Date: 2008-09-21 22:30:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 22:24:40 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 22:30:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -306,11 +306,11 @@ noa-rpm:
 rpms: noa-rpm lis-rpm lfs-rpm one-rpm
 
 # Another sneaky trick
-all-one-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lis-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-lfs-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-noa-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+all-one-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
+all-lis-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
+all-lfs-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
+all-noa-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
+all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
 
 #! sign srpm-sign:
 #!     These two targets are the same.  When invoked, they will add a signature
@@ -342,7 +342,7 @@ sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
 #!     architetures and kernels that do not already exist in the package
 #!     distribution directory.
 #!
-rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
 rebuild:
 	@rpms="`find $(rpmdir)/noarch -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm' 2>/dev/null`"; \
 	if test -z "$$rpms" -o -n '$(FORCE)'; then \
@@ -374,7 +374,7 @@ rebuild:
 #!     password.  Automated or unattended builds can be acheived with the
 #!     `emake' expect script located here: `@abs_srcdir@/scripts/emake'.
 #!
-resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
 resign: sign
 	@rpms="`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)'-o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`"; \
 	if test -z "$$rpms"; then \
@@ -506,7 +506,7 @@ update-srpm:
 ## exist, were created after the update stamp, and force is applied, recreate
 ## the RPM set.
 ##
-update-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+update-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' USTAMP='$(USTAMP)'
 update-rpms:
 	rebuild=yes; \
 	rpms=`find $(rpmdir)/noarch -name '$(rpm_binary_file)' 2>/dev/null`; \
@@ -813,6 +813,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.123  2008-09-21 22:30:14  brian
+## - update adjustments
+##
 ## Revision 0.9.2.122  2008-09-21 22:24:40  brian
 ## - corrections
 ##

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.97 $) $Date: 2008-09-21 22:24:40 $
+# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.98 $) $Date: 2008-09-21 22:30:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 22:24:40 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 22:30:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -239,15 +239,15 @@ chg-deb:
 debs: noa-deb lis-deb lfs-deb one-deb chg-deb
 
 # Another sneaky trick
-all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
 
 #! csig:
 #!     This target signs the .dsc file.  You will be prompted for a password,
@@ -278,7 +278,7 @@ csig:
 #!	to make.  This is a convenience target for building a group of debs on a
 #!	given build machine.
 #!
-reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
 reupload:
 	@debs="`find $(debdir) -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_all.*deb' 2>/dev/null`"; \
 	if test -z "$$debs" -o -n '$(FORCE)'; then \
@@ -377,7 +377,7 @@ update-dscs:
 ## exist, were created after the update stamp, and force is applied, recreate
 ## the DEB set.
 ##
-update-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+update-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
 update-debs:
 	rebuild=yes; \
 	debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_all\.deb') 2>/dev/null`; \
@@ -543,6 +543,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.98  2008-09-21 22:30:14  brian
+## - update adjustments
+##
 ## Revision 0.9.2.97  2008-09-21 22:24:40  brian
 ## - corrections
 ##
