@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.87 $) $Date: 2008-09-20 11:01:00 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.88 $) $Date: 2008-09-21 10:55:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-20 11:01:00 $ by $Author: brian $
+# Last Modified $Date: 2008-09-21 10:55:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2681,6 +2681,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
+# Revision 1.1.6.88  2008-09-21 10:55:11  brian
+# - update spec files
+#
 
 * Sat Sep 20 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.87  2008-09-20 11:01:00  brian
