@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008-09-20 23:06:08 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2008/09/21 07:45:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-20 23:06:08 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:45:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -507,15 +507,18 @@ AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
 # _OPENSS7_OPTIONS_GPG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_GPG], [dnl
-    AC_ARG_VAR([GPG], [GPG signature command])
-    AC_PATH_PROG([GPG], [gpg pgp], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_ARG_VAR([GPG],
+	       [GPG signature command. @<:@default=gpg@:>@])
+    AC_PATH_PROG([GPG], [gpg pgp], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GPG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find gpg program in PATH.])
 	GPG=/usr/bin/gpg
     fi
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg user])
-    AC_ARG_VAR([GNUPGUSER], [GPG user name])
+    AC_ARG_VAR([GNUPGUSER],
+	       [GPG user name. @<:@default=auto@:>@])
     AC_ARG_WITH([gpg-user],
 	AS_HELP_STRING([--with-gpg-user=USERNAME],
 	    [specify the USER for signing DEBs, RPMs and tarballs.
@@ -536,7 +539,8 @@ dnl          fi
     AC_MSG_RESULT([${GNUPGUSER:-no}])
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg home])
-    AC_ARG_VAR([GNUPGHOME], [GPG home directory])
+    AC_ARG_VAR([GNUPGHOME],
+	       [GPG home directory. @<:@default=auto@:>@])
     AC_ARG_WITH([gpg-home],
 	AS_HELP_STRING([--with-gpg-home=HOMEDIR],
 	    [specify the HOME for signing DEBs, RPMs and tarballs.
@@ -970,6 +974,12 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.68  2008/09/21 07:45:43  brian
+# - typo
+#
+# Revision 0.9.2.67  2008/09/21 07:40:46  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.66  2008-09-20 23:06:08  brian
 # - corrections
 #

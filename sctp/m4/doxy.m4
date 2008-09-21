@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008/09/21 07:40:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:40:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -131,7 +131,8 @@ AC_DEFUN([_DOXY_CONFIG_INPUT], [dnl
 # _DOXY_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_SETUP], [dnl
-    AC_ARG_VAR([DOXYGEN], [doxygen command])
+    AC_ARG_VAR([DOXYGEN],
+	       [doxygen command. @<:@default=doxygen@:>@])
     AC_PATH_PROG([DOXYGEN], [doxygen], [],
 		 [$PATH:/usr/local/bin:/usr/bin])
     if test :"${DOXYGEN:-no}" = :no ; then
@@ -190,6 +191,9 @@ AC_DEFUN([_DOXY_], [dnl
 # =============================================================================
 #
 # $Log: doxy.m4,v $
+# Revision 0.9.2.18  2008/09/21 07:40:45  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.17  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

@@ -15835,7 +15835,7 @@ __ss_r_data(ss_t *ss, queue_t *q, mblk_t *mp)
  *  On the read queue, an M_READ is used to indicate a sk_data_ready callback on
  *  the socket.  This can mean that the socket is now readable (when it was
  *  blocked before), or it may mean that a socket has completed connecting, or
- *  disconnected, or that a connection indication may be availabel on a
+ *  disconnected, or that a connection indication may be available on a
  *  listening socket.
  *
  *  We always examine both the state of the TPI interface and the state of the

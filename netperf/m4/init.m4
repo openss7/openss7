@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008/09/21 07:40:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:40:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -213,14 +213,16 @@ dnl
 dnl
 dnl I suppose we really don't care about these.
 dnl
-    AC_ARG_VAR([CHKCONFIG], [Chkconfig command])
+    AC_ARG_VAR([CHKCONFIG],
+	       [Chkconfig command. @<:@default=chkconfig@:>@])
     AC_PATH_PROG([CHKCONFIG], [chkconfig], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "${CHKCONFIG:-no}" = :no ; then
+    if test ":${CHKCONFIG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find chkconfig program in PATH.])
 	CHKCONFIG=''
     fi
-    AC_ARG_VAR([INSSERV], [Insserv command])
+    AC_ARG_VAR([INSSERV],
+	       [Insserv command. @<:@default=inserv@:>@])
     AC_PATH_PROG([INSSERV], [insserv], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${INSSERV:-no}" = :no ; then
@@ -329,6 +331,9 @@ AC_DEFUN([_INIT_], [dnl
 # =============================================================================
 #
 # $Log: init.m4,v $
+# Revision 0.9.2.18  2008/09/21 07:40:46  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.17  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

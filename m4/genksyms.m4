@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008/09/21 07:40:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:40:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,7 +91,8 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     if test :"${linux_cv_CONFIG_REGPARM:-no}" = :yes ; then
 	GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
-    AC_ARG_VAR([GENKSYMS], [Generate kernel symbols command])
+    AC_ARG_VAR([GENKSYMS],
+	       [Generate kernel symbols command. @<:@default=genksyms@:>@])
     AC_PATH_PROG([GENKSYMS], [genksyms], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${GENKSYMS:-no}" = :no ; then
@@ -101,7 +102,8 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
 	fi
 	GENKSYMS=/sbin/genksyms
     fi
-    AC_ARG_VAR([KGENKSYMS], [Generate kernel symbols command])
+    AC_ARG_VAR([KGENKSYMS],
+	       [Generate kernel symbols command. @<:@default=auto@:>@])
     eval "ksyms_dirs=\"$kbuilddir $ksrcdir\""
     ksyms_path=
     for ksyms_tmp in $ksyms_dirs ; do
@@ -116,7 +118,8 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
 	fi
 	KGENKSYMS='${kbuilddir}/scripts/genksyms/genksyms'
     fi
-dnl AC_ARG_VAR([MODPOST], [Kernel module post processing command])
+dnl AC_ARG_VAR([MODPOST],
+dnl	       [Kernel module post processing command. @<:@default=modpost@:>@])
 dnl AC_PATH_PROG([MODPOST], [modpost], [],
 dnl	         [${kbuilddir}/scripts:${kbuilddir}/scripts/mod])
 dnl if test :"${MODPOST:-no}" = :no ; then
@@ -126,14 +129,17 @@ dnl fi
 dnl
 dnl This is a weird place to put these I know, but genksyms.am needs it
 dnl
-    AC_ARG_VAR([OBJDUMP], [Dump object files])
+    AC_ARG_VAR([OBJDUMP],
+	       [Dump object files. @<:@default=objdump@:>@])
     AC_PATH_TOOL([OBJDUMP], [objdump], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${OBJDUMP:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable objdump program in $PATH.])
 	OBJDUMP=/usr/bin/objdump
     fi
-    AC_ARG_VAR([NM], [List object file symbols])
-    AC_PATH_TOOL([NM], [nm], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_ARG_VAR([NM],
+	       [List object file symbols. @<:@default=nm@:>@])
+    AC_PATH_TOOL([NM], [nm], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${NM:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable nm program in $PATH.])
 	NM=/usr/bin/nm
@@ -329,6 +335,9 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 #
 # $Log: genksyms.m4,v $
+# Revision 0.9.2.28  2008/09/21 07:40:45  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.27  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

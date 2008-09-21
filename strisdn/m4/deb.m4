@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.27 $) $Date: 2008-09-21 07:10:07 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008/09/21 07:40:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-21 07:10:07 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:40:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -357,7 +357,7 @@ dnl
 	DPKG_SCANSOURCES="${am_missing3_run}dpkg-scansources"
     fi
     AC_ARG_VAR([DPKG_SCANPACKAGES],
-	       [dpkg-scanpackages command])
+	       [dpkg-scanpackages command. @<:@default=dpkg-scanpackages@:>@])
     AC_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test ":${DPKG_SCANPACKAGES:-no}" = :no; then
@@ -367,7 +367,7 @@ dnl
 	DPKG_SCANPACKAGES="${am_missing3_run}dpkg-scanpackages"
     fi
     AC_ARG_VAR([DPKG_DEB],
-	       [dpkg-deb command])
+	       [dpkg-deb command. @<:@default=dpkg-deb@:>@])
     AC_PATH_PROG([DPKG_DEB], [dpkg-deb], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test ":${DPKG_DEB:-no}" = :no; then
@@ -430,6 +430,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.28  2008/09/21 07:40:45  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.27  2008-09-21 07:10:07  brian
 # - environment passed to rpm and dpkg cannot be precious
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008/09/21 07:40:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:40:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -95,7 +95,8 @@ AC_DEFUN([_AUTOTEST_SETUP], [dnl
 # _AUTOTEST_SETUP_AUTOM4TE
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
-    AC_ARG_VAR([AUTOM4TE], [Autom4te command])
+    AC_ARG_VAR([AUTOM4TE],
+	       [Autom4te command. @<:@default=autom4te@:>@])
     AC_PATH_PROG([AUTOM4TE], [autom4te], [${am_missing_run}autom4te],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
 ])# _AUTOTEST_SETUP_AUTOM4TE
@@ -105,7 +106,8 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
 # _AUTOTEST_SETUP_AUTOTEST
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOTEST], [dnl
-    AC_ARG_VAR([AUTOTEST], [Autotest macro build command])
+    AC_ARG_VAR([AUTOTEST],
+	       [Autotest macro build command. @<:@default=autotest@:>@])
     AC_PATH_PROG([AUTOTEST], [autotest], [$AUTOM4TE --language=autotest],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
 ])# _AUTOTEST_SETUP_AUTOTEST
@@ -206,6 +208,9 @@ AC_DEFUN([_AUTOTEST_], [dnl
 # =============================================================================
 #
 # $Log: autotest.m4,v $
+# Revision 0.9.2.17  2008/09/21 07:40:45  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.16  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

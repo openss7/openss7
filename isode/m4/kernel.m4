@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.168 $) $Date: 2008-09-08 05:19:00 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/09/21 07:40:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-08 05:19:00 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:40:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -361,28 +361,32 @@ dnl fi
 # _LINUX_CHECK_KERNEL_TOOLS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
-    AC_ARG_VAR([DEPMOD], [Build kernel module dependencies command])
+    AC_ARG_VAR([DEPMOD],
+	       [Build kernel module dependencies command. @<:@default=depmod@:>@])
     AC_PATH_PROG([DEPMOD], [depmod], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${DEPMOD:-no}" = :no ; then
 	AC_MSG_WARN([Could not find depmod program in PATH.])
 	DEPMOD=/sbin/depmod
     fi
-    AC_ARG_VAR([MODPROBE], [Probe kernel module dependencies command])
+    AC_ARG_VAR([MODPROBE],
+	       [Probe kernel module dependencies command. @<:@default=modprobe@:>@])
     AC_PATH_PROG([MODPROBE], [modprobe], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${MODPROBE:-no}" = :no ; then
 	AC_MSG_WARN([Could not find depmod program in PATH.])
 	MODPROBE=/sbin/modprobe
     fi
-    AC_ARG_VAR([LSMOD], [List kernel modules command])
+    AC_ARG_VAR([LSMOD],
+	       [List kernel modules command. @<:@default=lsmod@:>@])
     AC_PATH_PROG([LSMOD], [lsmod], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${LSMOD:-no}" = :no ; then
 	AC_MSG_WARN([Could not find lsmod program in PATH.])
 	LSMOD=/sbin/lsmod
     fi
-    AC_ARG_VAR([LSOF], [List open files command])
+    AC_ARG_VAR([LSOF],
+	       [List open files command. @<:@default=lsof@:>@])
     AC_PATH_PROG([LSOF], [lsof], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test "${LSOF:-no}" = :no ; then
@@ -2615,6 +2619,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.169  2008/09/21 07:40:46  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.168  2008-09-08 05:19:00  brian
 # - ubuntu needs KERNELRELEASE too
 #
