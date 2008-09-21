@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.26 $) $Date: 2008-09-20 23:06:07 $
+# @(#) $RCSfile: deb.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.27 $) $Date: 2008-09-21 07:10:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-20 23:06:07 $ by $Author: brian $
+# Last Modified $Date: 2008-09-21 07:10:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -151,7 +151,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_ARCH], [dnl
 	[enable_arch="$enableval"],
 	[enable_arch='yes'])
     AC_MSG_RESULT([${enable_arch:-yes}])
-    AM_CONDITIONAL([DEB_BUILD_ARCH], [test :"${enable_arch:-yes}" = :yes])dnl
+    AM_CONDITIONAL([DEB_BUILD_ARCH], [test ":${enable_arch:-yes}" = :yes])dnl
 	
 ])# _DEB_DPKG_SETUP_ARCH
 # =============================================================================
@@ -171,7 +171,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_INDEP], [dnl
 	[enable_indep="$enableval"],
 	[enable_indep='yes'])
     AC_MSG_RESULT([${enable_indep:-yes}])
-    AM_CONDITIONAL([DEB_BUILD_INDEP], [test :"${enable_indep:-yes}" = :yes])dnl
+    AM_CONDITIONAL([DEB_BUILD_INDEP], [test ":${enable_indep:-yes}" = :yes])dnl
 ])# _DEB_DPKG_SETUP_INDEP
 # =============================================================================
 
@@ -180,7 +180,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_INDEP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
-    if test :"$PACKAGE_DISTDIR" = :`pwd` ; then
+    if test ":$PACKAGE_DISTDIR" = :`pwd` ; then
 	deb_tmp='$(PACKAGE_DISTDIR)/debian'
     else
 	deb_tmp='$(PACKAGE_DISTDIR)/debs/'"${deb_cv_dist_subdir}"
@@ -191,7 +191,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
 	[with_deb_topdir="$withval"],
 	[with_deb_topdir="$deb_tmp"])
     AC_CACHE_CHECK([for deb top build directory], [deb_cv_topdir], [dnl
-	case :"$with_deb_topdir" in
+	case ":$with_deb_topdir" in
 	    (:no | :NO)
 		deb_cv_topdir="$deb_tmp"
 		;;
@@ -268,29 +268,38 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_BUILD], [dnl
 dnl
-dnl These environment variables are precious
+dnl These environment variables 
 dnl
-    AC_ARG_VAR([DEB_BUILD_ARCH], [Debian build architecture])
-    AC_ARG_VAR([DEB_BUILD_GNU_CPU], [Debian build cpu])
-    AC_ARG_VAR([DEB_BUILD_GNU_SYSTEM], [Debian build os])
-    AC_ARG_VAR([DEB_BUILD_GNU_TYPE], [Debian build alias])
-    AC_ARG_VAR([DEB_HOST_ARCH], [Debian host/target architecture])
-    AC_ARG_VAR([DEB_HOST_GNU_CPU], [Debian host/target cpu])
-    AC_ARG_VAR([DEB_HOST_GNU_SYSTEM], [Debian host/target os])
-    AC_ARG_VAR([DEB_HOST_GNU_TYPE], [Debian host/target alias])
+dnl AC_ARG_VAR([DEB_BUILD_ARCH], [Debian build architecture])
+dnl AC_ARG_VAR([DEB_BUILD_GNU_CPU], [Debian build cpu])
+dnl AC_ARG_VAR([DEB_BUILD_GNU_SYSTEM], [Debian build os])
+dnl AC_ARG_VAR([DEB_BUILD_GNU_TYPE], [Debian build alias])
+dnl AC_ARG_VAR([DEB_HOST_ARCH], [Debian host/target architecture])
+dnl AC_ARG_VAR([DEB_HOST_GNU_CPU], [Debian host/target cpu])
+dnl AC_ARG_VAR([DEB_HOST_GNU_SYSTEM], [Debian host/target os])
+dnl AC_ARG_VAR([DEB_HOST_GNU_TYPE], [Debian host/target alias])
 dnl
 dnl These commands are needed to perform DPKG package builds.
 dnl
-    BUILD_DPKG=no
+    AC_ARG_ENABLE([debs],
+	AS_HELP_STRING([--disable-debs],
+	    [disable building of debs.  @<:@default=auto@:>@]),
+	[enable_debs="$enableval"],
+	[enable_debs=yes])
+    AC_ARG_ENABLE([dscs],
+	AS_HELP_STRING([--disable-dscs],
+	    [disable building of dscs.  @<:@default=auto@:>@]),
+	[enable_dscs="$enableval"],
+	[enable_dscs=yes])
     AC_ARG_VAR([DPKG],
 	       [dpkg command. @<:@default=dpkg@:>@])
     AC_PATH_PROG([DPKG], [dpkg], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${DPKG:-no}" = :no; then
+    if test ":${DPKG:-no}" = :no; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
-	    AC_MSG_WARN([Could not find dpkg program in PATH.])
-	    ;;
+		AC_MSG_WARN([Could not find dpkg program in PATH.]) ;;
+	    (*) enable_debs=no; enable_dscs=no ;;
 	esac
 	DPKG="${am_missing3_run}dpkg"
     fi
@@ -298,11 +307,11 @@ dnl
 	       [dpkg-source command. @<:@default=dpkg-source@:>@])
     AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${DPKG_SOURCE:-no}" = :no; then
+    if test ":${DPKG_SOURCE:-no}" = :no; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
-	    AC_MSG_WARN([Could not find dpkg-source program in PATH.])
-	    ;;
+		AC_MSG_WARN([Could not find dpkg-source program in PATH.]) ;;
+	    (*) enable_dscs=no ;;
 	esac
 	DPKG_SOURCE="${am_missing3_run}dpkg-source"
     fi
@@ -310,18 +319,15 @@ dnl
 	       [dpkg-buildpackage command. @<:@default=dpkg-buildpackage@:>@])
     AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${DPKG_BUILDPACKAGE:-no}" = :no; then
+    if test ":${DPKG_BUILDPACKAGE:-no}" = :no; then
 	case "$target_vendor" in
 	    (debian|ubuntu)
-	    AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.])
-	    ;;
+		AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.]) ;;
+	    (*) enable_debs=no ;;
 	esac
 	DPKG_BUILDPACKAGE="${am_missing3_run}dpkg-buildpackage"
     fi
-    case :$ac_cv_path_DPKG_SOURCE:$ac_cv_path_DPKG_BUILDPACKAGE in
-	(::*|::|*:) ;; (*) BUILD_DPKG=yes ;;
-    esac
-    AM_CONDITIONAL([BUILD_DPKG], [test :$BUILD_DPKG = :yes])dnl
+    AM_CONDITIONAL([BUILD_DPKG], [test ":$enable_debs:$enable_dscs" = :yes:yes])dnl
 dnl
 dnl These commands are needed to create DPKG (e.g. APT) repositories.
 dnl
@@ -334,76 +340,40 @@ dnl
 	       [apt-ftparchive command. @<:@default=apt-ftparchive@:>@])
     AC_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${APT_FTPARCHIVE:-no}" = :no; then
-	if test ":$enable_dpkg" = :yes; then
-	    case "$target_vendor" in
-		(debian|ubuntu)
-		AC_MSG_WARN([Could not find apt-ftparchive program in PATH.])
-		;;
-		(*)
-		enable_repo_apt=no
-		;;
-	    esac
-	else
-	    enable_repo_apt=no
-	fi
+    if test ":${APT_FTPARCHIVE:-no}" = :no; then
+	if test ":$enable_debs" = :yes; then
+	    AC_MSG_WARN([Could not find apt-ftparchive program in PATH.])
+	else enable_repo_apt=no; fi
 	APT_FTPARCHIVE="${am_missing3_run}apt-ftparchive"
     fi
     AC_ARG_VAR([DPKG_SCANSOURCES],
 	       [dpkg-scansources command. @<:@default=dpkg-scansources@:>@])
     AC_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${DPKG_SCANSOURCES:-no}" = :no; then
-	if test ":$enable_dpkg" = :yes; then
-	    case "$target_vendor" in
-		(debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg-scansources program in PATH.])
-		;;
-		(*)
-		enable_repo_apt=no
-		;;
-	    esac
-	else
-	    enable_repo_apt=no
-	fi
+    if test ":${DPKG_SCANSOURCES:-no}" = :no; then
+	if test ":$enable_debs" = :yes; then
+	    AC_MSG_WARN([Could not find dpkg-scansources program in PATH.])
+	else enable_repo_apt=no; fi
 	DPKG_SCANSOURCES="${am_missing3_run}dpkg-scansources"
     fi
     AC_ARG_VAR([DPKG_SCANPACKAGES],
 	       [dpkg-scanpackages command])
     AC_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${DPKG_SCANPACKAGES:-no}" = :no; then
-	if test ":$enable_dpkg" = :yes; then
-	    case "$target_vendor" in
-		(debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg-scanpackages program in PATH.])
-		;;
-		(*)
-		enable_repo_apt=no
-		;;
-	    esac
-	else
-	    enable_repo_apt=no
-	fi
+    if test ":${DPKG_SCANPACKAGES:-no}" = :no; then
+	if test ":$enable_debs" = :yes; then
+	    AC_MSG_WARN([Could not find dpkg-scanpackages program in PATH.])
+	else enable_repo_apt=no; fi
 	DPKG_SCANPACKAGES="${am_missing3_run}dpkg-scanpackages"
     fi
     AC_ARG_VAR([DPKG_DEB],
 	       [dpkg-deb command])
     AC_PATH_PROG([DPKG_DEB], [dpkg-deb], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${DPKG_DEB:-no}" = :no; then
-	if test ":$enable_dpkg" = :yes; then
-	    case "$target_vendor" in
-		(debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg-deb program in PATH.])
-		;;
-		(*)
-		enable_repo_apt=no
-		;;
-	    esac
-	else
-	    enable_repo_apt=no
-	fi
+    if test ":${DPKG_DEB:-no}" = :no; then
+	if test ":$enable_debs" = :yes; then
+	    AC_MSG_WARN([Could not find dpkg-deb program in PATH.])
+	else enable_repo_apt=no; fi
 	DPK_DEB="${am_missing3_run}dpkg-deb"
     fi
     AM_CONDITIONAL([BUILD_REPO_APT], [test ":$enable_repo_apt" = :yes])
@@ -417,7 +387,7 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_OUTPUT], [dnl
 dnl the conditional confuses automake forcing extra config.status runs.
-dnl if test :"${DPKG_SOURCE:-no}" != :no -a :"${DPKG_BUILDPACKAGE:-no}" != :no ; then
+dnl if test ":${DPKG_SOURCE:-no}" != :no -a ":${DPKG_BUILDPACKAGE:-no}" != :no ; then
 	AC_CONFIG_FILES([debian/rules
 			 debian/control
 			 debian/mscript_header
@@ -460,6 +430,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.27  2008-09-21 07:10:07  brian
+# - environment passed to rpm and dpkg cannot be precious
+#
 # Revision 0.9.2.26  2008-09-20 23:06:07  brian
 # - corrections
 #
