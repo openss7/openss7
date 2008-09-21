@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008/09/21 07:40:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008/09/21 07:40:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -74,7 +74,8 @@ AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [dnl
 # _LDCONFIG_SPEC_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
-    AC_ARG_VAR([LDCONFIG], [Configure loader command])
+    AC_ARG_VAR([LDCONFIG],
+	       [Configure loader command. @<:@default=ldconfig@:>@])
     AC_PATH_PROG([LDCONFIG], [ldconfig], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test :"${LDCONFIG:-no}" = :no ; then
@@ -98,6 +99,9 @@ AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: libraries.m4,v $
+# Revision 0.9.2.16  2008/09/21 07:40:46  brian
+# - add defaults to environment variables
+#
 # Revision 0.9.2.15  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

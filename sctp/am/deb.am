@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.91 $) $Date: 2008-09-20 22:57:14 $
+# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.94 $) $Date: 2008-09-21 01:38:34 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-20 22:57:14 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 01:38:34 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -307,7 +307,7 @@ reupload:
 	if test -z "$$debs" -o -n '$(FORCE)'; then \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb"; \
 		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb || :; \
-	fi; \
+	fi
 
 distclean-deb:
 	rm -rf $(debian_dir)
@@ -381,12 +381,20 @@ if BUILD_REPO_APT
 ## The following builds apt repositories.
 ##
 
-apt_nonrel_files	= $(aptdir)/Packages.gz \
+apt_nonrel_files	= $(aptdir)/Packages \
+			  $(aptdir)/Sources \
+			  $(aptdir)/Contents \
+			  $(aptdir)/Packages.gz \
 			  $(aptdir)/Sources.gz \
 			  $(aptdir)/Contents.gz \
+			  $(aptdir)/Packages.bz2 \
+			  $(aptdir)/Sources.bz2 \
+			  $(aptdir)/Contents.bz2 \
 			  $(aptdir)/md5sum.txt
 
-apt_release_file	= $(aptdir)/Release.gz
+apt_release_file	= $(aptdir)/Release \
+			  $(aptdir)/Release.gz \
+			  $(aptdir)/Release.bz2
 
 apt_files		= $(apt_nonrel_files) \
 			  $(apt_release_file)
@@ -399,34 +407,26 @@ apt_files		= $(apt_nonrel_files) \
 #! repository metadata creation tools, the following targets are used to manage
 #! apt source repository meta data files.
 #!
-$(aptdir)/Packages.gz:
-	@subdir=`echo '$(aptdir)' | sed -e 's,^$(PACKAGE_DISTDIR),,'`; \
-	test -n "$$subdir" || subdir=.; \
-	$(ECHO) "(cd \"$$subdir\"; $(APT_FTPARCHIVE) packages \"$$subdir/\" | gzip -c > $@)"; \
-	(cd "$$subdir"; $(APT_FTPARCHIVE) packages "$$subdir/" | gzip -c > $@)
+$(aptdir)/Packages:
+	$(APT_FTPARCHIVE) packages $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
 
-$(aptdir)/Sources.gz:
-	@subdir=`echo '$(aptdir)' | sed -e 's,^$(PACKAGE_DISTDIR),,'`; \
-	test -n "$$subdir" || subdir=.; \
-	$(ECHO) "(cd \"$$subdir\"; $(APT_FTPARCHIVE) sources \"$$subdir/\" | gzip -c > $@)"; \
-	(cd "$$subdir"; $(APT_FTPARCHIVE) sources "$$subdir/" | gzip -c > $@)
+$(aptdir)/Sources:
+	$(APT_FTPARCHIVE) sources $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
 
-$(aptdir)/Contents.gz:
-	@subdir=`echo '$(aptdir)' | sed -e 's,^$(PACKAGE_DISTDIR),,'`; \
-	test -n "$$subdir" || subdir=.; \
-	$(ECHO) "(cd \"$$subdir\"; $(APT_FTPARCHIVE) contents \"$$subdir/\" | gzip -c > $@)"; \
-	(cd "$$subdir"; $(APT_FTPARCHIVE) contents "$$subdir/" | gzip -c > $@)
+$(aptdir)/Contents:
+	$(APT_FTPARCHIVE) contents $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
+
+$(aptdir)/Packages.gz $(aptdir)/Sources.gz $(aptdir)/Contents.gz $(aptdir)/Release.gz: %.gz : %
+	cat $< | gzip -c > $@
+
+$(aptdir)/Packages.bz2 $(aptdir)/Sources.bz2 $(aptdir)/Contents.bz2 $(aptdir)/Release.bz2: %.bz2 : %
+	cat $< | bzip2 -c > $@
 
 $(aptdir)/md5sum.txt:
-	@$(ECHO) "(cd $(aptdir); find . -type f | egrep -v '(md5sum.txt|Release.gz)' | sed -e 's,^\./,,' | xargs md5sum > md5sum.txt)"; \
-	(cd $(aptdir); find . -type f | egrep -v '(md5sum.txt|Release.gz)' | sed -e 's,^\./,,' | xargs md5sum > md5sum.txt)
+	find $(aptdir) -type f | egrep -v '(md5sum.txt|Release.gz)' | xargs $(MD5SUM) | sed -e 's, $(aptdir)/, ,' > $@
 
-
-$(aptdir)/Release.gz: $(apt_nonrel_files)
-	@subdir=`echo '$(aptdir)' | sed -e 's,^$(PACKAGE_DISTDIR),,'`; \
-	test -n "$$subdir" || subdir=.; \
-	$(ECHO) "(cd \"$$subdir\"; $(APT_FTPARCHIVE) release \"$$subdir/\" | gzip -c > $@)"; \
-	(cd "$$subdir"; $(APT_FTPARCHIVE) release "$$subdir/" | gzip -c > $@)
+$(aptdir)/Release: $(apt_nonrel_files)
+	$(APT_FTPARCHIVE) release $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
 
 #! repo-apt:
 #!     Create (or recreate) the meta data files for an APT repository in the
@@ -473,6 +473,15 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.94  2008-09-21 01:38:34  brian
+## - correction
+##
+## Revision 0.9.2.93  2008-09-21 01:07:55  brian
+## - improvements
+##
+## Revision 0.9.2.92  2008/09/20 23:12:34  brian
+## - trailing backslash
+##
 ## Revision 0.9.2.91  2008-09-20 22:57:14  brian
 ## - correct reupload target
 ##

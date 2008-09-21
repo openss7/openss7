@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.134 $) $Date: 2008-09-20 11:17:13 $
+# @(#) $RCSfile: openss7.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.137 $) $Date: 2008-09-21 01:32:52 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-20 11:17:13 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 01:32:52 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -173,8 +173,8 @@ $(MY_RECURSIVE_TARGETS):
 	     if test "$$subdir" = "."; then dot_seen=yes; fi; \
 	done; \
 	if test "$$dot_seen" = "no"; then list="$$list ."; fi; \
-	for subdir in $$list do \
-		case " m4 intl po " in *" $$subdir "*) continue ;; esac; \
+	for subdir in $$list; do \
+		case " m4 intl po " in (*" $$subdir "*) continue ;; esac; \
 		$(ECHO) "Making $$target in $$subdir"; \
 		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
 		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
@@ -199,7 +199,7 @@ $(MY_REVERSIVE_TARGETS):
 	done; \
 	if test "$$dot_seen" = "no"; then list=". $$list"; fi; \
 	for subdir in $$list; do \
-		case " m4 intl po " in *" $$subdir "*) \
+		case " m4 intl po " in (*" $$subdir "*) \
 			if test "$$target" = "remove"; then target='uninstall'; else continue; fi ;; \
 		esac; \
 		echo "Making $$target in $$subdir"; \
@@ -682,6 +682,7 @@ MY_PHONY		+= repo-sign $(REPO_SIGN)
 #!     `release-clean' target at the end of removal of distribution packages.
 #!
 repo-clean: $(REPO_CLEAN)
+	rm -f -- $(REPOCLEANFILES)
 
 MY_PHONY		+= repo-clean $(REPO_CLEAN)
 
@@ -921,6 +922,15 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.137  2008-09-21 01:32:52  brian
+## - clean repo files
+##
+## Revision 0.9.2.136  2008/09/21 00:21:23  brian
+## - correction
+##
+## Revision 0.9.2.135  2008/09/21 00:03:10  brian
+## - corrections
+##
 ## Revision 0.9.2.134  2008-09-20 11:17:13  brian
 ## - build system updates
 ##
