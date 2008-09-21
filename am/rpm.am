@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.121 $) $Date: 2008-09-21 22:18:25 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.122 $) $Date: 2008-09-21 22:24:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 22:18:25 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 22:24:40 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -490,7 +490,7 @@ UPDATECLEANFILES	+= $(rpm_cache_files) \
 ## the update stamp, and force is applied, remove and recreate the SRPM.
 ##
 update-srpm:
-	for f in '$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file)'; do \
+	for f in "$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file)"; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
 			$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
@@ -813,6 +813,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.122  2008-09-21 22:24:40  brian
+## - corrections
+##
 ## Revision 0.9.2.121  2008-09-21 22:18:25  brian
 ## - typo
 ##

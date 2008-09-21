@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008/09/21 22:16:30 $
+# @(#) $RCSfile: archive.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.44 $) $Date: 2008-09-21 22:24:40 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/21 22:16:30 $ by $Author: brian $
+## Last Modified $Date: 2008-09-21 22:24:40 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -262,7 +262,7 @@ endif
 ## tarball.  This applies to each tarball type.
 ##
 update-tar:
-	for a in '$(archive_suffixes)'; do \
+	for a in "$(archive_suffixes)"; do \
 		f="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
 			$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
@@ -279,7 +279,7 @@ update-tar:
 ## signature.  This applies to each signature type.
 ##
 update-sign-tar:
-	for a in '$(archive_suffixes)'; do \
+	for a in "$(archive_suffixes)"; do \
 		f="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; f="$${t}.asc"; \
 		if test ! -e "$$t"; then \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-tar"; \
@@ -299,7 +299,7 @@ update-sign-tar:
 ## remove it.
 ##
 update-clean-tar:
-	for a in '$(archive_suffixes)'; do \
+	for a in "$(archive_suffixes)"; do \
 		for f in "$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}.asc $(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; do \
 			if test -e "$$f" -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
 				$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
@@ -470,6 +470,9 @@ EXTRA_DIST		+= .pkgpatchlevel \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.44  2008-09-21 22:24:40  brian
+## - corrections
+##
 ## Revision 0.9.2.43  2008/09/21 22:16:30  brian
 ## - more update target work
 ##
