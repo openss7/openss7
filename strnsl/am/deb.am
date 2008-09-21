@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.95 $) $Date: 2008-09-21 13:50:06 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2008/09/21 22:16:30 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 13:50:06 $ by $Author: brian $
+## Last Modified $Date: 2008/09/21 22:16:30 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -293,14 +293,11 @@ reupload:
 			$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" lis-deb lfs-deb one-deb|| :; \
 		fi; \
 		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; for k in $$kernels; do \
-			k=`basename $$k`; \
-			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile; then \
-				ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
-				debs="`find $(debdir)/binary-$$t -name '$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_$$t.*deb' 2>/dev/null`"; \
-				if test -z "$$debs" -o -n '$(FORCE)'; then \
-					$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
-					$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" lis-deb lfs-deb one-deb || :; \
-				fi; \
+			k=`basename $$k`; test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			debs="`find $(debdir)/binary-$$t -name '$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_$$t.*deb' 2>/dev/null`"; \
+			if test -z "$$debs" -o -n '$(FORCE)'; then \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
+				$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" lis-deb lfs-deb one-deb || :; \
 			fi; \
 		done; \
 	done; \
@@ -360,21 +357,85 @@ UPDATECLEANFILES	+= $(debian_cache_files) \
 ##
 ## Provide updates to debian source packages.
 ##
+## If the DSC does not exist, create it.  If the DSC exists, was created after
+## the update stamp, and force is applied, remove and recreate the DSC.
+##
 update-dscs:
+	for f in '$(debtop_dsc_file)'; do \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
+			g=`echo "$$f" | sed -e 's,^$(debdir),$(debian_dir),'`; \
+			$(ECHO) "rm -f -- \"$$f\" \"$$g\""; rm -f -- "$$f" "$$g"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f"; \
+		fi; \
+	done
 
 ##
 ## Provide updates to debian binary packages.
 ##
+## If the DEBs in the set do not exist, create them.  If the DEBSs in the set
+## exist, were created after the update stamp, and force is applied, recreate
+## the DEB set.
+##
+update-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 update-debs:
+	rebuild=yes; \
+	debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_all\.deb') 2>/dev/null`; \
+	for f in $$debs; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
+	if ":$$rebuild" = :yes; then \
+		$(ECHO) "Updating $$f in `pwd`"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
+	fi; \
+	targets="$(ARCH) $(AM_DEBTARGETS)"; for t in $$targets; do \
+		test "$$t" = 'noarch' -o "$$t" = 'all' && continue; \
+		rebuild=yes; \
+		debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_$$t\..*deb') 2>/dev/null`; \
+		for f in $$debs; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
+		if ":$$rebuild" = :yes; then \
+			$(ECHO) "Updating $$f in `pwd`"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" lis-deb lfs-deb one-deb|| :; \
+		fi; \
+		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			rebuild=yes; \
+			debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_$(krelease)_$$t\..*deb') 2>/dev/null`; \
+			for f in $$debs; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
+			if ":$$rebuild" = :yes; then \
+				$(ECHO) "Updating $$f in `pwd`"; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
+				$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" lis-deb lfs-deb one-deb || :; \
+			fi; \
+		done; \
+	done
+
 
 ##
 ## Provide updates to debian source package signatures.
-update-csig:
-
-##
-## Provide updates to debian binary package signatures.
 ##
 update-sigs:
+	@list="$(debtop_sig_file)"; for f in $$list; do \
+		s=`echo $$f | sed -r -e 's|\.dsc(\.sig)?$$|.dsc.sig|'`; \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+			$(ECHO) "rm -f -- \"$$f\" \"$$s\""; rm -f -- "$$f" "$$s"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\" \"$$s\""; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f" "$$s"; \
+		fi; \
+	done
+
+## Provide updates to debian binary package signatures.
+##
+update-csig:
+	@list="$(debtop_change_files)"; for f in $$list; do \
+		s=`echo $$f | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'`; \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+			$(ECHO) "rm -f -- \"$$f\" \"$$s\""; rm -f -- "$$f" "$$s"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\" \"$$s\""; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f" "$$s"; \
+		fi; \
+	done
 
 MY_PHONY		+= update-dscs update-debs update-csig update-sigs
 ALL_RECURSIVE_TARGETS	+= all-update-dscs all-update-debs all-update-chgs all-update-csig all-update-sigs
@@ -458,6 +519,11 @@ RELEASE_SIGN		+= repo-sign-apt
 RELEASE_CLEAN_LOCAL	+= repo-clean-apt
 RELEASECLEANFILES	+= $(apt_files)
 
+UPDATE			+= repo-apt
+UPDATE_SIGN		+= repo-sign-apt
+UPDATE_CLEAN_LOCAL	+= repo-apt repo-sign-apt
+UPDATECLEANFILES	+=
+
 endif
 ## BUILD_REPO_APT
 
@@ -477,6 +543,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.96  2008/09/21 22:16:30  brian
+## - more update target work
+##
 ## Revision 0.9.2.95  2008-09-21 13:50:06  brian
 ## - updating update targets
 ##

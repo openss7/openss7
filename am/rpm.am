@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2008-09-21 13:50:06 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.120 $) $Date: 2008/09/21 22:16:30 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 13:50:06 $ by $Author: brian $
+## Last Modified $Date: 2008/09/21 22:16:30 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -321,8 +321,11 @@ all-rpms:    ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 #!
 sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
-		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $<"; \
-		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $< || :; \
+		user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $<"; \
+		eval "$$pass $(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $<" || :; \
 	fi
 
 ##
@@ -346,7 +349,7 @@ rebuild:
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm"; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :; \
 	fi; \
-	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; for t in $$targets;  do \
+	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; for t in $$targets; do \
 		rpms="`find $(rpmdir)/$$t -name '$(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`"; \
 		if test -z "$$rpms" -o -n '$(FORCE)'; then \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
@@ -354,13 +357,12 @@ rebuild:
 		fi; \
 		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; for k in $$kernels; do \
 			k=`basename $$k`; \
-			if test -f $(DESTDIR)/lib/modules/$$k/build/Makefile; then \
-				ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
-				rpms="`find $(rpmdir)/$$t -name 'kmod-$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`"; \
-				if test -z "$$rpms" -o -n '$(FORCE)'; then \
-					$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
-					$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
-				fi; \
+			test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; \
+			ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			rpms="`find $(rpmdir)/$$t -name 'kmod-$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`"; \
+			if test -z "$$rpms" -o -n '$(FORCE)'; then \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
 			fi; \
 		done; \
 	done
@@ -392,8 +394,11 @@ resign: sign
 		fi; \
 	done; \
 	if test ":$$unsigned_rpms" != :; then \
-		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms"; \
-		$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) -- $$unsigned_rpms; \
+		user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$unsigned_rpms"; \
+		eval "$$pass $(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$unsigned_rpms"; \
 	fi
 
 if BUILD_SRPMS
@@ -481,22 +486,114 @@ UPDATECLEANFILES	+= $(rpm_cache_files) \
 ##
 ## Provide updates to srpm packages.
 ##
+## If the SRPM does not exist, create it.  If the SRPM exists, was created after
+## the update stamp, and force is applied, remove and recreate the SRPM.
+##
 update-srpm:
+	for f in '$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file)'; do \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+			$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f"; \
+		fi; \
+	done
+
 
 ##
 ## Provide updates to rpm packages.
 ##
+## If the RPMs in the set do not exist, create them.  If the RPMs in the set
+## exist, were created after the update stamp, and force is applied, recreate
+## the RPM set.
+##
+update-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 update-rpms:
+	rebuild=yes; \
+	rpms=`find $(rpmdir)/noarch -name '$(rpm_binary_file)' 2>/dev/null`; \
+	for f in $$rpms; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
+	if ":$$rebuild" = :yes; then \
+		$(ECHO) "Updating $$f in `pwd`"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"noarch\" noa-rpm"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="noarch" noa-rpm || :; \
+	fi; \
+	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; for t in $$targets; do \
+		rebuild=yes; \
+		rpms=`find $(rpmdir)/$$t -name '$(rpm_binary_file)' 2>/dev/null`; \
+		for f in $$rpms; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
+		if ":$$rebuild" = :yes; then \
+			$(ECHO) "Updating $$f in `pwd`"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
+			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
+		fi; \
+		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			rebuild=yes; \
+			rpms="`find $(rpmdir)/$$t -name '*$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$t'.rpm' 2>/dev/null`"; \
+			for f in $$rpms; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
+			if ":$$rebuild" = :yes; then \
+				$(ECHO) "Updating $$f in `pwd`"; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_tools --without-tools\"' kversion=\"$$k\" RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
+				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_tools --without-tools"' kversion="$$k" RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
+			fi; \
+		done; \
+	done
 
 ##
 ## Provide updates to srpm signatures
 ##
+## If the SRPM signature does not exist, create it.  If the SRPM signature
+## exists, was created after the update stamp, and force is applied, resign the
+## SRPM.  Care must be taken when signing SRPMs to restore the original
+## file times.
+##
 update-sign-srpm:
+	@list="$(rpm_src_file) $(rpm_link_file)"; for f in $$list; do \
+		if test ! -e "$$f"; then \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-srpm"; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-srpm; \
+		fi; test -e "$$f" || continue; \
+		resign=yes; \
+		if ! $(RPM) -K -- "$$f" 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then resign=no; fi; \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then resign=no; fi; \
+		if test ":$$resign" = :yes; then \
+			user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
+			home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
+			pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
+			$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$f"; \
+			eval "$$pass $(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$f" || :; \
+		fi; \
+	done
 
 ##
 ## Provide updates to rpm signatures
 ##
+## If the RPM signatures do not exist, create them.  If the RPM signatures
+## exist, were created after the update stamp, and force is applied, resign the
+## RPMs.  Care must be taken when signing RPMs to restore the original file
+## times.
+##
 update-sign-rpms:
+	@rpms=`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
+	if test -z "$$rpms"; then \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms; \
+		rpms=`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
+	fi; if test -z "$$rpms"; then exit 0; fi; \
+	rpms_to_sign=; \
+	for f in $$rpms; do \
+		resign=yes; \
+		if ! $(RPM) -K -- "$$f" 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then resign=no; fi; \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then resign=no; fi; \
+		if test ":$$resign" = :yes; then rpms_to_sign="${rpms_to_sign:+$rpms_to_sign }$$f"; fi; \
+	done; \
+	if test -n "$$rpms_to_sign"; then \
+		user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$rpms_to_sign"; \
+		eval "$$pass $(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$rpms_to_sign" || :; \
+	fi
 
 MY_PHONY		+= update-srpm update-rpms update-sign-srpm update-sign-rpms
 ALL_RECURSIVE_TARGETS	+= all-update-srpm all-update-rpms all-update-sign-srpm all-update-sign-rpms
@@ -570,6 +667,11 @@ RELEASE			+= repo-yum
 RELEASE_SIGN		+= repo-sign-yum
 RELEASE_CLEAN_LOCAL	+= repo-clean-yum
 RELEASECLEANFILES	+= $(repomd_files) $(repomd_group)
+
+UPDATE			+= repo-yum
+UPDATE_SIGN		+= repo-sign-yum
+UPDATE_CLEAN_FILES	+= repo-yum repo-sign-yum
+UPDATECLEANFILES	+=
 
 endif
 ## BUILD_REPO_YUM
@@ -688,6 +790,11 @@ RELEASE_SIGN		+= repo-sign-yast
 RELEASE_CLEAN_LOCAL	+= repo-clean-yast
 RELEASECLEANFILES	+= $(yast_meta_files) $(yast_desc_files)
 
+UPDATE			+= repo-yast
+UPDATE_SIGN		+= repo-sign-yast
+UPDATE_CLEAN_LOCAL	+= repo-yast repo-sign-yast
+UPDATECLEANFILES	+=
+
 endif
 ## BUILD_REPO_YAST
 
@@ -706,6 +813,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.120  2008/09/21 22:16:30  brian
+## - more update target work
+##
 ## Revision 0.9.2.119  2008-09-21 13:50:06  brian
 ## - updating update targets
 ##
