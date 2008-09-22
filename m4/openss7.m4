@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2008-09-22 17:47:19 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-09-22 21:22:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:47:19 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 21:22:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -632,7 +632,12 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_PATCHLEVEL], [dnl
     AC_DEFINE_UNQUOTED([PACKAGE_PATCHLEVEL], ["$PACKAGE_PATCHLEVEL"], [The
 	Package Patch Level.  This defaults to null.])
     if test -n "$PACKAGE_PATCHLEVEL"; then
-	PACKAGE_RELEASE=$((PACKAGE_RELEASE-1))
+	# drop the release number for patches
+	if echo "$PACKAGE_RELEASE" | egrep '^[0-9][0-9]*$' >/dev/null 2>&1; then
+	    PACKAGE_RELEASE=$((PACKAGE_RELEASE-1))
+	else
+	    PACKAGE_RELEASE=`echo $PACKAGE_RELEASE | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,0ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy,'`
+	fi
     fi
 ])# _OPENSS7_OPTIONS_PKG_PATCHLEVEL
 # =========================================================================
@@ -997,6 +1002,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.73  2008-09-22 21:22:14  brian
+# - handle character release numbers
+#
 # Revision 0.9.2.72  2008-09-22 17:47:19  brian
 # - decrement package release when patching
 #
