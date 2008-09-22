@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008/07/29 02:14:09 $
+# @(#) $RCSfile: man.am,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2008/09/22 03:48:04 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/07/29 02:14:09 $ by $Author: brian $
+## Last Modified $Date: 2008/09/22 03:48:04 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -132,19 +132,19 @@ $(man9_MANS):: %.9: %.man $(man_MACROS)
 all-manmacros:
 
 install-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 uninstall-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 clean-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 distclean-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 maintainer-clean-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 ## COOKED_MANPAGES
 else
@@ -228,7 +228,7 @@ all-manmacros:
 # file in the mandir to be referenced by the uncooked manual pages.
 ##
 install-manmacros: $(man_MACROS)
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(mandir)
 	@list="$(man_MACROS)" ; for f in $$list ; do \
@@ -238,7 +238,7 @@ install-manmacros: $(man_MACROS)
 	done
 
 uninstall-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).macros
 	rm -f -- $(DESTDIR)$(mandir)/$(MANMACRO_PFX).refs
@@ -249,7 +249,7 @@ uninstall-manmacros:
 # the srcdir and the builddir are different before removing.
 ##
 clean-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@if test "`(cd $(srcdir); pwd)`" != "`pwd`" ; then \
 		macros='$(man_MACROS)' ; for macro in $$macros ; do \
 			$(ECHO) "rm -f -- $$macro" ;  \
@@ -258,10 +258,10 @@ clean-manmacros:
 	fi
 
 distclean-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 maintainer-clean-manmacros:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 ## ! COOKED_MANPAGES
 endif
@@ -273,16 +273,16 @@ all-manpages: $(man_MANS) $(man1_MANS) $(man2_MANS) $(man3_MANS) $(man4_MANS) \
 # This is handled by automake.
 ##
 install-manpages: install-man
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 ##
 # This is handled by automake.
 ##
 uninstall-manpages: uninstall-man
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 clean-manpages:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@if test -n "$(man_MANS)" ; then \
 		$(ECHO) "rm -f -- $(man_MANS)" ; \
 		rm -f -- $(man_MANS) ; \
@@ -325,10 +325,10 @@ clean-manpages:
 	fi ;
 
 distclean-manpages:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 maintainer-clean-manpages:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 ALL_LOCAL		+= all-manmacros all-manpages
 
@@ -628,6 +628,9 @@ EXTRA_DIST		+= \
 ## =============================================================================
 ##
 ## $Log: man.am,v $
+## Revision 0.9.2.67  2008/09/22 03:48:04  brian
+## - mark our debugs as such
+##
 ## Revision 0.9.2.66  2008/07/29 02:14:09  brian
 ## - more lzma compression additions
 ##

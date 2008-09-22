@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: snmp.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/09/22 03:48:05 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008/09/22 03:48:05 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -67,7 +67,7 @@ if RPM_BUILD_USER
 
 
 install-snmp: src/util/sysconfig/snmp
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/snmp/snmp.d
 	$(INSTALL_DATA) $< $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)$(PACKAGE_LCNAME)
@@ -99,7 +99,7 @@ install-snmp: src/util/sysconfig/snmp
 ##
 
 post-snmp:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@snmp_dir=$(DESTDIR)$(sysconfdir)/snmp ; \
 	if test ! -f $$snmp_dir/snmpd.conf ; then \
 		test -f $$snmp_dir/../snmpd.conf || exit 0 ; ( \
@@ -191,7 +191,7 @@ post-snmp:
 	killall -HUP snmpd || : ;
 
 uninstall-snmp:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)$(sysconfdir)/snmp/snmp.d/$(SNMPORDER)$(PACKAGE_LCNAME)
 
@@ -225,6 +225,9 @@ EXTRA_DIST		+= src/util/sysconfig/snmp
 ## =============================================================================
 ##
 ## $Log: snmp.am,v $
+## Revision 0.9.2.4  2008/09/22 03:48:05  brian
+## - mark our debugs as such
+##
 ## Revision 0.9.2.3  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##

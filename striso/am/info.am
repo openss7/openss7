@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.61 $) $Date: 2008-09-01 07:15:53 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008/09/22 03:48:04 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-01 07:15:53 $ by $Author: brian $
+## Last Modified $Date: 2008/09/22 03:48:04 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -113,7 +113,7 @@ endif
 endif
 
 txts-am:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@txts="$(FIG_TXTS) $(PNG_TXTS) $(PS_TXTS)" ; for i in $$txts ; do \
 		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
 			if test -f $(srcdir)/$$i ; then \
@@ -149,7 +149,7 @@ endif
 endif
 
 pngs-am:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
 		if test ! -f $$i -o $(srcdir)/$$i -nt $$i ; then \
 			if test -f $(srcdir)/$$i ; then \
@@ -273,7 +273,7 @@ texi/args.texi:
 	fi
 
 clean-figs:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@ figs="$(FIG_FIGS)" ; for i in $$figs ; do \
 		d=`$(ECHO) $$i | sed -e 's|\.fig||'` ; \
 		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
@@ -281,7 +281,7 @@ clean-figs:
 	done
 
 clean-tbls:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@ tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
 		d=`$(ECHO) $$i | sed -e 's|\.tbl||'` ; \
 		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
@@ -289,7 +289,7 @@ clean-tbls:
 	done
 
 clean-pngs:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@ pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
 		d=`$(ECHO) $$i | sed -e 's|\.png||'` ; \
 		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
@@ -297,7 +297,7 @@ clean-pngs:
 	done
 
 clean-pss:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@ pss="$(PS_PSS)" ; for i in $$pss ; do \
 		d=`$(ECHO) $$i | sed -e 's|\.ps||'` ; \
 		$(ECHO) "rm -f -- $$d.ps $$d.eps $$d.png $$d.jpg $$d.txt $$d.pdf" ; \
@@ -305,29 +305,29 @@ clean-pss:
 	done
 
 clean-texi:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@ if test -L texi ; then \
 		$(ECHO) "rm -f -- texi" ; \
 		rm -f -- texi ; \
 	fi
 
 distclean-figs:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 distclean-tbls:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 distclean-pngs:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 distclean-pss:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 distclean-texi:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 maintainer-clean-figs:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@figs="$(FIG_FIGS)" ; for i in $$figs ; do \
 		f=`$(ECHO) "$(srcdir)/$$i" | sed -e 's|\.fig$$||'` ; \
 		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
@@ -335,7 +335,7 @@ maintainer-clean-figs:
 	done
 
 maintainer-clean-tbls:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@tbls="$(TBL_TBLS)" ; for i in $$tbls ; do \
 		f=`$(ECHO) "$(srcdir)/$$i" | sed -e 's|\.tbl$$||'` ; \
 		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
@@ -343,7 +343,7 @@ maintainer-clean-tbls:
 	done
 
 maintainer-clean-pngs:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@pngs="$(PNG_PNGS)" ; for i in $$pngs ; do \
 		f=`$(ECHO) "$(srcdir)$$i" | sed -e 's|\.png$$||'` ; \
 		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.jpg $$f.pdf" ; \
@@ -351,7 +351,7 @@ maintainer-clean-pngs:
 	done
 
 maintainer-clean-pss:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@pss="$(PS_PSS)" ; for i in $$pss ; do \
 		f=`$(ECHO) "$(srcdir)/$$i" | sed -e 's|\.ps$$||'` ; \
 		$(ECHO) "rm -f -- $$f.ps $$f.eps $$f.png $$f.jpg $$f.txt $$f.pdf" ; \
@@ -359,7 +359,7 @@ maintainer-clean-pss:
 	done
 
 maintainer-clean-texi:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 install-pngs: $(IMG_PNGS)
 	@$(NORMAL_INSTALL)
@@ -418,6 +418,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 0.9.2.62  2008/09/22 03:48:04  brian
+## - mark our debugs as such
+##
 ## Revision 0.9.2.61  2008-09-01 07:15:53  brian
 ## - cannot rely on am__strip_dir being defined
 ##

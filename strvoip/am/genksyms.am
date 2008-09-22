@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: genksyms.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.45 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008/09/22 07:45:25 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008/09/22 07:45:25 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -184,7 +184,7 @@ clean-verfiles:
 CLEAN_LOCAL		+= clean-verfiles
 
 stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS)
-	@test -n '$(PKG_LDS)' && pkg_lds='-q -T $(PKG_LDS)' ; \
+	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
 	list="$?" ; for obj in $$list ; do \
 		test :$$obj != :stamp-verfiles || continue ; \
 		if $(OBJDUMP) -h $$obj | grep -q __ksymtab; then \
@@ -354,7 +354,7 @@ BUILD_SPECIFIC_FILES = $(AUTOCONFIG_H) $(MODVERSIONS_H)
 endif
 
 stamp-verobjs: $(KERNEL_OBJECTS)
-	@test -n '$(PKG_LDS)' && pkg_lds='-q -T $(PKG_LDS)' ; \
+	@test -z '$(PKG_LDS)' || pkg_lds='-q -T $(PKG_LDS)' ; \
 	list="$?" ; for obj in $$list ; do \
 		a=`$(ECHO) "$$obj" | sed -e 's|^lib.*_a-|$(kpre)|'` ; \
 		$(ECHO) "$(LD) -r -o a.$$$$.out $$pkg_lds $$obj && mv -f -- a.$$$$.out $$a" ; \
@@ -365,7 +365,7 @@ stamp-verobjs: $(KERNEL_OBJECTS)
 ALL_LOCAL		+= stamp-verobjs
 
 clean-verobjs:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@objs=`$(ECHO) " $(KERNEL_OBJECTS) " | sed -e 's| *  | |g;s| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
 	$(ECHO) "rm -f -- stamp-verobjs $$objs" ; \
 	rm -f -- stamp-verobjs $$objs
@@ -373,13 +373,13 @@ clean-verobjs:
 CLEAN_LOCAL		+= clean-verobjs
 
 clean-ksyms:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 ##
 # Remove the stamp file autoconf doesn't know about.
 ##
 distclean-ksyms:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@if test -n "$(AUTOCONFIG_H)" ; then \
 		p=`$(ECHO) "$(AUTOCONFIG_H)" | sed -e 's|[^/]*$$||'` ; \
 		if test -d "$$p" ; then \
@@ -389,10 +389,10 @@ distclean-ksyms:
 	rm -f -- $(BUILD_SPECIFIC_FILES)
 
 maintainer-clean-ksyms:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 install-ksyms: $(BUILD_SPECIFIC_FILES)
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	test -z "$(pkgincludedir)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)"
 	test -z "$(kversion)" || $(mkdir_p) "$(DESTDIR)$(pkgincludedir)/$(kversion)"
@@ -410,10 +410,10 @@ install-ksyms: $(BUILD_SPECIFIC_FILES)
 	done
 
 post-ksyms:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 uninstall-ksyms:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
 	@pkgstrip=`$(ECHO) "sys/$(PACKAGE_TARNAME)" | sed 's|.|.|g'`; \
 	dirstrip=`$(ECHO) "$(PKGINCL)" | sed "s|^$$pkgstrip||"`; \
@@ -428,7 +428,7 @@ uninstall-ksyms:
 	done
 
 postun-ksyms:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 
 ksyms-all: $(BUILD_SPECIFIC_FILES)
 
@@ -460,6 +460,12 @@ endif
 ## =============================================================================
 ##
 ## $Log: genksyms.am,v $
+## Revision 0.9.2.47  2008/09/22 07:45:25  brian
+## - corrections to logic
+##
+## Revision 0.9.2.46  2008/09/22 03:48:03  brian
+## - mark our debugs as such
+##
 ## Revision 0.9.2.45  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##

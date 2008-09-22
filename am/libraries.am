@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-04-28 09:30:19 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008/09/22 07:45:25 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-04-28 09:30:19 $ by $Author: brian $
+## Last Modified $Date: 2008/09/22 07:45:25 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -64,10 +64,10 @@ if RPM_BUILD_USER
 # removed.
 ##
 pre-libraries:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@l=`basename $(libdir)` ; \
 	for dir in /$$l /usr/$$l /usr/local/$$l ; do \
-		test "$$dir" -ef "$(libdir)" && continue ; \
+		test ! \( "$$dir" -ef "$(libdir)" \) || continue ; \
 		libs='$(lib_LTLIBRARIES)' ; for lib in $$libs ; do \
 			lib=`echo $$lib | sed -e 's|^.*/||;s|\.la$$||'` ; \
 			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.*" ; \
@@ -78,7 +78,7 @@ pre-libraries:
 if WITH_32BIT_LIBS
 	@l=`basename $(lib32dir)` ; 
 	for dir in /$$l /usr/local/$$l /usr/local/$$l ; do \
-		test "$$dir" -ef "$(lib32dir)" && continue ; \
+		test ! \( "$$dir" -ef "$(lib32dir)" \) || continue ; \
 		libs='$(lib32_LTLIBRARIES)' ; for lib in $$libs ; do \
 			lib=`echo $$lib | sed -e 's|^.*/||;s|\.la$$||'` ; \
 			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.*" ; \
@@ -103,7 +103,7 @@ PRE_INSTALL_AM		+= pre-libraries
 # in a cross-build situation, therefore, we perform the "finish" action ourselves.
 ##
 post-libraries:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
 		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
@@ -123,7 +123,7 @@ POST_INSTALL_AM		+= post-libraries
 # in a cross-build situation, therefore, we perform the "unfinish" action ourselves.
 ##
 postun-libraries:
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
 		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
 		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
@@ -159,6 +159,12 @@ EXTRA_DIST		+= $(LIBRARY_VERSION_FILES)
 ## =============================================================================
 ##
 ## $Log: libraries.am,v $
+## Revision 0.9.2.30  2008/09/22 07:45:25  brian
+## - corrections to logic
+##
+## Revision 0.9.2.29  2008/09/22 03:48:04  brian
+## - mark our debugs as such
+##
 ## Revision 0.9.2.28  2008-04-28 09:30:19  brian
 ## - updated headers for release
 ##
