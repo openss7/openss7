@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008/09/21 11:27:12 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008/09/22 05:52:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/21 11:27:12 $ by $Author: brian $
+# Last Modified $Date: 2008/09/22 05:52:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -146,6 +146,7 @@ Corporation at a fee.  See http://www.openss7.com/
     _OPENSS7_OPTIONS_CFLAGS
     _OPENSS7_MISSING2
     _OPENSS7_MISSING3
+    _OPENSS7_UPDATE
     _OPENSS7_BESTZIP
     AC_SUBST([cross_compiling])dnl
 ])# _OPENSS7_PACKAGE
@@ -841,7 +842,7 @@ dnl	    CFLAGS="${CFLAGS:+$CFLAGS }-Wdisabled-optimization"
 AC_DEFUN([_OPENSS7_MISSING2], [dnl
     test x"${MISSING2+set}" = xset || MISSING2="\${SHELL} $am_aux_dir/missing2"
     if eval "$MISSING2 --run true" ; then
-	am_missing2_run="$MISSING2 --run "
+	am_missing2_run="$MISSING2 "
     else
 	am_missing2_run=
 	AC_MSG_WARN(['missing2' script is too old or missing])
@@ -903,7 +904,7 @@ AC_DEFUN([_OPENSS7_MISSING2], [dnl
 AC_DEFUN([_OPENSS7_MISSING3], [dnl
     test x"${MISSING3+set}" = xset || MISSING3="\${SHELL} $am_aux_dir/missing3"
     if eval "$MISSING3 --run true" ; then
-	am_missing3_run="$MISSING3 --run "
+	am_missing3_run="$MISSING3 "
     else
 	am_missing3_run=
 	AC_MSG_WARN(['missing3' script is too old or missing])
@@ -945,6 +946,18 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
 # =============================================================================
 
 # =============================================================================
+# _OPENSS7_UPDATE
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_UPDATE], [dnl
+    AC_CACHE_CHECK([for pkg update stamp], [pkg_cv_update_stamp], [dnl
+	pkg_cv_update_stamp="`pwd`/update-stamp"
+    ])
+    USTAMP="$pkg_cv_update_stamp"
+    AC_SUBST([USTAMP])dnl
+])# _OPENSS7_UPDATE
+# =============================================================================
+
+# =============================================================================
 # _OPENSS7_BESTZIP
 # -----------------------------------------------------------------------------
 # Building lzma archives is very, very, very slow.  Use this option to suppress
@@ -981,6 +994,12 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.71  2008/09/22 05:52:21  brian
+# - update stamping corrections
+#
+# Revision 0.9.2.70  2008/09/22 03:23:27  brian
+# - do not run program automatically
+#
 # Revision 0.9.2.69  2008/09/21 11:27:12  brian
 # - add patch level detection
 #

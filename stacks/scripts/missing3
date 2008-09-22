@@ -1,7 +1,7 @@
 #!/bin/sh
 # =============================================================================
 # 
-# @(#) $RCSfile: missing3,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008/09/21 08:45:58 $
+# @(#) $RCSfile: missing3,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008/09/22 07:52:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/21 08:45:58 $ by $Author: brian $
+# Last Modified $Date: 2008/09/22 07:52:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -181,7 +181,7 @@ esac
 
 program="$1" ; shift
 
-zeroarg=`which $program` ; test -n $zeroarg || zeroarg="$program"
+zeroarg=`which $program 2>/dev/null` ; test -n $zeroarg || zeroarg="$program"
 
 # Now exit if we have PROGRAM, but it failed.  Also exit now if we do not have
 # PROGRAM and --version, --help or --copyring was passed to PROGRAM (most likely
@@ -230,6 +230,7 @@ case $program in
 		;;
 	    (contents|release)
 		cat 1>&2 <<-EOF
+			*** 
 			*** WARNING: \`$program' is needed, and is $msg.
 			*** 
 			*** Most arguments can be emulated, but the \`$arg' argument
@@ -240,11 +241,13 @@ case $program in
 			*** you about the needed prerequisites for installing this package.  You
 			*** may also peek at any GNU archive sites, in case some other package
 			*** would contain the missing \`$program' program.
+			*** 
 			EOF
 		exit 1;
 		;;
 	    (generate|clean)
 		cat 1>&2 <<-EOF
+			*** 
 			*** WARNING: \`$program' is needed, and is $msg.
 			*** 
 			*** Most arguments can be emulated, but the \`$arg' argument
@@ -255,6 +258,7 @@ case $program in
 			*** you about the needed prerequisites for installing this package.  You
 			*** may also peek at any GNU archive sites, in case some other package
 			*** would contain the missing \`$program' program.
+			*** 
 			EOF
 		exit 1;
 		;;
@@ -266,6 +270,7 @@ case $program in
 		;;
 	esac
 	cat 1>&2 <<-EOF
+		*** 
 		*** WARNING: \`$program' is needed, and is $msg.
 		*** 
 		*** You might have modified some files without having the proper tools
@@ -273,11 +278,13 @@ case $program in
 		*** you about the needed prerequisites for installing this package.  You
 		*** may also peek at any GNU archive site, in case some other package
 		*** would contain this missing \`$program' program.
+		*** 
 		EOF
 	exit 1
 	;;
     (dpkg-scanpackages|dpkg-scansources)
 	cat 1>&2 <<-EOF
+		*** 
 		*** WARNING: \`$program' is needed, and is $msg.
 		*** 
 		*** It is straightforward to emulate \`$program'; however,
@@ -288,11 +295,13 @@ case $program in
 		*** you about the needed prerequisites for installing this package.  You
 		*** may also peek at any GNU archive site, in case some other package
 		*** would contain this missing \`$program' program.
+		*** 
 		EOF
 	exit 1
 	;;
     (dpkg|dpkg-deb)
 	cat 1>&2 <<-EOF
+		*** 
 		*** WARNING \`$program' is needed, and is $msg.
 		*** 
 		*** You might have modified some files without having the proper tools
@@ -300,9 +309,13 @@ case $program in
 		*** you about the needed prerequisites for installing this package.  You
 		*** may also peek at any GNU archive site, in case some other package
 		*** would contain this missing \`$program' program.
+		*** 
 		EOF
+	exit 1
+	;;
     (*)
 	cat 1>&2 <<-EOF
+		*** 
 		*** WARNING: \`$program' is needed, and is $msg.
 		*** 
 		*** You might have modified some files without having the proper tools
@@ -310,6 +323,7 @@ case $program in
 		*** you about the needed prerequisites for installing this package.  You
 		*** may also peek at any GNU archive site, in case some other package
 		*** would contain this missing \`$program' program.
+		*** 
 		EOF
 	exit 1
 	;;
@@ -321,6 +335,15 @@ exit 0
 # =============================================================================
 #
 # $Log: missing3,v $
+# Revision 0.9.2.5  2008/09/22 07:52:51  brian
+# - more spsace
+#
+# Revision 0.9.2.4  2008/09/22 07:50:15  brian
+# - correction
+#
+# Revision 0.9.2.3  2008/09/22 03:24:30  brian
+# - null error output from which
+#
 # Revision 0.9.2.2  2008/09/21 08:45:58  brian
 # - additions
 #

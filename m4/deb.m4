@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008/09/21 07:40:45 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-21 13:39:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/21 07:40:45 $ by $Author: brian $
+# Last Modified $Date: 2008-09-21 13:39:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -390,6 +390,7 @@ dnl the conditional confuses automake forcing extra config.status runs.
 dnl if test ":${DPKG_SOURCE:-no}" != :no -a ":${DPKG_BUILDPACKAGE:-no}" != :no ; then
 	AC_CONFIG_FILES([debian/rules
 			 debian/control
+			 debian/changelog
 			 debian/mscript_header
 			 debian/mscript_preinst
 			 debian/mscript_postinst
@@ -430,6 +431,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 0.9.2.29  2008-09-21 13:39:53  brian
+# - add patch level to debian changelog
+#
 # Revision 0.9.2.28  2008/09/21 07:40:45  brian
 # - add defaults to environment variables
 #

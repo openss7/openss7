@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.137 $) $Date: 2008-09-21 01:32:52 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2008/09/22 07:14:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 01:32:52 $ by $Author: brian $
+## Last Modified $Date: 2008/09/22 07:14:28 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -166,7 +166,7 @@ endif
 ## Like automake recursive targets, but mine.
 ##
 $(MY_RECURSIVE_TARGETS):
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
 	target=`$(ECHO) $@ | sed s/-recursive//`; \
 	list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -175,7 +175,7 @@ $(MY_RECURSIVE_TARGETS):
 	if test "$$dot_seen" = "no"; then list="$$list ."; fi; \
 	for subdir in $$list; do \
 		case " m4 intl po " in (*" $$subdir "*) continue ;; esac; \
-		$(ECHO) "Making $$target in $$subdir"; \
+		$(ECHO) "D: Making $$target in $$subdir"; \
 		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
 		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
@@ -190,7 +190,7 @@ MY_PHONY	+= $(MY_RECURSIVE_TARGETS)
 ## We also try to override uninstall-recursive.  Automake will probably complain violently.
 ##
 $(MY_REVERSIVE_TARGETS):
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; dot_seen=no; \
 	target=`$(ECHO) $@ | sed s/-recursive//`; \
 	list=''; rev='$(SUBDIRS)'; for subdir in $$rev; do \
@@ -202,7 +202,7 @@ $(MY_REVERSIVE_TARGETS):
 		case " m4 intl po " in (*" $$subdir "*) \
 			if test "$$target" = "remove"; then target='uninstall'; else continue; fi ;; \
 		esac; \
-		echo "Making $$target in $$subdir"; \
+		$(ECHO) "D: Making $$target in $$subdir"; \
 		if test "$$subdir" = "."; then local="$$target-am"; else local="$$target"; fi; \
 		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local)"; \
 		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$local) \
@@ -219,21 +219,21 @@ MY_PHONY	+= $(MY_REVERSIVE_TARGETS)
 ALL_RECURSIVE_TARGETS = all-check all-distcheck all-installcheck all-install
 
 ALL_EXPORT_OPTS =
-ALL_USTAMP_EXPT = USTAMP=`test -z '$(USTAMP)' && echo $$(pwd)/update-stamp || echo '$(USTAMP)'`
 
-$(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)' $(ALL_USTAMP_EXPT)
+$(ALL_RECURSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 $(ALL_RECURSIVE_TARGETS):
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
 	if test -z '$(subdirs)'; then \
+		$(ECHO) "D: Making $$target in `pwd`"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	else \
 		list='$(subdirs)'; \
 		for subdir in $$list; do \
 			if test "$$subdir" = "."; then continue; fi; \
-			$(ECHO) "Making $$target in $$subdir"; \
+			$(ECHO) "D: Making $$target in $$subdir"; \
 			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
 			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
 				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
@@ -249,12 +249,13 @@ MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
 ##
 ALL_REVERSIVE_TARGETS = all-uninstall
 
-$(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)' $(ALL_USTAMP_EXPT)
+$(ALL_REVERSIVE_TARGETS): ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 $(ALL_REVERSIVE_TARGETS):
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
 	if test -z '$(subdirs)'; then \
+		$(ECHO) "D: Making $$target in `pwd`"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	else \
@@ -263,7 +264,7 @@ $(ALL_REVERSIVE_TARGETS):
 		done; \
 		for subdir in $$list; do \
 			if test "$$subdir" = "."; then continue; fi; \
-			$(ECHO) "Making $$target in $$subdir"; \
+			$(ECHO) "D: Making $$target in $$subdir"; \
 			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
 			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
 				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
@@ -635,7 +636,7 @@ MY_PHONY		+= retest retest-am
 
 remove-am: uninstall-am
 
-remove: remove-recursive remove-am
+remove: remove-recursive
 
 MY_REVERSIVE_TARGETS	+= remove-recursive
 MY_PHONY		+= remove remove-am
@@ -742,20 +743,27 @@ FORCED_TARGETS		+= forced-release-sign
 #!     This target will remove all distribution files for the current package
 #!     from the package distribution directory.
 #!
-release-clean: release-clean-recursive release-clean-am
+release-clean: release-clean-recursive release-clean-local
 
-release-clean-local:
-	@$(ECHO) "Making $@ in `pwd`"
-	@targets="$(RELEASE_CLEAN_LOCAL)"; for target in $$targets; do \
+release-clean-am:
+	@$(ECHO) "D: Making $@ in `pwd`"
+	@targets="$(RELEASE_CLEAN_LOCAL)"; revers=; for t in $$targets; do \
+		revers="$$t$${reverse:+ $$reverse}"; \
+	done; \
+	for target in $$reverse; do \
+		$(ECHO) "D: Making $$target in `pwd`"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	done
 
-release-clean-am: release-clean-local
-	@$(ECHO) "Making $@ in `pwd`"
-	@if test -n "$(RELEASECLEANFILES)"; then \
-		$(ECHO) "rm -f -- $(RELEASECLEANFILES)"; \
-		rm -f -- $(RELEASECLEANFILES); \
+release-clean-local:
+	@$(ECHO) "D: Making $@ in `pwd`"
+	@list="$(RELEASECLEANFILES)"; reverse=; for f in $$list; do \
+		reverse="$$f$${reverse:+ $$reverse}"; \
+	done; \
+	if test -n "$$reverse"; then \
+		$(ECHO) "rm -f -- $$reverse"; \
+		rm -f -- $$reverse; \
 	fi
 
 MY_REVERSIVE_TARGETS	+= release-clean-recursive
@@ -776,6 +784,7 @@ $(UPDATE_DIRECTORIES)::
 #! the existing distribution.
 #!
 $(USTAMP)::
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@test ! -f $@ || exit 0
 	echo `date -uIseconds` > $@
 	touch $@
@@ -818,25 +827,29 @@ MY_PHONY		+= update-sign $(UPDATE_SIGN)
 #!     This target will remove all update files for the current package from the
 #!     package distribution directories.
 #!
-update-clean: update-clean-recursive update-clean-am
+update-clean: update-clean-recursive update-clean-local
 
-update-clean-local:
-	@$(ECHO) "Making $@ in `pwd`"
-	@targets="$(UPDATE_CLEAN_LOCAL)"; for target in $$targets; do \
+update-clean-am:
+	@$(ECHO) "D: Making $@ in `pwd`"
+	@targets="$(UPDATE_CLEAN_LOCAL)"; reverse=; for t in $$targets; do \
+		reverse="$$t$${reverse:+ $$reverse}"; \
+	done; \
+	for target in $$reverse; do \
+		$(ECHO) "D: Making $$target in `pwd`"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
 	done
 
-update-clean-am: update-clean-local
-	@$(ECHO) "Making $@ in `pwd`"
-	@list="$(UPDATECLEANFILES)"; newlist=update-stamp; for f in $$list; do \
+update-clean-local:
+	@$(ECHO) "D: Making $@ in `pwd`"
+	@list="$(UPDATECLEANFILES)"; reverse=; for f in $$list; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
-			newlist="$$f $$newlist"; \
+			reverse="$$f$${reverse:+ $$reverse}"; \
 		fi; \
 	done; \
-	if test -n "$$newlist"; then \
-		$(ECHO) "rm -f -- $$newlist"; \
-		rm -f -- $$newlist; \
+	if test -n "$$reverse"; then \
+		$(ECHO) "rm -f -- $$reverse"; \
+		rm -f -- $$reverse; \
 	fi
 
 MY_REVERSIVE_TARGETS 	+= update-clean-recursive
@@ -878,7 +891,7 @@ LOGGING_TARGETS = compile.log check.log install.log installcheck.log dist.log di
 #! If you want to add one, simply add it to LOGGING_TARGETS in Makefile.am
 #!
 $(LOGGING_TARGETS): FORCE
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@target=`echo "$@" | sed -e 's|\.log$$||;s|compile||'`; \
 	if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
 	{ $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target || \
@@ -886,7 +899,7 @@ $(LOGGING_TARGETS): FORCE
 	| tee $@
 
 configure.log: FORCE
-	@$(ECHO) "Making $@ in `pwd`"
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@if test -n '$(AP_AUTOPR)'; then sendpr='$(AP_AUTOPR)'; else sendpr='false'; fi; \
 	{ (cd $(top_builddir); ./config.status --recheck; ./config.status) || \
 	{ exec 1>/dev/stdout; $$sendpr --batch --config=$(AP_CONFIG) --target="$@"; }; } 2>&1 \
@@ -922,6 +935,18 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.141  2008/09/22 07:14:28  brian
+## - typo
+##
+## Revision 0.9.2.140  2008/09/22 07:13:18  brian
+## - corrections to reversive targets
+##
+## Revision 0.9.2.139  2008/09/22 05:52:20  brian
+## - update stamping corrections
+##
+## Revision 0.9.2.138  2008/09/22 03:48:04  brian
+## - mark our debugs as such
+##
 ## Revision 0.9.2.137  2008-09-21 01:32:52  brian
 ## - clean repo files
 ##

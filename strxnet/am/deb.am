@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.98 $) $Date: 2008-09-21 22:30:14 $
+# @(#) $RCSfile: deb.am,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2008/09/22 13:04:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-21 22:30:14 $ by $Author: brian $
+## Last Modified $Date: 2008/09/22 13:04:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -149,17 +149,19 @@ $(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
 #	(cd "$(debbuilddir)"; $(DPKG_SOURCE) -b -sn $(debian_dir))
 
 $(debtop_dsc_file) $(debtop_tar_file)::
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^$(debdir)/|$(debbuilddir)/|'`; \
-	test "$@" -ef "$$f" && exit 0; \
+	test ! \( "$@" -ef "$$f" \) || exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f; }; \
-	test "$@" -ef "$$f" && exit 0; \
+	test ! \( "$@" -ef "$$f" \) || exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
 		$(ECHO) "cp -f -- $$f $@"; \
 		cp -f -- $$f $@; }
 
 $(debtop_sig_file): $(debtop_dsc_file)
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@\
 	user="$(GNUPGUSER)"; user="$${user:+ -u $$user}"; \
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
@@ -194,6 +196,7 @@ AM_BINARY_TARGET = binary-arch
 # current target, we also build any defined AM_DEBTARGETS
 ##
 each-deb: $(debian_dir_stamp)
+	@$(ECHO) "D: Making $@ in `pwd`"
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
 	( cd $(debian_dir); DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
 #	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
@@ -218,6 +221,7 @@ noa-deb:
 	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--disable-arch' AM_BINARY_TARGET='binary-indep' each-deb
 
 chg-deb:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@if test "$(debdir)" != "$(debbuilddir)"; then \
 		list="$(debian_binary_files) $(debian_change_files)"; for f in $$list; do \
 			test -f $$f || continue; \
@@ -239,21 +243,22 @@ chg-deb:
 debs: noa-deb lis-deb lfs-deb one-deb chg-deb
 
 # Another sneaky trick
-all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
-all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-lfs-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-lis-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 
 #! csig:
 #!     This target signs the .dsc file.  You will be prompted for a password,
 #!     unless to specify it to make with the GNUPGPASS variable.
 #!
 csig:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@list="$(debtop_change_files)"; for f in $$list; do \
 		test -f $$f || continue; \
 		t=`echo $$f | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'`; \
@@ -278,26 +283,45 @@ csig:
 #!	to make.  This is a convenience target for building a group of debs on a
 #!	given build machine.
 #!
-reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 reupload:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@debs="`find $(debdir) -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_all.*deb' 2>/dev/null`"; \
 	if test -z "$$debs" -o -n '$(FORCE)'; then \
+		$(ECHO) "D: $@: rebuild noarch"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
 		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
+	else \
+		$(ECHO) "D: $@: skipped noarch"; \
 	fi; \
 	targets="$(ARCH) $(AM_DEBTARGETS)"; for t in $$targets;  do \
-		test "$$t" = 'noarch' -o "$$t" = 'all' && continue; \
-		debs="`find $(debdir)/binary-$$t -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_$$t.*deb' 2>/dev/null`"; \
+		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
+		debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_$$a.*deb' 2>/dev/null`"; \
 		if test -z "$$debs" -o -n '$(FORCE)'; then \
+			$(ECHO) "D: $@: rebuild $$a"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
 			$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" lis-deb lfs-deb one-deb|| :; \
+		else \
+			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
-		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; for k in $$kernels; do \
-			k=`basename $$k`; test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
-			debs="`find $(debdir)/binary-$$t -name '$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_$$t.*deb' 2>/dev/null`"; \
+		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; \
+			test -f $(DESTDIR)/lib/modules/$$k/build || continue; \
+			if test -z '$(DESTDIR)'; then \
+				if ! $(DPKG) -S /lib/modules/$$k/build >/dev/null 2>&1; then \
+					continue; \
+				fi; \
+			fi; \
+			ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_$$a.*deb' 2>/dev/null`"; \
 			if test -z "$$debs" -o -n '$(FORCE)'; then \
+				$(ECHO) "D: $@: rebuild $$k"; \
 				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
 				$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" lis-deb lfs-deb one-deb || :; \
+			else \
+				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
 	done; \
@@ -307,6 +331,7 @@ reupload:
 	fi
 
 distclean-deb:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	rm -rf $(debian_dir)
 
 DISTCLEAN_LOCAL		+= distclean-deb
@@ -335,6 +360,7 @@ MY_PHONY		+= dsc debs each-deb one-deb lis-deb lfs-deb noa-deb sigs csig reuploa
 ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-lis-deb all-lfs-deb all-noa-deb all-chg-deb all-sigs all-csig all-reupload
 
 update-clean-deb:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	rm -rf $(debian_dir)
 	@list="$(debtop_source_files) $(debtop_change_files) $(debtop_binary_files)"; \
 	for f in $$list; do \
@@ -361,7 +387,8 @@ UPDATECLEANFILES	+= $(debian_cache_files) \
 ## the update stamp, and force is applied, remove and recreate the DSC.
 ##
 update-dscs:
-	for f in "$(debtop_dsc_file)"; do \
+	@$(ECHO) "D: Making $@ in `pwd`"
+	@list="$(debtop_dsc_file)"; for f in $$list; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
 			g=`echo "$$f" | sed -e 's,^$(debdir),$(debian_dir),'`; \
 			$(ECHO) "rm -f -- \"$$f\" \"$$g\""; rm -f -- "$$f" "$$g"; \
@@ -377,49 +404,95 @@ update-dscs:
 ## exist, were created after the update stamp, and force is applied, recreate
 ## the DEB set.
 ##
-update-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' USTAMP='$(USTAMP)'
+update-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 update-debs:
-	rebuild=yes; \
+	@$(ECHO) "D: Making $@ in `pwd`"
+	@rebuild=yes; rebuilt=no; \
 	debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_all\.deb') 2>/dev/null`; \
-	for f in $$debs; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
-	if ":$$rebuild" = :yes; then \
-		$(ECHO) "Updating $$f in `pwd`"; \
+	for f in $$debs; do \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+			$(ECHO) "D: $@: leaving $$f"; \
+			rebuild=no; \
+		fi; \
+	done; \
+	if test ":$$rebuild" = :yes; then \
+		$(ECHO) "D: $@: rebuild noarch"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
 		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
+		rebuilt=yes; \
+	else \
+		$(ECHO) "D: $@: skipped noarch"; \
 	fi; \
-	targets="$(ARCH) $(AM_DEBTARGETS)"; for t in $$targets; do \
-		test "$$t" = 'noarch' -o "$$t" = 'all' && continue; \
+	targets="$(ARCH) $(AM_DEBTARGETS)"; \
+	for t in $$targets; do \
+		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
 		rebuild=yes; \
-		debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_$$t\..*deb') 2>/dev/null`; \
-		for f in $$debs; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
-		if ":$$rebuild" = :yes; then \
-			$(ECHO) "Updating $$f in `pwd`"; \
+		debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_$$a\..*deb') 2>/dev/null`; \
+		for f in $$debs; do \
+			if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+				$(ECHO) "D: $@: leaving $$f"; \
+				rebuild=no; \
+			fi; \
+		done; \
+		if test ":$$rebuild" = :yes; then \
+			$(ECHO) "D: $@: rebuild $$a"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
 			$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" lis-deb lfs-deb one-deb|| :; \
+			rebuilt=yes; \
+		else \
+			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
 		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
-			k=`basename $$k`; test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
+			k=`basename $$k`; \
+			test -f $(DESTDIR)/lib/modules/$$k/build/Makefile || continue; \
+			if test -z '$(DESTDIR)'; then \
+				if ! $(DPKG) -S /lib/modules/$$k/build >/dev/null 2>&1; then \
+					continue; \
+				fi; \
+			fi; \
+			ks=`echo $$k | sed -e 's,-,.,g;s,_,.,g'`; \
 			rebuild=yes; \
-			debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_$(krelease)_$$t\..*deb') 2>/dev/null`; \
-			for f in $$debs; do if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then rebuild=no; fi; done; \
-			if ":$$rebuild" = :yes; then \
-				$(ECHO) "Updating $$f in `pwd`"; \
+			debs=`(find $(debdir) -name '$(deb_binary_files)' | grep '_$(krelease)_$$a\..*deb') 2>/dev/null`; \
+			for f in $$debs; do \
+				if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+					$(ECHO) "D: $@: leaving $$f"; \
+					rebuild=no; \
+				fi; \
+			done; \
+			if test ":$$rebuild" = :yes; then \
+				$(ECHO) "D: $@: rebuild $$k"; \
 				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" lis-deb lfs-deb one-deb"; \
 				$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" lis-deb lfs-deb one-deb || :; \
+				rebuilt=yes; \
+			else \
+				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
-	done
+	done; \
+	if test ":$$rebuilt" = :yes; then \
+		$(ECHO) "D: $@: rebuild changes"; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb || :; \
+	else \
+		$(ECHO) "D: $@: skipped changes"; \
+	fi
 
 
 ##
 ## Provide updates to debian source package signatures.
 ##
 update-sigs:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@list="$(debtop_sig_file)"; for f in $$list; do \
 		s=`echo $$f | sed -r -e 's|\.dsc(\.sig)?$$|.dsc.sig|'`; \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+			$(ECHO) "D: $@: removed $$f"; \
+			$(ECHO) "D: $@: removed $$s"; \
 			$(ECHO) "rm -f -- \"$$f\" \"$$s\""; rm -f -- "$$f" "$$s"; \
+			$(ECHO) "D: $@: rebuild $$f"; \
+			$(ECHO) "D: $@: rebuild $$s"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\" \"$$s\""; \
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f" "$$s"; \
 		fi; \
@@ -428,16 +501,25 @@ update-sigs:
 ## Provide updates to debian binary package signatures.
 ##
 update-csig:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	@list="$(debtop_change_files)"; for f in $$list; do \
 		s=`echo $$f | sed -r -e 's|\.changes(\.asc)?$$|.changes.asc|'`; \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+			$(ECHO) "D: $@: removed $$f"; \
+			$(ECHO) "D: $@: removed $$s"; \
 			$(ECHO) "rm -f -- \"$$f\" \"$$s\""; rm -f -- "$$f" "$$s"; \
+			$(ECHO) "D: $@: rebuild $$f"; \
+			$(ECHO) "D: $@: rebuild $$s"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\" \"$$s\""; \
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f" "$$s"; \
 		fi; \
 	done
 
-MY_PHONY		+= update-dscs update-debs update-csig update-sigs
+## Provide updates to debian binary package changes.
+##
+update-chgs:
+
+MY_PHONY		+= update-dscs update-debs update-chgs update-csig update-sigs
 ALL_RECURSIVE_TARGETS	+= all-update-dscs all-update-debs all-update-chgs all-update-csig all-update-sigs
 
 if BUILD_REPO_APT
@@ -473,24 +555,31 @@ apt_files		= $(apt_nonrel_files) \
 #! apt source repository meta data files.
 #!
 $(aptdir)/Packages:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	$(APT_FTPARCHIVE) packages $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Sources:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	$(APT_FTPARCHIVE) sources $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Contents:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	$(APT_FTPARCHIVE) contents $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Packages.gz $(aptdir)/Sources.gz $(aptdir)/Contents.gz $(aptdir)/Release.gz: %.gz : %
+	@$(ECHO) "D: Making $@ in `pwd`"
 	cat $< | gzip -c > $@
 
 $(aptdir)/Packages.bz2 $(aptdir)/Sources.bz2 $(aptdir)/Contents.bz2 $(aptdir)/Release.bz2: %.bz2 : %
+	@$(ECHO) "D: Making $@ in `pwd`"
 	cat $< | bzip2 -c > $@
 
 $(aptdir)/md5sum.txt:
+	@$(ECHO) "D: Making $@ in `pwd`"
 	find $(aptdir) -type f | egrep -v '(md5sum.txt|Release.gz)' | xargs $(MD5SUM) | sed -e 's, $(aptdir)/, ,' > $@
 
 $(aptdir)/Release: $(apt_nonrel_files)
+	@$(ECHO) "D: Making $@ in `pwd`"
 	$(APT_FTPARCHIVE) release $(aptdir) | sed -e 's, $(aptdir)/, ,' > $@
 
 #! repo-apt:
@@ -543,6 +632,27 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.105  2008/09/22 13:04:11  brian
+## - more additions and corrections
+##
+## Revision 0.9.2.104  2008/09/22 12:59:27  brian
+## - additions and corrections, more debugging
+##
+## Revision 0.9.2.103  2008/09/22 07:45:25  brian
+## - corrections to logic
+##
+## Revision 0.9.2.102  2008/09/22 05:52:20  brian
+## - update stamping corrections
+##
+## Revision 0.9.2.101  2008-09-22 00:41:01  brian
+## - add missing update changes target
+##
+## Revision 0.9.2.100  2008/09/21 22:54:21  brian
+## - correction
+##
+## Revision 0.9.2.99  2008-09-21 22:38:07  brian
+## - more corrections
+##
 ## Revision 0.9.2.98  2008-09-21 22:30:14  brian
 ## - update adjustments
 ##
