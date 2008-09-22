@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2008-04-29 08:33:12 $
+ @(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.15 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:12 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtdrv.c,v $
+ Revision 1.1.1.3.4.15  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 1.1.1.3.4.14  2008-04-29 08:33:12  brian
  - update headers for Affero release
 
- Revision 1.1.1.3.4.13  2007/08/15 04:58:03  brian
- - GPLv3 updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2008-04-29 08:33:12 $"
+#ident "@(#) $RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.15 $) $Date: 2008-09-22 20:30:53 $"
 
-static char const ident[] = "$RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2008-04-29 08:33:12 $";
+static char const ident[] = "$RCSfile: mtdrv.c,v $ $Name:  $($Revision: 1.1.1.3.4.15 $) $Date: 2008-09-22 20:30:53 $";
 
 /************************************************************************
 *                     Multi-Threaded Test Driver                        *
@@ -456,6 +456,10 @@ MODULE_DESCRIPTION("multi-threaded open test helper driver");
 #endif
 #if defined(MODULE_ALIAS)
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 
 #endif

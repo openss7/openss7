@@ -1,3 +1,19 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/aixcompat.c: add mod version, truncate logs
+	* src/kernel/hpuxcompat.c: add mod version, truncate logs
+	* src/kernel/irixcompat.c: add mod version, truncate logs
+	* src/kernel/lfscompat.c: add mod version, truncate logs
+	* src/kernel/liscompat.c: add mod version, truncate logs
+	* src/kernel/maccompat.c: add mod version, truncate logs
+	* src/kernel/mpscompat.c: add mod version, truncate logs
+	* src/kernel/os7compat.c: add mod version, truncate logs
+	* src/kernel/osfcompat.c: add mod version, truncate logs
+	* src/kernel/suncompat.c: add mod version, truncate logs
+	* src/kernel/svr3compat.c: add mod version, truncate logs
+	* src/kernel/svr4compat.c: add mod version, truncate logs
+	* src/kernel/uw7compat.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strcompat.spec.in: much improved spec files ready for repo building

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-20 11:13:17 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-20 11:13:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.54  2008-09-22 20:31:25  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.53  2008-09-20 11:13:17  brian
  - added patch level
 
@@ -60,120 +63,12 @@
  Revision 0.9.2.51  2008-04-29 07:11:19  brian
  - updating headers for release
 
- Revision 0.9.2.50  2007/12/15 20:19:16  brian
- - updates
-
- Revision 0.9.2.49  2007/10/15 17:17:19  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.48  2007/09/06 11:16:20  brian
- - testing updates
-
- Revision 0.9.2.47  2007/08/19 11:56:00  brian
- - move stdbool.h, obviate need for YFLAGS, general workup
-
- Revision 0.9.2.46  2007/08/15 05:20:53  brian
- - GPLv3 updates
-
- Revision 0.9.2.45  2007/08/12 16:20:36  brian
- - new PPA handling
-
- Revision 0.9.2.44  2007/07/22 01:10:16  brian
- - corrections for RHAS4 irq_handler_t and XEN paddr_t
-
- Revision 0.9.2.43  2007/07/14 01:35:23  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.42  2007/06/20 07:53:24  brian
- - updates for Fedora 7 and 2.6.21
-
- Revision 0.9.2.41  2007/06/20 06:52:02  brian
- - updates for Fedora 7 and 2.6.21 kernel
-
- Revision 0.9.2.40  2007/05/18 00:01:19  brian
- - check for nf_reset
-
- Revision 0.9.2.39  2007/03/25 19:00:41  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.38  2007/03/25 05:59:59  brian
- - flush corrections
-
- Revision 0.9.2.37  2007/03/25 00:52:21  brian
- - synchronization updates
-
- Revision 0.9.2.36  2007/03/14 05:39:22  brian
- - corrected support for older Dallas chips
-
- Revision 0.9.2.35  2007/03/13 19:12:22  brian
- - add support for DS2156 chip
-
- Revision 0.9.2.34  2007/03/13 11:29:16  brian
- - remove extraneous newlines
-
- Revision 0.9.2.33  2007/03/13 08:50:04  brian
- - bug fixes for PR x400p-ss7/5766
-
- Revision 0.9.2.32  2007/03/13 05:46:00  brian
- - more info
-
- Revision 0.9.2.31  2007/03/09 04:09:33  brian
- - fixed timer bug in x400p driver
-
- Revision 0.9.2.30  2006/12/21 11:14:43  brian
- - documentation updates for release, and moved tali
-
- Revision 0.9.2.29  2006/12/18 10:51:27  brian
- - subpackaging changes for release
-
- Revision 0.9.2.28  2006/12/11 22:02:51  brian
- - performance tuning
-
- Revision 0.9.2.27  2006/12/11 11:57:40  brian
- - T1 works correctly, almost all test cases pass
-
- Revision 0.9.2.26  2006/12/11 07:40:12  brian
- - corrections from testing
-
- Revision 0.9.2.25  2006/12/09 10:40:24  brian
- - corrections from testing
-
- Revision 0.9.2.24  2006/12/08 12:16:13  brian
- - bufq lock correction
-
- Revision 0.9.2.23  2006/12/08 11:46:32  brian
- - a few more corrections from testing
-
- Revision 0.9.2.22  2006/12/08 05:32:09  brian
- - changes from testing of X400P-SS7 driver
-
- Revision 0.9.2.21  2006/12/07 12:56:17  brian
- - corrections from testing
-
- Revision 0.9.2.20  2006/12/07 09:58:39  brian
- - corrections and init scripts
-
- Revision 0.9.2.19  2006/12/06 11:45:22  brian
- - updated X400P driver and test suites
-
- Revision 0.9.2.18  2006/11/15 08:58:54  brian
- - error in sdl rx found by inspection
-
- Revision 0.9.2.17  2006/05/08 11:01:17  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.16  2006/03/07 01:14:58  brian
- - binary compatible callouts
-
- Revision 0.9.2.15  2006/03/04 13:00:27  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-20 11:13:17 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-20 11:13:17 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -225,7 +120,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-20 11:13:17 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-09-22 20:31:25 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:10:51 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:51 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_hdlc.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:06  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-04-29 07:10:51  brian
  - updating headers for release
 
- Revision 0.9.2.17  2007/08/15 05:18:21  brian
- - GPLv3 updates
-
- Revision 0.9.2.16  2007/08/14 12:17:22  brian
- - GPLv3 header updates
-
- Revision 0.9.2.15  2007/07/14 01:33:53  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.14  2007/03/25 18:59:14  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.13  2007/03/25 02:22:35  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.12  2007/03/25 00:51:15  brian
- - synchronization updates
-
- Revision 0.9.2.11  2006/03/07 01:07:14  brian
- - binary compatible callouts
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:10:51 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:06 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:10:51 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:06 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -108,7 +90,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:10:51 $"
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:06 $"
 #define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
 #define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -130,6 +112,10 @@ MODULE_LICENSE(CD_HDLC_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-cd_hdlc");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:10 $
+ @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdtmux.c,v $
+ Revision 0.9.2.13  2008-09-22 20:31:19  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.12  2008-04-29 07:11:10  brian
  - updating headers for release
 
- Revision 0.9.2.11  2007/08/15 05:20:15  brian
- - GPLv3 updates
-
- Revision 0.9.2.10  2007/08/14 12:18:45  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:10 $"
+#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:19 $"
 
 static char const ident[] =
-    "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:10 $";
+    "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:19 $";
 
 /*
  *  This is an SDT multiplexing driver for multiplexing SDT upper streams into
@@ -106,5 +103,9 @@ MODULE_LICENSE(SDTM_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdtmux");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */

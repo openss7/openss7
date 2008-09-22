@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-22 20:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,50 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:55 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.12  2008-09-22 20:31:41  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.11  2008-09-10 03:49:55  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.10  2008-04-28 23:13:28  brian
  - updated headers for release
 
- Revision 0.9.2.9  2007/08/15 05:34:35  brian
- - GPLv3 updates
-
- Revision 0.9.2.8  2007/08/14 06:22:32  brian
- - GPLv3 header update
-
- Revision 0.9.2.7  2007/07/14 01:36:45  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.6  2007/03/25 19:02:16  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.5  2007/03/25 06:00:54  brian
- - flush corrections
-
- Revision 0.9.2.4  2007/03/25 02:23:35  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.3  2007/03/25 00:53:34  brian
- - synchronization updates
-
- Revision 0.9.2.2  2006/10/10 10:46:20  brian
- - updates for release
-
- Revision 0.9.2.1  2006/08/07 22:17:14  brian
- - changes from SCTP Interop
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-22 20:31:41 $"
 
 static char const ident[] =
-    "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $";
+    "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-22 20:31:41 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -109,7 +85,7 @@ static char const ident[] =
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-10 03:49:55 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-22 20:31:41 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"
@@ -130,6 +106,10 @@ MODULE_LICENSE(TPIPERF_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tpiperf");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

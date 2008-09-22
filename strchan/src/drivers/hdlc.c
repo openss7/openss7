@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:55 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,38 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:55 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.8  2008-09-22 20:31:26  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.7  2008-04-28 23:39:55  brian
  - updated headers for release
 
- Revision 0.9.2.6  2007/08/19 11:59:54  brian
- - move stdbool.h to compat.h
-
- Revision 0.9.2.5  2007/08/15 05:32:54  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/14 06:47:28  brian
- - GPLv3 header update
-
- Revision 0.9.2.3  2007/07/14 01:35:33  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.2  2007/03/25 19:00:51  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.1  2006/12/20 23:07:07  brian
- - new working files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:55 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:26 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:55 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:26 $";
 
 /*
  *  This is a multiplexing driver used to support linking CD HDLC streams.  When CD streams are
@@ -109,7 +94,7 @@ static char const ident[] =
 
 #define HDLC_DESCRIP	"HDLC STREAMS MULTIPLEXING DRIVER."
 #define HDLC_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 23:39:55 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:26 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -133,6 +118,10 @@ MODULE_LICENSE(HDLC_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-hldc");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

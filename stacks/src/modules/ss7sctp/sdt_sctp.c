@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:34 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,47 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:34 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.24  2008-09-22 20:31:21  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.23  2008-09-10 03:49:34  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.22  2008-04-29 07:11:12  brian
  - updating headers for release
 
- Revision 0.9.2.21  2007/08/15 05:20:25  brian
- - GPLv3 updates
-
- Revision 0.9.2.20  2007/08/14 12:18:49  brian
- - GPLv3 header updates
-
- Revision 0.9.2.19  2007/07/14 01:35:10  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.18  2007/03/25 19:00:20  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.17  2007/03/25 05:59:44  brian
- - flush corrections
-
- Revision 0.9.2.16  2007/03/25 02:23:02  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.15  2007/03/25 00:52:11  brian
- - synchronization updates
-
- Revision 0.9.2.14  2006/03/07 01:12:24  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:34 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:21 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:34 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:21 $";
 
 #include <sys/os7/compat.h>
 
@@ -103,7 +82,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:34 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:21 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -125,6 +104,10 @@ MODULE_LICENSE(SDT_SCTP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdt_sctp");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

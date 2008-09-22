@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:35 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.26  2008-09-22 20:31:22  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.25  2008-09-10 03:49:35  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,39 +63,12 @@
  Revision 0.9.2.23  2008-04-29 07:11:16  brian
  - updating headers for release
 
- Revision 0.9.2.22  2007/08/19 11:55:56  brian
- - move stdbool.h, obviate need for YFLAGS, general workup
-
- Revision 0.9.2.21  2007/08/15 05:20:37  brian
- - GPLv3 updates
-
- Revision 0.9.2.20  2007/08/12 16:20:31  brian
- - new PPA handling
-
- Revision 0.9.2.19  2007/08/03 13:35:43  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.18  2007/07/14 01:35:15  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.17  2007/03/25 19:00:26  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.16  2007/03/25 02:23:06  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.15  2007/03/25 00:52:15  brian
- - synchronization updates
-
- Revision 0.9.2.14  2006/03/04 13:00:19  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $ Copyright (c) 1997-2008 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -142,7 +118,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:35 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:22 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -165,6 +141,10 @@ MODULE_LICENSE(TCAP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tcap");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

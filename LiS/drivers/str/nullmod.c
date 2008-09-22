@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.15  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.14  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 0.9.2.13  2007/08/15 04:57:58  brian
- - GPLv3 updates
-
- Revision 0.9.2.12  2007/08/14 10:46:56  brian
- - GPLv3 header update
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -97,7 +94,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -120,6 +117,10 @@ MODULE_SUPPORTED_DEVICE(NULLMOD_DEVICE);
 MODULE_LICENSE(NULLMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-nullmod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

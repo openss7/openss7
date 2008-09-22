@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:50 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.45  2008-09-22 20:31:50  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.44  2008-09-10 03:50:07  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -59,48 +62,12 @@
  Revision 0.9.2.42  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
- Revision 0.9.2.41  2007/10/15 17:26:09  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.40  2007/08/15 05:35:42  brian
- - GPLv3 updates
-
- Revision 0.9.2.39  2007/08/14 03:31:09  brian
- - GPLv3 header update
-
- Revision 0.9.2.38  2007/07/14 01:37:20  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.37  2007/04/02 12:01:47  brian
- - fixed bugs in ldl
-
- Revision 0.9.2.36  2007/03/25 19:02:47  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.35  2007/03/25 06:01:05  brian
- - flush corrections
-
- Revision 0.9.2.34  2007/03/25 02:23:44  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.33  2006/07/16 12:46:52  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.32  2006/07/15 13:06:28  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.31  2006/03/04 04:34:26  brian
- - corrections for FC4 x86_64 build
-
- Revision 0.9.2.30  2006/03/03 11:27:47  brian
- - 32/64-bit compatibility
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:50 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:50 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -135,8 +102,8 @@ static char const ident[] =
 
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.44 $) $Date: 2008-09-10 03:50:07 $"
+#define LDL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation. All Rights Reserved."
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:50 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
@@ -160,6 +127,10 @@ MODULE_LICENSE(LDL_LICENSE);
 MODULE_ALIAS("streams-ldl");
 MODULE_ALIAS("streams-link-driver");
 MODULE_ALIAS("streams-link-dri");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

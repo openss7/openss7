@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl.c,v $
+ Revision 0.9.2.25  2008-09-22 20:31:16  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.24  2008-09-10 03:49:32  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.23  2008-04-29 07:11:09  brian
  - updating headers for release
 
- Revision 0.9.2.22  2007/08/15 05:20:11  brian
- - GPLv3 updates
-
- Revision 0.9.2.21  2007/08/12 16:36:53  brian
- - header error
-
- Revision 0.9.2.20  2007/08/12 16:20:25  brian
- - new PPA handling
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:16 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:16 $";
 
 #define _LFS_SOURCE	1
 //#define _SVR4_SOURCE	1
@@ -90,7 +84,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:32 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:16 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -112,6 +106,10 @@ MODULE_LICENSE(SDL_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdl");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

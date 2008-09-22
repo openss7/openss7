@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,50 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:51 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.11  2008-09-22 20:31:38  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.10  2008-09-10 03:49:51  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.9  2008-04-29 00:02:05  brian
  - updated headers for release
 
- Revision 0.9.2.8  2007/08/15 05:34:20  brian
- - GPLv3 updates
-
- Revision 0.9.2.7  2007/08/14 07:05:15  brian
- - GNUv3 header update
-
- Revision 0.9.2.6  2007/07/14 01:36:25  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.5  2007/03/25 19:01:53  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.4  2007/03/25 02:23:33  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.3  2007/03/25 00:53:13  brian
- - synchronization updates
-
- Revision 0.9.2.2  2006/10/10 10:44:16  brian
- - updates for release, lots of additions and workup
-
- Revision 0.9.2.1  2006/07/11 12:32:05  brian
- - added ISO and other implementations to distribution
-
- Revision 0.9.2.1  2006/04/11 18:30:11  brian
- - added new ISO over TCP modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -122,7 +98,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:51 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"
@@ -143,6 +119,10 @@ MODULE_LICENSE(TCPNS_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tcpns");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

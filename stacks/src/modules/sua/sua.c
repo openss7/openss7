@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:14 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:14 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:22  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-04-29 07:11:14  brian
  - updating headers for release
 
- Revision 0.9.2.17  2007/08/15 05:20:31  brian
- - GPLv3 updates
-
- Revision 0.9.2.16  2007/08/14 12:18:52  brian
- - GPLv3 header updates
-
- Revision 0.9.2.15  2007/07/14 01:35:13  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.14  2007/03/25 19:00:24  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.13  2007/03/25 02:23:04  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.12  2007/03/25 00:52:14  brian
- - synchronization updates
-
- Revision 0.9.2.11  2006/03/07 01:13:59  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:14 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:22 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:14 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:22 $";
 
 #include <sys/os7/compat.h>
 
@@ -122,6 +104,10 @@ MODULE_LICENSE(SUA_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sua");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

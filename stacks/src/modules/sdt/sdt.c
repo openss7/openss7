@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt.c,v $
+ Revision 0.9.2.24  2008-09-22 20:31:18  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.23  2008-09-10 03:49:33  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.22  2008-04-29 07:11:10  brian
  - updating headers for release
 
- Revision 0.9.2.21  2007/08/15 05:20:14  brian
- - GPLv3 updates
-
- Revision 0.9.2.20  2007/08/12 16:40:42  brian
- - header error
-
- Revision 0.9.2.19  2007/08/12 16:20:27  brian
- - new PPA handling
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:18 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -97,7 +91,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2008-09-10 03:49:33 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:18 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -119,6 +113,10 @@ MODULE_LICENSE(SDT_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdt");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

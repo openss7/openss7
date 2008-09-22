@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $
+ @(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp0.c,v $
+ Revision 0.9.2.3  2008-09-22 20:31:38  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.2  2008-04-29 00:02:05  brian
  - updated headers for release
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
+#ident "@(#) $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
 
-static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $";
+static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $";
 
 /*
  *  ISO Transport Class 0 over TCP/IP (TP0)
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 
 #define TP0_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP0_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
+#define TP0_REVISION	"OpenSS7 $RCSfile: tp0.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
 #define TP0_DEVICE	"SVR 4.2 STREAMS TP0 Module for RFC 1006 and RFC 2126"
 #define TP0_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP0_LICENSE	"GPL"
@@ -108,6 +111,10 @@ MODULE_LICENSE(TP0_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-tp0");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifndef CONFIG_STREAMS_TP0_NAME

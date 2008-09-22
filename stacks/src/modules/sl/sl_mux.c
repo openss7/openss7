@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.31  2008-09-22 20:31:19  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.30  2008-09-10 03:49:33  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,33 +63,12 @@
  Revision 0.9.2.28  2008-04-28 07:41:08  brian
  - updates for release
 
- Revision 0.9.2.27  2007/12/15 20:19:15  brian
- - updates
-
- Revision 0.9.2.26  2007/08/19 11:55:54  brian
- - move stdbool.h, obviate need for YFLAGS, general workup
-
- Revision 0.9.2.25  2007/08/15 05:20:18  brian
- - GPLv3 updates
-
- Revision 0.9.2.24  2007/08/12 15:10:05  brian
- - moved files around
-
- Revision 0.9.2.3  2007/08/06 04:43:57  brian
- - rework of pipe-based emulation modules
-
- Revision 0.9.2.2  2007/08/03 13:35:41  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.1  2007/07/21 20:22:02  brian
- - added channel modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $"
 
 static char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -128,7 +110,7 @@ static char const ident[] =
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:33 $"
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:19 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corportation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -151,6 +133,10 @@ MODULE_LICENSE(SL_MUX_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streasm-sl-mux");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

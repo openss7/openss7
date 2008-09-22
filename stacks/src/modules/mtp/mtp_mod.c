@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $
+ @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:29 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_mod.c,v $
+ Revision 0.9.2.6  2008-09-22 20:31:13  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.5  2008-09-10 03:49:29  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.4  2008-04-29 07:11:03  brian
  - updating headers for release
 
- Revision 0.9.2.3  2007/08/15 05:19:28  brian
- - GPLv3 updates
-
- Revision 0.9.2.2  2007/08/12 16:20:12  brian
- - new PPA handling
-
- Revision 0.9.2.1  2007/08/03 13:02:50  brian
- - added documentation and minimal modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $"
+#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:13 $"
 
-static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $";
+static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:13 $";
 
 /*
  * MTP-MOD is a minimal MTP in the spirit of Q.710 but which also supports ANSI and other variants.
@@ -108,7 +102,7 @@ static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/mtpi_ioctl.h>
 
 #define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS MODULE."
-#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:29 $"
+#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:13 $"
 #define MT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -131,6 +125,10 @@ MODULE_LICENSE(MT_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-mtp-mod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

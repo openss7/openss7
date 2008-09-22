@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:20 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_acb56.c,v $
+ Revision 0.9.2.21  2008-09-22 20:31:05  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.20  2008-09-10 03:49:20  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.19  2008-04-29 07:10:49  brian
  - updating headers for release
 
- Revision 0.9.2.18  2007/08/15 05:18:18  brian
- - GPLv3 updates
-
- Revision 0.9.2.17  2007/08/14 12:17:18  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:05 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:05 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -94,7 +91,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-10 03:49:20 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:05 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -114,6 +111,10 @@ MODULE_LICENSE(ACB56_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdt_acb56");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:32 $
+ @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nf.c,v $
+ Revision 0.9.2.7  2008-09-22 20:31:51  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.6  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
- Revision 0.9.2.5  2007/08/15 05:35:42  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/14 03:31:09  brian
- - GPLv3 header update
-
- Revision 0.9.2.3  2007/07/14 01:37:21  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.2  2006/05/14 06:34:31  brian
- - corrected buffer leaks
-
- Revision 0.9.2.1  2006/03/25 10:26:32  brian
- - added beginnings of netfilter driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:32 $"
+#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $"
 
 static char const ident[] =
-    "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:32 $";
+    "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $";
 
 /*
  *  This pseudo-device driver implements a range of netfilter hooks for
@@ -116,8 +104,8 @@ static char const ident[] =
 
 #define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define NF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:32 $"
+#define NF_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $"
 #define NF_DEVICE	"SVR 4.2 STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NF_LICENSE	"GPL"
@@ -139,6 +127,10 @@ MODULE_LICENSE(NF_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-nf");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

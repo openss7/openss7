@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: s_llic.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 12:16:24 $
+ @(#) $RCSfile: s_llic.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-07-01 12:16:24 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: s_llic.c,v $
+ Revision 0.9.2.2  2008-09-22 20:31:47  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.1  2008-07-01 12:16:24  brian
  - added manual pages, specs and conversion modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: s_llic.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 12:16:24 $"
+#ident "@(#) $RCSfile: s_llic.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
 
-static char const ident[] = "$RCSfile: s_llic.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 12:16:24 $";
+static char const ident[] = "$RCSfile: s_llic.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $";
 
 /*
  * This is s_llic, a pushable STREAMS module that interprets the SpiderX25
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile: s_llic.c,v $ $Name: OpenSS7-0_9_2 $($Revi
 #define S_LLIC_DESCRIP		"SPIDER LLI ADMIN COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
 #define S_LLIC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_LLIC_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define S_LLIC_REVISION		"OpenSS7 $RCSfile: s_llic.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-07-01 12:16:24 $"
+#define S_LLIC_REVISION		"OpenSS7 $RCSfile: s_llic.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
 #define S_LLIC_DEVICE		"SVR 4.2MP DLPI Devices"
 #define S_LLIC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define S_LLIC_LICENSE		"GPL"
@@ -112,6 +115,10 @@ MODULE_ALIAS("streams-s_llic");
 MODULE_ALIAS("streams-module-s_llic");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_S_LLIC_MODID));
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

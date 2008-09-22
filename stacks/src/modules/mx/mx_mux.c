@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 07:11:04 $
+ @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:04 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_mux.c,v $
+ Revision 0.9.2.9  2008-09-22 20:31:13  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.8  2008-04-29 07:11:04  brian
  - updating headers for release
 
- Revision 0.9.2.7  2007/08/15 05:19:31  brian
- - GPLv3 updates
-
- Revision 0.9.2.6  2007/08/14 12:18:10  brian
- - GPLv3 header updates
-
- Revision 0.9.2.5  2007/07/14 01:34:44  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.4  2007/03/25 18:59:51  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.3  2007/03/25 05:59:31  brian
- - flush corrections
-
- Revision 0.9.2.2  2006/12/18 10:51:15  brian
- - subpackaging changes for release
-
- Revision 0.9.2.1  2006/03/20 12:23:31  brian
- - first cut of zaptel driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 07:11:04 $"
+#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $"
 
 static char const ident[] =
-    "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 07:11:04 $";
+    "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -99,7 +81,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2008-04-29 07:11:04 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:13 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -122,6 +104,10 @@ MODULE_LICENSE(MX_MUX_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-mx_mux");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifndef CONFIG_STREAMS_MX_MUX_NAME

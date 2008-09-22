@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 01:52:20 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:30:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,77 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:20 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.21  2008-09-22 20:30:59  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.20  2008-04-29 01:52:20  brian
  - updated headers for release
 
- Revision 0.9.2.19  2007/08/19 11:48:07  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.18  2007/08/15 05:13:41  brian
- - GPLv3 updates
-
- Revision 0.9.2.17  2007/08/12 16:15:12  brian
- -
-
- Revision 0.9.2.16  2007/08/03 13:34:22  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.15  2007/07/14 01:33:21  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.14  2007/05/18 12:15:17  brian
- - careful not to flush timers
-
- Revision 0.9.2.13  2007/05/17 22:55:09  brian
- - use mi_timer requeue to requeue mi timers
-
- Revision 0.9.2.12  2007/03/25 18:58:36  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.11  2007/03/12 23:19:33  brian
- - changes for function type safety
-
- Revision 0.9.2.10  2007/02/26 07:25:26  brian
- - synchronizing changes
-
- Revision 0.9.2.9  2007/02/14 14:08:46  brian
- - broad changes updating support for SS7 MTP and M3UA
-
- Revision 0.9.2.8  2007/02/10 22:32:06  brian
- - working up sigtran drivers
-
- Revision 0.9.2.7  2007/02/03 03:07:44  brian
- - working up drivers
-
- Revision 0.9.2.6  2007/01/28 13:04:31  brian
- - reworked locking
-
- Revision 0.9.2.5  2007/01/28 01:09:40  brian
- - updated test programs and working up m2ua-as driver
-
- Revision 0.9.2.4  2007/01/26 21:54:33  brian
- - working up AS drivers and docs
-
- Revision 0.9.2.3  2007/01/23 10:00:45  brian
- - added test program and m2ua-as updates
-
- Revision 0.9.2.2  2007/01/21 20:22:34  brian
- - working up drivers
-
- Revision 0.9.2.1  2007/01/15 11:58:42  brian
- - added new m2ua-as mux files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 01:52:20 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:30:59 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 01:52:20 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:30:59 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -239,7 +185,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 01:52:20 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:30:59 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -263,6 +209,10 @@ MODULE_LICENSE(M2UA_AS_LICENSE);
 MODULE_ALIAS("streams-m2ua_as");
 MODULE_ALIAS("streams-m2ua-as");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:22 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:22 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.31  2008-09-22 20:31:08  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.30  2008-09-10 03:49:22  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,18 +63,12 @@
  Revision 0.9.2.28  2008-04-29 07:10:54  brian
  - updating headers for release
 
- Revision 0.9.2.27  2007/08/15 05:18:34  brian
- - GPLv3 updates
-
- Revision 0.9.2.26  2007/08/14 12:17:34  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:22 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:08 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:22 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:08 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -560,7 +557,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:22 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:08 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -582,6 +579,10 @@ MODULE_LICENSE(SS__LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-inet");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

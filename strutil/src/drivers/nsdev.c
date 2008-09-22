@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,23 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nsdev.c,v $
+ Revision 0.9.2.40  2008-09-22 20:31:43  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.39  2007/08/15 05:35:00  brian
  - GPLv3 updates
 
- Revision 0.9.2.38  2007/08/14 12:58:01  brian
- - GNUv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $";
 
 #define _LFS_SOURCE
 
@@ -78,8 +78,8 @@ static char const ident[] =
 #endif
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $"
+#define NSDEV_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -98,6 +98,10 @@ MODULE_SUPPORTED_DEVICE(NSDEV_DEVICE);
 MODULE_LICENSE(NSDEV_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-nsdev");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

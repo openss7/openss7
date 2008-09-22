@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 23:39:57 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:57 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.7  2008-09-22 20:31:28  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.6  2008-04-28 23:39:57  brian
  - updated headers for release
 
- Revision 0.9.2.5  2007/08/15 05:32:58  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/14 06:47:37  brian
- - GPLv3 header update
-
- Revision 0.9.2.3  2007/07/14 01:35:37  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.2  2007/03/25 19:00:54  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.1  2006/11/30 13:01:05  brian
- - added working files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 23:39:57 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:28 $"
 
 static char const ident[] =
-    "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 23:39:57 $";
+    "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:28 $";
 
 /*
  *  This is a CH module.  The purpose of the module is for it to be pushed over a (circuit-based) MX
@@ -114,7 +102,7 @@ static char const ident[] =
 
 #define CH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CH_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 23:39:57 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:28 $"
 #define CH_DEVICE	"SVR 4.2 STREAMS Channel Module (CH)"
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"
@@ -136,6 +124,10 @@ MODULE_LICENSE(CH_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-ch");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifndef CH_MOD_NAME

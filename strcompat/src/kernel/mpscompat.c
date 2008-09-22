@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-28 16:47:13 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,158 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.47  2008-09-22 20:31:29  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.46  2008-04-28 16:47:13  brian
  - updates for release
 
- Revision 0.9.2.45  2007/08/15 05:33:09  brian
- - GPLv3 updates
-
- Revision 0.9.2.44  2007/08/12 15:51:19  brian
- - header and extern updates, GPLv3, 3 new lock functions
-
- Revision 0.9.2.43  2007/08/03 13:36:01  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.42  2007/07/14 01:35:41  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.41  2007/05/17 22:50:34  brian
- - extensive rework of mi_timer functions
-
- Revision 0.9.2.40  2007/03/25 19:01:05  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.39  2007/03/02 10:04:06  brian
- - updates to common build process and versions for all exported symbols
-
- Revision 0.9.2.38  2007/02/21 01:09:17  brian
- - updating mtp.c driver, better mi_open allocators
-
- Revision 0.9.2.37  2007/02/17 02:53:01  brian
- - improved allocation functions
-
- Revision 0.9.2.36  2007/02/14 14:09:16  brian
- - broad changes updating support for SS7 MTP and M3UA
-
- Revision 0.9.2.35  2007/01/21 20:22:43  brian
- - working up drivers
-
- Revision 0.9.2.34  2007/01/15 12:16:38  brian
- - updated archive sizes, new development work
-
- Revision 0.9.2.33  2006/12/29 05:51:21  brian
- - changes for successful master build
-
- Revision 0.9.2.32  2006/12/19 11:47:58  brian
- - better mi_bufcall implementation
-
- Revision 0.9.2.31  2006/12/19 00:51:55  brian
- - corrections to mi_open/close functions
-
- Revision 0.9.2.30  2006/12/16 16:12:56  brian
- - strapped out unused manpages and allow mi_timers to be placed back on queue
-
- Revision 0.9.2.29  2006/12/08 05:08:24  brian
- - some rework resulting from testing and inspection
-
- Revision 0.9.2.28  2006/11/03 10:39:28  brian
- - updated headers, correction to mi_timer_expiry type
-
- Revision 0.9.2.27  2006/10/06 12:13:18  brian
- - updated manual pages to pass make check and for release
- - updated release files for release
- - added missing MacOT OSF/1 and MPS compatibility functions
-
- Revision 0.9.2.26  2006/07/24 09:01:06  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.25  2006/07/07 20:49:55  brian
- - change to correct LIS-only compile on FC5
-
- Revision 0.9.2.24  2006/06/22 13:11:33  brian
- - more optmization tweaks and fixes
-
- Revision 0.9.2.23  2006/03/03 11:11:14  brian
- - 64-bit compatibility, fixes, updates for release
-
- Revision 0.9.2.22  2005/12/29 21:36:14  brian
- - a few idiosynchrasies for PPC, old 2.95 compiler, and 2.6.14 builds
-
- Revision 0.9.2.21  2005/12/28 09:51:50  brian
- - remove warnings on FC4 compile
-
- Revision 0.9.2.20  2005/12/22 10:28:54  brian
- - no symbol mangling for 2.4 kernels
-
- Revision 0.9.2.19  2005/09/18 07:36:19  brian
- - M_IOCDATA bug fix
-
- Revision 0.9.2.18  2005/07/29 22:20:02  brian
- - corrections for debug compile
- - some size optimizations
-
- Revision 0.9.2.17  2005/07/29 07:37:51  brian
- - changes to compile with latest streams package.
-
- Revision 0.9.2.16  2005/07/22 06:06:51  brian
- - working up streams/src/kernel/strsched.h
-
- Revision 0.9.2.15  2005/07/18 15:52:13  brian
- - implemented mps mpprintf functions
-
- Revision 0.9.2.14  2005/07/18 12:25:42  brian
- - standard indentation
-
- Revision 0.9.2.13  2005/07/14 22:04:09  brian
- - updates for check pass and header splitting
-
- Revision 0.9.2.12  2005/07/14 03:40:12  brian
- - updates for check pass
-
- Revision 0.9.2.11  2005/07/13 12:01:49  brian
- - working up compat and check pass (finally lindented LiS)
-
- Revision 0.9.2.10  2005/07/13 01:40:39  brian
- - changes for check pass
-
- Revision 0.9.2.9  2005/07/12 13:54:46  brian
- - changes for os7 compatibility and check pass
-
- Revision 0.9.2.8  2005/07/12 08:42:42  brian
- - changes for check pass
-
- Revision 0.9.2.7  2005/07/09 21:51:21  brian
- - remove dependency on LFS headers
-
- Revision 0.9.2.6  2005/07/07 20:29:17  brian
- - changes for release
-
- Revision 0.9.2.5  2005/07/05 22:46:05  brian
- - change for strcompat package
-
- Revision 0.9.2.4  2005/07/04 20:14:30  brian
- - fixed spelling of CVS keyword
-
- Revision 0.9.2.3  2005/07/04 19:29:16  brian
- - first cut at streams compatibility package
-
- Revision 0.9.2.2  2005/07/03 17:41:27  brian
- - separated out MPS compatibility module
-
- Revision 0.9.2.1  2005/07/01 20:16:30  brian
- - added and updated manpages for some Mentat compatibility
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-28 16:47:13 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-28 16:47:13 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -225,7 +90,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-04-28 16:47:13 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -244,6 +109,10 @@ MODULE_SUPPORTED_DEVICE(MPSCOMP_DEVICE);
 MODULE_LICENSE(MPSCOMP_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-mpscompat");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

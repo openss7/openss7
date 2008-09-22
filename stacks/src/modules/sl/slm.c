@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slm.c,v $
+ Revision 0.9.2.20  2008-09-22 20:31:20  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.19  2008-09-10 03:49:33  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.18  2008-04-29 07:11:11  brian
  - updating headers for release
 
- Revision 0.9.2.17  2007/08/15 05:20:18  brian
- - GPLv3 updates
-
- Revision 0.9.2.16  2007/08/12 16:20:29  brian
- - new PPA handling
-
- Revision 0.9.2.15  2007/07/21 20:09:52  brian
- - added pass structure
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:20 $"
 
-static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $";
+static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:20 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also supports M2UA.  It
@@ -110,7 +104,7 @@ static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:33 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:20 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -132,6 +126,10 @@ MODULE_LICENSE(SLM_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-slm");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

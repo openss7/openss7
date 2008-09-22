@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,56 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:49 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdn.c,v $
+ Revision 0.9.2.10  2008-09-22 20:31:35  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.9  2008-09-10 03:49:49  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.8  2008-04-29 00:48:59  brian
  - updated headers for release
 
- Revision 0.9.2.7  2007/08/15 05:34:10  brian
- - GPLv3 updates
-
- Revision 0.9.2.6  2007/08/14 07:41:23  brian
- - GPLv3 header update
-
- Revision 0.9.2.5  2007/07/14 01:36:17  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.4  2007/03/25 19:01:39  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.3  2007/03/25 02:23:30  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.2  2007/03/25 00:53:10  brian
- - synchronization updates
-
- Revision 0.9.2.1  2006/10/17 11:56:12  brian
- - copied files into new packages from strss7 package
-
- Revision 0.9.2.18  2006/05/14 06:58:06  brian
- - removed redundant or unused QR_ definitions
-
- Revision 0.9.2.17  2006/05/08 11:00:44  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.16  2006/03/07 01:09:32  brian
- - binary compatible callouts
-
- Revision 0.9.2.15  2006/03/04 13:00:05  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -115,7 +85,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:49 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -137,6 +107,10 @@ MODULE_LICENSE(ISDN_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-isdn");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

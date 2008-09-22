@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $
 
  -----------------------------------------------------------------------------
 
@@ -46,53 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:19 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.13  2008-09-22 20:30:58  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.12  2008-04-29 01:52:19  brian
  - updated headers for release
 
- Revision 0.9.2.11  2007/08/19 11:48:05  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.10  2007/08/15 05:13:37  brian
- - GPLv3 updates
-
- Revision 0.9.2.9  2007/08/12 16:15:11  brian
- -
-
- Revision 0.9.2.8  2007/08/03 13:34:21  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.7  2007/07/14 01:33:20  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.6  2007/05/18 12:15:17  brian
- - careful not to flush timers
-
- Revision 0.9.2.5  2007/05/17 22:55:08  brian
- - use mi_timer requeue to requeue mi timers
-
- Revision 0.9.2.4  2007/03/25 18:58:33  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.3  2007/03/12 23:19:32  brian
- - changes for function type safety
-
- Revision 0.9.2.2  2007/02/14 14:08:46  brian
- - broad changes updating support for SS7 MTP and M3UA
-
- Revision 0.9.2.1  2007/02/03 03:05:15  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -159,7 +129,7 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2008-04-29 01:52:19 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -183,6 +153,10 @@ MODULE_LICENSE(ISUA_AS_LICENSE);
 MODULE_ALIAS("streams-ua_as");
 MODULE_ALIAS("streams-ua-as");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

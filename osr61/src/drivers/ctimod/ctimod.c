@@ -59,6 +59,10 @@ MODULE_ALIAS("ctimod");
 MODULE_ALIAS("streams-ctimod");
 MODULE_ALIAS("streams-ctimodDriver");
 #endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif
 
 // Pound Defines 

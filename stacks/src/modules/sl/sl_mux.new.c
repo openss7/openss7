@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:33 $
+ @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.new.c,v $
+ Revision 0.9.2.6  2008-09-22 20:31:19  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.5  2008-09-10 03:49:33  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.4  2008-04-29 07:11:11  brian
  - updating headers for release
 
- Revision 0.9.2.3  2007/08/15 05:20:18  brian
- - GPLv3 updates
-
- Revision 0.9.2.2  2007/08/14 12:18:46  brian
- - GPLv3 header updates
-
- Revision 0.9.2.1  2007/08/03 13:02:53  brian
- - added documentation and minimal modules
-
- Revision 0.9.2.19  2006/05/08 11:01:10  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.18  2006/04/24 05:01:02  brian
- - call interface corrections
-
- Revision 0.9.2.17  2006/03/07 01:11:56  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:33 $"
+#ident "@(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:19 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:33 $";
+    "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:19 $";
 
 /*
  *  This is a Signalling Link (SL) multiplexor that provides a convenient way of organizing various
@@ -114,7 +99,7 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:49:33 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:19 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -136,6 +121,10 @@ MODULE_LICENSE(SL_MUX_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sl_mux");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

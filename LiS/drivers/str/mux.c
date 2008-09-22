@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,38 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mux.c,v $
+ Revision 0.9.2.17  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.16  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 0.9.2.15  2007/08/15 04:57:58  brian
- - GPLv3 updates
-
- Revision 0.9.2.14  2007/08/14 10:46:56  brian
- - GPLv3 header update
-
- Revision 0.9.2.13  2007/07/14 01:32:56  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.12  2007/03/25 18:58:11  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.11  2007/03/25 05:59:12  brian
- - flush corrections
-
- Revision 0.9.2.10  2006/12/18 09:50:46  brian
- - updated headers for release
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -109,7 +94,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -132,6 +117,10 @@ MODULE_SUPPORTED_DEVICE(MUX_DEVICE);
 MODULE_LICENSE(MUX_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-mux");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

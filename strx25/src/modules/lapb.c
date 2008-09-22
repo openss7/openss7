@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-13 06:43:57 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 0.9.2.2  2008-09-22 20:31:47  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.1  2008-06-13 06:43:57  brian
  - added files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $"
+#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
 
-static char const ident[] = "$RCSfile: lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $";
+static char const ident[] = "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $";
 
 /*
  * This is a LAPB module that pushes over a stream implementing an HDLC
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revisi
 #define LAPB_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
 #define LAPB_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPB_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
 #define LAPB_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"
@@ -111,6 +114,10 @@ MODULE_ALIAS("streams-lapb");
 MODULE_ALIAS("streams-module-lapb");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_LAPB_MODID));
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

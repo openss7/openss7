@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 23:39:54 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:54 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.9  2008-09-22 20:31:26  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.8  2008-04-28 23:39:54  brian
  - updated headers for release
 
- Revision 0.9.2.7  2007/08/19 11:59:53  brian
- - move stdbool.h to compat.h
-
- Revision 0.9.2.6  2007/08/15 05:32:54  brian
- - GPLv3 updates
-
- Revision 0.9.2.5  2007/08/14 06:47:28  brian
- - GPLv3 header update
-
- Revision 0.9.2.4  2007/07/21 20:43:47  brian
- - added manual pages, corrections
-
- Revision 0.9.2.3  2007/07/14 01:35:32  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.2  2007/03/25 19:00:51  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.1  2006/12/20 23:07:07  brian
- - new working files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 23:39:54 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:26 $"
 
 static char const ident[] =
-    "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 23:39:54 $";
+    "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:26 $";
 
 /*
  * This is a CH multiplexing driver.  MX stream are linked beneath the lower multiplex and CH
@@ -106,7 +88,7 @@ static char const ident[] =
 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-28 23:39:54 $"
+#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:26 $"
 #define CHMUX_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -130,6 +112,10 @@ MODULE_LICENSE(CHMUX_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-ch");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

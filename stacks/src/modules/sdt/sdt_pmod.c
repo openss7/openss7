@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:10 $
+ @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,38 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_pmod.c,v $
+ Revision 0.9.2.8  2008-09-22 20:31:18  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.7  2008-04-29 07:11:10  brian
  - updating headers for release
 
- Revision 0.9.2.6  2007/08/19 11:55:51  brian
- - move stdbool.h, obviate need for YFLAGS, general workup
-
- Revision 0.9.2.5  2007/08/15 05:20:15  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/12 16:20:27  brian
- - new PPA handling
-
- Revision 0.9.2.3  2007/08/06 04:43:55  brian
- - rework of pipe-based emulation modules
-
- Revision 0.9.2.2  2007/08/03 13:35:40  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.1  2007/07/14 01:13:35  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:10 $"
+#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:10 $";
+    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $";
 
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
@@ -111,7 +96,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:10 $A"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $A"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports STREAMS-based Pipes."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -134,6 +119,10 @@ MODULE_LICENSE(SDT_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-sdt-pmod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

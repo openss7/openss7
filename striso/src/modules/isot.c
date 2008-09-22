@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-05 15:34:58 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 0.9.2.8  2008-09-22 20:31:38  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.7  2008-05-05 15:34:58  brian
  - be strict with MORE_data and DATA_flag
 
@@ -63,24 +66,12 @@
  Revision 0.9.2.4  2008-04-25 08:38:32  brian
  - working up libraries modules and drivers
 
- Revision 0.9.2.3  2007/08/14 07:05:15  brian
- - GNUv3 header update
-
- Revision 0.9.2.2  2006/10/10 10:44:15  brian
- - updates for release, lots of additions and workup
-
- Revision 0.9.2.1  2006/07/11 12:32:05  brian
- - added ISO and other implementations to distribution
-
- Revision 0.9.2.1  2006/04/11 18:30:10  brian
- - added new ISO over TCP modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $"
+#ident "@(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:38 $"
 
 static char const ident[] =
-    "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $";
+    "$RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:38 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -107,7 +98,7 @@ static char const ident[] =
 
 #define ISOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ISOT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-05-05 15:34:58 $"
+#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:38 $"
 #define ISOT_DEVICE	"SVR 4.2 STREAMS ISOT Module for RFC 1006 and RFC 2126"
 #define ISOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISOT_LICENSE	"GPL"
@@ -129,6 +120,10 @@ MODULE_LICENSE(ISOT_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-isot");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifndef CONFIG_STREAMS_ISOT_NAME

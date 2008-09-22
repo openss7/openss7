@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $
+ @(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:27 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi.c,v $
+ Revision 0.9.2.3  2008-09-22 20:31:47  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.2  2008-06-18 16:45:27  brian
  - widespread updates
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#ident "@(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:47 $"
 
-static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $";
+static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:47 $";
 
 /*
  * This is an NPI module for NLI.  It pushes over an NLI stream and provide an
@@ -94,7 +97,7 @@ static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #define NPI_DESCRIP	"NLI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:47 $"
 #define NPI_DEVICE	"SVR 4.2MP NLI to NPI Conversion Module (NPI) for X.25 CONS"
 #define NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_LICENSE	"GPL"
@@ -127,6 +130,10 @@ MODULE_ALIAS("streams-npi");
 MODULE_ALIAS("streams-module-npi");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_SREAMS_NPI_MODID));
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,56 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:26 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.25  2008-09-22 20:31:09  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.24  2008-09-10 03:49:26  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.23  2008-04-29 07:10:56  brian
  - updating headers for release
 
- Revision 0.9.2.22  2007/08/15 05:18:46  brian
- - GPLv3 updates
-
- Revision 0.9.2.21  2007/08/14 12:17:47  brian
- - GPLv3 header updates
-
- Revision 0.9.2.20  2007/08/03 13:35:05  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.19  2007/07/14 01:34:12  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.18  2007/03/25 18:59:28  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.17  2007/03/25 05:59:25  brian
- - flush corrections
-
- Revision 0.9.2.16  2007/03/25 00:51:44  brian
- - synchronization updates
-
- Revision 0.9.2.15  2006/05/08 11:00:47  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.14  2006/03/30 10:43:49  brian
- - zero cache pointers on deallocation
-
- Revision 0.9.2.13  2006/03/07 01:09:42  brian
- - binary compatible callouts
-
- Revision 0.9.2.12  2006/03/04 13:00:07  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:09 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:09 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -122,7 +92,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:26 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:09 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -142,6 +112,10 @@ MODULE_LICENSE(ISUP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-isup");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

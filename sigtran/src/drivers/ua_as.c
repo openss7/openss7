@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:22 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,62 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:22 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.16  2008-09-22 20:31:01  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.15  2008-04-29 01:52:22  brian
  - updated headers for release
 
- Revision 0.9.2.14  2007/08/19 11:48:31  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.13  2007/08/15 05:14:06  brian
- - GPLv3 updates
-
- Revision 0.9.2.12  2007/08/12 16:15:32  brian
- -
-
- Revision 0.9.2.11  2007/08/03 13:34:42  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.10  2007/07/14 01:33:36  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.9  2007/05/18 12:15:30  brian
- - careful not to flush timers
-
- Revision 0.9.2.8  2007/05/17 22:55:33  brian
- - use mi_timer requeue to requeue mi timers
-
- Revision 0.9.2.7  2007/03/25 18:58:53  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.6  2007/03/12 23:19:47  brian
- - changes for function type safety
-
- Revision 0.9.2.5  2007/02/26 07:25:30  brian
- - synchronizing changes
-
- Revision 0.9.2.4  2007/02/21 01:09:00  brian
- - updating mtp.c driver, better mi_open allocators
-
- Revision 0.9.2.3  2007/02/14 14:08:58  brian
- - broad changes updating support for SS7 MTP and M3UA
-
- Revision 0.9.2.2  2007/02/13 07:55:38  brian
- - working up MTP and UAs
-
- Revision 0.9.2.1  2007/02/10 22:33:09  brian
- - added new working files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:22 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:22 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -199,7 +160,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:22 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -223,6 +184,10 @@ MODULE_LICENSE(UA_AS_LICENSE);
 MODULE_ALIAS("streams-ua_as");
 MODULE_ALIAS("streams-ua-as");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

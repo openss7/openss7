@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:39 $
+ @(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-07 16:01:39 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi.c,v $
+ Revision 0.9.2.2  2008-09-22 20:31:46  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.1  2008-05-07 16:01:39  brian
  - added NLI X.25-PLP CONS and XX25 implemetnation
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:39 $"
+#ident "@(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
 
-static char const ident[] = "$RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:39 $";
+static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $";
 
 /*
  * This is a multiplexing driver that converts between the Network Layer
@@ -76,7 +79,7 @@ static char const ident[] = "$RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revisio
 #define NPI_DESCRIP	"NLI TO NPI CONVERSION FOR LINUX FAST STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-07 16:01:39 $"
+#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
 #define NPI_DEVICE	"SVR 4.2MP NLI to NPI Conversion (NPI) for X.25 CONS"
 #define NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_LICENSE	"GPL"
@@ -99,6 +102,10 @@ MODULE_LICENSE(NPI_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-npi");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 
 #ifndef CONFIG_STREAMS_NPI_NAME
 #error "CONFIG_STREAMS_NPI_NAME must be defined."

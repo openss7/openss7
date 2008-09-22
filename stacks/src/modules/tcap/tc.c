@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 07:11:15 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:31:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:15 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc.c,v $
+ Revision 0.9.2.17  2008-09-22 20:31:22  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.16  2008-04-29 07:11:15  brian
  - updating headers for release
 
- Revision 0.9.2.15  2007/08/15 05:20:37  brian
- - GPLv3 updates
-
- Revision 0.9.2.14  2007/08/14 12:18:55  brian
- - GPLv3 header updates
-
- Revision 0.9.2.13  2007/08/03 13:35:43  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.12  2007/07/14 01:35:16  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.11  2007/03/25 05:59:56  brian
- - flush corrections
-
- Revision 0.9.2.10  2007/03/25 00:52:15  brian
- - synchronization updates
-
- Revision 0.9.2.9  2006/03/07 01:14:07  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 07:11:15 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:31:22 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 07:11:15 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:31:22 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -114,6 +96,10 @@ MODULE_LICENSE(TC_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tc");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

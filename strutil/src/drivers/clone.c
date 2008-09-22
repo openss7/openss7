@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-09-22 20:31:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,35 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.48  2008-09-22 20:31:43  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.47  2007/08/15 05:35:00  brian
  - GPLv3 updates
 
- Revision 0.9.2.46  2007/08/14 12:58:00  brian
- - GNUv3 header updates
-
- Revision 0.9.2.45  2007/07/14 01:36:58  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.44  2007/03/25 19:02:29  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.43  2007/03/02 10:04:50  brian
- - updates to common build process and versions for all exported symbols
-
- Revision 0.9.2.42  2006/12/18 10:56:32  brian
- - updated headers for release
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-09-22 20:31:43 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-09-22 20:31:43 $";
 
 #define _LFS_SOURCE
 
@@ -92,8 +80,8 @@ static char const ident[] =
 #endif
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $"
+#define CLONE_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-09-22 20:31:43 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"
@@ -112,6 +100,10 @@ MODULE_SUPPORTED_DEVICE(CLONE_DEVICE);
 MODULE_LICENSE(CLONE_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-clone");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

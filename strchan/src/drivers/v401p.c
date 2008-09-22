@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-20 11:13:17 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,62 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-20 11:13:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.16  2008-09-22 20:31:27  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.15  2008-09-20 11:13:17  brian
  - added patch level
 
  Revision 0.9.2.14  2008-04-28 23:39:55  brian
  - updated headers for release
 
- Revision 0.9.2.13  2007/08/19 11:59:54  brian
- - move stdbool.h to compat.h
-
- Revision 0.9.2.12  2007/08/15 05:32:54  brian
- - GPLv3 updates
-
- Revision 0.9.2.11  2007/08/14 06:47:28  brian
- - GPLv3 header update
-
- Revision 0.9.2.10  2007/07/14 01:35:33  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.9  2007/05/25 12:19:53  brian
- - check for pm_message_t
-
- Revision 0.9.2.8  2007/03/25 19:00:52  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.7  2006/12/21 11:33:26  brian
- - updates for release, current development
-
- Revision 0.9.2.6  2006/12/20 23:07:37  brian
- - updates for release and current development
-
- Revision 0.9.2.5  2006/12/18 08:59:34  brian
- - working up strchan package
-
- Revision 0.9.2.4  2006/12/06 11:26:10  brian
- - current development updates
-
- Revision 0.9.2.3  2006/11/30 13:05:25  brian
- - checking in working copies
-
- Revision 0.9.2.2  2006/10/19 10:37:24  brian
- - working up drivers and modules
-
- Revision 0.9.2.1  2006/10/14 06:37:27  brian
- - added manpages, module, drivers, headers from strss7 package
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-20 11:13:17 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-20 11:13:17 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -297,7 +261,7 @@ static char const ident[] =
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-20 11:13:17 $"
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:27 $"
 #define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

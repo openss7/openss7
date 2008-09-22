@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.32 $) $Date: 2008-09-10 03:49:09 $
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.33 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,39 +45,32 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:09 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: linux-mdep.c,v $
+ Revision 1.1.1.11.4.33  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 1.1.1.11.4.32  2008-09-10 03:49:09  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 1.1.1.11.4.31  2008-04-29 08:33:12  brian
  - update headers for Affero release
 
- Revision 1.1.1.11.4.30  2007/08/15 04:58:06  brian
- - GPLv3 updates
-
- Revision 1.1.1.11.4.23  2006/03/05 04:03:03  brian
- - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
- - updates for new release
-
- Revision 1.1.1.11.4.22  2006/02/20 11:38:49  brian
- - corrections for some 64bit architectures, from patches
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.32 $) $Date: 2008-09-10 03:49:09 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.33 $) $Date: 2008-09-22 20:30:53 $"
 
-static char const ident[] = "$RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.32 $) $Date: 2008-09-10 03:49:09 $";
+static char const ident[] = "$RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.33 $) $Date: 2008-09-22 20:30:53 $";
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.32 2008-09-10 03:49:09 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.33 2008-09-22 20:30:53 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *
@@ -4100,7 +4093,7 @@ lis_init_module(void)
 #endif
 
 	printk("Linux STREAMS Subsystem ready.\n"
-	       "Copyright (c) 2004-2006 OpenSS7 Corporation.  All Rights Reserved.\n"
+	       "Copyright (c) 2004-2008 OpenSS7 Corporation.  All Rights Reserved.\n"
 	       "Copyright (c) 1997-2004 David Grothe, et al, http://www.gcom.com\n"
 	       "Major device number %d.\n" "Version %s %s. Compiled for kernel version %s.\n"
 	       "Using %s %s\n"
@@ -4984,6 +4977,10 @@ MODULE_DESCRIPTION("SVR4 STREAMS for Linux (GPL Code)");
 #endif
 #if defined(MODULE_ALIAS)
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 
 /************************************************************************

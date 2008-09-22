@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 23:39:57 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:57 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_daed.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:27  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-04-28 23:39:57  brian
  - updated headers for release
 
- Revision 0.9.2.17  2007/08/15 05:32:58  brian
- - GPLv3 updates
-
- Revision 0.9.2.16  2007/08/14 06:47:36  brian
- - GPLv3 header update
-
- Revision 0.9.2.15  2007/07/14 01:35:37  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.14  2007/03/25 19:00:54  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.13  2007/03/25 02:23:17  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.12  2007/03/25 00:52:30  brian
- - synchronization updates
-
- Revision 0.9.2.11  2006/03/07 01:07:05  brian
- - binary compatible callouts
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 23:39:57 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:27 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 23:39:57 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:27 $";
 
 #include <sys/os7/compat.h>
 
@@ -96,7 +78,7 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 23:39:57 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:27 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL"
@@ -117,6 +99,10 @@ MODULE_LICENSE(CD_DAED_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-cd_daed");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $
+ @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:40 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_pmod.c,v $
+ Revision 0.9.2.9  2008-09-22 20:31:28  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.8  2008-09-10 03:49:40  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.7  2008-04-28 23:39:57  brian
  - updated headers for release
 
- Revision 0.9.2.6  2007/10/15 17:18:50  brian
- - fix for freezestr on 2.4 kernels
-
- Revision 0.9.2.5  2007/08/15 05:32:59  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/14 06:47:37  brian
- - GPLv3 header update
-
- Revision 0.9.2.3  2007/08/06 04:44:06  brian
- - rework of pipe-based emulation modules
-
- Revision 0.9.2.2  2007/08/03 13:35:52  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.1  2007/07/14 01:13:38  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $"
+#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $"
 
 static char const ident[] =
-    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $";
+    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $";
 
 /*
  *  This is MX-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -103,7 +88,7 @@ static char const ident[] =
 //#undef unfreezestr
 
 #define MX_DESCRIP	"MX (Multiplex) STREAMS PIPE MODULE."
-#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:49:40 $"
+#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:28 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -126,6 +111,10 @@ MODULE_LICENSE(MX_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-mx-pmod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

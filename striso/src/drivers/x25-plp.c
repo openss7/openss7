@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 0.9.2.6  2008-09-22 20:31:37  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.5  2008-04-29 00:02:00  brian
  - updated headers for release
 
- Revision 0.9.2.4  2007/12/16 03:53:07  brian
- - updated release files
-
- Revision 0.9.2.3  2007/12/15 20:20:29  brian
- - updates
-
- Revision 0.9.2.2  2007/08/14 07:05:03  brian
- - GNUv3 header update
-
- Revision 0.9.2.1  2006/04/12 20:36:01  brian
- - added some experimental drivers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:37 $";
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the
@@ -92,7 +83,7 @@ static char const ident[] =
 #define PLP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 00:02:00 $"
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:37 $"
 #define PLP_DEVICE	"SVR 4.2 STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"
@@ -114,6 +105,10 @@ MODULE_LICENSE(PLP_LICENSE);
 #ifdef MODUL_ALIAS
 MODULE_ALIAS("streams-x25-plp");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

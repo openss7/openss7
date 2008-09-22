@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/15 05:35:05 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-22 20:31:44 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,46 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.39  2008-09-22 20:31:44  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.38  2007/08/15 05:35:05  brian
  - GPLv3 updates
 
- Revision 0.9.2.37  2007/08/14 12:58:05  brian
- - GNUv3 header updates
-
- Revision 0.9.2.36  2007/07/14 01:37:02  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.35  2007/03/25 19:02:31  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.34  2007/03/25 06:01:02  brian
- - flush corrections
-
- Revision 0.9.2.33  2006/09/29 11:51:14  brian
- - libtool library tweaks in Makefile.am
- - better rpm spec handling in *.spec.in
- - added AC_LIBTOOL_DLOPEN to configure.ac
- - updated some copyright headers
- - rationalized item in two packages
- - added manual pages, drivers and modules to new strtty package
-
- Revision 0.9.2.32  2006/08/23 11:06:42  brian
- - corrections for compile
-
- Revision 0.9.2.31  2006/03/10 07:24:14  brian
- - rationalized streams and strutil package sources
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/15 05:35:05 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-22 20:31:44 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/15 05:35:05 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-22 20:31:44 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -104,8 +81,8 @@ static char const ident[] =
 #endif
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/15 05:35:05 $"
+#define SC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-22 20:31:44 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -124,6 +101,10 @@ MODULE_SUPPORTED_DEVICE(SC_DEVICE);
 MODULE_LICENSE(SC_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sc");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

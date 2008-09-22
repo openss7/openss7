@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $
+ @(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: apmod.c,v $
+ Revision 0.9.2.3  2008-09-22 20:31:38  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.2  2008-04-29 00:02:05  brian
  - updated headers for release
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
+#ident "@(#) $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
 
-static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $";
+static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $";
 
 /*
  * ASCE/Presentation (A/P) Module
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 
 
 #define APLI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define APLI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
+#define APLI_REVISION	"OpenSS7 $RCSfile: apmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
 #define APLI_DEVICE	"SVR 4.2 STREAMS APLI Module for APLI"
 #define APLI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define APLI_LICENSE	"GPL"
@@ -108,6 +111,10 @@ MODULE_LICENSE(APLI_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-apli");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifndef CONFIG_STREAMS_APLI_NAME

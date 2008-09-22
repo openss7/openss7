@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $
+ @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:20 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zaptel.c,v $
+ Revision 0.9.2.6  2008-09-22 20:31:26  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.5  2008-04-29 07:11:20  brian
  - updating headers for release
 
- Revision 0.9.2.4  2007/08/15 05:21:02  brian
- - GPLv3 updates
-
- Revision 0.9.2.3  2007/08/14 12:19:05  brian
- - GPLv3 header updates
-
- Revision 0.9.2.2  2007/07/14 01:35:30  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.1  2006/03/20 12:23:30  brian
- - first cut of zaptel driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $"
+#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:26 $"
 
 static char const ident[] =
-    "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $";
+    "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:26 $";
 
 /*
  *  This module pushes over an OpenSS7 MX Stream and provides a zaptel drvier
@@ -104,7 +95,7 @@ static char const ident[] =
 #include <ss7/zap_ioctl.h>
 
 #define ZAP_MX_DESCRIP	"ZAPTEL MULTIPLEX (ZAP-MX) STREAMS MODULE."
-#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2008-04-29 07:11:20 $"
+#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:26 $"
 #define ZAP_MX_COPYRIGHT    "Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"
@@ -127,6 +118,10 @@ MODULE_LICENSE(ZAP_MX_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-zap_mx");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

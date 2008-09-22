@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:10 $
+ @(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:10 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_cd.c,v $
+ Revision 0.9.2.4  2008-09-22 20:31:18  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.3  2008-04-29 07:11:10  brian
  - updating headers for release
 
- Revision 0.9.2.2  2007/08/14 12:18:45  brian
- - GPLv3 header updates
-
- Revision 0.9.2.1  2007/08/12 15:20:14  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:10 $"
+#ident "@(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:10 $";
+    "$RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:18 $";
 
 /*
  *  This is the SDT-CD STREAMS pushable module.  It's purpose is to convert from a general purpose
@@ -101,7 +98,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:10 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:18 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corpopration.  All Rights Reserved."
 #define SDT_DEVICE	"Provides OpenSS7 SDT-CD module."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -124,6 +121,10 @@ MODULE_LICENSE(SDT_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-sdt-cd");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

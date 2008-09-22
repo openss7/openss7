@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:20 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:20 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua.c,v $
+ Revision 0.9.2.9  2008-09-22 20:31:00  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.8  2008-04-29 01:52:20  brian
  - updated headers for release
 
- Revision 0.9.2.7  2007/08/15 05:13:48  brian
- - GPLv3 updates
-
- Revision 0.9.2.6  2007/08/14 08:33:53  brian
- - GPLv3 header update
-
- Revision 0.9.2.5  2007/07/14 01:33:31  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.4  2007/03/25 18:58:41  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.3  2007/03/25 02:22:26  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.2  2007/03/25 00:51:06  brian
- - synchronization updates
-
- Revision 0.9.2.1  2006/10/17 11:55:42  brian
- - copied files into new packages from strss7 package
-
- Revision 0.9.2.11  2006/03/07 01:10:17  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:20 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:00 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:20 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:00 $";
 
 #include <sys/os7/compat.h>
 
@@ -105,7 +84,7 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:20 $"
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:00 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -127,6 +106,10 @@ MODULE_LICENSE(M3UA_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-m3ua");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

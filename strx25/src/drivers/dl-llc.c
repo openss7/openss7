@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $
+ @(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-13 06:43:56 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl-llc.c,v $
+ Revision 0.9.2.2  2008-09-22 20:31:46  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.1  2008-06-13 06:43:56  brian
  - added files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $"
+#ident "@(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
 
-static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $";
+static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $";
 
 /*
  * This is a DLPI interface LLC driver for Linux.  What it does is provides DLPI access to the Linux
@@ -100,7 +103,7 @@ static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revi
 #define LLC_DESCRIP	"UNIX SVR 4.2 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $"
+#define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
 #define LLC_DEVICE	"SVR 4.2MP IEEE 802.2 LLC Driver (LLC)"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"
@@ -158,6 +161,10 @@ MODULE_ALIAS("/dev/tpb");
 MODULE_ALIAS("/dev/tpr");
 MODULE_ALIAS("/dev/fddi");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

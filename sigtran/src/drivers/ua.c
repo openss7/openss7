@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.14  2008-09-22 20:31:01  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.13  2008-09-10 03:49:17  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,45 +63,15 @@
  Revision 0.9.2.11  2008-04-29 01:52:22  brian
  - updated headers for release
 
- Revision 0.9.2.10  2007/08/15 05:14:01  brian
- - GPLv3 updates
-
- Revision 0.9.2.9  2007/08/14 08:33:56  brian
- - GPLv3 header update
-
- Revision 0.9.2.8  2007/07/14 01:33:38  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.7  2007/03/25 18:58:49  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.6  2007/03/25 02:22:26  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.5  2007/03/25 00:51:07  brian
- - synchronization updates
-
- Revision 0.9.2.4  2007/02/03 03:07:46  brian
- - working up drivers
-
- Revision 0.9.2.3  2006/12/23 13:06:50  brian
- - manual page and other package updates for release
-
- Revision 0.9.2.2  2006/11/16 20:45:41  brian
- - working up UA driver release
-
- Revision 0.9.2.1  2006/11/04 11:31:15  brian
- - new generic ua files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:01 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:01 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:17 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:01 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -118,6 +91,10 @@ MODULE_LICENSE(UA_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-ua");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

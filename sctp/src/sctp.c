@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:30:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:15 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp.c,v $
+ Revision 0.9.2.46  2008-09-22 20:30:57  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.45  2008-09-10 03:49:15  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.44  2008-04-29 08:49:52  brian
  - updated headers for Affero release
 
- Revision 0.9.2.43  2007/08/15 05:10:28  brian
- - GPLv3 updates
-
- Revision 0.9.2.42  2007/08/14 09:42:35  brian
- - GPLv3 header update
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:30:57 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:30:57 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -179,9 +176,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.45 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.46 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-10 03:49:15 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:30:57 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -203,6 +200,10 @@ MODULE_SUPPORTED_DEVICE(SCTP_DEVICE);
 #ifdef MODULE_LICENSE
 MODULE_LICENSE(SCTP_LICENSE);
 #endif				/* MODULE_LICENSE */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #if STREAMS
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sctp");

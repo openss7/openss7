@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: timod.c,v 0.9.2.37 2008-09-10 03:50:05 brian Exp $
+ @(#) $Id: timod.c,v 0.9.2.38 2008-09-22 20:31:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,75 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.38  2008-09-22 20:31:49  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.37  2008-09-10 03:50:05  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.36  2008-04-28 18:38:39  brian
  - header updates for release
 
- Revision 0.9.2.35  2007/08/15 05:35:34  brian
- - GPLv3 updates
-
- Revision 0.9.2.34  2007/08/14 04:00:55  brian
- - GPLv3 header update
-
- Revision 0.9.2.33  2007/08/03 13:36:47  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.32  2007/07/14 01:37:09  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.31  2007/04/12 20:07:06  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.30  2007/03/25 19:02:39  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.29  2007/03/25 00:53:44  brian
- - synchronization updates
-
- Revision 0.9.2.28  2007/03/10 13:53:29  brian
- - checking in latest corrections for release
-
- Revision 0.9.2.27  2006/10/03 13:53:46  brian
- - changes to pass make check target
- - added some package config.h files
- - removed AUTOCONFIG_H from Makefile.am's
- - source code changes for compile
- - added missing manual pages
- - renamed conflicting manual pages
- - parameterized include Makefile.am
- - updated release notes
-
- Revision 0.9.2.26  2006/09/01 08:53:05  brian
- - minor corrections to headers and code
-
- Revision 0.9.2.25  2006/07/24 09:01:55  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.24  2006/07/07 21:14:53  brian
- - correct compile back to RH 7.2
-
- Revision 0.9.2.23  2006/05/25 08:39:14  brian
- - added noinline in strategic places
-
- Revision 0.9.2.22  2006/05/22 02:09:12  brian
- - changes from performance testing
-
- Revision 0.9.2.21  2006/03/03 11:35:17  brian
- - 32/64-bit compatibility
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:49 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:49 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Revision 2 transport
@@ -144,7 +95,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:49 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -165,6 +116,10 @@ MODULE_LICENSE(TIMOD_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-timod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

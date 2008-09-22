@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xos.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $
+ @(#) $RCSfile: xos.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-13 06:43:57 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xos.c,v $
+ Revision 0.9.2.2  2008-09-22 20:31:48  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.1  2008-06-13 06:43:57  brian
  - added files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xos.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $"
+#ident "@(#) $RCSfile: xos.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:48 $"
 
-static char const ident[] = "$RCSfile: xos.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $";
+static char const ident[] = "$RCSfile: xos.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:48 $";
 
 /*
  * This is a XOS [draft-bidulock-tsvwg-xos-00] module.  It pushes over a TCP
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: xos.c,v $ $Name: OpenSS7-0_9_2 $($Revisio
 #define XOS_DESCRIPT	"X.25 OVER SCTP MODULE FOR LINUX FAST-STREAMS"
 #define XOS_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOS_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define XOS_REVISION	"OpenSS7 $RCSfile: xos.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $"
+#define XOS_REVISION	"OpenSS7 $RCSfile: xos.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:48 $"
 #define XOS_DEVICE	"SVR 4.2MP X.25 over SCTP Module (XOS) for X.25 CONS"
 #define XOS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOS_LICENSE	"GPL"
@@ -114,6 +117,10 @@ MODULE_ALIAS("streams-xos");
 MODULE_ALIAS("streams-module-xos");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_XOS_MODID));
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

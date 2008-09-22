@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $
+ @(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xx25.c,v $
+ Revision 0.9.2.3  2008-09-22 20:31:38  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.2  2008-04-29 00:02:05  brian
  - updated headers for release
 
- Revision 0.9.2.1  2007/12/15 20:16:49  brian
- - added new mib files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
+#ident "@(#) $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
 
-static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $";
+static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $";
 
 /*
  * X25MOD - XX25 Module: This is an X.25 module that is pushed over a X.25-PLP stream supporting the
@@ -84,7 +84,7 @@ static char const ident[] = "$RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $
 
 #define XX25_DESCRIP	"UNIT SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define XX25_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:02:05 $"
+#define XX25_REVISION	"OpenSS7 $RCSfile: xx25.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:38 $"
 #define XX25_DEVICE	"SVR 4.2 STREAMS XX25 Modle for X.25-PLP (X25MOD)"
 #define XX25_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XX25_LICENSE	"GPL"
@@ -106,6 +106,10 @@ MODULE_LICENSE(XX25_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-xx25");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifndef XX25_MOD_NAME

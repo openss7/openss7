@@ -64,6 +64,10 @@ MODULE_ALIAS("mercd");
 MODULE_ALIAS("streams-mercd");
 MODULE_ALIAS("streams-mercdDriver");
 #endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif
 static int mercd_probe(struct pci_dev *pdev, const struct pci_device_id *ent);
 static void mercd_release(struct pci_dev *pdev);

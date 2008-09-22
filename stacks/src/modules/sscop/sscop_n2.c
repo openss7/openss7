@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 07:11:13 $
+ @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n2.c,v $
+ Revision 0.9.2.14  2008-09-22 20:31:21  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.13  2008-04-29 07:11:13  brian
  - updating headers for release
 
- Revision 0.9.2.12  2007/08/15 05:20:29  brian
- - GPLv3 updates
-
- Revision 0.9.2.11  2007/08/14 12:18:51  brian
- - GPLv3 header updates
-
- Revision 0.9.2.10  2007/07/14 01:35:12  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.9  2006/03/07 01:13:42  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 07:11:13 $"
+#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:21 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 07:11:13 $";
+    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:21 $";
 
 #include <sys/os7/compat.h>
 
@@ -96,6 +87,10 @@ MODULE_LICENSE(SSCOP_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sscop_n");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

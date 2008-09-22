@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:17 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:24  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-04-29 07:11:17  brian
  - updating headers for release
 
- Revision 0.9.2.17  2007/08/15 05:20:47  brian
- - GPLv3 updates
-
- Revision 0.9.2.16  2007/08/14 12:18:58  brian
- - GPLv3 header updates
-
- Revision 0.9.2.15  2007/07/14 01:35:20  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.14  2007/03/25 19:00:37  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.13  2007/03/25 02:23:08  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.12  2007/03/25 00:52:18  brian
- - synchronization updates
-
- Revision 0.9.2.11  2006/03/04 13:00:20  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:17 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:24 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:17 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:24 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -116,7 +98,7 @@ static char const ident[] =
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:17 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:24 $"
 #define TUA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -139,6 +121,10 @@ MODULE_LICENSE(TUA_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tua");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,3 +1,19 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/clone.c: add mod version, truncate logs
+	* src/drivers/echo.c: add mod version, truncate logs
+	* src/drivers/fifo.c: add mod version, truncate logs
+	* src/drivers/log.c: add mod version, truncate logs
+	* src/drivers/nsdev.c: add mod version, truncate logs
+	* src/drivers/nuls.c: add mod version, truncate logs
+	* src/drivers/pipe.c: add mod version, truncate logs
+	* src/drivers/sad.c: add mod version, truncate logs
+	* src/drivers/sfx.c: add mod version, truncate logs
+	* src/drivers/spx.c: add mod version, truncate logs
+	* src/modules/connld.c: add mod version, truncate logs
+	* src/modules/pipemod.c: add mod version, truncate logs
+	* src/modules/sc.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strutil.spec.in: much improved spec files ready for repo building

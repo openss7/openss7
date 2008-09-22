@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-28 17:46:04 $
+ @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,62 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 17:46:04 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pckt.c,v $
+ Revision 0.9.2.10  2008-09-22 20:31:42  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.9  2008-04-28 17:46:04  brian
  - updates for release
 
- Revision 0.9.2.8  2007/08/15 05:34:51  brian
- - GPLv3 updates
-
- Revision 0.9.2.7  2007/08/14 03:04:36  brian
- - GPLv3 header update
-
- Revision 0.9.2.6  2007/07/14 01:36:53  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.5  2007/03/25 19:02:25  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.4  2006/10/19 10:39:02  brian
- - corrections for compile on SuSE 10.0
-
- Revision 0.9.2.3  2006/10/12 09:37:42  brian
- - completed much of the strtty package
-
- Revision 0.9.2.2  2006/10/02 11:32:14  brian
- - changes to get master builds working for RPM and DEB
- - added outside licenses to package documentation
- - added LICENSE automated release file
- - copy MANUAL to source directory
- - add and remove devices in -dev debian subpackages
- - get debian rules working better
- - release library version files
- - added notes to debian changelog
- - corrections for cooked manual pages in spec files
- - added release documentation to spec and rules files
- - copyright header updates
- - moved controlling tty checks in stream head
- - missing some defines for LiS build in various source files
- - added OSI headers to striso package
- - added includes and manual page paths to acincludes for various packages
- - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-   files
- - moved pragma weak statements ahead of declarations
- - changes for master build of RPMS and DEBS with LiS
-
- Revision 0.9.2.1  2006/09/29 11:40:07  brian
- - new files for strtty package and manual pages
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-28 17:46:04 $"
+#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:42 $"
 
 static char const ident[] =
-    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-28 17:46:04 $";
+    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:42 $";
 
 /*
  * This is the pckt(4) STREAMS module, a Packet Mode module to be pushed on the
@@ -265,7 +226,7 @@ static char const ident[] =
 
 #define PCKT_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PCKT_COPYRIGHT		"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-28 17:46:04 $"
+#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:42 $"
 #define PCKT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PCKT_LICENSE		"GPL"
@@ -285,6 +246,10 @@ MODULE_LICENSE(PCKT_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-pckt");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-22 20:31:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,146 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.44  2008-09-22 20:31:50  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.43  2008-09-10 03:50:07  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.42  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
- Revision 0.9.2.41  2007/08/15 05:35:41  brian
- - GPLv3 updates
-
- Revision 0.9.2.40  2007/08/14 03:31:08  brian
- - GPLv3 header update
-
- Revision 0.9.2.39  2007/07/14 01:37:19  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.38  2007/06/17 01:57:36  brian
- - updates for release, remove any later language
-
- Revision 0.9.2.37  2007/05/17 22:21:29  brian
- - perform nf_reset if available
-
- Revision 0.9.2.36  2007/05/07 18:55:13  brian
- - corrections from release testing
-
- Revision 0.9.2.35  2007/03/25 19:02:46  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.34  2007/03/25 00:53:47  brian
- - synchronization updates
-
- Revision 0.9.2.33  2007/02/10 15:53:17  brian
- - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
-
- Revision 0.9.2.32  2006/07/15 13:06:28  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.31  2006/05/08 11:26:11  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.30  2006/05/08 08:16:42  brian
- - module_text_address, hash alloc changes
-
- Revision 0.9.2.29  2006/05/07 22:12:57  brian
- - updated for NPI-IP driver
-
- Revision 0.9.2.28  2006/05/06 10:22:29  brian
- - added test suite for NPI-IP driver
-
- Revision 0.9.2.27  2006/05/05 02:07:52  brian
- - working up NPI-IP driver
-
- Revision 0.9.2.26  2006/05/03 22:53:39  brian
- - working up NPI-IP driver
-
- Revision 0.9.2.25  2006/05/03 11:53:53  brian
- - changes for compile, working up NPI-IP driver
-
- Revision 0.9.2.24  2006/05/03 01:04:33  brian
- - corrections for compile
-
- Revision 0.9.2.23  2006/04/27 09:34:58  brian
- - working up NPI-IP driver some more
-
- Revision 0.9.2.22  2006/04/26 10:47:53  brian
- - sync
-
- Revision 0.9.2.21  2006/04/26 04:04:13  brian
- - sync
-
- Revision 0.9.2.20  2006/04/26 00:52:36  brian
- - sync
-
- Revision 0.9.2.19  2006/04/25 22:28:59  brian
- - working up NPI-IP driver
-
- Revision 0.9.2.18  2006/04/24 05:00:33  brian
- - call interface corrections
-
- Revision 0.9.2.17  2006/04/03 10:57:25  brian
- - need attributes on definition as well as declaration
-
- Revision 0.9.2.16  2006/03/31 12:36:46  brian
- - working up ip driver
-
- Revision 0.9.2.15  2006/03/30 12:51:56  brian
- - corrections for x64_64 compile
-
- Revision 0.9.2.14  2006/03/30 10:47:33  brian
- - working up NPI IP test and mux driver
-
- Revision 0.9.2.13  2006/03/27 01:25:54  brian
- - working up IP driver and SCTP testing
-
- Revision 0.9.2.12  2006/03/24 05:10:08  brian
- - 64-bit corrections
-
- Revision 0.9.2.11  2006/03/23 12:16:16  brian
- - changes for old 2.4 kernel (RH7) build
-
- Revision 0.9.2.10  2006/03/20 23:10:31  brian
- - corrected errors
-
- Revision 0.9.2.9  2006/03/20 12:16:45  brian
- - working up IP driver
-
- Revision 0.9.2.8  2006/03/18 09:42:11  brian
- - added in ip driver and manual pages
-
- Revision 0.9.2.7  2006/03/18 00:15:21  brian
- - syncing notebook
-
- Revision 0.9.2.6  2006/01/02 12:00:44  brian
- - working up IP driver
-
- Revision 0.9.2.5  2005/12/28 10:01:50  brian
- - remove warnings on FC4 compile
-
- Revision 0.9.2.4  2005/07/18 12:40:29  brian
- - standard indentation
-
- Revision 0.9.2.3  2005/07/05 22:46:14  brian
- - change for strcompat package
-
- Revision 0.9.2.2  2005/06/19 09:27:33  brian
- - working up IP NPI driver
-
- Revision 0.9.2.1  2005/06/16 20:41:45  brian
- - Start of the IP NPI driver.
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-22 20:31:50 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-22 20:31:50 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -237,8 +117,8 @@ typedef unsigned int socklen_t;
 
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-10 03:50:07 $"
+#define IP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2008-09-22 20:31:50 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -261,6 +141,10 @@ MODULE_LICENSE(IP_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-ip");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

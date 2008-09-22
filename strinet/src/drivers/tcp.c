@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:47 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.29  2008-09-22 20:31:34  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.28  2008-09-10 03:49:47  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -63,85 +66,12 @@
  Revision 0.9.2.25  2008-04-28 22:52:11  brian
  - updated headers for release
 
- Revision 0.9.2.24  2007/10/18 06:54:12  brian
- - corrected new socket buffer support
-
- Revision 0.9.2.23  2007/10/15 17:22:57  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.22  2007/08/15 05:33:58  brian
- - GPLv3 updates
-
- Revision 0.9.2.21  2007/08/14 04:27:16  brian
- - GPLv3 header update
-
- Revision 0.9.2.20  2007/07/14 01:36:10  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.19  2007/05/17 22:33:06  brian
- - perform nf_reset when available
-
- Revision 0.9.2.18  2007/05/08 12:17:51  brian
- - locking updates, changes from validation testing
-
- Revision 0.9.2.17  2007/03/25 19:01:33  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.16  2007/03/25 00:53:05  brian
- - synchronization updates
-
- Revision 0.9.2.15  2007/02/10 15:53:23  brian
- - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
-
- Revision 0.9.2.14  2006/08/16 07:47:37  brian
- - removed locking macro pollution
-
- Revision 0.9.2.13  2006/07/24 09:01:33  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.12  2006/07/16 12:46:34  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.11  2006/07/15 13:06:10  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.10  2006/07/08 09:37:52  brian
- - handle old SLES 9 2.6.5 kernel (untested)
-
- Revision 0.9.2.9  2006/07/07 21:15:02  brian
- - correct compile back to RH 7.2
-
- Revision 0.9.2.8  2006/07/02 12:19:54  brian
- - changes for 2.6.17 kernel
-
- Revision 0.9.2.7  2006/06/18 20:54:13  brian
- - minor optimizations from profiling
-
- Revision 0.9.2.6  2006/06/14 10:37:44  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.5  2006/05/14 08:34:30  brian
- - changes for compile and load
-
- Revision 0.9.2.4  2006/05/08 11:26:04  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.3  2006/05/07 22:12:48  brian
- - updated for NPI-IP driver
-
- Revision 0.9.2.2  2006/05/03 11:53:51  brian
- - changes for compile, working up NPI-IP driver
-
- Revision 0.9.2.1  2006/04/25 06:47:00  brian
- - added 2nd gen TCP driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -220,7 +150,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-10 03:49:47 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -243,6 +173,10 @@ MODULE_LICENSE(TCP_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-tcp");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

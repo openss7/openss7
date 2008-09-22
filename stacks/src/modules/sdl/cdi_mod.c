@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $
+ @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,48 +46,33 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi_mod.c,v $
+ Revision 0.9.2.16  2008-09-22 20:31:16  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.15  2008-09-10 03:49:32  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.14  2008-04-29 07:11:09  brian
  - updating headers for release
 
- Revision 0.9.2.13  2007/08/15 05:20:11  brian
- - GPLv3 updates
-
- Revision 0.9.2.12  2007/08/14 12:18:44  brian
- - GPLv3 header updates
-
- Revision 0.9.2.11  2007/07/14 01:35:00  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.10  2007/03/25 19:00:10  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.9  2007/03/25 00:52:05  brian
- - synchronization updates
-
- Revision 0.9.2.8  2006/03/07 01:11:39  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $"
+#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:16 $"
 
 static char const ident[] =
-    "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $";
+    "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:16 $";
 
 #include <sys/os7/compat.h>
 
 #include <sys/cdi.h>
 
 #define CDI_DESCRIP	"CDI SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-10 03:49:32 $"
+#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:16 $"
 #define CDI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define CDI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -109,6 +94,10 @@ MODULE_LICENSE(CDI_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-cdi_mod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

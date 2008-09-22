@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,53 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.57  2008-09-22 20:31:30  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.56  2008-04-28 12:54:05  brian
  - update file headers for release
 
- Revision 0.9.2.55  2007/12/15 20:19:54  brian
- - updates
-
- Revision 0.9.2.54  2007/08/15 05:33:21  brian
- - GPLv3 updates
-
- Revision 0.9.2.53  2007/08/13 22:46:15  brian
- - GPLv3 header updates
-
- Revision 0.9.2.52  2007/07/14 01:35:46  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.51  2007/03/25 19:01:13  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.50  2007/03/25 06:00:17  brian
- - flush corrections
-
- Revision 0.9.2.49  2006/12/18 07:32:40  brian
- - lfs device names, autoload clone minors, device numbering, missing manpages
-
- Revision 0.9.2.48  2006/10/27 23:19:34  brian
- - changes for 2.6.18 kernel
-
- Revision 0.9.2.47  2006/07/24 09:01:15  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.46  2006/03/04 04:37:34  brian
- - corrections for FC4 x86_64 gcc 4.0.4 build
-
- Revision 0.9.2.45  2006/03/03 10:57:11  brian
- - 32-bit compatibility support, updates for release
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:30 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:30 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -129,7 +99,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-04-28 12:54:05 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:30 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL"
@@ -148,6 +118,10 @@ MODULE_SUPPORTED_DEVICE(SAD_DEVICE);
 MODULE_LICENSE(SAD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sad");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

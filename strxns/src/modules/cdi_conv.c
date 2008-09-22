@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $
+ @(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi_conv.c,v $
+ Revision 0.9.2.7  2008-09-22 20:31:51  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.6  2008-04-25 11:39:33  brian
  - updates to AGPLv3
 
- Revision 0.9.2.5  2007/08/15 05:35:46  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/14 03:31:19  brian
- - GPLv3 header update
-
- Revision 0.9.2.3  2007/07/14 01:37:24  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.2  2007/03/25 19:02:50  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.1  2007/02/10 22:33:13  brian
- - added new working files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $"
+#ident "@(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $"
 
 static char const ident[] =
-    "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $";
+    "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $";
 
 /*
  *  CDI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -87,8 +75,8 @@ static char const ident[] =
 #include <sys/cdi.h>
 
 #define CDI_CONV_DESCRIP	"CDI ENDIAN CONVERSION (CDI-CONV) FOR LINUX FAST-STREAMS"
-#define CDI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CDI_CONV_REVISION	"OpenSS7 $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-25 11:39:33 $"
+#define CDI_CONV_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define CDI_CONV_REVISION	"OpenSS7 $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:51 $"
 #define CDI_CONV_DEVICE		"SVR 4.2 CDI Endian Conversion (CDI-CONV) for STREAMS"
 #define CDI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDI_CONV_LICENSE	"GPL"
@@ -108,6 +96,10 @@ MODULE_LICENSE(CDI_CONV_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-cdi-conv");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 
 #ifdef MODULE_ALIAS

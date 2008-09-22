@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:00 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,86 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:11  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-04-29 07:11:00  brian
  - updating headers for release
 
- Revision 0.9.2.17  2007/08/15 05:19:05  brian
- - GPLv3 updates
-
- Revision 0.9.2.16  2007/08/14 12:18:02  brian
- - GPLv3 header updates
-
- Revision 0.9.2.15  2007/07/14 01:34:31  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.14  2007/06/17 01:56:17  brian
- - updates for release, remove any later language
-
- Revision 0.9.2.13  2007/03/25 18:59:38  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.12  2007/03/25 05:59:30  brian
- - flush corrections
-
- Revision 0.9.2.11  2007/03/25 02:22:50  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.10  2007/03/25 00:51:52  brian
- - synchronization updates
-
- Revision 0.9.2.9  2005/07/13 12:01:32  brian
- - working up compat and check pass (finally lindented LiS)
-
- Revision 0.9.2.8  2005/07/05 22:45:32  brian
- - change for strcompat package
-
- Revision 0.9.2.7  2005/05/10 18:05:52  brian
- - do not set clone flag cause symbol no longer exported
-
- Revision 0.9.2.6  2005/04/09 09:42:20  brian
- - addition of module alias for ko modules
-
- Revision 0.9.2.5  2005/03/31 06:53:08  brian
- - changes for EL$ (CentOS 4.0) compatibility
-
- Revision 0.9.2.4  2005/03/08 19:30:03  brian
- - Changes for new build compile.
-
- Revision 0.9.2.3  2004/08/29 20:25:21  brian
- - Updates to driver registration for Linux Fast-STREAMS.
-
- Revision 0.9.2.2  2004/08/26 23:37:57  brian
- - Converted for use with Linux Fast-STREAMS.
-
- Revision 0.9.2.1  2004/08/21 10:14:44  brian
- - Force checkin on branch.
-
- Revision 0.9  2004/01/17 08:20:21  brian
- - Added files for 0.9 baseline autoconf release.
-
- Revision 0.8.2.3  2003/04/14 12:13:00  brian
- Updated module license defines.
-
- Revision 0.8.2.2  2003/04/03 19:50:31  brian
- Updates preparing for release.
-
- Revision 0.8.2.1  2002/10/18 03:27:42  brian
- Indentation changes only.
-
- Revision 0.8  2002/04/02 08:20:42  brian
- Started Linux 2.4 development branch.
-
- Revision 0.7  2001/06/04 03:48:36  brian
- Added files for M3UA.
-
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:00 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:11 $";
 
 #include <sys/os7/compat.h>
 
@@ -133,7 +67,7 @@ static char const ident[] = "$Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 
 #include <ss7/m3ua_ioctl.h>
 
 #define M3UA_DESCRIP	"M3UA/SCTP STREAMS MULTIPLEXOR."
-#define M3UA_COPYRIGHT	"Copyright (c) 2001 OpenSS7 Corp. All Rights Reserved."
+#define M3UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICES	"Supports OpenSS7 drivers."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_LICENSE	"GPL"
@@ -152,6 +86,10 @@ MODULE_LICENSE(M3UA_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-m3ua_as");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

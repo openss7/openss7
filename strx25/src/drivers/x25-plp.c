@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008/07/27 08:49:54 $
+ @(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/27 08:49:54 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.c,v $
+ Revision 0.9.2.6  2008-09-22 20:31:46  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.5  2008/07/27 08:49:54  brian
  - no invariant sections, more libtool ignores
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008/07/27 08:49:54 $"
+#ident "@(#) $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:46 $"
 
 static char const ident[] =
-    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008/07/27 08:49:54 $";
+    "$RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:46 $";
 
 /*
  * This is a multiplexing driver for the X.25 Packet Layer Protocol (PLP).  It
@@ -99,7 +102,7 @@ static char const ident[] =
 #define PLP_DESCRIP	"SVR 4.2 NLI X.25 PLP DRIVER FOR LINUX FAST-STREAMS"
 #define PLP_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STERAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008/07/27 08:49:54 $"
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:46 $"
 #define PLP_DEVICE	"SVR 4.2MP NLI Driver (NLI) for X.25/ISO 8208"
 #define PLP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"
@@ -152,6 +155,10 @@ MODULE_ALIAS("/dev/x25");
 MODULE_ALIAS("/dev/xx25");
 MODULE_ALIAS("/dev/cons");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

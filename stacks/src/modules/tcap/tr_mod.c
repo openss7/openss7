@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $
+ @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,38 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:36 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr_mod.c,v $
+ Revision 0.9.2.8  2008-09-22 20:31:23  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.7  2008-09-10 03:49:36  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.6  2008-04-29 07:11:16  brian
  - updating headers for release
 
- Revision 0.9.2.5  2007/10/15 17:17:17  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.4  2007/09/06 11:16:18  brian
- - testing updates
-
- Revision 0.9.2.3  2007/08/15 05:20:41  brian
- - GPLv3 updates
-
- Revision 0.9.2.2  2007/08/14 12:18:56  brian
- - GPLv3 header updates
-
- Revision 0.9.2.1  2007/08/03 13:02:54  brian
- - added documentation and minimal modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $"
+#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:23 $"
 
 static char const ident[] =
-    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $";
+    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:23 $";
 
 /*
  * This is TR-MOD.  It is a simplified Transaction Interface (TRI) module for TCAP that can be
@@ -122,7 +110,7 @@ static char const ident[] =
 #include <ss7/tcap_ioctl.h>
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
-#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-10 03:49:36 $"
+#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:23 $"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -145,6 +133,10 @@ MODULE_LICENSE(TR_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-tr-mod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

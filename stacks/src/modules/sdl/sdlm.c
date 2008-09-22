@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,31 +46,25 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdlm.c,v $
+ Revision 0.9.2.26  2008-09-22 20:31:18  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.25  2008-09-10 03:49:32  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.24  2008-04-29 07:11:09  brian
  - updating headers for release
 
- Revision 0.9.2.23  2007/08/15 05:20:11  brian
- - GPLv3 updates
-
- Revision 0.9.2.22  2007/08/12 16:38:45  brian
- - header error
-
- Revision 0.9.2.21  2007/08/12 16:20:25  brian
- - new PPA handling
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:18 $"
 
-static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $";
+static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:18 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -99,7 +93,7 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:32 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 20:31:18 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -121,6 +115,10 @@ MODULE_LICENSE(SDLM_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdlm");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,3 +1,27 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* drivers/str/bufmod.c: add mod version, truncate logs
+	* drivers/str/echo.c: add mod version, truncate logs
+	* drivers/str/fifo.c: add mod version, truncate logs
+	* drivers/str/loop.c: add mod version, truncate logs
+	* drivers/str/mux.c: add mod version, truncate logs
+	* drivers/str/nullmod.c: add mod version, truncate logs
+	* drivers/str/nuls.c: add mod version, truncate logs
+	* drivers/str/pipemod.c: add mod version, truncate logs
+	* drivers/str/relay.c: add mod version, truncate logs
+	* drivers/str/sad.c: add mod version, truncate logs
+	* drivers/str/testmod.c: add mod version, truncate logs
+	* drivers/str/timod.c: add mod version, truncate logs
+	* drivers/str/tirdwr.c: add mod version, truncate logs
+	* drivers/str/linux/connld.c: add mod version, truncate logs
+	* drivers/str/linux/ip_to_dlpi.c: add mod version, truncate logs
+	* drivers/str/linux/ldl.c: add mod version, truncate logs
+	* drivers/str/linux/liskmod.c: add mod version, truncate logs
+	* drivers/str/linux/mtdrv.c: add mod version, truncate logs
+	* head/linux-mdep.c: add mod version, truncate logs
+	* pkg/drv_wrap.c: add mod version, truncate logs
+	* pkg/mod_wrap.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS.spec.in: much improved spec files ready for repo building

@@ -66,6 +66,10 @@ MODULE_ALIAS("gncfd");
 MODULE_ALIAS("streams-gncfd");
 MODULE_ALIAS("streams-gncfdDriver");
 #endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif
 
 int gn_devflag = 0;

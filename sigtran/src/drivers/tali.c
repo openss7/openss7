@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tali.c,v $
+ Revision 0.9.2.11  2008-09-22 20:31:00  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.10  2008-09-10 03:49:17  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.9  2008-04-29 01:52:21  brian
  - updated headers for release
 
- Revision 0.9.2.8  2007/08/15 05:13:57  brian
- - GPLv3 updates
-
- Revision 0.9.2.7  2007/08/14 08:33:55  brian
- - GPLv3 header update
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:00 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:00 $";
 
 #include <sys/os7/compat.h>
 
@@ -86,7 +83,7 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:17 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:00 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -108,6 +105,10 @@ MODULE_LICENSE(TALI_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tali");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

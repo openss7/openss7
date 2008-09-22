@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:13 $
+ @(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_ip.c,v $
+ Revision 0.9.2.13  2008-09-22 20:31:21  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.12  2008-04-29 07:11:13  brian
  - updating headers for release
 
- Revision 0.9.2.11  2007/08/15 05:20:28  brian
- - GPLv3 updates
-
- Revision 0.9.2.10  2007/08/14 12:18:51  brian
- - GPLv3 header updates
-
- Revision 0.9.2.9  2007/07/14 01:35:12  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.8  2006/03/07 01:13:21  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:13 $"
+#ident "@(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:21 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:13 $";
+    "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:21 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE/IP as specified in
@@ -81,7 +72,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define SSCOP_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop_ip.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2008-04-29 07:11:13 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop_ip.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:21 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -103,6 +94,10 @@ MODULE_LICENSE(SSCOP_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sscop_ip");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

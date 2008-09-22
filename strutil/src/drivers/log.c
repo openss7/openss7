@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/15 05:35:00 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,23 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: log.c,v $
+ Revision 0.9.2.45  2008-09-22 20:31:43  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.44  2007/08/15 05:35:00  brian
  - GPLv3 updates
 
- Revision 0.9.2.43  2007/08/14 12:58:01  brian
- - GNUv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/15 05:35:00 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/15 05:35:00 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -95,8 +95,8 @@ static char const ident[] =
 #endif
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/15 05:35:00 $"
+#define LOG_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -115,6 +115,10 @@ MODULE_SUPPORTED_DEVICE(LOG_DEVICE);
 MODULE_LICENSE(LOG_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-log");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

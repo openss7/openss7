@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:04 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-22 20:31:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,59 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:04 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_npi.c,v $
+ Revision 0.9.2.27  2008-09-22 20:31:13  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.26  2008-04-29 07:11:04  brian
  - updating headers for release
 
- Revision 0.9.2.25  2007/08/15 05:19:28  brian
- - GPLv3 updates
-
- Revision 0.9.2.24  2007/08/14 12:18:06  brian
- - GPLv3 header updates
-
- Revision 0.9.2.23  2007/08/03 13:35:26  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.22  2007/07/14 01:34:41  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.21  2007/03/25 18:59:49  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.20  2007/03/25 02:22:52  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.19  2007/02/26 07:25:40  brian
- - synchronizing changes
-
- Revision 0.9.2.18  2007/02/17 02:49:17  brian
- - first clean recompile of MTP modules on LFS
-
- Revision 0.9.2.17  2007/02/14 14:09:11  brian
- - broad changes updating support for SS7 MTP and M3UA
-
- Revision 0.9.2.16  2007/02/13 07:55:43  brian
- - working up MTP and UAs
-
- Revision 0.9.2.15  2006/05/08 11:01:00  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.14  2006/03/07 01:10:46  brian
- - binary compatible callouts
-
- Revision 0.9.2.13  2006/03/04 13:00:15  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:04 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-22 20:31:13 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:04 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-22 20:31:13 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message Transfer Part Interface)
@@ -127,7 +91,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-04-29 07:11:04 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-22 20:31:13 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -149,6 +113,10 @@ MODULE_LICENSE(MTP_NPI_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-mtp_npi");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

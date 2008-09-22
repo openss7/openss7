@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 01:52:21 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,56 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:21 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.14  2008-09-22 20:31:00  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.13  2008-04-29 01:52:21  brian
  - updated headers for release
 
- Revision 0.9.2.12  2007/08/19 11:48:22  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.11  2007/08/15 05:13:53  brian
- - GPLv3 updates
-
- Revision 0.9.2.10  2007/08/12 16:15:24  brian
- -
-
- Revision 0.9.2.9  2007/08/03 13:34:34  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.8  2007/07/14 01:33:31  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.7  2007/05/18 12:15:25  brian
- - careful not to flush timers
-
- Revision 0.9.2.6  2007/05/17 22:55:28  brian
- - use mi_timer requeue to requeue mi timers
-
- Revision 0.9.2.5  2007/03/25 18:58:44  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.4  2007/03/12 23:19:41  brian
- - changes for function type safety
-
- Revision 0.9.2.3  2007/02/14 14:08:53  brian
- - broad changes updating support for SS7 MTP and M3UA
-
- Revision 0.9.2.2  2007/02/10 22:32:10  brian
- - working up sigtran drivers
-
- Revision 1.1.2.1  2007/02/03 03:05:15  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 01:52:21 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-04-29 01:52:21 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $";
 
 /*
  *  This is an SUA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -193,7 +160,7 @@ static char const ident[] =
 /* ============================== */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP AS SCCP STREAMS MULTIPLEXING DRIVER."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2008-04-29 01:52:21 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -217,6 +184,10 @@ MODULE_LICENSE(SUA_AS_LICENSE);
 MODULE_ALIAS("streams-sua_as");
 MODULE_ALIAS("streams-sua-as");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,3 +1,9 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/timod.c: add mod version, truncate logs
+	* src/modules/tirdwr.c: add mod version, truncate logs
+	* src/modules/tpi_conv.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxnet.spec.in: much improved spec files ready for repo building
