@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: osr61.spec.in,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-21 10:55:12 $
+# @(#) $RCSfile: osr61.spec.in,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-22 17:37:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-21 10:55:12 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:37:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -756,6 +756,22 @@ fi
     --with-k-release=%{kernel_version} \
     --with-k-modules=%{_kmoduledir} \
     --with-base-major=%{majbase} \
+    %{?_with_pkg_epoch:          '%_with_pkg_epoch'} \
+    %{?_without_pkg_epoch:       '%_without_pkg_epoch'} \
+    %{?_with_pkg_release:        '%_with_pkg_release'} \
+    %{?_without_pkg_release:     '%_without_pkg_release'} \
+    %{?_with_pkg_patchlevel:     '%_with_pkg_patchlevel'} \
+    %{?_without_pkg_patchlevel:  '%_without_pkg_patchlevel'} \
+    %{?_with_rpm_epoch:          '%_with_rpm_epoch'} \
+    %{?_without_rpm_epoch:       '%_without_rpm_epoch'} \
+    %{?_with_rpm_release:        '%_with_rpm_release'} \
+    %{?_without_rpm_release:     '%_without_rpm_release'} \
+    %{?_with_rpm_extra:          '%_with_rpm_extra'} \
+    %{?_without_rpm_extra:       '%_without_rpm_extra'} \
+    %{?_with_deb_epoch:          '%_with_deb_epoch'} \
+    %{?_without_deb_epoch:       '%_without_deb_epoch'} \
+    %{?_with_deb_release:        '%_with_deb_release'} \
+    %{?_without_deb_release:     '%_without_deb_release'} \
     %{?_with_arch:               '%enable %_with_arch'} \
     %{?_without_arch:            '%disable %_without_arch'} \
     %{?_with_indep:              '%enable %_with_indep'} \
@@ -2783,9 +2799,13 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: osr61.spec.in,v $
-# Revision 0.9.2.25  2008-09-21 10:55:12  brian
-# - update spec files
+# Revision 0.9.2.26  2008-09-22 17:37:25  brian
+# - build and release updates
 #
+
+* Sun Sep 21 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.25  2008-09-21 10:55:12  brian
+- update spec files
 
 * Sat Sep 20 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.24  2008-09-20 11:01:01  brian
