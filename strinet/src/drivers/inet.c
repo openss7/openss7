@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2008-09-10 14:26:43 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 14:26:43 $ by $Author: brian $
+ Last Modified $Date: 2008/09/22 17:15:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.94  2008/09/22 17:15:32  brian
+ - generate M_ERROR on error, discard excess data indications
+
  Revision 0.9.2.93  2008-09-10 14:26:43  brian
  - reworked write side locking
 
@@ -158,10 +161,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2008-09-10 14:26:43 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2008-09-10 14:26:43 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -652,7 +655,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2008-09-10 14:26:43 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -14060,7 +14063,12 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 
 			if ((err = ss_recvmsg(ss, msg, size)) <= 0) {
 				freemsg(mp);
-				return (err);
+				if (likely(err == -EAGAIN)) {
+					STRLOGIO(ss, "no data to read!");
+					freemsg(bp);
+					return (QR_ABSORBED);
+				}
+				return m_error(ss, q, bp, err);
 			}
 			mp->b_wptr = mp->b_rptr + err;
 			STRLOGIO(ss, "recvmsg with len = %d", err);
@@ -16232,6 +16240,8 @@ ss_rsrv(queue_t *q)
 		while (likely((mp = getq(q)) != NULL)) {
 			mp->b_wptr -= PRELOAD;
 			if (unlikely((rtn = ss_r_prim_srv(ss, q, mp)) != QR_ABSORBED)) {
+				/* reapply backpressure */
+				mp->b_wptr += PRELOAD;
 				if (unlikely(!putbq(q, mp))) {
 					mp->b_band = 0;
 					putbq(q, mp);	/* must succeed */
