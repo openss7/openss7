@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:44 $
 
  -----------------------------------------------------------------------------
 
@@ -46,50 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:59 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: h225.c,v $
+ Revision 0.9.2.10  2008-09-22 20:31:44  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.9  2008-09-10 03:49:59  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.8  2008-04-29 02:07:54  brian
  - updated headers for release
 
- Revision 0.9.2.7  2007/08/15 05:35:23  brian
- - GPLv3 updates
-
- Revision 0.9.2.6  2007/08/14 08:46:36  brian
- - GPLv3 header update
-
- Revision 0.9.2.5  2007/07/14 01:37:04  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.4  2007/03/25 19:02:33  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.3  2007/03/25 02:23:37  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.2  2007/03/25 00:53:40  brian
- - synchronization updates
-
- Revision 0.9.2.1  2006/10/17 11:56:23  brian
- - copied files into new packages from strss7 package
-
- Revision 0.9.2.13  2006/05/14 06:58:02  brian
- - removed redundant or unused QR_ definitions
-
- Revision 0.9.2.12  2006/03/07 01:08:08  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:44 $"
 
 static char const ident[] =
-    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $";
+    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:44 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -110,7 +86,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-10 03:49:59 $"
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:44 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -132,6 +108,10 @@ MODULE_LICENSE(ISDN_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-h225");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nuls.c,v $
+ Revision 0.9.2.17  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.16  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 0.9.2.15  2007/08/15 04:57:58  brian
- - GPLv3 updates
-
- Revision 0.9.2.14  2007/08/14 10:46:56  brian
- - GPLv3 header update
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -86,7 +83,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-29 08:33:11 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -109,6 +106,10 @@ MODULE_SUPPORTED_DEVICE(NULS_DEVICE);
 MODULE_LICENSE(NULS_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-nuls");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

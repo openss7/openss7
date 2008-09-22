@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $
+ @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_mod.c,v $
+ Revision 0.9.2.4  2008-09-22 20:31:15  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.3  2008-04-29 07:11:06  brian
  - updating headers for release
 
- Revision 0.9.2.2  2007/08/14 12:18:23  brian
- - GPLv3 header updates
-
- Revision 0.9.2.1  2007/08/03 13:02:51  brian
- - added documentation and minimal modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $"
+#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $"
 
 static char const ident[] =
-    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $";
+    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $";
 
 /*
  * This is SCCP-MOD.  It is a simplified Signalling Connection Control Part (SCCPI) module for SCCP
@@ -105,7 +102,7 @@ static char const ident[] =
 #include <ss7/mtpi_ioctl.h>
 
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS MODULE."
-#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:06 $"
+#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -128,6 +125,10 @@ MODULE_LICENSE(SC_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-sccp-mod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

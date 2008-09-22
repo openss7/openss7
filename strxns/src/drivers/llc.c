@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $
+ @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: llc.c,v $
+ Revision 0.9.2.6  2008-09-22 20:31:50  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.5  2008-09-10 03:50:07  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.4  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
- Revision 0.9.2.3  2007/08/19 12:03:19  brian
- - move stdbool.h to compat.h
-
- Revision 0.9.2.2  2007/08/14 03:31:09  brian
- - GPLv3 header update
-
- Revision 0.9.2.1  2007/08/12 15:20:26  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $"
+#ident "@(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:50 $"
 
 static char const ident[] =
-    "$RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $";
+    "$RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:50 $";
 
 /*
  * This is a DL driver for LLC1, LLC2 and LLC3 connections over 802.2.  It
@@ -89,8 +83,8 @@ static char const ident[] =
 #include <sys/dlpi.h>
 
 #define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-10 03:50:07 $"
-#define DL_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
+#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:31:50 $"
+#define DL_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -122,6 +116,10 @@ MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(LLC_CMAJOR_0) "-0");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

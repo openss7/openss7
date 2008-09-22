@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-10 03:49:31 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-22 20:31:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:31 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.32  2008-09-22 20:31:15  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.31  2008-09-10 03:49:31  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,39 +63,12 @@
  Revision 0.9.2.29  2008-04-29 07:11:06  brian
  - updating headers for release
 
- Revision 0.9.2.28  2007/08/15 05:19:51  brian
- - GPLv3 updates
-
- Revision 0.9.2.27  2007/08/14 12:18:24  brian
- - GPLv3 header updates
-
- Revision 0.9.2.26  2007/07/14 01:34:51  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.25  2007/05/18 05:02:43  brian
- - final sctp performance rework
-
- Revision 0.9.2.24  2007/05/18 00:01:00  brian
- - check for nf_reset
-
- Revision 0.9.2.23  2007/03/25 18:59:59  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.22  2007/03/25 05:59:33  brian
- - flush corrections
-
- Revision 0.9.2.21  2007/03/25 00:51:57  brian
- - synchronization updates
-
- Revision 0.9.2.20  2006/09/26 00:52:25  brian
- - rationalized to embedded packages
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-10 03:49:31 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-22 20:31:15 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-10 03:49:31 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-22 20:31:15 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -110,7 +86,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-10 03:49:31 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-22 20:31:15 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -137,6 +113,10 @@ MODULE_ALIAS("streams-sctp");
 #ifdef LFS
 MODULE_ALIAS("streams-driver-sctp");
 #endif
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* SCTP_CONFIG_MODULE */
 #endif				/* LINUX */

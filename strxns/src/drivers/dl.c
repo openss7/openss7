@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,59 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.15  2008-09-22 20:31:49  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.14  2008-09-10 03:50:06  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.13  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
- Revision 0.9.2.12  2007/08/15 05:35:40  brian
- - GPLv3 updates
-
- Revision 0.9.2.11  2007/08/14 03:31:07  brian
- - GPLv3 header update
-
- Revision 0.9.2.10  2007/07/14 01:37:18  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.9  2007/03/25 19:02:45  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.8  2007/03/25 00:53:47  brian
- - synchronization updates
-
- Revision 0.9.2.7  2006/07/11 12:32:07  brian
- - added ISO and other implementations to distribution
-
- Revision 0.9.2.6  2006/05/08 11:26:10  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.5  2006/04/18 18:00:44  brian
- - working up DL and NP drivers
-
- Revision 0.9.2.4  2006/04/13 18:32:49  brian
- - working up DL and NP drivers.
-
- Revision 0.9.2.3  2006/04/12 20:36:03  brian
- - added some experimental drivers
-
- Revision 0.9.2.2  2006/04/11 22:08:51  brian
- - working up DL driver
-
- Revision 0.9.2.1  2006/04/11 18:26:49  brian
- - added new DL driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $";
 
 /*
  *  This multiplexing driver is a master device driver for Data Link Provider streams prsenting a
@@ -131,8 +98,8 @@ static char const ident[] =
 
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:50:06 $"
+#define DL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:49 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -154,6 +121,10 @@ MODULE_LICENSE(DL_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-dl");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,3 +1,9 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp.c: add mod version, truncate logs
+	* src/drivers/sctp2.c: add mod version, truncate logs
+	* src/modules/tpiperf.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strsctp.spec.in: much improved spec files ready for repo building

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dl2.c,v 0.9.2.9 2008-09-20 11:13:18 brian Exp $
+ @(#) $Id: dl2.c,v 0.9.2.10 2008-09-22 20:31:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-20 11:13:18 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl2.c,v $
+ Revision 0.9.2.10  2008-09-22 20:31:50  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.9  2008-09-20 11:13:18  brian
  - added patch level
 
  Revision 0.9.2.8  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
- Revision 0.9.2.7  2007/08/19 12:03:19  brian
- - move stdbool.h to compat.h
-
- Revision 0.9.2.6  2007/08/15 05:35:41  brian
- - GPLv3 updates
-
- Revision 0.9.2.5  2007/08/14 03:31:07  brian
- - GPLv3 header update
-
- Revision 0.9.2.4  2007/07/14 01:37:18  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.3  2007/03/25 19:02:46  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.2  2006/12/21 11:33:31  brian
- - updates for release, current development
-
- Revision 0.9.2.1  2006/12/20 23:10:43  brian
- - added new mux drivers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-20 11:13:18 $"
+#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $"
 
 static char const ident[] =
-    "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-20 11:13:18 $";
+    "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $";
 
 /*
  *  This is a multiplexing driver use to support linking DL streams.  When DL streams are linked
@@ -115,8 +97,8 @@ static char const ident[] =
 #include <linux/netdevice.h>
 #define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-20 11:13:18 $"
-#define ND_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
+#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $"
+#define ND_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ND_LICENSE	"GPL"

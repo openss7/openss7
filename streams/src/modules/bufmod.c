@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 12:54:06 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,65 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.17  2008-09-22 20:31:31  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.16  2008-04-28 12:54:06  brian
  - update file headers for release
 
- Revision 0.9.2.15  2007/12/15 20:20:02  brian
- - updates
-
- Revision 0.9.2.14  2007/08/15 05:33:26  brian
- - GPLv3 updates
-
- Revision 0.9.2.13  2007/08/13 22:46:22  brian
- - GPLv3 header updates
-
- Revision 0.9.2.12  2007/07/14 01:35:56  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.11  2007/03/25 19:01:18  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.10  2007/03/25 06:00:20  brian
- - flush corrections
-
- Revision 0.9.2.9  2006/12/18 10:09:01  brian
- - updated headers for release
-
- Revision 0.9.2.8  2006/10/27 23:19:40  brian
- - changes for 2.6.18 kernel
-
- Revision 0.9.2.7  2006/07/24 09:01:20  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.6  2005/12/28 09:48:02  brian
- - remove warnings on FC4 compile
-
- Revision 0.9.2.5  2005/12/19 03:23:39  brian
- - wend for simple streamscall
-
- Revision 0.9.2.4  2005/12/09 18:01:47  brian
- - profiling copy
-
- Revision 0.9.2.3  2005/10/22 19:58:19  brian
- - more performance testing an tweaks
-
- Revision 0.9.2.2  2005/10/21 03:54:27  brian
- - modifications for queueing testing
-
- Revision 0.9.2.1  2005/10/20 08:18:58  brian
- - modifications for queuing and scheduling testing
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 12:54:06 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 12:54:06 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:31:31 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -132,7 +90,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-04-28 12:54:06 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:31:31 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -151,6 +109,10 @@ MODULE_SUPPORTED_DEVICE(BUFMOD_DEVICE);
 MODULE_LICENSE(BUFMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-bufmod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

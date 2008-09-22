@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:25 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.11  2008-09-22 20:31:08  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.10  2008-09-10 03:49:25  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,76 +63,12 @@
  Revision 0.9.2.8  2008-04-29 07:10:55  brian
  - updating headers for release
 
- Revision 0.9.2.7  2007/08/15 05:18:38  brian
- - GPLv3 updates
-
- Revision 0.9.2.6  2007/08/14 12:17:40  brian
- - GPLv3 header updates
-
- Revision 0.9.2.5  2007/07/14 01:34:05  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.4  2007/05/18 00:00:38  brian
- - check for nf_reset
-
- Revision 0.9.2.3  2007/03/25 18:59:23  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.2  2007/03/25 00:51:39  brian
- - synchronization updates
-
- Revision 0.9.2.1  2006/09/25 20:15:49  brian
- - rationalized to strinet and strxnet
-
- Revision 0.9.2.14  2006/08/16 07:47:37  brian
- - removed locking macro pollution
-
- Revision 0.9.2.13  2006/07/24 09:01:33  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.12  2006/07/16 12:46:34  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.11  2006/07/15 13:06:10  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.10  2006/07/08 09:37:52  brian
- - handle old SLES 9 2.6.5 kernel (untested)
-
- Revision 0.9.2.9  2006/07/07 21:15:02  brian
- - correct compile back to RH 7.2
-
- Revision 0.9.2.8  2006/07/02 12:19:54  brian
- - changes for 2.6.17 kernel
-
- Revision 0.9.2.7  2006/06/18 20:54:13  brian
- - minor optimizations from profiling
-
- Revision 0.9.2.6  2006/06/14 10:37:44  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.5  2006/05/14 08:34:30  brian
- - changes for compile and load
-
- Revision 0.9.2.4  2006/05/08 11:26:04  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.3  2006/05/07 22:12:48  brian
- - updated for NPI-IP driver
-
- Revision 0.9.2.2  2006/05/03 11:53:51  brian
- - changes for compile, working up NPI-IP driver
-
- Revision 0.9.2.1  2006/04/25 06:47:00  brian
- - added 2nd gen TCP driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -208,7 +147,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:25 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -231,6 +170,10 @@ MODULE_LICENSE(TCP_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-tcp");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-13 06:43:57 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.2  2008-09-22 20:31:47  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.1  2008-06-13 06:43:57  brian
  - added files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
 
-static char const ident[] = "$RCSfile: hdlc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $";
+static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $";
 
 /*
  * This is an HDLC module that pushes of a CH stream.  It provides a CDI HDLC
@@ -75,7 +78,7 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name: OpenSS7-0_9_2 $($Revisi
 #define HDLC_DESCRIP	"HDLC OVER CH MODULE FOR LINUX FAST-STREAMS"
 #define HDLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporaiton.  All Rights Reserved."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:57 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:47 $"
 #define HDLC_DEVICE	"SVR 4.2MP HDLC over CH Module (HDLC) for X.25"
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"
@@ -108,6 +111,10 @@ MODULE_ALIAS("streams-hdlc");
 MODULE_ALIAS("streams-module-hdlc");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_HDLC_MODID));
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-10 03:49:42 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:42 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.57  2008-09-22 20:31:29  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.56  2008-09-10 03:49:42  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -63,48 +66,12 @@
  Revision 0.9.2.53  2008-04-28 16:47:13  brian
  - updates for release
 
- Revision 0.9.2.52  2007/12/15 20:19:22  brian
- - updates
-
- Revision 0.9.2.51  2007/10/15 17:20:15  brian
- - fix for 2.4 kernels and pci_module_init
-
- Revision 0.9.2.50  2007/08/15 05:33:09  brian
- - GPLv3 updates
-
- Revision 0.9.2.49  2007/08/12 15:51:18  brian
- - header and extern updates, GPLv3, 3 new lock functions
-
- Revision 0.9.2.48  2007/07/14 01:35:41  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.47  2007/06/20 07:53:37  brian
- - updates for Fedora 7 and 2.6.21
-
- Revision 0.9.2.46  2007/06/20 05:39:09  brian
- - updates for Fedora 7 and 2.6.21 kernel
-
- Revision 0.9.2.45  2007/03/28 13:44:02  brian
- - updates to syncrhonization, release notes and documentation
-
- Revision 0.9.2.44  2007/03/25 19:01:04  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.43  2007/03/25 00:52:34  brian
- - synchronization updates
-
- Revision 0.9.2.42  2007/03/02 10:04:06  brian
- - updates to common build process and versions for all exported symbols
-
- Revision 0.9.2.41  2006/11/03 10:39:27  brian
- - updated headers, correction to mi_timer_expiry type
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-10 03:49:42 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-10 03:49:42 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:29 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -130,7 +97,7 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-10 03:49:42 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 20:31:29 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL"
@@ -149,6 +116,10 @@ MODULE_SUPPORTED_DEVICE(LISCOMP_DEVICE);
 MODULE_LICENSE(LISCOMP_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-liscompat");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

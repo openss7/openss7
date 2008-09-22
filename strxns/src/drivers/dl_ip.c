@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $
+ @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:31 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_ip.c,v $
+ Revision 0.9.2.10  2008-09-22 20:31:50  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.9  2008-04-25 11:39:31  brian
  - updates to AGPLv3
 
- Revision 0.9.2.8  2007/08/15 05:35:41  brian
- - GPLv3 updates
-
- Revision 0.9.2.7  2007/08/14 03:31:07  brian
- - GPLv3 header update
-
- Revision 0.9.2.6  2007/07/14 01:37:19  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.5  2007/03/25 19:02:46  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.4  2006/12/20 23:11:01  brian
- - current development
-
- Revision 0.9.2.3  2006/05/08 11:26:11  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.2  2006/04/18 18:00:45  brian
- - working up DL and NP drivers
-
- Revision 0.9.2.1  2006/04/13 18:32:50  brian
- - working up DL and NP drivers.
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $"
+#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $"
 
 static char const ident[] =
-    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $";
+    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $";
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the
@@ -109,8 +88,8 @@ static char const ident[] =
 
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-04-25 11:39:31 $"
+#define DL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:50 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"
@@ -132,6 +111,10 @@ MODULE_LICENSE(DL_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-dl_ip");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

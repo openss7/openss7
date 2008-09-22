@@ -1,3 +1,18 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/clns-ip.c: add mod version, truncate logs
+	* src/drivers/clns.c: add mod version, truncate logs
+	* src/drivers/otk6.c: add mod version, truncate logs
+	* src/drivers/tp.c: add mod version, truncate logs
+	* src/drivers/x25-plp.c: add mod version, truncate logs
+	* src/modules/apmod.c: add mod version, truncate logs
+	* src/modules/isot.c: add mod version, truncate logs
+	* src/modules/itot.c: add mod version, truncate logs
+	* src/modules/momod.c: add mod version, truncate logs
+	* src/modules/tcpns.c: add mod version, truncate logs
+	* src/modules/tp0.c: add mod version, truncate logs
+	* src/modules/xx25.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* striso.spec.in: much improved spec files ready for repo building

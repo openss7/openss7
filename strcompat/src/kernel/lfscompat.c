@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 16:47:13 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-09-22 20:31:28 $
 
  -----------------------------------------------------------------------------
 
@@ -46,116 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.34  2008-09-22 20:31:28  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.33  2008-04-28 16:47:13  brian
  - updates for release
 
- Revision 0.9.2.32  2007/08/15 05:33:08  brian
- - GPLv3 updates
-
- Revision 0.9.2.31  2007/08/12 15:51:18  brian
- - header and extern updates, GPLv3, 3 new lock functions
-
- Revision 0.9.2.30  2007/07/14 01:35:41  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.29  2007/03/25 00:52:34  brian
- - synchronization updates
-
- Revision 0.9.2.28  2007/03/02 10:04:06  brian
- - updates to common build process and versions for all exported symbols
-
- Revision 0.9.2.27  2006/11/03 10:39:27  brian
- - updated headers, correction to mi_timer_expiry type
-
- Revision 0.9.2.26  2006/10/21 10:31:17  brian
- - updated LiS release number
-
- Revision 0.9.2.25  2006/10/12 10:21:43  brian
- - removed redundant debug flags
-
- Revision 0.9.2.24  2006/07/25 06:39:02  brian
- - expanded minor device numbers and optimization and locking corrections
-
- Revision 0.9.2.23  2006/07/24 09:01:05  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.22  2006/07/07 20:49:54  brian
- - change to correct LIS-only compile on FC5
-
- Revision 0.9.2.21  2006/06/22 13:11:32  brian
- - more optmization tweaks and fixes
-
- Revision 0.9.2.20  2006/03/03 11:11:14  brian
- - 64-bit compatibility, fixes, updates for release
-
- Revision 0.9.2.19  2005/12/28 09:51:50  brian
- - remove warnings on FC4 compile
-
- Revision 0.9.2.18  2005/12/22 10:28:53  brian
- - no symbol mangling for 2.4 kernels
-
- Revision 0.9.2.17  2005/12/19 12:44:41  brian
- - locking down for release
-
- Revision 0.9.2.16  2005/11/29 05:46:39  brian
- - straightened out register_strlog
-
- Revision 0.9.2.15  2005/11/28 18:55:57  brian
- - added register_strlog function
-
- Revision 0.9.2.14  2005/07/29 07:37:51  brian
- - changes to compile with latest streams package.
-
- Revision 0.9.2.13  2005/07/21 20:47:18  brian
- - sync with notebook
-
- Revision 0.9.2.12  2005/07/19 11:21:19  brian
- - updated strlog(9) for compatibility
-
- Revision 0.9.2.11  2005/07/18 12:25:42  brian
- - standard indentation
-
- Revision 0.9.2.10  2005/07/14 03:40:11  brian
- - updates for check pass
-
- Revision 0.9.2.9  2005/07/13 12:01:49  brian
- - working up compat and check pass (finally lindented LiS)
-
- Revision 0.9.2.8  2005/07/12 13:54:45  brian
- - changes for os7 compatibility and check pass
-
- Revision 0.9.2.7  2005/07/12 08:42:42  brian
- - changes for check pass
-
- Revision 0.9.2.6  2005/07/09 21:51:21  brian
- - remove dependency on LFS headers
-
- Revision 0.9.2.5  2005/07/07 20:29:17  brian
- - changes for release
-
- Revision 0.9.2.4  2005/07/06 03:47:46  brian
- - minor corrections
-
- Revision 0.9.2.3  2005/07/05 22:46:05  brian
- - change for strcompat package
-
- Revision 0.9.2.2  2005/07/04 20:14:29  brian
- - fixed spelling of CVS keyword
-
- Revision 0.9.2.1  2005/07/04 19:29:16  brian
- - first cut at streams compatibility package
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 16:47:13 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-09-22 20:31:28 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 16:47:13 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-09-22 20:31:28 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -179,7 +86,7 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 16:47:13 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-09-22 20:31:28 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.9.2.1 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL"
@@ -198,6 +105,10 @@ MODULE_SUPPORTED_DEVICE(LFSCOMP_DEVICE);
 MODULE_LICENSE(LFSCOMP_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-lfscompat");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

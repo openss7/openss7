@@ -1,3 +1,20 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ch.c: add mod version, truncate logs
+	* src/drivers/hdlc.c: add mod version, truncate logs
+	* src/drivers/mg.c: add mod version, truncate logs
+	* src/drivers/mx.c: add mod version, truncate logs
+	* src/drivers/v401p.c: add mod version, truncate logs
+	* src/modules/cd.c: add mod version, truncate logs
+	* src/modules/cd_daed.c: add mod version, truncate logs
+	* src/modules/cd_hdlc.c: add mod version, truncate logs
+	* src/modules/cd_old.c: add mod version, truncate logs
+	* src/modules/ch.c: add mod version, truncate logs
+	* src/modules/ch_pmod.c: add mod version, truncate logs
+	* src/modules/lapb.c: add mod version, truncate logs
+	* src/modules/mx_pmod.c: add mod version, truncate logs
+	* src/modules/zaptel.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strchan.spec.in: much improved spec files ready for repo building

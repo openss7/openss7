@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 01:52:24 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:03 $
 
  -----------------------------------------------------------------------------
 
@@ -46,59 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:24 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.15  2008-09-22 20:31:03  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.14  2008-04-29 01:52:24  brian
  - updated headers for release
 
- Revision 0.9.2.13  2007/08/19 11:48:36  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.12  2007/08/15 05:14:11  brian
- - GPLv3 updates
-
- Revision 0.9.2.11  2007/08/12 16:15:36  brian
- -
-
- Revision 0.9.2.10  2007/08/03 13:34:45  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.9  2007/07/14 01:33:44  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.8  2007/05/17 22:55:37  brian
- - use mi_timer requeue to requeue mi timers
-
- Revision 0.9.2.7  2007/03/25 18:59:07  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.6  2007/03/05 23:01:41  brian
- - checking in release changes
-
- Revision 0.9.2.5  2007/01/15 12:16:28  brian
- - updated archive sizes, new development work
-
- Revision 0.9.2.4  2006/12/28 05:19:34  brian
- - minor changes
-
- Revision 0.9.2.3  2006/12/23 19:54:57  brian
- - void return
-
- Revision 0.9.2.2  2006/12/23 13:06:56  brian
- - manual page and other package updates for release
-
- Revision 0.9.2.1  2006/11/30 13:17:57  brian
- - added files from strss7 package
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 01:52:24 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:03 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 01:52:24 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:03 $";
 
 /*
  *  This is the AS side of M2UA implemented as a pushable module that pushes over an SCTP NPI
@@ -166,7 +130,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 01:52:24 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:03 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -188,6 +152,10 @@ MODULE_LICENSE(M2UA_AS_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-m2ua_as");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

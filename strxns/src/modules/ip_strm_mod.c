@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-22 20:31:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:08 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.30  2008-09-22 20:31:51  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.29  2008-09-10 03:50:08  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -59,39 +62,12 @@
  Revision 0.9.2.27  2008-04-25 11:39:33  brian
  - updates to AGPLv3
 
- Revision 0.9.2.26  2007/10/15 17:26:11  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.25  2007/08/15 05:35:46  brian
- - GPLv3 updates
-
- Revision 0.9.2.24  2007/08/14 03:31:19  brian
- - GPLv3 header update
-
- Revision 0.9.2.23  2007/07/14 01:37:32  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.22  2007/03/25 19:02:50  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.21  2007/03/25 06:01:08  brian
- - flush corrections
-
- Revision 0.9.2.20  2007/03/25 02:23:43  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.19  2006/05/08 03:37:17  brian
- - added two debug statements
-
- Revision 0.9.2.18  2006/03/03 11:27:48  brian
- - 32/64-bit compatibility
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-22 20:31:51 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-22 20:31:51 $";
 
 #include <sys/os7/compat.h>
 
@@ -118,8 +94,8 @@ static char const ident[] =
 
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.29 $) $Date: 2008-09-10 03:50:08 $"
+#define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.30 $) $Date: 2008-09-22 20:31:51 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -141,6 +117,10 @@ MODULE_LICENSE(IP_TO_STREAMS_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-ip_strm_mod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

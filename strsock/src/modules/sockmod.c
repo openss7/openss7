@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:56 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockmod.c,v $
+ Revision 0.9.2.13  2008-09-22 20:31:41  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.12  2008-09-10 03:49:56  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.11  2008-04-28 22:33:33  brian
  - updated headers for release
 
- Revision 0.9.2.10  2007/08/15 05:34:43  brian
- - GPLv3 updates
-
- Revision 0.9.2.9  2007/08/14 05:17:25  brian
- - GPLv3 header update
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -135,7 +132,7 @@ static char const ident[] =
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:56 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"
@@ -157,6 +154,10 @@ MODULE_LICENSE(SMOD_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sockmod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* CONFIG_STREAMS_SOCKMOD_MODULE */
 #endif				/* LINUX */

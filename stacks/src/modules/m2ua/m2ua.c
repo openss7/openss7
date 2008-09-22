@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:27 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.25  2008-09-22 20:31:11  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.24  2008-09-10 03:49:27  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,39 +63,12 @@
  Revision 0.9.2.22  2008-04-29 07:10:59  brian
  - updating headers for release
 
- Revision 0.9.2.21  2007/08/15 05:19:00  brian
- - GPLv3 updates
-
- Revision 0.9.2.20  2007/08/14 12:17:58  brian
- - GPLv3 header updates
-
- Revision 0.9.2.19  2007/07/14 01:34:28  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.18  2007/03/25 18:59:35  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.17  2007/03/25 02:22:47  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.16  2007/03/25 00:51:49  brian
- - synchronization updates
-
- Revision 0.9.2.15  2006/05/08 11:00:53  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.14  2006/03/07 01:10:04  brian
- - binary compatible callouts
-
- Revision 0.9.2.13  2006/03/04 13:00:10  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:11 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:11 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -107,7 +83,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:27 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:11 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -127,6 +103,10 @@ MODULE_LICENSE(M2UA_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-m2ua");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

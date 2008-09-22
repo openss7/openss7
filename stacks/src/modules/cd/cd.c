@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:49:20 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:20 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.18  2008-09-22 20:31:05  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.17  2008-09-10 03:49:20  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.16  2008-04-29 07:10:50  brian
  - updating headers for release
 
- Revision 0.9.2.15  2007/08/15 05:18:21  brian
- - GPLv3 updates
-
- Revision 0.9.2.14  2007/08/14 12:17:22  brian
- - GPLv3 header updates
-
- Revision 0.9.2.13  2007/07/14 01:33:53  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.12  2007/03/25 18:59:14  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.11  2006/11/30 13:25:45  brian
- - working up driver
-
- Revision 0.9.2.10  2006/03/07 01:05:52  brian
- - changes for gcc 4.0
-
- Revision 0.9.2.9  2006/03/04 13:00:02  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:49:20 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:05 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:49:20 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:05 $";
 
 //#define EXPORT_SYMTAB
 
@@ -101,7 +83,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:49:20 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:05 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -120,6 +102,10 @@ MODULE_LICENSE(HDLC_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-cd");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:49:34 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-22 20:31:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:34 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.33  2008-09-22 20:31:20  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.32  2008-09-10 03:49:34  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,18 +63,12 @@
  Revision 0.9.2.30  2008-04-29 07:11:12  brian
  - updating headers for release
 
- Revision 0.9.2.29  2007/08/15 05:20:22  brian
- - GPLv3 updates
-
- Revision 0.9.2.28  2007/08/14 12:18:47  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:49:34 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-22 20:31:20 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-10 03:49:34 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-22 20:31:20 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -116,6 +113,10 @@ MODULE_LICENSE(SL_TPI_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sl_tpi");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

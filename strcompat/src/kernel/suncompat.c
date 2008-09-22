@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-04-28 16:47:13 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,47 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: suncompat.c,v $
+ Revision 0.9.2.40  2008-09-22 20:31:29  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.39  2008-04-28 16:47:13  brian
  - updates for release
 
- Revision 0.9.2.38  2007/11/10 19:40:44  brian
- - documentation updates
-
- Revision 0.9.2.37  2007/08/15 05:33:10  brian
- - GPLv3 updates
-
- Revision 0.9.2.36  2007/08/12 15:51:19  brian
- - header and extern updates, GPLv3, 3 new lock functions
-
- Revision 0.9.2.35  2007/08/03 13:36:01  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.34  2007/07/14 01:35:42  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.33  2007/03/30 23:29:13  brian
- - change bool to int
-
- Revision 0.9.2.32  2007/03/30 11:59:24  brian
- - heavy rework of MP syncrhonization
-
- Revision 0.9.2.31  2007/03/02 10:04:08  brian
- - updates to common build process and versions for all exported symbols
-
- Revision 0.9.2.30  2006/11/03 10:39:28  brian
- - updated headers, correction to mi_timer_expiry type
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-04-28 16:47:13 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-04-28 16:47:13 $";
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:29 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -108,7 +84,7 @@ static char const ident[] =
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-04-28 16:47:13 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:29 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL"
@@ -127,6 +103,10 @@ MODULE_SUPPORTED_DEVICE(SUNCOMP_DEVICE);
 MODULE_LICENSE(SUNCOMP_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-suncompat");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/09/22 17:15:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.95  2008-09-22 20:31:33  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.94  2008/09/22 17:15:32  brian
  - generate M_ERROR on error, discard excess data indications
 
@@ -66,105 +69,12 @@
  Revision 0.9.2.90  2008-04-28 22:52:10  brian
  - updated headers for release
 
- Revision 0.9.2.89  2007/10/15 17:22:48  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.88  2007/08/15 05:33:49  brian
- - GPLv3 updates
-
- Revision 0.9.2.87  2007/08/14 04:27:07  brian
- - GPLv3 header update
-
- Revision 0.9.2.86  2007/07/14 01:36:04  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.85  2007/05/17 22:33:00  brian
- - perform nf_reset when available
-
- Revision 0.9.2.84  2007/05/08 12:17:44  brian
- - locking updates, changes from validation testing
-
- Revision 0.9.2.83  2007/05/03 22:26:45  brian
- - final preloading and buffer sizing
-
- Revision 0.9.2.82  2007/04/12 20:06:25  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.81  2007/03/29 12:10:37  brian
- - add T_SNDZERO for UDP and RAWIP per XNS 5.2
-
- Revision 0.9.2.80  2007/03/25 19:01:25  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.79  2007/03/25 06:00:22  brian
- - flush corrections
-
- Revision 0.9.2.78  2007/03/25 00:52:58  brian
- - synchronization updates
-
- Revision 0.9.2.77  2006/09/25 20:15:56  brian
- - minor formatting changes
-
- Revision 0.9.2.76  2006/07/29 07:43:12  brian
- - CVS checkin of changes before leaving for SCTP interop
-
- Revision 0.9.2.75  2006/07/24 09:01:27  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.74  2006/07/07 21:14:54  brian
- - correct compile back to RH 7.2
-
- Revision 0.9.2.73  2006/06/14 10:37:34  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.72  2006/06/07 09:54:36  brian
- - minor non-service affecting bug found by inspection
-
- Revision 0.9.2.71  2006/05/23 10:40:11  brian
- - handle non-exported sysctl_ip_default_ttl on receive FC4 kernels
-
- Revision 0.9.2.70  2006/05/19 08:49:38  brian
- - working up RAWIP and UDP drivers and testing
-
- Revision 0.9.2.69  2006/05/14 06:58:17  brian
- - removed redundant or unused QR_ definitions
-
- Revision 0.9.2.68  2006/04/22 01:09:26  brian
- - locking correction
-
- Revision 0.9.2.67  2006/04/04 04:16:17  brian
- - handling of __tcp_push_pending_frames on 2.6.13+ kernels
-
- Revision 0.9.2.66  2006/04/03 22:32:59  brian
- - must freeze before strqset
-
- Revision 0.9.2.65  2006/04/03 10:58:09  brian
- - 2.6.13 kernel has request_sock but no inet_connection_sock
-
- Revision 0.9.2.64  2006/03/31 12:43:31  brian
- - stab at ss_sock_sendmsg corrections
-
- Revision 0.9.2.63  2006/03/31 00:36:43  brian
- - fixed buffer leak reported by John Wenker
-
- Revision 0.9.2.62  2006/03/18 00:15:13  brian
- - syncing notebook
-
- Revision 0.9.2.61  2006/03/10 19:47:43  brian
- - reformatting
-
- Revision 0.9.2.60  2006/02/23 11:08:51  brian
- - a couple of bug corrections reported by sponsors
- - 64bit changes
- - validated on x86_64 SMP kernel
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -655,7 +565,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2008/09/22 17:15:32 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -677,6 +587,10 @@ MODULE_LICENSE(SS__LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-inet");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

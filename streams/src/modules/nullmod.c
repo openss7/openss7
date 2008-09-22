@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 12:54:06 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,73 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:31  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-04-28 12:54:06  brian
  - update file headers for release
 
- Revision 0.9.2.17  2007/12/15 20:20:02  brian
- - updates
-
- Revision 0.9.2.16  2007/08/15 05:33:26  brian
- - GPLv3 updates
-
- Revision 0.9.2.15  2007/08/13 22:46:22  brian
- - GPLv3 header updates
-
- Revision 0.9.2.14  2007/07/14 01:35:57  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.13  2007/03/25 19:01:18  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.12  2007/03/25 00:52:56  brian
- - synchronization updates
-
- Revision 0.9.2.11  2006/10/27 23:19:40  brian
- - changes for 2.6.18 kernel
-
- Revision 0.9.2.10  2006/07/24 09:01:20  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.9  2006/03/03 10:57:11  brian
- - 32-bit compatibility support, updates for release
-
- Revision 0.9.2.8  2005/12/20 15:12:14  brian
- - result of SMP kernel testing for LiS
-
- Revision 0.9.2.7  2005/12/19 03:23:39  brian
- - wend for simple streamscall
-
- Revision 0.9.2.6  2005/12/09 18:01:47  brian
- - profiling copy
-
- Revision 0.9.2.5  2005/10/22 19:58:19  brian
- - more performance testing an tweaks
-
- Revision 0.9.2.4  2005/10/20 08:18:58  brian
- - modifications for queuing and scheduling testing
-
- Revision 0.9.2.3  2005/10/07 09:34:23  brian
- - more testing and corrections
-
- Revision 0.9.2.2  2005/09/10 18:16:35  brian
- - more test build
-
- Revision 0.9.2.1  2005/09/08 05:52:41  brian
- - added nullmod module and loop driver
- - corrections during testing
- - many ioctl(2p) test cases work very well now
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 12:54:06 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 12:54:06 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:31 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -144,7 +94,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 12:54:06 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:31 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL"
@@ -167,6 +117,10 @@ MODULE_SUPPORTED_DEVICE(NULLMOD_DEVICE);
 MODULE_LICENSE(NULLMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-nullmod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

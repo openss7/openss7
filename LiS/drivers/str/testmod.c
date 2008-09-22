@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,77 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.15  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.14  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 0.9.2.13  2007/08/15 04:57:59  brian
- - GPLv3 updates
-
- Revision 0.9.2.12  2007/08/14 10:46:57  brian
- - GPLv3 header update
-
- Revision 0.9.2.11  2007/07/14 01:32:56  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.10  2007/04/01 12:22:00  brian
- - corrections to module loading
-
- Revision 0.9.2.9  2007/03/25 18:58:11  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.8  2007/03/25 00:51:03  brian
- - synchronization updates
-
- Revision 0.9.2.7  2006/12/18 09:50:46  brian
- - updated headers for release
-
- Revision 0.9.2.6  2006/10/27 22:38:54  brian
- - changes for 2.6.18 build
-
- Revision 0.9.2.5  2005/12/20 15:11:41  brian
- - result of SMP kernel testing for LiS
-
- Revision 0.9.2.4  2005/12/19 03:22:18  brian
- - wend for simple _RP
-
- Revision 0.9.2.3  2005/12/18 06:37:53  brian
- - corrections for binary compatiblity
-
- Revision 0.9.2.2  2005/12/12 12:26:27  brian
- - changes for warningless compile on gcc 4.0.2.
-
- Revision 0.9.2.1  2005/10/23 05:01:26  brian
- - test programs and modules for POSIX testing
-
- Revision 0.9.2.6  2005/10/14 12:26:49  brian
- - SC module and scls utility tested
-
- Revision 0.9.2.5  2005/10/13 10:58:44  brian
- - working up testing of sad(4) and sc(4)
-
- Revision 0.9.2.4  2005/10/07 09:34:24  brian
- - more testing and corrections
-
- Revision 0.9.2.3  2005/10/05 09:25:31  brian
- - poll tests, some noxious problem still with poll
-
- Revision 0.9.2.2  2005/09/27 23:34:25  brian
- - added test cases, tweaked straccess()
-
- Revision 0.9.2.1  2005/09/25 22:52:11  brian
- - added test module and continuing with testing
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -145,7 +91,7 @@ static char const ident[] =
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 08:33:11 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:30:53 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -168,6 +114,10 @@ MODULE_SUPPORTED_DEVICE(TESTMOD_DEVICE);
 MODULE_LICENSE(TESTMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-testmod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

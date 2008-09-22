@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mux.c,v $
+ Revision 0.9.2.31  2008-09-22 20:31:30  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.30  2008-04-28 12:54:05  brian
  - update file headers for release
 
- Revision 0.9.2.29  2007/12/15 20:19:54  brian
- - updates
-
- Revision 0.9.2.28  2007/08/15 05:33:21  brian
- - GPLv3 updates
-
- Revision 0.9.2.27  2007/08/13 22:46:15  brian
- - GPLv3 header updates
-
- Revision 0.9.2.26  2007/07/14 01:35:45  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.25  2007/04/12 20:06:09  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.24  2007/03/25 19:01:12  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.23  2007/03/25 06:00:17  brian
- - flush corrections
-
- Revision 0.9.2.22  2006/12/18 10:08:58  brian
- - updated headers for release
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:30 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:30 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -115,7 +94,7 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 12:54:05 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:30 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"
@@ -138,6 +117,10 @@ MODULE_SUPPORTED_DEVICE(MUX_DEVICE);
 MODULE_LICENSE(MUX_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-mux");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

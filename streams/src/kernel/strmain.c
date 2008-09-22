@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strmain.c,v $
+ Revision 0.9.2.38  2008-09-22 20:31:31  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.37  2008-04-28 12:54:05  brian
  - update file headers for release
 
- Revision 0.9.2.36  2007/12/15 20:19:55  brian
- - updates
-
- Revision 0.9.2.35  2007/08/15 05:33:23  brian
- - GPLv3 updates
-
- Revision 0.9.2.34  2007/08/13 22:46:17  brian
- - GPLv3 header updates
-
- Revision 0.9.2.33  2007/07/14 01:35:54  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.32  2006/12/18 10:08:59  brian
- - updated headers for release
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:31 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -88,7 +76,7 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-04-28 12:54:05 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:31 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"
@@ -107,6 +95,10 @@ MODULE_SUPPORTED_DEVICE(STREAMS_DEVICE);
 MODULE_LICENSE(STREAMS_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 #if defined HAVE_KINC_LINUX_SECURITY_H

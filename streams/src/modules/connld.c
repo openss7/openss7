@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-22 20:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: connld.c,v $
+ Revision 0.9.2.43  2008-09-22 20:31:31  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.42  2008-04-28 12:54:06  brian
  - update file headers for release
 
- Revision 0.9.2.41  2007/12/15 20:20:02  brian
- - updates
-
- Revision 0.9.2.40  2007/08/15 05:33:26  brian
- - GPLv3 updates
-
- Revision 0.9.2.39  2007/08/13 22:46:22  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-22 20:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-22 20:31:31 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -89,7 +83,7 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-04-28 12:54:06 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-22 20:31:31 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CONNLD_LICENSE		"GPL"
@@ -108,6 +102,10 @@ MODULE_SUPPORTED_DEVICE(CONNLD_DEVICE);
 MODULE_LICENSE(CONNLD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-connld");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:44 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,23 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipemod.c,v $
+ Revision 0.9.2.35  2008-09-22 20:31:44  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.34  2007/08/15 05:35:05  brian
  - GPLv3 updates
 
- Revision 0.9.2.33  2007/08/14 12:58:05  brian
- - GNUv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:44 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:44 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -81,8 +81,8 @@ static char const ident[] =
 #endif
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $"
+#define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:44 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL"
@@ -101,6 +101,10 @@ MODULE_SUPPORTED_DEVICE(PIPEMOD_DEVICE);
 MODULE_LICENSE(PIPEMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-pipemod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

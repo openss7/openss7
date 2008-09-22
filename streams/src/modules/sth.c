@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.203 $) $Date: 2008-09-22 20:31:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:45 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.203  2008-09-22 20:31:32  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.202  2008-09-10 03:49:45  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -75,201 +78,12 @@
  Revision 0.9.2.195  2008-04-10 23:36:25  brian
  - get Debian 4.0 deb/dsc build working
 
- Revision 0.9.2.194  2007/12/15 20:20:02  brian
- - updates
-
- Revision 0.9.2.193  2007/08/15 05:33:26  brian
- - GPLv3 updates
-
- Revision 0.9.2.192  2007/08/13 22:46:22  brian
- - GPLv3 header updates
-
- Revision 0.9.2.191  2007/07/14 01:35:57  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.190  2007/06/23 23:56:52  brian
- - minor correction of compiler warning
-
- Revision 0.9.2.189  2007/06/20 05:16:52  brian
- - updates for Fedora 7 and 2.6.21 kernel
-
- Revision 0.9.2.188  2007/06/18 21:31:34  brian
- - pass 32-bit checks
-
- Revision 0.9.2.187  2007/05/07 18:51:39  brian
- - changes from release testing
-
- Revision 0.9.2.186  2007/05/03 22:40:47  brian
- - significant performance improvements, some bug corrections
-
- Revision 0.9.2.185  2007/04/12 20:06:13  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.184  2007/04/04 01:15:21  brian
- - performance improvements (speeds up put and srv procedures)
-
- Revision 0.9.2.183  2007/04/01 12:29:27  brian
- - performance tuning (QWANTR/QWANTW corrections)
-
- Revision 0.9.2.182  2007/03/31 15:50:17  brian
- - flow control corrections
-
- Revision 0.9.2.181  2007/03/31 07:25:49  brian
- - get getown setown proper for struct pid
-
- Revision 0.9.2.180  2007/03/28 13:44:20  brian
- - updates to syncrhonization, release notes and documentation
-
- Revision 0.9.2.179  2007/03/25 19:01:18  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.178  2007/03/15 10:22:10  brian
- - test case reporting and pushed release date one day
-
- Revision 0.9.2.177  2007/03/12 03:28:24  brian
- - remove old ms_acnt pegs
-
- Revision 0.9.2.176  2007/03/10 13:52:54  brian
- - checking in latest corrections for release
-
- Revision 0.9.2.175  2007/03/02 09:23:32  brian
- - build updates and esballoc() feature
-
- Revision 0.9.2.174  2007/02/10 15:53:11  brian
- - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
-
- Revision 0.9.2.173  2007/01/27 09:23:54  brian
- - behavior and docs for IOC_NONE
-
- Revision 0.9.2.172  2006/10/29 13:11:44  brian
- - final changes for FC5 2.6.18 w/ inode diet
-
- Revision 0.9.2.171  2006/10/27 23:19:40  brian
- - changes for 2.6.18 kernel
-
- Revision 0.9.2.170  2006/10/21 12:00:12  brian
- - missing checkins
-
- Revision 0.9.2.169  2006/10/12 10:22:54  brian
- - removed redundant debug flags
-
- Revision 0.9.2.168  2006/10/02 11:31:37  brian
- - changes to get master builds working for RPM and DEB
- - added outside licenses to package documentation
- - added LICENSE automated release file
- - copy MANUAL to source directory
- - add and remove devices in -dev debian subpackages
- - get debian rules working better
- - release library version files
- - added notes to debian changelog
- - corrections for cooked manual pages in spec files
- - added release documentation to spec and rules files
- - copyright header updates
- - moved controlling tty checks in stream head
- - missing some defines for LiS build in various source files
- - added OSI headers to striso package
- - added includes and manual page paths to acincludes for various packages
- - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-   files
- - moved pragma weak statements ahead of declarations
- - changes for master build of RPMS and DEBS with LiS
-
- Revision 0.9.2.167  2006/09/29 11:50:28  brian
- - libtool library tweaks in Makefile.am
- - better rpm spec handling in *.spec.in
- - added AC_LIBTOOL_DLOPEN to configure.ac
- - updated some copyright headers
- - rationalized item in two packages
- - added manual pages, drivers and modules to new strtty package
-
- Revision 0.9.2.166  2006/09/22 21:20:20  brian
- - roughed in I_EGETSIG I_ESETSIG code
-
- Revision 0.9.2.165  2006/09/18 01:43:46  brian
- - struct lock ordering
-
- Revision 0.9.2.164  2006/08/22 12:36:53  brian
- - udpates to documentation, tweaks to Stream head
-
- Revision 0.9.2.163  2006/08/16 07:47:32  brian
- - added smp_lock.h for SLES
-
- Revision 0.9.2.162  2006/07/29 07:43:07  brian
- - CVS checkin of changes before leaving for SCTP interop
-
- Revision 0.9.2.161  2006/07/25 06:39:11  brian
- - expanded minor device numbers and optimization and locking corrections
-
- Revision 0.9.2.160  2006/07/24 09:01:20  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.159  2006/07/14 09:20:34  brian
- - hid allocb_skb() behind allocb() using BPRI_SKBUFF flag
-
- Revision 0.9.2.158  2006/07/13 08:07:52  brian
- - added sk_buff data buffer allocation mechanism for stream head
-
- Revision 0.9.2.157  2006/07/08 09:37:46  brian
- - handle old SLES 9 2.6.5 kernel (untested)
-
- Revision 0.9.2.156  2006/06/30 01:12:15  brian
- - fixed buffer overflow introduced with alloc_data() (thanks to git bisect)
-
- Revision 0.9.2.155  2006/06/27 09:22:16  brian
- - move sd->sd_rq dereferencing inside read locks
-
- Revision 0.9.2.154  2006/06/22 13:11:40  brian
- - more optmization tweaks and fixes
-
- Revision 0.9.2.153  2006/06/22 01:17:13  brian
- - syncing notebook, latest changes are not stable yet
-
- Revision 0.9.2.152  2006/06/19 20:51:28  brian
- - more optimizations
-
- Revision 0.9.2.151  2006/06/18 20:54:08  brian
- - minor optimizations from profiling
-
- Revision 0.9.2.150  2006/06/17 21:20:15  brian
- - sync
-
- Revision 0.9.2.149  2006/06/14 10:37:27  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.148  2006/06/06 06:26:43  brian
- - second gen UDP driver working well now
-
- Revision 0.9.2.147  2006/06/05 02:53:35  brian
- - working up udp zero-copy
-
- Revision 0.9.2.142  2006/03/08 00:03:56  brian
- - ioctl32 functions are streams calls
-
- Revision 0.9.2.141  2006/03/04 04:37:35  brian
- - corrections for FC4 x86_64 gcc 4.0.4 build
-
- Revision 0.9.2.140  2006/03/03 10:57:12  brian
- - 32-bit compatibility support, updates for release
-
- Revision 0.9.2.139  2006/02/25 01:30:44  brian
- - more roughing in of 32bit compatibilty support
- - updated perftest program to be able to use FIFOs as well as pipes
- - added README-LiS file to capture LiS binary compatibility issues
-
- Revision 0.9.2.138  2006/02/22 11:39:58  brian
- - split giant wait queue into 4 independent queues
- - adapt new and old style wait queue approach
-
- Revision 0.9.2.137  2006/02/20 10:59:24  brian
- - updated copyright headers on changed files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.203 $) $Date: 2008-09-22 20:31:32 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.203 $) $Date: 2008-09-22 20:31:32 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -371,7 +185,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.202 $) $Date: 2008-09-10 03:49:45 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.203 $) $Date: 2008-09-22 20:31:32 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -390,6 +204,10 @@ MODULE_SUPPORTED_DEVICE(STH_DEVICE);
 MODULE_LICENSE(STH_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sth");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* CONFIG_STREAMS_STH_MODULE */
 

@@ -1,3 +1,25 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/cd-llc.c: add mod version, truncate logs
+	* src/drivers/dl-llc.c: add mod version, truncate logs
+	* src/drivers/npi.c: add mod version, truncate logs
+	* src/drivers/x25-llc.c: add mod version, truncate logs
+	* src/drivers/x25-plp.c: add mod version, truncate logs
+	* src/modules/cdpmod.c: add mod version, truncate logs
+	* src/modules/dlaix.c: add mod version, truncate logs
+	* src/modules/hdlc.c: add mod version, truncate logs
+	* src/modules/lapb.c: add mod version, truncate logs
+	* src/modules/npi.c: add mod version, truncate logs
+	* src/modules/s_lli.c: add mod version, truncate logs
+	* src/modules/s_llic.c: add mod version, truncate logs
+	* src/modules/s_nli.c: add mod version, truncate logs
+	* src/modules/s_nlic.c: add mod version, truncate logs
+	* src/modules/s_wan.c: add mod version, truncate logs
+	* src/modules/s_wanc.c: add mod version, truncate logs
+	* src/modules/xos.c: add mod version, truncate logs
+	* src/modules/xot.c: add mod version, truncate logs
+	* src/modules/xx25.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strx25.spec.in: much improved spec files ready for repo building

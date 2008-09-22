@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,50 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:28 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.23  2008-09-22 20:31:12  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.22  2008-09-10 03:49:28  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.21  2008-04-29 07:11:02  brian
  - updating headers for release
 
- Revision 0.9.2.20  2007/08/15 05:19:07  brian
- - GPLv3 updates
-
- Revision 0.9.2.19  2007/08/14 12:18:04  brian
- - GPLv3 header updates
-
- Revision 0.9.2.18  2007/07/14 01:34:32  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.17  2007/03/25 18:59:39  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.16  2007/03/25 02:22:51  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.15  2007/03/25 00:51:53  brian
- - synchronization updates
-
- Revision 0.9.2.14  2006/05/08 11:00:57  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.13  2006/03/07 01:10:27  brian
- - binary compatible callouts
-
- Revision 0.9.2.12  2006/03/04 13:00:11  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:12 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:12 $";
 
 #include <sys/os7/compat.h>
 
@@ -101,7 +77,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:28 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:12 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -123,6 +99,10 @@ MODULE_LICENSE(MG_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-mg");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

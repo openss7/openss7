@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2008-04-29 08:33:12 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:12 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: connld.c,v $
+ Revision 1.1.1.4.4.14  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 1.1.1.4.4.13  2008-04-29 08:33:12  brian
  - update headers for Affero release
 
- Revision 1.1.1.4.4.12  2007/08/15 04:58:02  brian
- - GPLv3 updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2008-04-29 08:33:12 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2008-09-22 20:30:53 $"
 
 /*
  *  connld.c - unique pipe generator
@@ -431,6 +431,10 @@ MODULE_DESCRIPTION("STREAMS unique pipe generator pseudo-module");
 #endif
 #if defined(MODULE_ALIAS)
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 
 #endif				/* LINUX */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipemod.c,v $
+ Revision 1.1.1.4.4.14  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 1.1.1.4.4.13  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 1.1.1.4.4.12  2007/08/15 04:57:58  brian
- - GPLv3 updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2008-09-22 20:30:53 $"
 
-static char const ident[] = "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.13 $) $Date: 2008-04-29 08:33:11 $";
+static char const ident[] = "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2008-09-22 20:30:53 $";
 
 /*
  *  pipemod.c - "pipemod" module
@@ -317,6 +317,10 @@ MODULE_DESCRIPTION("STREAMS 'pipemod' pipe flushing module");
 #endif
 #if defined(MODULE_ALIAS)
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 
 #endif				/* LINUX */

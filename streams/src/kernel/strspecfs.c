@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,47 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:44 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.86  2008-09-22 20:31:31  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.85  2008-09-10 03:49:44  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.84  2008-04-28 12:54:06  brian
  - update file headers for release
 
- Revision 0.9.2.83  2007/12/15 20:19:58  brian
- - updates
-
- Revision 0.9.2.82  2007/10/13 08:51:45  brian
- - updates for 2.6.22 FC6 kernel and added MIBs
-
- Revision 0.9.2.81  2007/08/15 05:33:23  brian
- - GPLv3 updates
-
- Revision 0.9.2.80  2007/08/13 22:46:19  brian
- - GPLv3 header updates
-
- Revision 0.9.2.79  2007/07/14 01:35:55  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.78  2007/03/25 19:01:15  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.77  2007/03/02 09:23:29  brian
- - build updates and esballoc() feature
-
- Revision 0.9.2.76  2006/12/18 10:08:59  brian
- - updated headers for release
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -137,7 +116,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-09-10 03:49:44 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -156,6 +135,10 @@ MODULE_SUPPORTED_DEVICE(SPECFS_DEVICE);
 MODULE_LICENSE(SPECFS_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("specfs");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

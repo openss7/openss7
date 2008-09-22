@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,65 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:55 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.13  2008-09-22 20:31:41  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.12  2008-09-10 03:49:55  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.11  2008-04-28 22:33:32  brian
  - updated headers for release
 
- Revision 0.9.2.10  2007/08/15 05:34:41  brian
- - GPLv3 updates
-
- Revision 0.9.2.9  2007/08/14 05:17:14  brian
- - GPLv3 header update
-
- Revision 0.9.2.8  2007/07/14 01:36:47  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.7  2007/03/25 19:02:20  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.6  2007/03/25 00:53:35  brian
- - synchronization updates
-
- Revision 0.9.2.5  2006/10/12 10:26:38  brian
- - removed redundant debug flags
-
- Revision 0.9.2.4  2006/10/05 12:20:37  brian
- - updates for release
-
- Revision 0.9.2.3  2006/10/03 13:53:09  brian
- - changes to pass make check target
- - added some package config.h files
- - removed AUTOCONFIG_H from Makefile.am's
- - source code changes for compile
- - added missing manual pages
- - renamed conflicting manual pages
- - parameterized include Makefile.am
- - updated release notes
-
- Revision 0.9.2.2  2006/09/29 11:50:56  brian
- - libtool library tweaks in Makefile.am
- - better rpm spec handling in *.spec.in
- - added AC_LIBTOOL_DLOPEN to configure.ac
- - updated some copyright headers
- - rationalized item in two packages
- - added manual pages, drivers and modules to new strtty package
-
- Revision 0.9.2.1  2006/09/01 08:55:42  brian
- - added headers and working up code
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $"
 
 static char const ident[] =
-    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $";
+    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -153,7 +114,7 @@ static char const ident[] =
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:55 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:41 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"
@@ -195,6 +156,10 @@ MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(SOCKSYS_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/socksys");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 /*

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,68 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.18  2008-09-22 20:31:51  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.17  2008-09-10 03:50:07  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.16  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
- Revision 0.9.2.15  2007/08/15 05:35:42  brian
- - GPLv3 updates
-
- Revision 0.9.2.14  2007/08/14 03:31:09  brian
- - GPLv3 header update
-
- Revision 0.9.2.13  2007/07/14 01:37:21  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.12  2007/05/17 22:21:30  brian
- - perform nf_reset if available
-
- Revision 0.9.2.11  2007/03/25 19:02:47  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.10  2007/03/25 00:53:47  brian
- - synchronization updates
-
- Revision 0.9.2.9  2007/02/10 15:53:18  brian
- - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
-
- Revision 0.9.2.8  2006/07/16 12:46:52  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.7  2006/07/15 13:06:29  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.6  2006/05/08 11:26:13  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.5  2006/05/08 08:16:43  brian
- - module_text_address, hash alloc changes
-
- Revision 0.9.2.4  2006/04/22 01:08:03  brian
- - working up NP driver
-
- Revision 0.9.2.3  2006/04/18 22:19:37  brian
- - working up np driver
-
- Revision 0.9.2.2  2006/04/18 18:00:45  brian
- - working up DL and NP drivers
-
- Revision 0.9.2.1  2006/04/12 20:36:03  brian
- - added some experimental drivers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -145,8 +103,8 @@ static char const ident[] =
 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:50:07 $"
+#define NP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-09-22 20:31:51 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -168,6 +126,10 @@ MODULE_LICENSE(NP_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-np_ip");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

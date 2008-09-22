@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.52  2008-09-22 20:31:51  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.51  2008-09-10 03:50:07  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -63,171 +66,12 @@
  Revision 0.9.2.48  2008-04-25 11:39:32  brian
  - updates to AGPLv3
 
- Revision 0.9.2.47  2007/10/18 06:54:49  brian
- - corrected new socket buffer support
-
- Revision 0.9.2.46  2007/10/15 17:26:10  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.45  2007/08/15 05:35:43  brian
- - GPLv3 updates
-
- Revision 0.9.2.44  2007/08/14 03:31:10  brian
- - GPLv3 header update
-
- Revision 0.9.2.43  2007/07/14 01:37:22  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.42  2007/05/17 22:21:30  brian
- - perform nf_reset if available
-
- Revision 0.9.2.41  2007/05/07 18:55:13  brian
- - corrections from release testing
-
- Revision 0.9.2.40  2007/04/12 20:07:17  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.39  2007/03/25 19:02:47  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.38  2007/03/25 06:01:05  brian
- - flush corrections
-
- Revision 0.9.2.37  2007/03/25 00:53:48  brian
- - synchronization updates
-
- Revision 0.9.2.36  2007/02/10 15:53:18  brian
- - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
-
- Revision 0.9.2.35  2006/12/08 05:18:48  brian
- - minor updates and corrections
-
- Revision 0.9.2.34  2006/10/31 21:00:01  brian
- - optimization correction
-
- Revision 0.9.2.33  2006/10/12 10:28:38  brian
- - removed redundant debug flags
-
- Revision 0.9.2.32  2006/10/02 11:32:32  brian
- - changes to get master builds working for RPM and DEB
- - added outside licenses to package documentation
- - added LICENSE automated release file
- - copy MANUAL to source directory
- - add and remove devices in -dev debian subpackages
- - get debian rules working better
- - release library version files
- - added notes to debian changelog
- - corrections for cooked manual pages in spec files
- - added release documentation to spec and rules files
- - copyright header updates
- - moved controlling tty checks in stream head
- - missing some defines for LiS build in various source files
- - added OSI headers to striso package
- - added includes and manual page paths to acincludes for various packages
- - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-   files
- - moved pragma weak statements ahead of declarations
- - changes for master build of RPMS and DEBS with LiS
-
- Revision 0.9.2.31  2006/08/16 07:47:40  brian
- - removed locking macro pollution
-
- Revision 0.9.2.30  2006/07/25 06:39:24  brian
- - expanded minor device numbers and optimization and locking corrections
-
- Revision 0.9.2.29  2006/07/24 09:01:57  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.28  2006/07/16 12:46:52  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.27  2006/07/16 08:19:30  brian
- - noxious 2.4 bug fixed, test suite corrections
-
- Revision 0.9.2.26  2006/07/15 13:06:29  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.25  2006/07/15 05:40:39  brian
- - converted 2.4 inet protocol hooks to 2.6 style
-
- Revision 0.9.2.24  2006/07/08 09:37:56  brian
- - handle old SLES 9 2.6.5 kernel (untested)
-
- Revision 0.9.2.23  2006/07/07 21:01:08  brian
- - change to correct LIS-only compile on FC5
-
- Revision 0.9.2.22  2006/07/02 12:22:16  brian
- - changes for 2.6.17 kernel
-
- Revision 0.9.2.21  2006/06/16 08:02:01  brian
- - added constness, rationalized to udp
-
- Revision 0.9.2.20  2006/06/05 02:53:42  brian
- - working up udp zero-copy
-
- Revision 0.9.2.19  2006/05/18 11:22:48  brian
- - rationalized to RAWIP driver
-
- Revision 0.9.2.18  2006/05/14 06:34:31  brian
- - corrected buffer leaks
-
- Revision 0.9.2.17  2006/05/13 14:00:38  brian
- - rationalized to rawip driver
-
- Revision 0.9.2.16  2006/05/13 02:43:34  brian
- - corrections for 2.4 testing
-
- Revision 0.9.2.15  2006/05/12 23:54:40  brian
- - close to last changes from testing
-
- Revision 0.9.2.14  2006/05/12 09:58:00  brian
- - more testing results and corrections for NPI-IP driver
-
- Revision 0.9.2.13  2006/05/12 01:16:20  brian
- - more results from testing NPI-IP driver
-
- Revision 0.9.2.12  2006/05/11 22:16:46  brian
- - more testing of NPI-IP driver
-
- Revision 0.9.2.11  2006/05/11 10:59:36  brian
- - more testing of NPI-IP driver
-
- Revision 0.9.2.10  2006/05/10 20:56:30  brian
- - more testing
-
- Revision 0.9.2.9  2006/05/10 09:42:42  brian
- - more testing on NPI-IP driver
-
- Revision 0.9.2.8  2006/05/09 22:13:04  brian
- - changes from testing
-
- Revision 0.9.2.7  2006/05/09 09:47:56  brian
- - changes from initial testing
-
- Revision 0.9.2.6  2006/05/09 06:48:08  brian
- - changes from testing
-
- Revision 0.9.2.5  2006/05/08 11:26:13  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.4  2006/05/08 08:16:43  brian
- - module_text_address, hash alloc changes
-
- Revision 0.9.2.3  2006/05/07 22:12:57  brian
- - updated for NPI-IP driver
-
- Revision 0.9.2.2  2006/04/18 18:00:45  brian
- - working up DL and NP drivers
-
- Revision 0.9.2.1  2006/04/13 18:32:50  brian
- - working up DL and NP drivers.
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -288,7 +132,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.51 $) $Date: 2008-09-10 03:50:07 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -311,6 +155,10 @@ MODULE_LICENSE(NP_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-np_ip");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

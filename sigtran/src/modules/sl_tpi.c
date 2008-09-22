@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:49:18 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:18 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.15  2008-09-22 20:31:04  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.14  2008-09-10 03:49:18  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,21 +63,12 @@
  Revision 0.9.2.12  2008-04-29 01:52:25  brian
  - updated headers for release
 
- Revision 0.9.2.11  2007/08/15 05:14:12  brian
- - GPLv3 updates
-
- Revision 0.9.2.10  2007/08/14 08:34:11  brian
- - GPLv3 header update
-
- Revision 0.9.2.9  2007/08/12 16:15:37  brian
- -
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:49:18 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:04 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:49:18 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:04 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -122,6 +116,10 @@ MODULE_LICENSE(SL_TPI_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sl_tpi");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

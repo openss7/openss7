@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.15 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.16 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 1.1.1.3.4.16  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 1.1.1.3.4.15  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 1.1.1.3.4.14  2007/08/15 04:57:59  brian
- - GPLv3 updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.15 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.16 $) $Date: 2008-09-22 20:30:53 $"
 
-static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.15 $) $Date: 2008-04-29 08:33:11 $";
+static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.16 $) $Date: 2008-09-22 20:30:53 $";
 
 /*
  *  sad: STREAMS Administrative Driver
@@ -513,6 +513,10 @@ MODULE_DESCRIPTION("STREAMS Administrative Driver");
 #endif
 #if defined(MODULE_ALIAS)
 MODULE_ALIAS("streams-" __stringify(LIS_OBJNAME));
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:13 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:21 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:21  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-04-29 07:11:13  brian
  - updating headers for release
 
- Revision 0.9.2.17  2007/08/15 05:20:28  brian
- - GPLv3 updates
-
- Revision 0.9.2.16  2007/08/14 12:18:50  brian
- - GPLv3 header updates
-
- Revision 0.9.2.15  2007/07/14 01:35:11  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.14  2007/03/25 19:00:22  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.13  2007/03/25 05:59:45  brian
- - flush corrections
-
- Revision 0.9.2.12  2007/03/25 02:23:03  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.11  2007/03/25 00:52:12  brian
- - synchronization updates
-
- Revision 0.9.2.10  2006/03/07 01:13:01  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:13 $"
+#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:21 $"
 
 static char const ident[] =
-    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:13 $";
+    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:21 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE over a connectionless
@@ -105,7 +84,7 @@ static char const ident[] =
 //#include "sscop_input.h"
 
 #define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-29 07:11:13 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:21 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -127,6 +106,10 @@ MODULE_LICENSE(SSCOP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sscop");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:37 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,71 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:37 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x100p.c,v $
+ Revision 0.9.2.31  2008-09-22 20:31:25  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.30  2008-09-10 03:49:37  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.29  2008-04-29 07:11:19  brian
  - updating headers for release
 
- Revision 0.9.2.28  2007/10/15 17:17:18  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.27  2007/08/15 05:20:52  brian
- - GPLv3 updates
-
- Revision 0.9.2.26  2007/08/12 16:20:35  brian
- - new PPA handling
-
- Revision 0.9.2.25  2007/07/22 01:10:15  brian
- - corrections for RHAS4 irq_handler_t and XEN paddr_t
-
- Revision 0.9.2.24  2007/07/14 01:35:22  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.23  2007/06/20 07:53:23  brian
- - updates for Fedora 7 and 2.6.21
-
- Revision 0.9.2.22  2007/06/20 06:52:02  brian
- - updates for Fedora 7 and 2.6.21 kernel
-
- Revision 0.9.2.21  2007/03/25 19:00:40  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.20  2007/03/25 05:59:58  brian
- - flush corrections
-
- Revision 0.9.2.19  2007/03/25 02:23:10  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.18  2007/03/25 00:52:20  brian
- - synchronization updates
-
- Revision 0.9.2.17  2006/12/07 12:56:16  brian
- - corrections from testing
-
- Revision 0.9.2.16  2006/12/06 11:45:21  brian
- - updated X400P driver and test suites
-
- Revision 0.9.2.15  2006/05/08 11:01:16  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.14  2006/03/07 01:15:12  brian
- - binary compatible callouts
-
- Revision 0.9.2.13  2006/03/04 13:00:24  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:37 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:25 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:37 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:25 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -147,7 +102,7 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:37 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:25 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -170,6 +125,10 @@ MODULE_LICENSE(SL_X100P_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sl_x100p");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

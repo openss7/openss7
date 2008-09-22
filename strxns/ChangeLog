@@ -1,3 +1,26 @@
+2008-09-22  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/cd.c: add mod version, truncate logs
+	* src/drivers/cddev.c: add mod version, truncate logs
+	* src/drivers/dl.c: add mod version, truncate logs
+	* src/drivers/dl2.c: add mod version, truncate logs
+	* src/drivers/dl_ip.c: add mod version, truncate logs
+	* src/drivers/dlpi.c: add mod version, truncate logs
+	* src/drivers/hdlc.c: add mod version, truncate logs
+	* src/drivers/ip.c: add mod version, truncate logs
+	* src/drivers/ip_to_dlpi.c: add mod version, truncate logs
+	* src/drivers/lcd.c: add mod version, truncate logs
+	* src/drivers/ldl.c: add mod version, truncate logs
+	* src/drivers/ldl2.c: add mod version, truncate logs
+	* src/drivers/llc.c: add mod version, truncate logs
+	* src/drivers/nf.c: add mod version, truncate logs
+	* src/drivers/np.c: add mod version, truncate logs
+	* src/drivers/np_ip.c: add mod version, truncate logs
+	* src/modules/cdi_conv.c: add mod version, truncate logs
+	* src/modules/dlpi_conv.c: add mod version, truncate logs
+	* src/modules/ip_strm_mod.c: add mod version, truncate logs
+	* src/modules/npi_conv.c: add mod version, truncate logs
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strxns.spec.in: much improved spec files ready for repo building

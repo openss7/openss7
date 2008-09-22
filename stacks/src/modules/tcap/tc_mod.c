@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:15 $
+ @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:15 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc_mod.c,v $
+ Revision 0.9.2.5  2008-09-22 20:31:22  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.4  2008-04-29 07:11:15  brian
  - updating headers for release
 
- Revision 0.9.2.3  2007/08/15 05:20:37  brian
- - GPLv3 updates
-
- Revision 0.9.2.2  2007/08/14 12:18:55  brian
- - GPLv3 header updates
-
- Revision 0.9.2.1  2007/08/03 13:02:54  brian
- - added documentation and minimal modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:15 $"
+#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $"
 
 static char const ident[] =
-    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:15 $";
+    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $";
 
 /*
  * This is TC-MOD.  It is a simplified Transaction Component Interface (TCI) module for TCAP that
@@ -130,7 +124,7 @@ static char const ident[] =
 #include <sys/xti_tcap.h>
 
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS MODULE."
-#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 07:11:15 $"
+#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $"
 #define TC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -153,6 +147,10 @@ MODULE_LICENSE(TC_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-tc-mod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

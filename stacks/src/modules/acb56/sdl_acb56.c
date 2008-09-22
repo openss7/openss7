@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:10:49 $
+ @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:49 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_acb56.c,v $
+ Revision 0.9.2.10  2008-09-22 20:31:05  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.9  2008-04-29 07:10:49  brian
  - updating headers for release
 
- Revision 0.9.2.8  2007/08/15 05:18:18  brian
- - GPLv3 updates
-
- Revision 0.9.2.7  2007/08/14 12:17:18  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:10:49 $"
+#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:05 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:10:49 $";
+    "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:05 $";
 
 /*
  *  This is an implementation of the Signalling Data Link for the SeaLevel
@@ -114,6 +111,10 @@ MODULE_LICENSE(ACB56_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdl_acb56");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

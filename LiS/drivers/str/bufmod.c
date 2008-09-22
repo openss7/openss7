@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:30:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.16  2008-09-22 20:30:52  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.15  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 0.9.2.14  2007/08/15 04:57:58  brian
- - GPLv3 updates
-
- Revision 0.9.2.13  2007/08/14 10:46:56  brian
- - GPLv3 header update
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:30:52 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 08:33:11 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:30:52 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -94,7 +91,7 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 08:33:11 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:30:52 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL"
@@ -117,6 +114,10 @@ MODULE_SUPPORTED_DEVICE(BUFMOD_DEVICE);
 MODULE_LICENSE(BUFMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-bufmod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

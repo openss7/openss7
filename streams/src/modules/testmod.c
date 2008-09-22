@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-28 12:54:07 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:32 $
 
  -----------------------------------------------------------------------------
 
@@ -46,87 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:07 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.24  2008-09-22 20:31:32  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.23  2008-04-28 12:54:07  brian
  - update file headers for release
 
- Revision 0.9.2.22  2007/12/15 20:20:07  brian
- - updates
-
- Revision 0.9.2.21  2007/08/15 05:33:30  brian
- - GPLv3 updates
-
- Revision 0.9.2.20  2007/08/13 22:46:26  brian
- - GPLv3 header updates
-
- Revision 0.9.2.19  2007/07/14 01:36:00  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.18  2007/04/12 20:06:16  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.17  2007/03/25 19:01:22  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.16  2007/03/25 00:52:56  brian
- - synchronization updates
-
- Revision 0.9.2.15  2006/12/18 10:09:02  brian
- - updated headers for release
-
- Revision 0.9.2.14  2006/10/27 23:19:43  brian
- - changes for 2.6.18 kernel
-
- Revision 0.9.2.13  2006/07/24 09:01:22  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.12  2006/06/14 10:37:31  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.11  2006/03/03 10:57:13  brian
- - 32-bit compatibility support, updates for release
-
- Revision 0.9.2.10  2005/12/20 15:12:16  brian
- - result of SMP kernel testing for LiS
-
- Revision 0.9.2.9  2005/12/19 03:23:40  brian
- - wend for simple streamscall
-
- Revision 0.9.2.8  2005/12/09 18:01:49  brian
- - profiling copy
-
- Revision 0.9.2.7  2005/11/26 08:40:22  brian
- - added qprocson for portability
-
- Revision 0.9.2.6  2005/10/14 12:26:49  brian
- - SC module and scls utility tested
-
- Revision 0.9.2.5  2005/10/13 10:58:44  brian
- - working up testing of sad(4) and sc(4)
-
- Revision 0.9.2.4  2005/10/07 09:34:24  brian
- - more testing and corrections
-
- Revision 0.9.2.3  2005/10/05 09:25:31  brian
- - poll tests, some noxious problem still with poll
-
- Revision 0.9.2.2  2005/09/27 23:34:25  brian
- - added test cases, tweaked straccess()
-
- Revision 0.9.2.1  2005/09/25 22:52:11  brian
- - added test module and continuing with testing
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-28 12:54:07 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:32 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-28 12:54:07 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:32 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -155,7 +91,7 @@ static char const ident[] =
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-04-28 12:54:07 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-22 20:31:32 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TESTMOD_LICENSE		"GPL"
@@ -178,6 +114,10 @@ MODULE_SUPPORTED_DEVICE(TESTMOD_DEVICE);
 MODULE_LICENSE(TESTMOD_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-testmod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

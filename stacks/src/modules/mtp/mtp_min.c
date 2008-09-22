@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:29 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_min.c,v $
+ Revision 0.9.2.25  2008-09-22 20:31:13  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.24  2008-09-10 03:49:29  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,41 +63,11 @@
  Revision 0.9.2.22  2008-04-29 07:11:03  brian
  - updating headers for release
 
- Revision 0.9.2.21  2007/08/19 11:55:47  brian
- - move stdbool.h, obviate need for YFLAGS, general workup
-
- Revision 0.9.2.20  2007/08/15 05:19:27  brian
- - GPLv3 updates
-
- Revision 0.9.2.19  2007/08/12 16:20:11  brian
- - new PPA handling
-
- Revision 0.9.2.18  2007/08/03 13:35:25  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.17  2007/07/14 01:34:40  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.16  2007/05/18 00:00:50  brian
- - check for nf_reset
-
- Revision 0.9.2.15  2007/03/25 18:59:48  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.14  2007/02/17 02:49:16  brian
- - first clean recompile of MTP modules on LFS
-
- Revision 0.9.2.13  2006/05/14 06:58:08  brian
- - removed redundant or unused QR_ definitions
-
- Revision 0.9.2.12  2006/03/04 13:00:14  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:13 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:13 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)
@@ -124,7 +97,7 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/tihdr.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-10 03:49:29 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:13 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -146,6 +119,10 @@ MODULE_LICENSE(MTP_MIN_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-mtp_min");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

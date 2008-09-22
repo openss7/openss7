@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:20 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:00 $
 
  -----------------------------------------------------------------------------
 
@@ -46,107 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:20 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.16  2008-09-22 20:31:00  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.15  2008-04-29 01:52:20  brian
  - updated headers for release
-
- Revision 0.9.2.14  2007/08/19 11:48:16  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.13  2007/08/15 05:13:48  brian
- - GPLv3 updates
-
- Revision 0.9.2.12  2007/08/12 16:15:18  brian
- -
-
- Revision 0.9.2.11  2007/08/03 13:34:29  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.10  2007/07/14 01:33:28  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.9  2007/05/18 12:15:22  brian
- - careful not to flush timers
-
- Revision 0.9.2.8  2007/05/17 22:55:13  brian
- - use mi_timer requeue to requeue mi timers
-
- Revision 0.9.2.7  2007/03/25 18:58:41  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.6  2007/03/12 23:19:37  brian
- - changes for function type safety
-
- Revision 0.9.2.5  2007/02/14 14:08:50  brian
- - broad changes updating support for SS7 MTP and M3UA
-
- Revision 0.9.2.4  2007/02/10 22:32:09  brian
- - working up sigtran drivers
-
- Revision 0.9.2.3  2007/02/03 03:07:46  brian
- - working up drivers
-
- Revision 0.9.2.2  2007/01/23 10:00:46  brian
- - added test program and m2ua-as updates
-
- Revision 0.9.2.1  2006/10/17 11:55:42  brian
- - copied files into new packages from strss7 package
-
- Revision 0.9.2.9  2005/07/13 12:01:32  brian
- - working up compat and check pass (finally lindented LiS)
-
- Revision 0.9.2.8  2005/07/05 22:45:32  brian
- - change for strcompat package
-
- Revision 0.9.2.7  2005/05/10 18:05:52  brian
- - do not set clone flag cause symbol no longer exported
-
- Revision 0.9.2.6  2005/04/09 09:42:20  brian
- - addition of module alias for ko modules
-
- Revision 0.9.2.5  2005/03/31 06:53:08  brian
- - changes for EL$ (CentOS 4.0) compatibility
-
- Revision 0.9.2.4  2005/03/08 19:30:03  brian
- - Changes for new build compile.
-
- Revision 0.9.2.3  2004/08/29 20:25:21  brian
- - Updates to driver registration for Linux Fast-STREAMS.
-
- Revision 0.9.2.2  2004/08/26 23:37:57  brian
- - Converted for use with Linux Fast-STREAMS.
-
- Revision 0.9.2.1  2004/08/21 10:14:44  brian
- - Force checkin on branch.
-
- Revision 0.9  2004/01/17 08:20:21  brian
- - Added files for 0.9 baseline autoconf release.
-
- Revision 0.8.2.3  2003/04/14 12:13:00  brian
- Updated module license defines.
-
- Revision 0.8.2.2  2003/04/03 19:50:31  brian
- Updates preparing for release.
-
- Revision 0.8.2.1  2002/10/18 03:27:42  brian
- Indentation changes only.
-
- Revision 0.8  2002/04/02 08:20:42  brian
- Started Linux 2.4 development branch.
 
  Revision 0.7  2001/06/04 03:48:36  brian
  Added files for M3UA.
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:20 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:00 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:20 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:00 $";
 
 /*
  *  This is an M3UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -244,7 +163,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2008-04-29 01:52:20 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:00 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -268,6 +187,10 @@ MODULE_LICENSE(M3UA_AS_LICENSE);
 MODULE_ALIAS("streams-m3ua_as");
 MODULE_ALIAS("streams-m3ua-as");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

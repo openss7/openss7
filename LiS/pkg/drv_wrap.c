@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $
+ @(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:30:54 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:24 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: drv_wrap.c,v $
+ Revision 0.9.2.6  2008-09-22 20:30:54  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.5  2008-04-29 08:33:24  brian
  - update headers for Affero release
 
- Revision 0.9.2.4  2007/08/14 10:47:18  brian
- - GPLv3 header update
-
- Revision 0.9.2.3  2006/12/18 09:51:09  brian
- - updated headers for release
-
- Revision 0.9.2.2  2006/10/27 22:38:58  brian
- - changes for 2.6.18 build
-
- Revision 0.9.2.1  2006/07/08 22:04:49  brian
- - add wrapper files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $"
+#ident "@(#) $RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:30:54 $"
 
 static char const ident[] =
-    "$RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-29 08:33:24 $";
+    "$RCSfile: drv_wrap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-22 20:30:54 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>

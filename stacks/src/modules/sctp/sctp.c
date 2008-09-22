@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:06 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,38 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp.c,v $
+ Revision 0.9.2.15  2008-09-22 20:31:15  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.14  2008-04-29 07:11:06  brian
  - updating headers for release
 
- Revision 0.9.2.13  2007/08/15 05:19:51  brian
- - GPLv3 updates
-
- Revision 0.9.2.12  2007/08/14 12:18:24  brian
- - GPLv3 header updates
-
- Revision 0.9.2.11  2007/07/14 01:34:59  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.10  2006/10/27 22:57:18  brian
- - changes for build on 2.6.18 kernel
-
- Revision 0.9.2.9  2006/09/26 00:52:25  brian
- - rationalized to embedded packages
-
- Revision 0.9.2.8  2006/03/07 01:11:27  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:06 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:15 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:06 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:15 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
@@ -191,7 +176,7 @@ struct sockaddr_storage {
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-29 07:11:06 $"
+#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:15 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -210,6 +195,10 @@ MODULE_LICENSE(SCTP_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sctp");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 
 STATIC void

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:28 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.28  2008-09-22 20:31:12  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.27  2008-09-10 03:49:28  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,51 +63,12 @@
  Revision 0.9.2.25  2008-04-29 07:11:02  brian
  - updating headers for release
 
- Revision 0.9.2.24  2007/10/15 17:17:01  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.23  2007/08/15 05:19:10  brian
- - GPLv3 updates
-
- Revision 0.9.2.22  2007/08/12 16:19:54  brian
- - new PPA handling
-
- Revision 0.9.2.21  2007/08/03 13:35:10  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.20  2007/07/14 01:34:33  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.19  2007/05/18 00:00:44  brian
- - check for nf_reset
-
- Revision 0.9.2.18  2007/03/25 18:59:40  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.17  2007/02/26 07:25:33  brian
- - synchronizing changes
-
- Revision 0.9.2.16  2007/02/21 01:09:07  brian
- - updating mtp.c driver, better mi_open allocators
-
- Revision 0.9.2.15  2007/02/17 02:49:13  brian
- - first clean recompile of MTP modules on LFS
-
- Revision 0.9.2.14  2006/05/08 11:00:58  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.13  2006/03/07 01:10:36  brian
- - binary compatible callouts
-
- Revision 0.9.2.12  2006/03/04 13:00:12  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -144,7 +108,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:28 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -166,6 +130,10 @@ MODULE_LICENSE(MTP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-mtp");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

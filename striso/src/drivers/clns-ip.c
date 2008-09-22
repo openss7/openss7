@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $
+ @(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,22 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:01:59 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns-ip.c,v $
+ Revision 0.9.2.3  2008-09-22 20:31:37  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.2  2008-04-29 00:01:59  brian
  - updated headers for release
 
- Revision 0.9.2.1  2007/08/12 15:20:24  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $"
+#ident "@(#) $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:37 $"
 
-static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $";
+static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:37 $";
 
 /*
  *  This is an X.233 CLNP driver.
@@ -126,7 +126,7 @@ static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 00:01:59 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:37 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI ISO-IP (RFC 1070) Network Provider"
 #define CNLS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CNLS_LICENSE	"GPL"
@@ -148,6 +148,10 @@ MODULE_LICENSE(CLNS_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-clns-ip");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

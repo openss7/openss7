@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:10:53 $
+ @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:53 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_sl.c,v $
+ Revision 0.9.2.7  2008-09-22 20:31:06  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.6  2008-04-29 07:10:53  brian
  - updating headers for release
 
- Revision 0.9.2.5  2007/08/15 05:18:24  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/14 12:17:28  brian
- - GPLv3 header updates
-
- Revision 0.9.2.3  2007/07/14 01:33:55  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.2  2007/03/25 18:59:15  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.1  2006/12/23 13:03:58  brian
- - added new conversion module
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:10:53 $"
+#ident "@(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:06 $"
 
 static char const ident[] =
-    "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:10:53 $";
+    "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:06 $";
 
 /*
  *  This is a simple conversion module that converts between the OpenSS7 Signalling Link Interface
@@ -84,7 +72,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define DL_SL_DESCRIP	"DLPI/SLI CONVERSION STREAMS MODULE."
-#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 07:10:53 $"
+#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:06 $"
 #define DL_SL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define DL_SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define DL_SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -107,6 +95,10 @@ MODULE_LICENSE(DL_SL_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-dl_sl");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

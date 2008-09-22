@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $
+ @(#) $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +46,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-13 06:43:56 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd-llc.c,v $
+ Revision 0.9.2.2  2008-09-22 20:31:46  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.1  2008-06-13 06:43:56  brian
  - added files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $"
+#ident "@(#) $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
 
-static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $";
+static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $";
 
 /*
  * This is a driver for the IEEE 802.2 Logical Link Control (LLC).  It
@@ -77,7 +80,7 @@ static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revi
 #define LLC_DESCRIP	"SVR 4.2 CDI X.25 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: cd-llc.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-06-13 06:43:56 $"
+#define LLC_REVISION	"OpenSS7 $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-09-22 20:31:46 $"
 #define LLC_DEVICE	"SVR 4.2MP CDI Driver (CDI) for IEEE 802.2 LLC"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"
@@ -121,6 +124,10 @@ MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-0");
 MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-" __stringify(LLC_CMINOR));
 MODULE_ALIAS("/dev/llc");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

@@ -78,6 +78,10 @@ MODULE_ALIAS("pmacd");
 MODULE_ALIAS("streams-pmacd");
 MODULE_ALIAS("streams-pmacdDriver");
 #endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif
 int RH_Enabled = 0;
 

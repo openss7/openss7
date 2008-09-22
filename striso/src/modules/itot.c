@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $
+ @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:02:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itot.c,v $
+ Revision 0.9.2.9  2008-09-22 20:31:38  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.8  2008-04-29 00:02:05  brian
  - updated headers for release
 
- Revision 0.9.2.7  2007/08/15 05:34:20  brian
- - GPLv3 updates
-
- Revision 0.9.2.6  2007/08/14 07:05:15  brian
- - GNUv3 header update
-
- Revision 0.9.2.5  2007/07/14 01:36:25  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.4  2007/03/25 06:00:33  brian
- - flush corrections
-
- Revision 0.9.2.3  2006/10/12 10:24:51  brian
- - removed redundant debug flags, and got itot compiling
-
- Revision 0.9.2.2  2006/10/10 10:44:15  brian
- - updates for release, lots of additions and workup
-
- Revision 0.9.2.1  2006/07/11 12:32:05  brian
- - added ISO and other implementations to distribution
-
- Revision 0.9.2.1  2006/04/11 18:30:11  brian
- - added new ISO over TCP modules
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $"
+#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:38 $"
 
 static char const ident[] =
-    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $";
+    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:38 $";
 
 /*
  *  ISO Transport over TCP (ITOT)
@@ -106,7 +85,7 @@ static char const ident[] =
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ITOT_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 00:02:05 $"
+#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:38 $"
 #define ITOT_DEVICE	"SVR 4.2 STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"
@@ -128,6 +107,10 @@ MODULE_LICENSE(ITOT_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-itot");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifndef ITOT_MOD_NAME

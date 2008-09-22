@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.13 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,29 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: relay.c,v $
+ Revision 1.1.1.3.4.13  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 1.1.1.3.4.12  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 1.1.1.3.4.11  2007/08/15 04:57:59  brian
- - GPLv3 updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.13 $) $Date: 2008-09-22 20:30:53 $"
 
-static char const ident[] = "$RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2008-04-29 08:33:11 $";
+static char const ident[] = "$RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.13 $) $Date: 2008-09-22 20:30:53 $";
 
 /*                               -*- Mode: C -*- 
  * relay.c --- A simple relay pushable module
  * Author          : Dave Grothe
  * Created On      : Dec 30, 1995
  * Last Modified By: Dave Grothe
- * RCS Id          : $Id: relay.c,v 1.1.1.3.4.12 2008-04-29 08:33:11 brian Exp $
+ * RCS Id          : $Id: relay.c,v 1.1.1.3.4.13 2008-09-22 20:30:53 brian Exp $
  * Purpose         : relay messages just to test pushable modules
  * ----------------______________________________________________
  *
@@ -345,6 +345,10 @@ module_exit(relay3_cleanup_module);
 #endif
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 
 #endif				/* !defined __NO_VERSION__ */

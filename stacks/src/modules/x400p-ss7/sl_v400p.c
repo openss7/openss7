@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $
+ @(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,59 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:37 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_v400p.c,v $
+ Revision 0.9.2.11  2008-09-22 20:31:24  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.10  2008-09-10 03:49:37  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.9  2008-04-29 07:11:18  brian
  - updating headers for release
 
- Revision 0.9.2.8  2007/08/15 05:20:51  brian
- - GPLv3 updates
-
- Revision 0.9.2.7  2007/08/14 12:19:01  brian
- - GPLv3 header updates
-
- Revision 0.9.2.6  2007/07/14 01:35:22  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.5  2007/03/25 19:00:40  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.4  2007/03/25 05:59:57  brian
- - flush corrections
-
- Revision 0.9.2.3  2007/03/25 02:23:10  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.2  2007/03/25 00:52:20  brian
- - synchronization updates
-
- Revision 0.9.2.1  2006/12/06 11:36:19  brian
- - added new driver and test files
-
- Revision 0.9.2.18  2006/11/15 08:58:54  brian
- - error in sdl rx found by inspection
-
- Revision 0.9.2.17  2006/05/08 11:01:17  brian
- - new compilers mishandle postincrement of cast pointers
-
- Revision 0.9.2.16  2006/03/07 01:14:58  brian
- - binary compatible callouts
-
- Revision 0.9.2.15  2006/03/04 13:00:27  brian
- - FC4 x86_64 gcc 4.0.4 2.6.15 changes
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $"
+#ident "@(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:24 $"
 
 static char const ident[] =
-    "$RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $";
+    "$RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:24 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -140,7 +107,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-10 03:49:37 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:24 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -163,6 +130,10 @@ MODULE_LICENSE(SL_X400P_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sl_x400p");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

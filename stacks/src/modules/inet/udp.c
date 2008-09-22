@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:25 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:08 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:25 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.13  2008-09-22 20:31:08  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.12  2008-09-10 03:49:25  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,184 +63,12 @@
  Revision 0.9.2.10  2008-04-29 07:10:55  brian
  - updating headers for release
 
- Revision 0.9.2.9  2007/08/15 05:18:39  brian
- - GPLv3 updates
-
- Revision 0.9.2.8  2007/08/14 12:17:40  brian
- - GPLv3 header updates
-
- Revision 0.9.2.7  2007/07/14 01:34:05  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.6  2007/05/18 00:00:38  brian
- - check for nf_reset
-
- Revision 0.9.2.5  2007/03/25 18:59:23  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.4  2007/03/25 05:59:23  brian
- - flush corrections
-
- Revision 0.9.2.3  2007/03/25 00:51:39  brian
- - synchronization updates
-
- Revision 0.9.2.2  2006/10/12 10:19:36  brian
- - removed redundant debug flags
-
- Revision 0.9.2.1  2006/09/25 20:15:50  brian
- - rationalized to strinet and strxnet
-
- Revision 0.9.2.48  2006/08/16 07:47:38  brian
- - removed locking macro pollution
-
- Revision 0.9.2.47  2006/07/24 09:01:33  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.46  2006/07/16 12:46:34  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.45  2006/07/16 08:18:56  brian
- - noxious 2.4 bug fixed, test suite corrections
-
- Revision 0.9.2.44  2006/07/15 13:06:10  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.43  2006/07/15 05:40:36  brian
- - converted 2.4 inet protocol hooks to 2.6 style
-
- Revision 0.9.2.42  2006/07/13 08:07:57  brian
- - added sk_buff data buffer allocation mechanism for stream head
-
- Revision 0.9.2.41  2006/07/11 04:36:27  brian
- - fixed testcase 1074 1222 failure
-
- Revision 0.9.2.40  2006/07/08 09:37:52  brian
- - handle old SLES 9 2.6.5 kernel (untested)
-
- Revision 0.9.2.39  2006/07/07 21:14:59  brian
- - correct compile back to RH 7.2
-
- Revision 0.9.2.38  2006/07/02 12:19:52  brian
- - changes for 2.6.17 kernel
-
- Revision 0.9.2.37  2006/07/01 12:09:54  brian
- - gets and puts cannot be fastcalled
-
- Revision 0.9.2.36  2006/06/22 13:11:45  brian
- - more optmization tweaks and fixes
-
- Revision 0.9.2.35  2006/06/22 04:47:52  brian
- - corrected bug in optimization
-
- Revision 0.9.2.34  2006/06/22 01:17:18  brian
- - syncing notebook, latest changes are not stable yet
-
- Revision 0.9.2.33  2006/06/19 20:51:29  brian
- - more optimizations
-
- Revision 0.9.2.32  2006/06/18 20:54:13  brian
- - minor optimizations from profiling
-
- Revision 0.9.2.31  2006/06/16 10:48:04  brian
- - recent updates
-
- Revision 0.9.2.30  2006/06/16 08:01:40  brian
- - found noxious buffer overflow
-
- Revision 0.9.2.29  2006/06/14 10:37:44  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.28  2006/06/06 06:26:47  brian
- - second gen UDP driver working well now
-
- Revision 0.9.2.27  2006/06/05 02:53:40  brian
- - working up udp zero-copy
-
- Revision 0.9.2.26  2006/05/31 10:27:40  brian
- - working up zero-copy
-
- Revision 0.9.2.25  2006/05/29 08:53:07  brian
- - started zero copy architecture
-
- Revision 0.9.2.24  2006/05/25 08:39:11  brian
- - added noinline in strategic places
-
- Revision 0.9.2.23  2006/05/24 10:50:39  brian
- - optimizations
-
- Revision 0.9.2.22  2006/05/23 10:40:22  brian
- - handle non-exported sysctl_ip_default_ttl on receive FC4 kernels
-
- Revision 0.9.2.21  2006/05/22 02:09:09  brian
- - changes from performance testing
-
- Revision 0.9.2.20  2006/05/19 23:15:35  brian
- - corrections from testing
-
- Revision 0.9.2.19  2006/05/19 12:29:07  brian
- - results of testing, almost full pass
-
- Revision 0.9.2.18  2006/05/19 08:49:44  brian
- - working up RAWIP and UDP drivers and testing
-
- Revision 0.9.2.17  2006/05/18 21:01:18  brian
- - synced UDP driver to RAWIP driver
-
- Revision 0.9.2.16  2006/05/14 08:34:30  brian
- - changes for compile and load
-
- Revision 0.9.2.15  2006/05/08 11:26:05  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.14  2006/05/07 22:12:49  brian
- - updated for NPI-IP driver
-
- Revision 0.9.2.13  2006/05/03 11:53:51  brian
- - changes for compile, working up NPI-IP driver
-
- Revision 0.9.2.12  2006/04/24 09:25:10  brian
- - working up RAWIP and UDP drivers
-
- Revision 0.9.2.11  2006/04/23 18:13:22  brian
- - changes for compile
-
- Revision 0.9.2.10  2006/04/22 10:51:04  brian
- - working up UDP and RAWIP drivers
-
- Revision 0.9.2.9  2006/04/22 01:08:52  brian
- - working up second generation UPD driver
-
- Revision 0.9.2.8  2006/04/18 17:55:42  brian
- - raiontalizing rawip and udp drivers
-
- Revision 0.9.2.7  2006/04/03 10:57:25  brian
- - need attributes on definition as well as declaration
-
- Revision 0.9.2.6  2006/03/27 01:25:36  brian
- - working up IP driver and SCTP testing
-
- Revision 0.9.2.5  2006/03/25 10:20:09  brian
- - corrected some compile problems
-
- Revision 0.9.2.4  2006/03/24 16:03:26  brian
- - changes for x86_64 2.6.15 compile, working up udp
-
- Revision 0.9.2.3  2006/03/24 04:58:00  brian
- - first compile pass
-
- Revision 0.9.2.2  2006/03/24 00:08:29  brian
- - added second generation udp driver
-
- Revision 0.9.2.1  2006/03/20 12:16:23  brian
- - new approach to UDP
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:25 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:08 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:25 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:08 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -319,7 +150,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-09-10 03:49:25 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:31:08 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -342,6 +173,10 @@ MODULE_LICENSE(UDP_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-udp");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

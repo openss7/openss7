@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:17 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,77 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:17 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.23  2008-09-22 20:31:01  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.22  2008-09-10 03:49:17  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.21  2008/04/29 01:52:24  brian
  - updated headers for release
 
- Revision 0.9.2.20  2007/08/19 11:48:34  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.19  2007/08/15 05:14:10  brian
- - GPLv3 updates
-
- Revision 0.9.2.18  2007/08/12 16:15:35  brian
- -
-
- Revision 0.9.2.17  2007/07/14 01:33:43  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.16  2007/07/04 08:32:14  brian
- - doc updates and m2pa correction
-
- Revision 0.9.2.15  2007/05/18 12:24:02  brian
- - indentation
-
- Revision 0.9.2.14  2007/05/18 12:15:32  brian
- - careful not to flush timers
-
- Revision 0.9.2.13  2007/05/18 12:01:57  brian
- - trace logging and service procedures for m2pa
-
- Revision 0.9.2.12  2007/05/17 22:55:37  brian
- - use mi_timer requeue to requeue mi timers
-
- Revision 0.9.2.11  2007/03/25 18:59:06  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.10  2007/03/09 04:29:17  brian
- - never use bottom half locking
-
- Revision 0.9.2.9  2007/03/09 04:12:36  brian
- - fixed initial timeout value bug
-
- Revision 0.9.2.8  2007/01/26 21:54:36  brian
- - working up AS drivers and docs
-
- Revision 0.9.2.7  2006/12/18 08:51:36  brian
- - corections from testing, resolve device numbering
-
- Revision 0.9.2.6  2006/12/06 11:31:25  brian
- - rationalized to x400p driver and test program
-
- Revision 0.9.2.5  2006/11/03 11:08:46  brian
- - 32-bit compatibility testsuite passes
-
- Revision 0.9.2.4  2006/11/02 12:54:42  brian
- - major corrections and updates to M2PA module and tests cases
-
- Revision 0.9.2.3  2006/10/31 20:34:21  brian
- - more buildup of test suite
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:17 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:01 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:17 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:01 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -147,7 +96,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-10 03:49:17 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:01 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -169,6 +118,10 @@ MODULE_LICENSE(M2PA_SL_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-m2pa_sl");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

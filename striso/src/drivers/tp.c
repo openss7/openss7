@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:50 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.20  2008-09-22 20:31:37  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.19  2008-09-10 03:49:50  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,67 +63,12 @@
  Revision 0.9.2.17  2008-04-25 08:38:30  brian
  - working up libraries modules and drivers
 
- Revision 0.9.2.16  2007/08/15 05:34:18  brian
- - GPLv3 updates
-
- Revision 0.9.2.15  2007/08/14 07:05:03  brian
- - GNUv3 header update
-
- Revision 0.9.2.14  2007/07/14 01:36:23  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.13  2007/03/25 19:01:51  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.12  2006/10/12 10:24:50  brian
- - removed redundant debug flags, and got itot compiling
-
- Revision 0.9.2.11  2006/10/10 10:44:10  brian
- - updates for release, lots of additions and workup
-
- Revision 0.9.2.10  2006/10/03 13:52:22  brian
- - changes to pass make check target
- - added some package config.h files
- - removed AUTOCONFIG_H from Makefile.am's
- - source code changes for compile
- - added missing manual pages
- - renamed conflicting manual pages
- - parameterized include Makefile.am
- - updated release notes
-
- Revision 0.9.2.9  2006/07/25 06:39:18  brian
- - expanded minor device numbers and optimization and locking corrections
-
- Revision 0.9.2.8  2006/07/11 12:32:04  brian
- - added ISO and other implementations to distribution
-
- Revision 0.9.2.7  2006/05/03 01:05:55  brian
- - spelling correction
-
- Revision 0.9.2.6  2006/04/18 17:58:48  brian
- - added some notes
-
- Revision 0.9.2.5  2006/04/11 18:23:15  brian
- - working up TP driver
-
- Revision 0.9.2.4  2006/04/10 20:25:15  brian
- - working up TP driver
-
- Revision 0.9.2.3  2006/04/09 03:57:04  brian
- - working up TP driver
-
- Revision 0.9.2.2  2006/04/08 23:54:54  brian
- - working up ISO TP driver
-
- Revision 0.9.2.1  2006/04/08 03:39:15  brian
- - working up striso package
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -172,7 +120,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2008-09-10 03:49:50 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:37 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL"
@@ -193,6 +141,10 @@ MODULE_LICENSE(TP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-tp");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 01:52:24 $
+ @(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,40 +46,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:24 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_dl.c,v $
+ Revision 0.9.2.7  2008-09-22 20:31:01  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.6  2008-04-29 01:52:24  brian
  - updated headers for release
 
- Revision 0.9.2.5  2007/08/15 05:14:10  brian
- - GPLv3 updates
-
- Revision 0.9.2.4  2007/08/14 08:34:10  brian
- - GPLv3 header update
-
- Revision 0.9.2.3  2007/07/14 01:33:43  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.2  2007/03/25 18:59:06  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.1  2006/10/27 22:50:40  brian
- - working up modules and testsuite
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 01:52:24 $"
+#ident "@(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:01 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 01:52:24 $";
+    "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:01 $";
 
 #include <sys/os7/compat.h>
 
 #define M2PA_DL_DESCRIP		"M2PA/SCTP SS7 DATA LINK (DL) STREAMS MODULE"
-#define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-29 01:52:24 $"
+#define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-22 20:31:01 $"
 #define M2PA_DL_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define M2PA_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -100,6 +88,10 @@ MODULE_LICENSE(M2PA_DL_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-m2pa_dl");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

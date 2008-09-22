@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:10:59 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:59 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2tp.c,v $
+ Revision 0.9.2.20  2008-09-22 20:31:11  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.19  2008-04-29 07:10:59  brian
  - updating headers for release
 
- Revision 0.9.2.18  2007/08/15 05:18:57  brian
- - GPLv3 updates
-
- Revision 0.9.2.17  2007/08/14 12:17:57  brian
- - GPLv3 header updates
-
- Revision 0.9.2.16  2007/07/14 01:34:26  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.15  2007/03/25 18:59:34  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.14  2007/03/25 05:59:29  brian
- - flush corrections
-
- Revision 0.9.2.13  2007/03/25 02:22:45  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.12  2007/03/25 00:51:48  brian
- - synchronization updates
-
- Revision 0.9.2.11  2006/03/07 01:09:55  brian
- - updated headers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:10:59 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:11 $"
 
 static char const ident[] =
-    "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-29 07:10:59 $";
+    "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:11 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -106,7 +85,7 @@ static char const ident[] =
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -128,6 +107,10 @@ MODULE_LICENSE(M2TP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-m2tp");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

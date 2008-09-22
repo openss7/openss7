@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.13 $) $Date: 2008-04-29 08:33:11 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2008-09-22 20:30:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,29 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.c,v $
+ Revision 1.1.1.3.4.14  2008-09-22 20:30:53  brian
+ - added module version and truncated logs
+
  Revision 1.1.1.3.4.13  2008-04-29 08:33:11  brian
  - update headers for Affero release
 
- Revision 1.1.1.3.4.12  2007/08/15 04:57:58  brian
- - GPLv3 updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.13 $) $Date: 2008-04-29 08:33:11 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2008-09-22 20:30:53 $"
 
-static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.13 $) $Date: 2008-04-29 08:33:11 $";
+static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2008-09-22 20:30:53 $";
 
 /*                               -*- Mode: C -*- 
  * loop.c --- Streams loopback driver, as of Sun manual 
  * Author          : Graham Wheeler
  * Created On      : Sat Oct  7 05:01:31 1995
  * Last Modified By: David Grothe
- * RCS Id          : $Id: loop.c,v 1.1.1.3.4.13 2008-04-29 08:33:11 brian Exp $
+ * RCS Id          : $Id: loop.c,v 1.1.1.3.4.14 2008-09-22 20:30:53 brian Exp $
  * Purpose         : provide loopback streams driver
  * ----------------______________________________________________
  *
@@ -940,6 +940,10 @@ module_exit(loop_cleanup_module);
 #endif
 #if defined(MODULE_LICENSE)
 MODULE_LICENSE("GPL");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 
 #endif				/* !defined __NO_VERSION__ */

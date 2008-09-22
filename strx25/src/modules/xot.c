@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $
+ @(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:27 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xot.c,v $
+ Revision 0.9.2.3  2008-09-22 20:31:48  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.2  2008-06-18 16:45:27  brian
  - widespread updates
 
@@ -59,9 +62,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#ident "@(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $"
 
-static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $";
+static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $";
 
 
 /*
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.2 $)
 #define XOT_DESCRIPT	"X.25 OVER TCP MODULE FOR LINUX FAST-STREAMS"
 #define XOT_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOT_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-06-18 16:45:27 $"
+#define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $"
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"
 #define XOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOT_LICENSE	"GPL"
@@ -121,6 +124,10 @@ MODULE_ALIAS("streams-xot");
 MODULE_ALIAS("streams-module-xot");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_XOT_MODID));
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* MODULE */
 #endif				/* LINUX */
 

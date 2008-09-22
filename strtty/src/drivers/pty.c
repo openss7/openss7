@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,63 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:57 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.14  2008-09-22 20:31:42  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.13  2008-09-10 03:49:57  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.12  2008-04-28 17:46:02  brian
  - updates for release
 
- Revision 0.9.2.11  2007/12/15 20:20:41  brian
- - updates
-
- Revision 0.9.2.10  2007/08/15 05:34:49  brian
- - GPLv3 updates
-
- Revision 0.9.2.9  2007/08/14 03:04:30  brian
- - GPLv3 header update
-
- Revision 0.9.2.8  2007/07/14 01:36:52  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.7  2007/03/28 13:44:46  brian
- - updates to syncrhonization, release notes and documentation
-
- Revision 0.9.2.6  2007/03/25 19:02:24  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.5  2007/03/25 06:00:56  brian
- - flush corrections
-
- Revision 0.9.2.4  2006/12/18 07:37:00  brian
- - resolve device numbering
-
- Revision 0.9.2.3  2006/10/12 09:37:40  brian
- - completed much of the strtty package
-
- Revision 0.9.2.2  2006/10/03 13:53:26  brian
- - changes to pass make check target
- - added some package config.h files
- - removed AUTOCONFIG_H from Makefile.am's
- - source code changes for compile
- - added missing manual pages
- - renamed conflicting manual pages
- - parameterized include Makefile.am
- - updated release notes
-
- Revision 0.9.2.1  2006/09/29 11:40:06  brian
- - new files for strtty package and manual pages
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -126,8 +89,8 @@ static char const ident[] =
 #include <linux/spinlock.h>
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-10 03:49:57 $"
+#define PTY_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:42 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL"
@@ -156,6 +119,10 @@ MODULE_ALIAS("streams-pty");
 MODULE_ALIAS("streams-ptm");
 MODULE_ALIAS("streams-pts");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* CONFIG_STREAMS_PTY_MODULE */
 #endif				/* LINUX */
 

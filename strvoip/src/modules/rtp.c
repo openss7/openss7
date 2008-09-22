@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:00 $
+ @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:45 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:00 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rtp.c,v $
+ Revision 0.9.2.9  2008-09-22 20:31:45  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.8  2008-09-10 03:50:00  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.7  2008-04-29 02:07:56  brian
  - updated headers for release
 
- Revision 0.9.2.6  2007/08/15 05:35:26  brian
- - GPLv3 updates
-
- Revision 0.9.2.5  2007/08/14 08:46:44  brian
- - GPLv3 header update
-
- Revision 0.9.2.4  2007/07/14 01:37:06  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.3  2007/03/25 19:02:35  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.2  2007/03/25 00:53:42  brian
- - synchronization updates
-
- Revision 0.9.2.1  2006/10/17 11:56:26  brian
- - copied files into new packages from strss7 package
-
- Revision 0.9.2.1  2006/03/30 10:44:22  brian
- - added first cut of RTP driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:00 $"
+#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:45 $"
 
 static char const ident[] =
-    "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:00 $";
+    "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:45 $";
 
 /*
  *  This driver provides the functionality of an RTP (Realtime Transport
@@ -127,7 +109,7 @@ static char const ident[] =
 #define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2008-09-10 03:50:00 $"
+#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:45 $"
 #define RTP_DEVICE	"SVR 4.2 STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL"
@@ -149,6 +131,10 @@ MODULE_LICENSE(RTP_LICENSE);
 #endif
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-rtp");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

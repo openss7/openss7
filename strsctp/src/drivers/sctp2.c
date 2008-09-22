@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-09-22 20:31:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:53 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.81  2008-09-22 20:31:39  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.80  2008-09-10 03:49:53  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -66,120 +69,12 @@
  Revision 0.9.2.76  2008-04-28 23:13:23  brian
  - updated headers for release
 
- Revision 0.9.2.75  2007/10/18 06:54:16  brian
- - corrected new socket buffer support
-
- Revision 0.9.2.74  2007/10/15 17:24:24  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.73  2007/07/18 17:02:19  brian
- - correct NETIF_F_HW_CSUM, XTI_SNDBUF and XTI_RCVBUF
-
- Revision 0.9.2.72  2007/07/14 01:36:27  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.71  2007/06/20 06:36:54  brian
- - updates for Fedora 7 and 2.6.21 kernel
-
- Revision 0.9.2.70  2007/05/26 06:52:56  brian
- - get rid of compiler warning
-
- Revision 0.9.2.69  2007/05/25 12:04:56  brian
- - final performance tweaks
-
- Revision 0.9.2.68  2007/05/24 23:51:48  brian
- - nice stable performance test runs
-
- Revision 0.9.2.67  2007/05/22 02:10:20  brian
- - SCTP performance testing updates
-
- Revision 0.9.2.66  2007/05/18 12:05:25  brian
- - wrap up of sctp testing
-
- Revision 0.9.2.65  2007/05/18 05:02:01  brian
- - final sctp performance rework
-
- Revision 0.9.2.64  2007/04/12 20:06:41  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.63  2007/03/25 19:01:57  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.62  2007/03/25 06:00:36  brian
- - flush corrections
-
- Revision 0.9.2.61  2007/03/25 00:53:16  brian
- - synchronization updates
-
- Revision 0.9.2.60  2007/03/15 02:01:49  brian
- - last known bug fixes, report failed expectations
-
- Revision 0.9.2.59  2007/03/10 13:53:04  brian
- - checking in latest corrections for release
-
- Revision 0.9.2.58  2006/12/15 00:22:00  brian
- - bufq locking changes and test suite upgrade
-
- Revision 0.9.2.57  2006/12/08 05:28:08  brian
- - bufq locking change and debian init script name correction
-
- Revision 0.9.2.56  2006/10/30 20:26:18  brian
- - bug hunting
-
- Revision 0.9.2.55  2006/10/21 19:55:24  brian
- - a couple more test case corrections
-
- Revision 0.9.2.54  2006/10/21 12:00:18  brian
- - missing checkins
-
- Revision 0.9.2.53  2006/10/21 00:22:06  brian
- - corrections for zero-length messages, QR_TRIMMED tweaks
-
- Revision 0.9.2.52  2006/10/19 12:48:16  brian
- - corrections to ETSI SACK frequency
-
- Revision 0.9.2.51  2006/10/19 11:52:30  brian
- - added support for ETSI SACK frequency
-
- Revision 0.9.2.50  2006/10/17 12:11:28  brian
- - printf statement correction for debug compile
-
- Revision 0.9.2.49  2006/10/16 00:14:38  brian
- - updates for release and test case passes on UP
-
- Revision 0.9.2.48  2006/08/23 11:20:59  brian
- - rationalized sctp2.c to sctp package
-
- Revision 0.9.2.47  2006/08/07 22:17:02  brian
- - changes from SCTP Interop
-
- Revision 0.9.2.46  2006/07/29 07:44:07  brian
- - CVS checkin of changes before leaving for SCTP interop
-
- Revision 0.9.2.45  2006/07/24 09:01:40  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.44  2006/07/16 12:46:37  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.43  2006/07/15 13:06:13  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.42  2006/04/22 01:10:38  brian
- - locking correction
-
- Revision 0.9.2.41  2006/03/27 01:25:38  brian
- - working up IP driver and SCTP testing
-
- Revision 0.9.2.40  2006/03/03 11:46:59  brian
- - 32/64-bit compatibility
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-09-22 20:31:39 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-09-22 20:31:39 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -197,7 +92,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-09-10 03:49:53 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-09-22 20:31:39 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -224,6 +119,10 @@ MODULE_ALIAS("streams-sctp");
 #ifdef LFS
 MODULE_ALIAS("streams-driver-sctp");
 #endif
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* SCTP_CONFIG_MODULE */
 #endif				/* LINUX */

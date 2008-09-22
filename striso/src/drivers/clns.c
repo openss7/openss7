@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,96 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:50 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.19  2008-09-22 20:31:37  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.18  2008-09-10 03:49:50  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.17  2008-04-29 00:02:00  brian
  - updated headers for release
 
- Revision 0.9.2.16  2007/08/15 05:34:18  brian
- - GPLv3 updates
-
- Revision 0.9.2.15  2007/08/14 07:05:03  brian
- - GNUv3 header update
-
- Revision 0.9.2.14  2007/08/12 16:00:23  brian
- - updates, still working up CONS
-
- Revision 0.9.2.13  2007/07/14 01:36:23  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.12  2007/05/03 22:51:42  brian
- - corrections for test compile
-
- Revision 0.9.2.11  2007/03/25 19:01:51  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.10  2007/03/25 00:53:12  brian
- - synchronization updates
-
- Revision 0.9.2.9  2006/10/03 13:52:22  brian
- - changes to pass make check target
- - added some package config.h files
- - removed AUTOCONFIG_H from Makefile.am's
- - source code changes for compile
- - added missing manual pages
- - renamed conflicting manual pages
- - parameterized include Makefile.am
- - updated release notes
-
- Revision 0.9.2.8  2006/10/02 11:31:48  brian
- - changes to get master builds working for RPM and DEB
- - added outside licenses to package documentation
- - added LICENSE automated release file
- - copy MANUAL to source directory
- - add and remove devices in -dev debian subpackages
- - get debian rules working better
- - release library version files
- - added notes to debian changelog
- - corrections for cooked manual pages in spec files
- - added release documentation to spec and rules files
- - copyright header updates
- - moved controlling tty checks in Stream head
- - missing some defines for LiS build in various source files
- - added OSI headers to striso package
- - added includes and manual page paths to acincludes for various packages
- - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-   files
- - moved pragma weak statements ahead of declarations
- - changes for master build of RPMS and DEBS with LiS
-
- Revision 0.9.2.7  2006/08/26 09:19:05  brian
- - better release file generation
-
- Revision 0.9.2.6  2006/08/23 11:08:11  brian
- - changes for compile
-
- Revision 0.9.2.5  2006/07/24 09:01:38  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.4  2006/07/11 12:32:04  brian
- - added ISO and other implementations to distribution
-
- Revision 0.9.2.3  2006/04/13 18:32:48  brian
- - working up DL and NP drivers.
-
- Revision 0.9.2.2  2006/04/13 01:51:43  brian
- - starting CLNL driver
-
- Revision 0.9.2.1  2006/04/12 20:36:01  brian
- - added some experimental drivers
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:37 $";
 
 /*
  *  This is an X.233 CLNS driver.
@@ -226,7 +156,7 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:50 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:37 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL"
@@ -248,6 +178,10 @@ MODULE_LICENSE(CLNS_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-dl");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

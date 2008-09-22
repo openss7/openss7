@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-04-28 12:54:06 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,66 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.59  2008-09-22 20:31:31  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.58  2008-04-28 12:54:06  brian
  - update file headers for release
 
- Revision 0.9.2.57  2007/12/15 20:20:02  brian
- - updates
-
- Revision 0.9.2.56  2007/10/13 08:51:49  brian
- - updates for 2.6.22 FC6 kernel and added MIBs
-
- Revision 0.9.2.55  2007/08/15 05:33:26  brian
- - GPLv3 updates
-
- Revision 0.9.2.54  2007/08/13 22:46:22  brian
- - GPLv3 header updates
-
- Revision 0.9.2.53  2007/07/14 01:35:57  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.52  2007/04/12 20:06:13  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.51  2007/03/25 19:01:18  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.50  2007/03/25 06:00:20  brian
- - flush corrections
-
- Revision 0.9.2.49  2006/10/27 23:19:40  brian
- - changes for 2.6.18 kernel
-
- Revision 0.9.2.48  2006/08/23 11:09:13  brian
- - rationalized to strutil
-
- Revision 0.9.2.47  2006/07/24 09:01:20  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.46  2006/06/14 10:37:27  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.45  2006/03/10 07:23:58  brian
- - rationalized streams and strutil package sources
-
- Revision 0.9.2.44  2006/03/03 10:57:11  brian
- - 32-bit compatibility support, updates for release
-
- Revision 0.9.2.43  2006/02/20 10:59:24  brian
- - updated copyright headers on changed files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-04-28 12:54:06 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-04-28 12:54:06 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -132,7 +89,7 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-04-28 12:54:06 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:31 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SC_LICENSE	"GPL"
@@ -151,6 +108,10 @@ MODULE_SUPPORTED_DEVICE(SC_DEVICE);
 MODULE_LICENSE(SC_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sc");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-09-10 03:49:47 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:47 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.59  2008-09-22 20:31:33  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.58  2008-09-10 03:49:47  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -63,193 +66,12 @@
  Revision 0.9.2.55  2008-04-28 22:52:11  brian
  - updated headers for release
 
- Revision 0.9.2.54  2007/10/18 06:54:11  brian
- - corrected new socket buffer support
-
- Revision 0.9.2.53  2007/10/15 17:22:55  brian
- - updates for 2.6.22.5-49.fc6 kernel
-
- Revision 0.9.2.52  2007/08/15 05:33:56  brian
- - GPLv3 updates
-
- Revision 0.9.2.51  2007/08/14 04:27:14  brian
- - GPLv3 header update
-
- Revision 0.9.2.50  2007/07/14 01:36:09  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.49  2007/05/17 22:33:05  brian
- - perform nf_reset when available
-
- Revision 0.9.2.48  2007/05/08 12:17:49  brian
- - locking updates, changes from validation testing
-
- Revision 0.9.2.47  2007/05/07 20:04:18  brian
- - locking, return code, testing changes
-
- Revision 0.9.2.46  2007/04/12 20:06:30  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.45  2007/03/29 12:10:42  brian
- - add T_SNDZERO for UDP and RAWIP per XNS 5.2
-
- Revision 0.9.2.44  2007/03/25 19:01:31  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.43  2007/03/25 06:00:27  brian
- - flush corrections
-
- Revision 0.9.2.42  2007/03/25 00:53:03  brian
- - synchronization updates
-
- Revision 0.9.2.41  2007/02/10 15:53:22  brian
- - PR: openss7/4734 fixed missing spinlock symbols on ubuntu i386 UP kernels
-
- Revision 0.9.2.40  2006/12/08 05:23:56  brian
- - bufq locking changes and debian init script name correction
-
- Revision 0.9.2.39  2006/10/12 10:23:54  brian
- - removed redundant debug flags
-
- Revision 0.9.2.38  2006/10/02 11:31:43  brian
- - changes to get master builds working for RPM and DEB
- - added outside licenses to package documentation
- - added LICENSE automated release file
- - copy MANUAL to source directory
- - add and remove devices in -dev debian subpackages
- - get debian rules working better
- - release library version files
- - added notes to debian changelog
- - corrections for cooked manual pages in spec files
- - added release documentation to spec and rules files
- - copyright header updates
- - moved controlling tty checks in stream head
- - missing some defines for LiS build in various source files
- - added OSI headers to striso package
- - added includes and manual page paths to acincludes for various packages
- - added sunrpc, uidlpi, uinpi and uitpi licenses to documentation and release
-   files
- - moved pragma weak statements ahead of declarations
- - changes for master build of RPMS and DEBS with LiS
-
- Revision 0.9.2.37  2006/08/16 07:47:36  brian
- - removed locking macro pollution
-
- Revision 0.9.2.36  2006/07/24 09:01:31  brian
- - results of udp2 optimizations
-
- Revision 0.9.2.35  2006/07/16 12:46:33  brian
- - handle skb_linearize with 1 arg on recent kernels
-
- Revision 0.9.2.34  2006/07/16 08:18:55  brian
- - noxious 2.4 bug fixed, test suite corrections
-
- Revision 0.9.2.33  2006/07/15 13:06:09  brian
- - rationalized np_ip.c and rawip.c to upd.c drivers
-
- Revision 0.9.2.32  2006/07/15 05:40:35  brian
- - converted 2.4 inet protocol hooks to 2.6 style
-
- Revision 0.9.2.31  2006/07/08 09:37:51  brian
- - handle old SLES 9 2.6.5 kernel (untested)
-
- Revision 0.9.2.30  2006/07/07 21:15:00  brian
- - correct compile back to RH 7.2
-
- Revision 0.9.2.29  2006/07/02 12:19:53  brian
- - changes for 2.6.17 kernel
-
- Revision 0.9.2.28  2006/06/18 20:54:12  brian
- - minor optimizations from profiling
-
- Revision 0.9.2.27  2006/06/16 10:48:03  brian
- - recent updates
-
- Revision 0.9.2.26  2006/06/16 08:01:39  brian
- - found noxious buffer overflow
-
- Revision 0.9.2.25  2006/06/14 10:37:43  brian
- - defeat a lot of debug traces in debug mode for testing
- - changes to allow strinet to compile under LiS (why???)
-
- Revision 0.9.2.24  2006/05/31 10:27:42  brian
- - working up zero-copy
-
- Revision 0.9.2.23  2006/05/25 08:39:10  brian
- - added noinline in strategic places
-
- Revision 0.9.2.22  2006/05/24 10:50:38  brian
- - optimizations
-
- Revision 0.9.2.21  2006/05/23 10:40:20  brian
- - handle non-exported sysctl_ip_default_ttl on receive FC4 kernels
-
- Revision 0.9.2.20  2006/05/22 02:09:09  brian
- - changes from performance testing
-
- Revision 0.9.2.19  2006/05/19 12:29:06  brian
- - results of testing, almost full pass
-
- Revision 0.9.2.18  2006/05/19 08:49:43  brian
- - working up RAWIP and UDP drivers and testing
-
- Revision 0.9.2.17  2006/05/18 21:01:17  brian
- - synced UDP driver to RAWIP driver
-
- Revision 0.9.2.16  2006/05/18 11:52:11  brian
- - working up RAWIP driver
-
- Revision 0.9.2.15  2006/05/14 09:05:37  brian
- - corrected unitialized variable
-
- Revision 0.9.2.14  2006/05/14 08:34:30  brian
- - changes for compile and load
-
- Revision 0.9.2.13  2006/05/08 11:26:03  brian
- - post inc problem and working through test cases
-
- Revision 0.9.2.12  2006/05/03 11:53:51  brian
- - changes for compile, working up NPI-IP driver
-
- Revision 0.9.2.11  2006/04/26 10:47:51  brian
- - sync
-
- Revision 0.9.2.10  2006/04/24 09:25:09  brian
- - working up RAWIP and UDP drivers
-
- Revision 0.9.2.9  2006/04/23 18:13:21  brian
- - changes for compile
-
- Revision 0.9.2.8  2006/04/22 10:51:03  brian
- - working up UDP and RAWIP drivers
-
- Revision 0.9.2.7  2006/04/18 17:55:41  brian
- - raiontalizing rawip and udp drivers
-
- Revision 0.9.2.6  2006/04/03 10:57:25  brian
- - need attributes on definition as well as declaration
-
- Revision 0.9.2.5  2006/03/30 12:51:54  brian
- - corrections for x64_64 compile
-
- Revision 0.9.2.4  2006/03/30 10:46:22  brian
- - working up second gen rawip driver
-
- Revision 0.9.2.3  2006/03/27 01:25:36  brian
- - working up IP driver and SCTP testing
-
- Revision 0.9.2.2  2006/03/24 16:03:25  brian
- - changes for x86_64 2.6.15 compile, working up udp
-
- Revision 0.9.2.1  2006/03/24 06:16:38  brian
- - added next generation rawip driver
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-09-10 03:49:47 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:33 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-09-10 03:49:47 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:33 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -330,7 +152,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-09-10 03:49:47 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-09-22 20:31:33 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -353,6 +175,10 @@ MODULE_LICENSE(RAW_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-rawip");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

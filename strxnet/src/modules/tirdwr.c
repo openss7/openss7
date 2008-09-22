@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.c,v 0.9.2.37 2008-09-10 03:50:05 brian Exp $
+ @(#) $Id: tirdwr.c,v 0.9.2.38 2008-09-22 20:31:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.38  2008-09-22 20:31:49  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.37  2008-09-10 03:50:05  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -60,39 +63,12 @@
  Revision 0.9.2.35  2008-04-28 18:38:39  brian
  - header updates for release
 
- Revision 0.9.2.34  2007/08/15 05:35:34  brian
- - GPLv3 updates
-
- Revision 0.9.2.33  2007/08/14 04:00:55  brian
- - GPLv3 header update
-
- Revision 0.9.2.32  2007/08/03 13:36:47  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.31  2007/07/14 01:37:10  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.30  2007/04/12 20:07:06  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.29  2007/03/25 19:02:39  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.28  2007/03/25 02:23:40  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.27  2007/03/25 00:53:44  brian
- - synchronization updates
-
- Revision 0.9.2.26  2006/09/26 00:51:30  brian
- - rationalized to stacks package
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:49 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:49 $";
 
 #include <sys/os7/compat.h>
 
@@ -110,7 +86,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-10 03:50:05 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:49 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -131,6 +107,10 @@ MODULE_LICENSE(TIRDWR_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tirdwr");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

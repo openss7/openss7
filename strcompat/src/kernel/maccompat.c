@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 16:47:13 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,35 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:13 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: maccompat.c,v $
+ Revision 0.9.2.23  2008-09-22 20:31:29  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.22  2008-04-28 16:47:13  brian
  - updates for release
 
- Revision 0.9.2.21  2007/08/15 05:33:09  brian
- - GPLv3 updates
-
- Revision 0.9.2.20  2007/08/12 15:51:19  brian
- - header and extern updates, GPLv3, 3 new lock functions
-
- Revision 0.9.2.19  2007/07/14 01:35:41  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.18  2007/03/02 10:04:06  brian
- - updates to common build process and versions for all exported symbols
-
- Revision 0.9.2.17  2006/11/03 10:39:28  brian
- - updated headers, correction to mi_timer_expiry type
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 16:47:13 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 16:47:13 $";
+    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:29 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -96,7 +84,7 @@ static char const ident[] =
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 16:47:13 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:29 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"
@@ -115,6 +103,10 @@ MODULE_SUPPORTED_DEVICE(MACCOMP_DEVICE);
 MODULE_LICENSE(MACCOMP_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-maccompat");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

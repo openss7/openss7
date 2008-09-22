@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:25 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:25 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.9  2008-09-22 20:31:04  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.8  2008-04-29 01:52:25  brian
  - updated headers for release
 
- Revision 0.9.2.7  2007/08/19 11:48:36  brian
- - move stdbool.h, bison changes
-
- Revision 0.9.2.6  2007/08/15 05:14:12  brian
- - GPLv3 updates
-
- Revision 0.9.2.5  2007/08/14 08:34:11  brian
- - GPLv3 header update
-
- Revision 0.9.2.4  2007/07/14 01:33:46  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.3  2007/03/25 18:59:08  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.2  2006/12/23 13:06:56  brian
- - manual page and other package updates for release
-
- Revision 0.9.2.1  2006/11/30 13:17:57  brian
- - added files from strss7 package
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:25 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:04 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:25 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:04 $";
 
 /*
  *  This is the AS side of SUA implemented as a pushable module that pushes over an SCTP NPI
@@ -155,7 +137,7 @@ static char const ident[] =
 /* ======================= */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MODULE."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 01:52:25 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:04 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -177,6 +159,10 @@ MODULE_LICENSE(SUA_AS_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sua_as");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

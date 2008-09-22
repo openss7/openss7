@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,47 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:11 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.11  2008-09-22 20:31:20  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.10  2008-04-29 07:11:11  brian
  - updating headers for release
 
- Revision 0.9.2.9  2007/08/19 11:55:54  brian
- - move stdbool.h, obviate need for YFLAGS, general workup
-
- Revision 0.9.2.8  2007/08/15 05:20:19  brian
- - GPLv3 updates
-
- Revision 0.9.2.7  2007/08/12 16:20:30  brian
- - new PPA handling
-
- Revision 0.9.2.6  2007/08/06 04:43:57  brian
- - rework of pipe-based emulation modules
-
- Revision 0.9.2.5  2007/07/14 01:35:06  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.4  2007/05/18 00:01:17  brian
- - check for nf_reset
-
- Revision 0.9.2.3  2007/03/25 19:00:15  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.2  2006/12/29 12:18:14  brian
- - old rpms hate nested ifs, release updates
-
- Revision 0.9.2.1  2006/12/27 16:35:55  brian
- - added slpmod module and fixups for make check target
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $"
 
 static char const ident[] =
-    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $";
+    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $";
 
 /*
  *  This is SLPMOD, an SL module that is pushed over a pipe end to form an internal
@@ -113,7 +89,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:11 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:20 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -136,6 +112,10 @@ MODULE_LICENSE(SL_LICENSE);
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-slpmod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS

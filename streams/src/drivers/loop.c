@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,44 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.c,v $
+ Revision 0.9.2.23  2008-09-22 20:31:30  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.22  2008-04-28 12:54:05  brian
  - update file headers for release
 
- Revision 0.9.2.21  2007/12/15 20:19:54  brian
- - updates
-
- Revision 0.9.2.20  2007/08/15 05:33:21  brian
- - GPLv3 updates
-
- Revision 0.9.2.19  2007/08/13 22:46:15  brian
- - GPLv3 header updates
-
- Revision 0.9.2.18  2007/07/14 01:35:45  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.17  2007/04/12 20:06:09  brian
- - changes from performance testing and misc bug fixes
-
- Revision 0.9.2.16  2007/03/25 19:01:12  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.15  2007/03/25 06:00:17  brian
- - flush corrections
-
- Revision 0.9.2.14  2006/12/18 10:08:58  brian
- - updated headers for release
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:30 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:30 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -110,7 +89,7 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-04-28 12:54:05 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:30 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
@@ -129,6 +108,10 @@ MODULE_SUPPORTED_DEVICE(LOOP_DEVICE);
 MODULE_LICENSE(LOOP_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-loop");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:52 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,41 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:52 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.21  2008-09-22 20:31:06  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.20  2008-04-29 07:10:52  brian
  - updating headers for release
 
- Revision 0.9.2.19  2007/08/15 05:18:24  brian
- - GPLv3 updates
-
- Revision 0.9.2.18  2007/08/14 12:17:27  brian
- - GPLv3 header updates
-
- Revision 0.9.2.17  2007/07/14 01:33:55  brian
- - make license explicit, add documentation
-
- Revision 0.9.2.16  2007/03/25 18:59:15  brian
- - changes to support 2.6.20-1.2307.fc5 kernel
-
- Revision 0.9.2.15  2007/03/25 02:22:36  brian
- - add D_MP and D_MTPERQ flags
-
- Revision 0.9.2.14  2007/03/25 00:51:16  brian
- - synchronization updates
-
- Revision 0.9.2.13  2006/03/07 01:07:25  brian
- - binary compatible callouts
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:52 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:06 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:52 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:06 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -90,8 +72,8 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.20 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-29 07:10:52 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.21 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 20:31:06 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -113,6 +95,10 @@ MODULE_LICENSE(DL_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-dl");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

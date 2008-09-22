@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-22 20:31:30 $
 
  -----------------------------------------------------------------------------
 
@@ -46,29 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:04 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 0.9.2.53  2008-09-22 20:31:30  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.52  2008-04-28 12:54:04  brian
  - update file headers for release
 
- Revision 0.9.2.51  2007/12/15 20:19:53  brian
- - updates
-
- Revision 0.9.2.50  2007/08/15 05:33:21  brian
- - GPLv3 updates
-
- Revision 0.9.2.49  2007/08/13 22:46:15  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-22 20:31:30 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-22 20:31:30 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -94,7 +88,7 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-04-28 12:54:04 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-09-22 20:31:30 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -113,6 +107,10 @@ MODULE_SUPPORTED_DEVICE(FIFO_DEVICE);
 MODULE_LICENSE(FIFO_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-fifo");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif
 

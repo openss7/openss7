@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:32 $
+ @(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,32 +46,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:32 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: spm.c,v $
+ Revision 0.9.2.31  2008-09-22 20:31:18  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.30  2008-09-10 03:49:32  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
  Revision 0.9.2.29  2008-04-29 07:11:09  brian
  - updating headers for release
 
- Revision 0.9.2.28  2007/08/15 05:20:11  brian
- - GPLv3 updates
-
- Revision 0.9.2.27  2007/08/12 16:38:45  brian
- - header error
-
- Revision 0.9.2.26  2007/08/12 16:20:26  brian
- - new PPA handling
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:32 $"
+#ident "@(#) $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:18 $"
 
 static char const ident[] =
-    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:32 $";
+    "$RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:18 $";
 
 /*
  *  This is an SDL pipemod driver for testing and use with pipes.  This module
@@ -90,7 +84,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SPM_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-09-10 03:49:32 $"
+#define SPM_REVISION	"OpenSS7 $RCSfile: spm.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-09-22 20:31:18 $"
 #define SPM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SPM_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SPM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -112,6 +106,10 @@ MODULE_LICENSE(SPM_LICENSE);
 #endif				/* MODULE_LICENSE */
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-spm");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

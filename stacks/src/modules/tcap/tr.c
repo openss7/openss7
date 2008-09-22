@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 07:11:16 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,26 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:16 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr.c,v $
+ Revision 0.9.2.16  2008-09-22 20:31:23  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.15  2008-04-29 07:11:16  brian
  - updating headers for release
 
- Revision 0.9.2.14  2007/08/15 05:20:41  brian
- - GPLv3 updates
-
- Revision 0.9.2.13  2007/08/14 12:18:55  brian
- - GPLv3 header updates
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 07:11:16 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:23 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 07:11:16 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:23 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.
@@ -81,7 +78,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
-#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date"
+#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -103,6 +100,10 @@ MODULE_LICENSE(TR_LICENSE);
 #endif
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-tr");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 

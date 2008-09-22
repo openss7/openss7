@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:09 $
+ @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,38 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:09 $ by $Author: brian $
+ Last Modified $Date: 2008-09-22 20:31:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_pmod.c,v $
+ Revision 0.9.2.8  2008-09-22 20:31:18  brian
+ - added module version and truncated logs
+
  Revision 0.9.2.7  2008-04-29 07:11:09  brian
  - updating headers for release
 
- Revision 0.9.2.6  2007/08/15 05:20:11  brian
- - GPLv3 updates
-
- Revision 0.9.2.5  2007/08/12 16:20:25  brian
- - new PPA handling
-
- Revision 0.9.2.4  2007/08/06 04:43:53  brian
- - rework of pipe-based emulation modules
-
- Revision 0.9.2.3  2007/08/03 13:35:39  brian
- - manual updates, put ss7 modules in public release
-
- Revision 0.9.2.2  2007/07/21 20:09:51  brian
- - added pass structure
-
- Revision 0.9.2.1  2007/07/14 01:13:34  brian
- - added new files
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:09 $"
+#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:09 $";
+    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $";
 
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
@@ -113,7 +98,7 @@ static char const ident[] =
 #undef unfreezestr
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS PIPE MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:09 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:18 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -136,6 +121,10 @@ MODULE_LICENSE(SDL_LICENSE);
 #if defined MODULE_ALIAS
 MODULE_ALIAS("streams-sdl-pmod");
 #endif				/* MODULE_ALIAS */
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
 #endif				/* LINUX */
 
 #ifdef LFS
