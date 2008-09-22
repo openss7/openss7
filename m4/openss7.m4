@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008/09/22 05:52:21 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2008-09-22 17:47:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/22 05:52:21 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:47:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -631,6 +631,9 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_PATCHLEVEL], [dnl
     AC_SUBST([PACKAGE_PATCHLEVEL])
     AC_DEFINE_UNQUOTED([PACKAGE_PATCHLEVEL], ["$PACKAGE_PATCHLEVEL"], [The
 	Package Patch Level.  This defaults to null.])
+    if test -n "$PACKAGE_PATCHLEVEL"; then
+	PACKAGE_RELEASE=$((PACKAGE_RELEASE-1))
+    fi
 ])# _OPENSS7_OPTIONS_PKG_PATCHLEVEL
 # =========================================================================
 
@@ -994,6 +997,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.72  2008-09-22 17:47:19  brian
+# - decrement package release when patching
+#
 # Revision 0.9.2.71  2008/09/22 05:52:21  brian
 # - update stamping corrections
 #
