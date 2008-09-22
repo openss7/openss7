@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008/09/21 14:09:33 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008/09/22 17:57:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/21 14:09:33 $ by $Author: brian $
+# Last Modified $Date: 2008/09/22 17:57:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -328,6 +328,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	    rpm_cv_dist_subdir=`echo "$rpm_cv_dist_subdir" | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
 	fi
     ])
+    PACKAGE_RPMSUBDIR="${rpm_cv_dist_subdir}"
+    AC_SUBST([PACKAGE_RPMSUBDIR])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_RPMSUBDIR], ["$PACKAGE_RPMSUBDIR"], [The RPM Distribution
+	subdirectory.  This defaults to automatic detection.])
     PACKAGE_RPMDIST="${dist_cv_host_distrib:-Unknown Linux} ${dist_cv_host_release:-Unknown}${dist_cv_host_codename:+ ($dist_cv_host_codename)}"
     AC_SUBST([PACKAGE_RPMDIST])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
@@ -656,6 +660,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.80  2008/09/22 17:57:38  brian
+# - substitute rpm subdirectory
+#
 # Revision 0.9.2.79  2008/09/21 14:09:33  brian
 # - correction
 #
