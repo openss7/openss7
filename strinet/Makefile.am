@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008-04-28 22:52:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008-09-22 17:37:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 22:52:05 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:37:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -283,8 +283,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= scripts/missing2
-EXTRA_SCRIPTS			+= scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3
+EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
 
 ##
 ## Rules for building kernel objects
@@ -500,6 +500,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.77  2008-09-22 17:37:31  brian
+# - build and release updates
+#
 # Revision 0.9.2.76  2008-04-28 22:52:05  brian
 # - updated headers for release
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-16 10:00:18 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-22 17:37:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-16 10:00:18 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:37:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,8 +128,8 @@ EXTRA_TEX			+= \
 				scripts/texi/testsuite.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= scripts/missing2
-EXTRA_SCRIPTS			+= scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3
+EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
 
 ##
 ## Rules for lsms
@@ -186,6 +186,9 @@ DISTCLEANFILES			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.39  2008-09-22 17:37:22  brian
+# - build and release updates
+#
 # Revision 0.9.2.38  2008-09-16 10:00:18  brian
 # - support autoupdating kernel modules for various distros
 #

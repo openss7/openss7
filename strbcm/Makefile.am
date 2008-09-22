@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-04-28 17:30:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-22 17:37:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 17:30:58 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:37:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -172,8 +172,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= scripts/missing2
-EXTRA_SCRIPTS			+= scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3
+EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
 
 include am/packages.am
 
@@ -347,6 +347,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.21  2008-09-22 17:37:28  brian
+# - build and release updates
+#
 # Revision 0.9.2.20  2008-04-28 17:30:58  brian
 # - updates for release
 #

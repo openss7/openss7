@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.52 $) $Date: 2008-04-29 08:33:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.53 $) $Date: 2008-09-22 17:37:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 08:33:11 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:37:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -282,8 +282,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= scripts/missing2
-EXTRA_SCRIPTS			+= scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3
+EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
 
 ##
 ## Rules for building kernel objects
@@ -633,6 +633,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.6.53  2008-09-22 17:37:23  brian
+# - build and release updates
+#
 # Revision 1.1.6.52  2008-04-29 08:33:11  brian
 # - update headers for Affero release
 #

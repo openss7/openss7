@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-08-02 16:42:17 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 17:37:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-02 16:42:17 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:37:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -171,13 +171,13 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([ALL],
 		AS_HELP_STRING([--with-ALL],
 			       [include all packages in master pack @<:@disabled@:>@]),
-		[with_ALL="$withval"],
+		[with_ALL="${withval:-yes}"],
 		[with_ALL=''])
     AC_ARG_WITH([SCTP],
 		AS_HELP_STRING([--without-SCTP],
 			       [do not include SCTP in master pack @<:@detected@:>@]),
-		[with_SCTP="$withval"],
-		[with_SCTP=''])
+		[with_SCTP="${withval:-yes}"],
+		[with_SCTP="${with_ALL}"])
     AC_CACHE_CHECK([for sub-package sctp],[os7_cv_sctp_dir],[dnl
 	    os7_cv_sctp_dir=''
 	    for dir in $srcdir/sctp $srcdir/sctp-* ; do
@@ -205,8 +205,8 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([IPERF],
 		AS_HELP_STRING([--without-IPERF],
 			       [do not include IPERF in master pack @<:@detected@:>@]),
-		[with_IPERF="$withval"],
-		[with_IPERF=''])
+		[with_IPERF="${withval:-yes}"],
+		[with_IPERF="${with_ALL}"])
     AC_CACHE_CHECK([for sub-package iperf],[os7_cv_iperf_dir],[dnl
 	    os7_cv_iperf_dir=''
 	    for dir in $srcdir/iperf $srcdir/iperf-* ; do
@@ -234,8 +234,8 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([LIS],
 		AS_HELP_STRING([--with-LIS],
 			       [include LIS in master pack @<:@detected@:>@]),
-		[with_LIS="$withval"],
-		[with_LIS='no'])
+		[with_LIS="${withval:-yes}"],
+		[with_LIS="${with_ALL}"])
     AC_CACHE_CHECK([for sub-package LiS],[os7_cv_LiS_dir],[dnl
 	    os7_cv_LiS_dir=''
 	    for dir in $srcdir/LiS $srcdir/LiS-* ; do
@@ -263,7 +263,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STREAMS],
 		AS_HELP_STRING([--without-STREAMS],
 			       [do not include STREAMS in master pack @<:@included@:>@]),
-		[with_STREAMS="$withval"],
+		[with_STREAMS="${withval:-yes}"],
 		[with_STREAMS='yes'])
     AC_CACHE_CHECK([for sub-package streams],[os7_cv_streams_dir],[dnl
 	    os7_cv_streams_dir=''
@@ -292,7 +292,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRCOMPAT],
 		AS_HELP_STRING([--without-STRCOMPAT],
 			       [do not include STRCOMPAT in master pack @<:@included@:>@]),
-		[with_STRCOMPAT="$withval"],
+		[with_STRCOMPAT="${withval:-yes}"],
 		[with_STRCOMPAT='yes'])
     AC_CACHE_CHECK([for sub-package strcompat],[os7_cv_strcompat_dir],[dnl
 	    os7_cv_strcompat_dir=''
@@ -321,8 +321,8 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRUTIL],
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
-		[with_STRUTIL="$withval"],
-		[with_STRUTIL='no'])
+		[with_STRUTIL="${withval:-yes}"],
+		[with_STRUTIL="${with_ALL}"])
     AC_CACHE_CHECK([for sub-package strutil],[os7_cv_strutil_dir],[dnl
 	    os7_cv_strutil_dir=''
 	    for dir in $srcdir/strutil $srcdir/strutil-* ; do
@@ -350,8 +350,8 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRBCM],
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
-		[with_STRBCM="$withval"],
-		[with_STRBCM='no'])
+		[with_STRBCM="${withval:-yes}"],
+		[with_STRBCM="${with_ALL}"])
     AC_CACHE_CHECK([for sub-package strbcm],[os7_cv_strbcm_dir],[dnl
 	    os7_cv_strbcm_dir=''
 	    for dir in $srcdir/strbcm $srcdir/strbcm-* ; do
@@ -377,9 +377,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 	fi
     fi
     AC_ARG_WITH([STRTTY],
-		AS_HELP_STRING([--with-STRTTY],
-			       [include STRTTY in master pack @<:@detected@:>@]),
-		[with_STRTTY="$withval"],
+		AS_HELP_STRING([--without-STRTTY],
+			       [do not include STRTTY in master pack @<:@included@:>@]),
+		[with_STRTTY="${withval:-yes}"],
 		[with_STRTTY='yes'])
     AC_CACHE_CHECK([for sub-package strtty],[os7_cv_strtty_dir],[dnl
 	    os7_cv_strtty_dir=''
@@ -408,7 +408,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRXNS],
 		AS_HELP_STRING([--without-STRXNS],
 			       [do not include STRXNS in master pack @<:@included@:>@]),
-		[with_STRXNS="$withval"],
+		[with_STRXNS="${withval:-yes}"],
 		[with_STRXNS='yes'])
     AC_CACHE_CHECK([for sub-package strxns],[os7_cv_strxns_dir],[dnl
 	    os7_cv_strxns_dir=''
@@ -437,7 +437,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRXNET],
 		AS_HELP_STRING([--without-STRXNET],
 			       [do not include STRXNET in master pack @<:@included@:>@]),
-		[with_STRXNET="$withval"],
+		[with_STRXNET="${withval:-yes}"],
 		[with_STRXNET='yes'])
     AC_CACHE_CHECK([for sub-package strxnet],[os7_cv_strxnet_dir],[dnl
 	    os7_cv_strxnet_dir=''
@@ -466,7 +466,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRNSL],
 		AS_HELP_STRING([--without-STRNSL],
 			       [do not include STRNSL in master pack @<:@included@:>@]),
-		[with_STRNSL="$withval"],
+		[with_STRNSL="${withval:-yes}"],
 		[with_STRNSL='yes'])
     AC_CACHE_CHECK([for sub-package strnsl],[os7_cv_strnsl_dir],[dnl
 	    os7_cv_strnsl_dir=''
@@ -495,7 +495,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRSOCK],
 		AS_HELP_STRING([--without-STRSOCK],
 			       [do not include STRSOCK in master pack @<:@included@:>@]),
-		[with_STRSOCK="$withval"],
+		[with_STRSOCK="${withval:-yes}"],
 		[with_STRSOCK='yes'])
     AC_CACHE_CHECK([for sub-package strsock],[os7_cv_strsock_dir],[dnl
 	    os7_cv_strsock_dir=''
@@ -524,7 +524,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRINET],
 		AS_HELP_STRING([--without-STRINET],
 			       [do not include STRINET in master pack @<:@included@:>@]),
-		[with_STRINET="$withval"],
+		[with_STRINET="${withval:-yes}"],
 		[with_STRINET='yes'])
     AC_CACHE_CHECK([for sub-package strinet],[os7_cv_strinet_dir],[dnl
 	    for dir in $srcdir/strinet $srcdir/strinet-* ; do
@@ -552,7 +552,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRSCTP],
 		AS_HELP_STRING([--without-STRSCTP],
 			       [do not include STRSCTP in master pack @<:@included@:>@]),
-		[with_STRSCTP="$withval"],
+		[with_STRSCTP="${withval:-yes}"],
 		[with_STRSCTP='yes'])
     AC_CACHE_CHECK([for sub-package strsctp],[os7_cv_strsctp_dir],[dnl
 	    os7_cv_strsctp_dir=''
@@ -581,7 +581,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRCHAN],
 		AS_HELP_STRING([--without-STRCHAN],
 			       [do not include STRCHAN in master pack @<:@included@:>@]),
-		[with_STRCHAN="$withval"],
+		[with_STRCHAN="${withval:-yes}"],
 		[with_STRCHAN='yes'])
     AC_CACHE_CHECK([for sub-package strchan],[os7_cv_strchan_dir],[dnl
 	    for dir in $srcdir/strchan $srcdir/strchan-* ; do
@@ -607,9 +607,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 	fi
     fi
     AC_ARG_WITH([STRX25],
-		AS_HELP_STRING([--with-STRX25],
-			       [include STRX25 in master pack @<:@detected@:>@]),
-		[with_STRX25="$withval"],
+		AS_HELP_STRING([--without-STRX25],
+			       [do not include STRX25 in master pack @<:@included@:>@]),
+		[with_STRX25="${withval:-yes}"],
 		[with_STRX25='yes'])
     AC_CACHE_CHECK([for sub-package strx25],[os7_cv_strx25_dir],[dnl
 	    os7_cv_strx25_dir=''
@@ -636,9 +636,9 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 	fi
     fi
     AC_ARG_WITH([STRISO],
-		AS_HELP_STRING([--with-STRISO],
-			       [include STRISO in master pack @<:@detected@:>@]),
-		[with_STRISO="$withval"],
+		AS_HELP_STRING([--without-STRISO],
+			       [do not include STRISO in master pack @<:@included@:>@]),
+		[with_STRISO="${withval:-yes}"],
 		[with_STRISO='yes'])
     AC_CACHE_CHECK([for sub-package striso],[os7_cv_striso_dir],[dnl
 	    os7_cv_striso_dir=''
@@ -667,7 +667,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([NETPERF],
 		AS_HELP_STRING([--without-NETPERF],
 			       [do not include NETPERF in master pack @<:@included@:>@]),
-		[with_NETPERF="$withval"],
+		[with_NETPERF="${withval:-yes}"],
 		[with_NETPERF='yes'])
     AC_CACHE_CHECK([for sub-package netperf],[os7_cv_netperf_dir],[dnl
 	    os7_cv_netperf_dir=''
@@ -696,7 +696,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRISDN],
 		AS_HELP_STRING([--without-STRISDN],
 			       [do not include STRISDN in master pack @<:@included@:>@]),
-		[with_STRISDN="$withval"],
+		[with_STRISDN="${withval:-yes}"],
 		[with_STRISDN='yes'])
     AC_CACHE_CHECK([for sub-package strisdn],[os7_cv_strisdn_dir],[dnl
 	    os7_cv_strisdn_dir=''
@@ -725,7 +725,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STACKS],
 		AS_HELP_STRING([--without-STACKS],
 			       [do not include STACKS in master pack @<:@included@:>@]),
-		[with_STACKS="$withval"],
+		[with_STACKS="${withval:-yes}"],
 		[with_STACKS='yes'])
     AC_CACHE_CHECK([for sub-package strss7],[os7_cv_strss7_dir],[dnl
 	    os7_cv_strss7_dir=''
@@ -754,7 +754,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([SIGTRAN],
 		AS_HELP_STRING([--without-SIGTRAN],
 			       [do not include SIGTRAN in master pack @<:@included@:>@]),
-		[with_SIGTRAN="$withval"],
+		[with_SIGTRAN="${withval:-yes}"],
 		[with_SIGTRAN='yes'])
     AC_CACHE_CHECK([for sub-package sigtran],[os7_cv_sigtran_dir],[dnl
 	    os7_cv_sigtran_dir=''
@@ -783,7 +783,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([STRVOIP],
 		AS_HELP_STRING([--without-STRVOIP],
 			       [do not include STRVOIP in master pack @<:@included@:>@]),
-		[with_STRVOIP="$withval"],
+		[with_STRVOIP="${withval:-yes}"],
 		[with_STRVOIP='yes'])
     AC_CACHE_CHECK([for sub-package strvoip],[os7_cv_strvoip_dir],[dnl
 	    os7_cv_strvoip_dir=''
@@ -812,7 +812,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
     AC_ARG_WITH([OSR61],
 		AS_HELP_STRING([--without-OSR61],
 			       [do not include OSR61 in master pack @<:@included@:>@]),
-		[with_OSR61="$withval"],
+		[with_OSR61="${withval:-yes}"],
 		[with_OSR61='yes'])
     AC_CACHE_CHECK([for sub-package osr61],[os7_cv_osr61_dir],[dnl
 	    os7_cv_osr61_dir=''
@@ -1227,6 +1227,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.57  2008-09-22 17:37:22  brian
+# - build and release updates
+#
 # Revision 0.9.2.56  2008-08-02 16:42:17  brian
 # - updates for release
 #

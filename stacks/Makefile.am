@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2008-04-29 07:10:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.105 $) $Date: 2008-09-22 17:37:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-29 07:10:16 $ by $Author: brian $
+# Last Modified $Date: 2008-09-22 17:37:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1233,8 +1233,8 @@ EXTRA_TEX			+= \
 				scripts/texi/lesser.texi
 
 EXTRA_DIST			+= $(EXTRA_TEX)
-dist_noinst_SCRIPTS		+= scripts/missing2
-EXTRA_SCRIPTS			+= scripts/missing2
+dist_noinst_SCRIPTS		+= scripts/missing2 scripts/missing3
+EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3
 
 ##
 ## Rules for building kernel objects
@@ -1488,6 +1488,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.105  2008-09-22 17:37:27  brian
+## - build and release updates
+##
 ## Revision 0.9.2.104  2008-04-29 07:10:16  brian
 ## - updating headers for release
 ##
