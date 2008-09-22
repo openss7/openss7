@@ -1,0 +1,253 @@
+#!/bin/bash
+
+if test "$1" = '-p'; then
+    shift
+fi
+
+if test $# -gt 2; then
+    exit 2
+fi
+
+directory=$1
+
+if test ! -d "$directory"; then
+    exit 1
+fi
+
+packages=(`find $directory -name '*.rpm' | sed -e "s,$directory/,,"`)
+
+cat<<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://linux.duke.edu/metadata/common" xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="${#packages[@]}">
+EOF
+
+# AG_RSA
+# ARCH
+# ARCHIVESIZE
+# BASENAMES
+# BUILDARCHS
+# BUILDHOST
+# BUILDTIME
+# CHANGELOGNAME
+# CHANGELOGTEXT
+# CHANGELOGTIME
+# CONFLICTFLAGS
+# CONFLICTNAME
+# CONFLICTVERSION
+# COOKIE
+# COPYRIGHT
+# DESCRIPTION
+# DIRINDEXES
+# DIRNAMES
+# DISTRIBUTION
+# DISTURL
+# DSAHEADER
+# EPOCH
+# EXCLUDEARCH
+# EXCLUDEOS
+# EXCLUSIVEARCH
+# EXCLUSIVEOS
+# FILEDEVICES
+# FILEFLAGS
+# FILEGROUPNAME
+# FILEINODES
+# FILELANGS
+# FILELINKTOS
+# FILEMD5S
+# FILEMODES
+# FILEMTIMES
+# FILENAMES
+# FILERDEVS
+# FILESIZES
+# FILESTATES
+# FILEUSERNAME
+# FILEVERIFYFLAGS
+# FSNAMES
+# FSSIZES
+# GIF
+# GROUP
+# HEADERI18NTABLE
+# HEADERIMAGE
+# HEADERIMMUTABLE
+# HEADERREGIONS
+# HEADERSIGNATURES
+# ICON
+# INSTALLPREFIX
+# INSTALLTID
+# INSTALLTIME
+# INSTPREFIXES
+# LICENSE
+# MULTILIBS
+# NAME
+# OBSOLETEFLAGS
+# OBSOLETENAME
+# OBSOLETES
+# OBSOLETEVERSION
+# OLDFILENAMES
+# OPTFLAGS
+# OS
+# PACKAGER
+# PATCH
+# PAYLOADCOMPRESSOR
+# PAYLOADFLAGS
+# PAYLOADFORMAT
+# PLATFORM
+# POSTIN
+# POSTINPROG
+# POSTUN
+# POSTUNPROG
+# PREFIXES
+# PREIN
+# PREINPROG
+# PREUN
+# PREUNPROG
+# PROVIDEFLAGS
+# PROVIDENAME
+# PROVIDES
+# PROVIDEVERSION
+# PUBKEYS
+# RELEASE
+# REMOVETID
+# REQUIREFLAGS
+# REQUIRENAME
+# REQUIREVERSION
+# RHNPLATFORM
+# RPMVERSION
+# RSAHEADER
+# SERIAL
+# SHA1HEADER
+# SIGGPG
+# SIGMD5
+# SIGPGP
+# SIGSIZE
+# SIZE
+# SOURCE
+# SOURCERPM
+# SUMMARY
+# TRIGGERCONDS
+# TRIGGERFLAGS
+# TRIGGERINDEX
+# TRIGGERNAME
+# TRIGGERSCRIPTPROG
+# TRIGGERSCRIPTS
+# TRIGGERTYPE
+# TRIGGERVERSION
+# URL
+# VENDOR
+# VERIFYSCRIPT
+# VERIFYSCRIPTPROG
+# VERSION
+# XPM
+
+function query() {
+    rpm -qp --qf "%{$1}" $directory/$2 | sed -e 's,<,\&lt;,g;s,>,\&gt;,g'
+}
+
+function entries() {
+    echo "    <rpm:$1>"
+    rpm -qp "--$1" $directory/$2 | \
+    while read -a entry; do
+	echo -n "      <rpm:entry name=\"$entry\""
+	if test -n "${entry[1]}"; then
+	    case "${entry[1]}" in
+		(=)  echo -n " flags=\"EQ\"" ;;
+		(\<=) echo -n " flags=\"LE\"" ;;
+		(\>=) echo -n " flags=\"GE\"" ;;
+		(\<)  echo -n " flags=\"LT\"" ;;
+		(\>)  echo -n " flags=\"GT\"" ;;
+		(*)  ;;
+	    esac
+	fi
+	if test -n "${entry[2]}"; then
+	    epoch=`echo "${entry[2]}" | sed -e 's,:.*$,,;t;s,.*,0,'`
+	    version=`echo "${entry[2]}" | sed -e 's,.*:,,;s,-.*$,,'`
+	    release=`echo "${entry[2]}" | sed -e 's,.*-,,;t;s,.*,,'`
+	    if test -n "$epoch"; then
+		echo -n " epoch=\"$epoch\""
+	    fi
+	    if test -n "$version"; then
+		echo -n " ver=\"$version\""
+	    fi
+	    if test -n "$release"; then
+		echo -n " rel=\"$release\""
+	    fi
+	fi
+	echo "/>"
+    done
+    echo "    </rpm:$1>"
+}
+
+for p in "${packages[@]}"; do
+    NAME=$(query NAME $p)
+    ARCH=$(query ARCH $p)
+    EPOCH=$(query EPOCH $p)
+    VERSION=$(query VERSION $p)
+    RELEASE=$(query RELEASE $p)
+    URL=$(query URL $p)
+    BUILDTIME=$(query BUILDTIME $p)
+    SIZE=$(query SIZE $p)
+    ARCHIVESIZE=$(query ARCHIVESIZE $p)
+    LICENSE=$(query LICENSE $p)
+    GROUP=$(query GROUP $p)
+    DESCRIPTION=$(query DESCRIPTION $p)
+    PACKAGER=$(query PACKAGER $p)
+    SUMMARY=$(query SUMMARY $p)
+    GROUP=$(query GROUP $p)
+    BUILDHOST=$(query BUILDHOST $p)
+    SOURCERPM=$(query SOURCERPM $p)
+    SHA1HEADER=$(query SHA1HEADER $p)
+    DSAHEADER=$(query DSAHEADER $p)
+    RSAHEADER=$(query RSAHEADER $p)
+    stats=(`stat -t $p`)
+
+    PACKAGESIZE=$(stat $p | grep 'Size:' | sed -e 's,[[:space:]]*Size:[[:space:]]*,,;s,[[:space:]].*,,')
+    cat<<-EOF
+	<package type="rpm">
+	  <name>${NAME}</name>
+	  <arch>${ARCH}</arch>
+	  <version epoch="${EPOCH}" ver="${VERSION}" rel="${RELEASE}"/>
+	EOF
+    if test "$SHA1HEADER" != '(none)'; then
+	cat<<-EOF
+	  <checksum type="sha" pkgid="YES">${SHA1HEADER}</checksum>
+	EOF
+    fi
+    if test "$DSAHEADER" != '(none)'; then
+	cat<<-EOF
+	  <checksum type="dsa" pkgid="YES">${DSAHEADER}</checksum>
+	EOF
+    fi
+    if test "$RSAHEADER" != '(none)'; then
+	cat<<-EOF
+	  <checksum type="rsa" pkgid="YES">${RSAHEADER}</checksum>
+	EOF
+    fi
+    cat<<-EOF
+	  <summary>${SUMMARY}</summary>
+	  <description>${DESCRIPTION}</description>
+	  <packager>${PACKAGER}</packager>
+	  <url>${URL}</url>
+	  <time file="${stats[12]}" build="${BUILDTIME}"/>
+	  <size package="${stats[1]}" installed="${SIZE}" archive="${ARCHIVESIZE}"/>
+	  <location href="$p"/>
+	  <format>
+	    <rpm:license>${LICENSE}</rpm:license>
+	    <rpm:group>${GROUP}</rpm:group>
+	    <rpm:buildhost>${BUILDHOST}</rpm:buildhost>
+	    <rpm:sourcerpm>${SOURCERPM}</rpm:sourcerpm>
+	EOF
+	entries provides $p
+	entries conflicts $p
+	entries obsoletes $p
+	entries requires $p
+    cat<<-EOF
+	  </format>
+	</package>
+	EOF
+done
+
+cat<<EOF
+</metadata>
+EOF
+
+# vim: ft=sh sw=4 noet nocin nosi com=b\:#,b\:dnl,b\:***,b\:@%\:@ fo+=tcqlorn
