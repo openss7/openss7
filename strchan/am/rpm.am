@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.142 $) $Date: 2008-09-22 18:12:37 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.143 $) $Date: 2008-09-22 21:43:20 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-22 18:12:37 $ by $Author: brian $
+## Last Modified $Date: 2008-09-22 21:43:20 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -740,12 +740,12 @@ $(repodir)/openss7.repo: $(repodir)
 		echo '[openss7]'; \
 		echo 'enabled = 1'; \
 		echo 'name = OpenSS7 Repository'; \
-		echo 'baseurl = http://www.openss7.org/rpms/$(PACKAGE_RPMSUBDIR)'; \
+		echo 'baseurl = http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
 		echo 'gpgcheck = 1'; \
 		echo 'gpgkey = http://www.openss7.org/pubkey.asc'; \
 		echo ''; \
 		echo '[openss7-local]'; \
-		echo 'enabled = 1'; \
+		echo 'enabled = 0'; \
 		echo 'name = OpenSS7 Local Repository'; \
 		echo 'baseurl = file://$(topdir)'; \
 		echo 'gpgcheck = 0'; \
@@ -937,6 +937,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.143  2008-09-22 21:43:20  brian
+## - put repos under repos
+##
 ## Revision 0.9.2.142  2008-09-22 18:12:37  brian
 ## - also remove yum repo file
 ##
