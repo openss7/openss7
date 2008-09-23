@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2008-09-23 21:31:14 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2008-09-23 21:33:13 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 21:31:14 $ by $Author: brian $
+## Last Modified $Date: 2008-09-23 21:33:13 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -710,7 +710,7 @@ repomd_files		= $(repodir)/repomd.xml \
 			  $(repodir)/filelists.xml.gz \
 			  $(repodir)/other.xml.gz
 
-repomd_group		= $(repodir)/comp.xml
+repomd_group		= $(repodir)/comps.xml
 
 #!
 #! YUM Build Targets:
@@ -935,6 +935,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.155  2008-09-23 21:33:13  brian
+## - spelling
+##
 ## Revision 0.9.2.154  2008-09-23 21:31:14  brian
 ## - directory correction
 ##
