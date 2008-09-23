@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.146 $) $Date: 2008-09-23 06:45:16 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.147 $) $Date: 2008-09-23 11:44:02 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 06:45:16 $ by $Author: brian $
+## Last Modified $Date: 2008-09-23 11:44:02 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -360,14 +360,6 @@ rebuild:
 	for t in $$targets; do \
 		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		rpms=`find $(rpmdir)/$$a -name '$(rpm_binary_file)' 2>/dev/null`; \
-		if test -z "$$rpms" -o -n '$(FORCE)'; then \
-			$(ECHO) "D: $@: rebuild $$a"; \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
-			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
-		else \
-			$(ECHO) "D: $@: skipped $$a"; \
-		fi; \
 		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
@@ -387,6 +379,14 @@ rebuild:
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
+		rpms=`find $(rpmdir)/$$a -name '$(rpm_binary_file)' 2>/dev/null`; \
+		if test -z "$$rpms" -o -n '$(FORCE)'; then \
+			$(ECHO) "D: $@: rebuild $$a"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
+			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
+		else \
+			$(ECHO) "D: $@: skipped $$a"; \
+		fi; \
 	done
 
 #! resign:
@@ -569,21 +569,6 @@ update-rpms:
 	for t in $$targets; do \
 		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		rebuild=yes; \
-		rpms=`find $(rpmdir)/$$a -name '$(rpm_binary_file)' 2>/dev/null`; \
-		for f in $$rpms; do \
-			if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
-				$(ECHO) "D: $@: leaving $$f"; \
-				rebuild=no; \
-			fi; \
-		done; \
-		if test ":$$rebuild" = :yes; then \
-			$(ECHO) "D: $@: rebuild $$a"; \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
-			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
-		else \
-			$(ECHO) "D: $@: skipped $$a"; \
-		fi; \
 		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
@@ -610,6 +595,21 @@ update-rpms:
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
+		rebuild=yes; \
+		rpms=`find $(rpmdir)/$$a -name '$(rpm_binary_file)' 2>/dev/null`; \
+		for f in $$rpms; do \
+			if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+				$(ECHO) "D: $@: leaving $$f"; \
+				rebuild=no; \
+			fi; \
+		done; \
+		if test ":$$rebuild" = :yes; then \
+			$(ECHO) "D: $@: rebuild $$a"; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define \"_without_modules --without-modules\"' RPMTARGET=\"$$t\" lis-rpm lfs-rpm one-rpm"; \
+			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS) --define "_without_modules --without-modules"' RPMTARGET="$$t" lis-rpm lfs-rpm one-rpm || :; \
+		else \
+			$(ECHO) "D: $@: skipped $$a"; \
+		fi; \
 	done
 
 ##
@@ -937,6 +937,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.147  2008-09-23 11:44:02  brian
+## - build libraries last
+##
 ## Revision 0.9.2.146  2008-09-23 06:45:16  brian
 ## - more eval quotation attempts
 ##
