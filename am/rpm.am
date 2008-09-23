@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.150 $) $Date: 2008-09-23 19:28:14 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.151 $) $Date: 2008-09-23 19:30:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 19:28:14 $ by $Author: brian $
+## Last Modified $Date: 2008-09-23 19:30:42 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -483,8 +483,7 @@ if BUILD_SRPMS
 RELEASE_CLEAN_LOCAL	+= release-clean-rpm
 endif
 
-RELEASECLEANFILES	+= $(rpm_cache_files) \
-			   $(rpm_dir_stamp) \
+RELEASECLEANFILES	+= $(rpm_dir_stamp) \
 			   $(rpm_source_files) \
 			   $(rpm_src_file) \
 			   $(rpm_sig_file) \
@@ -518,8 +517,7 @@ UPDATE_SIGN		+= all-update-sign-srpm all-update-sign-rpms
 UPDATE_DIRECTORIES	+=
 UPDATE_CLEAN_LOCAL	+= update-clean-rpm
 endif
-UPDATECLEANFILES	+= $(rpm_cache_files) \
-			   $(rpm_dir_stamp)
+UPDATECLEANFILES	+= $(rpm_dir_stamp)
 ##
 ## Provide updates to srpm packages.
 ##
@@ -937,6 +935,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.151  2008-09-23 19:30:42  brian
+## - do not remove cache files on release clean
+##
 ## Revision 0.9.2.150  2008-09-23 19:28:14  brian
 ## - fill out repo file with key
 ##
