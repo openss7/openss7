@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.145 $) $Date: 2008-09-23 06:31:45 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.146 $) $Date: 2008-09-23 06:45:16 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 06:31:45 $ by $Author: brian $
+## Last Modified $Date: 2008-09-23 06:45:16 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -327,8 +327,8 @@ sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
 		user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
-		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) '$(RPMKOPTS)' $$user$$home -- $<"; \
-		eval "$$pass $(RPM) --addsign $(RPMFLAGS) '$(RPMKOPTS)' $$user$$home -- $<" || :; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $<"; \
+		eval "$$pass $(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $<" || :; \
 	fi
 
 ##
@@ -422,8 +422,8 @@ resign: sign
 		user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
-		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$rpms_to_sign"; \
-		eval "$$pass $(RPM) --addsign $(RPMFLAGS) '$(RPMKOPTS)' $$user$$home -- $$rpms_to_sign" || :; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms_to_sign"; \
+		eval "$$pass $(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms_to_sign" || :; \
 	else \
 		$(ECHO) "D: $@: no sigs"; \
 	fi
@@ -642,8 +642,8 @@ update-sign-srpm:
 			user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
 			home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
 			pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
-			$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$f"; \
-			eval "$$pass $(RPM) --addsign $(RPMFLAGS) '$(RPMKOPTS)' $$user$$home -- $$f" || :; \
+			$(ECHO) "$(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$f"; \
+			eval "$$pass $(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$f" || :; \
 		else \
 			$(ECHO) "D: $@: skipped $$f"; \
 		fi; \
@@ -687,8 +687,8 @@ update-sign-rpms:
 		user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+$(ECHO) \"$$pass\" |}"; \
-		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) $(RPMKOPTS) $$user$$home -- $$rpms_to_sign"; \
-		eval "$$pass $(RPM) --addsign $(RPMFLAGS) '$(RPMKOPTS)' $$user$$home -- $$rpms_to_sign" || :; \
+		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms_to_sign"; \
+		eval "$$pass $(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms_to_sign" || :; \
 	else \
 		$(ECHO) "D: $@: no sigs"; \
 	fi
@@ -937,6 +937,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.146  2008-09-23 06:45:16  brian
+## - more eval quotation attempts
+##
 ## Revision 0.9.2.145  2008-09-23 06:31:45  brian
 ## - more quotation in evals
 ##
