@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.151 $) $Date: 2008-09-23 19:30:42 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.152 $) $Date: 2008-09-23 19:42:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 19:30:42 $ by $Author: brian $
+## Last Modified $Date: 2008-09-23 19:42:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -757,7 +757,7 @@ $(repodir)/openss7.repo: $(repodir)
 #!     installation source (@PACKAGE_LCNAME@-media) in the /etc/yum.repo.d/
 #!     directory on the target machine in the @PACKAGE_LCNAME@.repo file.
 #!
-repo-yum: $(rpm_link_file) $(repodir) $(repodir)/openss7.repo
+repo-yum: $(repodir) $(repodir)/openss7.repo
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) $(repomd_group) | sed -e 's|^.*/||'`; \
 	d=; test -f $$f || d='$(srcdir)/scripts/'; \
@@ -935,6 +935,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.152  2008-09-23 19:42:27  brian
+## - do no link master directory
+##
 ## Revision 0.9.2.151  2008-09-23 19:30:42  brian
 ## - do not remove cache files on release clean
 ##
