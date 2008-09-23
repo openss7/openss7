@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-09-22 17:37:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-09-23 03:32:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:22 $ by $Author: brian $
+# Last Modified $Date: 2008-09-23 03:32:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -235,7 +235,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-LIS],
 			       [include LIS in master pack @<:@detected@:>@]),
 		[with_LIS="${withval:-yes}"],
-		[with_LIS="${with_ALL}"])
+		[with_LIS='no'])
     AC_CACHE_CHECK([for sub-package LiS],[os7_cv_LiS_dir],[dnl
 	    os7_cv_LiS_dir=''
 	    for dir in $srcdir/LiS $srcdir/LiS-* ; do
@@ -322,7 +322,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRUTIL],
 			       [include STRUTIL in master pack @<:@detected@:>@]),
 		[with_STRUTIL="${withval:-yes}"],
-		[with_STRUTIL="${with_ALL}"])
+		[with_STRUTIL='no'])
     AC_CACHE_CHECK([for sub-package strutil],[os7_cv_strutil_dir],[dnl
 	    os7_cv_strutil_dir=''
 	    for dir in $srcdir/strutil $srcdir/strutil-* ; do
@@ -351,7 +351,7 @@ AC_DEFUN([_OS7_OPTIONS], [dnl
 		AS_HELP_STRING([--with-STRBCM],
 			       [include STRBCM in master pack @<:@detected@:>@]),
 		[with_STRBCM="${withval:-yes}"],
-		[with_STRBCM="${with_ALL}"])
+		[with_STRBCM='no'])
     AC_CACHE_CHECK([for sub-package strbcm],[os7_cv_strbcm_dir],[dnl
 	    os7_cv_strbcm_dir=''
 	    for dir in $srcdir/strbcm $srcdir/strbcm-* ; do
@@ -871,7 +871,7 @@ dnl LiS or LFS.
 dnl
     with_lis='yes'
     with_lfs='yes'
-    if test :"${with_LIS:-no}" = :no ; then
+    if test :"${with_LIS:-yes}" = :no ; then
 	with_lis='no'
     fi
     if test :"${with_STREAMS:-yes}" = :no ; then
@@ -898,7 +898,7 @@ dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lfs'"
 	ac_configure_args="$ac_configure_args --without-lfs"
     fi
-    if test :"${with_LIS:-no}" != :no -o :"${with_STREAMS:-yes}" != :no ; then
+    if test :"${with_LIS:-yes}" != :no -o :"${with_STREAMS:-yes}" != :no ; then
 	: _LINUX_STREAMS
     fi
 dnl
@@ -1227,6 +1227,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.58  2008-09-23 03:32:42  brian
+# - correct STRUTIL and STRBCM defaults
+#
 # Revision 0.9.2.57  2008-09-22 17:37:22  brian
 # - build and release updates
 #
