@@ -1,3 +1,8 @@
+2008-09-23  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: rpm build corrections
+	* strnsl.spec.in: rpm build corrections
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strnsl.spec.in: much improved spec files ready for repo building
