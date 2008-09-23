@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2008-09-23 11:44:02 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.148 $) $Date: 2008-09-23 11:54:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 11:44:02 $ by $Author: brian $
+## Last Modified $Date: 2008-09-23 11:54:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -409,12 +409,12 @@ resign: sign
 	fi; \
 	rpms_to_sign=; \
 	for f in $$rpms; do \
-		if ! $(RPM) -K -- $$f 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
+		if $(RPM) -K -- $$f 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
+			$(ECHO) "D: $@: sign ok $$f"; \
+		else \
 			$(ECHO) "D: $@: signing $$f"; \
 			rpms_to_sign="$$rpms_to_sign $$f"; \
 			rpms_to_sign="${rpms_to_sign:+$rpms_to_sign }$$f"; \
-		else \
-			$(ECHO) "D: $@: sign ok $$f"; \
 		fi; \
 	done; \
 	if test -n "$$rpms_to_sign"; then \
@@ -629,7 +629,7 @@ update-sign-srpm:
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-srpm; \
 		fi; test -e "$$f" || continue; \
 		resign=yes; \
-		if ! $(RPM) -K -- "$$f" 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
+		if $(RPM) -K -- "$$f" 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
 			$(ECHO) "D: $@: sign ok $$f"; \
 			resign=no; \
 		fi; \
@@ -669,7 +669,7 @@ update-sign-rpms:
 	rpms_to_sign=; \
 	for f in $$rpms; do \
 		resign=yes; \
-		if ! $(RPM) -K -- "$$f" 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
+		if $(RPM) -K -- "$$f" 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
 			$(ECHO) "D: $@: sign ok $$f"; \
 			resign=no; \
 		fi; \
@@ -937,6 +937,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.148  2008-09-23 11:54:14  brian
+## - sign when appropriate
+##
 ## Revision 0.9.2.147  2008-09-23 11:44:02  brian
 ## - build libraries last
 ##
