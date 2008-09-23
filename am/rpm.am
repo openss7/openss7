@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2008/09/23 21:25:39 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2008-09-23 21:31:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/23 21:25:39 $ by $Author: brian $
+## Last Modified $Date: 2008-09-23 21:31:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -760,7 +760,7 @@ $(repodir)/openss7.repo: $(repodir)
 repo-yum: $(repodir) $(repodir)/openss7.repo
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) $(repomd_group) | sed -e 's|^.*/||'`; \
-	d=; test -f $$f || d='$(srcdir)/scripts/'; \
+	d=scripts/; test -f $$f || d='$(srcdir)/scripts/'; \
 	g=; test ! -f $$d$$f || g="-g $$d$$f"; \
 	$(ECHO) "$(CREATEREPO) -p $(REPOFLAGS) $$g $(topdir)"; \
 	$(CREATEREPO) -p $(REPOFLAGS) $$g $(topdir) || :
@@ -935,6 +935,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.154  2008-09-23 21:31:14  brian
+## - directory correction
+##
 ## Revision 0.9.2.153  2008/09/23 21:25:39  brian
 ## - typos
 ##
