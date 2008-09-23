@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strnsl.spec.in,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-09-22 17:37:33 $
+# @(#) $RCSfile: strnsl.spec.in,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-23 19:06:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:33 $ by $Author: brian $
+# Last Modified $Date: 2008-09-23 19:06:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2074,7 +2074,7 @@ Version:        @VERSION@
 Autoreq:        true
 Autoprov:       true
 #Prefix:         %{_bindir}
-Prefix:         %{_sbindir}
+#Prefix:         %{_sbindir}
 Prefix:         %{_pkglibexecdir}
 %if %{FILES_tools32}
 Prefix:         %{_pkglibexec32dir}
@@ -2162,7 +2162,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #{_bindir}/*
-%{_sbindir}/*
+#{_sbindir}/*
 %{?gdmos:%{_pkglibexecdir}/gdmo}
 %{?testfiles:%{_pkglibexecdir}/%{testfiles}}
 %{?testfiles:%{_pkglibexec32dir}/%{testfiles}}
@@ -2175,7 +2175,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #{_bindir}/*
-%{_sbindir}/*
+#{_sbindir}/*
 %{?gdmos:%{_pkglibexecdir}/gdmo}
 %{?testfiles:%{_pkglibexecdir}/%{testfiles}}
 %{?PATH_snmp:%{PATH_snmp}}
@@ -2799,9 +2799,13 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strnsl.spec.in,v $
-# Revision 0.9.2.32  2008-09-22 17:37:33  brian
-# - build and release updates
+# Revision 0.9.2.33  2008-09-23 19:06:31  brian
+# - strnsl build corrections
 #
+
+* Mon Sep 22 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.32  2008-09-22 17:37:33  brian
+- build and release updates
 
 * Sun Sep 21 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.31  2008-09-21 10:55:17  brian
