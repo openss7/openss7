@@ -1,3 +1,7 @@
+2008-09-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: switch back to old (slower) locking
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: add mod version, truncate logs
