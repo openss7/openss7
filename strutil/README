@@ -1,13 +1,13 @@
-OpenSS7 STREAMS Utilities -- read me first file.  2007-06-24
-$Id: README,v 0.9.2.18 2007/06/24 09:21:35 brian Exp $
-Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
+OpenSS7 STREAMS Utilities -- read me first file.  2008-09-22
+$Id: README,v 0.9.2.19 2008-09-24 16:27:27 brian Exp $
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
  OpenSS7 STREAMS Utilities
 ==========================
 
-Package strutil-0.9.2.6 was released under GPLv2 2007-06-24.
+Package strutil-0.9.2.7.20080921 was released under AGPLv3 2008-09-22.
 
 The `OpenSS7 STREAMS Utilities' package provides "STREAMS" modules and
 drivers, programs and daemons for administration and handling of the
@@ -36,12 +36,12 @@ well.
  Release
 --------
 
-This is the `strutil-0.9.2.6' package, released 2007-06-24.  This
-`0.9.2.6' release, and the latest version, can be obtained from the
-download area (http://www.openss7.org/download.html) of The OpenSS7
-Project website using a command such as:
+This is the `strutil-0.9.2.7.20080921' package, released 2008-09-22.
+This `0.9.2.7.20080921' release, and the latest version, can be
+obtained from the download area (http://www.openss7.org/download.html)
+of The OpenSS7 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.7.20080921.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', or as a set of binary `rpm's or `deb's.  See the download page
@@ -56,18 +56,18 @@ more detailed history of implementation changes.  The `TODO' file lists
 features not yet implemented and other outstanding items.
 
 Please see the `INSTALL', `INSTALL-strutil' and `README-make', files (or
-see `Installation', in the manual) for installation instructions.
+see `Installation',in the manual) for installation instructions.
 
 When working from `cvs(1)' or `git(1)', please see the `README-cvs',
-file (or see `Downloading from CVS', in the manual).  An abbreviated
+file (or see `Downloading from CVS',in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
-This release of the package is published strictly under Version 2 of
-the `GNU Public License' which can be found in the file `COPYING'.
-Package specific licensing terms (if any) can be found in the file
-`LICENSES'.  Please respect these licensing arrangements.  If you are
-interested in different licensing terms, please contact the copyright
-holder, or OpenSS7 Corporation <sales@openss7.com>.
+This release of the package is published strictly under Version 3 of
+the `GNU Affero Public License' which can be found in the file
+`COPYING'.  Package specific licensing terms (if any) can be found in
+the file `LICENSES'.  Please respect these licensing arrangements.  If
+you are interested in different licensing terms, please contact the
+copyright holder, or OpenSS7 Corporation <sales@openss7.com>.
 
 See `README-alpha' (if it exists) for alpha release information.
 
@@ -76,7 +76,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install this package from within the `OpenSS7 Master
-Package', `openss7-0.9.2.F', instead of separately.
+Package', `openss7-0.9.2.G', instead of separately.
 
 Prerequisites for the OpenSS7 STREAMS Utilities package are as follows:
 
@@ -85,25 +85,27 @@ Prerequisites for the OpenSS7 STREAMS Utilities package are as follows:
      compiling out-of-tree kernel modules.  Most recent `Linux'
      distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
-     `Compatibility', in the manual.
+     `Compatibility',in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.(1)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
-         - Linux 2.6 kernel (2.6.3 - 2.6.21);
+         - Linux 2.6 kernel (2.6.3 - 2.6.25.4);
          - glibc2 or better.
-         - GNU info (for info files).
          - GNU groff (for man pages).(2)
+         - GNU texinfo (for info files).
+         - GNU bison and flex (for config programs).
+         - net-snmp (for SNMP agents).(3)
 
 (Note: If you acquired `strutil' a part of the `OpenSS7 Master
 Package', then the dependencies listed below will already have been met
 by unpacking the master package.)
 
-  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.3
-     (http://www.openss7.org/tarballs/streams-0.9.2.3.tar.bz2).  (3)
+  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.4
+     (http://www.openss7.org/tarballs/streams-0.9.2.4.tar.bz2).  (4)
 
   3. `OpenSS7 STREAMS Compatibility Modules',
-     strcompat-0.9.2.6
-     (http://www.openss7.org/tarballs/strcompat-0.9.2.6.tar.bz2).
+     strcompat-0.9.2.7
+     (http://www.openss7.org/tarballs/strcompat-0.9.2.7.tar.bz2).
 
 When configuring and building multiple `OpenSS7 Project' release
 packages, place all of the source packages (unpacked tarballs) at the
@@ -122,7 +124,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../strutil-0.9.2.6/configure CC='gcc-3.4'
+     $> ../strutil-0.9.2.7.20080921/configure CC='gcc-3.4'
 
  Installation
 -------------
@@ -130,11 +132,11 @@ after `./configure', for example:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.6.tar.bz2
-     $> tar -xjvf strutil-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.7.20080921.tar.bz2
+     $> tar -xjvf strutil-0.9.2.7.20080921.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../strutil-0.9.2.6/configure --enable-autotest
+     $> ../strutil-0.9.2.7.20080921/configure --enable-autotest
      $> make
      $> make check
      $> sudo make install
@@ -142,20 +144,20 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf strutil-0.9.2.6
-     $> rm -f strutil-0.9.2.6.tar.bz2
+     $> rm -rf strutil-0.9.2.7.20080921
+     $> rm -f strutil-0.9.2.7.20080921.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
 be generated that can be mailed to The OpenSS7 Project
-<bugs@openss7.org>.(4) Installation steps using the logging targets
+<bugs@openss7.org>.(5) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.6.tar.bz2
-     $> tar -xjvf strutil-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.7.20080921.tar.bz2
+     $> tar -xjvf strutil-0.9.2.7.20080921.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../strutil-0.9.2.6/configure --enable-autotest
+     $> ../strutil-0.9.2.7.20080921/configure --enable-autotest
      $> make compile.log
      $> make check.log
      $> sudo make install.log
@@ -163,15 +165,15 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf strutil-0.9.2.6
-     $> rm -f strutil-0.9.2.6.tar.bz2
+     $> rm -rf strutil-0.9.2.7.20080921
+     $> rm -f strutil-0.9.2.7.20080921.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
 For custom applications, see the `INSTALL' and `INSTALL-strutil' files
-or the see `Installation', in the manual, as listed below.  If you
-encounter troubles, see `Troubleshooting', in the manual, before
-issuing a bug report.
+or the see `Installation',in the manual, as listed below.  If you
+encounter troubles, see `Troubleshooting',in the manual, before issuing
+a bug report.
 
  Brief Installation Instructions
 --------------------------------
@@ -180,14 +182,14 @@ The OpenSS7 STREAMS Utilities package is available from the downloads
 area of The OpenSS7 Project website
 (http://www.openss7.org/download.html) using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strutil-0.9.2.7.20080921.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf strutil-0.9.2.6.tar.bz2
+     $> tar -xjvf strutil-0.9.2.7.20080921.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: strutil-0.9.2.6.
+package name: strutil-0.9.2.7.20080921.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -195,19 +197,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../strutil-0.9.2.6/configure
+     $> ../strutil-0.9.2.7.20080921/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../strutil-0.9.2.6/INSTALL
+     $> less ../strutil-0.9.2.7.20080921/INSTALL
 
 For specific options to the `configure' script, see the
 `INSTALL-strutil' file in the distribution, or simply execute the
 configure script with the `--help' option like so:
 
-     $> ../strutil-0.9.2.6/configure --help
+     $> ../strutil-0.9.2.7.20080921/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -247,17 +249,17 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf strutil-0.9.2.6
-     $> rm -f strutil-0.9.2.6.tar.bz2
+     $> rm -rf strutil-0.9.2.7.20080921
+     $> rm -f strutil-0.9.2.7.20080921.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
 
 More detailed installation instructions can be found in the
-`Installation', in the manual, contained in the distribution in `text',
+`Installation',in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../strutil-0.9.2.6
+     $> cd ../strutil-0.9.2.7.20080921
      $> less doc/manual/strutil.txt
      $> lynx doc/manual/strutil.html
      $> info doc/manual/strutil.info
@@ -273,17 +275,20 @@ Project' website at:
 
 ---------- Footnotes ----------
 
-(1) See `GNU/Linux Distributions', in the manual, for more information.
+(1) See `GNU/Linux Distributions',in the manual, for more information.
 
 (2) If you are using a Debian release, please make sure to install the
 groff extension package (`groff_ext'), as it contains the `refer' or
 `grefer' commands necessary for including references in the manual
 pages.
 
-(3) Although, at one time, this package supported `LiS', `LiS' is now
+(3) A wide range of net-snmp releases are supported, from UCD-SNMP
+4.2.5 through net-snmp 5.4.
+
+(4) Although, at one time, this package supported `LiS', `LiS' is now
 deprecated and unsupported.
 
-(4) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
+(5) Please see `Problem Reports',in the manual, or the file `PROBLEMS'
 in the release directory for more information on filing a proper
 "Problem Report".
 

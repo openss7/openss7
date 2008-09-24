@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-23 19:06:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-24 16:27:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-23 19:06:31 $ by $Author: brian $
+# Last Modified $Date: 2008-09-24 16:27:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -340,7 +340,7 @@ endif
 ##
 ## Rules for net config files
 ##
-#include am/netconfig.am
+include am/netconfig.am
 #include am/sock2path.am
 
 ##
@@ -405,6 +405,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.17  2008-09-24 16:27:24  brian
+# - more spec file tweaks
+#
 # Revision 0.9.2.16  2008-09-23 19:06:31  brian
 # - strnsl build corrections
 #

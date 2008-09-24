@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.spec.in,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-24 03:29:52 $
+# @(#) $RCSfile: strbcm.spec.in,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-24 16:27:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-24 03:29:52 $ by $Author: brian $
+# Last Modified $Date: 2008-09-24 16:27:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,10 +70,13 @@
 %global BUILD_lfs     0
 %global BUILD_mibs    1
 %global BUILD_snmp    1
+%global BUILD_init    0
 
 %global NEED_compat   1
 #global NEED_xns      0
 #global NEED_xnet     0
+#global NEED_nsl      0
+#global NEED_sock     0
 #global NEED_inet     0
 #global NEED_sctp     0
 #global NEED_chan     0
@@ -113,6 +116,8 @@
 %global stitle      @PACKAGE_SHORTTITLE@
 %global virtual     STREAMS
 
+#global binfiles    %{nil}
+%global sbinfiles   %{nil}
 %global modules     streams-testdrv streams-testmod
 #global preloads    
 #global libraries   
@@ -135,6 +140,8 @@
 %global license     AGPLv3
 
 %global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')
+%global have_binfiles    %{?binfiles: 1}%{!?binfiles: 0}
+%global have_sbinfiles   %{?sbinfiles:1}%{!?sbinfiles:0}
 %global have_preloads    %{?preloads: 1}%{!?preloads: 0}
 %global have_modules     %{?modules:  1}%{!?modules:  0}
 %global have_libraries   %{?libraries:1}%{!?libraries:0}
@@ -154,12 +161,14 @@
 %global NEED_init     1
 %global have_oldmods  %{?modules:1}%{!?modules:0}
 %global have_newmods  0
+%global oldmodule     %{nil}
 %else
 # assume no devs for newer kernels
 %global NEED_devs     0
 %global NEED_init     0
 %global have_oldmods  0
 %global have_newmods  %{?modules:1}%{!?modules:0}
+%global newmodule     %{nil}
 %endif
 
 # define new autoconf 2.60, 2.61 stuff
@@ -264,6 +273,8 @@
 %global BUILD_source  0
 %endif
 
+%global minversion() %{expand: %(echo "%1" | sed -e 's,-.*$,,;s,\.20[0-1][0-9][0-1][0-9][0-3][0-9],,;s,@.*@,0,')}%{nil}
+
 %global _STREAMS SVR 4.2
 %global _streams STREAMS
 %global _ksubdir streams
@@ -274,7 +285,7 @@
 %global _ksubdir streams
 %global _kmodext streams
 %global _conflict LiS
-%global _strvers @LFS_VERSION@%{?extrarelease2}
+%global _strvers %{minversion @LFS_VERSION@}
 %global _with_lfs --with-lfs
 %endif
 %if %{BUILD_lis}
@@ -283,10 +294,12 @@
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
-%global _strvers @LIS_VERSION@%{?extrarelease2}
+%global _strvers %{minversion @LIS_VERSION@}
 %global _with_lis --with-lis
 %endif
 
+%global myversion @VERSION@
+%global myminversion %{minversion @VERSION@}
 %global corename() %1-core-%_kversion%{nil}
 %global infoname() %1-info-%_kversion%{nil}
 %global dbugname() %1-debug-%_kversion%{nil}
@@ -338,11 +351,9 @@
 
 %if %{BUILD_modules}
 %global FILES_modules       1
-%global FILES_ko_modules    1
 %global FILES_kern_debug    1
 %else
 %global FILES_modules       0
-%global FILES_ko_modules    0
 %global FILES_kern_debug    0
 %global kernel_fedora       0
 %global kernel_others       0
@@ -352,6 +363,22 @@
 %global PATH_snmpconf       %config(noreplace) %{_snmpconfdir}/*
 %global PATH_snmp           %{_snmpdlmoddir}/*
 %global PATH_snmp32         %{_snmpdlmod32dir}/*
+%endif
+
+%if %{have_initscripts}
+%global BUILD_init          1
+%endif
+%if %{have_configfiles}
+%global BUILD_init          1
+%endif
+%if %{have_netconfig}
+%global BUILD_init          1
+%endif
+%if %{have_sock2path}
+%global BUILD_init          1
+%endif
+%if %{have_snmpmods}
+%global BUILD_init          1
 %endif
 
 %if %{BUILD_tools}
@@ -369,10 +396,7 @@
 %global FILES_doc           1
 %global FILES_doclibs       1
 %global FILES_source        %{BUILD_source}
-%global FILES_init          1
-%global FILES_ko_init       1
-%global FILES_noinit        1
-%global FILES_ko_noinit     1
+%global FILES_init          %{BUILD_init}
 %global FILES_mibs          %{BUILD_mibs}
 %global FILES_snmp          %{BUILD_snmp}
 %global FILES_snmp32        %{BUILD_snmp}
@@ -394,9 +418,6 @@
 %global FILES_doclibs       0
 %global FILES_source        0
 %global FILES_init          0
-%global FILES_ko_init       0
-%global FILES_noinit        0
-%global FILES_ko_noinit     0
 %global FILES_mibs          0
 %global FILES_snmp          0
 %global FILES_snmp32        0
@@ -417,7 +438,6 @@
 %if %{BUILD_arch}
 %else
 %global FILES_modules       0
-%global FILES_ko_modules    0
 %global FILES_kern_debug    0
 %global FILES_libs          0
 %global FILES_libs32        0
@@ -440,10 +460,7 @@
 %global FILES_doc           0
 %global FILES_doclibs       0
 %global FILES_source        0
-%global FILES_ko_init       0
 %global FILES_init          0
-%global FILES_ko_noinit     0
-%global FILES_noinit        0
 %global FILES_mibs          0
 %global FILES_base          0
 %endif
@@ -475,13 +492,7 @@
 %endif
 
 %if %{without_ko_modules}
-%global FILES_ko_modules    0
-%global FILES_ko_init       0
-%global FILES_ko_noinit     0
 %else
-%global FILES_modules       0
-%global FILES_init          0
-%global FILES_noinit        0
 %global FILES_makedev       0
 %global FILES_builddev      0
 %endif
@@ -490,20 +501,6 @@
 %global FILES_makedev       0
 %else
 %global FILES_builddev      0
-%endif
-
-%if %{have_initscripts}
-%global FILES_ko_noinit     0
-%global FILES_noinit        0
-%global NEED_init           1
-%else
-%global FILES_ko_init       0
-%global FILES_init          0
-%endif
-
-%if %{have_configfiles}
-%else
-%global FILES_ko_noinit     0
 %endif
 
 %ifnarch x86_64 s390x sparc64 ppc64 ia64
@@ -537,9 +534,9 @@
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
 %global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1|')}%{nil}
-%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "%%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')}%{nil}
+%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "= %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|>= %2|')}%{nil}
 
-%global descripline %{title} provides %{_STREAMS} STREAMS Binary Compatibility Modules.
+%global descripline %{title} provides %{stitle} for %{_STREAMS} STREAMS.
 
 %if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
 %global descriptail %(echo -en '\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
@@ -596,31 +593,33 @@ BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
-%{?_strvers:BuildRequires: %{_streams}-devel = %version_of_or %{_streams}-devel %{_strvers}}
+%{?_strvers:BuildRequires: %{_streams}-devel %version_of_or %{_streams}-devel %{_strvers}}
 %{!?_strvers:BuildRequires: %requires_prov %{_streams}-devel = %{_streams}-devel}
 %if %{without_ko_modules}
-%{?_strvers:BuildRequires: %{inforoot %_streams} = %version_of_or %{_streams}-devel %{_strvers}}
+%{?_strvers:BuildRequires: %{inforoot %_streams} %version_of_or %{_streams}-devel %{_strvers}}
 %{!?_strvers:%{expand:BuildRequires: %%requires_prov %{inforoot %_streams} = %{_streams}-devel}}
 %else
-%{?_strvers:BuildRequires: %{coreroot %_streams} = %version_of_or %{_streams}-devel %{_strvers}}
+%{?_strvers:BuildRequires: %{coreroot %_streams} %version_of_or %{_streams}-devel %{_strvers}}
 %{!?_strvers:%{expand:BuildRequires: %%requires_prov %{coreroot %_streams} = %{_streams}-devel}}
 %endif
-%{?NEED_compat:BuildRequires: strcompat-devel = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
+%{?NEED_compat:%{expand:BuildRequires: strcompat-devel %%version_of_or strcompat-devel %{minversion @STRCOMP_VERSION@}}}
 %if %{without_ko_modules}
-%{?NEED_compat:BuildRequires: %{inforoot strcompat-%_streams} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
+%{?NEED_compat:%{expand:BuildRequires: %{inforoot strcompat-%_streams} %%version_of_or strcompat-devel %{minversion @STRCOMP_VERSION@}}}
 %else
-%{?NEED_compat:BuildRequires: %{coreroot strcompat-%_streams} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
+%{?NEED_compat:%{expand:BuildRequires: %{coreroot strcompat-%_streams} %%version_of_or strcompat-devel %{minversion @STRCOMP_VERSION@}}}
 %endif
-%{?NEED_xns:BuildRequires:    strxns-devel >=     @XNS_VERSION@%{?extrarelease2}}
-%{?NEED_xnet:BuildRequires:   strxnet-devel >=     @XTI_VERSION@%{?extrarelease2}}
-%{?NEED_inet:BuildRequires:   strinet-devel >=    @INET_VERSION@%{?extrarelease2}}
-%{?NEED_sctp:BuildRequires:   strsctp-devel >=    @SCTP_VERSION@%{?extrarelease2}}
-%{?NEED_chan:BuildRequires:   strchan-devel >=    @CHAN_VERSION@%{?extrarelease2}}
-%{?NEED_x25:BuildRequires:    strx25-devel >=     @X25_VERSION@%{?extrarelease2}}
-%{?NEED_iso:BuildRequires:    striso-devel >=     @ISO_VERSION@%{?extrarelease2}}
-%{?NEED_isdn:BuildRequires:   strisdn-devel >=    @ISDN_VERSION@%{?extrarelease2}}
-%{?NEED_ss7:BuildRequires:    strss7-devel >=     @SS7_VERSION@%{?extrarelease2}}
-%{?NEED_sigtran:BuildRequires:   sigtran-devel >= @SIGTRAN_VERSION@%{?extrarelease2}}
+%{?NEED_xns:BuildRequires:     strxns-devel  >= %{minversion @XNS_VERSION@}}
+%{?NEED_xnet:BuildRequires:    strxnet-devel >= %{minversion @XTI_VERSION@}}
+%{?NEED_nsl:BuildRequires:     strnsl-devel  >= %{minversion @NSL_VERSION@}}
+%{?NEED_sock:BuildRequires:    strsock-devel >= %{minversion @SOCK_VERSION@}}
+%{?NEED_inet:BuildRequires:    strinet-devel >= %{minversion @INET_VERSION@}}
+%{?NEED_sctp:BuildRequires:    strsctp-devel >= %{minversion @SCTP_VERSION@}}
+%{?NEED_chan:BuildRequires:    strchan-devel >= %{minversion @CHAN_VERSION@}}
+%{?NEED_x25:BuildRequires:     strx25-devel  >= %{minversion @X25_VERSION@}}
+%{?NEED_iso:BuildRequires:     striso-devel  >= %{minversion @ISO_VERSION@}}
+%{?NEED_isdn:BuildRequires:    strisdn-devel >= %{minversion @ISDN_VERSION@}}
+%{?NEED_ss7:BuildRequires:     strss7-devel  >= %{minversion @SS7_VERSION@}}
+%{?NEED_sigtran:BuildRequires: sigtran-devel >= %{minversion @SIGTRAN_VERSION@}}
 
 # these are some needs of the configure script
 # to manipulate manual pages:
@@ -888,9 +887,13 @@ Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
 %{?modules:Requires:       %{coreroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
 %{?modules:Requires:       %{inforoot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
 Requires:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+%if %{NEED_devs}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+%endif
 Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+%if %{BUILD_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+%endif
 %{?libraries:Requires:       %{name}-%_streams-lib = %{epoch}:%{version}-%{fullrelease2}}
 %{?mibfiles:Requires:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}}
 Requires:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
@@ -900,7 +903,7 @@ Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %if %{_enable_debug_packages}
 %{?modules:Requires:       %{dbugroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
-Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease2}
@@ -1143,8 +1146,20 @@ Version:        @VERSION@
 %{?_gif:Icon: %_gif}
 Autoreq:        true
 Autoprov:       true
+%if %{have_configfiles}
 Prefix:         %{_configdir}
+%endif
+%if %{have_initscripts}
 Prefix:         %{_initrddir}
+%endif
+%if %{have_netconfig}
+Prefix:         %{_sysconfdir}/netconfig.d
+%{?NEED_nsl:Requires:       %{expand: strnsl-init %%version_of_or strnsl-init %{minversion @NSL_VERSION@}}}
+%endif
+%if %{have_sock2path}
+Prefix:         %{_sysconfdir}/sock2path.d
+%{?NEED_sock:Requires:       %{expand: strsock-init %%version_of_or strsock-init %{minversion @SOCK_VERSION@}}}
+%endif
 Prefix:         %{_sysconfdir}
 %if %{BUILD_snmp}
 Prefix:         %{_snmpconfdir}
@@ -1154,9 +1169,9 @@ Prefix:         %{_modutildir}
 %endif
 Obsoletes:      %{name}-inits
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-init = %version_of_or %{_streams}-init %{_strvers}}
+%{?_strvers:Requires: %{_streams}-init %version_of_or %{_streams}-init %{_strvers}}
 %{!?_strvers:Requires: %requires_prov %{_streams}-init = %{_streams}-init}
-%{?NEED_compat:Requires:       strcompat-init = %version_of_or strcompat-init @STRCOMP_VERSION@%{?extrarelease2}}
+%{?NEED_compat:%{expand:Requires: strcompat-init %%version_of_or strcompat-init %{minversion @STRCOMP_VERSION@}}}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
@@ -1746,45 +1761,9 @@ fi
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
-%config(noreplace) %{_configdir}/*
-%config(noreplace) %{_modutildir}/*
-%{_initrddir}/*
-%endif
-
-%if %{FILES_ko_init}
-%files init
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{?PATH_snmpconf:%{PATH_snmpconf}}
-%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
-%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
-%config(noreplace) %{_configdir}/*
-%{_initrddir}/*
-%endif
-
-%if %{FILES_noinit}
-%files init
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{?PATH_snmpconf:%{PATH_snmpconf}}
-%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
-%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
-%{?modules:%config(noreplace) %{_modutildir}/*}
-%endif
-
-%if %{FILES_ko_noinit}
-%files init
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{?PATH_snmpconf:%{PATH_snmpconf}}
-%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
-%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
+%{?oldmodule:%config(noreplace) %{_modutildir}/*}
+%{?initfiles:%config(noreplace) %{_configdir}/*}
+%{?initfiles:%{_initrddir}/*}
 %endif
 
 # ===========================================================================
@@ -1799,7 +1778,7 @@ Autoreq:        true
 Autoprov:       true
 Prefix:         %{_snmpmibdir}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-mibs = %version_of_or %{_streams}-mibs %{_strvers}}
+%{?_strvers:Requires: %{_streams}-mibs %version_of_or %{_streams}-mibs %{_strvers}}
 %{!?_strvers:Requires: %requires_prov %{_streams}-mibs = %{_streams}-mibs}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
@@ -1998,11 +1977,11 @@ Prefix:         %{_localedir}
 Obsoletes:      %{name}-%{_streams}-libs
 Prereq:         /sbin/ldconfig
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-lib >= %version_of_or %{_streams}-lib %{_strvers}}
+%{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
-%{?NEED_xnet:Requires:         strxnet-lib >=     @XTI_VERSION@%{?extrarelease2}}
-%{?NEED_x25:Requires:          strx25-lib >=     @X25_VERSION@%{?extrarelease2}}
-%{?NEED_iso:Requires:          striso-lib >=     @ISO_VERSION@%{?extrarelease2}}
+%{?NEED_xnet:Requires: strxnet-lib >= %{minversion @XTI_VERSION@}}
+%{?NEED_x25:Requires:  strx25-lib  >= %{minversion @X25_VERSION@}}
+%{?NEED_iso:Requires:  striso-lib  >= %{minversion @ISO_VERSION@}}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
@@ -2082,8 +2061,12 @@ Version:        @VERSION@
 %{?_gif:Icon: %_gif}
 Autoreq:        true
 Autoprov:       true
-#Prefix:         %{_bindir}
+%if %{have_binfiles}
+Prefix:         %{_bindir}
+%endif
+%if %{have_sbinfiles}
 Prefix:         %{_sbindir}
+%endif
 Prefix:         %{_pkglibexecdir}
 %if %{FILES_tools32}
 Prefix:         %{_pkglibexec32dir}
@@ -2106,7 +2089,7 @@ Obsoletes:      %{name}-%{_streams}-utils
 #Requires:       net-snmp
 %endif
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-lib >= %version_of_or %{_streams}-lib %{_strvers}}
+%{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
 %{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
 %if %{have_libraries}
 Requires:       %{name}-lib >= %{epoch}:%{version}-%{fullrelease2}
@@ -2170,8 +2153,8 @@ fi
 %files %{_streams}-util
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_bindir}/*
-%{_sbindir}/*
+%{?binfiles:%{_bindir}/*}
+%{?sbinfiles:%{_sbindir}/*}
 %{?gdmos:%{_pkglibexecdir}/gdmo}
 %{?testfiles:%{_pkglibexecdir}/%{testfiles}}
 %{?testfiles:%{_pkglibexec32dir}/%{testfiles}}
@@ -2183,8 +2166,8 @@ fi
 %files %{_streams}-util
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{_bindir}/*
-%{_sbindir}/*
+%{?binfiles:%{_bindir}/*}
+%{?sbinfiles:%{_sbindir}/*}
 %{?gdmos:%{_pkglibexecdir}/gdmo}
 %{?testfiles:%{_pkglibexecdir}/%{testfiles}}
 %{?PATH_snmp:%{PATH_snmp}}
@@ -2250,110 +2233,116 @@ Obsoletes:      %{name}-%{virtual}-%{core_name} < %{epoch}:%{version}-%{rpmrelea
 Prereq:         lsof
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{coreroot %_streams} = %version_of_or %{_streams}-%{core_name} %{_strvers}}
-%{!?_strvers:%{expand:Requires: %%requires_prov %{coreroot %_streams} = %{_streams}-%{core_name}}}
-%{?NEED_compat:%{expand:Requires: %{coreroot strcompat-%_streams} = %%version_of_or %{coreroot strcompat-%_streams} @STRCOMP_VERSION@%{?extrarelease2}}}
+Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
+%{?_strvers:Requires: %{corename %_streams} %version_of_or %{_streams}-%{core_name} %{_strvers}}
+%{!?_strvers:%{expand:Requires: %%requires_prov %{corename %_streams} = %{_streams}-%{core_name}}}
+%{?NEED_compat:%{expand:Requires: %{corename strcompat-%_streams} %%version_of_or %{corename strcompat-%_streams} %{minversion @STRCOMP_VERSION@}}}
 %if %{NEED_init}
-Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-init = %{epoch}:%{myversion}-%{fullrelease2}
 %endif
 %if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-dev = %{epoch}:%{myversion}-%{fullrelease2}
 %endif
 Provides:       kernel-modules = %{_kversion}
-Provides:       %{coreroot %name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{coreroot %name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{coreroot %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{coreroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{coreroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{coreroot %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{coreroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{coreroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{coreroot %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{corename %name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{corename %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{corename %name} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{corename %name} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{corename %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{corename %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{corename %name-%_streams} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{corename %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{corename %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{corename %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{corename %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{corename %name-%virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{corename %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{corename %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{corename %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
@@ -2598,16 +2587,9 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %dir %{_kmoduledir}/%{base}
-%attr(644,root,root) %{_kmoduledir}/modules.%{base}
-%{_kmoduledir}/%{base}/*.o*
-%endif
-
-%if %{FILES_ko_modules}
-%files -n %{corename %name-%_streams}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_kmoduledir}/%{base}
-%{_kmoduledir}/%{base}/*.ko*
+%{?oldmodule:%attr(644,root,root) %{_kmoduledir}/modules.%{base}}
+%{?oldmodule:%{_kmoduledir}/%{base}/*.o*}
+%{?newmodule:%{_kmoduledir}/%{base}/*.ko*}
 %endif
 
 # ===========================================================================
@@ -2634,101 +2616,107 @@ Obsoletes:      %{name}-%{_streams}-info < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{_streams}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
 Provides:       kernel-modules = %{_kversion}
-Provides:       %{inforoot %name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{inforoot %name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{inforoot %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{inforoot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{inforoot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{inforoot %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{inforoot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{inforoot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{inforoot %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{infoname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{infoname %name} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{infoname %name} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{infoname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{infoname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{infoname %name-%_streams} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{infoname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{infoname %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{infoname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{infoname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{infoname %name-%virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{infoname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{infoname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{infoname %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-devel  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-devel-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
@@ -2749,19 +2737,10 @@ for kernel version %{_kversion}.
 %files -n %{infoname %name-%_streams}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir %{_includedir}/%{name}/%{kernel_version}
-%{_includedir}/%{name}/%{kernel_version}/*
+%{?oldmodule;%dir %{_includedir}/%{name}/%{kernel_version}}
+%{?oldmodule;%{_includedir}/%{name}/%{kernel_version}/*}
 %{_kmoduledir}/%{base}/Module*
 %endif
-
-%if %{FILES_ko_modules}
-%files -n %{infoname %name-%_streams}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_kmoduledir}/%{base}/Module*
-%endif
-
-# don't include package for FILES_ko_modules
 
 # ===========================================================================
 %package -n %{dbugname %name-%_streams}
@@ -2771,101 +2750,107 @@ Group:          Development/Debug
 AutoReq:        0
 AutoProv:       0
 %{?_conflict:Conflicts:      %{dbugname %name-%_conflict}}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
 Provides:       kernel-modules = %{_kversion}
-Provides:       %{dbugroot %name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{dbugroot %name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{dbugroot %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{dbugroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{dbugroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{dbugroot %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{dbugroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{dbugroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{dbugroot %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{dbugname %name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %name} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{dbugname %name} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{dbugname %name} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{dbugname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{dbugname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{dbugname %name-%_streams} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{dbugname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{dbugname %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{dbugname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{dbugname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{dbugname %name-%virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{dbugname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{dbugname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{dbugname %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
@@ -2889,6 +2874,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strbcm.spec.in,v $
+# Revision 0.9.2.40  2008-09-24 16:27:19  brian
+# - more spec file tweaks
+#
 # Revision 0.9.2.39  2008-09-24 03:29:52  brian
 # - corrections to interdependencies between subpackages
 #
