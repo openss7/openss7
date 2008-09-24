@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.162 $) $Date: 2008-09-24 16:27:30 $
+# @(#) $RCSfile: strxnet.spec.in,v $ $Name:  $($Revision: 0.9.2.163 $) $Date: 2008-09-24 21:03:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-24 16:27:30 $ by $Author: brian $
+# Last Modified $Date: 2008-09-24 21:03:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -352,9 +352,11 @@
 %if %{BUILD_modules}
 %global FILES_modules       1
 %global FILES_kern_debug    1
+%global FILES_kvirtual      1
 %else
 %global FILES_modules       0
 %global FILES_kern_debug    0
+%global FILES_kvirtual      0
 %global kernel_fedora       0
 %global kernel_others       0
 %endif
@@ -450,6 +452,7 @@
 %global FILES_snmp          0
 %global FILES_snmp32        0
 %global FILES_virtual       0
+%global FILES_kvirtual      0
 %endif
 
 %if %{BUILD_noarch}
@@ -881,7 +884,7 @@ Version:        @VERSION@
 %{?_gif:Icon: %_gif}
 Autoreq:        0
 Autoprov:       0
-%{?_conflict:Conflicts:      %{_conflict}-%{_streams}}
+%{?_conflict:Conflicts:      %{name}-%{_conflict}}
 Obsoletes:      %{name}-%{_streams}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
 %{?modules:Requires:       %{coreroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
@@ -905,6 +908,19 @@ Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 %{?modules:Requires:       %{dbugroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
 Requires:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
 %endif
+%{?NEED_compat:Requires: strcompat-%{_streams}}
+%{?NEED_xns:Requires: strxns-%{_streams}}
+%{?NEED_xnet:Requires: strxnet-%{_streams}}
+%{?NEED_nsl:Requires: strnsl-%{_streams}}
+%{?NEED_sock:Requires: strsock-%{_streams}}
+%{?NEED_inet:Requires: strinet-%{_streams}}
+%{?NEED_sctp:Requires: strsctp-%{_streams}}
+%{?NEED_chan:Requires: strchan-%{_streams}}
+%{?NEED_x25:Requires: strx25-%{_streams}}
+%{?NEED_iso:Requires: striso-%{_streams}}
+%{?NEED_isdn:Requires: strisdn-%{_streams}}
+%{?NEED_ss7:Requires: strss7-%{_streams}}
+%{?NEED_sigtran:Requires: sigtran-%{_streams}}
 Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{rpmrelease}
@@ -979,6 +995,19 @@ Prefix:         %{_mandir}
 Conflicts:      texinfo < 3.11
 Obsoletes:      %{name}-docs
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+#{?NEED_compat:Requires: strcompat-doc}
+#{?NEED_xns:Requires: strxns-doc}
+#{?NEED_xnet:Requires: strxnet-doc}
+#{?NEED_nsl:Requires: strnsl-doc}
+#{?NEED_sock:Requires: strsock-doc}
+#{?NEED_inet:Requires: strinet-doc}
+#{?NEED_sctp:Requires: strsctp-doc}
+#{?NEED_chan:Requires: strchan-doc}
+#{?NEED_x25:Requires: strx25-doc}
+#{?NEED_iso:Requires: striso-doc}
+#{?NEED_isdn:Requires: strisdn-doc}
+#{?NEED_ss7:Requires: strss7-doc}
+#{?NEED_sigtran:Requires: sigtran-doc}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
@@ -1111,6 +1140,19 @@ Autoreq:        true
 Autoprov:       true
 Prefix:         %{_usrsrc}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+%{?NEED_compat:Requires: strcompat-source}
+%{?NEED_xns:Requires: strxns-source}
+%{?NEED_xnet:Requires: strxnet-source}
+%{?NEED_nsl:Requires: strnsl-source}
+%{?NEED_sock:Requires: strsock-source}
+%{?NEED_inet:Requires: strinet-source}
+%{?NEED_sctp:Requires: strsctp-source}
+%{?NEED_chan:Requires: strchan-source}
+%{?NEED_x25:Requires: strx25-source}
+%{?NEED_iso:Requires: striso-source}
+%{?NEED_isdn:Requires: strisdn-source}
+%{?NEED_ss7:Requires: strss7-source}
+%{?NEED_sigtran:Requires: sigtran-source}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
@@ -1171,7 +1213,19 @@ Obsoletes:      %{name}-inits
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
 %{?_strvers:Requires: %{_streams}-init %version_of_or %{_streams}-init %{_strvers}}
 %{!?_strvers:Requires: %requires_prov %{_streams}-init = %{_streams}-init}
-%{?NEED_compat:%{expand:Requires: strcompat-init %%version_of_or strcompat-init %{minversion @STRCOMP_VERSION@}}}
+%{?NEED_compat:Requires: strcompat-init}
+%{?NEED_xns:Requires: strxns-init}
+%{?NEED_xnet:Requires: strxnet-init}
+%{?NEED_nsl:Requires: strnsl-init}
+%{?NEED_sock:Requires: strsock-init}
+%{?NEED_inet:Requires: strinet-init}
+%{?NEED_sctp:Requires: strsctp-init}
+%{?NEED_chan:Requires: strchan-init}
+%{?NEED_x25:Requires: strx25-init}
+%{?NEED_iso:Requires: striso-init}
+%{?NEED_isdn:Requires: strisdn-init}
+%{?NEED_ss7:Requires: strss7-init}
+%{?NEED_sigtran:Requires: sigtran-init}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
@@ -1780,6 +1834,19 @@ Prefix:         %{_snmpmibdir}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
 %{?_strvers:Requires: %{_streams}-mibs %version_of_or %{_streams}-mibs %{_strvers}}
 %{!?_strvers:Requires: %requires_prov %{_streams}-mibs = %{_streams}-mibs}
+#{?NEED_compat:Requires: strcompat-mibs}
+#{?NEED_xns:Requires: strxns-mibs}
+#{?NEED_xnet:Requires: strxnet-mibs}
+#{?NEED_nsl:Requires: strnsl-mibs}
+#{?NEED_sock:Requires: strsock-mibs}
+#{?NEED_inet:Requires: strinet-mibs}
+#{?NEED_sctp:Requires: strsctp-mibs}
+#{?NEED_chan:Requires: strchan-mibs}
+#{?NEED_x25:Requires: strx25-mibs}
+#{?NEED_iso:Requires: striso-mibs}
+#{?NEED_isdn:Requires: strisdn-mibs}
+#{?NEED_ss7:Requires: strss7-mibs}
+#{?NEED_sigtran:Requires: sigtran-mibs}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
@@ -1814,6 +1881,19 @@ Prefix:         %{_pkglibexecdir}
 Obsoletes:      %{name}-tests
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
 Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+#{?NEED_compat:Requires: strcompat-test}
+#{?NEED_xns:Requires: strxns-test}
+#{?NEED_xnet:Requires: strxnet-test}
+#{?NEED_nsl:Requires: strnsl-test}
+#{?NEED_sock:Requires: strsock-test}
+#{?NEED_inet:Requires: strinet-test}
+#{?NEED_sctp:Requires: strsctp-test}
+#{?NEED_chan:Requires: strchan-test}
+#{?NEED_x25:Requires: strx25-test}
+#{?NEED_iso:Requires: striso-test}
+#{?NEED_isdn:Requires: strisdn-test}
+#{?NEED_ss7:Requires: strss7-test}
+#{?NEED_sigtran:Requires: sigtran-test}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
@@ -1917,6 +1997,19 @@ Prefix:         %{_lib32dir}
 %endif
 Prefix:         %{_includedir}/%{name}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+%{?NEED_compat:Requires: strcompat-devel}
+%{?NEED_xns:Requires: strxns-devel}
+%{?NEED_xnet:Requires: strxnet-devel}
+%{?NEED_nsl:Requires: strnsl-devel}
+%{?NEED_sock:Requires: strsock-devel}
+%{?NEED_inet:Requires: strinet-devel}
+%{?NEED_sctp:Requires: strsctp-devel}
+%{?NEED_chan:Requires: strchan-devel}
+%{?NEED_x25:Requires: strx25-devel}
+%{?NEED_iso:Requires: striso-devel}
+%{?NEED_isdn:Requires: strisdn-devel}
+%{?NEED_ss7:Requires: strss7-devel}
+%{?NEED_sigtran:Requires: sigtran-devel}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
@@ -1977,11 +2070,15 @@ Prefix:         %{_localedir}
 Obsoletes:      %{name}-%{_streams}-libs
 Prereq:         /sbin/ldconfig
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
-%{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
-%{?NEED_xnet:Requires: strxnet-lib >= %{minversion @XTI_VERSION@}}
-%{?NEED_x25:Requires:  strx25-lib  >= %{minversion @X25_VERSION@}}
-%{?NEED_iso:Requires:  striso-lib  >= %{minversion @ISO_VERSION@}}
+#{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
+#{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
+#%{?NEED_xnet:Requires: strxnet-lib >= %{minversion @XTI_VERSION@}}
+#%{?NEED_x25:Requires:  strx25-lib  >= %{minversion @X25_VERSION@}}
+#%{?NEED_iso:Requires:  striso-lib  >= %{minversion @ISO_VERSION@}}
+Requires:       %{_streams}-lib
+%{?NEED_xnet:Requires: strxnet-lib}
+%{?NEED_x25:Requires: strx25-lib}
+%{?NEED_iso:Requires: striso-lib}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
@@ -2089,12 +2186,26 @@ Obsoletes:      %{name}-%{_streams}-utils
 #Requires:       net-snmp
 %endif
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
-%{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
 %if %{have_libraries}
 Requires:       %{name}-lib >= %{epoch}:%{version}-%{fullrelease2}
 Requires:       %{name}-%{_streams}-lib >= %{epoch}:%{version}-%{fullrelease2}
 %endif
+#{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
+#{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
+Requires:       %{_streams}-util
+%{?NEED_compat:Requires: strcompat-util}
+#{?NEED_xns:Requires: strxns-util}
+#{?NEED_xnet:Requires: strxnet-util}
+#{?NEED_nsl:Requires: strnsl-util}
+#{?NEED_sock:Requires: strsock-util}
+#{?NEED_inet:Requires: strinet-util}
+#{?NEED_sctp:Requires: strsctp-util}
+#{?NEED_chan:Requires: strchan-util}
+#{?NEED_x25:Requires: strx25-util}
+#{?NEED_iso:Requires: striso-util}
+#{?NEED_isdn:Requires: strisdn-util}
+#{?NEED_ss7:Requires: strss7-util}
+#{?NEED_sigtran:Requires: sigtran-util}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
@@ -2184,6 +2295,19 @@ AutoProv:       0
 %{?_conflict:Conflicts:      %{name}-%{_conflict}-debuginfo}
 Obsoletes:      %{name}-debug < %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+%{?NEED_compat:Requires: strcompat-%{_streams}-debuginfo}
+%{?NEED_xns:Requires: strxns-%{_streams}-debuginfo}
+%{?NEED_xnet:Requires: strxnet-%{_streams}-debuginfo}
+%{?NEED_nsl:Requires: strnsl-%{_streams}-debuginfo}
+%{?NEED_sock:Requires: strsock-%{_streams}-debuginfo}
+%{?NEED_inet:Requires: strinet-%{_streams}-debuginfo}
+%{?NEED_sctp:Requires: strsctp-%{_streams}-debuginfo}
+%{?NEED_chan:Requires: strchan-%{_streams}-debuginfo}
+%{?NEED_x25:Requires: strx25-%{_streams}-debuginfo}
+%{?NEED_iso:Requires: striso-%{_streams}-debuginfo}
+%{?NEED_isdn:Requires: strisdn-%{_streams}-debuginfo}
+%{?NEED_ss7:Requires: strss7-%{_streams}-debuginfo}
+%{?NEED_sigtran:Requires: sigtran-%{_streams}-debuginfo}
 Provides:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
@@ -2207,6 +2331,78 @@ use this package or when debugging this package.
 %{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
 %{_usrsrc}/debug
 %endif
+
+# ===========================================================================
+%package %{_streams}-%{_kversion}
+
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel virtual package.
+Group:          System Environment/Kernel
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        0
+Autoprov:       0
+%{?_conflict:Conflicts:      %{name}-%{_conflict}-%{_kversion}}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{corename %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+%if %{NEED_devs}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+%if %{BUILD_init}
+Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+%endif
+%{?libraries:Requires:       %{name}-%_streams-lib = %{epoch}:%{version}-%{fullrelease2}}
+%{?mibfiles:Requires:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}}
+Requires:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-%_streams-util = %{epoch}:%{version}-%{fullrelease2}
+%if %{_enable_ksource_package}
+Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
+%endif
+%if %{_enable_debug_packages}
+Requires:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
+%endif
+%{?NEED_compat:Requires: strcompat-%{_streams}-%{_kversion}}
+%{?NEED_xns:Requires: strxns-%{_streams}-%{_kversion}}
+%{?NEED_xnet:Requires: strxnet-%{_streams}-%{_kversion}}
+%{?NEED_nsl:Requires: strnsl-%{_streams}-%{_kversion}}
+%{?NEED_sock:Requires: strsock-%{_streams}-%{_kversion}}
+%{?NEED_inet:Requires: strinet-%{_streams}-%{_kversion}}
+%{?NEED_sctp:Requires: strsctp-%{_streams}-%{_kversion}}
+%{?NEED_chan:Requires: strchan-%{_streams}-%{_kversion}}
+%{?NEED_x25:Requires: strx25-%{_streams}-%{_kversion}}
+%{?NEED_iso:Requires: striso-%{_streams}-%{_kversion}}
+%{?NEED_isdn:Requires: strisdn-%{_streams}-%{_kversion}}
+%{?NEED_ss7:Requires: strss7-%{_streams}-%{_kversion}}
+%{?NEED_sigtran:Requires: sigtran-%{_streams}-%{_kversion}}
+Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_streams}-%{_kversion}
+%{descripline}
+The %{name}-%{_streams}-%{_kversion} binary package is a virtual package that
+depends on all %{name} kernel subpackages for the %{_kversion} kernel.
+Installing this package installs all necessary subpackages for the
+%{_kversion} kernel.
+%{descriptail}
+
+%if %{FILES_kvirtual}
+%files %{_streams}-%{_kversion}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%endif
+
 
 # ===========================================================================
 %package -n %{corename %name-%_streams}
@@ -2234,15 +2430,28 @@ Prereq:         lsof
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
 Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
-%{?_strvers:Requires: %{corename %_streams} %version_of_or %{_streams}-%{core_name} %{_strvers}}
-%{!?_strvers:%{expand:Requires: %%requires_prov %{corename %_streams} = %{_streams}-%{core_name}}}
-%{?NEED_compat:%{expand:Requires: %{corename strcompat-%_streams} %%version_of_or %{corename strcompat-%_streams} %{minversion @STRCOMP_VERSION@}}}
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{myversion}-%{fullrelease2}
 %endif
 %if %{NEED_devs}
 Requires:       %{name}-dev = %{epoch}:%{myversion}-%{fullrelease2}
 %endif
+%{?_strvers:Requires: %{corename %_streams} %version_of_or %{_streams}-%{core_name} %{_strvers}}
+%{!?_strvers:%{expand:Requires: %%requires_prov %{corename %_streams} = %{_streams}-%{core_name}}}
+#{?NEED_compat:%{expand:Requires: %{corename strcompat-%_streams} %%version_of_or %{corename strcompat-%_streams} %{minversion @STRCOMP_VERSION@}}}
+%{?NEED_compat:Requires: %{corename strcompat-%{_streams}}}
+%{?NEED_xns:Requires: %{corename strxns-%{_streams}}}
+%{?NEED_xnet:Requires: %{corename strxnet-%{_streams}}}
+#{?NEED_nsl:Requires: %{corename strnsl-%{_streams}}}
+#{?NEED_sock:Requires: %{corename strsock-%{_streams}}}
+%{?NEED_inet:Requires: %{corename strinet-%{_streams}}}
+%{?NEED_sctp:Requires: %{corename strsctp-%{_streams}}}
+%{?NEED_chan:Requires: %{corename strchan-%{_streams}}}
+%{?NEED_x25:Requires: %{corename strx25-%{_streams}}}
+%{?NEED_iso:Requires: %{corename striso-%{_streams}}}
+%{?NEED_isdn:Requires: %{corename strisdn-%{_streams}}}
+%{?NEED_ss7:Requires: %{corename strss7-%{_streams}}}
+%{?NEED_sigtran:Requires: %{corename sigtran-%{_streams}}}
 Provides:       kernel-modules = %{_kversion}
 Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{fullrelease}
 Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{fullrelease2}
@@ -2617,6 +2826,19 @@ Obsoletes:      %{name}-%{_streams}-%{info_name} < %{epoch}:%{version}-%{rpmrele
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
 Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
+%{?NEED_compat:Requires: %{infoname strcompat-%{_streams}}}
+%{?NEED_xns:Requires: %{infoname strxns-%{_streams}}}
+%{?NEED_xnet:Requires: %{infoname strxnet-%{_streams}}}
+#{?NEED_nsl:Requires: %{infoname strnsl-%{_streams}}}
+#{?NEED_sock:Requires: %{infoname strsock-%{_streams}}}
+%{?NEED_inet:Requires: %{infoname strinet-%{_streams}}}
+%{?NEED_sctp:Requires: %{infoname strsctp-%{_streams}}}
+%{?NEED_chan:Requires: %{infoname strchan-%{_streams}}}
+%{?NEED_x25:Requires: %{infoname strx25-%{_streams}}}
+%{?NEED_iso:Requires: %{infoname striso-%{_streams}}}
+%{?NEED_isdn:Requires: %{infoname strisdn-%{_streams}}}
+%{?NEED_ss7:Requires: %{infoname strss7-%{_streams}}}
+%{?NEED_sigtran:Requires: %{infoname sigtran-%{_streams}}}
 Provides:       kernel-modules = %{_kversion}
 Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{fullrelease}
 Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{fullrelease2}
@@ -2751,6 +2973,19 @@ AutoReq:        0
 AutoProv:       0
 %{?_conflict:Conflicts:      %{dbugname %name-%_conflict}}
 Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
+%{?NEED_compat:Requires: %{dbugname strcompat-%{_streams}}}
+%{?NEED_xns:Requires: %{dbugname strxns-%{_streams}}}
+%{?NEED_xnet:Requires: %{dbugname strxnet-%{_streams}}}
+#{?NEED_nsl:Requires: %{dbugname strnsl-%{_streams}}}
+#{?NEED_sock:Requires: %{dbugname strsock-%{_streams}}}
+%{?NEED_inet:Requires: %{dbugname strinet-%{_streams}}}
+%{?NEED_sctp:Requires: %{dbugname strsctp-%{_streams}}}
+%{?NEED_chan:Requires: %{dbugname strchan-%{_streams}}}
+%{?NEED_x25:Requires: %{dbugname strx25-%{_streams}}}
+%{?NEED_iso:Requires: %{dbugname striso-%{_streams}}}
+%{?NEED_isdn:Requires: %{dbugname strisdn-%{_streams}}}
+%{?NEED_ss7:Requires: %{dbugname strss7-%{_streams}}}
+%{?NEED_sigtran:Requires: %{dbugname sigtran-%{_streams}}}
 Provides:       kernel-modules = %{_kversion}
 Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{fullrelease}
 Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{fullrelease2}
@@ -2874,6 +3109,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxnet.spec.in,v $
+# Revision 0.9.2.163  2008-09-24 21:03:02  brian
+# - latest spec file tweaks
+#
 # Revision 0.9.2.162  2008-09-24 16:27:30  brian
 # - more spec file tweaks
 #

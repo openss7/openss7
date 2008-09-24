@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.178 $) $Date: 2008-09-24 16:27:21 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.179 $) $Date: 2008-09-24 21:02:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-24 16:27:21 $ by $Author: brian $
+# Last Modified $Date: 2008-09-24 21:02:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -352,9 +352,11 @@
 %if %{BUILD_modules}
 %global FILES_modules       1
 %global FILES_kern_debug    1
+%global FILES_kvirtual      1
 %else
 %global FILES_modules       0
 %global FILES_kern_debug    0
+%global FILES_kvirtual      0
 %global kernel_fedora       0
 %global kernel_others       0
 %endif
@@ -450,6 +452,7 @@
 %global FILES_snmp          0
 %global FILES_snmp32        0
 %global FILES_virtual       0
+%global FILES_kvirtual      0
 %endif
 
 %if %{BUILD_noarch}
@@ -2243,6 +2246,62 @@ use this package or when debugging this package.
 %endif
 
 # ===========================================================================
+%package %{_kversion}
+
+Summary:        OpenSS7 %{stitle} kernel virtual package.
+Group:          System Environment/Kernel
+%{?_xpm:Icon: %_xpm}
+%{?_gif:Icon: %_gif}
+Autoreq:        0
+Autoprov:       0
+%{?_conflict:Conflicts:      %{_conflict}-%{_kversion}}
+Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{corename %name} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{infoname %name} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+%if %{NEED_devs}
+Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
+%if %{BUILD_init}
+Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
+%endif
+%{?libraries:Requires:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}}
+%{?mibfiles:Requires:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}}
+Requires:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
+%if %{_enable_ksource_package}
+Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
+%endif
+%if %{_enable_debug_packages}
+Requires:       %{dbugname %name} = %{epoch}:%{version}-%{fullrelease2}
+Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
+%endif
+Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{virtual}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{virtual}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{virtual}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description %{_kversion}
+%{descripline}
+The %{name}-%{_kversion} binary package is a virtual package that
+depends on all %{name} kernel subpackages for the %{_kversion} kernel.
+Installing this package installs all necessary subpackages for the
+%{_kversion} kernel.
+%{descriptail}
+
+%if %{FILES_kvirtual}
+%files %{_kversion}
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%endif
+
+
+# ===========================================================================
 %package -n %{corename %name}
 
 Summary:        %{title} core kernel modules.
@@ -2735,6 +2794,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
+# Revision 0.9.2.179  2008-09-24 21:02:57  brian
+# - latest spec file tweaks
+#
 # Revision 0.9.2.178  2008-09-24 16:27:21  brian
 # - more spec file tweaks
 #
