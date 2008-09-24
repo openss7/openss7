@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-09-22 17:37:27 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-09-24 03:29:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:27 $ by $Author: brian $
+# Last Modified $Date: 2008-09-24 03:29:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -290,12 +290,18 @@
 %global corename() %1-core-%_kversion%{nil}
 %global infoname() %1-info-%_kversion%{nil}
 %global dbugname() %1-debug-%_kversion%{nil}
+%global coreroot() %1-core%{nil}
+%global inforoot() %1-info%{nil}
+%global dbugroot() %1-debug%{nil}
 %global kmodules_version @VERSION@
 
 %if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
 %global corename() openss7-%1-kmp%kernel_flavor%{nil}
 %global infoname() openss7-%1-kmp%kernel_flavor-devel%{nil}
 %global dbugname() openss7-%1-kmp%kernel_flavor-debuginfo%{nil}
+%global coreroot() openss7-%1-kmp%{nil}
+%global inforoot() openss7-%1-kmp-devel%{nil}
+%global dbugroot() openss7-%1-kmp-debuginfo%{nil}
 %global kmodules_version @VERSION@_%kernel_string
 %endif
 
@@ -303,6 +309,9 @@
 %global corename() kmod-%1%kernel_flavor%{nil}
 %global infoname() kmod-%1%kernel_flavor-devel%{nil}
 %global dbugname() kmod-%1%kernel_flavor-debuginfo%{nil}
+%global coreroot() kmod-%1%{nil}
+%global inforoot() kmod-%1-devel%{nil}
+%global dbugroot() kmod-%1-debuginfo%{nil}
 %global kmodules_version @VERSION@.%kernel_release
 %endif
 
@@ -590,17 +599,17 @@ BuildRequires:  gcc = 2.95.3
 %{?_strvers:BuildRequires: %{_streams}-devel = %version_of_or %{_streams}-devel %{_strvers}}
 %{!?_strvers:BuildRequires: %requires_prov %{_streams}-devel = %{_streams}-devel}
 %if %{without_ko_modules}
-%{?_strvers:BuildRequires: %{infoname %_streams} = %version_of_or %{_streams}-devel %{_strvers}}
-%{!?_strvers:%{expand:BuildRequires: %%requires_prov %{infoname %_streams} = %{_streams}-devel}}
+%{?_strvers:BuildRequires: %{inforoot %_streams} = %version_of_or %{_streams}-devel %{_strvers}}
+%{!?_strvers:%{expand:BuildRequires: %%requires_prov %{inforoot %_streams} = %{_streams}-devel}}
 %else
-%{?_strvers:BuildRequires: %{corename %_streams} = %version_of_or %{_streams}-devel %{_strvers}}
-%{!?_strvers:%{expand:BuildRequires: %%requires_prov %{corename %_streams} = %{_streams}-devel}}
+%{?_strvers:BuildRequires: %{coreroot %_streams} = %version_of_or %{_streams}-devel %{_strvers}}
+%{!?_strvers:%{expand:BuildRequires: %%requires_prov %{coreroot %_streams} = %{_streams}-devel}}
 %endif
 %{?NEED_compat:BuildRequires: strcompat-devel = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
 %if %{without_ko_modules}
-%{?NEED_compat:BuildRequires: %{infoname strcompat-%_streams} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
+%{?NEED_compat:BuildRequires: %{inforoot strcompat-%_streams} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
 %else
-%{?NEED_compat:BuildRequires: %{corename strcompat-%_streams} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
+%{?NEED_compat:BuildRequires: %{coreroot strcompat-%_streams} = %version_of_or strcompat-devel @STRCOMP_VERSION@%{?extrarelease2}}
 %endif
 %{?NEED_xns:BuildRequires:    strxns-devel >=     @XNS_VERSION@%{?extrarelease2}}
 %{?NEED_xnet:BuildRequires:   strxnet-devel >=     @XTI_VERSION@%{?extrarelease2}}
@@ -922,8 +931,8 @@ Autoprov:       0
 %{?_conflict:Conflicts:      %{_conflict}-%{_streams}}
 Obsoletes:      %{name}-%{_streams}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?modules:Requires:       %{corename %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
-%{?modules:Requires:       %{infoname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
+%{?modules:Requires:       %{coreroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
+%{?modules:Requires:       %{inforoot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
 Requires:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
@@ -936,7 +945,7 @@ Requires:       %{name}-%_streams-util = %{epoch}:%{version}-%{fullrelease2}
 Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
 %endif
 %if %{_enable_debug_packages}
-%{?modules:Requires:       %{dbugname %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
+%{?modules:Requires:       %{dbugroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
 Requires:       %{name}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease}
@@ -2228,7 +2237,7 @@ fi
 %endif
 
 # ===========================================================================
-%package debuginfo
+%package %{_streams}-debuginfo
 
 Summary:        %{title} debug information.
 Group:          Development/Debug
@@ -2247,7 +2256,7 @@ Provides:       %{name}-%{virtual}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description debuginfo
+%description %{_streams}-debuginfo
 %{descripline}
 This package provides debug information for package %{name}.
 Debug information is useful when developing applicaions that
@@ -2255,7 +2264,7 @@ use this package or when debugging this package.
 %{descriptail}
 
 %if %{FILES_debug}
-%files debuginfo
+%files %{_streams}-debuginfo
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
@@ -2288,9 +2297,9 @@ Prereq:         lsof
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{corename %_streams} = %version_of_or %{_streams}-%{core_name} %{_strvers}}
-%{!?_strvers:%{expand:Requires: %%requires_prov %{corename %_streams} = %{_streams}-%{core_name}}}
-%{?NEED_compat:%{expand:Requires: %{corename strcompat-%_streams} = %%version_of_or %{corename strcompat-%_streams} @STRCOMP_VERSION@%{?extrarelease2}}}
+%{?_strvers:Requires: %{coreroot %_streams} = %version_of_or %{_streams}-%{core_name} %{_strvers}}
+%{!?_strvers:%{expand:Requires: %%requires_prov %{coreroot %_streams} = %{_streams}-%{core_name}}}
+%{?NEED_compat:%{expand:Requires: %{coreroot strcompat-%_streams} = %%version_of_or %{coreroot strcompat-%_streams} @STRCOMP_VERSION@%{?extrarelease2}}}
 %if %{NEED_init}
 Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 %endif
@@ -2298,6 +2307,9 @@ Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
 Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
 %endif
 Provides:       kernel-modules = %{_kversion}
+Provides:       %{coreroot %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{coreroot %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{coreroot %name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
@@ -2670,6 +2682,9 @@ Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf 
 #Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
 Provides:       kernel-modules = %{_kversion}
+Provides:       %{inforoot %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{inforoot %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{inforoot %name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
@@ -2804,6 +2819,9 @@ AutoProv:       0
 %{?_conflict:Conflicts:      %{dbugname %name-%_conflict}}
 Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
 Provides:       kernel-modules = %{_kversion}
+Provides:       %{dbugroot %name} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{dbugroot %name} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{dbugroot %name} = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
@@ -2822,6 +2840,78 @@ Provides:       %{dbugname %name-%virtual} = %{epoch}:%{kmodules_version}-%{rpmr
 Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{dbugname %name-%virtual} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{version}-%{rpmrelease}
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
@@ -2845,9 +2935,13 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.107  2008-09-22 17:37:27  brian
-# - build and release updates
+# Revision 0.9.2.108  2008-09-24 03:29:52  brian
+# - corrections to interdependencies between subpackages
 #
+
+* Mon Sep 22 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.107  2008-09-22 17:37:27  brian
+- build and release updates
 
 * Sun Sep 21 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.106  2008-09-21 10:55:13  brian
