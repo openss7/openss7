@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2008-09-24 06:57:04 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:33 $ by $Author: brian $
+ Last Modified $Date: 2008-09-24 06:57:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.96  2008-09-24 06:57:04  brian
+ - switch back to slower locking
+
  Revision 0.9.2.95  2008-09-22 20:31:33  brian
  - added module version and truncated logs
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2008-09-24 06:57:04 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2008-09-24 06:57:04 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -565,7 +568,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2008-09-22 20:31:33 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2008-09-24 06:57:04 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -1258,7 +1261,7 @@ ss_socket_get(struct socket *sock, ss_t *ss)
  *
  *  =========================================================================
  */
-#if 0
+#if 1
 STATIC int
 ss_trylockq(queue_t *q)
 {
