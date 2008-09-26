@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2008/09/26 18:17:04 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2008/09/26 18:33:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/26 18:17:04 $ by $Author: brian $
+# Last Modified $Date: 2008/09/26 18:33:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -191,13 +191,13 @@ dnl
     AC_SUBST([localedir])
     if test :"${docdir+set}" != :set ; then docdir='${datarootdir}/doc/${PACKAGE}-${VERSION}' ; fi
     AC_SUBST([docdir])
-    if test :"${htmldir+set}" != :set ; then htmldir='${docdir}' ; fi
+    if test :"${htmldir+set}" != :set ; then htmldir='${docdir}/html' ; fi
     AC_SUBST([htmldir])
-    if test :"${dvidir+set}" != :set ; then dvidir='${docdir}' ; fi
+    if test :"${dvidir+set}" != :set ; then dvidir='${docdir}/dvi' ; fi
     AC_SUBST([dvidir])
-    if test :"${pdfdir+set}" != :set ; then pdfdir='${docdir}' ; fi
+    if test :"${pdfdir+set}" != :set ; then pdfdir='${docdir}/pdf' ; fi
     AC_SUBST([pdfdir])
-    if test :"${psdir+set}" != :set ; then psdir='${docdir}' ; fi
+    if test :"${psdir+set}" != :set ; then psdir='${docdir}/ps' ; fi
     AC_SUBST([psdir])
     AC_SUBST([rootdir])
 dnl
@@ -1002,6 +1002,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.75  2008/09/26 18:33:34  brian
+# - adjust defaults for doc directories
+#
 # Revision 0.9.2.74  2008/09/26 18:17:04  brian
 # - doc directories now commonly contain version numbers
 #
