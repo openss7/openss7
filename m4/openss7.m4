@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-09-22 21:22:14 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2008/09/26 18:17:04 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 21:22:14 $ by $Author: brian $
+# Last Modified $Date: 2008/09/26 18:17:04 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -189,7 +189,7 @@ dnl
     AC_SUBST([datadir])
     if test :"${localedir+set}" != :set ; then localedir='${datarootdir}/locale' ; fi
     AC_SUBST([localedir])
-    if test :"${docdir+set}" != :set ; then docdir='${datarootdir}/doc/${PACKAGE_TARNAME}' ; fi
+    if test :"${docdir+set}" != :set ; then docdir='${datarootdir}/doc/${PACKAGE}-${VERSION}' ; fi
     AC_SUBST([docdir])
     if test :"${htmldir+set}" != :set ; then htmldir='${docdir}' ; fi
     AC_SUBST([htmldir])
@@ -1002,6 +1002,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.74  2008/09/26 18:17:04  brian
+# - doc directories now commonly contain version numbers
+#
 # Revision 0.9.2.73  2008-09-22 21:22:14  brian
 # - handle character release numbers
 #
