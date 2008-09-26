@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.157 $) $Date: 2008-09-23 23:55:03 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.158 $) $Date: 2008-09-26 18:08:06 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 23:55:03 $ by $Author: brian $
+## Last Modified $Date: 2008-09-26 18:08:06 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -154,6 +154,7 @@ rpm_tar_file		= $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
 rpm_spec_file		= $(specdir)/$(PACKAGE)-$(VERSION).spec
 rpm_img_files		= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 rpm_source_files	= $(rpm_spec_file) $(rpm_img_files) $(rpm_tar_file)
+rpm_base_file		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE).*.rpm
 rpm_binary_file		= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 rpm_link_file		= $(topdir)/SRPMS/$(rpmpkg).src.rpm
 ##
@@ -168,7 +169,8 @@ rpm_module0_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXT
 rpm_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 rpm_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 rpm_module3_file	= openss7-$(PACKAGE)*-kmp-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-rpm_binary_files	= $(rpmdir)/*/$(rpm_binary_file) \
+rpm_binary_files	= $(rpmdir)/*/$(rpm_base_file) \
+			  $(rpmdir)/*/$(rpm_binary_file) \
 			  $(rpmdir)/*/$(rpm_module0_file) \
 			  $(rpmdir)/*/$(rpm_module1_file) \
 			  $(rpmdir)/*/$(rpm_module2_file) \
@@ -382,7 +384,7 @@ sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 rebuild:
 	@$(ECHO) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir)/noarch -name '$(rpm_binary_file)' 2>/dev/null`; \
+	@rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 	if test -z "$$rpms" -o -n '$(FORCE)'; then \
 		$(ECHO) "D: $@: rebuild noarch"; \
 		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" n-rpm || :; \
@@ -411,7 +413,7 @@ rebuild:
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
-		rpms=`find $(rpmdir)/$$a -name '$(rpm_binary_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 		if test -z "$$rpms" -o -n '$(FORCE)'; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
 			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" t-rpm || :; \
@@ -430,12 +432,12 @@ rebuild:
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
 	@$(ECHO) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
+	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild rebuild"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild; \
-		rpms=`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
 		if test -z "$$rpms"; then exit 1; fi; \
 	fi; \
 	rpms_to_sign=; \
@@ -615,7 +617,7 @@ update-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 update-rpms:
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@rebuild=yes; \
-	rpms=`find $(rpmdir)/noarch -name '$(rpm_binary_file)' 2>/dev/null`; \
+	rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 	for f in $$rpms; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
@@ -658,7 +660,7 @@ update-rpms:
 			fi; \
 		done; \
 		rebuild=yes; \
-		rpms=`find $(rpmdir)/$$a -name '$(rpm_binary_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 		for f in $$rpms; do \
 			if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 				$(ECHO) "D: $@: leaving $$f"; \
@@ -720,12 +722,12 @@ update-sign-srpm:
 ##
 update-sign-rpms:
 	@$(ECHO) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
+	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild update-rpm"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms; \
-		rpms=`find $(rpmdir) -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
 	fi; if test -z "$$rpms"; then exit 0; fi; \
 	rpms_to_sign=; \
 	for f in $$rpms; do \
@@ -998,6 +1000,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.158  2008-09-26 18:08:06  brian
+## - more files
+##
 ## Revision 0.9.2.157  2008-09-23 23:55:03  brian
 ## - different trick
 ##
