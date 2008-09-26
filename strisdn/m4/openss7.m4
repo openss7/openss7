@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.75 $) $Date: 2008/09/26 18:33:34 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008/09/26 19:02:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/26 18:33:34 $ by $Author: brian $
+# Last Modified $Date: 2008/09/26 19:02:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -189,15 +189,18 @@ dnl
     AC_SUBST([datadir])
     if test :"${localedir+set}" != :set ; then localedir='${datarootdir}/locale' ; fi
     AC_SUBST([localedir])
-    if test :"${docdir+set}" != :set ; then docdir='${datarootdir}/doc/${PACKAGE}-${VERSION}' ; fi
+    if test :"${docdir+set}" != :set ; then docdir='${datarootdir}/doc/${PACKAGE_TARNAME}' ; fi
+    if test :"$docdir" = :'${datarootdir}/doc/${PACKAGE_TARNAME}' ; then
+	docdir='${datarootdir}/doc/${PACKAGE}-${VERSION}'
+    fi
     AC_SUBST([docdir])
-    if test :"${htmldir+set}" != :set ; then htmldir='${docdir}/html' ; fi
+    if test :"${htmldir+set}" != :set ; then htmldir='${docdir}' ; fi
     AC_SUBST([htmldir])
-    if test :"${dvidir+set}" != :set ; then dvidir='${docdir}/dvi' ; fi
+    if test :"${dvidir+set}" != :set ; then dvidir='${docdir}' ; fi
     AC_SUBST([dvidir])
-    if test :"${pdfdir+set}" != :set ; then pdfdir='${docdir}/pdf' ; fi
+    if test :"${pdfdir+set}" != :set ; then pdfdir='${docdir}' ; fi
     AC_SUBST([pdfdir])
-    if test :"${psdir+set}" != :set ; then psdir='${docdir}/ps' ; fi
+    if test :"${psdir+set}" != :set ; then psdir='${docdir}' ; fi
     AC_SUBST([psdir])
     AC_SUBST([rootdir])
 dnl
@@ -1002,6 +1005,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.76  2008/09/26 19:02:40  brian
+# - more doc directory adjustments
+#
 # Revision 0.9.2.75  2008/09/26 18:33:34  brian
 # - adjust defaults for doc directories
 #
