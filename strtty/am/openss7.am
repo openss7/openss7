@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.141 $) $Date: 2008/09/22 07:14:28 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 0.9.2.142 $) $Date: 2008/09/28 17:59:54 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/22 07:14:28 $ by $Author: brian $
+## Last Modified $Date: 2008/09/28 17:59:54 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -225,21 +225,14 @@ $(ALL_RECURSIVE_TARGETS):
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
-	if test -z '$(subdirs)'; then \
-		$(ECHO) "D: Making $$target in `pwd`"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
-	else \
-		list='$(subdirs)'; \
-		for subdir in $$list; do \
-			if test "$$subdir" = "."; then continue; fi; \
-			$(ECHO) "D: Making $$target in $$subdir"; \
-			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
-			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
-				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
-		done; \
-		test -z "$$fail"; \
-	fi
+	list='. $(subdirs)'; \
+	for subdir in $$list; do \
+		$(ECHO) "D: Making $$target in $$subdir"; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
+	test -z "$$fail"
 
 MY_PHONY	+= $(ALL_RECURSIVE_TARGETS)
 
@@ -254,23 +247,16 @@ $(ALL_REVERSIVE_TARGETS):
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@set fnord $$MAKEFLAGS; amf=$$2; \
 	target=`$(ECHO) $@ | sed -e 's|^all-||'`; \
-	if test -z '$(subdirs)'; then \
-		$(ECHO) "D: Making $$target in `pwd`"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target; \
-	else \
-		list=''; rev='$(subdirs)'; for subdir in $$rev; do \
-			list="$$subdir $$list"; \
-		done; \
-		for subdir in $$list; do \
-			if test "$$subdir" = "."; then continue; fi; \
-			$(ECHO) "D: Making $$target in $$subdir"; \
-			$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
-			(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
-				|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
-		done; \
-		test -z "$$fail"; \
-	fi
+	list=''; rev='$(subdirs)'; for subdir in $$rev; do \
+		list="$$subdir $$list"; \
+	done; list='$$list .'; \
+	for subdir in $$list; do \
+		$(ECHO) "D: Making $$target in $$subdir"; \
+		$(ECHO) "(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target)"; \
+		(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target) \
+			|| case "$$amf" in (*=*) exit 1 ;; (*k*) fail=yes ;; (*) exit 1 ;; esac; \
+	done; \
+	test -z "$$fail"
 
 MY_PHONY	+= $(ALL_REVERSIVE_TARGETS)
 
@@ -935,6 +921,9 @@ $(PRECIOUS): $(MY_PRECIOUS)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 0.9.2.142  2008/09/28 17:59:54  brian
+## - process current directory in all targets
+##
 ## Revision 0.9.2.141  2008/09/22 07:14:28  brian
 ## - typo
 ##
