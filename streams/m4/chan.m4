@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.20 $) $Date: 2008-09-28 17:48:29 $
+# @(#) $RCSfile: chan.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.21 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -405,7 +405,7 @@ dnl		    this will just not be set
 			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$chan_version" -a -s "$chan_dir/../../configure" ; then
-			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$chan_package" -a -s "$chan_dir/../.pkgrelease" ; then
 			    chan_package=`cat $chan_dir/../.pkgrelease`
@@ -430,9 +430,6 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$chan_release" -a -s "$chan_dir/../../.rpmrelease" ; then
 			chan_release=`cat $chan_dir/../../.rpmrelease`
-		    fi
-		    if test -z "$chan_release" ; then
-			chan_release="1"
 		    fi
 		done
 	    fi
@@ -585,6 +582,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.21  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.20  2008-09-28 17:48:29  brian
 # - more version number corrections
 #

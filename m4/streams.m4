@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-28 17:48:29 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -576,9 +576,6 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 		    if test -z "$streams_release" -a -s "$streams_dir/../.rpmrelease" ; then
 			streams_release=`cat $streams_dir/../.rpmrelease`
 		    fi
-		    if test -z "$streams_release" ; then
-			streams_release="1"
-		    fi
 		done
 	    fi
 	    if test -n "$streams_epoch" -a -n "$streams_version" -a -n "$streams_release" ; then
@@ -955,9 +952,6 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 		    if test -z "$streams_release" -a -s "$streams_dir/../.rpmrelease" ; then
 			streams_release=`cat $streams_dir/../.rpmrelease`
 		    fi
-		    if test -z "$streams_release" ; then
-			streams_release="1"
-		    fi
 		done
 	    fi
 	    if test -n "$streams_epoch" -a -n "$streams_version" -a -n "$streams_release" ; then
@@ -1218,6 +1212,9 @@ AC_DEFUN([_LINUX_STREAMS_], [dnl
 # =============================================================================
 #
 # $Log: streams.m4,v $
+# Revision 0.9.2.98  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.97  2008-09-28 17:48:29  brian
 # - more version number corrections
 #

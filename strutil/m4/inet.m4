@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.48 $) $Date: 2008-09-28 17:48:29 $
+# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.49 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -458,9 +458,6 @@ dnl		    this will just not be set
 		    if test -z "$inet_release" -a -s "$inet_dir/../../.rpmrelease" ; then
 			inet_release=`cat $inet_dir/../../.rpmrelease`
 		    fi
-		    if test -z "$inet_release" ; then
-			inet_release="1"
-		    fi
 		done
 	    fi
 	    if test -n "$inet_epoch" -a -n "$inet_version" -a -n "$inet_release" ; then
@@ -612,6 +609,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.49  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.48  2008-09-28 17:48:29  brian
 # - more version number corrections
 #
