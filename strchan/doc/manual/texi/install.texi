@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 0.9.2.94 2008-09-15 17:59:12 brian Exp $
+@c @(#) $Id: install.texi,v 0.9.2.95 2008-09-28 17:02:47 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-09-15 17:59:12 $ by $Author: brian $
+@c Last Modified $Date: 2008-09-28 17:02:47 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,7 @@
 @set pkgexample @value{PACKAGE_LCNAME}
 
 @menu
+* Repositories::		Repositories for the package
 * Downloading::			Downloading the package
 * Configuration::		Configuration of the package
 * Building::			Building the package
@@ -72,6 +73,53 @@
 * Loading::			Loading the package
 * Maintenance::			Maintaining the package
 @end menu
+
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
+
+@node Repositories
+@section Repositories
+@cindex repositories
+
+The @value{PACKAGE_TITLE} package release can be access from the repositories of
+@uref{http://www.openss7.org/repos, The OpenSS7 Project}.
+For @manpage{rpm(1)} based systems, the package is available in a @manpage{yum(8)} repository based
+on @file{repomd} XML and may also be accessed using @manpage{zypper(8)} or @manpage{yast(8)}.
+For @manpage{dpkg(1)} based systems, the package is available in a @manpage{apt(8)} repository.
+
+By far the easiest (most repeatable and manageable) form for installing and using @cite{OpenSS7}
+package is to install packages from the @manpage{yum(8)} or @manpage{apt(8)} repositories.  If your
+distribution does not support @manpage{yum(8)}, @manpage{zypper(8)}, @manpage{yast(8)} or
+@manpage{apt(8)}, then it is still possible to install the RPMs or DEBs from the repositories using
+@manpage{rpm(1)}, @manpage{dpkg(1)}; or by using @manpage{wget(1)} and then installing them from RPM
+or DEB using @manpage{rpm(1)} or @manpage{dpkg(1)} locally.
+
+If binaries are not available for your distribution or specific kernel, but your distribution
+supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
+@cite{OpenSS7} packages is to download and rebuild the source RPMs or DSCs from the repository.
+This can also be performed with @manpage{yum(8)}, @manpage{zypper(8)}, @manpage{yast(8)},
+@manpage{apt(8)}; or directly using @manpage{wget(1)}, @manpage{rpm(1)} or @manpage{dpkg(1)}.
+
+If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
+special needs (such as cross-compiling for embedded targets), the final resort method is to
+download, configure, build and install from tarball.  In this later case, the easiest way to build
+and install @cite{OpenSS7} packages from tarball is to use the tarball for the
+@cite{OpenSS7 Master Package}, @command{openss7-@value{VERSION_OPENSS7}}.
+
+@menu
+Repositories for YUM::			the @manpage{yum(8)} repository
+Repositories for APT::			the @manpage{apt(8)} repository
+@end menu
+
+@node Repositories for YUM
+@subsection Repositories for YUM
+@cindex repositories, yum
+@cindex yum
+
+@node Repositories for APT
+@subsection Repositories for APT
+@cindex repositories, apt
+@cindex apt
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
