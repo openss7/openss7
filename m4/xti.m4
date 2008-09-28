@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-09-28 17:48:30 $
+# @(#) $RCSfile: xti.m4,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-09-28 18:42:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:30 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -463,7 +463,7 @@ dnl		    this will just not be set
 			    xti_version=`grep -m 1 '^PACKAGE_VERSION=' $xti_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$xti_version" -a -s "$xti_dir/../../configure" ; then
-			    xti_version=`grep -m 1 '^PACKAGE_VERSION=' $xti_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			    xti_version=`grep -m 1 '^PACKAGE_VERSION=' $xti_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$xti_package" -a -s "$xti_dir/../.pkgrelease" ; then
 			    xti_package=`cat $xti_dir/../.pkgrelease`
@@ -488,9 +488,6 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$xti_release" -a -s "$xti_dir/../../.rpmrelease" ; then
 			xti_release=`cat $xti_dir/../../.rpmrelease`
-		    fi
-		    if test -z "$xti_release" ; then
-			xti_release="1"
 		    fi
 		done
 	    fi
@@ -643,6 +640,9 @@ AC_DEFUN([_XTI_], [dnl
 # =============================================================================
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.63  2008-09-28 18:42:58  brian
+# - corrections
+#
 # Revision 0.9.2.62  2008-09-28 17:48:30  brian
 # - more version number corrections
 #

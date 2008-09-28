@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-28 17:48:29 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -456,7 +456,7 @@ dnl		    this will just not be set
 			    strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$strcomp_version" -a -s "$strcomp_dir/../../configure" ; then
-			    strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			    strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$strcomp_package" -a -s "$strcomp_dir/../.pkgrelease" ; then
 			    strcomp_package=`cat $strcomp_dir/../.pkgrelease`
@@ -481,9 +481,6 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$strcomp_release" -a -s "$strcomp_dir/../../.rpmrelease" ; then
 			strcomp_release=`cat $strcomp_dir/../../.rpmrelease`
-		    fi
-		    if test -z "$strcomp_release" ; then
-			strcomp_release="1"
 		    fi
 		done
 	    fi
@@ -646,6 +643,9 @@ AC_DEFUN([_STRCOMP_], [dnl
 # =============================================================================
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.39  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.38  2008-09-28 17:48:29  brian
 # - more version number corrections
 #

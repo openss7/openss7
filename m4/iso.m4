@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-28 17:48:29 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -447,7 +447,7 @@ dnl		    this will just not be set
 			    iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$iso_version" -a -s "$iso_dir/../../configure" ; then
-			    iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			    iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$iso_package" -a -s "$iso_dir/../.pkgrelease" ; then
 			    iso_package=`cat $iso_dir/../.pkgrelease`
@@ -472,9 +472,6 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$iso_release" -a -s "$iso_dir/../../.rpmrelease" ; then
 			iso_release=`cat $iso_dir/../../.rpmrelease`
-		    fi
-		    if test -z "$iso_release" ; then
-			iso_release="1"
 		    fi
 		done
 	    fi
@@ -627,6 +624,9 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.23  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.22  2008-09-28 17:48:29  brian
 # - more version number corrections
 #

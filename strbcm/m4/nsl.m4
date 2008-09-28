@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.26 $) $Date: 2008-09-28 17:48:29 $
+# @(#) $RCSfile: nsl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.27 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -474,7 +474,7 @@ dnl		    this will just not be set
 			    nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$nsl_version" -a -s "$nsl_dir/../../configure" ; then
-			    nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			    nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$nsl_package" -a -s "$nsl_dir/../.pkgrelease" ; then
 			    nsl_package=`cat $nsl_dir/../.pkgrelease`
@@ -499,9 +499,6 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$nsl_release" -a -s "$nsl_dir/../../.rpmrelease" ; then
 			nsl_release=`cat $nsl_dir/../../.rpmrelease`
-		    fi
-		    if test -z "$nsl_release" ; then
-			nsl_release="1"
 		    fi
 		done
 	    fi
@@ -654,6 +651,9 @@ AC_DEFUN([_NSL_], [dnl
 # =============================================================================
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.27  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.26  2008-09-28 17:48:29  brian
 # - more version number corrections
 #

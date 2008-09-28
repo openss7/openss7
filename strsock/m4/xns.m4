@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.55 $) $Date: 2008-09-28 17:48:30 $
+# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.56 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:30 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -466,7 +466,7 @@ dnl		    this will just not be set
 			    xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$xns_version" -a -s "$xns_dir/../../configure" ; then
-			    xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			    xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$xns_package" -a -s "$xns_dir/../.pkgrelease" ; then
 			    xns_package=`cat $xns_dir/../.pkgrelease`
@@ -491,9 +491,6 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$xns_release" -a -s "$xns_dir/../../.rpmrelease" ; then
 			xns_release=`cat $xns_dir/../../.rpmrelease`
-		    fi
-		    if test -z "$xns_release" ; then
-			xns_release="1"
 		    fi
 		done
 	    fi
@@ -646,6 +643,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.56  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.55  2008-09-28 17:48:30  brian
 # - more version number corrections
 #

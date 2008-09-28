@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-28 17:48:29 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-28 18:42:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -410,7 +410,7 @@ dnl		    this will just not be set
 			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sigtran_version" -a -s "$sigtran_dir/../../configure" ; then
-			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sigtran_package" -a -s "$sigtran_dir/../.pkgrelease" ; then
 			    sigtran_package=`cat $sigtran_dir/../.pkgrelease`
@@ -435,9 +435,6 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$sigtran_release" -a -s "$sigtran_dir/../../.rpmrelease" ; then
 			sigtran_release=`cat $sigtran_dir/../../.rpmrelease`
-		    fi
-		    if test -z "$sigtran_release" ; then
-			sigtran_release="1"
 		    fi
 		done
 	    fi
@@ -590,6 +587,9 @@ AC_DEFUN([_SIGTRAN_], [dnl
 # =============================================================================
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.19  2008-09-28 18:42:57  brian
+# - corrections
+#
 # Revision 0.9.2.18  2008-09-28 17:48:29  brian
 # - more version number corrections
 #
