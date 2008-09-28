@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.95 $) $Date: 2008-04-28 09:41:04 $
+# @(#) $RCSfile: streams.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.96 $) $Date: 2008-09-28 16:50:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:04 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 16:50:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -548,6 +548,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    streams_version=
 	    streams_package=
 	    streams_release=
+	    streams_patchlevel=
 	    if test -n "$streams_cv_lis_includes" ; then
 		for streams_dir in $streams_cv_lis_includes ; do
 		    if test -z "$streams_epoch" -a -s "$streams_dir/../.rpmepoch" ; then
@@ -557,10 +558,13 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 			streams_version=`cat $streams_dir/../.version`
 		    fi
 		    if test -z "$streams_version" -a -s "$streams_dir/../configure" ; then
-			streams_version=`grep -m 1 '^PACKAGE_VERSION=' $streams_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			streams_version=`grep -m 1 '^PACKAGE_VERSION=' $streams_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$streams_package" -a -s "$streams_dir/../.pkgrelease" ; then
 			streams_package=`cat $streams_dir/../.pkgrelease`
+		    fi
+		    if test -z "$streams_patchlevel" -a -s "$streams_dir/../.pkgpatchlevel" ; then
+			streams_patchlevel=`cat $streams_dir/../.pkgpatchlevel`
 		    fi
 		    if test -z "$streams_release" -a -s "$streams_dir/../.rpmrelease" ; then
 			streams_release=`cat $streams_dir/../.rpmrelease`
@@ -568,7 +572,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 		done
 	    fi
 	    if test -n "$streams_epoch" -a -n "$streams_version" -a -n "$streams_package" -a -n "$streams_release" ; then
-		streams_cv_lis_version="$streams_epoch:$streams_version.$streams_package-$streams_release"
+		streams_cv_lis_version="$streams_epoch:$streams_version.$streams_package${streams_patchlevel:+.$streams_patchlevel}-$streams_release"
 	    fi
 	fi
     ])
@@ -913,6 +917,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 	    streams_version=
 	    streams_package=
 	    streams_release=
+	    streams_patchlevel=
 	    if test -n "$streams_cv_lfs_includes" ; then
 		for streams_dir in $streams_cv_lfs_includes ; do
 		    if test -z "$streams_epoch" -a -s "$streams_dir/../.rpmepoch" ; then
@@ -922,10 +927,13 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 			streams_version=`cat $streams_dir/../.version`
 		    fi
 		    if test -z "$streams_version" -a -s "$streams_dir/../configure" ; then
-			streams_version=`grep -m 1 '^PACKAGE_VERSION=' $streams_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			streams_version=`grep -m 1 '^PACKAGE_VERSION=' $streams_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$streams_package" -a -s "$streams_dir/../.pkgrelease" ; then
 			streams_package=`cat $streams_dir/../.pkgrelease`
+		    fi
+		    if test -z "$streams_patchlevel" -a -s "$streams_dir/../.pkgpatchlevel" ; then
+			streams_patchlevel=`cat $streams_dir/../.pkgpatchlevel`
 		    fi
 		    if test -z "$streams_release" -a -s "$streams_dir/../.rpmrelease" ; then
 			streams_release=`cat $streams_dir/../.rpmrelease`
@@ -933,7 +941,7 @@ dnl		    if linux_cv_k_release is not defined (no _LINUX_KERNEL) then this will 
 		done
 	    fi
 	    if test -n "$streams_epoch" -a -n "$streams_version" -a -n "$streams_package" -a -n "$streams_release" ; then
-		streams_cv_lfs_version="$streams_epoch:$streams_version.$streams_package-$streams_release"
+		streams_cv_lfs_version="$streams_epoch:$streams_version.$streams_package${streams_patchlevel:+.$streams_patchlevel}-$streams_release"
 	    fi
 	fi
     ])
@@ -1190,6 +1198,9 @@ AC_DEFUN([_LINUX_STREAMS_], [dnl
 # =============================================================================
 #
 # $Log: streams.m4,v $
+# Revision 0.9.2.96  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.95  2008-04-28 09:41:04  brian
 # - updated headers for release
 #

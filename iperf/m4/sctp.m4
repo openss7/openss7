@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.45 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: sctp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.46 $) $Date: 2008-09-28 16:50:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 16:50:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -430,6 +430,7 @@ dnl		    this will just not be set
 	    sctp_version=
 	    sctp_package=
 	    sctp_release=
+	    sctp_patchlevel=
 	    if test -n "$sctp_cv_includes" ; then
 		for sctp_dir in $sctp_cv_includes ; do
 		    if test -z "$sctp_epoch" -a -s "$sctp_dir/../.rpmepoch" ; then
@@ -445,16 +446,22 @@ dnl		    this will just not be set
 			sctp_version=`cat $sctp_dir/../../.version`
 		    fi
 		    if test -z "$sctp_version" -a -s "$sctp_dir/../configure" ; then
-			sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$sctp_version" -a -s "$sctp_dir/../../configure" ; then
-			sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$sctp_package" -a -s "$sctp_dir/../.pkgrelease" ; then
 			sctp_package=`cat $sctp_dir/../.pkgrelease`
 		    fi
 		    if test -z "$sctp_package" -a -s "$sctp_dir/../../.pkgrelease" ; then
 			sctp_package=`cat $sctp_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$sctp_patchlevel" -a -s "$sctp_dir/../.pkgpatchlevel" ; then
+			sctp_patchlevel=`cat $sctp_dir/../.pkgpatchlevel`
+		    fi
+		    if test -z "$sctp_patchlevel" -a -s "$sctp_dir/../../.pkgpatchlevel" ; then
+			sctp_patchlevel=`cat $sctp_dir/../../.pkgpatchlevel`
 		    fi
 		    if test -z "$sctp_release" -a -s "$sctp_dir/../.rpmrelease" ; then
 			sctp_release=`cat $sctp_dir/../.rpmrelease`
@@ -465,7 +472,7 @@ dnl		    this will just not be set
 		done
 	    fi
 	    if test -n "$sctp_epoch" -a -n "$sctp_version" -a -n "$sctp_package" -a -n "$sctp_release" ; then
-		sctp_cv_version="$sctp_epoch:$sctp_version.$sctp_package-$sctp_release"
+		sctp_cv_version="$sctp_epoch:$sctp_version.$sctp_package${sctp_patchlevel:+.$sctp_patchlevel}-$sctp_release"
 	    fi
 	fi
     ])
@@ -623,6 +630,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.46  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.45  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
