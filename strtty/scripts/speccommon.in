@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008/09/28 18:58:15 $
+# @(#) $RCSfile: speccommon.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-09-28 19:06:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/28 18:58:15 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:06:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2217,7 +2217,7 @@ Requires:       strtty-lib >= @TTY_VERSION@}
 %{?need_xns:
 Requires:       strxns-lib >= @XNS_VERSION@}
 %{?need_xnet:
-Requires:       strxnet-lib >= @XTI_VESION@}
+Requires:       strxnet-lib >= @XTI_VERSION@}
 %{?need_nsl:
 Requires:       strnsl-lib >= @NSL_VERSION@}
 %{?need_sock:
@@ -2926,6 +2926,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 0.9.2.4  2008-09-28 19:06:46  brian
+# - typo
+#
 # Revision 0.9.2.3  2008/09/28 18:58:15  brian
 # - added tty dependencies
 #
