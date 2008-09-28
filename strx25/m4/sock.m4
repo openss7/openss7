@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.28 $) $Date: 2008-09-28 18:42:57 $
+# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.29 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -460,10 +460,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$sock_version" ; then
 			if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
-			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
-			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
 			    sock_package=`cat $sock_dir/../.pkgrelease`
@@ -640,6 +640,9 @@ AC_DEFUN([_SOCK_], [dnl
 # =============================================================================
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.29  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
 # Revision 0.9.2.28  2008-09-28 18:42:57  brian
 # - corrections
 #

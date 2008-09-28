@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008/05/03 16:54:40 $
+# @(#) $RCSfile: iso.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.24 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/05/03 16:54:40 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -427,6 +427,7 @@ dnl		    this will just not be set
 	    iso_version=
 	    iso_package=
 	    iso_release=
+	    iso_patchlevel=
 	    if test -n "$iso_cv_includes" ; then
 		for iso_dir in $iso_cv_includes ; do
 		    if test -z "$iso_epoch" -a -s "$iso_dir/../.rpmepoch" ; then
@@ -441,17 +442,30 @@ dnl		    this will just not be set
 		    if test -z "$iso_version" -a -s "$iso_dir/../../.version" ; then
 			iso_version=`cat $iso_dir/../../.version`
 		    fi
-		    if test -z "$iso_version" -a -s "$iso_dir/../configure" ; then
-			iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$iso_version" -a -s "$iso_dir/../../configure" ; then
-			iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$iso_package" -a -s "$iso_dir/../.pkgrelease" ; then
-			iso_package=`cat $iso_dir/../.pkgrelease`
-		    fi
-		    if test -z "$iso_package" -a -s "$iso_dir/../../.pkgrelease" ; then
-			iso_package=`cat $iso_dir/../../.pkgrelease`
+		    if test -z "$iso_version" ; then
+			if test -z "$iso_version" -a -s "$iso_dir/../configure" ; then
+			    iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$iso_version" -a -s "$iso_dir/../../configure" ; then
+			    iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$iso_package" -a -s "$iso_dir/../.pkgrelease" ; then
+			    iso_package=`cat $iso_dir/../.pkgrelease`
+			fi
+			if test -z "$iso_package" -a -s "$iso_dir/../../.pkgrelease" ; then
+			    iso_package=`cat $iso_dir/../../.pkgrelease`
+			fi
+			if test -z "$iso_patchlevel" -a -s "$iso_dir/../.pkgpatchlevel" ; then
+			    iso_patchlevel=`cat $iso_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$iso_patchlevel" -a -s "$iso_dir/../../.pkgpatchlevel" ; then
+			    iso_patchlevel=`cat $iso_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$iso_version" -a -n "$iso_package" ; then
+			    iso_version="$iso_version.$iso_package${iso_patchlevel:+.$iso_patchlevel}"
+			else
+			    iso_version=
+			fi
 		    fi
 		    if test -z "$iso_release" -a -s "$iso_dir/../.rpmrelease" ; then
 			iso_release=`cat $iso_dir/../.rpmrelease`
@@ -461,8 +475,8 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test -n "$iso_epoch" -a -n "$iso_version" -a -n "$iso_package" -a -n "$iso_release" ; then
-		iso_cv_version="$iso_epoch:$iso_version.$iso_package-$iso_release"
+	    if test -n "$iso_epoch" -a -n "$iso_version" -a -n "$iso_release" ; then
+		iso_cv_version="$iso_epoch:$iso_version-$iso_release"
 	    fi
 	fi
     ])
@@ -610,6 +624,18 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.24  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
+# Revision 0.9.2.23  2008-09-28 18:42:57  brian
+# - corrections
+#
+# Revision 0.9.2.22  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
+# Revision 0.9.2.21  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.20  2008/05/03 16:54:40  brian
 # - updates for libosi
 #

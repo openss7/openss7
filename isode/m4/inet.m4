@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.46 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.50 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -412,6 +412,7 @@ dnl		    this will just not be set
 	    inet_version=
 	    inet_package=
 	    inet_release=
+	    inet_patchlevel=
 	    if test -n "$inet_cv_includes" ; then
 		for inet_dir in $inet_cv_includes ; do
 		    if test -z "$inet_epoch" -a -s "$inet_dir/../.rpmepoch" ; then
@@ -426,17 +427,30 @@ dnl		    this will just not be set
 		    if test -z "$inet_version" -a -s "$inet_dir/../../.version" ; then
 			inet_version=`cat $inet_dir/../../.version`
 		    fi
-		    if test -z "$inet_version" -a -s "$inet_dir/../configure" ; then
-			inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$inet_version" -a -s "$inet_dir/../../configure" ; then
-			inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$inet_package" -a -s "$inet_dir/../.pkgrelease" ; then
-			inet_package=`cat $inet_dir/../.pkgrelease`
-		    fi
-		    if test -z "$inet_package" -a -s "$inet_dir/../../.pkgrelease" ; then
-			inet_package=`cat $inet_dir/../../.pkgrelease`
+		    if test -z "$inet_version" ; then
+			if test -z "$inet_version" -a -s "$inet_dir/../configure" ; then
+			    inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$inet_version" -a -s "$inet_dir/../../configure" ; then
+			    inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$inet_package" -a -s "$inet_dir/../.pkgrelease" ; then
+			    inet_package=`cat $inet_dir/../.pkgrelease`
+			fi
+			if test -z "$inet_package" -a -s "$inet_dir/../../.pkgrelease" ; then
+			    inet_package=`cat $inet_dir/../../.pkgrelease`
+			fi
+			if test -z "$inet_patchlevel" -a -s "$inet_dir/../.pkgpatchlevel" ; then
+			    inet_patchlevel=`cat $inet_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$inet_patchlevel" -a -s "$inet_dir/../../.pkgpatchlevel" ; then
+			    inet_patchlevel=`cat $inet_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$inet_version" -a -n "$inet_package" ; then
+			    inet_version="$inet_version.$inet_package${inet_patchlevel:+.$inet_patchlevel}"
+			else
+			    inet_version=
+			fi
 		    fi
 		    if test -z "$inet_release" -a -s "$inet_dir/../.rpmrelease" ; then
 			inet_release=`cat $inet_dir/../.rpmrelease`
@@ -446,8 +460,8 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test -n "$inet_epoch" -a -n "$inet_version" -a -n "$inet_package" -a -n "$inet_release" ; then
-		inet_cv_version="$inet_epoch:$inet_version.$inet_package-$inet_release"
+	    if test -n "$inet_epoch" -a -n "$inet_version" -a -n "$inet_release" ; then
+		inet_cv_version="$inet_epoch:$inet_version-$inet_release"
 	    fi
 	fi
     ])
@@ -595,6 +609,18 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.50  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
+# Revision 0.9.2.49  2008-09-28 18:42:57  brian
+# - corrections
+#
+# Revision 0.9.2.48  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
+# Revision 0.9.2.47  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.46  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

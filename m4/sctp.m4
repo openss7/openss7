@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-09-28 18:42:57 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -447,10 +447,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$sctp_version" ; then
 			if test -z "$sctp_version" -a -s "$sctp_dir/../configure" ; then
-			    sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sctp_version" -a -s "$sctp_dir/../../configure" ; then
-			    sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sctp_package" -a -s "$sctp_dir/../.pkgrelease" ; then
 			    sctp_package=`cat $sctp_dir/../.pkgrelease`
@@ -637,6 +637,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.49  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
 # Revision 0.9.2.48  2008-09-28 18:42:57  brian
 # - corrections
 #

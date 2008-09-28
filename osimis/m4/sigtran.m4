@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.16 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.20 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -390,6 +390,7 @@ dnl		    this will just not be set
 	    sigtran_version=
 	    sigtran_package=
 	    sigtran_release=
+	    sigtran_patchlevel=
 	    if test -n "$sigtran_cv_includes" ; then
 		for sigtran_dir in $sigtran_cv_includes ; do
 		    if test -z "$sigtran_epoch" -a -s "$sigtran_dir/../.rpmepoch" ; then
@@ -404,17 +405,30 @@ dnl		    this will just not be set
 		    if test -z "$sigtran_version" -a -s "$sigtran_dir/../../.version" ; then
 			sigtran_version=`cat $sigtran_dir/../../.version`
 		    fi
-		    if test -z "$sigtran_version" -a -s "$sigtran_dir/../configure" ; then
-			sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$sigtran_version" -a -s "$sigtran_dir/../../configure" ; then
-			sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$sigtran_package" -a -s "$sigtran_dir/../.pkgrelease" ; then
-			sigtran_package=`cat $sigtran_dir/../.pkgrelease`
-		    fi
-		    if test -z "$sigtran_package" -a -s "$sigtran_dir/../../.pkgrelease" ; then
-			sigtran_package=`cat $sigtran_dir/../../.pkgrelease`
+		    if test -z "$sigtran_version" ; then
+			if test -z "$sigtran_version" -a -s "$sigtran_dir/../configure" ; then
+			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$sigtran_version" -a -s "$sigtran_dir/../../configure" ; then
+			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$sigtran_package" -a -s "$sigtran_dir/../.pkgrelease" ; then
+			    sigtran_package=`cat $sigtran_dir/../.pkgrelease`
+			fi
+			if test -z "$sigtran_package" -a -s "$sigtran_dir/../../.pkgrelease" ; then
+			    sigtran_package=`cat $sigtran_dir/../../.pkgrelease`
+			fi
+			if test -z "$sigtran_patchlevel" -a -s "$sigtran_dir/../.pkgpatchlevel" ; then
+			    sigtran_patchlevel=`cat $sigtran_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$sigtran_patchlevel" -a -s "$sigtran_dir/../../.pkgpatchlevel" ; then
+			    sigtran_patchlevel=`cat $sigtran_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$sigtran_version" -a -n "$sigtran_package" ; then
+			    sigtran_version="$sigtran_version.$sigtran_package${sigtran_patchlevel:+.$sigtran_patchlevel}"
+			else
+			    sigtran_version=
+			fi
 		    fi
 		    if test -z "$sigtran_release" -a -s "$sigtran_dir/../.rpmrelease" ; then
 			sigtran_release=`cat $sigtran_dir/../.rpmrelease`
@@ -424,8 +438,8 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test -n "$sigtran_epoch" -a -n "$sigtran_version" -a -n "$sigtran_package" -a -n "$sigtran_release" ; then
-		sigtran_cv_version="$sigtran_epoch:$sigtran_version.$sigtran_package-$sigtran_release"
+	    if test -n "$sigtran_epoch" -a -n "$sigtran_version" -a -n "$sigtran_release" ; then
+		sigtran_cv_version="$sigtran_epoch:$sigtran_version-$sigtran_release"
 	    fi
 	fi
     ])
@@ -573,6 +587,18 @@ AC_DEFUN([_SIGTRAN_], [dnl
 # =============================================================================
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.20  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
+# Revision 0.9.2.19  2008-09-28 18:42:57  brian
+# - corrections
+#
+# Revision 0.9.2.18  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
+# Revision 0.9.2.17  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.16  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

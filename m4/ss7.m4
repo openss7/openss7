@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-28 18:42:57 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -413,10 +413,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$ss7_version" ; then
 			if test -z "$ss7_version" -a -s "$ss7_dir/../configure" ; then
-			    ss7_version=`grep -m 1 '^PACKAGE_VERSION=' $ss7_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    ss7_version=`grep -m 1 '^PACKAGE_VERSION=' $ss7_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$ss7_version" -a -s "$ss7_dir/../../configure" ; then
-			    ss7_version=`grep -m 1 '^PACKAGE_VERSION=' $ss7_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    ss7_version=`grep -m 1 '^PACKAGE_VERSION=' $ss7_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$ss7_package" -a -s "$ss7_dir/../.pkgrelease" ; then
 			    ss7_package=`cat $ss7_dir/../.pkgrelease`
@@ -593,6 +593,9 @@ AC_DEFUN([_SS7_], [dnl
 # =============================================================================
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.27  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
 # Revision 0.9.2.26  2008-09-28 18:42:57  brian
 # - corrections
 #

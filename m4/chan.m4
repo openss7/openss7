@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-28 18:42:57 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -402,10 +402,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$chan_version" ; then
 			if test -z "$chan_version" -a -s "$chan_dir/../configure" ; then
-			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$chan_version" -a -s "$chan_dir/../../configure" ; then
-			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$chan_package" -a -s "$chan_dir/../.pkgrelease" ; then
 			    chan_package=`cat $chan_dir/../.pkgrelease`
@@ -582,6 +582,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.22  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
 # Revision 0.9.2.21  2008-09-28 18:42:57  brian
 # - corrections
 #
