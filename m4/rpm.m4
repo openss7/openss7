@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-09-28 05:52:34 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-09-28 06:50:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 05:52:34 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 06:50:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -638,11 +638,11 @@ dnl
 # _RPM_SPEC_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
     AC_CONFIG_FILES([scripts/speccommon])
     speccommon="scripts/speccommon"
     AC_SUBST_FILE([speccommon])
+    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
+    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
     if test ":${enable_public:-yes}" != :yes ; then
 	PACKAGE="${PACKAGE_TARNAME}"
 	VERSION="bin-${PACKAGE_VERSION}.${PACKAGE_RELEASE}${PACKAGE_PATCHLEVEL}"
@@ -663,6 +663,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.82  2008-09-28 06:50:23  brian
+# - change order of spec files
+#
 # Revision 0.9.2.81  2008-09-28 05:52:34  brian
 # - add subsitution of common spec file
 #
