@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.37 $) $Date: 2008-09-28 16:50:56 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.38 $) $Date: 2008-09-28 17:48:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 16:50:56 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -431,7 +431,7 @@ dnl		    this will just not be set
 		strcomp_cv_version=`grep '#define.*\<STRCOMPAT_VERSION\>' $strcomp_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	    fi
 	fi
-	if test -z "$strcomp_version" ; then
+	if test -z "$strcomp_cv_version" ; then
 	    strcomp_epoch=
 	    strcomp_version=
 	    strcomp_package=
@@ -451,23 +451,30 @@ dnl		    this will just not be set
 		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../../.version" ; then
 			strcomp_version=`cat $strcomp_dir/../../.version`
 		    fi
-		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../configure" ; then
-			strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$strcomp_version" -a -s "$strcomp_dir/../../configure" ; then
-			strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$strcomp_package" -a -s "$strcomp_dir/../.pkgrelease" ; then
-			strcomp_package=`cat $strcomp_dir/../.pkgrelease`
-		    fi
-		    if test -z "$strcomp_package" -a -s "$strcomp_dir/../../.pkgrelease" ; then
-			strcomp_package=`cat $strcomp_dir/../../.pkgrelease`
-		    fi
-		    if test -z "$strcomp_patchlevel" -a -s "$strcomp_dir/../.pkgpatchlevel" ; then
-			strcomp_patchlevel=`cat $strcomp_dir/../.pkgpatchlevel`
-		    fi
-		    if test -z "$strcomp_patchlevel" -a -s "$strcomp_dir/../../.pkgpatchlevel" ; then
-			strcomp_patchlevel=`cat $strcomp_dir/../../.pkgpatchlevel`
+		    if test -z "$strcomp_version" ; then
+			if test -z "$strcomp_version" -a -s "$strcomp_dir/../configure" ; then
+			    strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			fi
+			if test -z "$strcomp_version" -a -s "$strcomp_dir/../../configure" ; then
+			    strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			fi
+			if test -z "$strcomp_package" -a -s "$strcomp_dir/../.pkgrelease" ; then
+			    strcomp_package=`cat $strcomp_dir/../.pkgrelease`
+			fi
+			if test -z "$strcomp_package" -a -s "$strcomp_dir/../../.pkgrelease" ; then
+			    strcomp_package=`cat $strcomp_dir/../../.pkgrelease`
+			fi
+			if test -z "$strcomp_patchlevel" -a -s "$strcomp_dir/../.pkgpatchlevel" ; then
+			    strcomp_patchlevel=`cat $strcomp_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$strcomp_patchlevel" -a -s "$strcomp_dir/../../.pkgpatchlevel" ; then
+			    strcomp_patchlevel=`cat $strcomp_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$strcomp_version" -a -n "$strcomp_package" ; then
+			    strcomp_version="$strcomp_version.$strcomp_package${strcomp_patchlevel:+.$strcomp_patchlevel}"
+			else
+			    strcomp_version=
+			fi
 		    fi
 		    if test -z "$strcomp_release" -a -s "$strcomp_dir/../.rpmrelease" ; then
 			strcomp_release=`cat $strcomp_dir/../.rpmrelease`
@@ -475,10 +482,13 @@ dnl		    this will just not be set
 		    if test -z "$strcomp_release" -a -s "$strcomp_dir/../../.rpmrelease" ; then
 			strcomp_release=`cat $strcomp_dir/../../.rpmrelease`
 		    fi
+		    if test -z "$strcomp_release" ; then
+			strcomp_release="1"
+		    fi
 		done
 	    fi
-	    if test -n "$strcomp_epoch" -a -n "$strcomp_version" -a -n "$strcomp_package" -a -n "$strcomp_release" ; then
-		strcomp_cv_version="$strcomp_epoch:$strcomp_version.$strcomp_package${strcomp_patchlevel:+.$strcomp_patchlevel}-$strcomp_release"
+	    if test -n "$strcomp_epoch" -a -n "$strcomp_version" -a -n "$strcomp_release" ; then
+		strcomp_cv_version="$strcomp_epoch:$strcomp_version-$strcomp_release"
 	    fi
 	fi
     ])
@@ -636,6 +646,9 @@ AC_DEFUN([_STRCOMP_], [dnl
 # =============================================================================
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.38  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
 # Revision 0.9.2.37  2008-09-28 16:50:56  brian
 # - parsing correction and addition of patchlevel
 #

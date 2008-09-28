@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-28 16:50:56 $
+# @(#) $RCSfile: nsl.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-28 17:48:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 16:50:56 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -469,23 +469,30 @@ dnl		    this will just not be set
 		    if test -z "$nsl_version" -a -s "$nsl_dir/../../.version" ; then
 			nsl_version=`cat $nsl_dir/../../.version`
 		    fi
-		    if test -z "$nsl_version" -a -s "$nsl_dir/../configure" ; then
-			nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$nsl_version" -a -s "$nsl_dir/../../configure" ; then
-			nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$nsl_package" -a -s "$nsl_dir/../.pkgrelease" ; then
-			nsl_package=`cat $nsl_dir/../.pkgrelease`
-		    fi
-		    if test -z "$nsl_package" -a -s "$nsl_dir/../../.pkgrelease" ; then
-			nsl_package=`cat $nsl_dir/../../.pkgrelease`
-		    fi
-		    if test -z "$nsl_patchlevel" -a -s "$nsl_dir/../.pkgpatchlevel" ; then
-			nsl_patchlevel=`cat $nsl_dir/../.pkgpatchlevel`
-		    fi
-		    if test -z "$nsl_patchlevel" -a -s "$nsl_dir/../../.pkgpatchlevel" ; then
-			nsl_patchlevel=`cat $nsl_dir/../../.pkgpatchlevel`
+		    if test -z "$nsl_version" ; then
+			if test -z "$nsl_version" -a -s "$nsl_dir/../configure" ; then
+			    nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			fi
+			if test -z "$nsl_version" -a -s "$nsl_dir/../../configure" ; then
+			    nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			fi
+			if test -z "$nsl_package" -a -s "$nsl_dir/../.pkgrelease" ; then
+			    nsl_package=`cat $nsl_dir/../.pkgrelease`
+			fi
+			if test -z "$nsl_package" -a -s "$nsl_dir/../../.pkgrelease" ; then
+			    nsl_package=`cat $nsl_dir/../../.pkgrelease`
+			fi
+			if test -z "$nsl_patchlevel" -a -s "$nsl_dir/../.pkgpatchlevel" ; then
+			    nsl_patchlevel=`cat $nsl_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$nsl_patchlevel" -a -s "$nsl_dir/../../.pkgpatchlevel" ; then
+			    nsl_patchlevel=`cat $nsl_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$nsl_version" -a -n "$nsl_package" ; then
+			    nsl_version="$nsl_version.$nsl_package${nsl_patchlevel:+.$nsl_patchlevel}"
+			else
+			    nsl_version=
+			fi
 		    fi
 		    if test -z "$nsl_release" -a -s "$nsl_dir/../.rpmrelease" ; then
 			nsl_release=`cat $nsl_dir/../.rpmrelease`
@@ -493,10 +500,13 @@ dnl		    this will just not be set
 		    if test -z "$nsl_release" -a -s "$nsl_dir/../../.rpmrelease" ; then
 			nsl_release=`cat $nsl_dir/../../.rpmrelease`
 		    fi
+		    if test -z "$nsl_release" ; then
+			nsl_release="1"
+		    fi
 		done
 	    fi
-	    if test -n "$nsl_epoch" -a -n "$nsl_version" -a -n "$nsl_package" -a -n "$nsl_release" ; then
-		nsl_cv_version="$nsl_epoch:$nsl_version.$nsl_package${nsl_patchlevel:+.$nsl_patchlevel}-$nsl_release"
+	    if test -n "$nsl_epoch" -a -n "$nsl_version" -a -n "$nsl_release" ; then
+		nsl_cv_version="$nsl_epoch:$nsl_version-$nsl_release"
 	    fi
 	fi
     ])
@@ -644,6 +654,9 @@ AC_DEFUN([_NSL_], [dnl
 # =============================================================================
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.26  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
 # Revision 0.9.2.25  2008-09-28 16:50:56  brian
 # - parsing correction and addition of patchlevel
 #

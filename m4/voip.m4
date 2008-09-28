@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-28 16:50:56 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-28 17:48:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 16:50:56 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 17:48:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -407,23 +407,30 @@ dnl		    this will just not be set
 		    if test -z "$voip_version" -a -s "$voip_dir/../../.version" ; then
 			voip_version=`cat $voip_dir/../../.version`
 		    fi
-		    if test -z "$voip_version" -a -s "$voip_dir/../configure" ; then
-			voip_version=`grep -m 1 '^PACKAGE_VERSION=' $voip_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$voip_version" -a -s "$voip_dir/../../configure" ; then
-			voip_version=`grep -m 1 '^PACKAGE_VERSION=' $voip_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$voip_package" -a -s "$voip_dir/../.pkgrelease" ; then
-			voip_package=`cat $voip_dir/../.pkgrelease`
-		    fi
-		    if test -z "$voip_package" -a -s "$voip_dir/../../.pkgrelease" ; then
-			voip_package=`cat $voip_dir/../../.pkgrelease`
-		    fi
-		    if test -z "$voip_patchlevel" -a -s "$voip_dir/../.pkgpatchlevel" ; then
-			voip_patchlevel=`cat $voip_dir/../.pkgpatchlevel`
-		    fi
-		    if test -z "$voip_patchlevel" -a -s "$voip_dir/../../.pkgpatchlevel" ; then
-			voip_patchlevel=`cat $voip_dir/../../.pkgpatchlevel`
+		    if test -z "$voip_version" ; then
+			if test -z "$voip_version" -a -s "$voip_dir/../configure" ; then
+			    voip_version=`grep -m 1 '^PACKAGE_VERSION=' $voip_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			fi
+			if test -z "$voip_version" -a -s "$voip_dir/../../configure" ; then
+			    voip_version=`grep -m 1 '^PACKAGE_VERSION=' $voip_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			fi
+			if test -z "$voip_package" -a -s "$voip_dir/../.pkgrelease" ; then
+			    voip_package=`cat $voip_dir/../.pkgrelease`
+			fi
+			if test -z "$voip_package" -a -s "$voip_dir/../../.pkgrelease" ; then
+			    voip_package=`cat $voip_dir/../../.pkgrelease`
+			fi
+			if test -z "$voip_patchlevel" -a -s "$voip_dir/../.pkgpatchlevel" ; then
+			    voip_patchlevel=`cat $voip_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$voip_patchlevel" -a -s "$voip_dir/../../.pkgpatchlevel" ; then
+			    voip_patchlevel=`cat $voip_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$voip_version" -a -n "$voip_package" ; then
+			    voip_version="$voip_version.$voip_package${voip_patchlevel:+.$voip_patchlevel}"
+			else
+			    voip_version=
+			fi
 		    fi
 		    if test -z "$voip_release" -a -s "$voip_dir/../.rpmrelease" ; then
 			voip_release=`cat $voip_dir/../.rpmrelease`
@@ -431,10 +438,13 @@ dnl		    this will just not be set
 		    if test -z "$voip_release" -a -s "$voip_dir/../../.rpmrelease" ; then
 			voip_release=`cat $voip_dir/../../.rpmrelease`
 		    fi
+		    if test -z "$voip_release" ; then
+			voip_release="1"
+		    fi
 		done
 	    fi
-	    if test -n "$voip_epoch" -a -n "$voip_version" -a -n "$voip_package" -a -n "$voip_release" ; then
-		voip_cv_version="$voip_epoch:$voip_version.$voip_package${voip_patchlevel:+.$voip_patchlevel}-$voip_release"
+	    if test -n "$voip_epoch" -a -n "$voip_version" -a -n "$voip_release" ; then
+		voip_cv_version="$voip_epoch:$voip_version-$voip_release"
 	    fi
 	fi
     ])
@@ -582,6 +592,9 @@ AC_DEFUN([_VOIP_], [dnl
 # =============================================================================
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.18  2008-09-28 17:48:30  brian
+# - more version number corrections
+#
 # Revision 0.9.2.17  2008-09-28 16:50:56  brian
 # - parsing correction and addition of patchlevel
 #

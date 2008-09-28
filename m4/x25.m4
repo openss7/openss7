@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: x25.m4,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-09-28 16:50:56 $
+# @(#) $RCSfile: x25.m4,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-09-28 17:48:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 16:50:56 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 17:48:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -442,23 +442,30 @@ dnl		    this will just not be set
 		    if test -z "$x25_version" -a -s "$x25_dir/../../.version" ; then
 			x25_version=`cat $x25_dir/../../.version`
 		    fi
-		    if test -z "$x25_version" -a -s "$x25_dir/../configure" ; then
-			x25_version=`grep -m 1 '^PACKAGE_VERSION=' $x25_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$x25_version" -a -s "$x25_dir/../../configure" ; then
-			x25_version=`grep -m 1 '^PACKAGE_VERSION=' $x25_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$x25_package" -a -s "$x25_dir/../.pkgrelease" ; then
-			x25_package=`cat $x25_dir/../.pkgrelease`
-		    fi
-		    if test -z "$x25_package" -a -s "$x25_dir/../../.pkgrelease" ; then
-			x25_package=`cat $x25_dir/../../.pkgrelease`
-		    fi
-		    if test -z "$x25_patchlevel" -a -s "$x25_dir/../.pkgpatchlevel" ; then
-			x25_patchlevel=`cat $x25_dir/../.pkgpatchlevel`
-		    fi
-		    if test -z "$x25_patchlevel" -a -s "$x25_dir/../../.pkgpatchlevel" ; then
-			x25_patchlevel=`cat $x25_dir/../../.pkgpatchlevel`
+		    if test -z "$x25_version" ; then
+			if test -z "$x25_version" -a -s "$x25_dir/../configure" ; then
+			    x25_version=`grep -m 1 '^PACKAGE_VERSION=' $x25_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			fi
+			if test -z "$x25_version" -a -s "$x25_dir/../../configure" ; then
+			    x25_version=`grep -m 1 '^PACKAGE_VERSION=' $x25_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			fi
+			if test -z "$x25_package" -a -s "$x25_dir/../.pkgrelease" ; then
+			    x25_package=`cat $x25_dir/../.pkgrelease`
+			fi
+			if test -z "$x25_package" -a -s "$x25_dir/../../.pkgrelease" ; then
+			    x25_package=`cat $x25_dir/../../.pkgrelease`
+			fi
+			if test -z "$x25_patchlevel" -a -s "$x25_dir/../.pkgpatchlevel" ; then
+			    x25_patchlevel=`cat $x25_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$x25_patchlevel" -a -s "$x25_dir/../../.pkgpatchlevel" ; then
+			    x25_patchlevel=`cat $x25_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$x25_version" -a -n "$x25_package" ; then
+			    x25_version="$x25_version.$x25_package${x25_patchlevel:+.$x25_patchlevel}"
+			else
+			    x25_version=
+			fi
 		    fi
 		    if test -z "$x25_release" -a -s "$x25_dir/../.rpmrelease" ; then
 			x25_release=`cat $x25_dir/../.rpmrelease`
@@ -466,10 +473,13 @@ dnl		    this will just not be set
 		    if test -z "$x25_release" -a -s "$x25_dir/../../.rpmrelease" ; then
 			x25_release=`cat $x25_dir/../../.rpmrelease`
 		    fi
+		    if test -z "$x25_release" ; then
+			x25_release="1"
+		    fi
 		done
 	    fi
-	    if test -n "$x25_epoch" -a -n "$x25_version" -a -n "$x25_package" -a -n "$x25_release" ; then
-		x25_cv_version="$x25_epoch:$x25_version.$x25_package${x25_patchlevel:+.$x25_patchlevel}-$x25_release"
+	    if test -n "$x25_epoch" -a -n "$x25_version" -a -n "$x25_release" ; then
+		x25_cv_version="$x25_epoch:$x25_version-$x25_release"
 	    fi
 	fi
     ])
@@ -617,6 +627,9 @@ AC_DEFUN([_X25_], [dnl
 # =============================================================================
 #
 # $Log: x25.m4,v $
+# Revision 0.9.2.7  2008-09-28 17:48:30  brian
+# - more version number corrections
+#
 # Revision 0.9.2.6  2008-09-28 16:50:56  brian
 # - parsing correction and addition of patchlevel
 #
