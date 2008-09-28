@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-09-28 16:50:56 $
+# @(#) $RCSfile: sock.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-28 17:48:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 16:50:56 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 17:48:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -458,23 +458,30 @@ dnl		    this will just not be set
 		    if test -z "$sock_version" -a -s "$sock_dir/../../.version" ; then
 			sock_version=`cat $sock_dir/../../.version`
 		    fi
-		    if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
-			sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
-			sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
-			sock_package=`cat $sock_dir/../.pkgrelease`
-		    fi
-		    if test -z "$sock_package" -a -s "$sock_dir/../../.pkgrelease" ; then
-			sock_package=`cat $sock_dir/../../.pkgrelease`
-		    fi
-		    if test -z "$sock_patchlevel" -a -s "$sock_dir/../.pkgpatchlevel" ; then
-			sock_patchlevel=`cat $sock_dir/../.pkgpatchlevel`
-		    fi
-		    if test -z "$sock_patchlevel" -a -s "$sock_dir/../../.pkgpatchlevel" ; then
-			sock_patchlevel=`cat $sock_dir/../../.pkgpatchlevel`
+		    if test -z "$sock_version" ; then
+			if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
+			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			fi
+			if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
+			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
+			fi
+			if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
+			    sock_package=`cat $sock_dir/../.pkgrelease`
+			fi
+			if test -z "$sock_package" -a -s "$sock_dir/../../.pkgrelease" ; then
+			    sock_package=`cat $sock_dir/../../.pkgrelease`
+			fi
+			if test -z "$sock_patchlevel" -a -s "$sock_dir/../.pkgpatchlevel" ; then
+			    sock_patchlevel=`cat $sock_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$sock_patchlevel" -a -s "$sock_dir/../../.pkgpatchlevel" ; then
+			    sock_patchlevel=`cat $sock_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$sock_version" -a -n "$sock_package" ; then
+			    sock_version="$sock_version.$sock_package${sock_patchlevel:+.$sock_patchlevel}"
+			else
+			    sock_version=
+			fi
 		    fi
 		    if test -z "$sock_release" -a -s "$sock_dir/../.rpmrelease" ; then
 			sock_release=`cat $sock_dir/../.rpmrelease`
@@ -482,10 +489,13 @@ dnl		    this will just not be set
 		    if test -z "$sock_release" -a -s "$sock_dir/../../.rpmrelease" ; then
 			sock_release=`cat $sock_dir/../../.rpmrelease`
 		    fi
+		    if test -z "$sock_release" ; then
+			sock_release="1"
+		    fi
 		done
 	    fi
-	    if test -n "$sock_epoch" -a -n "$sock_version" -a -n "$sock_package" -a -n "$sock_release" ; then
-		sock_cv_version="$sock_epoch:$sock_version.$sock_package${sock_patchlevel:+.$sock_patchlevel}-$sock_release"
+	    if test -n "$sock_epoch" -a -n "$sock_version" -a -n "$sock_release" ; then
+		sock_cv_version="$sock_epoch:$sock_version-$sock_release"
 	    fi
 	fi
     ])
@@ -633,6 +643,9 @@ AC_DEFUN([_SOCK_], [dnl
 # =============================================================================
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.27  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
 # Revision 0.9.2.26  2008-09-28 16:50:56  brian
 # - parsing correction and addition of patchlevel
 #
