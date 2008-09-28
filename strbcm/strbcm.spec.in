@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strbcm.spec.in,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-09-27 06:49:15 $
+# @(#) $RCSfile: strbcm.spec.in,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2008-09-28 03:46:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-27 06:49:15 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 03:46:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -204,6 +204,7 @@
 #global locales     %{nil}
 %global tools       %{base}_mknod
 %global infofiles   %{base}
+#global pngfiles    *.png
 %global initfiles   %{base}
 %global conffiles   %{name}.conf
 %global testfiles   *test*
@@ -237,6 +238,7 @@
 %global HAVE_locales        %{?locales:     1}%{!?locales:     0}
 %global HAVE_tools          %{?tools:       1}%{!?tools:       0}
 %global HAVE_infofiles      %{?infofiles:   1}%{!?infofiles:   0}
+%global HAVE_pngfiles       %{?pngfiles:    1}%{!?pngfiles:    0}
 %global HAVE_initscripts    %{?initfiles:   1}%{!?initfiles:   0}
 %global HAVE_configfiles    %{?conffiles:   1}%{!?conffiles:   0}
 %global HAVE_testfiles      %{?testfiles:   1}%{!?testfiles:   0}
@@ -313,6 +315,9 @@
 %global FILES_locales       %{HAVE_locales}
 %global FILES_tools         %{HAVE_tools}
 %global FILES_infofiles     %{HAVE_infofiles}
+%global FILES_pdffiles      %{HAVE_infofiles}
+%global FILES_htmlfiles     %{HAVE_infofiles}
+%global FILES_pngfiles      %{HAVE_pngfiles}
 %global FILES_initscripts   %{HAVE_initscripts}
 %global FILES_configfiles   %{HAVE_configfiles}
 %global FILES_testfiles     %{HAVE_testfiles}
@@ -337,9 +342,30 @@
 %global FILES_docfiles      %{HAVE_docfiles}
 %global FILES_includes      %{HAVE_includes}
 
+%if %{FILES_manual}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_specs}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_drafts}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_papers}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_projects}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+
 # define new autoconf 2.60, 2.61 stuff
 %{!?_datarootdir:       %{expand: %%global _datarootdir     %%{_datadir}}}
-%{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc}}
+%{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc/@PACKAGE@-@VERSION@}}
 %{!?_htmldir:           %{expand: %%global _htmldir         %%{_docdir}}}
 %{!?_dvidir:            %{expand: %%global _dvidir          %%{_docdir}}}
 %{!?_pdfdir:            %{expand: %%global _pdfdir          %%{_docdir}}}
@@ -391,8 +417,8 @@
 %global infoname() %1%_strextra-devel-%_kversion%{nil}
 %global coreconf() %1%_strother-%_kversion%{nil}
 %global infoconf() %1%_strother-devel-%_kversion%{nil}
-%global coreroot() %1-STREAMS%{nil}
-%global inforoot() %1-STREAMS-devel%{nil}
+%global coreroot() %1-%virtual%{nil}
+%global inforoot() %1-%virtual-devel%{nil}
 %global kmodules_version @VERSION@
 
 %if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
@@ -400,8 +426,8 @@
 %global infoname() openss7-%1%_strextra-kmp%kernel_flavor-devel%{nil}
 %global coreconf() openss7-%1%_strother-kmp%kernel_flavor%{nil}
 %global infoconf() openss7-%1%_strother-kmp%kernel_flavor-devel%{nil}
-%global coreroot() openss7-%1-STREAMS-kmp%{nil}
-%global inforoot() openss7-%1-STREAMS-kmp-devel%{nil}
+%global coreroot() openss7-%1-%virtual-kmp%{nil}
+%global inforoot() openss7-%1-%virtual-kmp-devel%{nil}
 %global kmodules_version @VERSION@_%kernel_string
 %endif
 
@@ -410,8 +436,8 @@
 %global infoname() kmod-%1%_strextra%kernel_flavor-devel%{nil}
 %global coreconf() kmod-%1%_strother%kernel_flavor%{nil}
 %global infoconf() kmod-%1%_strother%kernel_flavor-devel%{nil}
-%global coreroot() kmod-%1-STREAMS%{nil}
-%global inforoot() kmod-%1-STREAMS-devel%{nil}
+%global coreroot() kmod-%1-%virtual%{nil}
+%global inforoot() kmod-%1-%virtual-devel%{nil}
 %global kmodules_version @VERSION@.%kernel_release
 %endif
 
@@ -447,6 +473,9 @@
 %global FILES_papers        0
 %global FILES_projects      0
 %global FILES_infofiles     0
+%global FILES_pdffiles      0
+%global FILES_htmlfiles     0
+%global FILES_pngfiles      0
 %global FILES_manrefs       0
 %global FILES_manmacros     0
 %global FILES_manpages      0
@@ -475,6 +504,9 @@
 %else
 #global PACKAGE_base        0
 %global FILES_infofiles     0
+%global FILES_pdffiles      0
+%global FILES_htmlfiles     0
+%global FILES_pngfiles      0
 %global FILES_initscripts   0
 %global FILES_configfiles   0
 %global FILES_mibfiles      0
@@ -626,6 +658,42 @@
 %if %{FILES_testscripts}
 %global WANT_base       1
 %endif
+%if %{FILES_manual}
+%global WANT_base       1
+%endif
+%if %{FILES_specs}
+%global WANT_base       1
+%endif
+%if %{FILES_drafts}
+%global WANT_base       1
+%endif
+%if %{FILES_papers}
+%global WANT_base       1
+%endif
+%if %{FILES_projects}
+%global WANT_base       1
+%endif
+%if %{FILES_infofiles}
+%global WANT_base       1
+%endif
+%if %{FILES_pdffiles}
+%global WANT_base       1
+%endif
+%if %{FILES_htmlfiles}
+%global WANT_base       1
+%endif
+%if %{FILES_pngfiles}
+%global WANT_base       1
+%endif
+%if %{FILES_manrefs}
+%global WANT_base       1
+%endif
+%if %{FILES_manmacros}
+%global WANT_base       1
+%endif
+%if %{FILES_manpages}
+%global WANT_base       1
+%endif
 
 %if %{WANT_base}
 %else
@@ -680,33 +748,6 @@
 %global WANT_devel      1
 %endif
 %if %{FILES_sourcefiles}
-%global WANT_devel      1
-%endif
-%if %{FILES_manual}
-%global WANT_devel      1
-%endif
-%if %{FILES_specs}
-%global WANT_devel      1
-%endif
-%if %{FILES_drafts}
-%global WANT_devel      1
-%endif
-%if %{FILES_papers}
-%global WANT_devel      1
-%endif
-%if %{FILES_projects}
-%global WANT_devel      1
-%endif
-%if %{FILES_infofiles}
-%global WANT_devel      1
-%endif
-%if %{FILES_manrefs}
-%global WANT_devel      1
-%endif
-%if %{FILES_manmacros}
-%global WANT_devel      1
-%endif
-%if %{FILES_manpages}
 %global WANT_devel      1
 %endif
 
@@ -790,9 +831,11 @@
 
 %if %{FILES_binfiles}
 %global files_binfiles      %{nil}
+%global files_binaries      %{nil}
 %endif
 %if %{FILES_sbinfiles}
 %global files_sbinfiles     %{nil}
+%global files_binaries      %{nil}
 %endif
 %if %{FILES_preloads}
 %global files_preloads      %{nil}
@@ -808,15 +851,19 @@
 %endif
 %if %{FILES_libraries}
 %global files_libraries     %{nil}
+%global files_binaries      %{nil}
 %endif
 %if %{FILES_libstatic}
 %global files_libstatic     %{nil}
+%global files_binaries      %{nil}
 %endif
 %if %{FILES_lib32compat}
 %global files_lib32compat   %{nil}
+%global files_binaries      %{nil}
 %endif
 %if %{FILES_lib32static}
 %global files_lib32static   %{nil}
+%global files_binaries      %{nil}
 %endif
 %if %{FILES_locales}
 %global files_locales       %{nil}
@@ -826,6 +873,15 @@
 %endif
 %if %{FILES_infofiles}
 %global files_infofiles     %{nil}
+%endif
+%if %{FILES_pdffiles}
+%global files_pdffiles      %{nil}
+%endif
+%if %{FILES_htmlfiles}
+%global files_htmlfiles     %{nil}
+%endif
+%if %{FILES_pngfiles}
+%global files_pngfiles      %{nil}
 %endif
 %if %{FILES_initscripts}
 %global files_initscripts   %{nil}
@@ -912,7 +968,7 @@
 %global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1|')}%{nil}
 %global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "= %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|>= %2|')}%{nil}
 
-%global descripline %{title} provides %{stitle} for %{_STREAMS} %{virtual} for Linux.
+%global descripline %{title} provides %{stitle} for %{_STREAMS} STREAMS.
 
 %if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
 %global descriptail %(echo -en '\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
@@ -1038,7 +1094,7 @@ Prefix:         %{_sysconfdir}}
 %{?files_mibfiles:
 Prefix:         %{_snmpmibdir}}
 %{?files_initscripts:
-Prefix:         %{_configdir}}
+Prefix:         %{_configdir}
 Prefix:         %{_initrddir}}
 %{?files_netconfig:
 Prefix:         %{_sysconfdir}/netconfig.d}
@@ -1048,8 +1104,22 @@ Prefix:         %{_sysconfdir}/sock2path.d}
 Prefix:         %{_snmpconfdir}}
 %{?files_oldmods:
 Prefix:         %{_modutildir}}
-%{?files_testfiles:
+%{?files_testscripts:
 Prefix:         %{_pkglibexecdir}}
+%{?files_docfiles:
+Prefix:         %{_docdir}}
+%{?files_infofiles:
+Prefix:         %{_infodir}}
+%{?files_pdffiles:
+Prefix:         %{_pdfdir}}
+%{?files_htmlfiles:
+Prefix:         %{_htmldir}}
+%{?files_manpages:
+Prefix:         %{_mandir}}
+
+#Prereq:         /sbin/install-info
+
+Conflicts:      texinfo < 3.11
 
 Obsoletes:      %{name}-mib
 Obsoletes:      %{name}-mibs
@@ -1058,15 +1128,17 @@ Obsoletes:      %{name}-inits
 Obsoletes:      %{name}-dev
 Obsoletes:      %{name}-devs
 Obsoletes:      %{name}-test
+Obsoletes:      %{name}-doc
+Obsoletes:      %{name}-docs
 
 %if %{USE_makedev}
 Requires:       dev >= 3.3
 %endif
 Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-STREAMS = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-%virtual = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{coreroot %name} >= @VERSION@
 %{?need_streams:
-Requires:       STREAMS}
+Requires:       %virtual}
 %{?need_compat:
 Requires:       strcompat}
 %{?need_xns:
@@ -1100,6 +1172,9 @@ Requires:       sigtran}
 Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual} = %{epoch}:%{version}-%{rpmrelease}
 
 # ---------------------------------------------------------------------------
 %description
@@ -1115,26 +1190,36 @@ but should build and install well for other architectures.
 This package includes the following binary packages:
 
  - %{name}
-   -- mibs, devices, init scripts, config files, test utils.
+   -- docs, man pages, manual, info files, devices, init
+      scripts, configs, mibs, test utils.
  - %{name}-lib
    -- shared libraries and utilities.
  - %{coreroot %name}
    -- kernel modules.
  - %{name}-devel
-   -- headers, static libraries, source, debuginfo, man pages,
-      manuals, info files.
+   -- headers, static libraries, source, debuginfo.
  - %{inforoot %name}
    -- kernel module info and debug info.
 
-The %{name} binary package provides device definitions, Sys V
-init scripts and configuration files, SNMP MIB definitions, and
-test suites.  Device definitions are necessary to run
-applications programs and utilities.  On older systems, this
-binary creates the devices themselves.  On newer systems, this
-binary package includes the executable for creating devices from
-init scripts.  Init scripts load kernel modules, create devices,
-and apply system configuration customizations at boot.  SNMP MIB
-defintions for managing the package with external SNMP
+The %{name} binary package provides documentation, device
+definitions, Sys V init scripts and configuration files, SNMP
+MIB definitions, and test suites.
+
+Documentation includes text, html, info and pdf (texinfo)
+documentation and manuals for the development of applications,
+modules and drivers, as well as the installation and reference
+manual.  Also included are extensive manual pages for the entire
+package, including manual pages for commands, administrative
+utilities, user interfaces, and kernel functions.
+
+Device definitions are necessary to run applications programs
+and utilities.  On older systems, this binary creates the
+devices themselves.  On newer systems, this binary package
+includes the executable for creating devices from init scripts.
+Init scripts load kernel modules, create devices, and apply
+system configuration customizations at boot.
+
+SNMP MIB defintions for managing the package with external SNMP
 management tools.  Autotest validation testsuites are used for
 validating and troubleshooting.  Also included is the send-pr
 script for generating and submitting problem reports to
@@ -1210,13 +1295,13 @@ fi
     --sharedstatedir=%{_sharedstatedir} \
     --mandir=%{_mandir} \
     --infodir=%{_infodir} \
-    %{?_datarootdir:--datarootdir=%{_datarootdir}} \
-    %{?_docdir:--docdir=%{_docdir}/@PACKAGE@-@VERSION@} \
-    %{?_htmldir:--htmldir=%{_htmldir}} \
-    %{?_dvidir:--dvidir=%{_dvidir}} \
-    %{?_pdfdir:--pdfdir=%{_pdfdir}} \
-    %{?_psdir:--psdir=%{_psdir}} \
-    %{?_localedir:--localedir=%{_localedir}} \
+    --datarootdir=%{_datarootdir} \
+    --docdir=%{_docdir} \
+    --htmldir=%{_htmldir} \
+    --dvidir=%{_dvidir} \
+    --pdfdir=%{_pdfdir} \
+    --psdir=%{_psdir} \
+    --localedir=%{_localedir} \
     --disable-maintainer-mode \
     --disable-dependency-tracking \
     --with-gnu-ld \
@@ -1277,6 +1362,8 @@ fi
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
+%{?files_pdffiles: make pdf}
+%{?files_htmlfiles:make html}
 make check
 
 %install
@@ -1290,7 +1377,9 @@ make check
 # shared and static libraries.
 make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
     %{!?_enable_debug_packages: install-strip} \
-    %{?_enable_debug_packages: install}
+    %{?_enable_debug_packages: install} \
+    %{?files_pdffiles: install-pdf} \
+    %{?files_htmlfiles: install-html}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -1450,6 +1539,7 @@ if [ $arg = 1 ] ; then : # fresh install
         rm -f -- $prel_new
     fi
 %endif
+%if %{HAVE_initscripts}
     # Fresh install, go looking for non-rpm initscripts and remove them.
     list="%{initfiles}" ; for i in $list ; do
         if [ -f %_initrddir/$i ] ; then
@@ -1459,6 +1549,7 @@ if [ $arg = 1 ] ; then : # fresh install
             [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
         fi
     done
+%endif
 %if %{HAVE_modules}
     # remove conflicting and dependent modules
     if [ -n "$modl_mods" ] ; then
@@ -1587,6 +1678,33 @@ if [ $1 = 1 ] ; then : # fresh install
         [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue
         [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
     done
+%endif
+%if %{HAVE_infofiles}
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+%endif
+%if %{HAVE_manpages}
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
+    fi
+%endif
+%if %{HAVE_manrefs}
+    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
+    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+%endif
+%if %{HAVE_manmacros}
+    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
+    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
 %endif
 fi
 if [ $1 = 2 ] ; then : # upgrade
@@ -1800,6 +1918,26 @@ if [ $1 = 0 ] ; then : # final removal
         fi
     done
 %endif
+%if %{HAVE_infofiles}
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+%endif
+%if %{HAVE_manrefs}
+    rm -f -- %{_mandir}/%{base}.refs
+%endif
+%if %{HAVE_manmacros}
+    rm -f -- %{_mandir}/%{base}.macros
+%endif
 fi
 if [ $1 = 1 ] ; then : # upgrade
 %if %{HAVE_oldmods}
@@ -1911,6 +2049,36 @@ b loop' $prel_new > $prel_tmp
         fi
     done
 %endif
+%if %{HAVE_infofiles}
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+%endif
+%if %{HAVE_manrefs}
+    rm -f -- %{_mandir}/%{base}.refs
+%endif
+%if %{HAVE_manmacros}
+    rm -f -- %{_mandir}/%{base}.macros
+%endif
+fi
+
+%postun
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+%if %{HAVE_manpages}
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
+    fi
+%endif
 fi
 
 %if %{PACKAGE_base}
@@ -1923,6 +2091,16 @@ fi
 %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
 %doc README README-alpha README-cvs README-make THANKS TODO
 %doc %{name}-%{version}.lsm}
+#{?files_manual:
+#doc %{manual}}
+#{?files_specs:
+#doc %{specs}}
+#{?files_drafts:
+#doc %{drafts}}
+#{?files_papers:
+#doc %{papers}}
+#{?files_projects:
+#doc %{projects}}
 %{?files_snmpconf:
 %config(noreplace) %{_snmpconfdir}/*}
 %{?files_configfiles:
@@ -1946,6 +2124,20 @@ fi
 %{_pkglibexecdir}/testsuite*
 %{_pkglibexecdir}/send-pr
 %{_pkglibexecdir}/send-pr.config}
+%{?files_pdffiles:
+%{_pdfdir}/*.pdf}
+%{?files_htmlfiles:
+%{_htmldir}/*.html}
+%{?files_pngfiles:
+%{_htmldir}/*.png}
+%{?files_infofiles:
+%{_infodir}/*.info*}
+%{?files_manrefs:
+%{_mandir}/%{base}.refs*}
+%{?files_manmacros:
+%{_mandir}/%{base}.macros*}
+%{?files_manpages:
+%{_mandir}/man*/*}
 %endif
 
 # ===========================================================================
@@ -1989,8 +2181,9 @@ Obsoletes:      %{name}-%{_streams}-utils
 
 Prereq:         /sbin/ldconfig
 
+Requires:       %{name}-%{virtual}
 %{?need_streams:
-Requires:       STREAMS-lib}
+Requires:       %virtual-lib}
 %{?need_compat:
 Requires:       strcompat-lib >= @STRCOMP_VERSION@}
 %{?need_xns:
@@ -2133,12 +2326,6 @@ Autoprov:       true
 
 %{?files_includes:
 Prefix:         %{_includedir}/%{name}}
-%{?files_docfiles:
-Prefix:         %{_docdir}}
-%{?files_infofiles:
-Prefix:         %{_infodir}}
-%{?files_manpages:
-Prefix:         %{_mandir}}
 %{?files_libstatic:
 Prefix:         %{_libdir}
 %{?files_lib32static:
@@ -2153,7 +2340,7 @@ Conflicts:      texinfo < 3.11
 Requires:       %{name} = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{inforoot %name} >= @VERSION@
 %{?need_streams:
-Requires:       STREAMS-devel}
+Requires:       %virtual-devel}
 %{?need_compat:
 Requires:       strcompat-devel >= @STRCOMP_VERSION@}
 %{?need_xns:
@@ -2203,13 +2390,7 @@ This also includes the header files and static libraries required
 to compile %{title} applications programs.
 This package provides debug information for package %{name}.
 Debug information is useful when developing applications that
-use this package or when debugging this package.  It also
-contains text, html, info and pdf (texinfo) documentation and
-manuals for the development of %{title}
-applications, modules and drivers, as well as the installation
-and reference manual.  Also included are extensive manual pages
-for the entire package, including manual pages for commands,
-administrative utilities, user interfaces, and kernel functions.
+use this package or when debugging this package.
 %{HAVE_source:
 The package optionally contains the source code necessary for
 building the %{name} release.  It also includes the autoconf
@@ -2217,91 +2398,6 @@ configuration utilities necessary to create and distribute this
 rpm.  To develop on the package, it would be better to use the
 tarball or source rpm release.}
 %{descriptail}
-
-%pre devel
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
-%if %{HAVE_manpages}
-    # Old non-rpm distro puts some man pages in the wrong place, clean them out.
-    if [ -f /usr/man/man3/fattach.3 ] ; then
-        rm -f /usr/man/man3/fattach.3 2>/dev/null
-        rm -f /usr/man/man3/detach.3 2>/dev/null
-        rm -f /usr/man/man3/isastream.3 2>/dev/null
-        rmdir -p /usr/man/man3 2>/dev/null || :
-        rm -f /usr/man/man8/fattach.8 2>/dev/null
-        rm -f /usr/man/man8/fdetach.8 2>/dev/null
-        rmdir -p /usr/man/man8 2>/dev/null || :
-        rm -f /usr/man/man9/connld.9 2>/dev/null
-        rm -f /usr/man/man9/fifo.9 2>/dev/null
-        rm -f /usr/man/man9/pipemod.9 2>/dev/null
-        rmdir -p /usr/man/man9 2>/dev/null || :
-        rmdir -p /usr/man 2>/dev/null || :
-    fi
-%endif
-fi
-
-%post devel
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
-%if %{HAVE_infofiles}
-    if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
-        for n in %{infofiles} ; do
-            if [ -f %{_infodir}/$n.info ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
-            elif [ -f %{_infodir}/$n.info.gz ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-            fi
-        done
-    fi
-%endif
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
-    fi
-%if %{HAVE_manrefs}
-    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
-    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
-%endif
-%if %{HAVE_manmacros}
-    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
-    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
-%endif
-fi
-
-%preun devel
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-%if %{HAVE_infofiles}
-    if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
-        for n in %{infofiles} ; do
-            if [ -f %{_infodir}/$n.info ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
-            elif [ -f %{_infodir}/$n.info.gz ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-            fi
-        done
-    fi
-%endif
-%if %{HAVE_manrefs}
-    rm -f -- %{_mandir}/%{base}.refs
-%endif
-%if %{HAVE_manmacros}
-    rm -f -- %{_mandir}/%{base}.macros
-%endif
-fi
-
-%postun devel
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
-    fi
-fi
 
 %if %{PACKAGE_devel}
 %files devel
@@ -2315,13 +2411,12 @@ fi
 %{?files_lib32static:
 %{_lib32dir}/*.a}}
 %{?files_debugfiles:
-%{_usrsrc}/debug}
-%{?files_debugfiles:
-%{?files_libraries:
-%{_libdir}/debug}}
-%{?files_debugfiles:
-%{?files_lib32compat:
-%{_lib32dir}/debug}}
+%{?files_binaries:
+%{_usrsrc}/debug
+%{?_lib32dir:
+%{_lib32dir}/debug}
+%{!?_lib32dir:
+%{_libdir}/debug}}}
 %{?files_sourcefiles:
 %dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}}
 %{?files_sourcefiles:
@@ -2330,24 +2425,6 @@ fi
 %{_usrsrc}/%{name}-%{version}-%{fullrelease}/*}
 %{?files_sourcefiles:
 %{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*}
-%{?files_manual:
-%doc %{manual}}
-%{?files_specs:
-%doc %{specs}}
-%{?files_drafts:
-%doc %{drafts}}
-%{?files_papers:
-%doc %{papers}}
-%{?files_projects:
-%doc %{projects}}
-%{?files_infofiles:
-%{_infodir}/*}
-%{?files_manrefs:
-%{_mandir}/%{base}.refs*}
-%{?files_manmacros:
-%{_mandir}/%{base}.macros*}
-%{?files_manpages:
-%{_mandir}/man*/*}
 %endif
 
 # ===========================================================================
@@ -2427,6 +2504,9 @@ Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_vers
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}%{_strextra}-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease}
+Provides:       %{name}%{_strextra}-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease2}
+Provides:       %{name}%{_strextra}-%{_kversion} = %{epoch}:@VERSION@-%{rpmrelease}
 
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
@@ -2756,6 +2836,9 @@ Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodule
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
+Provides:       %{name}%{_strextra}-devel-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease}
+Provides:       %{name}%{_strextra}-devel-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease2}
+Provides:       %{name}%{_strextra}-devel-%{_kversion} = %{epoch}:@VERSION@-%{rpmrelease}
 
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
@@ -2781,9 +2864,11 @@ use this package or when debugging this package.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_kdebugfiles:
-{_libdir}/debug/lib/modules/%{kernel_version}}
-%{?files_kdebugfiles:
-{_usrsrc}/debug}
+%{_usrsrc}/debug
+%{?_lib32dir:
+%{_lib32dir}/debug/lib/modules/%{kernel_version}}
+%{!?_lib32dir:
+%{_libdir}/debug/lib/modules/%{kernel_version}}}
 %{?files_oldmods:
 %dir %{_includedir}/%{name}/%{kernel_version}}
 %{?files_oldmods:
@@ -2796,9 +2881,13 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strbcm.spec.in,v $
-# Revision 0.9.2.42  2008-09-27 06:49:15  brian
-# - initial rework of spec files
+# Revision 0.9.2.43  2008-09-28 03:46:46  brian
+# - updated spec files
 #
+
+* Sat Sep 27 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.42  2008-09-27 06:49:15  brian
+- initial rework of spec files
 
 * Wed Sep 24 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.41  2008-09-24 21:02:56  brian

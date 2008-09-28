@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-09-26 08:48:05 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2008-09-28 03:46:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,47 +47,124 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-26 08:48:05 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 03:46:45 $ by $Author: brian $
 #
 # =============================================================================
 
-# default is to build kernel modules and tools
-# conditional builds of binary rpms relies on the sneaky spec trick that
-# rpmbuild will not build a binary rpm when it has no %files section
-%global BUILD_modules 1
-%global BUILD_devel   1
-%global BUILD_tools   1
-%global BUILD_libs    1
-%global BUILD_debug   1
-%global BUILD_noarch  1
-%global BUILD_arch    1
-%global BUILD_source  0
-%global BUILD_test    1
-%global BUILD_devs    1
-%global MAKE_devs     0
-%global WANT_devs     1
-%global BUILD_lis     0
-%global BUILD_lfs     0
-%global BUILD_mibs    1
-%global BUILD_snmp    1
-%global BUILD_init    0
+# Logic of macros:
+#
+# WITH_zzz:     zzz group of files will be built and installed
+#               during the build and install stages
+#
+# BUILD_xxx:    xxx would have been built and installed during
+#               the build and install stages if xxx is
+#               available and is in a group for which zzz
+#               applies.
+#
+# HAVE_xxx:     xxx is available for this package and was built
+#               and installed if BUILD_xxx is also true.
+#
+# FILES_xxx:    xxx has files that need to be packaged.  It is
+#               the logical AND of BUILD_xxx and HAVE_xxx.
+#
+# PACKAGE_yyy:  yyy is to be included in the build at this
+#               point.
 
-%global NEED_compat   1
-%global NEED_xns      1
-%global NEED_xnet     1
-%global NEED_nsl      1
-%global NEED_sock     1
-%global NEED_inet     1
-%global NEED_sctp     1
-%global NEED_chan     1
-#global NEED_x25      0
-%global NEED_iso      1
-%global NEED_isdn     1
-#global NEED_ss7      0
-#global NEED_sigtran  0
+%global NEED_streams    1
+%global NEED_compat     1
+%global NEED_xns        1
+%global NEED_xnet       1
+%global NEED_nsl        1
+%global NEED_sock       1
+%global NEED_inet       1
+%global NEED_sctp       1
+%global NEED_chan       1
+%global NEED_x25        0
+%global NEED_iso        1
+%global NEED_isdn       1
+%global NEED_ss7        0
+%global NEED_sigtran    0
+
+%global PACKAGE_base    1
+%global PACKAGE_lib     1
+%global PACKAGE_devel   1
+%global PACKAGE_kmod    1
+%global PACKAGE_kbug    1
+
+%{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
+
+# These are the defaults for the WITH_zzz macros.  These
+# defaults can be changed by passing --with-zzz or --without-zzz
+# to the rpmbuild command.  The default is to build everything
+# for LFS but source.
+%global WITH_modules    1
+%global WITH_devel      1
+%global WITH_tools      1
+%global WITH_noarch     1
+%global WITH_arch       1
+%global WITH_source     0
+%global WITH_snmp       1
+%global WITH_mibs       1
+%global WITH_docs       1
+%global WITH_manrefs    1
+%global WITH_manmacros  1
+%global WITH_lfs        1
+%global WITH_lis        0
+%global WITH_debug      %{_enable_debug_packages}
+
+# Because we only need to build the tools binaries once for each
+# architecture, but need to build the modules binaries once for
+# each architecture and kernel vesion, we accept --with[out]-zzz
+# options "modules" and "tools".  There are number of other
+# options as well.
+%{?_without_modules:         %{expand: %%global WITH_modules   0}}
+%{?_with_modules:            %{expand: %%global WITH_modules   1}}
+%{?_without_devel:           %{expand: %%global WITH_devel     0}}
+%{?_with_devel:              %{expand: %%global WITH_devel     1}}
+%{?_without_tools:           %{expand: %%global WITH_tools     0}}
+%{?_with_tools:              %{expand: %%global WITH_tools     1}}
+%{?_without_indep:           %{expand: %%global WITH_noarch    0}}
+%{?_with_indep:              %{expand: %%global WITH_noarch    1}}
+%{?_without_arch:            %{expand: %%global WITH_arch      0}}
+%{?_with_arch:               %{expand: %%global WITH_arch      1}}
+%{?_with_public:             %{expand: %%global WITH_source    1}}
+%{?_with_k_package:          %{expand: %%global WITH_source    1}}
+%{?_without_snmp_agent:      %{expand: %%global WITH_snmp      0}}
+%{?_without_snmp_agent:      %{expand: %%global WITH_mibs      0}}
+%{?_with_snmp_agent:         %{expand: %%global WITH_snmp      1}}
+%{?_with_snmp_agent:         %{expand: %%global WITH_mibs      1}}
+%{?_without_docs:            %{expand: %%global WITH_docs      0}}
+%{?_with_docs:               %{expand: %%global WITH_docs      1}}
+%{?_without_lis:             %{expand: %%global WITH_lis       0}}
+%{?_without_lis:             %{expand: %%global WITH_lfs       1}}
+%{?_with_lis:                %{expand: %%global WITH_lis       1}}
+%{?_with_lis:                %{expand: %%global WITH_lfs       0}}
+%{?_without_lfs:             %{expand: %%global WITH_lfs       0}}
+%{?_without_lfs:             %{expand: %%global WITH_lis       1}}
+%{?_with_lfs:                %{expand: %%global WITH_lfs       1}}
+%{?_with_lfs:                %{expand: %%global WITH_lis       0}}
+%{?_without_cooked_manpages: %{expand: %%global WITH_manrefs   1}}
+%{?_without_cooked_manpages: %{expand: %%global WITH_manmacros 1}}
+%{?_with_cooked_manpages:    %{expand: %%global WITH_manrefs   0}}
+%{?_with_cooked_manpages:    %{expand: %%global WITH_manmacros 0}}
+
+%global BUILD_modules   %{WITH_modules}
+%global BUILD_devel     %{WITH_devel}
+%global BUILD_tools     %{WITH_tools}
+%global BUILD_noarch    %{WITH_noarch}
+%global BUILD_arch      %{WITH_arch}
+%global BUILD_source    %{WITH_source}
+%global BUILD_snmp      %{WITH_snmp}
+%global BUILD_mibs      %{WITH_mibs}
+%global BUILD_docs      %{WITH_docs}
+%global BUILD_manrefs   %{WITH_manrefs}
+%global BUILD_manmacros %{WITH_manmacros}
+%global BUILD_lfs       %{WITH_lfs}
+%global BUILD_lis       %{WITH_lis}
+%global BUILD_debug     %{WITH_debug}
 
 %ifnarch noarch
-%global BUILD_lfs     1
+%global BUILD_lfs       1
 %endif
 
 # there are three ways to pass kernel version to the build process:
@@ -98,18 +175,21 @@
 #{!?_kversion: #{expand: ##global _kversion #(env | grep PACKAGE_KVERSION | sed -e 's,.*=,,')}}
 %{!?_kversion: %{expand: %%global _kversion %(uname -r)}}
 
+%global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')
 %global kernel_version %{_kversion}
 %global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,')
 %global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
 %global kernel_release %(echo %{_kversion} | sed -e 's,-,.,g')
 %global kernel_string %(echo %{_kversion} | sed -e 's,-,_,g')
 %global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
-%global kernel_fedora %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[6789].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el5.*$,1,;t;s,.*$,0,')
-%global kernel_others %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[6789].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el5.*$,0,;t;s,.*$,1,')
 %global core_name   core-%{_kversion}
 %global info_name   info-%{_kversion}
 %global majbase     @STRCONF_MAJBASE@
 %global makedev     @STRCONF_MAKEDEV@
+#global mknods      /usr/sbin/inet_mkdev    # inet style install
+#global rmnods      /usr/sbin/inet_rmdev    # inet style removal
+%global mknods      /usr/sbin/@STRMAKENODES@
+%global rmnods      /usr/sbin/@STRMAKENODES@ --remove
 %global epoch       @PACKAGE_RPMEPOCH@
 %global base        @PACKAGE_LCNAME@
 %global title       @PACKAGE_TITLE@
@@ -124,9 +204,11 @@
 %global locales     %{nil}
 %global tools       strss7_mknod test-m2pa test-q781 test-tcpc test-tcps test-udpc test-udps test-x100p test-x400p
 %global infofiles   %{base} libxnet cci tri tci mapi mtpi hlr voip tpi_tcap
+%global pngfiles    *.png
 %global initfiles   %{base}
 %global conffiles   %{name}.conf
 %global testfiles   *test*
+%global testscripts testsuite
 #global mibfiles    *.mib
 #global snmpmods
 #global gdmos       %{nil}
@@ -137,43 +219,153 @@
 %global drafts      doc/drafts
 #global papers      doc/papers
 %global projects    doc/projects
+#global snmpconf    %{nil}
+%global manrefs     %{base}.refs
+%global manmacros   %{base}.macros
+%global manpages    man*
 %global license     AGPLv3
 
-%global without_ko_modules %(echo %{_kversion} | sed -e 's,^2\.[56]\..*$,0,;s,^2\.4\..*$,1,')
-%global have_binfiles    %{?binfiles: 1}%{!?binfiles: 0}
-%global have_sbinfiles   %{?sbinfiles:1}%{!?sbinfiles:0}
-%global have_preloads    %{?preloads: 1}%{!?preloads: 0}
-%global have_modules     %{?modules:  1}%{!?modules:  0}
-%global have_libraries   %{?libraries:1}%{!?libraries:0}
-%global have_tools       %{?tools:    1}%{!?tools:    0}
-%global have_infofiles   %{?infofiles:1}%{!?infofiles:0}
-%global have_initscripts %{?initfiles:1}%{!?initfiles:0}
-%global have_configfiles %{?conffiles:1}%{!?conffiles:0}
-%global have_mibfiles    %{?mibfiles: 1}%{!?mibfiles: 0}
-%global have_snmpmods    %{?snmpmods: 1}%{!?snmpmods: 0}
-%global have_gdmofiles   %{?gdmos:    1}%{!?gdmos:    0}
-%global have_netconfig   %{?netconfig:1}%{!?netconfig:0}
-%global have_sock2path   %{?sock2path:1}%{!?sock2path:0}
+%global HAVE_devices        %{?majbase:     1}%{!?majbase:     0}
+%global HAVE_makedev        %{?makedev:     1}%{!?makedev:     0}
+%global HAVE_mknods         %{?mknods:      1}%{!?mknods:      0}
+%global HAVE_rmnods         %{?rmnods:      1}%{!?rmnods:      0}
+%global HAVE_sbinfiles      %{?sbinfiles:   1}%{!?sbinfiles:   0}
+%global HAVE_binfiles       %{?binfiles:    1}%{!?binfiles:    0}
+%global HAVE_sbinfiles      %{?sbinfiles:   1}%{!?sbinfiles:   0}
+%global HAVE_preloads       %{?preloads:    1}%{!?preloads:    0}
+%global HAVE_modules        %{?modules:     1}%{!?modules:     0}
+%global HAVE_libraries      %{?libraries:   1}%{!?libraries:   0}
+%global HAVE_locales        %{?locales:     1}%{!?locales:     0}
+%global HAVE_tools          %{?tools:       1}%{!?tools:       0}
+%global HAVE_infofiles      %{?infofiles:   1}%{!?infofiles:   0}
+%global HAVE_pngfiles       %{?pngfiles:    1}%{!?pngfiles:    0}
+%global HAVE_initscripts    %{?initfiles:   1}%{!?initfiles:   0}
+%global HAVE_configfiles    %{?conffiles:   1}%{!?conffiles:   0}
+%global HAVE_testfiles      %{?testfiles:   1}%{!?testfiles:   0}
+%global HAVE_testscripts    %{?testscripts: 1}%{!?testscripts: 0}
+%global HAVE_mibfiles       %{?mibfiles:    1}%{!?mibfiles:    0}
+%global HAVE_snmpmods       %{?snmpmods:    1}%{!?snmpmods:    0}
+%global HAVE_gdmofiles      %{?gdmos:       1}%{!?gdmos:       0}
+%global HAVE_netconfig      %{?netconfig:   1}%{!?netconfig:   0}
+%global HAVE_sock2path      %{?sock2path:   1}%{!?sock2path:   0}
+%global HAVE_manual         %{?manual:      1}%{!?manual:      0}
+%global HAVE_specs          %{?specs:       1}%{!?specs:       0}
+%global HAVE_drafts         %{?drafts:      1}%{!?drafts:      0}
+%global HAVE_papers         %{?papers:      1}%{!?papers:      0}
+%global HAVE_projects       %{?projects:    1}%{!?projects:    0}
+%global HAVE_manrefs        %{?manrefs:     1}%{!?manrefs:     0}
+%global HAVE_manmacros      %{?manmacros:   1}%{!?manmacros:   0}
+%global HAVE_manpages       %{?manpages:    1}%{!?manpages:    0}
+%global HAVE_snmpconf       %{?snmpconf:    1}%{!?snmpconf:    0}
+%global HAVE_debugfiles     %{_enable_debug_packages}
+%global HAVE_kdebugfiles    %{_enable_debug_packages}
+%global HAVE_sourcefiles    1
+%global HAVE_docfiles       1
+%global HAVE_includes       1
 
 %if %{without_ko_modules}
-# assume devs for older kernels (except for strinet which has conflict with dev package)
-%global NEED_devs     %{WANT_devs}
-%global NEED_init     1
-%global have_oldmods  %{?modules:1}%{!?modules:0}
-%global have_newmods  0
-%global oldmodule     %{nil}
+%global HAVE_oldmods        %{HAVE_modules}
+%global HAVE_newmods        0
 %else
-# assume no devs for newer kernels
-%global NEED_devs     0
-%global NEED_init     0
-%global have_oldmods  0
-%global have_newmods  %{?modules:1}%{!?modules:0}
-%global newmodule     %{nil}
+%global HAVE_oldmods        0
+%global HAVE_newmods        %{HAVE_modules}
+%endif
+
+%ifarch x86_64 s390x sparc64 ppc64 ia64
+%global HAVE_lib32compat    %{HAVE_libraries}
+%else
+%global HAVE_lib32compat    0
+%endif
+
+%if %{HAVE_devices}
+%global USE_makedev         %{HAVE_makedev}
+%global USE_mknods          %{HAVE_mknods}
+%global USE_rmnods          %{HAVE_rmnods}
+%else
+%global USE_makedev         0
+%global USE_mknods          0
+%global USE_rmnods          0
+%endif
+
+%if %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
+%global USE_makedev         0
+%endif
+
+%if %{without_ko_modules}
+%else
+%global USE_makedev         0
+%endif
+
+%if %{USE_makedev}
+%global USE_mknods          0
+%global USE_rmnods          0
+%global devicesfile         -f %{makedev}
+%endif
+
+%global FILES_binfiles      %{HAVE_binfiles}
+%global FILES_sbinfiles     %{HAVE_sbinfiles}
+%global FILES_preloads      %{HAVE_preloads}
+%global FILES_modules       %{HAVE_modules}
+%global FILES_oldmods       %{HAVE_oldmods}
+%global FILES_newmods       %{HAVE_newmods}
+%global FILES_libraries     %{HAVE_libraries}
+%global FILES_libstatic     %{HAVE_libraries}
+%global FILES_lib32compat   %{HAVE_lib32compat}
+%global FILES_lib32static   %{HAVE_lib32compat}
+%global FILES_locales       %{HAVE_locales}
+%global FILES_tools         %{HAVE_tools}
+%global FILES_infofiles     %{HAVE_infofiles}
+%global FILES_pdffiles      %{HAVE_infofiles}
+%global FILES_htmlfiles     %{HAVE_infofiles}
+%global FILES_pngfiles      %{HAVE_pngfiles}
+%global FILES_initscripts   %{HAVE_initscripts}
+%global FILES_configfiles   %{HAVE_configfiles}
+%global FILES_testfiles     %{HAVE_testfiles}
+%global FILES_testscripts   %{HAVE_testscripts}
+%global FILES_mibfiles      %{HAVE_mibfiles}
+%global FILES_snmpmods      %{HAVE_snmpmods}
+%global FILES_gdmofiles     %{HAVE_gdmofiles}
+%global FILES_netconfig     %{HAVE_netconfig}
+%global FILES_sock2path     %{HAVE_sock2path}
+%global FILES_manual        %{HAVE_manual}
+%global FILES_specs         %{HAVE_specs}
+%global FILES_drafts        %{HAVE_drafts}
+%global FILES_papers        %{HAVE_papers}
+%global FILES_projects      %{HAVE_projects}
+%global FILES_manrefs       %{HAVE_manrefs}
+%global FILES_manmacros     %{HAVE_manmacros}
+%global FILES_manpages      %{HAVE_manpages}
+%global FILES_snmpconf      %{HAVE_snmpconf}
+%global FILES_debugfiles    %{HAVE_debugfiles}
+%global FILES_kdebugfiles   %{HAVE_kdebugfiles}
+%global FILES_sourcefiles   %{HAVE_sourcefiles}
+%global FILES_docfiles      %{HAVE_docfiles}
+%global FILES_includes      %{HAVE_includes}
+
+%if %{FILES_manual}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_specs}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_drafts}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_papers}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
+%endif
+%if %{FILES_projects}
+%global FILES_pdffiles      1
+%global FILES_htmlfiles     1
 %endif
 
 # define new autoconf 2.60, 2.61 stuff
 %{!?_datarootdir:       %{expand: %%global _datarootdir     %%{_datadir}}}
-%{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc}}
+%{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc/@PACKAGE@-@VERSION@}}
 %{!?_htmldir:           %{expand: %%global _htmldir         %%{_docdir}}}
 %{!?_dvidir:            %{expand: %%global _dvidir          %%{_docdir}}}
 %{!?_pdfdir:            %{expand: %%global _pdfdir          %%{_docdir}}}
@@ -192,100 +384,21 @@
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
 %endif
 
-# because we only need to build the tools binaries once for each architecture,
-# but need to build the modules binaries once for each architecture and kernel
-# version, we accept the --with[out] options "modules" and "tools"
-%{?_without_modules:    %{expand: %%global BUILD_modules 0}}
-%{?_without_devel:      %{expand: %%global BUILD_devel   0}}
-%{?_without_tools:      %{expand: %%global BUILD_tools   0}}
-%{?_without_indep:      %{expand: %%global BUILD_noarch  0}}
-%{?_without_arch:       %{expand: %%global BUILD_arch    0}}
-%{?_without_public:     %{expand: %%global BUILD_source  0}}
-%{?_without_k_package:  %{expand: %%global BUILD_source  0}}
-%{?_without_lis:        %{expand: %%global BUILD_lis     0}}
-%{?_without_lis:        %{expand: %%global BUILD_lfs     1}}
-%{?_without_lfs:        %{expand: %%global BUILD_lfs     0}}
-%{?_without_lfs:        %{expand: %%global BUILD_lis     1}}
-%{?_without_snmp_agent: %{expand: %%global BUILD_mibs    0}}
-%{?_without_snmp_agent: %{expand: %%global BUILD_snmp    0}}
-
-%{?_with_devfs:         %{expand: %%global NEED_devs     0}}
-%{?_with_modules:       %{expand: %%global BUILD_modules 1}}
-%{?_with_devel:         %{expand: %%global BUILD_devel   1}}
-%{?_with_tools:         %{expand: %%global BUILD_tools   1}}
-%{?_with_indep:         %{expand: %%global BUILD_noarch  1}}
-%{?_with_arch:          %{expand: %%global BUILD_arch    1}}
-%{?_with_public:        %{expand: %%global BUILD_source  1}}
-%{?_with_k_package:     %{expand: %%global BUILD_source  1}}
-%{?_with_lis:           %{expand: %%global BUILD_lis     1}}
-%{?_with_lis:           %{expand: %%global BUILD_lfs     0}}
-%{?_with_lfs:           %{expand: %%global BUILD_lfs     1}}
-%{?_with_lfs:           %{expand: %%global BUILD_lis     0}}
-%{?_with_snmp_agent:    %{expand: %%global BUILD_mibs    1}}
-%{?_with_snmp_agent:    %{expand: %%global BUILD_snmp    1}}
-
-%if %{BUILD_source}
-%global _enable_ksource_package  1
-%else
-%global _enable_ksource_package  0
-%endif
-
-# need manpage references unless otherwise specified
-%global NEED_manrefs  1
-
-%{?_without_cooked_manpages: %{expand: %%global NEED_manrefs 0}}
-%{?_with_cooked_manpages:    %{expand: %%global NEED_manrefs 1}}
-
-%global oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%global newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
-
-%global debug_package %{nil}
-
-%{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
-
-%if %{_enable_debug_packages}
-%else
-%global BUILD_debug   0
-%endif
-
-%if %{BUILD_arch}
-%global BUILD_source  0
-%endif
-
-%if %{NEED_devs}
-%global BUILD_devs    %newrpm
-%global MAKE_devs     %oldrpm
-%else
-%global BUILD_devs    0
-%global MAKE_devs     0
-%endif
-
-%if %{BUILD_tools}
-%else
-%global BUILD_libs    0
-%global BUILD_devs    0
-%global MAKE_devs     0
-%global BUILD_source  0
-%endif
-
-%if %{BUILD_devel}
-%else
-%global BUILD_source  0
-%endif
-
-%global minversion() %{expand: %(echo "%1" | sed -e 's,-.*$,,;s,\.20[0-1][0-9][0-1][0-9][0-3][0-9],,;s,@.*@,0,')}%{nil}
-
 %global _STREAMS SVR 4.2
 %global _streams STREAMS
 %global _ksubdir streams
 %global _kmodext streams
+%global _strextra -STREAMS
+%global _strother %{nil}
 %if %{BUILD_lfs}
 %global _STREAMS LfS
 %global _streams streams
 %global _ksubdir streams
 %global _kmodext streams
 %global _conflict LiS
-%global _strvers %{minversion @LFS_VERSION@}
+%global _strextra %{nil}
+%global _strother -LiS
+%global _strvers @LFS_VERSION@
 %global _with_lfs --with-lfs
 %endif
 %if %{BUILD_lis}
@@ -294,237 +407,553 @@
 %global _ksubdir lis
 %global _kmodext lis
 %global _conflict streams
-%global _strvers %{minversion @LIS_VERSION@}
+%global _strextra -LiS
+%global _strother %{nil}
+%global _strvers @LIS_VERSION@
 %global _with_lis --with-lis
 %endif
 
-%global myversion @VERSION@
-%global myminversion %{minversion @VERSION@}
-%global corename() %1-core-%_kversion%{nil}
-%global infoname() %1-info-%_kversion%{nil}
-%global dbugname() %1-debug-%_kversion%{nil}
-%global coreroot() %1-core%{nil}
-%global inforoot() %1-info%{nil}
-%global dbugroot() %1-debug%{nil}
+%global corename() %1%_strextra-%_kversion%{nil}
+%global infoname() %1%_strextra-devel-%_kversion%{nil}
+%global coreconf() %1%_strother-%_kversion%{nil}
+%global infoconf() %1%_strother-devel-%_kversion%{nil}
+%global coreroot() %1-%virtual%{nil}
+%global inforoot() %1-%virtual-devel%{nil}
 %global kmodules_version @VERSION@
 
 %if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
-%global corename() openss7-%1-kmp%kernel_flavor%{nil}
-%global infoname() openss7-%1-kmp%kernel_flavor-devel%{nil}
-%global dbugname() openss7-%1-kmp%kernel_flavor-debuginfo%{nil}
-%global coreroot() openss7-%1-kmp%{nil}
-%global inforoot() openss7-%1-kmp-devel%{nil}
-%global dbugroot() openss7-%1-kmp-debuginfo%{nil}
+%global corename() openss7-%1%_strextra-kmp%kernel_flavor%{nil}
+%global infoname() openss7-%1%_strextra-kmp%kernel_flavor-devel%{nil}
+%global coreconf() openss7-%1%_strother-kmp%kernel_flavor%{nil}
+%global infoconf() openss7-%1%_strother-kmp%kernel_flavor-devel%{nil}
+%global coreroot() openss7-%1-%virtual-kmp%{nil}
+%global inforoot() openss7-%1-%virtual-kmp-devel%{nil}
 %global kmodules_version @VERSION@_%kernel_string
 %endif
 
 %if %(test '%_vendor' = 'redhat' && echo 1 || echo 0)
-%global corename() kmod-%1%kernel_flavor%{nil}
-%global infoname() kmod-%1%kernel_flavor-devel%{nil}
-%global dbugname() kmod-%1%kernel_flavor-debuginfo%{nil}
-%global coreroot() kmod-%1%{nil}
-%global inforoot() kmod-%1-devel%{nil}
-%global dbugroot() kmod-%1-debuginfo%{nil}
+%global corename() kmod-%1%_strextra%kernel_flavor%{nil}
+%global infoname() kmod-%1%_strextra%kernel_flavor-devel%{nil}
+%global coreconf() kmod-%1%_strother%kernel_flavor%{nil}
+%global infoconf() kmod-%1%_strother%kernel_flavor-devel%{nil}
+%global coreroot() kmod-%1-%virtual%{nil}
+%global inforoot() kmod-%1-%virtual-devel%{nil}
 %global kmodules_version @VERSION@.%kernel_release
 %endif
 
-%if %{have_modules}
-%else
-%global BUILD_modules       0
-%global BUILD_devs          0
-%endif
+# ---------------------------------------------------------------------------
+# Calculate which files were not built (and are not included)
+# ---------------------------------------------------------------------------
 
-%if %{have_libraries}
-%else
-%global BUILD_libs          0
-%endif
-
-%if %{have_mibfiles}
-%else
-%global BUILD_mibs          0
-%endif
-
-%if %{have_snmpmods}
-%else
-%global BUILD_snmp          0
-%endif
+%global kernel_fedora       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[6789].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el5.*$,1,;t;s,.*$,0,')
+%global kernel_others       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[6789].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el5.*$,0,;t;s,.*$,1,')
 
 %if %{BUILD_modules}
-%global FILES_modules       1
-%global FILES_kern_debug    1
-%global FILES_kvirtual      1
 %else
-%global FILES_modules       0
-%global FILES_kern_debug    0
-%global FILES_kvirtual      0
+#global PACKAGE_kmod        0
+#global PACKAGE_kbug        0
 %global kernel_fedora       0
 %global kernel_others       0
-%endif
-
-%if %{BUILD_snmp}
-%global PATH_snmpconf       %config(noreplace) %{_snmpconfdir}/*
-%global PATH_snmp           %{_snmpdlmoddir}/*
-%global PATH_snmp32         %{_snmpdlmod32dir}/*
-%endif
-
-%if %{have_initscripts}
-%global BUILD_init          1
-%endif
-%if %{have_configfiles}
-%global BUILD_init          1
-%endif
-%if %{have_netconfig}
-%global BUILD_init          1
-%endif
-%if %{have_sock2path}
-%global BUILD_init          1
-%endif
-%if %{have_snmpmods}
-%global BUILD_init          1
-%endif
-
-%if %{BUILD_tools}
-%global FILES_libs          1
-%global FILES_libs32        1
-%global FILES_debug         1
-%global FILES_dev           1
-%global FILES_devlibs       1
-%global FILES_devlibs32     1
-%global FILES_tools         1
-%global FILES_tools32       1
-%global FILES_makedev       1
-%global FILES_builddev      1
-%global FILES_test          %{BUILD_test}
-%global FILES_doc           1
-%global FILES_doclibs       1
-%global FILES_source        %{BUILD_source}
-%global FILES_init          %{BUILD_init}
-%global FILES_mibs          %{BUILD_mibs}
-%global FILES_snmp          %{BUILD_snmp}
-%global FILES_snmp32        %{BUILD_snmp}
-%global FILES_virtual       1
-%global FILES_base          1
-%else
-%global FILES_libs          0
-%global FILES_libs32        0
-%global FILES_debug         0
-%global FILES_dev           0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_tools         0
-%global FILES_tools32       0
-%global FILES_makedev       0
-%global FILES_builddev      0
-%global FILES_test          0
-%global FILES_doc           0
-%global FILES_doclibs       0
-%global FILES_source        0
-%global FILES_init          0
-%global FILES_mibs          0
-%global FILES_snmp          0
-%global FILES_snmp32        0
-%global FILES_virtual       0
-%global FILES_base          0
+%global FILES_modules       0
+%global FILES_oldmods       0
+%global FILES_newmods       0
+%global FILES_kdebugfiles   0
 %endif
 
 %if %{BUILD_devel}
 %else
-%global FILES_doc           0
-%global FILES_doclibs       0
-%global FILES_dev           0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_source        0
+#global PACKAGE_devel       0
+%global FILES_includes      0
+%global FILES_libstatic     0
+%global FILES_lib32static   0
+%global FILES_sourcefiles   0
+%global FILES_manual        0
+%global FILES_specs         0
+%global FILES_drafts        0
+%global FILES_papers        0
+%global FILES_projects      0
+%global FILES_infofiles     0
+%global FILES_pdffiles      0
+%global FILES_htmlfiles     0
+%global FILES_pngfiles      0
+%global FILES_manrefs       0
+%global FILES_manmacros     0
+%global FILES_manpages      0
+%global FILES_debugfiles    0
+%global FILES_testscripts   0
 %endif
 
-%if %{BUILD_arch}
+%if %{BUILD_tools}
 %else
-%global FILES_modules       0
-%global FILES_kern_debug    0
-%global FILES_libs          0
-%global FILES_libs32        0
-%global FILES_debug         0
-%global FILES_dev           0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_tools         0
-%global FILES_tools32       0
-%global FILES_snmp          0
-%global FILES_snmp32        0
-%global FILES_virtual       0
-%global FILES_kvirtual      0
+#global PACKAGE_lib         0
+#global PACKAGE_devel       0
+%global FILES_binfiles      0
+%global FILES_sbinfiles     0
+%global FILES_includes      0
+%global FILES_libraries     0
+%global FILES_libstatic     0
+%global FILES_lib32compat   0
+%global FILES_lib32static   0
+%global FILES_locales       0
+%global FILES_testfiles     0
+%global FILES_snmpmods      0
+%global FILES_debugfiles    0
 %endif
 
 %if %{BUILD_noarch}
 %else
-%global FILES_makedev       0
-%global FILES_builddev      0
-%global FILES_test          0
-%global FILES_doc           0
-%global FILES_doclibs       0
-%global FILES_source        0
-%global FILES_init          0
-%global FILES_mibs          0
-%global FILES_base          0
+#global PACKAGE_base        0
+%global FILES_infofiles     0
+%global FILES_pdffiles      0
+%global FILES_htmlfiles     0
+%global FILES_pngfiles      0
+%global FILES_initscripts   0
+%global FILES_configfiles   0
+%global FILES_mibfiles      0
+%global FILES_netconfig     0
+%global FILES_sock2path     0
+%global FILES_manual        0
+%global FILES_specs         0
+%global FILES_drafts        0
+%global FILES_papers        0
+%global FILES_projects      0
+%global FILES_manrefs       0
+%global FILES_manmacros     0
+%global FILES_snmpconf      0
+%global FILES_sourcefiles   0
+%global FILES_docfiles      0
+%global FILES_testscripts   0
+%global FILES_manpages      0
+%endif
+
+%if %{BUILD_arch}
+%else
+#global PACKAGE_lib         0
+#global PACKAGE_devel       0
+#global PACKAGE_kmod        0
+#global PACKAGE_kbug        0
+%global FILES_binfiles      0
+%global FILES_sbinfiles     0
+%global FILES_modules       0
+%global FILES_oldmods       0
+%global FILES_newmods       0
+%global FILES_includes      0
+%global FILES_libraries     0
+%global FILES_libstatic     0
+%global FILES_lib32compat   0
+%global FILES_lib32static   0
+%global FILES_locales       0
+%global FILES_tools         0
+%global FILES_gdmofiles     0
+%global FILES_testfiles     0
+%global FILES_snmpmods      0
+%global FILES_debugfiles    0
+%global FILES_kdebugfiles   0
+%endif
+
+%if %{BUILD_source}
+%else
+%global FILES_sourcefiles   0
+%endif
+
+%if %{BUILD_snmp}
+%else
+%global FILES_snmpconf      0
+%global FILES_snmpmods      0
+%global FILES_mibfiles      0
+%endif
+
+%if %{BUILD_mibs}
+%else
+%global FILES_mibfiles      0
+%endif
+
+%if %{BUILD_docs}
+%else
+%global FILES_manual        0
+%global FILES_specs         0
+%global FILES_drafts        0
+%global FILES_papers        0
+%global FILES_projects      0
+%global FILES_manrefs       0
+%global FILES_manmacros     0
+%global FILES_manpages      0
+%endif
+
+%if %{BUILD_manrefs}
+%else
+%global FILES_manrefs       0
+%endif
+
+%if %{BUILD_manmacros}
+%else
+%global FILES_manmacros     0
+%endif
+
+%if %{BUILD_lfs}
+%else
+%endif
+
+%if %{BUILD_lis}
+%else
 %endif
 
 %if %{BUILD_debug}
 %else
-%global FILES_kern_debug    0
-%global FILES_debug         0
+%global FILES_debugfiles    0
+%global FILES_kdebugfiles   0
 %endif
 
-%if %{FILES_kern_debug}
-%global FILES_debug         0
+# ---------------------------------------------------------------------------
+# Calculate whether we want to build debugging information.
+# ---------------------------------------------------------------------------
+
+%global WANT_debug          0
+
+%if %{HAVE_debugfiles}
+%global WANT_debug          1
+%endif
+%if %{HAVE_kdebugfiles}
+%global WANT_debug          1
+%endif
+
+%if %{WANT_debug}
 %global __debug_package     1
-%endif
-
-%if %{FILES_debug}
-%global __debug_package     1
-%endif
-
-%if %{BUILD_libs}
-%global FILES_dev           0
-%global FILES_doc           0
 %else
-%global FILES_libs          0
-%global FILES_libs32        0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_doclibs       0
+%global __debug_package     0
 %endif
 
-%if %{without_ko_modules}
-%else
-%global FILES_makedev       0
-%global FILES_builddev      0
+%global debug_package       %{nil}
+
+# ---------------------------------------------------------------------------
+# Calculate which packages we want (and don't want).
+# ---------------------------------------------------------------------------
+
+%global WANT_base       0
+
+%if %{FILES_docfiles}
+%global WANT_base       1
+%endif
+%if %{FILES_snmpconf}
+%global WANT_base       1
+%endif
+%if %{FILES_configfiles}
+%global WANT_base       1
+%endif
+%if %{FILES_netconfig}
+%global WANT_base       1
+%endif
+%if %{FILES_sock2path}
+%global WANT_base       1
+%endif
+%if %{FILES_oldmods}
+%global WANT_base       1
+%endif
+%if %{FILES_initscripts}
+%global WANT_base       1
+%endif
+%if %{FILES_mibfiles}
+%global WANT_base       1
+%endif
+%if %{FILES_testscripts}
+%global WANT_base       1
+%endif
+%if %{FILES_manual}
+%global WANT_base       1
+%endif
+%if %{FILES_specs}
+%global WANT_base       1
+%endif
+%if %{FILES_drafts}
+%global WANT_base       1
+%endif
+%if %{FILES_papers}
+%global WANT_base       1
+%endif
+%if %{FILES_projects}
+%global WANT_base       1
+%endif
+%if %{FILES_infofiles}
+%global WANT_base       1
+%endif
+%if %{FILES_pdffiles}
+%global WANT_base       1
+%endif
+%if %{FILES_htmlfiles}
+%global WANT_base       1
+%endif
+%if %{FILES_pngfiles}
+%global WANT_base       1
+%endif
+%if %{FILES_manrefs}
+%global WANT_base       1
+%endif
+%if %{FILES_manmacros}
+%global WANT_base       1
+%endif
+%if %{FILES_manpages}
+%global WANT_base       1
 %endif
 
-%if %{BUILD_devs}
-%global FILES_makedev       0
+%if %{WANT_base}
 %else
-%global FILES_builddev      0
+%global PACKAGE_base    0
 %endif
 
-%ifnarch x86_64 s390x sparc64 ppc64 ia64
-%global FILES_libs32        0
-%global FILES_devlibs32     0
-%global FILES_tools32       0
-%global FILES_snmp32        0
-%else
-%global FILES_libs          0
-%global FILES_devlibs       0
-%global FILES_tools         0
-%global FILES_snmp          0
+# -----------------------
+
+%global WANT_lib        0
+
+%if %{FILES_binfiles}
+%global WANT_lib        1
+%endif
+%if %{FILES_sbinfiles}
+%global WANT_lib        1
+%endif
+%if %{FILES_libraries}
+%global WANT_lib        1
+%endif
+%if %{FILES_lib32compat}
+%global WANT_lib        1
+%endif
+%if %{FILES_locales}
+%global WANT_lib        1
+%endif
+%if %{FILES_gdmofiles}
+%global WANT_lib        1
+%endif
+%if %{FILES_testfiles}
+%global WANT_lib        1
+%endif
+%if %{FILES_snmpmods}
+%global WANT_lib        1
 %endif
 
-%if %{have_libraries}
+%if %{WANT_lib}
 %else
-%global FILES_libs          0
-%global FILES_libs32        0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
+%global PACKAGE_lib     0
 %endif
+
+# -----------------------
+
+%global WANT_devel      0
+
+%if %{FILES_includes}
+%global WANT_devel      1
+%endif
+%if %{FILES_libstatic}
+%global WANT_devel      1
+%endif
+%if %{FILES_lib32static}
+%global WANT_devel      1
+%endif
+%if %{FILES_sourcefiles}
+%global WANT_devel      1
+%endif
+
+%if %{WANT_devel}
+%else
+%global PACKAGE_devel   0
+%endif
+
+# -----------------------
+
+%global WANT_kmod       0
+
+%if %{FILES_modules}
+%global WANT_kmod       1
+%endif
+
+%if %{WANT_kmod}
+%else
+%global PACKAGE_kmod    0
+%endif
+
+# -----------------------
+
+%global WANT_kbug       0
+
+%if %{FILES_modules}
+%global WANT_kbug       1
+%endif
+
+%if %{WANT_kbug}
+%else
+%global PACKAGE_kbug    0
+%endif
+
+# ---------------------------------------------------------------------------
+
+%if %{NEED_streams}
+%global need_streams        %{nil}
+%endif
+%if %{NEED_compat}
+%global need_compat         %{nil}
+%endif
+%if %{NEED_xns}
+%global need_xns            %{nil}
+%endif
+%if %{NEED_xnet}
+%global need_xnet           %{nil}
+%endif
+%if %{NEED_nsl}
+%global need_nsl            %{nil}
+%endif
+%if %{NEED_sock}
+%global need_sock           %{nil}
+%endif
+%if %{NEED_inet}
+%global need_inet           %{nil}
+%endif
+%if %{NEED_sctp}
+%global need_sctp           %{nil}
+%endif
+%if %{NEED_chan}
+%global need_chan           %{nil}
+%endif
+%if %{NEED_x25}
+%global need_x25            %{nil}
+%endif
+%if %{NEED_iso}
+%global need_iso            %{nil}
+%endif
+%if %{NEED_isdn}
+%global need_isdn           %{nil}
+%endif
+%if %{NEED_ss7}
+%global need_ss7            %{nil}
+%endif
+%if %{NEED_sigtran}
+%global need_sigtran        %{nil}
+%endif
+
+# ---------------------------------------------------------------------------
+
+%if %{FILES_binfiles}
+%global files_binfiles      %{nil}
+%global files_binaries      %{nil}
+%endif
+%if %{FILES_sbinfiles}
+%global files_sbinfiles     %{nil}
+%global files_binaries      %{nil}
+%endif
+%if %{FILES_preloads}
+%global files_preloads      %{nil}
+%endif
+%if %{FILES_modules}
+%global files_modules       %{nil}
+%endif
+%if %{FILES_oldmods}
+%global files_oldmods       %{nil}
+%endif
+%if %{FILES_newmods}
+%global files_newmods       %{nil}
+%endif
+%if %{FILES_libraries}
+%global files_libraries     %{nil}
+%global files_binaries      %{nil}
+%endif
+%if %{FILES_libstatic}
+%global files_libstatic     %{nil}
+%global files_binaries      %{nil}
+%endif
+%if %{FILES_lib32compat}
+%global files_lib32compat   %{nil}
+%global files_binaries      %{nil}
+%endif
+%if %{FILES_lib32static}
+%global files_lib32static   %{nil}
+%global files_binaries      %{nil}
+%endif
+%if %{FILES_locales}
+%global files_locales       %{nil}
+%endif
+%if %{FILES_tools}
+%global files_tools         %{nil}
+%endif
+%if %{FILES_infofiles}
+%global files_infofiles     %{nil}
+%endif
+%if %{FILES_pdffiles}
+%global files_pdffiles      %{nil}
+%endif
+%if %{FILES_htmlfiles}
+%global files_htmlfiles     %{nil}
+%endif
+%if %{FILES_pngfiles}
+%global files_pngfiles      %{nil}
+%endif
+%if %{FILES_initscripts}
+%global files_initscripts   %{nil}
+%endif
+%if %{FILES_configfiles}
+%global files_configfiles   %{nil}
+%endif
+%if %{FILES_testfiles}
+%global files_testfiles     %{nil}
+%endif
+%if %{FILES_testscripts}
+%global files_testscripts   %{nil}
+%endif
+%if %{FILES_mibfiles}
+%global files_mibfiles      %{nil}
+%endif
+%if %{FILES_snmpmods}
+%global files_snmpmods      %{nil}
+%endif
+%if %{FILES_gdmofiles}
+%global files_gdmofiles     %{nil}
+%endif
+%if %{FILES_netconfig}
+%global files_netconfig     %{nil}
+%endif
+%if %{FILES_sock2path}
+%global files_sock2path     %{nil}
+%endif
+%if %{FILES_manual}
+%global files_manual        %{nil}
+%endif
+%if %{FILES_specs}
+%global files_specs         %{nil}
+%endif
+%if %{FILES_drafts}
+%global files_drafts        %{nil}
+%endif
+%if %{FILES_papers}
+%global files_papers        %{nil}
+%endif
+%if %{FILES_projects}
+%global files_projects      %{nil}
+%endif
+%if %{FILES_manrefs}
+%global files_manrefs       %{nil}
+%endif
+%if %{FILES_manmacros}
+%global files_manmacros     %{nil}
+%endif
+%if %{FILES_manpages}
+%global files_manpages      %{nil}
+%endif
+%if %{FILES_snmpconf}
+%global files_snmpconf      %{nil}
+%endif
+%if %{FILES_debugfiles}
+%global files_debugfiles    %{nil}
+%endif
+%if %{FILES_kdebugfiles}
+%global files_kdebugfiles   %{nil}
+%endif
+%if %{FILES_sourcefiles}
+%global files_sourcefiles   %{nil}
+%endif
+%if %{FILES_docfiles}
+%global files_docfiles      %{nil}
+%endif
+%if %{FILES_includes}
+%global files_includes      %{nil}
+%endif
+
+# ---------------------------------------------------------------------------
 
 # we have some more options that control configure for the build
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
@@ -554,27 +983,20 @@ Version:        @VERSION@
 Release:        %{rpmrelease}
 License:        %{license}
 Group:          System Environment/Kernel
-%{?url:URL:            %{url}}
-%{?_xpm_icon:Icon:           %{_xpm_icon}}
-%{?_gif_icon:Icon:           %{_gif_icon}}
+%{?url:
+URL:            %{url}}
+%{?_xpm_icon:
+Icon:           %{_xpm_icon}}
+%{?_gif_icon:
+Icon:           %{_gif_icon}}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
-%{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
+%{!?buildroot:
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 Autoreq:        true
 Autoprov:       true
-# TODO: FC4 wants kernel-devel not kernel-source
-# older rpm can't handle nested ifs
-%if %{kernel_fedora}
-BuildRequires:  kernel-devel = %{kernel_source}
-%endif
-%if %{kernel_others}
-BuildRequires:  kernel-source = %{kernel_source}
-%endif
-%if %{BUILD_modules}
-BuildRequires:  modutils >= 2.4.12
-%endif
 
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 
@@ -596,33 +1018,52 @@ BuildRequires:  gcc >= 2.96
 %else
 BuildRequires:  gcc = 2.95.3
 %endif
-%{?_strvers:BuildRequires: %{_streams}-devel %version_of_or %{_streams}-devel %{_strvers}}
-%{!?_strvers:BuildRequires: %requires_prov %{_streams}-devel = %{_streams}-devel}
-%if %{without_ko_modules}
-%{?_strvers:BuildRequires: %{inforoot %_streams} %version_of_or %{_streams}-devel %{_strvers}}
-%{!?_strvers:%{expand:BuildRequires: %%requires_prov %{inforoot %_streams} = %{_streams}-devel}}
-%else
-%{?_strvers:BuildRequires: %{coreroot %_streams} %version_of_or %{_streams}-devel %{_strvers}}
-%{!?_strvers:%{expand:BuildRequires: %%requires_prov %{coreroot %_streams} = %{_streams}-devel}}
+
+# TODO: FC4 wants kernel-devel not kernel-source
+# older rpm can't handle nested ifs
+%if %{kernel_fedora}
+BuildRequires:  kernel-devel = %{kernel_source}
 %endif
-%{?NEED_compat:%{expand:BuildRequires: strcompat-devel %%version_of_or strcompat-devel %{minversion @STRCOMP_VERSION@}}}
-%if %{without_ko_modules}
-%{?NEED_compat:%{expand:BuildRequires: %{inforoot strcompat-%_streams} %%version_of_or strcompat-devel %{minversion @STRCOMP_VERSION@}}}
-%else
-%{?NEED_compat:%{expand:BuildRequires: %{coreroot strcompat-%_streams} %%version_of_or strcompat-devel %{minversion @STRCOMP_VERSION@}}}
+%if %{kernel_others}
+BuildRequires:  kernel-source = %{kernel_source}
 %endif
-%{?NEED_xns:BuildRequires:     strxns-devel  >= %{minversion @XNS_VERSION@}}
-%{?NEED_xnet:BuildRequires:    strxnet-devel >= %{minversion @XTI_VERSION@}}
-%{?NEED_nsl:BuildRequires:     strnsl-devel  >= %{minversion @NSL_VERSION@}}
-%{?NEED_sock:BuildRequires:    strsock-devel >= %{minversion @SOCK_VERSION@}}
-%{?NEED_inet:BuildRequires:    strinet-devel >= %{minversion @INET_VERSION@}}
-%{?NEED_sctp:BuildRequires:    strsctp-devel >= %{minversion @SCTP_VERSION@}}
-%{?NEED_chan:BuildRequires:    strchan-devel >= %{minversion @CHAN_VERSION@}}
-%{?NEED_x25:BuildRequires:     strx25-devel  >= %{minversion @X25_VERSION@}}
-%{?NEED_iso:BuildRequires:     striso-devel  >= %{minversion @ISO_VERSION@}}
-%{?NEED_isdn:BuildRequires:    strisdn-devel >= %{minversion @ISDN_VERSION@}}
-%{?NEED_ss7:BuildRequires:     strss7-devel  >= %{minversion @SS7_VERSION@}}
-%{?NEED_sigtran:BuildRequires: sigtran-devel >= %{minversion @SIGTRAN_VERSION@}}
+%if %{BUILD_modules}
+BuildRequires:  modutils >= 2.4.12
+%endif
+
+%if %{without_ko_modules}
+# to generate kernel symbols:
+BuildRequires:  /sbin/genksyms
+%endif
+
+%{?need_streams:
+BuildRequires:  STREAMS-devel}
+%{?need_compat:
+BuildRequires:  strcompat-devel >= @STRCOMP_VERSION@}
+%{?need_xns:
+BuildRequires:  strxns-devel >= @XNS_VERSION@}
+%{?need_xnet:
+BuildRequires:  strxnet-devel >= @XTI_VERSION@}
+%{?need_nsl:
+BuildRequires:  strnsl-devel >= @NSL_VERSION@}
+%{?need_sock:
+BuildRequires:  strsock-devel >= @SOCK_VERSION@}
+%{?need_inet:
+BuildRequires:  strinet-devel >= @INET_VERSION@}
+%{?need_sctp:
+BuildRequires:  strsctp-devel >= @SCTP_VERSION@}
+%{?need_chan:
+BuildRequires:  strchan-devel >= @CHAN_VERSION@}
+%{?need_x25:
+BuildRequires:  strx25-devel >= @X25_VERSION@}
+%{?need_iso:
+BuildRequires:  striso-devel >= @ISO_VERSION@}
+%{?need_isdn:
+BuildRequires:  strisdn-devel >= @ISDN_VERSION@}
+%{?need_ss7:
+BuildRequires:  strss7-devel >= @SS7_VERSION@}
+%{?need_sigtran:
+BuildRequires:  sigtran-devel >= @SIGTRAN_VERSION@}
 
 # these are some needs of the configure script
 # to manipulate manual pages:
@@ -640,11 +1081,6 @@ BuildRequires:  /usr/bin/gzip
 #BuildRequires: net-snmp-devel
 %endif
 
-%if %{without_ko_modules}
-# to generate kernel symbols:
-BuildRequires:  /sbin/genksyms
-%endif
-
 # to build documentation
 #BuildRequires: transfig >= 3.2
 #BuildRequires: ImageMagick
@@ -653,9 +1089,92 @@ BuildRequires:  /sbin/genksyms
 # to install documentation
 #BuildRequires: texinfo >= 4.0
 
+%{?files_configfiles:
+Prefix:         %{_sysconfdir}}
+%{?files_mibfiles:
+Prefix:         %{_snmpmibdir}}
+%{?files_initscripts:
+Prefix:         %{_configdir}
+Prefix:         %{_initrddir}}
+%{?files_netconfig:
+Prefix:         %{_sysconfdir}/netconfig.d}
+%{?files_sock2path:
+Prefix:         %{_sysconfdir}/sock2path.d}
+%{?files_snmpmods:
+Prefix:         %{_snmpconfdir}}
+%{?files_oldmods:
+Prefix:         %{_modutildir}}
+%{?files_testscripts:
+Prefix:         %{_pkglibexecdir}}
+%{?files_docfiles:
+Prefix:         %{_docdir}}
+%{?files_infofiles:
+Prefix:         %{_infodir}}
+%{?files_pdffiles:
+Prefix:         %{_pdfdir}}
+%{?files_htmlfiles:
+Prefix:         %{_htmldir}}
+%{?files_manpages:
+Prefix:         %{_mandir}}
+
+#Prereq:         /sbin/install-info
+
+Conflicts:      texinfo < 3.11
+
+Obsoletes:      %{name}-mib
+Obsoletes:      %{name}-mibs
+Obsoletes:      %{name}-init
+Obsoletes:      %{name}-inits
+Obsoletes:      %{name}-dev
+Obsoletes:      %{name}-devs
+Obsoletes:      %{name}-test
+Obsoletes:      %{name}-doc
+Obsoletes:      %{name}-docs
+
+%if %{USE_makedev}
+Requires:       dev >= 3.3
+%endif
+Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{name}-%virtual = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{coreroot %name} >= @VERSION@
+%{?need_streams:
+Requires:       %virtual}
+%{?need_compat:
+Requires:       strcompat}
+%{?need_xns:
+Requires:       strxns}
+%{?need_xnet:
+Requires:       strxnet}
+%{?need_nsl:
+Requires:       strnsl}
+%{?need_sock:
+Requires:       strsock}
+%{?need_inet:
+Requires:       strinet}
+%{?need_sctp:
+Requires:       strsctp}
+%{?need_chan:
+Requires:       strchan}
+%{?need_x25:
+Requires:       strx25}
+%{?need_iso:
+Requires:       striso}
+%{?need_isdn:
+Requires:       strisdn}
+%{?need_ss7:
+Requires:       strss7}
+%{?need_sigtran:
+Requires:       sigtran}
+
+#{?_conflict:
+#onflicts:      %{_conflict}}
+
 Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       %{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-%{virtual} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-%{virtual} = %{epoch}:%{version}-%{rpmrelease}
 
 # ---------------------------------------------------------------------------
 %description
@@ -670,19 +1189,41 @@ and is validated for ix86, x86_64, ppc and ppc64 architectures,
 but should build and install well for other architectures.
 This package includes the following binary packages:
 
- - %{corename %name-%_streams} -- core kernel modules.
- - %{infoname %name-%_streams} -- kernel module info.
- - %{dbugname %name-%_streams} -- kernel module debug info.
- - %{name}-%{_streams}-lib -- run-time libraries.
- - %{name}-%{_streams}-util -- admin utilities.
- - %{name}-%{_streams}-debuginfo -- debugging information.
- - %{name}-devel -- headers, libs and docs.
- - %{name}-dev -- devices.
- - %{name}-test -- test utilities.
- - %{name}-doc -- manpages, manuals and docs.
- - %{name}-source -- source package.
- - %{name}-init -- init scripts and config files.
- - %{name}-mibs -- SNMP MIBs.
+ - %{name}
+   -- docs, man pages, manual, info files, devices, init
+      scripts, configs, mibs, test utils.
+ - %{name}-lib
+   -- shared libraries and utilities.
+ - %{coreroot %name}
+   -- kernel modules.
+ - %{name}-devel
+   -- headers, static libraries, source, debuginfo.
+ - %{inforoot %name}
+   -- kernel module info and debug info.
+
+The %{name} binary package provides documentation, device
+definitions, Sys V init scripts and configuration files, SNMP
+MIB definitions, and test suites.
+
+Documentation includes text, html, info and pdf (texinfo)
+documentation and manuals for the development of applications,
+modules and drivers, as well as the installation and reference
+manual.  Also included are extensive manual pages for the entire
+package, including manual pages for commands, administrative
+utilities, user interfaces, and kernel functions.
+
+Device definitions are necessary to run applications programs
+and utilities.  On older systems, this binary creates the
+devices themselves.  On newer systems, this binary package
+includes the executable for creating devices from init scripts.
+Init scripts load kernel modules, create devices, and apply
+system configuration customizations at boot.
+
+SNMP MIB defintions for managing the package with external SNMP
+management tools.  Autotest validation testsuites are used for
+validating and troubleshooting.  Also included is the send-pr
+script for generating and submitting problem reports to
+@PACKAGE_BUGREPORT@.
 %{descriptail}
 
 %prep
@@ -867,6 +1408,8 @@ fi
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
+%{?files_pdffiles: make pdf}
+%{?files_htmlfiles:make html}
 make check
 
 %install
@@ -880,7 +1423,9 @@ make check
 # shared and static libraries.
 make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
     %{!?_enable_debug_packages: install-strip} \
-    %{?_enable_debug_packages: install}
+    %{?_enable_debug_packages: install} \
+    %{?files_pdffiles: install-pdf} \
+    %{?files_htmlfiles: install-html}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -903,13 +1448,19 @@ function package_source() {
     ( cd %{buildroot}%{_usrsrc} ; ln -sf %{name}-%{version}-%{fullrelease} %{name} )
 }
 
-%if %{BUILD_source}
+%if %{FILES_sourcefiles}
 package_source
 %endif
 
-%if %{NEED_manrefs}
+%if %{HAVE_manrefs}
 # stupid mandrake spec-helper will compress our macros files otherwise
-#export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
+#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{base}.refs"
+#export EXCLUDE_FROM_COMPRESS
+%endif
+%if %{HAVE_manmacros}
+# stupid mandrake spec-helper will compress our macros files otherwise
+#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{base}.macros"
+#export EXCLUDE_FROM_COMPRESS
 %endif
 
 # stupid suse check compresses everything (including our macro files)
@@ -920,391 +1471,10 @@ package_source
 
 [ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
 
-# ===========================================================================
-%package %{_streams}
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} virtual package.
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        0
-Autoprov:       0
-%{?_conflict:Conflicts:      %{name}-%{_conflict}}
-Obsoletes:      %{name}-%{_streams}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?modules:Requires:       %{coreroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
-%{?modules:Requires:       %{inforoot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
-Requires:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
-%if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
-%endif
-Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
-%if %{BUILD_init}
-Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%{?libraries:Requires:       %{name}-%_streams-lib = %{epoch}:%{version}-%{fullrelease2}}
-%{?mibfiles:Requires:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}}
-Requires:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-%_streams-util = %{epoch}:%{version}-%{fullrelease2}
-%if %{_enable_ksource_package}
-Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%if %{_enable_debug_packages}
-%{?modules:Requires:       %{dbugroot %name-%_streams} = %{epoch}:%{version}-%{fullrelease2}}
-Requires:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%{?NEED_compat:Requires: strcompat-%{_streams}}
-%{?NEED_xns:Requires: strxns-%{_streams}}
-%{?NEED_xnet:Requires: strxnet-%{_streams}}
-%{?NEED_nsl:Requires: strnsl-%{_streams}}
-%{?NEED_sock:Requires: strsock-%{_streams}}
-%{?NEED_inet:Requires: strinet-%{_streams}}
-%{?NEED_sctp:Requires: strsctp-%{_streams}}
-%{?NEED_chan:Requires: strchan-%{_streams}}
-%{?NEED_x25:Requires: strx25-%{_streams}}
-%{?NEED_iso:Requires: striso-%{_streams}}
-%{?NEED_isdn:Requires: strisdn-%{_streams}}
-%{?NEED_ss7:Requires: strss7-%{_streams}}
-%{?NEED_sigtran:Requires: sigtran-%{_streams}}
-Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-%{_target_cpu} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name} = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{_streams}
-%{descripline}
-The %{name}-%{_streams} binary package is a virtual package that depends
-on all %{name} subpackages for the %{_target_cpu} architecture.  Installing
-this package installs all necessary subpackages for the %{_target_cpu}
-architecture.
-%{descriptail}
-
-%if %{FILES_virtual}
-%files %{_streams}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%endif
-
-# ===========================================================================
-%package base
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} base package.
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        0
-Autoprov:       0
-%{?_conflict:Conflicts:      %{_conflict}-base}
-Obsoletes:      %{name}-base
-Requires:       %{_streams}
-%{?NEED_compat:Requires: strcompat-base}
-%{?NEED_xns:Requires: strxns-base}
-%{?NEED_xnet:Requires: strxnet-base}
-%{?NEED_nsl:Requires: strnsl-base}
-%{?NEED_sock:Requires: strsock-base}
-%{?NEED_inet:Requires: strinet-base}
-%{?NEED_sctp:Requires: strsctp-base}
-%{?NEED_chan:Requires: strchan-base}
-%{?NEED_x25:Requires: strx25-base}
-%{?NEED_iso:Requires: striso-base}
-%{?NEED_isdn:Requires: strisdn-base}
-%{?NEED_ss7:Requires: strss7-base}
-%{?NEED_sigtran:Requires: sigtran-base}
-Provides:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description base
-%{descripline}
-The %{name}-base binary package is a virtual package upon which all other
-%{name} subpackages depend architecture.  Removing this package removes all
-subpackages.
-%{descriptail}
-
-%if %{FILES_base}
-%files base
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%endif
-
-# ===========================================================================
-%package doc
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} manpages and doc.
-Group:          Documentation
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_docdir}
-Prefix:         %{_infodir}
-Prefix:         %{_mandir}
-#Prereq:         /sbin/install-info
-Conflicts:      texinfo < 3.11
-Obsoletes:      %{name}-docs
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-#{?NEED_compat:Requires: strcompat-doc}
-#{?NEED_xns:Requires: strxns-doc}
-#{?NEED_xnet:Requires: strxnet-doc}
-#{?NEED_nsl:Requires: strnsl-doc}
-#{?NEED_sock:Requires: strsock-doc}
-#{?NEED_inet:Requires: strinet-doc}
-#{?NEED_sctp:Requires: strsctp-doc}
-#{?NEED_chan:Requires: strchan-doc}
-#{?NEED_x25:Requires: strx25-doc}
-#{?NEED_iso:Requires: striso-doc}
-#{?NEED_isdn:Requires: strisdn-doc}
-#{?NEED_ss7:Requires: strss7-doc}
-#{?NEED_sigtran:Requires: sigtran-doc}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description doc
-%{descripline}
-The %{name}-doc binary package contains text, html, info and pdf
-(texinfo) documentation and manuals for the development of
-%{title} applications, modules and drivers, as well as the
-installation and reference manual.  Also included are extensive
-manual pages for the entire package, including manual pages for
-commands, administrative utilities, user interfaces, and kernel
-functions.
-%{descriptail}
-
-%post doc
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
-%if %{have_infofiles}
-    if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
-        for n in %{infofiles} ; do
-            if [ -f %{_infodir}/$n.info ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
-            elif [ -f %{_infodir}/$n.info.gz ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-            fi
-        done
-    fi
-%endif
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
-    fi
-%if %{NEED_manrefs}
-    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
-    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
-    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
-    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
-%endif
-fi
-
-%preun doc
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-%if %{have_infofiles}
-    if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
-        for n in %{infofiles} ; do
-            if [ -f %{_infodir}/$n.info ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
-            elif [ -f %{_infodir}/$n.info.gz ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-            fi
-        done
-    fi
-%endif
-%if %{NEED_manrefs}
-    rm -f -- %{_mandir}/%{base}.refs
-    rm -f -- %{_mandir}/%{base}.macros
-%endif
-fi
-
-%postun doc
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
-    fi
-fi
-
-%if %{NEED_manrefs}
-%global manrefs %{_mandir}/%{base}.refs*
-%global manmacros %{_mandir}/%{base}.macros*
-%endif
-
-%if %{FILES_doclibs}
-%files doc
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%doc ABOUT-NLS
-%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make THANKS TODO
-%doc %{name}-%{version}.lsm
-%{?manual:%doc %{manual}}
-%{?specs:%doc %{specs}}
-%{?drafts:%doc %{drafts}}
-%{?papers:%doc %{papers}}
-%{?projects:%doc %{projects}}
-%doc %{name}-%{version}.lsm
-%{_infodir}/*
-%{manrefs}
-%{manmacros}
-%{_mandir}/man*/*
-%endif
-
-%if %{FILES_doc}
-%files doc
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make THANKS TODO
-%doc %{name}-%{version}.lsm
-%{?manual:%doc %{manual}}
-%{?specs:%doc %{specs}}
-%{?drafts:%doc %{drafts}}
-%{?papers:%doc %{papers}}
-%{?projects:%doc %{projects}}
-%doc %{name}-%{version}.lsm
-%{_infodir}/*
-%{manrefs}
-%{manmacros}
-%{_mandir}/man*/*
-%endif
-
-# ===========================================================================
-%package source
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} source package.
-Group:          Development/System
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_usrsrc}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?NEED_compat:Requires: strcompat-source}
-%{?NEED_xns:Requires: strxns-source}
-%{?NEED_xnet:Requires: strxnet-source}
-%{?NEED_nsl:Requires: strnsl-source}
-%{?NEED_sock:Requires: strsock-source}
-%{?NEED_inet:Requires: strinet-source}
-%{?NEED_sctp:Requires: strsctp-source}
-%{?NEED_chan:Requires: strchan-source}
-%{?NEED_x25:Requires: strx25-source}
-%{?NEED_iso:Requires: striso-source}
-%{?NEED_isdn:Requires: strisdn-source}
-%{?NEED_ss7:Requires: strss7-source}
-%{?NEED_sigtran:Requires: sigtran-source}
-Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description source
-%{descripline}
-The %{name}-source binary package contains the source code
-necessary for building the %{name} release.  It also includes
-the autoconf configuration utilities necessary to create and
-distribute this rpm.  To develop on the package, it would be
-better to use the tarball or source rpm release.
-%{descriptail}
-
-%if %{FILES_source}
-%files source
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}
-%{_usrsrc}/%{name}
-%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*
-%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*
-%endif
-
-# ===========================================================================
-%package init
-
-Summary:        %{title} init scripts and config files.
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-%if %{have_configfiles}
-Prefix:         %{_configdir}
-%endif
-%if %{have_initscripts}
-Prefix:         %{_initrddir}
-%endif
-%if %{have_netconfig}
-Prefix:         %{_sysconfdir}/netconfig.d
-%{?NEED_nsl:Requires:       %{expand: strnsl-init %%version_of_or strnsl-init %{minversion @NSL_VERSION@}}}
-%endif
-%if %{have_sock2path}
-Prefix:         %{_sysconfdir}/sock2path.d
-%{?NEED_sock:Requires:       %{expand: strsock-init %%version_of_or strsock-init %{minversion @SOCK_VERSION@}}}
-%endif
-Prefix:         %{_sysconfdir}
-%if %{BUILD_snmp}
-Prefix:         %{_snmpconfdir}
-%endif
-%if %{have_oldmods}
-Prefix:         %{_modutildir}
-%endif
-Obsoletes:      %{name}-inits
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-init %version_of_or %{_streams}-init %{_strvers}}
-%{!?_strvers:Requires: %requires_prov %{_streams}-init = %{_streams}-init}
-%{?NEED_compat:Requires: strcompat-init}
-%{?NEED_xns:Requires: strxns-init}
-%{?NEED_xnet:Requires: strxnet-init}
-%{?NEED_nsl:Requires: strnsl-init}
-%{?NEED_sock:Requires: strsock-init}
-%{?NEED_inet:Requires: strinet-init}
-%{?NEED_sctp:Requires: strsctp-init}
-%{?NEED_chan:Requires: strchan-init}
-%{?NEED_x25:Requires: strx25-init}
-%{?NEED_iso:Requires: striso-init}
-%{?NEED_isdn:Requires: strisdn-init}
-%{?NEED_ss7:Requires: strss7-init}
-%{?NEED_sigtran:Requires: sigtran-init}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-init = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description init
-%{descripline}
-The %{name}-init binary package provides the Sys V init scripts
-and configuration files associated with the %{title} package.
-These init scripts load kernel modules, create devices, and
-apply system configuration customizations at boot.
-%{descriptail}
-
-%pre init
+%pre
 # ---------------------------------------------------------------------------
 arg="$1"
-%if %{have_modules}
+%if %{HAVE_modules}
 function remove_depmods() {
     local t
     [ $# -gt 0 ] || return 0
@@ -1319,19 +1489,19 @@ function remove_depmods() {
 # installations on the host and remove any entries that might later conflict with our entries.  We
 # treat every fresh installation like an upgrade from non-deb/rpm install.
 if [ $arg = 1 ] ; then : # fresh install
-%if %{have_modules}
+%if %{HAVE_modules}
     # When performing a fresh install we want to go looking for non-rpm installations of LiS or
     # STREAMS or supplementary packages and perform what would otherwise have been the preun or
     # postun actions.
     list="%{modules}" ; modl_mods=
     for dir in %{_kmoduledir}/../* ; do
         [ -d $dir ] || continue
-	for m in `find $dir \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
-		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
-		case " $list " in (*" $b "*) ;; (*) continue ;; esac
-		echo "$m"
-		modl_mods="${modl_mods:+$modl_mods }$m"
-	done
+        for m in `find $dir \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
+                b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
+                case " $list " in (*" $b "*) ;; (*) continue ;; esac
+                echo "$m"
+                modl_mods="${modl_mods:+$modl_mods }$m"
+        done
         if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
@@ -1340,7 +1510,7 @@ if [ $arg = 1 ] ; then : # fresh install
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
                             dep="${dep:+$dep }$line" ; continue ;;
-                    (*)	    dep="${dep:+$dep }$line" ;;
+                    (*)     dep="${dep:+$dep }$line" ;;
                 esac
                 [ -n "$dep" ] || continue;
                 set dummy $dep
@@ -1397,13 +1567,13 @@ if [ $arg = 1 ] ; then : # fresh install
         fi
     done
 %endif
-%if %{have_oldmods}
+%if %{HAVE_oldmods}
     prel_old=%_sysconfdir/modules
 %endif
-%if %{have_newmods}
+%if %{HAVE_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
-%if %{have_modules}
+%if %{HAVE_modules}
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
@@ -1415,6 +1585,7 @@ if [ $arg = 1 ] ; then : # fresh install
         rm -f -- $prel_new
     fi
 %endif
+%if %{HAVE_initscripts}
     # Fresh install, go looking for non-rpm initscripts and remove them.
     list="%{initfiles}" ; for i in $list ; do
         if [ -f %_initrddir/$i ] ; then
@@ -1424,7 +1595,8 @@ if [ $arg = 1 ] ; then : # fresh install
             [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
         fi
     done
-%if %{have_modules}
+%endif
+%if %{HAVE_modules}
     # remove conflicting and dependent modules
     if [ -n "$modl_mods" ] ; then
         rm -f -- $modl_mods
@@ -1442,10 +1614,16 @@ if [ $arg = 2 ] ; then : # upgrade
     # be called.  Hopefully the old rpm can handle removal correctly.
 fi
 
-%post init
+%post
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
-%if %{have_oldmods}
+%if %{USE_mknods}
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    %{mknods}
+%endif
+%if %{HAVE_oldmods}
     # At the end of a fresh install we need to add our lines to the modules.conf file if it exists,
     # and it is necessary to use a modconf file (2.4 and pre 2.5.48 kernel), an even if the line is
     # already there (in which case we remove the existing line).
@@ -1462,13 +1640,13 @@ if [ $1 = 1 ] ; then : # fresh install
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_oldmods}
+%if %{HAVE_oldmods}
     prel_old=%_sysconfdir/modules
 %endif
-%if %{have_newmods}
+%if %{HAVE_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
-%if %{have_preloads}
+%if %{HAVE_preloads}
     # At the end of a fresh install we need to add our preloads to the modules or modprobe.preload
     # file, if it exists, and is necessary, and even if the lines are already there (in which case
     # we remove the existing line.
@@ -1486,7 +1664,7 @@ if [ $1 = 1 ] ; then : # fresh install
         rm -f -- $prel_new
     fi
 %endif
-%if %{have_netconfig}
+%if %{HAVE_netconfig}
     # At the end of a fresh install we need to rebuild the netconfig database, but only if the
     # netconfig database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
@@ -1525,7 +1703,7 @@ if [ $1 = 1 ] ; then : # fresh install
         rm -f $a
     fi
 %endif
-%if %{have_sock2path}
+%if %{HAVE_sock2path}
     # At the end of a fresh install we need to rebuild the sock2path database.
     t="%_sysconfdir/sock2path"
     cp -f -b --suffix=.rpmsave -- /dev/null $t
@@ -1538,7 +1716,7 @@ if [ $1 = 1 ] ; then : # fresh install
         fi
     done
 %endif
-%if %{have_initscripts}
+%if %{HAVE_initscripts}
     # This is the end of a fresh install, add init scripts if we can
     list="%{initfiles}" ; for i in $list ; do
         # Find the best working init script installation tool
@@ -1547,9 +1725,36 @@ if [ $1 = 1 ] ; then : # fresh install
         [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
     done
 %endif
+%if %{HAVE_infofiles}
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+%endif
+%if %{HAVE_manpages}
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
+    fi
+%endif
+%if %{HAVE_manrefs}
+    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
+    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+%endif
+%if %{HAVE_manmacros}
+    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
+    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
+%endif
 fi
 if [ $1 = 2 ] ; then : # upgrade
-%if %{have_oldmods}
+%if %{HAVE_oldmods}
     # At the end of an upgrade we place our new lines in the modules.conf file.
     conf_old=%_sysconfdir/modules.conf
     if [ -f $conf_old ] ; then
@@ -1564,13 +1769,13 @@ if [ $1 = 2 ] ; then : # upgrade
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_oldmods}
+%if %{HAVE_oldmods}
     prel_old=%_sysconfdir/modules
 %endif
-%if %{have_newmods}
+%if %{HAVE_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
-%if %{have_preloads}
+%if %{HAVE_preloads}
     # At the end of an upgrade we place just our preloads in the modules or modprobe.preload file.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
@@ -1585,7 +1790,7 @@ if [ $1 = 2 ] ; then : # upgrade
         rm -f -- $prel_new
     fi
 %endif
-%if %{have_netconfig}
+%if %{HAVE_netconfig}
     # At the end of an upgrade we need to rebuild the netconfig database, but only if the netconfig
     # database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
@@ -1624,7 +1829,7 @@ if [ $1 = 2 ] ; then : # upgrade
         rm -f $a
     fi
 %endif
-%if %{have_sock2path}
+%if %{HAVE_sock2path}
     # At the end of an upgrade we need to rebuild the sock2path database.
     t="%_sysconfdir/sock2path"
     cp -f -b --suffix=.rpmsave -- /dev/null $t
@@ -1637,7 +1842,7 @@ if [ $1 = 2 ] ; then : # upgrade
         fi
     done
 %endif
-%if %{have_initscripts}
+%if %{HAVE_initscripts}
     # This is the end of an upgrade, add init scripts if we can
     list="%{initfiles}" ; for i in $list ; do
         # Find the best working init script installation tool
@@ -1648,10 +1853,16 @@ if [ $1 = 2 ] ; then : # upgrade
 %endif
 fi
 
-%preun init
+%preun
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then : # final removal
-%if %{have_oldmods}
+%if %{USE_rmnods}
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    %{rmnods}
+%endif
+%if %{HAVE_oldmods}
     # When we are going away altogether we want to remove any lines whatsoever from the modules.conf
     # file.
     conf_old=%_sysconfdir/modules.conf
@@ -1666,13 +1877,13 @@ if [ $1 = 0 ] ; then : # final removal
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_oldmods}
+%if %{HAVE_oldmods}
     prel_old=%_sysconfdir/modules
 %endif
-%if %{have_newmods}
+%if %{HAVE_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
-%if %{have_preloads}
+%if %{HAVE_preloads}
     # When we are going away altogether we want to remove any of our preloads whatsoever from the
     # modules or modprobe.preload file.
     if [ -f $prel_old ] ; then
@@ -1688,7 +1899,7 @@ if [ $1 = 0 ] ; then : # final removal
         rm -f -- $prel_new
     fi
 %endif
-%if %{have_netconfig}
+%if %{HAVE_netconfig}
     # After going away altogether, we want to rebuild the netconfig database, but only if the
     # netconfig database was built by use or does not exist.
     t="%_sysconfdir/netconfig"
@@ -1727,7 +1938,7 @@ if [ $1 = 0 ] ; then : # final removal
         rm -f $a
     fi
 %endif
-%if %{have_sock2path}
+%if %{HAVE_sock2path}
     # After going away altogether, we want to rebuild the sock2path database.
     t="%_sysconfdir/sock2path"
     cp -f -b --suffix=.rpmsave -- /dev/null $t
@@ -1740,7 +1951,7 @@ if [ $1 = 0 ] ; then : # final removal
         fi
     done
 %endif
-%if %{have_initscripts}
+%if %{HAVE_initscripts}
     # Uninstalling for good, remove init scripts if we can
     list="%{initfiles}" ; for i in $list ; do
         if [ -f %_initrddir/$i ] ; then
@@ -1753,9 +1964,29 @@ if [ $1 = 0 ] ; then : # final removal
         fi
     done
 %endif
+%if %{HAVE_infofiles}
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+%endif
+%if %{HAVE_manrefs}
+    rm -f -- %{_mandir}/%{base}.refs
+%endif
+%if %{HAVE_manmacros}
+    rm -f -- %{_mandir}/%{base}.macros
+%endif
 fi
 if [ $1 = 1 ] ; then : # upgrade
-%if %{have_oldmods}
+%if %{HAVE_oldmods}
     # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
     # modules.conf file that we placed in them in the post scriptlet.  We only adjust our line and
     # leave any lines added by the new package post scriptlet.
@@ -1780,13 +2011,13 @@ b loop' $conf_new > $conf_tmp
         rm -f -- $conf_new
     fi
 %endif
-%if %{have_oldmods}
+%if %{HAVE_oldmods}
     prel_old=%_sysconfdir/modules
 %endif
-%if %{have_newmods}
+%if %{HAVE_newmods}
     prel_old=%_sysconfdir/modprobe.preload
 %endif
-%if %{have_preloads}
+%if %{HAVE_preloads}
     # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
     # modules or modprobe.preloads file that we placed in them in the post scriptlet.  We only
     # adjust our lines and leave any lines added by the new package post scriptlet.
@@ -1812,7 +2043,7 @@ b loop' $prel_new > $prel_tmp
         rm -f -- $prel_new
     fi
 %endif
-%if %{have_netconfig}
+%if %{HAVE_netconfig}
     # After going doing an upgrade we want to rebuild the netconfig database, but only if the
     # netconfig database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
@@ -1851,7 +2082,7 @@ b loop' $prel_new > $prel_tmp
         rm -f $a
     fi
 %endif
-%if %{have_sock2path}
+%if %{HAVE_sock2path}
     # After going doing an upgrade we want to rebuild the sock2path database.
     t="%_sysconfdir/sock2path"
     cp -f -b --suffix=.rpmsave -- /dev/null $t
@@ -1864,304 +2095,195 @@ b loop' $prel_new > $prel_tmp
         fi
     done
 %endif
+%if %{HAVE_infofiles}
+    if [ -x /sbin/install-info ] ; then
+        # Older rpm versions do not compress info files.
+        for n in %{infofiles} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
+            fi
+        done
+    fi
+%endif
+%if %{HAVE_manrefs}
+    rm -f -- %{_mandir}/%{base}.refs
+%endif
+%if %{HAVE_manmacros}
+    rm -f -- %{_mandir}/%{base}.macros
+%endif
 fi
 
-%if %{FILES_init}
-%files init
+%postun
 # ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{?PATH_snmpconf:%{PATH_snmpconf}}
-%{?conffiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-%{?netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
-%{?sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
-%{?oldmodule:%config(noreplace) %{_modutildir}/*}
-%{?initfiles:%config(noreplace) %{_configdir}/*}
-%{?initfiles:%{_initrddir}/*}
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+%if %{HAVE_manpages}
+    if [ -x /usr/sbin/makewhatis ] ; then
+        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
+    fi
 %endif
+fi
 
-# ===========================================================================
-%package mibs
-
-Summary:        %{title} SNMP MIBs.
-Group:          Development/System
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_snmpmibdir}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?_strvers:Requires: %{_streams}-mibs %version_of_or %{_streams}-mibs %{_strvers}}
-%{!?_strvers:Requires: %requires_prov %{_streams}-mibs = %{_streams}-mibs}
-#{?NEED_compat:Requires: strcompat-mibs}
-#{?NEED_xns:Requires: strxns-mibs}
-#{?NEED_xnet:Requires: strxnet-mibs}
-#{?NEED_nsl:Requires: strnsl-mibs}
-#{?NEED_sock:Requires: strsock-mibs}
-#{?NEED_inet:Requires: strinet-mibs}
-#{?NEED_sctp:Requires: strsctp-mibs}
-#{?NEED_chan:Requires: strchan-mibs}
-#{?NEED_x25:Requires: strx25-mibs}
-#{?NEED_iso:Requires: striso-mibs}
-#{?NEED_isdn:Requires: strisdn-mibs}
-#{?NEED_ss7:Requires: strss7-mibs}
-#{?NEED_sigtran:Requires: sigtran-mibs}
-Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-mibs = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description mibs
-%{descripline}
-The %{name}-mibs binary package provides SNMP MIB defintions
-for managing the %{title} package with
-external SNMP management tools.
-%{descriptail}
-
-%if %{FILES_mibs}
-%files mibs
+%if %{PACKAGE_base}
+%files %{?devicesfile:%{devicesfile}}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{_snmpmibdir}/*
-%endif
-
-# ===========================================================================
-%package test
-
-Summary:        %{title} test utilities.
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_pkglibexecdir}
-Obsoletes:      %{name}-tests
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-#{?NEED_compat:Requires: strcompat-test}
-#{?NEED_xns:Requires: strxns-test}
-#{?NEED_xnet:Requires: strxnet-test}
-#{?NEED_nsl:Requires: strnsl-test}
-#{?NEED_sock:Requires: strsock-test}
-#{?NEED_inet:Requires: strinet-test}
-#{?NEED_sctp:Requires: strsctp-test}
-#{?NEED_chan:Requires: strchan-test}
-#{?NEED_x25:Requires: strx25-test}
-#{?NEED_iso:Requires: striso-test}
-#{?NEED_isdn:Requires: strisdn-test}
-#{?NEED_ss7:Requires: strss7-test}
-#{?NEED_sigtran:Requires: sigtran-test}
-Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description test
-%{descripline}
-The %{name}-test binary package provides the autotest validation
-testsuites used for validating and troubleshooting the %{title}
-package.  It also includes the send-pr script for generating and
-submitting problem reports to @PACKAGE_BUGREPORT@.
-%{descriptail}
-
-%if %{FILES_test}
-%files test
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
+%{?files_docfiles:
+%{?files_locales:
+%doc ABOUT-NLS}
+%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
+%doc README README-alpha README-cvs README-make THANKS TODO
+%doc %{name}-%{version}.lsm}
+#{?files_manual:
+#doc %{manual}}
+#{?files_specs:
+#doc %{specs}}
+#{?files_drafts:
+#doc %{drafts}}
+#{?files_papers:
+#doc %{papers}}
+#{?files_projects:
+#doc %{projects}}
+%{?files_snmpconf:
+%config(noreplace) %{_snmpconfdir}/*}
+%{?files_configfiles:
+%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?files_netconfig:
+%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+%{?files_netconfig:
+%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?files_sock2path:
+%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
+%{?files_oldmods:
+%config(noreplace) %{_modutildir}/*}
+%{?files_initscripts:
+%config(noreplace) %{_configdir}/*}
+%{?files_initscripts:
+%{_initrddir}/*}
+%{?files_mibfiles:
+%{_snmpmibdir}/*}
+%{?files_testscripts:
 %{_pkglibexecdir}/atlocal
 %{_pkglibexecdir}/testsuite*
 %{_pkglibexecdir}/send-pr
-%{_pkglibexecdir}/send-pr.config
+%{_pkglibexecdir}/send-pr.config}
+%{?files_pdffiles:
+%{_pdfdir}/*.pdf}
+%{?files_htmlfiles:
+%{_htmldir}/*.html}
+%{?files_pngfiles:
+%{_htmldir}/*.png}
+%{?files_infofiles:
+%{_infodir}/*.info*}
+%{?files_manrefs:
+%{_mandir}/%{base}.refs*}
+%{?files_manmacros:
+%{_mandir}/%{base}.macros*}
+%{?files_manpages:
+%{_mandir}/man*/*}
 %endif
 
 # ===========================================================================
-%package dev
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} devices.
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Obsoletes:      %{name}-devs
-Requires:       dev >= 3.3
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%if %{MAKE_devs}
-Requires:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-%endif
-Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-dev = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description dev
-%{descripline}
-The %{name}-dev binary package contains the device definitions
-necessary to run applications programs and utilities developed
-for %{title}.  On older systems, this binary creates the devices
-themselves.  On newer systems, this binary package includes the
-executable for creating devices from init scripts.
-
-The package is not required for devfs based systems.
-%{descriptail}
-
-%if %{MAKE_devs}
-%post dev
-if [ $1 = 1 ] ; then : # fresh install
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
-    /usr/sbin/@STRMAKENODES@
-fi
-
-%preun dev
-if [ $1 = 0 ] ; then : # final removal
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
-    /usr/sbin/@STRMAKENODES@ --remove
-fi
-%endif
-
-%if %{FILES_makedev}
-%files dev
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%endif
-
-%if %{FILES_builddev}
-%files dev -f %{makedev}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%endif
-
-# ===========================================================================
-%package devel
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
-Group:          Development/System
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_libdir}
-%if %{FILES_devlibs32}
-Prefix:         %{_lib32dir}
-%endif
-Prefix:         %{_includedir}/%{name}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?NEED_compat:Requires: strcompat-devel}
-%{?NEED_xns:Requires: strxns-devel}
-%{?NEED_xnet:Requires: strxnet-devel}
-%{?NEED_nsl:Requires: strnsl-devel}
-%{?NEED_sock:Requires: strsock-devel}
-%{?NEED_inet:Requires: strinet-devel}
-%{?NEED_sctp:Requires: strsctp-devel}
-%{?NEED_chan:Requires: strchan-devel}
-%{?NEED_x25:Requires: strx25-devel}
-%{?NEED_iso:Requires: striso-devel}
-%{?NEED_isdn:Requires: strisdn-devel}
-%{?NEED_ss7:Requires: strss7-devel}
-%{?NEED_sigtran:Requires: sigtran-devel}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description devel
-%{descripline}
-The %{name}-devel binary package contains library archives
-for static compilation, and headers files to develop
-OpenSS7 %{_STREAMS} STREAMS %{stitle} applications.
-This also includes the header files and static libraries required
-to compile OpenSS7 %{_STREAMS} STREAMS %{stitle} applications programs.
-%{descriptail}
-
-%if %{FILES_devlibs32}
-%files devel
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.a
-%{_lib32dir}/*.a
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%endif
-
-%if %{FILES_devlibs}
-%files devel
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.a
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%endif
-
-%if %{FILES_dev}
-%files devel
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%endif
-
-# ===========================================================================
-%package %{_streams}-lib
+%package lib
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} run-time libraries.
 Group:          System Environment/Libraries
 Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
+%{?_xpm:
+Icon:           %_xpm}
+%{?_gif:
+Icon:           %_gif}
 Autoreq:        true
 Autoprov:       true
-Prefix:         %{_libdir}
-%if %{FILES_libs32}
-Prefix:         %{_lib32dir}
-%endif
-Prefix:         %{_localedir}
+
+%{?files_binfiles:
+Prefix:         %{_bindir}}
+%{?files_sbinfiles:
+Prefix:         %{_sbindir}}
+%{?files_libraries:
+Prefix:         %{_libdir}}
+%{?files_lib32compat:
+Prefix:         %{_lib32dir}}
+%{?files_testfiles:
+Prefix:         %{_pkglibexecdir}
+%{?files_lib32compat:
+Prefix: %{_pkglibexec32dir}}}
+%{?files_snmpmods:
+Prefix:         %{_snmpdlmoddir}
+%{?files_lib32compat:
+Prefix:         %{_snmpdlmod32dir}}}
+%{?files_locales:
+Prefix:         %{_localedir}}
+
+Obsoletes:      %{name}-libs
 Obsoletes:      %{name}-%{_streams}-libs
+Obsoletes:      %{name}-util
+Obsoletes:      %{name}-%{_streams}-util
+Obsoletes:      %{name}-utils
+Obsoletes:      %{name}-%{_streams}-utils
+
 Prereq:         /sbin/ldconfig
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-#{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
-#{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
-#%{?NEED_xnet:Requires: strxnet-lib >= %{minversion @XTI_VERSION@}}
-#%{?NEED_x25:Requires:  strx25-lib  >= %{minversion @X25_VERSION@}}
-#%{?NEED_iso:Requires:  striso-lib  >= %{minversion @ISO_VERSION@}}
-Requires:       %{_streams}-lib
-%{?NEED_xnet:Requires: strxnet-lib}
-%{?NEED_x25:Requires: strx25-lib}
-%{?NEED_iso:Requires: striso-lib}
+
+Requires:       %{name}-%{virtual}
+%{?need_streams:
+Requires:       %virtual-lib}
+%{?need_compat:
+Requires:       strcompat-lib >= @STRCOMP_VERSION@}
+%{?need_xns:
+Requires:       strxns-lib >= @XNS_VERSION@}
+%{?need_xnet:
+Requires:       strxnet-lib >= @XTI_VESION@}
+%{?need_nsl:
+Requires:       strnsl-lib >= @NSL_VERSION@}
+%{?need_sock:
+Requires:       strsock-lib >= @SOCK_VERSION@}
+%{?need_inet:
+Requires:       strinet-lib >= @INET_VERSION@}
+%{?need_sctp:
+Requires:       strsctp-lib >= @SCTP_VERSION@}
+%{?need_chan:
+Requires:       strchan-lib >= @CHAN_VERSION@}
+%{?need_x25:
+Requires:       strx25-lib >= @X25_VERSION@}
+%{?need_iso:
+Requires:       striso-lib >= @ISO_VERSION@}
+%{?need_isdn:
+Requires:       strisdn-lib >= @ISDN_VERSION@}
+%{?need_ss7:
+Requires:       strss7-lib >= @SS7_VERSION@}
+%{?need_sigtran:
+Requires:       sigtran-lib >= @SIGTRAN_VERSION@}
+
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-lib = %{epoch}:%{version}-%{rpmrelease}
+#rovides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease}
+#rovides:       %{virtual}-lib = %{epoch}:%{version}-%{fullrelease2}
+#rovides:       %{virtual}-lib = %{epoch}:%{version}-%{rpmrelease}
+
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description %{_streams}-lib
+%description lib
 %{descripline}
-The %{name}-%{_streams}-lib binary package contains the run-time (shared
+The %{name}-lib binary package contains the run-time (shared
 object) libraries necessary to run applications programs and
-utilities developed for %{title}.  Also included are the libtool
-.la files describing the shared object libraries.
+utilities developed for %{title}.
+Also included are the libtool .la files describing the shared
+object libraries.  The binary package also provides
+administrative and configuration test utilities and commands
+associated with the %{title}
+package.  Note that these utilities are needed for running the
+validation test suites contained in the %{name} binary package.
 %{descriptail}
 
-%pre %{_streams}-lib
+%pre lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
+%if %{HAVE_libraries}
     # See if there are any libraries hanging around from a non-rpm install.  If there are, just
     # delete them.
     libs="%{libraries}" ; for lib in $libs ; do
@@ -2172,125 +2294,8 @@ if [ $1 = 1 ] ; then : # fresh install
             rm -f $old_libs
         fi
     done
-fi
-
-%post %{_streams}-lib
-# ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-    # After a fresh install or upgrade, do a load config.
-    /sbin/ldconfig
-fi
-
-%postun %{_streams}-lib
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then
-    # Whether complete removal or upgrade, do a load config.
-    /sbin/ldconfig
-fi
-
-%if %{FILES_libs32}
-%files %{_streams}-lib
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.so*
-%{_libdir}/*.la
-%{_lib32dir}/*.so*
-%{_lib32dir}/*.la
-%{?locales:%{_localedir}/*}
 %endif
-
-%if %{FILES_libs}
-%files %{_streams}-lib
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_libdir}/*.so*
-%{_libdir}/*.la
-%{?locales:%{_localedir}/*}
-%endif
-
-# ===========================================================================
-%package %{_streams}-util
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} admin utilities.
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-%if %{have_binfiles}
-Prefix:         %{_bindir}
-%endif
-%if %{have_sbinfiles}
-Prefix:         %{_sbindir}
-%endif
-Prefix:         %{_pkglibexecdir}
-%if %{FILES_tools32}
-Prefix:         %{_pkglibexec32dir}
-%endif
-%if %{FILES_snmp}
-Prefix:         %{_snmpdlmoddir}
-%endif
-%if %{FILES_snmp32}
-Prefix:         %{_snmpdlmoddir}
-Prefix:         %{_snmpdlmod32dir}
-%endif
-%{?_conflict:Conflicts:      %{name}-%{_conflict}-util}
-%{?_conflict:Conflicts:      %{name}-%{_conflict}-utils}
-Obsoletes:      %{name}-utils
-Obsoletes:      %{name}-%{_streams}-utils
-%if %{FILES_snmp}
-#Requires:       net-snmp
-%endif
-%if %{FILES_snmp32}
-#Requires:       net-snmp
-%endif
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%if %{have_libraries}
-Requires:       %{name}-lib >= %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-%{_streams}-lib >= %{epoch}:%{version}-%{fullrelease2}
-%endif
-#{?_strvers:Requires: %{_streams}-lib %version_of_or %{_streams}-lib %{_strvers}}
-#{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
-Requires:       %{_streams}-util
-%{?NEED_compat:Requires: strcompat-util}
-#{?NEED_xns:Requires: strxns-util}
-#{?NEED_xnet:Requires: strxnet-util}
-#{?NEED_nsl:Requires: strnsl-util}
-#{?NEED_sock:Requires: strsock-util}
-#{?NEED_inet:Requires: strinet-util}
-#{?NEED_sctp:Requires: strsctp-util}
-#{?NEED_chan:Requires: strchan-util}
-#{?NEED_x25:Requires: strx25-util}
-#{?NEED_iso:Requires: striso-util}
-#{?NEED_isdn:Requires: strisdn-util}
-#{?NEED_ss7:Requires: strss7-util}
-#{?NEED_sigtran:Requires: sigtran-util}
-Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-util = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-util = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-util = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{_streams}-util
-%{descripline}
-The %{name}-%{_streams}-util binary package provides administrative
-and configuration test utilities and commands associated with the
-OpenSS7 %{_STREAMS} STREAMS %{stitle} package.
-Note that these utilities are needed for running the validation
-test suites contained in the %{name}-test binary package.
-%{descriptail}
-
-%if %{have_tools}
-%pre %{_streams}-util
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ]; then : # fresh install
+%if %{HAVE_tools}
     # This is a fresh install, look for old non-rpm tools.
     tools="%{tools}" ; for tool in $tools ; do
         location="`which $tool 2>/dev/null`"
@@ -2303,320 +2308,257 @@ if [ $1 = 1 ]; then : # fresh install
             done
         done
     done
+%endif
+fi
+
+%post lib
+# ---------------------------------------------------------------------------
+%if %{HAVE_libraries}
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+    # After a fresh install or upgrade, do a load config.
+    /sbin/ldconfig
 fi
 %endif
 
-# inet wants to install its own devices
-%if %{WANT_devs}
-%else
-%post %{_streams}-util
-if [ $1 = 1 ] ; then : # fresh install
-    /usr/sbin/inet_mkdev
-fi
-
-%preun %{_streams}-util
-if [ $1 = 0 ] ; then : # final removal
-    /usr/sbin/inet_rmdev
+%postun lib
+# ---------------------------------------------------------------------------
+%if %{HAVE_libraries}
+if [ $1 = 0 -o $1 = 1 ] ; then
+    # Whether complete removal or upgrade, do a load config.
+    /sbin/ldconfig
 fi
 %endif
 
-%if %{FILES_tools32}
-%files %{_streams}-util
+%if %{PACKAGE_lib}
+%files lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?binfiles:%{_bindir}/*}
-%{?sbinfiles:%{_sbindir}/*}
-%{?gdmos:%{_pkglibexecdir}/gdmo}
-%{?testfiles:%{_pkglibexecdir}/%{testfiles}}
-%{?testfiles:%{_pkglibexec32dir}/%{testfiles}}
-%{?PATH_snmp:%{PATH_snmp}}
-#{?PATH_snmp32:%{PATH_snmp32}}
-%endif
-
-%if %{FILES_tools}
-%files %{_streams}-util
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{?binfiles:%{_bindir}/*}
-%{?sbinfiles:%{_sbindir}/*}
-%{?gdmos:%{_pkglibexecdir}/gdmo}
-%{?testfiles:%{_pkglibexecdir}/%{testfiles}}
-%{?PATH_snmp:%{PATH_snmp}}
+%{?files_binfiles:
+%{_bindir}/*}
+%{?files_sbinfiles:
+%{_sbindir}/*}
+%{?files_libraries:
+%{_libdir}/*.so*}
+%{?files_libraries:
+%{_libdir}/*.la}
+%{?files_lib32compat:
+%{_lib32dir}/*.so*}
+%{?files_lib32compat:
+%{_lib32dir}/*.la}
+%{?files_locales:
+%{_localedir}/*}
+%{?files_gdmofiles:
+%{_pkglibexecdir}/gdmo}
+%{?files_testfiles:
+%{_pkglibexecdir}/%{testfiles}
+%{?files_lib32compat:
+%{_pkglibexec32dir}/%{testfiles}}}
+%{?files_snmpmods:
+%{_snmpdlmoddir}/*}
 %endif
 
 # ===========================================================================
-%package %{_streams}-debuginfo
+%package devel
 
-Summary:        %{title} debug information.
-Group:          Development/Debug
+Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} headers, lib and doc.
+Group:          Development/System
 Version:        @VERSION@
-AutoReq:        0
-AutoProv:       0
-%{?_conflict:Conflicts:      %{name}-%{_conflict}-debuginfo}
-Obsoletes:      %{name}-debug < %{epoch}:%{version}-%{rpmrelease}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-%{?NEED_compat:Requires: strcompat-%{_streams}-debuginfo}
-%{?NEED_xns:Requires: strxns-%{_streams}-debuginfo}
-%{?NEED_xnet:Requires: strxnet-%{_streams}-debuginfo}
-%{?NEED_nsl:Requires: strnsl-%{_streams}-debuginfo}
-%{?NEED_sock:Requires: strsock-%{_streams}-debuginfo}
-%{?NEED_inet:Requires: strinet-%{_streams}-debuginfo}
-%{?NEED_sctp:Requires: strsctp-%{_streams}-debuginfo}
-%{?NEED_chan:Requires: strchan-%{_streams}-debuginfo}
-%{?NEED_x25:Requires: strx25-%{_streams}-debuginfo}
-%{?NEED_iso:Requires: striso-%{_streams}-debuginfo}
-%{?NEED_isdn:Requires: strisdn-%{_streams}-debuginfo}
-%{?NEED_ss7:Requires: strss7-%{_streams}-debuginfo}
-%{?NEED_sigtran:Requires: sigtran-%{_streams}-debuginfo}
-Provides:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-debuginfo = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-debuginfo = %{epoch}:%{version}-%{rpmrelease}
+%{?_xpm:
+Icon:           %_xpm}
+%{?_gif:
+Icon:           %_gif}
+Autoreq:        true
+Autoprov:       true
+
+%{?files_includes:
+Prefix:         %{_includedir}/%{name}}
+%{?files_libstatic:
+Prefix:         %{_libdir}
+%{?files_lib32static:
+Prefix:         %{_lib32dir}}}
+
+#Prereq:         /sbin/install-info
+
+Conflicts:      texinfo < 3.11
+#{?_conflicts:
+#onflicts:      %{_conflict}-devel}
+
+Requires:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+Requires:       %{inforoot %name} >= @VERSION@
+%{?need_streams:
+Requires:       %virtual-devel}
+%{?need_compat:
+Requires:       strcompat-devel >= @STRCOMP_VERSION@}
+%{?need_xns:
+Requires:       strxns-devel >= @XNS_VERSION@}
+%{?need_xnet:
+Requires:       strxnet-devel >= @XTI_VERSION@}
+%{?need_nsl:
+Requires:       strnsl-devel >= @NSL_VERSION@}
+%{?need_sock:
+Requires:       strsock-devel >= @SOCK_VERSION@}
+%{?need_inet:
+Requires:       strinet-devel >= @INET_VERSION@}
+%{?need_sctp:
+Requires:       strsctp-devel >= @SCTP_VERSION@}
+%{?need_chan:
+Requires:       strchan-devel >= @CHAN_VERSION@}
+%{?need_x25:
+Requires:       strx25-devel >= @X25_VERSION@}
+%{?need_iso:
+Requires:       striso-devel >= @ISO_VERSION@}
+%{?need_isdn:
+Requires:       strisdn-devel >= @ISDN_VERSION@}
+%{?need_ss7:
+Requires:       strss7-devel >= @SS7_VERSION@}
+%{?need_sigtran:
+Requires:       sigtran-devel >= @SIGTRAN_VERSION@}
+
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
+#rovides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease}
+#rovides:       %{virtual}-devel = %{epoch}:%{version}-%{fullrelease2}
+#rovides:       %{virtual}-devel = %{epoch}:%{version}-%{rpmrelease}
+
+Obsoletes:      %{name}-doc
+Obsoletes:      %{name}-docs
+
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description %{_streams}-debuginfo
+%description devel
 %{descripline}
+The %{name}-devel binary package contains library archives
+for static compilation, and headers files to develop
+%{title} applications.
+This also includes the header files and static libraries required
+to compile %{title} applications programs.
 This package provides debug information for package %{name}.
-Debug information is useful when developing applicaions that
+Debug information is useful when developing applications that
 use this package or when debugging this package.
+%{HAVE_source:
+The package optionally contains the source code necessary for
+building the %{name} release.  It also includes the autoconf
+configuration utilities necessary to create and distribute this
+rpm.  To develop on the package, it would be better to use the
+tarball or source rpm release.}
 %{descriptail}
 
-%if %{FILES_debug}
-%files %{_streams}-debuginfo
+%if %{PACKAGE_devel}
+%files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
+%{?files_includes:
+%dir %{_includedir}/%{name}
+%{_includedir}/%{name}/*}
+%{?files_libstatic:
+%{_libdir}/*.a
+%{?files_lib32static:
+%{_lib32dir}/*.a}}
+%{?files_debugfiles:
+%{?files_binaries:
 %{_usrsrc}/debug
+%{?_lib32dir:
+%{_lib32dir}/debug}
+%{!?_lib32dir:
+%{_libdir}/debug}}}
+%{?files_sourcefiles:
+%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}}
+%{?files_sourcefiles:
+%{_usrsrc}/%{name}}
+%{?files_sourcefiles:
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*}
+%{?files_sourcefiles:
+%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*}
 %endif
 
 # ===========================================================================
-%package %{_streams}-%{_kversion}
-
-Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel virtual package.
-Group:          System Environment/Kernel
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        0
-Autoprov:       0
-%{?_conflict:Conflicts:      %{name}-%{_conflict}-%{_kversion}}
-Requires:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{corename %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Requires:       %{infoname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Requires:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
-%if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{version}-%{fullrelease2}
-%endif
-Requires:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
-%if %{BUILD_init}
-Requires:       %{name}-init = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%{?libraries:Requires:       %{name}-%_streams-lib = %{epoch}:%{version}-%{fullrelease2}}
-%{?mibfiles:Requires:       %{name}-mibs = %{epoch}:%{version}-%{fullrelease2}}
-Requires:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
-Requires:       %{name}-%_streams-util = %{epoch}:%{version}-%{fullrelease2}
-%if %{_enable_ksource_package}
-Requires:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%if %{_enable_debug_packages}
-Requires:       %{dbugname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Requires:       %{name}-%{_streams}-debuginfo = %{epoch}:%{version}-%{fullrelease2}
-%endif
-%{?NEED_compat:Requires: strcompat-%{_streams}-%{_kversion}}
-%{?NEED_xns:Requires: strxns-%{_streams}-%{_kversion}}
-%{?NEED_xnet:Requires: strxnet-%{_streams}-%{_kversion}}
-#{?NEED_nsl:Requires: strnsl-%{_streams}-%{_kversion}}
-%{?NEED_sock:Requires: strsock-%{_streams}-%{_kversion}}
-%{?NEED_inet:Requires: strinet-%{_streams}-%{_kversion}}
-%{?NEED_sctp:Requires: strsctp-%{_streams}-%{_kversion}}
-%{?NEED_chan:Requires: strchan-%{_streams}-%{_kversion}}
-%{?NEED_x25:Requires: strx25-%{_streams}-%{_kversion}}
-%{?NEED_iso:Requires: striso-%{_streams}-%{_kversion}}
-%{?NEED_isdn:Requires: strisdn-%{_streams}-%{_kversion}}
-%{?NEED_ss7:Requires: strss7-%{_streams}-%{_kversion}}
-%{?NEED_sigtran:Requires: sigtran-%{_streams}-%{_kversion}}
-Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{_streams}-%{_kversion}
-%{descripline}
-The %{name}-%{_streams}-%{_kversion} binary package is a virtual package that
-depends on all %{name} kernel subpackages for the %{_kversion} kernel.
-Installing this package installs all necessary subpackages for the
-%{_kversion} kernel.
-%{descriptail}
-
-%if %{FILES_kvirtual}
-%files %{_streams}-%{_kversion}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%endif
-
-
-# ===========================================================================
-%package -n %{corename %name-%_streams}
+%package -n %{corename %name}
 
 Summary:        OpenSS7 %{_STREAMS} STREAMS %{stitle} kernel modules.
 Group:          System Environment/Kernel
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
+%{?_xpm:
+Icon:           %_xpm}
+%{?_gif:
+Icon:           %_gif}
 Autoreq:        true
 Autoprov:       true
-Prefix:         %{_kmoduledir}
-%{?_conflict:Conflicts:      %{corename %name-%_conflict}}
+
+%{?files_modules:
+Prefix:         %{_kmoduledir}}
+
+%{?_conflict:
+Conflicts:      %{coreconf %name}}
+
 Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{_streams}-core < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{_streams}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{virtual}-core < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{virtual}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+
 #Prereq:         /sbin/depmod
 #Prereq:         /sbin/lsmod
 #Prereq:         /sbin/insmod
 #Prereq:         /sbin/modprobe
 # SuSE puts lsof in /usr/bin
 Prereq:         lsof
+
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
-#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
-%if %{NEED_init}
-Requires:       %{name}-init = %{epoch}:%{myversion}-%{fullrelease2}
-%endif
-%if %{NEED_devs}
-Requires:       %{name}-dev = %{epoch}:%{myversion}-%{fullrelease2}
-%endif
-%{?_strvers:Requires: %{corename %_streams} %version_of_or %{_streams}-%{core_name} %{_strvers}}
-%{!?_strvers:%{expand:Requires: %%requires_prov %{corename %_streams} = %{_streams}-%{core_name}}}
-#{?NEED_compat:%{expand:Requires: %{corename strcompat-%_streams} %%version_of_or %{corename strcompat-%_streams} %{minversion @STRCOMP_VERSION@}}}
-%{?NEED_compat:Requires: %{corename strcompat-%{_streams}}}
-%{?NEED_xns:Requires: %{corename strxns-%{_streams}}}
-%{?NEED_xnet:Requires: %{corename strxnet-%{_streams}}}
-#{?NEED_nsl:Requires: %{corename strnsl-%{_streams}}}
-#{?NEED_sock:Requires: %{corename strsock-%{_streams}}}
-%{?NEED_inet:Requires: %{corename strinet-%{_streams}}}
-%{?NEED_sctp:Requires: %{corename strsctp-%{_streams}}}
-%{?NEED_chan:Requires: %{corename strchan-%{_streams}}}
-%{?NEED_x25:Requires: %{corename strx25-%{_streams}}}
-%{?NEED_iso:Requires: %{corename striso-%{_streams}}}
-%{?NEED_isdn:Requires: %{corename strisdn-%{_streams}}}
-%{?NEED_ss7:Requires: %{corename strss7-%{_streams}}}
-%{?NEED_sigtran:Requires: %{corename sigtran-%{_streams}}}
+
+Requires:       %{name} = %{epoch}:@VERSION@-%{rpmrelease}
+%{?need_streams:
+Requires:       %{_streams}-%{_kversion} >= %{_strvers}}
+%{?need_compat:
+Requires:       %{coreroot strcompat} >= @STRCOMP_VERSION@}
+%{?need_xns:
+Requires:       %{coreroot strxns} >= @XNS_VERSION@}
+%{?need_xnet:
+Requires:       %{coreroot strxnet} >= @XTI_VERSION@}
+%{?need_nsl:
+#equires:       %{coreroot strnsl} >= @NSL_VERSION@}
+%{?need_sock:
+#equires:       %{coreroot strsock} >= @SOCK_VERSION@}
+%{?need_inet:
+Requires:       %{coreroot strinet} >= @INET_VERSION@}
+%{?need_sctp:
+Requires:       %{coreroot strsctp} >= @SCTP_VERSION@}
+%{?need_chan:
+Requires:       %{coreroot strchan} >= @CHAN_VERSION@}
+%{?need_x25:
+Requires:       %{coreroot strx25} >= @X25_VERSION@}
+%{?need_iso:
+Requires:       %{coreroot striso} >= @ISO_VERSION@}
+%{?need_isdn:
+Requires:       %{coreroot strisdn} >= @ISDN_VERSION@}
+%{?need_ss7:
+Requires:       %{coreroot strss7} >= @SS7_VERSION@}
+%{?need_sigtran:
+Requires:       %{coreroot sigtran} >= @SIGTRAN_VERSION@}
+
 Provides:       kernel-modules = %{_kversion}
-Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{coreroot %name} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{coreroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{coreroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{coreroot %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{coreroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{coreroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{coreroot %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{corename %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{corename %name} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{corename %name} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{corename %name} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{corename %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{corename %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}  = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{coreroot %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{coreroot %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{coreroot %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{name}%{_strextra}-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease}
+Provides:       %{name}%{_strextra}-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease2}
+Provides:       %{name}%{_strextra}-%{_kversion} = %{epoch}:@VERSION@-%{rpmrelease}
+
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n %{corename %name-%_streams}
+%description -n %{corename %name}
 %{descripline}
 The %{corename %name-%_streams} binary package contains the
 kernel modules that provide the Linux kernel %{stitle}
@@ -2630,7 +2572,7 @@ you cannot find a binary package that matches your kernel, rebuild
 from the source rpm.
 %{descriptail}
 
-%pre -n %{corename %name-%_streams}
+%pre -n %{corename %name}
 # ---------------------------------------------------------------------------
 arg="$1"
 function remove_depmods() {
@@ -2647,12 +2589,12 @@ if [ $arg = 1 ] ; then : # fresh install
     # installed kernel modules hanging around for this kernel version.
     list="%{modules}" ; modl_mods=
     if [ -d %{_kmoduledir} ] ; then
-	for m in `find %{_kmoduledir} \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
-		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
-		case " $list " in (*" $b "*) ;; (*) continue ;; esac
-		echo "$m"
-		modl_mods="${modl_mods:+$modl_mods }$m"
-	done
+        for m in `find %{_kmoduledir} \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
+                b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
+                case " $list " in (*" $b "*) ;; (*) continue ;; esac
+                echo "$m"
+                modl_mods="${modl_mods:+$modl_mods }$m"
+        done
         if [ -n "$modl_mods" -a -f %{_kmoduledir}/modules.dep ] ; then
             # First we can build a dependency tree from every dependency expression that can be
             # found in the modules.dep file.
@@ -2725,14 +2667,14 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
     fi
 fi
 
-%post -n %{corename %name-%_streams}
+%post -n %{corename %name}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # This is a running kernel, do a depmod on the modules directory for the running
         # kernel.
         depmod -ae 2>&1 || :
-%if %{have_initscripts}
+%if %{HAVE_initscripts}
         # Running kernels do need init scripts run.
         list="%{initfiles}" ; for i in $list ; do
             if [ -f %_initrddir/$i ] ; then
@@ -2749,13 +2691,13 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     fi
 fi
 
-%preun -n %{corename %name-%_streams}
+%preun -n %{corename %name}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # We are about to uninstall for good on a running kernel then we have to worry about which
         # modules are running
-%if %{have_initscripts}
+%if %{HAVE_initscripts}
         # First lets try shutting down using any init script first in reverse order
         list="%{initfiles}" ; for i in $list ; do
             reverse="$i${reverse:+ $reverse}"
@@ -2795,7 +2737,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 
-%postun -n %{corename %name-%_streams}
+%postun -n %{corename %name}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
@@ -2851,30 +2793,40 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 
-%if %{FILES_modules}
-%files -n %{corename %name-%_streams}
+%if %{PACKAGE_kmod}
+%files -n %{corename %name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%dir %{_kmoduledir}/%{base}
-%{?oldmodule:%attr(644,root,root) %{_kmoduledir}/modules.%{base}}
-%{?oldmodule:%{_kmoduledir}/%{base}/*.o*}
-%{?newmodule:%{_kmoduledir}/%{base}/*.ko*}
+%{?files_modules:
+%dir %{_kmoduledir}/%{base}}
+%{?files_oldmods:
+%attr(644,root,root) %{_kmoduledir}/modules.%{base}}
+%{?files_oldmods:
+%{_kmoduledir}/%{base}/*.o*}
+%{?files_newmods:
+%{_kmoduledir}/%{base}/*.ko*}
 %endif
 
 # ===========================================================================
-%package -n %{infoname %name-%_streams}
+%package -n %{infoname %name}
 
 Summary:        %{title} core kernel module symbol versions.
-Group:          System Environment/Kernel
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
+Group:          Development/Kernel
+%{?_xpm:
+Icon:           %_xpm}
+%{?_gif:
+Icon:           %_gif}
 Autoreq:        true
 Autoprov:       true
-%if %{FILES_modules}
-Prefix:         %{_includedir}/%{name}/%{kernel_version}
-%endif
-Prefix:         %{_kmoduledir}
-%{?_conflict:Conflicts:      %{infoname %name-%_conflict}}
+
+%{?files_modules:
+Prefix:         %{_kmoduledir}}
+%{?files_oldmods:
+Prefix:         %{_includedir}/%{name}/%{kernel_version}}
+
+%{?_conflict:
+Conflicts:      %{infoconf %name}}
+
 Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-info < %{epoch}:%{version}-%{rpmrelease}
@@ -2883,127 +2835,62 @@ Obsoletes:      %{name}-%{_streams}-core < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{_streams}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{_streams}-info < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-%{_streams}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
-#Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n")
-Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
-%{?NEED_compat:Requires: %{infoname strcompat-%{_streams}}}
-%{?NEED_xns:Requires: %{infoname strxns-%{_streams}}}
-%{?NEED_xnet:Requires: %{infoname strxnet-%{_streams}}}
-#{?NEED_nsl:Requires: %{infoname strnsl-%{_streams}}}
-#{?NEED_sock:Requires: %{infoname strsock-%{_streams}}}
-%{?NEED_inet:Requires: %{infoname strinet-%{_streams}}}
-%{?NEED_sctp:Requires: %{infoname strsctp-%{_streams}}}
-%{?NEED_chan:Requires: %{infoname strchan-%{_streams}}}
-%{?NEED_x25:Requires: %{infoname strx25-%{_streams}}}
-%{?NEED_iso:Requires: %{infoname striso-%{_streams}}}
-%{?NEED_isdn:Requires: %{infoname strisdn-%{_streams}}}
-%{?NEED_ss7:Requires: %{infoname strss7-%{_streams}}}
-%{?NEED_sigtran:Requires: %{infoname sigtran-%{_streams}}}
+
+Requires:       %{name}-devel = %{epoch}:@VERSION@-%{fullrelease}
+Requires:       %{corename %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
+%{?need_streams:
+Requires:       %{_streams}-devel-%{_kversion} >= %{_strvers}}
+%{?need_compat:
+Requires:       %{inforoot strcompat} >= @STRCOMP_VERSION@}
+%{?need_xns:
+Requires:       %{inforoot strxns} >= @XNS_VERSION@}
+%{?need_xnet:
+Requires:       %{inforoot strxnet} >= @XTI_VERSION@}
+#{?need_nsl:
+#equires:       %{inforoot strnsl} >= @NSL_VERSION@}
+#{?need_sock:
+#equires:       %{inforoot strsock} >= @SOCK_VERSION@}
+%{?need_inet:
+Requires:       %{inforoot strinet} >= @INET_VERSION@}
+%{?need_sctp:
+Requires:       %{inforoot strsctp} >= @SCTP_VERSION@}
+%{?need_chan:
+Requires:       %{inforoot strchan} >= @CHAN_VERSION@}
+%{?need_x25:
+Requires:       %{inforoot strx25} >= @X25_VERSION@}
+%{?need_iso:
+Requires:       %{inforoot striso} >= @ISO_VERSION@}
+%{?need_isdn:
+Requires:       %{inforoot strisdn} >= @ISDN_VERSION@}
+%{?need_ss7:
+Requires:       %{inforoot strss7} >= @SS7_VERSION@}
+%{?need_sigtran:
+Requires:       %{inforoot sigtran} >= @SIGTRAN_VERSION@}
+
 Provides:       kernel-modules = %{_kversion}
-Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{inforoot %name} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{inforoot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{inforoot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{inforoot %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{inforoot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{inforoot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{inforoot %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{infoname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{infoname %name} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{infoname %name} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{infoname %name} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{infoname %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{infoname %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-devel  = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{inforoot %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Provides:       %{inforoot %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
+Provides:       %{inforoot %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
 Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-devel  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-devel  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-devel%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-devel-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
 Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-devel-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-devel-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-devel-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
+Provides:       %{name}%{_strextra}-devel-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease}
+Provides:       %{name}%{_strextra}-devel-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease2}
+Provides:       %{name}%{_strextra}-devel-%{_kversion} = %{epoch}:@VERSION@-%{rpmrelease}
+
 Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n %{infoname %name-%_streams}
+%description -n %{infoname %name}
 %{descripline}
 The %{infoname %name-%_streams} binary package
 contains the kernel modules symbol information for development
@@ -3013,174 +2900,52 @@ package.  This package is heavily tied to the core kernel
 modules and kernel for which it was compiled.  This package
 applies to core kernel modules %{corename %name-%_streams}
 for kernel version %{_kversion}.
-%{descriptail}
-
-%if %{FILES_modules}
-%files -n %{infoname %name-%_streams}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{?oldmodule;%dir %{_includedir}/%{name}/%{kernel_version}}
-%{?oldmodule;%{_includedir}/%{name}/%{kernel_version}/*}
-%{_kmoduledir}/%{base}/Module*
-%endif
-
-# ===========================================================================
-%package -n %{dbugname %name-%_streams}
-
-Summary:        %{title} kernel module debug information.
-Group:          Development/Debug
-AutoReq:        0
-AutoProv:       0
-%{?_conflict:Conflicts:      %{dbugname %name-%_conflict}}
-Requires:       %{name}-base = %{epoch}:%{myversion}-%{fullrelease2}
-%{?NEED_compat:Requires: %{dbugname strcompat-%{_streams}}}
-%{?NEED_xns:Requires: %{dbugname strxns-%{_streams}}}
-%{?NEED_xnet:Requires: %{dbugname strxnet-%{_streams}}}
-#{?NEED_nsl:Requires: %{dbugname strnsl-%{_streams}}}
-#{?NEED_sock:Requires: %{dbugname strsock-%{_streams}}}
-%{?NEED_inet:Requires: %{dbugname strinet-%{_streams}}}
-%{?NEED_sctp:Requires: %{dbugname strsctp-%{_streams}}}
-%{?NEED_chan:Requires: %{dbugname strchan-%{_streams}}}
-%{?NEED_x25:Requires: %{dbugname strx25-%{_streams}}}
-%{?NEED_iso:Requires: %{dbugname striso-%{_streams}}}
-%{?NEED_isdn:Requires: %{dbugname strisdn-%{_streams}}}
-%{?NEED_ss7:Requires: %{dbugname strss7-%{_streams}}}
-%{?NEED_sigtran:Requires: %{dbugname sigtran-%{_streams}}}
-Provides:       kernel-modules = %{_kversion}
-Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{dbugroot %name} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{dbugroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{dbugroot %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{dbugroot %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{dbugroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{dbugroot %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{dbugroot %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{dbugname %name} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{dbugname %name} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{dbugname %name} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{dbugname %name} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{dbugname %name-%_streams} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{dbugname %name-%virtual} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-debuginfo  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{_streams}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       kernel-module-%{name}-%{virtual}-debuginfo%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-debuginfo-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-debuginfo-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{_streams}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-debuginfo-kmod  = %{epoch}:%{myversion}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{fullrelease2}
-Provides:       %{name}-%{virtual}-debuginfo-kmod%{kernel_flavor} = %{epoch}:%{myversion}-%{rpmrelease}
-Version:        %{kmodules_version}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description -n %{dbugname %name-%_streams}
-%{descripline}
 This package provides debug information for package %{name}.
 Debug information is useful when developing applications that
 use this package or when debugging this package.
 %{descriptail}
 
-%if %{FILES_kern_debug}
-%files -n %{dbugname %name-%_streams}
+%if %{PACKAGE_kbug}
+%files -n %{infoname %name}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?_lib32dir:%{_lib32dir}}%{!?_lib32dir:%{_libdir}}/debug
+%{?files_kdebugfiles:
 %{_usrsrc}/debug
+%{?_lib32dir:
+%{_lib32dir}/debug/lib/modules/%{kernel_version}}
+%{!?_lib32dir:
+%{_libdir}/debug/lib/modules/%{kernel_version}}}
+%{?files_oldmods:
+%dir %{_includedir}/%{name}/%{kernel_version}}
+%{?files_oldmods:
+%{_includedir}/%{name}/%{kernel_version}/*}
+%{?files_modules:
+%{_kmoduledir}/%{base}/Module*}
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.111  2008-09-26 08:48:05  brian
-# - sync spec files before rework
+# Revision 0.9.2.112  2008-09-28 03:46:45  brian
+# - updated spec files
 #
-# Revision 0.9.2.110  2008-09-24 21:02:55  brian
-# - latest spec file tweaks
-#
-# Revision 0.9.2.109  2008-09-24 16:27:19  brian
-# - more spec file tweaks
-#
-# Revision 0.9.2.108  2008-09-24 03:29:52  brian
-# - corrections to interdependencies between subpackages
-#
+
+* Fri Sep 26 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.111  2008-09-26 08:48:05  brian
+- sync spec files before rework
+
+* Wed Sep 24 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.110  2008-09-24 21:02:55  brian
+- latest spec file tweaks
+
+* Wed Sep 24 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.109  2008-09-24 16:27:19  brian
+- more spec file tweaks
+
+* Wed Sep 24 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.108  2008-09-24 03:29:52  brian
+- corrections to interdependencies between subpackages
 
 * Mon Sep 22 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.107  2008-09-22 17:37:27  brian
