@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: chan.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-28 16:50:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 16:50:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -385,6 +385,7 @@ dnl		    this will just not be set
 	    chan_version=
 	    chan_package=
 	    chan_release=
+	    chan_patchlevel=
 	    if test -n "$chan_cv_includes" ; then
 		for chan_dir in $chan_cv_includes ; do
 		    if test -z "$chan_epoch" -a -s "$chan_dir/../.rpmepoch" ; then
@@ -400,16 +401,22 @@ dnl		    this will just not be set
 			chan_version=`cat $chan_dir/../../.version`
 		    fi
 		    if test -z "$chan_version" -a -s "$chan_dir/../configure" ; then
-			chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$chan_version" -a -s "$chan_dir/../../configure" ; then
-			chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
+			chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s[^']^.*',,;s,'.*[$],,"`
 		    fi
 		    if test -z "$chan_package" -a -s "$chan_dir/../.pkgrelease" ; then
 			chan_package=`cat $chan_dir/../.pkgrelease`
 		    fi
 		    if test -z "$chan_package" -a -s "$chan_dir/../../.pkgrelease" ; then
 			chan_package=`cat $chan_dir/../../.pkgrelease`
+		    fi
+		    if test -z "$chan_patchlevel" -a -s "$chan_dir/../.pkgpatchlevel" ; then
+			chan_patchlevel=`cat $chan_dir/../.pkgpatchlevel`
+		    fi
+		    if test -z "$chan_patchlevel" -a -s "$chan_dir/../../.pkgpatchlevel" ; then
+			chan_patchlevel=`cat $chan_dir/../../.pkgpatchlevel`
 		    fi
 		    if test -z "$chan_release" -a -s "$chan_dir/../.rpmrelease" ; then
 			chan_release=`cat $chan_dir/../.rpmrelease`
@@ -420,7 +427,7 @@ dnl		    this will just not be set
 		done
 	    fi
 	    if test -n "$chan_epoch" -a -n "$chan_version" -a -n "$chan_package" -a -n "$chan_release" ; then
-		chan_cv_version="$chan_epoch:$chan_version.$chan_package-$chan_release"
+		chan_cv_version="$chan_epoch:$chan_version.$chan_package${chan_patchlevel:+.$chan_patchlevel}-$chan_release"
 	    fi
 	fi
     ])
@@ -568,6 +575,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.19  2008-09-28 16:50:55  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.18  2008-04-28 09:41:03  brian
 # - updated headers for release
 #
