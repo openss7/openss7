@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.17 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: isdn.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.21 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -392,6 +392,7 @@ dnl		    this will just not be set
 	    isdn_version=
 	    isdn_package=
 	    isdn_release=
+	    isdn_patchlevel=
 	    if test -n "$isdn_cv_includes" ; then
 		for isdn_dir in $isdn_cv_includes ; do
 		    if test -z "$isdn_epoch" -a -s "$isdn_dir/../.rpmepoch" ; then
@@ -406,17 +407,30 @@ dnl		    this will just not be set
 		    if test -z "$isdn_version" -a -s "$isdn_dir/../../.version" ; then
 			isdn_version=`cat $isdn_dir/../../.version`
 		    fi
-		    if test -z "$isdn_version" -a -s "$isdn_dir/../configure" ; then
-			isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$isdn_version" -a -s "$isdn_dir/../../configure" ; then
-			isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$isdn_package" -a -s "$isdn_dir/../.pkgrelease" ; then
-			isdn_package=`cat $isdn_dir/../.pkgrelease`
-		    fi
-		    if test -z "$isdn_package" -a -s "$isdn_dir/../../.pkgrelease" ; then
-			isdn_package=`cat $isdn_dir/../../.pkgrelease`
+		    if test -z "$isdn_version" ; then
+			if test -z "$isdn_version" -a -s "$isdn_dir/../configure" ; then
+			    isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$isdn_version" -a -s "$isdn_dir/../../configure" ; then
+			    isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$isdn_package" -a -s "$isdn_dir/../.pkgrelease" ; then
+			    isdn_package=`cat $isdn_dir/../.pkgrelease`
+			fi
+			if test -z "$isdn_package" -a -s "$isdn_dir/../../.pkgrelease" ; then
+			    isdn_package=`cat $isdn_dir/../../.pkgrelease`
+			fi
+			if test -z "$isdn_patchlevel" -a -s "$isdn_dir/../.pkgpatchlevel" ; then
+			    isdn_patchlevel=`cat $isdn_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$isdn_patchlevel" -a -s "$isdn_dir/../../.pkgpatchlevel" ; then
+			    isdn_patchlevel=`cat $isdn_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$isdn_version" -a -n "$isdn_package" ; then
+			    isdn_version="$isdn_version.$isdn_package${isdn_patchlevel:+.$isdn_patchlevel}"
+			else
+			    isdn_version=
+			fi
 		    fi
 		    if test -z "$isdn_release" -a -s "$isdn_dir/../.rpmrelease" ; then
 			isdn_release=`cat $isdn_dir/../.rpmrelease`
@@ -426,8 +440,8 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test -n "$isdn_epoch" -a -n "$isdn_version" -a -n "$isdn_package" -a -n "$isdn_release" ; then
-		isdn_cv_version="$isdn_epoch:$isdn_version.$isdn_package-$isdn_release"
+	    if test -n "$isdn_epoch" -a -n "$isdn_version" -a -n "$isdn_release" ; then
+		isdn_cv_version="$isdn_epoch:$isdn_version-$isdn_release"
 	    fi
 	fi
     ])
@@ -575,6 +589,18 @@ AC_DEFUN([_ISDN_], [dnl
 # =============================================================================
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.21  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
+# Revision 0.9.2.20  2008-09-28 18:42:57  brian
+# - corrections
+#
+# Revision 0.9.2.19  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
+# Revision 0.9.2.18  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.17  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

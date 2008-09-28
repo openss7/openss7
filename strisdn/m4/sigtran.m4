@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.19 $) $Date: 2008-09-28 18:42:57 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.20 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -407,10 +407,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$sigtran_version" ; then
 			if test -z "$sigtran_version" -a -s "$sigtran_dir/../configure" ; then
-			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sigtran_version" -a -s "$sigtran_dir/../../configure" ; then
-			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sigtran_package" -a -s "$sigtran_dir/../.pkgrelease" ; then
 			    sigtran_package=`cat $sigtran_dir/../.pkgrelease`
@@ -587,6 +587,9 @@ AC_DEFUN([_SIGTRAN_], [dnl
 # =============================================================================
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.20  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
 # Revision 0.9.2.19  2008-09-28 18:42:57  brian
 # - corrections
 #

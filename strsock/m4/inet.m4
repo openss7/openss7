@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.49 $) $Date: 2008-09-28 18:42:57 $
+# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.50 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 18:42:57 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -429,10 +429,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$inet_version" ; then
 			if test -z "$inet_version" -a -s "$inet_dir/../configure" ; then
-			    inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$inet_version" -a -s "$inet_dir/../../configure" ; then
-			    inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../../configure | sed -e "s,^[^']*',,;s,'.*[$],,"`
+			    inet_version=`grep -m 1 '^PACKAGE_VERSION=' $inet_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$inet_package" -a -s "$inet_dir/../.pkgrelease" ; then
 			    inet_package=`cat $inet_dir/../.pkgrelease`
@@ -609,6 +609,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.50  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
 # Revision 0.9.2.49  2008-09-28 18:42:57  brian
 # - corrections
 #

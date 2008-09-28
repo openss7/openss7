@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.25 $) $Date: 2008-04-28 09:41:03 $
+# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.29 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -443,6 +443,7 @@ dnl		    this will just not be set
 	    sock_version=
 	    sock_package=
 	    sock_release=
+	    sock_patchlevel=
 	    if test -n "$sock_cv_includes" ; then
 		for sock_dir in $sock_cv_includes ; do
 		    if test -z "$sock_epoch" -a -s "$sock_dir/../.rpmepoch" ; then
@@ -457,17 +458,30 @@ dnl		    this will just not be set
 		    if test -z "$sock_version" -a -s "$sock_dir/../../.version" ; then
 			sock_version=`cat $sock_dir/../../.version`
 		    fi
-		    if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
-			sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
-			sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
-			sock_package=`cat $sock_dir/../.pkgrelease`
-		    fi
-		    if test -z "$sock_package" -a -s "$sock_dir/../../.pkgrelease" ; then
-			sock_package=`cat $sock_dir/../../.pkgrelease`
+		    if test -z "$sock_version" ; then
+			if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
+			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
+			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
+			    sock_package=`cat $sock_dir/../.pkgrelease`
+			fi
+			if test -z "$sock_package" -a -s "$sock_dir/../../.pkgrelease" ; then
+			    sock_package=`cat $sock_dir/../../.pkgrelease`
+			fi
+			if test -z "$sock_patchlevel" -a -s "$sock_dir/../.pkgpatchlevel" ; then
+			    sock_patchlevel=`cat $sock_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$sock_patchlevel" -a -s "$sock_dir/../../.pkgpatchlevel" ; then
+			    sock_patchlevel=`cat $sock_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$sock_version" -a -n "$sock_package" ; then
+			    sock_version="$sock_version.$sock_package${sock_patchlevel:+.$sock_patchlevel}"
+			else
+			    sock_version=
+			fi
 		    fi
 		    if test -z "$sock_release" -a -s "$sock_dir/../.rpmrelease" ; then
 			sock_release=`cat $sock_dir/../.rpmrelease`
@@ -477,8 +491,8 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test -n "$sock_epoch" -a -n "$sock_version" -a -n "$sock_package" -a -n "$sock_release" ; then
-		sock_cv_version="$sock_epoch:$sock_version.$sock_package-$sock_release"
+	    if test -n "$sock_epoch" -a -n "$sock_version" -a -n "$sock_release" ; then
+		sock_cv_version="$sock_epoch:$sock_version-$sock_release"
 	    fi
 	fi
     ])
@@ -626,6 +640,18 @@ AC_DEFUN([_SOCK_], [dnl
 # =============================================================================
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.29  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
+# Revision 0.9.2.28  2008-09-28 18:42:57  brian
+# - corrections
+#
+# Revision 0.9.2.27  2008-09-28 17:48:29  brian
+# - more version number corrections
+#
+# Revision 0.9.2.26  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.25  2008-04-28 09:41:03  brian
 # - updated headers for release
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.53 $) $Date: 2008-04-28 09:41:04 $
+# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.57 $) $Date: 2008-09-28 19:10:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 09:41:04 $ by $Author: brian $
+# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -446,6 +446,7 @@ dnl		    this will just not be set
 	    xns_version=
 	    xns_package=
 	    xns_release=
+	    xns_patchlevel=
 	    if test -n "$xns_cv_includes" ; then
 		for xns_dir in $xns_cv_includes ; do
 		    if test -z "$xns_epoch" -a -s "$xns_dir/../.rpmepoch" ; then
@@ -460,17 +461,30 @@ dnl		    this will just not be set
 		    if test -z "$xns_version" -a -s "$xns_dir/../../.version" ; then
 			xns_version=`cat $xns_dir/../../.version`
 		    fi
-		    if test -z "$xns_version" -a -s "$xns_dir/../configure" ; then
-			xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$xns_version" -a -s "$xns_dir/../../configure" ; then
-			xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s,^.*',,;s,'.*[$],,"`
-		    fi
-		    if test -z "$xns_package" -a -s "$xns_dir/../.pkgrelease" ; then
-			xns_package=`cat $xns_dir/../.pkgrelease`
-		    fi
-		    if test -z "$xns_package" -a -s "$xns_dir/../../.pkgrelease" ; then
-			xns_package=`cat $xns_dir/../../.pkgrelease`
+		    if test -z "$xns_version" ; then
+			if test -z "$xns_version" -a -s "$xns_dir/../configure" ; then
+			    xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$xns_version" -a -s "$xns_dir/../../configure" ; then
+			    xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			fi
+			if test -z "$xns_package" -a -s "$xns_dir/../.pkgrelease" ; then
+			    xns_package=`cat $xns_dir/../.pkgrelease`
+			fi
+			if test -z "$xns_package" -a -s "$xns_dir/../../.pkgrelease" ; then
+			    xns_package=`cat $xns_dir/../../.pkgrelease`
+			fi
+			if test -z "$xns_patchlevel" -a -s "$xns_dir/../.pkgpatchlevel" ; then
+			    xns_patchlevel=`cat $xns_dir/../.pkgpatchlevel`
+			fi
+			if test -z "$xns_patchlevel" -a -s "$xns_dir/../../.pkgpatchlevel" ; then
+			    xns_patchlevel=`cat $xns_dir/../../.pkgpatchlevel`
+			fi
+			if test -n "$xns_version" -a -n "$xns_package" ; then
+			    xns_version="$xns_version.$xns_package${xns_patchlevel:+.$xns_patchlevel}"
+			else
+			    xns_version=
+			fi
 		    fi
 		    if test -z "$xns_release" -a -s "$xns_dir/../.rpmrelease" ; then
 			xns_release=`cat $xns_dir/../.rpmrelease`
@@ -480,8 +494,8 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test -n "$xns_epoch" -a -n "$xns_version" -a -n "$xns_package" -a -n "$xns_release" ; then
-		xns_cv_version="$xns_epoch:$xns_version.$xns_package-$xns_release"
+	    if test -n "$xns_epoch" -a -n "$xns_version" -a -n "$xns_release" ; then
+		xns_cv_version="$xns_epoch:$xns_version-$xns_release"
 	    fi
 	fi
     ])
@@ -629,6 +643,18 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.57  2008-09-28 19:10:58  brian
+# - quotation corrections
+#
+# Revision 0.9.2.56  2008-09-28 18:42:57  brian
+# - corrections
+#
+# Revision 0.9.2.55  2008-09-28 17:48:30  brian
+# - more version number corrections
+#
+# Revision 0.9.2.54  2008-09-28 16:50:56  brian
+# - parsing correction and addition of patchlevel
+#
 # Revision 0.9.2.53  2008-04-28 09:41:04  brian
 # - updated headers for release
 #
