@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-09-29 09:54:30 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2008-09-29 22:45:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,16 +47,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-29 09:54:30 $ by $Author: brian $
+# Last Modified $Date: 2008-09-29 22:45:36 $ by $Author: brian $
 #
 # =============================================================================
 
 %global majbase     @STRCONF_MAJBASE@
 %global makedev     @STRCONF_MAKEDEV@
-#global mknods      /usr/sbin/inet_mkdev    # inet style install
-#global rmnods      /usr/sbin/inet_rmdev    # inet style removal
-%global mknods      /usr/sbin/@STRMAKENODES@
-%global rmnods      /usr/sbin/@STRMAKENODES@ --remove
+#global mknods      /usr/sbin/@STRMAKENODES@
+#global rmnods      /usr/sbin/@STRMAKENODES@ --remove
 %global epoch       @PACKAGE_RPMEPOCH@
 %global base        @PACKAGE_LCNAME@
 %global title       @PACKAGE_TITLE@
@@ -113,6 +111,7 @@
 %global NEED_sigtran    0
 
 %global VIRT_base       1
+%global VIRT_lib        1
 %global VIRT_devel      1
 %global VIRT_kmod       1
 %global VIRT_kbug       1
@@ -1069,110 +1068,110 @@ Autoprov:       true
 %define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 
 %ifarch s390 s390x
-BuildRequires:  gcc >= 2.95.3
+BuildPrereq:    gcc >= 2.95.3
 %else
 %ifarch %all_ppc
-BuildRequires:  gcc >= 2.96-75
+BuildPrereq:    gcc >= 2.96-75
 %else
 %if %newgcc
-BuildRequires:  gcc >= 2.96-98
+BuildPrereq:    gcc >= 2.96-98
 %else
-BuildRequires:  gcc = 2.95.3
+BuildPrereq:    gcc = 2.95.3
 %endif
 %endif
 %endif
 %if %newgcc
-BuildRequires:  gcc >= 2.96
+BuildPrereq:    gcc >= 2.96
 %else
-BuildRequires:  gcc = 2.95.3
+BuildPrereq:    gcc = 2.95.3
 %endif
 
 # TODO: FC4 wants kernel-devel not kernel-source
 # older rpm can't handle nested ifs
 %if %{kernel_fedora}
-BuildRequires:  kernel-devel = %{kernel_source}
+BuildPrereq:    kernel-devel = %{kernel_source}
 %endif
 %if %{kernel_others}
-BuildRequires:  kernel-source = %{kernel_source}
+BuildPrereq:    kernel-source = %{kernel_source}
 %endif
 %if %{BUILD_modules}
-BuildRequires:  modutils >= 2.4.12
+BuildPrereq:    modutils >= 2.4.12
 %endif
 
 %if %{without_ko_modules}
 # to generate kernel symbols:
-BuildRequires:  /sbin/genksyms
+BuildPrereq:    /sbin/genksyms
 %endif
 
-#if %{NEED_streams}
-#uildRequires:  %{virtual}-devel
-#endif
-#if %{NEED_compat}
-#uildRequires:  strcompat-devel >= 0@STRCOMP_VERSION@
-#endif
-#if %{NEED_tty}
-#uildRequires:  strtty-devel >= 0@TTY_VERSION@
-#endif
-#if %{NEED_xns}
-#uildRequires:  strxns-devel >= 0@XNS_VERSION@
-#endif
-#if %{NEED_xnet}
-#uildRequires:  strxnet-devel >= 0@XTI_VERSION@
-#endif
-#if %{NEED_nsl}
-#uildRequires:  strnsl-devel >= 0@NSL_VERSION@
-#endif
-#if %{NEED_sock}
-#uildRequires:  strsock-devel >= 0@SOCK_VERSION@
-#endif
-#if %{NEED_inet}
-#uildRequires:  strinet-devel >= 0@INET_VERSION@
-#endif
-#if %{NEED_sctp}
-#uildRequires:  strsctp-devel >= 0@SCTP_VERSION@
-#endif
-#if %{NEED_chan}
-#uildRequires:  strchan-devel >= 0@CHAN_VERSION@
-#endif
-#if %{NEED_x25}
-#uildRequires:  strx25-devel >= 0@X25_VERSION@
-#endif
-#if %{NEED_iso}
-#uildRequires:  striso-devel >= 0@ISO_VERSION@
-#endif
-#if %{NEED_isdn}
-#uildRequires:  strisdn-devel >= 0@ISDN_VERSION@
-#endif
-#if %{NEED_ss7}
-#uildRequires:  strss7-devel >= 0@SS7_VERSION@
-#endif
-#if %{NEED_sigtran}
-#uildRequires:  sigtran-devel >= 0@SIGTRAN_VERSION@
-#endif
+%if %{NEED_streams}
+#uildPrereq:    %{virtual}-devel
+%endif
+%if %{NEED_compat}
+#uildPrereq:    strcompat-devel >= 0@STRCOMP_VERSION@
+%endif
+%if %{NEED_tty}
+#uildPrereq:    strtty-devel >= 0@TTY_VERSION@
+%endif
+%if %{NEED_xns}
+#uildPrereq:    strxns-devel >= 0@XNS_VERSION@
+%endif
+%if %{NEED_xnet}
+#uildPrereq:    strxnet-devel >= 0@XTI_VERSION@
+%endif
+%if %{NEED_nsl}
+#uildPrereq:    strnsl-devel >= 0@NSL_VERSION@
+%endif
+%if %{NEED_sock}
+#uildPrereq:    strsock-devel >= 0@SOCK_VERSION@
+%endif
+%if %{NEED_inet}
+#uildPrereq:    strinet-devel >= 0@INET_VERSION@
+%endif
+%if %{NEED_sctp}
+#uildPrereq:    strsctp-devel >= 0@SCTP_VERSION@
+%endif
+%if %{NEED_chan}
+#uildPrereq:    strchan-devel >= 0@CHAN_VERSION@
+%endif
+%if %{NEED_x25}
+#uildPrereq:    strx25-devel >= 0@X25_VERSION@
+%endif
+%if %{NEED_iso}
+#uildPrereq:    striso-devel >= 0@ISO_VERSION@
+%endif
+%if %{NEED_isdn}
+#uildPrereq:    strisdn-devel >= 0@ISDN_VERSION@
+%endif
+%if %{NEED_ss7}
+#uildPrereq:    strss7-devel >= 0@SS7_VERSION@
+%endif
+%if %{NEED_sigtran}
+#uildPrereq:    sigtran-devel >= 0@SIGTRAN_VERSION@
+%endif
 
 # these are some needs of the configure script
 # to manipulate manual pages:
-BuildRequires:  /usr/bin/groff
-BuildRequires:  /usr/bin/soelim
-BuildRequires:  /usr/bin/refer
-BuildRequires:  /usr/bin/tbl
-BuildRequires:  /usr/bin/pic
-BuildRequires:  /usr/bin/gzip
+BuildPrereq:    /usr/bin/groff
+BuildPrereq:    /usr/bin/soelim
+BuildPrereq:    /usr/bin/refer
+BuildPrereq:    /usr/bin/tbl
+BuildPrereq:    /usr/bin/pic
+BuildPrereq:    /usr/bin/gzip
 
 %if %{BUILD_snmp}
 # when providing snmp agents, the following are required:
-#BuildRequires: lm_sensors-devel
-#BuildRequires: net-snmp-libs
-#BuildRequires: net-snmp-devel
+#BuildPrereq:   lm_sensors-devel
+#BuildPrereq:   net-snmp-libs
+#BuildPrereq:   net-snmp-devel
 %endif
 
 # to build documentation
-#BuildRequires: transfig >= 3.2
-#BuildRequires: ImageMagick
-#BuildRequires: tetex >= 1.0
-#BuildRequires: ghostscript >= 6.51
+#BuildPrereq:   transfig >= 3.2
+#BuildPrereq:   ImageMagick
+#BuildPrereq:   tetex >= 1.0
+#BuildPrereq:   ghostscript >= 6.51
 # to install documentation
-#BuildRequires: texinfo >= 4.0
+#BuildPrereq:   texinfo >= 4.0
 
 %if %{FILES_configfiles}
 Prefix:         %{_sysconfdir}
@@ -1218,8 +1217,6 @@ Prefix:         %{_htmldir}/@PACKAGE@-@VERSION@
 Prefix:         %{_mandir}
 %endif
 
-#Prereq:         /sbin/install-info
-
 Conflicts:      texinfo < 3.11
 
 Obsoletes:      %{name}-mib
@@ -1243,58 +1240,67 @@ Obsoletes:      %{_obsopkg}-doc
 Obsoletes:      %{_obsopkg}-docs
 %endif
 
-%if %{USE_makedev}
-Requires:       dev >= 3.3
+#Prereq:         /sbin/install-info
+
+%if %{HAVE_mknods}
+Prereq:         %{mknods}
 %endif
-Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+%if %{HAVE_rmnods}
+Prereq:         %{rmnods}
+%endif
+%if %{USE_makedev}
+Prereq:         dev >= 3.3
+%endif
+Prereq:         %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+%if %{NEED_streams}
+Prereq:         %{virtual}
+%endif
+%if %{NEED_compat}
+Prereq:         strcompat
+%endif
+%if %{NEED_tty}
+Prereq:         strtty
+%endif
+%if %{NEED_xns}
+Prereq:         strxns
+%endif
+%if %{NEED_xnet}
+Prereq:         strxnet
+%endif
+%if %{NEED_nsl}
+Prereq:         strnsl
+%endif
+%if %{NEED_sock}
+Prereq:         strsock
+%endif
+%if %{NEED_inet}
+Prereq:         strinet
+%endif
+%if %{NEED_sctp}
+Prereq:         strsctp
+%endif
+%if %{NEED_chan}
+Prereq:         strchan
+%endif
+%if %{NEED_x25}
+Prereq:         strx25
+%endif
+%if %{NEED_iso}
+Prereq:         striso
+%endif
+%if %{NEED_isdn}
+Prereq:         strisdn
+%endif
+%if %{NEED_ss7}
+Prereq:         strss7
+%endif
+%if %{NEED_sigtran}
+Prereq:         sigtran
+%endif
+
 Requires:       %{_virtpkg} = %{epoch}:%{version}-%{rpmrelease}
 %if %{HAVE_modules}
 Requires:       %{corevirt} >= @VERSION@}}
-%endif
-%if %{NEED_streams}
-Requires:       %{virtual}
-%endif
-%if %{NEED_compat}
-Requires:       strcompat
-%endif
-%if %{NEED_tty}
-Requires:       strtty
-%endif
-%if %{NEED_xns}
-Requires:       strxns
-%endif
-%if %{NEED_xnet}
-Requires:       strxnet
-%endif
-%if %{NEED_nsl}
-Requires:       strnsl
-%endif
-%if %{NEED_sock}
-Requires:       strsock
-%endif
-%if %{NEED_inet}
-Requires:       strinet
-%endif
-%if %{NEED_sctp}
-Requires:       strsctp
-%endif
-%if %{NEED_chan}
-Requires:       strchan
-%endif
-%if %{NEED_x25}
-Requires:       strx25
-%endif
-%if %{NEED_iso}
-Requires:       striso
-%endif
-%if %{NEED_isdn}
-Requires:       strisdn
-%endif
-%if %{NEED_ss7}
-Requires:       strss7
-%endif
-%if %{NEED_sigtran}
-Requires:       sigtran
 %endif
 
 Conflicts:      %{_confpkg}
@@ -1668,7 +1674,7 @@ make check
 # if we are going to create debug packages, we need to install unstripped
 # binaries; otherwise use libtoolized install-strip to strip binaries, modules,
 # shared and static libraries.
-make DESTDIR="%{buildroot}" \
+make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" \
     %{!?_enable_debug_packages: install-strip} \
     %{?_enable_debug_packages: install}
 
@@ -2009,7 +2015,7 @@ if [ $1 = 1 ] ; then : # fresh install
 %endif
 %if %{HAVE_manpages}
     if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
+        LANGUAGE= LANG= /usr/sbin/makewhatis -u %{_mandir} || :
     fi
 %endif
 %if %{HAVE_manrefs}
@@ -2390,7 +2396,7 @@ fi
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 %if %{HAVE_manpages}
     if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
+        LANGUAGE= LANG= /usr/sbin/makewhatis -u %{_mandir} || :
     fi
 %endif
 fi
@@ -2410,7 +2416,7 @@ fi
 #{?files_projects:#doc #{projects}}
 %{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+#{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 #{?files_oldmods:%config(noreplace) %{_modutildir}/*}
@@ -2480,52 +2486,53 @@ Obsoletes:      %{_obsopkg}-utils
 
 Prereq:         /sbin/ldconfig
 
-Requires:       %{_virtpkg}
 %if %{NEED_streams}
-Requires:       %{virtual}-lib
+Prereq:         %{virtual}-lib
 %endif
 %if %{NEED_compat}
-Requires:       strcompat-lib >= 0@STRCOMP_VERSION@
+Prereq:         strcompat-lib >= 0@STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Requires:       strtty-lib >= 0@TTY_VERSION@
+Prereq:         strtty-lib >= 0@TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Requires:       strxns-lib >= 0@XNS_VERSION@
+Prereq:         strxns-lib >= 0@XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Requires:       strxnet-lib >= 0@XTI_VERSION@
+Prereq:         strxnet-lib >= 0@XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-Requires:       strnsl-lib >= 0@NSL_VERSION@
+Prereq:         strnsl-lib >= 0@NSL_VERSION@
 %endif
 %if %{NEED_sock}
-Requires:       strsock-lib >= 0@SOCK_VERSION@
+Prereq:         strsock-lib >= 0@SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Requires:       strinet-lib >= 0@INET_VERSION@
+Prereq:         strinet-lib >= 0@INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Requires:       strsctp-lib >= 0@SCTP_VERSION@
+Prereq:         strsctp-lib >= 0@SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Requires:       strchan-lib >= 0@CHAN_VERSION@
+Prereq:         strchan-lib >= 0@CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Requires:       strx25-lib >= 0@X25_VERSION@
+Prereq:         strx25-lib >= 0@X25_VERSION@
 %endif
 %if %{NEED_iso}
-Requires:       striso-lib >= 0@ISO_VERSION@
+Prereq:         striso-lib >= 0@ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Requires:       strisdn-lib >= 0@ISDN_VERSION@
+Prereq:         strisdn-lib >= 0@ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Requires:       strss7-lib >= 0@SS7_VERSION@
+Prereq:         strss7-lib >= 0@SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Requires:       sigtran-lib >= 0@SIGTRAN_VERSION@
+Prereq:         sigtran-lib >= 0@SIGTRAN_VERSION@
 %endif
+
+Requires:       %{_virtpkg}
 
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
@@ -2642,6 +2649,13 @@ Prefix:         %{_lib32dir}
 Conflicts:      texinfo < 3.11
 Conflicts:      %{_confpkg}-devel
 
+Obsoletes:      %{name}-doc
+Obsoletes:      %{name}-docs
+%if %{NEED_streams}
+Obsoletes:      %{_obsopkg}-doc
+Obsoletes:      %{_obsopkg}-docs
+%endif
+
 Requires:       %{name} = %{epoch}:%{version}-%{rpmrelease}
 %if %{HAVE_modules}
 Requires:       %{infovirt} >= @VERSION@
@@ -2698,13 +2712,6 @@ Provides:       %{name}-devel = %{epoch}:%{version}-%{rpmrelease}
 Provides:       %{_virtpkg}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{_virtpkg}-devel = %{epoch}:%{version}-%{fullrelease2}
 Provides:       %{_virtpkg}-devel = %{epoch}:%{version}-%{rpmrelease}
-
-Obsoletes:      %{name}-doc
-Obsoletes:      %{name}-docs
-%if %{NEED_streams}
-Obsoletes:      %{_obsopkg}-doc
-Obsoletes:      %{_obsopkg}-docs
-%endif
 
 Release:        %{fullrelease}
 
@@ -2774,53 +2781,57 @@ Obsoletes:      %{_obsopkg}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 # SuSE puts lsof in /usr/bin
 Prereq:         lsof
 
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+%if %{HAVE_initscripts}
+Prereq:         %{_initrddir}/%{base}
+%endif
 
-Requires:       %{name} = %{epoch}:@VERSION@-%{rpmrelease}
+Prereq:         %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+
+Prereq:         %{name} = %{epoch}:@VERSION@-%{rpmrelease}
 %if %{NEED_streams}
-Requires:       %{_streams}-%{_kversion} >= %{_strvers}
+Prereq:         %{_streams}-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Requires:       %{coreroot strcompat} >= 0@STRCOMP_VERSION@
+Prereq:         %{coreroot strcompat} >= 0@STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Requires:       %{coreroot strtty} >= 0@TTY_VERSION@
+Prereq:         %{coreroot strtty} >= 0@TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Requires:       %{coreroot strxns} >= 0@XNS_VERSION@
+Prereq:         %{coreroot strxns} >= 0@XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Requires:       %{coreroot strxnet} >= 0@XTI_VERSION@
+Prereq:         %{coreroot strxnet} >= 0@XTI_VERSION@
 %endif
 #if %{NEED_nsl}
-#equires:       %{coreroot strnsl} >= 0@NSL_VERSION@
+#rereq:         %{coreroot strnsl} >= 0@NSL_VERSION@
 #endif
 #if %{NEED_sock}
-#equires:       %{coreroot strsock} >= 0@SOCK_VERSION@
+#rereq:         %{coreroot strsock} >= 0@SOCK_VERSION@
 #endif
 %if %{NEED_inet}
-Requires:       %{coreroot strinet} >= 0@INET_VERSION@
+Prereq:         %{coreroot strinet} >= 0@INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Requires:       %{coreroot strsctp} >= 0@SCTP_VERSION@
+Prereq:         %{coreroot strsctp} >= 0@SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Requires:       %{coreroot strchan} >= 0@CHAN_VERSION@
+Prereq:         %{coreroot strchan} >= 0@CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Requires:       %{coreroot strx25} >= 0@X25_VERSION@
+Prereq:         %{coreroot strx25} >= 0@X25_VERSION@
 %endif
 %if %{NEED_iso}
-Requires:       %{coreroot striso} >= 0@ISO_VERSION@
+Prereq:         %{coreroot striso} >= 0@ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Requires:       %{coreroot strisdn} >= 0@ISDN_VERSION@
+Prereq:         %{coreroot strisdn} >= 0@ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Requires:       %{coreroot strss7} >= 0@SS7_VERSION@
+Prereq:         %{coreroot strss7} >= 0@SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Requires:       %{coreroot sigtran} >= 0@SIGTRAN_VERSION@
+Prereq:         %{coreroot sigtran} >= 0@SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -3129,54 +3140,54 @@ Obsoletes:      %{_obsopkg}-info < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{_obsopkg}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
 %endif
 
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+Prereq:         %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 
-Requires:       %{name}-devel = %{epoch}:@VERSION@-%{fullrelease}
-Requires:       %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Prereq:         %{name}-devel = %{epoch}:@VERSION@-%{fullrelease}
+Prereq:         %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
 %if %{NEED_streams}
-Requires:       %{_streams}-devel-%{_kversion} >= %{_strvers}
+Prereq:         %{_streams}-devel-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Requires:       %{inforoot strcompat} >= 0@STRCOMP_VERSION@
+Prereq:         %{inforoot strcompat} >= 0@STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Requires:       %{inforoot strtty} >= 0@TTY_VERSION@
+Prereq:         %{inforoot strtty} >= 0@TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Requires:       %{inforoot strxns} >= 0@XNS_VERSION@
+Prereq:         %{inforoot strxns} >= 0@XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Requires:       %{inforoot strxnet} >= 0@XTI_VERSION@
+Prereq:         %{inforoot strxnet} >= 0@XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-Requires:       %{inforoot strnsl} >= 0@NSL_VERSION@
+#rereq:         %{inforoot strnsl} >= 0@NSL_VERSION@
 %endif
 %if %{NEED_sock}
-Requires:       %{inforoot strsock} >= 0@SOCK_VERSION@
+#rereq:         %{inforoot strsock} >= 0@SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Requires:       %{inforoot strinet} >= 0@INET_VERSION@
+Prereq:         %{inforoot strinet} >= 0@INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Requires:       %{inforoot strsctp} >= 0@SCTP_VERSION@
+Prereq:         %{inforoot strsctp} >= 0@SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Requires:       %{inforoot strchan} >= 0@CHAN_VERSION@
+Prereq:         %{inforoot strchan} >= 0@CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Requires:       %{inforoot strx25} >= 0@X25_VERSION@
+Prereq:         %{inforoot strx25} >= 0@X25_VERSION@
 %endif
 %if %{NEED_iso}
-Requires:       %{inforoot striso} >= 0@ISO_VERSION@
+Prereq:         %{inforoot striso} >= 0@ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Requires:       %{inforoot strisdn} >= 0@ISDN_VERSION@
+Prereq:         %{inforoot strisdn} >= 0@ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Requires:       %{inforoot strss7} >= 0@SS7_VERSION@
+Prereq:         %{inforoot strss7} >= 0@SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Requires:       %{inforoot sigtran} >= 0@SIGTRAN_VERSION@
+Prereq:         %{inforoot sigtran} >= 0@SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -3231,9 +3242,13 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.90  2008-09-29 09:54:30  brian
-# - adjusted for older rpm
+# Revision 0.9.2.91  2008-09-29 22:45:36  brian
+# - strengthen ordering
 #
+
+* Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.90  2008-09-29 09:54:30  brian
+- adjusted for older rpm
 
 * Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.89  2008/09/29 06:28:15  brian
