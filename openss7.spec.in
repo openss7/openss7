@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.89 $) $Date: 2008/09/29 06:28:15 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-09-29 09:54:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/29 06:28:15 $ by $Author: brian $
+# Last Modified $Date: 2008-09-29 09:54:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -111,32 +111,6 @@
 %global NEED_isdn       0
 %global NEED_ss7        0
 %global NEED_sigtran    0
-
-%global config_options  \\\
-    --without-SCTP \\\
-    --without-IPERF \\\
-    --without-LIS \\\
-    --without-STREAMS \\\
-    --without-STRCOMPAT \\\
-    --without-STRUTIL \\\
-    --without-STRBCM \\\
-    --without-STRTTY \\\
-    --without-STRXNS \\\
-    --without-STRXNET \\\
-    --without-STRNSL \\\
-    --without-STRSOCK \\\
-    --without-STRINET \\\
-    --without-STRSCTP \\\
-    --without-STRCHAN \\\
-    --without-STRX25 \\\
-    --without-STRISO \\\
-    --without-NETPERF \\\
-    --without-STRISDN \\\
-    --without-STACKS \\\
-    --without-SIGTRAN \\\
-    --without-STRVOIP \\\
-    --without-OSR61 \\\
-    %{nil}
 
 %global VIRT_base       1
 %global VIRT_devel      1
@@ -487,11 +461,11 @@
 %global kernel_fedora       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,1,;t;s,.*\.fc[6789].*$,1,;t;s,.*\.EL[45]?.*$,1,;t;s,.*\.el5.*$,1,;t;s,.*$,0,')
 %global kernel_others       %(echo %{_kversion} | sed -r -e 's,.*FC[456].*$,0,;t;s,.*\.fc[6789].*$,0,;t;s,.*\.EL[45]?.*$,0,;t;s,.*\.el5.*$,0,;t;s,.*$,1,')
 
-%{?!VIRT_base:  %{expand: %global VIRT_base       0}}
-%{?!VIRT_lib:   %{expand: %global VIRT_lib        0}}
-%{?!VIRT_devel: %{expand: %global VIRT_devel      0}}
-%{?!VIRT_kmod:  %{expand: %global VIRT_kmod       0}}
-%{?!VIRT_kbug:  %{expand: %global VIRT_kbug       0}}
+%{!?VIRT_base:  %{expand: %%global VIRT_base       0}}
+%{!?VIRT_lib:   %{expand: %%global VIRT_lib        0}}
+%{!?VIRT_devel: %{expand: %%global VIRT_devel      0}}
+%{!?VIRT_kmod:  %{expand: %%global VIRT_kmod       0}}
+%{!?VIRT_kbug:  %{expand: %%global VIRT_kbug       0}}
 
 %if %{BUILD_modules}
 %else
@@ -1081,15 +1055,14 @@ Version:        @VERSION@
 Release:        %{rpmrelease}
 License:        %{license}
 Group:          System Environment/Kernel
-%{?url:         %{expand: URL:            %{url}}
-%{?_xpm:        %{expand: Icon:           %_xpm}}
-%{?_gif:        %{expand: Icon:           %_gif}}
+%{?url:URL:     %{url}}
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
 Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
-%{!?buildroot:
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
+%{!?buildroot:BuildRoot: %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
 Autoreq:        true
 Autoprov:       true
 
@@ -1131,21 +1104,51 @@ BuildRequires:  modutils >= 2.4.12
 BuildRequires:  /sbin/genksyms
 %endif
 
-#{?need_streams: %{expand: BuildRequires:  %{virtual}-devel}}
-#{?need_compat:  %{expand: BuildRequires:  strcompat-devel >= 0@STRCOMP_VERSION@}}
-#{?need_tty:     %{expand: BuildRequires:  strtty-devel >= 0@TTY_VERSION@}}
-#{?need_xns:     %{expand: BuildRequires:  strxns-devel >= 0@XNS_VERSION@}}
-#{?need_xnet:    %{expand: BuildRequires:  strxnet-devel >= 0@XTI_VERSION@}}
-#{?need_nsl:     %{expand: BuildRequires:  strnsl-devel >= 0@NSL_VERSION@}}
-#{?need_sock:    %{expand: BuildRequires:  strsock-devel >= 0@SOCK_VERSION@}}
-#{?need_inet:    %{expand: BuildRequires:  strinet-devel >= 0@INET_VERSION@}}
-#{?need_sctp:    %{expand: BuildRequires:  strsctp-devel >= 0@SCTP_VERSION@}}
-#{?need_chan:    %{expand: BuildRequires:  strchan-devel >= 0@CHAN_VERSION@}}
-#{?need_x25:     %{expand: BuildRequires:  strx25-devel >= 0@X25_VERSION@}}
-#{?need_iso:     %{expand: BuildRequires:  striso-devel >= 0@ISO_VERSION@}}
-#{?need_isdn:    %{expand: BuildRequires:  strisdn-devel >= 0@ISDN_VERSION@}}
-#{?need_ss7:     %{expand: BuildRequires:  strss7-devel >= 0@SS7_VERSION@}}
-#{?need_sigtran: %{expand: BuildRequires:  sigtran-devel >= 0@SIGTRAN_VERSION@}}
+#if %{NEED_streams}
+#uildRequires:  %{virtual}-devel
+#endif
+#if %{NEED_compat}
+#uildRequires:  strcompat-devel >= 0@STRCOMP_VERSION@
+#endif
+#if %{NEED_tty}
+#uildRequires:  strtty-devel >= 0@TTY_VERSION@
+#endif
+#if %{NEED_xns}
+#uildRequires:  strxns-devel >= 0@XNS_VERSION@
+#endif
+#if %{NEED_xnet}
+#uildRequires:  strxnet-devel >= 0@XTI_VERSION@
+#endif
+#if %{NEED_nsl}
+#uildRequires:  strnsl-devel >= 0@NSL_VERSION@
+#endif
+#if %{NEED_sock}
+#uildRequires:  strsock-devel >= 0@SOCK_VERSION@
+#endif
+#if %{NEED_inet}
+#uildRequires:  strinet-devel >= 0@INET_VERSION@
+#endif
+#if %{NEED_sctp}
+#uildRequires:  strsctp-devel >= 0@SCTP_VERSION@
+#endif
+#if %{NEED_chan}
+#uildRequires:  strchan-devel >= 0@CHAN_VERSION@
+#endif
+#if %{NEED_x25}
+#uildRequires:  strx25-devel >= 0@X25_VERSION@
+#endif
+#if %{NEED_iso}
+#uildRequires:  striso-devel >= 0@ISO_VERSION@
+#endif
+#if %{NEED_isdn}
+#uildRequires:  strisdn-devel >= 0@ISDN_VERSION@
+#endif
+#if %{NEED_ss7}
+#uildRequires:  strss7-devel >= 0@SS7_VERSION@
+#endif
+#if %{NEED_sigtran}
+#uildRequires:  sigtran-devel >= 0@SIGTRAN_VERSION@
+#endif
 
 # these are some needs of the configure script
 # to manipulate manual pages:
@@ -1171,21 +1174,49 @@ BuildRequires:  /usr/bin/gzip
 # to install documentation
 #BuildRequires: texinfo >= 4.0
 
-%{?files_configfiles: %{expand: Prefix:         %{_sysconfdir}}}
-%{?files_mibfiles:    %{expand: Prefix:         %{_snmpmibdir}}}
-%{?files_initscripts: %{expand: Prefix:         %{_configdir}}}
-%{?files_initscripts: %{expand: Prefix:         %{_initrddir}}}
-%{?files_netconfig:   %{expand: Prefix:         %{_sysconfdir}/netconfig.d}}
-%{?files_sock2path:   %{expand: Prefix:         %{_sysconfdir}/sock2path.d}}
-%{?files_snmpconf:    %{expand: Prefix:         %{_snmpconfdir}}}
-%{?files_oldmods:     %{expand: Prefix:         %{_modutildir}}}
-%{?files_testscripts: %{expand: Prefix:         %{_pkglibexecdir}}}
-%{?files_sendpr:      %{expand: Prefix:         %{_pkglibexecdir}}}
-%{?files_docfiles:    %{expand: Prefix:         %{_docdir}}}
-%{?files_infofiles:   %{expand: Prefix:         %{_infodir}}}
-%{?files_pdffiles:    %{expand: Prefix:         %{_pdfdir}}}
-%{?files_htmlfiles:   %{expand: Prefix:         %{_htmldir}}}
-%{?files_manpages:    %{expand: Prefix:         %{_mandir}}}
+%if %{FILES_configfiles}
+Prefix:         %{_sysconfdir}
+%endif
+%if %{FILES_mibfiles}
+Prefix:         %{_snmpmibdir}
+%endif
+%if %{FILES_initscripts}
+Prefix:         %{_configdir}
+Prefix:         %{_initrddir}
+%endif
+%if %{FILES_netconfig}
+Prefix:         %{_sysconfdir}/netconfig.d
+%endif
+%if %{FILES_sock2path}
+Prefix:         %{_sysconfdir}/sock2path.d
+%endif
+%if %{FILES_snmpconf}
+Prefix:         %{_snmpconfdir}
+%endif
+#if %{FILES_oldmods}
+#refix:         %{_modutildir}
+#endif
+%if %{FILES_testscripts}
+Prefix:         %{_pkglibexecdir}
+%endif
+%if %{FILES_sendpr}
+Prefix:         %{_pkglibexecdir}
+%endif
+%if %{FILES_docfiles}
+Prefix:         %{_docdir}/@PACKAGE@-@VERSION@
+%endif
+%if %{FILES_infofiles}
+Prefix:         %{_infodir}
+%endif
+%if %{FILES_pdffiles}
+Prefix:         %{_pdfdir}/@PACKAGE@-@VERSION@
+%endif
+%if %{FILES_htmlfiles}
+Prefix:         %{_htmldir}/@PACKAGE@-@VERSION@
+%endif
+%if %{FILES_manpages}
+Prefix:         %{_mandir}
+%endif
 
 #Prereq:         /sbin/install-info
 
@@ -1217,22 +1248,54 @@ Requires:       dev >= 3.3
 %endif
 Requires:       %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
 Requires:       %{_virtpkg} = %{epoch}:%{version}-%{rpmrelease}
-%{?have_modules: %{expand: Requires:       %{corevirt} >= @VERSION@}}
-%{?need_streams: %{expand: Requires:       %{virtual}}}
-%{?need_compat:  %{expand: Requires:       strcompat}}
-%{?need_tty:     %{expand: Requires:       strtty}}
-%{?need_xns:     %{expand: Requires:       strxns}}
-%{?need_xnet:    %{expand: Requires:       strxnet}}
-%{?need_nsl:     %{expand: Requires:       strnsl}}
-%{?need_sock:    %{expand: Requires:       strsock}}
-%{?need_inet:    %{expand: Requires:       strinet}}
-%{?need_sctp:    %{expand: Requires:       strsctp}}
-%{?need_chan:    %{expand: Requires:       strchan}}
-%{?need_x25:     %{expand: Requires:       strx25}}
-%{?need_iso:     %{expand: Requires:       striso}}
-%{?need_isdn:    %{expand: Requires:       strisdn}}
-%{?need_ss7:     %{expand: Requires:       strss7}}
-%{?need_sigtran: %{expand: Requires:       sigtran}}
+%if %{HAVE_modules}
+Requires:       %{corevirt} >= @VERSION@}}
+%endif
+%if %{NEED_streams}
+Requires:       %{virtual}
+%endif
+%if %{NEED_compat}
+Requires:       strcompat
+%endif
+%if %{NEED_tty}
+Requires:       strtty
+%endif
+%if %{NEED_xns}
+Requires:       strxns
+%endif
+%if %{NEED_xnet}
+Requires:       strxnet
+%endif
+%if %{NEED_nsl}
+Requires:       strnsl
+%endif
+%if %{NEED_sock}
+Requires:       strsock
+%endif
+%if %{NEED_inet}
+Requires:       strinet
+%endif
+%if %{NEED_sctp}
+Requires:       strsctp
+%endif
+%if %{NEED_chan}
+Requires:       strchan
+%endif
+%if %{NEED_x25}
+Requires:       strx25
+%endif
+%if %{NEED_iso}
+Requires:       striso
+%endif
+%if %{NEED_isdn}
+Requires:       strisdn
+%endif
+%if %{NEED_ss7}
+Requires:       strss7
+%endif
+%if %{NEED_sigtran}
+Requires:       sigtran
+%endif
 
 Conflicts:      %{_confpkg}
 
@@ -1375,56 +1438,220 @@ fi
     --with-k-release=%{kernel_version} \
     --with-k-modules=%{_kmoduledir} \
     --with-base-major=%{majbase} \
-    %{?_with_pkg_epoch:          '%_with_pkg_epoch'} \
-    %{?_without_pkg_epoch:       '%_without_pkg_epoch'} \
-    %{?_with_pkg_release:        '%_with_pkg_release'} \
-    %{?_without_pkg_release:     '%_without_pkg_release'} \
-    %{?_with_pkg_patchlevel:     '%_with_pkg_patchlevel'} \
-    %{?_without_pkg_patchlevel:  '%_without_pkg_patchlevel'} \
-    %{?_with_rpm_epoch:          '%_with_rpm_epoch'} \
-    %{?_without_rpm_epoch:       '%_without_rpm_epoch'} \
-    %{?_with_rpm_release:        '%_with_rpm_release'} \
-    %{?_without_rpm_release:     '%_without_rpm_release'} \
-    %{?_with_rpm_extra:          '%_with_rpm_extra'} \
-    %{?_without_rpm_extra:       '%_without_rpm_extra'} \
-    %{?_with_deb_epoch:          '%_with_deb_epoch'} \
-    %{?_without_deb_epoch:       '%_without_deb_epoch'} \
-    %{?_with_deb_release:        '%_with_deb_release'} \
-    %{?_without_deb_release:     '%_without_deb_release'} \
-    %{?_with_arch:               '%enable %_with_arch'} \
-    %{?_without_arch:            '%disable %_without_arch'} \
-    %{?_with_indep:              '%enable %_with_indep'} \
-    %{?_without_indep:           '%disable %_without_indep'} \
-    %{?_with_checks:             '%enable %_with_checks'} \
-    %{?_without_checks:          '%disable %_without_checks'} \
-    %{?_with_autotest:           '%enable %_with_autotest'} \
-    %{?_without_autotest:        '%disable %_without_autotest'} \
-    %{?_with_cooked_manpages:    '%_with_cooked_manpages'} \
-    %{?_without_cooked_manpages: '%_without_cooked_manpages'} \
-    %{?_with_public:             '%enable %_with_public'} \
-    %{?_without_public:          '%disable %_without_public'} \
-    %{?_with_k_package:          '%enable %_with_k_package'} \
-    %{?_without_k_package:       '%disable %_without_k_package'} \
-    %{?_with_k_optimize:         '%_with_k_optimize'} \
-    %{?_with_k_debug:            '%enable %_with_k_debug'} \
-    %{?_without_k_debug:         '%disable %_without_k_debug'} \
-    %{?_with_k_test:             '%enable %_with_k_test'} \
-    %{?_without_k_test:          '%disable %_without_k_test'} \
-    %{?_with_k_safe:             '%enable %_with_k_safe'} \
-    %{?_without_k_safe:          '%disable %_without_k_safe'} \
-    %{?_with_k_inline:           '%enable %_with_k_inline'} \
-    %{?_without_k_inline:        '%disable %_without_k_inline'} \
-    %{?_with_devfs:              '%enable %_with_devfs'} \
-    %{?_without_devfs:           '%disable %_without_devfs'} \
-    %{?_with_devel:              '%enable %_with_devel'} \
-    %{?_without_devel:           '%disable %_without_devel'} \
-    %{?_with_tools:              '%enable %_with_tools'} \
-    %{?_without_tools:           '%disable %_without_tools'} \
-    %{?_with_snmp_agent:         '%_with_snmp_agent'} \
-    %{?_without_snmp_agent:      '%_without_snmp_agent'} \
-    %{?_with_modules:            '%enable %_with_modules'} \
-    %{?_without_modules:         '%disable %_without_modules'} \
-    %{expand: %config_options} \
+    %{?_with_pkg_epoch:                     '%_with_pkg_epoch'} \
+    %{?_without_pkg_epoch:                  '%_without_pkg_epoch'} \
+    %{?_with_pkg_release:                   '%_with_pkg_release'} \
+    %{?_without_pkg_release:                '%_without_pkg_release'} \
+    %{?_with_pkg_patchlevel:                '%_with_pkg_patchlevel'} \
+    %{?_without_pkg_patchlevel:             '%_without_pkg_patchlevel'} \
+    %{?_with_rpm_epoch:                     '%_with_rpm_epoch'} \
+    %{?_without_rpm_epoch:                  '%_without_rpm_epoch'} \
+    %{?_with_rpm_release:                   '%_with_rpm_release'} \
+    %{?_without_rpm_release:                '%_without_rpm_release'} \
+    %{?_with_rpm_extra:                     '%_with_rpm_extra'} \
+    %{?_without_rpm_extra:                  '%_without_rpm_extra'} \
+    %{?_with_deb_epoch:                     '%_with_deb_epoch'} \
+    %{?_without_deb_epoch:                  '%_without_deb_epoch'} \
+    %{?_with_deb_release:                   '%_with_deb_release'} \
+    %{?_without_deb_release:                '%_without_deb_release'} \
+    %{?_with_arch:                          '%enable %_with_arch'} \
+    %{?_without_arch:                       '%disable %_without_arch'} \
+    %{?_with_indep:                         '%enable %_with_indep'} \
+    %{?_without_indep:                      '%disable %_without_indep'} \
+    %{?_with_checks:                        '%enable %_with_checks'} \
+    %{?_without_checks:                     '%disable %_without_checks'} \
+    %{?_with_autotest:                      '%enable %_with_autotest'} \
+    %{?_without_autotest:                   '%disable %_without_autotest'} \
+    %{?_with_cooked_manpages:               '%_with_cooked_manpages'} \
+    %{?_without_cooked_manpages:            '%_without_cooked_manpages'} \
+    %{?_with_public:                        '%enable %_with_public'} \
+    %{?_without_public:                     '%disable %_without_public'} \
+    %{?_with_k_package:                     '%enable %_with_k_package'} \
+    %{?_without_k_package:                  '%disable %_without_k_package'} \
+    %{?_with_k_optimize:                    '%_with_k_optimize'} \
+    %{?_with_k_debug:                       '%enable %_with_k_debug'} \
+    %{?_without_k_debug:                    '%disable %_without_k_debug'} \
+    %{?_with_k_test:                        '%enable %_with_k_test'} \
+    %{?_without_k_test:                     '%disable %_without_k_test'} \
+    %{?_with_k_safe:                        '%enable %_with_k_safe'} \
+    %{?_without_k_safe:                     '%disable %_without_k_safe'} \
+    %{?_with_k_inline:                      '%enable %_with_k_inline'} \
+    %{?_without_k_inline:                   '%disable %_without_k_inline'} \
+    %{?_with_devfs:                         '%enable %_with_devfs'} \
+    %{?_without_devfs:                      '%disable %_without_devfs'} \
+    %{?_with_devel:                         '%enable %_with_devel'} \
+    %{?_without_devel:                      '%disable %_without_devel'} \
+    %{?_with_tools:                         '%enable %_with_tools'} \
+    %{?_without_tools:                      '%disable %_without_tools'} \
+    %{?_with_snmp_agent:                    '%_with_snmp_agent'} \
+    %{?_without_snmp_agent:                 '%_without_snmp_agent'} \
+    %{?_with_modules:                       '%enable %_with_modules'} \
+    %{?_without_modules:                    '%disable %_without_modules'} \
+    %{?_with_lis:                           '%_with_lis'} \
+    %{?_with_lfs:                           '%_with_lfs'} \
+    %{?_with_solaris_cmn_err:               '%{_with_solaris_cmn_err}'} \
+    %{?_without_solaris_cmn_err:            '%{_without_solaris_cmn_err}'} \
+    %{?_with_solaris_consts:                '%{_with_solaris_consts}'} \
+    %{?_without_solaris_consts:             '%{_without_solaris_consts}'} \
+    %{?_with_lis_regparms:                  '%{_with_lis_regparms}'} \
+    %{?_without_lis_regparms:               '%{_without_lis_regparms}'} \
+    %{?_with_k_modversions:                 '%enable %_with_k_modversions'} \
+    %{?_without_k_modversions:              '%disable %_without_k_modversions'} \
+    %{?_with_k_cache:                       '%enable %_with_k_cache'} \
+    %{?_without_k_cache:                    '%disable %_without_k_cache'} \
+    %{?_with_k_timers:                      '%enable %_with_k_timers'} \
+    %{?_without_k_timers:                   '%disable %_without_k_timers'} \
+    %{?_with_broken_cpu_flags:              '%enable %_with_broken_cpu_flags'} \
+    %{?_without_broken_cpu_flags:           '%disable %_without_broken_cpu_flags'} \
+    %{?_with_atomic_stats:                  '%enable %_with_atomic_stats'} \
+    %{?_without_atomic_stats:               '%disable %_without_atomic_stats'} \
+    %{?_with_lis_development:               '%enable %_with_lis_development'} \
+    %{?_without_lis_development:            '%disable %_without_lis_development'} \
+    %{?_with_sctp_slow_verification:        '%enable %_with_sctp_slow_verification'} \
+    %{?_without_sctp_slow_verification:     '%disable %_without_sctp_slow_verification'} \
+    %{?_with_sctp_throttle_heartbeats:      '%enable %_with_sctp_throttle_heartbeats'} \
+    %{?_without_sctp_throttle_heartbeats:   '%disable %_without_sctp_throttle_heartbeats'} \
+    %{?_with_sctp_discard_ootb:             '%enable %_with_sctp_discard_ootb'} \
+    %{?_without_sctp_discard_ootb:          '%disable %_without_sctp_discard_ootb'} \
+    %{?_with_sctp_extended_ip_support:      '%enable %_with_sctp_extended_ip_support'} \
+    %{?_without_sctp_extended_ip_support:   '%disable %_without_sctp_extended_ip_support'} \
+    %{?_with_sctp_hmac_sha1:                '%enable %_with_sctp_hmac_sha1'} \
+    %{?_without_sctp_hmac_sha1:             '%disable %_without_sctp_hmac_sha1'} \
+    %{?_with_sctp_hmac_md5:                 '%enable %_with_sctp_hmac_md5'} \
+    %{?_without_sctp_hmac_md5:              '%disable %_without_sctp_hmac_md5'} \
+    %{?_with_sctp_adler32:                  '%enable %_with_sctp_adler32'} \
+    %{?_without_sctp_adler32:               '%disable %_without_sctp_adler32'} \
+    %{?_with_sctp_crc32c:                   '%enable %_with_sctp_crc32c'} \
+    %{?_without_sctp_crc32c:                '%disable %_without_sctp_crc32c'} \
+    %{?_with_sctp_throttle_passiveopens:    '%enable %_with_sctp_throttle_passiveopens'} \
+    %{?_without_sctp_throttle_passiveopens: '%disable %_without_sctp_throttle_passiveopens'} \
+    %{?_with_sctp_ecn:                      '%enable %_with_sctp_ecn'} \
+    %{?_without_sctp_ecn:                   '%disable %_without_sctp_ecn'} \
+    %{?_with_sctp_lifetimes:                '%enable %_with_sctp_lifetimes'} \
+    %{?_without_sctp_lifetimes:             '%disable %_without_sctp_lifetimes'} \
+    %{?_with_sctp_add_ip:                   '%enable %_with_sctp_add_ip'} \
+    %{?_without_sctp_add_ip:                '%disable %_without_sctp_add_ip'} \
+    %{?_with_sctp_adaptation_layer_info:    '%enable %_with_sctp_adaptation_layer_info'} \
+    %{?_without_sctp_adaptation_layer_info: '%disable %_without_sctp_adaptation_layer_info'} \
+    %{?_with_sctp_partial_reliability:      '%enable %_with_sctp_partial_reliability'} \
+    %{?_without_sctp_partial_reliability:   '%disable %_without_sctp_partial_reliability'} \
+    %{?_with_sctp_debug:                    '%enable %_with_sctp_debug'} \
+    %{?_without_sctp_debug:                 '%disable %_without_sctp_debug'} \
+    %{?_with_sctp_error_generator:          '%enable %_with_sctp_error_generator'} \
+    %{?_without_sctp_error_generator:       '%disable %_without_sctp_error_generator'} \
+    %{?_with_sctp:                          '%_with_sctp'} \
+    %{?_without_sctp:                       '%_without_sctp'} \
+    %{?_with_sctp2:                         '%_with_sctp2'} \
+    %{?_without_sctp2:                      '%_without_sctp2'} \
+    %{?_with_xns:                           '%_with_xns'} \
+    %{?_without_xns:                        '%_without_xns'} \
+    %{?_with_tli:                           '%_with_tli'} \
+    %{?_without_tli:                        '%_without_tli'} \
+    %{?_with_inet:                          '%_with_inet'} \
+    %{?_without_inet:                       '%_without_inet'} \
+    %{?_with_xnet:                          '%_with_xnet'} \
+    %{?_without_xnet:                       '%_without_xnet'} \
+    %{?_with_sock:                          '%_with_sock'} \
+    %{?_without_sock:                       '%_without_sock'} \
+    %{?_with_streams_syncqs:                '%enable %_with_streams_syncqs'} \
+    %{?_without_streams_syncqs:             '%disable %_without_streams_syncqs'} \
+    %{?_with_streams_kthreads:              '%enable %_with_streams_kthreads'} \
+    %{?_without_streams_kthreads:           '%disable %_without_streams_kthreads'} \
+    %{?_with_streams_utils:                 '%enable %_with_streams_utils'} \
+    %{?_without_streams_utils:              '%disable %_without_streams_utils'} \
+    %{?_with_big_compile:                   '%enable %_with_big_compile'} \
+    %{?_without_big_compile:                '%disable %_without_big_compile'} \
+    %{?_with_module_sth:                    '%enable %_with_module_sth'} \
+    %{?_without_module_sth:                 '%disable %_without_module_sth'} \
+    %{?_with_module_bufmod:                 '%enable %_with_module_bufmod'} \
+    %{?_without_module_bufmod:              '%disable %_without_module_bufmod'} \
+    %{?_with_module_nullmod:                '%enable %_with_module_nullmod'} \
+    %{?_without_module_nullmod:             '%disable %_without_module_nullmod'} \
+    %{?_with_module_pipemod:                '%enable %_with_module_pipemod'} \
+    %{?_without_module_pipemod:             '%disable %_without_module_pipemod'} \
+    %{?_with_module_connld:                 '%enable %_with_module_connld'} \
+    %{?_without_module_connld:              '%disable %_without_module_connld'} \
+    %{?_with_module_sc:                     '%enable %_with_module_sc'} \
+    %{?_without_module_sc:                  '%disable %_without_module_sc'} \
+    %{?_with_module_testmod:                '%enable %_with_module_testmod'} \
+    %{?_without_module_testmod:             '%disable %_without_module_testmod'} \
+    %{?_with_driver_clone:                  '%enable %_with_driver_clone'} \
+    %{?_without_driver_clone:               '%disable %_without_driver_clone'} \
+    %{?_with_driver_echo:                   '%enable %_with_driver_echo'} \
+    %{?_without_driver_echo:                '%disable %_without_driver_echo'} \
+    %{?_with_driver_fifo:                   '%enable %_with_driver_fifo'} \
+    %{?_without_driver_fifo:                '%disable %_without_driver_fifo'} \
+    %{?_with_driver_log:                    '%enable %_with_driver_log'} \
+    %{?_without_driver_log:                 '%disable %_without_driver_log'} \
+    %{?_with_driver_loop:                   '%enable %_with_driver_loop'} \
+    %{?_without_driver_loop:                '%disable %_without_driver_loop'} \
+    %{?_with_driver_nsdev:                  '%enable %_with_driver_nsdev'} \
+    %{?_without_driver_nsdev:               '%disable %_without_driver_nsdev'} \
+    %{?_with_driver_mux:                    '%enable %_with_driver_mux'} \
+    %{?_without_driver_mux:                 '%disable %_without_driver_mux'} \
+    %{?_with_driver_nuls:                   '%enable %_with_driver_nuls'} \
+    %{?_without_driver_nuls:                '%disable %_without_driver_nuls'} \
+    %{?_with_driver_pipe:                   '%enable %_with_driver_pipe'} \
+    %{?_without_driver_pipe:                '%disable %_without_driver_pipe'} \
+    %{?_with_driver_sad:                    '%enable %_with_driver_sad'} \
+    %{?_without_driver_sad:                 '%disable %_without_driver_sad'} \
+    %{?_with_driver_sfx:                    '%enable %_with_driver_sfx'} \
+    %{?_without_driver_sfx:                 '%disable %_without_driver_sfx'} \
+    %{?_with_driver_spx:                    '%enable %_with_driver_spx'} \
+    %{?_without_driver_spx:                 '%disable %_without_driver_spx'} \
+    %{?_with_streams_fifos:                 '%enable %_with_streams_fifos'} \
+    %{?_without_streams_fifos:              '%disable %_without_streams_fifos'} \
+    %{?_with_streams_bcm:                   '%enable %_with_streams_bcm'} \
+    %{?_without_streams_bcm:                '%disable %_without_streams_bcm'} \
+    %{?_with_compat_os7:                    '%enable %_with_compat_os7'} \
+    %{?_without_compat_os7:                 '%disable %_without_compat_os7'} \
+    %{?_with_compat_svr3:                   '%enable %_with_compat_svr3'} \
+    %{?_without_compat_svr3:                '%disable %_without_compat_svr3'} \
+    %{?_with_compat_svr4:                   '%enable %_with_compat_svr4'} \
+    %{?_without_compat_svr4:                '%disable %_without_compat_svr4'} \
+    %{?_with_compat_mps:                    '%enable %_with_compat_mps'} \
+    %{?_without_compat_mps:                 '%disable %_without_compat_mps'} \
+    %{?_with_compat_sol8:                   '%enable %_with_compat_sol8'} \
+    %{?_without_compat_sol8:                '%disable %_without_compat_sol8'} \
+    %{?_with_compat_uw7:                    '%enable %_with_compat_uw7'} \
+    %{?_without_compat_uw7:                 '%disable %_without_compat_uw7'} \
+    %{?_with_compat_osf:                    '%enable %_with_compat_osf'} \
+    %{?_without_compat_osf:                 '%disable %_without_compat_osf'} \
+    %{?_with_compat_aix:                    '%enable %_with_compat_aix'} \
+    %{?_without_compat_aix:                 '%disable %_without_compat_aix'} \
+    %{?_with_compat_hpux:                   '%enable %_with_compat_hpux'} \
+    %{?_without_compat_hpux:                '%disable %_without_compat_hpux'} \
+    %{?_with_compat_irix:                   '%enable %_with_compat_irix'} \
+    %{?_without_compat_irix:                '%disable %_without_compat_irix'} \
+    %{?_with_compat_lis:                    '%enable %_with_compat_lis'} \
+    %{?_without_compat_lis:                 '%disable %_without_compat_lis'} \
+    %{?_with_compat_lfs:                    '%enable %_with_compat_lfs'} \
+    %{?_without_compat_lfs:                 '%disable %_without_compat_lfs'} \
+    %{?_with_compat_mac:                    '%enable %_with_compat_mac'} \
+    %{?_without_compat_mac:                 '%disable %_without_compat_mac'} \
+    --without-SCTP \
+    --without-IPERF \
+    --without-LIS \
+    --without-STREAMS \
+    --without-STRCOMPAT \
+    --without-STRUTIL \
+    --without-STRBCM \
+    --without-STRTTY \
+    --without-STRXNS \
+    --without-STRXNET \
+    --without-STRNSL \
+    --without-STRSOCK \
+    --without-STRINET \
+    --without-STRSCTP \
+    --without-STRCHAN \
+    --without-STRX25 \
+    --without-STRISO \
+    --without-NETPERF \
+    --without-STRISDN \
+    --without-STACKS \
+    --without-SIGTRAN \
+    --without-STRVOIP \
+    --without-OSR61 \
     || { rm -f %{cache_file} ; exit 1 ; }
 
 make
@@ -1441,11 +1668,12 @@ make check
 # if we are going to create debug packages, we need to install unstripped
 # binaries; otherwise use libtoolized install-strip to strip binaries, modules,
 # shared and static libraries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
+make DESTDIR="%{buildroot}" \
     %{!?_enable_debug_packages: install-strip} \
-    %{?_enable_debug_packages: install} \
-    %{?files_pdffiles: install-pdf} \
-    %{?files_htmlfiles: install-html}
+    %{?_enable_debug_packages: install}
+
+%{?files_pdffiles:  make DESTDIR=`pwd` install-pdf }
+%{?files_htmlfiles: make DESTDIR=`pwd` install-html}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -2171,35 +2399,35 @@ fi
 %files %{?devicesfile:%{devicesfile}}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_docfiles:      %{?files_locales: %doc ABOUT-NLS}}
-%{?files_docfiles:      %{expand: %doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS}}
-%{?files_docfiles:      %{expand: %doc README README-alpha README-cvs README-make THANKS TODO}}
-%{?files_docfiles:      %{expand: %doc %{name}-%{version}.lsm}}
-#{?files_manual:        %{expand: %doc %{manual}}}
-#{?files_specs:         %{expand: %doc %{specs}}}
-#{?files_drafts:        %{expand: %doc %{drafts}}}
-#{?files_papers:        %{expand: %doc %{papers}}}
-#{?files_projects:      %{expand: %doc %{projects}}}
-%{?files_snmpconf:      %{expand: %config(noreplace) %{_snmpconfdir}/*}}
-%{?files_configfiles:   %{expand: %config(noreplace) %{_sysconfdir}/%{conffiles}}}
-%{?files_netconfig:     %{expand: %config(noreplace) %{_sysconfdir}/netconfig.xnsl}}
-%{?files_netconfig:     %{expand: %config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}}
-%{?files_sock2path:     %{expand: %config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}}
-%{?files_oldmods:       %{expand: %config(noreplace) %{_modutildir}/*}}
-%{?files_initscripts:   %{expand: %config(noreplace) %{_configdir}/*}}
-%{?files_initscripts:   %{expand: %{_initrddir}/*}}
-%{?files_mibfiles:      %{expand: %{_snmpmibdir}/*}}
-%{?files_testscripts:   %{expand: %{_pkglibexecdir}/atlocal}}
-%{?files_testscripts:   %{expand: %{_pkglibexecdir}/testsuite*}}
-%{?files_sendpr:        %{expand: %{_pkglibexecdir}/send-pr}}
-%{?files_sendpr:        %{expand: %{_pkglibexecdir}/send-pr.config}}
-%{?files_pdffiles:      %{expand: %{_pdfdir}/*.pdf}}
-%{?files_htmlfiles:     %{expand: %{_htmldir}/*.html}}
-%{?files_pngfiles:      %{expand: %{_htmldir}/*.png}}
-%{?files_infofiles:     %{expand: %{_infodir}/*.info*}}
-%{?files_manrefs:       %{expand: %{_mandir}/%{base}.refs*}}
-%{?files_manmacros:     %{expand: %{_mandir}/%{base}.macros*}}
-%{?files_manpages:      %{expand: %{_mandir}/man*/*}}
+%{?files_docfiles:%{?files_locales:%doc ABOUT-NLS}}
+%{?files_docfiles:%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LICENSES LSM MANUAL NEWS PROBLEMS}
+%{?files_docfiles:%doc README README-alpha README-cvs README-make THANKS TODO}
+%{?files_docfiles:%doc %{name}-%{version}.lsm}
+#{?files_manual:#doc #{manual}}
+#{?files_specs:#doc #{specs}}
+#{?files_drafts:#doc #{drafts}}
+#{?files_papers:#doc #{papers}}
+#{?files_projects:#doc #{projects}}
+%{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
+%{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
+%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
+#{?files_oldmods:%config(noreplace) %{_modutildir}/*}
+%{?files_initscripts:%config(noreplace) %{_configdir}/*}
+%{?files_initscripts:%{_initrddir}/*}
+%{?files_mibfiles:%{_snmpmibdir}/*}
+%{?files_testscripts:%{_pkglibexecdir}/atlocal}
+%{?files_testscripts:%{_pkglibexecdir}/testsuite*}
+%{?files_sendpr:%{_pkglibexecdir}/send-pr}
+%{?files_sendpr:%{_pkglibexecdir}/send-pr.config}
+%{?files_pdffiles:%doc .%{_pdfdir}/@PACKAGE@-@VERSION@/*.pdf}
+%{?files_htmlfiles:%doc .%{_htmldir}/@PACKAGE@-@VERSION@/*.html}
+%{?files_pngfiles:%doc .%{_htmldir}/@PACKAGE@-@VERSION@/*.png}
+%{?files_infofiles:%{_infodir}/*.info*}
+%{?files_manrefs:%{_mandir}/%{base}.refs*}
+%{?files_manmacros:%{_mandir}/%{base}.macros*}
+%{?files_manpages:%{_mandir}/man*/*}
 %endif
 
 # ===========================================================================
@@ -2208,20 +2436,38 @@ fi
 Summary:        %{title} run-time libraries and utilities.
 Group:          System Environment/Libraries
 Version:        @VERSION@
-%{?_xpm:        %{expand: Icon:           %_xpm}}
-%{?_gif:        %{expand: Icon:           %_gif}}
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
 Autoreq:        true
 Autoprov:       true
 
-%{?files_binfiles:    %{expand: Prefix:         %{_bindir}}}
-%{?files_sbinfiles:   %{expand: Prefix:         %{_sbindir}}}
-%{?files_libraries:   %{expand: Prefix:         %{_libdir}}}
-%{?files_lib32compat: %{expand: Prefix:         %{_lib32dir}}}
-%{?files_testfiles:   %{expand: Prefix:         %{_pkglibexecdir}}}
-%{?files_test32files: %{expand: Prefix:         %{_pkglibexec32dir}}
-%{?files_snmpmods:    %{expand: Prefix:         %{_snmpdlmoddir}}}
-%{?files_snmp32mods:  %{expand: Prefix:         %{_snmpdlmod32dir}}}
-%{?files_locales:     %{expand: Prefix:         %{_localedir}}}
+%if %{FILES_binfiles}
+Prefix:         %{_bindir}
+%endif
+%if %{FILES_sbinfiles}
+Prefix:         %{_sbindir}
+%endif
+%if %{FILES_libraries}
+Prefix:         %{_libdir}
+%endif
+%if %{FILES_lib32compat}
+Prefix:         %{_lib32dir}
+%endif
+%if %{FILES_testfiles}
+Prefix:         %{_pkglibexecdir}
+%endif
+%if %{FILES_test32files}
+Prefix:         %{_pkglibexec32dir}
+%endif
+%if %{FILES_snmpmods}
+Prefix:         %{_snmpdlmoddir}
+%endif
+%if %{FILES_snmp32mods}
+Prefix:         %{_snmpdlmod32dir}
+%endif
+%if %{FILES_locales}
+Prefix:         %{_localedir}
+%endif
 
 Obsoletes:      %{name}-libs
 Obsoletes:      %{name}-util
@@ -2235,21 +2481,51 @@ Obsoletes:      %{_obsopkg}-utils
 Prereq:         /sbin/ldconfig
 
 Requires:       %{_virtpkg}
-%{?need_streams: %{expand: Requires:       %{virtual}-lib}}
-%{?need_compat:  %{expand: Requires:       strcompat-lib >= 0@STRCOMP_VERSION@}}
-%{?need_tty:     %{expand: Requires:       strtty-lib >= 0@TTY_VERSION@}}
-%{?need_xns:     %{expand: Requires:       strxns-lib >= 0@XNS_VERSION@}}
-%{?need_xnet:    %{expand: Requires:       strxnet-lib >= 0@XTI_VERSION@}}
-%{?need_nsl:     %{expand: Requires:       strnsl-lib >= 0@NSL_VERSION@}}
-%{?need_sock:    %{expand: Requires:       strsock-lib >= 0@SOCK_VERSION@}}
-%{?need_inet:    %{expand: Requires:       strinet-lib >= 0@INET_VERSION@}}
-%{?need_sctp:    %{expand: Requires:       strsctp-lib >= 0@SCTP_VERSION@}}
-%{?need_chan:    %{expand: Requires:       strchan-lib >= 0@CHAN_VERSION@}}
-%{?need_x25:     %{expand: Requires:       strx25-lib >= 0@X25_VERSION@}}
-%{?need_iso:     %{expand: Requires:       striso-lib >= 0@ISO_VERSION@}}
-%{?need_isdn:    %{expand: Requires:       strisdn-lib >= 0@ISDN_VERSION@}}
-%{?need_ss7:     %{expand: Requires:       strss7-lib >= 0@SS7_VERSION@}}
-%{?need_sigtran: %{expand: Requires:       sigtran-lib >= 0@SIGTRAN_VERSION@}}
+%if %{NEED_streams}
+Requires:       %{virtual}-lib
+%endif
+%if %{NEED_compat}
+Requires:       strcompat-lib >= 0@STRCOMP_VERSION@
+%endif
+%if %{NEED_tty}
+Requires:       strtty-lib >= 0@TTY_VERSION@
+%endif
+%if %{NEED_xns}
+Requires:       strxns-lib >= 0@XNS_VERSION@
+%endif
+%if %{NEED_xnet}
+Requires:       strxnet-lib >= 0@XTI_VERSION@
+%endif
+%if %{NEED_nsl}
+Requires:       strnsl-lib >= 0@NSL_VERSION@
+%endif
+%if %{NEED_sock}
+Requires:       strsock-lib >= 0@SOCK_VERSION@
+%endif
+%if %{NEED_inet}
+Requires:       strinet-lib >= 0@INET_VERSION@
+%endif
+%if %{NEED_sctp}
+Requires:       strsctp-lib >= 0@SCTP_VERSION@
+%endif
+%if %{NEED_chan}
+Requires:       strchan-lib >= 0@CHAN_VERSION@
+%endif
+%if %{NEED_x25}
+Requires:       strx25-lib >= 0@X25_VERSION@
+%endif
+%if %{NEED_iso}
+Requires:       striso-lib >= 0@ISO_VERSION@
+%endif
+%if %{NEED_isdn}
+Requires:       strisdn-lib >= 0@ISDN_VERSION@
+%endif
+%if %{NEED_ss7}
+Requires:       strss7-lib >= 0@SS7_VERSION@
+%endif
+%if %{NEED_sigtran}
+Requires:       sigtran-lib >= 0@SIGTRAN_VERSION@
+%endif
 
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-lib = %{epoch}:%{version}-%{fullrelease2}
@@ -2327,17 +2603,17 @@ fi
 %files lib
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_binfiles:      %{expand: %{_bindir}/*}}
-%{?files_sbinfiles:     %{expand: %{_sbindir}/*}}
-%{?files_libraries:     %{expand: %{_libdir}/*.so*}}
-%{?files_libraries:     %{expand: %{_libdir}/*.la}}
-%{?files_lib32compat:   %{expand: %{_lib32dir}/*.so*}}
-%{?files_lib32compat:   %{expand: %{_lib32dir}/*.la}}
-%{?files_locales:       %{expand: %{_localedir}/*}}
-%{?files_gdmofiles:     %{expand: %{_pkglibexecdir}/gdmo}}
-%{?files_testfiles:     %{expand: %{_pkglibexecdir}/%{testfiles}}}
-%{?files_test32files:   %{expand: %{_pkglibexec32dir}/%{testfiles}}}
-%{?files_snmpmods:      %{expand: %{_snmpdlmoddir}/*}}
+%{?files_binfiles:%{_bindir}/*}
+%{?files_sbinfiles:%{_sbindir}/*}
+%{?files_libraries:%{_libdir}/*.so*}
+%{?files_libraries:%{_libdir}/*.la}
+%{?files_lib32compat:%{_lib32dir}/*.so*}
+%{?files_lib32compat:%{_lib32dir}/*.la}
+%{?files_locales:%{_localedir}/*}
+%{?files_gdmofiles:%{_pkglibexecdir}/gdmo}
+%{?files_testfiles:%{_pkglibexecdir}/%{testfiles}}
+%{?files_test32files:%{_pkglibexec32dir}/%{testfiles}}
+%{?files_snmpmods:%{_snmpdlmoddir}/*}
 %endif
 
 # ===========================================================================
@@ -2346,14 +2622,20 @@ fi
 Summary:        %{title} configured headers, static libraries and debug info.
 Group:          Development/System
 Version:        @VERSION@
-%{?_xpm:        %{expand: Icon:           %_xpm}}
-%{?_gif:        %{expand: Icon:           %_gif}}
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
 Autoreq:        true
 Autoprov:       true
 
-%{?files_includes:    %{expand: Prefix:         %{_includedir}/%{name}}}
-%{?files_libstatic:   %{expand: Prefix:         %{_libdir}}}
-%{?files_lib32static: %{expand: Prefix:         %{_lib32dir}}}
+%if %{FILES_includes}
+Prefix:         %{_includedir}/%{name}
+%endif
+%if %{FILES_libstatic}
+Prefix:         %{_libdir}
+%endif
+%if %{FILES_lib32static}
+Prefix:         %{_lib32dir}
+%endif
 
 #Prereq:         /sbin/install-info
 
@@ -2361,22 +2643,54 @@ Conflicts:      texinfo < 3.11
 Conflicts:      %{_confpkg}-devel
 
 Requires:       %{name} = %{epoch}:%{version}-%{rpmrelease}
+%if %{HAVE_modules}
 Requires:       %{infovirt} >= @VERSION@
-%{?need_streams: %{expand; Requires:       %{virtual}-devel}}
-%{?need_compat:  %{expand; Requires:       strcompat-devel >= 0@STRCOMP_VERSION@}}
-%{?need_tty:     %{expand; Requires:       strtty-devel >= 0@TTY_VERSION@}}
-%{?need_xns:     %{expand; Requires:       strxns-devel >= 0@XNS_VERSION@}}
-%{?need_xnet:    %{expand; Requires:       strxnet-devel >= 0@XTI_VERSION@}}
-%{?need_nsl:     %{expand; Requires:       strnsl-devel >= 0@NSL_VERSION@}}
-%{?need_sock:    %{expand; Requires:       strsock-devel >= 0@SOCK_VERSION@}}
-%{?need_inet:    %{expand; Requires:       strinet-devel >= 0@INET_VERSION@}}
-%{?need_sctp:    %{expand; Requires:       strsctp-devel >= 0@SCTP_VERSION@}}
-%{?need_chan:    %{expand; Requires:       strchan-devel >= 0@CHAN_VERSION@}}
-%{?need_x25:     %{expand; Requires:       strx25-devel >= 0@X25_VERSION@}}
-%{?need_iso:     %{expand; Requires:       striso-devel >= 0@ISO_VERSION@}}
-%{?need_isdn:    %{expand; Requires:       strisdn-devel >= 0@ISDN_VERSION@}}
-%{?need_ss7:     %{expand; Requires:       strss7-devel >= 0@SS7_VERSION@}}
-%{?need_sigtran: %{expand; Requires:       sigtran-devel >= 0@SIGTRAN_VERSION@}}
+%endif
+%if %{NEED_streams}
+Requires:       %{virtual}-devel
+%endif
+%if %{NEED_compat}
+Requires:       strcompat-devel >= 0@STRCOMP_VERSION@
+%endif
+%if %{NEED_tty}
+Requires:       strtty-devel >= 0@TTY_VERSION@
+%endif
+%if %{NEED_xns}
+Requires:       strxns-devel >= 0@XNS_VERSION@
+%endif
+%if %{NEED_xnet}
+Requires:       strxnet-devel >= 0@XTI_VERSION@
+%endif
+%if %{NEED_nsl}
+Requires:       strnsl-devel >= 0@NSL_VERSION@
+%endif
+%if %{NEED_sock}
+Requires:       strsock-devel >= 0@SOCK_VERSION@
+%endif
+%if %{NEED_inet}
+Requires:       strinet-devel >= 0@INET_VERSION@
+%endif
+%if %{NEED_sctp}
+Requires:       strsctp-devel >= 0@SCTP_VERSION@
+%endif
+%if %{NEED_chan}
+Requires:       strchan-devel >= 0@CHAN_VERSION@
+%endif
+%if %{NEED_x25}
+Requires:       strx25-devel >= 0@X25_VERSION@
+%endif
+%if %{NEED_iso}
+Requires:       striso-devel >= 0@ISO_VERSION@
+%endif
+%if %{NEED_isdn}
+Requires:       strisdn-devel >= 0@ISDN_VERSION@
+%endif
+%if %{NEED_ss7}
+Requires:       strss7-devel >= 0@SS7_VERSION@
+%endif
+%if %{NEED_sigtran}
+Requires:       sigtran-devel >= 0@SIGTRAN_VERSION@
+%endif
 
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease2}
@@ -2405,29 +2719,29 @@ to compile %{title} applications programs.
 This package provides debug information for package %{name}.
 Debug information is useful when developing applications that
 use this package or when debugging this package.
-%{HAVE_source:
+
 The package optionally contains the source code necessary for
 building the %{name} release.  It also includes the autoconf
 configuration utilities necessary to create and distribute this
 rpm.  To develop on the package, it would be better to use the
-tarball or source rpm release.}
+tarball or source rpm release.
 %{descriptail}
 
 %if %{PACKAGE_devel}
 %files devel
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_includes:      %{expand: %dir %{_includedir}/%{name}}}
-%{?files_includes:      %{expand: %{_includedir}/%{name}/*}}
-%{?files_libstatic:     %{expand: %{_libdir}/*.a}}
-%{?files_lib32static:   %{expand: %{_lib32dir}/*.a}}
-%{?files_debugfiles:    %{?files_binaries: %{_usrsrc}/debug}}
-%{?files_debugfiles:    %{?files_binaries: %{?_lib32dir:%{_lib32dir}/debug}}}
-%{?files_debugfiles:    %{?files_binaries: %{!?_lib32dir:%{_libdir}/debug}}}
-%{?files_sourcefiles:   %{expand: %dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}}}
-%{?files_sourcefiles:   %{expand: %{_usrsrc}/%{name}}}
-%{?files_sourcefiles:   %{expand: %{_usrsrc}/%{name}-%{version}-%{fullrelease}/*}}
-%{?files_sourcefiles:   %{expand: %{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*}}
+%{?files_includes:%dir %{_includedir}/%{name}}
+%{?files_includes:%{_includedir}/%{name}/*}
+%{?files_libstatic:%{_libdir}/*.a}
+%{?files_lib32static:%{_lib32dir}/*.a}
+%{?files_debugfiles:%{?files_binaries: %{_usrsrc}/debug}}
+%{?files_debugfiles:%{?files_binaries: %{?_lib32dir:%{_lib32dir}/debug}}}
+%{?files_debugfiles:%{?files_binaries: %{!?_lib32dir:%{_libdir}/debug}}}
+%{?files_sourcefiles:%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}}
+%{?files_sourcefiles:%{_usrsrc}/%{name}}
+%{?files_sourcefiles:%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*}
+%{?files_sourcefiles:%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*}
 %endif
 
 # ===========================================================================
@@ -2435,12 +2749,14 @@ tarball or source rpm release.}
 
 Summary:        %{title} kernel modules.
 Group:          System Environment/Kernel
-%{?_xpm:        %{expand: Icon:           %_xpm}}
-%{?_gif:        %{expand: Icon:           %_gif}}
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
 Autoreq:        true
 Autoprov:       true
 
-%{?files_modules:Prefix:         %{_kmoduledir}}
+%if %{FILES_modules}
+Prefix:         %{_kmoduledir}
+%endif
 
 Conflicts:      %{coreconf}
 
@@ -2461,21 +2777,51 @@ Prereq:         lsof
 Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 
 Requires:       %{name} = %{epoch}:@VERSION@-%{rpmrelease}
-%{?need_streams: %{expand: Requires:       %{_streams}-%{_kversion} >= %{_strvers}}}
-%{?need_compat:  %{expand: Requires:       %{coreroot strcompat} >= 0@STRCOMP_VERSION@}}
-%{?need_tty:     %{expand: Requires:       %{coreroot strtty} >= 0@TTY_VERSION@}}
-%{?need_xns:     %{expand: Requires:       %{coreroot strxns} >= 0@XNS_VERSION@}}
-%{?need_xnet:    %{expand: Requires:       %{coreroot strxnet} >= 0@XTI_VERSION@}}
-#{?need_nsl:     %{expand: Requires:       %{coreroot strnsl} >= 0@NSL_VERSION@}}
-#{?need_sock:    %{expand: Requires:       %{coreroot strsock} >= 0@SOCK_VERSION@}}
-%{?need_inet:    %{expand: Requires:       %{coreroot strinet} >= 0@INET_VERSION@}}
-%{?need_sctp:    %{expand: Requires:       %{coreroot strsctp} >= 0@SCTP_VERSION@}}
-%{?need_chan:    %{expand: Requires:       %{coreroot strchan} >= 0@CHAN_VERSION@}}
-%{?need_x25:     %{expand: Requires:       %{coreroot strx25} >= 0@X25_VERSION@}}
-%{?need_iso:     %{expand: Requires:       %{coreroot striso} >= 0@ISO_VERSION@}}
-%{?need_isdn:    %{expand: Requires:       %{coreroot strisdn} >= 0@ISDN_VERSION@}}
-%{?need_ss7:     %{expand: Requires:       %{coreroot strss7} >= 0@SS7_VERSION@}}
-%{?need_sigtran: %{expand: Requires:       %{coreroot sigtran} >= 0@SIGTRAN_VERSION@}}
+%if %{NEED_streams}
+Requires:       %{_streams}-%{_kversion} >= %{_strvers}
+%endif
+%if %{NEED_compat}
+Requires:       %{coreroot strcompat} >= 0@STRCOMP_VERSION@
+%endif
+%if %{NEED_tty}
+Requires:       %{coreroot strtty} >= 0@TTY_VERSION@
+%endif
+%if %{NEED_xns}
+Requires:       %{coreroot strxns} >= 0@XNS_VERSION@
+%endif
+%if %{NEED_xnet}
+Requires:       %{coreroot strxnet} >= 0@XTI_VERSION@
+%endif
+#if %{NEED_nsl}
+#equires:       %{coreroot strnsl} >= 0@NSL_VERSION@
+#endif
+#if %{NEED_sock}
+#equires:       %{coreroot strsock} >= 0@SOCK_VERSION@
+#endif
+%if %{NEED_inet}
+Requires:       %{coreroot strinet} >= 0@INET_VERSION@
+%endif
+%if %{NEED_sctp}
+Requires:       %{coreroot strsctp} >= 0@SCTP_VERSION@
+%endif
+%if %{NEED_chan}
+Requires:       %{coreroot strchan} >= 0@CHAN_VERSION@
+%endif
+%if %{NEED_x25}
+Requires:       %{coreroot strx25} >= 0@X25_VERSION@
+%endif
+%if %{NEED_iso}
+Requires:       %{coreroot striso} >= 0@ISO_VERSION@
+%endif
+%if %{NEED_isdn}
+Requires:       %{coreroot strisdn} >= 0@ISDN_VERSION@
+%endif
+%if %{NEED_ss7}
+Requires:       %{coreroot strss7} >= 0@SS7_VERSION@
+%endif
+%if %{NEED_sigtran}
+Requires:       %{coreroot sigtran} >= 0@SIGTRAN_VERSION@
+%endif
 
 Provides:       kernel-modules = %{_kversion}
 Provides:       %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
@@ -2747,10 +3093,10 @@ fi
 %files -n %{corename}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_modules:   %{expand: %dir %{_kmoduledir}/%{base}}
-%{?files_oldmods:   %{expand: %attr(644,root,root) %{_kmoduledir}/modules.%{base}}}
-%{?files_oldmods:   %{expand: %{_kmoduledir}/%{base}/*.o*}}
-%{?files_newmods:   %{expand: %{_kmoduledir}/%{base}/*.ko*}}}
+%{?files_modules:%dir %{_kmoduledir}/%{base}}
+%{?files_oldmods:%attr(644,root,root) %{_kmoduledir}/modules.%{base}}
+%{?files_oldmods:%{_kmoduledir}/%{base}/*.o*}
+%{?files_newmods:%{_kmoduledir}/%{base}/*.ko*}
 %endif
 
 # ===========================================================================
@@ -2758,13 +3104,17 @@ fi
 
 Summary:        %{title} kernel module symbol versions and debug info.
 Group:          Development/Kernel
-%{?_xpm:        %{expand: Icon:           %_xpm}}
-%{?_gif:        %{expand: Icon:           %_gif}}
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
 Autoreq:        true
 Autoprov:       true
 
-%{?files_modules:Prefix:         %{_kmoduledir}}
-%{?files_oldmods:Prefix:         %{_includedir}/%{name}/%{kernel_version}}
+%if %{FILES_modules}
+Prefix:         %{_kmoduledir}
+%endif
+%if %{FILES_oldmods}
+Prefix:         %{_includedir}/%{name}/%{kernel_version}
+%endif
 
 Conflicts:      %{infoconf}
 
@@ -2783,21 +3133,51 @@ Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf 
 
 Requires:       %{name}-devel = %{epoch}:@VERSION@-%{fullrelease}
 Requires:       %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
-%{?need_streams: %{expand: Requires:       %{_streams}-devel-%{_kversion} >= %{_strvers}}}
-%{?need_compat:  %{expand: Requires:       %{inforoot strcompat} >= 0@STRCOMP_VERSION@}}
-%{?need_tty:     %{expand: Requires:       %{inforoot strtty} >= 0@TTY_VERSION@}}
-%{?need_xns:     %{expand: Requires:       %{inforoot strxns} >= 0@XNS_VERSION@}}
-%{?need_xnet:    %{expand: Requires:       %{inforoot strxnet} >= 0@XTI_VERSION@}}
-#{?need_nsl:     %{expand: Requires:       %{inforoot strnsl} >= 0@NSL_VERSION@}}
-#{?need_sock:    %{expand: Requires:       %{inforoot strsock} >= 0@SOCK_VERSION@}}
-%{?need_inet:    %{expand: Requires:       %{inforoot strinet} >= 0@INET_VERSION@}}
-%{?need_sctp:    %{expand: Requires:       %{inforoot strsctp} >= 0@SCTP_VERSION@}}
-%{?need_chan:    %{expand: Requires:       %{inforoot strchan} >= 0@CHAN_VERSION@}}
-%{?need_x25:     %{expand: Requires:       %{inforoot strx25} >= 0@X25_VERSION@}}
-%{?need_iso:     %{expand: Requires:       %{inforoot striso} >= 0@ISO_VERSION@}}
-%{?need_isdn:    %{expand: Requires:       %{inforoot strisdn} >= 0@ISDN_VERSION@}}
-%{?need_ss7:     %{expand: Requires:       %{inforoot strss7} >= 0@SS7_VERSION@}}
-%{?need_sigtran: %{expand: Requires:       %{inforoot sigtran} >= 0@SIGTRAN_VERSION@}}
+%if %{NEED_streams}
+Requires:       %{_streams}-devel-%{_kversion} >= %{_strvers}
+%endif
+%if %{NEED_compat}
+Requires:       %{inforoot strcompat} >= 0@STRCOMP_VERSION@
+%endif
+%if %{NEED_tty}
+Requires:       %{inforoot strtty} >= 0@TTY_VERSION@
+%endif
+%if %{NEED_xns}
+Requires:       %{inforoot strxns} >= 0@XNS_VERSION@
+%endif
+%if %{NEED_xnet}
+Requires:       %{inforoot strxnet} >= 0@XTI_VERSION@
+%endif
+%if %{NEED_nsl}
+Requires:       %{inforoot strnsl} >= 0@NSL_VERSION@
+%endif
+%if %{NEED_sock}
+Requires:       %{inforoot strsock} >= 0@SOCK_VERSION@
+%endif
+%if %{NEED_inet}
+Requires:       %{inforoot strinet} >= 0@INET_VERSION@
+%endif
+%if %{NEED_sctp}
+Requires:       %{inforoot strsctp} >= 0@SCTP_VERSION@
+%endif
+%if %{NEED_chan}
+Requires:       %{inforoot strchan} >= 0@CHAN_VERSION@
+%endif
+%if %{NEED_x25}
+Requires:       %{inforoot strx25} >= 0@X25_VERSION@
+%endif
+%if %{NEED_iso}
+Requires:       %{inforoot striso} >= 0@ISO_VERSION@
+%endif
+%if %{NEED_isdn}
+Requires:       %{inforoot strisdn} >= 0@ISDN_VERSION@
+%endif
+%if %{NEED_ss7}
+Requires:       %{inforoot strss7} >= 0@SS7_VERSION@
+%endif
+%if %{NEED_sigtran}
+Requires:       %{inforoot sigtran} >= 0@SIGTRAN_VERSION@
+%endif
 
 Provides:       kernel-modules = %{_kversion}
 Provides:       %{infoname} = %{epoch}:%{kmodules_version}-%{fullrelease}
@@ -2839,21 +3219,25 @@ use this package or when debugging this package.
 %files -n %{infoname}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_modules: %{?files_kdebugfiles: %{_usrsrc}/debug}}
-%{?files_modules: %{?files_kdebugfiles: %{?_lib32dir:  %{_lib32dir}/debug/lib/modules/%{kernel_version}}}}
-%{?files_modules: %{?files_kdebugfiles: %{!?_lib32dir:  %{_libdir}/debug/lib/modules/%{kernel_version}}}}
-%{?files_oldmods: %{expand: %dir %{_includedir}/%{name}/%{kernel_version}}}
-%{?files_oldmods: %{expand: %{_includedir}/%{name}/%{kernel_version}/*}}
-%{?files_modules: %{expand: %{_kmoduledir}/%{base}/Module*}}
+%{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
+%{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug/lib/modules/%{kernel_version}}}}
+%{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug/lib/modules/%{kernel_version}}}}
+%{?files_oldmods:%dir %{_includedir}/%{name}/%{kernel_version}}
+%{?files_oldmods:%{_includedir}/%{name}/%{kernel_version}/*}
+%{?files_modules:%{_kmoduledir}/%{base}/Module*}
 %endif
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.89  2008/09/29 06:28:15  brian
-# - support older versions of rpm
+# Revision 0.9.2.90  2008-09-29 09:54:30  brian
+# - adjusted for older rpm
 #
+
+* Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.89  2008/09/29 06:28:15  brian
+- support older versions of rpm
 
 * Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.88  2008-09-28 17:00:18  brian
