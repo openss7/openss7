@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.76 $) $Date: 2008/09/26 19:02:40 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008/09/29 04:21:40 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/26 19:02:40 $ by $Author: brian $
+# Last Modified $Date: 2008/09/29 04:21:40 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -511,10 +511,11 @@ AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
 # _OPENSS7_OPTIONS_GPG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_GPG], [dnl
+    os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([GPG],
 	       [GPG signature command. @<:@default=gpg@:>@])
     AC_PATH_PROG([GPG], [gpg pgp], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+		 [$os7_tmp])
     if test :"${GPG:-no}" = :no ; then
 	AC_MSG_WARN([Could not find gpg program in PATH.])
 	GPG=/usr/bin/gpg
@@ -858,54 +859,55 @@ AC_DEFUN([_OPENSS7_MISSING2], [dnl
 	am_missing2_run=
 	AC_MSG_WARN(['missing2' script is too old or missing])
     fi
+    os7_tmp="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([LATEX],
 	       [Latex command. @<:@default=latex@:>@])
     AC_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([PSLATEX],
 	       [PS Latex command. @<:@default=pslatex@:>@])
     AC_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([PDFLATEX],
 	       [PDF Latex command. @<:@default=pdflatex@:>@])
     AC_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([BIBTEX],
 	       [BibTeX command. @<:@default=bibtex@:>@])
     AC_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([LATEX2HTML],
 	       [LaTeX to HTML command. @<:@default=latex2html@:>@])
     AC_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([DVI2PS],
 	       [DVI to PS command. @<:@default=dvips@:>@])
     AC_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([DVIPDF],
 	       [DVI to PDF command. @<:@default=dvipdf@:>@])
     AC_PATH_PROG([DVIPDF], [dvipdf], [${am_missing2_run}dvipdf],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([GNUPLOT],
 	       [GNU plot command. @<:@default=gnuplot@:>@])
     AC_PATH_PROG([GNUPLOT], [gnuplot], [${am_missing2_run}gnuplot],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([FIG2DEV],
 	       [Fig to graphics format command. @<:@default=fig2dev@:>@])
     AC_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([CONVERT],
 	       [Graphics format conversion command. @<:@default=convert@:>@])
     AC_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([PS2EPSI],
 	       [PS to EPSI conversion command. @<:@default=ps2epsi@:>@])
     AC_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
     AC_ARG_VAR([EPSTOPDF],
 	       [EPS to PDF conversion command. @<:@default=epstopdf@:>@])
     AC_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf],
-		 [$PATH:/usr/local/bin:/usr/bin:/bin])
+		 [$os7_tmp])
 ])# _OPENSS7_MISSING2
 # =============================================================================
 
@@ -925,10 +927,11 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
 	    [disable tar repo construction.  @<:@default=auto@:>@]),
 	[enable_repo_tar="$enableval"],
 	[enable_repo_tar=yes])
+    os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([MD5SUM],
 	       [MD5 sum command. @<:@default=md5sum@:>@])
     AC_PATH_PROG([MD5SUM], [md5sum], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+		 [$os7_tmp])
     if test :"${MD5SUM:-no}" = :no; then
 	AC_MSG_WARN([Could not find md5sum program in PATH.])
 	MD5SUM="${am_missing3_run}md5sum"
@@ -937,7 +940,7 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
     AC_ARG_VAR([SHA1SUM],
 	       [SHA1 sum command. @<:@default=sha1sum@:>@])
     AC_PATH_PROG([SHA1SUM], [sha1sum], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+		 [$os7_tmp])
     if test :"${SHA1SUM:-no}" = :no; then
 	AC_MSG_WARN([Could not find sha1sum program in PATH.])
 	SHA1SUM="${am_missing3_run}sha1sum"
@@ -946,7 +949,7 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
     AC_ARG_VAR([SHA256SUM],
 	       [SHA256 sum command. @<:@default=sha256sum@:>@])
     AC_PATH_PROG([SHA256SUM], [sha256sum], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+		 [$os7_tmp])
     if test :"${SHA256SUM:-no}" = :no; then
 	AC_MSG_WARN([Could not find sha256sum program in PATH.])
 	SHA256SUM="${am_missing3_run}sha256sum"
@@ -1005,6 +1008,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.77  2008/09/29 04:21:40  brian
+# - wider paths for tool searches
+#
 # Revision 0.9.2.76  2008/09/26 19:02:40  brian
 # - more doc directory adjustments
 #
