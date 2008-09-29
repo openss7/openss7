@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor tw=80
 ## =============================================================================
 ## 
-# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008/09/22 03:48:04 $
+# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-29 10:43:06 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/22 03:48:04 $ by $Author: brian $
+## Last Modified $Date: 2008-09-29 10:43:06 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -84,10 +84,14 @@ install-netconfig: src/util/sysconfig/netconfig
 # subdirectory, assume that we are being removed.  Note that if nothing really
 # gets installed in the /etc/netconfig.d subdirectory, calling this has no
 # overall effect.
+#
+# Note: do not do post-netconfig when building RPMS because each RPM will
+# conflict on the /etc/netconfig.xnsl file.
 ##
 
 post-netconfig:
 	@$(ECHO) "D: Making $@ in `pwd`"
+	@test -z '$(RPM_BUILD_ROOT)' || exit 0
 	@t="$(DESTDIR)$(sysconfdir)/netconfig" ; \
 	a="$(DESTDIR)$(sysconfdir)/netconfig.xnsl" ; \
 	d="$(DESTDIR)$(sysconfdir)/netconfig.d" ; \
@@ -165,6 +169,9 @@ EXTRA_DIST		+= src/util/sysconfig/netconfig
 ## =============================================================================
 ##
 ## $Log: netconfig.am,v $
+## Revision 0.9.2.14  2008-09-29 10:43:06  brian
+## - solve conflict on netconfig.xnsl
+##
 ## Revision 0.9.2.13  2008/09/22 03:48:04  brian
 ## - mark our debugs as such
 ##
