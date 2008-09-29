@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: speccommon.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.8 $) $Date: 2008-09-29 08:29:59 $
+# @(#) $RCSfile: speccommon.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.9 $) $Date: 2008-09-29 09:21:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-29 08:29:59 $ by $Author: brian $
+# Last Modified $Date: 2008-09-29 09:21:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1127,9 +1127,9 @@ Prefix:         %{_sysconfdir}/sock2path.d
 %if %{FILES_snmpconf}
 Prefix:         %{_snmpconfdir}
 %endif
-%if %{FILES_oldmods}
-Prefix:         %{_modutildir}
-%endif
+#if %{FILES_oldmods}
+#refix:         %{_modutildir}
+#endif
 %if %{FILES_testscripts}
 Prefix:         %{_pkglibexecdir}
 %endif
@@ -1579,11 +1579,12 @@ make check
 # if we are going to create debug packages, we need to install unstripped
 # binaries; otherwise use libtoolized install-strip to strip binaries, modules,
 # shared and static libraries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
+make DESTDIR="%{buildroot}" \
     %{!?_enable_debug_packages: install-strip} \
-    %{?_enable_debug_packages: install} \
-    %{?files_pdffiles: install-pdf} \
-    %{?files_htmlfiles: install-html}
+    %{?_enable_debug_packages: install}
+
+%{?files_pdffiles:  make DESTDIR=`pwd` install-pdf }
+%{?files_htmlfiles: make DESTDIR=`pwd` install-html}
 
 # copy out our devices list
 # cp -pf %{mybuilddir}/%{makedev} .
@@ -2310,7 +2311,7 @@ fi
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_docfiles:%{?files_locales:%doc ABOUT-NLS}}
-%{?files_docfiles:%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS}
+%{?files_docfiles:%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LICENSES LSM MANUAL NEWS PROBLEMS}
 %{?files_docfiles:%doc README README-alpha README-cvs README-make THANKS TODO}
 %{?files_docfiles:%doc %{name}-%{version}.lsm}
 #{?files_manual:#doc #{manual}}
@@ -2323,7 +2324,7 @@ fi
 %{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
-%{?files_oldmods:%config(noreplace) %{_modutildir}/*}
+#{?files_oldmods:%config(noreplace) %{_modutildir}/*}
 %{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %{?files_initscripts:%{_initrddir}/*}
 %{?files_mibfiles:%{_snmpmibdir}/*}
@@ -2331,9 +2332,9 @@ fi
 %{?files_testscripts:%{_pkglibexecdir}/testsuite*}
 %{?files_sendpr:%{_pkglibexecdir}/send-pr}
 %{?files_sendpr:%{_pkglibexecdir}/send-pr.config}
-%{?files_pdffiles:%{_pdfdir}/@PACKAGE@-@VERSION@/*.pdf}
-%{?files_htmlfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.html}
-%{?files_pngfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.png}
+%{?files_pdffiles:%doc .%{_pdfdir}/@PACKAGE@-@VERSION@/*.pdf}
+%{?files_htmlfiles:%doc .%{_htmldir}/@PACKAGE@-@VERSION@/*.html}
+%{?files_pngfiles:%doc .%{_htmldir}/@PACKAGE@-@VERSION@/*.png}
 %{?files_infofiles:%{_infodir}/*.info*}
 %{?files_manrefs:%{_mandir}/%{base}.refs*}
 %{?files_manmacros:%{_mandir}/%{base}.macros*}
@@ -3140,6 +3141,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 0.9.2.9  2008-09-29 09:21:03  brian
+# - beter documentation placement
+#
 # Revision 0.9.2.8  2008-09-29 08:29:59  brian
 # - bunch of corrections for older rpm
 #
