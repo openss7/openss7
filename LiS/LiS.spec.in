@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.94 $) $Date: 2008-09-28 17:00:18 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.95 $) $Date: 2008/09/29 06:27:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:00:18 $ by $Author: brian $
+# Last Modified $Date: 2008/09/29 06:27:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,6 +98,7 @@
 
 %global NEED_streams    0
 %global NEED_compat     0
+%global NEED_tty        0
 %global NEED_xns        0
 %global NEED_xnet       0
 %global NEED_nsl        0
@@ -111,27 +112,6 @@
 %global NEED_ss7        0
 %global NEED_sigtran    0
 
-%global config_options  \\\
-    %%{?_with_solaris_cmn_err:    '%%{_with_solaris_cmn_err}'} \\\
-    %%{?_without_solaris_cmn_err: '%%{_without_solaris_cmn_err}'} \\\
-    %%{?_with_solaris_consts:     '%%{_with_solaris_consts}'} \\\
-    %%{?_without_solaris_consts:  '%%{_without_solaris_consts}'} \\\
-    %%{?_with_lis_regparms:       '%%{_with_lis_regparms}'} \\\
-    %%{?_without_lis_regparms:    '%%{_without_lis_regparms}'} \\\
-    %%{?_with_k_modversions:      '%%enable %%_with_k_modversions'} \\\
-    %%{?_without_k_modversions:   '%%disable %%_without_k_modversions'} \\\
-    %%{?_with_k_cache:            '%%enable %%_with_k_cache'} \\\
-    %%{?_without_k_cache:         '%%disable %%_without_k_cache'} \\\
-    %%{?_with_k_timers:           '%%enable %%_with_k_timers'} \\\
-    %%{?_without_k_timers:        '%%disable %%_without_k_timers'} \\\
-    %%{?_with_broken_cpu_flags:   '%%enable %%_with_broken_cpu_flags'} \\\
-    %%{?_without_broken_cpu_flags:'%%disable %%_without_broken_cpu_flags'} \\\
-    %%{?_with_atomic_stats:       '%%enable %%_with_atomic_stats'} \\\
-    %%{?_without_atomic_stats:    '%%disable %%_without_atomic_stats'} \\\
-    %%{?_with_lis_development:    '%%enable %%_with_lis_development'} \\\
-    %%{?_without_lis_development: '%%disable %%_without_lis_development'} \\\
-    %{nil}
-
 %global _with_lis --with-lis
 %global _without_lfs --without-lfs
 
@@ -141,9 +121,13 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.94  2008-09-28 17:00:18  brian
-# - updated spec files
+# Revision 1.1.6.95  2008/09/29 06:27:50  brian
+# - support older versions of rpm
 #
+
+* Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.94  2008-09-28 17:00:18  brian
+- updated spec files
 
 * Fri Sep 26 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.93  2008-09-26 08:48:03  brian

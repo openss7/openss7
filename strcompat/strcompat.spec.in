@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-09-28 17:00:20 $
+# @(#) $RCSfile: strcompat.spec.in,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008/09/29 06:27:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:00:20 $ by $Author: brian $
+# Last Modified $Date: 2008/09/29 06:27:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,6 +98,7 @@
 
 %global NEED_streams    1
 %global NEED_compat     0
+%global NEED_tty        0
 %global NEED_xns        0
 %global NEED_xnet       0
 %global NEED_nsl        0
@@ -111,46 +112,19 @@
 %global NEED_ss7        0
 %global NEED_sigtran    0
 
-%global config_options  \\\
-    %%{?_with_lis:                '%%_with_lis'} \\\
-    %%{?_with_lfs:                '%%_with_lfs'} \\\
-    %%{?_with_compat_os7:         '%%enable %%_with_compat_os7'} \\\
-    %%{?_without_compat_os7:      '%%disable %%_without_compat_os7'} \\\
-    %%{?_with_compat_svr3:        '%%enable %%_with_compat_svr3'} \\\
-    %%{?_without_compat_svr3:     '%%disable %%_without_compat_svr3'} \\\
-    %%{?_with_compat_svr4:        '%%enable %%_with_compat_svr4'} \\\
-    %%{?_without_compat_svr4:     '%%disable %%_without_compat_svr4'} \\\
-    %%{?_with_compat_mps:         '%%enable %%_with_compat_mps'} \\\
-    %%{?_without_compat_mps:      '%%disable %%_without_compat_mps'} \\\
-    %%{?_with_compat_sol8:        '%%enable %%_with_compat_sol8'} \\\
-    %%{?_without_compat_sol8:     '%%disable %%_without_compat_sol8'} \\\
-    %%{?_with_compat_uw7:         '%%enable %%_with_compat_uw7'} \\\
-    %%{?_without_compat_uw7:      '%%disable %%_without_compat_uw7'} \\\
-    %%{?_with_compat_osf:         '%%enable %%_with_compat_osf'} \\\
-    %%{?_without_compat_osf:      '%%disable %%_without_compat_osf'} \\\
-    %%{?_with_compat_aix:         '%%enable %%_with_compat_aix'} \\\
-    %%{?_without_compat_aix:      '%%disable %%_without_compat_aix'} \\\
-    %%{?_with_compat_hpux:        '%%enable %%_with_compat_hpux'} \\\
-    %%{?_without_compat_hpux:     '%%disable %%_without_compat_hpux'} \\\
-    %%{?_with_compat_irix:        '%%enable %%_with_compat_irix'} \\\
-    %%{?_without_compat_irix:     '%%disable %%_without_compat_irix'} \\\
-    %%{?_with_compat_lis:         '%%enable %%_with_compat_lis'} \\\
-    %%{?_without_compat_lis:      '%%disable %%_without_compat_lis'} \\\
-    %%{?_with_compat_lfs:         '%%enable %%_with_compat_lfs'} \\\
-    %%{?_without_compat_lfs:      '%%disable %%_without_compat_lfs'} \\\
-    %%{?_with_compat_mac:         '%%enable %%_with_compat_mac'} \\\
-    %%{?_without_compat_mac:      '%%disable %%_without_compat_mac'} \\\
-    %{nil}
-
 @speccommon@
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strcompat.spec.in,v $
-# Revision 0.9.2.69  2008-09-28 17:00:20  brian
-# - updated spec files
+# Revision 0.9.2.70  2008/09/29 06:27:56  brian
+# - support older versions of rpm
 #
+
+* Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.69  2008-09-28 17:00:20  brian
+- updated spec files
 
 * Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.68  2008-09-28 03:46:47  brian

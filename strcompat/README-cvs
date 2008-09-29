@@ -1,4 +1,4 @@
-OpenSS7 STREAMS Compatibility -- read me CVS file.  2008-09-23
+OpenSS7 STREAMS Compatibility -- read me CVS file.  2008-09-28
 $Id: README-cvs,v 0.9.2.52 2008-09-24 16:27:20 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -6,7 +6,7 @@ See the end for copying conditions (for this file).
 
 The following is an extract from the manual to assist CVS developers:
 
-7.1.6 Downloading from CVS
+7.2.6 Downloading from CVS
 --------------------------
 
 If you are a subscriber or sponsor of The OpenSS7 Project
