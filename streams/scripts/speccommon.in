@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-29 09:21:03 $
+# @(#) $RCSfile: speccommon.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-09-29 10:43:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-29 09:21:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-29 10:43:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2321,7 +2321,7 @@ fi
 #{?files_projects:#doc #{projects}}
 %{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+#{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 #{?files_oldmods:%config(noreplace) %{_modutildir}/*}
@@ -3141,6 +3141,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 0.9.2.10  2008-09-29 10:43:06  brian
+# - solve conflict on netconfig.xnsl
+#
 # Revision 0.9.2.9  2008-09-29 09:21:03  brian
 # - beter documentation placement
 #
