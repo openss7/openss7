@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-29 11:10:21 $
+# @(#) $RCSfile: speccommon.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.12 $) $Date: 2008-09-29 11:21:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-29 11:10:21 $ by $Author: brian $
+# Last Modified $Date: 2008-09-29 11:21:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3059,12 +3059,12 @@ Requires:       %{inforoot strxns} >= 0@XNS_VERSION@
 %if %{NEED_xnet}
 Requires:       %{inforoot strxnet} >= 0@XTI_VERSION@
 %endif
-%if %{NEED_nsl}
-Requires:       %{inforoot strnsl} >= 0@NSL_VERSION@
-%endif
-%if %{NEED_sock}
-Requires:       %{inforoot strsock} >= 0@SOCK_VERSION@
-%endif
+#if %{NEED_nsl}
+#equires:       %{inforoot strnsl} >= 0@NSL_VERSION@
+#endif
+#if %{NEED_sock}
+#equires:       %{inforoot strsock} >= 0@SOCK_VERSION@
+#endif
 %if %{NEED_inet}
 Requires:       %{inforoot strinet} >= 0@INET_VERSION@
 %endif
@@ -3141,6 +3141,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 0.9.2.12  2008-09-29 11:21:30  brian
+# - remove dependency on non-existent modules
+#
 # Revision 0.9.2.11  2008-09-29 11:10:21  brian
 # - resolve netconfig.xnsl conflict some more
 #
