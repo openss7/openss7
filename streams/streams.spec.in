@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.183 $) $Date: 2008-09-28 17:00:21 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.184 $) $Date: 2008-09-29 06:27:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:00:21 $ by $Author: brian $
+# Last Modified $Date: 2008-09-29 06:27:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,6 +98,7 @@
 
 %global NEED_streams    0
 %global NEED_compat     0
+%global NEED_tty        0
 %global NEED_xns        0
 %global NEED_xnet       0
 %global NEED_nsl        0
@@ -111,59 +112,6 @@
 %global NEED_ss7        0
 %global NEED_sigtran    0
 
-%global config_options  \\\
-    %%{?_with_streams_syncqs:     '%%enable %%_with_streams_syncqs'} \\\
-    %%{?_without_streams_syncqs:  '%%disable %%_without_streams_syncqs'} \\\
-    %%{?_with_streams_kthreads:   '%%enable %%_with_streams_kthreads'} \\\
-    %%{?_without_streams_kthreads:'%%disable %%_without_streams_kthreads'} \\\
-    %%{?_with_streams_utils:      '%%enable %%_with_streams_utils'} \\\
-    %%{?_without_streams_utils:   '%%disable %%_without_streams_utils'} \\\
-    %%{?_with_big_compile:        '%%enable %%_with_big_compile'} \\\
-    %%{?_without_big_compile:     '%%disable %%_without_big_compile'} \\\
-    %%{?_with_module_sth:         '%%enable %%_with_module_sth'} \\\
-    %%{?_without_module_sth:      '%%disable %%_without_module_sth'} \\\
-    %%{?_with_module_bufmod:      '%%enable %%_with_module_bufmod'} \\\
-    %%{?_without_module_bufmod:   '%%disable %%_without_module_bufmod'} \\\
-    %%{?_with_module_nullmod:     '%%enable %%_with_module_nullmod'} \\\
-    %%{?_without_module_nullmod:  '%%disable %%_without_module_nullmod'} \\\
-    %%{?_with_module_pipemod:     '%%enable %%_with_module_pipemod'} \\\
-    %%{?_without_module_pipemod:  '%%disable %%_without_module_pipemod'} \\\
-    %%{?_with_module_connld:      '%%enable %%_with_module_connld'} \\\
-    %%{?_without_module_connld:   '%%disable %%_without_module_connld'} \\\
-    %%{?_with_module_sc:          '%%enable %%_with_module_sc'} \\\
-    %%{?_without_module_sc:       '%%disable %%_without_module_sc'} \\\
-    %%{?_with_module_testmod:     '%%enable %%_with_module_testmod'} \\\
-    %%{?_without_module_testmod:  '%%disable %%_without_module_testmod'} \\\
-    %%{?_with_driver_clone:       '%%enable %%_with_driver_clone'} \\\
-    %%{?_without_driver_clone:    '%%disable %%_without_driver_clone'} \\\
-    %%{?_with_driver_echo:        '%%enable %%_with_driver_echo'} \\\
-    %%{?_without_driver_echo:     '%%disable %%_without_driver_echo'} \\\
-    %%{?_with_driver_fifo:        '%%enable %%_with_driver_fifo'} \\\
-    %%{?_without_driver_fifo:     '%%disable %%_without_driver_fifo'} \\\
-    %%{?_with_driver_log:         '%%enable %%_with_driver_log'} \\\
-    %%{?_without_driver_log:      '%%disable %%_without_driver_log'} \\\
-    %%{?_with_driver_loop:        '%%enable %%_with_driver_loop'} \\\
-    %%{?_without_driver_loop:     '%%disable %%_without_driver_loop'} \\\
-    %%{?_with_driver_nsdev:       '%%enable %%_with_driver_nsdev'} \\\
-    %%{?_without_driver_nsdev:    '%%disable %%_without_driver_nsdev'} \\\
-    %%{?_with_driver_mux:         '%%enable %%_with_driver_mux'} \\\
-    %%{?_without_driver_mux:      '%%disable %%_without_driver_mux'} \\\
-    %%{?_with_driver_nuls:        '%%enable %%_with_driver_nuls'} \\\
-    %%{?_without_driver_nuls:     '%%disable %%_without_driver_nuls'} \\\
-    %%{?_with_driver_pipe:        '%%enable %%_with_driver_pipe'} \\\
-    %%{?_without_driver_pipe:     '%%disable %%_without_driver_pipe'} \\\
-    %%{?_with_driver_sad:         '%%enable %%_with_driver_sad'} \\\
-    %%{?_without_driver_sad:      '%%disable %%_without_driver_sad'} \\\
-    %%{?_with_driver_sfx:         '%%enable %%_with_driver_sfx'} \\\
-    %%{?_without_driver_sfx:      '%%disable %%_without_driver_sfx'} \\\
-    %%{?_with_driver_spx:         '%%enable %%_with_driver_spx'} \\\
-    %%{?_without_driver_spx:      '%%disable %%_without_driver_spx'} \\\
-    %%{?_with_streams_fifos:      '%%enable %%_with_streams_fifos'} \\\
-    %%{?_without_streams_fifos:   '%%disable %%_without_streams_fifos'} \\\
-    %%{?_with_streams_bcm:        '%%enable %%_with_streams_bcm'} \\\
-    %%{?_without_streams_bcm:     '%%disable %%_without_streams_bcm'} \\\
-    %{nil}
-
 %global _with_lfs --with-lfs
 %global _without_lis --without-lis
 
@@ -173,12 +121,17 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.183  2008-09-28 17:00:21  brian
-# - updated spec files
+# Revision 0.9.2.184  2008-09-29 06:27:57  brian
+# - support older versions of rpm
 #
-# Revision 0.9.2.182  2008-09-28 03:46:47  brian
-# - updated spec files
-#
+
+* Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.183  2008-09-28 17:00:21  brian
+- updated spec files
+
+* Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.182  2008-09-28 03:46:47  brian
+- updated spec files
 
 * Sat Sep 27 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.181  2008-09-27 06:49:15  brian

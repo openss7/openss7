@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: quick.texi,v 0.9.2.13 2008-04-28 09:50:07 brian Exp $
+@c @(#) $Id: quick.texi,v 0.9.2.14 2008-09-28 12:43:52 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-04-28 09:50:07 $ by $Author: brian $
+@c Last Modified $Date: 2008-09-28 12:43:52 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -74,9 +74,10 @@ OpenSS7 Project} website using a command such as:
 $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2
 @end example
 
-The release is available as an @manpage{autoconf(1)} tarball, @file{src.rpm} or @file{dsc}, or as a
-set of binary @file{rpm}s or @file{deb}s.  See the @uref{http://www.openss7.org/download.html,
-download page} for the @manpage{autoconf(1)} tarballs, @file{src.rpm}s or @file{dsc}s.  See the
+The release is available as an @manpage{autoconf(1)} tarball, @file{src.rpm} or @file{dsc}, as a
+set of binary @file{rpm}s or @file{deb}s, or as a @manpage{yum(8)} or @manpage{apt(8)} repository.
+See the @uref{http://www.openss7.org/download.html, download page} for the @manpage{autoconf(1)}
+tarballs, @file{src.rpm}s, @file{dsc}s, or repository access instructions.  See the
 @uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @command{@value{PACKAGE}} package page} for
 tarballs, source and binary packages.
 

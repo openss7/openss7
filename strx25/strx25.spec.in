@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strx25.spec.in,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-28 17:00:26 $
+# @(#) $RCSfile: strx25.spec.in,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008/09/29 06:28:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 17:00:26 $ by $Author: brian $
+# Last Modified $Date: 2008/09/29 06:28:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,6 +98,7 @@
 
 %global NEED_streams    1
 %global NEED_compat     1
+%global NEED_tty        0
 %global NEED_xns        1
 %global NEED_xnet       1
 %global NEED_nsl        1
@@ -111,20 +112,19 @@
 %global NEED_ss7        0
 %global NEED_sigtran    0
 
-%global config_options  \\\
-    %%{?_with_lis:                '%%_with_lis'} \\\
-    %%{?_with_lfs:                '%%_with_lfs'} \\\
-    %{nil}
-
 @speccommon@
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strx25.spec.in,v $
-# Revision 0.9.2.18  2008-09-28 17:00:26  brian
-# - updated spec files
+# Revision 0.9.2.19  2008/09/29 06:28:11  brian
+# - support older versions of rpm
 #
+
+* Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.18  2008-09-28 17:00:26  brian
+- updated spec files
 
 * Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.17  2008-09-28 03:46:51  brian
