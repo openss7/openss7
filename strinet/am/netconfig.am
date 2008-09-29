@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor tw=80
 ## =============================================================================
 ## 
-# @(#) $RCSfile: netconfig.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.14 $) $Date: 2008-09-29 10:43:06 $
+# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-29 11:10:21 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-29 10:43:06 $ by $Author: brian $
+## Last Modified $Date: 2008-09-29 11:10:21 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -91,10 +91,12 @@ install-netconfig: src/util/sysconfig/netconfig
 
 post-netconfig:
 	@$(ECHO) "D: Making $@ in `pwd`"
-	@test -z '$(RPM_BUILD_ROOT)' || exit 0
 	@t="$(DESTDIR)$(sysconfdir)/netconfig" ; \
 	a="$(DESTDIR)$(sysconfdir)/netconfig.xnsl" ; \
 	d="$(DESTDIR)$(sysconfdir)/netconfig.d" ; \
+	if test -n '$(DESTDIR)' -a ! -e $$t -a ! -e $$a ; then \
+		exit 0 ; \
+	fi ; \
 	if test -e $$t ; then \
 		if ! grep '^# Generated from netconfig.d' $$t >/dev/null 2>&1 ; then \
 			t="$$a" ; \
@@ -169,6 +171,9 @@ EXTRA_DIST		+= src/util/sysconfig/netconfig
 ## =============================================================================
 ##
 ## $Log: netconfig.am,v $
+## Revision 0.9.2.15  2008-09-29 11:10:21  brian
+## - resolve netconfig.xnsl conflict some more
+##
 ## Revision 0.9.2.14  2008-09-29 10:43:06  brian
 ## - solve conflict on netconfig.xnsl
 ##
