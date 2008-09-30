@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2008-09-29 22:45:36 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-30 09:20:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-29 22:45:36 $ by $Author: brian $
+# Last Modified $Date: 2008-09-30 09:20:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -408,7 +408,7 @@
 %global _obsopkg %name-%_streams
 %global _strmpkg %name%_strextra
 %global _confpkg %name%_strother
-%global _virtpkg %{name}-%{virtual}
+%global _virtpkg %name-%{virtual}
 %else
 %global _obsopkg %_streams
 %global _strmpkg %_streams
@@ -419,37 +419,34 @@
 %global core_name   core-%{_kversion}
 %global info_name   info-%{_kversion}
 
-%global corename %_strmpkg-%_kversion
-%global infoname %_strmpkg-devel-%_kversion
-%global coreconf %_confpkg-%_kversion
-%global infoconf %_confpkg-devel-%_kversion
-%global corevirt %_virtpkg
-%global infovirt %_virtpkg-devel
-%global coreroot() %1-%{virtual}%{nil}
-%global inforoot() %1-%{virtual}-devel%{nil}
+%global corebase() %1%_strextra-%{_kversion}%{nil}
+%global infobase() %1%_strextra-devel-%{_kversion}%{nil}
+
+%global corename %{_strmpkg}-%_kversion
+%global infoname %{_strmpkg}-devel-%_kversion
+%global coreconf %{_confpkg}-%_kversion
+%global infoconf %{_confpkg}-devel-%_kversion
+%global corevirt %{_virtpkg}
+%global infovirt %{_virtpkg}-devel
 %global kmodules_version @VERSION@
 
 %if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
-%global corename openss7-%_strmpkg-kmp%kernel_flavor
-%global infoname openss7-%_strmpkg-kmp%kernel_flavor-devel
-%global coreconf openss7-%_confpkg-kmp%kernel_flavor
-%global infoconf openss7-%_confpkg-kmp%kernel_flavor-devel
-%global corevirt openss7-%_virtpkg-kmp%{nil}
-%global infovirt openss7-%_virtpkg-kmp-devel%{nil}
-%global coreroot() openss7-%1-%{virtual}-kmp%{nil}
-%global inforoot() openss7-%1-%{virtual}-kmp-devel%{nil}
+%global corename openss7-%{_strmpkg}-kmp%kernel_flavor
+%global infoname openss7-%{_strmpkg}-kmp%kernel_flavor-devel
+%global coreconf openss7-%{_confpkg}-kmp%kernel_flavor
+%global infoconf openss7-%{_confpkg}-kmp%kernel_flavor-devel
+%global corevirt openss7-%{_virtpkg}-kmp
+%global infovirt openss7-%{_virtpkg}-kmp-devel
 %global kmodules_version @VERSION@_%kernel_string
 %endif
 
 %if %(test '%_vendor' = 'redhat' && echo 1 || echo 0)
-%global corename kmod-%_strmpkg%kernel_flavor
-%global infoname kmod-%_strmpkg%kernel_flavor-devel
-%global coreconf kmod-%_confpkg%kernel_flavor
-%global infoconf kmod-%_confpkg%kernel_flavor-devel
-%global corevirt kmod-%_virtpkg%{nil}
-%global infovirt kmod-%_virtpkg-devel%{nil}
-%global coreroot() kmod-%1-%{virtual}%{nil}
-%global inforoot() kmod-%1-%{virtual}-devel%{nil}
+%global corename kmod-%{_strmpkg}%kernel_flavor
+%global infoname kmod-%{_strmpkg}%kernel_flavor-devel
+%global coreconf kmod-%{_confpkg}%kernel_flavor
+%global infoconf kmod-%{_confpkg}%kernel_flavor-devel
+%global corevirt kmod-%{_virtpkg}
+%global infovirt kmod-%{_virtpkg}-devel
 %global kmodules_version @VERSION@.%kernel_release
 %endif
 
@@ -656,8 +653,71 @@
 
 %if %{VIRT_base}
 %global WANT_base       1
+%global NEED_base       1
 %else
 %global WANT_base       0
+%global NEED_base       0
+%endif
+
+%if %{HAVE_docfiles}
+%global NEED_base       1
+%endif
+%if %{HAVE_snmpconf}
+%global NEED_base       1
+%endif
+%if %{HAVE_configfiles}
+%global NEED_base       1
+%endif
+%if %{HAVE_netconfig}
+%global NEED_base       1
+%endif
+%if %{HAVE_sock2path}
+%global NEED_base       1
+%endif
+%if %{HAVE_oldmods}
+%global NEED_base       1
+%endif
+%if %{HAVE_initscripts}
+%global NEED_base       1
+%endif
+%if %{HAVE_mibfiles}
+%global NEED_base       1
+%endif
+%if %{HAVE_testscripts}
+%global NEED_base       1
+%endif
+%if %{HAVE_sendpr}
+%global NEED_base       1
+%endif
+%if %{HAVE_manual}
+%global NEED_base       1
+%endif
+%if %{HAVE_specs}
+%global NEED_base       1
+%endif
+%if %{HAVE_drafts}
+%global NEED_base       1
+%endif
+%if %{HAVE_papers}
+%global NEED_base       1
+%endif
+%if %{HAVE_projects}
+%global NEED_base       1
+%endif
+%if %{HAVE_infofiles}
+%global NEED_base       1
+%endif
+%if %{HAVE_pngfiles}
+%global NEED_base       1
+%endif
+%if %{HAVE_manrefs}
+%global NEED_base       1
+%endif
+%if %{HAVE_manmacros}
+%global NEED_base       1
+%endif
+%if %{HAVE_manpages}
+%global NEED_base       1
 %endif
 
 %if %{FILES_docfiles}
@@ -737,8 +797,41 @@
 
 %if %{VIRT_lib}
 %global WANT_lib        1
+%global NEED_lib        1
 %else
 %global WANT_lib        0
+%global NEED_lib        0
+%endif
+
+%if %{HAVE_binfiles}
+%global NEED_lib        1
+%endif
+%if %{HAVE_sbinfiles}
+%global NEED_lib        1
+%endif
+%if %{HAVE_libraries}
+%global NEED_lib        1
+%endif
+%if %{HAVE_lib32compat}
+%global NEED_lib        1
+%endif
+%if %{HAVE_locales}
+%global NEED_lib        1
+%endif
+%if %{HAVE_gdmofiles}
+%global NEED_lib        1
+%endif
+%if %{HAVE_testfiles}
+%global NEED_lib        1
+%endif
+%if %{HAVE_test32files}
+%global NEED_lib        1
+%endif
+%if %{HAVE_snmpmods}
+%global NEED_lib        1
+%endif
+%if %{HAVE_snmp32mods}
+%global NEED_lib        1
 %endif
 
 %if %{FILES_binfiles}
@@ -782,8 +875,20 @@
 
 %if %{VIRT_devel}
 %global WANT_devel      1
+%global NEED_devel      1
 %else
 %global WANT_devel      0
+%global NEED_devel      0
+%endif
+
+%if %{HAVE_includes}
+%global NEED_devel      1
+%endif
+%if %{HAVE_libraries}
+%global NEED_devel      1
+%endif
+%if %{HAVE_sourcefiles}
+%global NEED_devel      1
 %endif
 
 %if %{FILES_includes}
@@ -809,8 +914,14 @@
 
 %if %{VIRT_kmod}
 %global WANT_kmod       1
+%global NEED_kmod       1
 %else
 %global WANT_kmod       0
+%global NEED_kmod       0
+%endif
+
+%if %{HAVE_modules}
+%global NEED_kmod       1
 %endif
 
 %if %{FILES_modules}
@@ -827,8 +938,14 @@
 
 %if %{VIRT_kbug}
 %global WANT_kbug       1
+%global NEED_kbug       1
 %else
 %global WANT_kbug       0
+%global NEED_kbug       0
+%endif
+
+%if %{HAVE_modules}
+%global NEED_kbug       1
 %endif
 
 %if %{FILES_modules}
@@ -887,6 +1004,26 @@
 %endif
 %if %{NEED_sigtran}
 %global need_sigtran        %{nil}
+%endif
+
+%if %{NEED_base}
+%global need_base           %{nil}
+%endif
+
+%if %{NEED_lib}
+%global need_lib            %{nil}
+%endif
+
+%if %{NEED_devel}
+%global need_devel          %{nil}
+%endif
+
+%if %{NEED_kmod}
+%global need_kmod           %{nil}
+%endif
+
+%if %{NEED_kbug}
+%global need_kbug           %{nil}
 %endif
 
 # ---------------------------------------------------------------------------
@@ -1047,7 +1184,7 @@
 %global descriptail %{nil}
 %endif
 
-Summary:        %{title} for Linux.
+Summary:        %{title} for Linux
 Name:           @PACKAGE@
 Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
@@ -1055,8 +1192,8 @@ Release:        %{rpmrelease}
 License:        %{license}
 Group:          System Environment/Kernel
 %{?url:URL:     %{url}}
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
+%{?_xpm_icon:Icon: %{_xpm_icon}}
+%{?_gif_icon:Icon: %{_gif_icon}}
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{version}.tar.bz2
@@ -1242,16 +1379,12 @@ Obsoletes:      %{_obsopkg}-docs
 
 #Prereq:         /sbin/install-info
 
-%if %{HAVE_mknods}
-Prereq:         %{mknods}
-%endif
-%if %{HAVE_rmnods}
-Prereq:         %{rmnods}
-%endif
 %if %{USE_makedev}
 Prereq:         dev >= 3.3
 %endif
+%if %{NEED_lib}
 Prereq:         %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
+%endif
 %if %{NEED_streams}
 Prereq:         %{virtual}
 %endif
@@ -1483,24 +1616,24 @@ fi
     %{?_without_k_safe:                     '%disable %_without_k_safe'} \
     %{?_with_k_inline:                      '%enable %_with_k_inline'} \
     %{?_without_k_inline:                   '%disable %_without_k_inline'} \
-    %{?_with_devfs:                         '%enable %_with_devfs'} \
-    %{?_without_devfs:                      '%disable %_without_devfs'} \
     %{?_with_devel:                         '%enable %_with_devel'} \
     %{?_without_devel:                      '%disable %_without_devel'} \
     %{?_with_tools:                         '%enable %_with_tools'} \
     %{?_without_tools:                      '%disable %_without_tools'} \
-    %{?_with_snmp_agent:                    '%_with_snmp_agent'} \
-    %{?_without_snmp_agent:                 '%_without_snmp_agent'} \
     %{?_with_modules:                       '%enable %_with_modules'} \
     %{?_without_modules:                    '%disable %_without_modules'} \
+    %{?_with_devfs:                         '%enable %_with_devfs'} \
+    %{?_without_devfs:                      '%disable %_without_devfs'} \
+    %{?_with_snmp_agent:                    '%_with_snmp_agent'} \
+    %{?_without_snmp_agent:                 '%_without_snmp_agent'} \
     %{?_with_lis:                           '%_with_lis'} \
     %{?_with_lfs:                           '%_with_lfs'} \
-    %{?_with_solaris_cmn_err:               '%{_with_solaris_cmn_err}'} \
-    %{?_without_solaris_cmn_err:            '%{_without_solaris_cmn_err}'} \
-    %{?_with_solaris_consts:                '%{_with_solaris_consts}'} \
-    %{?_without_solaris_consts:             '%{_without_solaris_consts}'} \
-    %{?_with_lis_regparms:                  '%{_with_lis_regparms}'} \
-    %{?_without_lis_regparms:               '%{_without_lis_regparms}'} \
+    %{?_with_solaris_cmn_err:               '%_with_solaris_cmn_err'} \
+    %{?_without_solaris_cmn_err:            '%_without_solaris_cmn_err'} \
+    %{?_with_solaris_consts:                '%_with_solaris_consts'} \
+    %{?_without_solaris_consts:             '%_without_solaris_consts'} \
+    %{?_with_lis_regparms:                  '%_with_lis_regparms'} \
+    %{?_without_lis_regparms:               '%_without_lis_regparms'} \
     %{?_with_k_modversions:                 '%enable %_with_k_modversions'} \
     %{?_without_k_modversions:              '%disable %_without_k_modversions'} \
     %{?_with_k_cache:                       '%enable %_with_k_cache'} \
@@ -1861,26 +1994,6 @@ if [ $arg = 1 ] ; then : # fresh install
             rm -f -- $modl_deps
         done
     fi
-%endif
-%if %{NEED_streams}
-%else
-%if %{HAVE_manpages}
-    # Old non-rpm distro puts some man pages in the wrong place, clean them out.
-    if [ -f /usr/man/man3/fattach.3 ] ; then
-        rm -f /usr/man/man3/fattach.3 2>/dev/null
-        rm -f /usr/man/man3/detach.3 2>/dev/null
-        rm -f /usr/man/man3/isastream.3 2>/dev/null
-        rmdir -p /usr/man/man3 2>/dev/null || :
-        rm -f /usr/man/man8/fattach.8 2>/dev/null
-        rm -f /usr/man/man8/fdetach.8 2>/dev/null
-        rmdir -p /usr/man/man8 2>/dev/null || :
-        rm -f /usr/man/man9/connld.9 2>/dev/null
-        rm -f /usr/man/man9/fifo.9 2>/dev/null
-        rm -f /usr/man/man9/pipemod.9 2>/dev/null
-        rmdir -p /usr/man/man9 2>/dev/null || :
-        rmdir -p /usr/man 2>/dev/null || :
-    fi
-%endif
 %endif
 fi
 if [ $arg = 2 ] ; then : # upgrade
@@ -2781,57 +2894,55 @@ Obsoletes:      %{_obsopkg}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
 # SuSE puts lsof in /usr/bin
 Prereq:         lsof
 
-%if %{HAVE_initscripts}
-Prereq:         %{_initrddir}/%{base}
-%endif
-
 Prereq:         %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 
+%if %{NEED_base}
 Prereq:         %{name} = %{epoch}:@VERSION@-%{rpmrelease}
+%endif
 %if %{NEED_streams}
 Prereq:         %{_streams}-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         %{coreroot strcompat} >= 0@STRCOMP_VERSION@
+Prereq:         %{corebase strcompat} >= 0@STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         %{coreroot strtty} >= 0@TTY_VERSION@
+Prereq:         %{corebase strtty} >= 0@TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         %{coreroot strxns} >= 0@XNS_VERSION@
+Prereq:         %{corebase strxns} >= 0@XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         %{coreroot strxnet} >= 0@XTI_VERSION@
+Prereq:         %{corebase strxnet} >= 0@XTI_VERSION@
 %endif
 #if %{NEED_nsl}
-#rereq:         %{coreroot strnsl} >= 0@NSL_VERSION@
+#rereq:         %{corebase strnsl} >= 0@NSL_VERSION@
 #endif
 #if %{NEED_sock}
-#rereq:         %{coreroot strsock} >= 0@SOCK_VERSION@
+#rereq:         %{corebase strsock} >= 0@SOCK_VERSION@
 #endif
 %if %{NEED_inet}
-Prereq:         %{coreroot strinet} >= 0@INET_VERSION@
+Prereq:         %{corebase strinet} >= 0@INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         %{coreroot strsctp} >= 0@SCTP_VERSION@
+Prereq:         %{corebase strsctp} >= 0@SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         %{coreroot strchan} >= 0@CHAN_VERSION@
+Prereq:         %{corebase strchan} >= 0@CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         %{coreroot strx25} >= 0@X25_VERSION@
+Prereq:         %{corebase strx25} >= 0@X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         %{coreroot striso} >= 0@ISO_VERSION@
+Prereq:         %{corebase striso} >= 0@ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         %{coreroot strisdn} >= 0@ISDN_VERSION@
+Prereq:         %{corebase strisdn} >= 0@ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         %{coreroot strss7} >= 0@SS7_VERSION@
+Prereq:         %{corebase strss7} >= 0@SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         %{coreroot sigtran} >= 0@SIGTRAN_VERSION@
+Prereq:         %{corebase sigtran} >= 0@SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -2903,7 +3014,7 @@ if [ $arg = 1 ] ; then : # fresh install
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
                             dep="${dep:+$dep }$line" ; continue ;;
-                    (*)	    dep="${dep:+$dep }$line" ;;
+                    (*)     dep="${dep:+$dep }$line" ;;
                 esac
                 [ -n "$dep" ] || continue;
                 set dummy $dep
@@ -2976,14 +3087,12 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         # This is a running kernel, do a depmod on the modules directory for the running
         # kernel.
         depmod -ae 2>&1 || :
-%if %{HAVE_initscripts}
         # Running kernels do need init scripts run.
         list="%{initfiles}" ; for i in $list ; do
             if [ -f %_initrddir/$i ] ; then
                 /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
             fi
         done
-%endif
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
         # Non-running kernels a depmod will be performed on boot by depmod anyway, but
         # try one now.
@@ -3001,7 +3110,6 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # We are about to uninstall for good on a running kernel then we have to worry about which
         # modules are running
-%if %{HAVE_initscripts}
         # First lets try shutting down using any init script first in reverse order
         list="%{initfiles}" ; for i in $list ; do
             reverse="$i${reverse:+ $reverse}"
@@ -3011,7 +3119,6 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                 /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
             fi
         done
-%endif
         mods="%{modules}" ; for m in $mods ; do
             if ( lsmod | grep -q "^$m" ) ; then
                 # modules running, kick the stack
@@ -3142,52 +3249,56 @@ Obsoletes:      %{_obsopkg}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
 
 Prereq:         %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 
+%if %{NEED_devel}
 Prereq:         %{name}-devel = %{epoch}:@VERSION@-%{fullrelease}
+%endif
+%if %{NEED_kmod}
 Prereq:         %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
+%endif
 %if %{NEED_streams}
 Prereq:         %{_streams}-devel-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         %{inforoot strcompat} >= 0@STRCOMP_VERSION@
+Prereq:         %{infobase strcompat} >= 0@STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         %{inforoot strtty} >= 0@TTY_VERSION@
+Prereq:         %{infobase strtty} >= 0@TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         %{inforoot strxns} >= 0@XNS_VERSION@
+Prereq:         %{infobase strxns} >= 0@XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         %{inforoot strxnet} >= 0@XTI_VERSION@
+Prereq:         %{infobase strxnet} >= 0@XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-#rereq:         %{inforoot strnsl} >= 0@NSL_VERSION@
+#rereq:         %{infobase strnsl} >= 0@NSL_VERSION@
 %endif
 %if %{NEED_sock}
-#rereq:         %{inforoot strsock} >= 0@SOCK_VERSION@
+#rereq:         %{infobase strsock} >= 0@SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Prereq:         %{inforoot strinet} >= 0@INET_VERSION@
+Prereq:         %{infobase strinet} >= 0@INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         %{inforoot strsctp} >= 0@SCTP_VERSION@
+Prereq:         %{infobase strsctp} >= 0@SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         %{inforoot strchan} >= 0@CHAN_VERSION@
+Prereq:         %{infobase strchan} >= 0@CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         %{inforoot strx25} >= 0@X25_VERSION@
+Prereq:         %{infobase strx25} >= 0@X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         %{inforoot striso} >= 0@ISO_VERSION@
+Prereq:         %{infobase striso} >= 0@ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         %{inforoot strisdn} >= 0@ISDN_VERSION@
+Prereq:         %{infobase strisdn} >= 0@ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         %{inforoot strss7} >= 0@SS7_VERSION@
+Prereq:         %{infobase strss7} >= 0@SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         %{inforoot sigtran} >= 0@SIGTRAN_VERSION@
+Prereq:         %{infobase sigtran} >= 0@SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -3242,9 +3353,33 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 0.9.2.91  2008-09-29 22:45:36  brian
-# - strengthen ordering
+# Revision 0.9.2.97  2008-09-30 09:20:03  brian
+# - latest build updates
 #
+
+* Tue Sep 30 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.96  2008-09-30 07:29:55  brian
+- handle icons correctly
+
+* Tue Sep 30 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.95  2008-09-30 05:51:58  brian
+- older rpms cannot handle nested ifs
+
+* Tue Sep 30 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.94  2008/09/30 05:10:53  brian
+- older rpms can handle nested ifs
+
+* Tue Sep 30 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.93  2008-09-30 04:19:44  brian
+- old rpms do not like nested ifs in some places
+
+* Tue Sep 30 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.92  2008-09-30 03:19:05  brian
+- more spec tweaks
+
+* Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.91  2008-09-29 22:45:36  brian
+- strengthen ordering
 
 * Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.90  2008-09-29 09:54:30  brian
