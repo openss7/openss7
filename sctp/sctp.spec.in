@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.129 $) $Date: 2008-09-30 11:16:30 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.130 $) $Date: 2008-09-30 11:44:23 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-30 11:16:30 $ by $Author: brian $
+# Last Modified $Date: 2008-09-30 11:44:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1849,7 +1849,9 @@ if [ $1 = 1 ] ; then : # fresh install
     # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
     # because they have no %%dev macro, so in that case we just run the makenodes program that was
     # generated in the build to create devices.
-    %{mknods}
+    if [ -x "%{mknods}" ] ; then
+        %{mknods}
+    fi
 %endif
 %if %{HAVE_oldmods}
     # At the end of a fresh install we need to add our lines to the modules.conf file if it exists,
@@ -2088,7 +2090,9 @@ if [ $1 = 0 ] ; then : # final removal
     # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
     # because they have no %%dev macro, so in that case we just run the makenodes program that was
     # generated in the build to create devices.
-    %{rmnods}
+    if [ -x "%{mknods}" ] ; then
+        %{rmnods}
+    fi
 %endif
 %if %{HAVE_oldmods}
     # When we are going away altogether we want to remove any lines whatsoever from the modules.conf
@@ -2905,7 +2909,9 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
                                     ;; # this is ssh hiding the pid
                             esac
                         done
-                        /sbin/sleep 5 # wait for processes to die and close sockets
+                        if [ -x /bin/sleep ] ; then
+                            /bin/sleep 5 # wait for processes to die and close sockets
+                        fi
                         modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                         if ( lsmod | grep -q "^$m" ) ; then
                             echo "Cannot install or upgrade with $m module running." >&2
@@ -2964,7 +2970,9 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                 # modules running, kick the stack
                 modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                 if ( lsmod | grep -q "^$m" ) ; then
-                    fdetach -a
+                    if [ -x /usr/sbin/fdetach ] ; then
+                        /usr/sbin/fdetach -a 2>/dev/null
+                    fi
                     modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                     if ( lsmod | grep -q "^$m" ) ; then
                         /bin/netstat -p 2>/dev/null | grep "^$m" | while read -a tokens ; do
@@ -2975,7 +2983,9 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                                     ;; # this is ssh hiding the pid
                             esac
                         done
-                        /sbin/sleep 5 # wait for processes to die and close sockets
+                        if [ -x /bin/sleep ] ; then
+                            /bin/sleep 5 # wait for processes to die and close sockets
+                        fi
                         modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                         if ( lsmod | grep -q "^$m" ) ; then
                             echo "Cannot uninstall with $m module running." >&2
@@ -3043,7 +3053,9 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                                 :-) ;; # this is ssh hiding the pid
                             esac
                         done
-                        /sbin/sleep 5 # wait for processes to die and close sockets
+                        if [ -x /bin/sleep ] ; then
+                            /bin/sleep 5 # wait for processes to die and close sockets
+                        fi
                         modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
                         if ( lsmod | grep -q "^$m" ) ; then
                             echo "Error: modules may be still loaded" >&2
@@ -3208,6 +3220,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
+# Revision 0.9.2.130  2008-09-30 11:44:23  brian
+# - check for executables
+#
 # Revision 0.9.2.129  2008-09-30 11:16:30  brian
 # - better method for updating kernels
 #
