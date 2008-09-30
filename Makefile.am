@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-22 17:37:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-30 09:20:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:22 $ by $Author: brian $
+# Last Modified $Date: 2008-09-30 09:20:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -174,7 +174,8 @@ doxy: all-doxy
 EXTRA_DIST			+= \
 				  README-LiS \
 				  debian/README.Debian \
-				  debian/TODO.Debian
+				  debian/TODO.Debian \
+				  scripts/comps.xml
 
 DISTCLEANFILES			+= \
 				  Modules.map \
@@ -186,6 +187,9 @@ DISTCLEANFILES			+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.40  2008-09-30 09:20:03  brian
+# - latest build updates
+#
 # Revision 0.9.2.39  2008-09-22 17:37:22  brian
 # - build and release updates
 #

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.52 $) $Date: 2008-09-23 19:24:40 $
+# @(#) $RCSfile: archive.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.55 $) $Date: 2008-09-30 09:20:04 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 19:24:40 $ by $Author: brian $
+## Last Modified $Date: 2008-09-30 09:20:04 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -359,11 +359,14 @@ tar_files		= $(tardir)/MD5SUMS \
 #! source repository creation tools, the following targets are used to manage
 #! tarball install source repository meta data files.
 #!
-$(tardir)/MD5SUMS:
+$(tardir)/MD5SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 	if ( $(MD5SUM) --version >/dev/null 2>&1 ); then \
-		( cd $(tardir); find . -maxdepth 1 -type f | \
+		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
 		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
-		  sed -e 's,^\./,,' | while read f; do $(MD5SUM) $$f; done ) > $@; \
+		  sed -e 's,^\./,,' | while read f; do \
+		  	case $$f in (*MD5SUMS*|*SHA1SUMS*) continue ;; esac ; \
+		  	$(MD5SUM) $$f; \
+		  done ) > $@; \
 	else touch $@; fi
 
 $(tardir)/MD5SUMS.meta: $(tardir)/MD5SUMS
@@ -371,11 +374,14 @@ $(tardir)/MD5SUMS.meta: $(tardir)/MD5SUMS
 		( cd $(tardir); $(MD5SUM) MD5SUMS ) > $@; \
 	else touch $@; fi
 
-$(tardir)/SHA1SUMS:
+$(tardir)/SHA1SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 	if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
-		( cd $(tardir); find . -maxdepth 1 -type f | \
+		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
 		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
-		  sed -e 's,^\./,,' | while read f; do $(SHA1SUM) $$f; done ) > $@; \
+		  sed -e 's,^\./,,' | while read f; do \
+		  	case $$f in (*MD5SUMS*|*SHA1SUMS*) continue ;; esac ; \
+			$(SHA1SUM) $$f; \
+		  done ) > $@; \
 	else touch $@; fi
 
 $(tardir)/SHA1SUMS.meta: $(tardir)/SHA1SUMS
@@ -395,7 +401,7 @@ $(tardir)/INDEX.gz:
 $(tardir)/ARCHIVE.gz:
 	@$(ECHO) "cat /dev/null > $@" ; \
 	cat /dev/null > $@; \
-	find $(tardir) -follow -maxdepth 1 -type f | sed -e 's,^$(tardir)/,,' | while read f ; do \
+	find $(tardir) -follow -maxdepth 1 -type f | LANG= sort | sed -e 's,^$(tardir)/,,' | while read f ; do \
 		case "$$f" in \
 			(*.tar) \
 				$(ECHO) "$(AMTAR) tvvf $(tardir)/$$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
@@ -406,36 +412,36 @@ $(tardir)/ARCHIVE.gz:
 				gunzip -c $(tardir)/$$f | $(AMTAR) tvvf - | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.tbz2|*.tar.bz2) \
-				$(ECHO) "bunzip2 -c $$f | $(AMTAR) tvvf - | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				bunzip2 -c $$f | $(AMTAR) tvvf - | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "bunzip2 -c $(tardir)/$$f | $(AMTAR) tvvf - | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				bunzip2 -c $(tardir)/$$f | $(AMTAR) tvvf - | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.tlzma|*.tar.lzma) \
-				$(ECHO) "unlzma -c $$f | $(AMTAR) tvvf - | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				unlzma -c $$f | $(AMTAR) tvvf - | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "unlzma -c $(tardir)/$$f | $(AMTAR) tvvf - | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				unlzma -c $(tardir)/$$f | $(AMTAR) tvvf - | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.t[zZ]|*.tar.[zZ]) \
-				$(ECHO) "uncompress -c $$f | $(AMTAR) tvvf - | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				uncompress -c $$f | $(AMTAR) tvvf - | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.rpm) \
-				$(ECHO) "$(RPM) -qvlp $$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				$(RPM) -qvlp $$f | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "$(RPM) -qvlp $(tardir)/$$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				$(RPM) -qvlp $(tardir)/$$f | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.deb|*.udeb|*.ddeb) \
-				$(ECHO) "$(DPKG) --contents $$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				$(DPKG) --contents $$f | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "$(DPKG) --contents $(tardir)/$$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				$(DPKG) --contents $(tardir)/$$f | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.cpi|*.cpio) \
-				$(ECHO) "cpio -itv < $$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				cpio -itv < $$f | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "cpio -itv < $(tardir)/$$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				cpio -itv < $(tardir)/$$f | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.shar.gz) \
-				$(ECHO) "gunzip -c $$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				gunzip -c $$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*.zip) \
-				$(ECHO) "zipinfo $$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
-				zipinfo $$f | sed -e "s,^,$$f:\t," >> $@ || : \
+				$(ECHO) "zipinfo $(tardir)/$$f | sed -e \"s,^,$$f:\t,\" >> $@" ; \
+				zipinfo $(tardir)/$$f | sed -e "s,^,$$f:\t," >> $@ || : \
 				;; \
 			(*) \
 				;; \
@@ -496,6 +502,15 @@ EXTRA_DIST		+= .pkgpatchlevel \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.55  2008-09-30 09:20:04  brian
+## - latest build updates
+##
+## Revision 0.9.2.54  2008-09-30 06:26:48  brian
+## - sort filenames
+##
+## Revision 0.9.2.53  2008/09/30 03:39:17  brian
+## - corrections to repo-tar decompression
+##
 ## Revision 0.9.2.52  2008-09-23 19:24:40  brian
 ## - also install gpg key
 ##
