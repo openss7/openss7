@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.160 $) $Date: 2008-09-30 09:20:04 $
+# @(#) $RCSfile: rpm.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.161 $) $Date: 2008-09-30 11:16:29 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-30 09:20:04 $ by $Author: brian $
+## Last Modified $Date: 2008-09-30 11:16:29 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -570,7 +570,7 @@ update-clean-rpm:
 if BUILD_SRPMS
 UPDATE			+= all-update-srpm
 if BUILD_RPMS
-UPDATE			+= all-update-rpms
+UPDATE			+= update-all-rpms
 endif
 UPDATE_SIGN		+= all-update-sign-srpm all-update-sign-rpms
 UPDATE_DIRECTORIES	+=
@@ -596,6 +596,94 @@ update-srpm:
 		fi; \
 	done
 
+update-n-rpm:
+	@$(ECHO) "D: Making $@ in `pwd`"; \
+	rebuild=yes; \
+	rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
+	for f in $$rpms; do \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+			$(ECHO) "D: $@: leaving $$f"; \
+			rebuild=no; \
+		fi; \
+	done; \
+	if test ":$$rebuild" = :yes; then \
+		$(ECHO) "D: $@: rebuild noarch"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" noa-rpm || :; \
+	else \
+		$(ECHO) "D: $@: skipped noarch"; \
+	fi
+
+update-k-rpm:
+	@$(ECHO) "D: Making $@ in `pwd`"; \
+	a=`echo '$(RPMTARGET)' | sed -e 's,-.*$$,,'`; \
+	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
+	test -e $(DESTDIR)/lib/modules/$(kversion)/build || exit 0; \
+	if test -z '$(DESTDIR)'; then \
+		if ! $(RPM) -q --whatprovides /lib/modules/$(kversion)/build >/dev/null 2>&1; then \
+			exit 0; \
+		fi; \
+	fi; \
+	ks=`echo $(kversion) | sed -e 's,-,.,g;s,_,.,g'`; \
+	rebuild=yes; \
+	rpms="`find $(rpmdir)/$$a -name '*$(PACKAGE)-*$(VERSION)_'$$ks'-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).'$$a'.rpm' 2>/dev/null`"; \
+	for f in $$rpms; do \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+			$(ECHO) "D: $@: leaving $$f"; \
+			rebuild=no; \
+		fi; \
+	done; \
+	if test ":$$rebuild" = :yes; then \
+		$(ECHO) "D: $@: rebuild $(kversion)"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" lis-k-rpm lfs-k-rpm one-k-rpm || :; \
+	else \
+		$(ECHO) "D: $@: skipped $(kversion)"; \
+	fi
+
+update-t-rpm:
+	@$(ECHO) "D: Making $@ in `pwd`"; \
+	a=`echo '$(RPMTARGET)' | sed -e 's,-.*$$,,'`; \
+	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
+	rebuild=yes; \
+	rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
+	for f in $$rpms; do \
+		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
+			$(ECHO) "D: $@: leaving $$f"; \
+			rebuild=no; \
+		fi; \
+	done; \
+	if test ":$$rebuild" = :yes; then \
+		$(ECHO) "D: $@: rebuild $$a"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET='$(RPMTARGET)' lis-t-rpm lfs-t-rpm one-t-rpm || :; \
+	else \
+		$(ECHO) "D: $@: skipped $$a"; \
+	fi
+
+update-all-rpms:
+	@$(ECHO) "D: Making $@ in `pwd`"; \
+	$(ECHO) "D: $@: rebuild noarch"; \
+	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" all-update-n-rpm || :; \
+	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; \
+	for t in $$targets; do \
+		a=`echo "$$t" | sed -e 's,-.*$$,,'`; \
+		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
+		kernels="`( find $(DESTDIR)/lib/modules -type d -name '2\.[46]\.*' | sort -r ) 2>/dev/null`"; \
+		for k in $$kernels; do \
+			k=`basename $$k`; \
+			test -e $(DESTDIR)/lib/modules/$$k/build || continue; \
+			if test -z '$(DESTDIR)'; then \
+				if ! $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1; then \
+					continue; \
+				fi; \
+			fi; \
+			$(ECHO) "D: $@: rebuild $$k"; \
+			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" all-update-k-rpm || :; \
+		done; \
+		$(ECHO) "D: $@: rebuild $$a"; \
+		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" all-update-t-rpm || :; \
+	done
+
+MY_PHONY		+= update-n-rpm update-k-rpm update-t-rpm update-all-rpms
+ALL_RECURSIVE_TARGETS	+= all-update-n-rpm all-update-k-rpm all-update-t-rpm
 
 ##
 ## Provide updates to rpm packages.
@@ -991,6 +1079,9 @@ EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 0.9.2.161  2008-09-30 11:16:29  brian
+## - better method for updating kernels
+##
 ## Revision 0.9.2.160  2008-09-30 09:20:04  brian
 ## - latest build updates
 ##

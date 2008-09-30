@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-30 09:20:03 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-09-30 11:16:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-30 09:20:03 $ by $Author: brian $
+# Last Modified $Date: 2008-09-30 11:16:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1244,46 +1244,46 @@ BuildPrereq:    /sbin/genksyms
 #uildPrereq:    %{virtual}-devel
 %endif
 %if %{NEED_compat}
-#uildPrereq:    strcompat-devel >= 0@STRCOMP_VERSION@
+#uildPrereq:    strcompat-devel >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-#uildPrereq:    strtty-devel >= 0@TTY_VERSION@
+#uildPrereq:    strtty-devel >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-#uildPrereq:    strxns-devel >= 0@XNS_VERSION@
+#uildPrereq:    strxns-devel >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-#uildPrereq:    strxnet-devel >= 0@XTI_VERSION@
+#uildPrereq:    strxnet-devel >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-#uildPrereq:    strnsl-devel >= 0@NSL_VERSION@
+#uildPrereq:    strnsl-devel >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-#uildPrereq:    strsock-devel >= 0@SOCK_VERSION@
+#uildPrereq:    strsock-devel >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-#uildPrereq:    strinet-devel >= 0@INET_VERSION@
+#uildPrereq:    strinet-devel >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-#uildPrereq:    strsctp-devel >= 0@SCTP_VERSION@
+#uildPrereq:    strsctp-devel >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-#uildPrereq:    strchan-devel >= 0@CHAN_VERSION@
+#uildPrereq:    strchan-devel >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-#uildPrereq:    strx25-devel >= 0@X25_VERSION@
+#uildPrereq:    strx25-devel >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-#uildPrereq:    striso-devel >= 0@ISO_VERSION@
+#uildPrereq:    striso-devel >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-#uildPrereq:    strisdn-devel >= 0@ISDN_VERSION@
+#uildPrereq:    strisdn-devel >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-#uildPrereq:    strss7-devel >= 0@SS7_VERSION@
+#uildPrereq:    strss7-devel >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-#uildPrereq:    sigtran-devel >= 0@SIGTRAN_VERSION@
+#uildPrereq:    sigtran-devel >= @SIGTRAN_VERSION@
 %endif
 
 # these are some needs of the configure script
@@ -2603,46 +2603,46 @@ Prereq:         /sbin/ldconfig
 Prereq:         %{virtual}-lib
 %endif
 %if %{NEED_compat}
-Prereq:         strcompat-lib >= 0@STRCOMP_VERSION@
+Prereq:         strcompat-lib >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         strtty-lib >= 0@TTY_VERSION@
+Prereq:         strtty-lib >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         strxns-lib >= 0@XNS_VERSION@
+Prereq:         strxns-lib >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         strxnet-lib >= 0@XTI_VERSION@
+Prereq:         strxnet-lib >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-Prereq:         strnsl-lib >= 0@NSL_VERSION@
+Prereq:         strnsl-lib >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-Prereq:         strsock-lib >= 0@SOCK_VERSION@
+Prereq:         strsock-lib >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Prereq:         strinet-lib >= 0@INET_VERSION@
+Prereq:         strinet-lib >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         strsctp-lib >= 0@SCTP_VERSION@
+Prereq:         strsctp-lib >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         strchan-lib >= 0@CHAN_VERSION@
+Prereq:         strchan-lib >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         strx25-lib >= 0@X25_VERSION@
+Prereq:         strx25-lib >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         striso-lib >= 0@ISO_VERSION@
+Prereq:         striso-lib >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         strisdn-lib >= 0@ISDN_VERSION@
+Prereq:         strisdn-lib >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         strss7-lib >= 0@SS7_VERSION@
+Prereq:         strss7-lib >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         sigtran-lib >= 0@SIGTRAN_VERSION@
+Prereq:         sigtran-lib >= @SIGTRAN_VERSION@
 %endif
 
 Requires:       %{_virtpkg}
@@ -2777,46 +2777,46 @@ Requires:       %{infovirt} >= @VERSION@
 Requires:       %{virtual}-devel
 %endif
 %if %{NEED_compat}
-Requires:       strcompat-devel >= 0@STRCOMP_VERSION@
+Requires:       strcompat-devel >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Requires:       strtty-devel >= 0@TTY_VERSION@
+Requires:       strtty-devel >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Requires:       strxns-devel >= 0@XNS_VERSION@
+Requires:       strxns-devel >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Requires:       strxnet-devel >= 0@XTI_VERSION@
+Requires:       strxnet-devel >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-Requires:       strnsl-devel >= 0@NSL_VERSION@
+Requires:       strnsl-devel >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-Requires:       strsock-devel >= 0@SOCK_VERSION@
+Requires:       strsock-devel >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Requires:       strinet-devel >= 0@INET_VERSION@
+Requires:       strinet-devel >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Requires:       strsctp-devel >= 0@SCTP_VERSION@
+Requires:       strsctp-devel >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Requires:       strchan-devel >= 0@CHAN_VERSION@
+Requires:       strchan-devel >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Requires:       strx25-devel >= 0@X25_VERSION@
+Requires:       strx25-devel >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Requires:       striso-devel >= 0@ISO_VERSION@
+Requires:       striso-devel >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Requires:       strisdn-devel >= 0@ISDN_VERSION@
+Requires:       strisdn-devel >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Requires:       strss7-devel >= 0@SS7_VERSION@
+Requires:       strss7-devel >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Requires:       sigtran-devel >= 0@SIGTRAN_VERSION@
+Requires:       sigtran-devel >= @SIGTRAN_VERSION@
 %endif
 
 Provides:       %{name}-devel = %{epoch}:%{version}-%{fullrelease}
@@ -2903,46 +2903,46 @@ Prereq:         %{name} = %{epoch}:@VERSION@-%{rpmrelease}
 Prereq:         %{_streams}-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         %{corebase strcompat} >= 0@STRCOMP_VERSION@
+Prereq:         %{corebase strcompat} >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         %{corebase strtty} >= 0@TTY_VERSION@
+Prereq:         %{corebase strtty} >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         %{corebase strxns} >= 0@XNS_VERSION@
+Prereq:         %{corebase strxns} >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         %{corebase strxnet} >= 0@XTI_VERSION@
+Prereq:         %{corebase strxnet} >= @XTI_VERSION@
 %endif
 #if %{NEED_nsl}
-#rereq:         %{corebase strnsl} >= 0@NSL_VERSION@
+#rereq:         %{corebase strnsl} >= @NSL_VERSION@
 #endif
 #if %{NEED_sock}
-#rereq:         %{corebase strsock} >= 0@SOCK_VERSION@
+#rereq:         %{corebase strsock} >= @SOCK_VERSION@
 #endif
 %if %{NEED_inet}
-Prereq:         %{corebase strinet} >= 0@INET_VERSION@
+Prereq:         %{corebase strinet} >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         %{corebase strsctp} >= 0@SCTP_VERSION@
+Prereq:         %{corebase strsctp} >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         %{corebase strchan} >= 0@CHAN_VERSION@
+Prereq:         %{corebase strchan} >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         %{corebase strx25} >= 0@X25_VERSION@
+Prereq:         %{corebase strx25} >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         %{corebase striso} >= 0@ISO_VERSION@
+Prereq:         %{corebase striso} >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         %{corebase strisdn} >= 0@ISDN_VERSION@
+Prereq:         %{corebase strisdn} >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         %{corebase strss7} >= 0@SS7_VERSION@
+Prereq:         %{corebase strss7} >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         %{corebase sigtran} >= 0@SIGTRAN_VERSION@
+Prereq:         %{corebase sigtran} >= @SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -3259,46 +3259,46 @@ Prereq:         %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
 Prereq:         %{_streams}-devel-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         %{infobase strcompat} >= 0@STRCOMP_VERSION@
+Prereq:         %{infobase strcompat} >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         %{infobase strtty} >= 0@TTY_VERSION@
+Prereq:         %{infobase strtty} >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         %{infobase strxns} >= 0@XNS_VERSION@
+Prereq:         %{infobase strxns} >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         %{infobase strxnet} >= 0@XTI_VERSION@
+Prereq:         %{infobase strxnet} >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-#rereq:         %{infobase strnsl} >= 0@NSL_VERSION@
+#rereq:         %{infobase strnsl} >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-#rereq:         %{infobase strsock} >= 0@SOCK_VERSION@
+#rereq:         %{infobase strsock} >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Prereq:         %{infobase strinet} >= 0@INET_VERSION@
+Prereq:         %{infobase strinet} >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         %{infobase strsctp} >= 0@SCTP_VERSION@
+Prereq:         %{infobase strsctp} >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         %{infobase strchan} >= 0@CHAN_VERSION@
+Prereq:         %{infobase strchan} >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         %{infobase strx25} >= 0@X25_VERSION@
+Prereq:         %{infobase strx25} >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         %{infobase striso} >= 0@ISO_VERSION@
+Prereq:         %{infobase striso} >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         %{infobase strisdn} >= 0@ISDN_VERSION@
+Prereq:         %{infobase strisdn} >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         %{infobase strss7} >= 0@SS7_VERSION@
+Prereq:         %{infobase strss7} >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         %{infobase sigtran} >= 0@SIGTRAN_VERSION@
+Prereq:         %{infobase sigtran} >= @SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -3353,6 +3353,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 0.9.2.98  2008-09-30 11:16:28  brian
+# - better method for updating kernels
+#
 # Revision 0.9.2.97  2008-09-30 09:20:03  brian
 # - latest build updates
 #
