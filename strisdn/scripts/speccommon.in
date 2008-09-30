@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: speccommon.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.24 $) $Date: 2008-09-30 11:44:23 $
+# @(#) $RCSfile: speccommon.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.25 $) $Date: 2008-09-30 22:12:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-30 11:44:23 $ by $Author: brian $
+# Last Modified $Date: 2008-09-30 22:12:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -351,40 +351,6 @@
 %global _virtpkg %{virtual}
 %endif
 
-%global core_name   core-%{_kversion}
-%global info_name   info-%{_kversion}
-
-%global corebase() %1%_strextra-%{_kversion}%{nil}
-%global infobase() %1%_strextra-devel-%{_kversion}%{nil}
-
-%global corename %{_strmpkg}-%_kversion
-%global infoname %{_strmpkg}-devel-%_kversion
-%global coreconf %{_confpkg}-%_kversion
-%global infoconf %{_confpkg}-devel-%_kversion
-%global corevirt %{_virtpkg}
-%global infovirt %{_virtpkg}-devel
-%global kmodules_version @VERSION@
-
-%if %(test '%_vendor' = 'suse' && echo 1 || echo 0)
-%global corename openss7-%{_strmpkg}-kmp%kernel_flavor
-%global infoname openss7-%{_strmpkg}-kmp%kernel_flavor-devel
-%global coreconf openss7-%{_confpkg}-kmp%kernel_flavor
-%global infoconf openss7-%{_confpkg}-kmp%kernel_flavor-devel
-%global corevirt openss7-%{_virtpkg}-kmp
-%global infovirt openss7-%{_virtpkg}-kmp-devel
-%global kmodules_version @VERSION@_%kernel_string
-%endif
-
-%if %(test '%_vendor' = 'redhat' && echo 1 || echo 0)
-%global corename kmod-%{_strmpkg}%kernel_flavor
-%global infoname kmod-%{_strmpkg}%kernel_flavor-devel
-%global coreconf kmod-%{_confpkg}%kernel_flavor
-%global infoconf kmod-%{_confpkg}%kernel_flavor-devel
-%global corevirt kmod-%{_virtpkg}
-%global infovirt kmod-%{_virtpkg}-devel
-%global kmodules_version @VERSION@.%kernel_release
-%endif
-
 # ---------------------------------------------------------------------------
 # Calculate which files were not built (and are not included)
 # ---------------------------------------------------------------------------
@@ -446,6 +412,8 @@
 %global FILES_lib32compat   0
 %global FILES_lib32static   0
 %global FILES_locales       0
+%global FILES_tools         0
+%global FILES_gdmofiles     0
 %global FILES_testfiles     0
 %global FILES_test32files   0
 %global FILES_snmpmods      0
@@ -1176,49 +1144,49 @@ BuildPrereq:    /sbin/genksyms
 %endif
 
 %if %{NEED_streams}
-BuildPrereq:    %{virtual}-devel
+BuildPrereq:    %{_streams}-devel >= %{_strvers}
 %endif
 %if %{NEED_compat}
-BuildPrereq:    strcompat-devel >= @STRCOMP_VERSION@
+BuildPrereq:    strcompat%{_strextra}-devel >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-BuildPrereq:    strtty-devel >= @TTY_VERSION@
+BuildPrereq:    strtty%{_strextra}-devel >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-BuildPrereq:    strxns-devel >= @XNS_VERSION@
+BuildPrereq:    strxns%{_strextra}-devel >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-BuildPrereq:    strxnet-devel >= @XTI_VERSION@
+BuildPrereq:    strxnet%{_strextra}-devel >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-BuildPrereq:    strnsl-devel >= @NSL_VERSION@
+BuildPrereq:    strnsl%{_strextra}-devel >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-BuildPrereq:    strsock-devel >= @SOCK_VERSION@
+BuildPrereq:    strsock%{_strextra}-devel >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-BuildPrereq:    strinet-devel >= @INET_VERSION@
+BuildPrereq:    strinet%{_strextra}-devel >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-BuildPrereq:    strsctp-devel >= @SCTP_VERSION@
+BuildPrereq:    strsctp%{_strextra}-devel >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-BuildPrereq:    strchan-devel >= @CHAN_VERSION@
+BuildPrereq:    strchan%{_strextra}-devel >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-BuildPrereq:    strx25-devel >= @X25_VERSION@
+BuildPrereq:    strx25%{_strextra}-devel >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-BuildPrereq:    striso-devel >= @ISO_VERSION@
+BuildPrereq:    striso%{_strextra}-devel >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-BuildPrereq:    strisdn-devel >= @ISDN_VERSION@
+BuildPrereq:    strisdn%{_strextra}-devel >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-BuildPrereq:    strss7-devel >= @SS7_VERSION@
+BuildPrereq:    strss7%{_strextra}-devel >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-BuildPrereq:    sigtran-devel >= @SIGTRAN_VERSION@
+BuildPrereq:    sigtran%{_strextra}-devel >= @SIGTRAN_VERSION@
 %endif
 
 # these are some needs of the configure script
@@ -1321,54 +1289,54 @@ Prereq:         dev >= 3.3
 Prereq:         %{name}-lib = %{epoch}:%{version}-%{rpmrelease}
 %endif
 %if %{NEED_streams}
-Prereq:         %{virtual}
+Prereq:         %{_streams} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         strcompat
+Prereq:         strcompat%{_strextra} >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         strtty
+Prereq:         strtty%{_strextra} >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         strxns
+Prereq:         strxns%{_strextra} >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         strxnet
+Prereq:         strxnet%{_strextra} >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-Prereq:         strnsl
+Prereq:         strnsl%{_strextra} >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-Prereq:         strsock
+Prereq:         strsock%{_strextra} >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Prereq:         strinet
+Prereq:         strinet%{_strextra} >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         strsctp
+Prereq:         strsctp%{_strextra} >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         strchan
+Prereq:         strchan%{_strextra} >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         strx25
+Prereq:         strx25%{_strextra} >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         striso
+Prereq:         striso%{_strextra} >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         strisdn
+Prereq:         strisdn%{_strextra} >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         strss7
+Prereq:         strss7%{_strextra} >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         sigtran
+Prereq:         sigtran%{_strextra} >= @SIGTRAN_VERSION@
 %endif
 
 Requires:       %{_virtpkg} = %{epoch}:%{version}-%{rpmrelease}
 %if %{HAVE_modules}
-Requires:       %{corevirt} >= @VERSION@}}
+Requires:       %{_virtpkg} >= %{version}
 %endif
 
 Conflicts:      %{_confpkg}
@@ -1398,11 +1366,11 @@ This package includes the following binary packages:
       scripts, configs, mibs, test utils.
  - %{name}-lib
    -- shared libraries and utilities.
- - %{corevirt}
+ - %{_virtpkg}
    -- kernel modules.
  - %{name}-devel
    -- headers, static libraries, source, debuginfo.
- - %{infovirt}
+ - %{_virtpkg}-devel
    -- kernel module info and debug info.
 
 The %{name} binary package provides documentation, device
@@ -2470,7 +2438,6 @@ fi
 
 Summary:        %{title} run-time libraries and utilities.
 Group:          System Environment/Libraries
-Version:        @VERSION@
 %{?_xpm:Icon:   %_xpm}
 %{?_gif:Icon:   %_gif}
 Autoreq:        true
@@ -2516,49 +2483,49 @@ Obsoletes:      %{_obsopkg}-utils
 Prereq:         /sbin/ldconfig
 
 %if %{NEED_streams}
-Prereq:         %{virtual}-lib
+Prereq:         %{_streams}-lib >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         strcompat-lib >= @STRCOMP_VERSION@
+Prereq:         strcompat%{_strextra}-lib >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         strtty-lib >= @TTY_VERSION@
+Prereq:         strtty%{_strextra}-lib >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         strxns-lib >= @XNS_VERSION@
+Prereq:         strxns%{_strextra}-lib >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         strxnet-lib >= @XTI_VERSION@
+Prereq:         strxnet%{_strextra}-lib >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-Prereq:         strnsl-lib >= @NSL_VERSION@
+Prereq:         strnsl%{_strextra}-lib >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-Prereq:         strsock-lib >= @SOCK_VERSION@
+Prereq:         strsock%{_strextra}-lib >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Prereq:         strinet-lib >= @INET_VERSION@
+Prereq:         strinet%{_strextra}-lib >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         strsctp-lib >= @SCTP_VERSION@
+Prereq:         strsctp%{_strextra}-lib >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         strchan-lib >= @CHAN_VERSION@
+Prereq:         strchan%{_strextra}-lib >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         strx25-lib >= @X25_VERSION@
+Prereq:         strx25%{_strextra}-lib >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         striso-lib >= @ISO_VERSION@
+Prereq:         striso%{_strextra}-lib >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         strisdn-lib >= @ISDN_VERSION@
+Prereq:         strisdn%{_strextra}-lib >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         strss7-lib >= @SS7_VERSION@
+Prereq:         strss7%{_strextra}-lib >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         sigtran-lib >= @SIGTRAN_VERSION@
+Prereq:         sigtran%{_strextra}-lib >= @SIGTRAN_VERSION@
 %endif
 
 Requires:       %{_virtpkg}
@@ -2657,7 +2624,6 @@ fi
 
 Summary:        %{title} configured headers, static libraries and debug info.
 Group:          Development/System
-Version:        @VERSION@
 %{?_xpm:Icon:   %_xpm}
 %{?_gif:Icon:   %_gif}
 Autoreq:        true
@@ -2687,7 +2653,7 @@ Obsoletes:      %{_obsopkg}-docs
 
 Requires:       %{name} = %{epoch}:%{version}-%{rpmrelease}
 %if %{HAVE_modules}
-Requires:       %{infovirt} >= @VERSION@
+Requires:       %{_virtpkg}-devel >= %{version}
 %endif
 %if %{NEED_streams}
 Requires:       %{virtual}-devel
@@ -2781,7 +2747,7 @@ tarball or source rpm release.
 %endif
 
 # ===========================================================================
-%package -n %{corename}
+%package -n %{_strmpkg}-%{_kversion}
 
 Summary:        %{title} kernel modules.
 Group:          System Environment/Kernel
@@ -2794,13 +2760,17 @@ Autoprov:       true
 Prefix:         %{_kmoduledir}
 %endif
 
-Conflicts:      %{coreconf}
+Conflicts:      %{_confpkg}-%{_kversion}
+Conflicts:      openss7-%{_confpkg}-kmp%{kernel_flavor}
+Conflicts:      kmod-%{_confpkg}%{kernel_flavor}
 
+Obsoletes:      openss7-%{_strmpkg}-kmp%kernel_flavor
+Obsoletes:      kmod-%{_strmpkg}%kernel_flavor
 Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core-%{_kversion} < %{epoch}:%{version}-%{rpmrelease}
 %if %{NEED_streams}
 Obsoletes:      %{_obsopkg}-core < %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{_obsopkg}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{_obsopkg}-core-%{_kversion} < %{epoch}:%{version}-%{rpmrelease}
 %endif
 
 #Prereq:         /sbin/depmod
@@ -2813,78 +2783,89 @@ Prereq:         lsof
 Prereq:         %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 
 %if %{NEED_base}
-Prereq:         %{name} = %{epoch}:@VERSION@-%{rpmrelease}
+Prereq:         %{name} = %{epoch}:%{version}-%{rpmrelease}
 %endif
 %if %{NEED_streams}
 Prereq:         %{_streams}-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         %{corebase strcompat} >= @STRCOMP_VERSION@
+Prereq:         strcompat%{_strextra}-%{_kversion} >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         %{corebase strtty} >= @TTY_VERSION@
+Prereq:         strtty%{_strextra}-%{_kversion} >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         %{corebase strxns} >= @XNS_VERSION@
+Prereq:         strxns%{_strextra}-%{_kversion} >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         %{corebase strxnet} >= @XTI_VERSION@
+Prereq:         strxnet%{_strextra}-%{_kversion} >= @XTI_VERSION@
 %endif
 #if %{NEED_nsl}
-#rereq:         %{corebase strnsl} >= @NSL_VERSION@
+#rereq:         strnsl%{_strextra}-%{_kversion} >= @NSL_VERSION@
 #endif
 #if %{NEED_sock}
-#rereq:         %{corebase strsock} >= @SOCK_VERSION@
+#rereq:         strsock%{_strextra}-%{_kversion} >= @SOCK_VERSION@
 #endif
 %if %{NEED_inet}
-Prereq:         %{corebase strinet} >= @INET_VERSION@
+Prereq:         strinet%{_strextra}-%{_kversion} >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         %{corebase strsctp} >= @SCTP_VERSION@
+Prereq:         strsctp%{_strextra}-%{_kversion} >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         %{corebase strchan} >= @CHAN_VERSION@
+Prereq:         strchan%{_strextra}-%{_kversion} >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         %{corebase strx25} >= @X25_VERSION@
+Prereq:         strx25%{_strextra}-%{_kversion} >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         %{corebase striso} >= @ISO_VERSION@
+Prereq:         striso%{_strextra}-%{_kversion} >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         %{corebase strisdn} >= @ISDN_VERSION@
+Prereq:         strisdn%{_strextra}-%{_kversion} >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         %{corebase strss7} >= @SS7_VERSION@
+Prereq:         strss7%{_strextra}-%{_kversion} >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         %{corebase sigtran} >= @SIGTRAN_VERSION@
+Prereq:         sigtran%{_strextra}-%{_kversion} >= @SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
-Provides:       %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{corename} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{corevirt} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{corevirt} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{corevirt} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease}
-Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease2}
-Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:@VERSION@-%{rpmrelease}
+Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       openss7-%{_strmpkg}-kmp%kernel_flavor = %{epoch}:%{version}_%{kernel_string}-%{fullrelease}
+Provides:       openss7-%{_strmpkg}-kmp%kernel_flavor = %{epoch}:%{version}_%{kernel_string}-%{fullrelease2}
+Provides:       openss7-%{_strmpkg}-kmp%kernel_flavor = %{epoch}:%{version}_%{kernel_string}-%{rpmrelease}
+Provides:       kmod-%{_strmpkg}%kernel_flavor = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       kmod-%{_strmpkg}%kernel_flavor = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       kmod-%{_strmpkg}%kernel_flavor = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       %{_virtpkg} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{_virtpkg} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{_virtpkg} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       openss7-%{_virtpkg}-kmp = %{epoch}:%{version}_%{kernel_string}-%{fullrelease}
+Provides:       openss7-%{_virtpkg}-kmp = %{epoch}:%{version}_%{kernel_string}-%{fullrelease2}
+Provides:       openss7-%{_virtpkg}-kmp = %{epoch}:%{version}_%{kernel_string}-%{rpmrelease}
+Provides:       kmod-%{_virtpkg} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       kmod-%{_virtpkg} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       kmod-%{_virtpkg} = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       kernel-module-%{name}%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       %{name}-kmod%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{_strmpkg}-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
 
-Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n %{corename}
+%description -n %{_strmpkg}-%{_kversion}
 %{descripline}
-The %{corename} binary package contains
+The %{_strmpkg}-%{_kversion} binary package contains
 the kernel modules that provide the Linux kernel
 %{stitle} drivers and modules.
 This includes assorted drivers and modules for additional
@@ -2899,7 +2880,7 @@ matches your kernel, rebuild from the source rpm.
 %{descriptail}
 
 %if %{HAVE_modules}
-%pre -n %{corename}
+%pre -n %%{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 arg="$1"
 function remove_depmods() {
@@ -3000,7 +2981,7 @@ fi
 %endif
 
 %if %{HAVE_modules}
-%post -n %{corename}
+%post -n %{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -3024,7 +3005,7 @@ fi
 %endif
 
 %if %{HAVE_modules}
-%preun -n %{corename}
+%preun -n %{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -3074,7 +3055,7 @@ fi
 %endif
 
 %if %{HAVE_modules}
-%postun -n %{corename}
+%postun -n %{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
@@ -3136,7 +3117,7 @@ fi
 %endif
 
 %if %{PACKAGE_kmod}
-%files -n %{corename}
+%files -n %{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_modules:%dir %{_kmoduledir}/%{base}}
@@ -3146,7 +3127,7 @@ fi
 %endif
 
 # ===========================================================================
-%package -n %{infoname}
+%package -n %{_strmpkg}-devel-%{_kversion}
 
 Summary:        %{title} kernel module symbol versions and debug info.
 Group:          Development/Kernel
@@ -3162,103 +3143,116 @@ Prefix:         %{_kmoduledir}
 Prefix:         %{_includedir}/%{name}/%{kernel_version}
 %endif
 
-Conflicts:      %{infoconf}
+Conflicts:      %{_confpkg}-devel-%{_kversion}
+Conflicts:      openss7-%{_confpkg}-kmp%kernel_flavor-devel
+Conflicts:      kmod-%{_confpkg}%kernel_flavor-devel
 
 Obsoletes:      %{name}-core < %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{name}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-core-%{_kversion} < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{name}-info < %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{name}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{name}-info-%{_kversion} < %{epoch}:%{version}-%{rpmrelease}
 %if %{NEED_streams}
 Obsoletes:      %{_obsopkg}-core < %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{_obsopkg}-%{core_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{_obsopkg}-core-%{_kversion} < %{epoch}:%{version}-%{rpmrelease}
 Obsoletes:      %{_obsopkg}-info < %{epoch}:%{version}-%{rpmrelease}
-Obsoletes:      %{_obsopkg}-%{info_name} < %{epoch}:%{version}-%{rpmrelease}
+Obsoletes:      %{_obsopkg}-info-%{_kversion} < %{epoch}:%{version}-%{rpmrelease}
 %endif
 
 Prereq:         %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
 
 %if %{NEED_devel}
-Prereq:         %{name}-devel = %{epoch}:@VERSION@-%{fullrelease}
+Prereq:         %{name}-devel = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_kmod}
-Prereq:         %{corename} = %{epoch}:%{kmodules_version}-%{fullrelease}
+Prereq:         %{_strmpkg}-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_streams}
 Prereq:         %{_streams}-devel-%{_kversion} >= %{_strvers}
 %endif
 %if %{NEED_compat}
-Prereq:         %{infobase strcompat} >= @STRCOMP_VERSION@
+Prereq:         strcompat%{_strextra}-devel-%{_kversion} >= @STRCOMP_VERSION@
 %endif
 %if %{NEED_tty}
-Prereq:         %{infobase strtty} >= @TTY_VERSION@
+Prereq:         strtty%{_strextra}-devel-%{_kversion} >= @TTY_VERSION@
 %endif
 %if %{NEED_xns}
-Prereq:         %{infobase strxns} >= @XNS_VERSION@
+Prereq:         strxns%{_strextra}-devel-%{_kversion} >= @XNS_VERSION@
 %endif
 %if %{NEED_xnet}
-Prereq:         %{infobase strxnet} >= @XTI_VERSION@
+Prereq:         strxnet%{_strextra}-devel-%{_kversion} >= @XTI_VERSION@
 %endif
 %if %{NEED_nsl}
-#rereq:         %{infobase strnsl} >= @NSL_VERSION@
+#rereq:         strnsl%{_strextra}-devel-%{_kversion} >= @NSL_VERSION@
 %endif
 %if %{NEED_sock}
-#rereq:         %{infobase strsock} >= @SOCK_VERSION@
+#rereq:         strsock%{_strextra}-devel-%{_kversion} >= @SOCK_VERSION@
 %endif
 %if %{NEED_inet}
-Prereq:         %{infobase strinet} >= @INET_VERSION@
+Prereq:         strinet%{_strextra}-devel-%{_kversion} >= @INET_VERSION@
 %endif
 %if %{NEED_sctp}
-Prereq:         %{infobase strsctp} >= @SCTP_VERSION@
+Prereq:         strsctp%{_strextra}-devel-%{_kversion} >= @SCTP_VERSION@
 %endif
 %if %{NEED_chan}
-Prereq:         %{infobase strchan} >= @CHAN_VERSION@
+Prereq:         strchan%{_strextra}-devel-%{_kversion} >= @CHAN_VERSION@
 %endif
 %if %{NEED_x25}
-Prereq:         %{infobase strx25} >= @X25_VERSION@
+Prereq:         strx25%{_strextra}-devel-%{_kversion} >= @X25_VERSION@
 %endif
 %if %{NEED_iso}
-Prereq:         %{infobase striso} >= @ISO_VERSION@
+Prereq:         striso%{_strextra}-devel-%{_kversion} >= @ISO_VERSION@
 %endif
 %if %{NEED_isdn}
-Prereq:         %{infobase strisdn} >= @ISDN_VERSION@
+Prereq:         strisdn%{_strextra}-devel-%{_kversion} >= @ISDN_VERSION@
 %endif
 %if %{NEED_ss7}
-Prereq:         %{infobase strss7} >= @SS7_VERSION@
+Prereq:         strss7%{_strextra}-devel-%{_kversion} >= @SS7_VERSION@
 %endif
 %if %{NEED_sigtran}
-Prereq:         %{infobase sigtran} >= @SIGTRAN_VERSION@
+Prereq:         sigtran%{_strextra}-devel-%{_kversion} >= @SIGTRAN_VERSION@
 %endif
 
 Provides:       kernel-modules = %{_kversion}
-Provides:       %{infoname} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{infoname} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{infoname} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{infovirt} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{infovirt} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{infovirt} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{fullrelease2}
-Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{kmodules_version}-%{rpmrelease}
-Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease}
-Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:@VERSION@-%{fullrelease2}
-Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:@VERSION@-%{rpmrelease}
+Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
+Provides:       openss7-%{_strmpkg}-kmp%{kernel_flavor}-devel = %{epoch}:%{version}_%{kernel_string}-%{fullrelease}
+Provides:       openss7-%{_strmpkg}-kmp%{kernel_flavor}-devel = %{epoch}:%{version}_%{kernel_string}-%{fullrelease2}
+Provides:       openss7-%{_strmpkg}-kmp%{kernel_flavor}-devel = %{epoch}:%{version}_%{kernel_string}-%{rpmrelease}
+Provides:       kmod-%{_strmpkg}%{kernel_flavor}-devel = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       kmod-%{_strmpkg}%{kernel_flavor}-devel = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       kmod-%{_strmpkg}%{kernel_flavor}-devel = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       %{_virtpkg}-devel = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{_virtpkg}-devel = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{_virtpkg}-devel = %{epoch}:%{version}-%{rpmrelease}
+Provides:       openss7-%{_virtpkg}-kmp-devel = %{epoch}:%{version}_%{kernel_string}-%{fullrelease}
+Provides:       openss7-%{_virtpkg}-kmp-devel = %{epoch}:%{version}_%{kernel_string}-%{fullrelease2}
+Provides:       openss7-%{_virtpkg}-kmp-devel = %{epoch}:%{version}_%{kernel_string}-%{rpmrelease}
+Provides:       kmod-%{_virtpkg}-devel = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       kmod-%{_virtpkg}-devel = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       kmod-%{_virtpkg}-devel = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       kernel-module-%{name}-devel%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{fullrelease2}
+Provides:       %{name}-devel-kmod%{kernel_flavor} = %{epoch}:%{version}.%{kernel_release}-%{rpmrelease}
+Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:%{version}-%{fullrelease}
+Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:%{version}-%{fullrelease2}
+Provides:       %{_strmpkg}-devel-%{_kversion} = %{epoch}:%{version}-%{rpmrelease}
 
-Version:        %{kmodules_version}
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
-%description -n %{infoname}
+%description -n %{_strmpkg}-devel-%{_kversion}
 %{descripline}
-The %{infoname} binary package
+The %{_strmpkg}-devel-%{_kversion} binary package
 contains the kernel modules symbol information for development
 of additional %{_STREAMS} kernel modules against the core kernel
-modules included in the %{corename} binary
+modules included in the %{_strmpkg}-%{_kversion} binary
 package.  This package is heavily tied to the core kernel
 modules and kernel for which it was compiled.  This package
-applies to core kernel modules %{corename}
+applies to core kernel modules %{_strmpkg}-%{_kversion}
 for kernel version %{_kversion}.
 This package provides debug information for package %{name}.
 Debug information is useful when developing applications that
@@ -3266,7 +3260,7 @@ use this package or when debugging this package.
 %{descriptail}
 
 %if %{PACKAGE_kbug}
-%files -n %{infoname}
+%files -n %{_strmpkg}-devel-%{_kversion}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
@@ -3280,6 +3274,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 0.9.2.25  2008-09-30 22:12:29  brian
+# - updated spec files
+#
 # Revision 0.9.2.24  2008-09-30 11:44:23  brian
 # - check for executables
 #
