@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-09-22 17:37:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-30 09:37:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:32 $ by $Author: brian $
+# Last Modified $Date: 2008-09-30 09:37:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -82,8 +82,9 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
-				  @PACKAGE_TARNAME@_mknod \
-				  asn
+				  asn \
+				  gdmo \
+				  @PACKAGE_TARNAME@_mknod
 
 pkglibexec_PROGRAMS		= \
 				  gdmo
@@ -178,7 +179,9 @@ else
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-EXTRA_PROGRAMS			+= asn
+EXTRA_PROGRAMS			+= \
+				  asn \
+				  gdmo
 
 pkglibexec_PROGRAMS		= \
 				  gdmo
@@ -467,6 +470,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.23  2008-09-30 09:37:15  brian
+# - some corrections to build
+#
 # Revision 0.9.2.22  2008-09-22 17:37:32  brian
 # - build and release updates
 #
