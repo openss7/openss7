@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-09-22 17:37:24 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-09-30 09:37:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:24 $ by $Author: brian $
+# Last Modified $Date: 2008-09-30 09:37:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -146,7 +146,7 @@
 %global oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
 %global newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
 
-%global debug_package %{nil}
+#global debug_package %{nil}
 
 %{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
 
@@ -908,6 +908,9 @@ better to use the tarball or source rpm release.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 0.9.2.82  2008-09-30 09:37:13  brian
+# - some corrections to build
+#
 # Revision 0.9.2.81  2008-09-22 17:37:24  brian
 # - build and release updates
 #
