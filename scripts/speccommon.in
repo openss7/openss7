@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-30 22:12:29 $
+# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-01 03:27:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-30 22:12:29 $ by $Author: brian $
+# Last Modified $Date: 2008-10-01 03:27:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2880,7 +2880,7 @@ matches your kernel, rebuild from the source rpm.
 %{descriptail}
 
 %if %{HAVE_modules}
-%pre -n %%{_strmpkg}-%{_kversion}
+%pre -n %{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 arg="$1"
 function remove_depmods() {
@@ -3274,6 +3274,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 0.9.2.26  2008-10-01 03:27:02  brian
+# - typo
+#
 # Revision 0.9.2.25  2008-09-30 22:12:29  brian
 # - updated spec files
 #
