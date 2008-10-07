@@ -1,5 +1,8 @@
 2008-10-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/snmp/strMIB.c: strStrhold is a truth value, some new ranges
+	* src/snmp/strMIB.h: strStrhold is a truth value, some new ranges
+
 	* doc/manual/bugs.texi: documented bug #022.
 	* src/modules/sth.c: fixed CDROM ioctl bug reported by
 	  Sylvain Chouler for DGAC.
