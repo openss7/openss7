@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-STREAMS-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.6 $) $Date: 2008-04-28 12:54:08 $
+-- @(#) $RCSfile: OPENSS7-STREAMS-MIB.mib,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-10-07 13:22:08 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -15,7 +15,7 @@
 -- Software Foundation; version 3 of the License.
 --
 -- This program is distributed in the hope that it will be useful, but WITHOUT 
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
 -- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
 -- for more details.
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-28 12:54:08 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-07 13:22:08 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-STREAMS-MIB.mib,v $
+-- Revision 0.9.2.7  2008-10-07 13:22:08  brian
+-- - updated mibs
+--
 -- Revision 0.9.2.6  2008-04-28 12:54:08  brian
 -- - update file headers for release
 --
@@ -105,6 +108,13 @@ strMIB MODULE-IDENTITY
     REVISION    "200710010804Z"
     DESCRIPTION 
 	"This is the first version of this MIB."
+    REVISION    "200810052305Z"
+    DESCRIPTION 
+	"Corrected default values and spelling corrections."
+    REVISION    "200810070142Z"
+    DESCRIPTION 
+	"Made strStrhold a TruthValue.  Also more spelling 
+	 corrections."
     ::= { openss7Modules 1 }
 
 
@@ -135,7 +145,7 @@ StreamsModuleQueues ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION 
 	"This textual convention describes the STREAMS module 
-	 queues to which a module_info or module_stats structure  
+	 queues to which a module_info or module_stats structure 
 	 applies.  STREAMS modules and drivers have an upper 
 	 multiplex read and write queue (rq, wq) and STREAMS 
 	 multiplexing drivers also have a lower multiplex read 
@@ -160,7 +170,7 @@ strModTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-	"Provides a table of modules and drivers which provides 
+	"Provides a table of modules and drivers that provides 
 	 some information about their initial packet sizes and 
 	 water marks as well as providing an index for an 
 	 auxillary statistics table."
@@ -175,7 +185,7 @@ strModEntry OBJECT-TYPE
     DESCRIPTION 
 	"An entry in the STREAMS modules table for one driver or 
 	 module.  Each table entry is indexed by the module 
-	 identifier which is the STREAMS module identifier that 
+	 identifier that is the STREAMS module identifier that 
 	 appears in the mi_idnum field of the module_info(9) 
 	 STREAMS structure."
     REFERENCE   
@@ -266,8 +276,8 @@ strModRowStatus OBJECT-TYPE
 	 these fail, the row will not be created and an error is 
 	 returned.
 	 
-	 Attempting to delete a conceptual row from a 
-	 management station results in an attempt to unload the 
+	 Attempting to delete a conceptual row from a management 
+	 station results in an attempt to unload the 
 	 corresponding STREAMS driver or module.  If the 
 	 unloading of the module fails for any reason, the row 
 	 will not be destroyed and an error is returned."
@@ -284,7 +294,7 @@ strModInfoTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
 	"Provides a side-table of STREAMS module information for 
-	 the strModTable.  This is information contained in one  
+	 the strModTable.  This is information contained in one 
 	 or more module_info(9) structures associated with a 
 	 single STREAMS module or driver."
     REFERENCE   
@@ -332,7 +342,7 @@ strModInfoEntry OBJECT-TYPE
 	 
 	 VALUE PERSISTENCE: Values perist across an agent reboot 
 	 but not across a STREAMS module reload.  After a 
-	 STREAMS module reload (which occurs on system reboot) 
+	 STREAMS module reload (that occurs on system reboot) 
 	 the values will revert back to the values compiled-in 
 	 for the STREAMS module."
     INDEX       { strModIdnum, strModInfoIndex }
@@ -440,7 +450,7 @@ strModInfoTraceLevel OBJECT-TYPE
     DESCRIPTION 
 	"Specifies the trace level associated with the driver or 
 	 module for the queues indicated in the strModInfoQueues 
-	 column.  This column does not correspond to a field in  
+	 column.  This column does not correspond to a field in 
 	 the module_info(9) structure."
     REFERENCE   
 	"scls(8), sc(4), module_info(9)"
@@ -471,9 +481,9 @@ strModStatEntry OBJECT-TYPE
 	 table.  Each entry represents one unique statistics 
 	 collection for a queue.  Each STREAMS module can have 
 	 from zero to four statistics groups for queues.  When 
-	 there are no statistics groups, no entry exists in 
-	 this table for the module name.  When one to four, one 
-	 to four entries exist in this table.
+	 there are no statistics groups, no entry exists in this 
+	 table for the module name.  When one to four, one to 
+	 four entries exist in this table.
 	 
 	 Not all STREAMS drivers and modules will have an entry 
 	 in this table.  Modules and non-multiplexing drivers 
@@ -485,16 +495,16 @@ strModStatEntry OBJECT-TYPE
 	 statically deteremined by the STREAMS driver or module 
 	 at the time that the driver of module is registered.  
 	 If the STREAMS subsystem has the ability to dynamically 
-	 load STREAMS drivers or modules, rows are created 
-	 by internal system operations whenever a STREAMS driver  
-	 or module regisers with the STREAMS subsystem.  If the 
+	 load STREAMS drivers or modules, rows are created by 
+	 internal system operations whenever a STREAMS driver or 
+	 module regisers with the STREAMS subsystem.  If the 
 	 STREAMS subsystem has the ability to dynamically unload 
 	 STREAMS driver modules, rows are destroyed by internal 
 	 system operations whenever a STREAMS driver of module 
 	 deregisters from the STREAMS sybsystem.
 	 
-	 EFFECT OF CHANGING VALUES:  All values in this entry 
-	 are read-only.  Counters in this table are only reset 
+	 EFFECT OF CHANGING VALUES: All values in this entry are 
+	 read-only.  Counters in this table are only reset 
 	 during system reinialiation or STREAMS subsystem 
 	 reinitialization.  The scalar strDiscontinuityTime is 
 	 used to determine when the last discontinuity in 
@@ -671,7 +681,7 @@ strApshTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
 	"Provides the STREAMS autopush table.  The autopush 
-	 table provides the STREAMS modules which are configured 
+	 table provides the STREAMS modules that are configured 
 	 by the system to be autopushed on top of driver minor 
 	 devices."
     REFERENCE   
@@ -685,7 +695,7 @@ strApshEntry OBJECT-TYPE
     DESCRIPTION 
 	"Provides an entry in the STREAMS autopush table.  Each 
 	 entry is indexed by the driver name and the initial 
-	 minor device numbe to which the entry belongs."
+	 minor device number to which the entry belongs."
     REFERENCE   
 	"autopush(8)"
     INDEX       { strApshName, strApshMinor }
@@ -769,7 +779,8 @@ strApshRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
 	"Provides management stations with the ability to add 
-	 rows to, or delete rows from, the STREAMS autopush table."
+	 rows to, or delete rows from, the STREAMS autopush 
+	 table."
     REFERENCE   
 	"autopush(8)"
     ::= { strApshEntry 6 }
@@ -941,7 +952,7 @@ strMaxMblk OBJECT-TYPE
 	 traditional UNIX value of 10 blocks.  This system 
 	 control defines the maximum for the next run of 
 	 runqueues(9) for all CPUs.  Increasing or decreasing 
-	 this number may have a positive or negative perormance 
+	 this number may have a positive or negative performance 
 	 impact.  This value corresponds to the system control 
 	 sys.streams.max_mblk."
     REFERENCE   
@@ -957,7 +968,7 @@ strMaxStramod OBJECT-TYPE
     DESCRIPTION 
 	"Specifies the maximum number of autopush structures 
 	 that will be defined for the entire system.  Valid 
-	 values are zero (0) or greater (MAXINT).  THe default 
+	 values are zero (0) or greater (MAXINT).  The default 
 	 value is eight (8).  This system control defines the 
 	 system-wide maximum.  This value corresponds to the 
 	 system control sys.streams.max_stramod."
@@ -976,16 +987,16 @@ strMaxStrdev OBJECT-TYPE
 	 is normally the maximum number of character devices 
 	 (MAX_CHRDEV).  Valid values are zero (0) or greater 
 	 (MAXINT).  The default value is MAX_CHRDEV (256 on 
-	 16-bit device number systems, 
-	 16384 on 32-bit device number systems).  This is a 
-	 read-only system control.  This value corresponds to 
-	 system control sys.streams.max_strdev.
+	 16-bit device number systems, 16384 on 32-bit device 
+	 number systems).  This is a read-only system control.  
+	 This value corresponds to system control 
+	 sys.streams.max_strdev.
 	 
-	 This value had more significance on systems which used 
-	 to allocate the character device switch tables a static 
-	 arrays.  Modern STREAMS subsystems use hashes  and 
-	 linked lists and the number is limited by memory rather 
-	 than by index number as this value reflects."
+	 This value had more significance on systems that used 
+	 to allocate the character device switch tables as 
+	 static arrays.  Modern STREAMS subsystems use hashes 
+	 and linked lists and the number is limited by memory 
+	 rather than by index number as this value reflects."
     REFERENCE   
 	"sys.streams.max_strdev."
     DEFVAL      { 16384 }
@@ -1006,9 +1017,9 @@ strMaxStrmod OBJECT-TYPE
 	 This value corresponds to system control 
 	 sys.streams.max_strmod.
 	 
-	 This value had more significance on systems which used 
-	 to allocate the module switch tables a static arrays.  
-	 Modern STREAMS subsystems use hashes  and linked lists 
+	 This value had more significance on systems that used 
+	 to allocate the module switch tables as static arrays.  
+	 Modern STREAMS subsystems use hashes and linked lists 
 	 and the number is limited by memory rather than by 
 	 index number as this value reflects."
     REFERENCE   
@@ -1024,7 +1035,7 @@ strMsgPriority OBJECT-TYPE
     DESCRIPTION 
 	"Specifies whether allocation priority will be honoured 
 	 or whether all allocations will be treated the same.  
-	 See allocb(9).  When true, allocation priotity will be 
+	 See allocb(9).  When true, allocation priority will be 
 	 honoured when allocating message blocks.  When false, 
 	 allocation priority will be ignored.  Valid values are 
 	 true or false.  The default value is false.  Changing 
@@ -1098,6 +1109,7 @@ strNstrpush OBJECT-TYPE
 	 sys.streams.nstrpush."
     REFERENCE   
 	"sys.streams.nstrpush."
+    DEFVAL	{ 64 }
     ::= { strTunables 10 }
 
 strHiwat OBJECT-TYPE
@@ -1117,6 +1129,7 @@ strHiwat OBJECT-TYPE
 	 sys.streams.hiwat."
     REFERENCE   
 	"sys.streams.hiwat"
+    DEFVAL	{ 5120 }
     ::= { strTunables 11 }
 
 strLowat OBJECT-TYPE
@@ -1140,7 +1153,7 @@ strLowat OBJECT-TYPE
     ::= { strTunables 12 }
 
 strMaxpsz OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32(0..2147482648)
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
@@ -1157,7 +1170,7 @@ strMaxpsz OBJECT-TYPE
 	 
 	 The Stream head only uses this value on the write side, 
 	 where it is used to determine the maximum message size, 
-	 not the maximum write size.  When a write occurs which 
+	 not the maximum write size.  When a write occurs that 
 	 is larger than this maximum, multiple message blocks 
 	 are allocated so that the size of the message block 
 	 falls between the Minpsz and Maxpsz values.  When a 
@@ -1181,7 +1194,7 @@ strMaxpsz OBJECT-TYPE
     ::= { strTunables 13 }
 
 strMinpsz OBJECT-TYPE
-    SYNTAX      Integer32
+    SYNTAX      Integer32(0..2147482648)
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
@@ -1225,7 +1238,7 @@ strReuseFmodsw OBJECT-TYPE
 	"Specifies whether fmodsw table entries will be reused.  
 	 When false, fmodsw table entries will not be reused.  
 	 When true, fmodsw table entries will be reused.  Valid 
-	 values are true or false.  THe default value is false.  
+	 values are true or false.  The default value is false.  
 	 Corresponds to the control sys.streams.reuse_fmodsw."
     REFERENCE   
 	"sys.streams.reuse_fmodsw"
@@ -1252,15 +1265,14 @@ strRtime OBJECT-TYPE
     ::= { strTunables 16 }
 
 strStrhold OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
+    SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
 	"Specifies whether the SNDHOLD feature is active or not.  
-	 When zero (0), the SNDHOLD feature is deactivated.  When 
-	 non-zero, the SNDHOLD feature is activated.  Value values 
-	 are non-zero or zero.  The default value is zero.  This 
+	 When false, the SNDHOLD feature is deactivated.  When 
+	 true, the SNDHOLD feature is activated.  Valid values 
+	 are true or false.  The default value is false.  This 
 	 is the default value for all new Streams.  Existing 
 	 Streams are unaffected.  This setting can be examined 
 	 and altered on an open Stream using the I_GWROPT and 
@@ -1268,7 +1280,7 @@ strStrhold OBJECT-TYPE
 	 the system control sys.streams.strhold."
     REFERENCE   
 	"sys.streams.strhold"
-    DEFVAL      { 0 }
+    DEFVAL      { false }
     ::= { strTunables 17 }
 
 strStrctlsz OBJECT-TYPE
@@ -1320,14 +1332,16 @@ strStrthresh OBJECT-TYPE
 	 Valid values are zero (0) or greater (MAXINT).  This is 
 	 the system wide maximum.   Existing allocations are 
 	 unaffected by lowering this value.  Changing this value 
-	 to a low value mau have some use in debugging STREAMS 
+	 to a low value may have some use in debugging STREAMS 
 	 drivers and modules.  Corresponds to the system control 
-	 sys.streams.strthresh.
+	 sys.streams.strthresh.  The value zero (0) means no 
+	 constraint.
 	 
-	 The purpose of this constraint is to keep memory leaking 
-	 drivers from consuming all system resources."
+	 The purpose of this constraint is to keep memory 
+	 leaking drivers from consuming all system resources."
     REFERENCE   
 	"sys.streams.strthresh"
+    DEFVAL	{ 0 }
     ::= { strTunables 20 }
 
 strLowthresh OBJECT-TYPE
@@ -1340,12 +1354,13 @@ strLowthresh OBJECT-TYPE
 	 above which low priority message allocations will fail.  
 	 Low priority message allocations are those which pass 
 	 the BPRI_LO flag to an allocator function such as 
-	 allocb(9).
+	 allocb(9).  The value zero (0) means no constraint.
 	 
 	 Setting this threshold to a low value may have a 
 	 negative impact on STREAMS performance."
     REFERENCE   
 	"sys.streams.lowthresh"
+    DEFVAL	{ 0 }
     ::= { strTunables 21 }
 
 strMedthresh OBJECT-TYPE
@@ -1358,12 +1373,14 @@ strMedthresh OBJECT-TYPE
 	 above which medium priority message allocations will 
 	 fail.  Medium priority message allocations are those 
 	 which pass the BPRI_MED flag to an allocator function 
-	 such as allocb(9).
+	 such as allocb(9).  The value zero (0) means no 
+	 constraint.
 	 
 	 Setting this threshold to a low value may have a 
 	 negative impact on STREAMS performance."
     REFERENCE   
 	"sys.streams.medthresh"
+    DEFVAL	{ 0 }
     ::= { strTunables 22 }
 
 strIoctime OBJECT-TYPE
@@ -1376,11 +1393,11 @@ strIoctime OBJECT-TYPE
 	 await a response to an M_IOCTL message issued 
 	 downstream.  Valid values are zero (0) or greater 
 	 (MAXINT).  The default value is the traditional UNIX 
-	 value of 15 seconds (1500 centiseconds).  This system
+	 value of 15 seconds (1500 centiseconds).  This system 
 	 control defines the default for all new Streams.  The 
 	 value for a given Stream can be changed with the 
 	 streamio(7) input-output control, after the Stream is 
-	 opepened and before the Stream is closed.  This value 
+	 opened and before the Stream is closed.  This value 
 	 coresponds to the system control sys.streams.ioctime."
     REFERENCE   
 	"sys.streams.ioctime"
@@ -1457,7 +1474,7 @@ strApshTableConditionalGroup OBJECT-GROUP
     STATUS      current
     DESCRIPTION 
 	"A collection of objects necessary for implementing a 
-	 strApshTable that allows management stations to create  
+	 strApshTable that allows management stations to create 
 	 and delete entries."
     ::= { strGroups 6 }
 
@@ -1541,250 +1558,247 @@ strMIBCompliance MODULE-COMPLIANCE
 
     MODULE      -- this module
 
-	MANDATORY-GROUPS        { strTunablesMandatoryGroup, 
-		  strModTableMandatoryGroup, 
-		  strModInfoTableMandatoryGroup, 
-		  strModStatTableMandatoryGroup, 
-		  strApshTableMandatoryGroup, 
-		  strStatsTableMandatoryGroup }
+    MANDATORY-GROUPS        { strTunablesMandatoryGroup, 
+	      strModTableMandatoryGroup, 
+	      strModInfoTableMandatoryGroup, 
+	      strModStatTableMandatoryGroup, 
+	      strApshTableMandatoryGroup, 
+	      strStatsTableMandatoryGroup }
 
 	GROUP   strTunablesOptionalGroup
 	DESCRIPTION   
-	      "Optional tunables."
+	    "Optional tunables."
 
 	GROUP   strMessagePoolsConditionalGroup
 	DESCRIPTION   
-	      "Mandatory if the STREAMS implementation 
-	       allocates priority messages from fixed size 
-	       buffer pools."
+	    "Mandatory if the STREAMS implementation allocates 
+	     priority messages from fixed size buffer pools."
 
 	GROUP   strHoldConditionalGroup
 	DESCRIPTION   
-	      "Mandatory if the Stream head hold feature is 
-	       present in the STREAMS implementation."
+	    "Mandatory if the Stream head hold feature is 
+	     present in the STREAMS implementation."
 
 	GROUP   strApshTableConditionalGroup
 	DESCRIPTION   
-	      "Mandatory when the STREAMS implementation is 
-	       capable of adding entries to an autopush 
-	       specification while the system is running and 
-	       without rebooting."
+	    "Mandatory when the STREAMS implementation is 
+	     capable of adding entries to an autopush 
+	     specification while the system is running and 
+	     without rebooting."
 
 	GROUP   strModTableConditionalGroup
 	DESCRIPTION   
-	      "Mandatory when the STREAMS implementation is 
-	       capable of creating or destroying entries in 
-	       the module or driver switch table while the 
-	       system is running and without rebooting."
+	    "Mandatory when the STREAMS implementation is 
+	     capable of creating or destroying entries in the 
+	     module or driver switch table while the system is 
+	     running and without rebooting."
 
 	GROUP   strModInfoTableConditionalGroup
 	DESCRIPTION   
-	      "Mandatory if the STREAMS implementation 
-	       supports user settable trace levels for STREAMS 
-	       modules."
+	    "Mandatory if the STREAMS implementation supports 
+	     user settable trace levels for STREAMS modules."
 
 	GROUP   strModStatTableConditionalGroup
 	DESCRIPTION   
-	      "Mandatory if the STREAMS implementation 
-	       supports more than one module_stat structure 
-	       per module."
+	    "Mandatory if the STREAMS implementation supports 
+	     more than one module_stat structure per module."
 
 	GROUP   strStatsTableConditionalGroup
 	DESCRIPTION   
-	      "Mandatory when the STREAMS implementation keeps 
-	       track of high water marks."
+	    "Mandatory when the STREAMS implementation keeps 
+	     track of high water marks."
 
 	OBJECT  strCltime
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strMaxApush
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strMaxMblk
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strMaxStramod
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strMsgPriority
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strNstrmsgs
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strNstrpush
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strHiwat
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strLowat
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strMaxpsz
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strMinpsz
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strRtime
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strStrhold
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strStrctlsz
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strStrmsgsz
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strIoctime
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strStrthresh
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strLowthresh
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strMedthresh
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this tunable a 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this tunable as 
+	     read-only where the STREAMS subsystem is incapable 
+	     of changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strModInfoMinpsz
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this column as 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recomipiling the kernel."
+	    "It is permitted to provide this column as read-only 
+	     where the STREAMS subsystem is incapable of 
+	     changing it without exceptional action such as 
+	     recomipiling the kernel."
 
 	OBJECT  strModInfoMaxpsz
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this column as 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recomipiling the kernel."
+	    "It is permitted to provide this column as read-only 
+	     where the STREAMS subsystem is incapable of 
+	     changing it without exceptional action such as 
+	     recomipiling the kernel."
 
 	OBJECT  strModInfoHiwat
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this column as 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recompiling the kernel."
+	    "It is permitted to provide this column as read-only 
+	     where the STREAMS subsystem is incapable of 
+	     changing it without exceptional action such as 
+	     recompiling the kernel."
 
 	OBJECT  strModInfoLowat
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "It is permitted to provide this column as 
-	       read-only where the STREAMS subsystem is 
-	       incapable of changing it without exceptional 
-	       action such as recomipiling the kernel."
+	    "It is permitted to provide this column as read-only 
+	     where the STREAMS subsystem is incapable of 
+	     changing it without exceptional action such as 
+	     recomipiling the kernel."
 
 	OBJECT  strApshModules
 	MIN-ACCESS  read-only
 	DESCRIPTION   
-	      "As it is optional to permit addition of rows to 
-	       the strApshTable by management stations, this 
-	       column may be implemented as read-only when the 
-	       capability to add rows is not provided."
+	    "As it is optional to permit addition of rows to the 
+	     strApshTable by management stations, this column 
+	     may be implemented as read-only when the capability 
+	     to add rows is not provided."
 
     ::= { strCompliances 1 }
 
