@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.169 $) $Date: 2008/09/21 07:40:46 $
+# @(#) $RCSfile: kernel.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.170 $) $Date: 2008-10-07 22:58:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/21 07:40:46 $ by $Author: brian $
+# Last Modified $Date: 2008-10-07 22:58:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1684,7 +1684,7 @@ dnl	when it does it faking out the flags check.  Therefore, we now tail the outp
 dnl	makefile is overwritten by config.status and the flags otherwise seem to be generated
 dnl	correctly.
 dnl
-	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check | tail -1`"
+	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check | tail -1`"
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"
 	rm -f .config
 	linux_cflags=
@@ -1858,7 +1858,7 @@ dnl	when it does it faking out the flags check.  Therefore, we now tail the outp
 dnl	makefile is overwritten by config.status and the flags otherwise seem to be generated
 dnl	correctly.
 dnl
-	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check | tail -1`"
+	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check | tail -1`"
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"
 	rm -f .config
 	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
@@ -1907,7 +1907,7 @@ dnl	when it does it faking out the flags check.  Therefore, we now tail the outp
 dnl	makefile is overwritten by config.status and the flags otherwise seem to be generated
 dnl	correctly.
 dnl
-	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check | tail -1`"
+	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check | tail -1`"
 	linux_cv_k_modflags_orig="$linux_cv_k_modflags"
 	rm -f .config
 dnl
@@ -1936,7 +1936,7 @@ dnl	when it does it faking out the flags check.  Therefore, we now tail the outp
 dnl	makefile is overwritten by config.status and the flags otherwise seem to be generated
 dnl	correctly.
 dnl
-	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} bldflag-check | tail -1`"
+	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} bldflag-check | tail -1`"
 	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"
 	rm -f .config
 dnl
@@ -2619,6 +2619,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.170  2008-10-07 22:58:01  brian
+# - more overrides for cflagcheck
+#
 # Revision 0.9.2.169  2008/09/21 07:40:46  brian
 # - add defaults to environment variables
 #
