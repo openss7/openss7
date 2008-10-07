@@ -1,0 +1,1635 @@
+#!/usr/bin/perl
+#!/usr/bin/perl -W
+# =============================================================================
+# 
+# @(#) $RCSfile: mibbrowser,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-07 13:17:35 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2008-10-07 13:17:35 $ by $Author: brian $
+#
+# =============================================================================
+
+#eval 'exec perl -S $0 ${1+"@"}'
+#    if $running_under_some_shell;
+
+if (!eval { require SNMP; }) {
+	print STDERR<<EOF;
+ERROR: You do not have the SNMP perl module installed.  Please obtain
+this by getting the latest source release of the ucd-snmp toolkit from
+http://www.net-snmp.org/download/ .  The perl module is contained in
+the perl/SNMP directory.  See the INSTALL file there for instructions.
+EOF
+	exit;
+} else {
+	eval { import SNMP; }
+}
+
+#if (!eval { require Gtk2; }) {
+#	print STDERR<<EOF;
+#ERROR: Use of the $0 program requires the availability of the perl
+#Gtk2 module.  It can either be obtained from CPAN or by installing
+#the necessary package on your system.
+#EOF
+#} else {
+#	eval { import Gtk2; }
+#}
+
+if (!eval { require Tk; }) {
+    print STDERR<<EOF;
+ERROR: Use of the $0 program requires the availablity of the perl
+Tk module.  It can either be obtained from CPAN or by insgalling the
+necessary package on your system.
+EOF
+} else {
+    eval { import Tk; }
+}
+
+$\ = "\n";
+
+use strict;
+
+my $program = $0; $program =~ s/^.*\///;
+my $modename = "$program";
+
+my $debug = 0;
+my $verbose = 1;
+my $show = 'yes';
+
+my $ident = '$RCSfile: mibbrowser,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-07 13:17:35 $';
+my $version = '0.9.2';
+
+
+sub version {
+	return if $show eq 'no';
+	print STDOUT<<EOF;
+Version $version
+$ident
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Distributed under Affero GPL Version 3, included here by reference.
+See `$program --copying' for copying permissions.
+EOF
+}
+
+sub usage {
+	return if $show eq 'no';
+	print STDERR<<EOF;
+$program
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+}
+
+sub help {
+	return if $show eq 'no';
+	print STDOUT<<EOF;
+$program:
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+Arguments:
+    NONE
+Options:
+    -n, --dryrun
+        don't perform the actions, just check them
+    -q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+        increase or set output verbosity
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+}
+
+sub copying {
+	return if $show eq 'no';
+	print STDOUT<<EOF;
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the GNU General Public License  as  published by the Free Software
+Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should  have received a copy of the GNU  General  Public License  along with
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+}
+
+sub syntax_error($)
+{
+    my $error = shift;
+    if ($verbose > 0) {
+	print STDERR "$program: syntax error -- $error";
+	usage;
+    }
+    exit 2;
+}
+
+sub option_unrec($)
+{
+    my $opt = shift;
+    $opt =~ s/=.*//;
+    syntax_error "`$opt' unrecognized";
+}
+
+sub option_noarg($)
+{
+    my $opt = shift;
+    syntax_error "`$opt' does accept an argument";
+}
+
+sub option_needarg($)
+{
+    my $opt = shift;
+    syntax_error "`$opt' requires an argument";
+}
+
+sub option_after($$)
+{
+    my $opt = shift;
+    my $oth = shift;
+    syntax_error "`$opt' cannot occur with `$oth'";
+}
+
+my ($more,$arg,$optarg,$prev,$prevopt,$run,@nonopt);
+my ($show_help,$show_usage,$show_copy);
+
+$more = '';
+
+while (scalar(@ARGV) or $more ne '') {
+    if ($more) {
+	$arg = "-$more";
+	$more = '';
+    } else {
+	$arg = shift;
+    }
+    # check for attached option agrumnet
+    if ($arg =~ /^--(debug|verbose)=(.*)$/) {
+	$optarg = $2;
+    } elsif ($arg =~ /^--.*=/) {
+	option_noarg $arg;
+    } elsif ($arg =~ /^-[nqDvhVC]$/) {
+	$optarg = '';
+    } elsif ($arg =~ /^(-[nqDvhVC])(.*)$/) {
+	$arg = $1;
+	$more = $2;
+	$optarg = '';
+    } elsif ($arg =~ /^-[x]$/) {
+	$optarg = '';
+    } elsif ($arg =~ /^(-[x])(.*)$/) {
+	$arg = $1;
+	$optarg = $2;
+    } else {
+	$optarg = '';
+    }
+    # check for optional or required option argument
+    if (ref($prev)) {
+	if ($arg =~ /^-/) {
+	    if (ref($prev) eq 'SUB') {
+		# these have an optional argument
+	    } elsif (ref($prev) =~ /^(SCALAR|ARRAY)$/) {
+		# these require an argument
+		option_needarg $prevopt;
+	    }
+	    $prev = ''; $prevopt = '';
+	} else {
+	    if (ref($prev) eq 'ARRAY') {
+		# these can be repeated
+		push @$prev, $arg;
+	    } elsif (ref($prev) eq 'SCALAR') {
+		# these override
+		$$prev = $arg;
+	    } elsif (ref($prev) eq 'SUB') {
+		&$prev($optarg);
+	    }
+	    $prev = ''; $prevopt = '';
+	    next;
+	}
+    }
+
+         if ($arg =~ /^-(-help|-h|-Help|-H|-\?|h|H|\?)$/) {
+	$show_help = 'yes';
+	help();
+	exit 0;
+    } elsif ($arg =~ /^-(-version|-versio|-versi|-vers|V)$/) {
+	$show_usage = 'yes';
+	version();
+	exit 0;
+    } elsif ($arg =~ /^-(-copying|-copyin|-copy|-cop|-co|-c|C)$/) {
+	$show_copy = 'yes';
+	copying();
+	exit 0;
+    } elsif ($arg =~ /^-(-verbose|-verbos|-verb)$/) {
+	$prevopt = $arg;
+	$prev = sub {
+	    if ($optarg eq '') {
+		$verbose++;
+	    } elsif ($optarg =~ /^[0-9]+$/) {
+		$verbose = $optarg;
+	    } else {
+		syntax_error "$arg $optarg";
+	    }
+	}
+    } elsif ($arg =~ /^-(v)$/) {
+	$verbose++;
+    } elsif ($arg =~ /^-(-verbose=|-verbos=|-verb=).*$/) {
+	if ($optarg eq '') {
+	    $verbose++;
+	} elsif ($optarg =~ /^[0-9]+$/) {
+	    $verbose = $optarg;
+	} else {
+	    syntax_error $arg;
+	}
+    } elsif ($arg =~ /^-(-debug|-debu|-deb)$/) {
+	$prevopt = $arg;
+	$prev = sub {
+	    if ($optarg eq '') {
+		$debug++;
+	    } elsif ($optarg =~ /^[0-9]+$/) {
+		$debug = $optarg;
+	    } else {
+		syntax_error "$arg $optarg";
+	    }
+	}
+    } elsif ($arg =~ /^-(D)$/) {
+	$debug++;
+    } elsif ($arg =~ /^-(-debug=|-debu=|-deb=|D).*$/) {
+	if ($optarg eq '') {
+	    $debug++;
+	} elsif ($optarg =~ /^[0-9]+$/) {
+	    $debug = $optarg;
+	} else {
+	    syntax_error "$arg $optarg";
+	}
+    } elsif ($arg =~ /^-(-dry-run|-dryrun|-n|n)$/) {
+	$run = 'no';
+    } elsif ($arg =~ /^-(-quiet|-silent|q)$/) {
+	$show = 'no';
+	$verbose = 0;
+	$debug = 0;
+    } elsif ($arg eq '--') {
+	#end of options
+	last;
+    } elsif ($arg =~ /^-.*/) {
+	option_unrec $arg;
+    } else {
+	push @nonopt, $arg;
+    }
+}
+
+# hit end of list wanting arguments
+if (ref($prev)) {
+    if (ref($prev) eq 'SUB') {
+	# argument was optional
+	&$prev('');
+    } else {
+	# the reset require arguments
+	option_needarg $prevopt;
+    }
+}
+
+# set ARGV to be the non-option elements
+push @nonopt, @ARGV;
+@ARGV = ( @nonopt );
+
+#
+# for perl, the defaults list consists of a reference to the variable and the
+# default value for the variable.
+#
+my @defaults = (
+    'verbose', \$verbose, 1,
+    'debug', \$debug, 0,
+    'show', \$show, 1,
+    'show_help', \$show_help, 0,
+    'show_usage', \$show_usage, 0,
+    'show_copy', \$show_copy, 0,
+);
+
+while ($#defaults >= 2) {
+    my $lab = shift @defaults;
+    my $ref = shift @defaults;
+    my $val = shift @defaults;
+
+    if (not defined $$ref) {
+	#print "\$$lab = $val (default)";
+	$$ref = $val;
+    } else {
+	#print "\$$lab = $$ref (set)";
+    }
+}
+
+#Gtk2->init;
+#
+#my $w = Gtk2::Window->new('toplevel');
+#my $b = Gtk2::Button->new('Quit');
+#my $m = Gtk2::MenuBar->new;
+#$m->set_pack_direction('ltr');
+#$m->set_child_pack_direction('ttb');
+#$b->signal_connect(clicked => sub { Gtk2->main_quit; });
+#$w->add($b);
+#$w->show_all;
+#Gtk2->main;
+
+use Tk;
+require Tk::Adjuster;
+require Tk::Dialog;
+require Tk::FileSelect;
+require Tk::HList;
+require Tk::LabFrame;
+require Tk::ROText;
+
+use Storable qw(lock_store lock_nstore lock_retrieve);
+
+my @myapps = ();
+
+package myapp;
+use strict;
+
+sub new {
+    my $type = shift;
+    my $self = {};
+    bless $self, $type;
+    $self->create(@_);
+    return $self;
+}
+
+sub newfile {
+    my $self = shift;
+    new myapp();
+    return;
+}
+
+sub loadrecent {
+    my $self = shift;
+    my $file = shift;
+    print "Request to load recent files $file";
+    return;
+}
+
+sub saveas {
+    my $self = shift;
+    my $data = $self->{data};
+    my $fs = $self->{MainWindow}->FileSelect(
+	-directory => $data->{directory},
+    );
+    my $file = $fs->Show;
+    $fs->destroy;
+    if ($file) {
+	my $base = $file; $base =~ s/^.*\///;
+	if (-e $file) {
+	    my $d = $self->{MainWindow}->Dialog(
+		-title => 'Are you sure?',
+		-text => "File $base already exists: are you sure that you want to overwrite it?",
+		-default_button => 'Cancel',
+		-buttons => [ qw/Save Cancel Help/ ],
+	    );
+	    my $answer = $d->Show;
+	    $d->destroy;
+	    return unless $answer eq 'Save';
+	    if (not -w $file) {
+		$d = $self->{MainWindow}->Dialog(
+		    -title => 'Permission denied.',
+		    -text => "You do not have permission to write to $base.",
+		    -default_button => 'Ok',
+		    -buttons => [ 'Ok' ],
+		);
+		$d->Show;
+		$d->destroy;
+		return $self->saveas();
+	    }
+	}
+	if (Storable::lock_nstore($data, $file)) {
+	    $data->{filename} = $file;
+	    $self->{dirty} = 'no';
+	} else {
+		my $d = $self->{MainWindow}->Dialog(
+		    -title => 'Write failed.',
+		    -text => "Could not write to $base.",
+		    -default_button => 'Ok',
+		    -buttons => [ 'Ok' ],
+		);
+		$d->Show;
+		$d->destroy;
+	}
+    }
+}
+
+sub save {
+    my $self = shift;
+    my $data = $self->{data};
+    my $file = $data->{filename};
+    return $self->saveas() unless $file;
+    my $base = $file; $base =~ s/^.*\///;
+    if (-e $file) {
+	my $d = $self->{MainWindow}->Dialog(
+	    -title => 'Are you sure?',
+	    -text => "File $base already exists: are you sure that you want to overwrite it?",
+	    -default_button => 'Cancel',
+	    -buttons => [ qw/Save Cancel Help/ ],
+	);
+	my $answer = $d->Show;
+	$d->destroy;
+	return unless $answer eq 'Save';
+	if (not -w $file) {
+	    $d = $self->{MainWindow}->Dialog(
+		-title => 'Permission denied.',
+		-text => "You do not have permission to write to $base.",
+		-default_button => 'Ok',
+		-buttons => [ 'Ok' ],
+	    );
+	    $d->Show;
+	    $d->destroy;
+	    return $self->saveas();
+	}
+    }
+    if (Storable::lock_nstore($data, $file)) {
+	$self->{dirty} = 'no';
+    } else {
+	my $d = $self->{MainWindow}->Dialog(
+	    -title => 'Write failed.',
+	    -text => "Could not write to $base.",
+	    -default_button => 'Ok',
+	    -buttons => [ 'Ok' ],
+	);
+	$d->Show;
+	$d->destroy;
+    }
+}
+
+sub storefile {
+    my $self = shift;
+    my $data = $self->{data};
+    while ($self->{dirty} eq 'yes') {
+	my $d = $self->{MainWindow}->Dialog(
+	    -title => 'Are you sure?',
+	    -text => 'Changes will be lost: are you sure?',
+	    -default_button => 'Cancel',
+	    -buttons => [ 'Discard', 'Cancel', 'Save' ],
+	);
+	my $answer = $d->Show;
+	$d->destroy;
+	if ($answer eq 'Cancel') {
+	    return 'Cancel';
+	} elsif ($answer eq 'Save') {
+	    $self->save();
+	    next;
+	} elsif ($answer eq 'Discard') {
+	    return 'Discard';
+	} else {
+	    return 'Discard';
+	}
+    }
+    return 'Saved';
+}
+
+sub openfile {
+    my $self = shift;
+    my $data = $self->{data};
+    my $result = $self->storefile();
+    return if $result eq 'Cancel';
+    my $fs = $self->{MainWindow}->FileSelect(
+	-directory => $data->{directory},
+    );
+    my $file = $fs->Show;
+    $fs->destroy;
+    return unless $file;
+    my $base = $file =~ s/^.*\///;
+    if (-r $file) {
+	my $temp;
+	if ($temp = Storable::lock_retrieve($file)) {
+	    $temp->{filename} = $file;
+	    $self->{data} = $temp;
+	    $self->{dirty} = 'no';
+	    return;
+	} else {
+	    my $d = $self->{MainWindow}->Dialog(
+		-title => 'Could not read file.',
+		-text => "File $base could not be read!",
+		-default_button => 'Ok',
+		-buttons => [ 'Ok' ],
+	    );
+	    $d->Show;
+	    $d->destroy;
+	}
+    } else {
+	if (-e $file) {
+	    my $d = $self->{MainWindow}->Dialog(
+		-title => 'Permission denied.',
+		-text => "File $base is not readable for you!",
+		-default_button => 'Ok',
+		-buttons => [ 'Ok' ],
+	    );
+	    $d->Show;
+	    $d->destroy;
+	} else {
+	    my $d = $self->{MainWindow}->Dialog(
+		-title => 'File does not exist?',
+		-text => "File $base does not exist!",
+		-default_button => 'Ok',
+		-buttons => [ 'Ok' ],
+	    );
+	    $d->Show;
+	    $d->destroy;
+	}
+    }
+}
+
+sub closefile {
+    my $self = shift;
+    my $data = $self->{data};
+    my $result = $self->storefile();
+    return if $result eq 'Cancel';
+    if (scalar(@main::myapps) > 1) {
+	$self->{MainWindow}->destroy;
+    } else {
+	$data->{recent} = [];
+	$data->{filename} = undef;
+	$data->{directory} = '/usr/share/snmp/mibs';
+	$self->{dirty} = 'no';
+    }
+}
+
+sub loadmib {
+    my $self = shift;
+    my $data = $self->{data};
+    my $file;
+    my @temp = ();
+    my $fs;
+    $fs = $self->{MainWindow}->FileSelect(
+	-directory => $data->{directory},
+    );
+    if (my $file = $fs->Show) {
+	$data->{directory} = $file;
+	$data->{directory} =~ s/\/[^\/]*$//;
+	foreach my $f ( @{$data->{recent}} ) {
+	    push @temp, $f unless $f eq $file;
+	}
+	push @temp, $file;
+	$data->{recent} = [ @temp ];
+	$self->{RecentMenu}->delete(0, 'last');
+	while (my $f = pop @temp) {
+	    $self->{RecentMenu}->add('command',
+		-command => [ \&loadrecent, $self, $f ],
+		-label => $f,
+	    );
+	}
+	$self->{FileMenu}->entryconfigure('Recent MIBs...',
+	    -state => 'normal',
+	);
+    }
+    $fs->destroy;
+    return;
+}
+
+sub somedialog {
+    my $self = shift;
+    my $answer = $self->{Dialog}->Show;
+    print "MIB Dialog answered $answer";
+}
+
+sub destroyed {
+    my $mw = shift;
+    my $self = shift;
+    my @temp = ();
+    if (UNIVERSAL::isa($mw, 'Tk::MainWindow')) {
+	#print "Main Window $mw and $self destroyed.";
+	foreach my $s ( @main::myapps ) {
+	    push @temp, $s unless $s eq $self;
+	}
+	@main::myapps = ( @temp );
+	# self is no longer referenced and will be destroyed too...
+    }
+    return;
+}
+
+sub exit {
+    my $self = shift;
+    foreach my $s (@main::myapps) {
+	$s->{MainWindow}->destroy;
+    }
+}
+
+sub showversion {
+    my $self = shift;
+    my $tl = $self->{MainWindow}->Toplevel();
+    $tl->title("Version");
+    my $tx = $tl->Scrolled('ROText',
+	-scrollbars => 'osoe',
+	-width => 80,
+	-wrap => 'none',
+    )->pack(
+	-side => 'top',
+	-fill => 'x',
+	-expand => 1,
+    );
+    my $bt = $tl->Button(
+	-text => 'Dismiss',
+	-default => 'active',
+	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
+    )->pack(
+	-side => 'bottom',
+	-fill => 'none',
+	-expand => 0,
+    );
+    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
+Version $version
+$ident
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Distributed under Affero GPL Version 3, included here by reference.
+See `$program --copying' for copying permissions.
+EOF
+    return;
+}
+
+sub showusage {
+    my $self = shift;
+    my $tl = $self->{MainWindow}->Toplevel();
+    $tl->title("Usage");
+    my $tx = $tl->Scrolled('ROText',
+	-scrollbars => 'osoe',
+	-width => 80,
+	-wrap => 'none',
+    )->pack(
+	-side => 'top',
+	-fill => 'x',
+	-expand => 1,
+    );
+    my $bt = $tl->Button(
+	-text => 'Dismiss',
+	-default => 'active',
+	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
+    )->pack(
+	-side => 'bottom',
+	-fill => 'none',
+	-expand => 0,
+    );
+    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
+$program
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+    return;
+}
+
+sub showcopying {
+    my $self = shift;
+    my $tl = $self->{MainWindow}->Toplevel();
+    $tl->title("Copying");
+    my $tx = $tl->Scrolled('ROText',
+	-scrollbars => 'osoe',
+	-width => 80,
+	-wrap => 'none',
+    )->pack(
+	-side => 'top',
+	-fill => 'both',
+	-expand => 1,
+    );
+    my $bt = $tl->Button(
+	-text => 'Dismiss',
+	-default => 'active',
+	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
+    )->pack(
+	-side => 'bottom',
+	-fill => 'none',
+	-expand => 0,
+    );
+    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the GNU General Public License  as  published by the Free Software
+Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should  have received a copy of the GNU  General  Public License  along with
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+    return;
+}
+
+sub showhelp {
+    my $self = shift;
+    my $tl = $self->{MainWindow}->Toplevel();
+    $tl->title("Help");
+    my $tx = $tl->Scrolled('ROText',
+	-scrollbars => 'osoe',
+	-width => 80,
+	-wrap => 'none',
+    )->pack(
+	-side => 'top',
+	-fill => 'x',
+	-expand => 1,
+    );
+    my $bt = $tl->Button(
+	-text => 'Dismiss',
+	-default => 'active',
+	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
+    )->pack(
+	-side => 'bottom',
+	-fill => 'none',
+	-expand => 0,
+    );
+    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
+$program:
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+Arguments:
+    NONE
+Options:
+    -n, --dryrun
+        don't perform the actions, just check them
+    -q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+        increase or set output verbosity
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+    return;
+}
+
+sub refreshchild {
+    my $self = shift;
+    my $entry = shift;
+    my $hl = $self->{HList};
+    my @list = $hl->info('children', $entry);
+    if (@list) {
+	$hl->itemCreate($entry, 1,
+	    -itemtype => 'text',
+	    -text => $#list+1);
+    } else {
+	$hl->itemDelete($entry, 1) if ($hl->itemExists($entry, 1));
+	$hl->indicator('create', $entry,
+	    -itemtype => 'image',
+	    -image => 'doc');
+    }
+    foreach (@list) {
+	$self->refreshchild($_);
+    }
+}
+
+sub refresh {
+    my $self = shift;
+    my $hl = $self->{HList};
+    my @list = $hl->info('children');
+    foreach (@list) {
+	$self->refreshchild($_);
+    }
+}
+
+sub expandchild {
+    my $self = shift;
+    my $entry = shift;
+    my $hl = $self->{HList};
+    my @list = $hl->info('children', $entry);
+    if (@list) {
+	my $data = $hl->entrycget($entry,
+	    -data);
+	$data->{'opened'} = 1;
+	$hl->indicator('create', $entry,
+	    -itemtype => 'image',
+	    -image => 'obook');
+	foreach (@list) {
+	    $hl->show('entry', $_);
+	    $self->expandchild($_);
+	}
+    }
+}
+
+sub expandall {
+    my $self = shift;
+    my $hl = $self->{HList};
+    my @list = $hl->info('children');
+    foreach (@list) {
+	$self->expandchild($_);
+    }
+}
+
+sub collapsechild {
+    my $self = shift;
+    my $entry = shift;
+    my $hl = $self->{HList};
+    my @list = $hl->info('children', $entry);
+    if (@list) {
+	my $data = $hl->entrycget($entry,
+	    -data);
+	$data->{'opened'} = 0;
+	$hl->indicator('create', $entry,
+	    -itemtype => 'image',
+	    -image => 'cbook');
+	foreach (@list) {
+	    $self->collapsechild($_);
+	    $hl->hide('entry', $_);
+	}
+    }
+}
+
+sub collapseall {
+    my $self = shift;
+    my $hl = $self->{HList};
+    my @list = $hl->info('children');
+    foreach (@list) {
+	$self->collapsechild($_);
+    }
+}
+
+sub prefsok {
+    my $self = shift;
+    my $nb = shift;
+    $nb->destroy;
+    return;
+}
+
+sub prefsaccept {
+    my $self = shift;
+    my $nb = shift;
+    $nb->destroy;
+    return;
+}
+
+sub prefscancel {
+    my $self = shift;
+    my $nb = shift;
+    $nb->destroy;
+    return;
+}
+
+#
+# This subroutine is responsible for establishing the preferences which include
+# pereferences for the SNMP utility such as default MIB directories, default MIB
+# modules to load, and default MIB files to load.  As, well, several default
+# SNMP configuration items.  A la mode du jour, we just a notebook for the
+# preferences toplevel.
+#
+sub preferences {
+    my $self = shift;
+    my $data = $self->{data};
+    my $tl = $self->{MainWindow}->Toplevel();
+    $tl->title('Preferences');
+    my $nb = $tl->NoteBook(
+	-dynamicgeometry => 0,
+	-ipadx => 2,
+	-ipady => 2,
+	-backpagecolor => 'white',
+	-focuscolor => 'black',
+	-font => 'Helvetica 9',
+	-tabpadx => 5,
+	-tabpady => 5,
+    )->pack(
+	-side => 'top',
+	-fill => 'x',
+	-expand => 0,
+    );
+    my $f = $tl->Frame()->pack(
+	-side => 'top',
+	-fill => 'x',
+	-expand => 0,
+    );
+    my $b = $f->Button(
+	-text => 'OK',
+	-default => 'active', 
+	-command => [ \&prefsok, $self, $tl ],
+    )->grid(
+	-row => 0,
+	-column => 0,
+    );
+    my $b = $f->Button(
+	-text => 'Accept',
+	-command => [ \&prefsaccept, $self, $tl ],
+    )->grid(
+	-row => 0,
+	-column => 1,
+    );
+    my $b = $f->Button(
+	-text => 'Cancel',
+	-command => [ \&prefscancel, $self, $tl ],
+    )->grid(
+	-row => 0,
+	-column => 2,
+    );
+    return;
+}
+
+sub create {
+    my $self = shift;
+    my $data = {};
+    $self->{data} = $data;
+    $data->{recent} = [];
+    $self->{dirty} = 'no';
+    $self->{MainWindow} = Tk::MainWindow->new;
+    $self->{MainWindow}->title("STREAMS Manager");
+    $self->{MainWindow}->bind('<Destroy>', [ \&destroyed, $self ]);
+    $self->{MainWindow}->geometry('800x600');
+
+#    $self->{MainWindow}->optionAdd('*font' => '-*-helvetica-medium-r-*--*-100-*-*-*-*-*-*');
+#    $self->{MainWindow}->optionAdd('*.Button.*.font' => '-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
+#    $self->{MainWindow}->optionAdd('*.Label.*.font' => '-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
+    $self->{MainWindow}->optionAdd('*HighlightThickness' => 0);
+    $self->{MainWindow}->optionAdd('*Relief' => 'groove');
+    $self->{MainWindow}->optionAdd('*BorderThickness' => 1);
+    $self->{MainWindow}->optionAdd('*BorderWidth' => 1);
+    $self->{MainWindow}->optionAdd('*Border' => 1);
+    $self->{MainWindow}->optionAdd('*Scrollbar*Width' => 8);
+    $self->{MainWindow}->optionAdd('*Menu*Width' => 2);
+    $self->{MainWindow}->optionAdd('*Menu*Heigth' => 2);
+
+    $self->{MainWindow}->Pixmap('doc',
+	-data => <<EOF);
+/* XPM */
+static char * mini-doc_xpm[] = {
+"16 14 4 1",
+" 	c None",
+".	c black",
+"X	c white",
+"o	c gray50",
+"   .......      ",
+"   .XXXXX..     ",
+"   .XoooX.X.    ",
+"   .XXXXX....   ",
+"   .XooooXoo.o  ",
+"   .XXXXXXXX.o  ",
+"   .XooooooX.o  ",
+"   .XXXXXXXX.o  ",
+"   .XooooooX.o  ",
+"   .XXXXXXXX.o  ",
+"   .XooooooX.o  ",
+"   .XXXXXXXX.o  ",
+"   ..........o  ",
+"    oooooooooo  "};
+EOF
+    $self->{MainWindow}->Pixmap('cbook',
+    -data => <<EOF);
+/* XPM */
+static char * mini_book1_xpm[] = {
+"16 14 7 1",
+" 	c None",
+".	c #0000CD",
+"+	c #000000",
+"@	c #FF0000",
+"#	c #FFFF00",
+":	c #FFFFFF",
+"%	c #7F7F7F",
+"       ++       ",
+"     ++@@+      ",
+"   ++@@@@@+     ",
+" ++@@@@@@@@+    ",
+"+##@@@@@@@@@+   ",
+"++##@@@@@@@@@+  ",
+"+@+##@@@@@@@@@+ ",
+"+@@+##@@@@@@++  ",
+" +@@+##@@@++:%  ",
+"  +@@+##++::%%+ ",
+"   +@@++::%%++  ",
+"    +@+:%%++    ",
+"     ++%++      ",
+"      ++        "};
+EOF
+    $self->{MainWindow}->Pixmap('obook',
+    -data => <<EOF);
+/* XPM */
+static char * mini-book2_xpm[] = {
+"16 14 4 1",
+" 	c None",
+".	c black",
+"X	c gray50",
+"o	c white",
+"  ..            ",
+" .Xo.    ...    ",
+" .Xoo. ..oo.    ",
+" .Xooo.Xooo...  ",
+" .Xooo.oooo.X.  ",
+" .Xooo.Xooo.X.  ",
+" .Xooo.oooo.X.  ",
+" .Xooo.Xooo.X.  ",
+" .Xooo.oooo.X.  ",
+"  .Xoo.Xoo..X.  ",
+"   .Xo.o..ooX.  ",
+"    .X..XXXXX.  ",
+"    ..X.......  ",
+"     ..         "};
+EOF
+
+    $data->{directory} = '/usr/share/snmp/mibs';
+    $self->{Menu} = $self->{MainWindow}->Menu(
+	-type => 'menubar',
+	-relief => 'groove',
+    );
+    $self->{MainWindow}->configure(-menu => $self->{Menu});
+    $self->{Dialog} = $self->{MainWindow}->Dialog(
+	-title => 'MIB Selection',
+	-text => 'Please input the MIB to load.',
+	-default_button => 'Cancel',
+	-buttons => [ 'Ok', 'Cancel', 'Help' ],
+    );
+    $self->{FileMenu} = $self->{Menu}->Menu(
+	-type => 'normal',
+	-title => 'File Menu',
+	-tearoff => 0,
+    );
+    $self->{FileMenu}->add('command',
+	-command => [ \&newfile, $self ],
+	-label => 'New',
+	-underline => 0,
+	-accelerator => '~N',
+    );
+    $self->{FileMenu}->add('command',
+	-label => 'Open...',
+	-command => [ \&openfile, $self ],
+	-underline => 0,
+	-accelerator => '~O',
+    );
+    $self->{FileMenu}->add('command',
+	-command => [ \&save, $self ],
+	-label => 'Save',
+	-underline => 0,
+    );
+    $self->{FileMenu}->add('command',
+	-command => [ \&saveas, $self ],
+	-label => 'Save As...',
+	-underline => 5,
+    );
+    $self->{FileMenu}->add('command',
+	-command => [ \&closefile, $self ],
+	-label => 'Close',
+	-underline => 0,
+    );
+    $self->{FileMenu}->add('separator');
+    $self->{FileMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Properties...',
+    );
+    $self->{FileMenu}->add('separator');
+    $self->{FileMenu}->add('command',
+	-command => [ \&loadmib, $self ],
+	-label => 'Load MIB',
+	-underline => 0,
+    );
+    $self->{FileMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Unload MIB',
+	-underline => 0,
+    );
+    $self->{RecentMenu} = $self->{FileMenu}->Menu(
+	-title => 'Recent Files',
+	-tearoff => 0,
+    );
+    $self->{FileMenu}->add('cascade',
+	-menu => $self->{RecentMenu},
+	-label => 'Recent MIBs...',
+	-underline => 0,
+	-state => 'disabled',
+    );
+    $self->{FileMenu}->add('separator');
+    $self->{FileMenu}->add('command',
+	-command => [ \&exit, $self ],
+	-label => 'Exit All',
+	-underline => 1,
+    );
+    $self->{Menu}->add('cascade',
+	-menu => $self->{FileMenu},
+	-label => 'File',
+	-underline => 0,
+    );
+
+    $self->{EditMenu} = $self->{Menu}->Menu(
+	-title => 'Edit Menu',
+	-tearoff => 0,
+    );
+    $self->{EditMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Undo',
+	-underline => 0,
+	-state => 'disabled',
+	-accelerator => '<Control-u>',
+    );
+    $self->{EditMenu}->bind('all', '<Control-u>', sub { return; });
+    $self->{EditMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Redo',
+	-underline => 0,
+	-state => 'disabled',
+	-accelerator => '<Control-r>',
+    );
+    $self->{EditMenu}->bind('all', '<Control-r>', sub { return; });
+    $self->{EditMenu}->add('separator');
+    $self->{EditMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Cut',
+	-underline => 0,
+	-state => 'normal',
+	-accelerator => '<Control-x>',
+    );
+    $self->{EditMenu}->bind('all', '<Control-x>', sub { return; });
+    $self->{EditMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Copy',
+	-underline => 3,
+	-state => 'normal',
+	-accelerator => '<Control-c>',
+    );
+    $self->{EditMenu}->bind('all', '<Control-c>', sub { return; });
+    $self->{EditMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Paste',
+	-underline => 0,
+	-state => 'disabled',
+	-accelerator => '<Control-v>',
+    );
+    $self->{EditMenu}->bind('all', '<Control-v>', sub { return; });
+    $self->{EditMenu}->add('separator');
+    $self->{EditMenu}->add('command',
+	-command => sub { return; },
+	-label => 'Delete',
+	-underline => 0,
+	-state => 'normal',
+	-accelerator => '<Delete>',
+    );
+    $self->{EditMenu}->bind('all', '<Delete>', sub { return; });
+    $self->{EditMenu}->add('separator');
+    $self->{EditMenu}->add('command',
+	-command => [ \&preferences, $self ],
+	-label => 'Preferences...',
+	-underline => 1,
+	-state => 'normal',
+    );
+    $self->{Menu}->add('cascade',
+	-menu => $self->{EditMenu},
+	-label => 'Edit',
+	-underline => 0,
+    );
+
+    $self->{ViewMenu} = $self->{Menu}->Menu(
+	-title => 'View Menu',
+	-tearoff => 0,
+    );
+    $self->{ViewMenu}->add('command',
+	-command => [ \&expandall, $self ],
+	-label => 'Expand All',
+	-underline => 0,
+	-accelerator => '~E',
+    );
+    $self->{ViewMenu}->add('command',
+	-command => [ \&collapseall, $self ],
+	-label => 'Collapse All',
+	-underline => 0,
+	-accelerator => '~C',
+    );
+    $self->{Menu}->add('cascade',
+	-menu => $self->{ViewMenu},
+	-label => 'View',
+	-underline => 0,
+    );
+
+    $self->{MibMenu} = $self->{Menu}->Menu(
+	-title => 'Mib Menu',
+	-tearoff => 0,
+    );
+    $self->{MibMenu}->add('command',
+	-command => [\&addmibdir, $self],
+	-label => 'Add MIB Directory',
+	-underline => 0,
+	-accelerator => '~F',
+    );
+    $self->{MibMenu}->add('command',
+	-command => [\&loadmibmod, $self],
+	-label => 'Load MIB Module',
+	-underline => 9,
+	-accelerator => '~L',
+    );
+    $self->{MibMenu}->add('command',
+	-command => [\&loadmibfile, $self],
+	-label => 'Load MIB File',
+	-underline => 9,
+	-accelerator => '~F',
+    );
+    $self->{MibDirs} = $self->{MibMenu}->Menu(
+	-title => 'MIB Directories',
+	-tearoff => 1,
+    );
+    $self->{MibMods} = $self->{MibMenu}->Menu(
+	-title => 'MIB Modules',
+	-tearoff => 1,
+    );
+    $self->{MibFiles} = $self->{MibMenu}->Menu(
+	-title => 'MIB Files',
+	-tearoff => 1,
+    );
+    $self->{MibMenu}->add('separator');
+    $self->{MibMenu}->add('cascade',
+	-menu => $self->{MibDirs},
+	-label => 'MIB Directories',
+	-underline => 4,
+	-state => 'disabled',
+    );
+    $self->{MibMenu}->add('cascade',
+	-menu => $self->{MibMods},
+	-label => 'MIB Modules',
+	-underline => 4,
+	-state => 'disabled',
+    );
+    $self->{MibMenu}->add('cascade',
+	-menu => $self->{MibFiles},
+	-label => 'MIB Files',
+	-underline => 4,
+	-state => 'disabled',
+    );
+    $self->{Menu}->add('cascade',
+	-menu => $self->{MibMenu},
+	-label => 'MIBs',
+	-underline => 0,
+    );
+
+    $self->{About} = $self->{Menu}->Menu(
+	-title => 'About',
+	-tearoff => 0,
+    );
+    $self->{About}->add('command',
+	-command => [ \&showversion, $self ],
+	-label => 'Version',
+	-underline => 0,
+    );
+    $self->{About}->add('command',
+	-command => [ \&showusage, $self ],
+	-label => 'Usage',
+	-underline => 0,
+    );
+    $self->{About}->add('command',
+	-command => [ \&showcopying, $self ],
+	-label => 'Copying',
+	-underline => 0,
+    );
+    $self->{About}->add('command',
+	-command => [ \&showhelp, $self ],
+	-label => 'Help',
+	-underline => 0,
+    );
+    $self->{Menu}->add('separator');
+    $self->{Menu}->add('cascade',
+	-menu => $self->{About},
+	-label => 'About',
+	-underline => 0,
+    );
+
+    $self->{HList} = $self->{MainWindow}->Scrolled('HList',
+	-scrollbars => 'osoe',
+	-bg => 'white',
+	-columns => 2,
+	-width => 36,
+	-indicator => 1,
+	-indicatorcmd => [ \&indic, $self ],
+	-browsecmd => [ \&browse, $self ],
+	-command => [ \&hlistsel, $self ],
+	-drawbranch => 1,
+	-indent => 20,
+	-header => 1,
+	-selectmode => 'single',
+	-separator => '.',
+    )->pack(
+	-side => 'left',
+	-fill => 'y',
+	-expand => 0,
+    );
+    $self->{HList}->header('create', 0,
+	-itemtype => 'text',
+	-text => 'Name');
+    $self->{HList}->header('create', 1,
+	-itemtype => 'text',
+	-text => 'Children');
+    $self->{Adjuster} = $self->{MainWindow}->Adjuster(
+	-side => 'left',
+	-widget => $self->{HList})->pack(
+	-side => 'left',
+	-fill => 'y',
+	-expand => 0,
+    );
+    $self->{Canvas} = $self->{MainWindow}->Scrolled('Canvas',
+	-scrollbars => 'osoe',
+	-bg => 'white')->pack(
+	-side => 'left',
+	-fill => 'both',
+	-expand => 1,
+    );
+    $SNMP::save_descriptions = 1;
+    SNMP::initMib();
+    SNMP::addMibDirs(qw(/home/brian/os8/mibs /home/brian/os8/streams/src/mibs));
+    SNMP::loadModules('OPENSS7-STREAMS-MIB');
+    $self->{MIB} = $SNMP::MIB{'1.3.6.1'};
+    $self->addtree('', $self->{MIB});
+    push @main::myapps, $self;
+    return;
+}
+
+sub indic {
+    my $self = shift;
+    my $hl = $self->{HList};
+    #print "Indicating ".join(".", @_);
+    if ($_[1] =~ /Activate/) {
+	my $data = $hl->entrycget($_[0],
+	    -data);
+	if ($data->{'opened'}) {
+	    $data->{'opened'} = 0;
+	    my @list = $hl->info('children', $_[0]);
+	    if (@list) {
+		$hl->indicator('create', $_[0],
+		    -itemtype => 'image',
+		    -image => 'cbook');
+		$hl->itemCreate($_[0], 1,
+		    -itemtype => 'text',
+		    -text => $#list+1);
+		foreach (@list) {
+		    $hl->hide('entry', $_);
+		}
+	    }
+	} else {
+	    $data->{'opened'} = 1;
+	    my @list = $hl->info('children', $_[0]);
+	    if (@list) {
+		$hl->indicator('create', $_[0],
+		    -itemtype => 'image',
+		    -image => 'obook');
+		$hl->itemCreate($_[0], 1,
+		    -itemtype => 'text',
+		    -text => $#list+1);
+		foreach (@list) {
+		    $hl->show('entry', $_);
+		}
+	    }
+	}
+    }
+}
+
+sub browse {
+    my $self = shift;
+    my $hl = $self->{HList};
+    #print "Browsing ".join(".", @_);
+}
+
+sub hlistsel {
+    my $self = shift;
+    my $hl = $self->{HList};
+    #print "Selecting ".join(".", @_);
+    my $data = $hl->entrycget($_[0],
+	-data);
+    my $mib = $data->{'mib'};
+    my $tl = $self->{MainWindow}->Toplevel();
+    $tl->title($mib->{'label'});
+    my $tx = $tl->Scrolled('ROText',
+	-scrollbars => 'osoe',
+	-width => 80,
+	-wrap => 'none',
+    )->pack(
+	-side => 'top',
+	-fill => 'x',
+	-expand => 1,
+    );
+    my $bt = $tl->Button(
+	-text => 'Dismiss',
+	-default => 'active',
+	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
+    )->pack(
+	-side => 'bottom',
+	-fill => 'none',
+	-expand => 0,
+    );
+    my $enums = '';
+    foreach my $e ( sort keys %{$mib->{'enums'}} ) {
+	$enums .= ",\n         " unless $enums eq '';
+	$enums .= "$e\($mib->{enums}->{$e}\)";
+    }
+    my $indices = '';
+    foreach my $i ( @{$mib->{'indexes'}} ) {
+	$indices .= ",\n         " unless $indices eq '';
+	$indices .= "$i";
+    }
+    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
+Object:  $mib->{'objectID'}
+Label:   $mib->{'label'}
+Module:  $mib->{'moduleID'}
+Type:    $mib->{'type'}
+Access:  $mib->{'access'}
+Status:  $mib->{'status'}
+Syntax:  $mib->{'syntax'}
+Enums:   $enums
+Indexes: $indices
+Units:   $mib->{'units'}
+Hint:    $mib->{'hint'}
+Refer:   $mib->{'reference'}
+Description:
+         $mib->{'description'}
+EOF
+#    foreach my $k ( sort keys %{$mib} ) {
+#	print "$k: $mib->{$k}";
+#	if (ref($mib->{$k}) eq 'ARRAY') {
+#	    foreach my $i ( @{$mib->{$k}} ) {
+#		print "$k: $i";
+#	    }
+#	} elsif (ref($mib->{$k}) eq 'HASH') {
+#	    foreach my $i ( sort keys %{$mib->{$k}} ) {
+#		print "$k: $i: $mib->{$k}->{$i}";
+#	    }
+#	} elsif (UNIVERSAL::isa($mib->{$k}, 'ARRAY')) {
+#	    foreach my $i ( $mib->{$k} ) {
+#		print "$k: $i";
+#	    }
+#	} elsif (UNIVERSAL::isa($mib->{$k}, 'HASH')) {
+#	    foreach my $i ( sort keys %{$mib->{$k}} ) {
+#		print "$k: $i: $mib->{$k}{$i}";
+#	    }
+#	}
+#	if ($k eq 'indexes') {
+#	    foreach my $i ( @{$mib->{$k}} ) {
+#		print "$k: $i";
+#	    }
+#	}
+#
+#    }
+    return;
+}
+
+sub itempopup {
+    my $self = shift;
+    my $entry = shift;
+    print "<Button-3> press for $entry";
+}
+
+sub addtree {
+    my $self = shift;
+    my $parent = shift;
+    my $mib = shift;
+    my $hl = $self->{HList};
+    my $entry;
+    my @list = ( @{$mib->{'children'}} );
+    if (@list) {
+	$entry = $hl->addchild($parent,
+	    -itemtype => 'text',
+	    -text => $mib->{'label'},
+	    -data => { opened => 0, mib => $mib, },
+	);
+	$hl->indicator('create', $entry,
+	    -itemtype => 'image',
+	    -image => 'cbook',
+	);
+	$hl->itemCreate($entry, 1,
+	    -itemtype => 'text',
+	    -text => $#list+1,
+	);
+	foreach (@list) {
+	    $self->addtree($entry, $_);
+	}
+    } else {
+	$entry = $hl->addchild($parent,
+	    -itemtype => 'text',
+	    -text => $mib->{'label'},
+	    -data => { opened => 1, mib => $mib, },
+	);
+	$hl->indicator('create', $entry,
+	    -itemtype => 'image',
+	    -image => 'doc',
+	);
+    }
+    $hl->hide('entry', $entry) unless $parent eq '';
+    $hl->bind('entry', '<Button-3>', [\&itempopup, $self, $entry]);
+}
+
+package main;
+use strict;
+
+new myapp();
+
+Tk::MainLoop;
+
+exit;
+
+# =============================================================================
+#
+# $Log: mibbrowser,v $
+# Revision 0.9.2.1  2008-10-07 13:17:35  brian
+# - added perltk files
+#
+# =============================================================================
+# vim: ft=perl sw=4
