@@ -1,3 +1,7 @@
+2008-10-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/kernel.m4: more overrides for cflagcheck
+
 2008-09-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* streams/streams.spec.in: initial rework of spec files
