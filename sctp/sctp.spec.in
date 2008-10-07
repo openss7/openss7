@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.132 $) $Date: 2008-10-01 03:27:02 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.133 $) $Date: 2008-10-07 13:28:25 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-01 03:27:02 $ by $Author: brian $
+# Last Modified $Date: 2008-10-07 13:28:25 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1643,7 +1643,7 @@ make check
 # ---------------------------------------------------------------------------
 
 # in case it was not cleaned
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot} || :
 
 # if we are going to create debug packages, we need to install unstripped
 # binaries; otherwise use libtoolized install-strip to strip binaries, modules,
@@ -1659,7 +1659,7 @@ make DESTDIR="%{buildroot}" RPM_BUILD_ROOT="%{buildroot}" \
 # cp -pf %{mybuilddir}/%{makedev} .
 
 # get the installed info directory out of the build root
-[ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
+[ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir" || :
 
 function package_source() {
 # remove include2 symbolic link
@@ -1697,7 +1697,7 @@ package_source
 %clean
 # ---------------------------------------------------------------------------
 
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
+[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot} || :
 
 %pre
 # ---------------------------------------------------------------------------
@@ -1784,9 +1784,9 @@ if [ $arg = 1 ] ; then : # fresh install
     list="%{initfiles}" ; for i in $list %{nonrpminit} ; do
         if [ -f %_initrddir/$i ] ; then
             # Find the best working init script removal tool
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
+            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
+            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
         fi
     done
 %endif
@@ -1916,9 +1916,9 @@ if [ $1 = 1 ] ; then : # fresh install
     # This is the end of a fresh install, add init scripts if we can
     list="%{initfiles}" ; for i in $list ; do
         # Find the best working init script installation tool
-        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue
-        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue
-        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
+        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || :
+        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || :
+        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || :
     done
 %endif
 %if %{HAVE_infofiles}
@@ -2042,9 +2042,9 @@ if [ $1 = 2 ] ; then : # upgrade
     # This is the end of an upgrade, add init scripts if we can
     list="%{initfiles}" ; for i in $list ; do
         # Find the best working init script installation tool
-        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue
-        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue
-        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue
+        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || :
+        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || :
+        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || :
     done
 %endif
 fi
@@ -2156,9 +2156,9 @@ if [ $1 = 0 ] ; then : # final removal
             # rpm is not too good about the order of removal
             /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
             # Find the best working init script removal tool
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue
+            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
+            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
         fi
     done
 %endif
@@ -3209,6 +3209,9 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
+# Revision 0.9.2.133  2008-10-07 13:28:25  brian
+# - make sure some commands do not fail
+#
 # Revision 0.9.2.132  2008-10-01 03:27:02  brian
 # - typo
 #
