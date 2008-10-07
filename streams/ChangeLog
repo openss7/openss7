@@ -1,3 +1,9 @@
+2008-10-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: documented bug #022.
+	* src/modules/sth.c: fixed CDROM ioctl bug reported by
+	  Sylvain Chouler for DGAC.
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/clone.c: add mod version, truncate logs
