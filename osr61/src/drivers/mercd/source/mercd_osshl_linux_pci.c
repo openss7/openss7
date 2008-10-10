@@ -1919,7 +1919,7 @@ void linux_pci_ww_recv_bigmsg_descriptor_table_from_strm_buffers(void *rcvPtr)
         pesbfrtn = (pmerc_uchar_t)mercd_allocator(sizeof(frtn_t));
 #endif
         pesbfrtn->free_func = supp_esb_free;
-        pesbfrtn->free_arg = pesbuffer;
+        pesbfrtn->free_arg = (caddr_t) pesbuffer;
         Msg = abstract_esballoc(pesbuffer, szBigMsg, BPRI_MED, pesbfrtn);
         pbigmsg->host_address = (pmerc_void_t)Msg;
         pbigmsg->board_address =  (pmerc_void_t)virt_to_phys((pmerc_void_t)pesbuffer);

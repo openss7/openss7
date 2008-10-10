@@ -1,3 +1,9 @@
+2008-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ip_to_dlpi.c: remove signed pointer warnings
+	* src/drivers/ldl.c: remove signed pointer warnings
+	* src/modules/ip_strm_mod.c: remove signed pointer warnings
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/cd.c: add mod version, truncate logs

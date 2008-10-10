@@ -2820,7 +2820,7 @@ rcv_func(struct sk_buff *skb, struct ldldev *dev, struct packet_type *pt)
  *  Try to send an unitdata error upstream
  */
 STATIC void
-send_uderror(struct dl *dl, char *addr, int addrlen, dl_ulong err, dl_ulong uerr)
+send_uderror(struct dl *dl, unsigned char *addr, int addrlen, dl_ulong err, dl_ulong uerr)
 {
 	mblk_t *mp;
 	dl_uderror_ind_t *nakp;
@@ -3050,7 +3050,7 @@ tx_func_proto(struct dl *dl, mblk_t *mp)
 #ifdef KERNEL_2_1
 	skb_reset_network_header(skb);
 #endif
-	if (dl->mkhdr(dl, (char *) reqp + reqp->dl_dest_addr_offset, dlen, skb) != 1) {
+	if (dl->mkhdr(dl, (unsigned char *) reqp + reqp->dl_dest_addr_offset, dlen, skb) != 1) {
 #ifdef KERNEL_2_1
 		kfree_skb(skb);
 #else
@@ -4332,7 +4332,7 @@ ioc_findppa(struct dl *dl, struct iocblk *iocp, mblk_t *mp)
 	/* Find device with this name */
 	for (dev = (struct ldldev *) first_net_device(), ppa = 0; dev != NULL;
 	     dev = (struct ldldev *) next_net_device((struct net_device *) dev), ++ppa)
-		if (!strcmp(dev->name, dp->b_rptr))
+		if (!strcmp(dev->name, (char *) dp->b_rptr))
 			break;
 	if (dev == NULL)
 		return ioc_nak(dl, mp);	/* No such device */

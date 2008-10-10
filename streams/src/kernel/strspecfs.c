@@ -356,7 +356,7 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 		struct qstr name;
 		char buf[25];
 
-		name.name = buf;
+		name.name = (typeof(name.name)) buf;
 		if ((cmin = cmin_get(cdev, getminor(dev))))
 			name.len = snprintf(buf, sizeof(buf), "STR %s/%s",
 					    cdev->d_name, cmin->n_name);
@@ -513,7 +513,7 @@ spec_dir_i_lookup(struct inode *dir, struct dentry *new)
 
 		_ptrace(("found cdev %s\n", cdev->d_name));
 		/* check if the name is registered as a minor device node name */
-		if ((cmin = cmin_find(cdev, new->d_name.name))) {
+		if ((cmin = cmin_find(cdev, (char *) new->d_name.name))) {
 			struct inode *inode;
 
 			_ptrace(("found cmin %s\n", cmin->n_name));
@@ -721,7 +721,7 @@ spec_root_i_lookup(struct inode *dir, struct dentry *new)
 
 	_ptrace(("looking up %s\n", new->d_name.name));
 	/* this will also attempt to demand load the "streams-%s" module if required */
-	if ((cdev = cdev_find(new->d_name.name))) {
+	if ((cdev = cdev_find((char *) new->d_name.name))) {
 		struct inode *inode;
 
 		_ptrace(("found cdev %s\n", cdev->d_name));

@@ -2242,7 +2242,7 @@ mtp_recv_err(struct mtp *mtp, queue_t *q, mblk_t *mp, int err)
 		if (err < 0)
 			err = UA_ECODE_PROTOCOL_ERROR;
 	      error:
-		return mtp_send_mgmt_err(mtp, q, mp, err, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+		return mtp_send_mgmt_err(mtp, q, mp, err, (caddr_t) mp->b_rptr, mp->b_wptr - mp->b_rptr);
 	}
 	return (err);
 }

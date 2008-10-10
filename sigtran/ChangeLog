@@ -1,3 +1,15 @@
+2008-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/isua_as.c: remove signed pointer warnings
+	* src/drivers/m2ua_as.c: remove signed pointer warnings
+	* src/drivers/m3ua_as.c: remove signed pointer warnings
+	* src/drivers/sua_as.c: remove signed pointer warnings
+	* src/drivers/tua_as.c: remove signed pointer warnings
+	* src/drivers/ua_as.c: remove signed pointer warnings
+	* src/modules/m2pa_sl.c: remove signed pointer warnings
+	* src/modules/m2ua_as.c: remove signed pointer warnings
+	* src/modules/m3ua_as.c: remove signed pointer warnings
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/isua_as.c: add mod version, truncate logs

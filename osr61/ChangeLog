@@ -1,3 +1,14 @@
+2008-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/dlgn/source/dlgn.c: remove signed pointer warnings
+	* src/drivers/dlgn/source/srmap.c: remove signed pointer warnings
+	* src/drivers/dlgn/source/srpm.c: remove signed pointer warnings
+	* src/drivers/gncfd/source/cfd.c: remove signed pointer warnings
+	* src/drivers/mercd/source/mercd_osshl_linux_pci.c: remove signed pointer warnings
+	* src/drivers/mercd/source/msdstrmutl.c: remove signed pointer warnings
+	* src/drivers/mercd/source/msdwwinitmngr.c: remove signed pointer warnings
+	* src/drivers/mercd/source/msdwwsnd.c: remove signed pointer warnings
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/ctimod/ctimod.c: add mod version, truncate logs

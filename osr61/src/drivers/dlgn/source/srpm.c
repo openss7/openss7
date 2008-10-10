@@ -871,7 +871,7 @@ GN_BOARD *bdp;
 
    /* Single Board Start Support Only If Enabled */
    if (Single_Board_SS && (PCIBoardId < 0x10)) {
-       PciIntEnb(MAP_ADDR(GET_CFG_PHY_ADDR(PCIBoardId), 0x80), PCIBoardId);
+       PciIntEnb((char *) MAP_ADDR(GET_CFG_PHY_ADDR(PCIBoardId), 0x80), PCIBoardId);
    }
    
    /* Display the board start-up message */
@@ -958,7 +958,7 @@ GN_BOARD *bdp;
    
    /* Single Board Stop Support Only If Enabled */
    if (Single_Board_SS && (PCIBoardId < 0x10)) {
-       PciIntDis(MAP_ADDR(GET_CFG_PHY_ADDR(PCIBoardId), 0x80), PCIBoardId);
+       PciIntDis((char *) MAP_ADDR(GET_CFG_PHY_ADDR(PCIBoardId), 0x80), PCIBoardId);
    }
 
    return (0);

@@ -1,3 +1,11 @@
+2008-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: remove signed pointer warnings
+	* src/drivers/rawip.c: remove signed pointer warnings
+	* src/drivers/tcp.c: remove signed pointer warnings
+	* src/drivers/udp.c: remove signed pointer warnings
+	* src/drivers/sctp2.c: remove signed pointer warnings
+
 2008-09-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: switch back to old (slower) locking

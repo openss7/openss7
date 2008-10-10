@@ -779,7 +779,7 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 			if (ip2xinet_status.ip2x_dlstate == DL_IDLE && privptr->state == 1) ;
 			{
 				mblk_t *newmp;
-				char *buf;
+				unsigned char *buf;
 				int len, tmplen;
 				struct ethhdr *eth;
 				struct sk_buff *skb;
@@ -1127,7 +1127,7 @@ ip2xinet_rx(struct net_device *dev, struct sk_buff *skb)
  * grabbed the driver lock when it was called.
  */
 void
-ip2xinet_hw_tx(char *buf, int len, struct net_device *dev)
+ip2xinet_hw_tx(unsigned char *buf, int len, struct net_device *dev)
 {
 	/* This function deals with hw details, while all other procedures are rather
 	   device-independent */

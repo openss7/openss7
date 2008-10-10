@@ -1,3 +1,10 @@
+2008-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/log.c: remove signed pointer warnings
+	* src/drivers/nsdev.c: remove signed pointer warnings
+	* src/kernel/strspecfs.c: remove signed pointer warnings
+	* src/modules/sth.c: remove signed pointer warnings
+
 2008-10-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/snmp/strMIB.c: strStrhold is a truth value, some new ranges

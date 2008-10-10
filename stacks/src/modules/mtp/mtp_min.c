@@ -492,7 +492,7 @@ struct sl {
 	struct bufq buff;		/* retrieval buffer */
 	uint fsnc;			/* retreived BSNT */
 	uint reason;			/* reason for failure */
-	unsigned char tdata[16];	/* test data */
+	char tdata[16];			/* test data */
 	size_t tlen;			/* test length */
 	mtp_timers_sl_t timers;		/* SL timers */
 	mtp_opt_conf_sl_t config;	/* SL configuration */
@@ -2912,7 +2912,7 @@ mtp_build_upt(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc,
 }
 static inline mblk_t *
 mtp_build_sltm(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc,
-	       uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+	       uint32_t opc, uint sls, uint slc, caddr_t data, size_t dlen)
 {
 	mtp_build_rl(msg, pvar, ni, 3, 1, dpc, opc, sls);
 	mtp_build_slc(msg, slc);
@@ -2924,7 +2924,7 @@ mtp_build_sltm(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc
 }
 static inline mblk_t *
 mtp_build_slta(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc,
-	       uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+	       uint32_t opc, uint sls, uint slc, caddr_t data, size_t dlen)
 {
 	mtp_build_rl(msg, pvar, ni, 3, 1, dpc, opc, sls);
 	mtp_build_slc(msg, slc);
@@ -2936,7 +2936,7 @@ mtp_build_slta(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc
 }
 static inline mblk_t *
 mtp_build_ssltm(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc,
-		uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+		uint32_t opc, uint sls, uint slc, caddr_t data, size_t dlen)
 {
 	mtp_build_rl(msg, pvar, ni, 3, 2, dpc, opc, sls);
 	mtp_build_slc(msg, slc);
@@ -2948,7 +2948,7 @@ mtp_build_ssltm(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dp
 }
 static inline mblk_t *
 mtp_build_sslta(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc,
-		uint32_t opc, uint sls, uint slc, unsigned char *data, size_t dlen)
+		uint32_t opc, uint sls, uint slc, caddr_t data, size_t dlen)
 {
 	mtp_build_rl(msg, pvar, ni, 3, 2, dpc, opc, sls);
 	mtp_build_slc(msg, slc);
@@ -2960,7 +2960,7 @@ mtp_build_sslta(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dp
 }
 static inline mblk_t *
 mtp_build_user(queue_t *q, struct mtp_msg *msg, uint pvar, uint ni, uint32_t dpc,
-	       uint32_t opc, uint sls, uint mp, uint si, unsigned char *data, size_t dlen)
+	       uint32_t opc, uint sls, uint mp, uint si, caddr_t data, size_t dlen)
 {
 	mtp_build_rl(msg, pvar, ni, mp, si, dpc, opc, sls);
 	msg->data = data;
@@ -3382,7 +3382,7 @@ mtp_send_upt(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 }
 static inline int
 mtp_send_sltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	      uint slc, unsigned char *data, size_t dlen)
+	      uint slc, caddr_t data, size_t dlen)
 {
 	mblk_t *mp;
 	struct mtp_msg msg = { 0, };
@@ -3393,7 +3393,7 @@ mtp_send_sltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t
 }
 static inline int
 mtp_send_slta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	      uint slc, unsigned char *data, size_t dlen)
+	      uint slc, caddr_t data, size_t dlen)
 {
 	mblk_t *mp;
 	struct mtp_msg msg = { 0, };
@@ -3404,7 +3404,7 @@ mtp_send_slta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t
 }
 static inline int
 mtp_send_ssltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	       uint slc, unsigned char *data, size_t dlen)
+	       uint slc, caddr_t data, size_t dlen)
 {
 	mblk_t *mp;
 	struct mtp_msg msg = { 0, };
@@ -3415,7 +3415,7 @@ mtp_send_ssltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_
 }
 static inline int
 mtp_send_sslta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	       uint slc, unsigned char *data, size_t dlen)
+	       uint slc, caddr_t data, size_t dlen)
 {
 	mblk_t *mp;
 	struct mtp_msg msg = { 0, };
@@ -3426,7 +3426,7 @@ mtp_send_sslta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_
 }
 static inline int
 mtp_send_user(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	      uint dp, uint si, unsigned char *data, size_t dlen)
+	      uint dp, uint si, caddr_t data, size_t dlen)
 {
 	mblk_t *mp;
 	struct mtp_msg msg = { 0, };
@@ -4457,7 +4457,7 @@ mtp_dec_sltm(mblk_t *mp, struct mtp_msg *msg)
 			break;
 		msg->slc = msg->sls;
 		msg->dlen = *mp->b_rptr++ >> 4;
-		msg->data = mp->b_rptr;
+		msg->data = (caddr_t) mp->b_rptr;
 		if (mp->b_rptr + msg->dlen > mp->b_wptr)
 			break;
 		return (0);
@@ -4466,7 +4466,7 @@ mtp_dec_sltm(mblk_t *mp, struct mtp_msg *msg)
 			break;
 		msg->slc = *mp->b_rptr & 0x0f;
 		msg->dlen = *mp->b_rptr++ >> 4;
-		msg->data = mp->b_rptr;
+		msg->data = (caddr_t) mp->b_rptr;
 		if (mp->b_wptr < mp->b_rptr + msg->dlen)
 			break;
 		return (0);
@@ -4487,7 +4487,7 @@ mtp_dec_user(mblk_t *mp, struct mtp_msg *msg)
 {
 	if (mp->b_wptr < mp->b_rptr)
 		goto error;
-	msg->data = mp->b_rptr;
+	msg->data = (caddr_t) mp->b_rptr;
 	msg->dlen = mp->b_wptr - mp->b_rptr;
 	return (0);
       error:

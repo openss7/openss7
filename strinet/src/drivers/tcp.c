@@ -1864,7 +1864,7 @@ t_size_negotiate_options(const struct tpi *t, const unsigned char *ip, size_t il
  * Calculates the overall T_OPTMGMT_ACK flag result from individual results.
  */
 STATIC uint
-t_overall_result(uint * overall, uint result)
+t_overall_result(t_scalar_t * overall, uint result)
 {
 	switch (result) {
 	case T_NOTSUPPORT:
@@ -6990,7 +6990,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, short, 0444);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the driver. (0 for allocation.)");
 

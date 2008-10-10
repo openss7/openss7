@@ -640,8 +640,8 @@ struct sl {
 	uint bsnt;			/* BSNT retrieved locally */
 	struct bufq rbuf;		/* retrieval buffer */
 	uint reason;
-	uchar tdata[16];		/* SL test data */
-	uchar tlen;			/* SL test data length */
+	char tdata[16];			/* SL test data */
+	uint tlen;			/* SL test data length */
 	struct mtp_timers_sl timers;	/* signalling link timers */
 	struct mtp_opt_conf_sl config;	/* signalling link configuration */
 	struct mtp_stats_sl statsp;	/* signalling link statistics periods */
@@ -4034,7 +4034,7 @@ mtp_enc_upm(mblk_t *mp, struct sp *sp, uint dest, uint upi)
  *  ------------------------+-------^-------+
  */
 static int
-mtp_enc_sltm(mblk_t *mp, struct sp *sp, uint slc, size_t dlen, uchar *data)
+mtp_enc_sltm(mblk_t *mp, struct sp *sp, uint slc, size_t dlen, caddr_t data)
 {
 	switch (sp->na.na->option.pvar & SS7_PVAR_MASK) {
 	default:
@@ -5584,7 +5584,7 @@ mtp_transfer_ind(queue_t *q, struct mtp *mtp, struct mtp_msg *m)
 		struct mtp_addr src = { ni:m->ni, pc:m->opc, si:m->si };
 		struct mtp_addr dst = { ni:m->ni, pc:m->dpc, si:m->si };
 
-		dp->b_rptr = m->data;
+		dp->b_rptr = (unsigned char *) m->data;
 		dp->b_wptr = dp->b_rptr + m->dlen;
 		switch (mtp->type) {
 		default:
@@ -6370,7 +6370,7 @@ mtp_send_upt(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
 }
 static int
 mtp_send_sltm(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
-	      uint sls, uint slc, unsigned char *data, size_t dlen, struct sl *sl)
+	      uint sls, uint slc, caddr_t data, size_t dlen, struct sl *sl)
 {
 	mblk_t *bp;
 	uint rl_sls = ((sp->na.na->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI) ? sls : slc;
@@ -6384,7 +6384,7 @@ mtp_send_sltm(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
 }
 static int
 mtp_send_slta(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
-	      uint sls, uint slc, unsigned char *data, size_t dlen)
+	      uint sls, uint slc, caddr_t data, size_t dlen)
 {
 	mblk_t *bp;
 	uint rl_sls = ((sp->na.na->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI) ? sls : slc;
@@ -6398,7 +6398,7 @@ mtp_send_slta(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
 }
 static int
 mtp_send_ssltm(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
-	       uint sls, uint slc, unsigned char *data, size_t dlen, struct sl *sl)
+	       uint sls, uint slc, caddr_t data, size_t dlen, struct sl *sl)
 {
 	mblk_t *bp;
 	uint rl_sls = ((sp->na.na->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI) ? sls : slc;
@@ -6412,7 +6412,7 @@ mtp_send_ssltm(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
 }
 static int
 mtp_send_sslta(queue_t *q, struct sp *sp, uint ni, uint32_t dpc, uint32_t opc,
-	       uint sls, uint slc, unsigned char *data, size_t dlen)
+	       uint sls, uint slc, caddr_t data, size_t dlen)
 {
 	mblk_t *bp;
 	uint rl_sls = ((sp->na.na->option.pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI) ? sls : slc;
@@ -13522,7 +13522,7 @@ mtp_dec_sltm(mblk_t *mp, struct mtp_msg *m)
 			break;
 		m->slc = m->sls;
 		m->dlen = *mp->b_rptr++ >> 4;
-		m->data = mp->b_rptr;
+		m->data = (caddr_t) mp->b_rptr;
 		if (mp->b_rptr + m->dlen > mp->b_wptr)
 			break;
 		return (0);
@@ -13531,7 +13531,7 @@ mtp_dec_sltm(mblk_t *mp, struct mtp_msg *m)
 			break;
 		m->slc = *mp->b_rptr & 0x0f;
 		m->dlen = *mp->b_rptr++ >> 4;
-		m->data = mp->b_rptr;
+		m->data = (caddr_t) mp->b_rptr;
 		if (mp->b_wptr < mp->b_rptr + m->dlen)
 			break;
 		return (0);
@@ -13552,7 +13552,7 @@ mtp_dec_user(mblk_t *mp, struct mtp_msg *m)
 {
 	if (mp->b_wptr < mp->b_rptr)
 		goto error;
-	m->data = mp->b_rptr;
+	m->data = (caddr_t) mp->b_rptr;
 	m->dlen = mp->b_wptr - mp->b_rptr;
 	return (0);
       error:

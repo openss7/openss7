@@ -3633,7 +3633,7 @@ tr_bind_ack(struct tr *tr, queue_t *q, mblk_t *mp)
 	tr_set_state(tr, TRS_IDLE);
 	if (tc_get_state(tc) == TCS_WACK_BREQ)
 		return tc_bind_ack(tc, q, mp,
-				   p->XACT_number, p->ADDR_length, mp->b_rptr + p->ADDR_offset);
+				   p->XACT_number, p->ADDR_length, (caddr_t) mp->b_rptr + p->ADDR_offset);
 	if (tc_get_state(tc) != TCS_IDLE)
 		goto outstate;
 	freemsg(mp);
@@ -3762,7 +3762,7 @@ tr_optmgmt_ack(struct tr *tr, queue_t *q, mblk_t *mp)
 			goto badopt;
 	}
 	/* FIXME: there might be more to do here, such as respond to the TC only option portion. */
-	return tc_optmgmt_ack(tc, q, mp, p->MGMT_flags, p->OPT_length, mp->b_rptr + p->OPT_offset);
+	return tc_optmgmt_ack(tc, q, mp, p->MGMT_flags, p->OPT_length, (caddr_t) mp->b_rptr + p->OPT_offset);
       badopt:
 	err = EFAULT;
 	goto error;
@@ -5364,7 +5364,7 @@ static unsigned short modid = MOD_ID;
  */
 
 #ifdef module_param
-module_param(modid, short, 0444);
+module_param(modid, ushort, 0444);
 #else				/* module_param */
 MODULE_PARM(modid, "h");
 #endif				/* module_param */

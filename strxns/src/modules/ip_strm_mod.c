@@ -480,7 +480,7 @@ ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 		 */
 		/* FIXME: this function does not check for TRANSPARENT ioctl! */
 		if (xmp != NULL && *xmp->b_rptr != 0) {	/* name specified */
-			strncpy(minor_ptr->myname, xmp->b_rptr, sizeof(minor_ptr->myname));
+			strncpy(minor_ptr->myname, (char *) xmp->b_rptr, sizeof(minor_ptr->myname));
 #if defined(KERNEL_2_3)
 			strcpy(minor_ptr->mydev.name, minor_ptr->myname);
 #else
@@ -1244,7 +1244,7 @@ convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 	struct sk_buff *skb;
 	int len;
 	mblk_t *tmp = mp;
-	char *ctmp;
+	unsigned char *ctmp;
 
 	if ((mp->b_datap->db_type == M_PROTO)
 	    || (mp->b_datap->db_type == M_PCPROTO)

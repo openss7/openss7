@@ -117,8 +117,8 @@ typedef struct head {
 	void streamscall (*o_wakeup)(queue_t *);		/* osrv wakeup function */ \
 	spinlock_t qlock;			/* queue lock */ \
 	uint users;				/* queue users */ \
-	uint ibid;				/* iput bufcall id */ \
-	uint obid;				/* oput bufcall id */ \
+	bufcall_id_t ibid;			/* iput bufcall id */ \
+	bufcall_id_t obid;			/* oput bufcall id */ \
 	queue_t *iwait;				/* iput queue waiting */ \
 	queue_t *owait;				/* oput queue waiting */ \
 	ulong i_state;				/* interface state */ \
