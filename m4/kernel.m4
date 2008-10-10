@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.171 $) $Date: 2008-10-08 07:24:33 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-10-10 10:41:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-08 07:24:33 $ by $Author: brian $
+# Last Modified $Date: 2008-10-10 10:41:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1686,9 +1686,11 @@ dnl	correctly.
 dnl
 dnl	Newer kernel makefiles (openSUSE 11.0 with 2.6.25 kernel) need srctree and objtree defined
 dnl	and make way too many files in the build directory, so we also now change directories to the
-dnl	kernel build directory.  Do not configure as root.
+dnl	kernel build directory.  Do not configure as root.  Changing to build directory messes up
+dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
+dnl	was removed.
 dnl
-	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} -C ${kbuilddir} cflag-check | tail -1`"
+	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cflag-check | tail -1`"
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"
 	rm -f .config
 	linux_cflags=
@@ -1864,9 +1866,11 @@ dnl	correctly.
 dnl
 dnl	Newer kernel makefiles (openSUSE 11.0 with 2.6.25 kernel) need srctree and objtree defined
 dnl	and make way too many files in the build directory, so we also now change directories to the
-dnl	kernel build directory.  Do not configure as root.
+dnl	kernel build directory.  Do not configure as root.  Changing to build directory messes up
+dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
+dnl	was removed.
 dnl
-	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} -C ${kbuilddir} cppflag-check | tail -1`"
+	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} cppflag-check | tail -1`"
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"
 	rm -f .config
 	linux_cv_k_cppflags="-nostdinc -iwithprefix include -DLINUX $linux_cv_k_cppflags"
@@ -1917,9 +1921,11 @@ dnl	correctly.
 dnl
 dnl	Newer kernel makefiles (openSUSE 11.0 with 2.6.25 kernel) need srctree and objtree defined
 dnl	and make way too many files in the build directory, so we also now change directories to the
-dnl	kernel build directory.  Do not configure as root.
+dnl	kernel build directory.  Do not configure as root.  Changing to build directory messes up
+dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
+dnl	was removed.
 dnl
-	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} -C ${kbuilddir} modflag-check | tail -1`"
+	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} modflag-check | tail -1`"
 	linux_cv_k_modflags_orig="$linux_cv_k_modflags"
 	rm -f .config
 dnl
@@ -1950,9 +1956,11 @@ dnl	correctly.
 dnl
 dnl	Newer kernel makefiles (openSUSE 11.0 with 2.6.25 kernel) need srctree and objtree defined
 dnl	and make way too many files in the build directory, so we also now change directories to the
-dnl	kernel build directory.  Do not configure as root.
+dnl	kernel build directory.  Do not configure as root.  Changing to build directory messes up
+dnl	compiler checks in kernel makefiles that attempt to write to the current directory, so it
+dnl	was removed.
 dnl
-	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} -C ${kbuilddir} bldflag-check | tail -1`"
+	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} -I${ksrcdir} bldflag-check | tail -1`"
 	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"
 	rm -f .config
 dnl
@@ -2635,6 +2643,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.172  2008-10-10 10:41:43  brian
+# - more SuSE 2.6.25 build trials
+#
 # Revision 0.9.2.171  2008-10-08 07:24:33  brian
 # - change directories when running cflagcheck
 #
