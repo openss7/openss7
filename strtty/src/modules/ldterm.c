@@ -197,7 +197,7 @@ modID_t modid = CONFIG_STREAMS_LDTERM_MODID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else				/* module_param */
-module_param(modid, short, 0444);
+module_param(modid, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module Id for LDTERM (0 for allocation).");
 

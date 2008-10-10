@@ -813,7 +813,7 @@ int snd_ww_strm_data2adapter(pmercd_ww_send_streamData pStreamDataSt)
 
               MSD_FREE_KERNEL_MEMORY(Msg->b_cont->b_datap->db_base, Msg->b_cont->b_datap->db_size);
               Msg->b_cont->b_datap->db_base = (unsigned char *)Buffer;
-              Msg->b_cont->b_datap->db_lim = (char *)Buffer + MsgDataSize;
+              Msg->b_cont->b_datap->db_lim = (unsigned char *)Buffer + MsgDataSize;
               Msg->b_cont->b_datap->db_size = MsgDataSize;
               Msg->b_cont->b_rptr = (unsigned char *) Buffer;
               Msg->b_cont->b_wptr = (unsigned char *) Msg->b_cont->b_rptr + MsgDataSize;

@@ -836,7 +836,7 @@ log_alloc_data(char *fmt, va_list args)
 		va_end(args2);
 		/* pass through once more with arguments */
 		if ((dp = allocb(alen, BPRI_MED))) {
-			fmt = bp->b_rptr;
+			fmt = (char *) bp->b_rptr;
 			for (; *fmt; ++fmt) {
 				if (*fmt != '%')
 					continue;
@@ -979,7 +979,7 @@ log_alloc_data(char *fmt, va_list args)
 					size_t slen = strnlen(s, LOGMSGSZ);
 					size_t splen = PROMOTE_ALIGN(slen + 1);
 
-					strncpy(dp->b_wptr, s, slen);
+					strncpy((char *) dp->b_wptr, s, slen);
 					dp->b_wptr[slen] = '\0';
 					dp->b_wptr += splen;
 					if (!--nargs)

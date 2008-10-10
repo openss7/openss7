@@ -8380,7 +8380,7 @@ rp_lookup_first(struct tp *tp, uchar *beg, uchar *end, struct ua_parm *asid, int
 				if (__unlikely(asid->len < 1))
 					break;
 				for (rp = tp->gp.gp->rp.list; rp; rp = rp->gp.next)
-					if (strncmp(asid->cp,
+					if (strncmp((char *) asid->cp,
 						    rp->as.as->as.addr.m2ua.iid_text,
 						    min(asid->len, 32)) == 0)
 						return (rp);
@@ -8748,10 +8748,10 @@ tp_recv_asps_hbeat_req(struct tp *tp, queue_t *q, mblk_t *mp)
 		return (-EINVAL);
 
 	if ((rp = rp_lookup(tp, mp, NULL)))
-		return rp_send_asps_hbeat_ack(rp, tp, q, mp, hbeat.cp, hbeat.len);
+		return rp_send_asps_hbeat_ack(rp, tp, q, mp, (caddr_t) hbeat.cp, hbeat.len);
 
 	/* process as normal */
-	return tp_send_asps_hbeat_ack(tp, q, mp, hbeat.cp, hbeat.len);
+	return tp_send_asps_hbeat_ack(tp, q, mp, (caddr_t) hbeat.cp, hbeat.len);
 }
 
 /**
@@ -10439,7 +10439,7 @@ tp_recv_err(struct tp *tp, queue_t *q, mblk_t *mp, int err)
 		if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &asid, UA_PARM_IID))
 			return tp_send_aspt_aspia_req(tp, q, mp, &asid.val, NULL, 0, NULL, 0);
 		if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &asid, UA_PARM_IID_TEXT))
-			return tp_send_aspt_aspia_req(tp, q, mp, NULL, asid.cp, asid.len, NULL, 0);
+			return tp_send_aspt_aspia_req(tp, q, mp, NULL, (caddr_t) asid.cp, asid.len, NULL, 0);
 #endif
 #if M3UA
 		if (ua_dec_parm(mp->b_rptr, mp->b_wptr, &asid, UA_PARM_RC))
@@ -10487,7 +10487,7 @@ tp_recv_err(struct tp *tp, queue_t *q, mblk_t *mp, int err)
 		if (err < 0)
 			err = UA_ECODE_PROTOCOL_ERROR;
 	      error:
-		return gp_send_mgmt_err(tp->gp.gp, q, mp, err, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+		return gp_send_mgmt_err(tp->gp.gp, q, mp, err, (caddr_t) mp->b_rptr, mp->b_wptr - mp->b_rptr);
 	}
 	return (err);
 }

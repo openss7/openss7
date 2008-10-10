@@ -2217,7 +2217,7 @@ t_size_negotiate_options(const struct tp *t, const unsigned char *ip, size_t ile
  * Calculates the overall T_OPTMGMT_ACK flag result from individual results.
  */
 STATIC uint
-t_overall_result(uint * overall, const uint result)
+t_overall_result(t_scalar_t * overall, const uint result)
 {
 	switch (result) {
 	case T_NOTSUPPORT:

@@ -1,3 +1,7 @@
+2008-10-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/priv.h: remove signed pointer warnings
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/kernel/aixcompat.c: add mod version, truncate logs

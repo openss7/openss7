@@ -10952,13 +10952,13 @@ sctp_recv_init(struct sctp *sp, mblk_t *mp)
 	struct sctp_init *m;
 	struct sctp *oldsp;
 	union sctp_parm *ph;
-	unsigned char *pptr, *pend;
+	caddr_t pptr, pend;
 	size_t plen;
 	size_t anum = 0;
 	ulong ck_inc = 0;
 	int err = 0;
 	size_t errl = 0;
-	unsigned char *errp = NULL;
+	caddr_t errp = NULL;
 	struct sctp_cookie ck;
 	mblk_t *unrec = NULL;
 	uint32_t p_caps, p_ali;
@@ -10979,7 +10979,7 @@ sctp_recv_init(struct sctp *sp, mblk_t *mp)
 	{
 		size_t clen = ntohs(m->ch.len);
 
-		pptr = (unsigned char *) (m + 1);
+		pptr = (caddr_t) (m + 1);
 		pend = pptr + clen - sizeof(*m);
 		if (clen < sizeof(*m))
 			goto emsgsize;
@@ -11228,10 +11228,10 @@ sctp_recv_init_ack(struct sctp *sp, mblk_t *mp)
 	int err = 0;
 	struct iphdr *iph;
 	struct sctp_init_ack *m;
-	unsigned char *kptr = NULL;
+	caddr_t kptr = NULL;
 	size_t klen = 0;
-	unsigned char *pptr;
-	unsigned char *pend;
+	caddr_t pptr;
+	caddr_t pend;
 	size_t plen;
 	union sctp_parm *ph;
 
@@ -11255,7 +11255,7 @@ sctp_recv_init_ack(struct sctp *sp, mblk_t *mp)
 		/* SCTP IG 2.11 not allowed to bundle */
 		if (PADC(clen) + mp->b_rptr < mp->b_wptr)
 			goto eproto;
-		pptr = (unsigned char *) (m + 1);
+		pptr = (caddr_t) (m + 1);
 		pend = pptr + PADC(clen) - sizeof(*m);
 	}
 	ph = (typeof(ph)) pptr;
@@ -12151,7 +12151,7 @@ sctp_recv_unrec_ctype(struct sctp *sp, mblk_t *mp)
 		goto emsgsize;
 	ctype = ch->type;
 	if (ctype & SCTP_CTYPE_MASK_REPORT)
-		sctp_send_error(sp, SCTP_CAUSE_BAD_CHUNK_TYPE, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+		sctp_send_error(sp, SCTP_CAUSE_BAD_CHUNK_TYPE, (caddr_t) mp->b_rptr, mp->b_wptr - mp->b_rptr);
 	if (ctype & SCTP_CTYPE_MASK_CONTINUE)
 		return sctp_return_more(mp);
 	return (0);		/* discard packet */
@@ -12259,10 +12259,10 @@ sctp_recv_asconf(struct sctp *sp, mblk_t *mp)
 		struct sctp_daddr *sd;
 		union sctp_parm *ph;
 		struct sctp_ipv4_addr *a;
-		unsigned char *pptr = (unsigned char *) (m + 1);
-		unsigned char *pend = pptr + ntohs(m->ch.len) - sizeof(*m);
-		unsigned char *rptr;
-		unsigned char *bptr;
+		caddr_t pptr = (caddr_t)  (m + 1);
+		caddr_t pend = pptr + ntohs(m->ch.len) - sizeof(*m);
+		caddr_t rptr;
+		caddr_t bptr;
 		size_t rlen = 0;
 		size_t plen;
 
@@ -12347,7 +12347,7 @@ sctp_recv_asconf(struct sctp *sp, mblk_t *mp)
 		/* second pass to build response */
 		if (!(bptr = rptr = kmalloc(rlen, GFP_ATOMIC)))
 			return -ENOMEM;
-		for (pptr = (unsigned char *) (m + 1), rlen = 0, ph = (union sctp_parm *) pptr;
+		for (pptr = (caddr_t) (m + 1), rlen = 0, ph = (union sctp_parm *) pptr;
 		     pptr + sizeof(ph->ph) <= pend && pptr + (plen = ntohs(ph->ph.len)) <= pend;
 		     pptr += PADC(plen), ph = (union sctp_parm *) pptr) {
 			uint type;
@@ -13808,7 +13808,8 @@ STATIC fastcall __hot_write int
 sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, uint rcpt,
 	      mblk_t *mp)
 {
-	uint err = 0, flags = 0;
+	int err = 0;
+	uint flags = 0;
 	struct sctp_strm *st;
 
 	sctplogda(sp, "X_DATA_REQ ->");

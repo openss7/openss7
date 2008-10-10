@@ -1217,7 +1217,7 @@ straccess_wlock(struct stdata *sd, const int access)
  *  is attempted on a broken or hung up pipe.  ESTRPIPE tells the wait loop not to block further.
  */
 STATIC int
-straccess_wakeup(struct stdata *sd, const int f_flags, long *timeo, const int access)
+straccess_wakeup(struct stdata *sd, const int f_flags, unsigned long *timeo, const int access)
 {				/* PROFILED */
 	int err;
 
@@ -2723,7 +2723,7 @@ strdoioctl_str(struct stdata *sd, struct strioctl *ic, const int access, const b
 {
 	union ioctypes *ioc;
 	mblk_t *mb;
-	long timeo;
+	unsigned long timeo;
 	int err = 0;
 
 #ifdef CONFIG_STREAMS_LIS_BCM
@@ -2862,7 +2862,7 @@ strdoioctl_trans(struct stdata *sd, unsigned int cmd, unsigned long arg, const i
 {
 	union ioctypes *ioc;
 	mblk_t *mb, *db;
-	long timeo;
+	unsigned long timeo;
 	int err = 0;
 
 #ifdef CONFIG_STREAMS_LIS_BCM
@@ -2983,7 +2983,7 @@ strdoioctl_link(const struct file *file, struct stdata *sd, struct linkblk *l, u
 	union ioctypes *ioc;
 	struct linkblk *lbp;
 	mblk_t *mb, *db;
-	long timeo;
+	unsigned long timeo;
 	int err = 0;
 
 #ifdef CONFIG_STREAMS_LIS_BCM
@@ -5504,7 +5504,7 @@ __strfreepage(caddr_t data)
  */
 STATIC __unlikely mblk_t *
 strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int band, int type,
-	    caddr_t base, struct free_rtn *frtn, long *timeo)
+	    caddr_t base, struct free_rtn *frtn, unsigned long *timeo)
 {
 	mblk_t *mp;
 	int err;
@@ -5567,7 +5567,7 @@ strwaitpage(struct stdata *sd, const int f_flags, size_t size, int prio, int ban
 	srunlock(sd);
 	if (err)
 		return ERR_PTR(err);
-	if ((mp = esballoc(base, size, prio, frtn))) {
+	if ((mp = esballoc((unsigned char *) base, size, prio, frtn))) {
 		mp->b_datap->db_type = type;
 		mp->b_band = (band == -1) ? 0 : band;
 		return (mp);
@@ -5600,7 +5600,7 @@ strsendpage(struct file *file, struct page *page, int offset, size_t size, loff_
 	if (ppos == &file->f_pos) {
 		char *base = kmap(page) + offset;
 		struct free_rtn frtn = { __strfreepage, (caddr_t) page };
-		long timeo = ((file->f_flags & FNDELAY)
+		unsigned long timeo = ((file->f_flags & FNDELAY)
 			      && !test_bit(STRNDEL_BIT, &sd->sd_flag)) ? 0 : MAX_SCHEDULE_TIMEOUT;
 
 		mp = strwaitpage(sd, file->f_flags, size, BPRI_MED, 0, M_DATA, base, &frtn, &timeo);

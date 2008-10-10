@@ -4384,7 +4384,7 @@ static unsigned short modid = MOD_ID;
 #ifdef LINUX
 
 #ifdef module_param
-module_param(modid, short, 0444);
+module_param(modid, ushort, 0444);
 #else				/* module_param */
 MODULE_PARM(modid, "h");
 #endif				/* module_param */

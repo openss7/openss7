@@ -205,7 +205,7 @@ nsdevopen(struct inode *inode, struct file *file)
 	struct cdevsw *cdev;
 	int err;
 
-	if ((cdev = cdev_match(file->f_dentry->d_name.name))) {
+	if ((cdev = cdev_match((char *) file->f_dentry->d_name.name))) {
 		major_t major = cdev->d_modid;
 		minor_t minor = getminor(inode->i_ino);
 		dev_t dev = makedevice(major, minor);
@@ -285,7 +285,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	major = nsdev_cdev.d_major;
 	modid = nsdev_cdev.d_modid;
 	err = -ENXIO;
-	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
+	if (!(cdev = cdev_match((char *) file->f_dentry->d_name.name)))
 		goto exit;
 	err = -ENXIO;
 	if (cdev == &nsdev_cdev)

@@ -3231,7 +3231,7 @@ sl_recv_err(struct sl *sl, queue_t *q, mblk_t *mp, int err)
 		if (err < 0)
 			err = UA_ECODE_PROTOCOL_ERROR;
 	      error:
-		return sl_send_mgmt_err(sl, q, mp, err, mp->b_rptr, mp->b_wptr - mp->b_rptr);
+		return sl_send_mgmt_err(sl, q, mp, err, (caddr_t) mp->b_rptr, mp->b_wptr - mp->b_rptr);
 	}
 	return (err);
 }

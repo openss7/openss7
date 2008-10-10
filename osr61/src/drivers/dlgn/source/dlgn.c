@@ -731,7 +731,7 @@ char *namep;
          for (ldp = bdp->bd_ldp; ldp != NULL; ldp = ldp->ld_nldp) {
  
             /* Check the name for a match */
-            if (cf_cmpstr(namep, ldp->ld_name, LD_NAMELEN) == 0) {
+            if (cf_cmpstr((unsigned char *) namep, ldp->ld_name, LD_NAMELEN) == 0) {
                return (ldp);
             }
          }

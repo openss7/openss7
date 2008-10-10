@@ -659,7 +659,7 @@ mblk_t  *mp;
       /* Find the GN_PMDEVCNT structure in the message for this PM. */
       for (pdc = 0; pdc < Gn_Maxpm; pdc++) {
          pdp = ((GN_PMDEVCNT *)(pcp + 1)) + pdc;
-         if (cf_cmpstr(pdp->gd_pmname, pmname, PM_NAMELEN) == 0) {
+         if (cf_cmpstr((unsigned char *) pdp->gd_pmname, (unsigned char *) pmname, PM_NAMELEN) == 0) {
             break;
          }
       }
@@ -735,7 +735,7 @@ mblk_t  *mp;
       /* Find the GN_PMDEVCNT structure in the message for this PM. */
       for (pdc = 0; pdc < Gn_Maxpm; pdc++) {
          pdp = ((GN_PMDEVCNT *)(pcp + 1)) + pdc;
-         if (cf_cmpstr(pdp->gd_pmname, pmname, PM_NAMELEN) == 0) {
+         if (cf_cmpstr((unsigned char *) pdp->gd_pmname, (unsigned char *) pmname, PM_NAMELEN) == 0) {
             break;
          }
       }
@@ -747,7 +747,7 @@ mblk_t  *mp;
       }
 
       /* Copy the PM name into the GN_HEADER structure for this PM */
-      cf_copystr(pmname,ghp->gh_pmname,PM_NAMELEN);
+      cf_copystr((unsigned char *) pmname, (unsigned char *) ghp->gh_pmname,PM_NAMELEN);
 
       /*
        * Force the device-dependent structure sizes up to the next 
@@ -983,7 +983,7 @@ mblk_t  *mp;
    /* Find the pmid for the given PM */
    for (pmid = 0; pmid < Gn_Numpms; pmid++) {
       ghp = Gn_Headerp + pmid;
-      if (cf_cmpstr(ghp->gh_pmname, spp->gp_pmname, PM_NAMELEN) == 0) {
+      if (cf_cmpstr((unsigned char *) ghp->gh_pmname, spp->gp_pmname, PM_NAMELEN) == 0) {
          break;
       }
    }
@@ -1275,7 +1275,7 @@ mblk_t  *mp;
    /* Find the pmid for the given PM */
    for (pmid = 0; pmid < Gn_Numpms; pmid++) {
       ghp = Gn_Headerp + pmid;
-      if (cf_cmpstr(ghp->gh_pmname, spp->gp_pmname, PM_NAMELEN) == 0) {
+      if (cf_cmpstr((unsigned char *) ghp->gh_pmname, spp->gp_pmname, PM_NAMELEN) == 0) {
          break;
       }
    }
@@ -1761,7 +1761,7 @@ mblk_t   *mp;
       (*pmswtbl[pmid].memsz)(&gpmsp->gps_bdsz,&gpmsp->gps_ldsz,&pmnamep);
 
       /* Record the PM's name */
-      cf_copystr(pmnamep, gpmsp->gps_pmname, PM_NAMELEN);
+      cf_copystr((unsigned char *) pmnamep, gpmsp->gps_pmname, PM_NAMELEN);
       copysz += sizeof(GN_PMSTATUS);
 
       /* Skip remaining stats on this PM if driver not started */
@@ -1849,7 +1849,7 @@ mblk_t   *mp;
    /* Find the pmid for the given PM */
    for (pmid = 0; pmid < Gn_Numpms; pmid++) {
       ghp = Gn_Headerp + pmid;
-      if (cf_cmpstr(ghp->gh_pmname, gdbp->pmname, PM_NAMELEN) == 0) {
+      if (cf_cmpstr((unsigned char *) ghp->gh_pmname, gdbp->pmname, PM_NAMELEN) == 0) {
          break;
       }
    }
@@ -1924,7 +1924,7 @@ mblk_t   *mp;
    /* Find the pmid for the given PM */
    for (pmid = 0; pmid < Gn_Numpms; pmid++) {
       ghp = Gn_Headerp + pmid;
-      if (cf_cmpstr(ghp->gh_pmname, gdbp->gd_pmname, PM_NAMELEN) == 0) {
+      if (cf_cmpstr((unsigned char *) ghp->gh_pmname, gdbp->gd_pmname, PM_NAMELEN) == 0) {
          break;
       }
    }

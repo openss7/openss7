@@ -966,7 +966,7 @@ if ((long)segp->sg_phys) {
 #endif
            rc = -1;
            }
-   	   PciIntEnb(segp->sg_cfgvirt, index);
+   	   PciIntEnb((char *) segp->sg_cfgvirt, index);
 	   if (GpControlBlock->BoardAttrs[index].BoardType != PCI_MSI_ID) { 
 	       GpControlBlock->GpVirtMapBlock[index].VirtAddr =(ULONG)segp->sg_virt ;
 	   }
@@ -1009,7 +1009,7 @@ if ((long)segp->sg_phys) {
 #endif
                 rc = -1;
              }
-   	     PciIntEnb(segp->sg_cfgvirt, index);
+   	     PciIntEnb((char *) segp->sg_cfgvirt, index);
    	     GpControlBlock->GpVirtMapBlock[index].CfgVirtAddr =(ULONG)segp->sg_cfgvirt ;
 	   } 
       }  
@@ -1128,7 +1128,7 @@ generic driver loaded  not in protocol module like other drivers */
 	       ((((int)segp->sg_phys & 0xffffe000) == GpControlBlock->GpVirtMapBlock[index].PhysAddr) &&  (GpControlBlock->BoardAttrs[index].BoardType != PCI_COYOTE_ID)) ) {
 #endif
 
-          	PciIntDis(segp->sg_cfgvirt, index);
+          	PciIntDis((char *) segp->sg_cfgvirt, index);
 #ifdef LINUX
         /*  
          * lis_vfree won't accept an address not on a page boundary, but ioremap

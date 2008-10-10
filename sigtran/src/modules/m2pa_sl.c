@@ -5182,7 +5182,7 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
 		goto badppa;
-	return n_bind_req(sl, q, mp->b_rptr + p->lmi_ppa_offset, p->lmi_ppa_length);
+	return n_bind_req(sl, q, (caddr_t) mp->b_rptr + p->lmi_ppa_offset, p->lmi_ppa_length);
 badppa:
 	m2palogrx(sl, "bad PPA");
 	err = LMI_BADPPA;

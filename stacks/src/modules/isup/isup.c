@@ -4183,7 +4183,7 @@ isup_st_in_cdpn(uchar *p, size_t l)
 	return (0);		/* didn't find an ST */
 }
 STATIC INLINE int
-isup_check_cdpn(char *p, size_t l)
+isup_check_cdpn(uchar *p, size_t l)
 {
 	if (l < 3) {
 		ptrace(("%s: PROTO: bad cdpn size\n", DRV_NAME));
@@ -7887,7 +7887,7 @@ isup_send_rel(queue_t *q, struct ct *ct, ulong causv, uchar *opt_ptr, size_t opt
 	mblk_t *mp, *dp;
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
-	char caus_ptr[2] = { 0x80, 0x80 };
+	uchar caus_ptr[2] = { 0x80, 0x80 };
 	size_t caus_len = 2;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_REL)
 	    + size_caus(pvar, caus_len) + 1 + size_opt(pvar, opt_len) + 1;

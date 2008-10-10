@@ -756,9 +756,9 @@ void mid_wwmgr_set_mode(PMSD_OPEN_BLOCK MsdOpenBlock,PSTRM_MSG Msg)
            MSD_ZERO_MEMORY(savedbuffer, size);
            MsdCopyMemory(Msg->b_rptr, savedbuffer, size);
            Msg->b_datap->db_base = savedbuffer;
-           Msg->b_datap->db_lim = (char *)savedbuffer + size;
-           Msg->b_rptr = (char *)savedbuffer;
-           Msg->b_wptr = (char *)savedbuffer+size;
+           Msg->b_datap->db_lim = (unsigned char *)savedbuffer + size;
+           Msg->b_rptr = (unsigned char *)savedbuffer;
+           Msg->b_wptr = (unsigned char *)savedbuffer+size;
       }
       supp_process_receive(MsdOpenBlock, Msg);
   }
