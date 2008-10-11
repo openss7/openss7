@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-22 20:31:30 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-10-11 04:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: log.c,v $
+ Revision 0.9.2.57  2008-10-11 04:31:31  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.56  2008-09-22 20:31:30  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-22 20:31:30 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-10-11 04:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-22 20:31:30 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-10-11 04:31:31 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -105,7 +108,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2008-09-22 20:31:30 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2008-10-11 04:31:31 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"

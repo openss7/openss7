@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-10-11 04:31:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:30:58 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.14  2008-10-11 04:31:24  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.13  2008-09-22 20:30:58  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-10-11 04:31:24 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-10-11 04:31:24 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -129,7 +132,7 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2008-09-22 20:30:58 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2008-10-11 04:31:24 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

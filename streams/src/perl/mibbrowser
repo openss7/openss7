@@ -2,7 +2,7 @@
 #!/usr/bin/perl -W
 # =============================================================================
 # 
-# @(#) $RCSfile: mibbrowser,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-07 13:17:35 $
+# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-11 04:31:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-07 13:17:35 $ by $Author: brian $
+# Last Modified $Date: 2008-10-11 04:31:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,15 +91,149 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $modename = "$program";
+my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-11 04:31:32 $';
+my $version = '$Revision: 0.9.2.2 $';
+my $date = '$Date: 2008-10-11 04:31:32 $';
+my $title = 'OpenSS7 Network Manager';
+
+my $Title = <<EOF;
+Linux Fast-STREAMS
+$title
+$version, $date
+EOF
+
+$Title =~ s/\n*$//;
+$Title =~ s/^\n*//;
+
+my $Version = <<EOF;
+Version $version
+$ident
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Distributed under Affero GPL Version 3, included here by reference.
+See `$program --copying' for copying permissions.
+EOF
+
+$Version =~ s/\n*$//;
+$Version =~ s/^\n*//;
+
+my $Copying = <<EOF;
+________________________________________________________________________________
+
+$ident
+________________________________________________________________________________
+
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
+
+All Rights Reserved.
+________________________________________________________________________________
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+________________________________________________________________________________
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf of the U.S. Government ("Government"), the following provisions apply to you. If the Software is supplied by the Department of Defense ("DoD"), it is classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is acquiring only the license rights granted herein (the license rights customarily provided to non-Government users). If the Software is supplied to any unit or agency of the Government other than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations).
+________________________________________________________________________________
+
+Commercial licensing and support of this software is available from OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+________________________________________________________________________________
+EOF
+
+$Copying =~ s/\n*$//;
+$Copying =~ s/^\n*//;
+
+my $CopyingMono = <<EOF;
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the  GNU Affero General Public License  as  published by the  Free
+Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+
+You should have received a copy of the  GNU Affero General Public License  along
+with this program.   If not,  see  <http://www.gnu.org/licenses/>,  or  write to
+the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+
+$CopyingMono =~ s/\n*$//;
+$CopyingMono =~ s/^\n*//;
+
+my $Help = <<EOF;
+$program:
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+Arguments:
+    NONE
+Options:
+    -n, --dryrun
+        don't perform the actions, just check them
+    -q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+        increase or set output verbosity
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+
+$Help =~ s/\n*$//;
+$Help =~ s/^\n*//;
+
+my $Usage = <<EOF;
+$program
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+
+$Usage =~ s/\n*$//;
+$Usage =~ s/^\n*//;
 
 my $debug = 0;
 my $verbose = 1;
 my $show = 'yes';
-
-my $ident = '$RCSfile: mibbrowser,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-07 13:17:35 $';
-my $version = '0.9.2';
-
 
 sub version {
 	return if $show eq 'no';
@@ -408,7 +542,7 @@ while ($#defaults >= 2) {
 #my $m = Gtk2::MenuBar->new;
 #$m->set_pack_direction('ltr');
 #$m->set_child_pack_direction('ttb');
-#$b->signal_connect(clicked => sub { Gtk2->main_quit; });
+#$b->signal_connect(clicked=>sub { Gtk2->main_quit; });
 #$w->add($b);
 #$w->show_all;
 #Gtk2->main;
@@ -420,13 +554,1069 @@ require Tk::FileSelect;
 require Tk::HList;
 require Tk::LabFrame;
 require Tk::ROText;
+require Tk::FileDialog;
 
 use Storable qw(lock_store lock_nstore lock_retrieve);
 
-my @myapps = ();
+# ---------------------------------
+package ObjectType;
+use strict;
+# ---------------------------------
+
+# ---------------------------------
+package ConceptualTable;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ---------------------------------
+
+# ---------------------------------
+package ConceptualRow;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ---------------------------------
+
+# ---------------------------------
+package ConceptualColumn;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ---------------------------------
+
+# ---------------------------------
+package Notification;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ---------------------------------
+
+# ---------------------------------
+package NotifyParameter;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ---------------------------------
+
+# ---------------------------------
+package ObjectIdentity;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ---------------------------------
+
+package myapp::object;
+use strict;
+
+# This package is a mib object within the application.  It is create by passing
+# an SNMP hash.
+
+sub format {
+    my $self = shift;
+    my $orig = shift;
+    my ($text,$lead);
+    $text = $$orig;
+    chomp $text;
+    $text =~ s/^\n*//s;
+    $text =~ s/\n*$//s;
+    $text =~ /(\n\s*)/s;
+    $lead = $1;
+    $text =~ s/$lead/\n         /sg;
+    $text =~ s/\n+\s*$//s;
+    $$orig = $text;
+    return;
+}
+
+sub new {
+    my $type = shift;
+    my $self = {};
+    bless $self, $type;
+    my $parent = shift;
+    my $snmp = shift;
+    $self->{SNMP} = $snmp;
+    $self->{parent} = $parent;
+    $self->{subID} = $snmp->{subID};
+    $self->{objectID} = $snmp->{objectID};
+    $self->{label} = $snmp->{label};
+    $self->{moduleID} = $snmp->{moduleID};
+    $self->{type} = $snmp->{type};
+    $self->{access} = $snmp->{access};
+    $self->{status} = $snmp->{status};
+    $self->{syntax} = $snmp->{syntax};
+    $self->{defaultValue} = $snmp->{defaultValue};
+    $self->{units} = $snmp->{units};
+    $self->{hint} = $snmp->{hint};
+    $self->{augments} = $snmp->{augments};
+    $self->{textualConvention} = $snmp->{textualConvention};
+    foreach (@{$snmp->{ranges}}) {
+	my $r = {};
+	$r->{low} = $_->{low};
+	$r->{high} = $_->{high};
+	push @{$self->{ranges}}, $r;
+    }
+    foreach (@{$snmp->{indexes}}) {
+	push @{$self->{indexes}};
+    }
+    my $enumhash = {};
+    %{$enumhash} = reverse %{$snmp->{enums}};
+    foreach ( sort { return $a <=> $b; } ( keys %{$enumhash} ) ) {
+	push @{$self->{enums}}, $enumhash->{$_}, $_;
+    }
+    $self->{description} = $snmp->{description};
+    $self->format(\$self->{description});
+    $self->{TCDescription} = $snmp->{TCDescription};
+    $self->format(\$self->{TCDescription});
+    $self->{reference} = $snmp->{reference};
+    $self->format(\$self->{reference});
+    $self->{children} = ();
+    push @{$parent->{children}}, $self if $parent;
+    foreach ( reverse @{$snmp->{children}} ) {
+	push @{$self->{children}}, new($self,$_);
+    }
+    return $self;
+}
+
+sub tree {
+    # build entire tree of objects
+    my $root = new(undef,$SNMP::MIB{'.1'});
+    return $root;
+}
+
 
 package myapp;
 use strict;
+
+my @myapps = ();
+
+my $parmImage = <<EOF;
+/* XPM */
+static char * mini_parm_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"         aa     ",
+"       aabba    ",
+"     aabbbbaa   ",
+"   aabbbcbbba   ",
+" aabbbcbbbbbaa  ",
+" abbcbbbbcbbba  ",
+" aabbbbcbbbbbaa ",
+"  abbcbbbbcbbba ",
+"  aabbbbcbbbaacc",
+"   abbcbbbaaccc ",
+"   aabbbaaccc   ",
+"    abaaccc     ",
+"    aaccc       ",
+"     cc         "};
+EOF
+
+my $noteImage = <<EOF;
+/* XPM */
+static char * mini_note_xpm[] = {
+"16 12 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"                ",
+" aaaaaaaaaaaaa  ",
+" abbbbbbaaaabac ",
+" abbbbbbabbabac ",
+" abbbbbbaaaabac ",
+" abbbbbbbbbbbac ",
+" abcccccbccbbac ",
+" abccbbcccccbac ",
+" abbbbbbbbbbbac ",
+" aaaaaaaaaaaaac ",
+"  ccccccccccccc ",
+"                "};
+EOF
+
+my $objsImage = <<EOF;
+/* XPM */
+static char * mini_obj1_xpm[] = {
+"16 12 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"      aaa       ",
+"    aabbbaa     ",
+"   abbbbbbba    ",
+"  abbbbbbbbba   ",
+"  abbbbbbbbbac  ",
+" abbbbbbbbbbba  ",
+"  abbbbbbbbbacc ",
+"  abbbbbbbbbac  ",
+"   abbbbbbbacc  ",
+"    aabbbaacc   ",
+"     caaaccc    ",
+"       ccc      "};
+EOF
+
+my $odocsImage = <<EOF;
+/* XPM */
+static char * mini_doc1_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"   aaaaaaa      ",
+"   abbbbbaa     ",
+"   abcccbaba    ",
+"   abbbbbaaaa   ",
+"   abccccbccac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
+EOF
+
+my $cdocsImage = <<EOF;
+/* XPM */
+static char * mini_doc2_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"   aaaaaaaaaa   ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
+EOF
+
+my $odocsRedImage = <<EOF;
+/* XPM */
+static char * mini_doc3_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c red",
+"c	c red3",
+"   aaaaaaa      ",
+"   abbbbbaa     ",
+"   abcccbaba    ",
+"   abbbbbaaaa   ",
+"   abccccbccac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
+EOF
+
+my $cdocsRedImage = <<EOF;
+/* XPM */
+static char * mini_doc4_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c red",
+"c	c red3",
+"   aaaaaaaaaa   ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
+EOF
+
+my $orowsImage = <<EOF;
+/* XPM */
+static char * mini_doc5_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"   aaaaaaa      ",
+"   abbbbbaa     ",
+"   abcccbaba    ",
+"   abbbbbaaaa   ",
+"   abccccbccac  ",
+"   abbbbbbbbac  ",
+" aaaaaaaaaaaaaa ",
+" abaccccccccacac",
+" ababbbbbbbbacac",
+" aaaaaaaaaaaaaac",
+"   abccccccbaccc",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
+EOF
+
+my $crowsImage = <<EOF;
+/* XPM */
+static char * mini_doc6_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"   aaaaaaaaaa   ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+" aaaaaaaaaaaaaa ",
+" abaccccccccacac",
+" ababbbbbbbbacac",
+" aaaaaaaaaaaaaac",
+"   abccccccbaccc",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
+EOF
+
+my $ocolsImage = <<EOF;
+/* XPM */
+static char * mini_doc7_xpm[] = {
+"16 16 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"     aaaa       ",
+"     abbac      ",
+"   aaaaaaa      ",
+"   ababbaaa     ",
+"   abaccaaba    ",
+"   ababbaaaaa   ",
+"   abaccabccac  ",
+"   ababbabbbac  ",
+"   abaccaccbac  ",
+"   ababbabbbac  ",
+"   abaccaccbac  ",
+"   ababbabbbac  ",
+"   aaaaaaaaaac  ",
+"    caccaccccc  ",
+"     aaaac      ",
+"      cccc      "};
+EOF
+
+my $ccolsImage = <<EOF;
+/* XPM */
+static char * mini_doc8_xpm[] = {
+"16 16 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"     aaaa       ",
+"     abbac      ",
+"   aaaaaaaaaa   ",
+"   ababbabbbac  ",
+"   abaccaccbac  ",
+"   ababbabbbac  ",
+"   abaccaccbac  ",
+"   ababbabbbac  ",
+"   abaccaccbac  ",
+"   ababbabbbac  ",
+"   abaccaccbac  ",
+"   ababbabbbac  ",
+"   aaaaaaaaaac  ",
+"    caccaccccc  ",
+"     aaaac      ",
+"      cccc      "};
+EOF
+
+my $obookImage = <<EOF;
+/* XPM */
+static char * mini_book1_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c gray50",
+"c	c white",
+"  aa            ",
+" abca    aaa    ",
+" abcca aacca    ",
+" abcccabcccaaa  ",
+" abcccaccccaba  ",
+" abcccabcccaba  ",
+" abcccaccccaba  ",
+" abcccabcccaba  ",
+" abcccaccccaba  ",
+"  abccabccaaba  ",
+"   abcacaaccba  ",
+"    abaabbbbba  ",
+"    aabaaaaaaa  ",
+"     aa         "};
+EOF
+
+my $cbookImage = <<EOF;
+/* XPM */
+static char * mini_book2_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
+EOF
+
+my $cbookRedImage = <<EOF;
+/* XPM */
+static char * mini_book3_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c red",
+"c	c red4",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
+EOF
+
+my $cbookGrnImage = <<EOF;
+/* XPM */
+static char * mini_book4_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c green",
+"c	c green4",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
+EOF
+
+my $cbookBluImage = <<EOF;
+/* XPM */
+static char * mini_book5_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c blue",
+"c	c blue4",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
+EOF
+
+my $iconImage = <<EOF;
+/* XPM */
+static char * streams_icon_xpm[] = {
+"48 48 484 2",
+"  	c #575757",
+". 	c #C4C4C4",
+"+ 	c #FFFFFF",
+"\@ 	c #FBFBFE",
+"# 	c #DCDDF4",
+"\$ 	c #969BDD",
+"\% 	c #6B73D2",
+"\& 	c #6F75D4",
+"* 	c #8389D8",
+"= 	c #C4C6ED",
+"- 	c #ECEDF9",
+"; 	c #FEFEFF",
+"> 	c #F0F0F0",
+", 	c #CECECE",
+"' 	c #797979",
+") 	c #3D3D3D",
+"! 	c #313131",
+"~ 	c #333333",
+"{ 	c #6B6B6B",
+"] 	c #CACACA",
+"^ 	c #FCFCFC",
+"/ 	c #FCFDFE",
+"( 	c #C1C5EC",
+"_ 	c #5057C8",
+": 	c #434CC1",
+"< 	c #8D91DB",
+"[ 	c #A0A4E2",
+"} 	c #8489D9",
+"| 	c #4F58C8",
+"1 	c #7178D4",
+"2 	c #CCCFEF",
+"3 	c #EFEFEF",
+"4 	c #808080",
+"5 	c #242424",
+"6 	c #414141",
+"7 	c #878787",
+"8 	c #ACACAC",
+"9 	c #8E8E8E",
+"0 	c #3B3B3B",
+"a 	c #323232",
+"b 	c #C2C2C2",
+"c 	c #E7E8F7",
+"d 	c #4B53C7",
+"e 	c #4750C7",
+"f 	c #C5C8ED",
+"g 	c #FAFAFD",
+"h 	c #F7F7FD",
+"i 	c #CCCEEF",
+"j 	c #6D73D1",
+"k 	c #4751C5",
+"l 	c #5D5D68",
+"m 	c #1A1A1A",
+"n 	c #4A4A4A",
+"o 	c #DADADA",
+"p 	c #FBFBFB",
+"q 	c #CBCBCB",
+"r 	c #3E3E3E",
+"s 	c #424242",
+"t 	c #EAEAEA",
+"u 	c #FDFDFE",
+"v 	c #7E85D7",
+"w 	c #3840C1",
+"x 	c #B9BBEA",
+"y 	c #FDFDFF",
+"z 	c #E2E3EA",
+"A 	c #40435F",
+"B 	c #090B17",
+"C 	c #72738A",
+"D 	c #F0F0F4",
+"E 	c #C5C5C5",
+"F 	c #212121",
+"G 	c #858585",
+"H 	c #E2E2F6",
+"I 	c #414AC4",
+"J 	c #6E74D2",
+"K 	c #F2F2FB",
+"L 	c #F3F3F3",
+"M 	c #151515",
+"N 	c #525581",
+"O 	c #4C53BE",
+"P 	c #C6C9EE",
+"Q 	c #585858",
+"R 	c #454545",
+"S 	c #E0E0E0",
+"T 	c #AAAEE5",
+"U 	c #353FBC",
+"V 	c #A8ADE5",
+"W 	c #FEFEFE",
+"X 	c #B2B2B2",
+"Y 	c #1C1C1C",
+"Z 	c #636363",
+"` 	c #DDDEEE",
+" .	c #6D73D2",
+"..	c #535BCB",
+"+.	c #F0F1FB",
+"\@.	c #B0B0B0",
+"#.	c #B9B9B9",
+"\$.	c #F9FAFE",
+"\%.	c #777DD5",
+"\&.	c #3940C1",
+"*.	c #E5E7F8",
+"=.	c #E2E2E2",
+"-.	c #262626",
+";.	c #DBDCF3",
+">.	c #555ECA",
+",.	c #7F84D6",
+"'.	c #F6F7FD",
+").	c #909090",
+"!.	c #E8E9F8",
+"~.	c #5F65CD",
+"{.	c #5158C8",
+"].	c #FCFCFF",
+"^.	c #F8F8F8",
+"/.	c #6E6E6E",
+"(.	c #1F1F1F",
+"_.	c #B3B3B3",
+":.	c #FDFDFD",
+"<.	c #B9BCE9",
+"[.	c #3C45C0",
+"}.	c #B5B9E9",
+"|.	c #EDEDED",
+"1.	c #4D4D4D",
+"2.	c #686868",
+"3.	c #D8D9F3",
+"4.	c #4F55C9",
+"5.	c #7176D4",
+"6.	c #202020",
+"7.	c #6F6F6F",
+"8.	c #F5F5F5",
+"9.	c #6E73D3",
+"0.	c #6268CE",
+"a.	c #E4E5F7",
+"b.	c #4B4B4B",
+"c.	c #ECECEC",
+"d.	c #C9CCEF",
+"e.	c #3E48C0",
+"f.	c #8F94DC",
+"g.	c #E6E6E6",
+"h.	c #525252",
+"i.	c #E9E9E9",
+"j.	c #D3D7F3",
+"k.	c #454EC6",
+"l.	c #9CA1E1",
+"m.	c #FCFCFE",
+"n.	c #F9F9F9",
+"o.	c #E7E7E7",
+"p.	c #BFC2EC",
+"q.	c #363FC1",
+"r.	c #A2A5E2",
+"s.	c #AAAAAA",
+"t.	c #171717",
+"u.	c #8C8C8C",
+"v.	c #F6F7FC",
+"w.	c #8F94DB",
+"x.	c #4D56C9",
+"y.	c #E9E9F9",
+"z.	c #979797",
+"A.	c #232323",
+"B.	c #E3E3E3",
+"C.	c #BBBEEA",
+"D.	c #323ABF",
+"E.	c #ABAEE6",
+"F.	c #4F4F4F",
+"G.	c #D7D7D7",
+"H.	c #D1D4F1",
+"I.	c #4F57C9",
+"J.	c #A5AAE4",
+"K.	c #9E9E9E",
+"L.	c #B9BDE9",
+"M.	c #2F3ABB",
+"N.	c #AFB4E5",
+"O.	c #C1C1C1",
+"P.	c #111111",
+"Q.	c #898989",
+"R.	c #FBFBFD",
+"S.	c #5D66CE",
+"T.	c #EAECF9",
+"U.	c #A4A4A4",
+"V.	c #BDC1EB",
+"W.	c #3C46C3",
+"X.	c #B2B6E7",
+"Y.	c #656565",
+"Z.	c #363636",
+"`.	c #CCCCCC",
+" +	c #5A61CC",
+".+	c #B5B7E8",
+"++	c #353535",
+"\@+	c #E4E4E4",
+"#+	c #CBCCEE",
+"\$+	c #5E64CD",
+"\%+	c #B8BCEA",
+"\&+	c #727272",
+"*+	c #F7F7F7",
+"=+	c #8C92DB",
+"-+	c #989DDF",
+";+	c #F3F4FB",
+">+	c #DEE0F5",
+",+	c #9499DD",
+"'+	c #C7CAEE",
+")+	c #B6B6B6",
+"!+	c #676767",
+"~+	c #D8DAF3",
+"{+	c #9CA1E0",
+"]+	c #E3E4F6",
+"^+	c #BFBFBF",
+"/+	c #888888",
+"(+	c #EDEDF9",
+"_+	c #BCBFEA",
+":+	c #D3D5F1",
+"<+	c #B1B1B1",
+"[+	c #999999",
+"}+	c #F5F5FC",
+"|+	c #B9BDEA",
+"1+	c #D6D8F3",
+"2+	c #FAFAFB",
+"3+	c #C9C9C9",
+"4+	c #D0D3F0",
+"5+	c #D9DBF3",
+"6+	c #EEEEEE",
+"7+	c #BBBBBB",
+"8+	c #CBCDEF",
+"9+	c #F6F6F9",
+"0+	c #CDCDCD",
+"a+	c #FAFAFA",
+"b+	c #F1F1F1",
+"c+	c #EFEFF7",
+"d+	c #F4F4F4",
+"e+	c #E1E1E1",
+"f+	c #DEDEDE",
+"g+	c #DCDCDD",
+"h+	c #D2D3E3",
+"i+	c #C6C7DD",
+"j+	c #BFBFC1",
+"k+	c #D9D9D9",
+"l+	c #E8E8E8",
+"m+	c #D6D8F2",
+"n+	c #D4D5E5",
+"o+	c #D5D5D5",
+"p+	c #E5E5E5",
+"q+	c #404040",
+"r+	c #777777",
+"s+	c #7C7C7C",
+"t+	c #7D7E88",
+"u+	c #6D6D79",
+"v+	c #333334",
+"w+	c #3C3C3C",
+"x+	c #BEBEBE",
+"y+	c #B5B5B5",
+"z+	c #464646",
+"A+	c #989898",
+"B+	c #DEDFF5",
+"C+	c #9495A8",
+"D+	c #F6F6F6",
+"E+	c #C0C0C0",
+"F+	c #494949",
+"G+	c #C6C6C6",
+"H+	c #535353",
+"I+	c #9D9D9D",
+"J+	c #F2F2F2",
+"K+	c #8B8B8B",
+"L+	c #444444",
+"M+	c #9B9B9B",
+"N+	c #4E4E4E",
+"O+	c #DFE0E9",
+"P+	c #55555C",
+"Q+	c #D3D3D3",
+"R+	c #D8D8D8",
+"S+	c #3A3A3A",
+"T+	c #EBEBEB",
+"U+	c #6D6D6D",
+"V+	c #090909",
+"W+	c #2E2E2E",
+"X+	c #E9EAF8",
+"Y+	c #7E7F8D",
+"Z+	c #030303",
+"`+	c #929292",
+" \@	c #131313",
+".\@	c #0D0D0D",
+"+\@	c #474747",
+"\@\@	c #6C6C6C",
+"#\@	c #A2A2A2",
+"\$\@	c #D1D1D1",
+"\%\@	c #9C9C9C",
+"\&\@	c #828282",
+"*\@	c #DCDCDC",
+"=\@	c #646464",
+"-\@	c #57575B",
+";\@	c #B8B8B8",
+">\@	c #7E7E7E",
+",\@	c #0F0F0F",
+"'\@	c #9F9F9F",
+")\@	c #666666",
+"!\@	c #1D1D1D",
+"~\@	c #F5F6FC",
+"{\@	c #7F7F88",
+"]\@	c #3F3F3F",
+"^\@	c #959595",
+"/\@	c #B4B4B4",
+"(\@	c #343434",
+"_\@	c #A3A3A3",
+":\@	c #585859",
+"<\@	c #252525",
+"[\@	c #C3C3C3",
+"}\@	c #0A0A0A",
+"|\@	c #484848",
+"1\@	c #6A6A6A",
+"2\@	c #F6F7F8",
+"3\@	c #7F8082",
+"4\@	c #383838",
+"5\@	c #A0A0A0",
+"6\@	c #505050",
+"7\@	c #5C5C5C",
+"8\@	c #707070",
+"9\@	c #303030",
+"0\@	c #DDDDDD",
+"a\@	c #696969",
+"b\@	c #4B4B4E",
+"c\@	c #E2E2E6",
+"d\@	c #2A2A2A",
+"e\@	c #161616",
+"f\@	c #A5A5A5",
+"g\@	c #4C4C4C",
+"h\@	c #1B1B1B",
+"i\@	c #D2D2D2",
+"j\@	c #3F3F40",
+"k\@	c #626263",
+"l\@	c #8A8A8A",
+"m\@	c #717171",
+"n\@	c #565656",
+"o\@	c #4D4E55",
+"p\@	c #ABABAB",
+"q\@	c #9A9A9A",
+"r\@	c #7A7A7A",
+"s\@	c #3C3C3F",
+"t\@	c #8F8F93",
+"u\@	c #969696",
+"v\@	c #DFDFDF",
+"w\@	c #838390",
+"x\@	c #EBECF9",
+"y\@	c #F7F7F8",
+"z\@	c #7F7F7F",
+"A\@	c #8F8F8F",
+"B\@	c #97979A",
+"C\@	c #787887",
+"D\@	c #C4C4CA",
+"E\@	c #D4D4D4",
+"F\@	c #838383",
+"G\@	c #CDCDCE",
+"H\@	c #D1D2E4",
+"I\@	c #E1E2F5",
+"J\@	c #C8C8C8",
+"K\@	c #CFCFD5",
+"L\@	c #C4C7E6",
+"M\@	c #EAEBF6",
+"N\@	c #CBCBCC",
+"O\@	c #E0E2F1",
+"P\@	c #CDD0F0",
+"Q\@	c #E4E4EA",
+"R\@	c #BEC2EC",
+"S\@	c #E4E6F7",
+"T\@	c #B3B4B5",
+"U\@	c #E7E8F6",
+"V\@	c #B6B9E9",
+"W\@	c #D3D5F2",
+"X\@	c #A6A6A6",
+"Y\@	c #ECEDF3",
+"Z\@	c #AEB2E6",
+"`\@	c #D5D7F2",
+" #	c #8A8A8B",
+".#	c #8990DB",
+"+#	c #AEAEAE",
+"\@#	c #F0F0F8",
+"##	c #979DDF",
+"\$#	c #BCBEEA",
+"\%#	c #ADB2E6",
+"\&#	c #525AC9",
+"*#	c #C4C6EC",
+"=#	c #8085D8",
+"-#	c #9DA2E0",
+";#	c #F8F9FD",
+">#	c #DFE1F6",
+",#	c #4C55C7",
+"'#	c #7C83D7",
+")#	c #F8F8FD",
+"!#	c #626262",
+"~#	c #767DD5",
+"{#	c #8A90DB",
+"]#	c #515151",
+"^#	c #8084D6",
+"/#	c #434EC2",
+"(#	c #CCCFF0",
+"_#	c #C7C7C7",
+":#	c #A8A8A8",
+"<#	c #7379D4",
+"[#	c #8288D8",
+"}#	c #DCDCF4",
+"|#	c #333CBF",
+"1#	c #858ADA",
+"2#	c #F6F6FC",
+"3#	c #F1F2FB",
+"4#	c #6F76D3",
+"5#	c #8289DA",
+"6#	c #7980D6",
+"7#	c #4149C4",
+"8#	c #D6D7F2",
+"9#	c #F0F0FA",
+"0#	c #676ECF",
+"a#	c #8B90DA",
+"b#	c #C8CBEE",
+"c#	c #4049C4",
+"d#	c #8287D9",
+"e#	c #686869",
+"f#	c #484849",
+"g#	c #5B62CC",
+"h#	c #979DDE",
+"i#	c #FAFBFE",
+"j#	c #8C92DD",
+"k#	c #323BC0",
+"l#	c #ADADAD",
+"m#	c #292929",
+"n#	c #474FC7",
+"o#	c #ABAEE5",
+"p#	c #1E1E1E",
+"q#	c #DEE0F4",
+"r#	c #6971D0",
+"s#	c #EBECF8",
+"t#	c #DEDFF4",
+"u#	c #BDC0EA",
+"v#	c #B7B9E9",
+"w#	c #333BBF",
+"x#	c #9FA3E2",
+"y#	c #FAFAFE",
+"z#	c #373737",
+"A#	c #4D54C7",
+"B#	c #D2D4F1",
+"C#	c #2D2D2D",
+"D#	c #5F5F5F",
+"E#	c #838ADA",
+"F#	c #3D46C2",
+"G#	c #BABDE9",
+"H#	c #2B2B2B",
+"I#	c #787DD5",
+"J#	c #6C72D1",
+"K#	c #E3E5F7",
+"L#	c #676ECE",
+"M#	c #4B53C6",
+"N#	c #9C9EAF",
+"O#	c #4B52C7",
+"P#	c #9AA0E1",
+"Q#	c #848484",
+"R#	c #D6D9F3",
+"S#	c #4A4FA5",
+"T#	c #1D1D2A",
+"U#	c #6F6F75",
+"V#	c #9DA1E1",
+"W#	c #454CC4",
+"X#	c #E1E3F6",
+"Y#	c #A1A1A1",
+"Z#	c #E6E6E7",
+"`#	c #979798",
+" \$	c #3F4376",
+".\$	c #4D56C4",
+"+\$	c #B8BCE9",
+"\@\$	c #B6B9E8",
+"#\$	c #464FC2",
+"\$\$	c #A6A9E3",
+"\%\$	c #787878",
+"\&\$	c #5A5A5A",
+"*\$	c #DEDEEF",
+"=\$	c #8288D7",
+"-\$	c #4A52C7",
+";\$	c #8388D8",
+">\$	c #B8BBEA",
+",\$	c #C6C8EE",
+"'\$	c #979CDF",
+")\$	c #F2F3FC",
+"!\$	c #7B7B7B",
+"~\$	c #CCCDEE",
+"{\$	c #8289D7",
+"]\$	c #6A72D0",
+"^\$	c #6970D1",
+"/\$	c #7077D4",
+"(\$	c #B2B4E7",
+"_\$	c #EFF0FA",
+"                                                                                              . ",
+"  + + + + + + + + + + + + + + \@ # \$ \% \& * = - ; + > , ' ) ! ~ { ] ^ + + + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + + / ( _ : < [ } | 1 2 3 4 5 6 7 8 9 0 a b + + + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + + c d e f g + h i j k l m n o p + ^ q r s t + + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + u v w x y + + + + z A B C D + + + + + E F G ^ + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + H I J K + + + + L G M N O P ; + + + + ^ Q R S + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + T U V + + + + W X Y Z `  ...+.+ + + + + \@.Y #.+ + + + + + + + + + + . ",
+"  + + + + + + + + + + + \$.\%.\&.*.+ + + + =.-.n S + ;.>.,.'.+ + + + =.5 ).p + + + + + + + + + + . ",
+"  + + + + + + + + + + + !.~.{.].+ + + ^./.(._.:.+ + <.[.}.; + + + |.1.2.L + + + + + + + + + + . ",
+"  + + + + + + + + + + + 3.4.5.+ + + + #.6.7.8.+ + + g 9.0.a.+ + + L { b.c.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + d.e.f.+ + + g.h.(.i.+ + + + + j.k.l.m.+ + n.G a o.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + p.q.r.+ + :.s.t.u.+ + + + + + v.w.x.y.+ + :.z.A.B.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + C.D.E.+ + 8.F.~ G.+ + + + + + + H.I.J.+ + W K.6.=.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + L.M.N.+ + O.P.Q.n.+ + + + + + + R.f.S.T.+ W U.5 =.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + V.W.X.+ p Y.Z.`.+ + + + + + + + + #  +.+; W s.++\@++ + + + + + + + + + . ",
+"  + + + + + + + + + + + #+\$+\%++ o s \&+*++ + + + + + + + + u =+-+;+:.X Q i.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + >+,+'+W )+!+`.+ + + + + + + + + + + ~+{+]+^ ^+/+> + + + + + + + + + + . ",
+"  + + + + + + + + + + + (+_+:+8.<+[+n.+ + + + + + + + + + + }+|+1+2+3+X *++ + + + + + + + + + . ",
+"  + + + + + + + + + + + }+4+5+6+7+, + + + + + + + + + + + + m.~+8+9+0+] a++ + + + + + + + + + . ",
+"  + + + + + + + + + + + g >+;.o.3+b++ + + + + + + + + + + + + - i c+, o ^ + + + + + + + + + + . ",
+"  + + d+e+=.n.+ i.f+f+f+g+h+i+j+7+k+l++ W f+f+f+f+l+^ + 8.e+d+h m+n+X o+:.*+=.S + |.f+o.+ + + . ",
+"  + p+/.q+s r+B.s+) ) ) ) t+u+v+Z.w+1.x+^.) ) ) ) s+|.+ y+z+A+y B+C+! /+D+E+s F+G+H+) b.I+J++ . ",
+"  + K+r . G+L+M+l+=.N+Q =.O+P+s Q+R+S+Y.o.M [+=.=.T+^ J+U+V+W+t X+Y+Z+F+l+`+ \@.\@+\@\@\@o #\@S+\$\@+ . ",
+"  + \%\@(.\&\@X <+*\@W + Q =\@+ v.-\@0 )+;\@+\@>\@T+,\@\@\@'\@'\@0++ k+! )\@!\@s.~\@{\@Y a o+Y.]\@t.Q S+^\@;\@/\@> + . ",
+"  + t K+L+(\@~ _\@p + Q =\@+ m.:\@Y H+s <\@[\@D+}\@|\@1\@1\@X + #\@! q ) 7.2\@3\@4\@4\@5\@6\@7\@(.0+8\@w+9\@n 0++ . ",
+"  + ^+)+e+0\@a\@R d++ Q =\@+ p   b\@c\@o d\@^\@D+e\@f\@d+d+n.:.g\@M 9\@h\@0 i\@>\@j\@k\@{ q+' m f\@G+l+[\@S+l\@+ . ",
+"  + ).<\@G A+R m\@^.+ Q =\@+ d+n\@o\@K L 0 7 d+,\@7._\@_\@O.`.h\@).3+p\@F q\@r\@s\@t\@M Y.M+e\@N+6 A+G 9\@\@.+ . ",
+"  + c.u\@\@\@{ `+v\@W + M+_\@+ 3 Q.w\@x\@y\@l\@p\@d+!+!+!+!+A+;\@z\@B.+ b+A\@M+B\@C\@D\@' )+. ' E\@F\@!+m\@s.J++ . ",
+"  + + p d+L a++ + + *+*++ i.G\@H\@I\@R.8.*+W J+J+J+J+*+^.d+:.+ W 3 J\@K\@L\@M\@d+a+a+d++ ^.J+8.:.+ + . ",
+"  + + + + + + + + + + + + f+N\@O\@P\@;++ + + + + + + + + + + + + \@+y+Q\@R\@S\@+ + + + + + + + + + + . ",
+"  + + + + + + + + + + + ^ J\@T\@U\@V\@W\@+ + + + + + + + + + + + a+O.X\@Y\@Z\@`\@; + + + + + + + + + + . ",
+"  + + + + + + + + + + + 8.K. #K [ .#g + + + + + + + + + + + t r++#\@###\$#m.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + T+m\@2.; \%#\&#*#+ + + + + + + + + + + /\@s q K =#-#;#+ + + + + + + + + + . ",
+"  + + + + + + + + + + + g.  Q + >#,#'#)#+ + + + + + + + + :.H+!#6+K ~#{#v.+ + + + + + + + + + . ",
+"  + + + + + + + + + + + B.n ]#+ / ^#/#(#+ + + + + + + + + _#<\@:#W K <#[#~\@+ + + + + + + + + + . ",
+"  + + + + + + + + + + + p+|\@|\@+ + }#|#1#2#+ + + + + + + d+Z z+J++ 3#4#5#2#+ + + + + + + + + + . ",
+"  + + + + + + + + + + + T+N+]\@+ + ;#6#7#8#+ + + + + + + x+-.8 + + 9#0#a#)#+ + + + + + + + + + . ",
+"  + + + + + + + + + + + d+Q W+W + ; b#c#d#; + + + + + 3 e#f#3 + + (+g#h#i#+ + + + + + + + + + . ",
+"  + + + + + + + + + + + W U+Y |.+ + )#j#k#P\@+ + + + + l#m##.W + + !.n#o#; + + + + + + + + + + . ",
+"  + + + + + + + + + + + + A\@p#0++ + + q#_ r#s#+ + + |.r 7.> + + + t#7#u#+ + + + + + + + + + + . ",
+"  + + + + + + + + + + + + ;\@6.'\@+ + + W v#w#x#y#+ n.z\@z#R++ + + + _+A#B#+ + + + + + + + + + + . ",
+"  + + + + + + + + + + + + 6+C#D#D++ + + m.E#F#G#^.\%\@H#E++ + + + + I#J#9#+ + + + + + + + + + + . ",
+"  + + + + + + + + + + + + + m\@9\@0++ + + + K#L#M#N#S+K+^ + + + + X+O#P#; + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + + 0+t.Q#*++ + + ; R#S#T#U#6++ + + + ; V#W#X#+ + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + + n.Q.Y Y#D++ + Z#`#~  \$.\$+\$}++ + i#\@\$#\$\$\$+ + + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + + + l+' d\@\%\$U.A+\&\$H+f\@*\$=\$-\$;\$>\$,\$'\$\&#;\$)\$+ + + + + + + + + + + + + . ",
+"  + + + + + + + + + + + + + + + 3 ;\@!\$\%\$4 <+S p + K ~\${\$]\$^\$/\$(\$_\$+ + + + + + + + + + + + + + . ",
+". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "};
+EOF
 
 sub new {
     my $type = shift;
@@ -453,7 +1643,7 @@ sub saveas {
     my $self = shift;
     my $data = $self->{data};
     my $fs = $self->{MainWindow}->FileSelect(
-	-directory => $data->{directory},
+	-directory=>$data->{directory},
     );
     my $file = $fs->Show;
     $fs->destroy;
@@ -461,20 +1651,20 @@ sub saveas {
 	my $base = $file; $base =~ s/^.*\///;
 	if (-e $file) {
 	    my $d = $self->{MainWindow}->Dialog(
-		-title => 'Are you sure?',
-		-text => "File $base already exists: are you sure that you want to overwrite it?",
-		-default_button => 'Cancel',
-		-buttons => [ qw/Save Cancel Help/ ],
+		-title=>'Are you sure?',
+		-text=>"File $base already exists: are you sure that you want to overwrite it?",
+		-default_button=>'Cancel',
+		-buttons=>[ qw/Save Cancel Help/ ],
 	    );
 	    my $answer = $d->Show;
 	    $d->destroy;
 	    return unless $answer eq 'Save';
 	    if (not -w $file) {
 		$d = $self->{MainWindow}->Dialog(
-		    -title => 'Permission denied.',
-		    -text => "You do not have permission to write to $base.",
-		    -default_button => 'Ok',
-		    -buttons => [ 'Ok' ],
+		    -title=>'Permission denied.',
+		    -text=>"You do not have permission to write to $base.",
+		    -default_button=>'Ok',
+		    -buttons=>[ 'Ok' ],
 		);
 		$d->Show;
 		$d->destroy;
@@ -486,10 +1676,10 @@ sub saveas {
 	    $self->{dirty} = 'no';
 	} else {
 		my $d = $self->{MainWindow}->Dialog(
-		    -title => 'Write failed.',
-		    -text => "Could not write to $base.",
-		    -default_button => 'Ok',
-		    -buttons => [ 'Ok' ],
+		    -title=>'Write failed.',
+		    -text=>"Could not write to $base.",
+		    -default_button=>'Ok',
+		    -buttons=>[ 'Ok' ],
 		);
 		$d->Show;
 		$d->destroy;
@@ -505,20 +1695,20 @@ sub save {
     my $base = $file; $base =~ s/^.*\///;
     if (-e $file) {
 	my $d = $self->{MainWindow}->Dialog(
-	    -title => 'Are you sure?',
-	    -text => "File $base already exists: are you sure that you want to overwrite it?",
-	    -default_button => 'Cancel',
-	    -buttons => [ qw/Save Cancel Help/ ],
+	    -title=>'Are you sure?',
+	    -text=>"File $base already exists: are you sure that you want to overwrite it?",
+	    -default_button=>'Cancel',
+	    -buttons=>[ qw/Save Cancel Help/ ],
 	);
 	my $answer = $d->Show;
 	$d->destroy;
 	return unless $answer eq 'Save';
 	if (not -w $file) {
 	    $d = $self->{MainWindow}->Dialog(
-		-title => 'Permission denied.',
-		-text => "You do not have permission to write to $base.",
-		-default_button => 'Ok',
-		-buttons => [ 'Ok' ],
+		-title=>'Permission denied.',
+		-text=>"You do not have permission to write to $base.",
+		-default_button=>'Ok',
+		-buttons=>[ 'Ok' ],
 	    );
 	    $d->Show;
 	    $d->destroy;
@@ -529,10 +1719,10 @@ sub save {
 	$self->{dirty} = 'no';
     } else {
 	my $d = $self->{MainWindow}->Dialog(
-	    -title => 'Write failed.',
-	    -text => "Could not write to $base.",
-	    -default_button => 'Ok',
-	    -buttons => [ 'Ok' ],
+	    -title=>'Write failed.',
+	    -text=>"Could not write to $base.",
+	    -default_button=>'Ok',
+	    -buttons=>[ 'Ok' ],
 	);
 	$d->Show;
 	$d->destroy;
@@ -544,10 +1734,10 @@ sub storefile {
     my $data = $self->{data};
     while ($self->{dirty} eq 'yes') {
 	my $d = $self->{MainWindow}->Dialog(
-	    -title => 'Are you sure?',
-	    -text => 'Changes will be lost: are you sure?',
-	    -default_button => 'Cancel',
-	    -buttons => [ 'Discard', 'Cancel', 'Save' ],
+	    -title=>'Are you sure?',
+	    -text=>'Changes will be lost: are you sure?',
+	    -default_button=>'Cancel',
+	    -buttons=>[ 'Discard', 'Cancel', 'Save' ],
 	);
 	my $answer = $d->Show;
 	$d->destroy;
@@ -571,7 +1761,7 @@ sub openfile {
     my $result = $self->storefile();
     return if $result eq 'Cancel';
     my $fs = $self->{MainWindow}->FileSelect(
-	-directory => $data->{directory},
+	-directory=>$data->{directory},
     );
     my $file = $fs->Show;
     $fs->destroy;
@@ -586,10 +1776,10 @@ sub openfile {
 	    return;
 	} else {
 	    my $d = $self->{MainWindow}->Dialog(
-		-title => 'Could not read file.',
-		-text => "File $base could not be read!",
-		-default_button => 'Ok',
-		-buttons => [ 'Ok' ],
+		-title=>'Could not read file.',
+		-text=>"File $base could not be read!",
+		-default_button=>'Ok',
+		-buttons=>[ 'Ok' ],
 	    );
 	    $d->Show;
 	    $d->destroy;
@@ -597,19 +1787,19 @@ sub openfile {
     } else {
 	if (-e $file) {
 	    my $d = $self->{MainWindow}->Dialog(
-		-title => 'Permission denied.',
-		-text => "File $base is not readable for you!",
-		-default_button => 'Ok',
-		-buttons => [ 'Ok' ],
+		-title=>'Permission denied.',
+		-text=>"File $base is not readable for you!",
+		-default_button=>'Ok',
+		-buttons=>[ 'Ok' ],
 	    );
 	    $d->Show;
 	    $d->destroy;
 	} else {
 	    my $d = $self->{MainWindow}->Dialog(
-		-title => 'File does not exist?',
-		-text => "File $base does not exist!",
-		-default_button => 'Ok',
-		-buttons => [ 'Ok' ],
+		-title=>'File does not exist?',
+		-text=>"File $base does not exist!",
+		-default_button=>'Ok',
+		-buttons=>[ 'Ok' ],
 	    );
 	    $d->Show;
 	    $d->destroy;
@@ -622,7 +1812,7 @@ sub closefile {
     my $data = $self->{data};
     my $result = $self->storefile();
     return if $result eq 'Cancel';
-    if (scalar(@main::myapps) > 1) {
+    if (scalar(@myapps) > 1) {
 	$self->{MainWindow}->destroy;
     } else {
 	$data->{recent} = [];
@@ -639,7 +1829,7 @@ sub loadmib {
     my @temp = ();
     my $fs;
     $fs = $self->{MainWindow}->FileSelect(
-	-directory => $data->{directory},
+	-directory=>$data->{directory},
     );
     if (my $file = $fs->Show) {
 	$data->{directory} = $file;
@@ -652,12 +1842,12 @@ sub loadmib {
 	$self->{RecentMenu}->delete(0, 'last');
 	while (my $f = pop @temp) {
 	    $self->{RecentMenu}->add('command',
-		-command => [ \&loadrecent, $self, $f ],
-		-label => $f,
+		-command=>[ \&loadrecent, $self, $f ],
+		-label=>$f,
 	    );
 	}
 	$self->{FileMenu}->entryconfigure('Recent MIBs...',
-	    -state => 'normal',
+	    -state=>'normal',
 	);
     }
     $fs->destroy;
@@ -676,10 +1866,10 @@ sub destroyed {
     my @temp = ();
     if (UNIVERSAL::isa($mw, 'Tk::MainWindow')) {
 	#print "Main Window $mw and $self destroyed.";
-	foreach my $s ( @main::myapps ) {
+	foreach my $s ( @myapps ) {
 	    push @temp, $s unless $s eq $self;
 	}
-	@main::myapps = ( @temp );
+	@myapps = ( @temp );
 	# self is no longer referenced and will be destroyed too...
     }
     return;
@@ -687,219 +1877,178 @@ sub destroyed {
 
 sub exit {
     my $self = shift;
-    foreach my $s (@main::myapps) {
+    foreach my $s (@myapps) {
 	$s->{MainWindow}->destroy;
     }
 }
 
-sub showversion {
+sub ShowVersion {
     my $self = shift;
-    my $tl = $self->{MainWindow}->Toplevel();
-    $tl->title("Version");
-    my $tx = $tl->Scrolled('ROText',
-	-scrollbars => 'osoe',
-	-width => 80,
-	-wrap => 'none',
-    )->pack(
-	-side => 'top',
-	-fill => 'x',
-	-expand => 1,
+    my $dialog = $self->{MainWindow}->DialogBox(
+	-title=>'Program Version',
+	-default_button=>'Dismiss',
+	-buttons=>[qw/Dismiss/],
     );
-    my $bt = $tl->Button(
-	-text => 'Dismiss',
-	-default => 'active',
-	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
+    $dialog->resizable(0,0);
+    $dialog->iconimage('icon');
+    $dialog->iconname($title);
+    $dialog->Label(
+	-image=>'icon',
+	-relief=>'flat',
+	-text=>$Title,
+	-compound=>'left',
+	-justify=>'left',
+	-padx=>10,
     )->pack(
-	-side => 'bottom',
-	-fill => 'none',
-	-expand => 0,
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
     );
-    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
-Version $version
-$ident
-Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
-Distributed under Affero GPL Version 3, included here by reference.
-See `$program --copying' for copying permissions.
-EOF
+    my $lines = $Version;
+    $lines =~ s/[^\n]//g;
+    $lines = length($lines) + 1;
+    my $text = $dialog->Scrolled('ROText',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'word',
+	-font=>'Arial 8',
+	-relief=>'groove',
+	-height=>$lines,
+	-bg=>'white smoke',
+    )->pack(
+	-side=>'top',
+	-fill=>'both',
+	-expand=>1,
+    );
+    $text->insert('0.0', $Version);
+    $dialog->Show();
+}
+
+sub ShowUsage {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->DialogBox(
+	-title=>'Program Copying Conditions',
+	-default_button=>'Accept',
+	-buttons=>[qw/Accept Refuse/],
+    );
+    $dialog->resizable(0,0);
+    $dialog->iconimage('icon');
+    $dialog->iconname($title);
+    $dialog->Label(
+	-image=>'icon',
+	-relief=>'flat',
+	-text=>$Title,
+	-compound=>'left',
+	-justify=>'left',
+	-padx=>10,
+    )->pack(
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
+    );
+    my $lines = $Usage;
+    $lines =~ s/[^\n]//g;
+    $lines = length($lines) + 1;
+    my $tx = $dialog->Scrolled('ROText',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'word',
+	-font=>'Arial 8',
+	-relief=>'groove',
+	-height=>$lines,
+	-bg=>'white smoke',
+    )->pack(
+	-side=>'top',
+	-fill=>'both',
+	-expand=>1,
+    );
+    $tx->insert('0.0', $Usage);
+    exit 0 if ($dialog->Show() eq 'Refuse');
+}
+
+sub ShowCopying {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->DialogBox(
+	-title=>'Program Copying Conditions',
+	-default_button=>'Accept',
+	-buttons=>[qw/Accept Refuse/],
+    );
+    $dialog->resizable(0,0);
+    $dialog->iconimage('icon');
+    $dialog->iconname($title);
+    $dialog->Label(
+	-image=>'icon',
+	-relief=>'flat',
+	-text=>$Title,
+	-compound=>'left',
+	-justify=>'left',
+	-padx=>10,
+    )->pack(
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
+    );
+    my $lines = $Copying;
+    $lines =~ s/[^\n]//g;
+    $lines = length($lines) + 1 + 15;
+    my $tx = $dialog->Scrolled('ROText',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'word',
+	-font=>'Arial 8',
+	-relief=>'groove',
+	-height=>$lines,
+	-bg=>'white smoke',
+    )->pack(
+	-side=>'top',
+	-fill=>'both',
+	-expand=>1,
+    );
+    $tx->insert('0.0', $Copying);
+    exit 0 if ($dialog->Show() eq 'Refuse');
+}
+
+sub ShowHelp {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->DialogBox(
+	-title=>'Help',
+	-default_button=>'Dismiss',
+	-buttons=>[qw/Dismiss/],
+    );
+    $dialog->resizable(0,0);
+    $dialog->iconimage('icon');
+    $dialog->iconname($title);
+    $dialog->Label(
+	-image=>'icon',
+	-relief=>'flat',
+	-text=>$Title,
+	-compound=>'left',
+	-justify=>'left',
+	-padx=>10,
+    )->pack(
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
+    );
+    my $lines = $Help;
+    $lines =~ s/[^\n]//g;
+    $lines = length($lines) + 1 + 5;
+    my $tx = $dialog->Scrolled('ROText',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'word',
+	-font=>'Arial 8',
+	-relief=>'groove',
+	-height=>$lines,
+	-bg=>'white smoke',
+    )->pack(
+	-side=>'top',
+	-fill=>'both',
+	-expand=>1,
+    );
+    $tx->insert('0.0', $Help);
+    $dialog->Show();
     return;
-}
-
-sub showusage {
-    my $self = shift;
-    my $tl = $self->{MainWindow}->Toplevel();
-    $tl->title("Usage");
-    my $tx = $tl->Scrolled('ROText',
-	-scrollbars => 'osoe',
-	-width => 80,
-	-wrap => 'none',
-    )->pack(
-	-side => 'top',
-	-fill => 'x',
-	-expand => 1,
-    );
-    my $bt = $tl->Button(
-	-text => 'Dismiss',
-	-default => 'active',
-	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
-    )->pack(
-	-side => 'bottom',
-	-fill => 'none',
-	-expand => 0,
-    );
-    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
-$program
-    $ident
-Usage:
-    $program [options] [MODULE ...]
-    $program {-h|--help}
-    $program {-V|--version}
-    $program {-C|--copying}
-EOF
-    return;
-}
-
-sub showcopying {
-    my $self = shift;
-    my $tl = $self->{MainWindow}->Toplevel();
-    $tl->title("Copying");
-    my $tx = $tl->Scrolled('ROText',
-	-scrollbars => 'osoe',
-	-width => 80,
-	-wrap => 'none',
-    )->pack(
-	-side => 'top',
-	-fill => 'both',
-	-expand => 1,
-    );
-    my $bt = $tl->Button(
-	-text => 'Dismiss',
-	-default => 'active',
-	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
-    )->pack(
-	-side => 'bottom',
-	-fill => 'none',
-	-expand => 0,
-    );
-    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
---------------------------------------------------------------------------------
-$ident
---------------------------------------------------------------------------------
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
-
-All Rights Reserved.
---------------------------------------------------------------------------------
-This program is free software; you can  redistribute  it and/or modify  it under
-the terms  of the GNU General Public License  as  published by the Free Software
-Foundation; version 3 of the License.
-
-This program is distributed in the hope that it will  be useful, but WITHOUT ANY
-WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-You should  have received a copy of the GNU  General  Public License  along with
-this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
---------------------------------------------------------------------------------
-U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
-of the U.S. Government ("Government"), the following provisions apply to you. If
-the Software is supplied by the  Department of Defense ("DoD"), it is classified
-as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
-Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
-regulations) and the  Government  is acquiring  only the  license rights granted
-herein (the license rights customarily provided to non-Government users). If the
-Software is supplied to any unit or agency of the Government  other than DoD, it
-is  classified as  "Restricted Computer Software" and the Government's rights in
-the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
-Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
-paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
-regulations).
---------------------------------------------------------------------------------
-Commercial  licensing  and  support of this  software is  available from OpenSS7
-Corporation at a fee.  See http://www.openss7.com/
---------------------------------------------------------------------------------
-EOF
-    return;
-}
-
-sub showhelp {
-    my $self = shift;
-    my $tl = $self->{MainWindow}->Toplevel();
-    $tl->title("Help");
-    my $tx = $tl->Scrolled('ROText',
-	-scrollbars => 'osoe',
-	-width => 80,
-	-wrap => 'none',
-    )->pack(
-	-side => 'top',
-	-fill => 'x',
-	-expand => 1,
-    );
-    my $bt = $tl->Button(
-	-text => 'Dismiss',
-	-default => 'active',
-	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
-    )->pack(
-	-side => 'bottom',
-	-fill => 'none',
-	-expand => 0,
-    );
-    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
-$program:
-    $ident
-Usage:
-    $program [options] [MODULE ...]
-    $program {-h|--help}
-    $program {-V|--version}
-    $program {-C|--copying}
-Arguments:
-    NONE
-Options:
-    -n, --dryrun
-        don't perform the actions, just check them
-    -q, --quiet
-        suppress normal output
-    -D, --debug [LEVEL]
-        increase or set debugging verbosity
-    -v, --verbose [LEVEL]
-        increase or set output verbosity
-    -h, --help
-        prints this usage information and exits
-    -V, --version
-        prints the version and exits
-    -C, --copying
-        prints copying permissions and exits
-EOF
-    return;
-}
-
-sub refreshchild {
-    my $self = shift;
-    my $entry = shift;
-    my $hl = $self->{HList};
-    my @list = $hl->info('children', $entry);
-    if (@list) {
-	$hl->itemCreate($entry, 1,
-	    -itemtype => 'text',
-	    -text => $#list+1);
-    } else {
-	$hl->itemDelete($entry, 1) if ($hl->itemExists($entry, 1));
-	$hl->indicator('create', $entry,
-	    -itemtype => 'image',
-	    -image => 'doc');
-    }
-    foreach (@list) {
-	$self->refreshchild($_);
-    }
-}
-
-sub refresh {
-    my $self = shift;
-    my $hl = $self->{HList};
-    my @list = $hl->info('children');
-    foreach (@list) {
-	$self->refreshchild($_);
-    }
 }
 
 sub expandchild {
@@ -911,9 +2060,12 @@ sub expandchild {
 	my $data = $hl->entrycget($entry,
 	    -data);
 	$data->{'opened'} = 1;
+	my $image = $hl->indicator('cget', $entry, -image);
+	$image =~ s/^c/o/;
 	$hl->indicator('create', $entry,
-	    -itemtype => 'image',
-	    -image => 'obook');
+	    -itemtype=>'image',
+	    -image=>$image,
+	);
 	foreach (@list) {
 	    $hl->show('entry', $_);
 	    $self->expandchild($_);
@@ -939,9 +2091,12 @@ sub collapsechild {
 	my $data = $hl->entrycget($entry,
 	    -data);
 	$data->{'opened'} = 0;
+	my $image = $hl->indicator('cget', $entry, -image);
+	$image =~ s/^o/c/;
 	$hl->indicator('create', $entry,
-	    -itemtype => 'image',
-	    -image => 'cbook');
+	    -itemtype=>'image',
+	    -image=>$image,
+	);
 	foreach (@list) {
 	    $self->collapsechild($_);
 	    $hl->hide('entry', $_);
@@ -992,45 +2147,46 @@ sub preferences {
     my $tl = $self->{MainWindow}->Toplevel();
     $tl->title('Preferences');
     my $nb = $tl->NoteBook(
-	-dynamicgeometry => 0,
-	-ipadx => 2,
-	-ipady => 2,
-	-backpagecolor => 'white',
-	-focuscolor => 'black',
-	-font => 'Helvetica 9',
-	-tabpadx => 5,
-	-tabpady => 5,
+	-dynamicgeometry=>0,
+	-ipadx=>2,
+	-ipady=>2,
+	-backpagecolor=>'white',
+	-focuscolor=>'black',
+	-font=>'Helvetica 9',
+	-tabpadx=>5,
+	-tabpady=>5,
     )->pack(
-	-side => 'top',
-	-fill => 'x',
-	-expand => 0,
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
     );
-    my $f = $tl->Frame()->pack(
-	-side => 'top',
-	-fill => 'x',
-	-expand => 0,
-    );
-    my $b = $f->Button(
-	-text => 'OK',
-	-default => 'active', 
-	-command => [ \&prefsok, $self, $tl ],
-    )->grid(
-	-row => 0,
-	-column => 0,
+    my $f = $tl->Frame(
+    )->pack(
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
     );
     my $b = $f->Button(
-	-text => 'Accept',
-	-command => [ \&prefsaccept, $self, $tl ],
+	-text=>'OK',
+	-default=>'active', 
+	-command=>[ \&prefsok, $self, $tl ],
     )->grid(
-	-row => 0,
-	-column => 1,
+	-row=>0,
+	-column=>0,
     );
     my $b = $f->Button(
-	-text => 'Cancel',
-	-command => [ \&prefscancel, $self, $tl ],
+	-text=>'Accept',
+	-command=>[ \&prefsaccept, $self, $tl ],
     )->grid(
-	-row => 0,
-	-column => 2,
+	-row=>0,
+	-column=>1,
+    );
+    my $b = $f->Button(
+	-text=>'Cancel',
+	-command=>[ \&prefscancel, $self, $tl ],
+    )->grid(
+	-row=>0,
+	-column=>2,
     );
     return;
 }
@@ -1041,441 +2197,525 @@ sub create {
     $self->{data} = $data;
     $data->{recent} = [];
     $self->{dirty} = 'no';
-    $self->{MainWindow} = Tk::MainWindow->new;
-    $self->{MainWindow}->title("STREAMS Manager");
-    $self->{MainWindow}->bind('<Destroy>', [ \&destroyed, $self ]);
-    $self->{MainWindow}->geometry('800x600');
+    my ($mw,$mb,$mi,$mc,$hl,$tx);
+    $mw = Tk::MainWindow->new;
+    $self->{MainWindow} = $mw;
+    $mw->title($title);
+    $mw->bind('<Destroy>', [\&destroyed, $self]);
+    $mw->geometry('800x600');
 
-#    $self->{MainWindow}->optionAdd('*font' => '-*-helvetica-medium-r-*--*-100-*-*-*-*-*-*');
-#    $self->{MainWindow}->optionAdd('*.Button.*.font' => '-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
-#    $self->{MainWindow}->optionAdd('*.Label.*.font' => '-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
-    $self->{MainWindow}->optionAdd('*HighlightThickness' => 0);
-    $self->{MainWindow}->optionAdd('*Relief' => 'groove');
-    $self->{MainWindow}->optionAdd('*BorderThickness' => 1);
-    $self->{MainWindow}->optionAdd('*BorderWidth' => 1);
-    $self->{MainWindow}->optionAdd('*Border' => 1);
-    $self->{MainWindow}->optionAdd('*Scrollbar*Width' => 8);
-    $self->{MainWindow}->optionAdd('*Menu*Width' => 2);
-    $self->{MainWindow}->optionAdd('*Menu*Heigth' => 2);
-
-    $self->{MainWindow}->Pixmap('doc',
-	-data => <<EOF);
-/* XPM */
-static char * mini-doc_xpm[] = {
-"16 14 4 1",
-" 	c None",
-".	c black",
-"X	c white",
-"o	c gray50",
-"   .......      ",
-"   .XXXXX..     ",
-"   .XoooX.X.    ",
-"   .XXXXX....   ",
-"   .XooooXoo.o  ",
-"   .XXXXXXXX.o  ",
-"   .XooooooX.o  ",
-"   .XXXXXXXX.o  ",
-"   .XooooooX.o  ",
-"   .XXXXXXXX.o  ",
-"   .XooooooX.o  ",
-"   .XXXXXXXX.o  ",
-"   ..........o  ",
-"    oooooooooo  "};
-EOF
-    $self->{MainWindow}->Pixmap('cbook',
-    -data => <<EOF);
-/* XPM */
-static char * mini_book1_xpm[] = {
-"16 14 7 1",
-" 	c None",
-".	c #0000CD",
-"+	c #000000",
-"@	c #FF0000",
-"#	c #FFFF00",
-":	c #FFFFFF",
-"%	c #7F7F7F",
-"       ++       ",
-"     ++@@+      ",
-"   ++@@@@@+     ",
-" ++@@@@@@@@+    ",
-"+##@@@@@@@@@+   ",
-"++##@@@@@@@@@+  ",
-"+@+##@@@@@@@@@+ ",
-"+@@+##@@@@@@++  ",
-" +@@+##@@@++:%  ",
-"  +@@+##++::%%+ ",
-"   +@@++::%%++  ",
-"    +@+:%%++    ",
-"     ++%++      ",
-"      ++        "};
-EOF
-    $self->{MainWindow}->Pixmap('obook',
-    -data => <<EOF);
-/* XPM */
-static char * mini-book2_xpm[] = {
-"16 14 4 1",
-" 	c None",
-".	c black",
-"X	c gray50",
-"o	c white",
-"  ..            ",
-" .Xo.    ...    ",
-" .Xoo. ..oo.    ",
-" .Xooo.Xooo...  ",
-" .Xooo.oooo.X.  ",
-" .Xooo.Xooo.X.  ",
-" .Xooo.oooo.X.  ",
-" .Xooo.Xooo.X.  ",
-" .Xooo.oooo.X.  ",
-"  .Xoo.Xoo..X.  ",
-"   .Xo.o..ooX.  ",
-"    .X..XXXXX.  ",
-"    ..X.......  ",
-"     ..         "};
-EOF
+#    $mw->optionAdd('*font'=>'-*-helvetica-medium-r-*--*-100-*-*-*-*-*-*');
+#    $mw->optionAdd('*.Button.*.font'=>'-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
+#    $mw->optionAdd('*.Label.*.font'=>'-*-helvetica-bold-r-*--*-100-*-*-*-*-*-*');
+    $mw->optionAdd('*HighlightThickness'=>0);
+    $mw->optionAdd('*Relief'=>'groove');
+    $mw->optionAdd('*BorderThickness'=>1);
+    $mw->optionAdd('*BorderWidth'=>1);
+    $mw->optionAdd('*Border'=>1);
+    $mw->optionAdd('*Scrollbar*Width'=>8);
+    $mw->optionAdd('*Menu*Width'=>2);
+    $mw->optionAdd('*Menu*Heigth'=>2);
+    $mw->Pixmap('icon', -data=>$iconImage,);
+    $mw->Pixmap('oobjs', -data=>$objsImage,);
+    $mw->Pixmap('cobjs', -data=>$objsImage,);
+    $mw->Pixmap('onote', -data=>$noteImage,);
+    $mw->Pixmap('cnote', -data=>$noteImage,);
+    $mw->Pixmap('oparm', -data=>$parmImage,);
+    $mw->Pixmap('cparm', -data=>$parmImage,);
+    $mw->Pixmap('odocs', -data=>$odocsImage,);
+    $mw->Pixmap('cdocs', -data=>$cdocsImage,);
+    $mw->Pixmap('odocs-red', -data=>$odocsRedImage,);
+    $mw->Pixmap('cdocs-red', -data=>$cdocsRedImage,);
+    $mw->Pixmap('orows', -data=>$orowsImage,);
+    $mw->Pixmap('crows', -data=>$crowsImage,);
+    $mw->Pixmap('ocols', -data=>$ocolsImage,);
+    $mw->Pixmap('ccols', -data=>$ocolsImage,);
+    $mw->Pixmap('cbook', -data=>$cbookImage,);
+    $mw->Pixmap('obook', -data=>$obookImage,);
+    $mw->Pixmap('cbook-red', -data=>$cbookRedImage,);
+    $mw->Pixmap('cbook-grn', -data=>$cbookGrnImage,);
+    $mw->Pixmap('cbook-blu', -data=>$cbookBluImage,);
+    $mw->iconimage('icon');
+    $mw->iconname($title);
 
     $data->{directory} = '/usr/share/snmp/mibs';
-    $self->{Menu} = $self->{MainWindow}->Menu(
-	-type => 'menubar',
-	-relief => 'groove',
+    $mb = $mw->Menu(
+	-relief=>'groove',
+	-type=>'menubar',
     );
-    $self->{MainWindow}->configure(-menu => $self->{Menu});
-    $self->{Dialog} = $self->{MainWindow}->Dialog(
-	-title => 'MIB Selection',
-	-text => 'Please input the MIB to load.',
-	-default_button => 'Cancel',
-	-buttons => [ 'Ok', 'Cancel', 'Help' ],
+    $mw->configure(-menu=>$mb);
+    $self->{Dialog} = $mw->Dialog(
+	-buttons=>[qw/Ok Cancel Help/],
+	-default_button=>'Cancel',
+	-text=>'Please input the MIB to load.',
+	-title=>'MIB Selection',
     );
-    $self->{FileMenu} = $self->{Menu}->Menu(
-	-type => 'normal',
-	-title => 'File Menu',
-	-tearoff => 0,
+    $mi = $mb->Menu(
+	-tearoff=>1,
+	-title=>'File Menu',
+	-type=>'normal',
     );
-    $self->{FileMenu}->add('command',
-	-command => [ \&newfile, $self ],
-	-label => 'New',
-	-underline => 0,
-	-accelerator => '~N',
+    $mi->add('command',
+	-command=>[\&newfile,$self],
+	-label=>'New',
+	-underline=>0,
     );
-    $self->{FileMenu}->add('command',
-	-label => 'Open...',
-	-command => [ \&openfile, $self ],
-	-underline => 0,
-	-accelerator => '~O',
+    $mi->add('command',
+	-command=>[\&openfile,$self],
+	-label=>'Open...',
+	-underline=>0,
     );
-    $self->{FileMenu}->add('command',
-	-command => [ \&save, $self ],
-	-label => 'Save',
-	-underline => 0,
+    $mi->add('command',
+	-command=>[\&save,$self],
+	-label=>'Save',
+	-underline=>0,
     );
-    $self->{FileMenu}->add('command',
-	-command => [ \&saveas, $self ],
-	-label => 'Save As...',
-	-underline => 5,
+    $mi->add('command',
+	-command=>[\&saveas,$self],
+	-label=>'Save As...',
+	-underline=>5,
     );
-    $self->{FileMenu}->add('command',
-	-command => [ \&closefile, $self ],
-	-label => 'Close',
-	-underline => 0,
+    $mi->add('command',
+	-command=>[\&closefile,$self],
+	-label=>'Close',
+	-underline=>0,
     );
-    $self->{FileMenu}->add('separator');
-    $self->{FileMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Properties...',
+    $mi->add('separator');
+    $mi->add('command',
+	-command=>sub { return; },
+	-label=>'Properties...',
+	-underline=>0,
     );
-    $self->{FileMenu}->add('separator');
-    $self->{FileMenu}->add('command',
-	-command => [ \&loadmib, $self ],
-	-label => 'Load MIB',
-	-underline => 0,
+    $mi->add('separator');
+    $mi->add('command',
+	-command=>[\&loadmib,$self],
+	-label=>'Load MIB',
+	-underline=>0,
     );
-    $self->{FileMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Unload MIB',
-	-underline => 0,
+    $mi->add('command',
+	-command=>sub { return; },
+	-label=>'Unload MIB',
+	-underline=>0,
     );
-    $self->{RecentMenu} = $self->{FileMenu}->Menu(
-	-title => 'Recent Files',
-	-tearoff => 0,
+    $mc = $mi->Menu(
+	-tearoff=>1,
+	-title=>'Recent Files',
     );
-    $self->{FileMenu}->add('cascade',
-	-menu => $self->{RecentMenu},
-	-label => 'Recent MIBs...',
-	-underline => 0,
-	-state => 'disabled',
+    $mi->add('cascade',
+	-menu=>$mc,
+	-label=>'Recent MIBs...',
+	-underline=>0,
+	-state=>'disabled',
     );
-    $self->{FileMenu}->add('separator');
-    $self->{FileMenu}->add('command',
-	-command => [ \&exit, $self ],
-	-label => 'Exit All',
-	-underline => 1,
+    $self->{RecentMenu} = $mc;
+    $mi->add('separator');
+    $mi->add('command',
+	-command=>[\&exit,$self],
+	-label=>'Exit All',
+	-underline=>1,
     );
-    $self->{Menu}->add('cascade',
-	-menu => $self->{FileMenu},
-	-label => 'File',
-	-underline => 0,
+    $mb->add('cascade',
+	-menu=>$mi,
+	-label=>'File',
+	-underline=>0,
     );
+    $self->{FileMenu} = $mi;
 
-    $self->{EditMenu} = $self->{Menu}->Menu(
-	-title => 'Edit Menu',
-	-tearoff => 0,
+    $mi = $mb->Menu(
+	-tearoff=>1,
+	-title=>'Edit Menu',
     );
-    $self->{EditMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Undo',
-	-underline => 0,
-	-state => 'disabled',
-	-accelerator => '<Control-u>',
+    $mi->add('command',
+	-accelerator=>'^U',
+	-command=>sub { return; },
+	-label=>'Undo',
+	-state=>'disabled',
+	-underline=>0,
     );
-    $self->{EditMenu}->bind('all', '<Control-u>', sub { return; });
-    $self->{EditMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Redo',
-	-underline => 0,
-	-state => 'disabled',
-	-accelerator => '<Control-r>',
+    $mi->bind('all', '<Control-u>', sub { return; });
+    $mi->add('command',
+	-accelerator=>'^R',
+	-command=>sub { return; },
+	-label=>'Redo',
+	-state=>'disabled',
+	-underline=>0,
     );
-    $self->{EditMenu}->bind('all', '<Control-r>', sub { return; });
-    $self->{EditMenu}->add('separator');
-    $self->{EditMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Cut',
-	-underline => 0,
-	-state => 'normal',
-	-accelerator => '<Control-x>',
+    $mi->bind('all', '<Control-r>', sub { return; });
+    $mi->add('separator');
+    $mi->add('command',
+	-accelerator=>'^X',
+	-command=>sub { return; },
+	-label=>'Cut',
+	-state=>'normal',
+	-underline=>0,
     );
-    $self->{EditMenu}->bind('all', '<Control-x>', sub { return; });
-    $self->{EditMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Copy',
-	-underline => 3,
-	-state => 'normal',
-	-accelerator => '<Control-c>',
+    $mi->bind('all', '<Control-x>', sub { return; });
+    $mi->add('command',
+	-accelerator=>'^C',
+	-command=>sub { return; },
+	-label=>'Copy',
+	-state=>'normal',
+	-underline=>3,
     );
-    $self->{EditMenu}->bind('all', '<Control-c>', sub { return; });
-    $self->{EditMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Paste',
-	-underline => 0,
-	-state => 'disabled',
-	-accelerator => '<Control-v>',
+    $mi->bind('all', '<Control-c>', sub { return; });
+    $mi->add('command',
+	-accelerator=>'^V',
+	-command=>sub { return; },
+	-label=>'Paste',
+	-state=>'disabled',
+	-underline=>0,
     );
-    $self->{EditMenu}->bind('all', '<Control-v>', sub { return; });
-    $self->{EditMenu}->add('separator');
-    $self->{EditMenu}->add('command',
-	-command => sub { return; },
-	-label => 'Delete',
-	-underline => 0,
-	-state => 'normal',
-	-accelerator => '<Delete>',
+    $mi->bind('all', '<Control-v>', sub { return; });
+    $mi->add('separator');
+    $mi->add('command',
+	-accelerator=>'DEL',
+	-command=>sub { return; },
+	-label=>'Delete',
+	-state=>'normal',
+	-underline=>0,
     );
-    $self->{EditMenu}->bind('all', '<Delete>', sub { return; });
-    $self->{EditMenu}->add('separator');
-    $self->{EditMenu}->add('command',
-	-command => [ \&preferences, $self ],
-	-label => 'Preferences...',
-	-underline => 1,
-	-state => 'normal',
+    $mi->bind('all', '<Delete>', sub { return; });
+    $mi->add('separator');
+    $mi->add('command',
+	-command=>[\&preferences,$self],
+	-label=>'Preferences...',
+	-state=>'normal',
+	-underline=>1,
     );
-    $self->{Menu}->add('cascade',
-	-menu => $self->{EditMenu},
-	-label => 'Edit',
-	-underline => 0,
+    $mb->add('cascade',
+	-label=>'Edit',
+	-menu=>$mi,
+	-underline=>0,
     );
+    $self->{EditMenu} = $mi;
 
-    $self->{ViewMenu} = $self->{Menu}->Menu(
-	-title => 'View Menu',
-	-tearoff => 0,
+    $mi = $mb->Menu(
+	-tearoff=>1,
+	-title=>'View Menu',
     );
-    $self->{ViewMenu}->add('command',
-	-command => [ \&expandall, $self ],
-	-label => 'Expand All',
-	-underline => 0,
-	-accelerator => '~E',
+    $mi->add('command',
+	-command=>[\&expandall,$self],
+	-label=>'Expand All',
+	-underline=>0,
     );
-    $self->{ViewMenu}->add('command',
-	-command => [ \&collapseall, $self ],
-	-label => 'Collapse All',
-	-underline => 0,
-	-accelerator => '~C',
+    $mi->add('command',
+	-command=>[\&collapseall,$self],
+	-label=>'Collapse All',
+	-underline=>0,
     );
-    $self->{Menu}->add('cascade',
-	-menu => $self->{ViewMenu},
-	-label => 'View',
-	-underline => 0,
+    $mb->add('cascade',
+	-label=>'View',
+	-menu=>$mi,
+	-underline=>0,
     );
+    $self->{ViewMenu} = $mi;
 
-    $self->{MibMenu} = $self->{Menu}->Menu(
-	-title => 'Mib Menu',
-	-tearoff => 0,
+    $mi = $mb->Menu(
+	-tearoff=>1,
+	-title=>'Mib Menu',
     );
-    $self->{MibMenu}->add('command',
-	-command => [\&addmibdir, $self],
-	-label => 'Add MIB Directory',
-	-underline => 0,
-	-accelerator => '~F',
+    $mi->add('command',
+	-command=>[\&addmibdir,$self],
+	-label=>'Add MIB Directory',
+	-underline=>0,
     );
-    $self->{MibMenu}->add('command',
-	-command => [\&loadmibmod, $self],
-	-label => 'Load MIB Module',
-	-underline => 9,
-	-accelerator => '~L',
+    $mi->add('command',
+	-command=>[\&loadmibmod,$self],
+	-label=>'Load MIB Module',
+	-underline=>0,
     );
-    $self->{MibMenu}->add('command',
-	-command => [\&loadmibfile, $self],
-	-label => 'Load MIB File',
-	-underline => 9,
-	-accelerator => '~F',
+    $mi->add('command',
+	-command=>[\&loadmibfile,$self],
+	-label=>'Load MIB File',
+	-underline=>9,
     );
-    $self->{MibDirs} = $self->{MibMenu}->Menu(
-	-title => 'MIB Directories',
-	-tearoff => 1,
+    $mi->add('separator');
+    $mc = $mi->Menu(
+	-tearoff=>1,
+	-title=>'MIB Directories',
     );
-    $self->{MibMods} = $self->{MibMenu}->Menu(
-	-title => 'MIB Modules',
-	-tearoff => 1,
+    $mi->add('cascade',
+	-label=>'MIB Directories',
+	-menu=>$mc,
+	-state=>'disabled',
+	-underline=>4,
     );
-    $self->{MibFiles} = $self->{MibMenu}->Menu(
-	-title => 'MIB Files',
-	-tearoff => 1,
+    $self->{MibDirs} = $mc;
+    $mc = $mi->Menu(
+	-tearoff=>1,
+	-title=>'MIB Modules',
     );
-    $self->{MibMenu}->add('separator');
-    $self->{MibMenu}->add('cascade',
-	-menu => $self->{MibDirs},
-	-label => 'MIB Directories',
-	-underline => 4,
-	-state => 'disabled',
+    $mi->add('cascade',
+	-label=>'MIB Modules',
+	-menu=>$mc,
+	-state=>'disabled',
+	-underline=>4,
     );
-    $self->{MibMenu}->add('cascade',
-	-menu => $self->{MibMods},
-	-label => 'MIB Modules',
-	-underline => 4,
-	-state => 'disabled',
+    $self->{MibMods} = $mc;
+    $mc = $mi->Menu(
+	-tearoff=>1,
+	-title=>'MIB Files',
     );
-    $self->{MibMenu}->add('cascade',
-	-menu => $self->{MibFiles},
-	-label => 'MIB Files',
-	-underline => 4,
-	-state => 'disabled',
+    $mi->add('cascade',
+	-label=>'MIB Files',
+	-menu=>$mc,
+	-state=>'disabled',
+	-underline=>4,
     );
-    $self->{Menu}->add('cascade',
-	-menu => $self->{MibMenu},
-	-label => 'MIBs',
-	-underline => 0,
+    $self->{MibFiles} = $mc;
+    $mb->add('cascade',
+	-label=>'MIBs',
+	-menu=>$mi,
+	-underline=>0,
     );
+    $self->{MibMenu} = $mi;
 
-    $self->{About} = $self->{Menu}->Menu(
-	-title => 'About',
-	-tearoff => 0,
+    $mi = $mb->Menu(
+	-tearoff=>1,
+	-title=>'About',
+	-type=>'normal',
     );
-    $self->{About}->add('command',
-	-command => [ \&showversion, $self ],
-	-label => 'Version',
-	-underline => 0,
+    $mi->add('command',
+	-command=>[\&ShowVersion,$self],
+	-label=>'Version',
+	-underline=>0,
     );
-    $self->{About}->add('command',
-	-command => [ \&showusage, $self ],
-	-label => 'Usage',
-	-underline => 0,
+    $mi->add('command',
+	-command=>[\&ShowUsage,$self],
+	-label=>'Usage',
+	-underline=>0,
     );
-    $self->{About}->add('command',
-	-command => [ \&showcopying, $self ],
-	-label => 'Copying',
-	-underline => 0,
+    $mi->add('command',
+	-command=>[\&ShowCopying,$self],
+	-label=>'Copying',
+	-underline=>0,
     );
-    $self->{About}->add('command',
-	-command => [ \&showhelp, $self ],
-	-label => 'Help',
-	-underline => 0,
+    $mi->add('command',
+	-command=>[\&ShowHelp,$self],
+	-label=>'Help',
+	-underline=>0,
     );
-    $self->{Menu}->add('separator');
-    $self->{Menu}->add('cascade',
-	-menu => $self->{About},
-	-label => 'About',
-	-underline => 0,
+    $mb->add('separator');
+    $mb->add('cascade',
+	-menu=>$mi,
+	-label=>'About',
+	-underline=>0,
     );
+    $self->{About} = $mi;
+    $self->{Menu} = $mb;
 
-    $self->{HList} = $self->{MainWindow}->Scrolled('HList',
-	-scrollbars => 'osoe',
-	-bg => 'white',
-	-columns => 2,
-	-width => 36,
-	-indicator => 1,
-	-indicatorcmd => [ \&indic, $self ],
-	-browsecmd => [ \&browse, $self ],
-	-command => [ \&hlistsel, $self ],
-	-drawbranch => 1,
-	-indent => 20,
-	-header => 1,
-	-selectmode => 'single',
-	-separator => '.',
+    $hl = $mw->Scrolled('HList',
+	-scrollbars=>'osoe',
+	-bg=>'white',
+	-browsecmd=>[\&EntryBrowse,$self],
+	-columns=>0,
+	-command=>[\&EntrySelect,$self],
+	-drawbranch=>1,
+	#-header=>1,
+	-indent=>18,
+	-indicator=>1,
+	-indicatorcmd=>[\&EntryIndicator,$self],
+	-selectmode=>'single',
+	-separator=>'.',
+	-width=>36,
     )->pack(
-	-side => 'left',
-	-fill => 'y',
-	-expand => 0,
+	-side=>'left',
+	-fill=>'y',
+	-expand=>0,
     );
-    $self->{HList}->header('create', 0,
-	-itemtype => 'text',
-	-text => 'Name');
-    $self->{HList}->header('create', 1,
-	-itemtype => 'text',
-	-text => 'Children');
-    $self->{Adjuster} = $self->{MainWindow}->Adjuster(
-	-side => 'left',
-	-widget => $self->{HList})->pack(
-	-side => 'left',
-	-fill => 'y',
-	-expand => 0,
+#    $hl->header('create', 0,
+#	-itemtype=>'text',
+#	-text=>'Name');
+#    $hl->header('create', 1,
+#	-itemtype=>'text',
+#	-text=>'Children');
+    $self->{Adjuster} = $mw->Adjuster(
+	-side=>'left',
+	-widget=>$hl,
+    )->pack(
+	-expand=>0,
+	-fill=>'y',
+	-side=>'left',
     );
-    $self->{Canvas} = $self->{MainWindow}->Scrolled('Canvas',
-	-scrollbars => 'osoe',
-	-bg => 'white')->pack(
-	-side => 'left',
-	-fill => 'both',
-	-expand => 1,
+    $self->{HList} = $hl;
+    $tx = $mw->Scrolled('ROText',
+	-bg=>'white',
+	-font=>'Monospace 10',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'none',
+    )->pack(
+	-expand=>1,
+	-fill=>'both',
+	-side=>'left',
     );
+    $self->{ROText} = $tx;
+    $SNMP::use_long_names = 1;
+    $SNMP::use_enums = 1;
     $SNMP::save_descriptions = 1;
     SNMP::initMib();
-    SNMP::addMibDirs(qw(/home/brian/os8/mibs /home/brian/os8/streams/src/mibs));
-    SNMP::loadModules('OPENSS7-STREAMS-MIB');
-    $self->{MIB} = $SNMP::MIB{'1.3.6.1'};
-    $self->addtree('', $self->{MIB});
-    push @main::myapps, $self;
+    SNMP::addMibDirs(qw{
+/home/brian/os8/mibs
+/home/brian/os8/sigtran/src/mibs
+/home/brian/os8/stacks/src/mibs
+/home/brian/os8/strchan/src/mibs
+/home/brian/os8/streams/src/mibs
+/home/brian/os8/striso/src/mibs
+/home/brian/os8/strsctp/src/mibs
+/home/brian/os8/strx25/src/mibs
+/home/brian/os8/strxns/src/mibs
+});
+    #SNMP::loadModules('ALL');
+    #$self->{MIB} = $SNMP::MIB{'1.3.6.1'};
+    foreach (qw{
+OPENSS7-SMI-MIB
+OPENSS7-GMI-MIB
+OPENSS7-UMC-MIB
+OPENSS7-SS7-MIB
+OPENSS7-X400P-MIB
+OPENSS7-M2PA-MIB
+OPENSS7-MTP-MIB
+OPENSS7-CLNS-MIB
+OPENSS7-SCCP-MIB
+OPENSS7-SNARE-MIB
+OPENSS7-CONS-MIB
+RFC1381-MIB
+RFC1382-MIB
+RS-232-MIB
+OPENSS7-X25-LLC-MIB
+OPENSS7-X25-PLP-MIB
+PerfHist-TC-MIB
+DS1-MIB
+DS1-EXT-MIB
+OPENSS7-PHY-MIB
+OPENSS7-MX-MIB
+OPENSS7-X400P-MX-MIB
+OPENSS7-OSI-MIB
+OPENSS7-DL-MIB
+OPENSS7-LAPB-MIB
+OPENSS7-LLC2-MIB
+SCTP-MIB
+OPENSS7-CDR2-MIB
+OPENSS7-CDR-MIB
+OPENSS7-MTP-TC
+OPENSS7-ISUP-MIB
+OPENSS7-TCAP-MIB
+OPENSS7-SIGTRAN-TC
+OPENSS7-SIGTRAN-MIB
+OPENSS7-M3UA-ASP-MIB
+OPENSS7-M3UA-SGP-MIB
+OPENSS7-M2UA-ASP-MIB
+OPENSS7-M2UA-MIB
+	}) {
+	print "Loading module $_.";
+	SNMP::loadModules($_);
+    }
+    $self->updatetree();
+    push @myapps, $self;
     return;
 }
 
-sub indic {
+sub addmibdir {
     my $self = shift;
+    my $dir = $self->{MainWindow}->chooseDirectory(
+	-initialdir=>'/usr/share/snmp/mibs',
+	-parent=>$self->{MainWindow},
+	-title=>'Add MIB Directory',
+	#-mustexist=>1,
+    );
+    #my $dir = $dialog->Show();
+    if (defined $dir) {
+	if ($dir ne '') {
+	    SNMP::addMibDirs($dir);
+	    $self->updatetree();
+	}
+    }
+}
+
+sub loadmibmod {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->DialogBox(
+	-title=>'Load MIB Module Dialog',
+	-buttons=>[qw/OK Cancel/],
+	-default_button=>'OK',
+    );
+    my $value = '';
+    $dialog->Label(
+	-text=>"MIB Module Name:",
+    )->grid(
+	-row=>0,
+	-column=>0,
+	-sticky=>'ew',
+    );
+    $dialog->Entry(
+	-bg=>'white',
+	-textvariable=>\$value,
+    )->grid(
+	-row=>0,
+	-column=>1,
+	-sticky=>'ew',
+    );
+    if ($dialog->Show() eq 'OK') {
+	if ($value ne '') {
+	    SNMP::loadModules($value);
+	    $self->updatetree();
+	}
+    }
+}
+
+sub loadmibfile {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->FileSelect(
+	-title=>'Load MIB File',
+    );
+    my $filename = $dialog->Show();
+    if (defined $filename) {
+	SNMP::addMibFiles($filename);
+	$self->updatetree();
+    }
+}
+
+sub EntryIndicator {
+    my $self = shift;
+    my $entry = shift;
+    my $action = shift;
     my $hl = $self->{HList};
-    #print "Indicating ".join(".", @_);
-    if ($_[1] =~ /Activate/) {
-	my $data = $hl->entrycget($_[0],
+    if ($action =~ /Activate/) {
+	my $data = $hl->entrycget($entry,
 	    -data);
 	if ($data->{'opened'}) {
 	    $data->{'opened'} = 0;
-	    my @list = $hl->info('children', $_[0]);
-	    if (@list) {
-		$hl->indicator('create', $_[0],
-		    -itemtype => 'image',
-		    -image => 'cbook');
-		$hl->itemCreate($_[0], 1,
-		    -itemtype => 'text',
-		    -text => $#list+1);
-		foreach (@list) {
+	    my @children = $hl->info('children', $entry);
+	    if (@children) {
+		my $image = $hl->indicator('cget', $entry, -image);
+		$image =~ s/^o/c/;
+		$hl->indicator('configure', $entry,
+		    -itemtype=>'image',
+		    -image=>$image,
+		);
+#		$hl->itemCreate($entry, 1,
+#		    -itemtype=>'text',
+#		    -text=>$#children+1,
+#		);
+		foreach (@children) {
 		    $hl->hide('entry', $_);
 		}
 	    }
 	} else {
 	    $data->{'opened'} = 1;
-	    my @list = $hl->info('children', $_[0]);
-	    if (@list) {
-		$hl->indicator('create', $_[0],
-		    -itemtype => 'image',
-		    -image => 'obook');
-		$hl->itemCreate($_[0], 1,
-		    -itemtype => 'text',
-		    -text => $#list+1);
-		foreach (@list) {
+	    my @children = $hl->info('children', $entry);
+	    if (@children) {
+		my $image = $hl->indicator('cget', $entry, -image);
+		$image =~ s/^c/o/;
+		$hl->indicator('configure', $entry,
+		    -itemtype=>'image',
+		    -image=>$image,
+		);
+#		$hl->itemCreate($entry, 1,
+#		    -itemtype=>'text',
+#		    -text=>$#children+1,
+#		);
+		foreach (@children) {
 		    $hl->show('entry', $_);
 		}
 	    }
@@ -1483,38 +2723,130 @@ sub indic {
     }
 }
 
-sub browse {
+sub EntryBrowse {
     my $self = shift;
+    my $item = shift;
     my $hl = $self->{HList};
-    #print "Browsing ".join(".", @_);
+    my $data = $hl->entrycget($item, -data);
+    my $mib = $data->{mib};
+    my $tx = $self->{ROText};
+    my $enumhash = {};
+    foreach my $k ( keys %{$mib->{enums}} ) {
+	$enumhash->{$mib->{enums}{$k}} = $k;
+    }
+    my $enums = '';
+    foreach my $v ( sort { return $a <=> $b; } ( keys %{$enumhash}) ) {
+	$enums .= ",\n         " unless $enums eq '';
+	$enums .= "$enumhash->{$v}($v)";
+    }
+    my $ranges = '';
+    foreach my $r ( @{$mib->{ranges}} ) {
+	$ranges .= ",\n         " unless $ranges eq '';
+	$ranges .= "($r->{low}..$r->{high})";
+    }
+    my $children = '';
+    my @childlist = ( @{$mib->{children}} );
+    while (my $c = pop @childlist) {
+	$children .= ",\n         " unless $children eq '';
+	$children .= $c->{label};
+    }
+    my $indexes = '';
+    my @indexlist = ( @{$mib->{indexes}} );
+    while (my $i = pop @indexlist) {
+	$indexes .= ",\n         " unless $indexes eq  '';
+	$indexes .= $i;
+    }
+    my $labels = join(",\n         ", keys %{$mib});
+    my $lead;
+    my $descrip = $mib->{description};
+    chomp $descrip;
+    $descrip =~ s/^\n*//;
+    $descrip =~ s/\n*$//;
+    $descrip =~ /(\n\s*)/;
+    $lead = $1;
+    $descrip =~ s/$lead/\n         /g;
+    $descrip =~ s/\n+\s*$//;
+    my $tcdesc = $mib->{TCDescription};
+    chomp $tcdesc;
+    $tcdesc =~ s/^\n*//;
+    $tcdesc =~ s/\n*$//;
+    $tcdesc =~ /(\n\s*)/;
+    $lead = $1;
+    $tcdesc =~ s/$lead/\n         /g;
+    $tcdesc =~ s/\n+\s*$//;
+    my $refer = $mib->{reference};
+    chomp $refer;
+    $refer =~ s/^\n*//;
+    $refer =~ s/\n*$//;
+    $refer =~ /(\n\s*)/;
+    $lead = $1;
+    $refer =~ s/$lead/\n         /g;
+    $refer =~ s/\n+\s*$//;
+    my $nextnode = '';
+    if (defined $mib->{nextNode}) {
+	$nextnode = $mib->{nextNode}->{objectID}
+	    unless $nextnode = $mib->{nextNode}->{label};
+    }
+    my $parent = '';
+    if (defined $mib->{parent}) {
+	$parent = $mib->{parent}->{objectID}
+	    unless $parent = $mib->{parent}->{label};
+    }
+    $tx->delete('0.0', 'end');
+    $tx->insert('end', "Id:      $mib->{subID}\n") if $mib->{subID};
+    $tx->insert('end', "Object:  $mib->{objectID}\n") if $mib->{objectID};
+    $tx->insert('end', "Label:   $mib->{label}\n") if $mib->{label};
+    $tx->insert('end', "Module:  $mib->{moduleID}\n") if $mib->{moduleID};
+    $tx->insert('end', "Next:    $nextnode\n") if $nextnode;
+    $tx->insert('end', "Parent:  $parent\n") if $parent;
+    $tx->insert('end', "Type:    $mib->{type}\n") if $mib->{type};
+    $tx->insert('end', "Access:  $mib->{access}\n") if $mib->{access};
+    $tx->insert('end', "Status:  $mib->{status}\n") if $mib->{status};
+    $tx->insert('end', "Syntax:  $mib->{syntax}\n") if $mib->{syntax};
+    $tx->insert('end', "Ranges:  $ranges\n") if $ranges;
+    $tx->insert('end', "Enums:   $enums\n") if $enums;
+    $tx->insert('end', "Indexes: $indexes\n") if $indexes;
+    $tx->insert('end', "Default: $mib->{defaultValue}\n") if $mib->{defaultValue};
+    $tx->insert('end', "Units:   $mib->{units}\n") if $mib->{units};
+    $tx->insert('end', "Hint:    $mib->{hint}\n") if $mib->{hint};
+    $tx->insert('end', "Augment: $mib->{augments}\n") if $mib->{augments};
+    $tx->insert('end', "Refer:   $refer\n") if $refer;
+    $tx->insert('end', "Descrip: $descrip\n") if $descrip;
+    $tx->insert('end', "TC:      $mib->{textualConvention}\n") if $mib->{textualConvention};
+    $tx->insert('end', "TC Desc: $tcdesc\n") if $tcdesc;
+    $tx->insert('end', "Child:   $children\n") if $children;
+}
+
+sub EntrySelect {
+    my $self = shift;
+    my $entry = shift;
 }
 
 sub hlistsel {
     my $self = shift;
+    my $item = shift;
     my $hl = $self->{HList};
-    #print "Selecting ".join(".", @_);
-    my $data = $hl->entrycget($_[0],
-	-data);
-    my $mib = $data->{'mib'};
+    my $data = $hl->entrycget($item, -data);
+    my $mib = $data->{mib};
     my $tl = $self->{MainWindow}->Toplevel();
     $tl->title($mib->{'label'});
     my $tx = $tl->Scrolled('ROText',
-	-scrollbars => 'osoe',
-	-width => 80,
-	-wrap => 'none',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'none',
     )->pack(
-	-side => 'top',
-	-fill => 'x',
-	-expand => 1,
+	-side=>'top',
+	-fill=>'x',
+	-expand=>1,
     );
     my $bt = $tl->Button(
-	-text => 'Dismiss',
-	-default => 'active',
-	-command => [ sub { my $w = shift; $w->destroy; return; }, $tl ],
+	-text=>'Dismiss',
+	-default=>'active',
+	-command=>[ sub { my $w = shift; $w->destroy; return; }, $tl ],
     )->pack(
-	-side => 'bottom',
-	-fill => 'none',
-	-expand => 0,
+	-side=>'bottom',
+	-fill=>'none',
+	-expand=>0,
     );
     my $enums = '';
     foreach my $e ( sort keys %{$mib->{'enums'}} ) {
@@ -1526,7 +2858,7 @@ sub hlistsel {
 	$indices .= ",\n         " unless $indices eq '';
 	$indices .= "$i";
     }
-    $tx->Subwidget('scrolled')->insert('0.0', <<EOF);
+    $tx->insert('0.0', <<EOF);
 Object:  $mib->{'objectID'}
 Label:   $mib->{'label'}
 Module:  $mib->{'moduleID'}
@@ -1577,43 +2909,88 @@ sub itempopup {
     print "<Button-3> press for $entry";
 }
 
-sub addtree {
+sub updateitem {
     my $self = shift;
+    my $base = shift;
     my $parent = shift;
     my $mib = shift;
-    my $hl = $self->{HList};
-    my $entry;
-    my @list = ( @{$mib->{'children'}} );
-    if (@list) {
-	$entry = $hl->addchild($parent,
-	    -itemtype => 'text',
-	    -text => $mib->{'label'},
-	    -data => { opened => 0, mib => $mib, },
-	);
-	$hl->indicator('create', $entry,
-	    -itemtype => 'image',
-	    -image => 'cbook',
-	);
-	$hl->itemCreate($entry, 1,
-	    -itemtype => 'text',
-	    -text => $#list+1,
-	);
-	foreach (@list) {
-	    $self->addtree($entry, $_);
-	}
+    my $hlist = $self->{HList};
+    my $entry = $mib->{objectID};
+    $entry =~ s/^$base/0/;
+    my @children = ( @{$mib->{children}} );
+    #
+    # For tables, use odocs or cdocs; for entries (conceptual rows) use orows
+    # or crows; for items (conceptual columns) use ccols.  For all others use
+    # cbook.
+    #
+    # Tables have no access, have no indices, have children.
+    # Rows have no access, indices and children.
+    # Columns have any access, no indices and no children.
+    #
+    my $image;
+    if (@{$mib->{indexes}}) {
+	$image = 'crows';
+    } elsif ($mib->{access} eq 'NoAccess' and @{$mib->{children}}) {
+	$image = 'cdocs';
+    } elsif ($mib->{parent} and @{$mib->{parent}->{indexes}}) {
+	$image = 'ccols';
+    } elsif (@{$mib->{children}}) {
+	$image = 'cbook';
+    } elsif ($mib->{type} eq 'NOTIF') {
+	$image = 'cnote';
+    } elsif ($mib->{access} eq 'Notify') {
+	$image = 'cparm';
     } else {
-	$entry = $hl->addchild($parent,
-	    -itemtype => 'text',
-	    -text => $mib->{'label'},
-	    -data => { opened => 1, mib => $mib, },
-	);
-	$hl->indicator('create', $entry,
-	    -itemtype => 'image',
-	    -image => 'doc',
-	);
+	$image = 'cobjs';
     }
-    $hl->hide('entry', $entry) unless $parent eq '';
-    $hl->bind('entry', '<Button-3>', [\&itempopup, $self, $entry]);
+    my $data;
+    my $label = $mib->{label};
+    if ($label eq '') {
+	$label = $mib->{objectID};
+	$label =~ s/^\.//;
+    }
+    #print "Looking for item $entry...";
+    if ($hlist->info('exists', $entry)) {
+	#print "Found item $entry...";
+	$data = $hlist->entrycget($entry, -data);
+	$data->{mib} = $mib;
+	$hlist->entryconfigure($entry,
+	    -text=>$label,
+	);
+	$image =~ s/^c/o/ if ($data->{opened} != 0);
+	$hlist->indicator('configure', $entry,
+	    -image=>$image,
+	);
+    } else {
+	#print "Creating item $entry...";
+	$data = { opened=>0, mib=>$mib };
+	$hlist->add($entry,
+	    -itemtype=>'text',
+	    -text=>$label,
+	    -data=>$data,
+	);
+#	$hlist->itemCreate($entry, 1,
+#	    -itemtype=>'text',
+#	    -text=>$#children+1,
+#	);
+	$hlist->indicator('create', $entry,
+	    -itemtype=>'image',
+	    -image=>$image,
+	);
+	$hlist->hide('entry', $entry)
+	    if defined($parent) and $parent->{opened} == 0;
+	$hlist->bind('entry', '<Button-3>', [\&itempopup,$self,$entry]);
+    }
+    while (my $child = pop @children) {
+	$self->updateitem($base,$data,$child);
+    }
+
+}
+
+sub updatetree {
+    my $self = shift;
+    $self->{MIB} = $SNMP::MIB{'1.3.6.1'};
+    $self->updateitem('.1.3.6.1',undef,$self->{MIB});
 }
 
 package main;
@@ -1628,6 +3005,9 @@ exit;
 # =============================================================================
 #
 # $Log: mibbrowser,v $
+# Revision 0.9.2.2  2008-10-11 04:31:32  brian
+# - handle -Wpointer-sign
+#
 # Revision 0.9.2.1  2008-10-07 13:17:35  brian
 # - added perltk files
 #

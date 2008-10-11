@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:12 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.29  2008-10-11 04:31:27  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.28  2008-09-22 20:31:12  brian
  - added module version and truncated logs
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -108,7 +111,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-09-22 20:31:12 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-11 04:31:27 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

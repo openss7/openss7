@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-11 04:31:25 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:00 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.15  2008-10-11 04:31:25  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.14  2008-09-22 20:31:00  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-11 04:31:25 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-11 04:31:25 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -129,7 +132,7 @@ static char const ident[] =
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2008-09-22 20:31:00 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2008-10-11 04:31:25 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
