@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-11 04:31:34 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:34 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.30  2008-10-11 04:31:34  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.29  2008-09-22 20:31:34  brian
  - added module version and truncated logs
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-11 04:31:34 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-11 04:31:34 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -150,7 +153,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:34 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-11 04:31:34 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"

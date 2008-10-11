@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:30 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-11 04:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nsdev.c,v $
+ Revision 0.9.2.53  2008-10-11 04:31:31  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.52  2008-09-22 20:31:30  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:30 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-11 04:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:30 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-11 04:31:31 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -83,7 +86,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:30 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-11 04:31:31 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"

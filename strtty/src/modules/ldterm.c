@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:42 $
+ @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:42 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldterm.c,v $
+ Revision 0.9.2.9  2008-10-11 04:31:37  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.8  2008-09-22 20:31:42  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:42 $"
+#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:42 $";
+    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:37 $";
 
 /*
  * This is ldterm (line discipline terminal) module.
@@ -157,7 +160,7 @@ static char const ident[] =
 
 #define LDTERM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDTERM_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-09-22 20:31:42 $"
+#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:31:37 $"
 #define LDTERM_DEVICE		"SVR 4.2 STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LDTERM_LICENSE		"GPL"

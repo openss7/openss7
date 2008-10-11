@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:31 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.87  2008-10-11 04:31:31  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.86  2008-09-22 20:31:31  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -116,7 +119,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-09-22 20:31:31 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"

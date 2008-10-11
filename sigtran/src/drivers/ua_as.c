@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-10-11 04:31:26 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:01 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.17  2008-10-11 04:31:26  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.16  2008-09-22 20:31:01  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-10-11 04:31:26 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-10-11 04:31:26 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -160,7 +163,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2008-09-22 20:31:01 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2008-10-11 04:31:26 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

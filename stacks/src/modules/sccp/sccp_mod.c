@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $
+ @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:15 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_mod.c,v $
+ Revision 0.9.2.5  2008-10-11 04:31:29  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.4  2008-09-22 20:31:15  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $"
+#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $";
+    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $";
 
 /*
  * This is SCCP-MOD.  It is a simplified Signalling Connection Control Part (SCCPI) module for SCCP
@@ -102,7 +105,7 @@ static char const ident[] =
 #include <ss7/mtpi_ioctl.h>
 
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS MODULE."
-#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-09-22 20:31:15 $"
+#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:31:29 $"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

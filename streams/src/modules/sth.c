@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.204 $) $Date: 2008-10-07 18:48:40 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-07 18:48:40 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.205  2008-10-11 04:31:31  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.204  2008-10-07 18:48:40  brian
  - fixed streams bug #022 reported by Sylvain Chouleur
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.204 $) $Date: 2008-10-07 18:48:40 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.204 $) $Date: 2008-10-07 18:48:40 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -188,7 +191,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.204 $) $Date: 2008-10-07 18:48:40 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"

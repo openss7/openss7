@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-manager,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-07 13:17:35 $
+# @(#) $RCSfile: streams-manager,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-11 04:31:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-07 13:17:35 $ by $Author: brian $
+# Last Modified $Date: 2008-10-11 04:31:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,6 +59,7 @@ use Tk::NumEntry;
 use Tk::Balloon;
 use Tk::Xrm;
 use Tk::Pane;
+use Tk::Dialog;
 use Tk::DialogBox;
 
 use Data::Dumper;
@@ -66,6 +67,104 @@ use Data::Dumper;
 use SNMP;
 
 $\ = "\n";
+
+my $program = $0; $program =~ s/^.*\///;
+my $ident = '$RCSfile: streams-manager,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-11 04:31:32 $';
+my $version = '$Revision: 0.9.2.2 $';
+my $date = '$Date: 2008-10-11 04:31:32 $';
+my $title = 'STREAMS SNMP Manager';
+
+my $Title = <<EOF;
+Linux Fast-STREAMS
+$title
+$version, $date
+EOF
+
+$Title =~ s/\n*$//;
+$Title =~ s/^\n*//;
+
+my $Version = <<EOF;
+Version $version
+$ident
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.
+Distributed under Affero GPL Version 3, included here by reference.
+See `$program --copying' for copying permissions.
+EOF
+
+$Version =~ s/\n*$//;
+$Version =~ s/^\n*//;
+
+my $Copying = <<EOF;
+________________________________________________________________________________
+
+$ident
+________________________________________________________________________________
+
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
+
+All Rights Reserved.
+________________________________________________________________________________
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+________________________________________________________________________________
+
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf of the U.S. Government ("Government"), the following provisions apply to you. If the Software is supplied by the Department of Defense ("DoD"), it is classified as "Commercial Computer Software" under paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any successor regulations) and the Government is acquiring only the license rights granted herein (the license rights customarily provided to non-Government users). If the Software is supplied to any unit or agency of the Government other than DoD, it is classified as "Restricted Computer Software" and the Government's rights in the Software are defined in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR (or any successor regulations).
+________________________________________________________________________________
+
+Commercial licensing and support of this software is available from OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+________________________________________________________________________________
+EOF
+
+$Copying =~ s/\n*$//;
+$Copying =~ s/^\n*//;
+
+my $CopyingMono = <<EOF;
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock\@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the  GNU Affero General Public License  as  published by the  Free
+Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+
+You should have received a copy of the  GNU Affero General Public License  along
+with this program.   If not,  see  <http://www.gnu.org/licenses/>,  or  write to
+the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+
+$CopyingMono =~ s/\n*$//;
+$CopyingMono =~ s/^\n*//;
 
 package Mysession;
 use strict;
@@ -132,6 +231,12 @@ EOF
 	    syntax=>'OCTETSTRING',
 	    units=>'',
 	    ranges=>[],
+	    description=><<EOF,
+Directly specified SNMPv3 USM privacy localized user key.  When
+specified, this key value will be used instead of deriving the
+key from the PrivPass field.  When null, the PrivPass field will
+be used to generate a privacy localized user key.
+EOF
 	},
 	{
 	    label=>'authLocalizedKey',
@@ -141,6 +246,12 @@ EOF
 	    syntax=>'OCTETSTRING',
 	    units=>'',
 	    ranges=>[],
+	    description=><<EOF,
+Directly specified SNMPv3 USM authentication localized user key.
+When specified, this key value will be used instead of deriving
+the key from the AuthPass field.  When null, the AuthPass field
+will be used to generate a privacy localized user key.
+EOF
 	},
 	{
 	    label=>'privMasterKey',
@@ -150,6 +261,12 @@ EOF
 	    syntax=>'OCTETSTRING',
 	    units=>'',
 	    ranges=>[],
+	    description=><<EOF,
+Directly specified SNMPv3 USM privacy master user key.  When
+specified, this key value will be used instead of deriving the
+key from the PrivPass field.  When null, the PrivPass field will
+be used to generate a privacy localized user key.
+EOF
 	},
 	{
 	    label=>'authMasterKey',
@@ -159,6 +276,12 @@ EOF
 	    syntax=>'OCTETSTRING',
 	    units=>'',
 	    ranges=>[],
+	    description=><<EOF,
+Directly specified SNMPv3 USM authentication master user key.
+When specified, this key value will be used instead of deriving
+the key from the AuthPass field.  When null, the AuthPass field
+will be used to generate a privacy localized user key.
+EOF
 	},
 	{
 	    label=>'PrivPass',
@@ -168,6 +291,12 @@ EOF
 	    syntax=>'OCTETSTRING',
 	    units=>'',
 	    ranges=>[],
+	    description=><<EOF,
+Specifies the SNMPv3 USM privacy passphrase.  When specified,
+the passphrase will be used to generate localized and master
+privacy keys.  When null, or when SNMPv3 is not set, this field
+is ignored.
+EOF
 	},
 	{
 	    label=>'PrivProto',
@@ -182,6 +311,11 @@ EOF
 		DES=>1,
 	    },
 	    defaultValue=>'DES',
+	    description=><<EOF,
+Specifies the encryption algorithm to use for privacy with the
+SNMP agent for SNMPv3 operation.  Choices include DES and AES
+encryption algorithms.  The default is DES.
+EOF
 	},
 	{
 	    label=>'AuthPass',
@@ -191,6 +325,12 @@ EOF
 	    syntax=>'OCTETSTRING',
 	    units=>'',
 	    ranges=>[],
+	    description=><<EOF,
+Specifies the SNMPv3 USM authentication passphrase.  When
+specified, the passphrase will be used to generate localized and
+master authentication keys.  When null, or when SNMPv3 is not
+set, this field is ignored.
+EOF
 	},
 	{
 	    label=>'AuthProto',
@@ -205,24 +345,13 @@ EOF
 		MD5=>1,
 	    },
 	    defaultValue=>'MD5',
-	},
-	{
-	    label=>'Context',
-	    moduleID=>'Session',
-	    objectID=>'.1.3.6.1.4.1.29591.99.12',
-	    type=>'OctetString',
-	    syntax=>'OCTETSTRING',
-	    units=>'',
-	    ranges=>[],
-	},
-	{
-	    label=>'ContextEngineId',
-	    moduleID=>'Session',
-	    objectID=>'.1.3.6.1.4.1.29591.99.11',
-	    type=>'OctetString',
-	    syntax=>'OCTETSTRING',
-	    units=>'',
-	    ranges=>[],
+	    description=><<EOF,
+Specifies the HMAC algorithm to use for authentication to the
+SNMP agent for SNMPv3 operation.  Choices include MD5 and SHA1
+signing algorithms.  The default is MD5.  MD5 experiences better
+performance in little-endian machines and SHA1 experiences
+better performance on big-endian machines.
+EOF
 	},
 	{
 	    label=>'SecEngineId',
@@ -257,6 +386,24 @@ EOF
 	    units=>'',
 	    ranges=>[],
 	    defaultValue=>'inital',
+	},
+	{
+	    label=>'ContextEngineId',
+	    moduleID=>'Session',
+	    objectID=>'.1.3.6.1.4.1.29591.99.11',
+	    type=>'OctetString',
+	    syntax=>'OCTETSTRING',
+	    units=>'',
+	    ranges=>[],
+	},
+	{
+	    label=>'Context',
+	    moduleID=>'Session',
+	    objectID=>'.1.3.6.1.4.1.29591.99.12',
+	    type=>'OctetString',
+	    syntax=>'OCTETSTRING',
+	    units=>'',
+	    ranges=>[],
 	},
 	{
 	    label=>'RetryNoSuch',
@@ -403,7 +550,7 @@ sub new {
     bless $self, $type;
     my $parent = shift;
     $self->{data} = {};
-    foreach my $s ( qw/Session Tunables Autopush Modules/ ) {
+    foreach my $s ( qw/Session Tunables Autopush Modules Statistics/ ) {
 	$self->{data}->{$s} = {};
 	if ($parent and defined $parent->{data}->{$s}) {
 	    foreach my $k ( keys %{$parent->{data}->{$s}} ) {
@@ -419,7 +566,7 @@ sub EditHost {
     my $mapp = shift;
     my $tree = {};
     $self->{Host} = $tree;
-    foreach my $s ( qw/Session Tunables Autopush Modules/ ) {
+    foreach my $s ( qw/Session Tunables Autopush Modules Statistics/ ) {
 	$self->{Host}->{$s} = {};
 	if (defined $mapp->{data}->{$s}) {
 	    foreach my $k ( keys %{$mapp->{data}->{$s}} ) {
@@ -591,10 +738,6 @@ sub EditHost {
 			$k = $keys[-1];
 			$v = $t->{enums}{$k};
 		    }
-#		    unless (defined $data->{$label}) {
-#			$data->{$label}[0] = $k;
-#			$data->{$label}[1] = $v;
-#		    }
 		    unless (defined $data->{$label}) {
 			$data->{$label} = $k;
 		    }
@@ -612,10 +755,8 @@ sub EditHost {
 			-padx=>2,
 			-pady=>0,
 			#-text=>$data->{$label}[0],
-#			-textvariable=>\$data->{$label}[0],
-#			-variable=>\$data->{$label}[1],
-			-variable=>\$dv,
 			-textvariable=>\$data->{$label},
+			-variable=>\$dv,
 		    )->grid(
 			-column=>1,
 			-row=>$row,
@@ -755,26 +896,50 @@ my @myapps = ();
 
 my $docImage = <<EOF;
 /* XPM */
-static char * mini-doc_xpm[] = {
+static char * mini_doc_xpm[] = {
 "16 14 4 1",
 " 	c None",
-".	c black",
-"X	c white",
-"o	c gray50",
-"   .......      ",
-"   .XXXXX..     ",
-"   .XoooX.X.    ",
-"   .XXXXX....   ",
-"   .XooooXoo.o  ",
-"   .XXXXXXXX.o  ",
-"   .XooooooX.o  ",
-"   .XXXXXXXX.o  ",
-"   .XooooooX.o  ",
-"   .XXXXXXXX.o  ",
-"   .XooooooX.o  ",
-"   .XXXXXXXX.o  ",
-"   ..........o  ",
-"    oooooooooo  "};
+"a	c black",
+"b	c white",
+"c	c gray50",
+"   aaaaaaa      ",
+"   abbbbbaa     ",
+"   abcccbaba    ",
+"   abbbbbaaaa   ",
+"   abccccbccac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
+EOF
+
+my $docRedImage = <<EOF;
+/* XPM */
+static char * mini_doc2_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c red",
+"c	c red3",
+"   aaaaaaa      ",
+"   abbbbbaa     ",
+"   abcccbaba    ",
+"   abbbbbaaaa   ",
+"   abccccbccac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   abccccccbac  ",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "};
 EOF
 
 my $obookImage = <<EOF;
@@ -782,50 +947,127 @@ my $obookImage = <<EOF;
 static char * mini-book2_xpm[] = {
 "16 14 4 1",
 " 	c None",
-".	c black",
-"X	c gray50",
-"o	c white",
-"  ..            ",
-" .Xo.    ...    ",
-" .Xoo. ..oo.    ",
-" .Xooo.Xooo...  ",
-" .Xooo.oooo.X.  ",
-" .Xooo.Xooo.X.  ",
-" .Xooo.oooo.X.  ",
-" .Xooo.Xooo.X.  ",
-" .Xooo.oooo.X.  ",
-"  .Xoo.Xoo..X.  ",
-"   .Xo.o..ooX.  ",
-"    .X..XXXXX.  ",
-"    ..X.......  ",
-"     ..         "};
+"a	c black",
+"b	c gray50",
+"c	c white",
+"  aa            ",
+" abca    aaa    ",
+" abcca aacca    ",
+" abcccabcccaaa  ",
+" abcccaccccaba  ",
+" abcccabcccaba  ",
+" abcccaccccaba  ",
+" abcccabcccaba  ",
+" abcccaccccaba  ",
+"  abccabccaaba  ",
+"   abcacaaccba  ",
+"    abaabbbbba  ",
+"    aabaaaaaaa  ",
+"     aa         "};
 EOF
 
 my $cbookImage = <<EOF;
 /* XPM */
-static char * mini_book1_xpm[] = {
-"16 14 7 1",
+static char * mini_book2_xpm[] = {
+"16 14 6 1",
 " 	c None",
-".	c #0000CD",
-"+	c #000000",
-"@	c #FF0000",
-"#	c #FFFF00",
-":	c #FFFFFF",
-"%	c #7F7F7F",
-"       ++       ",
-"     ++@@+      ",
-"   ++@@@@@+     ",
-" ++@@@@@@@@+    ",
-"+##@@@@@@@@@+   ",
-"++##@@@@@@@@@+  ",
-"+@+##@@@@@@@@@+ ",
-"+@@+##@@@@@@++  ",
-" +@@+##@@@++:%  ",
-"  +@@+##++::%%+ ",
-"   +@@++::%%++  ",
-"    +@+:%%++    ",
-"     ++%++      ",
-"      ++        "};
+"a	c black",
+"b	c white",
+"c	c gray50",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
+EOF
+
+my $cbookRedImage = <<EOF;
+/* XPM */
+static char * mini_book1_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c red",
+"c	c red4",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
+EOF
+
+my $cbookGrnImage = <<EOF;
+/* XPM */
+static char * mini_book3_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c green",
+"c	c green4",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
+EOF
+
+my $cbookBluImage = <<EOF;
+/* XPM */
+static char * mini_book4_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c blue",
+"c	c blue4",
+"d	c white",
+"e	c gray50",
+"       aa       ",
+"     aabba      ",
+"   aabbbbba     ",
+" aabbbbbbbba    ",
+"accbbbbbbbbba   ",
+"aaccbbbbbbbbba  ",
+"abaccbbbbbbbbba ",
+"abbaccbbbbbbaa  ",
+" abbaccbbbaade  ",
+"  abbaccaaddeea ",
+"   abbaaddeeaa  ",
+"    abadeeaa    ",
+"     aaeaa      ",
+"      aa        "};
 EOF
 
 my $iconImage = <<EOF;
@@ -1385,7 +1627,7 @@ sub CloseFile {
 	push @temp, $a unless $a eq $self;
     }
     @myapps = ( @temp );
-    print Data::Dumper->Dump([$self->{data}], [qw/data/]);
+    #print Data::Dumper->Dump([$self->{data}], [qw/data/]);
     $self->{MainWindow}->destroy;
     return;
 }
@@ -1416,15 +1658,10 @@ sub create {
     foreach my $t ( @{$mib->{children}} ) {
 	my $label = $t->{label};
 	if ($t->{defaultValue}) {
-#	    if (defined $t->{enums} and scalar(%{$t->{enums}})) {
-#		$data->{$label} = [$t->{defaultValue},$t->{enums}{$t->{defaultValue}}];
-#	    } else {
-		$data->{$label} = $t->{defaultValue};
-#	    }
+	    $data->{$label} = $t->{defaultValue};
 	} elsif ( $t->{syntax} =~ /INTEGER|UNSIGNED|SIGNED/i ) {
 	    if (scalar(%{$t->{enums}})) {
 		my @keys = keys %{$t->{enums}};
-#		$data->{$label} = [$keys[-1],$t->{enums}{$keys[-1]}];
 		$data->{$label} = $keys[-1];
 	    } else {
 		$data->{$label} = 0;
@@ -1439,15 +1676,10 @@ sub create {
     foreach my $t ( @{$mib->{children}} ) {
 	my $label = $t->{label};
 	if ($t->{defaultValue}) {
-#	    if (scalar(%{$t->{enums}})) {
-#		$data->{$label} = [$t->{defaultValue},$t->{enums}{$t->{defaultValue}}];
-#	    } else {
-		$data->{$label} = $t->{defaultValue};
-#	    }
+	    $data->{$label} = $t->{defaultValue};
 	} elsif ( $t->{syntax} =~ /INTEGER|UNSIGNED|SIGNED/i ) {
 	    if (scalar(%{$t->{enums}})) {
 		my @keys = keys %{$t->{enums}};
-#		$data->{$label} = [$keys[-1],$t->{enums}{$keys[-1]}];
 		$data->{$label} = $keys[-1];
 	    } else {
 		$data->{$label} = 0;
@@ -1463,7 +1695,7 @@ sub create {
     );
     $self->{MainWindow} = $mw;
     $mw->OnDestroy([\&DestroyApp, $self]);
-    $mw->title("STREAMS Manager");
+    $mw->title($title);
     #$mw->bind('<Destroy>', [\&destroyed, $self]);
     $mw->geometry('800x600');
 #    $mw->optionAdd('*font'=>'-*-helvetica-medium-r-*--*-100-*-*-*-*-*-*');
@@ -1478,20 +1710,16 @@ sub create {
     $mw->optionAdd('*Scrollbar*Width'=>8);
     $mw->optionAdd('*Menu*Width'=>2);
     $mw->optionAdd('*Menu*Height'=>2);
-    $mw->Pixmap('icon',
-	-data=>$iconImage,
-    );
-    $mw->Pixmap('doc',
-	-data=>$docImage,
-    );
-    $mw->Pixmap('cbook',
-	-data=>$cbookImage,
-    );
-    $mw->Pixmap('obook',
-	-data=>$obookImage,
-    );
+    $mw->Pixmap('icon', -data=>$iconImage,);
+    $mw->Pixmap('doc', -data=>$docImage,);
+    $mw->Pixmap('doc-red', -data=>$docRedImage,);
+    $mw->Pixmap('cbook', -data=>$cbookImage,);
+    $mw->Pixmap('cbook-red', -data=>$cbookRedImage,);
+    $mw->Pixmap('cbook-grn', -data=>$cbookGrnImage,);
+    $mw->Pixmap('cbook-blu', -data=>$cbookBluImage,);
+    $mw->Pixmap('obook', -data=>$obookImage,);
     $mw->iconimage('icon');
-    $mw->iconname('STREAMS Manager');
+    $mw->iconname($title);
     my $mb = $mw->Menu(
 	-relief=>'groove',
 	-type=>'menubar',
@@ -1502,7 +1730,7 @@ sub create {
     $self->{MenuBar} = $mb;
     my $mi;
     $mi = $mb->Menu(
-	-tearoff=>0,
+	-tearoff=>1,
 	-title=>'File Menu',
 	-type=>'normal',
     );
@@ -1558,7 +1786,7 @@ sub create {
 	-underline=>0,
     );
     $mi = $mb->Menu(
-	-tearoff=>0,
+	-tearoff=>1,
 	-title=>'Edit Menu',
 	-type=>'normal',
     );
@@ -1576,9 +1804,44 @@ sub create {
 	-underline=>0,
     );
     $mi = $mb->Menu(
-	-tearoff=>0,
+	-tearoff=>1,
 	-title=>'View Menu',
 	-type=>'normal',
+    );
+    $mi->add('command',
+	-accelerator=>'~S',
+	-command=>[\&HlistViewSession,$self],
+	-label=>'Session View...',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('command',
+	-accelerator=>'~T',
+	-command=>[\&HlistViewTunables,$self],
+	-label=>'Tunables View...',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('command',
+	-accelerator=>'~A',
+	-command=>[\&HlistViewAutopush,$self],
+	-label=>'Autopush View...',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('command',
+	-accelerator=>'~M',
+	-command=>[\&HlistViewModules,$self],
+	-label=>'Modules View...',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('command',
+	-accelerator=>'~T',
+	-command=>[\&HlistViewStatistics,$self],
+	-label=>'Statistics View...',
+	-underline=>1,
+	-state=>'disabled',
     );
     $self->{ViewMenu} = $mi;
     $mb->add('cascade',
@@ -1588,7 +1851,7 @@ sub create {
 	-underline=>0,
     );
     $mi = $mb->Menu(
-	-tearoff=>0,
+	-tearoff=>1,
 	-title=>'MIBs Menu',
 	-type=>'normal',
     );
@@ -1600,15 +1863,59 @@ sub create {
 	-underline=>0,
     );
     $mi = $mb->Menu(
-	-tearoff=>0,
+	-tearoff=>1,
 	-title=>'Host Menu',
 	-type=>'normal',
     );
     $mi->add('command',
 	-accelerator=>'~A',
-	-command=>[\&AddHost, $self],
+	-command=>[\&HlistAddHost,$self],
 	-label=>'Add Host',
 	-underline=>0,
+    );
+    $mi->add('command',
+	-accelerator=>'~E',
+	-command=>[\&HlistEditHost,$self],
+	-label=>'Edit Host',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('command',
+	-accelerator=>'~D',
+	-command=>[\&HlistDelHost,$self],
+	-label=>'Delete Host',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('separator');
+    $mi->add('command',
+	-accelerator=>'~a',
+	-command=>[\&HlistAddModule,$self],
+	-label=>'Add Module',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('command',
+	-accelerator=>'~e',
+	-command=>[\&HlistEditModule,$self],
+	-label=>'Edit Module',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('command',
+	-accelerator=>'~d',
+	-command=>[\&HlistDelModule,$self],
+	-label=>'Delete Module',
+	-underline=>0,
+	-state=>'disabled',
+    );
+    $mi->add('separator');
+    $mi->add('command',
+	-accelerator=>'~C',
+	-command=>[\&HlistConnect,$self],
+	-label=>'Connect',
+	-underline=>0,
+	-state=>'disabled',
     );
     $self->{HostMenu} = $mi;
     $mb->add('cascade',
@@ -1709,58 +2016,19 @@ sub create {
 	-fill=>'both',
 	-side=>'left',
     );
-    my $p1;
-    $p1 = $nb->add('Tunables',
-	-anchor=>'center',
-	-justify=>'center',
-	-label=>'Tunables',
-	-state=>'normal',
-	-underline=>0,
-    );
-    $nb->pageconfigure('Tunables',
-	-createcmd=>[\&CreateTunables, $self, $nb, $p1],
-	-raisecmd=>[\&RefreshTunables, $self, $nb, $p1],
-    );
-    $self->{Tunables} = $p1;
-    my $p2;
-    $p2 = $nb->add('Statistics',
-	-anchor=>'center',
-	-justify=>'center',
-	-label=>'Statistics',
-	-state=>'normal',
-	-underline=>0,
-    );
-    $nb->pageconfigure('Statistics',
-	-createcmd=>[\&CreateStatistics, $self, $nb, $p2],
-	-raisecmd=>[\&RefreshStatistics, $self, $nb, $p2],
-    );
-    $self->{Statistics} = $p2;
-    my $p3;
-    $p3 = $nb->add('Autopush',
-	-anchor=>'center',
-	-justify=>'center',
-	-label=>'Autopush',
-	-state=>'normal',
-	-underline=>0,
-    );
-    $nb->pageconfigure('Autopush',
-	-createcmd=>[\&CreateAutopush, $self, $nb, $p3],
-	-raisecmd=>[\&RefreshAutopush, $self, $nb, $p3],
-    );
-    $self->{Autopush} = $p3;
-    my $p4;
-    $p4 = $nb->add('Modules',
-	-anchor=>'center',
-	-justify=>'center',
-	-label=>'Modules',
-	-state=>'normal',
-	-underline=>0,
-    );
-    $nb->pageconfigure('Modules',
-	-createcmd=>[\&CreateModules, $self, $nb, $p4],
-	-raisecmd=>[\&RefreshModules, $self, $nb, $p4],
-    );
-    $self->{Modules} = $p4;
+    foreach my $s (qw/Session Tunables Autopush Modules Statistics/) {
+	$self->{$s} = $nb->add($s,
+	    -anchor=>'center',
+	    -justify=>'center',
+	    -label=>$s,
+	    -state=>'normal',
+	    -underline=>0,
+	);
+	$nb->pageconfigure($s,
+	    -createcmd=>[\&CreatePage, $s, $self, $nb, $self->{$s}],
+	    -raisecmd=>[\&RefreshPage, $s, $self, $nb, $self->{$s}],
+	);
+    }
 }
 
 sub NewFile {
@@ -1820,15 +2088,10 @@ sub Preferences {
 		foreach my $t ( @{$mib->{children}} ) {
 		    my $label = $t->{label};
 		    if ($t->{defaultValue}) {
-#			if (defined $t->{enums} and scalar(%{$t->{enums}})) {
-#			    $data->{$label} = [$t->{defaultValue},$t->{enums}{$t->{defaultValue}}];
-#			} else {
-			    $data->{$label} = $t->{defaultValue};
-#			}
+			$data->{$label} = $t->{defaultValue};
 		    } elsif ( $t->{syntax} =~ /INTEGER|UNSIGNED|SIGNED/i ) {
 			if (scalar(%{$t->{enums}})) {
 			    my @keys = keys %{$t->{enums}};
-#			    $data->{$label} = [$keys[-1],$t->{enums}{$keys[-1]}];
 			    $data->{$label} = $keys[-1];
 			} else {
 			    $data->{$label} = 0;
@@ -1842,15 +2105,10 @@ sub Preferences {
 		foreach my $t ( @{$mib->{children}} ) {
 		    my $label = $t->{label};
 		    if ($t->{defaultValue}) {
-#			if (defined $t->{enums} and scalar(%{$t->{enums}})) {
-#			    $data->{$label} = [$t->{defaultValue},$t->{enums}{$t->{defaultValue}}];
-#			} else {
-			    $data->{$label} = $t->{defaultValue};
-#			}
+			$data->{$label} = $t->{defaultValue};
 		    } elsif ( $t->{syntax} =~ /INTEGER|UNSIGNED|SIGNED/i ) {
 			if (scalar(%{$t->{enums}})) {
 			    my @keys = keys %{$t->{enums}};
-#			    $data->{$label} = [$keys[-1],$t->{enums}{$keys[-1]}];
 			    $data->{$label} = $keys[-1];
 			} else {
 			    $data->{$label} = 0;
@@ -1984,10 +2242,6 @@ sub Preferences {
 			$k = $keys[-1];
 			$v = $t->{enums}{$k};
 		    }
-#		    unless (defined $data->{$label}) {
-#			$data->{$label}[0] = $k;
-#			$data->{$label}[1] = $v;
-#		    }
 		    unless (defined $data->{$label}) {
 			$data->{$label} = $k;
 		    }
@@ -2005,10 +2259,8 @@ sub Preferences {
 			-padx=>2,
 			-pady=>0,
 			#-text=>$data->{$label}[0],
-#			-textvariable=>\$data->{$label}[0],
-#			-variable=>\$data->{$label}[1],
-			-variable=>\$dv,
 			-textvariable=>\$data->{$label},
+			-variable=>\$dv,
 		    )->grid(
 			-column=>1,
 			-row=>$row,
@@ -2229,10 +2481,6 @@ sub Preferences {
 			$k = $keys[-1];
 			$v = $t->{enums}{$k};
 		    }
-#		    unless (defined $data->{$label}) {
-#			$data->{$label}[0] = $k;
-#			$data->{$label}[1] = $v;
-#		    }
 		    unless (defined $data->{$label}) {
 			$data->{$label} = $k;
 		    }
@@ -2250,10 +2498,8 @@ sub Preferences {
 			-padx=>2,
 			-pady=>0,
 			#-text=>$data->{$label}[0],
-#			-textvariable=>\$data->{$label}[0],
-#			-variable=>\$data->{$label}[1],
-			-variable=>\$dv,
 			-textvariable=>\$data->{$label},
+			-variable=>\$dv,
 		    )->grid(
 			-column=>1,
 			-row=>$row,
@@ -2442,6 +2688,99 @@ sub Preferences {
     return;
 }
 
+sub ShowVersion {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->DialogBox(
+	-title=>'Program Version',
+	-default_button=>'Dismiss',
+	-buttons=>[qw/Dismiss/],
+    );
+    $dialog->resizable(0,0);
+    $dialog->iconimage('icon');
+    $dialog->iconname($title);
+    $dialog->Label(
+	-image=>'icon',
+	-relief=>'flat',
+	-text=>$Title,
+	-compound=>'left',
+	-justify=>'left',
+	-padx=>10,
+    )->pack(
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
+    );
+    my $lines = $Version;
+    $lines =~ s/[^\n]//g;
+    $lines = length($lines) + 1;
+    my $text = $dialog->Scrolled('ROText',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'word',
+	-font=>'Arial 8',
+	-relief=>'groove',
+	-height=>$lines,
+	-bg=>'white smoke',
+    )->pack(
+	-side=>'top',
+	-fill=>'both',
+	-expand=>1,
+    );
+    $text->insert('0.0', $Version);
+    $dialog->Show();
+}
+
+sub ShowUsage {
+    my $self = shift;
+}
+
+sub ShowCopying {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->DialogBox(
+	-title=>'Program Copying Conditions',
+	-default_button=>'Accept',
+	-buttons=>[qw/Accept Refuse/],
+    );
+    $dialog->resizable(0,0);
+    $dialog->iconimage('icon');
+    $dialog->iconname($title);
+    $dialog->Label(
+	-image=>'icon',
+	-relief=>'flat',
+	-text=>$Title,
+	-compound=>'left',
+	-justify=>'left',
+	-padx=>10,
+    )->pack(
+	-side=>'top',
+	-fill=>'x',
+	-expand=>0,
+    );
+    my $lines = $Copying;
+    $lines =~ s/[^\n]//g;
+    $lines = length($lines) + 1 + 15;
+    my $tx = $dialog->Scrolled('ROText',
+	-scrollbars=>'osoe',
+	-width=>80,
+	-wrap=>'word',
+	-font=>'Arial 8',
+	-relief=>'groove',
+	-height=>$lines,
+	-bg=>'white smoke',
+    )->pack(
+	-side=>'top',
+	-fill=>'both',
+	-expand=>1,
+    );
+    $tx->insert('0.0', $Copying);
+    exit 0 if ($dialog->Show() eq 'Refuse');
+}
+
+sub ShowHelp {
+    my $self = shift;
+    my $dialog = $self->{MainWindow}->DialogBox();
+}
+
 sub HlistAddHost {
     my $self = shift;
     my $host = new Host($self);
@@ -2455,8 +2794,9 @@ sub HlistAddHost {
 	-itemtype=>'text',
 	-text=>$host->{data}->{Session}->{DestHost},
     );
+    $host->{indicator} = 'cbook-red';
     $hl->indicator('create', $entry,
-	-image=>'cbook',
+	-image=>'cbook-red',
 	-itemtype=>'image',
     );
     $hl->itemCreate($entry, 1,
@@ -2467,15 +2807,17 @@ sub HlistAddHost {
 
 sub HlistEditHost {
     my $self = shift;
+    my $item = shift;
     my $hl = $self->{HList};
-    my $host = $hl->entrycget($self->{currentItem}, '-data');
+    my $host = $hl->entrycget($item, '-data');
     my $answer = $host->EditHost($self);
 }
 
 sub HlistDelHost {
     my $self = shift;
+    my $item = shift;
     my $hl = $self->{HList};
-    my $host = $hl->entrycget($self->{currentItem}, '-data');
+    my $host = $hl->entrycget($item, '-data');
     my $temp;
     $temp = [];
     while (my $h = pop @{$self->{hosts}}) {
@@ -2487,29 +2829,121 @@ sub HlistDelHost {
 	push @{$temp}, $h unless $h eq $host->{data};
     }
     $self->{data}->{hosts} = $temp;
-    $hl->delete('entry', $self->{currentItem});
+    $hl->delete('entry', $item);
 }
 
 sub HlistAddModule {
     my $self = shift;
+    my $item = shift;
 }
 
 sub HlistEditModule {
     my $self = shift;
+    my $item = shift;
 }
 
 sub HlistDelModule {
     my $self = shift;
+    my $item = shift;
+}
+
+sub Indicator {
+    my $self = shift;
+    my $item = shift;
+    my $what = shift;
+    my $hl = $self->{HList};
+    my $host = $hl->entrycget($item, '-data');
+    if ($what eq '<Arm>') {
+	$hl->indicator('configure', $item,
+	    -image=>'cbook-blu',
+	    -itemtype=>'image',
+	);
+    } elsif ($what eq '<Activate>') {
+	if ($host->{indicator} =~ /cbook-(red|grn)/) {
+	    $hl->indicator('configure', $item,
+		-image=>'obook',
+		-itemtype=>'image',
+	    );
+	    $host->{indicator} = 'obook';
+	} else {
+	    $hl->indicator('configure', $item,
+		-image=>'cbook-grn',
+		-itemtype=>'image',
+	    );
+	    $host->{indicator} = 'cbook-grn';
+	}
+    }
+}
+
+sub Select {
+    my $self = shift;
+    my $item = shift;
+    my $hl = $self->{HList};
+    if (defined $item and $item ne '') {
+	if (not defined $hl->info('parent', $item)) {
+	    $self->HlistEditHost($item);
+	} else {
+	    $self->HlistEditModule($item);
+	}
+    }
+}
+
+sub Browse {
+    my $self = shift;
+    my $item = shift;
+    my $hl = $self->{HList};
+    my $mh = $self->{HostMenu};
+    my $mv = $self->{ViewMenu};
+    if (defined $item and $item ne '') {
+	my $parent = $hl->info('parent', $item);
+	if (defined $parent) {
+	    $mh->entryconfigure('Edit Module', -state=>'normal', -command=>[\&HlistEditModule,$self,$item],);
+	    $mh->entryconfigure('Delete Module', -state=>'normal', -command=>[\&HlistDelModule,$self,$item],);
+	    $mh->entryconfigure('Edit Host', -state=>'normal', -command=>[\&HlistEditHost,$self,$parent],);
+	    $mh->entryconfigure('Delete Host', -state=>'normal', -command=>[\&HlistDelHost,$self,$parent],);
+	    $mh->entryconfigure('Connect', -state=>'normal', -command=>[\&HlistConnect,$self,$parent],);
+	    $mh->entryconfigure('Add Module', -state=>'normal', -command=>[\&HlistAddModule,$self,$parent],);
+	    $mv->entryconfigure('Session View...', -state=>'normal', -command=>[\&HlistViewSession,$self,$parent],);
+	    $mv->entryconfigure('Tunables View...', -state=>'normal', -command=>[\&HlistViewTunables,$self,$parent],);
+	    $mv->entryconfigure('Autopush View...', -state=>'normal', -command=>[\&HlistViewAutopush,$self,$parent],);
+	    $mv->entryconfigure('Modules View...', -state=>'normal', -command=>[\&HlistViewModules,$self,$parent],);
+	    $mv->entryconfigure('Statistics View...', -state=>'normal', -command=>[\&HlistViewStatistics,$self,$parent],);
+	} else {
+	    $mh->entryconfigure('Edit Host', -state=>'normal', -command=>[\&HlistEditHost,$self,$item],);
+	    $mh->entryconfigure('Delete Host', -state=>'normal', -command=>[\&HlistDelHost,$self,$item],);
+	    $mh->entryconfigure('Connect', -state=>'normal', -command=>[\&HlistConnect,$self,$item],);
+	    $mh->entryconfigure('Add Module', -state=>'normal', -command=>[\&HlistAddModule,$self,$item],);
+	    $mh->entryconfigure('Edit Module', -state=>'disabled', -command=>[\&HlistEditModule,$self,$item],);
+	    $mh->entryconfigure('Delete Module', -state=>'disabled', -command=>[\&HlistDelModule,$self,$item],);
+	    $mv->entryconfigure('Session View...', -state=>'normal', -command=>[\&HlistViewSession,$self,$item],);
+	    $mv->entryconfigure('Tunables View...', -state=>'normal', -command=>[\&HlistViewTunables,$self,$item],);
+	    $mv->entryconfigure('Autopush View...', -state=>'normal', -command=>[\&HlistViewAutopush,$self,$item],);
+	    $mv->entryconfigure('Modules View...', -state=>'normal', -command=>[\&HlistViewModules,$self,$item],);
+	    $mv->entryconfigure('Statistics View...', -state=>'normal', -command=>[\&HlistViewStatistics,$self,$item],);
+	}
+    } else {
+	$mh->entryconfigure('Edit Host', -state=>'disabled', -command=>[\&HlistEditHost,$self,$item],);
+	$mh->entryconfigure('Delete Host', -state=>'disabled', -command=>[\&HlistDelHost,$self,$item],);
+	$mh->entryconfigure('Connect Host', -state=>'disabled', -command=>[\&HlistConnect,$self,$item],);
+	$mh->entryconfigure('Add Module', -state=>'disabled', -command=>[\&HlistAddModule,$self,$item],);
+	$mh->entryconfigure('Edit Module', -state=>'disabled', -command=>[\&HlistEditModule,$self,$item],);
+	$mh->entryconfigure('Delete Module', -state=>'disabled', -command=>[\&HlistDelModule,$self,$item],);
+	$mv->entryconfigure('Session View...', -state=>'disabled', -command=>[\&HlistViewSession,$self,$item],);
+	$mv->entryconfigure('Tunables View...', -state=>'disabled', -command=>[\&HlistViewTunables,$self,$item],);
+	$mv->entryconfigure('Autopush View...', -state=>'disabled', -command=>[\&HlistViewAutopush,$self,$item],);
+	$mv->entryconfigure('Modules View...', -state=>'disabled', -command=>[\&HlistViewModules,$self,$item],);
+	$mv->entryconfigure('Statistics View...', -state=>'disabled', -command=>[\&HlistViewStatistics,$self,$item],);
+    }
 }
 
 sub HlistButton {
     my $hl = shift;
     my $self = shift;
     my $y = shift;
-    print "Y coordinate is $y";
+    #print "Y coordinate is $y";
     my $m = $self->{HlistPopup};
-    $self->{currentItem} = $hl->nearest($y);
-    print "Nearest item is $self->{currentItem}" if defined $self->{currentItem};
+    my $item = $hl->nearest($y);
+    #print "Nearest item is $item" if defined $item;
     unless ($m) {
 	$m = $self->{MainWindow}->Menu(
 	    -tearoff=>0,
@@ -2517,91 +2951,56 @@ sub HlistButton {
 	    -type=>'normal',
 	);
 	$self->{HlistPopup} = $m;
-	$m->add('command',
-	    -accelerator=>'~A',
-	    -command=>[\&HlistAddHost,$self],
-	    -label=>'Add Host',
-	    -underline=>0,
-	);
-	$m->add('command',
-	    -accelerator=>'~E',
-	    -command=>[\&HlistEditHost,$self],
-	    -label=>'Edit Host',
-	    -underline=>0,
-	);
-	$m->add('command',
-	    -accelerator=>'~D',
-	    -command=>[\&HlistDelHost,$self],
-	    -label=>'Delete Host',
-	    -underline=>0,
-	);
+	$m->add('command', -accelerator=>'~A', -command=>[\&HlistAddHost,$self,$item], -label=>'Add Host', -underline=>0,);
+	$m->add('command', -accelerator=>'~E', -command=>[\&HlistEditHost,$self,$item], -label=>'Edit Host', -underline=>0,);
+	$m->add('command', -accelerator=>'~D', -command=>[\&HlistDelHost,$self,$item], -label=>'Delete Host', -underline=>0,);
 	$m->add('separator');
-	$m->add('command',
-	    -accelerator=>'~a',
-	    -command=>[\&HlistAddModule,$self],
-	    -label=>'Add Module',
-	    -underline=>0,
-	);
-	$m->add('command',
-	    -accelerator=>'~e',
-	    -command=>[\&HlistEditModule,$self],
-	    -label=>'Edit Module',
-	    -underline=>0,
-	);
-	$m->add('command',
-	    -accelerator=>'~d',
-	    -command=>[\&HlistDelModule,$self],
-	    -label=>'Delete Module',
-	    -underline=>0,
-	);
+	$m->add('command', -accelerator=>'~a', -command=>[\&HlistAddModule,$self,$item], -label=>'Add Module', -underline=>0,);
+	$m->add('command', -accelerator=>'~e', -command=>[\&HlistEditModule,$self,$item], -label=>'Edit Module', -underline=>0,);
+	$m->add('command', -accelerator=>'~d', -command=>[\&HlistDelModule,$self,$item], -label=>'Delete Module', -underline=>0,);
+	$m->add('separator');
+	$m->add('command', -accelerator=>'~C', -command=>[\&HlistConnect,$self,$item], -label=>'Connect', -underline=>0,);
+	$m->add('separator');
+	$m->add('command', -accelerator=>'~S', -command=>[\&HlistViewSession,$self,$item], -label=>'Session View...', -underline=>0,);
+	$m->add('command', -accelerator=>'~T', -command=>[\&HlistViewTunables,$self,$item], -label=>'Tunables View...', -underline=>0,);
+	$m->add('command', -accelerator=>'~A', -command=>[\&HlistViewAutopush,$self,$item], -label=>'Autopush View...', -underline=>0,);
+	$m->add('command', -accelerator=>'~M', -command=>[\&HlistViewModules,$self,$item], -label=>'Modules View...', -underline=>0,);
+	$m->add('command', -accelerator=>'~T', -command=>[\&HlistViewStatistics,$self,$item], -label=>'Statistics View...', -underline=>1,);
     }
     $m->Popup(
 	-popanchor=>'nw',
 	-popover=>'cursor',
     );
-    if (defined $self->{currentItem} and $self->{currentItem} ne '') {
-	$m->entryconfigure('Edit Host',
-	    -state=>'normal',
-	);
-	$m->entryconfigure('Delete Host',
-	    -state=>'normal',
-	);
-	$m->entryconfigure('Add Module',
-	    -state=>'normal',
-	);
-	if (not defined $hl->info('parent', $self->{currentItem})) {
-	    $m->entryconfigure('Edit Module',
-		-state=>'disabled',
-	    );
-	    $m->entryconfigure('Delete Module',
-		-state=>'disabled',
-	    );
+    if (defined $item and $item ne '') {
+	$m->entryconfigure('Edit Host', -state=>'normal',);
+	$m->entryconfigure('Delete Host', -state=>'normal',);
+	$m->entryconfigure('Add Module', -state=>'normal',);
+	if (not defined $hl->info('parent', $item)) {
+	    $m->entryconfigure('Edit Module', -state=>'disabled',);
+	    $m->entryconfigure('Delete Module', -state=>'disabled',);
 	} else {
-	    $m->entryconfigure('Edit Module',
-		-state=>'normal',
-	    );
-	    $m->entryconfigure('Delete Module',
-		-state=>'normal',
-	    );
+	    $m->entryconfigure('Edit Module', -state=>'normal',);
+	    $m->entryconfigure('Delete Module', -state=>'normal',);
 	}
+	$m->entryconfigure('Connect', -state=>'normal',);
+	$m->entryconfigure('Session View...', -state=>'normal',);
+	$m->entryconfigure('Tunables View...', -state=>'normal',);
+	$m->entryconfigure('Autopush View...', -state=>'normal',);
+	$m->entryconfigure('Modules View...', -state=>'normal',);
+	$m->entryconfigure('Statistics View...', -state=>'normal',);
     } else {
-	$m->entryconfigure('Edit Host',
-	    -state=>'disabled',
-	);
-	$m->entryconfigure('Delete Host',
-	    -state=>'disabled',
-	);
-	$m->entryconfigure('Add Module',
-	    -state=>'disabled',
-	);
-	$m->entryconfigure('Edit Module',
-	    -state=>'disabled',
-	);
-	$m->entryconfigure('Delete Module',
-	    -state=>'disabled',
-	);
+	$m->entryconfigure('Edit Host', -state=>'disabled',);
+	$m->entryconfigure('Delete Host', -state=>'disabled',);
+	$m->entryconfigure('Add Module', -state=>'disabled',);
+	$m->entryconfigure('Edit Module', -state=>'disabled',);
+	$m->entryconfigure('Delete Module', -state=>'disabled',);
+	$m->entryconfigure('Connect', -state=>'disabled',);
+	$m->entryconfigure('Session View...', -state=>'disabled',);
+	$m->entryconfigure('Tunables View...', -state=>'disabled',);
+	$m->entryconfigure('Autopush View...', -state=>'disabled',);
+	$m->entryconfigure('Modules View...', -state=>'disabled',);
+	$m->entryconfigure('Statistics View...', -state=>'disabled',);
     }
-
     return;
 }
 
@@ -2721,6 +3120,16 @@ sub MibHelp {
 	}
     }
     $tl->deiconify unless $tl->viewable;
+}
+
+sub CreatePage {
+    my $item = shift;
+    my $self = shift;
+}
+
+sub RefreshPage {
+    my $item = shift;
+    my $self = shift;
 }
 
 sub CreateTunables {
@@ -3104,12 +3513,16 @@ SNMP::loadModules('OPENSS7-STREAMS-MIB');
 
 my $myapp = new myapp;
 $myapp->create();
+$myapp->ShowCopying();
 
 Tk::MainLoop;
 
 # =============================================================================
 #
 # $Log: streams-manager,v $
+# Revision 0.9.2.2  2008-10-11 04:31:32  brian
+# - handle -Wpointer-sign
+#
 # Revision 0.9.2.1  2008-10-07 13:17:35  brian
 # - added perltk files
 #

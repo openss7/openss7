@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-24 07:14:53 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-24 07:14:53 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.98  2008-10-11 04:31:33  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.97  2008-09-24 07:14:53  brian
  - rationalized prototype
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-24 07:14:53 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-24 07:14:53 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -571,7 +574,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2008-09-24 07:14:53 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -12857,6 +12860,8 @@ m_error(ss_t *ss, queue_t *q, mblk_t *msg, int error)
 	mblk_t *mp;
 
 	if ((mp = ss_allocb(q, 2, BPRI_HI))) {
+		if (ss->sock)
+			ss_socket_put(xchg(&ss->sock, NULL));
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = error;
 		*mp->b_wptr++ = error;
@@ -12916,11 +12921,16 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
 	case -ENOMEM:
 		return (error);
 	case QR_DONE:
+	absorb:
 		freemsg(msg);
+	case QR_ABSORBED:
 		return (QR_ABSORBED);
 	case -EPIPE:
 	case -ENETDOWN:
 	case -EHOSTUNREACH:
+	case -ECONNRESET:
+	case -ECONNREFUSED:
+		goto absorb;
 		hangup = 1;
 		error = EPIPE;
 		break;
@@ -13364,7 +13374,7 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
 			if ((err = ss_accept(ss, &sock, cp)))
 				goto free_error;
 			if (as->sock)
-				ss_socket_put(as->sock);	/* get rid of old socket */
+				ss_socket_put(xchg(&as->sock, NULL));	/* get rid of old socket */
 			as->sock = sock;
 			ss_socket_get(as->sock, as);
 			ss_set_state(as, TS_DATA_XFER);
@@ -13988,7 +13998,7 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 					freemsg(bp);
 					return (QR_ABSORBED);
 				}
-				return m_error(ss, q, bp, err);
+				return m_error_reply(ss, q, bp, err);
 			}
 			mp->b_wptr = mp->b_rptr + err;
 			STRLOGIO(ss, "recvmsg with len = %d", err);
@@ -14838,7 +14848,8 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	goto error;
 #endif
       error_close:
-	ss_socket_put(xchg(&ss->sock, NULL));
+	if (ss->sock)
+		ss_socket_put(xchg(&ss->sock, NULL));
       error:
 	return t_error_ack(ss, q, mp, T_BIND_REQ, err);
 }

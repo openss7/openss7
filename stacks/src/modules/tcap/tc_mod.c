@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $
+ @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:22 $ by $Author: brian $
+ Last Modified $Date: 2008-10-11 04:31:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc_mod.c,v $
+ Revision 0.9.2.6  2008-10-11 04:31:29  brian
+ - handle -Wpointer-sign
+
  Revision 0.9.2.5  2008-09-22 20:31:22  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $"
+#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $"
 
 static char const ident[] =
-    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $";
+    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $";
 
 /*
  * This is TC-MOD.  It is a simplified Transaction Component Interface (TCI) module for TCAP that
@@ -124,7 +127,7 @@ static char const ident[] =
 #include <sys/xti_tcap.h>
 
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS MODULE."
-#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-09-22 20:31:22 $"
+#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-11 04:31:29 $"
 #define TC_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
