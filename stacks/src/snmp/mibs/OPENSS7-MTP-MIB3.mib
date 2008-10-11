@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-MTP-MIB3.mib,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-04-29 07:11:22 $
+-- @(#) $RCSfile: OPENSS7-MTP-MIB3.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2008-10-11 04:34:39 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,12 +47,15 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 07:11:22 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-11 04:34:39 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-MTP-MIB3.mib,v $
--- Revision 0.9.2.2  2008-04-29 07:11:22  brian
+-- Revision 0.9.2.3  2008-10-11 04:34:39  brian
+-- - cleanup MIBs
+--
+-- Revision 0.9.2.2  2008/04/29 07:11:22  brian
 -- - updating headers for release
 --
 -- Revision 0.9.2.1  2008/01/24 17:43:03  brian
@@ -2037,7 +2040,7 @@ transmissionRate OBJECT-TYPE
          transmissionRate attribute."
     ::= { narrowbandProtocolProfileEntry 1 }
 
-narrowbandProtocolProfileRowStatus
+narrowbandProtocolProfileRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
@@ -6042,7 +6045,6 @@ slTimersProfileMtpT21A OBJECT-TYPE
     SYNTAX      TimeInterval
     MAX-ACCESS  read-create
     STATUS      current
-    STATUS      current
     DESCRIPTION 
         "This attribute defines the initial timer value of timer 
          T21 (ANSI) remote inhibit test timer defined in ANSI 
@@ -8459,7 +8461,7 @@ mtpSignPointPackage OBJECT-GROUP
 
 signDataLinkTpPackage OBJECT-GROUP
     OBJECTS     { signDataLinkTpAdjPc, signDataLinkTpTransmissionRate, 
-                  signDataLinkLoopDelay, signDataLinkTpOperationalState, 
+                  signDataLinkTpLoopDelay, signDataLinkTpOperationalState, 
                   signDataLinkTpEquipmentPointer, 
                   signDataLinkTpRowStatus }
     STATUS      current
@@ -9732,6 +9734,10 @@ lsTimersProfileCompliance MODULE-COMPLIANCE
 
         MANDATORY-GROUPS        { lsTimersProfilePackage }
 
+        GROUP   lsTimersProfileNamePackage
+        DESCRIPTION   
+              "PRESENT IF an instance supports it."
+
     MODULE  OPENSS7-SMI-MIB
 
         GROUP   createDeleteNotificationsPackage
@@ -9747,10 +9753,6 @@ lsTimersProfileCompliance MODULE-COMPLIANCE
                defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 
                10165-2 : 1992' is supported by an instance of 
                this class"
-
-        GROUP   lsTimersProfileNamePackage
-        DESCRIPTION   
-              "PRESENT IF an instance supports it."
 
     ::= { mtpCompliances 1 }
 
@@ -10041,6 +10043,18 @@ signDataLinkTpCompliance MODULE-COMPLIANCE
                signalling point supports the automatic 
                allocation of signalling datalinks."
 
+        GROUP   narrowbandSpecificPackage
+        DESCRIPTION   
+              "PRESENT IF an instance supports it."
+
+        GROUP   broadbandSpecificPackage
+        DESCRIPTION   
+              "PRESENT IF an instance supports it."
+
+        GROUP   saalSignDataLinkTpPackage
+        DESCRIPTION   
+              "PRESENT IF an instance supports it."
+
     MODULE  OPENSS7-SMI-MIB
 
         GROUP   attributeValueChangeNotificationPackage
@@ -10056,18 +10070,6 @@ signDataLinkTpCompliance MODULE-COMPLIANCE
                notifications defined in 'ITU-T Rec. X.721 (1992) 
                | ISO/IEC 10165-2 : 1992' are supported by an 
                instance of this class."
-
-        GROUP   narrowbandSpecificPackage
-        DESCRIPTION   
-              "PRESENT IF an instance supports it."
-
-        GROUP   broadbandSpecificPackage
-        DESCRIPTION   
-              "PRESENT IF an instance supports it."
-
-        GROUP   saalSignDataLinkTpPackage
-        DESCRIPTION   
-              "PRESENT IF an instance supports it."
 
     ::= { mtpCompliances 9 }
 

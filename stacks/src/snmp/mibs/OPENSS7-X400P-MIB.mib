@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 07:11:23 $
+-- @(#) $RCSfile: OPENSS7-X400P-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.9 $) $Date: 2008-10-11 04:34:40 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 07:11:23 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-11 04:34:40 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-X400P-MIB.mib,v $
+-- Revision 0.9.2.9  2008-10-11 04:34:40  brian
+-- - cleanup MIBs
+--
 -- Revision 0.9.2.8  2008-04-29 07:11:23  brian
 -- - updating headers for release
 --
@@ -78,10 +81,12 @@
 OPENSS7-X400P-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, DisplayString
+	MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32
 		FROM SNMPv2-SMI
-	openss7
-		FROM OPENSS7-MIB;
+	DisplayString
+		FROM SNMPv2-TC
+	openss7Modules
+		FROM OPENSS7-SMI;
 
 x400pMIB MODULE-IDENTITY
 	LAST-UPDATED
@@ -99,7 +104,7 @@ x400pMIB MODULE-IDENTITY
 		 E-Mail: bidulock@openss7.org"
 	DESCRIPTION
 		"MIB Module for the X400P Drivers and Cards."
-	::= { openss7 400 }
+	::= { openss7Modules 400 }
 
 -- top level oragnization of the MIB
 
@@ -576,7 +581,7 @@ x400pCardPciIrq OBJECT-TYPE
 		 assigned."
 	::= { x400pCardEntry 19 }
 
-x400pCardStatus INTEGER
+x400pCardStatus OBJECT-TYPE
 	SYNTAX		RowStatus
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -908,6 +913,10 @@ x400pSpanLineBuildout OBJECT-TYPE
 			mon-30dB(21),
 			mon-32db(22)
 		}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	""
+	::= { x400pSpanEntry 18 }
 
 x400pSpanTxLevel OBJECT-TYPE
 	SYNTAX	INTEGER {
@@ -917,7 +926,7 @@ x400pSpanTxLevel OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	""
-	::= { x400pSpanEntry 18 }
+	::= { x400pSpanEntry 19 }
 
 x400pSpanRxLevel OBJECT-TYPE
 	SYNTAX	INTEGER {
@@ -927,7 +936,7 @@ x400pSpanRxLevel OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	""
-	::= { x400pSpanEntry 19 }
+	::= { x400pSpanEntry 20 }
 
 
 -- ====================================================================
@@ -1001,7 +1010,7 @@ x400pChanIndex OBJECT-TYPE
 		 multiplexed together into a single virtual channel.  
 		 Management stations do not add or delete rows from this 
 		 table, only agents, and then only at boot time."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  1 }
 
 x400pChanOperationalState OBJECT-TYPE
 	SYNTAX		OperationalState
@@ -1011,7 +1020,7 @@ x400pChanOperationalState OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 operationalState."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  2 }
 
 x400pChanUsageState OBJECT-TYPE
 	SYNTAX		UsageState
@@ -1021,7 +1030,7 @@ x400pChanUsageState OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 usageState."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  3 }
 
 x400pChanAdministativeState OBJECT-TYPE
 	SYNTAX		AdministrativeState
@@ -1031,7 +1040,7 @@ x400pChanAdministativeState OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 administrativeState."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  4 }
 
 x400pChanAlarmStatus OBJECT-TYPE
 	SYNTAX		AlarmStatus
@@ -1041,7 +1050,7 @@ x400pChanAlarmStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 alarmStatus."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  5 }
 
 x400pChanProceduralStatus OBJECT-TYPE
 	SYNTAX		ProceduralStatus
@@ -1051,7 +1060,7 @@ x400pChanProceduralStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 proceduralStatus."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  6 }
 
 x400pChanAvailabilityStatus OBJECT-TYPE
 	SYNTAX		AvailabilityStatus
@@ -1061,7 +1070,7 @@ x400pChanAvailabilityStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 availabilityStatus."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  7 }
 
 x400pChanControlStatus OBJECT-TYPE
 	SYNTAX		ControlStatus
@@ -1071,7 +1080,7 @@ x400pChanControlStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 controlStatus."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  8 }
 
 x400pChanStandbyStatus OBJECT-TYPE
 	SYNTAX		StandbyStatus
@@ -1081,7 +1090,7 @@ x400pChanStandbyStatus OBJECT-TYPE
 	REFERENCE
 		"OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
 		 standbyStatus."
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry  9 }
 
 
 x400pChanType OBJECT-TYPE
@@ -1096,14 +1105,14 @@ x400pChanType OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	""
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry 10 }
 
 x400pChanRate OBJECT-TYPE
 	SYNTAX		Unsigned32 (0|56000|64000|1536000|1984000)
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	""
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry 11 }
 
 x400pChanMode OBJECT-TYPE
 	SYNTAX	INTEGER {
@@ -1116,7 +1125,7 @@ x400pChanMode OBJECT-TYPE
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	""
-	::= { x400pChanEntry xx }
+	::= { x400pChanEntry 12 }
 
 -- ====================================================================
 --
@@ -1238,7 +1247,7 @@ x400PCardTypeV400PE OBJECT-IDENTITY
 		 These cards are treated as E1 only.  These cards were 
 		 discontinued by Varion due to excessive lead content 
 		 compared to newer European standards."
-	::= { x400pCardTypeV400P 1 }
+	::= { x400PCardTypeV400P 1 }
 
 x400PCardTypeV400PT OBJECT-IDENTITY
 	STATUS		current
@@ -1250,7 +1259,7 @@ x400PCardTypeV400PT OBJECT-IDENTITY
 		 These cards are treated as T1 only.  These cards were 
 		 discontinued by Varion due to excessive lead content 
 		 compared to newer European standards."
-	::= { x400pCardTypeV400P 2 }
+	::= { x400PCardTypeV400P 2 }
 
 x400PCardTypeV401PE OBJECT-IDENTITY
 	STATUS		current

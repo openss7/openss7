@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-DL-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008/07/28 08:51:39 $
+-- @(#) $RCSfile: OPENSS7-DL-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.5 $) $Date: 2008-10-11 04:34:42 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -46,12 +46,15 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008/07/28 08:51:39 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-11 04:34:42 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-DL-MIB.mib,v $
--- Revision 0.9.2.4  2008/07/28 08:51:39  brian
+-- Revision 0.9.2.5  2008-10-11 04:34:42  brian
+-- - cleanup MIBs
+--
+-- Revision 0.9.2.4  2008-07-28 08:51:39  brian
 -- - SNMP updates
 --
 -- Revision 0.9.2.3  2008-06-18 16:45:40  brian
@@ -84,7 +87,7 @@ IMPORTS
     Float
         FROM UCD-SNMP-MIB;
 
-osiMIB MODULE-IDENTITY
+osiDL-MIB MODULE-IDENTITY
     LAST-UPDATED "200712170903Z"
     ORGANIZATION 
         "The OpenSS7 Project"
@@ -106,13 +109,13 @@ osiMIB MODULE-IDENTITY
     REVISION    "200712170903Z"
     DESCRIPTION 
         "First release of this module."
-    ::= { openss7Modules 2 }
+    ::= { openss7Modules 212 }
 
  -- top level organization of the MIB
  
--- osiNotifications	OBJECT IDENTIFIER ::= { osiMIB       0 }
--- osiObjects		OBJECT IDENTIFIER ::= { osiMIB       1 }
--- osiConformance	OBJECT IDENTIFIER ::= { osiMIB       2 }
+-- osiNotifications	OBJECT IDENTIFIER ::= { osiDL-MIB    0 }
+-- osiObjects		OBJECT IDENTIFIER ::= { osiDL-MIB    1 }
+-- osiConformance	OBJECT IDENTIFIER ::= { osiDL-MIB    2 }
 
 -- osiTables		OBJECT IDENTIFIER ::= { osiObjects   1 }
 -- osiScalars		OBJECT IDENTIFIER ::= { osiObjects   2 }
@@ -455,10 +458,10 @@ SNPAPrefix ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(0..21))
 
 osiNotifications OBJECT IDENTIFIER
-    ::= { osiMIB 0 }
+    ::= { osiDL-MIB 0 }
 
 osiObjects OBJECT IDENTIFIER
-    ::= { osiMIB 1 }
+    ::= { osiDL-MIB 1 }
 
 osiTables OBJECT IDENTIFIER
     ::= { osiObjects 1 }
@@ -12925,7 +12928,7 @@ osiOids OBJECT IDENTIFIER
     ::= { osiObjects 4 }
 
 osiConformance OBJECT IDENTIFIER
-    ::= { osiMIB 2 }
+    ::= { osiDL-MIB 2 }
 
 osiGroups OBJECT IDENTIFIER
     ::= { osiConformance 1 }

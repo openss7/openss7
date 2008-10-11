@@ -1,3 +1,9 @@
+2008-10-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/mibs/OPENSS7-STREAMS-EXT-MIB.mib: more MIB updates
+	* src/mibs/OPENSS7-STREAMS-MIB.mib: more MIB updates
+	* src/perl/mibbrowser: more MIB updates
+
 2008-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/log.c: remove signed pointer warnings
