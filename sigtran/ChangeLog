@@ -1,3 +1,13 @@
+2008-10-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/mibs/OPENSS7-M2PA-MIB.mib: cleanup MIBs
+	* src/mibs/OPENSS7-M2UA-ASP-MIB.mib: cleanup MIBs
+	* src/mibs/OPENSS7-M2UA-MIB.mib: cleanup MIBs
+	* src/mibs/OPENSS7-M3UA-ASP-MIB.mib: cleanup MIBs
+	* src/mibs/OPENSS7-M3UA-SGP-MIB.mib: cleanup MIBs
+	* src/mibs/OPENSS7-SIGTRAN-MIB.mib: cleanup MIBs
+	* src/mibs/OPENSS7-SIGTRAN-TC.mib: cleanup MIBs
+
 2008-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/isua_as.c: remove signed pointer warnings
