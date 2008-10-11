@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-M2PA-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2008-04-29 01:52:24 $
+-- @(#) $RCSfile: OPENSS7-M2PA-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.4 $) $Date: 2008-10-11 04:34:38 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 01:52:24 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-11 04:34:38 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-M2PA-MIB.mib,v $
+-- Revision 0.9.2.4  2008-10-11 04:34:38  brian
+-- - cleanup MIBs
+--
 -- Revision 0.9.2.3  2008-04-29 01:52:24  brian
 -- - updated headers for release
 --
@@ -101,6 +104,9 @@ m2paMIB MODULE-IDENTITY
     REVISION    "200711281554Z"
     DESCRIPTION 
         "First release of this module."
+    REVISION    "200810100532Z"
+    DESCRIPTION
+        "Corrections to work with OpenSS7 MIB Browser."
     ::= { openss7Modules 202 }
 
  -- top level organization of the MIB
