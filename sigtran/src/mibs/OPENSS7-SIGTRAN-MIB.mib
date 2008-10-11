@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-SIGTRAN-MIB.mib,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-04-29 01:52:24 $
+-- @(#) $RCSfile: OPENSS7-SIGTRAN-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-11 04:34:38 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 01:52:24 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-11 04:34:38 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-SIGTRAN-MIB.mib,v $
+-- Revision 0.9.2.4  2008-10-11 04:34:38  brian
+-- - cleanup MIBs
+--
 -- Revision 0.9.2.3  2008-04-29 01:52:24  brian
 -- - updated headers for release
 --
@@ -318,7 +321,7 @@ sigtranSctpProfileCsumType OBJECT-TYPE
 		 management station and the implementation specified 
 		 algorithm is CRC32C, the value returned by a subsequent 
 		 get operation will be crc32c(1).
-
+		 
 		 The default value is crc32c(1).  Other values should 
 		 only be used in special circumstances."
 	REFERENCE
@@ -351,7 +354,7 @@ sigtranSctpProfileMacType OBJECT-TYPE
 		 implementation specified signing algorithm is MD5, the 
 		 value md5(1) will be returned on subsequent management 
 		 get operations.
-
+		 
 		 The default value is other(5), which may will normally 
 		 translate into md5(1) or sha1(2).  The value none(3) 
 		 defeats security associated with association 
@@ -375,13 +378,13 @@ sigtranSctpProfileValidCookieLife OBJECT-TYPE
 		 minmum clock granularity of the implementation.  Valid 
 		 values span the full range of a TimeInterval.  Not all 
 		 implementations will support all values in the range.
-
+		 
 		 The default value from RFC 4960 is 60 seconds (6000 
 		 centiseconds).  Unfortuantely the default value must be 
 		 adjusted to accomodate the slowest peer on the slowest 
 		 connection.  The default value is adequate for Internet 
 		 applications.
-
+		 
 		 Reducing this value will increase the chances that 
 		 passive connection attempts will fail due to expired 
 		 cookies.  Increasing the value will reduce the overall 
@@ -406,11 +409,11 @@ sigtranSctpProfileCookieInc OBJECT-TYPE
 		 the lifespan of the cookie.  Valid values are the 
 		 entire range of a TimeInterval.  Not all 
 		 implementations will support the entire range.
-
+		 
 		 The default value from RFC 4960 is 1 second (100 
 		 centiseconds).  The default value is appropriate for 
 		 Internet applications.
-
+		 
 		 Reducing this value will increase the chances that 
 		 passive connection attempts will fail due to expired 
 		 cookies.  Increasing the value will reduce the overall 
@@ -434,12 +437,12 @@ sigtranSctpProfileMaxIstreams OBJECT-TYPE
 		 valid values are from 2 to 16834.  Not all 
 		 implementations will support the full range, but must 
 		 support at least 2.
-
+		 
 		 The default value is 257 or the implementation 
 		 specified maximum number of inbound streams for an SCTP 
 		 association.  The default value is suitable for most 
 		 SIGTRAN applications.
-
+		 
 		 Reducing this number from the implementation maximum 
 		 beneath about 257 will increase the chances that head 
 		 of line blocking occurs between independent data flows.  
@@ -496,10 +499,10 @@ sigtranSctpEcn OBJECT-TYPE
 		 implementations will permit this value to be changed on 
 		 a per-association basis.  Valid values are TRUE or 
 		 FALSE.
-
+		 
 		 - When TRUE, ECN will be supported on the association.  
 		 - When FALSE, ECN will not be supported.
-
+		 
 		 The default is TRUE.  ECN implementations can be 
 		 problematic.  This value should be set to FALSE if an 
 		 ECN implementation problem is suspected."
@@ -537,10 +540,10 @@ sigtranSctpProfileMaxInitRetries OBJECT-TYPE
 		 Valid values are the full range of Unsigned32.  Not all 
 		 implementations will support the entire range, but must 
 		 support the value 8.
-
+		 
 		 The default value from RFC 4960 is 8 retires.  The 
 		 default value is suitable for Internet applications.
-
+		 
 		 Reducing this value will reduce the chances that an 
 		 active open of an SCTP association will succeed, but 
 		 will also reduce the latency in detecting initiation 
@@ -583,17 +586,17 @@ sigtranSctpProfileAssocMaxRetrans OBJECT-TYPE
 		 will attempt retransmission of a packet on any active 
 		 destination transport address before it aborts the 
 		 association.  Value values are zero (0) or greater.
-		
-		The default value from RFC 4960 is 10 retries.  The 
-		default value is suitable for Internet applications.
-
-		This value should be larger than the sum of the maximum 
-		path retransmission values for each destination.  
-		Setting the value to less than this sum has the 
-		interesting effect on some implementations of permitting 
-		an association to persist even when all destinations 
-		have been deemed inactive, which is undesirable for 
-		SIGTRAN applications."
+		 
+		 The default value from RFC 4960 is 10 retries.  The 
+		 default value is suitable for Internet applications.
+		 
+		 This value should be larger than the sum of the maximum 
+		 path retransmission values for each destination.  
+		 Setting the value to less than this sum has the 
+		 interesting effect on some implementations of 
+		 permitting an association to persist even when all 
+		 destinations have been deemed inactive, which is 
+		 undesirable for SIGTRAN applications."
 	REFERENCE
 		"RFC 4960"
 	DEFVAL		{ 10 }
@@ -613,7 +616,7 @@ sigtranSctpProfileMaxSackDelay OBJECT-TYPE
 		 Internet applications.  The default value from RFC 4960 
 		 is 200 milliseconds (20 centiseconds).  The default 
 		 value is suitable for Internet applications.
-
+		 
 		 Reducing this value (even to 0) has the effect that 
 		 more SACKs are sent for the same data flow, but reduces 
 		 the chances of spurious false congestion events.  
@@ -644,11 +647,11 @@ sigtranSctpProfileRtoMin OBJECT-TYPE
 		 instead.   This minimum must be less than or equal to 
 		 both RtoInitial and RtoMax.  Also, the value must be 
 		 greater than the MaxSackDelay of the far end.
-
+		 
 		 The default value from RFC 4960 is 1 second (100 
 		 centiseconds).  The default value is suitable for 
 		 Internet applications.
-
+		 
 		 It is generally agreed that the default values of 
 		 RtoMin, RtoInitial and RtoMax are all too high for high 
 		 performance SIGTRAN applications operating on 
@@ -716,10 +719,10 @@ sigtranSctpProfileRtoMax OBJECT-TYPE
 		 set to zero (0), the implementation should use the 
 		 minimum clock granularity instead.  This maximum must 
 		 be greater than both RtoInitial and RtoMin.
-
+		 
 		 The default from RFC 4960 is 60 seconds.  The default 
 		 value is sutiable for Internet applications.
-
+		 
 		 It is generally agreed that the default values of 
 		 RtoMin, RtoInitial and RtoMax are all too high for high 
 		 performance SIGTRAN applications operating on 
@@ -754,7 +757,7 @@ sigtranSctpProfilePathMaxRetrans OBJECT-TYPE
 		 
 		 The default value from RFC 4960 is 5 retries.  The 
 		 default value is suitable for Internet applications.
-
+		 
 		 Adjusting the value has a dramatic effect on the period 
 		 of time taken to fail-over between destinations for 
 		 multi-homed connections.  Lower values (including zero) 
@@ -812,7 +815,7 @@ sigtranSctpProfileStatus OBJECT-TYPE
 		 delete rows from this table.  Rows may also be added 
 		 and deleted by the agent in respond to actions from a 
 		 local craft interface.
-
+		 
 		 Note that all values in the SCTP profile table are 
 		 persistent across an agent reboot."
 	REFERENCE

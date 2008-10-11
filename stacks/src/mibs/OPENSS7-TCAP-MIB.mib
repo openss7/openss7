@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-TCAP-MIB.mib,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.3 $) $Date: 2008-04-29 07:11:22 $
+-- @(#) $RCSfile: OPENSS7-TCAP-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-11 04:34:40 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-04-29 07:11:22 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-11 04:34:40 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-TCAP-MIB.mib,v $
+-- Revision 0.9.2.4  2008-10-11 04:34:40  brian
+-- - cleanup MIBs
+--
 -- Revision 0.9.2.3  2008-04-29 07:11:22  brian
 -- - updating headers for release
 --
@@ -59,6 +62,78 @@
 -- - added new mib files
 --
 -- =============================================================================
+
+OPENSS7-TCAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Q751
+	FROM OPENSS7-SMI
+    AdministrativeState, AvailabilityStatus, OperationalState, 
+    ProceduralStatus, SimpleNameType, UsageState, 
+    attributeValueChangeNotificationPackage, communicationsAlarmPackage, 
+    createDeleteNotificationsPackage, tmnObjectInstance, 
+    tmnPerceivedSeverity, tmnProbableCause
+        FROM OPENSS7-SMI-MIB
+    MtpCongestionLevel, MtpLinkFailureReason, MtpUserPartStatus, 
+    NetworkPointCode
+        FROM OPENSS7-SS7-TC
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
+        FROM SNMPv2-SMI
+    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
+    TimeInterval, TruthValue
+        FROM SNMPv2-TC;
+
+tcapMIB MODULE-IDENTITY
+    LAST-UPDATED "200810092250Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "This is a MIB providing management information is 
+         accordance with ITU-T Rec. Q.751.1, ITU-T Rec. 
+         Q.2751.1, ANSI T1.116.1."
+    REVISION	"200810092250Z"
+    DESCRIPTION
+	"First release of this module."
+    ::= { openss7Q751 4 }
+
+tcapNotifications OBJECT IDENTIFIER
+    ::= { tcapMIB 0 }
+
+tcapSpecificExtensions OBJECT IDENTIFIER
+    ::= { tcapMIB 1 }
+
+tcapDefaults OBJECT IDENTIFIER
+    ::= { tcapMIB 2 }
+
+tcapObjectClass OBJECT IDENTIFIER
+    ::= { tcapMIB 3 }
+
+tcapParameters OBJECT IDENTIFIER
+    ::= { tcapMIB 4 }
+
+tcapScalars OBJECT IDENTIFIER
+    ::= { tcapMIB 5 }
+
+tcapPackage OBJECT IDENTIFIER
+    ::= { tcapMIB 6 }
+
+tcapCompliances OBJECT IDENTIFIER
+    ::= { tcapMIB 7 }
+
+END -- end of modules OPENSS7-TCAP-MIB
 
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8
 

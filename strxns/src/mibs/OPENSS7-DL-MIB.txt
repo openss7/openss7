@@ -43,7 +43,7 @@ osiMIB MODULE-IDENTITY
     REVISION    "200712170903Z"
     DESCRIPTION 
         "First release of this module."
-    ::= { openss7Modules 2 }
+    ::= { openss7Modules 202 }
 
 
 DummySyntax ::=
