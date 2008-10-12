@@ -58,6 +58,25 @@
 @c =========================================================================
 
 @table @code
+@item 024.  2008-10-11T19:36:41+0000
+
+A list delete corruption bug in the STREAMS driver and module lookup functions (e.g. __cdrv_lookup)
+was discovered by the list debugging in the FC9 kernel.
+
+@emph{*fixed*} in @command{streams-0.9.2.4}
+
+@item 023.  2008-10-11T19:36:23+0000
+
+Not really a bug, but newer (2.6.25) kernels no longer permit registration of binary identifiers for
+sysctls (i.e. ctl_name).  The proc filesystem entries (i.e. procname) are still permitted and
+ctl_name should be set to zero for these kernels.  Added a check for the existence of symbol
+sysctl_check_table() to identify when binary registration is forbidden.  Another related problem is
+that when binary registration of system controls is not possible, sysctl(2) becomes worthless.
+Unfortunately, the STREAMS MIB agent was written to use sysctl(2) and needs to be rewritten to use
+the /proc/sys filesystem instead ala sysctl(8).
+
+@emph{*fixed*} in @command{streams-0.9.2.4}
+
 @item 022.  2008-10-07T18:40:25+0000
 
 When overriding 32-bit compatability on input-output controls conflicting from the CDROM block
