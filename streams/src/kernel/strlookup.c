@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-10-12 03:07:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2008-10-12 03:07:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlookup.c,v $
+ Revision 0.9.2.55  2008-10-12 03:07:40  brian
+ - changes for FC9 2.6.25 kernel
+
  Revision 0.9.2.54  2008-04-28 12:54:05  brian
  - update file headers for release
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-10-12 03:07:40 $"
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2008-10-12 03:07:40 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>

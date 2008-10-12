@@ -2,7 +2,7 @@
 #!/usr/bin/perl -W
 # =============================================================================
 # 
-# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-10-11 09:32:18 $
+# @(#) $RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-12 03:07:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-11 09:32:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-12 03:07:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -91,9 +91,9 @@ $\ = "\n";
 use strict;
 
 my $program = $0; $program =~ s/^.*\///;
-my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-10-11 09:32:18 $';
-my $version = '$Revision: 0.9.2.3 $';
-my $date = '$Date: 2008-10-11 09:32:18 $';
+my $ident = '$RCSfile: mibbrowser,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-12 03:07:41 $';
+my $version = '$Revision: 0.9.2.4 $';
+my $date = '$Date: 2008-10-12 03:07:41 $';
 my $title = 'OpenSS7 Network Manager';
 
 my $Title = <<EOF;
@@ -550,11 +550,10 @@ while ($#defaults >= 2) {
 use Tk;
 require Tk::Adjuster;
 require Tk::Dialog;
-require Tk::FileSelect;
 require Tk::HList;
 require Tk::LabFrame;
 require Tk::ROText;
-require Tk::FileDialog;
+require Tk::FBox;
 
 use Storable qw(lock_store lock_nstore lock_retrieve);
 
@@ -1642,11 +1641,12 @@ sub loadrecent {
 sub saveas {
     my $self = shift;
     my $data = $self->{data};
-    my $fs = $self->{MainWindow}->FileSelect(
-	-directory=>$data->{directory},
+    my $file = $self->{MainWindow}->getSaveFile(
+	-defaultextension=>'.dat',
+	-initialdir=>$data->{directory},
+	-initialfile=>$data->{filename},
+	-title=>'Save As Dialog',
     );
-    my $file = $fs->Show;
-    $fs->destroy;
     if ($file) {
 	my $base = $file; $base =~ s/^.*\///;
 	if (-e $file) {
@@ -1760,11 +1760,12 @@ sub openfile {
     my $data = $self->{data};
     my $result = $self->storefile();
     return if $result eq 'Cancel';
-    my $fs = $self->{MainWindow}->FileSelect(
-	-directory=>$data->{directory},
+    my $file = $self->{MainWindow}->getOpenFile(
+	-defaultextension=>'.dat',
+	-initialdir=>$data->{directory},
+	-initialfile=>$data->{filename},
+	-title=>'Open Dialog',
     );
-    my $file = $fs->Show;
-    $fs->destroy;
     return unless $file;
     my $base = $file =~ s/^.*\///;
     if (-r $file) {
@@ -1827,11 +1828,14 @@ sub loadmib {
     my $data = $self->{data};
     my $file;
     my @temp = ();
-    my $fs;
-    $fs = $self->{MainWindow}->FileSelect(
-	-directory=>$data->{directory},
+    my $file = $self->{MainWindow}->getOpenFile(
+	-defaultextension=>'.mib',
+	-initialdir=>$data->{directory},
+	-initialfile=>$data->{filename},
+	-title=>'Load MIB Dialog',
+	-type=>'open',
     );
-    if (my $file = $fs->Show) {
+    if ($file) {
 	$data->{directory} = $file;
 	$data->{directory} =~ s/\/[^\/]*$//;
 	foreach my $f ( @{$data->{recent}} ) {
@@ -1850,7 +1854,6 @@ sub loadmib {
 	    -state=>'normal',
 	);
     }
-    $fs->destroy;
     return;
 }
 
@@ -2625,8 +2628,7 @@ sub addmibdir {
 	-title=>'Add MIB Directory',
 	#-mustexist=>1,
     );
-    #my $dir = $dialog->Show();
-    if (defined $dir) {
+    if ($dir) {
 	if ($dir ne '') {
 	    SNMP::addMibDirs($dir);
 	    $self->updatetree();
@@ -2667,11 +2669,12 @@ sub loadmibmod {
 
 sub loadmibfile {
     my $self = shift;
-    my $dialog = $self->{MainWindow}->FileSelect(
-	-title=>'Load MIB File',
+    my $filename = $self->{MainWindow}->getOpenFile(
+	-defaultextension=>'.mib',
+	-initialdir=>'/usr/share/snmp/mibs',
+	-title=>'Load MIB Dialog',
     );
-    my $filename = $dialog->Show();
-    if (defined $filename) {
+    if ($filename) {
 	SNMP::addMibFiles($filename);
 	$self->updatetree();
     }
@@ -3007,6 +3010,9 @@ exit;
 # =============================================================================
 #
 # $Log: mibbrowser,v $
+# Revision 0.9.2.4  2008-10-12 03:07:41  brian
+# - changes for FC9 2.6.25 kernel
+#
 # Revision 0.9.2.3  2008-10-11 09:32:18  brian
 # - more MIB updates
 #
