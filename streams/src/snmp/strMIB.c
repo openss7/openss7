@@ -161,7 +161,6 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <signal.h>
 #include <sys/stat.h>		/* for struct stat, fstat() */
 #include <sys/types.h>
-#include <limits.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <pwd.h>		/* for getpwuid() getpwnam() */
@@ -169,9 +168,9 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <libgen.h>		/* for basename() */
 #include <fcntl.h>		/* for O_CREAT */
 
-#include <sys/sysctl.h>		/* for sysctl */
 #include <errno.h>
 #include <string.h>
+#include <limits.h>
 
 #ifdef _GNU_SOURCE
 #include <getopt.h>
@@ -617,11 +616,9 @@ store_strMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 void
 refresh_strMIB(void)
 {
-	int cvec[] = { CTL_STREAMS, 0 };
-	int clen = 2;
+	FILE *file;
 	int ival;
 	ulong val;
-	size_t len;
 
 	if (strMIBStorage == NULL) {
 		if ((strMIBStorage = SNMP_MALLOC_STRUCT(strMIB_data)) == NULL)
@@ -638,166 +635,235 @@ refresh_strMIB(void)
 
 	/* Update scalars as required here... */
 
-	cvec[1] = STREAMS_CLTIME;
-	val = strMIBStorage->strCltime * 10;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/cltime", "r"))) {
+		val = strMIBStorage->strCltime * 10;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strCltime = (val + 9) / 10;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strCltime = (val + 9) / 10;
+	}
 
-	cvec[1] = STREAMS_MAX_APUSH;
-	val = strMIBStorage->strMaxApush;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/max_apush", "r"))) {
+		val = strMIBStorage->strMaxApush;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMaxApush = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMaxApush = val;
+	}
 
-	cvec[1] = STREAMS_MAX_MBLK;
-	val = strMIBStorage->strMaxMblk;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/max_mblk", "r"))) {
+		val = strMIBStorage->strMaxMblk;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMaxMblk = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMaxMblk = val;
+	}
 
-	cvec[1] = STREAMS_MAX_STRAMOD;
-	val = strMIBStorage->strMaxStramod;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/max_stramod", "r"))) {
+		val = strMIBStorage->strMaxStramod;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMaxStramod = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMaxStramod = val;
+	}
 
-	cvec[1] = STREAMS_MAX_STRDEV;
-	val = strMIBStorage->strMaxStrdev;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/max_strdev", "r"))) {
+		val = strMIBStorage->strMaxStrdev;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMaxStrdev = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMaxStrdev = val;
+	}
 
-	cvec[1] = STREAMS_MAX_STRMOD;
-	val = strMIBStorage->strMaxStrmod;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/max_strmod", "r"))) {
+		val = strMIBStorage->strMaxStrmod;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMaxStrmod = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMaxStrmod = val;
+	}
 
-	cvec[1] = STREAMS_MSG_PRIORITY;
-	ival = (strMIBStorage->strMsgPriority == TV_TRUE);
-	len = sizeof(ival);
-	if (sysctl(cvec, clen, &ival, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/msg_priority", "r"))) {
+		ival = (strMIBStorage->strMsgPriority == TV_TRUE);
+		if (fscanf(file, "%d", &ival)) {
+			strMIBStorage->strMsgPriority = ival ? TV_TRUE : TV_FALSE;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMsgPriority = ival ? TV_TRUE : TV_FALSE;
+	}
 
-	cvec[1] = STREAMS_NBAND;
-	val = strMIBStorage->strNband;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/nband", "r"))) {
+		val = strMIBStorage->strNband;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strNband = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strNband = val;
+	}
 
-	cvec[1] = STREAMS_NSTRMSGS;
-	val = strMIBStorage->strNstrmsgs;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/nstrmsgs", "r"))) {
+		val = strMIBStorage->strNstrmsgs;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strNstrmsgs = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strNstrmsgs = val;
+	}
 
-	cvec[1] = STREAMS_NSTRPUSH;
-	val = strMIBStorage->strNstrpush;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/nstrpush", "r"))) {
+		val = strMIBStorage->strNstrpush;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strNstrpush = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strNstrpush = val;
+	}
 
-	cvec[1] = STREAMS_HIWAT;
-	val = strMIBStorage->strHiwat;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/hiwat", "r"))) {
+		val = strMIBStorage->strHiwat;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strHiwat = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strHiwat = val;
+	}
 
-	cvec[1] = STREAMS_LOWAT;
-	val = strMIBStorage->strLowat;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/lowat", "r"))) {
+		val = strMIBStorage->strLowat;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strLowat = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strLowat = val;
+	}
 
-	cvec[1] = STREAMS_MAXPSZ;
-	val = strMIBStorage->strMaxpsz;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/maxpsz", "r"))) {
+		val = strMIBStorage->strMaxpsz;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMaxpsz = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMaxpsz = val;
+	}
 
-	cvec[1] = STREAMS_MINPSZ;
-	val = strMIBStorage->strMinpsz;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/minpsz", "r"))) {
+		val = strMIBStorage->strMinpsz;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMinpsz = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMinpsz = val;
+	}
 
-	cvec[1] = STREAMS_REUSE_FMODSW;
-	ival = (strMIBStorage->strReuseFmodsw == TV_TRUE);
-	len = sizeof(ival);
-	if (sysctl(cvec, clen, &ival, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/reuse_fmodsw", "r"))) {
+		ival = (strMIBStorage->strReuseFmodsw == TV_TRUE);
+		if (fscanf(file, "%d", &ival)) {
+			strMIBStorage->strReuseFmodsw = ival ? TV_TRUE : TV_FALSE;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strReuseFmodsw = ival ? TV_TRUE : TV_FALSE;
+	}
 
-	cvec[1] = STREAMS_RTIME;
-	val = strMIBStorage->strRtime * 10;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/rtime", "r"))) {
+		val = strMIBStorage->strRtime * 10;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strRtime = (val + 9) / 10;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strRtime = (val + 9) / 10;
+	}
 
-	cvec[1] = STREAMS_STRHOLD;
-	ival = (strMIBStorage->strStrhold == TV_TRUE);
-	len = sizeof(ival);
-	if (sysctl(cvec, clen, &ival, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/strhold", "r"))) {
+		ival = (strMIBStorage->strStrhold == TV_TRUE);
+		if (fscanf(file, "%d", &ival)) {
+			strMIBStorage->strStrhold = ival ? TV_TRUE : TV_FALSE;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strStrhold = ival ? TV_TRUE : TV_FALSE;
+	}
 
-	cvec[1] = STREAMS_STRCTLSZ;
-	val = strMIBStorage->strStrctlsz;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/strctlsz", "r"))) {
+		val = strMIBStorage->strStrctlsz;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strStrctlsz = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strStrctlsz = val;
+	}
 
-	cvec[1] = STREAMS_STRMSGSZ;
-	val = strMIBStorage->strStrmsgsz;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/strmsgsz", "r"))) {
+		val = strMIBStorage->strStrmsgsz;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strStrmsgsz = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strStrmsgsz = val;
+	}
 
-	cvec[1] = STREAMS_STRTHRESH;
-	val = strMIBStorage->strStrthresh;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/strthresh", "r"))) {
+		val = strMIBStorage->strStrthresh;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strStrthresh = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strStrthresh = val;
+	}
 
-	cvec[1] = STREAMS_STRTHRESH;
-	val = strMIBStorage->strLowthresh;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/strlowthresh", "r"))) {
+		val = strMIBStorage->strLowthresh;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strLowthresh = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strLowthresh = val;
+	}
 
-	cvec[1] = STREAMS_STRTHRESH;
-	val = strMIBStorage->strMedthresh;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/strmedthresh", "r"))) {
+		val = strMIBStorage->strMedthresh;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strMedthresh = val;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strMedthresh = val;
+	}
 
-	cvec[1] = STREAMS_IOCTIME;
-	val = strMIBStorage->strIoctime * 10;
-	len = sizeof(val);
-	if (sysctl(cvec, clen, &val, &len, NULL, 0))
+	if ((file = fopen("/proc/sys/streams/ioctime", "r"))) {
+		val = strMIBStorage->strIoctime * 10;
+		if (fscanf(file, "%lu", &val)) {
+			strMIBStorage->strIoctime = (val + 9) / 10;
+		}
+		fclose(file);
+	} else {
 		snmp_perror(__FUNCTION__);
-	strMIBStorage->strIoctime = (val + 9) / 10;
+	}
 }
 
 /*
@@ -2548,17 +2614,18 @@ write_strCltime(int action, u_char *var_val, u_char var_val_type, size_t var_val
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_CLTIME };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strCltime * 10;	/* centiseconds to milliseconds */
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/cltime", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strCltime: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -2614,17 +2681,18 @@ write_strMaxApush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_MAX_APUSH };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strMaxApush;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/max_apush", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strMaxApush: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -2679,17 +2747,18 @@ write_strMaxMblk(int action, u_char *var_val, u_char var_val_type, size_t var_va
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_MAX_MBLK };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strMaxMblk;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/max_mblk", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strMaxMblk: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -2745,14 +2814,13 @@ write_strMaxStramod(int action, u_char *var_val, u_char var_val_type, size_t var
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_MAX_STRAMOD };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strMaxStramod;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/max_stramod", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE),
 				 "write to strMaxStramod: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
@@ -2821,18 +2889,18 @@ write_strMsgPriority(int action, u_char *var_val, u_char var_val_type, size_t va
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_MSG_PRIORITY };
-		int clen = 2;
+		FILE *file;
 		int value = (StorageTmp->strMsgPriority == TV_TRUE) ? 1 : 0;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
-			snmp_log(MY_FACILITY(LOG_NOTICE),
-				 "write to strMsgPriority: commit failed\n");
+		if ((file = fopen("/proc/sys/streams/msg_priority", "w")) == NULL || fprintf(file, "%d\n", value) < 0) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strMsgPriority: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -2888,17 +2956,18 @@ write_strNstrmsgs(int action, u_char *var_val, u_char var_val_type, size_t var_v
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_NSTRMSGS };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strNstrmsgs;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/nstrmsgs", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strNstrmsgs: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -2954,17 +3023,18 @@ write_strNstrpush(int action, u_char *var_val, u_char var_val_type, size_t var_v
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_NSTRPUSH };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strNstrpush;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/nstrpush", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strNstrpush: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3019,17 +3089,18 @@ write_strHiwat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_HIWAT };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strHiwat;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/hiwat", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strHiwat: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3084,17 +3155,18 @@ write_strLowat(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_LOWAT };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strLowat;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/lowat", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strLowat: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3154,17 +3226,18 @@ write_strMaxpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_MAXPSZ };
-		int clen = 2;
+		FILE *file;
 		int value = StorageTmp->strMaxpsz;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/maxpsz", "w")) == NULL || fprintf(file, "%d\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strMaxpsz: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3224,17 +3297,18 @@ write_strMinpsz(int action, u_char *var_val, u_char var_val_type, size_t var_val
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_MINPSZ };
-		int clen = 2;
+		FILE *file;
 		int value = StorageTmp->strMinpsz;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/minpsz", "w")) == NULL || fprintf(file, "%d\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strMinpsz: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3299,18 +3373,19 @@ write_strReuseFmodsw(int action, u_char *var_val, u_char var_val_type, size_t va
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_REUSE_FMODSW };
-		int clen = 2;
+		FILE *file;
 		int value = (StorageTmp->strReuseFmodsw == TV_TRUE) ? 1 : 0;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/reuse_fmodsw", "w")) == NULL || fprintf(file, "%d\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE),
 				 "write to strReuseFmodsw: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3370,17 +3445,18 @@ write_strRtime(int action, u_char *var_val, u_char var_val_type, size_t var_val_
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_RTIME };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strRtime * 10;	/* centiseconds to milliseconds */
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/rtime", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strRtime: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3444,17 +3520,18 @@ write_strStrhold(int action, u_char *var_val, u_char var_val_type, size_t var_va
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_STRHOLD };
-		int clen = 2;
+		FILE *file;
 		int value = (StorageTmp->strStrhold == TV_TRUE) ? 1 : 0;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/strhold", "w")) == NULL || fprintf(file, "%d\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strStrhold: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3518,17 +3595,18 @@ write_strStrctlsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_STRCTLSZ };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strStrctlsz;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/strhold", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strStrctlsz: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3592,17 +3670,18 @@ write_strStrmsgsz(int action, u_char *var_val, u_char var_val_type, size_t var_v
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_STRMSGSZ };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strStrmsgsz;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/strmsgsz", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strStrmsgsz: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3658,17 +3737,18 @@ write_strStrthresh(int action, u_char *var_val, u_char var_val_type, size_t var_
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_STRTHRESH };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strStrthresh;
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value))) {
+		if ((file = fopen("/proc/sys/streams/strthresh", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strStrthresh: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
 		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}
@@ -3844,15 +3924,18 @@ write_strIoctime(int action, u_char *var_val, u_char var_val_type, size_t var_va
 
 	case COMMIT:
 	{
-		int cvec[] = { CTL_STREAMS, STREAMS_IOCTIME };
-		int clen = 2;
+		FILE *file;
 		u_long value = StorageTmp->strIoctime * 10;	/* centiseconds to milliseconds */
 
 		/* Things are working well, so it's now safe to make the change permanently.  Make
 		   sure that anything done here can't fail! */
 
-		if (sysctl(cvec, clen, NULL, 0, &value, sizeof(value)))
+		if ((file = fopen("/proc/sys/streams/ioctime", "w")) == NULL || fprintf(file, "%lu\n", value) < 0) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strIoctime: commit failed\n");
 			return SNMP_ERR_COMMITFAILED;
+		}
+		if (file)
+			fclose(file);
 		break;
 	}
 	}

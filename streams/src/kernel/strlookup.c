@@ -249,7 +249,7 @@ __cmaj_lookup(major_t major)
 
 		if (cmaj->n_major == major) {
 			/* cache to front */
-			list_del(&cmaj->n_hash);
+			list_del_init(&cmaj->n_hash);
 			list_add(&cmaj->n_hash, slot);
 			return (cmaj);
 		}
@@ -297,7 +297,7 @@ __cdrv_lookup(modID_t modid)
 
 		if (cdev->d_modid == modid) {
 			/* cache to front */
-			list_del(&cdev->d_hash);
+			list_del_init(&cdev->d_hash);
 			list_add(&cdev->d_hash, slot);
 			return (cdev);
 		}
@@ -322,7 +322,7 @@ __cmin_lookup(struct cdevsw *cdev, minor_t minor)
 
 		if (cmin->n_dev == cdev && cmin->n_minor == minor) {
 			/* pull to head of slot */
-			list_del(&cmin->n_hash);
+			list_del_init(&cmin->n_hash);
 			list_add(&cmin->n_hash, slot);
 			return (cmin);
 		}
@@ -350,7 +350,7 @@ __fmod_lookup(modID_t modid)
 
 		if (fmod->f_modid == modid) {
 			/* pull to front of slot */
-			list_del(&fmod->f_hash);
+			list_del_init(&fmod->f_hash);
 			list_add(&fmod->f_hash, slot);
 			return (fmod);
 		}
@@ -370,7 +370,7 @@ __cdev_search(const char *name)
 
 		if (!strncmp(cdev->d_name, name, FMNAMESZ)) {
 			/* pull to front of slot */
-			list_del(&cdev->d_list);
+			list_del_init(&cdev->d_list);
 			list_add(&cdev->d_list, slot);
 			return (cdev);
 		}
@@ -390,7 +390,7 @@ __fmod_search(const char *name)
 
 		if (!strncmp(fmod->f_name, name, FMNAMESZ)) {
 			/* pull to front of slot */
-			list_del(&fmod->f_list);
+			list_del_init(&fmod->f_list);
 			list_add(&fmod->f_list, slot);
 			return (fmod);
 		}
@@ -412,7 +412,7 @@ __cmin_search(struct cdevsw *cdev, const char *name)
 
 		if (!strncmp(cmin->n_name, name, FMNAMESZ)) {
 			/* pull to head of slot */
-			list_del(&cmin->n_list);
+			list_del_init(&cmin->n_list);
 			list_add(&cmin->n_list, slot);
 			return (cmin);
 		}

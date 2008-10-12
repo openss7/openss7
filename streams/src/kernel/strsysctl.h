@@ -82,6 +82,7 @@
 #define BIG_STATIC_STH
 #endif
 
+#if !defined(HAVE_SYSCTL_CHECK_TABLE_SYMBOL)
 /* /proc/streams */
 enum {
 	CTL_STREAMS = 11,		/* STREAMS */
@@ -111,32 +112,83 @@ enum {
 	STREAMS_MAX_MBLK = 20,
 	STREAMS_MSG_PRIORITY = 21,
 };
+#else				/* !defined(HAVE_SYSCTL_CHECK_TABLE_SYMBOL) */
+/* /proc/streams */
+enum {
+	CTL_STREAMS = 0,		/* STREAMS */
+};
+
+/* /proc/sys/streams */
+enum {
+	STREAMS_MAXPSZ = 0,
+	STREAMS_MINPSZ = 0,
+	STREAMS_HIWAT = 0,
+	STREAMS_LOWAT = 0,
+	STREAMS_CLTIME = 0,
+	STREAMS_RTIME = 0,
+	STREAMS_IOCTIME = 0,
+	STREAMS_NSTRPUSH = 0,
+	STREAMS_STRTHRESH = 0,
+	STREAMS_STRHOLD = 0,
+	STREAMS_STRCTLSZ = 0,
+	STREAMS_STRMSGSZ = 0,
+	STREAMS_NSTRMSGS = 0,
+	STREAMS_NBAND = 0,
+	STREAMS_REUSE_FMODSW = 0,
+	STREAMS_MAX_APUSH = 0,
+	STREAMS_MAX_STRAMOD = 0,
+	STREAMS_MAX_STRDEV = 0,
+	STREAMS_MAX_STRMOD = 0,
+	STREAMS_MAX_MBLK = 0,
+	STREAMS_MSG_PRIORITY = 0,
+};
+#endif				/* !defined(HAVE_SYSCTL_CHECK_TABLE_SYMBOL) */
 
 BIG_STATIC ulong sysctl_str_maxpsz;	/* stream head default max packet size */
+
 BIG_STATIC ulong sysctl_str_minpsz;	/* stream head default min packet size */
+
 BIG_STATIC ulong sysctl_str_hiwat;	/* stream head default hi water mark */
+
 BIG_STATIC ulong sysctl_str_lowat;	/* stream head default lo water mark */
+
 BIG_STATIC ulong sysctl_str_cltime;	/* close wait time in msec (save in ticks) */
+
 BIG_STATIC ulong sysctl_str_rtime;	/* msec to wait to forward held msg (save in ticks) */
+
 BIG_STATIC ulong sysctl_str_ioctime;	/* msec to wait for ioctl() acknowledgement (save in ticks) 
 					 */
 BIG_STATIC_STH ulong sysctl_str_nstrpush;	/* max pushed modules */
+
 BIG_STATIC ulong sysctl_str_strthresh;	/* memory limit */
+
 BIG_STATIC ulong sysctl_str_strhold;	/* active stream hold feature */
+
 BIG_STATIC_STH ulong sysctl_str_strctlsz;	/* maximum stream control size */
+
 extern ulong sysctl_str_strmsgsz;	/* maximum stream message size */
+
 BIG_STATIC ulong sysctl_str_nstrmsgs;	/* maximum number of streams messages */
+
 BIG_STATIC ulong sysctl_str_nband;	/* number of queue bands */
+
 BIG_STATIC int sysctl_str_reuse_fmodsw;	/* reuse fmodsw entries */
+
 BIG_STATIC ulong sysctl_str_max_apush;	/* max autopushed mods per str */
+
 BIG_STATIC ulong sysctl_str_max_stramod;	/* max autopushed modules */
+
 BIG_STATIC ulong sysctl_str_max_strdev;	/* max streams devices */
+
 BIG_STATIC ulong sysctl_str_max_strmod;	/* max streams modules */
+
 BIG_STATIC ulong sysctl_str_max_mblk;	/* max of headers on free list */
+
 BIG_STATIC int sysctl_str_msg_priority;	/* observer message allocation priority */
 
 /* initialization for main */
 BIG_STATIC int strsysctl_init(void);
+
 BIG_STATIC void strsysctl_exit(void);
 
 #endif				/* __LOCAL_STRSYSCTL_H__ */

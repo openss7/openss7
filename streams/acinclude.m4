@@ -1076,6 +1076,12 @@ dnl We want to run kernel threads lately at real-time.  We need several symbols 
 dnl are not present on 2.4, but then the task structure can be manipulated directly.
 dnl
     _LINUX_KERNEL_SYMBOLS([sched_setscheduler, __setscheduler, task_rq_lock, task_rq_unlock])
+dnl
+dnl Recent kernels (2.6.25) no longer permit direct registration of binary sysctl numbers.  We can
+dnl check for a kernel that forbids binary sysctl registration by checking for the symbol
+dnl sysctl_check_table.
+dnl
+    _LINUX_KERNEL_SYMBOLS([sysctl_check_table])
     _LINUX_CHECK_FUNCS([try_module_get module_put to_kdev_t force_delete kern_umount iget_locked \
 			process_group process_session cpu_raise_softirq check_region pcibios_init \
 			pcibios_find_class pcibios_find_device pcibios_present \
