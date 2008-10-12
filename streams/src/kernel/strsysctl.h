@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsysctl.h,v 0.9.2.17 2008-04-28 12:54:06 brian Exp $
+ @(#) $Id: strsysctl.h,v 0.9.2.18 2008-10-12 03:07:40 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:06 $ by $Author: brian $
+ Last Modified $Date: 2008-10-12 03:07:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsysctl.h,v $
+ Revision 0.9.2.18  2008-10-12 03:07:40  brian
+ - changes for FC9 2.6.25 kernel
+
  Revision 0.9.2.17  2008-04-28 12:54:06  brian
  - update file headers for release
 
@@ -68,7 +71,7 @@
 #ifndef __LOCAL_STRSYSCTL_H__
 #define __LOCAL_STRSYSCTL_H__
 
-#ident "@(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsysctl.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef BIG_STATIC
 #define BIG_STATIC

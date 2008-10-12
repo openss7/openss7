@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:-,\f\b\:· fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-STREAMS-EXT-MIB.mib,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-11 09:32:17 $
+-- @(#) $RCSfile: OPENSS7-STREAMS-EXT-MIB.mib,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-12 03:07:41 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -47,11 +47,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2008-10-11 09:32:17 $ by $Author: brian $
+-- Last Modified $Date: 2008-10-12 03:07:41 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-STREAMS-EXT-MIB.mib,v $
+-- Revision 0.9.2.5  2008-10-12 03:07:41  brian
+-- - changes for FC9 2.6.25 kernel
+--
 -- Revision 0.9.2.4  2008-10-11 09:32:17  brian
 -- - more MIB updates
 --
@@ -101,6 +104,51 @@ strExtMIB MODULE-IDENTITY
     DESCRIPTION
         "This is the first version of this MIB."
     ::= { openss7Modules 1000 }
+
+StrlogFlags ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This textual convention describes the flags associated 
+         with a STREAMS log entry.  This multi-valued type can 
+         be used both to generate log entries as well as to 
+         determine the characteristics with which log entries 
+         were generated.  They determine both the class of the 
+         log entry as well as the options associated with the 
+         log entry.  Possible values are as follows:
+
+         - slError(0), the entry has syslog(3) class LOG_CRIT.
+
+         - slTrace(1), the entry has syslog(3) class LOG_DEBUG.
+
+         - slNotify(2), the entry was also emailed to the system 
+           administrator.
+
+         - slConsole(3), the entry has syslog(3) class LOG_INFO.
+
+         - slFatal(4), the entry has syslog(3) class LOG_CRIT.
+
+         - slWarn(5), the entry has syslog(3) class LOG_WARNING.
+
+         - slNote(6), the entry has syslog(3) class LOG_NOTICE.
+
+         - slNoputbuf(7), the entry was not placed in the put 
+           buffer (buffer used for strlog messages).
+
+         Only one of slFatal, slError, slWarn, slNote, slConsole 
+         or slTrace should be set.  If multiple settings are 
+         present, the highest priority syslog(3) class prevails."
+    REFERENCE
+        "syslog(3), strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    SYNTAX      BITS {
+                    slError(0),
+                    slTrace(1),
+                    slNotify(2),
+                    slConsole(3),
+                    slFatal(4),
+                    slWarn(5),
+                    slNote(6),
+                    slNoputbuf(7)
+                }
 
 strExtNotifications OBJECT IDENTIFIER
     ::= { strExtMIB 0 }
@@ -169,7 +217,7 @@ strStrlogRecord NOTIFICATION-TYPE
 
          "
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifications 1 }
 
 strExtObjects OBJECT IDENTIFIER
@@ -178,136 +226,164 @@ strExtObjects OBJECT IDENTIFIER
 strExtTables OBJECT IDENTIFIER
     ::= { strExtObjects 1 }
 
-strExtStrlogTable OBJECT-TYPE
+strExtStrlogRecordTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF StrExtStrlogRecord
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        ""
+        "This object provides a conceptual table that contains 
+         strlog records."
     REFERENCE
-        ""
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtTables 1 }
 
+strExtStrlogRecordNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the next ordinal index value for the strlog 
+         record table.  The value returned may be created by the 
+         SNMP manager, or simply indicates one more than the 
+         current value of the index."
+    REFERENCE
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordTable 1 }
 
-strExtStrlogEntry OBJECT-TYPE
+strExtStrlogRecordEntry OBJECT-TYPE
     SYNTAX      StrExtStrlogRecord
     MAX-ACCESS  not-accessible
     STATUS      current
     INDEX       { strExtStrlogIndex }
     DESCRIPTION
-        ""
+        "This object provides a conceptual row in the strlog 
+         record table.  Each conceptual row represents a strlog 
+         record entry."
     REFERENCE
-        ""
-    ::= { strExtStrlogTable 1 }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordTable 2 }
 
 StrExtStrlogRecord ::=
     SEQUENCE {
-        strExtStrlogIndex
+        strExtStrlogRecordIndex
             Unsigned32,
-        strExtStrlogTimeStamp
+        strExtStrlogRecordTimeStamp
             TimeStamp,
-        strExtStrlogMid
+        strExtStrlogRecordMid
             Unsigned32,
-        strExtStrlogSid
+        strExtStrlogRecordSid
             Unsigned32,
-        strExtStrlogLevel
+        strExtStrlogRecordLevel
             Unsigned32,
-        strExtStrlogFlags
-            BITS,
-        strExtStrlogFmtString
+        strExtStrlogRecordFlags
+            StrlogFlags,
+        strExtStrlogRecordMsgString
             OCTET STRING,
-        strExtStrlogRowStatus
+        strExtStrlogRecordRowStatus
             RowStatus
     }
 
-strExtStrlogIndex OBJECT-TYPE
+strExtStrlogRecordIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides an index into the strlog record table.  The 
+         index is a monotoniclaly increasing value starting with 
+         one (1).  When the STREAMS logger drops a record, there 
+         is no corresponding record in the table for the dropped 
+         index value.  A value missing in the sequence indicates 
+         that the record was dropped by the managed system."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 1 }
 
-strExtStrlogTimeStamp OBJECT-TYPE
+strExtStrlogRecordTimeStamp OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides the time stamp associated with the strlog 
+         record entry.  This is the time that the entry was 
+         written to the log and not necessarily the time that 
+         the event occurred."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 2 }
 
-strExtStrlogMid OBJECT-TYPE
+strExtStrlogRecordMid OBJECT-TYPE
     SYNTAX      Unsigned32(0..16383)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides the STREAMS module identifier associated with 
+         the Stream that generated the log record."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 3 }
 
-strExtStrlogSid OBJECT-TYPE
+strExtStrlogRecordSid OBJECT-TYPE
     SYNTAX      Unsigned32(0..16383)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides the STREAMS sub-identifier associated with the 
+         Stream that generated the log record.  This is the 
+         STREAMS minor device number or module instance number."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 4 }
 
-strExtStrlogLevel OBJECT-TYPE
+strExtStrlogRecordLevel OBJECT-TYPE
     SYNTAX      Unsigned32(0..255)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides the priority level associated with the log 
+         record.  Priority levels determine the priority of the 
+         log record with respect to other log records in the 
+         same class."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 5 }
 
-strExtStrlogFlags OBJECT-TYPE
-    SYNTAX      BITS {
-                    slError(0),
-                    slTrace(1),
-                    slNotify(2),
-                    slConsole(3),
-                    slFatal(4),
-                    slWarn(5),
-                    slNote(6),
-                    slNoputbuf(7)
-                }
+strExtStrlogRecordFlags OBJECT-TYPE
+    SYNTAX      StrlogFlags
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides the flags associated with the log record.  
+         Flags determine the class of the log record and a 
+         number of other optional characteristics of the record 
+         according to the StrlogFlags textual convention."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 6 }
 
-strExtStrlogFmtString OBJECT-TYPE
+strExtStrlogRecordMsgString OBJECT-TYPE
     SYNTAX      OCTET STRING(SIZE(0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides the fully formatted message associated with 
+         the log record."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 7 }
 
-strExtStrlogRowStatus OBJECT-TYPE
+strExtStrlogRecordRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides a mechanism whereby management stations may 
+         create or delete rows from this table.  Deleting rows 
+         from this table makes the log records unavailable for 
+         subsequent retrieval.  Creating rows in this table 
+         generates new log records."
     REFERENCE
-        ""
-    ::= { strExtStrlogEntry xx }
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtStrlogRecordEntry 8 }
 
 
 strExtScalars OBJECT IDENTIFIER
@@ -328,7 +404,7 @@ strNlogargs OBJECT-TYPE
          on performance.  Setting this value too low may 
          truncate valuable or necessary log information."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtScalars 1 }
 
 strExtNotifs OBJECT IDENTIFIER
@@ -356,7 +432,7 @@ strExtStrlogTimeStamp OBJECT-TYPE
          This object indicates the system time as a parameter to 
          the strStrlogRecord notification."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 1 }
 
 strExtStrlogMid OBJECT-TYPE
@@ -370,7 +446,7 @@ strExtStrlogMid OBJECT-TYPE
          identifier as a parameter to the strStrlogRecord 
          notification."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 2 }
 
 strExtStrlogSid OBJECT-TYPE
@@ -384,7 +460,7 @@ strExtStrlogSid OBJECT-TYPE
          indicates the STREAMS minor device or instance number 
          as a parameter to the strStrlogRecord notification."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 3 }
 
 strExtStrlogLevel OBJECT-TYPE
@@ -400,60 +476,23 @@ strExtStrlogLevel OBJECT-TYPE
          priority level of the record as a parameter to the 
          strStrlogRecord notification."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 4 }
 
 strExtStrlogFlags OBJECT-TYPE
-    SYNTAX      BITS {
-                    slError(0),
-                    slTrace(1),
-                    slNotify(2),
-                    slConsole(3),
-                    slFatal(4),
-                    slWarn(5),
-                    slNote(6),
-                    slNoputbuf(7)
-                }
+    SYNTAX      StrlogFlags
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "This object is for use with the strStrlogRecord 
-         notification.  Each strlog record has flags.  The 
-         flags indicate the class of the strlog record as well 
-         as several optional features. This 
-         object indicates the flags of the record as a parameter 
-         to the strStrlogRecord notifications.  This object is 
-         multi-valued and can have zero or more of the following 
-         values:
-          
-         - slError(0), indicates that the strlog record was 
-           logged with a syslog(3) level of LOG_CRIT.
-          
-         - slTrace(1), indicates that the strlog record was 
-           logged with a strlog(3) level of LOG_DEBUG.
-          
-         - slNotify(2), indicates that a copy of the strlog 
-           record was emailed to the system administrator.
-          
-         - slConsole(3), indicates that the strlog record was 
-           logged with a syslog(3) level of LOG_INFO.
-          
-         - slFatal(4), indicates that the strlog record was 
-           logged with a syslog(3) level of LOG_CRIT.
-          
-         - slWarn(5), indicates that the strlog record was 
-           logged with a syslog(3) level of LOG_WARNING.
-          
-         - slNote(6), indicates that the strlog record was 
-           logged with a syslog(3) level of LOG_NOTICE.
-          
-         - slNoputbuf(7), indicates thte strlog record was not 
-           buffered in the logger ring buffer.
-          
-         Only one of slFatal, slError, slWarn, slNote, 
-         slConsole or slTrace should be set."
+         notification.  Each strlog record has flags.  The flags 
+         indicate the class of the strlog record as well as 
+         several optional features. This object indicates the 
+         flags of the record as a parameter to the 
+         strStrlogRecord notifications using the StrlogFlags 
+         textual convention."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 5 }
 
 strExtStrlogFmtString OBJECT-TYPE
@@ -471,7 +510,7 @@ strExtStrlogFmtString OBJECT-TYPE
          printf(3)-style conversion specifiers: %c, %s, %p, %%, 
          %o, %X, %x, %d, %i and %u."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 6 }
 
 strExtStrlogInteger OBJECT-TYPE
@@ -488,7 +527,7 @@ strExtStrlogInteger OBJECT-TYPE
          indicates the integer valued parameter of the 
          strStrlogRecord notification."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 7 }
 
 strExtStrlogUnsigned OBJECT-TYPE
@@ -505,7 +544,7 @@ strExtStrlogUnsigned OBJECT-TYPE
          object indicates the unsigned integer valued parameter 
          of the strStrlogRecord notification."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 8 }
 
 strExtStrlogString OBJECT-TYPE
@@ -521,7 +560,7 @@ strExtStrlogString OBJECT-TYPE
          indicates the string valued parameter of the 
          strStrlogRecord notification."
     REFERENCE
-        "strlog(3), strlog(9) UNIX Manual Pages"
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 9 }
 
 strExtOids OBJECT IDENTIFIER
