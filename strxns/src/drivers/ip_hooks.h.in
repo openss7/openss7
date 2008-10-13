@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ip_hooks.h.in,v 0.9.2.6 2008-09-10 03:50:07 brian Exp $
+ @(#) $Id: ip_hooks.h.in,v 0.9.2.7 2008-10-13 04:12:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:50:07 $ by $Author: brian $
+ Last Modified $Date: 2008-10-13 04:12:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_hooks.h.in,v $
+ Revision 0.9.2.7  2008-10-13 04:12:21  brian
+ - handle exports rework strinet
+
  Revision 0.9.2.6  2008-09-10 03:50:07  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -74,7 +77,7 @@
 #ifndef __LOCAL_IP_HOOKS_H__
 #define __LOCAL_IP_HOOKS_H__
 
-#ident "@(#) $RCSfile: ip_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ip_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:33 $ by $Author: brian $
+ Last Modified $Date: 2008-10-13 04:12:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.99  2008-10-13 04:12:17  brian
+ - handle exports rework strinet
+
  Revision 0.9.2.98  2008-10-11 04:31:33  brian
  - handle -Wpointer-sign
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -596,7 +599,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.98 $) $Date: 2008-10-11 04:31:33 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -984,7 +987,6 @@ typedef struct ss_protocol {
 	struct ss_protocol *next;	/* list linkage */
 	struct ss_protocol **prev;	/* list linkage */
 	atomic_t refcnt;		/* reference count */
-	spinlock_t lock;		/* structure lock */
 	void (*put) (struct ss_protocol *);	/* release function */
 	struct ss_protocol *(*get) (struct ss_protocol *);	/* acquire function */
 	uint type;			/* structure type */
@@ -1003,19 +1005,17 @@ struct ss_protocol *ss_protosw = NULL;
 typedef struct inet {
 	struct inet *next;		/* list of all IP-Users */
 	struct inet **prev;		/* list of all IP-Users */
-	size_t refcnt;			/* structure reference count */
-	spinlock_t lock;		/* structure lock */
+	atomic_t refcnt;		/* structure reference count */
 	major_t cmajor;			/* major device number */
 	minor_t cminor;			/* minor device number */
 	queue_t *rq;			/* associated read queue */
 	queue_t *wq;			/* associated write queue */
 	cred_t cred;			/* credientials */
-	spinlock_t qlock;		/* queue lock */
-	queue_t *rwait;			/* RD queue waiting on lock */
-	queue_t *wwait;			/* WR queue waiting on lock */
 	long users;			/* lock holders */
-	uint rbid;			/* RD buffer call id */
-	uint wbid;			/* WR buffer call id */
+	wait_queue_head_t waitq;	/* sleepers on lock */
+	bcid_t bcid;			/* RD/WR buffer call id */
+	bcid_t rbid;			/* RD buffer call id */
+	bcid_t wbid;			/* WR buffer call id */
 	ushort port;			/* port/protocol number */
 	int tcp_state;			/* tcp state history */
 	ss_profile_t p;			/* protocol profile */
@@ -1205,6 +1205,69 @@ STATIC ss_t *ss_dflt_lstn = NULL;
 /*
  *  =========================================================================
  *
+ *  Private Structure cache
+ *
+ *  =========================================================================
+ */
+STATIC kmem_cachep_t ss_priv_cachep = NULL;
+STATIC int
+ss_init_caches(void)
+{
+	if (!ss_priv_cachep &&
+	    !(ss_priv_cachep =
+	      kmem_create_cache("ss_priv_cachep", sizeof(ss_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
+		cmn_err(CE_PANIC, "%s: Cannot allocate ss_priv_cachep", __FUNCTION__);
+		return (-ENOMEM);
+	} else
+		cmn_err(CE_DEBUG, "%s: initialized driver private structure cache", DRV_NAME);
+	return (0);
+}
+STATIC int
+ss_term_caches(void)
+{
+	if (ss_priv_cachep) {
+#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
+		if (kmem_cache_destroy(ss_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy ss_priv_cachep", __FUNCTION__);
+			return (-EBUSY);
+		} else
+			cmn_err(CE_DEBUG, "%s: destroyed ss_priv_cachep", DRV_NAME);
+#else
+		kmem_cache_destroy(ss_priv_cachep);
+#endif
+	}
+	return (0);
+}
+static inline ss_t *
+ss_get(void)
+{
+	ss_t *ss;
+
+	if ((ss = kmem_cache_alloc(ss_priv_cachep, GFP_ATOMIC))) {
+		bzero(ss, sizeof(*ss));
+		atomic_set(&ss->refcnt, 1);
+	}
+	return (ss);
+}
+static inline void
+ss_hold(ss_t *ss)
+{
+	if (ss)
+		atomic_inc(&ss->refcnt);
+}
+static inline void
+ss_put(ss_t *ss)
+{
+	if (ss) {
+		if (atomic_dec_and_test(&ss->refcnt))
+			kmem_cache_free(ss_priv_cachep, ss);
+	}
+}
+
+/*
+ *  =========================================================================
+ *
  *  Socket Callbacks
  *
  *  =========================================================================
@@ -1229,19 +1292,19 @@ ss_socket_put(struct socket *sock)
 
 			if ((ss = SOCK_PRIV(sk))) {
 				SOCK_PRIV(sk) = NULL;
-				ss->refcnt--;
 				sk->sk_state_change = ss->cb_save.sk_state_change;
 				sk->sk_data_ready = ss->cb_save.sk_data_ready;
 				sk->sk_write_space = ss->cb_save.sk_write_space;
 				sk->sk_error_report = ss->cb_save.sk_error_report;
+				ss_put(ss);
 			} else
 				assure(ss);
 		}
 		write_unlock_irqrestore(&sock->sk->sk_callback_lock, flags);
 		/* The following will cause the socket to be aborted, particularly for Linux TCP or 
 		   other orderly release sockets. XXX: Perhaps should check the state of the socket 
-		   and call sk->prot->disconnect() first as well.  SCTP will probably behave
-		   better that way. */
+		   and call sk->prot->disconnect() first as well.  SCTP will probably behave better 
+		   that way. */
 		sock_set_keepopen(sk);
 		sk->sk_lingertime = 0;
 	} else
@@ -1261,7 +1324,7 @@ ss_socket_get(struct socket *sock, ss_t *ss)
 		write_lock_irqsave(&sock->sk->sk_callback_lock, flags);
 		{
 			SOCK_PRIV(sk) = ss;
-			ss->refcnt++;
+			ss_hold(ss);
 			ss->cb_save.sk_state_change = sk->sk_state_change;
 			ss->cb_save.sk_data_ready = sk->sk_data_ready;
 			ss->cb_save.sk_write_space = sk->sk_write_space;
@@ -1289,59 +1352,85 @@ ss_socket_get(struct socket *sock, ss_t *ss)
  *
  *  =========================================================================
  */
-#if 1
+
+/**
+ * ss_trylockq: - try to lock a private structure
+ * @q: queue pair associated with private structure
+ *
+ * Returns a pointer to the locked private structure or NULL if the private structure could not be
+ * locked immediately.  This form is used by message handling procedures to gain exclusive access to
+ * the queue pair private structure.
+ *
+ * This works by using bit 0 of ss->users as the lock bit.  If the lock bit cannot be acquired, the
+ * bit corresponding to the queue in the queue pair is set and the lock attempted again.  If the
+ * lock fails on the second attempt the queue bit is set and the queue will be enabled when the
+ * structure is unlocked (or has already been enabled).  If the lock succeeds on the second attempt,
+ * it is possible that the queue may be enabled again later, but with no consequence.
+ */
 STATIC inline fastcall ss_t *
 ss_trylockq(queue_t *q)
 {
-	unsigned long flags;
-	int res;
 	ss_t *ss = PRIV(q);
 
-	spin_lock_irqsave(&ss->qlock, flags);
-	if (!(res = !ss->users++)) {
-		if (q == ss->rq)
-			ss->rwait = q;
-		if (q == ss->wq)
-			ss->wwait = q;
-		--ss->users;
+	if (likely(ss != NULL) && unlikely(test_and_set_bit(0, &ss->users))) {
+		set_bit((q->q_flag & QREADR) ? 1 : 2, &ss->users);
+		if (likely(test_and_set_bit(0, &ss->users)))
+			return (NULL);
 	}
-	spin_unlock_irqrestore(&ss->qlock, flags);
-	return (res ? ss : NULL);
+	return (ss);
 }
-STATIC inline fastcall void
-ss_unlockq(queue_t *q)
-{
-	unsigned long flags;
-	ss_t *ss = PRIV(q);
 
-	spin_lock_irqsave(&ss->qlock, flags);
-	if (ss->rwait)
-		qenable(xchg(&ss->rwait, NULL));
-	if (ss->wwait)
-		qenable(xchg(&ss->wwait, NULL));
-	ss->users = 0;
-	spin_unlock_irqrestore(&ss->qlock, flags);
-}
-#else
-STATIC inline fastcall ss_t *
-ss_trylockq(queue_t *q)
+/**
+ * ss_sleeplock: - try to lock a private structure with blocking
+ * @q: queue pair associated with private structure
+ *
+ * Returns a pointer to the locked private structure or NULL if the private structure could not be
+ * locked and the wait was interrupted by a signal.  The reason for this function is to allow the
+ * stream close procedure to sleep while waiting for a listening stream to complete accepting a
+ * connection on the closing stream before proceeding.
+ */
+STATIC ss_t *
+ss_sleeplock(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
-	long users;
 
-	users = xchg(&ss->users, 0x1 | ((q->q_flag & QREADR) ? 0x2 : 0x4));
-	return ((users & 0x1) ? NULL : ss);
+	if (unlikely(test_and_set_bit(0, &ss->users))) {
+		DECLARE_WAITQUEUE(wait, current);
+		add_wait_queue(&ss->waitq, &wait);
+		for (;;) {
+			set_current_state(TASK_UNINTERRUPTIBLE);
+			set_bit(3, &ss->users);
+			if (!test_and_set_bit(0, &ss->users))
+				break;
+			schedule();
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&ss->waitq, &wait);
+	}
+	return (ss);
 }
+
+/**
+ * ss_unlockq: - unlock a private structure
+ * @ss: pointer to locked private structure
+ *
+ * Waiting queues will be enabled and waiting processes will be worken up.  Not normally used by the
+ * close procedure, just the queue procedures when unlocking a locked private structure.
+ */
 STATIC inline fastcall void
-ss_unlockq(queue_t *q)
+ss_unlockq(ss_t *ss)
 {
 	long users;
 
-	users = xchg(&PRIV(q)->users, 0);
-	if (unlikely(users & ((q->q_flag & QREADR) ? 0x04 : 0x02)))
-		enableq(OTHERQ(q));
+	users = xchg(&ss->users, 0x00);
+
+	if (users & 0x02)
+		enableq(ss->rq);
+	if (users & 0x04)
+		enableq(ss->wq);
+	if (users & 0x08)
+		wake_up_all(&ss->waitq);
 }
-#endif
 
 /*
  *  =========================================================================
@@ -1350,34 +1439,22 @@ ss_unlockq(queue_t *q)
  *
  *  =========================================================================
  */
-/*
- *  BUFSRV calls service routine
- *  -------------------------------------------------------------------------
+/**
+ * ss_bufsrv: - bufcall callback for mblk allocation failures
+ * @data: a pointer to the private structure
+ *
  */
 STATIC void streamscall
 ss_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
+	ss_t *ss = PRIV(q);
+	bcid_t *bcidp;
 
-	if (q) {
-		ss_t *ss = PRIV(q);
-		unsigned long flags;
-
-		spin_lock_irqsave(&ss->lock, flags);
-		if (q == ss->rq) {
-			if (ss->rbid) {
-				ss->rbid = 0;
-				ss->refcnt--;
-			}
-		} else if (q == ss->wq) {
-			if (ss->wbid) {
-				ss->wbid = 0;
-				ss->refcnt--;
-			}
-		} else
-			STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
-		spin_unlock_irqrestore(&ss->lock, flags);
+	bcidp = (q->q_flag & QREADR) ? &ss->rbid : &ss->wbid;
+	if (xchg(bcidp, 0)) {
 		qenable(q);
+		ss_put(ss);
 	}
 }
 
@@ -1386,17 +1463,17 @@ ss_bufsrv(long data)
  *  -------------------------------------------------------------------------
  */
 STATIC void
-__ss_unbufcall(queue_t *q)
+ss_unbufcall(ss_t *ss)
 {
-	ss_t *ss = PRIV(q);
+	bcid_t bcid;
 
-	if (ss->rbid) {
-		unbufcall(xchg(&ss->rbid, 0));
-		ss->refcnt--;
+	if ((bcid = xchg(&ss->rbid, 0))) {
+		unbufcall(bcid);
+		ss_put(ss);
 	}
-	if (ss->wbid) {
-		unbufcall(xchg(&ss->wbid, 0));
-		ss->refcnt--;
+	if ((bcid = xchg(&ss->wbid, 0))) {
+		unbufcall(bcid);
+		ss_put(ss);
 	}
 }
 
@@ -1409,28 +1486,17 @@ ss_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
 
-	if ((mp = allocb(size, prior)))
-		return (mp);
-	else {
+	if (unlikely((mp = allocb(size, prior)) == NULL)) {
 		ss_t *ss = PRIV(q);
-		unsigned long flags;
+		bcid_t *bcidp;
 
-		spin_lock_irqsave(&ss->lock, flags);
-		if (q == ss->rq) {
-			if (!ss->rbid) {
-				ss->rbid = bufcall(size, prior, &ss_bufsrv, (long) q);
-				ss->refcnt++;
-			}
-		} else if (q == ss->wq) {
-			if (!ss->wbid) {
-				ss->wbid = bufcall(size, prior, &ss_bufsrv, (long) q);
-				ss->refcnt++;
-			}
-		} else
-			STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
-		spin_unlock_irqrestore(&ss->lock, flags);
-		return (NULL);
+		bcidp = (q->q_flag & QREADR) ? &ss->rbid : &ss->wbid;
+		if (!*bcidp) {
+			*bcidp = bufcall(size, prior, &ss_bufsrv, (long) q);
+			ss_hold(ss);
+		}
 	}
+	return (mp);
 }
 
 #if 0
@@ -1451,14 +1517,14 @@ ss_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frt
 		if (q == ss->rq) {
 			if (!ss->rbid) {
 				ss->rbid = esbbcall(prior, &ss_bufsrv, (long) q);
-				ss->refcnt++;
+				ss_hold(ss);
 			}
 			return (NULL);
 		}
 		if (q == ss->wq) {
 			if (!ss->wbid) {
 				ss->wbid = esbbcall(prior, &ss_bufsrv, (long) q);
-				ss->refcnt++;
+				ss_hold(ss);
 			}
 			return (NULL);
 		}
@@ -12437,6 +12503,7 @@ tcp_statename(int state)
 		return ("(unknown)");
 	}
 }
+
 #if 0
 STATIC const char *
 sock_statename(int state)
@@ -12469,6 +12536,83 @@ STATIC INLINE streams_fastcall __hot t_scalar_t
 ss_get_state(ss_t *ss)
 {
 	return (ss->p.info.CURRENT_state);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  Private Structure allocation, deallocation
+ *
+ *  =========================================================================
+ */
+STATIC ss_t *
+ss_alloc_priv(queue_t *q, ss_t **slp, major_t cmajor, minor_t cminor, cred_t *crp,
+	      const ss_profile_t * prof)
+{
+	ss_t *ss;
+
+	if ((ss = ss_get())) {
+		unsigned long flags;
+
+		RD(q)->q_ptr = WR(q)->q_ptr = ss;
+		ss->rq = RD(q);
+		ss->wq = WR(q);
+		ss->cmajor = cmajor;
+		ss->cminor = cminor;
+		ss->p = *prof;
+		ss->cred = *crp;
+		bufq_init(&ss->conq);
+		ss->conind = 0;
+		ss->users = 0;
+		init_waitqueue_head(&ss->waitq);
+		ss_set_state(ss, TS_UNBND);
+		spin_lock_irqsave(&ss_lock, flags);
+		if ((ss->next = *slp))
+			ss->next->prev = &ss->next;
+		ss->prev = slp;
+		*slp = ss;
+		spin_unlock_irqrestore(&ss_lock, flags);
+	} else
+		strlog(cmajor, cminor, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
+		       "ERROR: Could not allocate module private structure");
+	return (ss);
+}
+STATIC void
+ss_free_priv(queue_t *q)
+{
+	ss_t *ss;
+	unsigned long flags;
+
+	ss = ss_sleeplock(q);
+	STRLOGNO(ss, "unlinking private structure, reference count = %lu",
+		 (ulong) atomic_read(&ss->refcnt));
+	/* Unfortunately, ss_socket_put calls sock_release which can cause TCP to do a
+	   tcp_send_fin, and in tcp_send_fin an skbuff is allocated with GFP_KERNEL. */
+	if (ss->sock)
+		ss_socket_put(xchg(&ss->sock, NULL));
+	STRLOGNO(ss, "removed socket, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
+	bufq_purge(&ss->conq);
+	ss_unbufcall(ss);
+	STRLOGNO(ss, "removed bufcalls, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
+	spin_lock_irqsave(&ss_lock, flags);
+	if ((*ss->prev = ss->next))
+		ss->next->prev = ss->prev;
+	ss->next = NULL;
+	ss->prev = NULL;
+	spin_unlock_irqrestore(&ss_lock, flags);
+	STRLOGNO(ss, "unlinked, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
+	ss->rq->q_ptr = NULL;
+	ss->wq->q_ptr = NULL;
+	if (atomic_read(&ss->refcnt) > 1) {
+		assure(atomic_read(&ss->refcnt) <= 1);
+		STRLOGNO(ss, "WARNING: ss->refcnt = %lu", (ulong) atomic_read(&ss->refcnt));
+	}
+	ss_put(ss);		/* possibly final put */
+	// kmem_cache_free(ss_priv_cachep, ss);
+#if 0
+	strlog(cmajor, cminor, 6, SL_TRACE, "freed module private structure");
+#endif
+	return;
 }
 
 /*
@@ -12967,7 +13111,7 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
 	case -ENOMEM:
 		return (error);
 	case QR_DONE:
-	absorb:
+	      absorb:
 		freemsg(msg);
 	case QR_ABSORBED:
 		return (QR_ABSORBED);
@@ -13949,15 +14093,18 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
       out:
 	switch (-err) {
 	case ENOMEM:
+	{
+		bcid_t bcid;
 		/* This buffer call is just to kick us.  Because LiS uses kmalloc for mblks, if we
 		   can allocate an mblk, then another kernel routine can allocate that much memory
 		   too. */
-		if (ss->wbid) {
-			unbufcall(xchg(&ss->wbid, 0));
-			ss->refcnt--;
+		bcid = bufcall(len, BPRI_LO, &ss_bufsrv, (long) ss->wq);
+		ss_hold(ss);
+		if ((bcid = xchg(&ss->wbid, bcid))) {
+			unbufcall(bcid);
+			ss_put(ss);
 		}
-		ss->wbid = bufcall(len, BPRI_LO, &ss_bufsrv, (long) ss->wq);
-		ss->refcnt++;
+	}
 	default:
 		return m_error_reply(ss, ss->rq, mp, err);
 	}
@@ -14148,7 +14295,6 @@ ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struc
 {
 	mblk_t *mp;
 	ss_event_t *p;
-	unsigned long flags;
 
 	if ((mp = allocb(sizeof(*p), BPRI_HI))) {
 		mp->b_datap->db_type = type;
@@ -14163,20 +14309,27 @@ ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struc
 #endif
 		return (void) (0);
 	}
-	/* set up bufcall so we don't lose events */
-	spin_lock_irqsave(&ss->lock, flags);
-	/* make sure bufcalls don't happen now */
-	if (q == ss->rq) {
-		if (ss->rbid)
-			unbufcall(xchg(&ss->rbid, 0));
-		ss->rbid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
-	} else if (q == ss->wq) {
-		if (ss->wbid)
-			unbufcall(xchg(&ss->wbid, 0));
-		ss->wbid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
-	} else
-		STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
-	spin_unlock_irqrestore(&ss->lock, flags);
+	{
+		bcid_t bcid;
+
+		/* set up bufcall so we don't lose events */
+		if (q == ss->rq) {
+			bcid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
+			ss_hold(ss);
+			if ((bcid = xchg(&ss->rbid, bcid))) {
+				unbufcall(bcid);
+				ss_put(ss);
+			}
+		} else if (q == ss->wq) {
+			bcid = bufcall(FASTBUF, BPRI_HI, func, (long) sk);
+			ss_hold(ss);
+			if ((bcid = xchg(&ss->wbid, bcid))) {
+				unbufcall(bcid);
+				ss_put(ss);
+			}
+		} else
+			STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	}
 }
 
 /*
@@ -15522,7 +15675,7 @@ ss_w_proto(queue_t *q, mblk_t *mp)
 			int rtn;
 
 			rtn = ss_w_proto_slow(ss, q, mp, prim);
-			ss_unlockq(q);
+			ss_unlockq(ss);
 			return (rtn);
 		}
 		return (-EDEADLK);
@@ -16240,7 +16393,7 @@ ss_rsrv(queue_t *q)
 #if 0
 		ss_r_wakeup(ss, q);
 #endif
-		ss_unlockq(q);
+		ss_unlockq(ss);
 	}
 	return (0);
 }
@@ -16301,131 +16454,9 @@ ss_wsrv(queue_t *q)
 				break;
 			}
 		}
-		ss_unlockq(q);
+		ss_unlockq(ss);
 	}
 	return (0);
-}
-
-/*
- *  =========================================================================
- *
- *  Private Structure allocation, deallocation and cache
- *
- *  =========================================================================
- */
-STATIC kmem_cachep_t ss_priv_cachep = NULL;
-STATIC int
-ss_init_caches(void)
-{
-	if (!ss_priv_cachep &&
-	    !(ss_priv_cachep =
-	      kmem_create_cache("ss_priv_cachep", sizeof(ss_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
-	    )) {
-		cmn_err(CE_PANIC, "%s: Cannot allocate ss_priv_cachep", __FUNCTION__);
-		return (-ENOMEM);
-	} else
-		cmn_err(CE_DEBUG, "%s: initialized driver private structure cache", DRV_NAME);
-	return (0);
-}
-STATIC int
-ss_term_caches(void)
-{
-	if (ss_priv_cachep) {
-#ifdef HAVE_KTYPE_KMEM_CACHE_T_P
-		if (kmem_cache_destroy(ss_priv_cachep)) {
-			cmn_err(CE_WARN, "%s: did not destroy ss_priv_cachep", __FUNCTION__);
-			return (-EBUSY);
-		} else
-			cmn_err(CE_DEBUG, "%s: destroyed ss_priv_cachep", DRV_NAME);
-#else
-		kmem_cache_destroy(ss_priv_cachep);
-#endif
-	}
-	return (0);
-}
-STATIC ss_t *
-ss_alloc_priv(queue_t *q, ss_t **slp, major_t cmajor, minor_t cminor, cred_t *crp,
-	      const ss_profile_t * prof)
-{
-	ss_t *ss;
-
-	if ((ss = kmem_cache_alloc(ss_priv_cachep, GFP_ATOMIC))) {
-		bzero(ss, sizeof(*ss));
-		ss->cmajor = cmajor;
-		ss->cminor = cminor;
-#if 0
-		STRLOGNO(ss, "allocated module private structure");
-#endif
-		ss->rq = RD(q);
-		ss->rq->q_ptr = ss;
-		ss->refcnt++;
-		ss->wq = WR(q);
-		ss->wq->q_ptr = ss;
-		ss->refcnt++;
-		ss->cred = *crp;
-		ss->p = *prof;
-		spin_lock_init(&ss->qlock);
-		ss->rwait = NULL;
-		ss->wwait = NULL;
-		ss->users = 0;
-		ss_set_state(ss, TS_UNBND);
-		spin_lock_init(&ss->lock);
-		bufq_init(&ss->conq);
-		if ((ss->next = *slp))
-			ss->next->prev = &ss->next;
-		ss->prev = slp;
-		*slp = ss;
-		ss->refcnt++;
-#if 0
-		STRLOGNO(ss, "linked private structure, reference count %d", ss->refcnt);
-#endif
-	} else
-		strlog(cmajor, cminor, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
-		       "ERROR: Could not allocate module private structure");
-	return (ss);
-}
-STATIC void
-ss_free_priv(queue_t *q)
-{
-	ss_t *ss = PRIV(q);
-	unsigned long flags;
-
-	STRLOGNO(ss, "unlinking private structure, reference count = %lu", (ulong) ss->refcnt);
-	/* Unfortunately, ss_socket_put calls sock_release which can cause TCP to do a
-	   tcp_send_fin, and in tcp_send_fin an skbuff is allocated with GFP_KERNEL. */
-	if (ss->sock) {
-		ss_disconnect(ss);
-		ss_socket_put(xchg(&ss->sock, NULL));
-	}
-	STRLOGNO(ss, "removed socket, reference count = %lu", (ulong) ss->refcnt);
-	spin_lock_irqsave(&ss->lock, flags);
-	{
-		bufq_purge(&ss->conq);
-		__ss_unbufcall(q);
-		STRLOGNO(ss, "removed bufcalls, reference count = %lu", (ulong) ss->refcnt);
-		spin_lock(&ss_lock);
-		if ((*ss->prev = ss->next))
-			ss->next->prev = ss->prev;
-		ss->next = NULL;
-		ss->prev = NULL;
-		spin_unlock(&ss_lock);
-		ss->refcnt--;
-		STRLOGNO(ss, "unlinked, reference count = %lu", (ulong) ss->refcnt);
-		ss->rq->q_ptr = NULL;
-		ss->refcnt--;
-		ss->wq->q_ptr = NULL;
-		ss->refcnt--;
-	}
-	spin_unlock_irqrestore(&ss->lock, flags);
-	if (ss->refcnt) {
-		assure(ss->refcnt);
-		STRLOGNO(ss, "WARNING: ss->refcnt = %lu", (ulong) ss->refcnt);
-	}
-	kmem_cache_free(ss_priv_cachep, ss);
-#if 0
-	strlog(cmajor, cminor, 6, SL_TRACE, "freed module private structure");
-#endif
-	return;
 }
 
 /*
@@ -16665,6 +16696,7 @@ ss_close(queue_t *q, int flag, cred_t *crp)
       skip_pop:
 	qprocsoff(q);
 	ss_free_priv(q);
+	q->q_ptr = WR(q)->q_ptr = NULL;
 	goto quit;
       quit:
 	return (0);
