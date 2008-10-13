@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-09-10 03:49:46 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-10-13 04:12:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:46 $ by $Author: brian $
+# Last Modified $Date: 2008-10-13 04:12:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -394,7 +394,8 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 #include <net/tcp.h>
     ])
     _LINUX_CHECK_FUNCS([rcu_read_lock dst_output dst_mtu nf_reset ip_dst_output \
-			ip_route_output_key __in_dev_get_rcu synchronize_net skb_transport_header], [], [], [
+			ip_route_output_key __in_dev_get_rcu synchronize_net skb_transport_header \
+			], [], [], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -552,7 +553,6 @@ AC_DEFUN([_INET_CONFIG_KERNEL], [dnl
 			  struct net_protocol.proto,
 			  struct net_protocol.next,
 			  struct net_protocol.no_policy,
-			  struct dst_entry.path,
 			  struct dst_entry.path,
 			  struct net.dev_base_head], [], [], [
 #include <linux/autoconf.h>
@@ -878,7 +878,6 @@ dnl 	fi
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_max])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
-    _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
     _LINUX_KERNEL_ENV([
 	AC_CACHE_CHECK([for ip_frag_mem with 1 arg],
 		       [linux_cv_ip_frag_mem_1_arg], [dnl
@@ -1347,6 +1346,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.85  2008-10-13 04:12:16  brian
+# - handle exports rework strinet
+#
 # Revision 0.9.2.84  2008-09-10 03:49:46  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #

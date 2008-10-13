@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-10-11 04:31:34 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:34 $ by $Author: brian $
+ Last Modified $Date: 2008-10-13 04:12:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.83  2008-10-13 04:12:18  brian
+ - handle exports rework strinet
+
  Revision 0.9.2.82  2008-10-11 04:31:34  brian
  - handle -Wpointer-sign
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-10-11 04:31:34 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-10-11 04:31:34 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -95,7 +98,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-10-11 04:31:34 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14307,13 +14310,14 @@ sctp_alloc_priv(queue_t *q, struct sctp **spp, int cmajor, int cminor, struct sc
 		sctp_init_lock(sp);
 		sp->users = 0;
 		init_waitqueue_head(&sp->waitq);
-		/* FIXME: must take list lock here! */
+		spin_lock(&sctp_protolock);
 		/* link into master list */
 		if ((sp->next = *spp))
 			sp->next->prev = &sp->next;
 		sp->prev = spp;
 		*spp = sp;
 		atomic_inc(&sctp_stream_count);
+		spin_unlock(&sctp_protolock);
 		qprocson(q);
 	}
 	usual(sp);

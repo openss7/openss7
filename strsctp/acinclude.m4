@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-09-10 03:49:52 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2008-10-13 04:12:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:52 $ by $Author: brian $
+# Last Modified $Date: 2008-10-13 04:12:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -414,11 +414,15 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
 #include <linux/fs.h>
 #include <linux/sched.h>
+#include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_KDEV_T_H
 #include <linux/kdev_t.h>
 #endif
@@ -429,6 +433,12 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #include <linux/namespace.h>
 #endif
 #include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
 #include <linux/time.h>		/* for struct timespec */
 #include <net/sock.h>
 #include <net/protocol.h>
@@ -505,6 +515,9 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
 #ifdef HAVE_KINC_LINUX_SLAB_H
 #include <linux/slab.h>
 #endif
@@ -527,7 +540,6 @@ AC_DEFUN([_SCTP_CONFIG_KERNEL], [dnl
 			  struct net_protocol.proto,
 			  struct net_protocol.next,
 			  struct net_protocol.no_policy,
-			  struct dst_entry.path,
 			  struct dst_entry.path,
 			  struct sk_buff.transport_header,
 			  struct net.dev_base_head], [], [], [
@@ -1475,6 +1487,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.80  2008-10-13 04:12:18  brian
+# - handle exports rework strinet
+#
 # Revision 0.9.2.79  2008-09-10 03:49:52  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #
