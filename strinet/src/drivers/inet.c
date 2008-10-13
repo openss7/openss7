@@ -472,6 +472,28 @@ static __u32 *const _sysctl_wmem_default_location =
 #endif
 #endif
 
+#ifndef sysctl_rmem_max
+#ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
+static __u32 *const _sysctl_rmem_max_location =
+    (typeof(_sysctl_rmem_max_location)) (HAVE_SYSCTL_RMEM_MAX_ADDR);
+
+#define sysctl_rmem_max (*_sysctl_rmem_max_location)
+#else
+#define sysctl_rmem_max SK_RMEM_MAX
+#endif
+#endif
+
+#ifndef sysctl_wmem_max
+#ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
+static __u32 *const _sysctl_wmem_max_location =
+    (typeof(_sysctl_wmem_max_location)) (HAVE_SYSCTL_WMEM_MAX_ADDR);
+
+#define sysctl_wmem_max (*_sysctl_wmem_max_location)
+#else
+#define sysctl_wmem_max SK_WMEM_MAX
+#endif
+#endif
+
 #ifndef sysctl_tcp_fin_timeout
 #ifdef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
 static __u32 *const _sysctl_tcp_fin_timeout_location =
@@ -12415,6 +12437,26 @@ tcp_statename(int state)
 		return ("(unknown)");
 	}
 }
+#if 0
+STATIC const char *
+sock_statename(int state)
+{
+	switch (state) {
+	case SS_FREE:
+		return ("SS_FREE");
+	case SS_UNCONNECTED:
+		return ("SS_UNCONNECTED");
+	case SS_CONNECTING:
+		return ("SS_CONNECTING");
+	case SS_CONNECTED:
+		return ("SS_CONNECTED");
+	case SS_DISCONNECTING:
+		return ("SS_DISCONNECTING");
+	default:
+		return ("(unknown)");
+	}
+}
+#endif
 #endif
 STATIC INLINE streams_fastcall __hot void
 ss_set_state(ss_t *ss, t_scalar_t state)
@@ -12860,8 +12902,10 @@ m_error(ss_t *ss, queue_t *q, mblk_t *msg, int error)
 	mblk_t *mp;
 
 	if ((mp = ss_allocb(q, 2, BPRI_HI))) {
-		if (ss->sock)
+		if (ss->sock) {
+			ss_disconnect(ss);
 			ss_socket_put(xchg(&ss->sock, NULL));
+		}
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = error;
 		*mp->b_wptr++ = error;
@@ -12884,8 +12928,10 @@ m_hangup(ss_t *ss, queue_t *q, mblk_t *msg)
 
 	if ((mp = ss_allocb(q, 0, BPRI_HI))) {
 		mp->b_datap->db_type = M_HANGUP;
-		if (ss->sock)
+		if (ss->sock) {
+			ss_disconnect(ss);
 			ss_socket_put(xchg(&ss->sock, NULL));
+		}
 		freemsg(msg);
 		STRLOGTX(ss, "<- M_HANGUP");
 		putnext(ss->rq, mp);
@@ -12941,6 +12987,9 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
 		err = (err < 0) ? -err : err;
 		break;
 	}
+	/* always flush before M_ERROR or M_HANGUP */
+	if (m_flush(ss, q, NULL, FLUSHRW, 0) == -ENOBUFS)
+		return (-ENOBUFS);
 	if (hangup)
 		return m_hangup(ss, q, msg);
 	return m_error(ss, q, msg, err);
@@ -13084,8 +13133,11 @@ t_seq_delete(ss_t *ss, mblk_t *rp)
 	if ((mp = t_seq_find(ss, rp))) {
 		struct socket *sock = NULL;
 
-		if (!ss_accept(ss, &sock, rp) && sock)
+		if (!ss_accept(ss, &sock, rp) && sock) {
+			if (!sock->sk->sk_prot->disconnect(sock->sk, O_NONBLOCK))
+				sock->state = SS_UNCONNECTED;
 			sock_release(sock);
+		}
 		return ((t_uscalar_t) (long) mp);
 	}
 	return (0);
@@ -13373,8 +13425,10 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
 			ensure(as && cp, goto free_error);
 			if ((err = ss_accept(ss, &sock, cp)))
 				goto free_error;
-			if (as->sock)
+			if (as->sock) {
+				ss_disconnect(as);
 				ss_socket_put(xchg(&as->sock, NULL));	/* get rid of old socket */
+			}
 			as->sock = sock;
 			ss_socket_get(as->sock, as);
 			ss_set_state(as, TS_DATA_XFER);
@@ -14848,8 +14902,10 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	goto error;
 #endif
       error_close:
-	if (ss->sock)
+	if (ss->sock) {
+		ss_disconnect(ss);
 		ss_socket_put(xchg(&ss->sock, NULL));
+	}
       error:
 	return t_error_ack(ss, q, mp, T_BIND_REQ, err);
 }
@@ -16337,8 +16393,10 @@ ss_free_priv(queue_t *q)
 	STRLOGNO(ss, "unlinking private structure, reference count = %lu", (ulong) ss->refcnt);
 	/* Unfortunately, ss_socket_put calls sock_release which can cause TCP to do a
 	   tcp_send_fin, and in tcp_send_fin an skbuff is allocated with GFP_KERNEL. */
-	if (ss->sock)
+	if (ss->sock) {
+		ss_disconnect(ss);
 		ss_socket_put(xchg(&ss->sock, NULL));
+	}
 	STRLOGNO(ss, "removed socket, reference count = %lu", (ulong) ss->refcnt);
 	spin_lock_irqsave(&ss->lock, flags);
 	{
