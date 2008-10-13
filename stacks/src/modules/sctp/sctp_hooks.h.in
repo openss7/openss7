@@ -177,6 +177,11 @@ __ip_route_output_key(struct rtable **rp, const struct flowi *flp)
 #endif
 
 #undef HAVE_KFUNC_DST_MTU
+#ifdef HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#undef dst_pmtu
+#define dst_pmtu dst_mtu
+#else
 #undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 #ifdef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 /* dst_pmtu should be already defined */
@@ -199,6 +204,7 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 {
 	dst->pmtu = mtu;
 }
+#endif
 #endif
 
 #undef HAVE_KMEMB_STRUCT_NET_DEV_BASE_HEAD
@@ -321,6 +327,28 @@ static __inline__ __u32 *const _sysctl_wmem_default_location =
 #define sysctl_wmem_default (*_sysctl_wmem_default_location)
 #else
 #define sysctl_wmem_default SK_WMEM_MAX
+#endif
+#endif
+
+#undef HAVE_SYSCTL_RMEM_MAX_ADDR
+#ifndef sysctl_rmem_max
+#ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
+static __u32 *const _sysctl_rmem_max_location =
+    (typeof(_sysctl_rmem_max_location)) (HAVE_SYSCTL_RMEM_MAX_ADDR);
+#define sysctl_rmem_max (*_sysctl_rmem_max_location)
+#else
+#define sysctl_rmem_max SK_RMEM_MAX
+#endif
+#endif
+
+#undef HAVE_SYSCTL_WMEM_MAX_ADDR
+#ifndef sysctl_wmem_max
+#ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
+static __u32 *const _sysctl_wmem_max_location =
+    (typeof(_sysctl_wmem_max_location)) (HAVE_SYSCTL_WMEM_MAX_ADDR);
+#define sysctl_wmem_max (*_sysctl_wmem_max_location)
+#else
+#define sysctl_wmem_max SK_WMEM_MAX
 #endif
 #endif
 

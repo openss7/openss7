@@ -874,8 +874,11 @@ dnl 	fi
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_default_ttl])
     _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_rmem_max])
+    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_max])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
     _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
+    _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
     _LINUX_KERNEL_ENV([
 	AC_CACHE_CHECK([for ip_frag_mem with 1 arg],
 		       [linux_cv_ip_frag_mem_1_arg], [dnl

@@ -13873,12 +13873,6 @@ sctp_data_req(struct sctp *sp, uint32_t ppi, uint16_t sid, uint ord, uint more, 
  */
 STATIC int sctp_port_rover = 0;
 
-/* FIXME: the following should be done in the hooks file. */
-#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
-extern int sysctl_local_port_range[2];
-#else				/* sysctl_local_port_range */
-STATIC int sysctl_local_port_range[2] = { 1024, 4999 };
-#endif				/* sysctl_local_port_range */
 STATIC INLINE int
 sctp_addr_match(sctp_t * sp1, sctp_t * sp2)
 {

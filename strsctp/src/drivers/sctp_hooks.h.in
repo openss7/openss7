@@ -158,11 +158,18 @@ extern int sysctl_ip_nonlocal_bind;
 #define sysctl_ip_nonlocal_bind (*((typeof(sysctl_ip_nonlocal_bind) *)HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR))
 #endif
 
-#undef HAVE_SYSCLT_IP_DEFAULT_TTL_ADDR
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
 extern int sysctl_ip_default_ttl;
 
 #ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
 #define sysctl_ip_default_ttl (*((typeof(sysctl_ip_default_ttl) *)HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR))
+#endif
+
+#undef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
+extern int sysctl_local_port_range[2];
+
+#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
+#define sysctl_local_port_range (*((typeof(sysctl_local_port_range) *)HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR))
 #endif
 
 #undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
@@ -324,6 +331,28 @@ static __inline__ __u32 *const _sysctl_wmem_default_location =
 #define sysctl_wmem_default (*_sysctl_wmem_default_location)
 #else
 #define sysctl_wmem_default SK_WMEM_MAX
+#endif
+#endif
+
+#undef HAVE_SYSCTL_RMEM_MAX_ADDR
+#ifndef sysctl_rmem_max
+#ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
+static __u32 *const _sysctl_rmem_max_location =
+    (typeof(_sysctl_rmem_max_location)) (HAVE_SYSCTL_RMEM_MAX_ADDR);
+#define sysctl_rmem_max (*_sysctl_rmem_max_location)
+#else
+#define sysctl_rmem_max SK_RMEM_MAX
+#endif
+#endif
+
+#undef HAVE_SYSCTL_WMEM_MAX_ADDR
+#ifndef sysctl_wmem_max
+#ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
+static __u32 *const _sysctl_wmem_max_location =
+    (typeof(_sysctl_wmem_max_location)) (HAVE_SYSCTL_WMEM_MAX_ADDR);
+#define sysctl_wmem_max (*_sysctl_wmem_max_location)
+#else
+#define sysctl_wmem_max SK_WMEM_MAX
 #endif
 #endif
 

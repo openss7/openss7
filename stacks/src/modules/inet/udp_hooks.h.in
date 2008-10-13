@@ -351,6 +351,28 @@ static __inline__ __u32 *const _sysctl_wmem_default_location =
 #endif
 #endif
 
+#undef HAVE_SYSCTL_RMEM_MAX_ADDR
+#ifndef sysctl_rmem_max
+#ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
+static __u32 *const _sysctl_rmem_max_location =
+    (typeof(_sysctl_rmem_max_location)) (HAVE_SYSCTL_RMEM_MAX_ADDR);
+#define sysctl_rmem_max (*_sysctl_rmem_max_location)
+#else
+#define sysctl_rmem_max SK_RMEM_MAX
+#endif
+#endif
+
+#undef HAVE_SYSCTL_WMEM_MAX_ADDR
+#ifndef sysctl_wmem_max
+#ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
+static __u32 *const _sysctl_wmem_max_location =
+    (typeof(_sysctl_wmem_max_location)) (HAVE_SYSCTL_WMEM_MAX_ADDR);
+#define sysctl_wmem_max (*_sysctl_wmem_max_location)
+#else
+#define sysctl_wmem_max SK_WMEM_MAX
+#endif
+#endif
+
 #ifndef socklen_t
 typedef int socklen_t;
 
