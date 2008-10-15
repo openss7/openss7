@@ -1,3 +1,7 @@
+2008-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: replace suspicious postincrement construct
+
 2008-10-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: unexported sysctl_(w|r)mem_max

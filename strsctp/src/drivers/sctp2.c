@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-10-15 01:34:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-13 04:12:18 $ by $Author: brian $
+ Last Modified $Date: 2008-10-15 01:34:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.84  2008-10-15 01:34:01  brian
+ - replaced suspicious postincrement construct
+
  Revision 0.9.2.83  2008-10-13 04:12:18  brian
  - handle exports rework strinet
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-10-15 01:34:01 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-10-15 01:34:01 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -98,7 +101,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-13 04:12:18 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-10-15 01:34:01 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2202,7 +2205,8 @@ __adler32_partial_copy_from_user(register const unsigned char *src, register uns
 		}
 		if (len != 0)
 			do {
-				s1 += (*dst++ = *src++);
+				s1 += (*dst = *src);
+				dst++; src++;
 				s2 += s1;
 			} while (--len);
 	}
@@ -14900,8 +14904,9 @@ m_flush(struct sctp *sp, mblk_t *msg, int how, int band)
 
 	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
 		mp->b_datap->db_type = M_FLUSH;
-		*mp->b_wptr++ = how;
-		*mp->b_wptr++ = band;
+		mp->b_wptr[0] = how;
+		mp->b_wptr[1] = band;
+		mp->b_wptr += 2;
 		flushq(sp->rq, FLUSHALL);
 		freemsg(msg);
 		sctplogtx(sp, "<- M_FLUSH");
@@ -14928,8 +14933,9 @@ m_error(struct sctp *sp, mblk_t *msg, int error)
 
 	if ((mp = sctp_allocb(sp, 2, BPRI_HI))) {
 		mp->b_datap->db_type = M_ERROR;
-		*mp->b_wptr++ = error;
-		*mp->b_wptr++ = error;
+		mp->b_wptr[0] = error;
+		mp->b_wptr[1] = error;
+		mp->b_wptr += 2;
 		freemsg(msg);
 		sctplogtx(sp, "<- M_ERROR");
 		putnext(sp->rq, mp);
