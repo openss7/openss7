@@ -1,3 +1,8 @@
+2008-10-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/inet.c: major rework
+	* src/test/test-inet_raw.c: spelling correction
+
 2008-10-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: unexported sysctl_(w|r)mem_max

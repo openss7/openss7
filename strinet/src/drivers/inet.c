@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2008-10-15 01:33:29 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-13 04:12:17 $ by $Author: brian $
+ Last Modified $Date: 2008-10-15 01:33:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.100  2008-10-15 01:33:29  brian
+ - major rework of strinet driver
+
  Revision 0.9.2.99  2008-10-13 04:12:17  brian
  - handle exports rework strinet
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2008-10-15 01:33:29 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2008-10-15 01:33:29 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -126,6 +129,10 @@ static char const ident[] =
 #undef STATIC
 #undef INLINE
 #include <net/sctp.h>
+#endif
+
+#ifdef LIS
+#error This driver no longer works with LIS: LIS has too many bugs.
 #endif
 
 #if 0
@@ -599,7 +606,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.99 $) $Date: 2008-10-13 04:12:17 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2008-10-15 01:33:29 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -757,7 +764,7 @@ MODULE_ALIAS("/dev/inet/sctp");
 #define DRV_BANNER	SS__SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info ss_rinfo = {
+static struct module_info ss_rinfo = {
 	.mi_idnum = DRV_ID,	/* Module ID number */
 	.mi_idname = DRV_NAME,	/* Module name */
 	.mi_minpsz = 0,		/* Min packet size accepted */
@@ -766,16 +773,16 @@ STATIC struct module_info ss_rinfo = {
 	.mi_lowat = 0,		/* Lo water mark */
 };
 
-STATIC struct module_stat ss_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat ss_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat ss_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat ss_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
-STATIC streamscall int ss_open(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int ss_close(queue_t *, int, cred_t *);
+static streamscall int ss_open(queue_t *, dev_t *, int, int, cred_t *);
+static streamscall int ss_close(queue_t *, int, cred_t *);
 
-STATIC streamscall int ss_rput(queue_t *, mblk_t *);
-STATIC streamscall int ss_rsrv(queue_t *);
+static streamscall int ss_rput(queue_t *, mblk_t *);
+static streamscall int ss_rsrv(queue_t *);
 
-STATIC struct qinit ss_rinit = {
+static struct qinit ss_rinit = {
 	.qi_putp = ss_rput,	/* Read put (msg from below) */
 	.qi_srvp = ss_rsrv,	/* Read queue service */
 	.qi_qopen = ss_open,	/* Each open */
@@ -784,7 +791,7 @@ STATIC struct qinit ss_rinit = {
 	.qi_mstat = &ss_rstat,	/* Statistics */
 };
 
-STATIC struct module_info ss_winfo = {
+static struct module_info ss_winfo = {
 	.mi_idnum = DRV_ID,	/* Module ID number */
 	.mi_idname = DRV_NAME,	/* Module name */
 	.mi_minpsz = 0,		/* Min packet size accepted */
@@ -793,10 +800,10 @@ STATIC struct module_info ss_winfo = {
 	.mi_lowat = 0,		/* Lo water mark */
 };
 
-STATIC streamscall int ss_wput(queue_t *, mblk_t *);
-STATIC streamscall int ss_wsrv(queue_t *);
+static streamscall int ss_wput(queue_t *, mblk_t *);
+static streamscall int ss_wsrv(queue_t *);
 
-STATIC struct qinit ss_winit = {
+static struct qinit ss_winit = {
 	.qi_putp = ss_wput,	/* Write put (msg from above) */
 	.qi_srvp = ss_wsrv,	/* Write queue service */
 	.qi_minfo = &ss_winfo,	/* Information */
@@ -877,11 +884,7 @@ MODULE_STATIC struct streamtab ss_info = {
  */
 
 typedef struct ss_options {
-#if 0
-	unsigned char flags[12];	/* twelve bytes of flags for 96 flags */
-#else
 	unsigned long flags[3];		/* at least 96 flags */
-#endif
 	struct {
 		t_uscalar_t debug[4];	/* XTI_DEBUG */
 		struct t_linger linger;	/* XTI_LINGER */
@@ -1188,18 +1191,19 @@ enum {
 typedef struct ss_event {
 	struct sock *sk;		/* sock (child) for event */
 	int state;			/* state at time of event */
+	int error;			/* error to report */
 } ss_event_t;
 
-STATIC spinlock_t ss_lock = SPIN_LOCK_UNLOCKED;	/* protects ss_opens lists */
-STATIC ss_t *ss_opens = NULL;
+static spinlock_t ss_lock = SPIN_LOCK_UNLOCKED;	/* protects ss_opens lists */
+static ss_t *ss_opens = NULL;
 
 #if 0
 
 /*
    for later when we support default destinations and default listeners 
  */
-STATIC ss_t *ss_dflt_dest = NULL;
-STATIC ss_t *ss_dflt_lstn = NULL;
+static ss_t *ss_dflt_dest = NULL;
+static ss_t *ss_dflt_lstn = NULL;
 #endif
 
 /*
@@ -1209,8 +1213,8 @@ STATIC ss_t *ss_dflt_lstn = NULL;
  *
  *  =========================================================================
  */
-STATIC kmem_cachep_t ss_priv_cachep = NULL;
-STATIC int
+static kmem_cachep_t ss_priv_cachep = NULL;
+static int
 ss_init_caches(void)
 {
 	if (!ss_priv_cachep &&
@@ -1223,7 +1227,7 @@ ss_init_caches(void)
 		cmn_err(CE_DEBUG, "%s: initialized driver private structure cache", DRV_NAME);
 	return (0);
 }
-STATIC int
+static int
 ss_term_caches(void)
 {
 	if (ss_priv_cachep) {
@@ -1272,46 +1276,49 @@ ss_put(ss_t *ss)
  *
  *  =========================================================================
  */
-STATIC void ss_state_change(struct sock *sk);
-STATIC void ss_write_space(struct sock *sk);
-STATIC void ss_error_report(struct sock *sk);
-STATIC void ss_data_ready(struct sock *sk, int len);
-STATIC void
-ss_socket_put(struct socket *sock)
+static void ss_state_change(struct sock *sk);
+static void ss_write_space(struct sock *sk);
+static void ss_error_report(struct sock *sk);
+static void ss_data_ready(struct sock *sk, int len);
+static void
+ss_socket_put(struct socket **sockp)
 {
 	unsigned long flags;
+	struct socket *sock;
 	struct sock *sk;
 
-	ensure(sock, return);
-	if ((sk = sock->sk)) {
-		/* We don't really need to lock out interrupts here, just bottom halves 'cause a
-		   read lock is taken in the callback function itself. */
-		write_lock_irqsave(&sk->sk_callback_lock, flags);
-		{
-			ss_t *ss;
+	if (likely((sock = xchg(sockp, NULL)) != NULL)) {
+		if (likely((sk = sock->sk) != NULL)) {
+			/* We don't really need to lock out interrupts here, just bottom halves
+			   'cause a read lock is taken in the callback function itself. */
+			write_lock_irqsave(&sk->sk_callback_lock, flags);
+			{
+				ss_t *ss;
 
-			if ((ss = SOCK_PRIV(sk))) {
-				SOCK_PRIV(sk) = NULL;
-				sk->sk_state_change = ss->cb_save.sk_state_change;
-				sk->sk_data_ready = ss->cb_save.sk_data_ready;
-				sk->sk_write_space = ss->cb_save.sk_write_space;
-				sk->sk_error_report = ss->cb_save.sk_error_report;
-				ss_put(ss);
-			} else
-				assure(ss);
-		}
-		write_unlock_irqrestore(&sock->sk->sk_callback_lock, flags);
-		/* The following will cause the socket to be aborted, particularly for Linux TCP or 
-		   other orderly release sockets. XXX: Perhaps should check the state of the socket 
-		   and call sk->prot->disconnect() first as well.  SCTP will probably behave better 
-		   that way. */
-		sock_set_keepopen(sk);
-		sk->sk_lingertime = 0;
+				if ((ss = SOCK_PRIV(sk))) {
+					SOCK_PRIV(sk) = NULL;
+					sk->sk_state_change = ss->cb_save.sk_state_change;
+					sk->sk_data_ready = ss->cb_save.sk_data_ready;
+					sk->sk_write_space = ss->cb_save.sk_write_space;
+					sk->sk_error_report = ss->cb_save.sk_error_report;
+					ss_put(ss);
+				} else
+					assure(ss);
+			}
+			write_unlock_irqrestore(&sock->sk->sk_callback_lock, flags);
+			/* The following will cause the socket to be aborted, particularly for
+			   Linux TCP or other orderly release sockets. XXX: Perhaps should check
+			   the state of the socket and call sk->prot->disconnect() first as well.
+			   SCTP will probably behave better that way. */
+			sock_set_keepopen(sk);
+			sk->sk_lingertime = 0;
+		} else
+			assure(sk);
+		sock_release(sock);
 	} else
-		assure(sk);
-	sock_release(sock);
+		assure(sock);
 }
-STATIC void
+static void
 ss_socket_get(struct socket *sock, ss_t *ss)
 {
 	unsigned long flags;
@@ -1367,16 +1374,15 @@ ss_socket_get(struct socket *sock, ss_t *ss)
  * structure is unlocked (or has already been enabled).  If the lock succeeds on the second attempt,
  * it is possible that the queue may be enabled again later, but with no consequence.
  */
-STATIC inline fastcall ss_t *
+static inline fastcall ss_t *
 ss_trylockq(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
 
-	if (likely(ss != NULL) && unlikely(test_and_set_bit(0, &ss->users))) {
-		set_bit((q->q_flag & QREADR) ? 1 : 2, &ss->users);
-		if (likely(test_and_set_bit(0, &ss->users)))
-			return (NULL);
-	}
+	if (likely(ss != NULL) && unlikely(test_and_set_bit(0, &ss->users))
+	    && likely(!test_and_set_bit((q->q_flag & QREADR) ? 1 : 2, &ss->users))
+	    && likely(test_and_set_bit(0, &ss->users)))
+		return (NULL);
 	return (ss);
 }
 
@@ -1389,7 +1395,7 @@ ss_trylockq(queue_t *q)
  * stream close procedure to sleep while waiting for a listening stream to complete accepting a
  * connection on the closing stream before proceeding.
  */
-STATIC ss_t *
+static ss_t *
 ss_sleeplock(queue_t *q)
 {
 	ss_t *ss = PRIV(q);
@@ -1417,18 +1423,18 @@ ss_sleeplock(queue_t *q)
  * Waiting queues will be enabled and waiting processes will be worken up.  Not normally used by the
  * close procedure, just the queue procedures when unlocking a locked private structure.
  */
-STATIC inline fastcall void
+static inline fastcall void
 ss_unlockq(ss_t *ss)
 {
 	long users;
 
 	users = xchg(&ss->users, 0x00);
 
-	if (users & 0x02)
+	if (test_bit(1, &users))
 		enableq(ss->rq);
-	if (users & 0x04)
+	if (test_bit(2, &users))
 		enableq(ss->wq);
-	if (users & 0x08)
+	if (test_bit(3, &users))
 		wake_up_all(&ss->waitq);
 }
 
@@ -1444,7 +1450,7 @@ ss_unlockq(ss_t *ss)
  * @data: a pointer to the private structure
  *
  */
-STATIC void streamscall
+static void streamscall
 ss_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
@@ -1462,7 +1468,7 @@ ss_bufsrv(long data)
  *  UNBUFCALL
  *  -------------------------------------------------------------------------
  */
-STATIC void
+static void
 ss_unbufcall(ss_t *ss)
 {
 	bcid_t bcid;
@@ -1481,7 +1487,7 @@ ss_unbufcall(ss_t *ss)
  *  ALLOCB
  *  -------------------------------------------------------------------------
  */
-STATIC mblk_t *
+static mblk_t *
 ss_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
@@ -1504,7 +1510,7 @@ ss_allocb(queue_t *q, size_t size, int prior)
  *  ESBALLOC
  *  -------------------------------------------------------------------------
  */
-STATIC mblk_t *
+static mblk_t *
 ss_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
@@ -1553,7 +1559,7 @@ ss_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frt
 #define _T_LENGTH_SIZEOF(s) \
 	T_LENGTH(sizeof(s))
 
-STATIC ss_options_t ss_defaults = {
+static ss_options_t ss_defaults = {
 	{0,}
 	,
 	{
@@ -1643,13 +1649,12 @@ STATIC ss_options_t ss_defaults = {
 /*
  *  Size connection indication or confirmation options.
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Return an option buffer size for a connection indication or confirmation.
- *  Options without end-to-end significance are not indicated and are only
- *  confirmed if requested.  Options with end-to-end significance are always
- *  both indicated and confirmed.  For this to work for connection
- *  indications, all request options flags must be cleared to zero.
+ *  Return an option buffer size for a connection indication or confirmation.  Options without
+ *  end-to-end significance are not indicated and are only confirmed if requested.  Options with
+ *  end-to-end significance are always both indicated and confirmed.  For this to work for
+ *  connection indications, all request options flags must be cleared to zero.
  */
-STATIC int
+static int
 ss_size_conn_opts(ss_t *ss)
 {
 	int size = 0;
@@ -1670,14 +1675,8 @@ ss_size_conn_opts(ss_t *ss)
 		{
 			/* These two have end-to-end significance for connection indications and
 			   responses. */
-#if 0
-			if (t_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
-#endif
-				size += _T_SPACE_SIZEOF(ss->options.ip.options);
-#if 0
-			if (t_tst_bit(_T_BIT_IP_TOS, ss->options.flags))
-#endif
-				size += _T_SPACE_SIZEOF(ss->options.ip.tos);
+			size += _T_SPACE_SIZEOF(ss->options.ip.options);
+			size += _T_SPACE_SIZEOF(ss->options.ip.tos);
 		}
 		if (t_tst_bit(_T_BIT_IP_TTL, ss->options.flags))
 			size += _T_SPACE_SIZEOF(ss->options.ip.ttl);
@@ -1713,11 +1712,6 @@ ss_size_conn_opts(ss_t *ss)
 				size += _T_SPACE_SIZEOF(ss->options.tcp.defer_accept);
 			if (t_tst_bit(_T_BIT_TCP_WINDOW_CLAMP, ss->options.flags))
 				size += _T_SPACE_SIZEOF(ss->options.tcp.window_clamp);
-#if 0
-			/* read only */
-			if (t_tst_bit(_T_BIT_TCP_INFO, ss->options.flags))
-				size += _T_SPACE_SIZEOF(ss->options.tcp.info);
-#endif
 			if (t_tst_bit(_T_BIT_TCP_QUICKACK, ss->options.flags))
 				size += _T_SPACE_SIZEOF(ss->options.tcp.quickack);
 			break;
@@ -1760,14 +1754,8 @@ ss_size_conn_opts(ss_t *ss)
 			{
 				/* These two have end-to-end significance for connection
 				   indications and connection responses */
-#if 0
-				if (t_tst_bit(_T_BIT_SCTP_OSTREAMS, ss->options.flags))
-#endif
-					size += _T_SPACE_SIZEOF(ss->options.sctp.ostreams);
-#if 0
-				if (t_tst_bit(_T_BIT_SCTP_ISTREAMS, ss->options.flags))
-#endif
-					size += _T_SPACE_SIZEOF(ss->options.sctp.istreams);
+				size += _T_SPACE_SIZEOF(ss->options.sctp.ostreams);
+				size += _T_SPACE_SIZEOF(ss->options.sctp.istreams);
 			}
 			if (t_tst_bit(_T_BIT_SCTP_COOKIE_INC, ss->options.flags))
 				size += _T_SPACE_SIZEOF(ss->options.sctp.cookie_inc);
@@ -1810,7 +1798,7 @@ ss_size_conn_opts(ss_t *ss)
  *  field of received ancillary information (for example, T_IP options) that is not subject to
  *  negotiation is always set to T_SUCCESS.
  */
-STATIC int
+static int
 t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 {
 	struct t_opthdr *oh;
@@ -1919,9 +1907,6 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 	if (ss->p.prot.family == PF_INET) {
 		struct inet_opt *np = inet_sk(sk);
 
-#if 0
-		if (t_tst_bit(_T_BIT_IP_OPTIONS, ss->options.flags))
-#endif
 		{
 			if (oh == NULL)
 				goto efault;
@@ -1931,9 +1916,6 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 			oh->status = T_SUCCESS;
 			oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 		}
-#if 0
-		if (t_tst_bit(_T_BIT_IP_TOS, ss->options.flags))
-#endif
 		{
 			if (oh == NULL)
 				goto efault;
@@ -2472,9 +2454,6 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.rto_max;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
-#if 0
-			if (t_tst_bit(_T_BIT_SCTP_OSTREAMS, ss->options.flags))
-#endif
 			{
 				if (oh == NULL)
 					goto efault;
@@ -2491,9 +2470,6 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 				*((t_uscalar_t *) T_OPT_DATA(oh)) = ss->options.sctp.ostreams;
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 			}
-#if 0
-			if (t_tst_bit(_T_BIT_SCTP_ISTREAMS, ss->options.flags))
-#endif
 			{
 				if (oh == NULL)
 					goto efault;
@@ -2779,12 +2755,11 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 /*
  *  Set options on new socket.
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  This is used after accepting a new socket.  It is used to negotiate the
- *  options applied to the responding stream in the connection response to the
- *  newly accepted socket.  All options of interest have their flags set and
- *  the appropriate option values set.
+ *  This is used after accepting a new socket.  It is used to negotiate the options applied to the
+ *  responding stream in the connection response to the newly accepted socket.  All options of
+ *  interest have their flags set and the appropriate option values set.
  */
-STATIC int
+static int
 t_set_options(ss_t *ss)
 {
 	struct sock *sk;
@@ -3038,15 +3013,6 @@ t_set_options(ss_t *ss)
 
 				sp->sid = *valp;
 			}
-#if 0
-			/* These are per-packet, read-only, options only. */
-			if (t_tst_bit(_T_BIT_SCTP_SSN, ss->options.flags)) {
-				t_uscalar_t *valp = &ss->options.sctp.ssn;
-			}
-			if (t_tst_bit(_T_BIT_SCTP_TSN, ss->options.flags)) {
-				t_uscalar_t *valp = &ss->options.sctp.tsn;
-			}
-#endif
 			if (t_tst_bit(_T_BIT_SCTP_RECVOPT, ss->options.flags)) {
 				t_uscalar_t *valp = &ss->options.sctp.recvopt;
 
@@ -3257,23 +3223,6 @@ t_set_options(ss_t *ss)
 				else
 					sp->l_caps &= ~SCTP_CAPS_SET_IP;
 			}
-#if 0
-			if (t_tst_bit(_T_BIT_SCTP_ADD_IP, ss->options.flags)) {
-				t_uscalar_t *valp = &ss->options.sctp.add_ip;
-
-				sctp_add_ip(sk, valp);
-			}
-			if (t_tst_bit(_T_BIT_SCTP_DEL_IP, ss->options.flags)) {
-				t_uscalar_t *valp = &ss->options.sctp.del_ip;
-
-				sctp_del_ip(sk, valp);
-			}
-			if (t_tst_bit(_T_BIT_SCTP_SET_IP, ss->options.flags)) {
-				t_uscalar_t *valp = &ss->options.sctp.set_ip;
-
-				sctp_set_ip(sk, valp);
-			}
-#endif
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 			if (t_tst_bit(_T_BIT_SCTP_PR, ss->options.flags)) {
@@ -3354,7 +3303,7 @@ t_set_options(ss_t *ss)
  *  that could be successfully negotiated before the erroneous option was processed retain their
  *  negotiated values.  There is no roll-back mechanmism.
  */
-STATIC int
+static int
 t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 {
 	const struct t_opthdr *ih;
@@ -3867,16 +3816,6 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 					tp->window_clamp = *valp;
 					continue;
 				}
-#if 0
-				case T_TCP_INFO:
-				{
-					/* read-only */
-				}
-				case T_TCP_QUICKACK:
-				{
-					/* not valid in this state */
-				}
-#endif
 				}
 			}
 			continue;
@@ -4427,64 +4366,6 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 						sp->l_caps &= ~SCTP_CAPS_SET_IP;
 					continue;
 				}
-#if 0
-					/* We do not add, delete or set ip addresses on connection
-					   request or on connection response. */
-				case T_SCTP_ADD_IP:
-				{
-					struct sockaddr_in *valp =
-					    (struct sockaddr_in *) T_OPT_DATA(ih);
-
-					if (ih->len - sizeof(*ih) != sizeof(*valp))
-						goto einval;
-					if (valp->sin_family != AF_INET)
-						goto einval;
-					if (!sk->sport || valp->sin_port != sk->sport)
-						goto einval;
-					ss->options.sctp.add_ip = *valp;
-					t_set_bit(_T_BIT_SCTP_ADD_IP, ss->options.flags);
-					if (!request)
-						continue;
-					sctp_add_ip(sk, valp);
-					continue;
-				}
-				case T_SCTP_DEL_IP:
-				{
-					struct sockaddr_in *valp =
-					    (struct sockaddr_in *) T_OPT_DATA(ih);
-
-					if (ih->len - sizeof(*ih) != sizeof(*valp))
-						goto einval;
-					if (valp->sin_family != AF_INET)
-						goto einval;
-					if (!sk->sport || valp->sin_port != sk->sport)
-						goto einval;
-					ss->options.sctp.del_ip = *valp;
-					t_set_bit(_T_BIT_SCTP_DEL_IP, ss->options.flags);
-					if (!request)
-						continue;
-					sctp_del_ip(sk, valp);
-					continue;
-				}
-				case T_SCTP_SET_IP:
-				{
-					struct sockaddr_in *valp =
-					    (struct sockaddr_in *) T_OPT_DATA(ih);
-
-					if (ih->len - sizeof(*ih) != sizeof(*valp))
-						goto einval;
-					if (valp->sin_family != AF_INET)
-						goto einval;
-					if (!sk->sport || valp->sin_port != sk->sport)
-						goto einval;
-					ss->options.sctp.set_ip = *valp;
-					t_set_bit(_T_BIT_SCTP_SET_IP, ss->options.flags);
-					if (!request)
-						continue;
-					sctp_set_ip(sk, valp);
-					continue;
-				}
-#endif
 #endif				/* defined CONFIG_SCTP_ADD_IP */
 #if defined CONFIG_SCTP_PARTIAL_RELIABILITY
 				case T_SCTP_PR:
@@ -4579,10 +4460,10 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 /*
  *  Size send cmsg
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Calculate how large a cmsg buffer needs to be to contain all of the
- *  options provided to T_OPTDATA_REQ or T_UNITDATA_REQ.
+ *  Calculate how large a cmsg buffer needs to be to contain all of the options provided to
+ *  T_OPTDATA_REQ or T_UNITDATA_REQ.
  */
-STATIC streams_fastcall __hot_out int
+static fastcall __hot_out int
 ss_cmsg_size(const ss_t *ss, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -4662,10 +4543,9 @@ ss_cmsg_size(const ss_t *ss, const unsigned char *ip, size_t ilen)
 /*
  *  Build send cmsg
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Build a cmsg buffer from options provided to T_OPTDATA_REQ or
- *  T_UNITDATA_REQ.
+ *  Build a cmsg buffer from options provided to T_OPTDATA_REQ or T_UNITDATA_REQ.
  */
-STATIC streams_fastcall __hot_out int
+static fastcall __hot_out int
 ss_cmsg_build(const ss_t *ss, const unsigned char *ip, size_t ilen, struct msghdr *msg)
 {
 	struct cmsghdr *ch = CMSG_FIRSTHDR(msg);
@@ -4844,12 +4724,12 @@ ss_cmsg_build(const ss_t *ss, const unsigned char *ip, size_t ilen, struct msghd
 	return (-EPROTO);
 }
 
-STATIC INLINE streams_fastcall __hot_get int
+static inline fastcall __hot_get int
 ss_errs_size(ss_t *ss, struct msghdr *msg)
 {
 	return (0);
 }
-STATIC INLINE streams_fastcall __hot_get int
+static inline fastcall __hot_get int
 ss_errs_build(ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen, int *etype)
 {
 	return (-EFAULT);
@@ -4858,10 +4738,10 @@ ss_errs_build(ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen, int 
 /*
  *  Size cmsg Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Calculate the size of the options buffer necessary to hold elements in a
- *  cmsg.  Only options with end to end significance are important.
+ *  Calculate the size of the options buffer necessary to hold elements in a cmsg.  Only options
+ *  with end to end significance are important.
  */
-STATIC streams_fastcall __hot_in int
+static fastcall __hot_in int
 ss_opts_size(const ss_t *ss, struct msghdr *msg)
 {
 	int size = 0;
@@ -4927,7 +4807,7 @@ ss_opts_size(const ss_t *ss, struct msghdr *msg)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Data indications only indicate options with end-to-end significance.
  */
-STATIC streams_fastcall __hot_in int
+static fastcall __hot_in int
 ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen)
 {
 	struct cmsghdr *cmsg;
@@ -5065,7 +4945,7 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
  *  given the option management flag, and return the size required of the acknowledgement options
  *  field.
  */
-STATIC int
+static int
 t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -5446,7 +5326,7 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 	return (-EINVAL);
 }
 
-STATIC int
+static int
 t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -5823,7 +5703,7 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 	return (-EINVAL);
 }
 
-STATIC int
+static int
 t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -6336,7 +6216,7 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 	return (-EINVAL);
 }
 
-STATIC int
+static int
 t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 {
 	int olen = 0, optlen;
@@ -6910,7 +6790,7 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Calculates the overall T_OPTMGMT_ACK flag result from individual results.
  */
-STATIC uint
+static uint
 t_overall_result(t_scalar_t *overall, uint result)
 {
 	switch (result) {
@@ -6945,7 +6825,7 @@ t_overall_result(t_scalar_t *overall, uint result)
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  *  Perform the actions required of T_DEFAULT placing the output in the provided buffer.
  */
-STATIC t_scalar_t
+static t_scalar_t
 t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsigned char *op,
 			size_t *olen)
 {
@@ -7777,10 +7657,9 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 /*
  *  Current Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Perform the actions required of T_CURRENT placing the output in the
- *  provided buffer.
+ *  Perform the actions required of T_CURRENT placing the output in the provided buffer.
  */
-STATIC t_scalar_t
+static t_scalar_t
 t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			size_t *olen)
 {
@@ -8683,10 +8562,9 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 /*
  *  Check Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Perform the actions required of T_CHECK placing the output in the provided
- *  buffer.
+ *  Perform the actions required of T_CHECK placing the output in the provided buffer.
  */
-STATIC t_scalar_t
+static t_scalar_t
 t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsigned char *op,
 		      size_t *olen)
 {
@@ -8969,14 +8847,6 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
 							    t_overall_result(&overall,
 									     T_PARTSUCCESS);
 						}
-#if 0
-						if (*valp > 255) {
-							*valp = 255;
-							oh->status =
-							    t_overall_result(&overall,
-									     T_PARTSUCCESS);
-						}
-#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -10366,10 +10236,10 @@ __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss, int nonagle)
 /*
  *  Process Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and
- *  T_NEGOTIARE, placing the output in the provided buffer.
+ *  Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and T_NEGOTIARE, placing the
+ *  output in the provided buffer.
  */
-STATIC t_scalar_t
+static t_scalar_t
 t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			  size_t *olen)
 {
@@ -10751,14 +10621,6 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 								    t_overall_result(&overall,
 										     T_PARTSUCCESS);
 							}
-#if 0
-							if (*valp > 255) {
-								*valp = 255;
-								oh->status =
-								    t_overall_result(&overall,
-										     T_PARTSUCCESS);
-							}
-#endif
 						}
 						t->options.ip.ttl = *valp;
 #ifdef HAVE_STRUCT_SOCK_PROTINFO_AF_INET_TTL
@@ -12306,10 +12168,10 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 /*
  *  Process Options
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- *  Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and
- *  T_NEGOTIARE, placing the output in the provided buffer.
+ *  Perform the actions required of T_DEFAULT, T_CURRENT, T_CHECK and T_NEGOTIARE, placing the
+ *  output in the provided buffer.
  */
-STATIC t_scalar_t
+static t_scalar_t
 t_build_options(ss_t *t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
 		t_scalar_t flag)
 {
@@ -12333,7 +12195,7 @@ t_build_options(ss_t *t, unsigned char *ip, size_t ilen, unsigned char *op, size
  *
  *  =========================================================================
  */
-STATIC INLINE streams_fastcall __hot int
+static inline fastcall __hot int
 ss_addr_size(ss_t *ss, struct sockaddr *add)
 {
 	if (add) {
@@ -12359,7 +12221,7 @@ ss_addr_size(ss_t *ss, struct sockaddr *add)
  *  =========================================================================
  */
 #if !defined _OPTIMIZE_SPEED
-STATIC const char *
+static const char *
 tpi_statename(t_scalar_t state)
 {
 	switch (state) {
@@ -12403,7 +12265,7 @@ tpi_statename(t_scalar_t state)
 		return ("(unknown)");
 	}
 }
-STATIC const char *
+static const char *
 tpi_primname(t_scalar_t prim)
 {
 	switch (prim) {
@@ -12471,7 +12333,7 @@ tpi_primname(t_scalar_t prim)
 		return ("????");
 	}
 }
-STATIC const char *
+static const char *
 tcp_statename(int state)
 {
 	switch (state) {
@@ -12505,7 +12367,7 @@ tcp_statename(int state)
 }
 
 #if 0
-STATIC const char *
+static const char *
 sock_statename(int state)
 {
 	switch (state) {
@@ -12525,14 +12387,14 @@ sock_statename(int state)
 }
 #endif
 #endif
-STATIC INLINE streams_fastcall __hot void
+static inline fastcall __hot void
 ss_set_state(ss_t *ss, t_scalar_t state)
 {
 	STRLOGST(ss, "%s <- %s", tpi_statename(state), tpi_statename(ss->p.info.CURRENT_state));
 	ss->p.info.CURRENT_state = state;
 }
 
-STATIC INLINE streams_fastcall __hot t_scalar_t
+static inline fastcall __hot t_scalar_t
 ss_get_state(ss_t *ss)
 {
 	return (ss->p.info.CURRENT_state);
@@ -12545,15 +12407,13 @@ ss_get_state(ss_t *ss)
  *
  *  =========================================================================
  */
-STATIC ss_t *
+static ss_t *
 ss_alloc_priv(queue_t *q, ss_t **slp, major_t cmajor, minor_t cminor, cred_t *crp,
 	      const ss_profile_t * prof)
 {
 	ss_t *ss;
 
 	if ((ss = ss_get())) {
-		unsigned long flags;
-
 		RD(q)->q_ptr = WR(q)->q_ptr = ss;
 		ss->rq = RD(q);
 		ss->wq = WR(q);
@@ -12563,55 +12423,44 @@ ss_alloc_priv(queue_t *q, ss_t **slp, major_t cmajor, minor_t cminor, cred_t *cr
 		ss->cred = *crp;
 		bufq_init(&ss->conq);
 		ss->conind = 0;
-		ss->users = 0;
+		ss->users = 1;	/* allocate locked */
 		init_waitqueue_head(&ss->waitq);
 		ss_set_state(ss, TS_UNBND);
-		spin_lock_irqsave(&ss_lock, flags);
 		if ((ss->next = *slp))
 			ss->next->prev = &ss->next;
 		ss->prev = slp;
 		*slp = ss;
-		spin_unlock_irqrestore(&ss_lock, flags);
 	} else
 		strlog(cmajor, cminor, 0, SL_TRACE | SL_ERROR | SL_CONSOLE,
 		       "ERROR: Could not allocate module private structure");
 	return (ss);
 }
-STATIC void
-ss_free_priv(queue_t *q)
+static void
+ss_free_priv(ss_t *ss, queue_t *q)
 {
-	ss_t *ss;
 	unsigned long flags;
 
-	ss = ss_sleeplock(q);
 	STRLOGNO(ss, "unlinking private structure, reference count = %lu",
 		 (ulong) atomic_read(&ss->refcnt));
-	/* Unfortunately, ss_socket_put calls sock_release which can cause TCP to do a
-	   tcp_send_fin, and in tcp_send_fin an skbuff is allocated with GFP_KERNEL. */
-	if (ss->sock)
-		ss_socket_put(xchg(&ss->sock, NULL));
-	STRLOGNO(ss, "removed socket, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
-	bufq_purge(&ss->conq);
-	ss_unbufcall(ss);
-	STRLOGNO(ss, "removed bufcalls, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
 	spin_lock_irqsave(&ss_lock, flags);
 	if ((*ss->prev = ss->next))
 		ss->next->prev = ss->prev;
 	ss->next = NULL;
 	ss->prev = NULL;
 	spin_unlock_irqrestore(&ss_lock, flags);
+	STRLOGNO(ss, "removed socket, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
+	bufq_purge(&ss->conq);
+	ss_unbufcall(ss);
+	STRLOGNO(ss, "removed bufcalls, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
 	STRLOGNO(ss, "unlinked, reference count = %lu", (ulong) atomic_read(&ss->refcnt));
 	ss->rq->q_ptr = NULL;
 	ss->wq->q_ptr = NULL;
+	ss->users = 0;
 	if (atomic_read(&ss->refcnt) > 1) {
 		assure(atomic_read(&ss->refcnt) <= 1);
 		STRLOGNO(ss, "WARNING: ss->refcnt = %lu", (ulong) atomic_read(&ss->refcnt));
 	}
 	ss_put(ss);		/* possibly final put */
-	// kmem_cache_free(ss_priv_cachep, ss);
-#if 0
-	strlog(cmajor, cminor, 6, SL_TRACE, "freed module private structure");
-#endif
 	return;
 }
 
@@ -12627,7 +12476,7 @@ ss_free_priv(queue_t *q)
  *  SOCKET CREATE
  *  ------------------------------------------------------------------------
  */
-STATIC int
+static int
 ss_socket(ss_t *ss)
 {
 	int err;
@@ -12655,11 +12504,11 @@ ss_socket(ss_t *ss)
 /*
  *  SOCKET INIT
  *  ------------------------------------------------------------------------
- *  For all but sockets of type IPPROTO_RAW, we can create the socket at
- *  initialization time.  For IPPROTO_RAW sockets, we cannot create the socket
- *  until they have been bound to a protocol.  Those are deferred until bind.
+ *  For all but sockets of type IPPROTO_RAW, we can create the socket at initialization time.  For
+ *  IPPROTO_RAW sockets, we cannot create the socket until they have been bound to a protocol.
+ *  Those are deferred until bind.
  */
-STATIC int
+static int
 ss_sock_init(ss_t *ss)
 {
 	if (ss->p.prot.protocol == IPPROTO_RAW)
@@ -12670,11 +12519,11 @@ ss_sock_init(ss_t *ss)
 /*
  *  SOCKET BIND
  *  ------------------------------------------------------------------------
- *  We create IPPROTO_RAW sockets at bind time.  All other sockets are
- *  normally created at initialization (open/unbind) time, but we will create
- *  them here now if an earlier reinitialization failed.
+ *  We create IPPROTO_RAW sockets at bind time.  All other sockets are normally created at
+ *  initialization (open/unbind) time, but we will create them here now if an earlier
+ *  reinitialization failed.
  */
-STATIC int
+static int
 ss_bind(ss_t *ss, struct sockaddr *add, size_t add_len)
 {
 	int err;
@@ -12727,7 +12576,7 @@ ss_bind(ss_t *ss, struct sockaddr *add, size_t add_len)
  *  SOCKET LISTEN
  *  ------------------------------------------------------------------------
  */
-STATIC int
+static int
 ss_listen(ss_t *ss, uint cons)
 {
 	int err;
@@ -12768,14 +12617,12 @@ ss_listen(ss_t *ss, uint cons)
 /*
  *  SOCKET ACCEPT
  *  ------------------------------------------------------------------------
- *  Unfortunately, sock->ops->accept will only accept the next sequential
- *  connection indication.  In TLI's case, we want to be able to accept or
- *  release connection indications other than the next sequential indication.
- *  To do this we must muck with TCP's accept queue when the SEQ_number is not
- *  the next in the queue.  To do this we mimic some of the tcp_accept
- *  behavior.
+ *  Unfortunately, sock->ops->accept will only accept the next sequential connection indication.  In
+ *  TLI's case, we want to be able to accept or release connection indications other than the next
+ *  sequential indication.  To do this we must muck with TCP's accept queue when the SEQ_number is
+ *  not the next in the queue.  To do this we mimic some of the tcp_accept behavior.
  */
-STATIC int
+static int
 ss_accept(ss_t *ss, struct socket **newsock, mblk_t *cp)
 {
 	struct socket *sock;
@@ -12823,7 +12670,7 @@ ss_accept(ss_t *ss, struct socket **newsock, mblk_t *cp)
 			return (0);
 		}
 		release_sock(sk);
-		ss_socket_put(sock);
+		ss_socket_put(&sock);
 		STRLOGNO(ss, "invalid accept");
 		return (-EAGAIN);
 	}
@@ -12834,22 +12681,20 @@ ss_accept(ss_t *ss, struct socket **newsock, mblk_t *cp)
 /*
  *  SOCKET UNBIND
  *  ------------------------------------------------------------------------
- *  There is no good way to unbind and rebind a socket in Linux, so we just
- *  close the entire socket.  The next time we go to bind, we will create a
- *  fresh IPPROTO_RAW socket to bind.  All other sockets are recreated now.
+ *  There is no good way to unbind and rebind a socket in Linux, so we just close the entire socket.
+ *  The next time we go to bind, we will create a fresh IPPROTO_RAW socket to bind.  All other
+ *  sockets are recreated now.
  *
- *  Actually, socket code is supposed to allow a bind to AF_UNSPEC to unbind a
- *  socket.  This is X/Open POSIX behavior.
+ *  Actually, socket code is supposed to allow a bind to AF_UNSPEC to unbind a socket.  This is
+ *  X/Open POSIX behavior.
  */
-STATIC int
+static int
 ss_unbind(ss_t *ss)
 {
 	ensure(ss, return (-EFAULT));
-	if (ss->sock) {
-		ensure(ss->sock->sk, return (-EFAULT));
-		STRLOGTX(ss, "SS_UNBIND");
-		ss_socket_put(xchg(&ss->sock, NULL));
-	}
+	STRLOGTX(ss, "SS_UNBIND");
+	ss_set_state(ss, TS_UNBND);
+	ss_socket_put(&ss->sock);
 	/* Note: if the reinitialization of the socket fails, we will attempt again to reinitialize 
 	   it when an attempt is ever made to rebind the socket.  We just want to have an
 	   initialized socket around so that we can effect options management on the socket in the
@@ -12862,7 +12707,7 @@ ss_unbind(ss_t *ss)
  *  SOCKET CONNECT
  *  ------------------------------------------------------------------------
  */
-STATIC int
+static int
 ss_connect(ss_t *ss, struct sockaddr *dst)
 {
 	int err;
@@ -12884,7 +12729,7 @@ ss_connect(ss_t *ss, struct sockaddr *dst)
  *  SOCKET SENDMSG
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_out int
+static inline fastcall __hot_out int
 ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 {
 	int res;
@@ -12912,7 +12757,7 @@ ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
  *  SOCKET RECVMSG
  *  ------------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_in int
+static inline fastcall __hot_in int
 ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 {
 	int res;
@@ -12940,12 +12785,11 @@ ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 /*
  *  SOCKET DISCONNECT
  *  ------------------------------------------------------------------------
- *  Performing a sock_release (ss_socket_put) from the established state does
- *  not affect an abortive release for TCP, but rather, initiates an orderly
- *  shutdown rather than an abortive release.  We can try performing a
- *  protocol disconnect and see if that works better.
+ *  Performing a sock_release (ss_socket_put) from the established state does not affect an abortive
+ *  release for TCP, but rather, initiates an orderly shutdown rather than an abortive release.  We
+ *  can try performing a protocol disconnect and see if that works better.
  */
-STATIC int
+static int
 ss_disconnect(ss_t *ss)
 {
 	int err;
@@ -12971,7 +12815,7 @@ ss_disconnect(ss_t *ss)
  *  ------------------------------------------------------------------------
  *  Get the names from a socket.
  */
-STATIC int
+static int
 ss_getsockname(ss_t *ss)
 {
 	int err, len = sizeof(ss->src);
@@ -12984,7 +12828,7 @@ ss_getsockname(ss_t *ss)
 		return (err);
 	return (len);
 }
-STATIC int
+static int
 ss_getpeername(ss_t *ss)
 {
 	int err, len = sizeof(ss->dst);
@@ -12997,7 +12841,7 @@ ss_getpeername(ss_t *ss)
 		return (err);
 	return (len);
 }
-STATIC int
+static int
 ss_getnames(ss_t *ss)
 {
 	int err_src, err_dst;
@@ -13018,20 +12862,29 @@ ss_getnames(ss_t *ss)
  *  M_FLUSH
  *  ---------------------------------------------------------------
  */
-STATIC int
+static int
 m_flush(ss_t *ss, queue_t *q, mblk_t *msg, int how, int band)
 {
 	mblk_t *mp;
 
 	if ((mp = ss_allocb(q, 2, BPRI_HI))) {
 		mp->b_datap->db_type = M_FLUSH;
-		*mp->b_wptr++ = how;
-		*mp->b_wptr++ = band;
-		flushq(ss->rq, FLUSHALL);
+		mp->b_wptr[0] = how;
+		mp->b_wptr[1] = band;
+		mp->b_wptr += 2;
+#if 0
+		/* get things started off right */
+		if (mp->b_rptr[0] & FLUSHR) {
+			if (mp->b_rptr[0] & FLUSHBAND)
+				flushband(ss->rq, mp->b_rptr[1], FLUSHDATA);
+			else
+				flushq(ss->rq, FLUSHDATA);
+		}
+#endif
 		freemsg(msg);
 		STRLOGTX(ss, "<- M_FLUSH");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	return (-ENOBUFS);
 }
@@ -13040,23 +12893,24 @@ m_flush(ss_t *ss, queue_t *q, mblk_t *msg, int how, int band)
  *  M_ERROR
  *  ---------------------------------------------------------------
  */
-STATIC int
+static int
 m_error(ss_t *ss, queue_t *q, mblk_t *msg, int error)
 {
 	mblk_t *mp;
 
 	if ((mp = ss_allocb(q, 2, BPRI_HI))) {
-		if (ss->sock) {
-			ss_disconnect(ss);
-			ss_socket_put(xchg(&ss->sock, NULL));
-		}
+#if 0
+		ss_set_state(ss, TS_UNBND);
+		ss_socket_put(&ss->sock);
+#endif
 		mp->b_datap->db_type = M_ERROR;
-		*mp->b_wptr++ = error;
-		*mp->b_wptr++ = error;
+		mp->b_wptr[0] = error < 0 ? -error : error;
+		mp->b_wptr[1] = error < 0 ? -error : error;
+		mp->b_wptr += 2;
 		freemsg(msg);
 		STRLOGTX(ss, "<- M_ERROR %d", error);
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	return (-ENOBUFS);
 }
@@ -13065,21 +12919,21 @@ m_error(ss_t *ss, queue_t *q, mblk_t *msg, int error)
  *  M_HANGUP
  *  ---------------------------------------------------------------
  */
-STATIC inline fastcall __unlikely int
+static inline fastcall __unlikely int
 m_hangup(ss_t *ss, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 
 	if ((mp = ss_allocb(q, 0, BPRI_HI))) {
+#if 0
+		ss_set_state(ss, TS_UNBND);
+		ss_socket_put(&ss->sock);
+#endif
 		mp->b_datap->db_type = M_HANGUP;
-		if (ss->sock) {
-			ss_disconnect(ss);
-			ss_socket_put(xchg(&ss->sock, NULL));
-		}
 		freemsg(msg);
 		STRLOGTX(ss, "<- M_HANGUP");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	return (-ENOBUFS);
 }
@@ -13091,12 +12945,11 @@ m_hangup(ss_t *ss, queue_t *q, mblk_t *msg)
  * @msg: message to free upon success
  * @err: error to place in M_ERROR message
  *
- * Generates an M_ERROR or M_HANGUP message upstream to generate a fatal error
- * when required by the TPI specification.  The four errors that require the
- * message to be placed on the message queue (%EBUSY, %ENOBUFS, %EAGAIN,
- * %ENOMEM) are simply returned.  Other errors are either translated to an
- * M_ERROR or M_HANGUP message.  If a message block cannot be allocated
- * -%ENOBUGS is returned, otherwise %QR_ABSORBED is returned.
+ * Generates an M_ERROR or M_HANGUP message upstream to generate a fatal error when required by the
+ * TPI specification.  The four errors that require the message to be placed on the message queue
+ * (%EBUSY, %ENOBUFS, %EAGAIN, %ENOMEM) are simply returned.  Other errors are either translated to
+ * an M_ERROR or M_HANGUP message.  If a message block cannot be allocated -%ENOBUFS is returned,
+ * otherwise zero (0) is returned.
  */
 noinline fastcall __unlikely int
 m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
@@ -13104,23 +12957,22 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
 	int hangup = 0;
 	int error = err;
 
+	if (error > 0)
+		error = -error;
 	switch (error) {
+	case 0:
 	case -EBUSY:
 	case -ENOBUFS:
 	case -EAGAIN:
 	case -ENOMEM:
 		return (error);
-	case QR_DONE:
-	      absorb:
-		freemsg(msg);
-	case QR_ABSORBED:
-		return (QR_ABSORBED);
 	case -EPIPE:
 	case -ENETDOWN:
 	case -EHOSTUNREACH:
 	case -ECONNRESET:
 	case -ECONNREFUSED:
-		goto absorb;
+		freemsg(msg);
+		return (0);
 		hangup = 1;
 		error = EPIPE;
 		break;
@@ -13131,9 +12983,11 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
 		err = (err < 0) ? -err : err;
 		break;
 	}
+#if 0
 	/* always flush before M_ERROR or M_HANGUP */
 	if (m_flush(ss, q, NULL, FLUSHRW, 0) == -ENOBUFS)
 		return (-ENOBUFS);
+#endif
 	if (hangup)
 		return m_hangup(ss, q, msg);
 	return m_error(ss, q, msg, err);
@@ -13143,7 +12997,7 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
  *  T_CONN_IND          11 - Connection Indication
  *  ---------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_conn_ind(ss_t *ss, queue_t *q, struct sockaddr *src, mblk_t *cp)
 {
 	mblk_t *mp;
@@ -13175,14 +13029,14 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sockaddr *src, mblk_t *cp)
 						freemsg(mp);
 						STRLOGNO(ss, "ERROR: option build fault");
 						freemsg(cp);
-						return (QR_ABSORBED);
+						return (0);
 					}
 				}
 				bufq_queue(&ss->conq, cp);
 				ss_set_state(ss, TS_WRES_CIND);
 				STRLOGTX(ss, "<- T_CONN_IND");
 				putnext(ss->rq, mp);
-				return (QR_ABSORBED);	/* absorbed cp */
+				return (0);	/* absorbed cp */
 			}
 			STRLOGNO(ss, "ERROR: no buffers");
 			return (-ENOBUFS);
@@ -13198,7 +13052,7 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sockaddr *src, mblk_t *cp)
  *  T_CONN_CON          12 - Connection Confirmation
  *  ---------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_conn_con(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *res, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -13230,14 +13084,14 @@ t_conn_con(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *res, mblk_t *dp)
 					freemsg(mp);
 					freemsg(msg);
 					STRLOGNO(ss, "ERROR: option build fault");
-					return (QR_ABSORBED);
+					return (0);
 				}
 			}
 			ss_set_state(ss, TS_DATA_XFER);
 			freemsg(msg);
 			STRLOGTX(ss, "<- T_CONN_CON");
 			putnext(ss->rq, mp);
-			return (QR_ABSORBED);
+			return (0);
 		}
 		STRLOGNO(ss, "ERROR: no buffers");
 		return (-ENOBUFS);
@@ -13250,7 +13104,7 @@ t_conn_con(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *res, mblk_t *dp)
  *  T_DISCON_IND        13 - Disconnect Indication
  *  ---------------------------------------------------------------
  */
-STATIC mblk_t *
+static mblk_t *
 t_seq_find(ss_t *ss, mblk_t *rp)
 {
 	mblk_t *mp;
@@ -13269,7 +13123,7 @@ t_seq_find(ss_t *ss, mblk_t *rp)
 	return (mp);
 }
 
-STATIC t_uscalar_t
+static t_uscalar_t
 t_seq_delete(ss_t *ss, mblk_t *rp)
 {
 	mblk_t *mp;
@@ -13286,7 +13140,7 @@ t_seq_delete(ss_t *ss, mblk_t *rp)
 	}
 	return (0);
 }
-STATIC int
+static int
 t_discon_ind(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *res, uint orig, uint reason,
 	     mblk_t *cp, mblk_t *dp)
 {
@@ -13322,12 +13176,12 @@ t_discon_ind(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *res, uint orig,
 				freemsg(msg);
 				STRLOGTX(ss, "<- T_DISCON_IND");
 				putnext(ss->rq, mp);
-				return (QR_ABSORBED);
+				return (0);
 			}
 			freemsg(mp);
 			freemsg(msg);
 			STRLOGNO(ss, "ERROR: bad sequence number");
-			return (QR_ABSORBED);
+			return (0);
 		}
 	      enobufs:
 		STRLOGNO(ss, "ERROR: no buffers");
@@ -13341,7 +13195,7 @@ t_discon_ind(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *res, uint orig,
  *  T_DATA_IND          14 - Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_in int
+static inline fastcall __hot_in int
 t_data_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -13358,7 +13212,7 @@ t_data_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 		mp->b_cont = dp;
 		STRLOGTX(ss, "<- T_DATA_IND");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13368,7 +13222,7 @@ t_data_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_EXDATA_IND        15 - Expedited Data Indication
  *  ---------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_in int
+static inline fastcall __hot_in int
 t_exdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -13386,7 +13240,7 @@ t_exdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 		mp->b_cont = dp;
 		STRLOGTX(ss, "<- T_EXDATA_IND");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13396,7 +13250,7 @@ t_exdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_INFO_ACK          16 - Information acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_info_ack(ss_t *ss, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
@@ -13410,7 +13264,7 @@ t_info_ack(ss_t *ss, queue_t *q, mblk_t *msg)
 		freemsg(msg);
 		STRLOGTX(ss, "<- T_INFO_ACK");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13420,7 +13274,7 @@ t_info_ack(ss_t *ss, queue_t *q, mblk_t *msg)
  *  T_BIND_ACK          17 - Bind Acknowledgement
  *  ---------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_bind_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *add, t_uscalar_t conind)
 {
 	mblk_t *mp;
@@ -13443,7 +13297,7 @@ t_bind_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *add, t_uscalar_t 
 		freemsg(msg);
 		STRLOGTX(ss, "<- T_BIND_ACK");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13453,7 +13307,7 @@ t_bind_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *add, t_uscalar_t 
  *  T_ERROR_ACK         18 - Error Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int
+static int
 t_error_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t error)
 {
 	mblk_t *mp;
@@ -13468,7 +13322,7 @@ t_error_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t error
 	case 0:
 		never();
 		freemsg(msg);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	if (!(mp = ss_allocb(q, sizeof(*p), BPRI_MED)))
 		goto enobufs;
@@ -13522,19 +13376,19 @@ t_error_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t error
 	freemsg(msg);
 	STRLOGTX(ss, "<- T_ERROR_ACK");
 	putnext(ss->rq, mp);
-	return (QR_ABSORBED);
+	return (0);
       enobufs:
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
 }
 
-STATIC streams_fastcall __hot_in int ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *msg);
+static fastcall __hot_in int ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *mp);
 
 /*
  *  T_OK_ACK            19 - Success Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC int
+static int
 t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *as)
 {
 	int err = 0;
@@ -13569,10 +13423,8 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
 			ensure(as && cp, goto free_error);
 			if ((err = ss_accept(ss, &sock, cp)))
 				goto free_error;
-			if (as->sock) {
-				ss_disconnect(as);
-				ss_socket_put(xchg(&as->sock, NULL));	/* get rid of old socket */
-			}
+			ss_set_state(as, TS_UNBND);
+			ss_socket_put(&as->sock);	/* get rid of old socket */
 			as->sock = sock;
 			ss_socket_get(as->sock, as);
 			ss_set_state(as, TS_DATA_XFER);
@@ -13631,7 +13483,7 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
 		freemsg(msg);
 		STRLOGTX(ss, "<- T_OK_ACK");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
       enobufs:
 	STRLOGNO(ss, "ERROR: no buffers");
@@ -13645,17 +13497,13 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
  *  T_UNIDATA_IND       20 - Unitdata indication
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_in int
+static inline fastcall __hot_in int
 t_unitdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
 	size_t opt_len = ss_opts_size(ss, msg);
 
-#if 0
-	fixme(("Option processing strapped out for debugging: size would be %u\n", opt_len));
-	opt_len = 0;
-#endif
 	if ((mp = ss_allocb(q, sizeof(*p) + msg->msg_namelen + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -13678,7 +13526,7 @@ t_unitdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 		mp->b_cont = dp;
 		STRLOGTX(ss, "<- T_UNITDATA_IND");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13687,13 +13535,12 @@ t_unitdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 /*
  *  T_UDERROR_IND       21 - Unitdata Error Indication
  *  -------------------------------------------------------------------------
- *  This primitive indicates to the transport user that a datagram with the
- *  specified destination address and options produced an error.
+ *  This primitive indicates to the transport user that a datagram with the specified destination
+ *  address and options produced an error.
  *
- *  This is not called, but should be when T_UNITDATA_REQ fails due to options
- *  errors or permission.
+ *  This is not called, but should be when T_UNITDATA_REQ fails due to options errors or permission.
  */
-STATIC INLINE streams_fastcall __hot_get int
+static inline fastcall __hot_get int
 t_uderror_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -13726,7 +13573,7 @@ t_uderror_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 			mp->b_cont = dp;
 			STRLOGTX(ss, "<- T_UDERROR_IND");
 			putnext(ss->rq, mp);
-			return (QR_ABSORBED);
+			return (0);
 		}
 		STRLOGNO(ss, "ERROR: no buffers");
 		return (-ENOBUFS);
@@ -13738,10 +13585,10 @@ t_uderror_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 /*
  *  T_OPTMGMT_ACK       22 - Options Management Acknowledge
  *  -------------------------------------------------------------------------
- *  Note: opt_len is conservative but might not be actual size of the output
- *  options.  This will be adjusted when the option buffer is built.
+ *  Note: opt_len is conservative but might not be actual size of the output options.  This will be
+ *  adjusted when the option buffer is built.
  */
-STATIC streams_fastcall int
+static fastcall int
 t_optmgmt_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t flags, unsigned char *req,
 	      size_t req_len, size_t opt_len)
 {
@@ -13770,7 +13617,7 @@ t_optmgmt_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t flags, unsigned char
 		freemsg(msg);
 		STRLOGTX(ss, "<- T_OPTMGMT_ACK");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13780,7 +13627,7 @@ t_optmgmt_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t flags, unsigned char
  *  T_ORDREL_IND        23 - Orderly Release Indication
  *  -------------------------------------------------------------------------
  */
-STATIC int
+static int
 t_ordrel_ind(ss_t *ss, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
@@ -13803,7 +13650,7 @@ t_ordrel_ind(ss_t *ss, queue_t *q, mblk_t *msg)
 			freemsg(msg);
 			STRLOGTX(ss, "<- T_ORDREL_IND");
 			putnext(ss->rq, mp);
-			return (QR_ABSORBED);
+			return (0);
 		}
 		STRLOGNO(ss, "ERROR: no buffers");
 		return (-ENOBUFS);
@@ -13816,17 +13663,13 @@ t_ordrel_ind(ss_t *ss, queue_t *q, mblk_t *msg)
  *  T_OPTDATA_IND       26 - Data with Options Indication
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_in int
+static inline fastcall __hot_in int
 t_optdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_optdata_ind *p;
 	size_t opt_len = ss_opts_size(ss, msg);
 
-#if 0
-	fixme(("Option processing strapped out for debugging: size would be %u\n", opt_len));
-	opt_len = 0;
-#endif
 	if ((mp = ss_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		mp->b_band = msg->msg_flags & T_ODF_EX ? 1 : 0;	/* expedite */
@@ -13848,7 +13691,7 @@ t_optdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 		mp->b_cont = dp;
 		STRLOGTX(ss, "<- T_OPTDATA_IND");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13859,7 +13702,7 @@ t_optdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
  *  T_ADDR_ACK          27 - Address Acknowledgement
  *  -------------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_addr_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *loc, struct sockaddr *rem)
 {
 	mblk_t *mp;
@@ -13887,7 +13730,7 @@ t_addr_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *loc, struct socka
 		freemsg(msg);
 		STRLOGTX(ss, "<- T_ADDR_ACK");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13898,12 +13741,11 @@ t_addr_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *loc, struct socka
 /*
  *  T_CAPABILITY_ACK    ?? - Protocol Capability Ack
  *  -------------------------------------------------------------------------
- *  Note that TPI Revision 2 Draft 2 says that if the T_CAPABILITY_REQ is sent as
- *  a M_PCPROTO then the the T_CAPABILITY_ACK must be sent as an M_PCPROTO and
- *  that if the T_CAPABILITY_REQ was sent as a M_PROTO, then the
- *  T_CAPABILITY_ACK must also be sent as a M_PROTO.
+ *  Note that TPI Revision 2 Draft 2 says that if the T_CAPABILITY_REQ is sent as a M_PCPROTO then
+ *  the the T_CAPABILITY_ACK must be sent as an M_PCPROTO and that if the T_CAPABILITY_REQ was sent
+ *  as a M_PROTO, then the T_CAPABILITY_ACK must also be sent as a M_PROTO.
  */
-STATIC streams_fastcall int
+static fastcall int
 t_capability_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_uscalar_t caps, int type)
 {
 	mblk_t *mp;
@@ -13923,7 +13765,7 @@ t_capability_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_uscalar_t caps, int type)
 		freemsg(msg);
 		STRLOGTX(ss, "<- T_CAPABILITY_ACK");
 		putnext(ss->rq, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	STRLOGNO(ss, "ERROR: no buffers");
 	return (-ENOBUFS);
@@ -13940,14 +13782,12 @@ t_capability_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_uscalar_t caps, int type)
 /*
  *  CONIND
  *  -------------------------------------------------------------------------
- *  An unfortunate mis-match between the socket model and the TLI model is
- *  that in TLI it is possible to determine the remote address from a
- *  T_CONN_IND *before* accepting the connection.  Under sockets, the
- *  connection must be accepted before it is possible to determine the peer's
- *  address.  This means that connection must be accepted and then released,
- *  rather than refused.
+ *  An unfortunate mis-match between the socket model and the TLI model is that in TLI it is
+ *  possible to determine the remote address from a T_CONN_IND *before* accepting the connection.
+ *  Under sockets, the connection must be accepted before it is possible to determine the peer's
+ *  address.  This means that connection must be accepted and then released, rather than refused.
  */
-STATIC streams_fastcall int
+static fastcall int
 ss_conn_ind(ss_t *ss, queue_t *q, mblk_t *cp)
 {
 	struct sock *sk;
@@ -13983,23 +13823,27 @@ ss_conn_ind(ss_t *ss, queue_t *q, mblk_t *cp)
 		break;
 	}
 	default:
-		goto einval;
+		goto enoproto;
 	}
 	return t_conn_ind(ss, q, &dst, cp);
+      enoproto:
+	STRLOGERR(ss, "SWERR: invalid protocol family: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	goto discard;
       einval:
-	STRLOGERR(ss, "SWERR: invalid primitive format");
-	goto absorb;
+	STRLOGERR(ss, "SWERR: invalid primitive format: %s %s:%d", __FUNCTION__, __FILE__,
+		  __LINE__);
+	goto discard;
       outstate:
 	STRLOGNO(ss, "ERROR: connect indication in wrong state %ld", (long) ss_get_state(ss));
-	goto absorb;
+	goto discard;
       nolisten:
 	STRLOGNO(ss, "ERROR: connect indication received while not listening");
-	goto absorb;
+	goto discard;
       duplicate:
 	STRLOGNO(ss, "INFO: discarding duplicate connection indication");
-      absorb:
+      discard:
 	freemsg(cp);
-	return (QR_ABSORBED);
+	return (0);
 }
 
 /*
@@ -14012,11 +13856,11 @@ ss_conn_ind(ss_t *ss, queue_t *q, mblk_t *cp)
 /*
  *  SENDMSG
  *  -------------------------------------------------------------------------
- *  Convert the mblk to send into an iovec and the options into a control
- *  message and then call sendmsg on the socket with the kernel data segment.
- *  The socket will handle moving data from the mblks.
+ *  Convert the mblk to send into an iovec and the options into a control message and then call
+ *  sendmsg on the socket with the kernel data segment.  The socket will handle moving data from the
+ *  mblks.
  */
-STATIC streams_fastcall __hot_out int
+static fastcall __hot_out int
 ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 {
 	int err;
@@ -14069,7 +13913,7 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 	}
 	if (err >= len) {
 		freemsg(mp);
-		return (QR_ABSORBED);	/* full write */
+		return (0);	/* full write */
 	}
 	switch (ss->p.prot.type) {	/* partial write */
 	case SOCK_DGRAM:
@@ -14091,10 +13935,11 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 	}
 	err = -EFAULT;
       out:
-	switch (-err) {
-	case ENOMEM:
+	switch (err) {
+	case -ENOMEM:
 	{
 		bcid_t bcid;
+
 		/* This buffer call is just to kick us.  Because LiS uses kmalloc for mblks, if we
 		   can allocate an mblk, then another kernel routine can allocate that much memory
 		   too. */
@@ -14110,13 +13955,13 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 	}
 }
 
-STATIC streams_fastcall int __hot_in __ss_r_data(ss_t *ss, queue_t *q, mblk_t *mp);
+static fastcall int __hot_in __ss_r_data(ss_t *ss, queue_t *q, mblk_t *mp);
 
 /*
  *  RECVMSG
  *  -------------------------------------------------------------------------
  */
-STATIC streams_fastcall __hot_in int
+static fastcall __hot_in int
 ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 {
 	mblk_t *mp;
@@ -14125,9 +13970,9 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 	u_int32_t *cbuf;
 	const size_t clen = (sizeof(u_int32_t) << 5);
 	struct iovec *iov;
-	int size;
+	int size, rtn;
 
-	while (canput(q)) {
+	while (canput(ss->rq)) {
 		switch (ss->p.prot.type) {
 		case SOCK_DGRAM:
 		case SOCK_RAW:
@@ -14136,14 +13981,12 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 		{
 			struct sk_buff *skb;
 
-			ensure(ss->sock, freemsg(bp);
-			       return (QR_ABSORBED));	/* spurious, ignore it */
+			ensure(ss->sock, goto done);	/* spurious, ignore it */
 			size = (skb = skb_peek(&ss->sock->sk->sk_receive_queue)) ? skb->len : 0;
 			break;
 		}
 		case SOCK_SEQPACKET:
-			ensure(ss->sock, freemsg(bp);
-			       return (QR_ABSORBED));	/* spurious, ignore it */
+			ensure(ss->sock, goto done);	/* spurious, ignore it */
 			size = atomic_read(&ss->sock->sk->sk_rmem_alloc);
 			break;
 		default:
@@ -14151,14 +13994,17 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 			size = 0;
 			break;
 		}
-		if (!size) {
-			freemsg(bp);
-			return (QR_ABSORBED);
-		}
+		if (!size)
+			/* Nothing to read.  Done.  This procedure will be invoked again by the
+			   next sk_data_ready() callback or called directly. */
+			goto done;
 
 		if (!(mp = ss_allocb(ss->rq,
 				     size + sizeof(*msg) + sizeof(*add) +
 				     clen + sizeof(*iov), BPRI_MED)))
+			/* Cannot allocate a buffer.  A buffer callback was generated and the queue
+			   will be scheduled when a buffer is available.  This will reinvoke the
+			   read service procedure, the read wakeup and this function again. */
 			return (-ENOBUFS);
 		/* message header */
 		msg = (struct msghdr *) mp->b_wptr;
@@ -14189,21 +14035,27 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 		msg->msg_control = cbuf;
 		msg->msg_controllen = clen;
 		msg->msg_flags = MSG_DONTWAIT;
-		{
-			int err;
-
-			if ((err = ss_recvmsg(ss, msg, size)) <= 0) {
-				freemsg(mp);
-				if (likely(err == -EAGAIN)) {
-					STRLOGIO(ss, "no data to read!");
-					freemsg(bp);
-					return (QR_ABSORBED);
-				}
-				return m_error_reply(ss, q, bp, err);
+		while (unlikely((rtn = ss_recvmsg(ss, msg, size)) <= 0)) {
+			freemsg(mp);
+			switch (__builtin_expect(rtn, -EAGAIN)) {
+			case -EAGAIN:
+				STRLOGIO(ss, "no data to read!");
+				/* Nothing to read.  Done.  This procedure will be invoked again by 
+				   the next sk_data_ready() callback or called directly.  This
+				   should noly happen if data was flushed since we checked the size 
+				   above.  */
+			default:
+				/* Any other error is rather permanent, however, this is not the
+				   place to be reporting errors.  Chances are the error has already 
+				   resulted in or from a state change. */
+				goto done;
+			case -EINTR:
+			case -ERESTARTSYS:
+				continue;
 			}
-			mp->b_wptr = mp->b_rptr + err;
-			STRLOGIO(ss, "recvmsg with len = %d", err);
 		}
+		mp->b_wptr = mp->b_rptr + rtn;
+		STRLOGIO(ss, "recvmsg with len = %d", rtn);
 		if (msg->msg_flags & MSG_CTRUNC) {
 			STRLOGIO(ss, "control message truncated");
 			msg->msg_control = NULL;
@@ -14231,49 +14083,19 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
 			freemsg(mp);
 			continue;
 		}
-		{
-			int err = QR_ABSORBED;
-
-			/* Attempt to deliver directly as was done before. */
-			/* careful not to swap message order */
-			if (q->q_first || (q->q_flag & QSVCBUSY) ||
-			    (err = __ss_r_data(ss, q, mp)) != QR_ABSORBED) {
-				/* If unsuccessful, place the M_DATA message on the queue for later 
-				   processing.  Note that if an M_READ message is placed back on
-				   the queue as a result of flow control (-EBUSY) of lack of bufers 
-				   (-ENOBUFS) it will be transformed into an M_CTL message of band
-				   0 and will, therefore, queue behind the M_DATA mesages. */
-				if (msg->msg_flags & (MSG_OOB | MSG_ERRQUEUE)) {
-					mp->b_band = 2;	/* expedite */
-					mp->b_flag |= MSGMARK;
-				} else {
-					mp->b_band = 1;
-				}
-				/* Note that this could enable the queue.  When the service
-				   procedure runs (possibly again), __ss_r_data() will do a putbq() 
-				   on a subsequent failure and suspend the service procedure from
-				   there. */
-#if 0
-				if (!putq(q, mp)) {
-					STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__,
-						  __LINE__);
-					/* Will only happen if there is not enough memory to
-					   allocate a band 1 or 2 qband structure, which is quite
-					   possible if we got here as a result of a buffer
-					   allocation failure. Therefore, strqset() is used to
-					   allocate one of each when the Stream is opened so (see
-					   ss_open()) so that this call cannot fail. */
-					freemsg(mp);
-				}
-#else
-				put(q, mp);
-#endif
-				if (err != QR_ABSORBED)
-					return (err);
-			}
+		/* Place the M_DATA message on the queue for (immediate or) later processing. */
+		if (msg->msg_flags & (MSG_OOB | MSG_ERRQUEUE)) {
+			mp->b_band = 2;	/* expedite */
+			mp->b_flag |= MSGMARK;
+		} else {
+			mp->b_band = 1;
 		}
+		put(q, mp);
 	}
 	return (-EBUSY);
+      done:
+	freemsg(bp);
+	return (0);
 }
 
 /*
@@ -14290,23 +14112,53 @@ ss_sock_recvmsg(ss_t *ss, queue_t *q, mblk_t *bp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC streams_fastcall __hot void
+
+/**
+ * ss_putctl: - put a control message on a queue
+ * @ss: private structure (unlocked)
+ * @q: active queue (read queue)
+ * @type: type of control message
+ * @func: bufcall function if allocation fails
+ * @sock: socket
+ *
+ * When we place control messages on the read or write queues, the objective is as follows:
+ *
+ * WR(q): there is one message that can be placed on the write queue:
+ *
+ *   M_PCRSE placed directly on the queue with the purpose of enabling the queue and invoking write
+ *   processing in response to sk_write_space.  A queue is always enabled when a high priority
+ *   message is placed on the queue.
+ *
+ * RD(q): there are three message that can be placed on the read queue:
+ *
+ *   M_PCRSE: placed directly on the queue with the purpose of enabling the queue and invoking read
+ *   processing in response to sk_data_ready.  A queue is always enabled when a high priority
+ *   message is placed on the queue.
+ *
+ *   M_PCCTL: placed directly on the queue with the purpose of enabling the queue and invoking a
+ *   state change in response to sk_state_change.  A queue is always enabled when a high priority
+ *   message is placed on the queue.
+ *
+ *   M_ERROR: placed directon on the queue with the purpose of enabling the queue and invoking a
+ *   error indication in respond to sk_error_report.  A queue is always enabled when a high priority
+ *   message is placed on the queue.
+ *
+ *
+ */
+static fastcall __hot void
 ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struct sock *sk)
 {
 	mblk_t *mp;
 	ss_event_t *p;
 
-	if ((mp = allocb(sizeof(*p), BPRI_HI))) {
+	if (likely(!!(mp = allocb(sizeof(*p), BPRI_HI)))) {
 		mp->b_datap->db_type = type;
 		p = (typeof(p)) mp->b_wptr;
 		p->sk = sk;
 		p->state = sk->sk_state;	/* capture current state */
+		p->error = likely(type != M_ERROR) ? 0 : sock_error(sk);
 		mp->b_wptr += sizeof(*p);
-#if 0
-		putq(q, mp);	/* must succeed because band is zero */
-#else
 		put(q, mp);
-#endif
 		return (void) (0);
 	}
 	{
@@ -14338,7 +14190,7 @@ ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struc
  *  We get state changes on sockets that we hold.  We also get state changes
  *  on accepting sockets.
  */
-STATIC streamscall __hot void
+static streamscall __hot void
 _ss_sock_state_change(long data)
 {
 	struct sock *sk;
@@ -14348,7 +14200,7 @@ _ss_sock_state_change(long data)
 		read_lock(&sk->sk_callback_lock);
 		if (sk->sk_state_change == &ss_state_change) {
 			if ((ss = SOCK_PRIV(sk))) {
-				ss_putctl(ss, ss->rq, M_RSE, &_ss_sock_state_change, sk);
+				ss_putctl(ss, ss->rq, M_PCCTL, &_ss_sock_state_change, sk);
 			} else
 				assure(ss);
 		} else
@@ -14357,7 +14209,7 @@ _ss_sock_state_change(long data)
 	} else
 		assure(sk);
 }
-STATIC __hot void
+static __hot void
 ss_state_change(struct sock *sk)
 {
 	_ss_sock_state_change((long) sk);
@@ -14367,7 +14219,7 @@ ss_state_change(struct sock *sk)
  *  WRITE Available
  *  -------------------------------------------------------------------------
  */
-STATIC streamscall __hot_out void
+static streamscall __hot_out void
 _ss_sock_write_space(long data)
 {
 	struct sock *sk;
@@ -14377,11 +14229,7 @@ _ss_sock_write_space(long data)
 		read_lock(&sk->sk_callback_lock);
 		if (sk->sk_write_space == &ss_write_space) {
 			if ((ss = SOCK_PRIV(sk))) {
-#if 1
-				ss_putctl(ss, ss->wq, M_READ, &_ss_sock_write_space, sk);
-#else
-				qenable(ss->wq);	/* this is NOT enough */
-#endif
+				ss_putctl(ss, ss->wq, M_PCRSE, &_ss_sock_write_space, sk);
 			} else
 				assure(ss);
 		} else
@@ -14390,7 +14238,7 @@ _ss_sock_write_space(long data)
 	} else
 		assure(sk);
 }
-STATIC __hot_out void
+static __hot_out void
 ss_write_space(struct sock *sk)
 {
 	_ss_sock_write_space((long) sk);
@@ -14400,7 +14248,7 @@ ss_write_space(struct sock *sk)
  *  ERROR Available
  *  -------------------------------------------------------------------------
  */
-STATIC streamscall __hot_get void
+static streamscall __hot_get void
 _ss_sock_error_report(long data)
 {
 	struct sock *sk;
@@ -14411,18 +14259,15 @@ _ss_sock_error_report(long data)
 		if (sk->sk_error_report == &ss_error_report) {
 			if ((ss = SOCK_PRIV(sk))) {
 				ss_putctl(ss, ss->rq, M_ERROR, &_ss_sock_error_report, sk);
-			}
-#if 0
-			else
+			} else
 				assure(ss);
-#endif
 		} else
 			assure(sk->sk_error_report == &ss_error_report);
 		read_unlock(&sk->sk_callback_lock);
 	} else
 		assure(sk);
 }
-STATIC __hot_get void
+static __hot_get void
 ss_error_report(struct sock *sk)
 {
 	_ss_sock_error_report((long) sk);
@@ -14432,7 +14277,7 @@ ss_error_report(struct sock *sk)
  *  READ Available
  *  -------------------------------------------------------------------------
  */
-STATIC streamscall __hot_in void
+static streamscall __hot_in void
 _ss_sock_data_ready(long data)
 {
 	struct sock *sk;
@@ -14442,7 +14287,7 @@ _ss_sock_data_ready(long data)
 		read_lock(&sk->sk_callback_lock);
 		if (sk->sk_data_ready == &ss_data_ready) {
 			if ((ss = SOCK_PRIV(sk))) {
-				ss_putctl(ss, ss->rq, M_CTL, &_ss_sock_data_ready, sk);
+				ss_putctl(ss, ss->rq, M_PCRSE, &_ss_sock_data_ready, sk);
 			} else
 				assure(ss);
 		} else
@@ -14451,7 +14296,7 @@ _ss_sock_data_ready(long data)
 	} else
 		assure(sk);
 }
-STATIC __hot_in void
+static __hot_in void
 ss_data_ready(struct sock *sk, int len)
 {
 	(void) len;
@@ -14468,7 +14313,7 @@ ss_data_ready(struct sock *sk, int len)
  *  T_CONN_REQ           0 - TC Request
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_conn_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -14567,7 +14412,7 @@ t_conn_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_CONN_RES           1 - Accept previous connection indication
  *  -------------------------------------------------------------------
  */
-STATIC mblk_t *
+static mblk_t *
 t_seq_check(ss_t *ss, t_uscalar_t seq)
 {
 	mblk_t *mp;
@@ -14579,7 +14424,7 @@ t_seq_check(ss_t *ss, t_uscalar_t seq)
 	usual(mp);
 	return (mp);
 }
-STATIC streams_fastcall ss_t *
+static fastcall ss_t *
 t_tok_check(t_uscalar_t tok)
 {
 	ss_t *as;
@@ -14591,7 +14436,7 @@ t_tok_check(t_uscalar_t tok)
 	usual(as);
 	return (as);
 }
-STATIC streams_fastcall int
+static fastcall int
 t_conn_res(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	int err = 0;
@@ -14696,7 +14541,7 @@ t_conn_res(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_DISCON_REQ         2 - TC disconnection request
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_discon_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -14767,7 +14612,7 @@ t_discon_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  M_DATA
  *  -------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_write int
+static inline fastcall __hot_write int
 t_write(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	long mlen, mmax;
@@ -14800,19 +14645,19 @@ t_write(ss_t *ss, queue_t *q, mblk_t *mp)
       discard:
 	freemsg(mp);
 	STRLOGNO(ss, "ERROR: ignore in idle state");
-	return (QR_ABSORBED);
+	return (0);
       notsupport:
 	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
-	return m_error(ss, q, mp, EPROTO);
+	return m_error(ss, q, mp, -EPROTO);
 }
 
 /*
  *  T_DATA_REQ           3 - Connection-Mode data transfer request
  *  -------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_out int
+static inline fastcall __hot_out int
 t_data_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	long mlen, mmax;
@@ -14850,19 +14695,19 @@ t_data_req(ss_t *ss, queue_t *q, mblk_t *mp)
       discard:
 	STRLOGNO(ss, "ERROR: ignore in idle state");
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
       notsupport:
 	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
-	return m_error(ss, q, mp, EPROTO);
+	return m_error(ss, q, mp, -EPROTO);
 }
 
 /*
  *  T_EXDATA_REQ         4 - Expedited data request
  *  -------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_put int
+static inline fastcall __hot_put int
 t_exdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	long mlen, mmax;
@@ -14901,19 +14746,19 @@ t_exdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
       discard:
 	STRLOGNO(ss, "ERROR: ignore in idle state");
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
       notsupport:
 	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
-	return m_error(ss, q, mp, EPROTO);
+	return m_error(ss, q, mp, -EPROTO);
 }
 
 /*
  *  T_INFO_REQ           5 - Information Request
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_info_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	return t_info_ack(ss, q, mp);
@@ -14923,7 +14768,7 @@ t_info_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_BIND_REQ           6 - Bind a TS user to a transport address
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	int err, add_len;
@@ -15055,10 +14900,8 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	goto error;
 #endif
       error_close:
-	if (ss->sock) {
-		ss_disconnect(ss);
-		ss_socket_put(xchg(&ss->sock, NULL));
-	}
+	ss_set_state(ss, TS_UNBND);
+	ss_socket_put(&ss->sock);
       error:
 	return t_error_ack(ss, q, mp, T_BIND_REQ, err);
 }
@@ -15067,7 +14910,7 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_UNBIND_REQ         7 - Unbind TS user from transport address
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_unbind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	if (ss_get_state(ss) != TS_IDLE)
@@ -15083,7 +14926,7 @@ t_unbind_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_UNITDATA_REQ       8 -Unitdata Request 
  *  -------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_out int
+static inline fastcall __hot_out int
 t_unitdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	long mmax;
@@ -15160,7 +15003,7 @@ t_unitdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	STRLOGNO(ss, "ERROR: primitive not supported for T_COTS");
 	goto error;
       error:
-	return m_error(ss, q, mp, EPROTO);
+	return m_error(ss, q, mp, -EPROTO);
 }
 
 /*
@@ -15189,7 +15032,7 @@ t_unitdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *
  *  TSYSERR:    a system error has occured and the UNIX system error is indicated in the primitive.
  */
-STATIC INLINE streams_fastcall __hot_put int
+static inline fastcall __hot_put int
 t_optmgmt_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	int err, opt_len;
@@ -15272,7 +15115,7 @@ t_optmgmt_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_ORDREL_REQ        10 - TS user is finished sending
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_ordrel_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	const struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
@@ -15300,7 +15143,7 @@ t_ordrel_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		break;
 	}
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
       baddata:
 	STRLOGNO(ss, "ERROR: bad orderly release data");
 	goto error;
@@ -15311,14 +15154,14 @@ t_ordrel_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS or T_COTS");
 	goto error;
       error:
-	return m_error(ss, q, mp, EPROTO);
+	return m_error(ss, q, mp, -EPROTO);
 }
 
 /*
  *  T_OPTDATA_REQ       24 - Data with options request
  *  -------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall __hot_out int
+static inline fastcall __hot_out int
 t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
@@ -15377,12 +15220,12 @@ t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
       discard:
 	STRLOGNO(ss, "ERROR: ignore in idle state");
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
       notsupport:
 	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
-	return m_error(ss, q, mp, EPROTO);
+	return m_error(ss, q, mp, -EPROTO);
 }
 
 #ifdef T_ADDR_REQ
@@ -15390,7 +15233,7 @@ t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_ADDR_REQ          25 - Address Request
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_addr_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	struct sockaddr *loc = NULL;
@@ -15429,7 +15272,7 @@ t_addr_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  T_CAPABILITY_REQ    ?? - Capability Request
  *  -------------------------------------------------------------------
  */
-STATIC streams_fastcall int
+static fastcall int
 t_capability_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -15451,7 +15294,7 @@ t_capability_req(ss_t *ss, queue_t *q, mblk_t *mp)
  *  Other primitives    XX - other invalid primitives
  *  -------------------------------------------------------------------------
  */
-STATIC int
+static int
 t_other_req(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	t_scalar_t prim = *((t_scalar_t *) mp->b_rptr);
@@ -15479,9 +15322,8 @@ t_other_req(ss_t *ss, queue_t *q, mblk_t *mp)
  * @mp: the M_PROTO or M_PCPROTO message
  * @rtn: the return value
  *
- * Some M_PROTO and M_PCPROTO processing functions return an error just to
- * cause the primary state of the endpoint to be restored.  Also, some functions
- * may still return QR_DONE.  These return values are processed here.
+ * Some M_PROTO and M_PCPROTO processing functions return an error just to cause the primary state
+ * of the endpoint to be restored.  These return values are processed here.
  */
 noinline fastcall int
 ss_w_proto_return(mblk_t *mp, int rtn)
@@ -15494,26 +15336,25 @@ ss_w_proto_return(mblk_t *mp, int rtn)
 	case -EDEADLK:
 		return (rtn);
 	default:
-	case QR_DONE:
 		freemsg(mp);
-	case QR_ABSORBED:
-		return (QR_ABSORBED);
+	case 0:
+		return (0);
 	}
 }
 
 /**
- * ss_w_proto_slow: process M_PROTO or M_PCPROTO primitive
+ * __ss_w_proto_slow: process M_PROTO or M_PCPROTO primitive
  * @ss: private structure (locked)
  * @q: the active queue
  * @mp: the M_PROTO or M_PCPROTO primitive
  * @prim: primitive
  *
- * This function either returns QR_ABSORBED when the message has been consumed,
- * or a negative error number when the message is to be (re)queued.  This
- * function must be called with the private structure locked.
+ * This function either returns zero (0) when the message has been consumed, or a negative error
+ * number when the message is to be (re)queued.  This function must be called with the private
+ * structure locked.
  */
 noinline fastcall int
-ss_w_proto_slow(ss_t *ss, queue_t *q, mblk_t *mp, t_scalar_t prim)
+__ss_w_proto_slow(ss_t *ss, queue_t *q, mblk_t *mp, t_scalar_t prim)
 {
 	t_uscalar_t oldstate = ss_get_state(ss);
 	int rtn;
@@ -15608,16 +15449,31 @@ ss_w_proto_slow(ss_t *ss, queue_t *q, mblk_t *mp, t_scalar_t prim)
 	return ss_w_proto_return(mp, rtn);
 }
 
+noinline fastcall int
+ss_w_proto_slow(queue_t *q, mblk_t *mp, t_scalar_t prim)
+{
+	ss_t *ss;
+	int err;
+
+	if (likely(!!(ss = ss_trylockq(q)))) {
+		err = __ss_w_proto_slow(ss, q, mp, prim);
+		ss_unlockq(ss);
+	} else
+		err = -EDEADLK;
+	return (err);
+
+}
+
 /**
  * __ss_w_proto: - process M_PROTO or M_PCPROTO message locked
  * @ss: private structure (locked)
  * @q: active queue (write queue)
  * @mp: the M_PROTO or M_PCPROTO message
  *
- * This locked version is for use by the service procedure that takes private
- * structure locks once for the entire service procedure run.
+ * This locked version is for use by the service procedure that takes private structure locks once
+ * for the entire service procedure run.
  */
-STATIC inline fastcall __hot_write int
+static inline fastcall __hot_write int
 __ss_w_proto(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
@@ -15626,19 +15482,19 @@ __ss_w_proto(ss_t *ss, queue_t *q, mblk_t *mp)
 		int rtn;
 
 		if (likely(prim == T_DATA_REQ)) {
-			if (likely((rtn = t_data_req(ss, q, mp)) == QR_ABSORBED))
-				return (QR_ABSORBED);
+			if (likely((rtn = t_data_req(ss, q, mp)) == 0))
+				return (0);
 		} else if (likely(prim == T_UNITDATA_REQ)) {
-			if (likely((rtn = t_unitdata_req(ss, q, mp)) == QR_ABSORBED))
-				return (QR_ABSORBED);
+			if (likely((rtn = t_unitdata_req(ss, q, mp)) == 0))
+				return (0);
 		} else if (likely(prim == T_OPTDATA_REQ)) {
-			if (likely((rtn = t_optdata_req(ss, q, mp)) == QR_ABSORBED))
-				return (QR_ABSORBED);
+			if (likely((rtn = t_optdata_req(ss, q, mp)) == 0))
+				return (0);
 		} else if (likely(prim == T_EXDATA_REQ)) {
-			if (likely((rtn = t_exdata_req(ss, q, mp)) == QR_ABSORBED))
-				return (QR_ABSORBED);
+			if (likely((rtn = t_exdata_req(ss, q, mp)) == 0))
+				return (0);
 		} else
-			return ss_w_proto_slow(ss, q, mp, prim);
+			return __ss_w_proto_slow(ss, q, mp, prim);
 		if (rtn < 0)
 			ss_set_state(ss, oldstate);
 		return ss_w_proto_return(mp, rtn);
@@ -15652,35 +15508,24 @@ __ss_w_proto(ss_t *ss, queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the M_PROTO or M_PCPROTO message
  *
- * This locking version is for use by the put procedure which does not take
- * locks.
+ * This locking version is for use by the put procedure which does not take locks.  For data
+ * messages we simply return (-EAGAIN) for performance.
  */
-STATIC inline fastcall __hot_write int
+static inline fastcall __hot_write int
 ss_w_proto(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t))) {
 		t_scalar_t prim = *(t_scalar_t *) mp->b_rptr;
-		ss_t *ss;
 
-		if (likely(prim == T_DATA_REQ))
-			return (-EAGAIN);
-		else if (likely(prim == T_OPTDATA_REQ))
-			return (-EAGAIN);
-		else if (likely(prim == T_UNITDATA_REQ))
-			return (-EAGAIN);
-		else if (likely(prim == T_EXDATA_REQ))
-			return (-EAGAIN);
-
-		if (likely((ss = ss_trylockq(q)) != NULL)) {
-			int rtn;
-
-			rtn = ss_w_proto_slow(ss, q, mp, prim);
-			ss_unlockq(ss);
-			return (rtn);
-		}
-		return (-EDEADLK);
+		if (likely(prim == T_DATA_REQ)) {
+		} else if (likely(prim == T_UNITDATA_REQ)) {
+		} else if (likely(prim == T_OPTDATA_REQ)) {
+		} else if (likely(prim == T_EXDATA_REQ)) {
+		} else
+			return ss_w_proto_slow(q, mp, prim);
+		return (-EAGAIN);
 	}
-	STRLOGTX(PRIV(q), "%s() replying with error %d", __FUNCTION__, -EPROTO);
+	STRLOGRX(PRIV(q), "%s() replying with error %d", __FUNCTION__, -EPROTO);
 	return m_error_reply(PRIV(q), q, mp, -EPROTO);
 }
 
@@ -15697,11 +15542,10 @@ ss_w_proto(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the M_DATA message
  *
- * This function either returns QR_ABSORBED when the message is consumed, or a
- * negative error number when the message is to be (re)queued.  This non-locking
- * version is used by the service procedure.
+ * This function either returns zero (0) when the message is consumed, or a negative error number
+ * when the message is to be (re)queued.  This non-locking version is used by the service procedure.
  */
-STATIC inline fastcall __hot_write int
+static inline fastcall __hot_write int
 __ss_w_data(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	return t_write(ss, q, mp);
@@ -15712,14 +15556,13 @@ __ss_w_data(ss_t *ss, queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the M_DATA message
  *
- * This function either returns QR_ABSORBED when the message is consumed, or a
- * negative error number when the message is to be (re)queued.  This locking
- * version is used by the put procedure.
+ * This function either returns zero (0) when the message is consumed, or a negative error number
+ * when the message is to be (re)queued.  This locking version is used by the put procedure.
  */
-STATIC inline fastcall __hot_write int
+static inline fastcall __hot_write int
 ss_w_data(queue_t *q, mblk_t *mp)
 {
-	/* alway queue data */
+	/* Always queue from put procedure for performance. */
 	return (-EAGAIN);
 }
 
@@ -15730,26 +15573,63 @@ ss_w_data(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-STATIC INLINE streams_fastcall int
-ss_w_flush(queue_t *q, mblk_t *mp)
+
+/**
+ * ss_r_flush: - canonical driver read flush procedure
+ * @q: active queue (read queue)
+ * @mp: the flush message
+ *
+ * This canonical driver read flsuh procedure flushes the read queue if requested and passes the
+ * message upwards.  If neither side flush is requested, the message is freed.
+ */
+noinline fastcall int
+ss_r_flush(queue_t *q, mblk_t *mp)
 {
-	if (*mp->b_rptr & FLUSHW) {
-		if (*mp->b_rptr & FLUSHBAND)
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
 			flushq(q, FLUSHDATA);
-		*mp->b_rptr &= ~FLUSHW;
+		putnext(q, mp);
+		return (0);
 	}
-	if (*mp->b_rptr & FLUSHR) {
-		if (*mp->b_rptr & FLUSHBAND)
+	if (mp->b_rptr[0] & FLUSHW) {
+		putnext(q, mp);
+		return (0);
+	}
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * ss_w_flush: - canonical driver write flush procedure
+ * @q: active queue (write queue)
+ * @mp: the flush message
+ *
+ * This canonical driver write flush procedure flushes the write side queue if requested and cancels
+ * write side flush.  If read side flush is also requested, the read side is flushed and the message
+ * is passed upwards.  If read side flush is not requested, the message is freed.
+ */
+noinline fastcall int
+ss_w_flush(queue_t *q, mblk_t *mp)
+{
+	if (mp->b_rptr[0] & FLUSHW) {
+		if (mp->b_rptr[0] & FLUSHBAND)
+			flushband(q, mp->b_rptr[1], FLUSHDATA);
+		else
+			flushq(q, FLUSHDATA);
+		mp->b_rptr[0] &= ~FLUSHW;
+	}
+	if (mp->b_rptr[0] & FLUSHR) {
+		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(OTHERQ(q), mp->b_rptr[1], FLUSHDATA);
 		else
 			flushq(OTHERQ(q), FLUSHDATA);
 		qreply(q, mp);
-		return (QR_ABSORBED);
+		return (0);
 	}
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
 }
 
 /*
@@ -15758,6 +15638,15 @@ ss_w_flush(queue_t *q, mblk_t *mp)
  *  M_IOCTL Handling
  *
  *  -------------------------------------------------------------------------
+ */
+
+/**
+ * ss_w_ioctl: - process M_IOCTL or M_IOCDATA messages
+ * @q: active queue (write queue only)
+ * @mp: the M_IOCTL or M_IOCDATA message
+ *
+ * This is canonical driver write processing for M_IOCTL or M_IOCDATA messages for a driver that has
+ * no input-output controls of its own.  Messages are simply negatively acknowledged.
  */
 noinline fastcall int
 ss_w_ioctl(queue_t *q, mblk_t *mp)
@@ -15768,33 +15657,64 @@ ss_w_ioctl(queue_t *q, mblk_t *mp)
 	ioc->ioc_error = EINVAL;
 	ioc->ioc_rval = -1;
 	qreply(q, mp);
-	return (QR_ABSORBED);
+	return (0);
 }
+
+#if 0
+#define PRELOAD (FASTBUF<<2)
+#else
+#define PRELOAD (0)
+#endif
 
 /*
  *  -------------------------------------------------------------------------
  *
- *  M_PCRSE Handling
+ *  M_CTL, M_PCCTL Handling
  *
  *  -------------------------------------------------------------------------
- *  On the read queue, an M_PCRSE is used to indicate a sk_state_change callback
- *  on the socket.  This can mean that the socket has completed connecting or
- *  has disconnected, or it may signal a connection indication on a listening
- *  socket.
- *
- *  We always examine both the state of the TPI interface and the state of the
- *  socket to determine which actions need to be performed.  This makes the
- *  state machine interworking more robust.
- *
- *  Note that the sk pointer passed in here is not necessarily the same as
- *  ss->sock->sk, sk may be a child (connection indication) of the primary
- *  socket.
  */
-STATIC INLINE streams_fastcall __hot int
-__ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
+
+/**
+ * __ss_r_pcctl: - process M_PCCTL message on read queue
+ * @ss: locked private structure
+ * @q: active qeuue (read queue only)
+ * @mp: the M_PCCTL message
+ *
+ * This procedure simply requeues the M_PCCTL message as an M_CTL message.  The purpose is to
+ * maintain the order of sk_data_ready events with sk_state_change events.  This procedure is only
+ * run from the service procedure, so if this is the only event it will be at the beginning of the
+ * queue.  The purpose of the high priority message was to enable the service procedure.
+ */
+static inline fastcall __hot int
+__ss_r_pcctl(ss_t *ss, queue_t *q, mblk_t *mp)
+{
+	mp->b_datap->db_type = M_CTL;
+	mp->b_wptr += PRELOAD;
+	putq(q, mp);
+	return (0);
+}
+
+/**
+ * __ss_r_ctl: - process M_CTL messages on read queue
+ * @ss: locked private structure
+ * @q: active queue (read queue only)
+ * @mp: the M_CTL message
+ *
+ * On the read queue, an M_PCCTL is used to indicate a sk_state_change callback on the socket.  This
+ * can mean that the socket has completed connecting or has disconnected, or it may signal a
+ * connection indication on a listening socket.
+ *
+ * We always examine both the state of the TPI interface and the state of the socket to determine
+ * which actions need to be performed.  This makes the state machine interworking more robust.
+ *
+ * Note that the sk pointer passed in here is not necessarily the same as ss->sock->sk, sk may be a
+ * child (connection indication) of the primary socket.
+ */
+static inline fastcall __hot int
+__ss_r_ctl(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
-	int oldstate, rtn;
+	int oldstate, err;
 
 	oldstate = xchg(&ss->tcp_state, p->state);
 
@@ -15813,12 +15733,12 @@ __ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
 			switch (p->state) {
 			case TCP_ESTABLISHED:
 				ss_getpeername(ss);
-				rtn = t_conn_con(ss, q, mp, &ss->dst, NULL);
+				err = t_conn_con(ss, q, mp, &ss->dst, NULL);
 				goto done;
 			case TCP_TIME_WAIT:
 			case TCP_CLOSE:
 				ss_getpeername(ss);
-				rtn = t_discon_ind(ss, q, mp, &ss->dst, T_PROVIDER, 0, NULL, NULL);
+				err = t_discon_ind(ss, q, mp, &ss->dst, T_PROVIDER, 0, NULL, NULL);
 				goto done;
 			}
 			break;
@@ -15828,11 +15748,11 @@ __ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
 			case TCP_CLOSE:
 				switch (oldstate) {
 				case TCP_FIN_WAIT2:
-					rtn = t_ordrel_ind(ss, q, mp);
+					err = t_ordrel_ind(ss, q, mp);
 					goto done;
 				case TCP_ESTABLISHED:
 				case TCP_FIN_WAIT1:
-					rtn = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL,
+					err = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL,
 							   NULL);
 					goto done;
 				}
@@ -15845,11 +15765,11 @@ __ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
 		case TS_DATA_XFER:
 			switch (p->state) {
 			case TCP_CLOSE_WAIT:
-				rtn = t_ordrel_ind(ss, q, mp);
+				err = t_ordrel_ind(ss, q, mp);
 				goto done;
 			case TCP_TIME_WAIT:
 			case TCP_CLOSE:
-				rtn = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL, NULL);
+				err = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL, NULL);
 				goto done;
 			}
 			break;
@@ -15859,7 +15779,7 @@ __ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
 			case TCP_CLOSE:
 				switch (oldstate) {
 				case TCP_CLOSE_WAIT:
-					rtn = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL,
+					err = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL,
 							   NULL);
 					goto done;
 				}
@@ -15889,7 +15809,7 @@ __ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
 					ss->tcp_state = TCP_LISTEN;
 					/* look for the child */
 					if ((cp = t_seq_find(ss, mp))) {
-						rtn = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0,
+						err = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0,
 								   cp, NULL);
 						goto done;
 					}
@@ -15902,34 +15822,52 @@ __ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
 				case TCP_LISTEN:
 					/* state change was on child */
 					ss->tcp_state = TCP_LISTEN;
-					rtn = ss_conn_ind(ss, q, mp);
+					err = ss_conn_ind(ss, q, mp);
 					goto done;
 				}
 				break;
 			}
 			break;
 		}
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
+		STRLOGERR(ss, "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+			  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+			  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
 		goto absorb;
 	case SOCK_DGRAM:
 	case SOCK_RAW:
 	case SOCK_RDM:
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
+		STRLOGERR(ss, "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+			  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+			  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
 		goto absorb;
 	default:
-		STRLOGNO(ss, "ERROR: unsupported socket type");
+		STRLOGERR(ss, "SWERR: unsupported socket type %d: %s %s:%d", ss->p.prot.type,
+			  __FUNCTION__, __FILE__, __LINE__);
 		goto absorb;
 	}
       done:
-	return (rtn);
+	return (err);
       discard:
 	STRLOGNO(ss, "ERROR: lingering event, ignoring");
 	goto absorb;
       absorb:
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
+}
+
+/**
+ * ss_r_ctl: - process M_CTL or M_PCCTL message on read queue
+ * @q: active queue (read queue only)
+ * @mp: the M_CTL or M_PCCTL message
+ *
+ * This is the unlocked put procedure version of __ss_r_ctl().  These messages are always queued as
+ * their purpose is to enable the service procedure.
+ */
+static inline fastcall int
+ss_r_ctl(queue_t *q, mblk_t *mp)
+{
+	/* Always queue to enable the service procedure. */
+	return (-EAGAIN);
 }
 
 /*
@@ -15952,7 +15890,7 @@ __ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
  * starts at mp->b_rptr and ends at mp->b_wptr-1.
  *
  */
-STATIC streams_fastcall int __hot_in
+static fastcall int __hot_in
 __ss_r_data(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	struct msghdr *msg = (struct msghdr *) mp->b_datap->db_base;
@@ -15970,37 +15908,71 @@ __ss_r_data(ss_t *ss, queue_t *q, mblk_t *mp)
 	return (err);
 }
 
+/**
+ * ss_r_data: - process M_DATA or M_HPDATA message on read queue
+ * @q: active queue (read queue only)
+ * @mp: the M_DATA or M_HPDATA message
+ *
+ * This is the unlocked put procedure version of __ss_r_data().  These messages are always queued
+ * for performance.
+ */
+static inline fastcall __hot_in int
+ss_r_data(queue_t *q, mblk_t *mp)
+{
+	/* Always queue for performance. */
+	return (-EAGAIN);
+}
+
 /*
  *  -------------------------------------------------------------------------
  *
- *  M_READ Handling
+ *  M_RSE, M_PCRSE Handling
  *
  *  -------------------------------------------------------------------------
- *
- *  M_READ on the RD(q)
- *  -------------------------------------------------------------------------
- *
- *  On the read queue, an M_READ is used to indicate a sk_data_ready callback on
- *  the socket.  This can mean that the socket is now readable (when it was
- *  blocked before), or it may mean that a socket has completed connecting, or
- *  disconnected, or that a connection indication may be available on a
- *  listening socket.
- *
- *  We always examine both the state of the TPI interface and the state of the
- *  socket to determine which actions need to be performed.  This makes the
- *  state machine interworking more robust.
- *
- *  Note that the sk pointer passed in here is not necessarily the same as
- *  ss->sock->sk, sk may be a child (connection indication) of the primary
- *  socket.
  */
-STATIC INLINE streams_fastcall __hot_in int
-__ss_r_read(ss_t *ss, queue_t *q, mblk_t *mp)
+
+/**
+ * __ss_r_pcrse: - process M_PCRSE message on read queue (locked)
+ * @ss: locked private structure
+ * @q: active queue (read queue only)
+ * @mp: the M_PCRSE message
+ *
+ * This procedure simply requeues the M_PCRSE message as an M_RSE message.  The purpose is to
+ * maintain the order of sk_data_ready events with sk_state_change events.  This procedure is only
+ * run from the service procedure, so if this is the only event it will be at the beginning of the
+ * queue.  The purpose of the high priority message was to enable the service procedure.
+ */
+static inline fastcall __hot_in int
+__ss_r_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
+{
+	mp->b_datap->db_type = M_RSE;
+	mp->b_wptr += PRELOAD;
+	putq(q, mp);
+	return (0);
+}
+
+/**
+ * __ss_r_rse: - process M_RSE or M_PCRSE message on the read queue (locked)
+ * @ss: locked private structure
+ * @q: active queue (read queue only)
+ * @mp: the M_RSE or M_PCRSE message
+ *
+ * On the read queue, an M_RSE is used to indicate a sk_data_ready callback on the socket.  This can
+ * mean that the socket is now readable (when it was blocked before), or it may mean that a socket
+ * has completed connecting, or disconnected, or that a connection indication may be available on a
+ * listening socket.
+ *
+ * We always examine both the state of the TPI interface and the state of the socket to determine
+ * which actions need to be performed.  This makes the state machine interworking more robust.
+ *
+ * Note that the sk pointer passed in here is not necessarily the same as ss->sock->sk, sk may be a
+ * child (connection indication) of the primary socket.
+ */
+static inline fastcall __hot_in int
+__ss_r_rse(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
-	int rtn;
 
-	mp->b_datap->db_type = M_CTL;	/* in case it needs to be placed back */
 	if (!ss->sock)
 		goto discard;
 	assure(ss->tcp_state == p->state || ss->tcp_state == TCP_LISTEN || p->state == TCP_CLOSE
@@ -16011,65 +15983,88 @@ __ss_r_read(ss_t *ss, queue_t *q, mblk_t *mp)
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:	/* TCP */
 	case SOCK_SEQPACKET:	/* SCTP */
-		switch (ss_get_state(ss)) {
+		switch (__builtin_expect(ss_get_state(ss), TS_DATA_XFER)) {
 		case TS_IDLE:
 		case TS_WRES_CIND:
 			if (p->state == TCP_LISTEN)
-				goto absorb;
+				break;
 		case TS_DATA_XFER:
 		case TS_WIND_ORDREL:
 		case TS_WREQ_ORDREL:	/* TCP bug I believe */
-			rtn = ss_sock_recvmsg(ss, q, mp);
-			goto done;
+			return ss_sock_recvmsg(ss, q, mp);
+		default:
+			STRLOGERR(ss,
+				  "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+				  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+				  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
+			break;
 		}
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
-		goto absorb;
+		break;
 	case SOCK_DGRAM:
 	case SOCK_RAW:
 	case SOCK_RDM:
-		switch (ss_get_state(ss)) {
+		switch (__builtin_expect(ss_get_state(ss), TS_IDLE)) {
 		case TS_IDLE:
-			rtn = ss_sock_recvmsg(ss, q, mp);
-			goto done;
+			return ss_sock_recvmsg(ss, q, mp);
+		default:
+			STRLOGERR(ss,
+				  "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+				  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+				  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
+			break;
 		}
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
-		goto absorb;
+	default:
+		STRLOGERR(ss, "SWERR: unsupported socket type %d: %s %s:%d", ss->p.prot.type,
+			  __FUNCTION__, __FILE__, __LINE__);
+		break;
 	}
-	STRLOGNO(ss, "SWERR: unsupported socket type %d", ss->p.prot.type);
-	goto absorb;
-      done:
-	return (rtn);
+      absorb:
+	freemsg(mp);
+	return (0);
       discard:
 	STRLOGNO(ss, "ERROR: lingering event, ignoring");
 	goto absorb;
-      absorb:
-	freemsg(mp);
-	return (QR_ABSORBED);
 }
 
-/*
- *  M_READ on the WR(q)
- *  -------------------------------------------------------------------------
+/**
+ * ss_r_rse: - process M_RSE or M_PCRSE message on read queue
+ * @q: active queue (read queue only)
+ * @mp: the M_RSE or M_PCRSE message
  *
- *  On the write queue, an M_READ is used to indicate a sk_write_space callback
- *  on the socket.  This can mean that the socket is now writeable (when it
- *  was blocked before).  This can also mean that a connecting socket has
- *  completed connecting (or has disconnected), or that a listening socket has
- *  a connection indication on the socket.
+ * This is the unlocked version of __ss_r_rse().  These messages are always queued as their purpose
+ * is to enable the service procedure.
+ */
+static inline fastcall int
+ss_r_rse(queue_t *q, mblk_t *mp)
+{
+	/* Always queue to enable the service procedure. */
+	return (-EAGAIN);
+}
+
+/**
+ * __ss_w_pcrse: - process M_PCRSE message on the write queue (locked)
+ * @ss: locked private structure
+ * @q: active queue (write queue only)
+ * @mp: the M_PCRSE message
  *
- *  We always examine both the state of the TPI interface and the state of the
- *  socket to determine which actions need to be performed.  This makes the
- *  state machine interworking more robust.
+ * On the write queue, an M_RSE or M_PCRSE is used to indicate a sk_write_space callback on the
+ * socket.  This can mean that the socket is now writeable (when it was blocked before).  This can
+ * also mean that a connecting socket has completed connecting (or has disconnected), or that a
+ * listening socket has a connection indication on the socket.
  *
- *  Note that the sk pointer passed in here is not necessarily the same as
- *  ss->sock->sk, sk may be a child (connection indication) of the primary
- *  socket.
+ * We always examine both the state of the TPI interface and the state of the socket to determine
+ * which actions need to be performed.  This makes the state machine interworking more robust.
+ *
+ * Note that the sk pointer passed in here is not necessarily the same as ss->sock->sk, sk may be a
+ * child (connection indication) of the primary socket.
+ *
+ * This procedure is really just a sanity check.  This function is only called from the service
+ * procedure.  The purpose of placing the M_PCRSE message on the queue was to enable the service
+ * procedure, so, barring sanity checks, the message could simply be discarded.
  *
  */
-STATIC INLINE streams_fastcall __hot_out int
-__ss_w_read(ss_t *ss, queue_t *q, mblk_t *mp)
+static inline fastcall __hot_out int
+__ss_w_pcrse(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
 
@@ -16081,70 +16076,112 @@ __ss_w_read(ss_t *ss, queue_t *q, mblk_t *mp)
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
 	case SOCK_SEQPACKET:
-		switch (ss_get_state(ss)) {
+		switch (__builtin_expect(ss_get_state(ss), TS_DATA_XFER)) {
 		case TS_DATA_XFER:
 		case TS_WREQ_ORDREL:
-			// qenable(ss->wq); /* it's running! */
-			goto absorb;
+			/* ok */
+			break;
+		default:
+			STRLOGERR(ss,
+				  "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+				  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+				  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
+			break;
 		}
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
-		goto absorb;
+		break;
 	case SOCK_DGRAM:
 	case SOCK_RAW:
 	case SOCK_RDM:
-		switch (ss_get_state(ss)) {
+		switch (__builtin_expect(ss_get_state(ss), TS_IDLE)) {
 		case TS_IDLE:
-			// qenable(ss->wq); /* it's running! */
-			goto absorb;
+			/* ok */
+			break;
+		default:
+			STRLOGERR(ss,
+				  "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+				  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+				  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
+			break;
 		}
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
-		goto absorb;
+	default:
+		STRLOGERR(ss, "SWERR: unsupported socket type %d: %s %s:%d", ss->p.prot.type,
+			  __FUNCTION__, __FILE__, __LINE__);
+		break;
 	}
-	STRLOGNO(ss, "SWERR: unsupported socket type %d", ss->p.prot.type);
-	goto absorb;
+      absorb:
+	freemsg(mp);
+	return (0);
       discard:
 	STRLOGNO(ss, "ERROR: lingering event, ignoring");
 	goto absorb;
-      absorb:
-	freemsg(mp);
-	return (QR_ABSORBED);
 }
 
-STATIC inline fastcall __hot_out int
-ss_w_read(queue_t *q, mblk_t *mp)
+/**
+ * ss_w_pcrse: - process M_PCRSE message on write queue
+ * @q: active queue (write queue only)
+ * @mp: the M_PCRSE message
+ *
+ * This is the unlocked put procedure version of __ss_w_pcrse().  These messages are always queued as
+ * their purpose is to enable the service procedure.
+ */
+static inline fastcall __hot_out int
+ss_w_pcrse(queue_t *q, mblk_t *mp)
 {
-	/* always queue these */
+	/* Always queue to enable the service procedure. */
 	return (-EAGAIN);
 }
 
 /*
  *  -------------------------------------------------------------------------
  *
- *  M_ERROR Handling
+ *  M_BREAK, M_ERROR Handling
  *
  *  -------------------------------------------------------------------------
- *  On the read queue, an M_ERROR is used to indicate an sk_error_report callback
- *  on the socket.  This can mean that the socket has disconected.  We might
- *  not received any other indication of the error.
- *
- *  We always examine both the state of the TPI interface and the state of the
- *  socket to determine which actions need to be performed.  This makes the
- *  state machine interworking more robust.
- *
- *  Note that the sk pointer passed in here is not necessarily the same as
- *  ss->sock->sk, sk may be a child (connection indication) of the primary
- *  socket.
  */
-STATIC INLINE streams_fastcall __hot_get int
+
+/**
+ * __ss_r_error: - process M_ERROR message on read queue
+ * @ss: locked private structure
+ * @q: active queue (read queue only)
+ * @mp: the M_ERROR message
+ *
+ * This procedure simply requeues the M_ERROR message as an M_BREAK message.  The purpose is to
+ * maintain the order of sk_error_report events with sk_data_ready and sk_state_change events on
+ * SOCK_STREAM sockets.  This procedure is only run from the service procedure, so if this is the
+ * only event it will be at the beginning of the queue.  The purpose of the high priority message
+ * was ot enable the service procedure.
+ */
+static inline fastcall __hot_get int
 __ss_r_error(ss_t *ss, queue_t *q, mblk_t *mp)
+{
+	mp->b_datap->db_type = M_BREAK;
+	mp->b_wptr += PRELOAD;
+	putq(q, mp);
+	return (0);
+}
+
+/**
+ * __ss_r_break: - process M_BREAK message (locked)
+ * @ss: locked private structure
+ * @q: active queue (read queue)
+ * @mp: the M_BREAK message
+ *
+ * On the read queue, an M_BREAK is used to indicate an sk_error_report callback on the socket.
+ * This can mean that the socket has disconected.  We might not received any other indication of the
+ * error.
+ *
+ * We always examine both the state of the TPI interface and the state of the socket to determine
+ * which actions need to be performed.  This makes the state machine interworking more robust.
+ *
+ * Note that the sk pointer passed in here is not necessarily the same as ss->sock->sk, sk may be a
+ * child (connection indication) of the primary socket.
+ */
+static inline fastcall __hot_get int
+__ss_r_break(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	int err;
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
-	int rtn;
 
-	err = sock_error(p->sk);
 	if (!ss->sock)
 		goto discard;
 #if 0
@@ -16155,18 +16192,21 @@ __ss_r_error(ss_t *ss, queue_t *q, mblk_t *mp)
 	switch (ss->p.prot.type) {
 	case SOCK_STREAM:
 	case SOCK_SEQPACKET:
-		switch (ss_get_state(ss)) {
+		switch (__builtin_expect(ss_get_state(ss), TS_DATA_XFER)) {
 		case TS_WCON_CREQ:
 		case TS_DATA_XFER:
 		case TS_WIND_ORDREL:
 		case TS_WREQ_ORDREL:
-			switch (-err) {
-			case ECONNREFUSED:
+			switch (-p->error) {
 			case EPIPE:
+			case ENETDOWN:
+			case EHOSTUNREACH:
 			case ECONNRESET:
-				rtn = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL, NULL);
+			case ECONNREFUSED:
+				err = t_discon_ind(ss, q, mp, NULL, T_PROVIDER, 0, NULL, NULL);
 				goto done;
 			default:
+				STRLOGNO(ss, "INFO: ignoring error event %d", p->error);
 				goto absorb;
 			}
 #if 0
@@ -16175,41 +16215,96 @@ __ss_r_error(ss_t *ss, queue_t *q, mblk_t *mp)
 		default:
 		case TS_IDLE:
 		case TS_WRES_CIND:
-			STRLOGNO(ss, "INFO: ignoring error event %d", err);
+			STRLOGNO(ss, "INFO: ignoring error event %d", p->error);
 			goto absorb;
 		}
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
+		STRLOGERR(ss, "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+			  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+			  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
 		goto absorb;
 	case SOCK_DGRAM:
 	case SOCK_RAW:
 	case SOCK_RDM:
-		switch (ss_get_state(ss)) {
+		switch (__builtin_expect(ss_get_state(ss), TS_IDLE)) {
 		case TS_IDLE:
 			STRLOGNO(ss, "FIXME: generate uderror");
-			STRLOGNO(ss, "INFO: ignoring error event %d", err);
+			STRLOGNO(ss, "INFO: ignoring error event %d", p->error);
 			goto absorb;
 		}
-		STRLOGNO(ss, "SWERR: socket state %s in TPI state %s", tcp_statename(p->state),
-			 tpi_statename(ss_get_state(ss)));
+		STRLOGERR(ss, "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+			  tcp_statename(p->state), tpi_statename(ss_get_state(ss)),
+			  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
 		goto absorb;
 	}
-	STRLOGNO(ss, "SWERR: unsupported socket type %d", ss->p.prot.type);
+	STRLOGERR(ss, "SWERR: unsupported socket type %d: %s %s:%d", ss->p.prot.type, __FUNCTION__,
+		  __FILE__, __LINE__);
 	goto absorb;
       done:
-	return (rtn);
+	return (err);
       discard:
 	STRLOGNO(ss, "ERROR: lingering event, ignoring");
 	goto absorb;
       absorb:
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
 }
 
+/**
+ * ss_r_error: - process M_ERROR message on read queue
+ * @q: the active queue (read queue)
+ * @mp: the M_ERROR message
+ *
+ * This is the unlocked version of __ss_r_error().  These messages are always queued as their
+ * purpose is to enable the service procedure.
+ */
+static inline fastcall __hot_get int
+ss_r_error(queue_t *q, mblk_t *mp)
+{
+	/* Always queue to enable the service procedure. */
+	return (-EAGAIN);
+}
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Other Message Handling
+ *
+ *  -------------------------------------------------------------------------
+ */
+
+/**
+ * ss_r_other: - process other messages on the driver read queue
+ * @q: active queue (read queue only)
+ * @mp: the message
+ *
+ * The only other messages that we expect on the driver read queue is M_FLUSH messages.  We process
+ * these appropriately.  Any other message is an error and is discarded.
+ */
+noinline fastcall __unlikely int
+ss_r_other(queue_t *q, mblk_t *mp)
+{
+	switch (__builtin_expect(mp->b_datap->db_type, M_FLUSH)) {
+	case M_FLUSH:
+		return ss_r_flush(q, mp);
+	}
+	STRLOGERR(PRIV(q), "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	freemsg(mp);
+	return (0);
+}
+
+/**
+ * ss_w_other: - process other messages on the driver write queue
+ * @q: active queue (write queue only)
+ * @mp: the message
+ *
+ * The only other messages that we expect on the driver write queue is M_FLUSH and M_IOCTL or
+ * M_IOCDATA messages.  We process these appropriately.  Any other message is an error and is
+ * discarded.
+ */
 noinline fastcall int
 ss_w_other(queue_t *q, mblk_t *mp)
 {
-	switch (mp->b_datap->db_type) {
+	switch (__builtin_expect(mp->b_datap->db_type, M_FLUSH)) {
 	case M_FLUSH:
 		return ss_w_flush(q, mp);
 	case M_IOCTL:
@@ -16218,7 +16313,7 @@ ss_w_other(queue_t *q, mblk_t *mp)
 	}
 	STRLOGERR(PRIV(q), "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	freemsg(mp);
-	return (QR_ABSORBED);
+	return (0);
 }
 
 /*
@@ -16236,11 +16331,10 @@ ss_w_other(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  *
- * This is the fast path for the TPI write put procedure.  Data is simply queued
- * by returning -%EAGAIN.  This provides better flow control and scheduling for
- * maximum throughput.
+ * This is the fast path for the TPI write put procedure.  Data is simply queued by returning
+ * -%EAGAIN.  This provides better flow control and scheduling for maximum throughput.
  */
-STATIC INLINE streamscall __hot_put int
+static inline streamscall __hot_put int
 ss_w_prim_put(queue_t *q, mblk_t *mp)
 {
 	switch (__builtin_expect(mp->b_datap->db_type, M_PROTO)) {
@@ -16249,9 +16343,8 @@ ss_w_prim_put(queue_t *q, mblk_t *mp)
 		return ss_w_proto(q, mp);
 	case M_DATA:
 		return ss_w_data(q, mp);
-	case M_CTL:
-	case M_READ:
-		return ss_w_read(q, mp);
+	case M_PCRSE:
+		return ss_w_pcrse(q, mp);
 	default:
 		return ss_w_other(q, mp);
 	}
@@ -16263,11 +16356,11 @@ ss_w_prim_put(queue_t *q, mblk_t *mp)
  * @q: active queue (write queue)
  * @mp: the primitive
  *
- * Tihs is the fast path for the TPI write service procedure.  Data is
- * processed.  Processing data from the write service procedure provies better
- * flow control and scheduling for maximum throughput and minimum latency.
+ * This is the fast path for the TPI write service procedure.  Data is processed.  Processing data
+ * from the write service procedure provies better flow control and scheduling for maximum
+ * throughput and minimum latency.
  */
-STATIC INLINE streamscall __hot_put int
+static inline streamscall __hot_put int
 ss_w_prim_srv(ss_t *ss, queue_t *q, mblk_t *mp)
 {
 	switch (__builtin_expect(mp->b_datap->db_type, M_PROTO)) {
@@ -16276,9 +16369,8 @@ ss_w_prim_srv(ss_t *ss, queue_t *q, mblk_t *mp)
 		return __ss_w_proto(ss, q, mp);
 	case M_DATA:
 		return __ss_w_data(ss, q, mp);
-	case M_CTL:
-	case M_READ:
-		return __ss_w_read(ss, q, mp);
+	case M_PCRSE:
+		return __ss_w_pcrse(ss, q, mp);
 	default:
 		return ss_w_other(q, mp);
 	}
@@ -16288,55 +16380,134 @@ ss_w_prim_srv(ss_t *ss, queue_t *q, mblk_t *mp)
  *  READ PUT ad SERVICE (Message from below IP-Provider --> IP-User
  *  -------------------------------------------------------------------------
  */
-noinline fastcall __unlikely int
-ss_r_other(queue_t *q, mblk_t *mp)
-{
-	if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-		putnext(q, mp);
-		return (QR_ABSORBED);
-	}
-	return (-EBUSY);
-}
-
 /**
- * ss_r_prim_srv: - read primitive handling
- * @ss: private structure
+ * ss_r_prim_put: - read primitive handling (put procedure)
  * @q: active queue (read queue)
  * @mp: the primitive
+ *
+ * There are four messages that can appear on the read queue: M_DATA messages are data messages that
+ * were collected from the socket and are being formatted as the appropriate TPI messages and passed
+ * along.  These M_DATA messages only exists on the read queue after experiencing upstream flow
+ * control.
  */
-STATIC INLINE streamscall __hot_in int
-ss_r_prim_srv(ss_t *ss, queue_t *q, mblk_t *mp)
+static inline fastcall __hot_out int
+ss_r_prim_put(queue_t *q, mblk_t *mp)
 {
 	switch (__builtin_expect(mp->b_datap->db_type, M_PCRSE)) {
 	case M_DATA:
-		return __ss_r_data(ss, q, mp);
-	case M_PCRSE:
+		return ss_r_data(q, mp);
 	case M_RSE:
-		return __ss_r_pcrse(ss, q, mp);
-	case M_READ:
+	case M_PCRSE:
+		return ss_r_rse(q, mp);
 	case M_CTL:
-		return __ss_r_read(ss, q, mp);
+	case M_PCCTL:
+		return ss_r_ctl(q, mp);
+	case M_BREAK:
 	case M_ERROR:
-		return __ss_r_error(ss, q, mp);
+		return ss_r_error(q, mp);
 	default:
 		return ss_r_other(q, mp);
 	}
 }
 
-#if 0
+/**
+ * ss_r_prim_srv: - read primitive handling (srv procedure)
+ * @ss: private structure
+ * @q: active queue (read queue)
+ * @mp: the primitive
+ */
+static inline streamscall __hot_in int
+ss_r_prim_srv(ss_t *ss, queue_t *q, mblk_t *mp)
+{
+	switch (__builtin_expect(mp->b_datap->db_type, M_DATA)) {
+	case M_DATA:
+		return __ss_r_data(ss, q, mp);
+	case M_PCRSE:
+		return __ss_r_pcrse(ss, q, mp);
+	case M_RSE:
+		return __ss_r_rse(ss, q, mp);
+	case M_PCCTL:
+		return __ss_r_pcctl(ss, q, mp);
+	case M_CTL:
+		return __ss_r_ctl(ss, q, mp);
+	case M_ERROR:
+		return __ss_r_error(ss, q, mp);
+	case M_BREAK:
+		return __ss_r_break(ss, q, mp);
+	default:
+		return ss_r_other(q, mp);
+	}
+}
+
 /*
  *  READ SIDE wakeup procedure (called on each service procedure exit)
  *  -------------------------------------------------------------------------
  */
-STATIC streams_fastcall __hot_in void
-ss_r_wakeup(ss_t *ss, queue_t *q)
-{
-	if (ss->sock != NULL)
-		ss_sock_recvmsg(ss, q, NULL);
-}
-#endif
 
-#define PRELOAD (FASTBUF<<2)
+/**
+ * __ss_r_wakeup: - process read side wakeup (locked)
+ * @ss: locked private structure
+ * @q: active queue (read queue only)
+ *
+ * The read side wakeup procedure acts as a backenable between the read queue and the underlying
+ * socket.  When in the appropriate state, ss_sock_recvmsg() is called and will place messages on
+ * the read queue if canput() succeeds.  When canput() fails the service run on the socket is
+ * complete and the read queue waits to be backenabled from upstream.
+ */
+static inline fastcall __hot_in void
+__ss_r_wakeup(ss_t *ss, queue_t *q)
+{
+	struct socket *sock;
+	struct sock *sk;
+
+	if (unlikely((sock = ss->sock) == NULL))
+		return;
+	if (unlikely((sk = sock->sk) == NULL))
+		return;
+	switch (ss->p.prot.type) {
+	case SOCK_STREAM:	/* TCP */
+	case SOCK_SEQPACKET:	/* SCTP */
+		switch (__builtin_expect(ss_get_state(ss), TS_DATA_XFER)) {
+		case TS_IDLE:
+		case TS_WRES_CIND:
+			if (sk->sk_state == TCP_LISTEN)
+				break;
+		case TS_DATA_XFER:
+		case TS_WIND_ORDREL:
+		case TS_WREQ_ORDREL:	/* TCP bug I believe */
+			ss_sock_recvmsg(ss, q, NULL);
+			break;
+		default:
+			STRLOGERR(ss,
+				  "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+				  tcp_statename(sk->sk_state), tpi_statename(ss_get_state(ss)),
+				  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
+			break;
+		}
+		break;
+	case SOCK_DGRAM:
+	case SOCK_RAW:
+	case SOCK_RDM:
+		switch (__builtin_expect(ss_get_state(ss), TS_IDLE)) {
+		case TS_IDLE:
+			ss_sock_recvmsg(ss, q, NULL);
+			break;
+		default:
+			STRLOGERR(ss,
+				  "SWERR: socket state %s in TPI state %s, oldstate %s: %s %s:%d",
+				  tcp_statename(sk->sk_state), tpi_statename(ss_get_state(ss)),
+				  tcp_statename(ss->tcp_state), __FUNCTION__, __FILE__, __LINE__);
+			break;
+		}
+		break;
+	default:
+		STRLOGERR(ss, "SWERR: unsupported socket type %d: %s %s:%d", ss->p.prot.type,
+			  __FUNCTION__, __FILE__, __LINE__);
+		break;
+	}
+	return;
+}
+
 /*
  *  =========================================================================
  *
@@ -16345,16 +16516,25 @@ ss_r_wakeup(ss_t *ss, queue_t *q)
  *  =========================================================================
  */
 
-STATIC streamscall __hot_in int
+static streamscall __hot_in int
 ss_rput(queue_t *q, mblk_t *mp)
 {
 	/* Always just put the message to the queue.  The problem is that the put procedure is
 	   almost always called at bottom-half and if we execute socket procedures with the socket
 	   bottom-half locked we are in a world of pain. */
-	mp->b_wptr += PRELOAD;
-	if (unlikely(putq(q, mp) == 0)) {
-		mp->b_band = 0;	/* must succeed */
-		putq(q, mp);
+	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
+	    || unlikely(ss_r_prim_put(q, mp))) {
+		ss_rstat.ms_acnt++;
+		/* apply backpressure */
+		mp->b_wptr += PRELOAD;
+#ifdef LFS
+		putq(q, mp);	/* qopen allocates all necessary queue bands */
+#else
+		if (unlikely(!putq(q, mp))) {
+			mp->b_band = 0;	/* must succeed */
+			putq(q, mp);
+		}
+#endif
 	}
 	return (0);
 }
@@ -16363,35 +16543,33 @@ ss_rput(queue_t *q, mblk_t *mp)
  * ss_rsrv: - read service procedure
  * @q: active queue (read queue)
  *
- * This is a canonical service procedure for the read queue.  Messages placed on
- * the read queue either come from this module internally or the INET socket.
- * The service procedure takes private structure locks once for the entire loop
- * for speed.
+ * This is a canonical service procedure for the read queue.  Messages placed on the read queue
+ * either come from this module internally or the INET socket.  The service procedure takes private
+ * structure locks once for the entire loop for speed.
  */
-STATIC streamscall __hot_in int
+static streamscall __hot_in int
 ss_rsrv(queue_t *q)
 {
 	ss_t *ss;
+	mblk_t *mp;
 
 	if (likely((ss = ss_trylockq(q)) != NULL)) {
-		mblk_t *mp;
-		int rtn;
-
 		while (likely((mp = getq(q)) != NULL)) {
+			/* remove backpressure */
 			mp->b_wptr -= PRELOAD;
-			if (unlikely((rtn = ss_r_prim_srv(ss, q, mp)) != QR_ABSORBED)) {
-				/* reapply backpressure */
+			if (unlikely(ss_r_prim_srv(ss, q, mp))) {
+				/* reaply backpressure */
 				mp->b_wptr += PRELOAD;
 				if (unlikely(!putbq(q, mp))) {
 					mp->b_band = 0;
 					putbq(q, mp);	/* must succeed */
 				}
-				STRLOGRX(ss, "read queue stalled %d", rtn);
+				STRLOGRX(ss, "read queue stalled");
 				break;
 			}
 		}
 #if 0
-		ss_r_wakeup(ss, q);
+		__ss_r_wakeup(ss, q);
 #endif
 		ss_unlockq(ss);
 	}
@@ -16403,15 +16581,15 @@ ss_rsrv(queue_t *q)
  * @q: active queue (write queue)
  * @mp: message to put
  *
- * This is a canoncial put procedure for write.  Locking is performed by the
- * individual message handling procedures.
+ * This is a canoncial put procedure for write.  Locking is performed by the individual message
+ * handling procedures.
  */
-STATIC streamscall __hot_in int
+static streamscall __hot_in int
 ss_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || unlikely(ss_w_prim_put(q, mp) != QR_ABSORBED)) {
-		// ss_wstat.ms_acnt++;
+	    || unlikely(ss_w_prim_put(q, mp))) {
+		ss_wstat.ms_acnt++;
 		/* apply backpressure */
 		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {
@@ -16426,34 +16604,34 @@ ss_wput(queue_t *q, mblk_t *mp)
  * ss_wsrv: - write service procedure
  * @q: active queue (write queue)
  *
- * This is a canonical service procedure for write.  Locking is performed
- * outside the loop so that locks do not need to be released and acquired with
- * each loop.  Note that the wakeup function must also be executed with the
- * private structure locked.
+ * This is a canonical service procedure for write.  Locking is performed outside the loop so that
+ * locks do not need to be released and acquired with each loop.  Note that the wakeup function must
+ * also be executed with the private structure locked.
  */
-STATIC streamscall __hot_in int
+static streamscall __hot_in int
 ss_wsrv(queue_t *q)
 {
 	ss_t *ss;
+	mblk_t *mp;
 
 	if (likely((ss = ss_trylockq(q)) != NULL)) {
-		mblk_t *mp;
-		int rtn;
-
 		while (likely((mp = getq(q)) != NULL)) {
 			/* remove backpressure */
 			mp->b_wptr -= PRELOAD;
-			if (unlikely((rtn = ss_w_prim_srv(ss, q, mp)) != QR_ABSORBED)) {
+			if (unlikely(ss_w_prim_srv(ss, q, mp))) {
 				/* reapply backpressure */
 				mp->b_wptr += PRELOAD;
 				if (unlikely(!putbq(q, mp))) {
 					mp->b_band = 0;	/* must succeed */
 					putbq(q, mp);
 				}
-				STRLOGTX(ss, "write queue stalled %d", rtn);
+				STRLOGTX(ss, "write queue stalled");
 				break;
 			}
 		}
+#if 0
+		ss_w_wakeup(ss, q);
+#endif
 		ss_unlockq(ss);
 	}
 	return (0);
@@ -16469,7 +16647,7 @@ ss_wsrv(queue_t *q)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
-STATIC const ss_profile_t ss_profiles[] = {
+static const ss_profile_t ss_profiles[] = {
 	{{PF_INET, SOCK_RAW, IPPROTO_ICMP},
 	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
@@ -16537,8 +16715,8 @@ STATIC const ss_profile_t ss_profiles[] = {
 	  T_INFINITE, 65535, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 #endif				/* defined HAVE_OPENSS7_SCTP */
 };
-STATIC int ss_majors[SS__CMAJORS] = { SS__CMAJOR_0, };
-STATIC streamscall int
+static int ss_majors[SS__CMAJORS] = { SS__CMAJOR_0, };
+static streamscall int
 ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int mindex = 0, err;
@@ -16637,33 +16815,29 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	   to create until the socket is bound to a protocol. For all others, the protocol is known 
 	   and the socket is created so that we can accept options management on unbound sockets. */
 	spin_unlock_irqrestore(&ss_lock, flags);
-	if ((err = ss_sock_init(ss)) < 0) {
-		STRLOGERR(ss, "ERROR: from ss_sock_init %d", -err);
-		ss_free_priv(q);
-		freeb(mp);
-		return (-err);
-	}
 	so = (typeof(so)) mp->b_wptr;
 	bzero(so, sizeof(*so));
 	so->so_flags |= SO_MINPSZ;
 	so->so_minpsz = ss_winfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
 	so->so_maxpsz = ss_winfo.mi_maxpsz;
-#if 0
-	so->so_flags |= SO_HIWAT;
-	so->so_hiwat = (SHEADHIWAT << 3) + (STRHIGH << 1);
-	so->so_flags |= SO_LOWAT;
-	so->so_lowat = 0;
-#else
 	so->so_flags |= SO_HIWAT;
 	so->so_hiwat = (SHEADHIWAT >> 1);
 	so->so_flags |= SO_LOWAT;
 	so->so_lowat = 0;
-#endif
 	mp->b_wptr += sizeof(*so);
 	mp->b_datap->db_type = M_SETOPTS;
 	qprocson(q);
 	putnext(q, mp);
+	if ((err = ss_sock_init(ss)) < 0) {
+		STRLOGERR(ss, "ERROR: from ss_sock_init %d", -err);
+		ss_set_state(ss, TS_UNBND);
+		ss_socket_put(&ss->sock);
+		qprocsoff(q);
+		ss_free_priv(ss, q);
+		return (-err);
+	}
+	ss_unlockq(ss);
 	return (0);
 }
 
@@ -16671,14 +16845,11 @@ ss_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
  *  CLOSE
  *  -------------------------------------------------------------------------
  */
-STATIC streamscall int
+static streamscall int
 ss_close(queue_t *q, int flag, cred_t *crp)
 {
-	ss_t *ss = PRIV(q);
+	ss_t *ss = PRIV(q);;
 
-	(void) flag;
-	(void) crp;
-	(void) ss;
 	STRLOGNO(ss, "closing character device %d:%d", ss->cmajor, ss->cminor);
 #if defined LIS
 	/* protect against LiS bugs */
@@ -16694,9 +16865,11 @@ ss_close(queue_t *q, int flag, cred_t *crp)
 #endif				/* defined LIS */
 	goto skip_pop;
       skip_pop:
+	ss = ss_sleeplock(q);
+	ss_set_state(ss, TS_UNBND);
+	ss_socket_put(&ss->sock);
 	qprocsoff(q);
-	ss_free_priv(q);
-	q->q_ptr = WR(q)->q_ptr = NULL;
+	ss_free_priv(ss, q);
 	goto quit;
       quit:
 	return (0);
@@ -16739,7 +16912,7 @@ MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)"
  */
 #ifdef LFS
 
-STATIC struct cdevsw ss_cdev = {
+static struct cdevsw ss_cdev = {
 	.d_name = DRV_NAME,
 	.d_str = &ss_info,
 	.d_flag = D_MP | D_CLONE,
@@ -16748,93 +16921,93 @@ STATIC struct cdevsw ss_cdev = {
 	.d_kmod = THIS_MODULE,
 };
 
-STATIC struct devnode inet_node_ip = {
+static struct devnode inet_node_ip = {
 	.n_name = "ip",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_icmp = {
+static struct devnode inet_node_icmp = {
 	.n_name = "icmp",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_ggp = {
+static struct devnode inet_node_ggp = {
 	.n_name = "ggp",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_ipip = {
+static struct devnode inet_node_ipip = {
 	.n_name = "ipip",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_tcp = {
+static struct devnode inet_node_tcp = {
 	.n_name = "tcp",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_egp = {
+static struct devnode inet_node_egp = {
 	.n_name = "egp",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_pup = {
+static struct devnode inet_node_pup = {
 	.n_name = "pup",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_udp = {
+static struct devnode inet_node_udp = {
 	.n_name = "udp",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_idp = {
+static struct devnode inet_node_idp = {
 	.n_name = "idp",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_rawip = {
+static struct devnode inet_node_rawip = {
 	.n_name = "rawip",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_ticots_ord = {
+static struct devnode inet_node_ticots_ord = {
 	.n_name = "ticots_ord",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_ticots = {
+static struct devnode inet_node_ticots = {
 	.n_name = "ticots",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
-STATIC struct devnode inet_node_ticlts = {
+static struct devnode inet_node_ticlts = {
 	.n_name = "ticlts",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 
 #if defined HAVE_OPENSS7_SCTP
-STATIC struct devnode inet_node_sctp = {
+static struct devnode inet_node_sctp = {
 	.n_name = "sctp",
 	.n_flag = D_CLONE,	/* clone minor */
 	.n_mode = S_IFCHR | S_IRUGO | S_IWUGO,
 };
 #endif
 
-STATIC int
+static int
 ss_register_strdev(major_t major)
 {
 	int err;
@@ -16888,7 +17061,7 @@ ss_register_strdev(major_t major)
 	return (0);
 }
 
-STATIC int
+static int
 ss_unregister_strdev(major_t major)
 {
 	int err;
@@ -16950,7 +17123,7 @@ ss_unregister_strdev(major_t major)
  */
 #ifdef LIS
 
-STATIC int
+static int
 ss_register_strdev(major_t major)
 {
 	int err;
@@ -16966,7 +17139,7 @@ ss_register_strdev(major_t major)
 	return (0);
 }
 
-STATIC int
+static int
 ss_unregister_strdev(major_t major)
 {
 	int err;
