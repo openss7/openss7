@@ -1,3 +1,8 @@
+2008-10-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/bugs.texi: document bug #025
+	* src/kernel/strsched.c: fixed putnext qprocsoff behaviour (see bug #025)
+
 2008-10-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: check for snmp_check_tables

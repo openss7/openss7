@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2008-09-10 03:49:44 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2008-10-17 06:04:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:44 $ by $Author: brian $
+ Last Modified $Date: 2008-10-17 06:04:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.174  2008-10-17 06:04:53  brian
+ - fixed putnext qprocsoff bug
+
  Revision 0.9.2.173  2008-09-10 03:49:44  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -204,10 +207,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2008-09-10 03:49:44 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2008-10-17 06:04:53 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.173 $) $Date: 2008-09-10 03:49:44 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.174 $) $Date: 2008-10-17 06:04:53 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -2696,7 +2699,7 @@ srvp_fast(queue_t *q)
 		assert(sd);
 
 		/* spin here if Stream frozen by other than caller */
-		freeze_barrier(q);
+		stream_barrier(sd);
 
 		prlock(sd);
 
@@ -3510,7 +3513,7 @@ put_filter(queue_t **qp, mblk_t *mp)
  *  scheduler to call the qi_putp on the queue with the messages and taking the appropriate
  *  synchronization (i.e. calling qputp()).  Well, if we save the function, queue and argument in
  *  the mbinfo structure just as we do for deferral against synchroniation queues, but queue the
- *  message against the STREAMS scheduler rather than the syncrhoniation queue, using atomic
+ *  message against the STREAMS scheduler rather than the syncrhonization queue, using atomic
  *  exchanges, then we could also defer qwriter() and streams_put() along with put() from
  *  non-STREAMS contexts.  If only these three (queue) functions are called from outside STREAMS and
  *  no others like putq() or getq(), then we could avoid suppressing hard interrupts throughout
@@ -3590,6 +3593,11 @@ EXPORT_SYMBOL(put);
  *
  *  NOTICES: Changed this function to take no locks.  Do not call from ISR.  Use put() instead.
  *  You can then simply call putnext() from the driver's queue put procedure if you'd like.
+ *
+ *  Note that putnext() from a queue for which procedures are turned off should be OK.  Otherwise
+ *  where is little point to the half-insert of the queue pair.  Changed to not check QPROCS flags
+ *  on the queue that we are putting from, they will still be checked on the queue that we are
+ *  putting to.
  */
 streams_fastcall __hot void
 putnext(queue_t *q, mblk_t *mp)
@@ -3612,17 +3620,13 @@ putnext(queue_t *q, mblk_t *mp)
 	sd = qstream(q);
 	dassert(sd);
 	prlock(sd);
-	if (likely(test_bit(QPROCS_BIT, &q->q_flag) == 0)) {
+	{
 		_assure(q->q_next != NULL);
 #ifdef CONFIG_STREAMS_SYNCQS
 		qputp(q->q_next, mp);
 #else
 		putp_fast(q->q_next, mp);
 #endif
-	} else {
-		swerr();
-		dump_stack();
-		freemsg(mp);
 	}
 	/* prlock/unlock doesn't cost much anymore, so it is here so put() can be called on a
 	   Stream end (upper mux rq, lower mux wq), but we don't want sd (or anything for that
