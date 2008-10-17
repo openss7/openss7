@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:29 $ by $Author: brian $
+ Last Modified $Date: 2008-10-17 10:34:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.48  2008-10-17 10:34:40  brian
+ - expanded and correct MPS functions
+
  Revision 0.9.2.47  2008-09-22 20:31:29  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -90,7 +93,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-09-22 20:31:29 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -186,8 +189,10 @@ struct mi_comm {
 	bcid_t mi_wbid;			/* wr queue bufcall */
 	long mi_users;			/* users and waiters */
 	queue_t *mi_q;			/* attached read queue */
+	atomic_t mi_refs;		/* references to structure */
 	struct mi_comm *mi_waiter;	/* waiter on lock */
 	wait_queue_head_t mi_waitq;	/* processes waiting on lock */
+	kmem_cachep_t mi_cachep;	/* cache pointer */
 	union {
 		dev_t dev;		/* device number (or NODEV for modules) */
 		int index;		/* link index */
@@ -200,6 +205,63 @@ struct mi_comm {
 
 #define mi_to_ptr(mi) ((mi) ? (mi)->mi_ptr : NULL)
 #define ptr_to_mi(ptr) ((ptr) ? (struct mi_comm *)(ptr) - 1 : NULL)
+
+/**
+ * mi_open_grab: - grab a reference to an open structure
+ * @ptr: a pointer to the user portion of the structure
+ *
+ * Grabs a reference to the open structure referenced by @ptr and returns a pointer to the user
+ * portion of the structure.  If the passed in pointer is invalid or NULL, the function returns NULL.
+ */
+__MPS_EXTERN caddr_t
+mi_open_grab(caddr_t ptr)
+{
+	if (ptr) {
+		struct mi_comm *mi = ptr_to_mi(ptr);
+
+		assert(mi);
+		assert(atomic_read(&mi->mi_refs) > 0);
+		atomic_inc(&mi->mi_refs);
+		return (ptr);
+	}
+	return (NULL);
+}
+
+EXPORT_SYMBOL(mi_open_grab);
+
+/**
+ * mi_close_put: - release a reference to an open structure
+ * @ptr: a pointer to the user portion of the structure
+ *
+ * Release a reference from the open structure referenced by @ptr and returns a pointer to the user
+ * portion of the structure.  If the reference is the last reference released, the open structure is
+ * detached, unlinked and deallocated as necessary.  It the passed pointer is invalid or NULL, the
+ * function simply returns NULL.
+ */
+__MPS_EXTERN caddr_t
+mi_close_put(caddr_t ptr)
+{
+	if (ptr) {
+		struct mi_comm *mi = ptr_to_mi(ptr);
+
+		assert(mi);
+		assert(atomic_read(&mi->mi_refs) > 0);
+		if (atomic_dec_and_test(&mi->mi_refs)) {
+			if (mi->mi_q != NULL)
+				mi_detach(mi->mi_q, ptr);
+			if (mi->mi_head != NULL)
+				mi_close_unlink((caddr_t *)mi->mi_head, ptr);
+			if (mi->mi_cachep)
+				kmem_cache_free(mi->mi_cachep, mi);
+			else
+				kmem_free(mi, mi->mi_size);
+			return (NULL);
+		}
+	}
+	return (ptr);
+}
+
+EXPORT_SYMBOL(mi_close_put);
 
 /**
  * mi_open_size: - obtain size of open structure
@@ -220,7 +282,8 @@ EXPORT_SYMBOL(mi_open_size);
 /**
  * mi_open_obj: - initialize open structure
  * @obj: pointer to allocated memory extent
- * @size: size of user portion
+ * @size: size of user portion (zero for cache allocated)
+ * @cachep: memory cache pointer (NULL for kmem allocated)
  *
  * Initializes a user allocated structure for use by the mi_open routines and returns a pointer to
  * the user portion.  The structure allocated should be of the size returned by mi_open_size().  The
@@ -230,7 +293,7 @@ EXPORT_SYMBOL(mi_open_size);
  * Note that this function will return NULL if passed NULL.
  */
 __MPS_EXTERN caddr_t
-mi_open_obj(void *obj, size_t size)
+mi_open_obj(void *obj, size_t size, kmem_cachep_t cachep)
 {
 	struct mi_comm *mi;
 
@@ -238,6 +301,8 @@ mi_open_obj(void *obj, size_t size)
 		bzero(mi, sizeof(*mi));
 		mi->mi_prev = mi->mi_head = &mi->mi_next;
 		mi->mi_size = size;
+		mi->mi_cachep = cachep;
+		atomic_set(&mi->mi_refs, 1);
 		init_waitqueue_head(&mi->mi_waitq);
 	}
 	return (mi_to_ptr(mi));
@@ -284,19 +349,25 @@ mi_open_alloc_cache(kmem_cachep_t cachep, int flag)
 	struct mi_comm *mi;
 
 	if ((mi = kmem_cache_alloc(cachep, flag)))
-		return mi_open_obj(mi, 0);
+		return mi_open_obj(mi, 0, cachep);
 	return (NULL);
 }
 
 EXPORT_SYMBOL(mi_open_alloc_cache);
 
+/**
+ * mi_close_free_cache: - free a private structure
+ * @cachep: memory cache from which structure was allocated
+ * @ptr: private structure to free
+ *
+ * This function does not actually free the structure but removes a reference from the structure.
+ * When the last reference is removed, the structure will be freed.
+ */
 __MPS_EXTERN void
 mi_close_free_cache(kmem_cachep_t cachep, caddr_t ptr)
 {
-	struct mi_comm *mi = ptr_to_mi(ptr);
-
-	if (mi && mi->mi_head == NULL && mi->mi_next == NULL)
-		kmem_cache_free(cachep, mi);
+	(void) cachep;
+	mi_close_put(ptr);
 }
 
 EXPORT_SYMBOL(mi_close_free_cache);
@@ -307,7 +378,7 @@ mi_open_alloc_flag(size_t size, int flag)
 	struct mi_comm *mi;
 
 	if ((mi = kmem_zalloc(mi_open_size(size), flag)))
-		return mi_open_obj(mi, size);
+		return mi_open_obj(mi, size, NULL);
 	return (NULL);
 }
 
@@ -559,14 +630,14 @@ EXPORT_SYMBOL(mi_close_unlink);	/* mps/ddi.h */
 /**
  * mi_close_free: - free a private structure
  * @ptr: private structure to free
+ *
+ * This function does not actually free the structure but removes a reference from the structure.
+ * When the last reference is removed, the structure will be freed.
  */
 __MPS_EXTERN void
 mi_close_free(caddr_t ptr)
 {
-	struct mi_comm *mi = ptr_to_mi(ptr);
-
-	if (mi && mi->mi_head == NULL && mi->mi_next == NULL)
-		kmem_free(mi, mi->mi_size);
+	mi_close_put(ptr);
 }
 
 EXPORT_SYMBOL(mi_close_free);	/* mps/ddi.h */
@@ -685,13 +756,16 @@ struct mi_iocblk {
 static noinline fastcall void
 mi_wakepriv(struct mi_comm *mi)
 {
-	if (!test_and_clear_bit(MI_WAIT_SLEEP_BIT, &mi->mi_users))
+	if (test_and_clear_bit(MI_WAIT_SLEEP_BIT, &mi->mi_users))
 		if (waitqueue_active(&mi->mi_waitq))
 			wake_up_all(&mi->mi_waitq);
-	if (!test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_users))
-		qenable(RD(mi->mi_q));
-	if (!test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_users))
-		qenable(WR(mi->mi_q));
+	if (test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_users))
+		if (mi->mi_q != NULL)
+			qenable(RD(mi->mi_q));
+	if (test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_users))
+		if (mi->mi_q != NULL)
+			qenable(WR(mi->mi_q));
+	mi_close_put(mi_to_ptr(mi));
 }
 
 /**
@@ -705,21 +779,27 @@ mi_wakepriv(struct mi_comm *mi)
 __MPS_EXTERN caddr_t
 mi_acquire(caddr_t ptr, queue_t *q)
 {
-	struct mi_comm *mi = ptr_to_mi(ptr);
+	if (ptr) {
+		struct mi_comm *mi = ptr_to_mi(ptr);
 
-	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
-		if (q && (mi = ptr_to_mi((caddr_t) q->q_ptr))) {
-			if (q->q_flag & QREADR)
-				set_bit(MI_WAIT_RQ_BIT, &mi->mi_users);
-			else
-				set_bit(MI_WAIT_WQ_BIT, &mi->mi_users);
-			if ((mi = xchg(&mi->mi_waiter, mi)))
-				mi_wakepriv(mi);
-			mi = ptr_to_mi(ptr);
-			if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
-				return (ptr);
+		assert(mi);
+		if (unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
+			struct mi_comm *mi2;
+			caddr_t ptr2;
+
+			if (q && (ptr2 = (caddr_t) q->q_ptr) && (mi2 = ptr_to_mi(ptr2))
+			    && (ptr2 = mi_open_grab(ptr2))) {
+				struct mi_comm *miO;
+
+				set_bit((q->q_flag & QREADR) ? MI_WAIT_RQ_BIT : MI_WAIT_WQ_BIT,
+					&mi2->mi_users);
+				if ((miO = xchg(&mi->mi_waiter, mi2)))
+					mi_wakepriv(miO);
+				if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
+					return (ptr);
+			}
+			return (NULL);
 		}
-		return (NULL);
 	}
 	return (ptr);
 }
@@ -2653,9 +2733,11 @@ EXPORT_SYMBOL(mi_mpprintf_nr);
  *
  *  =========================================================================
  */
-/*
- *  MI_SET_STH_HIWAT
- *  -------------------------------------------------------------------------
+
+/**
+ * mi_set_sth_hiwat: - set Stream Head high water mark
+ * @q: read queue of queue pair in Stream
+ * @size: size of high water mark (in bytes)
  */
 __MPS_EXTERN int
 mi_set_sth_hiwat(queue_t *q, size_t size)
@@ -2679,9 +2761,10 @@ mi_set_sth_hiwat(queue_t *q, size_t size)
 
 EXPORT_SYMBOL(mi_set_sth_hiwat);
 
-/*
- *  MI_SET_STH_LOWAT
- *  -------------------------------------------------------------------------
+/**
+ * mi_set_sth_lowat: - set Stream Head low water mark
+ * @q: read queue of queue pair in Stream
+ * @size: size of low water mark (in bytes)
  */
 __MPS_EXTERN int
 mi_set_sth_lowat(queue_t *q, size_t size)
@@ -2705,9 +2788,10 @@ mi_set_sth_lowat(queue_t *q, size_t size)
 
 EXPORT_SYMBOL(mi_set_sth_lowat);
 
-/*
- *  MI_SET_STH_MAXBLK
- *  -------------------------------------------------------------------------
+/**
+ * mi_set_sth_maxblk: - set Stream Head maximum block size
+ * @q: read queue of queue pair in Stream
+ * @size: maximum block size (bytes)
  */
 __MPS_EXTERN int
 mi_set_sth_maxblk(queue_t *q, ssize_t size)
@@ -2732,9 +2816,10 @@ mi_set_sth_maxblk(queue_t *q, ssize_t size)
 
 EXPORT_SYMBOL(mi_set_sth_maxblk);
 
-/*
- *  MI_SET_STH_COPYOPT
- *  -------------------------------------------------------------------------
+/**
+ * mi_set_sth_coyopt: - set Stream Head copy options
+ * @q: read queue of queue pair in Stream
+ * @copyopt: copy options
  */
 __MPS_EXTERN int
 mi_set_sth_copyopt(queue_t *q, int copyopt)
@@ -2759,9 +2844,10 @@ mi_set_sth_copyopt(queue_t *q, int copyopt)
 
 EXPORT_SYMBOL(mi_set_sth_copyopt);
 
-/*
- *  MI_SET_STH_WROFF
- *  -------------------------------------------------------------------------
+/**
+ * mi_set_sth_wroff: - set Stream Head write offset
+ * @q: read queue of queue pair in Stream
+ * @size: size of write offset (bytes)
  */
 __MPS_EXTERN int
 mi_set_sth_wroff(queue_t *q, size_t size)

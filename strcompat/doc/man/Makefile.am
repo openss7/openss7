@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-04-28 16:47:00 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-10-17 10:34:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 16:47:00 $ by $Author: brian $
+# Last Modified $Date: 2008-10-17 10:34:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -157,6 +157,7 @@ mps_compat_pages = \
 	man9/mi_close_free.9 \
 	man9/mi_close_free_cache.9 \
 	man9/mi_close_obj.9 \
+	man9/mi_close_put.9 \
 	man9/mi_close_size.9 \
 	man9/mi_close_unlink.9 \
 	man9/mi_copy_done.9 \
@@ -184,6 +185,7 @@ mps_compat_pages = \
 	man9/mi_open_comm_cache.9 \
 	man9/mi_open_detached.9 \
 	man9/mi_open_detached_cache.9 \
+	man9/mi_open_grab.9 \
 	man9/mi_open_link.9 \
 	man9/mi_open_obj.9 \
 	man9/mi_open_size.9 \
@@ -1245,6 +1247,7 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_close_free.9.man \
 	man9/mi_close_free_cache.9.man \
 	man9/mi_close_obj.9.man \
+	man9/mi_close_put.9.man \
 	man9/mi_close_size.9.man \
 	man9/mi_close_unlink.9.man \
 	man9/mi_copy_done.9.man \
@@ -1272,6 +1275,7 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_open_comm_cache.9.man \
 	man9/mi_open_detached.9.man \
 	man9/mi_open_detached_cache.9.man \
+	man9/mi_open_grab.9.man \
 	man9/mi_open_link.9.man \
 	man9/mi_open_obj.9.man \
 	man9/mi_open_size.9.man \
@@ -2185,6 +2189,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.32  2008-10-17 10:34:39  brian
+# - expanded and correct MPS functions
+#
 # Revision 0.9.2.31  2008-04-28 16:47:00  brian
 # - updates for release
 #
