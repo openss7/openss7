@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.23 2008-04-28 16:47:10 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.24 2008-10-17 10:34:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-10-17 10:34:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.24  2008-10-17 10:34:39  brian
+ - expanded and correct MPS functions
+
  Revision 0.9.2.23  2008-04-28 16:47:10  brian
  - updates for release
 
@@ -125,7 +128,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.23 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.24 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -162,10 +165,12 @@
 /*
  *  Module or driver open and close helper functions.
  */
+__MPS_EXTERN caddr_t mi_open_grab(caddr_t ptr);
+__MPS_EXTERN caddr_t mi_close_put(caddr_t ptr);
 __MPS_EXTERN void *mi_close_obj(caddr_t ptr);
 __MPS_EXTERN size_t mi_open_size(size_t size);
 __MPS_EXTERN size_t mi_close_size(caddr_t ptr);
-__MPS_EXTERN caddr_t mi_open_obj(void *obj, size_t size);
+__MPS_EXTERN caddr_t mi_open_obj(void *obj, size_t size, kmem_cachep_t cachep);
 __MPS_EXTERN caddr_t mi_open_alloc(size_t size);
 __MPS_EXTERN caddr_t mi_open_alloc_sleep(size_t size);
 __MPS_EXTERN caddr_t mi_open_alloc_cache(kmem_cachep_t cachep, int flag);
