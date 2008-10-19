@@ -1,3 +1,7 @@
+2008-10-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/mpscompat.c: locking enhancements
+
 2008-10-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: add new man pages
