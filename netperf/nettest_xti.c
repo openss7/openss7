@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.28 $) $Date: 2007/08/14 07:26:49 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 1.1.1.28 $) $Date: 2007-08-14 07:26:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 07:26:49 $ by $Author: brian $
+ Last Modified $Date: 2007-08-14 07:26:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nettest_xti.c,v $
- Revision 1.1.1.28  2007/08/14 07:26:49  brian
+ Revision 1.1.1.28  2007-08-14 07:26:49  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.28 $) $Date: 2007/08/14 07:26:49 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 1.1.1.28 $) $Date: 2007-08-14 07:26:49 $"
 
 static char const ident[] =
-    "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.28 $) $Date: 2007/08/14 07:26:49 $";
+    "$RCSfile: nettest_xti.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 1.1.1.28 $) $Date: 2007-08-14 07:26:49 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
