@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-19 12:28:52 $ by $Author: brian $
+ Last Modified $Date: 2008-10-19 19:59:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.51  2008-10-19 19:59:42  brian
+ - fix mi_open_link BUG #008
+
  Revision 0.9.2.50  2008-10-19 12:28:52  brian
  - fix BUG #007, mi_open_link() bug
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -99,7 +102,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -537,8 +540,9 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 
 	major_t cmajor = devp ? getmajor(*devp) : 0;
 	minor_t cminor = devp ? getminor(*devp) : 0;
-	major_t dmajor;
 
+	if (mip == NULL || mi == NULL)
+		return (EINVAL);
 	switch (sflag) {
 	case CLONEOPEN:
 		/* first clone minor (above 5 per AIX docs, above 10 per MacOT docs), but the
@@ -562,24 +566,29 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 		/* invalid sflag */
 		return (EINVAL);
 	}
-	dmajor = cmajor;
 	spin_lock(&mi_list_lock);
-	for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor; mip = &(*mip)->mi_next) ;
-	for (; *mip && dmajor == getmajor((*mip)->mi_dev)
-	     && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
-		minor_t dminor = getminor((*mip)->mi_dev);
-
-		if (cminor < dminor)
+	for (; *mip; mip = &(*mip)->mi_next) {
+		if (cmajor != (*mip)->mi_mid)
 			break;
-		if (cminor == dminor)
-			if (sflag == DRVOPEN) {
-				spin_unlock(&mi_list_lock);
-				return (ENXIO);
+		if (cmajor == (*mip)->mi_mid) {
+			if (cminor < (*mip)->mi_sid)
+				break;
+			if (cminor > (*mip)->mi_sid)
+				continue;
+			if (cminor == (*mip)->mi_sid) {
+				if (sflag == DRVOPEN) {
+					/* conflicting device number */
+					spin_unlock(&mi_list_lock);
+					return (ENXIO);
+				}
+				if (getminor(makedevice(0, ++cminor)) == 0) {
+					/* no minor device numbers left */
+					spin_unlock(&mi_list_lock);
+					return (EAGAIN);
+				}
+				continue;
 			}
-	}
-	if (getminor(makedevice(0, cminor)) == 0) {	/* no minors left */
-		spin_unlock(&mi_list_lock);
-		return (EAGAIN);
+		}
 	}
 	mi->mi_dev = makedevice(cmajor, cminor);
 	mi->mi_mid = cmajor;
