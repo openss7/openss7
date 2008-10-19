@@ -1,5 +1,7 @@
 2008-10-19  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/bugs.texi: document mi_open_link BUG #008
+	* src/kernel/mpscompat.c: fix mi_open_link BUG #008
 	* doc/manual/bugs.texi: document mi_open_link BUG #007
 	* src/kernel/mpscompat.c: fix mi_open_link BUG #007
 	* src/kernel/mpscompat.c: locking enhancements
