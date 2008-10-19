@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-19 06:51:09 $ by $Author: brian $
+ Last Modified $Date: 2008-10-19 12:28:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.50  2008-10-19 12:28:52  brian
+ - fix BUG #007, mi_open_link() bug
+
  Revision 0.9.2.49  2008-10-19 06:51:09  brian
  - locking rework
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -96,7 +99,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-19 12:28:52 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -234,8 +237,8 @@ mi_open_grab(caddr_t ptr)
 	if (ptr) {
 		struct mi_comm *mi = ptr_to_mi(ptr);
 
-		assert(mi);
-		assert(atomic_read(&mi->mi_refs) > 0);
+		dassert(mi);
+		dassert(atomic_read(&mi->mi_refs) > 0);
 		atomic_inc(&mi->mi_refs);
 		return (ptr);
 	}
@@ -259,8 +262,8 @@ mi_close_put(caddr_t ptr)
 	if (ptr) {
 		struct mi_comm *mi = ptr_to_mi(ptr);
 
-		assert(mi);
-		assert(atomic_read(&mi->mi_refs) > 0);
+		dassert(mi);
+		dassert(atomic_read(&mi->mi_refs) > 0);
 		if (atomic_dec_and_test(&mi->mi_refs)) {
 			if (mi->mi_q != NULL)
 				mi_detach(mi->mi_q, ptr);
@@ -536,21 +539,31 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 	minor_t cminor = devp ? getminor(*devp) : 0;
 	major_t dmajor;
 
-	spin_lock(&mi_list_lock);
-	if (sflag == CLONEOPEN) {
+	switch (sflag) {
+	case CLONEOPEN:
 		/* first clone minor (above 5 per AIX docs, above 10 per MacOT docs), but the
 		   caller can start wherever they want above that */
 #define MI_OPEN_COMM_CLONE_MINOR 10
 		if (cminor <= MI_OPEN_COMM_CLONE_MINOR)
 			cminor = MI_OPEN_COMM_CLONE_MINOR + 1;
-	}
-	if (sflag == MODOPEN) {
+		/* fall through */
+	case DRVOPEN:
+		/* devp must be specified for DRVOPEN or CLONEOPEN */
+		if (devp == NULL)
+			return (EINVAL);
+		break;
+	case MODOPEN:
 		cmajor = 0;
 		/* caller can specify a preferred instance number */
 		if (cminor == 0)
 			cminor = 1;
+		break;
+	default:
+		/* invalid sflag */
+		return (EINVAL);
 	}
 	dmajor = cmajor;
+	spin_lock(&mi_list_lock);
 	for (; *mip && (dmajor = getmajor((*mip)->mi_dev)) < cmajor; mip = &(*mip)->mi_next) ;
 	for (; *mip && dmajor == getmajor((*mip)->mi_dev)
 	     && getminor(makedevice(0, cminor)) != 0; mip = &(*mip)->mi_next, cminor++) {
@@ -577,6 +590,9 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 	*mip = mi;
 	mi->mi_head = (struct mi_comm **) mi_head;
 	spin_unlock(&mi_list_lock);
+	if (sflag == CLONEOPEN)
+		/* must return unique device number */
+		*devp = makedevice(cmajor, cminor);
 	return (0);
 }
 
@@ -776,12 +792,14 @@ mi_wakenoput(struct mi_comm *mi)
 		if (waitqueue_active(&mi->mi_waitq))
 			wake_up_all(&mi->mi_waitq);
 	if (test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_users)) {
-		assert(mi->mi_q);
-		qenable(RD(mi->mi_q));
+		dassert(mi->mi_q);
+		if (mi->mi_q)
+			qenable(RD(mi->mi_q));
 	}
 	if (test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_users)) {
-		assert(mi->mi_q);
-		qenable(WR(mi->mi_q));
+		dassert(mi->mi_q);
+		if (mi->mi_q)
+			qenable(WR(mi->mi_q));
 	}
 }
 
@@ -808,7 +826,7 @@ mi_acquire(caddr_t ptr, queue_t *q)
 	if (ptr) {
 		struct mi_comm *mi = ptr_to_mi(ptr);
 
-		assert(mi);
+		dassert(mi);
 		if (unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
 			struct mi_comm *mi2;
 			caddr_t ptr2;
@@ -1094,9 +1112,9 @@ mi_copy_done(queue_t *q, mblk_t *mp, int err)
 	struct mi_iocblk *mi;
 	int rval;
 
-	assert(mp);
-	assert(q);
-	assert(mp->b_wptr >= mp->b_rptr + sizeof(*ioc));
+	dassert(mp);
+	dassert(q);
+	dassert(mp->b_wptr >= mp->b_rptr + sizeof(*ioc));
 
 	ioc = (typeof(ioc)) mp->b_rptr;
 	rval = ioc->iocblk.ioc_rval;
@@ -2776,7 +2794,7 @@ mi_set_sth_hiwat(queue_t *q, size_t size)
 	struct stroptions *so;
 	mblk_t *mp;
 
-	assert(q == RD(q));
+	dassert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
@@ -2803,7 +2821,7 @@ mi_set_sth_lowat(queue_t *q, size_t size)
 	struct stroptions *so;
 	mblk_t *mp;
 
-	assert(q == RD(q));
+	dassert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
@@ -2831,7 +2849,7 @@ mi_set_sth_maxblk(queue_t *q, ssize_t size)
 	struct stroptions *so;
 	mblk_t *mp;
 
-	assert(q == RD(q));
+	dassert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
@@ -2859,7 +2877,7 @@ mi_set_sth_copyopt(queue_t *q, int copyopt)
 	struct stroptions *so;
 	mblk_t *mp;
 
-	assert(q == RD(q));
+	dassert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
@@ -2886,7 +2904,7 @@ mi_set_sth_wroff(queue_t *q, size_t size)
 	struct stroptions *so;
 	mblk_t *mp;
 
-	assert(q == RD(q));
+	dassert(q == RD(q));
 	if ((mp = allocb(sizeof(*so), BPRI_MED))) {
 		mp->b_datap->db_type = M_SETOPTS;
 		mp->b_wptr += sizeof(*so);
