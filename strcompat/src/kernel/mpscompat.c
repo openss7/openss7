@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-17 10:34:40 $ by $Author: brian $
+ Last Modified $Date: 2008-10-19 06:51:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.49  2008-10-19 06:51:09  brian
+ - locking rework
+
  Revision 0.9.2.48  2008-10-17 10:34:40  brian
  - expanded and correct MPS functions
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -93,7 +96,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2008-10-17 10:34:40 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-10-19 06:51:09 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -185,8 +188,7 @@ struct mi_comm {
 	size_t mi_size;			/* size of this structure plus private data */
 	unsigned short mi_mid;		/* module identifier */
 	unsigned short mi_sid;		/* stream identifier */
-	bcid_t mi_rbid;			/* rd queue bufcall */
-	bcid_t mi_wbid;			/* wr queue bufcall */
+	bcid_t mi_bcid;			/* queue bufcall */
 	long mi_users;			/* users and waiters */
 	queue_t *mi_q;			/* attached read queue */
 	atomic_t mi_refs;		/* references to structure */
@@ -200,11 +202,24 @@ struct mi_comm {
 	char mi_ptr[0];			/* followed by private data */
 };
 
+#define MI_WAIT_LOCKED_BIT	0
+#define MI_WAIT_RQ_BIT		1
+#define MI_WAIT_WQ_BIT		2
+#define MI_WAIT_SLEEP_BIT	3
+
+#define MI_WAIT_LOCKED		(1<<MI_WAIT_LOCKED_BIT)
+#define MI_WAIT_RQ		(1<<MI_WAIT_RQ_BIT)
+#define MI_WAIT_WQ		(1<<MI_WAIT_WQ_BIT)
+#define MI_WAIT_SLEEP		(1<<MI_WAIT_SLEEP_BIT)
+
 #define mi_dev mi_u.dev
 #define mi_index mi_u.index
 
 #define mi_to_ptr(mi) ((mi) ? (mi)->mi_ptr : NULL)
 #define ptr_to_mi(ptr) ((ptr) ? (struct mi_comm *)(ptr) - 1 : NULL)
+
+noinline void mi_unbufcall(bcid_t *bcidp, bcid_t bcid);
+noinline fastcall void mi_wakepriv(struct mi_comm **mip, struct mi_comm *mi);
 
 /**
  * mi_open_grab: - grab a reference to an open structure
@@ -251,6 +266,10 @@ mi_close_put(caddr_t ptr)
 				mi_detach(mi->mi_q, ptr);
 			if (mi->mi_head != NULL)
 				mi_close_unlink((caddr_t *)mi->mi_head, ptr);
+			if (mi->mi_bcid != 0)
+				mi_unbufcall(&mi->mi_bcid, 0);
+			if (mi->mi_waiter != NULL)
+				mi_wakepriv(&mi->mi_waiter, NULL);
 			if (mi->mi_cachep)
 				kmem_cache_free(mi->mi_cachep, mi);
 			else
@@ -622,6 +641,10 @@ mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 		mi->mi_prev = &mi->mi_next;
 		mi->mi_head = NULL;
 		spin_unlock(&mi_list_lock);
+		/* again kill bufcalls */
+		mi_unbufcall(&mi->mi_bcid, 0);
+		/* see if waiters can find us again now that we are off the list */
+		mi_wakepriv(&mi->mi_waiter, NULL);
 	}
 }
 
@@ -646,19 +669,22 @@ EXPORT_SYMBOL(mi_close_free);	/* mps/ddi.h */
  * mi_detach: - detach a private structure from a queue pair
  * @q: read queue of queue pair
  * @ptr: private structure to detach
+ *
+ * Normally one should perform qprocsoff(9) before calling this function or another housekeeping
+ * function that calls this one.
  */
 __MPS_EXTERN void
 mi_detach(queue_t *q, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
-	bcid_t bid;
 
 	if (mi) {
-		if ((bid = xchg(&mi->mi_rbid, 0)))
-			unbufcall(bid);
-		if ((bid = xchg(&mi->mi_wbid, 0)))
-			unbufcall(bid);
+		mi->mi_users = MI_WAIT_LOCKED;
+		mi_unbufcall(&mi->mi_bcid, 0);
+		mi_wakepriv(&mi->mi_waiter, NULL);
 		mi->mi_q = NULL;
+		/* we might have another waiter at this point, but it is guaranteed to not be us if
+		   qprocsoff(9) was called before this function. */
 	}
 	q->q_ptr = WR(q)->q_ptr = NULL;
 }
@@ -743,29 +769,29 @@ struct mi_iocblk {
  *  =========================================================================
  */
 
-#define MI_WAIT_LOCKED_BIT	0
-#define MI_WAIT_RQ_BIT		0
-#define MI_WAIT_WQ_BIT		0
-#define MI_WAIT_SLEEP_BIT	0
-
-#define MI_WAIT_LOCKED		(1<<MI_WAIT_LOCKED_BIT)
-#define MI_WAIT_RQ		(1<<MI_WAIT_RQ_BIT)
-#define MI_WAIT_WQ		(1<<MI_WAIT_WQ_BIT)
-#define MI_WAIT_SLEEP		(1<<MI_WAIT_SLEEP_BIT)
-
-static noinline fastcall void
-mi_wakepriv(struct mi_comm *mi)
+noinline fastcall void
+mi_wakenoput(struct mi_comm *mi)
 {
 	if (test_and_clear_bit(MI_WAIT_SLEEP_BIT, &mi->mi_users))
 		if (waitqueue_active(&mi->mi_waitq))
 			wake_up_all(&mi->mi_waitq);
-	if (test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_users))
-		if (mi->mi_q != NULL)
-			qenable(RD(mi->mi_q));
-	if (test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_users))
-		if (mi->mi_q != NULL)
-			qenable(WR(mi->mi_q));
-	mi_close_put(mi_to_ptr(mi));
+	if (test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_users)) {
+		assert(mi->mi_q);
+		qenable(RD(mi->mi_q));
+	}
+	if (test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_users)) {
+		assert(mi->mi_q);
+		qenable(WR(mi->mi_q));
+	}
+}
+
+noinline fastcall void
+mi_wakepriv(struct mi_comm **mip, struct mi_comm *mi)
+{
+	if ((mi = xchg(mip, mi))) {
+		mi_wakenoput(mi);
+		mi_close_put(mi_to_ptr(mi));
+	}
 }
 
 /**
@@ -789,12 +815,10 @@ mi_acquire(caddr_t ptr, queue_t *q)
 
 			if (q && (ptr2 = (caddr_t) q->q_ptr) && (mi2 = ptr_to_mi(ptr2))
 			    && (ptr2 = mi_open_grab(ptr2))) {
-				struct mi_comm *miO;
 
 				set_bit((q->q_flag & QREADR) ? MI_WAIT_RQ_BIT : MI_WAIT_WQ_BIT,
 					&mi2->mi_users);
-				if ((miO = xchg(&mi->mi_waiter, mi2)))
-					mi_wakepriv(miO);
+				mi_wakepriv(&mi->mi_waiter, mi2);
 				if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
 					return (ptr);
 			}
@@ -846,16 +870,13 @@ mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *fl
 			if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
 				break;
 			{
-				struct mi_comm *mw = xchg(&mi->mi_waiter, ml);
-
 				if (lockp) {
 					if (flagsp)
 						write_unlock_irqrestore(lockp, *flagsp);
 					else
 						write_unlock(lockp);
 				}
-				if (mw != NULL)
-					mi_wakepriv(mw);
+				mi_wakepriv(&mi->mi_waiter, ml);
 			}
 			schedule();
 			{
@@ -886,9 +907,7 @@ mi_release(caddr_t ptr)
 	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	clear_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users);
-
-	if ((mi = xchg(&mi->mi_waiter, NULL)))
-		mi_wakepriv(mi);
+	mi_wakepriv(&mi->mi_waiter, NULL);
 	return;
 }
 EXPORT_SYMBOL(mi_release);
@@ -935,26 +954,38 @@ EXPORT_SYMBOL(mi_sleeplock);
 static fastcall void
 mi_qenable(long data)
 {
-	queue_t *q = (queue_t *) data;
-	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
-	bcid_t *bidp = (q->q_flag & QREADR) ? &mi->mi_rbid : &mi->mi_wbid;
+	caddr_t ptr = (caddr_t) data;
+	struct mi_comm *mi = ptr_to_mi(ptr);
 
-	*bidp = 0;
-	qenable(q);
+	if (xchg(&mi->mi_bcid, 0))
+		mi_wakenoput(mi);
+}
+
+noinline void
+mi_unbufcall(bcid_t *bcidp, bcid_t bcid)
+{
+	if ((bcid = xchg(bcidp, bcid)))
+		unbufcall(bcid);
 }
 
 __MPS_EXTERN void
 mi_bufcall(queue_t *q, int size, int priority)
 {
-	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
-	bcid_t bid, *bidp = (q->q_flag & QREADR) ? &mi->mi_rbid : &mi->mi_wbid;
+	struct mi_comm *mi;
+	caddr_t ptr;
 
-	if ((bid = bufcall(size, priority, &mi_qenable, (long) q))) {
-		if ((bid = xchg(bidp, bid)))
-			unbufcall(bid);
-		return;
+	if (q && (ptr = (caddr_t) q->q_ptr) && (mi = ptr_to_mi(ptr))) {
+		set_bit((q->q_flag & QREADR) ? MI_WAIT_RQ_BIT : MI_WAIT_WQ_BIT, &mi->mi_users);
+		if (!mi->mi_bcid) {
+			bcid_t bid;
+
+			if ((bid = bufcall(size, priority, &mi_qenable, (long) ptr))) {
+				mi_unbufcall(&mi->mi_bcid, bid);
+				return;
+			}
+			mi_wakenoput(mi);
+		}
 	}
-	qenable(q);
 }
 
 EXPORT_SYMBOL(mi_bufcall);
