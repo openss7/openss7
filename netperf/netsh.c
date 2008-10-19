@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/08/15 05:06:38 $
+ @(#) $RCSfile: netsh.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 1.1.1.18 $) $Date: 2007-08-15 05:06:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,12 +45,12 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:06:38 $ by $Author: brian $
+ Last Modified $Date: 2007-08-15 05:06:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netsh.c,v $
- Revision 1.1.1.18  2007/08/15 05:06:38  brian
+ Revision 1.1.1.18  2007-08-15 05:06:38  brian
  - GPLv3 updates
 
  Revision 1.1.1.17  2007/08/14 07:26:45  brian
@@ -76,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/08/15 05:06:38 $"
+#ident "@(#) $RCSfile: netsh.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 1.1.1.18 $) $Date: 2007-08-15 05:06:38 $"
 
 static char const ident[] =
-    "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/08/15 05:06:38 $";
+    "$RCSfile: netsh.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 1.1.1.18 $) $Date: 2007-08-15 05:06:38 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
