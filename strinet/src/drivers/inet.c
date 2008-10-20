@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 10:30:24 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 11:18:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.111  2008-10-20 11:18:13  brian
+ - detect rapid orderly release
+
  Revision 0.9.2.110  2008-10-20 10:30:24  brian
  - can get error reports in TS_IDLE state
 
@@ -116,10 +119,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -636,7 +639,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -12909,6 +12912,10 @@ ss_connect(ss_t *ss, struct sockaddr *dst)
 	STRLOGTX(ss, "SS_CONNECT");
 	if ((err = sock_connect(ss->sock, dst, O_NONBLOCK)))
 		STRLOGNO(ss, "ERROR: from sock_connect() %d", err);
+	else {
+		ss->tcp_state = ss->sock->sk->sk_state;
+		ss->lasterror = 0;
+	}
 	return (err);
 }
 
@@ -13678,6 +13685,7 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
 	mp->b_wptr += sizeof(*p);
 	switch (ss_get_state(ss)) {
 	case TS_WACK_CREQ:
+		ss->lasterror = 0;
 		if ((err = ss_connect(ss, &ss->dst)))
 			goto free_error;
 		ss_getnames(ss);
@@ -16763,11 +16771,23 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 					if ((err = t_ordrel_ind(ss, q)))
 						goto error;
 					goto done;
-				case TCP_ESTABLISHED:
 				case TCP_FIN_WAIT1:
 					/* The new TPI state will become TS_IDLE. */
 					if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
 						goto error;
+					goto done;
+				case TCP_ESTABLISHED:
+					/* Went right through TCP_FIN_WAIT1 or TCP_FIN_WAIT2: the
+					   was to detect which one is to check for errors. */
+					if (ss->lasterror == 0 && sk->sk_err == 0) {
+						/* The new TPI state will become TS_IDLE. */
+						if ((err = t_ordrel_ind(ss, q)))
+							goto error;
+					} else {
+						/* The new TPI state will become TS_IDLE. */
+						if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
+							goto error;
+					}
 					goto done;
 				}
 				break;
@@ -16832,13 +16852,11 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	t_scalar_t tpi_oldstate = ss_get_state(ss);
 	int tcp_oldstate = ss->tcp_state;
 	int tcp_newstate = sk->sk_state;
-	t_scalar_t reason;
 
 	STRLOGRX(ss, "%s", __FUNCTION__);
-	if (unlikely((reason = sk->sk_err) == 0))
+	if (unlikely(sk->sk_err == 0))
 		/* error report was already absorbed */
 		return;
-	reason = reason < 0 ? -reason : reason;
 
 	switch (__builtin_expect(type, SOCK_STREAM)) {
 	case SOCK_STREAM:	/* TCP */
