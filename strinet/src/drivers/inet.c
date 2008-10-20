@@ -16781,10 +16781,6 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 						goto error;
 					goto done;
 				case TCP_FIN_WAIT1:
-					/* The new TPI state will become TS_IDLE. */
-					if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
-						goto error;
-					goto done;
 				case TCP_ESTABLISHED:
 					/* Went right through TCP_FIN_WAIT1 or TCP_FIN_WAIT2: the
 					   was to detect which one is to check for errors. */
