@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-10-20 07:20:20 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-10-20 10:02:55 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 07:20:20 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 10:02:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.60  2008-10-20 10:02:55  brian
+ - conn inds might be absorbed by discon inds
+
  Revision 0.9.2.59  2008-10-20 07:20:20  brian
  - corrections from testing
 
@@ -277,9 +280,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-10-20 07:20:20 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-10-20 10:02:55 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-10-20 07:20:20 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-10-20 10:02:55 $";
 
 /*
  *  Simple test program for INET streams.
@@ -23007,16 +23010,32 @@ test_case_3_2_list(int child)
 	state++;
 	switch (last_info.SERV_type) {
 	case T_CLTS:
-		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+		expect(child, SHORT_WAIT, __TEST_CONN_IND);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			goto success;
+		case __TEST_CONN_IND:
+			break;
+		default:
 			goto failure;
+		}
 		state++;
 		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
 			goto failure;
 		break;
 	case T_COTS:
 	case T_COTS_ORD:
-		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		expect(child, SHORT_WAIT, __TEST_CONN_IND);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			goto success;
+		case __TEST_CONN_IND:
+			break;
+		default:
 			goto failure;
+		}
 		state++;
 		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
@@ -23024,6 +23043,7 @@ test_case_3_2_list(int child)
 	default:
 		goto failure;
 	}
+      success:
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
