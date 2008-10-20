@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2008-10-20 07:58:06 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 07:58:06 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 08:53:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.107  2008-10-20 08:53:17  brian
+ - state changes after data collected
+
  Revision 0.9.2.106  2008-10-20 07:58:06  brian
  - only read urgent data when we have it
 
@@ -104,10 +107,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2008-10-20 07:58:06 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2008-10-20 07:58:06 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -624,7 +627,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.106 $) $Date: 2008-10-20 07:58:06 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -14706,6 +14709,7 @@ ss_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 noinline fastcall __hot void
 ss_all_error_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
+#if 0
 	int err = 0;
 
 	if (unlikely((err = ss->lasterror) || (err = ss->lasterror = sock_error(sk)))) {
@@ -14726,6 +14730,10 @@ ss_all_error_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		/* clear error */
 		ss->lasterror = 0;
 	}
+#else
+	if (ss->lasterror == 0)
+		ss->lasterror = sock_error(sk);
+#endif
 }
 /**
  * ss_all_data_ind: - deliver all data indications
@@ -16925,12 +16933,12 @@ __ss_r_events(ss_t *ss, queue_t *q)
 	if (!(sk = ss->sock->sk))
 		return;
 
-	if (test_bit(SS_BIT_STATE_CHANGE, &ss_rflags))
-		__ctrace(__ss_r_state_change(ss, q, sk, type));
 	if (test_bit(SS_BIT_ERROR_REPORT, &ss_rflags))
 		__ctrace(__ss_r_error_report(ss, q, sk, type));
 	if (test_bit(SS_BIT_DATA_READY, &ss_rflags))
 		__ctrace(__ss_r_data_ready(ss, q, sk, type));
+	if (test_bit(SS_BIT_STATE_CHANGE, &ss_rflags))
+		__ctrace(__ss_r_state_change(ss, q, sk, type));
 	return;
 }
 
