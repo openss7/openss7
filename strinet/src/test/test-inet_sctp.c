@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-04-28 22:52:13 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-20 10:02:57 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:52:13 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 10:02:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.35  2008-10-20 10:02:57  brian
+ - conn inds might be absorbed by discon inds
+
  Revision 0.9.2.34  2008-04-28 22:52:13  brian
  - updated headers for release
 
@@ -229,9 +232,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-04-28 22:52:13 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-20 10:02:57 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-04-28 22:52:13 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-20 10:02:57 $";
 
 /*
  *  Simple test program for INET streams.
@@ -330,7 +333,8 @@ static int verbose = 1;
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
-static int show_data = 1;
+
+//static int show_data = 1;
 
 static int last_prim = 0;
 static int last_event = 0;
@@ -1593,7 +1597,7 @@ etype_string(t_uscalar_t etype)
 		case ICMP_PARAMETERPROB:
 			return ("<ICMP_PARAMETERPROB>");
 		default:
-			return ("<ICMP_???? >");
+			return errno_string(etype);
 		}
 	}
 	}
@@ -23008,16 +23012,32 @@ test_case_3_2_list(int child)
 	state++;
 	switch (last_info.SERV_type) {
 	case T_CLTS:
-		if (expect(child, SHORT_WAIT, __TEST_CONN_IND) == __RESULT_SUCCESS)
+		expect(child, SHORT_WAIT, __TEST_CONN_IND);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			goto success;
+		case __TEST_CONN_IND:
+			break;
+		default:
 			goto failure;
+		}
 		state++;
 		if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
 			goto failure;
 		break;
 	case T_COTS:
 	case T_COTS_ORD:
-		if (expect(child, LONGER_WAIT, __TEST_CONN_IND) != __RESULT_SUCCESS)
+		expect(child, SHORT_WAIT, __TEST_CONN_IND);
+		switch (last_event) {
+		case __EVENT_NO_MSG:
+		case __EVENT_TIMEOUT:
+			goto success;
+		case __TEST_CONN_IND:
+			break;
+		default:
 			goto failure;
+		}
 		state++;
 		if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
 			goto failure;
@@ -23025,6 +23045,7 @@ test_case_3_2_list(int child)
 	default:
 		goto failure;
 	}
+      success:
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -31538,7 +31559,7 @@ test_case_11_1(int child, int prim)
 #define desc_case_11_1_1 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_ADDR_REQ primitive that is too short."
@@ -31568,7 +31589,7 @@ struct test_stream test_11_1_1_list = { &preamble_11_1_1_list, &test_case_11_1_1
 #define desc_case_11_1_2 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_BIND_REQ primitive that is too short."
@@ -31598,7 +31619,7 @@ struct test_stream test_11_1_2_list = { &preamble_11_1_2_list, &test_case_11_1_2
 #define desc_case_11_1_3 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_CAPABILITY_REQ primitive that is too short."
@@ -31628,7 +31649,7 @@ struct test_stream test_11_1_3_list = { &preamble_11_1_3_list, &test_case_11_1_3
 #define desc_case_11_1_4 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_CONN_REQ primitive that is too short."
@@ -31658,7 +31679,7 @@ struct test_stream test_11_1_4_list = { &preamble_11_1_4_list, &test_case_11_1_4
 #define desc_case_11_1_5 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_CONN_RES primitive that is too short."
@@ -31688,7 +31709,7 @@ struct test_stream test_11_1_5_list = { &preamble_11_1_5_list, &test_case_11_1_5
 #define desc_case_11_1_6 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_DATA_REQ primitive that is too short."
@@ -31718,7 +31739,7 @@ struct test_stream test_11_1_6_list = { &preamble_11_1_6_list, &test_case_11_1_6
 #define desc_case_11_1_7 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_DISCON_REQ primitive that is too short."
@@ -31748,7 +31769,7 @@ struct test_stream test_11_1_7_list = { &preamble_11_1_7_list, &test_case_11_1_7
 #define desc_case_11_1_8 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_EXDATA_REQ primitive that is too short."
@@ -31778,7 +31799,7 @@ struct test_stream test_11_1_8_list = { &preamble_11_1_8_list, &test_case_11_1_8
 #define desc_case_11_1_9 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_INFO_REQ primitive that is too short."
@@ -31808,7 +31829,7 @@ struct test_stream test_11_1_9_list = { &preamble_11_1_9_list, &test_case_11_1_9
 #define desc_case_11_1_10 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_OPTDATA_REQ primitive that is too short."
@@ -31838,7 +31859,7 @@ struct test_stream test_11_1_10_list = { &preamble_11_1_10_list, &test_case_11_1
 #define desc_case_11_1_11 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_ORDREL_REQ primitive that is too short."
@@ -31868,7 +31889,7 @@ struct test_stream test_11_1_11_list = { &preamble_11_1_11_list, &test_case_11_1
 #define desc_case_11_1_12 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_UNBIND_REQ primitive that is too short."
@@ -31898,7 +31919,7 @@ struct test_stream test_11_1_12_list = { &preamble_11_1_12_list, &test_case_11_1
 #define desc_case_11_1_13 "\
 Checks that a primitive that is too short results in an error.  Neither the TPI\n\
 nor the XTI specification indicates what action is taken when a primitive is\n\
-received that is too short.  For primitives that require an acknowledgeement we\n\
+received that is too short.  For primitives that require an acknowledgement we\n\
 return a T_ERROR_ACK with a UNIX error number of EINVAL.  For primitives that do\n\
 not require an acknowledgement we issue an M_ERROR with an error number of\n\
 EPROTO.  This test case is for a T_UNITDATA_REQ primitive that is too short."
@@ -41218,7 +41239,7 @@ struct test_case {
 } tests[] = {
 	{
 		numb_case_0_1, tgrp_case_0_1, NULL, name_case_0_1, NULL, desc_case_0_1, sref_case_0_1, {
-	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 0, 0}, {
+	&test_0_1_conn, &test_0_1_resp, &test_0_1_list}, &begin_tests, &end_tests, 5000, 0, 0, __RESULT_INCONCLUSIVE}, {
 		numb_case_1_1, tgrp_case_1_1, NULL, name_case_1_1, NULL, desc_case_1_1, sref_case_1_1, {
 	&test_1_1_conn, &test_1_1_resp, &test_1_1_list}, &begin_tests, &end_tests, 0, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_1_2, tgrp_case_1_2, NULL, name_case_1_2, NULL, desc_case_1_2, sref_case_1_2, {
