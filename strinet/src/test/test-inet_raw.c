@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-10-15 01:33:30 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-10-20 07:20:20 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-15 01:33:30 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 07:20:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.59  2008-10-20 07:20:20  brian
+ - corrections from testing
+
  Revision 0.9.2.58  2008-10-15 01:33:30  brian
  - major rework of strinet driver
 
@@ -274,9 +277,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-10-15 01:33:30 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-10-20 07:20:20 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-10-15 01:33:30 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-10-20 07:20:20 $";
 
 /*
  *  Simple test program for INET streams.
@@ -1638,7 +1641,7 @@ etype_string(t_uscalar_t etype)
 		case ICMP_PARAMETERPROB:
 			return ("<ICMP_PARAMETERPROB>");
 		default:
-			return ("<ICMP_???? >");
+			return errno_string(etype);
 		}
 	}
 	}
