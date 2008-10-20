@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.24 2008-10-17 10:34:39 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.25 2008-10-20 01:22:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-17 10:34:39 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 01:22:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.25  2008-10-20 01:22:50  brian
+ - updates and corrections
+
  Revision 0.9.2.24  2008-10-17 10:34:39  brian
  - expanded and correct MPS functions
 
@@ -128,7 +131,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.24 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.25 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -180,7 +183,7 @@ __MPS_EXTERN caddr_t mi_next_ptr(caddr_t ptr);
 __MPS_EXTERN caddr_t mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr);
 __MPS_EXTERN caddr_t mi_prev_ptr(caddr_t ptr);
 __MPS_EXTERN int mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag,
-			cred_t *credp);
+			      cred_t *credp);
 __MPS_EXTERN void mi_close_free(caddr_t ptr);
 __MPS_EXTERN void mi_close_free_cache(kmem_cachep_t cachep, caddr_t ptr);
 
@@ -330,6 +333,8 @@ __MPS_EXTERN int mi_timer_cond(mblk_t *mp, clock_t msec);
  */
 __MPS_EXTERN caddr_t mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp,
 				      unsigned long *flagsp);
+__MPS_EXTERN caddr_t mi_acquire_sleep_nosignal(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp,
+					       unsigned long *flagsp);
 __MPS_EXTERN caddr_t mi_acquire(caddr_t ptr, queue_t *q);
 __MPS_EXTERN void mi_release(caddr_t ptr);
 __MPS_EXTERN caddr_t mi_sleeplock(queue_t *q);
@@ -368,7 +373,7 @@ __MPS_EXTERN void mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len);
 __MPS_EXTERN void mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len);
 __MPS_EXTERN void mi_copyout(queue_t *q, mblk_t *mp);
 __MPS_EXTERN mblk_t *mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len,
-				int free_on_error);
+				      int free_on_error);
 __MPS_EXTERN void mi_copy_done(queue_t *q, mblk_t *mp, int err);
 __MPS_EXTERN int mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp);
 __MPS_EXTERN void mi_copy_set_rval(mblk_t *mp, int rval);

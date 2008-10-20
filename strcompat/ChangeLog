@@ -1,3 +1,12 @@
+2008-10-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/kernel/mpscompat.c: updates and corrections
+	* src/include/sys/mps/stream.h: added mi_acquire_sleep_nosignal
+	* doc/man/Makefile.am: added mi_acquire_sleep_nosignal
+	* doc/man/man9/mi_acquire_sleep.9.man: added mi_acquire_sleep_nosignal
+	* src/drivers/testdrv_mps.c: started MPS test and example modules
+	* src/modules/testmod_mps.c: started MPS test and example modules
+
 2008-10-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: document mi_open_link BUG #008
