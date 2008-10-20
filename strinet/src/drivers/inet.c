@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 08:53:17 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 09:44:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.108  2008-10-20 09:44:19  brian
+ - do not report conn_ind if already disconnected
+
  Revision 0.9.2.107  2008-10-20 08:53:17  brian
  - state changes after data collected
 
@@ -107,10 +110,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -627,7 +630,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.107 $) $Date: 2008-10-20 08:53:17 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -752,6 +755,7 @@ MODULE_ALIAS("/dev/inet/sctp");
 	mi_strlog(ss->rq, level, flags, fmt, ##__VA_ARGS__)
 #endif
 
+#if 0
 #define STRLOGERR(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
 #define STRLOGNO(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE, fmt, ##__VA_ARGS__)
 #define STRLOGST(ss, fmt, ...) INETLOG(ss, 1, SL_TRACE, fmt, ##__VA_ARGS__)
@@ -761,6 +765,17 @@ MODULE_ALIAS("/dev/inet/sctp");
 #define STRLOGTE(ss, fmt, ...) INETLOG(ss, 5, SL_TRACE, fmt, ##__VA_ARGS__)
 #define STRLOGIO(ss, fmt, ...) INETLOG(ss, 6, SL_TRACE, fmt, ##__VA_ARGS__)
 #define STRLOGDA(ss, fmt, ...) INETLOG(ss, 7, SL_TRACE, fmt, ##__VA_ARGS__)
+#else
+#define STRLOGERR(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define STRLOGNO(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define STRLOGST(ss, fmt, ...) INETLOG(ss, 1, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define STRLOGTO(ss, fmt, ...) INETLOG(ss, 2, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define STRLOGRX(ss, fmt, ...) INETLOG(ss, 3, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define STRLOGTX(ss, fmt, ...) INETLOG(ss, 4, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define STRLOGTE(ss, fmt, ...) INETLOG(ss, 5, SL_TRACE, fmt, ##__VA_ARGS__)
+#define STRLOGIO(ss, fmt, ...) INETLOG(ss, 6, SL_TRACE, fmt, ##__VA_ARGS__)
+#define STRLOGDA(ss, fmt, ...) INETLOG(ss, 7, SL_TRACE, fmt, ##__VA_ARGS__)
+#endif
 
 /*
  *  =========================================================================
@@ -16560,7 +16575,7 @@ __ss_r_child_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 
 			sock_accept_queue_lock(sk);
 			for (req = sock_accept_queue_head(sk); req; req = req->dl_next) {
-				if (SOCK_PRIV(req->sk) == ss)
+				if (SOCK_PRIV(req->sk) == ss && req->sk->sk_state == TCP_ESTABLISHED)
 					if ((err = t_conn_ind(ss, q, req->sk)) < 0)
 						break;
 			}
@@ -16631,6 +16646,7 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	int tcp_oldstate, tcp_newstate, tpi_oldstate, err;
 
+	STRLOGRX(ss, "%s", __FUNCTION__);
 	tcp_newstate = sk->sk_state;
 	tcp_oldstate = XCHG(&ss->tcp_state, tcp_newstate);
 	tpi_oldstate = ss_get_state(ss);
@@ -16812,6 +16828,7 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	int tcp_newstate = sk->sk_state;
 	t_scalar_t reason;
 
+	STRLOGRX(ss, "%s", __FUNCTION__);
 	if (unlikely((reason = sk->sk_err) == 0))
 		/* error report was already absorbed */
 		return;
@@ -16874,6 +16891,7 @@ __ss_r_data_ready(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	int tcp_oldstate = ss->tcp_state;
 	int tcp_newstate = sk->sk_state;
 
+	STRLOGRX(ss, "%s", __FUNCTION__);
 	switch (__builtin_expect(type, SOCK_STREAM)) {
 	case SOCK_STREAM:	/* TCP */
 	case SOCK_SEQPACKET:	/* SCTP */
@@ -16934,11 +16952,11 @@ __ss_r_events(ss_t *ss, queue_t *q)
 		return;
 
 	if (test_bit(SS_BIT_ERROR_REPORT, &ss_rflags))
-		__ctrace(__ss_r_error_report(ss, q, sk, type));
+		__ss_r_error_report(ss, q, sk, type);
 	if (test_bit(SS_BIT_DATA_READY, &ss_rflags))
-		__ctrace(__ss_r_data_ready(ss, q, sk, type));
+		__ss_r_data_ready(ss, q, sk, type);
 	if (test_bit(SS_BIT_STATE_CHANGE, &ss_rflags))
-		__ctrace(__ss_r_state_change(ss, q, sk, type));
+		__ss_r_state_change(ss, q, sk, type);
 	return;
 }
 
