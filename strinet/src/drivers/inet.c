@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2008-10-20 07:20:18 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 01:33:59 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 07:20:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.104  2008-10-20 07:20:18  brian
+ - corrections from testing
+
  Revision 0.9.2.103  2008-10-20 01:33:59  brian
  - corrections to open and close
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2008-10-20 07:20:18 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2008-10-20 07:20:18 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -615,7 +618,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.104 $) $Date: 2008-10-20 07:20:18 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -13223,6 +13226,8 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sock *sk)
 	ci->ci_parent = ss;
 	cp->b_wptr += sizeof(*ci);
 
+	SOCK_PRIV(sk) = ci;
+
 	mp->b_datap->db_type = M_PROTO;
 	p = (typeof(p)) mp->b_wptr;
 	p->PRIM_type = T_CONN_IND;
@@ -14071,83 +14076,6 @@ t_capability_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_uscalar_t caps, int type)
 /*
  *  =========================================================================
  *
- *  CONNECTION INNDICATIONS
- *
- *  =========================================================================
- */
-
-#if 0
-/**
- * ss_conn_ind: - CONIND
- *
- * An unfortunate mis-match between the socket model and the TLI model is that in TLI it is possible
- * to determine the remote address from a T_CONN_IND *before* accepting the connection.  Under
- * sockets, the connection must be accepted before it is possible to determine the peer's address.
- * This means that connection must be accepted and then released, rather than refused.
- */
-static fastcall int
-ss_conn_ind(ss_t *ss, queue_t *q, mblk_t *cp)
-{
-	struct sock *sk;
-	struct ss_event *p = (typeof(p)) cp->b_rptr;
-	struct sockaddr dst = { AF_UNSPEC, };
-
-	if (unlikely((1 << ss_get_state(ss)) & ~TSM_LISTEN))
-		goto outstate;
-	if (unlikely(cp->b_wptr < cp->b_rptr + sizeof(*p)))
-		goto einval;
-	if (unlikely(ss->sock->sk == p->sk))
-		goto duplicate;
-	sk = p->sk;
-	switch (__builtin_expect(ss->p.prot.family, AF_INET)) {
-	case AF_INET:
-	{
-		struct sockaddr_in *dst_in = (typeof(dst_in)) & dst;
-
-		if (unlikely(!ss->conind || ss->sock->sk->sk_state != TCP_LISTEN))
-			goto nolisten;
-		dst_in->sin_family = AF_INET;
-		dst_in->sin_port = sock_dport(sk);
-		dst_in->sin_addr.s_addr = sock_daddr(sk);
-		break;
-	}
-	case AF_UNIX:
-	{
-		struct sockaddr_un *dst_un = (typeof(dst_un)) & dst;
-
-		/* FIXME: use AF_UNIX states */
-		if (unlikely(!ss->conind || ss->sock->sk->sk_state != TCP_LISTEN))
-			goto nolisten;
-		break;
-	}
-	default:
-		goto enoproto;
-	}
-	return t_conn_ind(ss, q, &dst, cp);
-      enoproto:
-	STRLOGERR(ss, "SWERR: invalid protocol family: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
-	goto discard;
-      einval:
-	STRLOGERR(ss, "SWERR: invalid primitive format: %s %s:%d", __FUNCTION__, __FILE__,
-		  __LINE__);
-	goto discard;
-      outstate:
-	STRLOGNO(ss, "ERROR: connect indication in wrong state %ld", (long) ss_get_state(ss));
-	goto discard;
-      nolisten:
-	STRLOGNO(ss, "ERROR: connect indication received while not listening");
-	goto discard;
-      duplicate:
-	STRLOGNO(ss, "INFO: discarding duplicate connection indication");
-      discard:
-	freemsg(cp);
-	return (0);
-}
-#endif
-
-/*
- *  =========================================================================
- *
  *  SENDMSG and RECVMSG
  *
  *  =========================================================================
@@ -14249,10 +14177,6 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 	}
 }
 
-/*
- *  RECVMSG
- *  -------------------------------------------------------------------------
- */
 /**
  * ss_setup_size: - return the size of data available
  * @ss: private structure (locked)
@@ -14692,7 +14616,11 @@ ss_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	if (unlikely(!bcanputnext(ss->rq, 1)))
 		goto ebusy;
 
-	if ((size = ss_setup_size(ss, sk, type, 1)) == 0)
+	if ((size = ss_setup_size(ss, sk, type, 1)) < 0)
+		goto eagain;
+	if (size == 0 && sk->sk_err == 0)
+		goto eagain;
+	if (size == 0)
 		size = 1;	/* iovlen cannot be zero */
 
 	if (unlikely(!(mp = mi_allocb(q, plen, BPRI_MED))))
@@ -14745,6 +14673,9 @@ ss_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	putnext(ss->rq, mp);
 	return (0);
 
+      eagain:
+	err = -EAGAIN;
+	goto error;
       enobufs:
 	err = -ENOBUFS;
 	goto error;
@@ -14756,6 +14687,40 @@ ss_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	return (err);
 }
 
+/**
+ * ss_all_error_ind: - deliver all error indications
+ * @ss: private structure (locked)
+ * @q: active queue (read queue only)
+ * @sk: underlying socket
+ * @type: socket type
+ *
+ * Read and deliver T_EXDATA_IND and T_DATA_IND while the receive qeuue can be read and primitives
+ * can be delivered upstream.
+ */
+noinline fastcall __hot void
+ss_all_error_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
+{
+	int err = 0;
+
+	if (unlikely((err = ss->lasterror) || (err = ss->lasterror = sock_error(sk)))) {
+		/* Process disconnect-related errors as disconnects. */
+		/* Note that the reason will be picked from ss->lasterror. */
+		if (unlikely((err = t_discon_ind(ss, q, sk, 0, NULL)) < 0)) {
+			switch (-err) {
+			case EBUSY:
+			case ENOBUFS:
+			case ENOMEM:
+			case EAGAIN:
+			case EDEADLK:
+				/* regenerate error report */
+				set_bit(SS_BIT_ERROR_REPORT, &ss->ss_rflags);
+				break;
+			}
+		}
+		/* clear error */
+		ss->lasterror = 0;
+	}
+}
 /**
  * ss_all_data_ind: - deliver all data indications
  * @ss: private structure (locked)
@@ -14770,99 +14735,91 @@ noinline fastcall __hot void
 ss_all_data_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	int err = 0;
-	bool flow_oob = false;
-	bool flow_dat = false;
 
 	do {
-		if (unlikely((err = ss->lasterror) || (err = ss->lasterror = sock_error(sk)))) {
-			/* Process disconnect-related errors as disconnects. */
-		      do_disconnect:
-			/* Note that the reason will be picked from ss->lasterror. */
-			if (unlikely((err = t_discon_ind(ss, q, sk, 0, NULL)) < 0)) {
-				switch (-err) {
-				case EBUSY:
-				case ENOBUFS:
-				case ENOMEM:
-				case EAGAIN:
-				case EDEADLK:
-					/* regenerate error report */
-					set_bit(SS_BIT_ERROR_REPORT, &ss->ss_rflags);
-					break;
-				}
+		if (unlikely((err = ss_exdata_ind(ss, q, sk, type)) <= 0)) {
+			switch (-err) {
+			case EBUSY:
+			case ENOBUFS:
+			case ENOMEM:
+			case EDEADLK:
+				/* deferred, mark data read service */
+				set_bit(SS_BIT_DATA_READY, &ss->ss_rflags);
+			case EAGAIN:
+			case EINVAL:
+				/* note that EAGAIN or EINVAL means that there was nothing to read */
+				break;
+			case EPIPE:
+			case ENETDOWN:
+			case EHOSTUNREACH:
+			case ECONNRESET:
+			case ECONNREFUSED:
+			case ETIMEDOUT:
+			case ENOTCONN:
+				/* These errors indicate a disconnection. */
+				ss->lasterror = -err;
+				break;
 			}
-			/* clear error */
-			ss->lasterror = 0;
-			return;
 		}
-		if (likely(err >= 0 && !flow_oob)) {
-			do {
-				if (unlikely((err = ss_exdata_ind(ss, q, sk, type)) < 0)) {
-					switch (-err) {
-					case EBUSY:
-						flow_oob = true;
-						/* fall through */
-					case ENOBUFS:
-					case ENOMEM:
-					case EDEADLK:
-						/* deferred, mark data read service */
-						set_bit(SS_BIT_DATA_READY, &ss->ss_rflags);
-					case EAGAIN:
-					case EINVAL:
-						/* note that EAGAIN or EINVAL means that there was
-						   nothing to read */
-						break;
-					case EPIPE:
-					case ENETDOWN:
-					case EHOSTUNREACH:
-					case ECONNRESET:
-					case ECONNREFUSED:
-					case ETIMEDOUT:
-					case ENOTCONN:
-						/* These errors indicate a disconnection. */
-						ss->lasterror = -err;
-						goto do_disconnect;
-					}
-				}
-			} while (err >= 0 && !flow_oob
-				 && (tcp_sk(sk)->urg_data
-				     && tcp_sk(sk)->urg_seq == tcp_sk(sk)->copied_seq));
+	} while (err > 0);
+	do {
+		if (unlikely((err = ss_data_ind(ss, q, sk, type)) <= 0)) {
+			switch (-err) {
+			case EBUSY:
+			case ENOBUFS:
+			case ENOMEM:
+			case EDEADLK:
+				/* deferred, mark data read service */
+				set_bit(SS_BIT_DATA_READY, &ss->ss_rflags);
+			case EAGAIN:
+				/* note that EAGAIN or zero(0) means that there was nothing to read 
+				 */
+				break;
+			case EPIPE:
+			case ENETDOWN:
+			case EHOSTUNREACH:
+			case ECONNRESET:
+			case ECONNREFUSED:
+			case ETIMEDOUT:
+			case ENOTCONN:
+				/* These errors indicate a disconnection. */
+				ss->lasterror = -err;
+				break;
+			}
 		}
-		if (likely(err >= 0 && !flow_dat)) {
-			do {
-				if (unlikely((err = ss_data_ind(ss, q, sk, type)) < 0)) {
-					switch (-err) {
-					case EBUSY:
-						flow_dat = true;
-						/* fall through */
-					case ENOBUFS:
-					case ENOMEM:
-					case EDEADLK:
-						/* deferred, mark data read service */
-						set_bit(SS_BIT_DATA_READY, &ss->ss_rflags);
-					case EAGAIN:
-						/* note that EAGAIN or zero(0) means that there was
-						   nothing to read */
-						break;
-					case EPIPE:
-					case ENETDOWN:
-					case EHOSTUNREACH:
-					case ECONNRESET:
-					case ECONNREFUSED:
-					case ETIMEDOUT:
-					case ENOTCONN:
-						/* These errors indicate a disconnection. */
-						ss->lasterror = -err;
-						goto do_disconnect;
-					}
-				}
-			} while (err >= 0 && !flow_dat && skb_peek(&sk->sk_receive_queue));
+	} while (err > 0);
+}
+
+/**
+ * ss_all_uderror_ind: - deliver all error indications
+ * @ss: private structure (locked)
+ * @q: active queue (read queue only)
+ * @sk: underlying socket
+ * @type: socket type
+ *
+ * Read and deliver T_UDERROR_IND while the error queue can be read and primitives can be delivered
+ * upstream.
+ */
+noinline fastcall __hot void
+ss_all_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
+{
+	int err = 0;
+
+	do {
+		if (unlikely((err = ss_uderror_ind(ss, q, sk, type)) < 0)) {
+			switch (-err) {
+			case EBUSY:
+			case ENOBUFS:
+			case ENOMEM:
+			case EDEADLK:
+				/* deferred, mark error report service */
+				set_bit(SS_BIT_ERROR_REPORT, &ss->ss_rflags);
+			case EAGAIN:
+				/* note that here EAGAIN means that there was nothing to read */
+				break;
+			}
 		}
-	} while (err >= 0
-		 && (sk->sk_err
-		     || (!flow_oob
-			 && (tcp_sk(sk)->urg_data && tcp_sk(sk)->urg_seq == tcp_sk(sk)->copied_seq))
-		     || (!flow_dat && skb_peek(&sk->sk_receive_queue))));
-	return;
+	} while (err >= 0);
 }
 
 /**
@@ -14872,59 +14829,30 @@ ss_all_data_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
  * @sk: underlying socket
  * @type: socket type
  *
- * Read and deliver T_UDERROR_IND and T_UNITDATA_IND while the receive queue can be read and
- * primitives can be delivered upstream.
+ * Read and deliver T_UNITDATA_IND while the receive queue can be read and primitives can be
+ * delivered upstream.
  */
 noinline fastcall __hot void
 ss_all_unitdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	int err = 0;
-	bool flow_err = false;
-	bool flow_dat = false;
 
 	do {
-		if (err >= 0 && !flow_err) {
-			do {
-				if (unlikely((err = ss_uderror_ind(ss, q, sk, type)) < 0)) {
-					switch (-err) {
-					case EBUSY:
-						flow_err = true;
-						err = 0;
-						break;
-					case ENOBUFS:
-					case ENOMEM:
-					case EDEADLK:
-						/* deferred, mark error report service */
-						set_bit(SS_BIT_ERROR_REPORT, &ss->ss_rflags);
-					case EAGAIN:
-						/* note that here EAGAIN means that there was
-						   nothing to read */
-						break;
-					}
-				}
-			} while (err >= 0 && (!flow_err && sk->sk_err));
+		if (unlikely((err = ss_unitdata_ind(ss, q, sk, type)) < 0)) {
+			switch (-err) {
+			case EBUSY:
+			case ENOBUFS:
+			case ENOMEM:
+			case EDEADLK:
+				/* deferred, mark data ready service */
+				set_bit(SS_BIT_DATA_READY, &ss->ss_rflags);
+			case EAGAIN:
+				/* note that EAGAIN means that there was nothing to read */
+				break;
+			}
+			break;
 		}
-		if (err >= 0 && !flow_dat) {
-			do {
-				if (unlikely((err = ss_unitdata_ind(ss, q, sk, type)) < 0)) {
-					switch (-err) {
-					case EBUSY:
-						flow_dat = true;
-					case ENOBUFS:
-					case ENOMEM:
-					case EDEADLK:
-						/* deferred, mark data ready service */
-						set_bit(SS_BIT_DATA_READY, &ss->ss_rflags);
-					case EAGAIN:
-						/* note that EAGAIN means that there was nothing to 
-						   read */
-						break;
-					}
-				}
-			} while (err >= 0 && (!flow_dat && skb_peek(&sk->sk_receive_queue)));
-		}
-	} while (err >= 0
-		 && ((!flow_err && sk->sk_err) || (!flow_dat && skb_peek(&sk->sk_receive_queue))));
+	} while (err >= 0);
 }
 
 /*
@@ -14958,6 +14886,10 @@ ss_state_change(struct sock *sk)
 					if (!test_and_set_bit(SS_BIT_STATE_CHANGE, &ss->ss_rflags))
 						qenable(ss->rq);
 					set_bit(SS_BIT_STATE_CHANGE, &ci->ci_rflags);
+					if ((void *)ci != (void *)ss)
+						STRLOGERR(ss, "state change child %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
+					else
+						STRLOGERR(ss, "state change sock  %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
 				} else
 					assure(ss->rq);
 			}
@@ -14995,6 +14927,10 @@ ss_write_space(struct sock *sk)
 					if (!test_and_set_bit(SS_BIT_WRITE_SPACE, &ss->ss_wflags))
 						qenable(ss->wq);
 					set_bit(SS_BIT_WRITE_SPACE, &ci->ci_wflags);
+					if ((void *)ci != (void *)ss)
+						STRLOGERR(ss, "write space child %p", (void *)sk);
+					else
+						STRLOGERR(ss, "write space sock  %p", (void *)sk);
 				} else
 					assure(ss->wq);
 			}
@@ -15032,6 +14968,10 @@ ss_error_report(struct sock *sk)
 					if (!test_and_set_bit(SS_BIT_ERROR_REPORT, &ss->ss_rflags))
 						qenable(ss->rq);
 					set_bit(SS_BIT_ERROR_REPORT, &ci->ci_rflags);
+					if ((void *)ci != (void *)ss)
+						STRLOGERR(ss, "error report child %p", (void *)sk);
+					else
+						STRLOGERR(ss, "error report sock  %p", (void *)sk);
 				} else
 					assure(ss->rq);
 			}
@@ -15070,6 +15010,10 @@ ss_data_ready(struct sock *sk, int len)
 					if (!test_and_set_bit(SS_BIT_DATA_READY, &ss->ss_rflags))
 						qenable(ss->rq);
 					set_bit(SS_BIT_DATA_READY, &ci->ci_rflags);
+					if ((void *)ci != (void *)ss)
+						STRLOGERR(ss, "data ready child %p", (void *)sk);
+					else
+						STRLOGERR(ss, "data ready sock  %p", (void *)sk);
 				} else
 					assure(ss->rq);
 			}
@@ -16875,7 +16819,7 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		case TS_DATA_XFER:
 		case TS_WIND_ORDREL:
 		case TS_WREQ_ORDREL:
-			ss_all_data_ind(ss, q, sk, type);
+			ss_all_error_ind(ss, q, sk, type);
 			return;
 		}
 		break;
@@ -16883,9 +16827,9 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	case SOCK_RDM:
 		switch (__builtin_expect(tpi_oldstate, TS_IDLE)) {
 		case TS_IDLE:
-			/* Read and deliver T_UDERROR_IND and T_UNITDATA_IND while the error or
-			   receive queue can be read and primitives can be delivered upstream. */
-			ss_all_unitdata_ind(ss, q, sk, type);
+			/* Read and deliver T_UDERROR_IND while the error queue can be read and
+			   primitives can be delivered upstream. */
+			ss_all_uderror_ind(ss, q, sk, type);
 			return;
 		}
 		break;
@@ -16945,8 +16889,8 @@ __ss_r_data_ready(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	case SOCK_RDM:
 		switch (__builtin_expect(tpi_oldstate, TS_IDLE)) {
 		case TS_IDLE:
-			/* Read and deliver T_UDERROR_IND and T_UNITDATA_IND while the receive
-			   queue can be read and primitives can be delivered upstream. */
+			/* Read and deliver T_UNITDATA_IND while the receive queue can be read and
+			   primitives can be delivered upstream. */
 			ss_all_unitdata_ind(ss, q, sk, type);
 			return;
 		}
@@ -16976,11 +16920,11 @@ __ss_r_events(ss_t *ss, queue_t *q)
 		return;
 
 	if (test_bit(SS_BIT_STATE_CHANGE, &ss_rflags))
-		__ss_r_state_change(ss, q, sk, type);
+		__ctrace(__ss_r_state_change(ss, q, sk, type));
 	if (test_bit(SS_BIT_ERROR_REPORT, &ss_rflags))
-		__ss_r_error_report(ss, q, sk, type);
+		__ctrace(__ss_r_error_report(ss, q, sk, type));
 	if (test_bit(SS_BIT_DATA_READY, &ss_rflags))
-		__ss_r_data_ready(ss, q, sk, type);
+		__ctrace(__ss_r_data_ready(ss, q, sk, type));
 	return;
 }
 
@@ -17060,78 +17004,6 @@ ss_r_recvmsg(ss_t *ss, queue_t *q)
 	return (err);
 }
 
-/**
- * __ss_r_service: - process read side service
- * @ss: private structure (locked)
- * @q: active queue (read queue only)
- *
- * The read side service procedure acts as a backenable between the read queue and the underlying
- * socket.  When in the appropriate state, ss_r_recvmsg() is called and will place messages upstream
- * when bcanputnext() succeeds.  When bcanputnext() fails the service run on the socket is complete
- * and the read queue waits to be backenabled from upstream.  Under this approach there are never
- * any messages on the read queue.
- */
-static inline fastcall __hot_in void
-__ss_r_service(ss_t *ss, queue_t *q)
-{
-	struct sock *sk;
-	t_scalar_t tpi_oldstate;
-	int tcp_newstate, tcp_oldstate, type;
-
-	if (unlikely(ss->sock == NULL || (sk = ss->sock->sk) == NULL))
-		return;
-	tpi_oldstate = ss_get_state(ss);
-	tcp_newstate = sk->sk_state;
-	tcp_oldstate = ss->tcp_state;
-
-	switch (__builtin_expect((type = ss->p.prot.type), SOCK_STREAM)) {
-	case SOCK_STREAM:	/* TCP */
-	case SOCK_SEQPACKET:	/* SCTP */
-		switch (__builtin_expect(tpi_oldstate, TS_DATA_XFER)) {
-		case TS_UNBND:
-		case TS_WCON_CREQ:
-			break;
-		case TS_WRES_CIND:
-			if (tcp_oldstate == TCP_LISTEN)
-				return;
-			break;
-		case TS_IDLE:
-			if (tcp_oldstate == TCP_LISTEN)
-				return;
-			/* fall through */
-		case TS_DATA_XFER:
-		case TS_WIND_ORDREL:
-		case TS_WREQ_ORDREL:
-			if (ss_r_recvmsg(ss, q) != 0)
-				return;
-			break;
-		default:
-			STRLOGERR(ss, "SWERR: socket state %s -> %s in TPI state %s: %s %s:%d",
-				  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
-				  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
-			break;
-		}
-		break;
-	case SOCK_DGRAM:
-	case SOCK_RAW:
-	case SOCK_RDM:
-		switch (__builtin_expect(tpi_oldstate, TS_IDLE)) {
-		case TS_IDLE:
-			if (ss_r_recvmsg(ss, q) != 0)
-				return;
-			break;
-		default:
-			STRLOGERR(ss, "SWERR: socket state %s -> %s in TPI state %s: %s %s:%d",
-				  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
-				  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
-			break;
-		}
-		break;
-	default:
-		break;
-	}
-}
-
 /*
  *  =========================================================================
  *
@@ -17169,7 +17041,7 @@ ss_rsrv(queue_t *q)
 	ss_t *ss;
 
 	if (likely((ss = (ss_t *) mi_trylock(q)) != NULL)) {
-		__ss_r_service(ss, q);
+		__ss_r_events(ss, q);
 		mi_unlock((caddr_t) ss);
 	}
 	return (0);
