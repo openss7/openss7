@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-19 19:59:42 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 01:22:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.52  2008-10-20 01:22:50  brian
+ - updates and corrections
+
  Revision 0.9.2.51  2008-10-19 19:59:42  brian
  - fix mi_open_link BUG #008
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -102,7 +105,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-19 19:59:42 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -535,18 +538,18 @@ static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
 __MPS_EXTERN int
 mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
-	struct mi_comm *mi = ptr_to_mi(ptr);
-	struct mi_comm **mip = (struct mi_comm **) mi_head;
-
+	struct mi_comm *mi, **mip;
 	major_t cmajor = devp ? getmajor(*devp) : 0;
 	minor_t cminor = devp ? getminor(*devp) : 0;
 
-	if (mip == NULL || mi == NULL)
+	if (mi_head == NULL || (mi = ptr_to_mi(ptr)) == NULL)
 		return (EINVAL);
+
 	switch (sflag) {
 	case CLONEOPEN:
-		/* first clone minor (above 5 per AIX docs, above 10 per MacOT docs), but the
-		   caller can start wherever they want above that */
+		/* first clone minor (above 5 per AIX docs, above 10 per MacOT
+		   docs), but the caller can start wherever they want above
+		   that */
 #define MI_OPEN_COMM_CLONE_MINOR 10
 		if (cminor <= MI_OPEN_COMM_CLONE_MINOR)
 			cminor = MI_OPEN_COMM_CLONE_MINOR + 1;
@@ -566,8 +569,9 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 		/* invalid sflag */
 		return (EINVAL);
 	}
+
 	spin_lock(&mi_list_lock);
-	for (; *mip; mip = &(*mip)->mi_next) {
+	for (mip = (struct mi_comm **) mi_head; *mip; mip = &(*mip)->mi_next) {
 		if (cmajor != (*mip)->mi_mid)
 			break;
 		if (cmajor == (*mip)->mi_mid) {
@@ -590,6 +594,7 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 			}
 		}
 	}
+
 	mi->mi_dev = makedevice(cmajor, cminor);
 	mi->mi_mid = cmajor;
 	mi->mi_sid = cminor;
@@ -668,7 +673,8 @@ mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 		spin_unlock(&mi_list_lock);
 		/* again kill bufcalls */
 		mi_unbufcall(&mi->mi_bcid, 0);
-		/* see if waiters can find us again now that we are off the list */
+		/* see if waiters can find us again now that we are off the
+		   list */
 		mi_wakepriv(&mi->mi_waiter, NULL);
 	}
 }
@@ -866,7 +872,7 @@ EXPORT_SYMBOL(mi_acquire);
  *
  * Returns a pointer to the locked private structure or NULL if the private structure could not be
  * locked because a signal was caught or does not exist.  The caller can test the condition for
- * reutrning NULL by checking *ptrp.  When a lock pointer is passed, the lock must be write locked
+ * returning NULL by checking *ptrp.  When a lock pointer is passed, the lock must be write locked
  * before the call and the function returns with the lock write locked.  If a flags pointer is
  * provided, irq write locks will be performed.  The lock must protect the *ptrp dereference.
  *
@@ -884,49 +890,106 @@ mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *fl
 
 	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
 		DECLARE_WAITQUEUE(wait, current);
-		struct mi_comm *ml = ptr_to_mi(ptrw);
+		struct mi_comm *mw = ptr_to_mi(ptrw);
 
-		add_wait_queue(&ml->mi_waitq, &wait);
+		add_wait_queue(&mw->mi_waitq, &wait);
 		for (;;) {
 			if (signal_pending(current)) {
 				ptr = NULL;
 				break;
 			}
 			set_current_state(TASK_INTERRUPTIBLE);
-			set_bit(MI_WAIT_SLEEP_BIT, &ml->mi_users);
-			if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
-				break;
-			{
-				if (lockp) {
-					if (flagsp)
-						write_unlock_irqrestore(lockp, *flagsp);
-					else
-						write_unlock(lockp);
+			if (test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users)) {
+				if (mi->mi_waiter != mw) {
+					mi_open_grab(ptrw);
+					set_bit(MI_WAIT_SLEEP_BIT, &mw->mi_users);
+					mi_wakepriv(&mi->mi_waiter, mw);
 				}
-				mi_wakepriv(&mi->mi_waiter, ml);
+				if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
+					break;
+			}
+			if (lockp) {
+				if (flagsp)
+					write_unlock_irqrestore(lockp, *flagsp);
+				else
+					write_unlock(lockp);
 			}
 			schedule();
-			{
-				if (lockp) {
-					if (flagsp)
-						write_lock_irqsave(lockp, *flagsp);
-					else
-						write_lock(lockp);
-				}
+			if (lockp) {
+				if (flagsp)
+					write_lock_irqsave(lockp, *flagsp);
+				else
+					write_lock(lockp);
 			}
 			if ((ptr = *ptrp) == NULL)
 				break;
 			mi = ptr_to_mi(ptr);
 		}
 		set_current_state(TASK_RUNNING);
-		remove_wait_queue(&ml->mi_waitq, &wait);
-		clear_bit(MI_WAIT_SLEEP_BIT, &ml->mi_users);
+		remove_wait_queue(&mw->mi_waitq, &wait);
 	}
 	return (ptr);
 
 }
 
 EXPORT_SYMBOL(mi_acquire_sleep);
+
+/**
+ * mi_acquire_sleep_nosignal: - lock a private structure or wait
+ * @ptrw: pointer to private structure of locker
+ * @ptrp: pointer to pointer to private structure to lock
+ * @lockp: pointer to an irq locked lock protecting *ptrp
+ * @flagsp: pointer to saved flags word
+ *
+ * Just as mi_acquire_sleep(), except will not be woken by a signal.
+ */
+__MPS_EXTERN caddr_t
+mi_acquire_sleep_nosignal(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *flagsp)
+{
+	caddr_t ptr = *ptrp;
+	struct mi_comm *mi = ptr_to_mi(ptr);
+
+	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
+		DECLARE_WAITQUEUE(wait, current);
+		struct mi_comm *mw = ptr_to_mi(ptrw);
+
+		add_wait_queue(&mw->mi_waitq, &wait);
+		for (;;) {
+			set_current_state(TASK_UNINTERRUPTIBLE);
+			if (test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users)) {
+				if (mi->mi_waiter != mw) {
+					mi_open_grab(ptrw);
+					set_bit(MI_WAIT_SLEEP_BIT, &mw->mi_users);
+					mi_wakepriv(&mi->mi_waiter, mw);
+				}
+				if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
+					break;
+			}
+			if (lockp) {
+				if (flagsp)
+					write_unlock_irqrestore(lockp, *flagsp);
+				else
+					write_unlock(lockp);
+			}
+			schedule();
+			if (lockp) {
+				if (flagsp)
+					write_lock_irqsave(lockp, *flagsp);
+				else
+					write_lock(lockp);
+			}
+			if ((ptr = *ptrp) == NULL)
+				break;
+			mi = ptr_to_mi(ptr);
+		}
+		set_current_state(TASK_RUNNING);
+		remove_wait_queue(&mw->mi_waitq, &wait);
+	}
+	return (ptr);
+
+}
+
+EXPORT_SYMBOL(mi_acquire_sleep_nosignal);
 
 __MPS_EXTERN void
 mi_release(caddr_t ptr)

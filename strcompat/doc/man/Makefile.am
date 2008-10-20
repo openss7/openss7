@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-10-17 10:34:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-10-20 01:22:50 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-17 10:34:39 $ by $Author: brian $
+# Last Modified $Date: 2008-10-20 01:22:50 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -223,6 +223,7 @@ mps_compat_pages = \
 	man9/mi_trylock.9 \
 	man9/mi_acquire.9 \
 	man9/mi_acquire_sleep.9 \
+	man9/mi_acquire_sleep_nosignal.9 \
 	man9/mi_release.9 \
 	man9/mi_unlock.9 \
 	man9/mi_zalloc.9 \
@@ -1313,6 +1314,7 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_trylock.9.man \
 	man9/mi_acquire.9.man \
 	man9/mi_acquire_sleep.9.man \
+	man9/mi_acquire_sleep_nosignal.9.man \
 	man9/mi_release.9.man \
 	man9/mi_unlock.9.man \
 	man9/mi_zalloc.9.man \
@@ -2189,6 +2191,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.33  2008-10-20 01:22:50  brian
+# - updates and corrections
+#
 # Revision 0.9.2.32  2008-10-17 10:34:39  brian
 # - expanded and correct MPS functions
 #
