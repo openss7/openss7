@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2008-10-20 11:27:23 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 11:18:13 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 11:27:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.112  2008-10-20 11:27:23  brian
+ - process all state changes
+
  Revision 0.9.2.111  2008-10-20 11:18:13  brian
  - detect rapid orderly release
 
@@ -119,10 +122,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2008-10-20 11:27:23 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2008-10-20 11:27:23 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -639,7 +642,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.111 $) $Date: 2008-10-20 11:18:13 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.112 $) $Date: 2008-10-20 11:27:23 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -16660,13 +16663,15 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	int tcp_oldstate, tcp_newstate, tpi_oldstate, err;
 
-	STRLOGRX(ss, "%s", __FUNCTION__);
+//	STRLOGRX(ss, "%s", __FUNCTION__);
 	tcp_newstate = sk->sk_state;
 	tcp_oldstate = XCHG(&ss->tcp_state, tcp_newstate);
 	tpi_oldstate = ss_get_state(ss);
 
+#if 0
 	if (tcp_newstate == tcp_oldstate && tcp_oldstate != TCP_LISTEN)
 		return;
+#endif
 
 	STRLOGST(ss, "%s [%s <- %s] (%s) %p", __FUNCTION__, tcp_statename(tcp_newstate),
 		 tcp_statename(tcp_oldstate), tpi_statename(tpi_oldstate), sk);
