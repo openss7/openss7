@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 09:44:19 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 10:20:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.109  2008-10-20 10:20:15  brian
+ - ss_r_recvmsg only receives data
+
  Revision 0.9.2.108  2008-10-20 09:44:19  brian
  - do not report conn_ind if already disconnected
 
@@ -110,10 +113,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -630,7 +633,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.108 $) $Date: 2008-10-20 09:44:19 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -13640,7 +13643,7 @@ t_error_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t error
 	return (-ENOBUFS);
 }
 
-static fastcall __hot_in int ss_r_recvmsg(ss_t *ss, queue_t *q);
+static fastcall __hot_in void ss_r_recvmsg(ss_t *ss, queue_t *q);
 
 /**
  * t_ok_ack: - issue a T_OK_ACK primitive
@@ -16965,75 +16968,37 @@ __ss_r_events(ss_t *ss, queue_t *q)
  * @ss: private structure (locked)
  * @q: active queue (read queue only)
  */
-noinline fastcall __hot_read int
+noinline fastcall __hot_read void
 ss_r_recvmsg(ss_t *ss, queue_t *q)
 {
-	int err = 0, band_full = 0;
 	struct sock *sk;
 	int type;
 
 	if (unlikely(!ss->sock))
-		return (0);
+		return;
 	if (unlikely(!(sk = ss->sock->sk)))
-		goto done;
+		return;
 
 	switch (__builtin_expect((type = ss->p.prot.type), SOCK_STREAM)) {
 	case SOCK_STREAM:
 	case SOCK_SEQPACKET:
-		if ((err = xchg(&ss->lasterror, 0)))
-			break;
-		if ((err = sock_error(sk)) < 0)
-			break;
-		while ((err = ss_exdata_ind(ss, q, sk, type)) > 0) ;
-		band_full |= (err == -EBUSY);
-		if (err != -EBUSY && err != -EAGAIN)
-			break;
-		while ((err = ss_data_ind(ss, q, sk, type)) > 0) ;
-		band_full |= (err == -EBUSY);
+		/* Read and deliver T_EXDATA_IND and T_DATA_IND while the receive queue can
+		   be read and primitives can be delivered upstream. */
+		ss_all_data_ind(ss, q, sk, type);
 		break;
 	case SOCK_DGRAM:
 	case SOCK_RAW:
 	case SOCK_RDM:
-#if 0
-		while ((err = ss_uderror_ind(ss, q, sk, type)) >= 0) ;
-		band_full |= (err == -EBUSY);
-		if (err != -EBUSY && err != -EAGAIN)
-			break;
-#endif
-		while ((err = ss_unitdata_ind(ss, q, sk, type)) > 0) ;
-		band_full |= (err == -EBUSY);
+		/* Read and deliver T_UNITDATA_IND while the receive queue can be read and
+		   primitives can be delivered upstream. */
+		ss_all_unitdata_ind(ss, q, sk, type);
 		break;
 	default:
 		STRLOGERR(ss, "SWERR: unknown socket type %d: %s %s:%d", type, __FUNCTION__,
 			  __FILE__, __LINE__);
-		err = -EFAULT;
 		break;
 	}
-      done:
-	if (band_full && err == 0)
-		err = -EBUSY;
-	if (err == -EAGAIN)
-		err = 0;
-
-	switch (-err) {
-	case EBUSY:
-	case EAGAIN:
-	case ENOMEM:
-	case ENOBUFS:
-	case EDEADLK:
-	case 0:
-		break;
-	case EPIPE:
-	case ENETDOWN:
-	case EHOSTUNREACH:
-	case ECONNRESET:
-	case ECONNREFUSED:
-	case ETIMEDOUT:
-	case ENOTCONN:
-		err = t_discon_ind(ss, q, sk, -err, NULL);
-		break;
-	}
-	return (err);
+	return;
 }
 
 /*
