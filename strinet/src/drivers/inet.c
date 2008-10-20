@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 10:20:15 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 10:30:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.110  2008-10-20 10:30:24  brian
+ - can get error reports in TS_IDLE state
+
  Revision 0.9.2.109  2008-10-20 10:20:15  brian
  - ss_r_recvmsg only receives data
 
@@ -113,10 +116,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -633,7 +636,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.109 $) $Date: 2008-10-20 10:20:15 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.110 $) $Date: 2008-10-20 10:30:24 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -16844,11 +16847,14 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		switch (__builtin_expect(tpi_oldstate, TS_DATA_XFER)) {
 		case TS_UNBND:
 			break;
-		case TS_IDLE:
 		case TS_WRES_CIND:
 			if (tcp_oldstate == TCP_LISTEN)
 				return;
 			break;
+		case TS_IDLE:
+			if (tcp_oldstate == TCP_LISTEN)
+				return;
+			/* fall through */
 		case TS_WCON_CREQ:
 		case TS_DATA_XFER:
 		case TS_WIND_ORDREL:
