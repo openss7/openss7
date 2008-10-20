@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2008-10-19 08:32:22 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-19 08:32:22 $ by $Author: brian $
+ Last Modified $Date: 2008-10-20 01:33:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.103  2008-10-20 01:33:59  brian
+ - corrections to open and close
+
  Revision 0.9.2.102  2008-10-19 08:32:22  brian
  - logic reversal
 
@@ -92,10 +95,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2008-10-19 08:32:22 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2008-10-19 08:32:22 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -136,11 +139,11 @@ static char const ident[] =
 #include <linux/in.h>
 #include <linux/un.h>
 #include <linux/ip.h>
-#include <linux/errqueue.h>
 
 #undef ASSERT
 
 #include <net/sock.h>
+#include <net/ip.h>
 #include <net/udp.h>
 #include <net/tcp.h>
 #if defined HAVE_OPENSS7_SCTP
@@ -148,6 +151,8 @@ static char const ident[] =
 #undef INLINE
 #include <net/sctp.h>
 #endif
+
+#include <linux/errqueue.h>
 
 #if 0
 /* Turn on some tracing and debugging. */
@@ -610,7 +615,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.102 $) $Date: 2008-10-19 08:32:22 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.103 $) $Date: 2008-10-20 01:33:59 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -17381,20 +17386,29 @@ ss_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		ss->cred = *crp;
 		bufq_init(&ss->conq);
 	}
-	while (!mi_acquire(ptr, NULL)) ;
 	sflag = CLONEOPEN;
 	cminor = FREE_CMINOR;	/* start at the first free minor device number */
+	/* The static device range for mi_open_link() is 5 or 10, and inet uses 50, so we need to
+	   adjust the minor device number before calling mi_open_link(). */
+	*devp = makedevice(getmajor(*devp), cminor);
 	write_lock_irqsave(&ss_lock, flags);
+	if (mi_acquire_sleep(ptr, &ptr, &ss_lock, &flags) == NULL) {
+		err = EINTR;
+		goto unlock_free;
+	}
 	if ((err = mi_open_link(&ss_opens, ptr, devp, oflags, sflag, crp))) {
 		mi_release(ptr);
-		mi_close_free_cache(ss_priv_cachep, ptr);
-		write_unlock_irqrestore(&ss_lock, flags);
-		return (err);
+		goto unlock_free;
 	}
 	mi_attach(q, ptr);
+	mi_release(ptr);
 	write_unlock_irqrestore(&ss_lock, flags);
 	ss_sock_init(ss);
 	return (0);
+      unlock_free:
+	mi_close_free_cache(ss_priv_cachep, ptr);
+	write_unlock_irqrestore(&ss_lock, flags);
+	return (err);
 }
 
 /**
@@ -17411,9 +17425,9 @@ ss_qclose(queue_t *q, int oflags, cred_t *crp)
 	caddr_t ptr = (caddr_t) ss;
 	int err;
 
-	write_lock_irqsave(&ss_lock, flags);
-	while (!(ss = (ss_t *) mi_acquire_sleep(ptr, &ptr, &ss_lock, &flags))) ;
 	ss_socket_put(&ss->sock);
+	write_lock_irqsave(&ss_lock, flags);
+	mi_acquire_sleep_nosignal(ptr, &ptr, &ss_lock, &flags);
 	qprocsoff(q);
 	bufq_purge(&ss->conq);
 	ss->ss_parent = NULL;
@@ -17447,7 +17461,7 @@ MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
-module_param(major, uint, 0444);
+module_param(major, int, 0444);
 #endif
 MODULE_PARM_DESC(major, "Device number for the INET driver. (0 for allocation.)");
 
