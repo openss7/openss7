@@ -13442,6 +13442,7 @@ t_discon_ind(ss_t *ss, queue_t *q, struct sock *sk, t_scalar_t reason, mblk_t *c
 		assure(cp != NULL);
 		if (unlikely(!canputnext(ss->rq)))
 			goto ebusy;
+		break;
 	default:
 		STRLOGERR(ss, "SWERR: out of state: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 		/* remove it anyway and feign success */
