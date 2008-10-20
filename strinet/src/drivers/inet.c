@@ -16609,7 +16609,7 @@ __ss_r_child_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		cp_next = bufq_head(&ss->conq);
 		while ((cp = cp_next)) {
 			cp_next = cp->b_next;
-			if (((ss_conind_t *) cp)->ci_rflags & (1 << SS_BIT_STATE_CHANGE))
+			if (((ss_conind_t *) cp->b_rptr)->ci_rflags & (1 << SS_BIT_STATE_CHANGE))
 				if ((err = t_discon_ind(ss, q, sk, ECONNRESET, cp)) < 0)
 					break;
 		}
