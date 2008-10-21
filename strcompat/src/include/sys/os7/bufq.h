@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.14 2008-04-28 16:47:10 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.15 2008-10-21 07:49:31 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:10 $ by $Author: brian $
+ Last Modified $Date: 2008-10-21 07:49:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufq.h,v $
+ Revision 0.9.2.15  2008-10-21 07:49:31  brian
+ - sanity checks for bufq_unlink
+
  Revision 0.9.2.14  2008-04-28 16:47:10  brian
  - updates for release
 
@@ -71,7 +74,7 @@
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef psw_t
 #ifdef INT_PSW
@@ -313,12 +316,20 @@ __bufq_unlink(bufq_t * q, mblk_t *mp)
 	ensure(q && mp, return (NULL));
 	if (mp->b_next)
 		mp->b_next->b_prev = mp->b_prev;
-	else
+	else if (q->q_tail == mp)
 		q->q_tail = mp->b_prev;
+	else {
+		swerr();
+		return(NULL);
+	}
 	if (mp->b_prev)
 		mp->b_prev->b_next = mp->b_next;
-	else
+	else if (q->q_head == mp)
 		q->q_head = mp->b_next;
+	else {
+		swerr();
+		return (NULL);
+	}
 	mp->b_next = NULL;
 	mp->b_prev = NULL;
 	__bufq_sub(q, mp);
