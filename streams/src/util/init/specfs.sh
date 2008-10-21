@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:11 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-21 22:42:15 $
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -66,11 +66,14 @@ RETVAL=0
 
 umask 077
 
-if [ "${VERBOSE:-0}" -eq 0 ] ; then
-    redir='>/dev/null 2>&1'
-else
-    redir=
-fi
+case :$VERBOSE in
+    :no|:NO|:false|:FALSE|:0|:)
+	redir='>/dev/null 2>&1'
+	;;
+    *)
+	redir=
+	;;
+esac
 
 build_options() {
     # Build up the options string
@@ -186,7 +189,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:11 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-21 22:42:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -231,11 +234,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 12:54:11 $ by $Author: brian $
+# Last Modified $Date: 2008-10-21 22:42:15 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: specfs.sh,v $
+# Revision 0.9.2.15  2008-10-21 22:42:15  brian
+# - handle verbose better in debian initscripts
+#
 # Revision 0.9.2.14  2008-04-28 12:54:11  brian
 # - update file headers for release
 #

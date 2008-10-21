@@ -1,3 +1,7 @@
+2008-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strbcm.sh: handle VERBOSE better
+
 2008-09-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* strbcm.spec.in: much improved spec files ready for repo building

@@ -1,3 +1,7 @@
+2008-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strx25.sh: handle VERBOSE better
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/cd-llc.c: add mod version, truncate logs
