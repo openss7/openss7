@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.153 $) $Date: 2008-10-12 03:07:40 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2008-10-21 03:06:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-12 03:07:40 $ by $Author: brian $
+# Last Modified $Date: 2008-10-21 03:06:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1037,7 +1037,8 @@ AC_DEFUN([_LFS_CONFIG_KERNEL], [dnl
 			  linux/hardirq.h linux/cpumask.h linux/kref.h linux/security.h \
 			  asm/uaccess.h linux/kthread.h linux/compat.h linux/ioctl32.h \
 			  asm/ioctl32.h linux/syscalls.h linux/rwsem.h linux/smp_lock.h \
-			  linux/devfs_fs_kernel.h linux/compile.h linux/utsrelease.h], [:], [:], [
+			  linux/devfs_fs_kernel.h linux/compile.h linux/utsrelease.h \
+			  linux/fdtable.h], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1101,7 +1102,8 @@ dnl
 			set_cpus_allowed yield \
 			prepare_to_wait prepare_to_wait_exclusive finish_wait \
 			compat_ptr register_ioctl32_conversion unregister_ioctl32_conversion \
-			simple_statfs task_pgrp_nr task_session_nr], [:], [
+			simple_statfs task_pgrp_nr task_session_nr \
+			create_proc_info_entry], [:], [
 			case "$lk_func" in
 			    pcibios_*)
 				EXPOSED_SYMBOLS="${EXPOSED_SYMBOLS:+$EXPOSED_SYMBOLS }lis_${lk_func}"
@@ -1140,6 +1142,9 @@ dnl
 #endif
 #ifdef HAVE_KINC_LINUX_NAMESPACE_H
 #include <linux/namespace.h>
+#endif
+#ifdef CONFIG_PROC_FS
+#include <linux/proc_fs.h>
 #endif
 #ifdef HAVE_KINC_LINUX_NAMEI_H
 #include <linux/namei.h>
@@ -1316,6 +1321,7 @@ dnl
 			  struct file_system_type.get_sb,
 			  struct super_operations.read_inode,
 			  struct super_operations.read_inode2,
+			  struct super_operations.put_inode,
 			  struct kstatfs.f_type,
 			  struct kobject.kref,
 			  struct inode.i_mutex,
@@ -1342,6 +1348,9 @@ dnl
 #endif
 #include <linux/fs.h>
 #include <linux/file.h>
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>
+#endif
 #include <linux/sched.h>
 #include <linux/wait.h>
 #ifdef HAVE_KINC_LINUX_STATFS_H
@@ -1753,6 +1762,9 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.154  2008-10-21 03:06:47  brian
+# - tweaks for 2.6.26.5-45.fc9 kernel
+#
 # Revision 0.9.2.153  2008-10-12 03:07:40  brian
 # - changes for FC9 2.6.25 kernel
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-04-28 12:54:05 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 03:06:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:05 $ by $Author: brian $
+ Last Modified $Date: 2008-10-21 03:06:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 0.9.2.61  2008-10-21 03:06:48  brian
+ - tweaks for 2.6.26.5-45.fc9 kernel
+
  Revision 0.9.2.60  2008-04-28 12:54:05  brian
  - update file headers for release
 
@@ -87,10 +90,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-04-28 12:54:05 $"
+#ident "@(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 03:06:48 $"
 
 static char const ident[] =
-    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-04-28 12:54:05 $";
+    "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 03:06:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -156,7 +159,12 @@ get_streams_driver(char *page, int maxlen, struct cdevsw *d)
 
 /* called by proc file system to list the registered STREAMS devices */
 STATIC int
-get_streams_drivers_list(char *page, char **start, off_t offset, int length)
+get_streams_drivers_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 1024;
@@ -206,7 +214,12 @@ get_streams_module(char *page, int maxlen, struct cdevsw *d)
 
 /* called by proc file system to list the registered STREAMS modules */
 STATIC int
-get_streams_modules_list(char *page, char **start, off_t offset, int length)
+get_streams_modules_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 1024;
@@ -470,7 +483,12 @@ get_streams_cdevsw(char *page, int maxlen, struct cdevsw *d)
 
 /* called by proc file system to list the registered STREAMS devices */
 STATIC int
-get_streams_cdevsw_list(char *page, char **start, off_t offset, int length)
+get_streams_cdevsw_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 1024;
@@ -576,7 +594,12 @@ get_streams_fmodsw(char *page, int maxlen, struct fmodsw *f)
 
 /* called by proc file system to list the registered STREAMS modules */
 STATIC int
-get_streams_fmodsw_list(char *page, char **start, off_t offset, int length)
+get_streams_fmodsw_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 1024;
@@ -643,7 +666,12 @@ get_streams_strinfo_data(char *page, int maxlen)
 	return len;
 }
 STATIC int
-get_streams_strinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_strinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len;
 
@@ -790,7 +818,12 @@ get_streams_shinfo_data(char *page, int maxlen, struct shinfo *sh)
 
 /* list stream head information for allocated streams */
 STATIC int
-get_streams_shinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_shinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 512;
@@ -919,7 +952,12 @@ get_streams_queinfo_data(char *page, int maxlen, struct queinfo *qu)
 
 /* list stream head information for allocated queues */
 STATIC int
-get_streams_queinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_queinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 512;
@@ -1020,7 +1058,12 @@ get_streams_mbinfo_data(char *page, int maxlen, struct mbinfo *m)
 
 /* list stream head information for allocated message blocks */
 STATIC int
-get_streams_mbinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_mbinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 256;
@@ -1119,7 +1162,12 @@ get_streams_dbinfo_data(char *page, int maxlen, struct dbinfo *db)
 
 /* list stream head information for allocated data blocks */
 STATIC int
-get_streams_dbinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_dbinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 256;
@@ -1208,7 +1256,12 @@ get_streams_linkinfo_data(char *page, int maxlen, struct linkinfo *li)
 
 /* list stream head information for allocated link blocks */
 STATIC int
-get_streams_linkinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_linkinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 256;
@@ -1324,7 +1377,12 @@ get_streams_seinfo_data(char *page, int maxlen, struct seinfo *s)
 
 /* list stream head information for allocated strevents */
 STATIC int
-get_streams_seinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_seinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 256;
@@ -1425,7 +1483,12 @@ get_streams_qbinfo_data(char *page, int maxlen, struct qbinfo *qbi)
 
 /* list stream head information for allocated qbands */
 STATIC int
-get_streams_qbinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_qbinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 256;
@@ -1524,7 +1587,12 @@ get_streams_apinfo_data(char *page, int maxlen, struct apinfo *api)
 
 /* list stream head information for allocate strapush structures */
 STATIC int
-get_streams_apinfo_list(char *page, char **start, off_t offset, int length)
+get_streams_apinfo_list
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+	(char *page, char **start, off_t offset, int length, int *eof, void *data)
+#else
+	(char *page, char **start, off_t offset, int length)
+#endif
 {
 	int len = 0;
 	static const int maxlen = 256;
@@ -1564,6 +1632,11 @@ get_streams_apinfo_list(char *page, char **start, off_t offset, int length)
 struct proc_dir_entry *proc_str = NULL;
 
 #endif				/* CONFIG_PROC_FS */
+
+#ifndef HAVE_KFUNC_CREATE_PROC_INFO_ENTRY
+#undef create_proc_info_entry
+#define create_proc_info_entry(name, mode, base, info) create_proc_read_entry(name, mode, base, info, NULL)
+#endif				/* HAVE_KFUNC_CREATE_PROC_INFO_ENTRY */
 
 BIG_STATIC int
 strprocfs_init(void)

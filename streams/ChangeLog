@@ -1,3 +1,10 @@
+2008-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* acinclude.m4: changes to accomodate 2.6.26.5-45.fc9 kernel
+	* src/kernel/strprocfs.c: changes to accomodate 2.6.26.5-45.fc9 kernel
+	* src/kernel/strspecfs.c: changes to accomodate 2.6.26.5-45.fc9 kernel
+	* src/modules/sth.c: changes to accomodate 2.6.26.5-45.fc9 kernel
+
 2008-10-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: document bug #025

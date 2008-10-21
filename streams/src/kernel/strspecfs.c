@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2008-10-21 03:06:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:31 $ by $Author: brian $
+ Last Modified $Date: 2008-10-21 03:06:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.88  2008-10-21 03:06:48  brian
+ - tweaks for 2.6.26.5-45.fc9 kernel
+
  Revision 0.9.2.87  2008-10-11 04:31:31  brian
  - handle -Wpointer-sign
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2008-10-21 03:06:48 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2008-10-21 03:06:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -119,7 +122,7 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-11 04:31:31 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2008-10-21 03:06:48 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -1029,6 +1032,7 @@ spec_read_inode2(struct inode *inode, void *opaque)
 }
 #endif
 
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE
 /**
  *  spec_put_inode: - put an inode to the filesystem
  *  @inode:	inode to put
@@ -1060,6 +1064,7 @@ spec_put_inode(struct inode *inode)
 #endif
 	}
 }
+#endif				/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE */
 
 /**
  *  spec_put_super: - put a superblock for the filesystem
@@ -1191,10 +1196,12 @@ STATIC struct super_operations spec_s_ops ____cacheline_aligned = {
 #endif
 #if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2
 	.read_inode2 = spec_read_inode2,
-#endif					/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2 */
+#endif				/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_READ_INODE2 */
+#if defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE
 	.put_inode = spec_put_inode,
+#endif				/* defined HAVE_KMEMB_STRUCT_SUPER_OPERATIONS_PUT_INODE */
 	.put_super = spec_put_super,
-	.statfs = spec_statfs,		/* like simple_statfs */
+	.statfs = spec_statfs,	/* like simple_statfs */
 	.remount_fs = spec_remount_fs,
 #if 0
 	.umount_begin = spec_umount_begin,
