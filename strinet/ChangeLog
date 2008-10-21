@@ -2,6 +2,11 @@
 
 	* src/drivers/inet.c: corrections from testing
 
+	* acinclude.m4: get autoloading working for UDP and RAWIP drivers
+	* src/drivers/inet.c: get autoloading working for UDP and RAWIP drivers
+	* src/drivers/rawip.c: get autoloading working for UDP and RAWIP drivers
+	* src/drivers/udp.c: get autoloading working for UDP and RAWIP drivers
+
 2008-10-20  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/inet.c: corrections to open and close

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-10-13 04:12:16 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-10-21 07:49:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-13 04:12:16 $ by $Author: brian $
+# Last Modified $Date: 2008-10-21 07:49:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1307,7 +1307,7 @@ AC_DEFUN([_INET_CONFIG], [dnl
 AC_DEFUN([_INET_STRCONF], [dnl
     strconf_cv_stem='lis.conf'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=218
+    strconf_cv_majbase=212
     strconf_cv_midbase=90
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
@@ -1346,6 +1346,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.86  2008-10-21 07:49:57  brian
+# - get autoloading working for UDP and RAWIP drivers
+#
 # Revision 0.9.2.85  2008-10-13 04:12:16  brian
 # - handle exports rework strinet
 #

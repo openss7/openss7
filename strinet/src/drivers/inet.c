@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2008-10-21 03:07:18 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-21 03:07:18 $ by $Author: brian $
+ Last Modified $Date: 2008-10-21 07:49:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.115  2008-10-21 07:49:57  brian
+ - get autoloading working for UDP and RAWIP drivers
+
  Revision 0.9.2.114  2008-10-21 03:07:18  brian
  - corrections from testing
 
@@ -128,10 +131,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2008-10-21 03:07:18 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2008-10-21 03:07:18 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -648,7 +651,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.114 $) $Date: 2008-10-21 03:07:18 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -16737,7 +16740,6 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 				goto done;
 			case TCP_TIME_WAIT:
 			case TCP_CLOSE:
-				assure(tcp_oldstate == TCP_SYN_SENT);
 				/* The new TPI state will become TS_IDLE. */
 				if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
 					goto error;
@@ -16753,7 +16755,6 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 				goto done;
 			case TCP_TIME_WAIT:
 			case TCP_CLOSE:
-				assure(tcp_oldstate == TCP_ESTABLISHED);
 				/* The new TPI state will become TS_IDLE. */
 				if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
 					goto error;
@@ -16777,6 +16778,10 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		case TS_WIND_ORDREL:
 			switch (tcp_newstate) {
 			case TCP_TIME_WAIT:
+				/* The new TPI state will become TS_IDLE. */
+				if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
+					goto error;
+				goto done;
 			case TCP_CLOSE:
 				switch (tcp_oldstate) {
 				case TCP_FIN_WAIT2:
@@ -17122,8 +17127,8 @@ ss_wsrv(queue_t *q)
 	ss_t *ss;
 	mblk_t *mp;
 
-	if (likely((ss = (ss_t *) mi_trylock(q)) != NULL)) {
-		while (likely((mp = getq(q)) != NULL)) {
+	if (likely(!!(ss = (ss_t *) mi_trylock(q)))) {
+		while (likely(!!(mp = getq(q)))) {
 			/* remove backpressure */
 			mp->b_wptr -= PRELOAD;
 			if (unlikely(ss_w_prim_srv(ss, q, mp))) {

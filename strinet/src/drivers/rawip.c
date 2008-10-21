@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-10-11 04:31:34 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:34 $ by $Author: brian $
+ Last Modified $Date: 2008-10-21 07:49:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.61  2008-10-21 07:49:59  brian
+ - get autoloading working for UDP and RAWIP drivers
+
  Revision 0.9.2.60  2008-10-11 04:31:34  brian
  - handle -Wpointer-sign
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-10-11 04:31:34 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-10-11 04:31:34 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -155,7 +158,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-10-11 04:31:34 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -196,11 +199,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #ifdef MODULE_ALIAS
 #ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_RAW_MODID));
-MODULE_ALIAS("streams-driver-rawip2");
+MODULE_ALIAS("streams-driver-rawip");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_RAW_MAJOR));
-MODULE_ALIAS("/dev/streams/rawip2");
-MODULE_ALIAS("/dev/streams/rawip2/*");
-MODULE_ALIAS("/dev/streams/clone/rawip2");
+MODULE_ALIAS("/dev/streams/rawip");
+MODULE_ALIAS("/dev/streams/rawip/*");
+MODULE_ALIAS("/dev/streams/clone/rawip");
 #endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(RAW_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(RAW_CMAJOR_0) "-*");
