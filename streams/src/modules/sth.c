@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.206 $) $Date: 2008-10-21 03:06:48 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:31 $ by $Author: brian $
+ Last Modified $Date: 2008-10-21 03:06:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.206  2008-10-21 03:06:48  brian
+ - tweaks for 2.6.26.5-45.fc9 kernel
+
  Revision 0.9.2.205  2008-10-11 04:31:31  brian
  - handle -Wpointer-sign
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.206 $) $Date: 2008-10-21 03:06:48 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.206 $) $Date: 2008-10-21 03:06:48 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -107,6 +110,9 @@ static char const ident[] =
 #include <linux/spinlock.h>
 #include <linux/fs.h>		/* for file */
 #include <linux/file.h>		/* for fget() */
+#ifdef HAVE_KINC_LINUX_FDTABLE_H
+#include <linux/fdtable.h>	/* for files_struct */
+#endif
 #include <linux/poll.h>		/* for poll_wait */
 #include <linux/highmem.h>	/* for kmap, kunmap */
 #include <linux/uio.h>		/* for iovec */
@@ -191,7 +197,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.205 $) $Date: 2008-10-11 04:31:31 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.206 $) $Date: 2008-10-21 03:06:48 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
