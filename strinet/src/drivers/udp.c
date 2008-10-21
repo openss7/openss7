@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-10-11 04:31:34 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2008-10-21 07:49:59 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:34 $ by $Author: brian $
+ Last Modified $Date: 2008-10-21 07:49:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.74  2008-10-21 07:49:59  brian
+ - get autoloading working for UDP and RAWIP drivers
+
  Revision 0.9.2.73  2008-10-11 04:31:34  brian
  - handle -Wpointer-sign
 
@@ -71,10 +74,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-10-11 04:31:34 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2008-10-21 07:49:59 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-10-11 04:31:34 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2008-10-21 07:49:59 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -156,7 +159,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2008-10-11 04:31:34 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.74 $) $Date: 2008-10-21 07:49:59 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL"
@@ -197,11 +200,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #ifdef MODULE_ALIAS
 #ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_UDP_MODID));
-MODULE_ALIAS("streams-driver-udp2");
+MODULE_ALIAS("streams-driver-udp");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_UDP_MAJOR));
-MODULE_ALIAS("/dev/streams/udp2");
-MODULE_ALIAS("/dev/streams/udp2/*");
-MODULE_ALIAS("/dev/streams/clone/udp2");
+MODULE_ALIAS("/dev/streams/udp");
+MODULE_ALIAS("/dev/streams/udp/*");
+MODULE_ALIAS("/dev/streams/clone/udp");
 #endif				/* LFS */
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(UDP_CMAJOR_0) "-*");
