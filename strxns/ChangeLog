@@ -1,3 +1,7 @@
+2008-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strxns.sh: handle VERBOSE better
+
 2008-10-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: unexported sysctl_(w|r)mem_max

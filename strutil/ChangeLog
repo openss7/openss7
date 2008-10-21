@@ -1,3 +1,9 @@
+2008-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/strace.sh: handle VERBOSE better
+	* src/util/init/strerr.sh: handle VERBOSE better
+	* src/util/init/strlogd.sh: handle VERBOSE better
+
 2008-09-22  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/clone.c: add mod version, truncate logs

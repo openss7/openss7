@@ -1,5 +1,10 @@
 2008-10-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/util/init/specfs.sh: handle VERBOSE better
+	* src/util/init/strace.sh: handle VERBOSE better
+	* src/util/init/streams.sh: handle VERBOSE better
+	* src/util/init/strerr.sh: handle VERBOSE better
+
 	* acinclude.m4: changes to accomodate 2.6.26.5-45.fc9 kernel
 	* src/kernel/strprocfs.c: changes to accomodate 2.6.26.5-45.fc9 kernel
 	* src/kernel/strspecfs.c: changes to accomodate 2.6.26.5-45.fc9 kernel

@@ -1,5 +1,7 @@
 2008-10-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/util/init/osr61.sh: handle VERBOSE better
+
 	* src/drivers/ctimod/ctimod.c: changes for 2.6.26.5-45.fc9 kernel
 	* src/drivers/mercd/include/ctimod.h: changes for 2.6.26.5-45.fc9 kernel
 	* src/drivers/pmacd/source/pmacd_proc.c: changes for 2.6.26.5-45.fc9 kernel

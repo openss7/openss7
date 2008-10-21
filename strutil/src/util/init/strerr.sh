@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 12:58:15 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-21 22:42:21 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -73,11 +73,14 @@ RETVAL=0
 
 umask 077
 
-if [ "${VERBOSE:-0}" -eq 0 ] ; then
-    redir='>/dev/null 2>&1'
-else
-    redir=
-fi
+case :$VERBOSE in
+    :no|:NO|:false|:FALSE|:0|:)
+	redir='>/dev/null 2>&1'
+	;;
+    *)
+	redir=
+	;;
+esac
 
 build_options() {
     # Build up the options string
@@ -170,7 +173,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 12:58:15 $
+# @(#) $RCSfile: strerr.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-21 22:42:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -215,11 +218,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 12:58:15 $ by $Author: brian $
+# Last Modified $Date: 2008-10-21 22:42:21 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strerr.sh,v $
+# Revision 0.9.2.10  2008-10-21 22:42:21  brian
+# - handle verbose better in debian initscripts
+#
 # Revision 0.9.2.9  2007/08/14 12:58:15  brian
 # - GNUv3 header updates
 #

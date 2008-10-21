@@ -1,3 +1,7 @@
+2008-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/util/init/striso.sh: handle VERBOSE better
+
 2008-10-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/mibs/OPENSS7-CLNS-MIB.mib: update MIBs

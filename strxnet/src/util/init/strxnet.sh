@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-28 18:38:42 $
+# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-21 22:42:22 $
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -78,11 +78,14 @@ RETVAL=0
 
 umask 077
 
-if [ "${VERBOSE:-0}" -eq 0 ] ; then
-    redir='>/dev/null 2>&1'
-else
-    redir=
-fi
+case :$VERBOSE in
+    :no|:NO|:false|:FALSE|:0|:)
+	redir='>/dev/null 2>&1'
+	;;
+    *)
+	redir=
+	;;
+esac
 
 build_options() {
     # Build up the options string
@@ -218,7 +221,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-28 18:38:42 $
+# @(#) $RCSfile: strxnet.sh,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-21 22:42:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -263,11 +266,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 18:38:42 $ by $Author: brian $
+# Last Modified $Date: 2008-10-21 22:42:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strxnet.sh,v $
+# Revision 0.9.2.10  2008-10-21 22:42:22  brian
+# - handle verbose better in debian initscripts
+#
 # Revision 0.9.2.9  2008-04-28 18:38:42  brian
 # - header updates for release
 #
