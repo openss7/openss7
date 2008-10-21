@@ -1,3 +1,7 @@
+2008-10-20  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/send-pr: updates for release
+
 2008-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* m4/kernel.m4: more SuSE 2.6.25 build trials
