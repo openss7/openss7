@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-09-10 03:49:39 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-21 07:49:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:39 $ by $Author: brian $
+# Last Modified $Date: 2008-10-21 07:49:03 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -415,7 +415,7 @@ AC_DEFUN([_CHAN_CONFIG], [dnl
 AC_DEFUN([_CHAN_STRCONF], [dnl
     strconf_cv_stem='Config'
     strconf_cv_input='Config.master'
-    strconf_cv_majbase=211
+    strconf_cv_majbase=210
     strconf_cv_midbase=110
     if test ${streams_cv_package:-LfS} = LfS ; then
 	if test ${linux_cv_minorbits:-8} -gt 8 ; then
@@ -454,6 +454,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.19  2008-10-21 07:49:03  brian
+# - adjust major device numbers to reduce conflict
+#
 # Revision 0.9.2.18  2008-09-10 03:49:39  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #
