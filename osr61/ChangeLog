@@ -1,3 +1,10 @@
+2008-10-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ctimod/ctimod.c: changes for 2.6.26.5-45.fc9 kernel
+	* src/drivers/mercd/include/ctimod.h: changes for 2.6.26.5-45.fc9 kernel
+	* src/drivers/pmacd/source/pmacd_proc.c: changes for 2.6.26.5-45.fc9 kernel
+	* src/include/sys/ctimod.h: changes for 2.6.26.5-45.fc9 kernel
+
 2008-10-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/dlgn/source/dlgn.c: remove signed pointer warnings

@@ -260,7 +260,10 @@ int pmacd_procDriverInfo(char *buf, char **start, off_t offset, int len){
   
 }
 
-
+int pmacd_procDriverRead(char *buf, char **start, off_t offset, int len, int *eof, void *data);
+int pmacd_procDriverRead(char *buf, char **start, off_t offset, int len, int *eof, void *data){
+	return pmacd_procDriverInfo(buf, start, offset, len);
+}
 
 static struct proc_dir_entry *pmacd_driverInfo_proc_entry;
 static struct proc_dir_entry *pmacd_driverInfo_proc_entry;
@@ -284,7 +287,8 @@ static struct proc_dir_entry *pmacd_driverInfo_proc_entry;
 void pmacd_registerProcDriverInfo(void){
   pmacd_driverInfo_proc_entry = create_proc_entry("pmac", S_IFREG | S_IRUGO, NULL);
 //  pmacd_driverInfo_proc_entry = create_proc_entry("pmac", S_IFREG | S_IRUGO, &proc_root);
-  pmacd_driverInfo_proc_entry->get_info = &pmacd_procDriverInfo;
+  // pmacd_driverInfo_proc_entry->get_info = &pmacd_procDriverInfo;
+  pmacd_driverInfo_proc_entry->read_proc = &pmacd_procDriverRead;
 }
 
 /*

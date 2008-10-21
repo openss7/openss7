@@ -72,7 +72,7 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #define ctimod_dbg(fmt, args...)	//ctimod_printk(fmt, ##args)
 #define ctimod_dbg_locks(fmt, args...)  //ctimod_printk(fmt, ##args)
 
-struct proc_dir_entry ctimod_proc_root;
+// struct proc_dir_entry ctimod_proc_root;
 
 // Modlue Patameters
 static char ctimod_name[]	= "ctimod";
@@ -652,7 +652,7 @@ static int __init ctimod_init_module(void)
    ctimod_printk("*******************************************\n\n");
 #endif
 
-   ctimod_proc_root    = proc_root;
+//    ctimod_proc_root    = proc_root;
    
    return (0);
 }

@@ -190,10 +190,12 @@
 #endif
 #define printk(fmt,args...)		ctimod_printk(fmt,##args)
 
+#if 0
 #ifdef proc_root
 #undef proc_root
 #endif
 #define proc_root			ctimod_proc_root
+#endif
 
 #ifdef poll_wait
 #undef poll_wait
