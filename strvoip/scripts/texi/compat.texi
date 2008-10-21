@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: compat.texi,v 0.9.2.43 2008/09/05 05:10:33 brian Exp $
+@c @(#) $Id: compat.texi,v 0.9.2.44 2008-10-21 07:48:08 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008/09/05 05:10:33 $ by $Author: brian $
+@c Last Modified $Date: 2008-10-21 07:48:08 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -150,9 +150,9 @@ to distribution production kernels that have had patches applied over the offici
 @url{http://www.kernel.org/, kernel.org} sources.
 
 The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
-been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.25
+been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.26
 (with Fedora 9, openSUSE 11.0 and Ubuntu 8.04 patchsets).  Please note that your mileage may vary if
-you use a kernel more recent than 2.6.25.4: it is difficult to anticipate changes that kernel
+you use a kernel more recent than 2.6.26.4: it is difficult to anticipate changes that kernel
 developers will make in the future.  Many kernels in the 2.6 series now vary widely by release
 version and if you encounter problems, try a kernel within the supported series.
 
