@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.42 2008-09-20 11:04:36 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.43 2008-10-23 09:21:54 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-09-20 11:04:36 $ by $Author: brian $
+@c Last Modified $Date: 2008-10-23 09:21:54 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -135,6 +135,9 @@ BUGS in the release for more information.
 
 @item
 Added workaround for use of crash().
+
+@item
+Modifications to build under Fedora 2.6.25-45.fc9 and 2.6.26.5-45.fc9 kernels.
 
 @item
 
