@@ -1,5 +1,10 @@
 2008-10-23  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-inet_raw.c: relax disconnect versus orderly release
+	* src/test/test-inet_sctp.c: relax disconnect versus orderly release
+	* src/test/test-inet_tcp.c: relax disconnect versus orderly release
+	* src/test/test-inet_udp.c: relax disconnect versus orderly release
+
 	* doc/manual/news.texi: updated release notes
 
 2008-10-21  Brian Bidulock  <bidulock@openss7.org>
