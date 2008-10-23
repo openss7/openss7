@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-20 10:02:57 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-23 09:37:51 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- Affero General Public License (GPL) Version 3, so long as the software is
+ Affero General Public License (AGPL) Version 3, so long as the software is
  distributed with, and only used for the testing of, OpenSS7 modules, drivers,
  and libraries.
 
@@ -40,17 +40,18 @@
 
  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
  behalf of the U.S. Government ("Government"), the following provisions apply
- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
- is classified as "Commercial Computer Software" under paragraph 252.227-7014
- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
- successor regulations) and the Government is acquiring only the license rights
- granted herein (the license rights customarily provided to non-Government
- users).  If the Software is supplied to any unit or agency of the Government
- other than DoD, it is classified as "Restricted Computer Software" and the
- Government's rights in the Software are defined in paragraph 52.227-19 of the
- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
- (or any successor regulations).
+ to you.  If the Software is supplied by the Department of Defense ("DoD"),
+ it is classified as "Commercial Computer Software" under paragraph
+ 252.227-7014 of the DoD Supplement to the Federal Acquisition Regulations
+ ("DFARS") (or any successor regulations) and the Government is acquiring
+ only the license rights granted herein (the license rights customarily
+ provided to non-Government users).  If the Software is supplied to any unit
+ or agency of the Government other than DoD, it is classified as "Restricted
+ Computer Software" and the Government's rights in the Software are defined
+ in paragraph 52.227-19 of the Federal Acquisition Regulations ("FAR") (or
+ any successor regulations) or, in the cases of NASA, in paragraph
+ 18.52.227-86 of the NASA Supplement to the FAR (or any successor
+ regulations).
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 10:02:57 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:37:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.36  2008-10-23 09:37:51  brian
+ - relax disconnect versus orderly release
+
  Revision 0.9.2.35  2008-10-20 10:02:57  brian
  - conn inds might be absorbed by discon inds
 
@@ -73,168 +77,11 @@
  Revision 0.9.2.33  2007/08/14 04:27:46  brian
  - GPLv3 header update
 
- Revision 0.9.2.32  2007/04/04 01:16:17  brian
- - T_SNDZERO ok for rawip and udp, cleanup of udp.c driver
-
- Revision 0.9.2.31  2007/03/15 10:22:35  brian
- - test case reporting and pushed release date one day
-
- Revision 0.9.2.30  2007/03/12 09:34:17  brian
- - boosted default test port numbers from 10000 to 18000
-
- Revision 0.9.2.29  2007/03/08 08:26:51  brian
- - print primitives at default verbosity
-
- Revision 0.9.2.28  2007/01/28 01:10:11  brian
- - updated test programs and working up m2ua-as driver
-
- Revision 0.9.2.27  2007/01/08 16:23:43  brian
- - final updates for release
-
- Revision 0.9.2.26  2006/12/18 07:53:38  brian
- - resolve device numbering
-
- Revision 0.9.2.25  2006/07/29 07:43:28  brian
- - CVS checkin of changes before leaving for SCTP interop
-
- Revision 0.9.2.24  2006/07/08 07:25:56  brian
- - removed trigraphs
-
- Revision 0.9.2.23  2006/05/19 12:29:17  brian
- - results of testing, almost full pass
-
- Revision 0.9.2.22  2006/05/19 08:49:58  brian
- - working up RAWIP and UDP drivers and testing
-
- Revision 0.9.2.21  2006/03/24 16:03:48  brian
- - rationalized to strsctp package
-
- Revision 0.9.2.20  2006/02/23 11:10:11  brian
- - 64bit changes for x86_64
- - suppress lockf because it doesn't work too well on SMP
-
- Revision 0.9.2.19  2005/12/28 10:00:37  brian
- - remove warnings on FC4 compile
-
- Revision 0.9.2.18  2005/07/18 12:47:53  brian
- - standard indentation
-
- Revision 0.9.2.17  2005/06/28 03:18:49  brian
- - upgrading test suites
-
- Revision 0.9.2.16  2005/06/23 22:06:04  brian
- - changes to pass _FORTIFY_SOURCE=2 on gcc 4 testing on FC4
-
- Revision 0.9.2.15  2005/06/16 04:33:33  brian
- - modifications for test-inet_sctp
-
- Revision 0.9.2.14  2005/06/15 23:00:19  brian
- - final allowed state test cases
-
- Revision 0.9.2.13  2005/06/15 12:36:36  brian
- - added negative test cases
-
- Revision 0.9.2.12  2005/06/15 00:38:38  brian
- - fixed introduced typo
-
- Revision 0.9.2.11  2005/06/14 23:16:14  brian
- - corrected standards reference
-
- Revision 0.9.2.10  2005/06/14 23:02:26  brian
- - additional test cases for flushing and capabilities request
-
- Revision 0.9.2.9  2005/06/14 06:30:02  brian
- - a few more test cases
-
- Revision 0.9.2.8  2005/06/13 11:20:52  brian
- - added bug test case, a few timing corrections
-
- Revision 0.9.2.7  2005/06/13 09:51:07  brian
- - added more tests for connect request/response options
-
- Revision 0.9.2.6  2005/06/12 12:52:55  brian
- - added more tests, bad primitive corrections
-
- Revision 0.9.2.5  2005/06/11 02:21:20  brian
- - added more test cases
-
- Revision 0.9.2.4  2005/06/10 04:03:12  brian
- - more options corrections
-
- Revision 0.9.2.3  2005/06/08 09:01:19  brian
- - corrected options processing
-
- Revision 0.9.2.2  2005/06/08 06:08:25  brian
- - more options testing
-
- Revision 0.9.2.1  2005/06/07 00:52:06  brian
- - upgrading test suites
-
- Revision 0.9.2.10  2005/06/04 13:38:47  brian
- - final workup of test suites
-
- Revision 0.9.2.9  2005/06/04 09:13:55  brian
- - test suite corrections
-
- Revision 0.9.2.8  2005/06/04 05:01:42  brian
- - working up test suite upgrade
-
- Revision 0.9.2.7  2005/06/04 03:02:18  brian
- - upgraded test suites
-
- Revision 0.9.2.6  2005/05/14 08:28:53  brian
- - copyright header correction
-
- Revision 0.9.2.5  2005/04/04 16:43:17  brian
- - removed references to HZ
-
- Revision 0.9.2.4  2005/01/25 16:09:59  brian
- - Add check for <sys/wait.h>.
-
- Revision 0.9.2.3  2005/01/22 16:38:22  brian
- - Fixed compiler warnings.
-
- Revision 0.9.2.2  2004/09/02 10:07:37  brian
- - Updates for LFS compile.
-
- Revision 0.9.2.1  2004/06/27 10:08:37  brian
- - Built up separate inet release.
-
- Revision 0.9.2.1  2004/05/16 04:12:36  brian
- - Updating strxnet release.
-
- Revision 1.1.4.6  2004/04/13 12:12:55  brian
- - Rearranged header files.
-
- Revision 1.1.4.5  2004/04/13 06:04:04  brian
- - INET driver works pretty good now.
-
- Revision 1.1.4.4  2004/04/12 20:18:00  brian
- - Test cases pass.
-
- Revision 1.1.4.3  2004/03/31 09:00:50  brian
- - Working up new inet driver and documentation.
-
- Revision 1.1.4.2  2004/03/28 17:30:20  brian
- - First clean compile of inet updates.
-
- Revision 1.1.4.1  2004/01/12 23:33:18  brian
- - Updated LiS-2.16.18 gcom release to autoconf.
-
- Revision 1.1.2.3  2004/01/07 11:34:53  brian
- - Updated copyright dates.
-
- Revision 1.1.2.2  2004/01/04 11:31:23  brian
- - Corrected xti include.
-
- Revision 1.1.2.1  2003/12/23 11:12:23  brian
- - Added INET streams test programs.
-
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-20 10:02:57 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-23 09:37:51 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-20 10:02:57 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-23 09:37:51 $";
 
 /*
  *  Simple test program for INET streams.
@@ -17738,7 +17585,6 @@ struct test_stream test_1_9_3_1_conn = { &preamble_1_9_3_1_conn, &test_case_1_9_
 struct test_stream test_1_9_3_1_resp = { &preamble_1_9_3_1_resp, &test_case_1_9_3_1_resp, &postamble_1_9_3_1_resp };
 struct test_stream test_1_9_3_1_list = { &preamble_1_9_3_1_list, &test_case_1_9_3_1_list, &postamble_1_9_3_1_list };
 
-#define test_group_1_9_3 "Options management -- illegal options"
 #define tgrp_case_1_9_3_2 test_group_1_9_3
 #define numb_case_1_9_3_2 "1.9.3.2"
 #define name_case_1_9_3_2 "Perform options management -- T_CURRENT (illegal)"
@@ -17773,7 +17619,6 @@ struct test_stream test_1_9_3_2_conn = { &preamble_1_9_3_2_conn, &test_case_1_9_
 struct test_stream test_1_9_3_2_resp = { &preamble_1_9_3_2_resp, &test_case_1_9_3_2_resp, &postamble_1_9_3_2_resp };
 struct test_stream test_1_9_3_2_list = { &preamble_1_9_3_2_list, &test_case_1_9_3_2_list, &postamble_1_9_3_2_list };
 
-#define test_group_1_9_3 "Options management -- illegal options"
 #define tgrp_case_1_9_3_3 test_group_1_9_3
 #define numb_case_1_9_3_3 "1.9.3.3"
 #define name_case_1_9_3_3 "Perform options management -- T_CHECK (illegal)"
@@ -17808,7 +17653,6 @@ struct test_stream test_1_9_3_3_conn = { &preamble_1_9_3_3_conn, &test_case_1_9_
 struct test_stream test_1_9_3_3_resp = { &preamble_1_9_3_3_resp, &test_case_1_9_3_3_resp, &postamble_1_9_3_3_resp };
 struct test_stream test_1_9_3_3_list = { &preamble_1_9_3_3_list, &test_case_1_9_3_3_list, &postamble_1_9_3_3_list };
 
-#define test_group_1_9_3 "Options management -- illegal options"
 #define tgrp_case_1_9_3_4 test_group_1_9_3
 #define numb_case_1_9_3_4 "1.9.3.4"
 #define name_case_1_9_3_4 "Perform options management -- T_NEGOTIATE (illegal)"
@@ -18522,9 +18366,7 @@ while it is successful for T_CLTS service."
 int
 test_case_1_10_11(int child)
 {
-	struct sockaddr_in addr = { AF_INET, addrs[child][0].sin_port,
-		{child == 0 ? 0 : addrs[child][0].sin_addr.s_addr}
-	};
+	struct sockaddr_in addr = { AF_INET, addrs[child][0].sin_port, {child == 0 ? 0 : addrs[child][0].sin_addr.s_addr} };
 
 	test_addr = &addr;
 	test_alen = sizeof(addr);
@@ -19509,7 +19351,6 @@ struct test_stream test_2_2_4_1_list = { &preamble_2_2_list, &test_case_2_2_4_1_
 /*
  *  Transfer connectionless data with options -- T_TCP_MAXSEG
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_2 test_group_2_2_4
 #define numb_case_2_2_4_2 "2.2.4.2"
 #define name_case_2_2_4_2 "Transfer connectionless data with options -- T_TCP_MAXSEG"
@@ -19573,7 +19414,6 @@ struct test_stream test_2_2_4_2_list = { &preamble_2_2_list, &test_case_2_2_4_2_
 /*
  *  Transfer connectionless data with options -- T_TCP_KEEPALIVE
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_3 test_group_2_2_4
 #define numb_case_2_2_4_3 "2.2.4.3"
 #define name_case_2_2_4_3 "Transfer connectionless data with options -- T_TCP_KEEPALIVE"
@@ -19640,7 +19480,6 @@ struct test_stream test_2_2_4_3_list = { &preamble_2_2_list, &test_case_2_2_4_3_
 /*
  *  Transfer connectionless data with options -- T_TCP_CORK
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_4 test_group_2_2_4
 #define numb_case_2_2_4_4 "2.2.4.4"
 #define name_case_2_2_4_4 "Transfer connectionless data with options -- T_TCP_CORK"
@@ -19704,7 +19543,6 @@ struct test_stream test_2_2_4_4_list = { &preamble_2_2_list, &test_case_2_2_4_4_
 /*
  *  Transfer connectionless data with options -- T_TCP_KEEPIDLE
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_5 test_group_2_2_4
 #define numb_case_2_2_4_5 "2.2.4.5"
 #define name_case_2_2_4_5 "Transfer connectionless data with options -- T_TCP_KEEPIDLE"
@@ -19768,7 +19606,6 @@ struct test_stream test_2_2_4_5_list = { &preamble_2_2_list, &test_case_2_2_4_5_
 /*
  *  Transfer connectionless data with options -- T_TCP_KEEPINTVL
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_6 test_group_2_2_4
 #define numb_case_2_2_4_6 "2.2.4.6"
 #define name_case_2_2_4_6 "Transfer connectionless data with options -- T_TCP_KEEPINTVL"
@@ -19832,7 +19669,6 @@ struct test_stream test_2_2_4_6_list = { &preamble_2_2_list, &test_case_2_2_4_6_
 /*
  *  Transfer connectionless data with options -- T_TCP_KEEPCNT
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_7 test_group_2_2_4
 #define numb_case_2_2_4_7 "2.2.4.7"
 #define name_case_2_2_4_7 "Transfer connectionless data with options -- T_TCP_KEEPCNT"
@@ -19896,7 +19732,6 @@ struct test_stream test_2_2_4_7_list = { &preamble_2_2_list, &test_case_2_2_4_7_
 /*
  *  Transfer connectionless data with options -- T_TCP_SYNCNT
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_8 test_group_2_2_4
 #define numb_case_2_2_4_8 "2.2.4.8"
 #define name_case_2_2_4_8 "Transfer connectionless data with options -- T_TCP_SYNCNT"
@@ -19960,7 +19795,6 @@ struct test_stream test_2_2_4_8_list = { &preamble_2_2_list, &test_case_2_2_4_8_
 /*
  *  Transfer connectionless data with options -- T_TCP_LINGER2
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_9 test_group_2_2_4
 #define numb_case_2_2_4_9 "2.2.4.9"
 #define name_case_2_2_4_9 "Transfer connectionless data with options -- T_TCP_LINGER2"
@@ -20024,7 +19858,6 @@ struct test_stream test_2_2_4_9_list = { &preamble_2_2_list, &test_case_2_2_4_9_
 /*
  *  Transfer connectionless data with options -- T_TCP_DEFER_ACCEPT
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_10 test_group_2_2_4
 #define numb_case_2_2_4_10 "2.2.4.10"
 #define name_case_2_2_4_10 "Transfer connectionless data with options -- T_TCP_DEFER_ACCEPT"
@@ -20088,7 +19921,6 @@ struct test_stream test_2_2_4_10_list = { &preamble_2_2_list, &test_case_2_2_4_1
 /*
  *  Transfer connectionless data with options -- T_TCP_WINDOW_CLAMP
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_11 test_group_2_2_4
 #define numb_case_2_2_4_11 "2.2.4.11"
 #define name_case_2_2_4_11 "Transfer connectionless data with options -- T_TCP_WINDOW_CLAMP"
@@ -20152,7 +19984,6 @@ struct test_stream test_2_2_4_11_list = { &preamble_2_2_list, &test_case_2_2_4_1
 /*
  *  Transfer connectionless data with options -- T_TCP_INFO
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_12 test_group_2_2_4
 #define numb_case_2_2_4_12 "2.2.4.12"
 #define name_case_2_2_4_12 "Transfer connectionless data with options -- T_TCP_INFO"
@@ -20213,7 +20044,6 @@ struct test_stream test_2_2_4_12_list = { &preamble_2_2_list, &test_case_2_2_4_1
 /*
  *  Transfer connectionless data with options -- T_TCP_QUICKACK
  */
-#define test_group_2_2_4 "Connectionless data transfer -- TCP options"
 #define tgrp_case_2_2_4_13 test_group_2_2_4
 #define numb_case_2_2_4_13 "2.2.4.13"
 #define name_case_2_2_4_13 "Transfer connectionless data with options -- T_TCP_QUICKACK"
@@ -20341,7 +20171,6 @@ struct test_stream test_2_2_5_1_list = { &preamble_2_2_list, &test_case_2_2_5_1_
 /*
  *  Transfer connectionless data with options -- T_SCTP_CORK
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_2 test_group_2_2_5
 #define numb_case_2_2_5_2 "2.2.5.2"
 #define name_case_2_2_5_2 "Transfer connectionless data with options -- T_SCTP_CORK"
@@ -20405,7 +20234,6 @@ struct test_stream test_2_2_5_2_list = { &preamble_2_2_list, &test_case_2_2_5_2_
 /*
  *  Transfer connectionless data with options -- T_SCTP_PPI
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_3 test_group_2_2_5
 #define numb_case_2_2_5_3 "2.2.5.3"
 #define name_case_2_2_5_3 "Transfer connectionless data with options -- T_SCTP_PPI"
@@ -20469,7 +20297,6 @@ struct test_stream test_2_2_5_3_list = { &preamble_2_2_list, &test_case_2_2_5_3_
 /*
  *  Transfer connectionless data with options -- T_SCTP_SID
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_4 test_group_2_2_5
 #define numb_case_2_2_5_4 "2.2.5.4"
 #define name_case_2_2_5_4 "Transfer connectionless data with options -- T_SCTP_SID"
@@ -20533,7 +20360,6 @@ struct test_stream test_2_2_5_4_list = { &preamble_2_2_list, &test_case_2_2_5_4_
 /*
  *  Transfer connectionless data with options -- T_SCTP_SSN
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_5 test_group_2_2_5
 #define numb_case_2_2_5_5 "2.2.5.5"
 #define name_case_2_2_5_5 "Transfer connectionless data with options -- T_SCTP_SSN"
@@ -20597,7 +20423,6 @@ struct test_stream test_2_2_5_5_list = { &preamble_2_2_list, &test_case_2_2_5_5_
 /*
  *  Transfer connectionless data with options -- T_SCTP_TSN
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_6 test_group_2_2_5
 #define numb_case_2_2_5_6 "2.2.5.6"
 #define name_case_2_2_5_6 "Transfer connectionless data with options -- T_SCTP_TSN"
@@ -20661,7 +20486,6 @@ struct test_stream test_2_2_5_6_list = { &preamble_2_2_list, &test_case_2_2_5_6_
 /*
  *  Transfer connectionless data with options -- T_SCTP_RECVOPT
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_7 test_group_2_2_5
 #define numb_case_2_2_5_7 "2.2.5.7"
 #define name_case_2_2_5_7 "Transfer connectionless data with options -- T_SCTP_RECVOPT"
@@ -20725,7 +20549,6 @@ struct test_stream test_2_2_5_7_list = { &preamble_2_2_list, &test_case_2_2_5_7_
 /*
  *  Transfer connectionless data with options -- T_SCTP_COOKIE_LIFE
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_8 test_group_2_2_5
 #define numb_case_2_2_5_8 "2.2.5.8"
 #define name_case_2_2_5_8 "Transfer connectionless data with options -- T_SCTP_COOKIE_LIFE"
@@ -20789,7 +20612,6 @@ struct test_stream test_2_2_5_8_list = { &preamble_2_2_list, &test_case_2_2_5_8_
 /*
  *  Transfer connectionless data with options -- T_SCTP_SACK_DELAY
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_9 test_group_2_2_5
 #define numb_case_2_2_5_9 "2.2.5.9"
 #define name_case_2_2_5_9 "Transfer connectionless data with options -- T_SCTP_SACK_DELAY"
@@ -20853,7 +20675,6 @@ struct test_stream test_2_2_5_9_list = { &preamble_2_2_list, &test_case_2_2_5_9_
 /*
  *  Transfer connectionless data with options -- T_SCTP_PATH_MAX_RETRANS
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_10 test_group_2_2_5
 #define numb_case_2_2_5_10 "2.2.5.10"
 #define name_case_2_2_5_10 "Transfer connectionless data with options -- T_SCTP_PATH_MAX_RETRANS"
@@ -20917,7 +20738,6 @@ struct test_stream test_2_2_5_10_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_ASSOC_MAX_RETRANS
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_11 test_group_2_2_5
 #define numb_case_2_2_5_11 "2.2.5.11"
 #define name_case_2_2_5_11 "Transfer connectionless data with options -- T_SCTP_ASSOC_MAX_RETRANS"
@@ -20981,7 +20801,6 @@ struct test_stream test_2_2_5_11_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_MAX_INIT_RETRIES
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_12 test_group_2_2_5
 #define numb_case_2_2_5_12 "2.2.5.12"
 #define name_case_2_2_5_12 "Transfer connectionless data with options -- T_SCTP_MAX_INIT_RETRIES"
@@ -21045,7 +20864,6 @@ struct test_stream test_2_2_5_12_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_HEARTBEAT_ITVL
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_13 test_group_2_2_5
 #define numb_case_2_2_5_13 "2.2.5.13"
 #define name_case_2_2_5_13 "Transfer connectionless data with options -- T_SCTP_HEARTBEAT_ITVL"
@@ -21109,7 +20927,6 @@ struct test_stream test_2_2_5_13_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_RTO_INITIAL
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_14 test_group_2_2_5
 #define numb_case_2_2_5_14 "2.2.5.14"
 #define name_case_2_2_5_14 "Transfer connectionless data with options -- T_SCTP_RTO_INITIAL"
@@ -21173,7 +20990,6 @@ struct test_stream test_2_2_5_14_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_RTO_MIN
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_15 test_group_2_2_5
 #define numb_case_2_2_5_15 "2.2.5.15"
 #define name_case_2_2_5_15 "Transfer connectionless data with options -- T_SCTP_RTO_MIN"
@@ -21237,7 +21053,6 @@ struct test_stream test_2_2_5_15_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_RTO_MAX
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_16 test_group_2_2_5
 #define numb_case_2_2_5_16 "2.2.5.16"
 #define name_case_2_2_5_16 "Transfer connectionless data with options -- T_SCTP_RTO_MAX"
@@ -21301,7 +21116,6 @@ struct test_stream test_2_2_5_16_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_OSTREAMS
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_17 test_group_2_2_5
 #define numb_case_2_2_5_17 "2.2.5.17"
 #define name_case_2_2_5_17 "Transfer connectionless data with options -- T_SCTP_OSTREAMS"
@@ -21365,7 +21179,6 @@ struct test_stream test_2_2_5_17_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_ISTREAMS
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_18 test_group_2_2_5
 #define numb_case_2_2_5_18 "2.2.5.18"
 #define name_case_2_2_5_18 "Transfer connectionless data with options -- T_SCTP_ISTREAMS"
@@ -21429,7 +21242,6 @@ struct test_stream test_2_2_5_18_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_COOKIE_INC
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_19 test_group_2_2_5
 #define numb_case_2_2_5_19 "2.2.5.19"
 #define name_case_2_2_5_19 "Transfer connectionless data with options -- T_SCTP_COOKIE_INC"
@@ -21491,7 +21303,6 @@ struct test_stream test_2_2_5_19_list = { &preamble_2_2_list, &test_case_2_2_5_1
 /*
  *  Transfer connectionless data with options -- T_SCTP_THROTTLE_ITVL
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_20 test_group_2_2_5
 #define numb_case_2_2_5_20 "2.2.5.20"
 #define name_case_2_2_5_20 "Transfer connectionless data with options -- T_SCTP_THROTTLE_ITVL"
@@ -21555,7 +21366,6 @@ struct test_stream test_2_2_5_20_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_MAC_TYPE
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_21 test_group_2_2_5
 #define numb_case_2_2_5_21 "2.2.5.21"
 #define name_case_2_2_5_21 "Transfer connectionless data with options -- T_SCTP_MAC_TYPE"
@@ -21619,7 +21429,6 @@ struct test_stream test_2_2_5_21_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_CKSUM_TYPE
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_22 test_group_2_2_5
 #define numb_case_2_2_5_22 "2.2.5.22"
 #define name_case_2_2_5_22 "Transfer connectionless data with options -- T_SCTP_CKSUM_TYPE"
@@ -21683,7 +21492,6 @@ struct test_stream test_2_2_5_22_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_ECN
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_23 test_group_2_2_5
 #define numb_case_2_2_5_23 "2.2.5.23"
 #define name_case_2_2_5_23 "Transfer connectionless data with options -- T_SCTP_ECN"
@@ -21747,7 +21555,6 @@ struct test_stream test_2_2_5_23_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_ALI
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_24 test_group_2_2_5
 #define numb_case_2_2_5_24 "2.2.5.24"
 #define name_case_2_2_5_24 "Transfer connectionless data with options -- T_SCTP_ALI"
@@ -21811,7 +21618,6 @@ struct test_stream test_2_2_5_24_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_ADD
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_25 test_group_2_2_5
 #define numb_case_2_2_5_25 "2.2.5.25"
 #define name_case_2_2_5_25 "Transfer connectionless data with options -- T_SCTP_ADD"
@@ -21875,7 +21681,6 @@ struct test_stream test_2_2_5_25_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_SET
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_26 test_group_2_2_5
 #define numb_case_2_2_5_26 "2.2.5.26"
 #define name_case_2_2_5_26 "Transfer connectionless data with options -- T_SCTP_SET"
@@ -21939,7 +21744,6 @@ struct test_stream test_2_2_5_26_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_ADD_IP
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_27 test_group_2_2_5
 #define numb_case_2_2_5_27 "2.2.5.27"
 #define name_case_2_2_5_27 "Transfer connectionless data with options -- T_SCTP_ADD_IP"
@@ -22009,7 +21813,6 @@ struct test_stream test_2_2_5_27_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_DEL_IP
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_28 test_group_2_2_5
 #define numb_case_2_2_5_28 "2.2.5.28"
 #define name_case_2_2_5_28 "Transfer connectionless data with options -- T_SCTP_DEL_IP"
@@ -22079,7 +21882,6 @@ struct test_stream test_2_2_5_28_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_SET_IP
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_29 test_group_2_2_5
 #define numb_case_2_2_5_29 "2.2.5.29"
 #define name_case_2_2_5_29 "Transfer connectionless data with options -- T_SCTP_SET_IP"
@@ -22149,7 +21951,6 @@ struct test_stream test_2_2_5_29_list = { &preamble_2_2_list, &test_case_2_2_5_2
 /*
  *  Transfer connectionless data with options -- T_SCTP_PR
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_30 test_group_2_2_5
 #define numb_case_2_2_5_30 "2.2.5.30"
 #define name_case_2_2_5_30 "Transfer connectionless data with options -- T_SCTP_PR"
@@ -22213,7 +22014,6 @@ struct test_stream test_2_2_5_30_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_LIFETIME
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_31 test_group_2_2_5
 #define numb_case_2_2_5_31 "2.2.5.31"
 #define name_case_2_2_5_31 "Transfer connectionless data with options -- T_SCTP_LIFETIME"
@@ -22277,7 +22077,6 @@ struct test_stream test_2_2_5_31_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_DISPOSITION
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_32 test_group_2_2_5
 #define numb_case_2_2_5_32 "2.2.5.32"
 #define name_case_2_2_5_32 "Transfer connectionless data with options -- T_SCTP_DISPOSITION"
@@ -22341,7 +22140,6 @@ struct test_stream test_2_2_5_32_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_MAX_BURST
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_33 test_group_2_2_5
 #define numb_case_2_2_5_33 "2.2.5.33"
 #define name_case_2_2_5_33 "Transfer connectionless data with options -- T_SCTP_MAX_BURST"
@@ -22405,7 +22203,6 @@ struct test_stream test_2_2_5_33_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_HB
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_34 test_group_2_2_5
 #define numb_case_2_2_5_34 "2.2.5.34"
 #define name_case_2_2_5_34 "Transfer connectionless data with options -- T_SCTP_HB"
@@ -22472,7 +22269,6 @@ struct test_stream test_2_2_5_34_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_RTO
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_35 test_group_2_2_5
 #define numb_case_2_2_5_35 "2.2.5.35"
 #define name_case_2_2_5_35 "Transfer connectionless data with options -- T_SCTP_RTO"
@@ -22539,7 +22335,6 @@ struct test_stream test_2_2_5_35_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_MAXSEG
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_36 test_group_2_2_5
 #define numb_case_2_2_5_36 "2.2.5.36"
 #define name_case_2_2_5_36 "Transfer connectionless data with options -- T_SCTP_MAXSEG"
@@ -22603,7 +22398,6 @@ struct test_stream test_2_2_5_36_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_STATUS
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_37 test_group_2_2_5
 #define numb_case_2_2_5_37 "2.2.5.37"
 #define name_case_2_2_5_37 "Transfer connectionless data with options -- T_SCTP_STATUS"
@@ -22667,7 +22461,6 @@ struct test_stream test_2_2_5_37_list = { &preamble_2_2_list, &test_case_2_2_5_3
 /*
  *  Transfer connectionless data with options -- T_SCTP_DEBUG
  */
-#define test_group_2_2_5 "Connectionless data transfer -- SCTP options"
 #define tgrp_case_2_2_5_38 test_group_2_2_5
 #define numb_case_2_2_5_38 "2.2.5.38"
 #define name_case_2_2_5_38 "Transfer connectionless data with options -- T_SCTP_DEBUG"
@@ -33603,8 +33396,14 @@ test_case_12_3_3_conn(int child)
 	if (do_signal(child, __TEST_ORDREL_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, LONGER_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+	expect(child, LONGER_WAIT, __TEST_DISCON_IND);
+	switch (last_event) {
+	case __TEST_DISCON_IND:
+	case __TEST_ORDREL_IND:
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -39872,8 +39671,14 @@ can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WREQ_O
 int
 test_case_14_7_5_conn(int child)
 {
-	if (expect(child, LONG_WAIT, __TEST_DISCON_IND) != __RESULT_SUCCESS)
+	expect(child, LONG_WAIT, __TEST_DISCON_IND);
+	switch (last_event) {
+	case __TEST_DISCON_IND:
+	case __TEST_ORDREL_IND:
+		break;
+	default:
 		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -41037,13 +40842,13 @@ run_stream(int child, struct test_stream *stream)
  */
 
 int
-test_run(struct test_stream *stream[])
+test_run(struct test_stream *stream[], ulong duration)
 {
 	int children = 0;
 	pid_t this_child, child[3] = { 0, };
 	int this_status, status[3] = { 0, };
 
-	if (start_tt(TEST_DURATION) != __RESULT_SUCCESS)
+	if (start_tt(duration) != __RESULT_SUCCESS)
 		goto inconclusive;
 	if (stream[2]) {
 		switch ((child[2] = fork())) {
