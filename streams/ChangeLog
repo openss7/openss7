@@ -1,5 +1,6 @@
 2008-10-23  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/sys/streams/strdebug.h: rationalize debug macros
 	* doc/manual/news.texi: updated release notes
 
 2008-10-21  Brian Bidulock  <bidulock@openss7.org>
