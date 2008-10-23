@@ -1,5 +1,7 @@
 2008-10-23  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/np_ip.c: cleanup of function prototype types
+
 	* src/drivers/debug.h: rationalize debug macros
 	* src/modules/debug.h: rationalize debug macros
 

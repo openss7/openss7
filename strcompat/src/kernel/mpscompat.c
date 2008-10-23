@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:10 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-20 01:22:50 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:34:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.53  2008-10-23 09:34:10  brian
+ - updates for release and compatibility
+
  Revision 0.9.2.52  2008-10-20 01:22:50  brian
  - updates and corrections
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:10 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:10 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -105,7 +108,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-10-20 01:22:50 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:10 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"
@@ -198,7 +201,9 @@ struct mi_comm {
 	unsigned short mi_mid;		/* module identifier */
 	unsigned short mi_sid;		/* stream identifier */
 	bcid_t mi_bcid;			/* queue bufcall */
-	long mi_users;			/* users and waiters */
+	spinlock_t mi_lock;		/* structure lock */
+	long mi_users;			/* users */
+	long mi_flags;			/* wait flags */
 	queue_t *mi_q;			/* attached read queue */
 	atomic_t mi_refs;		/* references to structure */
 	struct mi_comm *mi_waiter;	/* waiter on lock */
@@ -227,8 +232,13 @@ struct mi_comm {
 #define mi_to_ptr(mi) ((mi) ? (mi)->mi_ptr : NULL)
 #define ptr_to_mi(ptr) ((ptr) ? (struct mi_comm *)(ptr) - 1 : NULL)
 
-noinline void mi_unbufcall(bcid_t *bcidp, bcid_t bcid);
-noinline fastcall void mi_wakepriv(struct mi_comm **mip, struct mi_comm *mi);
+static void
+mi_grab(struct mi_comm *mi)
+{
+	assert(mi);
+	assert(atomic_read(&mi->mi_refs) > 0);
+	atomic_inc(&mi->mi_refs);
+}
 
 /**
  * mi_open_grab: - grab a reference to an open structure
@@ -240,18 +250,39 @@ noinline fastcall void mi_wakepriv(struct mi_comm **mip, struct mi_comm *mi);
 __MPS_EXTERN caddr_t
 mi_open_grab(caddr_t ptr)
 {
-	if (ptr) {
-		struct mi_comm *mi = ptr_to_mi(ptr);
-
-		dassert(mi);
-		dassert(atomic_read(&mi->mi_refs) > 0);
-		atomic_inc(&mi->mi_refs);
-		return (ptr);
-	}
-	return (NULL);
+	assert(ptr);
+	if (ptr)
+		mi_grab(ptr_to_mi(ptr));
+	return (ptr);
 }
 
 EXPORT_SYMBOL(mi_open_grab);
+
+noinline void mi_unbufcall(struct mi_comm *mi);
+noinline void mi_wakepriv(struct mi_comm *mi);
+
+static struct mi_comm *
+mi_put(struct mi_comm *mi)
+{
+	assert(mi);
+	assert(atomic_read(&mi->mi_refs) > 0);
+	if (atomic_dec_and_test(&mi->mi_refs)) {
+		if (mi->mi_q != NULL)
+			swerr();	// mi_detach(mi->mi_q, ptr);
+		if (mi->mi_head != NULL)
+			swerr();	// mi_close_unlink((caddr_t *)mi->mi_head, ptr);
+		if (mi->mi_bcid != 0)
+			mi_unbufcall(mi);
+		if (mi->mi_waiter != NULL)
+			mi_wakepriv(mi);
+		if (mi->mi_cachep)
+			kmem_cache_free(mi->mi_cachep, mi);
+		else
+			kmem_free(mi, mi->mi_size);
+		mi = NULL;
+	}
+	return (mi);
+}
 
 /**
  * mi_close_put: - release a reference to an open structure
@@ -265,27 +296,8 @@ EXPORT_SYMBOL(mi_open_grab);
 __MPS_EXTERN caddr_t
 mi_close_put(caddr_t ptr)
 {
-	if (ptr) {
-		struct mi_comm *mi = ptr_to_mi(ptr);
-
-		dassert(mi);
-		dassert(atomic_read(&mi->mi_refs) > 0);
-		if (atomic_dec_and_test(&mi->mi_refs)) {
-			if (mi->mi_q != NULL)
-				mi_detach(mi->mi_q, ptr);
-			if (mi->mi_head != NULL)
-				mi_close_unlink((caddr_t *)mi->mi_head, ptr);
-			if (mi->mi_bcid != 0)
-				mi_unbufcall(&mi->mi_bcid, 0);
-			if (mi->mi_waiter != NULL)
-				mi_wakepriv(&mi->mi_waiter, NULL);
-			if (mi->mi_cachep)
-				kmem_cache_free(mi->mi_cachep, mi);
-			else
-				kmem_free(mi, mi->mi_size);
-			return (NULL);
-		}
-	}
+	if (ptr)
+		ptr = mi_to_ptr(mi_put(ptr_to_mi(ptr)));
 	return (ptr);
 }
 
@@ -330,6 +342,7 @@ mi_open_obj(void *obj, size_t size, kmem_cachep_t cachep)
 		mi->mi_prev = mi->mi_head = &mi->mi_next;
 		mi->mi_size = size;
 		mi->mi_cachep = cachep;
+		spin_lock_init(&mi->mi_lock);
 		atomic_set(&mi->mi_refs, 1);
 		init_waitqueue_head(&mi->mi_waitq);
 	}
@@ -547,9 +560,8 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 
 	switch (sflag) {
 	case CLONEOPEN:
-		/* first clone minor (above 5 per AIX docs, above 10 per MacOT
-		   docs), but the caller can start wherever they want above
-		   that */
+		/* first clone minor (above 5 per AIX docs, above 10 per MacOT docs), but the
+		   caller can start wherever they want above that */
 #define MI_OPEN_COMM_CLONE_MINOR 10
 		if (cminor <= MI_OPEN_COMM_CLONE_MINOR)
 			cminor = MI_OPEN_COMM_CLONE_MINOR + 1;
@@ -570,6 +582,7 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 		return (EINVAL);
 	}
 
+	mi_grab(mi);
 	spin_lock(&mi_list_lock);
 	for (mip = (struct mi_comm **) mi_head; *mip; mip = &(*mip)->mi_next) {
 		if (cmajor != (*mip)->mi_mid)
@@ -583,11 +596,13 @@ mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cr
 				if (sflag == DRVOPEN) {
 					/* conflicting device number */
 					spin_unlock(&mi_list_lock);
+					mi_put(mi);
 					return (ENXIO);
 				}
 				if (getminor(makedevice(0, ++cminor)) == 0) {
 					/* no minor device numbers left */
 					spin_unlock(&mi_list_lock);
+					mi_put(mi);
 					return (EAGAIN);
 				}
 				continue;
@@ -631,10 +646,15 @@ __MPS_EXTERN void
 mi_attach(queue_t *q, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
+	unsigned long flags;
 
+	mi_grab(mi);
+	/* Protect dereference of mi->mi_q and resetting mi_flags. */
+	spin_lock_irqsave(&mi->mi_lock, flags);
 	mi->mi_mid = q->q_qinfo->qi_minfo->mi_idnum;
 	mi->mi_q = q;
 	q->q_ptr = WR(q)->q_ptr = ptr;
+	spin_unlock_irqrestore(&mi->mi_lock, flags);
 }
 
 EXPORT_SYMBOL(mi_attach);	/* mps/ddi.h, mac/ddi.h */
@@ -671,11 +691,7 @@ mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 		mi->mi_prev = &mi->mi_next;
 		mi->mi_head = NULL;
 		spin_unlock(&mi_list_lock);
-		/* again kill bufcalls */
-		mi_unbufcall(&mi->mi_bcid, 0);
-		/* see if waiters can find us again now that we are off the
-		   list */
-		mi_wakepriv(&mi->mi_waiter, NULL);
+		mi_put(mi);
 	}
 }
 
@@ -710,14 +726,18 @@ mi_detach(queue_t *q, caddr_t ptr)
 	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	if (mi) {
-		mi->mi_users = MI_WAIT_LOCKED;
-		mi_unbufcall(&mi->mi_bcid, 0);
-		mi_wakepriv(&mi->mi_waiter, NULL);
+		unsigned long flags;
+
+		/* Protect dereference of mi->mi_q and resetting mi_flags. */
+		spin_lock_irqsave(&mi->mi_lock, flags);
+		mi->mi_flags = 0;
 		mi->mi_q = NULL;
-		/* we might have another waiter at this point, but it is guaranteed to not be us if
-		   qprocsoff(9) was called before this function. */
+		q->q_ptr = WR(q)->q_ptr = NULL;
+		spin_unlock_irqrestore(&mi->mi_lock, flags);
+		mi_put(mi);
+	} else {
+		q->q_ptr = WR(q)->q_ptr = NULL;
 	}
-	q->q_ptr = WR(q)->q_ptr = NULL;
 }
 
 EXPORT_SYMBOL(mi_detach);	/* mps/ddi.h */
@@ -801,30 +821,80 @@ struct mi_iocblk {
  */
 
 noinline fastcall void
-mi_wakenoput(struct mi_comm *mi)
+mi_wakeold(struct mi_comm *mi)
 {
-	if (test_and_clear_bit(MI_WAIT_SLEEP_BIT, &mi->mi_users))
-		if (waitqueue_active(&mi->mi_waitq))
-			wake_up_all(&mi->mi_waitq);
-	if (test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_users)) {
-		dassert(mi->mi_q);
-		if (mi->mi_q)
+	unsigned long flags;
+
+	/* Protect dereference of mi->mi_q and resetting mi_flags. */
+	spin_lock_irqsave(&mi->mi_lock, flags);
+	{
+		assert(atomic_read(&mi->mi_refs) > 1);
+		assert(atomic_read(&mi->mi_refs) < 10);
+		if (test_and_clear_bit(MI_WAIT_SLEEP_BIT, &mi->mi_flags))
+			if (waitqueue_active(&mi->mi_waitq))
+				wake_up_all(&mi->mi_waitq);
+		if (test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_flags) && mi->mi_q)
 			qenable(RD(mi->mi_q));
-	}
-	if (test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_users)) {
-		dassert(mi->mi_q);
-		if (mi->mi_q)
+		if (test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_flags) && mi->mi_q)
 			qenable(WR(mi->mi_q));
 	}
+	spin_unlock_irqrestore(&mi->mi_lock, flags);
+	mi_put(mi);
 }
 
-noinline fastcall void
-mi_wakepriv(struct mi_comm **mip, struct mi_comm *mi)
+noinline void
+mi_wakepriv(struct mi_comm *mi)
 {
-	if ((mi = xchg(mip, mi))) {
-		mi_wakenoput(mi);
-		mi_close_put(mi_to_ptr(mi));
+	unsigned long flags;
+	struct mi_comm *mo;
+
+	spin_lock_irqsave(&mi->mi_lock, flags);
+	if ((mo = XCHG(&mi->mi_waiter, NULL)) == mi)
+		mo = NULL;
+	spin_unlock_irqrestore(&mi->mi_lock, flags);
+	if (unlikely(mo != NULL))
+		mi_wakeold(mo);
+}
+
+noinline fastcall struct mi_comm *
+__mi_waitpriv(struct mi_comm *mi, queue_t *q, int bit)
+{
+	struct mi_comm *mw;
+
+	if ((mw = q ? ptr_to_mi(q->q_ptr) : NULL)) {
+		/* do not wake old waiter or install new waiter if old same as new */
+		assert(atomic_read(&mw->mi_refs) > 1);
+		assert(atomic_read(&mw->mi_refs) < 10);
+		if (mi->mi_waiter == mw) {
+			set_bit(bit, &mw->mi_flags);
+			mw = NULL;
+		} else {
+			mi_grab(mw);
+			set_bit(bit, &mw->mi_flags);
+			mw = XCHG(&mi->mi_waiter, mw);
+		}
 	}
+	return (mw);
+}
+
+static inline fastcall int
+__mi_acquire(struct mi_comm *mi, queue_t *q, int bit)
+{
+	struct mi_comm *mo = NULL;
+	unsigned long flags;
+	int result;
+
+	assert(mi);
+	spin_lock_irqsave(&mi->mi_lock, flags);
+	if (unlikely(!(result = !mi->mi_users++))) {
+		mo = __mi_waitpriv(mi, q, bit);
+		--mi->mi_users;
+	}
+	spin_unlock_irqrestore(&mi->mi_lock, flags);
+	if (unlikely(mo != NULL))
+		mi_wakeold(mo);
+	return (result);
+
 }
 
 /**
@@ -838,27 +908,12 @@ mi_wakepriv(struct mi_comm **mip, struct mi_comm *mi)
 __MPS_EXTERN caddr_t
 mi_acquire(caddr_t ptr, queue_t *q)
 {
-	if (ptr) {
-		struct mi_comm *mi = ptr_to_mi(ptr);
+	struct mi_comm *mi;
+	int bit;
 
-		dassert(mi);
-		if (unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
-			struct mi_comm *mi2;
-			caddr_t ptr2;
-
-			if (q && (ptr2 = (caddr_t) q->q_ptr) && (mi2 = ptr_to_mi(ptr2))
-			    && (ptr2 = mi_open_grab(ptr2))) {
-
-				set_bit((q->q_flag & QREADR) ? MI_WAIT_RQ_BIT : MI_WAIT_WQ_BIT,
-					&mi2->mi_users);
-				mi_wakepriv(&mi->mi_waiter, mi2);
-				if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
-					return (ptr);
-			}
-			return (NULL);
-		}
-	}
-	return (ptr);
+	mi = ptr_to_mi(ptr);
+	bit = q ? ((q->q_flag & QREADR) ? MI_WAIT_RQ_BIT : MI_WAIT_WQ_BIT) : 0;
+	return (likely(__mi_acquire(mi, q, bit)) ? ptr : NULL);
 }
 
 EXPORT_SYMBOL(mi_acquire);
@@ -887,27 +942,19 @@ mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *fl
 {
 	caddr_t ptr = *ptrp;
 	struct mi_comm *mi = ptr_to_mi(ptr);
+	struct mi_comm *mw = ptr_to_mi(ptrw);
 
-	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
+	if (unlikely(!__mi_acquire(mi, mw->mi_q, MI_WAIT_SLEEP_BIT))) {
 		DECLARE_WAITQUEUE(wait, current);
-		struct mi_comm *mw = ptr_to_mi(ptrw);
-
 		add_wait_queue(&mw->mi_waitq, &wait);
 		for (;;) {
-			if (signal_pending(current)) {
+			if (unlikely(signal_pending(current))) {
 				ptr = NULL;
 				break;
 			}
 			set_current_state(TASK_INTERRUPTIBLE);
-			if (test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users)) {
-				if (mi->mi_waiter != mw) {
-					mi_open_grab(ptrw);
-					set_bit(MI_WAIT_SLEEP_BIT, &mw->mi_users);
-					mi_wakepriv(&mi->mi_waiter, mw);
-				}
-				if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
-					break;
-			}
+			if (likely(__mi_acquire(mi, mw->mi_q, MI_WAIT_SLEEP_BIT)))
+				break;
 			if (lockp) {
 				if (flagsp)
 					write_unlock_irqrestore(lockp, *flagsp);
@@ -921,7 +968,7 @@ mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *fl
 				else
 					write_lock(lockp);
 			}
-			if ((ptr = *ptrp) == NULL)
+			if (unlikely((ptr = *ptrp) == NULL))
 				break;
 			mi = ptr_to_mi(ptr);
 		}
@@ -929,7 +976,6 @@ mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *fl
 		remove_wait_queue(&mw->mi_waitq, &wait);
 	}
 	return (ptr);
-
 }
 
 EXPORT_SYMBOL(mi_acquire_sleep);
@@ -948,23 +994,15 @@ mi_acquire_sleep_nosignal(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned
 {
 	caddr_t ptr = *ptrp;
 	struct mi_comm *mi = ptr_to_mi(ptr);
+	struct mi_comm *mw = ptr_to_mi(ptrw);
 
-	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
+	if (unlikely(!__mi_acquire(mi, mw->mi_q, MI_WAIT_SLEEP_BIT))) {
 		DECLARE_WAITQUEUE(wait, current);
-		struct mi_comm *mw = ptr_to_mi(ptrw);
-
 		add_wait_queue(&mw->mi_waitq, &wait);
 		for (;;) {
 			set_current_state(TASK_UNINTERRUPTIBLE);
-			if (test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users)) {
-				if (mi->mi_waiter != mw) {
-					mi_open_grab(ptrw);
-					set_bit(MI_WAIT_SLEEP_BIT, &mw->mi_users);
-					mi_wakepriv(&mi->mi_waiter, mw);
-				}
-				if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
-					break;
-			}
+			if (likely(__mi_acquire(mi, mw->mi_q, MI_WAIT_SLEEP_BIT)))
+				break;
 			if (lockp) {
 				if (flagsp)
 					write_unlock_irqrestore(lockp, *flagsp);
@@ -978,7 +1016,7 @@ mi_acquire_sleep_nosignal(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned
 				else
 					write_lock(lockp);
 			}
-			if ((ptr = *ptrp) == NULL)
+			if (unlikely((ptr = *ptrp) == NULL))
 				break;
 			mi = ptr_to_mi(ptr);
 		}
@@ -986,20 +1024,31 @@ mi_acquire_sleep_nosignal(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned
 		remove_wait_queue(&mw->mi_waitq, &wait);
 	}
 	return (ptr);
-
 }
 
 EXPORT_SYMBOL(mi_acquire_sleep_nosignal);
 
+static inline fastcall void
+__mi_release(struct mi_comm *mi)
+{
+	unsigned long flags;
+	struct mi_comm *mo;
+
+	spin_lock_irqsave(&mi->mi_lock, flags);
+	__assert(mi->mi_users == 1);
+	mi->mi_users = 0;
+	mo = XCHG(&mi->mi_waiter, NULL);
+	spin_unlock_irqrestore(&mi->mi_lock, flags);
+	if (unlikely(mo != NULL))
+		mi_wakeold(mo);
+}
+
 __MPS_EXTERN void
 mi_release(caddr_t ptr)
 {
-	struct mi_comm *mi = ptr_to_mi(ptr);
-
-	clear_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users);
-	mi_wakepriv(&mi->mi_waiter, NULL);
-	return;
+	__mi_release(ptr_to_mi(ptr));
 }
+
 EXPORT_SYMBOL(mi_release);
 
 /**
@@ -1021,6 +1070,7 @@ mi_trylock(queue_t *q)
 {
 	return mi_acquire((caddr_t) q->q_ptr, q);
 }
+
 EXPORT_SYMBOL(mi_trylock);
 
 __MPS_EXTERN caddr_t
@@ -1028,10 +1078,10 @@ mi_sleeplock(queue_t *q)
 {
 	caddr_t ptr = (caddr_t) q->q_ptr;
 
-	if (ptr)
-		ptr = mi_acquire_sleep(ptr, &ptr, NULL, NULL);
+	ptr = mi_acquire_sleep(ptr, &ptr, NULL, NULL);
 	return (ptr);
 }
+
 EXPORT_SYMBOL(mi_sleeplock);
 
 /*
@@ -1044,37 +1094,44 @@ EXPORT_SYMBOL(mi_sleeplock);
 static fastcall void
 mi_qenable(long data)
 {
-	caddr_t ptr = (caddr_t) data;
-	struct mi_comm *mi = ptr_to_mi(ptr);
+	struct mi_comm *mi = (struct mi_comm *) data;
 
-	if (xchg(&mi->mi_bcid, 0))
-		mi_wakenoput(mi);
+	if (likely(xchg(&mi->mi_bcid, 0)))
+		mi_wakeold(mi);
 }
 
 noinline void
-mi_unbufcall(bcid_t *bcidp, bcid_t bcid)
+mi_rebufcall(struct mi_comm *mi, bcid_t bcid)
 {
-	if ((bcid = xchg(bcidp, bcid)))
+	if ((bcid = xchg(&mi->mi_bcid, bcid))) {
 		unbufcall(bcid);
+		mi_put(mi);
+	}
+}
+
+noinline void
+mi_unbufcall(struct mi_comm *mi)
+{
+	mi_rebufcall(mi, 0);
 }
 
 __MPS_EXTERN void
 mi_bufcall(queue_t *q, int size, int priority)
 {
 	struct mi_comm *mi;
-	caddr_t ptr;
 
-	if (q && (ptr = (caddr_t) q->q_ptr) && (mi = ptr_to_mi(ptr))) {
-		set_bit((q->q_flag & QREADR) ? MI_WAIT_RQ_BIT : MI_WAIT_WQ_BIT, &mi->mi_users);
-		if (!mi->mi_bcid) {
-			bcid_t bid;
+	if (q && (mi = ptr_to_mi(q->q_ptr))) {
+		bcid_t bid;
 
-			if ((bid = bufcall(size, priority, &mi_qenable, (long) ptr))) {
-				mi_unbufcall(&mi->mi_bcid, bid);
-				return;
-			}
-			mi_wakenoput(mi);
+		assert(atomic_read(&mi->mi_refs) > 1);
+		assert(atomic_read(&mi->mi_refs) < 10);
+		mi_grab(mi);
+		set_bit((q->q_flag & QREADR) ? MI_WAIT_RQ_BIT : MI_WAIT_WQ_BIT, &mi->mi_flags);
+		if ((bid = bufcall(size, priority, &mi_qenable, (long) mi))) {
+			mi_rebufcall(mi, bid);
+			return;
 		}
+		mi_wakeold(mi);
 	}
 }
 

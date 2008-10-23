@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hooks.h.in,v 0.9.2.14 2008-10-13 04:12:20 brian Exp $
+ @(#) $Id: sctp_hooks.h.in,v 0.9.2.15 2008-10-23 09:34:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-13 04:12:20 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:34:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_hooks.h.in,v $
+ Revision 0.9.2.15  2008-10-23 09:34:11  brian
+ - updates for release and compatibility
+
  Revision 0.9.2.14  2008-10-13 04:12:20  brian
  - handle exports rework strinet
 
@@ -68,7 +71,7 @@
 #ifndef __LOCAL_SCTP_HOOKS_H__
 #define __LOCAL_SCTP_HOOKS_H__
 
-#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_hooks.h.in,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This symbol should be defined by newer kernels, however, since the protocol
    value is always 132, we double check the definition for those kernels that
@@ -400,11 +403,13 @@ void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
 #define ip_cmsg_recv (*((typeof(ip_cmsg_recv) *) HAVE_IP_CMSG_RECV_ADDR))
 #endif
 
+#if 0
 #undef HAVE_IP_CMSG_SEND_ADDR
 #ifdef HAVE_IP_CMSG_SEND_ADDR
 int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc);
 
 #define ip_cmsg_send (*((typeof(ip_cmsg_send) *) HAVE_IP_CMSG_SEND_ADDR))
+#endif
 #endif
 
 #undef HAVE_INET_BIND_ADDR

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.31 2008-09-10 03:49:42 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.32 2008-10-23 09:34:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:42 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:34:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.32  2008-10-23 09:34:10  brian
+ - updates for release and compatibility
+
  Revision 0.9.2.31  2008-09-10 03:49:42  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -77,7 +80,7 @@
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.31 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.32 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -187,7 +190,7 @@ LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag)
 	lock_t *lockp;
 
 	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
-		spin_lock_init(lockp);
+		*lockp = SPIN_LOCK_UNLOCKED;
 	return (lockp);
 }
 
@@ -251,7 +254,7 @@ RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag)
 	rwlock_t *lockp;
 
 	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
-		rwlock_init(lockp);
+		*lockp = RW_LOCK_UNLOCKED;
 	return (lockp);
 }
 __SVR4_EXTERN_INLINE void
