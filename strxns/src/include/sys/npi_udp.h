@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: npi_udp.h,v 1.1.2.1 2008-10-23 11:44:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,17 +46,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2008-10-23 11:44:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: npi_udp.h,v $
+ Revision 1.1.2.1  2008-10-23 11:44:33  brian
+ - start of np_udp driver
+
  *****************************************************************************/
 
 #ifndef SYS_NPI_UDP_H
 #define SYS_NPI_UDP_H
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_udp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
