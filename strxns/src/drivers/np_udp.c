@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-10-23 11:44:32 $
+ @(#) $RCSfile: np_udp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-23 11:44:32 $
 
  -----------------------------------------------------------------------------
 
@@ -51,14 +51,14 @@
  -----------------------------------------------------------------------------
 
  $Log: np_udp.c,v $
- Revision 1.1.2.1  2008-10-23 11:44:32  brian
+ Revision 0.9.2.1  2008-10-23 11:44:32  brian
  - start of np_udp driver
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-10-23 11:44:32 $"
+#ident "@(#) $RCSfile: np_udp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-23 11:44:32 $"
 
-static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-10-23 11:44:32 $";
+static char const ident[] = "$RCSfile: np_udp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-23 11:44:32 $";
 
 /*
  * This driver provides the functionality of a UDP (User Datagram Protocol) hook similary to udp
@@ -125,7 +125,7 @@ static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.1
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2008-10-23 11:44:32 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-10-23 11:44:32 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_UDP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
