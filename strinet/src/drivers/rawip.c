@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-21 07:49:59 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:46:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.62  2008-10-23 09:46:36  brian
+ - rationalize to np_ip driver
+
  Revision 0.9.2.61  2008-10-21 07:49:59  brian
  - get autoloading working for UDP and RAWIP drivers
 
@@ -74,10 +77,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -128,6 +131,7 @@ static char const ident[] =
 
 #include <net/udp.h>
 
+
 #ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
@@ -158,7 +162,7 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-21 07:49:59 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RAW_LICENSE	"GPL"
@@ -877,7 +881,7 @@ tp_set_state(struct tp *tp, const t_uscalar_t state)
 	tp->info.CURRENT_state = state;
 }
 
-STATIC INLINE fastcall __hot t_uscalar_t
+STATIC INLINE fastcall __unlikely t_uscalar_t
 tp_get_state(const struct tp *tp)
 {
 	return (tp->info.CURRENT_state);
@@ -7932,13 +7936,25 @@ tp_r_prim_slow(queue_t *q, mblk_t *mp)
 	}
 }
 
+#if 0
+STATIC INLINE streamscall __hot_in int
+tp_r_prim_put(queue_t *q, mblk_t *mp)
+{
+	if (likely(mp->b_datap->db_type == M_DATA))
+		/* fast path for data */
+		if (likely(TP_PRIV(q)->info.SERV_type == T_CLTS))
+			return (-EAGAIN);
+	return tp_r_prim_slow(q, mp);
+}
+#endif
+
 /**
- * tp_r_prim - process primitive on read queue
+ * tp_r_prim_srv - process primitive on read queue
  * @q: active queue in queue pair (read queue)
  * @mp: the message
  */
 STATIC INLINE streamscall __hot_in int
-tp_r_prim(queue_t *q, mblk_t *mp)
+tp_r_prim_srv(queue_t *q, mblk_t *mp)
 {
 	if (likely(mp->b_datap->db_type == M_DATA))
 		/* fast path for data */
@@ -7981,8 +7997,10 @@ STATIC INLINE streamscall __hot_put int
 tp_w_prim_put(queue_t *q, mblk_t *mp)
 {
 	/* fast path for data */
+#if 0
 	if (likely(mp->b_datap->db_type == M_DATA))
 		return (-EAGAIN);	/* want to queue these */
+#endif
 	if (likely(mp->b_datap->db_type == M_PROTO) &&
 	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
 	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ))
@@ -7999,8 +8017,10 @@ STATIC INLINE streamscall __hot_put int
 tp_w_prim_srv(queue_t *q, mblk_t *mp)
 {
 	/* fast path for data */
+#if 0
 	if (likely(mp->b_datap->db_type == M_DATA))
 		return tp_w_data(q, mp);
+#endif
 	if (likely(mp->b_datap->db_type == M_PROTO) &&
 	    likely(mp->b_wptr >= mp->b_rptr + sizeof(t_scalar_t)) &&
 	    likely(*((t_scalar_t *) mp->b_rptr) == T_UNITDATA_REQ)) {
@@ -8021,7 +8041,7 @@ streamscall __hot_out int
 tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
-	    || tp_r_prim(q, mp) != QR_ABSORBED) {
+	    || tp_r_prim_srv(q, mp) != QR_ABSORBED) {
 		raw_rstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
@@ -8038,7 +8058,7 @@ tp_rsrv(queue_t *q)
 	while (likely((mp = getq(q)) != NULL)) {
 		/* remove backpressure */
 		mp->b_wptr -= PRELOAD;
-		if (unlikely(tp_r_prim(q, mp) != QR_ABSORBED)) {
+		if (unlikely(tp_r_prim_srv(q, mp) != QR_ABSORBED)) {
 			if (putbq(q, mp))
 				break;
 			freemsg(mp);
