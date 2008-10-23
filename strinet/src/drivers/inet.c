@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-21 07:49:57 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:40:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.116  2008-10-23 09:40:12  brian
+ - corrections from testing
+
  Revision 0.9.2.115  2008-10-21 07:49:57  brian
  - get autoloading working for UDP and RAWIP drivers
 
@@ -131,10 +134,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -226,6 +229,7 @@ static char const ident[] =
 #define sk_error_queue		error_queue
 #define sk_rmem_alloc		rmem_alloc
 #define sk_err			err
+#define sk_shutdown		shutdown
 
 #define sock_tst_dead(_sk)		(((struct sock *)_sk)->dead ? 1 : 0)
 #define sock_tst_done(_sk)		(((struct sock *)_sk)->done ? 1 : 0)
@@ -651,7 +655,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.115 $) $Date: 2008-10-21 07:49:57 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -776,7 +780,7 @@ MODULE_ALIAS("/dev/inet/sctp");
 	mi_strlog(ss->rq, level, flags, fmt, ##__VA_ARGS__)
 #endif
 
-#if 0
+#if 1
 #define STRLOGERR(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
 #define STRLOGNO(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE, fmt, ##__VA_ARGS__)
 #define STRLOGST(ss, fmt, ...) INETLOG(ss, 1, SL_TRACE, fmt, ##__VA_ARGS__)
@@ -788,11 +792,11 @@ MODULE_ALIAS("/dev/inet/sctp");
 #define STRLOGDA(ss, fmt, ...) INETLOG(ss, 7, SL_TRACE, fmt, ##__VA_ARGS__)
 #else
 #define STRLOGERR(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define STRLOGNO(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define STRLOGST(ss, fmt, ...) INETLOG(ss, 1, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define STRLOGTO(ss, fmt, ...) INETLOG(ss, 2, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define STRLOGRX(ss, fmt, ...) INETLOG(ss, 3, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define STRLOGTX(ss, fmt, ...) INETLOG(ss, 4, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define STRLOGNO(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE, fmt, ##__VA_ARGS__)
+#define STRLOGST(ss, fmt, ...) INETLOG(ss, 1, SL_TRACE, fmt, ##__VA_ARGS__)
+#define STRLOGTO(ss, fmt, ...) INETLOG(ss, 2, SL_TRACE, fmt, ##__VA_ARGS__)
+#define STRLOGRX(ss, fmt, ...) INETLOG(ss, 3, SL_TRACE, fmt, ##__VA_ARGS__)
+#define STRLOGTX(ss, fmt, ...) INETLOG(ss, 4, SL_TRACE, fmt, ##__VA_ARGS__)
 #define STRLOGTE(ss, fmt, ...) INETLOG(ss, 5, SL_TRACE, fmt, ##__VA_ARGS__)
 #define STRLOGIO(ss, fmt, ...) INETLOG(ss, 6, SL_TRACE, fmt, ##__VA_ARGS__)
 #define STRLOGDA(ss, fmt, ...) INETLOG(ss, 7, SL_TRACE, fmt, ##__VA_ARGS__)
@@ -1308,6 +1312,51 @@ ss_term_caches(void)
  *
  *  =========================================================================
  */
+
+/**
+ * ss_trylock: - try to lock a Stream queue pair
+ * @q: the queue pair to lock
+ *
+ * Because we lock connecting, listening and accepting Streams, and listening streams can be waiting
+ * on accepting streams, we must ensure that the other stream cannot close and detach from its queue
+ * pair at the same time that we are locking or unlocking.  Therefore, hold the master list
+ * reader-writer lock while locking or unlocking.
+ */
+static inline fastcall ss_t *
+ss_trylock(queue_t *q)
+{
+	ss_t *ss;
+
+	read_lock(&ss_lock);
+	ss = (ss_t *) mi_trylock(q);
+	read_unlock(&ss_lock);
+	return (ss);
+}
+
+/**
+ * ss_unlock: - unlock a Stream queue pair
+ * @q: the queue pair to unlock
+ *
+ * Because we lock connecting, listening and accepting Streams, and listening streams can be waiting
+ * on accepting streams, we must ensure that the other stream cannot close and detach from its queue
+ * pair at the same time that we are locking or unlocking.  Therefore, hold the master list
+ * reader-writer lock while locking or unlocking.
+ */
+static inline fastcall void
+ss_unlock(ss_t *ss)
+{
+	read_lock(&ss_lock);
+	mi_unlock((caddr_t) ss);
+	read_unlock(&ss_lock);
+}
+
+/*
+ *  =========================================================================
+ *
+ *  Socket Callbacks
+ *
+ *  =========================================================================
+ */
 /*
  * Forward declarations of our callback functions.
  */
@@ -1342,7 +1391,7 @@ ss_socket_put(struct socket **sockp)
 					sk->sk_data_ready = ss->cb_save.sk_data_ready;
 					sk->sk_write_space = ss->cb_save.sk_write_space;
 					sk->sk_error_report = ss->cb_save.sk_error_report;
-					mi_close_put((caddr_t) ss);
+					// mi_close_put((caddr_t) ss);
 				} else
 					assure(ss);
 				/* The following will cause the socket to be aborted, particularly
@@ -1373,7 +1422,7 @@ ss_socket_get(struct socket *sock, ss_t *ss)
 		write_lock_irqsave(&sk->sk_callback_lock, flags);
 		{
 			SOCK_PRIV(sk) = ss;
-			mi_open_grab((caddr_t) ss);
+			// mi_open_grab((caddr_t) ss);
 			ss->cb_save.sk_state_change = sk->sk_state_change;
 			ss->cb_save.sk_data_ready = sk->sk_data_ready;
 			ss->cb_save.sk_write_space = sk->sk_write_space;
@@ -1414,7 +1463,7 @@ ss_socket_grab(struct socket *sock, ss_t *ss)
 		write_lock_irqsave(&sk->sk_callback_lock, flags);
 		{
 			SOCK_PRIV(sk) = ss;
-			mi_open_grab((caddr_t) ss);
+			// mi_open_grab((caddr_t) ss);
 			/* We only want to overwrite the ones that were not inherited from the
 			   parent listening socket. */
 			if (sk->sk_state_change != ss_state_change) {
@@ -12577,18 +12626,21 @@ static int
 sock_disconnect(struct socket *sock)
 {
 	int err;
+	struct sock *sk;
 
 	ensure(sock, return (-EPROTO));
 	ensure(sock->ops, return (-EFAULT));
 	ensure(sock->ops->connect, return (-EFAULT));
 	ensure(sock->sk, return (-EFAULT));
-	ensure(sock->sk->sk_prot, return (-EFAULT));
-	ensure(sock->sk->sk_prot->disconnect, return (-EFAULT));
-	if (!(err = sock->sk->sk_prot->disconnect(sock->sk, O_NONBLOCK))) {
+	lock_sock((sk = sock->sk));
+	ensure(sk->sk_prot, release_sock(sk); return (-EFAULT));
+	ensure(sk->sk_prot->disconnect, release_sock(sk); return (-EFAULT));
+	if (!(err = sk->sk_prot->disconnect(sk, O_NONBLOCK))) {
 		sock->state = SS_UNCONNECTED;
 	} else {
 		sock->state = SS_DISCONNECTING;
 	}
+	release_sock(sk);
 	return (err);
 }
 
@@ -12781,7 +12833,7 @@ ss_accept(ss_t *ss, queue_t *q, struct socket **newsock, mblk_t *cp)
 
 	STRLOGTX(ss, "SS_ACCEPT");
 	if (likely(!(err = sock_accept(ss->sock, newsock, cp)))) {
-		bufq_unlink(&ss->conq, cp);
+		__bufq_unlink(&ss->conq, cp);
 		freemsg(cp);
 		return (0);
 	}
@@ -12859,7 +12911,7 @@ ss_refuse(ss_t *ss, queue_t *q, mblk_t *cp)
 		sock_disconnect(newsock);
 		ss_socket_put(&newsock);
 	      done:
-		bufq_unlink(&ss->conq, cp);
+		__bufq_unlink(&ss->conq, cp);
 		freemsg(cp);
 		return (0);
 	}
@@ -13274,6 +13326,8 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sock *sk)
 	ci->ci_seq = (ss->seq + 1) ? : (ss->seq + 2);
 	ci->ci_parent = ss;
 	cp->b_wptr += sizeof(*ci);
+	cp->b_next = cp->b_prev = cp->b_cont = NULL;
+
 
 	SOCK_PRIV(sk) = ci;
 
@@ -13305,7 +13359,7 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sock *sk)
 	}
 	ss->seq = ++ss->seq ? : ++ss->seq;
 	SOCK_PRIV(sk) = (void *) ci;
-	bufq_queue(&ss->conq, cp);
+	__bufq_queue(&ss->conq, cp);
 	ss_set_state(ss, TS_WRES_CIND);
 	STRLOGTX(ss, "<- T_CONN_IND");
 	putnext(ss->rq, mp);
@@ -14219,12 +14273,29 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
       out:
 	switch (-err) {
 	case ENOMEM:
+	case ENOBUFS:
 		mi_bufcall(ss->wq, len, BPRI_LO);
 		/* This buffer call is just to kick us.  Because allocb uses kmalloc for mblks, if
 		   we can allocate an mblk, then another kernel routine can allocate that much
 		   memory too. */
+		return (err);
+	case EAGAIN:
+	case EDEADLK:
+	case EBUSY:
+		qenable(ss->wq);
+		return (err);
+	case EPIPE:
+		err = -ECONNRESET;
+	case ENETDOWN:
+	case EHOSTUNREACH:
+	case ECONNRESET:
+	case ECONNREFUSED:
+		if (ss->lasterror == 0)
+			ss->lasterror = err;
+		return (err);
 	default:
-		return m_error_reply(ss, ss->rq, mp, err);
+		return (err);
+		// return m_error_reply(ss, ss->rq, mp, err);
 	}
 }
 
@@ -14249,7 +14320,7 @@ ss_setup_size(ss_t *ss, struct sock *sk, const int type, const char band)
 	case SOCK_STREAM:
 		if (likely(!band)) {
 			skb = skb_peek(&sk->sk_receive_queue);
-			size = skb ? skb->len : 0;
+			size = skb ? (skb->len ? : 1) : 0;
 		} else {
 			size = (tcp_sk(sk)->urg_data && (tcp_sk(sk)->urg_data != TCP_URG_READ)
 				&& (tcp_sk(sk)->urg_data & TCP_URG_VALID)) ? 1 : 0;
@@ -14259,10 +14330,10 @@ ss_setup_size(ss_t *ss, struct sock *sk, const int type, const char band)
 	case SOCK_RAW:
 		if (likely(!band)) {
 			skb = skb_peek(&sk->sk_receive_queue);
-			size = skb ? skb->len : 0;
+			size = skb ? (skb->len ? : 1) : 0;
 		} else {
 			skb = skb_peek(&sk->sk_error_queue);
-			size = skb ? skb->len : 0;
+			size = skb ? (skb->len ? : 1) : 0;
 		}
 		break;
 	case SOCK_SEQPACKET:
@@ -14943,9 +15014,9 @@ ss_state_change(struct sock *sk)
 						qenable(ss->rq);
 					set_bit(SS_BIT_STATE_CHANGE, &ci->ci_rflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGERR(ss, "state change child %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
+						STRLOGST(ss, "state change child %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
 					else
-						STRLOGERR(ss, "state change sock  %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
+						STRLOGST(ss, "state change sock  %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
 				} else
 					assure(ss->rq);
 			}
@@ -14984,9 +15055,9 @@ ss_write_space(struct sock *sk)
 						qenable(ss->wq);
 					set_bit(SS_BIT_WRITE_SPACE, &ci->ci_wflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGERR(ss, "write space child %p", (void *)sk);
+						STRLOGDA(ss, "write space child %p", (void *)sk);
 					else
-						STRLOGERR(ss, "write space sock  %p", (void *)sk);
+						STRLOGDA(ss, "write space sock  %p", (void *)sk);
 				} else
 					assure(ss->wq);
 			}
@@ -15025,9 +15096,9 @@ ss_error_report(struct sock *sk)
 						qenable(ss->rq);
 					set_bit(SS_BIT_ERROR_REPORT, &ci->ci_rflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGERR(ss, "error report child %p", (void *)sk);
+						STRLOGNO(ss, "error report child %p", (void *)sk);
 					else
-						STRLOGERR(ss, "error report sock  %p", (void *)sk);
+						STRLOGNO(ss, "error report sock  %p", (void *)sk);
 				} else
 					assure(ss->rq);
 			}
@@ -15067,9 +15138,9 @@ ss_data_ready(struct sock *sk, int len)
 						qenable(ss->rq);
 					set_bit(SS_BIT_DATA_READY, &ci->ci_rflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGERR(ss, "data ready child %p", (void *)sk);
+						STRLOGDA(ss, "data ready child %p", (void *)sk);
 					else
-						STRLOGERR(ss, "data ready sock  %p", (void *)sk);
+						STRLOGDA(ss, "data ready sock  %p", (void *)sk);
 				} else
 					assure(ss->rq);
 			}
@@ -15310,8 +15381,11 @@ t_conn_res(ss_t *ss, queue_t *q, mblk_t *mp)
 	/* FIXME: The accepting socket does not have to be in the bound state. The socket will be
 	   autobound to the correct address already. */
 	err = t_ok_ack(ss, q, mp, T_CONN_RES, cp, as);
-	if (as && as != ss)
+	if (as && as != ss) {
+		read_lock(&ss_lock);
 		mi_release((caddr_t) as);
+		read_unlock(&ss_lock);
+	}
 	return (err);
       baddata:
 	err = TBADDATA;
@@ -15358,8 +15432,11 @@ t_conn_res(ss_t *ss, queue_t *q, mblk_t *mp)
 	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       unlock_error:
-	if (as && as != ss)
+	if (as && as != ss) {
+		read_lock(&ss_lock);
 		mi_release((caddr_t) as);
+		read_unlock(&ss_lock);
+	}
 	goto error;
       error:
 	return t_error_ack(ss, q, mp, T_CONN_RES, err);
@@ -15501,7 +15578,8 @@ t_data_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		goto discard;
 	if (unlikely((1 << ss_get_state(ss)) & ~TSM_OUTDATA))
 		goto outstate;
-	mlen = msgdsize(mp);
+	if (!(mlen = msgdsize(mp)) &&!(ss->p.info.PROVIDER_flag & T_SNDZERO))
+		goto baddata;
 	if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID
 	    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
@@ -15516,6 +15594,9 @@ t_data_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
       emsgsize:
 	STRLOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
+	goto error;
+      baddata:
+	STRLOGNO(ss, "ERROR: zero length data");
 	goto error;
       outstate:
 	STRLOGNO(ss, "ERROR: would place i/f out of state");
@@ -15553,7 +15634,8 @@ t_exdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		goto discard;
 	if (unlikely((1 << ss_get_state(ss)) & ~TSM_OUTDATA))
 		goto outstate;
-	mlen = msgdsize(mp);
+	if (!(mlen = msgdsize(mp)) &&!(ss->p.info.PROVIDER_flag & T_SNDZERO))
+		goto baddata;
 	if (((mmax = ss->p.info.ETSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID
 	    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
 		goto emsgsize;
@@ -15568,6 +15650,9 @@ t_exdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
       emsgsize:
 	STRLOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
+	goto error;
+      baddata:
+	STRLOGNO(ss, "ERROR: zero length data");
 	goto error;
       outstate:
 	STRLOGNO(ss, "ERROR: would place i/f out of state");
@@ -16007,7 +16092,9 @@ t_ordrel_req(ss_t *ss, queue_t *q, mblk_t *mp)
  */
 static inline fastcall __hot_out int
 t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
+
 {
+	long mlen, mmax;
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
 
 	if (unlikely(ss->p.info.SERV_type == T_CLTS))
@@ -16018,7 +16105,18 @@ t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		goto discard;
 	if (unlikely((1 << ss_get_state(ss)) & ~TSM_OUTDATA))
 		goto outstate;
-	else {
+	if (!(mlen = msgdsize(mp)) &&!(ss->p.info.PROVIDER_flag & T_SNDZERO))
+		goto baddata;
+	if (likely(!(p->DATA_flag & T_ODF_EX))) {
+		if (((mmax = ss->p.info.TSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID
+		    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
+			goto emsgsize;
+	} else {
+		if (((mmax = ss->p.info.ETSDU_size) > 0 && mlen > mmax) || mmax == T_INVALID
+		    || ((mmax = ss->p.info.TIDU_size) > 0 && mlen > mmax) || mmax == T_INVALID)
+			goto emsgsize;
+	}
+	{
 		int cmsg_len;
 		size_t opt_len = p->OPT_length;
 		size_t opt_off = p->OPT_offset;
@@ -16055,6 +16153,12 @@ t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	goto error;
       acces:
 	STRLOGNO(ss, "ERROR: no permission to options");
+	goto error;
+      emsgsize:
+	STRLOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
+	goto error;
+      baddata:
+	STRLOGNO(ss, "ERROR: zero length data");
 	goto error;
       outstate:
 	STRLOGNO(ss, "ERROR: would place i/f out of state");
@@ -16302,9 +16406,9 @@ ss_w_proto_slow(queue_t *q, mblk_t *mp, t_scalar_t prim)
 	ss_t *ss;
 	int err;
 
-	if (likely(!!(ss = (ss_t *) mi_trylock(q)))) {
+	if (likely(!!(ss = ss_trylock(q)))) {
 		err = __ss_w_proto_slow(ss, q, mp, prim);
-		mi_unlock((caddr_t) ss);
+		ss_unlock(ss);
 	} else
 		err = -EDEADLK;
 	return (err);
@@ -16673,7 +16777,7 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	int tcp_oldstate, tcp_newstate, tpi_oldstate, err;
 
-//	STRLOGRX(ss, "%s", __FUNCTION__);
+//      STRLOGRX(ss, "%s", __FUNCTION__);
 	tcp_newstate = sk->sk_state;
 	tcp_oldstate = XCHG(&ss->tcp_state, tcp_newstate);
 	tpi_oldstate = ss_get_state(ss);
@@ -16793,13 +16897,14 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 				case TCP_ESTABLISHED:
 					/* Went right through TCP_FIN_WAIT1 or TCP_FIN_WAIT2: the
 					   was to detect which one is to check for errors. */
-					if (ss->lasterror == 0 && sk->sk_err == 0) {
+					if (sk->sk_shutdown == 0 || ss->lasterror != 0
+					    || sk->sk_err != 0) {
 						/* The new TPI state will become TS_IDLE. */
-						if ((err = t_ordrel_ind(ss, q)))
+						if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
 							goto error;
 					} else {
 						/* The new TPI state will become TS_IDLE. */
-						if ((err = t_discon_ind(ss, q, sk, 0, NULL)))
+						if ((err = t_ordrel_ind(ss, q)))
 							goto error;
 					}
 					goto done;
@@ -16876,7 +16981,6 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	switch (__builtin_expect(type, SOCK_STREAM)) {
 	case SOCK_STREAM:	/* TCP */
 	case SOCK_SEQPACKET:	/* SCTP */
-	case SOCK_DGRAM:	/* UDP */
 		switch (__builtin_expect(tpi_oldstate, TS_DATA_XFER)) {
 		case TS_UNBND:
 			break;
@@ -16896,6 +17000,7 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			return;
 		}
 		break;
+	case SOCK_DGRAM:	/* UDP */
 	case SOCK_RAW:		/* IP */
 	case SOCK_RDM:
 		switch (__builtin_expect(tpi_oldstate, TS_IDLE)) {
@@ -16993,10 +17098,10 @@ __ss_r_events(ss_t *ss, queue_t *q)
 	if (!(sk = ss->sock->sk))
 		return;
 
-	if (test_bit(SS_BIT_ERROR_REPORT, &ss_rflags))
-		__ss_r_error_report(ss, q, sk, type);
 	if (test_bit(SS_BIT_DATA_READY, &ss_rflags))
 		__ss_r_data_ready(ss, q, sk, type);
+	if (test_bit(SS_BIT_ERROR_REPORT, &ss_rflags))
+		__ss_r_error_report(ss, q, sk, type);
 	if (test_bit(SS_BIT_STATE_CHANGE, &ss_rflags))
 		__ss_r_state_change(ss, q, sk, type);
 	return;
@@ -17076,9 +17181,9 @@ ss_rsrv(queue_t *q)
 {
 	ss_t *ss;
 
-	if (likely((ss = (ss_t *) mi_trylock(q)) != NULL)) {
+	if (likely(!!(ss = ss_trylock(q)))) {
 		__ss_r_events(ss, q);
-		mi_unlock((caddr_t) ss);
+		ss_unlock(ss);
 	}
 	return (0);
 }
@@ -17127,7 +17232,7 @@ ss_wsrv(queue_t *q)
 	ss_t *ss;
 	mblk_t *mp;
 
-	if (likely(!!(ss = (ss_t *) mi_trylock(q)))) {
+	if (likely(!!(ss = ss_trylock(q)))) {
 		while (likely(!!(mp = getq(q)))) {
 			/* remove backpressure */
 			mp->b_wptr -= PRELOAD;
@@ -17145,7 +17250,7 @@ ss_wsrv(queue_t *q)
 #if 0
 		ss_w_wakeup(ss, q);
 #endif
-		mi_unlock((caddr_t) ss);
+		ss_unlock(ss);
 	}
 	return (0);
 }
@@ -17337,7 +17442,8 @@ ss_qclose(queue_t *q, int oflags, cred_t *crp)
 	write_lock_irqsave(&ss_lock, flags);
 	mi_acquire_sleep_nosignal(ptr, &ptr, &ss_lock, &flags);
 	qprocsoff(q);
-	bufq_purge(&ss->conq);
+	while (bufq_head(&ss->conq))
+		freemsg(__bufq_dequeue(&ss->conq));
 	ss->ss_parent = NULL;
 	ss->rq = NULL;
 	ss->wq = NULL;
