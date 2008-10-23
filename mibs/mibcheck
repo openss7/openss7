@@ -1,0 +1,188 @@
+#!/usr/bin/perl
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+#
+# This is a pure perl SNMP MIB parser.
+#
+
+my %Modules = ();
+
+# ----------------------------
+package Module;
+use strict;
+# ----------------------------
+
+# This is a representation of an SNMP MIB module.
+
+sub new {
+    my $type = shift;
+    my $self = {};
+    $self->{filename} = $_[0];
+    $self->{module} = $_[1];
+    $self->{identity} = $_[2];
+    $self->{imports} = {};
+    $self->{names} = {};
+    $self->{oids} = {};
+    $self->{types} = {};
+    bless $self, $type;
+    return $self;
+}
+
+sub addImport { $_[0]->{imports}->{$_[2]} = $_[1]; }
+sub addOid { $_[0]->{oids}->{$_[2]} = $_[1]; 
+sub addName { $_[0]->{names}->{$_[2]} = $_[1]; 
+sub addType { $_[0]->{types}->{$_[2]} = $_[1]; 
+
+# ----------------------------------------------------------------------------
+package ObjectIdentifier;
+use strict;
+#
+# This is a base type for object identifiers that have nothing to do with the
+# MIB other than to establish an arc.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package Object;
+use strict;
+#
+# This is base type for all objects in the MIB tree with the exception of
+# modules.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package ObjectIdentity;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Object);
+#
+# This is the OBJECT-IDENTITY object.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package ObjectType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Object);
+#
+# This is the OBJECT-TYPE object.  It is a base class: all objects are more
+# specialized.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package ConceptualTable;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ----------------------------------------------------------------------------
+# This is a specialized OBJECT-TYPE that represents a conceptual table.
+# Conceptual tables can be identifed by their SYNTAX clause which contain
+# SEQUENCE OF Type, where "Type" is a row type that is itself a sequence of
+# columns.  Their MAX-ACCESS clause contains not-accessible.  Conceptual
+# tables contain optional auxillary objects and one conceptual row object.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package ConceptualRow;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ----------------------------------------------------------------------------
+# This is a specialized OBJECT-TYPE that represent a conceptual row.  It is an
+# immediate descendant of a Conceptual Table.  The SYNTAX clause contains the
+# Type of the conceptual table.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package ConceptualColumn;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ----------------------------------------------------------------------------
+# THis is a specialized OBJECT-TYPE that represents a conceptual column.  It
+# is an immediate descendant of a Conceptual Row.  A conceptual column has no
+# children.
+# ----------------------------------------------------------------------------
+
+
+# ----------------------------------------------------------------------------
+package Index;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ConceptualColumn);
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package NotifyParameter;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ObjectType);
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package Notification;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Object);
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+package Type;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Object);
+# ----------------------------------------------------------------------------
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=perl sw=4 fo+=tcqlorn
