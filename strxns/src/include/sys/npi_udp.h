@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_udp.h,v 1.1.2.1 2008-10-23 11:44:33 brian Exp $
+ @(#) $Id: npi_udp.h,v 0.9.2.1 2008-10-23 11:44:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -51,7 +51,7 @@
  -----------------------------------------------------------------------------
 
  $Log: npi_udp.h,v $
- Revision 1.1.2.1  2008-10-23 11:44:33  brian
+ Revision 0.9.2.1  2008-10-23 11:44:33  brian
  - start of np_udp driver
 
  *****************************************************************************/
@@ -59,7 +59,7 @@
 #ifndef SYS_NPI_UDP_H
 #define SYS_NPI_UDP_H
 
-#ident "@(#) $RCSfile: npi_udp.h,v $ $Name:  $($Revision: 1.1.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_udp.h,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
