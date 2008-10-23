@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:51 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:34:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.53  2008-10-23 09:34:11  brian
+ - updates for release and compatibility
+
  Revision 0.9.2.52  2008-09-22 20:31:51  brian
  - added module version and truncated logs
 
@@ -68,10 +71,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:11 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:11 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -113,6 +116,9 @@ static char const ident[] =
 #include <net/inet_ecn.h>
 #include <net/snmp.h>
 
+#include <net/udp.h>
+
+
 #ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
@@ -132,7 +138,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.52 $) $Date: 2008-09-22 20:31:51 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.53 $) $Date: 2008-10-23 09:34:11 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -204,16 +210,6 @@ MODULE_ALIAS("/dev/np_ip");
 #else				/* MODULE */
 #define DRV_BANNER	NP_SPLASH
 #endif				/* MODULE */
-
-#ifndef noinline
-#define noinline
-#endif
-#ifndef fastcall
-#define fastcall
-#endif
-#ifndef __unlikely
-#define __unlikely
-#endif
 
 STATIC struct module_info np_minfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
@@ -386,7 +382,7 @@ typedef struct df {
 	SLIST_HEAD (np, np);		/* master list of np (open) structures */
 } df_t;
 
-STATIC struct df master = {.lock = RW_LOCK_UNLOCKED, };
+static struct df master = {.lock = RW_LOCK_UNLOCKED, };
 
 /*
  *  Bind buckets, caches and hashes.
@@ -425,13 +421,13 @@ STATIC struct np_chash_bucket *np_chash;
 STATIC size_t np_chash_size = 0;
 STATIC size_t np_chash_order = 0;
 
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 np_bhashfn(unsigned char proto, unsigned short bport)
 {
 	return ((np_bhash_size - 1) & (proto + bport));
 }
 
-STATIC INLINE streams_fastcall __unlikely int
+STATIC INLINE fastcall __unlikely int
 np_chashfn(unsigned char proto, unsigned short sport, unsigned short dport)
 {
 	return ((np_chash_size - 1) & (proto + sport + dport));
@@ -478,7 +474,7 @@ np_put(struct np *np)
 		kmem_cache_free(np_ip_priv_cachep, np);
 	}
 }
-static INLINE streams_fastcall __hot void
+static INLINE fastcall __hot void
 np_release(struct np **npp)
 {
 	struct np *np;
@@ -554,6 +550,18 @@ np_alloc(void)
 
 #endif
 
+#ifdef LIS
+#ifndef noinline
+#define noinline
+#endif
+#ifndef fastcall
+#define fastcall
+#endif
+#ifndef __unlikely
+#define __unlikely
+#endif
+#endif
+
 /*
  *  Buffer allocation
  */
@@ -584,7 +592,7 @@ np_bufsrv(long data)
 	return;
 }
 
-STATIC noinline fastcall __unlikely void
+noinline fastcall __unlikely void
 np_unbufcall(str_t * s)
 {
 	bufcall_id_t bid;
@@ -599,7 +607,7 @@ np_unbufcall(str_t * s)
 	}
 }
 
-STATIC noinline fastcall __unlikely void
+noinline fastcall __unlikely void
 np_bufcall(queue_t *q, size_t size, int prior)
 {
 	if (q) {
@@ -706,7 +714,7 @@ np_dupmsg(queue_t *q, mblk_t *bp)
 
 #ifdef _DEBUG
 STATIC const char *
-state_name(np_ulong state)
+np_state_name(np_ulong state)
 {
 	switch (state) {
 	case NS_UNBND:
@@ -753,33 +761,33 @@ state_name(np_ulong state)
 
 /* State functions */
 
-STATIC INLINE streams_fastcall __unlikely void
+STATIC INLINE fastcall __unlikely void
 np_set_state(struct np *np, const np_ulong state)
 {
-	_printd(("%s: %p: %s <- %s\n", DRV_NAME, np, state_name(state),
-		 state_name(np->info.CURRENT_state)));
+	_printd(("%s: %p: %s <- %s\n", DRV_NAME, np, np_state_name(state),
+		 np_state_name(np->info.CURRENT_state)));
 	np->info.CURRENT_state = state;
 }
 
-STATIC INLINE streams_fastcall __unlikely np_ulong
+STATIC INLINE fastcall __unlikely np_ulong
 np_get_state(const struct np *np)
 {
 	return (np->info.CURRENT_state);
 }
 
-STATIC INLINE streams_fastcall __unlikely np_ulong
+STATIC INLINE fastcall __unlikely np_ulong
 np_chk_state(const struct np *np, const np_ulong mask)
 {
 	return (((1 << np->info.CURRENT_state) & (mask)) != 0);
 }
 
-STATIC INLINE streams_fastcall __unlikely np_ulong
+STATIC INLINE fastcall __unlikely np_ulong
 np_not_state(const struct np *np, const np_ulong mask)
 {
 	return (((1 << np->info.CURRENT_state) & (mask)) == 0);
 }
 
-STATIC INLINE streams_fastcall __unlikely np_ulong
+STATIC INLINE fastcall __unlikely long
 np_get_statef(const struct np *np)
 {
 	return (1 << np_get_state(np));
@@ -811,7 +819,7 @@ STATIC void np_v4_err(struct sk_buff *skb, u32 info);
  * and one (1) if the packet has or will be seen by another packet handler.  This return value is
  * used to determine whether to generate ICMP errors or not.
  */
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 np_v4_rcv_next(struct sk_buff *skb)
 {
 	struct np_prot_bucket *pb;
@@ -836,7 +844,7 @@ np_v4_rcv_next(struct sk_buff *skb)
  * In the Linux packet error handler, if the packet is not for us, pass it to the next error
  * handler.  If there is no next error handler, simply return.
  */
-STATIC INLINE streams_fastcall __hot_in void
+STATIC INLINE fastcall __hot_in void
 np_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	struct np_prot_bucket *pb;
@@ -885,7 +893,7 @@ STATIC struct mynet_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_P
  * unloading the module after protocol override would break things horribly.  Taking the reference
  * keeps the module from unloading (this works for OpenSS7 SCTP as well as lksctp).
  */
-STATIC INLINE streams_fastcall __unlikely struct np_prot_bucket *
+STATIC INLINE fastcall __unlikely struct np_prot_bucket *
 np_init_nproto(unsigned char proto, unsigned int type)
 {
 	struct np_prot_bucket *pb;
@@ -992,7 +1000,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
  * owning kernel module.  If there was no protocol previously registered, this reduces to
  * inet_del_protocol().
  */
-STATIC INLINE streams_fastcall __unlikely void
+STATIC INLINE fastcall __unlikely void
 np_term_nproto(unsigned char proto, unsigned int type)
 {
 	struct np_prot_bucket *pb;
@@ -1062,7 +1070,7 @@ np_term_nproto(unsigned char proto, unsigned int type)
  *  only one function.  We don't want that either.  If the message is not for us, we want to pass it
  *  to the next protocol module.
  */
-STATIC INLINE streams_fastcall __unlikely int
+STATIC INLINE fastcall __unlikely int
 np_bind_prot(unsigned char proto, unsigned int type)
 {
 	struct np_prot_bucket *pb;
@@ -1076,7 +1084,7 @@ np_bind_prot(unsigned char proto, unsigned int type)
  *  np_unbind_prot - unbind a protocol
  *  @proto:	    protocol number to unbind
  */
-STATIC INLINE streams_fastcall __unlikely void
+STATIC INLINE fastcall __unlikely void
 np_unbind_prot(unsigned char proto, unsigned int type)
 {
 	np_term_nproto(proto, type);
@@ -1097,7 +1105,7 @@ np_unbind_prot(unsigned char proto, unsigned int type)
  * IP address.  The bind hash contains bind buckets that list Streams that are bound to the same
  * protocol id and port number.
  */
-STATIC INLINE streams_fastcall __unlikely int
+STATIC INLINE fastcall __unlikely int
 np_bind(struct np *np, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	struct sockaddr_in *ADDR_buffer, const socklen_t ADDR_length,
 	const np_ulong CONIND_number, const np_ulong BIND_flags)
@@ -1234,7 +1242,7 @@ np_ip_queue_xmit(struct sk_buff *skb)
 #endif				/* defined HAVE_KFUNC_DST_OUTPUT */
 
 #if 0
-STATIC noinline streams_fastcall void
+noinline fastcall void
 np_skb_destructor_slow(struct np *np, struct sk_buff *skb)
 {
 	unsigned long flags;
@@ -1314,7 +1322,7 @@ np_skb_destructor(struct sk_buff *skb)
  * slow.  This is the only way that LiS can do things (because it has unworkable message block
  * allocation).
  */
-STATIC noinline streams_fastcall __unlikely struct sk_buff *
+noinline fastcall __unlikely struct sk_buff *
 np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -1413,7 +1421,7 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
  * through the data to generate the checksum.
  */
 #if defined LFS
-STATIC noinline streams_fastcall __unlikely struct sk_buff *
+noinline fastcall __unlikely struct sk_buff *
 np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -1561,7 +1569,7 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	return np_alloc_skb_slow(np, mp, headroom, gfp);
 }
 
-STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+STATIC INLINE fastcall __hot_out struct sk_buff *
 np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
@@ -1597,14 +1605,14 @@ np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	return np_alloc_skb_slow(np, mp, headroom, gfp);
 }
 #else				/* !defined LFS */
-STATIC INLINE streams_fastcall __hot_out struct sk_buff *
+STATIC INLINE fastcall __hot_out struct sk_buff *
 np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	return np_alloc_skb_slow(np, mp, headroom, gfp);
 }
 #endif				/* !defined LFS */
 
-STATIC noinline streams_fastcall int
+noinline fastcall int
 np_route_output_slow(struct np *np, const uint32_t daddr, struct rtable **rtp)
 {
 	int err;
@@ -1618,7 +1626,7 @@ np_route_output_slow(struct np *np, const uint32_t daddr, struct rtable **rtp)
 	return (err);
 }
 
-STATIC INLINE streams_fastcall __hot_out int
+STATIC INLINE fastcall __hot_out int
 np_route_output(struct np *np, const uint32_t daddr, struct rtable **rtp)
 {
 	register struct rtable *rt;
@@ -1639,7 +1647,7 @@ np_route_output(struct np *np, const uint32_t daddr, struct rtable **rtp)
  * @daddr: destination address
  * @mp: message payload
  */
-STATIC INLINE streams_fastcall __hot_out int
+STATIC INLINE fastcall __hot_out int
 np_senddata(struct np *np, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 {
 	struct rtable *rt;
@@ -1713,7 +1721,7 @@ np_senddata(struct np *np, uint8_t protocol, uint32_t daddr, mblk_t *mp)
 }
 
 #if 1
-STATIC INLINE streams_fastcall int
+STATIC INLINE fastcall int
 np_datack(queue_t *q)
 {
 	/* not supported */
@@ -1726,7 +1734,7 @@ np_datack(queue_t *q)
  * @np: private structure
  * @proto: protocol to which to connect
  */
-STATIC streams_fastcall int
+STATIC fastcall int
 np_conn_check(struct np *np, unsigned char proto)
 {
 	unsigned short sport = np->sport;
@@ -1803,7 +1811,7 @@ np_conn_check(struct np *np, unsigned char proto)
  * is an error in the connection request.  When any primitive containing options fails and returns
  * and error, it is the caller's responsibility to set again the values of the options.
  */
-STATIC streams_fastcall int
+STATIC fastcall int
 np_connect(struct np *np, const struct sockaddr_in *DEST_buffer, socklen_t DEST_length,
 	   struct N_qos_sel_conn_ip *QOS_buffer, const np_ulong CONN_flags)
 {
@@ -2326,7 +2334,7 @@ np_unbind(struct np *np)
  * @CONN_flags: connection flags
  * @dp: user connect data
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 np_passive(struct np *np, struct sockaddr_in *RES_buffer, const socklen_t RES_length,
 	   struct N_qos_sel_conn_ip *QOS_buffer, mblk_t *SEQ_number, struct np *TOKEN_value,
 	   const np_ulong CONN_flags, mblk_t *dp)
@@ -2669,7 +2677,7 @@ np_disconnect(struct np *np, struct sockaddr_in *RES_buffer, mblk_t *SEQ_number,
  * @how: FLUSHBAND or FLUSHALL
  * @band: band to flush if how is FLUSHBAND
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 m_flush(queue_t *q, const int how, const int band)
 {
 	struct np *np = NP_PRIV(q);
@@ -2691,7 +2699,7 @@ m_flush(queue_t *q, const int how, const int band)
  * @q: a queue in the queue pair (write queue)
  * @error: the error to deliver
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 m_error(queue_t *q, const int error)
 {
 	struct np *np = NP_PRIV(q);
@@ -2716,7 +2724,7 @@ m_error(queue_t *q, const int error)
  * m_hangup: deliver an M_HANGUP message upstream
  * @q: a queue in the queue pair (write queue)
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 m_hangup(queue_t *q)
 {
 	struct np *np = NP_PRIV(q);
@@ -2741,7 +2749,7 @@ m_hangup(queue_t *q)
  * @q: active queue in queue pair (write queue)
  * @error: error number
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 ne_error_reply(queue_t *q, const long error)
 {
 	switch (error) {
@@ -2768,7 +2776,7 @@ ne_error_reply(queue_t *q, const long error)
  * ne_info_ack - generate an N_INFO_ACK and pass it upstream
  * @q: active queue in queue pair (write queue)
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_info_ack(queue_t *q)
 {
 	struct np *np = NP_PRIV(q);
@@ -2855,7 +2863,7 @@ ne_info_ack(queue_t *q)
  *
  * Generate an N_BIND_ACK and pass it upstream.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
 	    struct sockaddr_in *ADDR_buffer, socklen_t ADDR_length, np_ulong CONIND_number,
 	    np_ulong BIND_flags)
@@ -2927,7 +2935,7 @@ ne_bind_ack(queue_t *q, unsigned char *PROTOID_buffer, size_t PROTOID_length,
  * issuing the N_ERROR_ACK according to the Sequence of Primities of the Network Provider Interface
  * specification, Revision 2.0.0.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 ne_error_ack(queue_t *q, np_ulong ERROR_prim, np_long error)
 {
 	struct np *np = NP_PRIV(q);
@@ -3130,7 +3138,7 @@ ne_ok_ack(queue_t *q, np_ulong CORRECT_prim, struct sockaddr_in *ADDR_buffer, so
  * value for the destinations.  These values are set in the private structure by the np_connect()
  * function.
  */
-STATIC INLINE streams_fastcall int
+STATIC INLINE fastcall int
 ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	    struct N_qos_sel_conn_ip *QOS_buffer, np_ulong CONN_flags)
 {
@@ -3195,7 +3203,7 @@ ne_conn_con(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  *
  * An N_RESET_CON message is sent only when the reset completes successfully.
  */
-STATIC streams_fastcall int
+STATIC fastcall int
 ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
@@ -3241,7 +3249,7 @@ ne_reset_con(queue_t *q, np_ulong RESET_orig, np_ulong RESET_reason, mblk_t *dp)
  * the destination address of the IP packet, where no connection exists for the source address of
  * the IP packet.
  */
-STATIC INLINE streams_fastcall __hot_get int
+STATIC INLINE fastcall __hot_get int
 ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
 {
 	struct np *np = NP_PRIV(q);
@@ -3378,7 +3386,7 @@ ne_conn_ind(queue_t *q, mblk_t *SEQ_number)
  * result of receiving an ICMP error.  For multihomed hosts, we only do this if all destination
  * addresses have errors, otherwise, we just perform a reset for the affected destination.
  */
-STATIC INLINE streams_fastcall int
+STATIC INLINE fastcall int
 ne_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 	      np_ulong RESERVED_field, np_ulong DISCON_orig, np_ulong DISCON_reason,
 	      mblk_t *SEQ_number, mblk_t *dp)
@@ -3425,7 +3433,7 @@ ne_discon_ind(queue_t *q, struct sockaddr_in *RES_buffer, socklen_t RES_length,
  * @q: active queue in queue pair
  * @mp: the ICMP message
  */
-STATIC INLINE streams_fastcall int
+STATIC INLINE fastcall int
 ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -3577,7 +3585,7 @@ ne_discon_ind_icmp(queue_t *q, mblk_t *mp)
  * Very fast.  In fact, we could just pass the raw M_DATA blocks upstream.  We leave the IP header
  * in the block.
  */
-STATIC INLINE streams_fastcall __hot_get int
+STATIC INLINE fastcall __hot_get int
 ne_data_ind(queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -3616,7 +3624,7 @@ ne_data_ind(queue_t *q, mblk_t *dp)
  * @q: active queue in queue pair (read queue)
  * @dp: message containing IP packet
  */
-STATIC INLINE streams_fastcall __hot_get int
+STATIC INLINE fastcall __hot_get int
 ne_exdata_ind(queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
@@ -3655,7 +3663,7 @@ ne_exdata_ind(queue_t *q, mblk_t *dp)
  * the message.  If the NS user is willing to extract information from the IP header, it is
  * welcome to discard the control part.
  */
-STATIC INLINE streams_fastcall __hot_get int
+STATIC INLINE fastcall __hot_get int
 ne_unitdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct np *np = NP_PRIV(q);
@@ -3729,7 +3737,7 @@ ne_unitdata_ind(queue_t *q, mblk_t *dp)
  * dp->b_datap->db_base.  The IP message payload starts at dp->b_rptr.  This function extracts IP
  * header information and uses it to create options.
  */
-STATIC noinline streams_fastcall __hot_get int
+noinline fastcall __hot_get int
 te_optdata_ind(queue_t *q, mblk_t *dp)
 {
 	struct tp *tp = TP_PRIV(q);
@@ -3784,7 +3792,7 @@ te_optdata_ind(queue_t *q, mblk_t *dp)
  * ignore this field must use N_INFO_REQ and examine the NSDU_size parameter to determine the
  * current value of the MTU.
  */
-STATIC noinline __unlikely int
+noinline __unlikely int
 ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_field,
 	       np_ulong ERROR_type, mblk_t *dp)
 {
@@ -3845,7 +3853,7 @@ ne_uderror_ind(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_fi
  * because the field must be coded zero according to NPI spec, so the presence of a non-zero value
  * indicates the MTU value from a supporting NPI provider.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 ne_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 {
 	struct iphdr *iph;
@@ -3940,7 +3948,7 @@ ne_uderror_ind_icmp(queue_t *q, mblk_t *mp)
 	return (err);
 }
 
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 ne_uderror_reply(queue_t *q, struct sockaddr_in *DEST_buffer, np_ulong RESERVED_field,
 		 np_long ERROR_type, mblk_t *db)
 {
@@ -4125,7 +4133,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
  * Note: opt_len is conservative but might not be actual size of the output options.  This will be
  * adjusted when the option buffer is built.
  */
-STATIC noinline int
+noinline int
 t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size_t req_len,
 	      size_t opt_len)
 {
@@ -4166,7 +4174,7 @@ t_optmgmt_ack(queue_t *q, t_scalar_t flags, const unsigned char *req, const size
  * ne_datack_ind - NE_DATACK_IND event
  * @q: active queue in pair (read queue)
  */
-STATIC INLINE streams_fastcall int
+STATIC INLINE fastcall int
 ne_datack_ind(queue_t *q)
 {
 	mblk_t *mp;
@@ -4209,7 +4217,7 @@ ne_datack_ind(queue_t *q)
  * @q: active queue in pair (write queue)
  * @mp: N_INFO_REQ message
  */
-STATIC noinline int
+noinline int
 ne_info_req(queue_t *q, mblk_t *mp)
 {
 	N_info_req_t *p;
@@ -4252,7 +4260,7 @@ ne_info_req(queue_t *q, mblk_t *mp)
  * protocol id, but, instead of generating an error, we simply bind to the first protocol id
  * specified and ignore the reset.  We will only return the first protocol id in the bind ack.
  */
-STATIC noinline int
+noinline int
 ne_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -4372,7 +4380,7 @@ ne_bind_req(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: N_UNBIND_REQ message
  */
-STATIC INLINE streams_fastcall int
+STATIC INLINE fastcall int
 ne_unbind_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -4401,7 +4409,7 @@ ne_unbind_req(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: N_OPTMGMT_REQ message
  */
-STATIC noinline int
+noinline int
 ne_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -4473,7 +4481,7 @@ ne_optmgmt_req(queue_t *q, mblk_t *mp)
  * for all packets sent.  The NPI-IP provider will request that the Stream head provide an
  * additional write offset of 20 bytes to accomodate the IP header.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 ne_unitdata_req_slow(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -4534,7 +4542,7 @@ ne_unitdata_req_slow(queue_t *q, mblk_t *mp)
  * Optimize fast path for no options and correct behaviour.  This should run much faster than the
  * old plodding way of doing things.
  */
-STATIC INLINE streams_fastcall __hot_put int
+STATIC INLINE fastcall __hot_put int
 ne_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -4613,7 +4621,7 @@ ne_unitdata_req(queue_t *q, mblk_t *mp)
  * until changed with a NE_OPTMGMT_REQ event.
  *
  */
-STATIC noinline streams_fastcall __hot_put int
+noinline fastcall __hot_put int
 ne_conn_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -4721,7 +4729,7 @@ ne_conn_req(queue_t *q, mblk_t *mp)
 	return ne_error_ack(q, N_CONN_REQ, err);
 }
 
-STATIC INLINE streams_fastcall mblk_t *
+STATIC INLINE fastcall mblk_t *
 n_seq_check(struct np *np, np_ulong SEQ_number)
 {
 	mblk_t *cp;
@@ -4730,7 +4738,7 @@ n_seq_check(struct np *np, np_ulong SEQ_number)
 	usual(cp);
 	return (cp);
 }
-STATIC INLINE streams_fastcall struct np *
+STATIC INLINE fastcall struct np *
 n_tok_check(np_ulong TOKEN_value)
 {
 	struct np *ap;
@@ -4762,7 +4770,7 @@ n_tok_check(np_ulong TOKEN_value)
  * connection.  If no responding addresses are provided, then the destination address is the source
  * address from the connection indication.
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_conn_res(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q), *TOKEN_value = np;
@@ -4880,7 +4888,7 @@ ne_conn_res(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair (write queue)
  * @mp: the N_DISCON_REQ message
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_discon_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -4972,7 +4980,7 @@ ne_discon_req(queue_t *q, mblk_t *mp)
  * not, we should accumulate the M_DATA block in a buffer waiting for a delimited message or final
  * N_DATA_REQ.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 ne_write_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5020,7 +5028,7 @@ ne_write_req(queue_t *q, mblk_t *mp)
  * multihomed hosts.  We use N_OPTMGMT_REQ to change the primary destination address, source address
  * and QOS parameters.
  */
-STATIC noinline streams_fastcall __hot_put int
+noinline fastcall __hot_put int
 ne_data_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5077,7 +5085,7 @@ ne_data_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair (write queue)
  * @mp: the N_EXDATA_REQ message
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_exdata_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5125,7 +5133,7 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair (write queue)
  * @mp: the N_DATACK_REQ message
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_datack_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5168,7 +5176,7 @@ ne_datack_req(queue_t *q, mblk_t *mp)
  * @q: active queue in queue pair (write queue)
  * @mp: the N_RESET_REQ message
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_reset_req(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5215,7 +5223,7 @@ ne_reset_req(queue_t *q, mblk_t *mp)
  * No additional reset indication will be issued until a response is received.  Because of this,
  * reset indications are expedited (band 2).
  */
-STATIC noinline streams_fastcall int
+noinline fastcall int
 ne_reset_res(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5256,7 +5264,7 @@ ne_reset_res(queue_t *q, mblk_t *mp)
  *
  * These are normal N-primitives written from the upper layer protocol.
  */
-STATIC INLINE streams_fastcall __hot_put int
+STATIC INLINE fastcall __hot_put int
 np_w_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn = -EPROTO;
@@ -5373,7 +5381,7 @@ np_w_proto(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: the M_DATA message
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_w_data(queue_t *q, mblk_t *mp)
 {
 	return ne_write_req(q, mp);
@@ -5384,7 +5392,7 @@ np_w_data(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (write queue)
  * @mp: the message
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_w_other(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5403,7 +5411,7 @@ np_w_other(queue_t *q, mblk_t *mp)
  * This NPI-IP provider does not support any input-output controls and, therefore, all input-output
  * controls are negatively acknowledged.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
@@ -5416,7 +5424,7 @@ np_w_ioctl(queue_t *q, mblk_t *mp)
 	return (QR_ABSORBED);
 }
 
-STATIC noinline streamscall int
+noinline streamscall int
 np_w_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHW) {
@@ -5442,7 +5450,7 @@ np_w_flush(queue_t *q, mblk_t *mp)
  * @q: active queue in pair (read queue)
  * @mp: the message
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_r_other(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5467,7 +5475,7 @@ np_r_other(queue_t *q, mblk_t *mp)
  * contains a complete IP datagram starting with the IP header.  What needs to be done is to convert
  * this to an upper layer indication and deliver it upstream.
  */
-STATIC INLINE streams_fastcall __hot_in int
+STATIC INLINE fastcall __hot_in int
 np_r_data(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5531,7 +5539,7 @@ np_r_data(queue_t *q, mblk_t *mp)
  * contains a complete ICMP datagram starting with the IP header.  What needs to be done is to
  * convert this to an upper layer indication and deliver it upstream.
  */
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_r_ctl(queue_t *q, mblk_t *mp)
 {
 	struct np *np = NP_PRIV(q);
@@ -5579,7 +5587,7 @@ np_r_ctl(queue_t *q, mblk_t *mp)
 	return (rtn);
 }
 
-STATIC noinline streamscall int
+noinline streamscall int
 np_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
@@ -5597,7 +5605,7 @@ np_r_flush(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
 }
 
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_r_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -5627,7 +5635,7 @@ np_r_prim(queue_t *q, mblk_t *mp)
 	return np_r_prim_slow(q, mp);
 }
 
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_w_prim_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -5645,7 +5653,7 @@ np_w_prim_slow(queue_t *q, mblk_t *mp)
 	}
 }
 
-STATIC noinline streams_fastcall __unlikely int
+noinline fastcall __unlikely int
 np_w_prim_error(queue_t *q, const int rtn)
 {
 	switch (rtn) {
@@ -5685,7 +5693,7 @@ np_w_prim(queue_t *q, mblk_t *mp)
 	return np_w_prim_slow(q, mp);
 }
 
-STATIC noinline streams_fastcall void
+noinline fastcall void
 np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
 	switch (rtn) {
@@ -5737,7 +5745,7 @@ np_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	return;
 }
 
-static noinline streams_fastcall int
+static noinline fastcall int
 np_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 {
 	switch (rtn) {
@@ -5941,7 +5949,7 @@ np_wsrv(queue_t *q)
  * combination (but possibly different IP adresses).  These Streams that are "owners" of the
  * connection bucket must be traversed and checked for address matches.
  */
-STATIC noinline streams_fastcall __unlikely struct np *
+noinline fastcall __unlikely struct np *
 np_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct np *result = NULL;
@@ -6038,7 +6046,7 @@ np_lookup_conn(unsigned char proto, uint32_t daddr, uint16_t dport, uint32_t sad
  * a Stream for a received packet, we are interested in any N_CLNS Stream that matches or any N_CONS
  * stream that is in the listening state that matches.
  */
-STATIC INLINE streams_fastcall __hot_in struct np *
+STATIC INLINE fastcall __hot_in struct np *
 np_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 {
 	struct np *result = NULL;
@@ -6108,7 +6116,7 @@ np_lookup_bind(unsigned char proto, uint32_t daddr, unsigned short dport)
 	return (result);
 }
 
-STATIC noinline streams_fastcall __unlikely struct np *
+noinline fastcall __unlikely struct np *
 np_lookup_common_slow(struct np_prot_bucket *pp, uint8_t proto, uint32_t daddr, uint16_t dport,
 		      uint32_t saddr, uint16_t sport)
 {
@@ -6123,7 +6131,7 @@ np_lookup_common_slow(struct np_prot_bucket *pp, uint8_t proto, uint32_t daddr, 
 	return (result);
 }
 
-STATIC INLINE streams_fastcall __hot_in struct np *
+STATIC INLINE fastcall __hot_in struct np *
 np_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, uint16_t sport)
 {
 	struct np_prot_bucket *pp, **ppp;
@@ -6161,7 +6169,7 @@ np_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
  * to the protocol id.  Bind hashes are only searched for connectionless Streams if there is a
  * connectionless Stream bound to the protocol id.
  */
-STATIC INLINE streams_fastcall __hot_in struct np *
+STATIC INLINE fastcall __hot_in struct np *
 np_lookup(struct iphdr *iph, struct udphdr *uh)
 {
 	return np_lookup_common(iph->protocol, iph->daddr, uh->dest, iph->saddr, uh->source);
@@ -6175,7 +6183,7 @@ np_lookup(struct iphdr *iph, struct udphdr *uh)
  * This needs to do a reverse lookup (where destination address and port are compared to source
  * address and port, and visa versa).
  */
-STATIC noinline streams_fastcall __unlikely struct np *
+noinline fastcall __unlikely struct np *
 np_lookup_icmp(struct iphdr *iph, unsigned int len)
 {
 	struct udphdr *uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));
@@ -6404,7 +6412,7 @@ np_v4_err(struct sk_buff *skb, u32 info)
  * Allocates a new private structure, initializes it to appropriate values, and then inserts it into
  * the private structure list.
  */
-STATIC noinline struct np *
+noinline struct np *
 np_alloc_priv(queue_t *q, struct np **npp, int type, dev_t *devp, cred_t *crp)
 {
 	struct np *np;
@@ -6494,7 +6502,7 @@ np_alloc_priv(queue_t *q, struct np **npp, int type, dev_t *devp, cred_t *crp)
  * np_free_priv - deallocate a private structure for the close routine
  * @q: read queue of closing Stream
  */
-STATIC noinline void
+noinline void
 np_free_priv(queue_t *q)
 {
 	struct np *np;
@@ -6696,6 +6704,8 @@ np_qclose(queue_t *q, int oflag, cred_t *crp)
 	goto skip_pop;
       skip_pop:
 	/* make sure procedures are off */
+	flushq(WR(q), FLUSHALL);
+	flushq(RD(q), FLUSHALL);
 	qprocsoff(q);
 	np_free_priv(q);	/* free and unlink the structure */
 	goto quit;
@@ -6739,8 +6749,9 @@ STATIC __unlikely int
 np_init_caches(void)
 {
 	if (np_ip_priv_cachep == NULL) {
-		np_ip_priv_cachep = kmem_create_cache("np_ip_priv_cachep", sizeof(struct np), 0,
-						      SLAB_HWCACHE_ALIGN, NULL, NULL);
+		np_ip_priv_cachep =
+		    kmem_create_cache("np_ip_priv_cachep", sizeof(struct np), 0,
+				      SLAB_HWCACHE_ALIGN, NULL, NULL);
 		if (np_ip_priv_cachep == NULL) {
 			cmn_err(CE_WARN, "%s: Cannot allocate np_ip_priv_cachep", __FUNCTION__);
 			np_term_caches();

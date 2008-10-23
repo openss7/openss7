@@ -1,5 +1,13 @@
 2008-10-23  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/sys/os7/bufpool.h: static spin lock initializers are
+	  required in inline functions with newer compilers.
+	* src/include/sys/os7/bufq.h: static spin lock initializers are required
+	  in inline functions with newer compilers.
+	* src/include/sys/svr4/ddi.h: static spin lock initializers are required
+	  in inline functions with newer compilers.
+	* src/kernel/mpscompat.c: reworked locking for stronger assurances
+
 	* src/include/sys/os7/debug.h: rationalize debug macros
 
 2008-10-21  Brian Bidulock  <bidulock@openss7.org>

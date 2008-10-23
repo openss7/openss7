@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufq.h,v 0.9.2.15 2008-10-21 07:49:31 brian Exp $
+ @(#) $Id: bufq.h,v 0.9.2.16 2008-10-23 09:34:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-21 07:49:31 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:34:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufq.h,v $
+ Revision 0.9.2.16  2008-10-23 09:34:09  brian
+ - updates for release and compatibility
+
  Revision 0.9.2.15  2008-10-21 07:49:31  brian
  - sanity checks for bufq_unlink
 
@@ -74,7 +77,7 @@
 #ifndef __BUFQ_H__
 #define __BUFQ_H__
 
-#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: bufq.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef psw_t
 #ifdef INT_PSW
@@ -95,7 +98,7 @@ typedef struct bufq {
 __OS7_EXTERN_INLINE void
 bufq_init(bufq_t * q)
 {
-	spin_lock_init(&q->q_lock);
+	q->q_lock = SPIN_LOCK_UNLOCKED;
 	q->q_head = NULL;
 	q->q_tail = NULL;
 	q->q_msgs = 0;
@@ -147,7 +150,7 @@ __bufq_add(bufq_t * q, mblk_t *mp)
 	q->q_msgs++;
 	while (md) {
 		if (md->b_wptr > md->b_rptr)
-			q->q_count += md->b_wptr - md->b_rptr;
+			q->q_count += (md->b_wptr - md->b_rptr);
 		md = md->b_cont;
 	}
 	assure(q->q_head);
@@ -164,7 +167,7 @@ __bufq_sub(bufq_t * q, mblk_t *mp)
 	while (md) {
 		if (md->b_wptr > md->b_rptr) {
 			if (q->q_count >= md->b_wptr - md->b_rptr)
-				q->q_count -= md->b_wptr - md->b_rptr;
+				q->q_count -= (md->b_wptr - md->b_rptr);
 			else
 				q->q_count = 0;
 		}

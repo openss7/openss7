@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: bufpool.h,v 0.9.2.16 2008-09-10 03:49:41 brian Exp $
+ @(#) $Id: bufpool.h,v 0.9.2.17 2008-10-23 09:34:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-10 03:49:41 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:34:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufpool.h,v $
+ Revision 0.9.2.17  2008-10-23 09:34:09  brian
+ - updates for release and compatibility
+
  Revision 0.9.2.16  2008-09-10 03:49:41  brian
  - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 
@@ -71,7 +74,7 @@
 #ifndef __OS7_BUFPOOL_H__
 #define __OS7_BUFPOOL_H__
 
-#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: bufpool.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  *  -------------------------------------------------------------------------
@@ -236,7 +239,7 @@ ss7_bufpool_init(struct ss7_bufpool *pool)
 		pool->head = NULL;
 		atomic_set(&pool->count, 0);
 		atomic_set(&pool->reserve, 0);
-		spin_lock_init(&pool->lock);
+		pool->lock = SPIN_LOCK_UNLOCKED;
 		pool->initialized = 1;
 	} else
 		swerr();
