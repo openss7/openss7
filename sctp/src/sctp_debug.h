@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_debug.h,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 08:49:53 $
+ @(#) $Id: sctp_debug.h,v 0.9.2.9 2008-10-23 09:25:14 brian Exp $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:49:53 $ by $Author: brian $
+ Last Modified $Date: 2008-10-23 09:25:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_debug.h,v $
+ Revision 0.9.2.9  2008-10-23 09:25:14  brian
+ - rationalize debug macros
+
  Revision 0.9.2.8  2008-04-29 08:49:53  brian
  - updated headers for Affero release
 
@@ -65,7 +68,7 @@
 #ifndef __LOCAL_SCTP_DEBUG_H__
 #define __LOCAL_SCTP_DEBUG_H__
 
-#ident "@(#) $RCSfile: sctp_debug.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_debug.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #include <linux/compiler.h>
 
@@ -287,15 +290,15 @@
 
 #undef  __assert
 #define __assert(__exp) \
-	do { if (unlikely(!(__exp))) { printk(KERN_EMERG "%s: assert(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); *(int *)0 = 0; } } while(0)
+	do { if (unlikely(!(__exp))) { panic("%s: assert(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } } while(0)
 
 #undef  __assure
 #define __assure(__exp) \
-	do { if (unlikely(!(__exp))) printk(KERN_WARNING "%s: assure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); } while(0)
+	do { if (unlikely(!(__exp))) { printk(KERN_WARNING "%s: assure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); dump_stack(); } } while(0)
 
 #undef  __ensure
 #define __ensure(__exp,__sta) \
-	do { if (unlikely(!(__exp))) { printk(KERN_WARNING "%s: ensure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); __sta; } } while(0)
+	do { if (unlikely(!(__exp))) { printk(KERN_WARNING "%s: ensure(%s) failed at " __FILE__ " +%d\n",__FUNCTION__, #__exp, __LINE__); dump_stack(); __sta; } } while(0)
 
 #undef  __unless
 #define __unless(__exp,__sta) \
@@ -303,11 +306,11 @@ __ensure(!(__exp),__sta)
 
 #undef  __trace
 #define __trace() \
-	do { printk(KERN_INFO "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { printk(KERN_NOTICE "%s: trace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
 
 #undef  __ptrace
 #define __ptrace(__pkspec) \
-	do { printk(KERN_INFO "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+	do { printk(KERN_NOTICE "%s: ptrace() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
 
 #undef  __fixme
 #define __fixme(__pkspec) \
@@ -319,7 +322,7 @@ __ensure(!(__exp),__sta)
 
 #undef  __ctrace
 #define __ctrace(__fnc) \
-	({ printk(KERN_INFO "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
+	({ printk(KERN_NOTICE "%s: calling " #__fnc " at " __FILE__ "+%d\n", __FUNCTION__, __LINE__); __fnc; })
 
 #undef  __printd
 #define __printd(__pkspec) \
@@ -327,11 +330,11 @@ __ensure(!(__exp),__sta)
 
 #undef  __swerr
 #define __swerr() \
-	do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); } while(0)
+	do { printk(KERN_WARNING "%s: swerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); dump_stack(); } while(0)
 
 #undef  __pswerr
 #define __pswerr(__pkspec) \
-do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; } while(0)
+	do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __LINE__); printk __pkspec; dump_stack(); } while(0)
 
 /* These are for completely suppressing a debugging macro. */
 
@@ -344,8 +347,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define _abnormal(__exp)	do { } while(0)
 #define   _assert(__exp)	do { } while(0)
 #define   _assure(__exp)	do { } while(0)
-#define   _ensure(__exp,__sta)	do { if (unlikely(!(__exp))) { __sta; } } while(0)
-#define   _unless(__exp,__sta)	do { if (unlikely( (__exp))) { __sta; } } while(0)
+#define   _ensure(__exp,__sta)	do { if (unlikely( !(__exp))) { __sta; } } while(0)
+#define   _unless(__exp,__sta)	do { if (unlikely(!!(__exp))) { __sta; } } while(0)
 #define    _trace()		do { } while(0)
 #define   _ptrace(__pks)	do { } while(0)
 #define   _ctrace(__fnc)	(__fnc)
@@ -355,7 +358,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    _swerr()		do { } while(0)
 #define   _pswerr(__pks)	do { } while(0)
 
-#ifdef _DEBUG
+#if	defined _DEBUG
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -378,8 +381,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#else
-#ifdef _TEST
+#else				/* defined _DEBUG */
+#if	defined _TEST
 
 #define    never()		__never()
 #define     rare()		__rare()
@@ -402,8 +405,8 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#else
-#ifdef _SAFE
+#else				/* defined _TEST */
+#if	defined _SAFE
 
 #define    never()		do { *(int *)0 = 0; } while(0)
 #define     rare()		_rare()
@@ -426,7 +429,7 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		__swerr()
 #define   pswerr(__pks)		__pswerr(__pks)
 
-#else
+#else				/* defined _SAFE */
 
 #define    never()		_never()
 #define     rare()		_rare()
@@ -449,9 +452,11 @@ do { printk(KERN_WARNING "%s: pswerr() at " __FILE__ " +%d\n", __FUNCTION__, __L
 #define    swerr()		_swerr()
 #define   pswerr(__pks)		_pswerr(__pks)
 
-#endif
-#endif
-#endif
+#endif				/* defined _SAFE */
+
+#endif				/* defined _TEST */
+
+#endif				/* defined _DEBUG */
 
 #ifdef SCTP_CONFIG_MODULE
 #define __SCTP_STATIC STATIC
