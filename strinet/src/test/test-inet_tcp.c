@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-24 18:25:08 $
+ @(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 18:31:44 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-24 18:25:08 $ by $Author: brian $
+ Last Modified $Date: 2008-10-24 18:31:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_tcp.c,v $
+ Revision 0.9.2.63  2008-10-24 18:31:44  brian
+ - tweak timing
+
  Revision 0.9.2.62  2008-10-24 18:25:08  brian
  - final test suites
 
@@ -94,9 +97,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-24 18:25:08 $"
+#ident "@(#) $RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 18:31:44 $"
 
-static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-24 18:25:08 $";
+static char const ident[] = "$RCSfile: test-inet_tcp.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 18:31:44 $";
 
 /*
  *  Simple test program for INET streams.
@@ -36473,7 +36476,7 @@ bound to a protocol address with a CONIND_number that is greater than zero."
 int
 test_case_13_5_12_conn(int child)
 {
-	if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+	if (expect(child, LONG_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
