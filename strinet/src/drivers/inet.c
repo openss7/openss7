@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-24 08:52:39 $ by $Author: brian $
+ Last Modified $Date: 2008-10-24 15:51:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.118  2008-10-24 15:51:11  brian
+ - updated test suites
+
  Revision 0.9.2.117  2008-10-24 08:52:39  brian
  - upgrade strinet test cases and documentation
 
@@ -137,10 +140,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -658,7 +661,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -783,26 +786,36 @@ MODULE_ALIAS("/dev/inet/sctp");
 	mi_strlog(ss->rq, level, flags, fmt, ##__VA_ARGS__)
 #endif
 
+#define STRLOGERR	0	/* log INET error information */
+#define STRLOGNO	0	/* log INET notice information */
+#define STRLOGST	1	/* log INET state transitions */
+#define STRLOGTO	2	/* log INET timeouts */
+#define STRLOGRX	3	/* log INET primitives received */
+#define STRLOGTX	4	/* log INET primitives issued */
+#define STRLOGTE	5	/* log INET timer events */
+#define STRLOGIO	6	/* log INET additional data */
+#define STRLOGDA	7	/* log INET data */
+
 #if 1
-#define STRLOGERR(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define STRLOGNO(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGST(ss, fmt, ...) INETLOG(ss, 1, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGTO(ss, fmt, ...) INETLOG(ss, 2, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGRX(ss, fmt, ...) INETLOG(ss, 3, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGTX(ss, fmt, ...) INETLOG(ss, 4, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGTE(ss, fmt, ...) INETLOG(ss, 5, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGIO(ss, fmt, ...) INETLOG(ss, 6, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGDA(ss, fmt, ...) INETLOG(ss, 7, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGERR(ss, fmt, ...) INETLOG(ss, STRLOGERR, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGNO(ss, fmt, ...) INETLOG(ss, STRLOGNO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGST(ss, fmt, ...) INETLOG(ss, STRLOGST, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTO(ss, fmt, ...) INETLOG(ss, STRLOGTO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGRX(ss, fmt, ...) INETLOG(ss, STRLOGRX, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTX(ss, fmt, ...) INETLOG(ss, STRLOGTX, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGTE(ss, fmt, ...) INETLOG(ss, STRLOGTE, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGIO(ss, fmt, ...) INETLOG(ss, STRLOGIO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGDA(ss, fmt, ...) INETLOG(ss, STRLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
 #else
-#define STRLOGERR(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
-#define STRLOGNO(ss, fmt, ...) INETLOG(ss, 0, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGST(ss, fmt, ...) INETLOG(ss, 1, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGTO(ss, fmt, ...) INETLOG(ss, 2, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGRX(ss, fmt, ...) INETLOG(ss, 3, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGTX(ss, fmt, ...) INETLOG(ss, 4, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGTE(ss, fmt, ...) INETLOG(ss, 5, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGIO(ss, fmt, ...) INETLOG(ss, 6, SL_TRACE, fmt, ##__VA_ARGS__)
-#define STRLOGDA(ss, fmt, ...) INETLOG(ss, 7, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGERR(ss, fmt, ...) INETLOG(ss, STRLOGERR, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGNO(ss, fmt, ...) INETLOG(ss, STRLOGNO, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGST(ss, fmt, ...) INETLOG(ss, STRLOGST, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGTO(ss, fmt, ...) INETLOG(ss, STRLOGTO, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGRX(ss, fmt, ...) INETLOG(ss, STRLOGRX, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGTX(ss, fmt, ...) INETLOG(ss, STRLOGTX, SL_TRACE | SL_ERROR | SL_CONSOLE, fmt, ##__VA_ARGS__)
+#define LOGTE(ss, fmt, ...) INETLOG(ss, STRLOGTE, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGIO(ss, fmt, ...) INETLOG(ss, STRLOGIO, SL_TRACE, fmt, ##__VA_ARGS__)
+#define LOGDA(ss, fmt, ...) INETLOG(ss, STRLOGDA, SL_TRACE, fmt, ##__VA_ARGS__)
 #endif
 
 /*
@@ -2702,10 +2715,10 @@ t_build_conn_opts(ss_t *ss, unsigned char *op, size_t olen)
 	return (olen);
 	// return ((unsigned char *) oh - op); /* return actual length */
       eproto:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EPROTO);
       efault:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EFAULT);
 }
 
@@ -3223,7 +3236,7 @@ t_set_options(ss_t *ss)
 	}
 	return (0);
       eproto:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EPROTO);
 }
 
@@ -4420,7 +4433,7 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 	return (-EACCES);
 #endif				/* defined HAVE_OPENSS7_SCTP */
       eproto:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EPROTO);
 }
 
@@ -4504,7 +4517,7 @@ ss_cmsg_size(const ss_t *ss, const unsigned char *ip, size_t ilen)
 	}
 	return (olen);
       eproto:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EPROTO);
       einval:
 	return (-EINVAL);
@@ -4694,7 +4707,7 @@ ss_cmsg_build(const ss_t *ss, const unsigned char *ip, size_t ilen, struct msghd
 	msg->msg_controllen = (unsigned char *) ch - (unsigned char *) msg->msg_control;
 	return (0);
       eproto:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EPROTO);
 }
 
@@ -4823,8 +4836,8 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 
 					len = cmsg->cmsg_len < 40 ? cmsg->cmsg_len : 40;
 
-					STRLOGIO(ss, "processing option IP_RECVOPTS");
-					STRLOGIO(ss, "building option T_IP_OPTIONS");
+					LOGIO(ss, "processing option IP_RECVOPTS");
+					LOGIO(ss, "building option T_IP_OPTIONS");
 					oh->len = T_LENGTH(len);
 					oh->level = T_INET_IP;
 					oh->name = T_IP_OPTIONS;
@@ -4837,8 +4850,8 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 					continue;
 				}
 				case IP_TOS:
-					STRLOGIO(ss, "processing option IP_TOS");
-					STRLOGIO(ss, "building option T_IP_TOS");
+					LOGIO(ss, "processing option IP_TOS");
+					LOGIO(ss, "building option T_IP_TOS");
 					oh->len = _T_LENGTH_SIZEOF(unsigned char);
 
 					oh->level = T_INET_IP;
@@ -4852,8 +4865,8 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_TTL:
-					STRLOGIO(ss, "processing option IP_TTL");
-					STRLOGIO(ss, "building option T_IP_TTL");
+					LOGIO(ss, "processing option IP_TTL");
+					LOGIO(ss, "building option T_IP_TTL");
 					oh->len = _T_LENGTH_SIZEOF(unsigned char);
 
 					oh->level = T_INET_IP;
@@ -4867,8 +4880,8 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 					oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 					continue;
 				case IP_PKTINFO:
-					STRLOGIO(ss, "processing option IP_PKTINFO");
-					STRLOGIO(ss, "building option T_IP_ADDR");
+					LOGIO(ss, "processing option IP_PKTINFO");
+					LOGIO(ss, "building option T_IP_ADDR");
 					oh->len = _T_LENGTH_SIZEOF(uint32_t);
 
 					oh->level = T_INET_IP;
@@ -4896,8 +4909,8 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 		case SOL_SCTP:
 			switch (cmsg->cmsg_type) {
 			case SCTP_PPI:
-				STRLOGIO(ss, "processing option SCTP_PPI");
-				STRLOGIO(ss, "building option T_SCTP_PPI");
+				LOGIO(ss, "processing option SCTP_PPI");
+				LOGIO(ss, "building option T_SCTP_PPI");
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 
 				oh->level = T_INET_SCTP;
@@ -4911,8 +4924,8 @@ ss_opts_build(const ss_t *ss, struct msghdr *msg, unsigned char *op, size_t olen
 				oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 				continue;
 			case SCTP_DISPOSITION:
-				STRLOGIO(ss, "processing option SCTP_DISPOSITION");
-				STRLOGIO(ss, "building option T_SCTP_DISPOSITION");
+				LOGIO(ss, "processing option SCTP_DISPOSITION");
+				LOGIO(ss, "building option T_SCTP_DISPOSITION");
 				oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
 
 				oh->level = T_INET_SCTP;
@@ -5323,10 +5336,10 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	STRLOGIO(t, "Calculated option output size = %u", olen);
+	LOGIO(t, "Calculated option output size = %u", olen);
 	return (olen);
       einval:
-	STRLOGNO(t, "ERROR: Invalid input options");
+	LOGNO(t, "ERROR: Invalid input options");
 	return (-EINVAL);
 }
 
@@ -5712,10 +5725,10 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	STRLOGIO(t, "Calculated option output size = %u", olen);
+	LOGIO(t, "Calculated option output size = %u", olen);
 	return (olen);
       einval:
-	STRLOGNO(t, "ERROR: Invalid input options");
+	LOGNO(t, "ERROR: Invalid input options");
 	return (-EINVAL);
 }
 
@@ -6237,10 +6250,10 @@ t_size_check_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	STRLOGIO(t, "Calculated option output size = %u", olen);
+	LOGIO(t, "Calculated option output size = %u", olen);
 	return (olen);
       einval:
-	STRLOGNO(t, "ERROR: Invalid input options");
+	LOGNO(t, "ERROR: Invalid input options");
 	return (-EINVAL);
 }
 
@@ -6818,10 +6831,10 @@ t_size_negotiate_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 #endif				/* defined HAVE_OPENSS7_SCTP */
 		}
 	}
-	STRLOGIO(t, "Calculated option output size = %u", olen);
+	LOGIO(t, "Calculated option output size = %u", olen);
 	return (olen);
       einval:
-	STRLOGNO(t, "ERROR: Invalid input options");
+	LOGNO(t, "ERROR: Invalid input options");
 	return (-EINVAL);
 }
 
@@ -7697,7 +7710,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
       einval:
 	return (-EINVAL);
       efault:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EFAULT);
 }
 
@@ -8607,7 +8620,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
       einval:
 	return (-EINVAL);
       efault:
-	STRLOGERR(t, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(t, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EFAULT);
 }
 
@@ -10254,7 +10267,7 @@ t_build_check_options(const ss_t *ss, const unsigned char *ip, size_t ilen, unsi
       einval:
 	return (-EINVAL);
       efault:
-	STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EFAULT);
 }
 
@@ -12222,7 +12235,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
       einval:
 	return (-EINVAL);
       efault:
-	STRLOGERR(t, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(t, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	return (-EFAULT);
 }
 
@@ -12494,7 +12507,7 @@ sock_statename(int state)
 static inline fastcall __hot void
 ss_set_state(ss_t *ss, t_scalar_t state)
 {
-	STRLOGST(ss, "%s <- %s", tpi_statename(state), tpi_statename(ss->p.info.CURRENT_state));
+	LOGST(ss, "%s <- %s", tpi_statename(state), tpi_statename(ss->p.info.CURRENT_state));
 	ss->p.info.CURRENT_state = state;
 }
 
@@ -12695,7 +12708,7 @@ ss_socket(ss_t *ss)
 	family = ss->p.prot.family;
 	type = ss->p.prot.type;
 	protocol = (ss->p.prot.protocol == IPPROTO_RAW) ? ss->port : ss->p.prot.protocol;
-	STRLOGTX(ss, "SS_CREATE %d:%d:%d", family, type, protocol);
+	LOGTX(ss, "SS_CREATE %d:%d:%d", family, type, protocol);
 	if (!(err = sock_create(family, type, protocol, &ss->sock))) {
 		ensure(ss->sock, return (-EFAULT));
 		ensure(ss->sock->sk, return (-EFAULT));
@@ -12705,7 +12718,7 @@ ss_socket(ss_t *ss)
 			inet_sk(ss->sock->sk)->cmsg_flags |= 0x0f;
 		return (0);
 	}
-	STRLOGNO(ss, "ERROR: from sock_create %d", err);
+	LOGNO(ss, "ERROR: from sock_create %d", err);
 	return (err);
 }
 
@@ -12739,12 +12752,12 @@ ss_bind(ss_t *ss, struct sockaddr *add, size_t add_len)
 	int err;
 
 	if (ss->sock || !(err = ss_socket(ss))) {
-		STRLOGTX(ss, "SS_BIND");
+		LOGTX(ss, "SS_BIND");
 		if (!(err = sock_bind(ss->sock, add, add_len))) {
 			ss->src = *add;
 			return (0);
 		} else
-			STRLOGNO(ss, "ERROR: from sock_bind() %d", err);
+			LOGNO(ss, "ERROR: from sock_bind() %d", err);
 		switch (-err) {
 		case EADDRINUSE:
 			err = TADDRBUSY;
@@ -12789,13 +12802,13 @@ ss_listen(ss_t *ss, uint cons)
 	int type = ss->p.prot.type;
 
 	ensure(type == SOCK_STREAM || type == SOCK_SEQPACKET, return (-EFAULT));
-	STRLOGTX(ss, "SS_LISTEN %d", cons);
+	LOGTX(ss, "SS_LISTEN %d", cons);
 	if (!(err = sock_listen(ss->sock, cons))) {
 		ss->conind = cons;
 		ss->tcp_state = ss->sock->sk->sk_state;
 		return (0);
 	}
-	STRLOGNO(ss, "ERROR: from sock_listen %d", err);
+	LOGNO(ss, "ERROR: from sock_listen %d", err);
 	switch (-err) {
 	case EDESTADDRREQ:
 	case ESOCKTNOSUPPORT:
@@ -12834,7 +12847,7 @@ ss_accept(ss_t *ss, queue_t *q, struct socket **newsock, mblk_t *cp)
 {
 	int err;
 
-	STRLOGTX(ss, "SS_ACCEPT");
+	LOGTX(ss, "SS_ACCEPT");
 	if (likely(!(err = sock_accept(ss->sock, newsock, cp)))) {
 		__bufq_unlink(&ss->conq, cp);
 		freemsg(cp);
@@ -12858,7 +12871,7 @@ ss_accept(ss_t *ss, queue_t *q, struct socket **newsock, mblk_t *cp)
 			case EDEADLK:
 				goto error;
 			}
-			STRLOGERR(ss, "SWERR: unexpected error %d: %s %s:%d", -err,
+			LOGERR(ss, "SWERR: unexpected error %d: %s %s:%d", -err,
 				  __FUNCTION__, __FILE__, __LINE__);
 			goto error;
 		}
@@ -12872,7 +12885,7 @@ ss_accept(ss_t *ss, queue_t *q, struct socket **newsock, mblk_t *cp)
 				   socket. */
 		break;
 	}
-	STRLOGERR(ss, "SWERR: unexpected error %d: %s %s:%d", -err, __FUNCTION__, __FILE__,
+	LOGERR(ss, "SWERR: unexpected error %d: %s %s:%d", -err, __FUNCTION__, __FILE__,
 		  __LINE__);
 	goto error;
       error:
@@ -12909,7 +12922,7 @@ ss_refuse(ss_t *ss, queue_t *q, mblk_t *cp)
 	struct socket *newsock = NULL;
 	int err;
 
-	STRLOGTX(ss, "SS_REFUSE");
+	LOGTX(ss, "SS_REFUSE");
 	if (likely(!(err = sock_accept(ss->sock, &newsock, cp)))) {
 		sock_disconnect(newsock);
 		ss_socket_put(&newsock);
@@ -12933,7 +12946,7 @@ ss_refuse(ss_t *ss, queue_t *q, mblk_t *cp)
 				   socket. */
 		break;
 	}
-	STRLOGERR(ss, "SWERR: unexpected error %d: %s %s:%d", -err, __FUNCTION__, __FILE__,
+	LOGERR(ss, "SWERR: unexpected error %d: %s %s:%d", -err, __FUNCTION__, __FILE__,
 		  __LINE__);
 	/* feign success anyways */
 	goto done;
@@ -12955,7 +12968,7 @@ ss_refuse(ss_t *ss, queue_t *q, mblk_t *cp)
 static int
 ss_unbind(ss_t *ss)
 {
-	STRLOGTX(ss, "SS_UNBIND");
+	LOGTX(ss, "SS_UNBIND");
 	ss_socket_put(&ss->sock);
 	/* Note: if the reinitialization of the socket fails, we will attempt again to reinitialize 
 	   it when an attempt is ever made to rebind the socket.  We just want to have an
@@ -12976,9 +12989,9 @@ ss_connect(ss_t *ss, struct sockaddr *dst)
 	int err;
 
 	ensure(ss->sock, return (-EPROTO));
-	STRLOGTX(ss, "SS_CONNECT");
+	LOGTX(ss, "SS_CONNECT");
 	if ((err = sock_connect(ss->sock, dst, O_NONBLOCK)))
-		STRLOGNO(ss, "ERROR: from sock_connect() %d", err);
+		LOGNO(ss, "ERROR: from sock_connect() %d", err);
 	else {
 		ss->tcp_state = ss->sock->sk->sk_state;
 		ss->lasterror = 0;
@@ -12998,7 +13011,7 @@ ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 	int err;
 
 	ensure(ss->sock, return (-EPROTO));
-	STRLOGDA(ss, "SS_SENDMSG");
+	LOGDA(ss, "SS_SENDMSG");
 	{
 		mm_segment_t fs = get_fs();
 
@@ -13007,7 +13020,7 @@ ss_sendmsg(ss_t *ss, struct msghdr *msg, int len)
 		set_fs(fs);
 	}
 	if (err <= 0)
-		STRLOGNO(ss, "ERROR: from sock_sendmsg() %d", err);
+		LOGNO(ss, "ERROR: from sock_sendmsg() %d", err);
 	return (err);
 }
 
@@ -13031,7 +13044,7 @@ ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 		*cbuf = 0xdeadbeef;
 
 	ensure(ss->sock, return (-EPROTO));
-	STRLOGDA(ss, "SS_RECVMSG");
+	LOGDA(ss, "SS_RECVMSG");
 	{
 		mm_segment_t fs = get_fs();
 
@@ -13040,24 +13053,24 @@ ss_recvmsg(ss_t *ss, struct msghdr *msg, int size)
 		set_fs(fs);
 	}
 	if (err < 0) {
-		STRLOGNO(ss, "ERROR: from sock_recvmsg() %d", err);
+		LOGNO(ss, "ERROR: from sock_recvmsg() %d", err);
 		return (err);
 	}
-	STRLOGIO(ss, "recvmsg with len = %d", err);
+	LOGIO(ss, "recvmsg with len = %d", err);
 	if (msg->msg_flags & MSG_CTRUNC) {
-		STRLOGIO(ss, "control message truncated");
+		LOGIO(ss, "control message truncated");
 		msg->msg_control = NULL;
 		msg->msg_controllen = 0;
 	} else if (msg->msg_control != (void *) cbuf) {
-		STRLOGIO(ss, "control message pointer moved!");
-		STRLOGIO(ss, "initial control buffer %p", msg->msg_control);
-		STRLOGIO(ss, "initial control length %ld", (long) msg->msg_controllen);
+		LOGIO(ss, "control message pointer moved!");
+		LOGIO(ss, "initial control buffer %p", msg->msg_control);
+		LOGIO(ss, "initial control length %ld", (long) msg->msg_controllen);
 		msg->msg_control = (void *) cbuf;
 		msg->msg_controllen = clen - msg->msg_controllen;
-		STRLOGIO(ss, "final control buffer %p", msg->msg_control);
-		STRLOGIO(ss, "final control length %ld", (long) msg->msg_controllen);
+		LOGIO(ss, "final control buffer %p", msg->msg_control);
+		LOGIO(ss, "final control length %ld", (long) msg->msg_controllen);
 	} else if (clen > sizeof(*cbuf) && msg->msg_controllen == clen && cbuf[0] == 0xdeadbeef) {
-		STRLOGIO(ss, "control message unchanged!");
+		LOGIO(ss, "control message unchanged!");
 		msg->msg_control = NULL;
 		msg->msg_controllen = 0;
 	}
@@ -13080,9 +13093,9 @@ ss_disconnect(ss_t *ss)
 	int err;
 
 	ensure(ss->sock, return (-EPROTO));
-	STRLOGTX(ss, "SS_DISCONNECT");
+	LOGTX(ss, "SS_DISCONNECT");
 	if ((err = sock_disconnect(ss->sock)))
-		STRLOGNO(ss, "ERROR: from sock_disconnect() %d", err);
+		LOGNO(ss, "ERROR: from sock_disconnect() %d", err);
 	return (err);
 }
 
@@ -13096,7 +13109,7 @@ ss_getsockname(ss_t *ss)
 {
 	int err, len = sizeof(ss->src);
 
-	STRLOGTX(ss, "SS_GETSOCKNAME");
+	LOGTX(ss, "SS_GETSOCKNAME");
 	if (!(err = sock_getsockname(ss->sock, &ss->src, &len)))
 		return (len);
 	return (err);
@@ -13106,7 +13119,7 @@ ss_getpeername(ss_t *ss)
 {
 	int err, len = sizeof(ss->dst);
 
-	STRLOGTX(ss, "SS_GETPEERNAME");
+	LOGTX(ss, "SS_GETPEERNAME");
 	if (!(err = sock_getpeername(ss->sock, &ss->dst, &len)))
 		return (len);
 	return (err);
@@ -13162,7 +13175,7 @@ m_flush(ss_t *ss, queue_t *q, mblk_t *msg, int how, int band)
 	}
 #endif
 	freemsg(msg);
-	STRLOGTX(ss, "<- M_FLUSH");
+	LOGTX(ss, "<- M_FLUSH");
 	putnext(ss->rq, mp);
 	return (0);
       enobufs:
@@ -13192,7 +13205,7 @@ m_error(ss_t *ss, queue_t *q, mblk_t *msg, int error)
 	mp->b_wptr += 2;
 	ss_set_state(ss, ss->oldstate);
 	freemsg(msg);
-	STRLOGTX(ss, "<- M_ERROR %d", error);
+	LOGTX(ss, "<- M_ERROR %d", error);
 	putnext(ss->rq, mp);
 #if 0
 	if (ss->sock) {
@@ -13226,7 +13239,7 @@ m_hangup(ss_t *ss, queue_t *q, mblk_t *msg)
 	mp->b_datap->db_type = M_HANGUP;
 	ss_set_state(ss, ss->oldstate);
 	freemsg(msg);
-	STRLOGTX(ss, "<- M_HANGUP");
+	LOGTX(ss, "<- M_HANGUP");
 	putnext(ss->rq, mp);
 #if 0
 	if (ss->sock) {
@@ -13278,7 +13291,7 @@ m_error_reply(ss_t *ss, queue_t *q, mblk_t *msg, int err)
 		error = EPIPE;
 		break;
 	case EFAULT:
-		STRLOGERR(ss, "%s() fault", __FUNCTION__);
+		LOGERR(ss, "%s() fault", __FUNCTION__);
 	default:
 	case EPROTO:
 		err = (err < 0) ? -err : err;
@@ -13355,7 +13368,7 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sock *sk)
 			mp->b_wptr += opt_len;
 		else {
 			freemsg(mp);
-			STRLOGNO(ss, "ERROR: option build fault");
+			LOGNO(ss, "ERROR: option build fault");
 			freemsg(cp);
 			return (0);
 		}
@@ -13364,7 +13377,7 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sock *sk)
 	SOCK_PRIV(sk) = (void *) ci;
 	__bufq_queue(&ss->conq, cp);
 	ss_set_state(ss, TS_WRES_CIND);
-	STRLOGTX(ss, "<- T_CONN_IND");
+	LOGTX(ss, "<- T_CONN_IND");
 	putnext(ss->rq, mp);
 	return (0);		/* absorbed cp */
 
@@ -13372,10 +13385,10 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sock *sk)
 	freemsg(cp);
 	return (-ENOBUFS);
       ebusy:
-	STRLOGNO(ss, "ERROR: flow controlled");
+	LOGNO(ss, "ERROR: flow controlled");
 	return (-EBUSY);
       eagain:
-	STRLOGNO(ss, "ERROR: too many conn inds");
+	LOGNO(ss, "ERROR: too many conn inds");
 	return (-EAGAIN);
 }
 
@@ -13425,12 +13438,12 @@ t_conn_con(ss_t *ss, queue_t *q)
 			mp->b_wptr += opt_len;
 		else {
 			freemsg(mp);
-			STRLOGNO(ss, "ERROR: option build fault");
+			LOGNO(ss, "ERROR: option build fault");
 			return (0);
 		}
 	}
 	ss_set_state(ss, TS_DATA_XFER);
-	STRLOGTX(ss, "<- T_CONN_CON");
+	LOGTX(ss, "<- T_CONN_CON");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13507,7 +13520,7 @@ t_discon_ind(ss_t *ss, queue_t *q, struct sock *sk, t_scalar_t reason, mblk_t *c
 			goto ebusy;
 		break;
 	default:
-		STRLOGERR(ss, "SWERR: out of state: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+		LOGERR(ss, "SWERR: out of state: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 		/* remove it anyway and feign success */
 		if (cp && (err = ss_refuse(ss, q, cp)))
 			goto error;
@@ -13532,12 +13545,12 @@ t_discon_ind(ss_t *ss, queue_t *q, struct sock *sk, t_scalar_t reason, mblk_t *c
 		ss_set_state(ss, TS_IDLE);
 	else
 		ss_set_state(ss, TS_WRES_CIND);
-	STRLOGTX(ss, "<- T_DISCON_IND");
+	LOGTX(ss, "<- T_DISCON_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
       ebusy:
-	STRLOGNO(ss, "ERROR: Flow controlled");
+	LOGNO(ss, "ERROR: Flow controlled");
 	err = -EBUSY;
 	goto error;
       enobufs:
@@ -13571,7 +13584,7 @@ t_data_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 	dp->b_band = 0;		/* sometimes non-zero */
 	dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 	mp->b_cont = dp;
-	STRLOGTX(ss, "<- T_DATA_IND");
+	LOGTX(ss, "<- T_DATA_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13604,7 +13617,7 @@ t_exdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 	dp->b_band = 0;		/* sometimes non-zero */
 	dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 	mp->b_cont = dp;
-	STRLOGTX(ss, "<- T_EXDATA_IND");
+	LOGTX(ss, "<- T_EXDATA_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13632,7 +13645,7 @@ t_info_ack(ss_t *ss, queue_t *q, mblk_t *msg)
 	*p = ss->p.info;
 	mp->b_wptr += sizeof(*p);
 	freemsg(msg);
-	STRLOGTX(ss, "<- T_INFO_ACK");
+	LOGTX(ss, "<- T_INFO_ACK");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13670,7 +13683,7 @@ t_bind_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *add, t_uscalar_t 
 	}
 	ss_set_state(ss, TS_IDLE);
 	freemsg(msg);
-	STRLOGTX(ss, "<- T_BIND_ACK");
+	LOGTX(ss, "<- T_BIND_ACK");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13715,7 +13728,7 @@ t_error_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, t_scalar_t error
 	mp->b_wptr += sizeof(*p);
 	ss_set_state(ss, ss->oldstate);
 	freemsg(msg);
-	STRLOGTX(ss, "<- T_ERROR_ACK");
+	LOGTX(ss, "<- T_ERROR_ACK");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13778,7 +13791,7 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
 		case SOCK_STREAM:
 			break;
 		default:
-			STRLOGERR(ss, "SWERR: unknown socket type %d: %s %s:%d", ss->p.prot.type,
+			LOGERR(ss, "SWERR: unknown socket type %d: %s %s:%d", ss->p.prot.type,
 				  __FUNCTION__, __FILE__, __LINE__);
 			break;
 		}
@@ -13842,7 +13855,7 @@ t_ok_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t prim, mblk_t *cp, ss_t *a
 		   state. */
 	}
 	freemsg(msg);
-	STRLOGTX(ss, "<- T_OK_ACK");
+	LOGTX(ss, "<- T_OK_ACK");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13889,7 +13902,7 @@ t_unitdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 	dp->b_band = 0;		/* sometimes non-zero */
 	dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 	mp->b_cont = dp;
-	STRLOGTX(ss, "<- T_UNITDATA_IND");
+	LOGTX(ss, "<- T_UNITDATA_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -13944,14 +13957,14 @@ t_uderror_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 		dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 		mp->b_cont = dp;
 	}
-	STRLOGTX(ss, "<- T_UDERROR_IND");
+	LOGTX(ss, "<- T_UDERROR_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
       enobufs:
 	return (-ENOBUFS);
       ebusy:
-	STRLOGNO(ss, "ERROR: Flow controlled");
+	LOGNO(ss, "ERROR: Flow controlled");
 	return (-EBUSY);
 }
 
@@ -13997,7 +14010,7 @@ t_optmgmt_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_scalar_t flags, unsigned char
 		ss_set_state(ss, TS_IDLE);
 #endif
 	freemsg(msg);
-	STRLOGTX(ss, "<- T_OPTMGMT_ACK");
+	LOGTX(ss, "<- T_OPTMGMT_ACK");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -14043,7 +14056,7 @@ t_ordrel_ind(ss_t *ss, queue_t *q)
 		ss_set_state(ss, TS_IDLE);
 		break;
 	}
-	STRLOGTX(ss, "<- T_ORDREL_IND");
+	LOGTX(ss, "<- T_ORDREL_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -14085,7 +14098,7 @@ t_optdata_ind(ss_t *ss, queue_t *q, struct msghdr *msg, mblk_t *dp)
 	dp->b_band = 0;		/* sometimes non-zero */
 	dp->b_flag &= ~MSGMARK;	/* sometimes marked */
 	mp->b_cont = dp;
-	STRLOGTX(ss, "<- T_OPTDATA_IND");
+	LOGTX(ss, "<- T_OPTDATA_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -14130,7 +14143,7 @@ t_addr_ack(ss_t *ss, queue_t *q, mblk_t *msg, struct sockaddr *loc, struct socka
 		mp->b_wptr += rem_len;
 	}
 	freemsg(msg);
-	STRLOGTX(ss, "<- T_ADDR_ACK");
+	LOGTX(ss, "<- T_ADDR_ACK");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -14172,7 +14185,7 @@ t_capability_ack(ss_t *ss, queue_t *q, mblk_t *msg, t_uscalar_t caps, int type)
 	else
 		bzero(&p->INFO_ack, sizeof(p->INFO_ack));
 	freemsg(msg);
-	STRLOGTX(ss, "<- T_CAPABILITY_ACK");
+	LOGTX(ss, "<- T_CAPABILITY_ACK");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -14241,7 +14254,7 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 				i++;
 			}
 		}
-		STRLOGIO(ss, "sendmsg with len = %d", len);
+		LOGIO(ss, "sendmsg with len = %d", len);
 		err = ss_sendmsg(ss, msg, len);
 	}
 	if (err < 0)
@@ -14268,7 +14281,7 @@ ss_sock_sendmsg(ss_t *ss, mblk_t *mp, struct msghdr *msg)
 			dassert(dp != NULL);
 		}
 		if (!adjmsg(dp, err))
-			STRLOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+			LOGERR(ss, "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 		err = -EAGAIN;
 		goto out;
 	}
@@ -14344,7 +14357,7 @@ ss_setup_size(ss_t *ss, struct sock *sk, const int type, const char band)
 		size = atomic_read(&sk->sk_rmem_alloc);
 		break;
 	default:
-		STRLOGERR(ss, "SWERR: unknown socket type %d: %s %s:%d",
+		LOGERR(ss, "SWERR: unknown socket type %d: %s %s:%d",
 			  type, __FUNCTION__, __FILE__, __LINE__);
 		size = 0;
 		break;
@@ -14438,7 +14451,7 @@ ss_data_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		switch (__builtin_expect(-err, EAGAIN)) {
 		case EAGAIN:
 		case 0:
-			STRLOGIO(ss, "no data to read!");
+			LOGIO(ss, "no data to read!");
 			goto eagain;
 		case ENOBUFS:
 		case ENOMEM:
@@ -14449,7 +14462,7 @@ ss_data_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			qenable(q);
 			goto error;
 		}
-		STRLOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
+		LOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
 		goto error;
 	}
 
@@ -14473,7 +14486,7 @@ ss_data_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			ss_opts_build(ss, msg, mp->b_wptr, p->OPT_length, NULL);
 			mp->b_wptr += p->OPT_length;
 		}
-		STRLOGTX(ss, "<- T_OPTDATA_IND");
+		LOGTX(ss, "<- T_OPTDATA_IND");
 	} else {
 		struct T_data_ind *p;
 
@@ -14481,7 +14494,7 @@ ss_data_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		p->PRIM_type = T_DATA_IND;
 		p->MORE_flag = (type == SOCK_STREAM) ? 0 : (msg->msg_flags & MSG_EOR) ? 0 : T_MORE;
 		mp->b_wptr += sizeof(*p);
-		STRLOGTX(ss, "<- T_DATA_IND");
+		LOGTX(ss, "<- T_DATA_IND");
 	}
 	putnext(ss->rq, mp);
 	return (err);
@@ -14548,7 +14561,7 @@ ss_exdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		case EINVAL:	/* No OOB data. */
 		case EAGAIN:
 		case 0:
-			STRLOGIO(ss, "no data to read!");
+			LOGIO(ss, "no data to read!");
 			goto eagain;
 		case ENOBUFS:
 		case ENOMEM:
@@ -14559,7 +14572,7 @@ ss_exdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			qenable(q);
 			goto error;
 		}
-		STRLOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
+		LOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
 		goto error;
 	}
 
@@ -14584,7 +14597,7 @@ ss_exdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			ss_opts_build(ss, msg, mp->b_wptr, p->OPT_length, NULL);
 			mp->b_wptr += p->OPT_length;
 		}
-		STRLOGTX(ss, "<- T_OPTDATA_IND");
+		LOGTX(ss, "<- T_OPTDATA_IND");
 	} else {
 		struct T_exdata_ind *p;
 
@@ -14592,7 +14605,7 @@ ss_exdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		p->PRIM_type = T_EXDATA_IND;
 		p->MORE_flag = (type == SOCK_STREAM) ? 0 : (msg->msg_flags & MSG_EOR) ? 0 : T_MORE;
 		mp->b_wptr += sizeof(*p);
-		STRLOGTX(ss, "<- T_EXDATA_IND");
+		LOGTX(ss, "<- T_EXDATA_IND");
 	}
 	putnext(ss->rq, mp);
 	return (err);
@@ -14655,7 +14668,7 @@ ss_unitdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	if (unlikely((err = ss_recvmsg(ss, msg, size)) <= 0)) {
 		switch (__builtin_expect(-err, EAGAIN)) {
 		case EAGAIN:
-			STRLOGIO(ss, "no data to read!");
+			LOGIO(ss, "no data to read!");
 			goto error;
 		case ENOBUFS:
 		case ENOMEM:
@@ -14666,10 +14679,10 @@ ss_unitdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			qenable(q);
 			goto error;
 		case 0:
-			STRLOGIO(ss, "zero data!");
+			LOGIO(ss, "zero data!");
 			goto eagain;
 		}
-		STRLOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
+		LOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
 		goto error;
 	}
 
@@ -14695,12 +14708,12 @@ ss_unitdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		ss_opts_build(ss, msg, mp->b_wptr, p->OPT_length, NULL);
 		mp->b_wptr += p->OPT_length;
 	}
-	STRLOGTX(ss, "<- T_UNITDATA_IND");
+	LOGTX(ss, "<- T_UNITDATA_IND");
 	putnext(ss->rq, mp);
 	return (err);
 
       efault:
-	STRLOGIO(ss, "message was truncated");
+	LOGIO(ss, "message was truncated");
 	err = 0;
 	goto error;
       eagain:
@@ -14761,7 +14774,7 @@ ss_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	if (unlikely((err = ss_recvmsg(ss, msg, size)) < 0)) {
 		switch (__builtin_expect(-err, EAGAIN)) {
 		case EAGAIN:
-			STRLOGIO(ss, "no data to read!");
+			LOGIO(ss, "no data to read!");
 			goto error;
 		case ENOBUFS:
 		case ENOMEM:
@@ -14772,7 +14785,7 @@ ss_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			qenable(q);
 			goto error;
 		}
-		STRLOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
+		LOGERR(ss, "Error %d: %s : %s:%d", -err, __FUNCTION__, __FILE__, __LINE__);
 		goto error;
 	}
 
@@ -14796,7 +14809,7 @@ ss_uderror_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		ss_opts_build(ss, msg, mp->b_wptr, p->OPT_length, &p->ERROR_type);
 		mp->b_wptr += p->OPT_length;
 	}
-	STRLOGTX(ss, "<- T_UDERROR_IND");
+	LOGTX(ss, "<- T_UDERROR_IND");
 	putnext(ss->rq, mp);
 	return (0);
 
@@ -15019,9 +15032,9 @@ ss_state_change(struct sock *sk)
 						qenable(ss->rq);
 					set_bit(SS_BIT_STATE_CHANGE, &ci->ci_rflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGST(ss, "state change child %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
+						LOGST(ss, "state change child %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
 					else
-						STRLOGST(ss, "state change sock  %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
+						LOGST(ss, "state change sock  %p -> %s", (void *)sk, tcp_statename(sk->sk_state));
 				} else
 					assure(ss->rq);
 			}
@@ -15060,9 +15073,9 @@ ss_write_space(struct sock *sk)
 						qenable(ss->wq);
 					set_bit(SS_BIT_WRITE_SPACE, &ci->ci_wflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGDA(ss, "write space child %p", (void *)sk);
+						LOGDA(ss, "write space child %p", (void *)sk);
 					else
-						STRLOGDA(ss, "write space sock  %p", (void *)sk);
+						LOGDA(ss, "write space sock  %p", (void *)sk);
 				} else
 					assure(ss->wq);
 			}
@@ -15101,9 +15114,9 @@ ss_error_report(struct sock *sk)
 						qenable(ss->rq);
 					set_bit(SS_BIT_ERROR_REPORT, &ci->ci_rflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGNO(ss, "error report child %p", (void *)sk);
+						LOGNO(ss, "error report child %p", (void *)sk);
 					else
-						STRLOGNO(ss, "error report sock  %p", (void *)sk);
+						LOGNO(ss, "error report sock  %p", (void *)sk);
 				} else
 					assure(ss->rq);
 			}
@@ -15143,9 +15156,9 @@ ss_data_ready(struct sock *sk, int len)
 						qenable(ss->rq);
 					set_bit(SS_BIT_DATA_READY, &ci->ci_rflags);
 					if ((void *)ci != (void *)ss)
-						STRLOGDA(ss, "data ready child %p", (void *)sk);
+						LOGDA(ss, "data ready child %p", (void *)sk);
 					else
-						STRLOGDA(ss, "data ready sock  %p", (void *)sk);
+						LOGDA(ss, "data ready sock  %p", (void *)sk);
 				} else
 					assure(ss->rq);
 			}
@@ -15240,31 +15253,31 @@ t_conn_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
       baddata:
 	err = TBADDATA;
-	STRLOGNO(ss, "ERROR: bad connection data");
+	LOGNO(ss, "ERROR: bad connection data");
 	goto error;
       badopt:
 	err = TBADOPT;
-	STRLOGNO(ss, "ERROR: bad options");
+	LOGNO(ss, "ERROR: bad options");
 	goto error;
       acces:
 	err = TACCES;
-	STRLOGNO(ss, "ERROR: no permission for address or option");
+	LOGNO(ss, "ERROR: no permission for address or option");
 	goto error;
       badaddr:
 	err = TBADADDR;
-	STRLOGNO(ss, "ERROR: address is unusable");
+	LOGNO(ss, "ERROR: address is unusable");
 	goto error;
       einval:
 	err = -EINVAL;
-	STRLOGNO(ss, "ERROR: invalid message format");
+	LOGNO(ss, "ERROR: invalid message format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(ss, q, mp, T_CONN_REQ, err);
@@ -15394,47 +15407,47 @@ t_conn_res(ss_t *ss, queue_t *q, mblk_t *mp)
 	return (err);
       baddata:
 	err = TBADDATA;
-	STRLOGNO(ss, "ERROR: bad connection data");
+	LOGNO(ss, "ERROR: bad connection data");
 	goto unlock_error;
       badopt:
 	err = TBADOPT;
-	STRLOGNO(ss, "ERROR: bad options");
+	LOGNO(ss, "ERROR: bad options");
 	goto unlock_error;
       acces:
 	err = TACCES;
-	STRLOGNO(ss, "ERROR: no access to accepting queue");
+	LOGNO(ss, "ERROR: no access to accepting queue");
 	goto unlock_error;
       resqlen:
 	err = TRESQLEN;
-	STRLOGNO(ss, "ERROR: accepting queue is listening");
+	LOGNO(ss, "ERROR: accepting queue is listening");
 	goto unlock_error;
       provmismatch:
 	err = TPROVMISMATCH;
-	STRLOGNO(ss, "ERROR: not same transport provider");
+	LOGNO(ss, "ERROR: not same transport provider");
 	goto unlock_error;
       badf:
 	err = TBADF;
-	STRLOGNO(ss, "ERROR: accepting queue id is invalid");
+	LOGNO(ss, "ERROR: accepting queue id is invalid");
 	goto unlock_error;
       edeadlk:
 	err = -EDEADLK;
-	STRLOGNO(ss, "ERROR: cannot lock accepting stream");
+	LOGNO(ss, "ERROR: cannot lock accepting stream");
 	goto error;
       badseq:
 	err = TBADSEQ;
-	STRLOGNO(ss, "ERROR: sequence number is invalid");
+	LOGNO(ss, "ERROR: sequence number is invalid");
 	goto error;
       inval:
 	err = -EINVAL;
-	STRLOGNO(ss, "ERROR: invalid primitive format");
+	LOGNO(ss, "ERROR: invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       unlock_error:
 	if (as && as != ss) {
@@ -15497,23 +15510,23 @@ t_discon_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
       badseq:
 	err = TBADSEQ;
-	STRLOGNO(ss, "ERROR: sequence number is invalid");
+	LOGNO(ss, "ERROR: sequence number is invalid");
 	goto error;
       baddata:
 	err = TBADDATA;
-	STRLOGNO(ss, "ERROR: bad disconnection data");
+	LOGNO(ss, "ERROR: bad disconnection data");
 	goto error;
       einval:
 	err = -EINVAL;
-	STRLOGNO(ss, "ERROR: invalid primitive format");
+	LOGNO(ss, "ERROR: invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       notsupport:
 	err = TNOTSUPPORT;
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
 	return t_error_ack(ss, q, mp, T_DISCON_REQ, err);
@@ -15548,17 +15561,17 @@ t_write(ss_t *ss, queue_t *q, mblk_t *mp)
 	return ss_sock_sendmsg(ss, mp, &msg);
 
       emsgsize:
-	STRLOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
+	LOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
 	goto error;
       outstate:
-	STRLOGNO(ss, "ERROR: would place i/f out of staten");
+	LOGNO(ss, "ERROR: would place i/f out of staten");
 	goto error;
       discard:
 	freemsg(mp);
-	STRLOGNO(ss, "ERROR: ignore in idle state");
+	LOGNO(ss, "ERROR: ignore in idle state");
 	return (0);
       notsupport:
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
 	return m_error(ss, q, mp, -EPROTO);
@@ -15598,23 +15611,23 @@ t_data_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	return ss_sock_sendmsg(ss, mp, &msg);
 
       emsgsize:
-	STRLOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
+	LOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
 	goto error;
       baddata:
-	STRLOGNO(ss, "ERROR: zero length data");
+	LOGNO(ss, "ERROR: zero length data");
 	goto error;
       outstate:
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       einval:
-	STRLOGNO(ss, "ERROR: invalid primitive format");
+	LOGNO(ss, "ERROR: invalid primitive format");
 	goto error;
       discard:
-	STRLOGNO(ss, "ERROR: ignore in idle state");
+	LOGNO(ss, "ERROR: ignore in idle state");
 	freemsg(mp);
 	return (0);
       notsupport:
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
 	return m_error(ss, q, mp, -EPROTO);
@@ -15654,23 +15667,23 @@ t_exdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	return ss_sock_sendmsg(ss, mp, &msg);
 
       emsgsize:
-	STRLOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
+	LOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
 	goto error;
       baddata:
-	STRLOGNO(ss, "ERROR: zero length data");
+	LOGNO(ss, "ERROR: zero length data");
 	goto error;
       outstate:
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       einval:
-	STRLOGNO(ss, "ERROR: invalid primitive format");
+	LOGNO(ss, "ERROR: invalid primitive format");
 	goto error;
       discard:
-	STRLOGNO(ss, "ERROR: ignore in idle state");
+	LOGNO(ss, "ERROR: ignore in idle state");
 	freemsg(mp);
 	return (0);
       notsupport:
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
 	return m_error(ss, q, mp, -EPROTO);
@@ -15708,7 +15721,7 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		goto notsupport;
 #endif
 	if (p->ADDR_length && (mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)) {
-		STRLOGNO(ss, "ADDR_offset(%u) or ADDR_length(%u) are incorrect", p->ADDR_offset,
+		LOGNO(ss, "ADDR_offset(%u) or ADDR_length(%u) are incorrect", p->ADDR_offset,
 			 p->ADDR_length);
 		goto badaddr;
 	}
@@ -15725,27 +15738,27 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 			add->sa_family = AF_INET;
 		} else {
 			if (add_len < sizeof(struct sockaddr_in)) {
-				STRLOGNO(ss, "add_len(%d) < sizeof(struct sockaddr_in)(%lu)",
+				LOGNO(ss, "add_len(%d) < sizeof(struct sockaddr_in)(%lu)",
 					 add_len, (ulong) sizeof(struct sockaddr_in));
 				goto badaddr;
 			}
 			if (ss->p.prot.protocol != T_INET_SCTP) {
 				if (add_len > sizeof(struct sockaddr_in)) {
-					STRLOGNO(ss,
+					LOGNO(ss,
 						 "add_len(%d) > sizeof(struct sockaddr_in)(%lu)",
 						 add_len, (ulong) sizeof(struct sockaddr_in));
 					goto badaddr;
 				}
 			} else {
 				if ((add_len % sizeof(struct sockaddr_in)) != 0) {
-					STRLOGNO(ss,
+					LOGNO(ss,
 						 "add_len(%d) %% sizeof(struct sockaddr_in)(%lu)",
 						 add_len, (ulong) sizeof(struct sockaddr_in));
 					goto badaddr;
 				}
 			}
 			if (add->sa_family != AF_INET && add->sa_family != 0) {
-				STRLOGNO(ss, "sa_family incorrect (%u)", add->sa_family);
+				LOGNO(ss, "sa_family incorrect (%u)", add->sa_family);
 				goto badaddr;
 			}
 			add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
@@ -15769,12 +15782,12 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 			add->sa_family = AF_UNIX;
 		} else {
 			if (add_len < sizeof(struct sockaddr_un)) {
-				STRLOGNO(ss, "add_len(%d) < sizeof(struct sockaddr_un)(%lu)",
+				LOGNO(ss, "add_len(%d) < sizeof(struct sockaddr_un)(%lu)",
 					 add_len, (ulong) sizeof(struct sockaddr_un));
 				goto badaddr;
 			}
 			if (add->sa_family != AF_UNIX && add->sa_family != 0) {
-				STRLOGNO(ss, "sa_family incorrect (%u)", add->sa_family);
+				LOGNO(ss, "sa_family incorrect (%u)", add->sa_family);
 				goto badaddr;
 			}
 			add = (typeof(add)) (mp->b_rptr + p->ADDR_offset);
@@ -15784,7 +15797,7 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		break;
 	}
 	default:
-		STRLOGNO(ss, "protocol family incorrect %u", ss->p.prot.family);
+		LOGNO(ss, "protocol family incorrect %u", ss->p.prot.family);
 		goto badaddr;
 	}
 	if (unlikely((err = ss_bind(ss, add, add_len))))
@@ -15798,28 +15811,28 @@ t_bind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
       acces:
 	err = TACCES;
-	STRLOGNO(ss, "ERROR: no permission for address");
+	LOGNO(ss, "ERROR: no permission for address");
 	goto error;
       noaddr:
 	err = TNOADDR;
-	STRLOGNO(ss, "ERROR: address could not be assigned");
+	LOGNO(ss, "ERROR: address could not be assigned");
 	goto error;
       badaddr:
 	err = TBADADDR;
-	STRLOGNO(ss, "ERROR: address is invalid");
+	LOGNO(ss, "ERROR: address is invalid");
 	goto error;
       einval:
 	err = -EINVAL;
-	STRLOGNO(ss, "ERROR: invalid primitive format");
+	LOGNO(ss, "ERROR: invalid primitive format");
 	goto error;
       outstate:
 	err = TOUTSTATE;
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
 #if 0
       notsupport:
 	err = TNOTSUPPORT;
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
 #endif
       error_close:
@@ -15846,7 +15859,7 @@ t_unbind_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	return t_ok_ack(ss, q, mp, T_UNBIND_REQ, NULL, NULL);
 
       outstate:
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	return t_error_ack(ss, q, mp, T_UNBIND_REQ, TOUTSTATE);
 }
 
@@ -15910,25 +15923,25 @@ t_unitdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
 	/* FIXME: we can send uderr for some of these instead of erroring out the entire stream. */
       badopt:
-	STRLOGNO(ss, "ERROR: bad options");
+	LOGNO(ss, "ERROR: bad options");
 	goto error;
       acces:
-	STRLOGNO(ss, "ERROR: no permission to address or options");
+	LOGNO(ss, "ERROR: no permission to address or options");
 	goto error;
       badadd:
-	STRLOGNO(ss, "ERROR: bad destination address");
+	LOGNO(ss, "ERROR: bad destination address");
 	goto error;
       einval:
-	STRLOGNO(ss, "ERROR: invalid primitive");
+	LOGNO(ss, "ERROR: invalid primitive");
 	goto error;
       outstate:
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       baddata:
-	STRLOGNO(ss, "ERROR: bad data size");
+	LOGNO(ss, "ERROR: bad data size");
 	goto error;
       notsupport:
-	STRLOGNO(ss, "ERROR: primitive not supported for T_COTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_COTS");
 	goto error;
       error:
 	return m_error(ss, q, mp, -EPROTO);
@@ -16021,23 +16034,23 @@ t_optmgmt_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
       provspec:
 	err = err;
-	STRLOGNO(ss, "ERROR: provider specific");
+	LOGNO(ss, "ERROR: provider specific");
 	goto error;
       badflag:
 	err = TBADFLAG;
-	STRLOGNO(ss, "ERROR: bad options flags");
+	LOGNO(ss, "ERROR: bad options flags");
 	goto error;
       acces:
 	err = TACCES;
-	STRLOGNO(ss, "ERROR: no permission for option");
+	LOGNO(ss, "ERROR: no permission for option");
 	goto error;
       badopt:
 	err = TBADOPT;
-	STRLOGNO(ss, "ERROR: bad options");
+	LOGNO(ss, "ERROR: bad options");
 	goto error;
       einval:
 	err = -EINVAL;
-	STRLOGNO(ss, "ERROR: invalid primitive format");
+	LOGNO(ss, "ERROR: invalid primitive format");
 	goto error;
       error:
 	return t_error_ack(ss, q, mp, T_OPTMGMT_REQ, err);
@@ -16078,13 +16091,13 @@ t_ordrel_req(ss_t *ss, queue_t *q, mblk_t *mp)
 	return (0);
 
       baddata:
-	STRLOGNO(ss, "ERROR: bad orderly release data");
+	LOGNO(ss, "ERROR: bad orderly release data");
 	goto error;
       outstate:
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       notsupport:
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS or T_COTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS or T_COTS");
 	goto error;
       error:
 	ss_set_state(ss, ss->oldstate);
@@ -16154,29 +16167,29 @@ t_optdata_req(ss_t *ss, queue_t *q, mblk_t *mp)
 		goto badopt;
 	}
       badopt:
-	STRLOGNO(ss, "ERROR: bad options");
+	LOGNO(ss, "ERROR: bad options");
 	goto error;
       acces:
-	STRLOGNO(ss, "ERROR: no permission to options");
+	LOGNO(ss, "ERROR: no permission to options");
 	goto error;
       emsgsize:
-	STRLOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
+	LOGNO(ss, "ERROR: message too large %ld > %ld", mlen, mmax);
 	goto error;
       baddata:
-	STRLOGNO(ss, "ERROR: zero length data");
+	LOGNO(ss, "ERROR: zero length data");
 	goto error;
       outstate:
-	STRLOGNO(ss, "ERROR: would place i/f out of state");
+	LOGNO(ss, "ERROR: would place i/f out of state");
 	goto error;
       einval:
-	STRLOGNO(ss, "ERROR: invalid primitive format");
+	LOGNO(ss, "ERROR: invalid primitive format");
 	goto error;
       discard:
-	STRLOGNO(ss, "ERROR: ignore in idle state");
+	LOGNO(ss, "ERROR: ignore in idle state");
 	freemsg(mp);
 	return (0);
       notsupport:
-	STRLOGNO(ss, "ERROR: primitive not supported for T_CLTS");
+	LOGNO(ss, "ERROR: primitive not supported for T_CLTS");
 	goto error;
       error:
 	return m_error(ss, q, mp, -EPROTO);
@@ -16239,7 +16252,7 @@ t_capability_req(ss_t *ss, queue_t *q, mblk_t *mp)
 
       einval:
 	err = -EINVAL;
-	STRLOGNO(ss, "ERROR: invalid message format");
+	LOGNO(ss, "ERROR: invalid message format");
 	goto error;
       error:
 	return t_error_ack(ss, q, mp, T_CAPABILITY_REQ, err);
@@ -16320,10 +16333,10 @@ __ss_w_proto_slow(ss_t *ss, queue_t *q, mblk_t *mp, t_scalar_t prim)
 	case T_EXDATA_REQ:
 	case T_UNITDATA_REQ:
 	case T_OPTDATA_REQ:
-		STRLOGDA(ss, "-> %s", tpi_primname(prim));
+		LOGDA(ss, "-> %s", tpi_primname(prim));
 		break;
 	default:
-		STRLOGRX(ss, "-> %s", tpi_primname(prim));
+		LOGRX(ss, "-> %s", tpi_primname(prim));
 		break;
 	}
 	switch (prim) {
@@ -16391,7 +16404,7 @@ __ss_w_proto_slow(ss_t *ss, queue_t *q, mblk_t *mp, t_scalar_t prim)
 #ifdef T_CAPABILITY_ACK
 	case T_CAPABILITY_ACK:
 #endif
-		STRLOGRX(ss, "%s() replying with error %d", __FUNCTION__, -EPROTO);
+		LOGRX(ss, "%s() replying with error %d", __FUNCTION__, -EPROTO);
 		rtn = m_error(ss, q, mp, -EPROTO);
 		break;
 	default:
@@ -16455,7 +16468,7 @@ __ss_w_proto(ss_t *ss, queue_t *q, mblk_t *mp)
 			ss_set_state(ss, ss->oldstate);
 		return ss_w_proto_return(mp, rtn);
 	}
-	STRLOGRX(ss, "%s() replying with error %d", __FUNCTION__, -EPROTO);
+	LOGRX(ss, "%s() replying with error %d", __FUNCTION__, -EPROTO);
 	return m_error(ss, q, mp, -EPROTO);
 }
 
@@ -16609,7 +16622,7 @@ ss_w_other(queue_t *q, mblk_t *mp)
 	case M_IOCDATA:
 		return ss_w_ioctl(q, mp);
 	}
-	STRLOGERR(PRIV(q), "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
+	LOGERR(PRIV(q), "SWERR: %s %s:%d", __FUNCTION__, __FILE__, __LINE__);
 	freemsg(mp);
 	return (0);
 }
@@ -16782,7 +16795,7 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 {
 	int tcp_oldstate, tcp_newstate, tpi_oldstate, err;
 
-//      STRLOGRX(ss, "%s", __FUNCTION__);
+//      LOGRX(ss, "%s", __FUNCTION__);
 	tcp_newstate = sk->sk_state;
 	tcp_oldstate = XCHG(&ss->tcp_state, tcp_newstate);
 	tpi_oldstate = ss_get_state(ss);
@@ -16792,7 +16805,7 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		return;
 #endif
 
-	STRLOGST(ss, "%s [%s <- %s] (%s) %p", __FUNCTION__, tcp_statename(tcp_newstate),
+	LOGST(ss, "%s [%s <- %s] (%s) %p", __FUNCTION__, tcp_statename(tcp_newstate),
 		 tcp_statename(tcp_oldstate), tpi_statename(tpi_oldstate), sk);
 
 	switch (__builtin_expect(type, SOCK_STREAM)) {
@@ -16924,7 +16937,7 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 			break;
 		}
 		if (tcp_oldstate != tcp_newstate)
-			STRLOGERR(ss, "SWERR: socket state %s -> %s in TPI state %s: %s %s:%d",
+			LOGERR(ss, "SWERR: socket state %s -> %s in TPI state %s: %s %s:%d",
 				  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
 				  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
 		break;
@@ -16932,12 +16945,12 @@ __ss_r_state_change(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	case SOCK_RAW:
 	case SOCK_RDM:
 		/* connectionless sockets are stateless */
-		STRLOGERR(ss, "SWERR: socket state %s -> %s in TPI state %s: %s %s:%d",
+		LOGERR(ss, "SWERR: socket state %s -> %s in TPI state %s: %s %s:%d",
 			  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
 			  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
 		break;
 	default:
-		STRLOGERR(ss, "SWERR: unsupported socket type %d: %s %s:%d",
+		LOGERR(ss, "SWERR: unsupported socket type %d: %s %s:%d",
 			  ss->p.prot.type, __FUNCTION__, __FILE__, __LINE__);
 		break;
 	}
@@ -16978,7 +16991,7 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	int tcp_oldstate = ss->tcp_state;
 	int tcp_newstate = sk->sk_state;
 
-	STRLOGRX(ss, "%s", __FUNCTION__);
+	LOGRX(ss, "%s", __FUNCTION__);
 	if (unlikely(sk->sk_err == 0))
 		/* error report was already absorbed */
 		return;
@@ -17017,7 +17030,7 @@ __ss_r_error_report(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		}
 		break;
 	}
-	STRLOGERR(ss, "SWERR: socket type %d state %s -> %s in TPI state %s: %s %s:%d", type,
+	LOGERR(ss, "SWERR: socket type %d state %s -> %s in TPI state %s: %s %s:%d", type,
 		  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
 		  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
 	return;
@@ -17043,7 +17056,7 @@ __ss_r_data_ready(ss_t *ss, queue_t *q, struct sock *sk, int type)
 	int tcp_oldstate = ss->tcp_state;
 	int tcp_newstate = sk->sk_state;
 
-	STRLOGRX(ss, "%s", __FUNCTION__);
+	LOGRX(ss, "%s", __FUNCTION__);
 	switch (__builtin_expect(type, SOCK_STREAM)) {
 	case SOCK_STREAM:	/* TCP */
 	case SOCK_SEQPACKET:	/* SCTP */
@@ -17080,7 +17093,7 @@ __ss_r_data_ready(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		}
 		break;
 	}
-	STRLOGERR(ss, "SWERR: socket %d state %s -> %s in TPI state %s: %s %s:%d", type,
+	LOGERR(ss, "SWERR: socket %d state %s -> %s in TPI state %s: %s %s:%d", type,
 		  tcp_statename(tcp_oldstate), tcp_statename(tcp_newstate),
 		  tpi_statename(tpi_oldstate), __FUNCTION__, __FILE__, __LINE__);
 	return;
@@ -17143,7 +17156,7 @@ ss_r_recvmsg(ss_t *ss, queue_t *q)
 		ss_all_unitdata_ind(ss, q, sk, type);
 		break;
 	default:
-		STRLOGERR(ss, "SWERR: unknown socket type %d: %s %s:%d", type, __FUNCTION__,
+		LOGERR(ss, "SWERR: unknown socket type %d: %s %s:%d", type, __FUNCTION__,
 			  __FILE__, __LINE__);
 		break;
 	}
@@ -17168,7 +17181,7 @@ ss_r_recvmsg(ss_t *ss, queue_t *q)
 static streamscall __unlikely int
 ss_rput(queue_t *q, mblk_t *mp)
 {
-	STRLOGERR(PRIV(q), "SWERR: Read put routine called!");
+	LOGERR(PRIV(q), "SWERR: Read put routine called!");
 	freemsg(mp);
 	return (0);
 }
@@ -17248,7 +17261,7 @@ ss_wsrv(queue_t *q)
 					mp->b_band = 0;	/* must succeed */
 					putbq(q, mp);
 				}
-				STRLOGTX(ss, "write queue stalled");
+				LOGTX(ss, "write queue stalled");
 				break;
 			}
 		}

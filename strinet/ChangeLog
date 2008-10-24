@@ -1,5 +1,16 @@
 2008-10-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/man8/test-inet_raw.8.man: updated test suites
+	* doc/man/man8/test-inet_sctp.8.man: updated test suites
+	* doc/man/man8/test-inet_tcp.8.man: updated test suites
+	* doc/man/man8/test-inet_udp.8.man: updated test suites
+	* src/drivers/inet.c: updated test suites
+	* src/test/test-inet_raw.c: updated test suites
+	* src/test/test-inet_sctp.c: updated test suites
+	* src/test/test-inet_tcp.c: updated test suites
+	* src/test/test-inet_udp.c: updated test suites
+	* tests/testsuite-inet_sctp.at: updated test suites
+
 	* doc/man/man3/xti_tcp.3.man: correction
 	* doc/man/man4/rawip.4.man: updated strinet driver docs
 	* doc/man/man4/tcp.4.man: updated strinet driver docs
