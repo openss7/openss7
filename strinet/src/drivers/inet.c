@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-23 09:40:12 $ by $Author: brian $
+ Last Modified $Date: 2008-10-24 08:52:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.117  2008-10-24 08:52:39  brian
+ - upgrade strinet test cases and documentation
+
  Revision 0.9.2.116  2008-10-23 09:40:12  brian
  - corrections from testing
 
@@ -134,10 +137,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -655,7 +658,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-23 09:40:12 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008-10-24 08:52:39 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -14648,6 +14651,7 @@ ss_unitdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 
 	msg = ss_setup_message(dp, size, type);
 
+	/* Make this < 0 if it seems possible that zero-length data can be delivered. */
 	if (unlikely((err = ss_recvmsg(ss, msg, size)) <= 0)) {
 		switch (__builtin_expect(-err, EAGAIN)) {
 		case EAGAIN:
@@ -14669,6 +14673,7 @@ ss_unitdata_ind(ss_t *ss, queue_t *q, struct sock *sk, int type)
 		goto error;
 	}
 
+	/* leave zero length data blocks for now */
 	dp->b_wptr = dp->b_rptr + err;
 
 	if (unlikely(msg->msg_flags & MSG_TRUNC))
@@ -17268,6 +17273,8 @@ unsigned short modid = DRV_ID;
 major_t major = CMAJOR_0;
 
 static const ss_profile_t ss_profiles[] = {
+	/* For all SOCK_RAW protocols, we seem able to send zero-length messages, but are unable to
+	   receive them. */
 	{{PF_INET, SOCK_RAW, IPPROTO_ICMP},
 	 {T_INFO_ACK, 65515, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
@@ -17298,6 +17305,8 @@ static const ss_profile_t ss_profiles[] = {
 	  sizeof(struct sockaddr_in),
 	  T_INFINITE, 65515, T_CLTS, TS_UNBND, XPG4_1 | T_SNDZERO}}
 	,
+	/* T_SNDZERO is specified in UNIX '98 XNS 5.2 for UDP.  We seem to be able to send zero
+	   length UDP datagrams but cannot receive them. */
 	{{PF_INET, SOCK_DGRAM, IPPROTO_UDP},
 	 {T_INFO_ACK, 65507, T_INVALID, T_INVALID, T_INVALID,
 	  sizeof(struct sockaddr_in),
@@ -17335,7 +17344,6 @@ static const ss_profile_t ss_profiles[] = {
 	  T_INFINITE, 65535, T_COTS_ORD, TS_UNBND, XPG4_1 & ~T_SNDZERO}}
 #endif				/* defined HAVE_OPENSS7_SCTP */
 };
-
 /**
  * ss_alloc_qbands: - pre-allocate queue bands for queue pair
  * @q: queue for which to allocate queue bands

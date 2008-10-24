@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-23 09:46:36 $ by $Author: brian $
+ Last Modified $Date: 2008-10-24 08:52:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.63  2008-10-24 08:52:40  brian
+ - upgrade strinet test cases and documentation
+
  Revision 0.9.2.62  2008-10-23 09:46:36  brian
  - rationalize to np_ip driver
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -159,28 +162,28 @@ static char const ident[] =
 
 #define T_ALLLEVELS -1
 
-#define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define RAW_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-23 09:46:36 $"
-#define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
-#define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define RAW_LICENSE	"GPL"
-#define RAW_BANNER	RAW_DESCRIP	"\n" \
-			RAW_EXTRA	"\n" \
-			RAW_REVISION	"\n" \
-			RAW_COPYRIGHT	"\n" \
-			RAW_DEVICE	"\n" \
-			RAW_CONTACT
-#define RAW_SPLASH	RAW_DESCRIP	" - " \
-			RAW_REVISION
+#define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
+#define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
+#define TP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
+#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $"
+#define TP_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
+#define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
+#define TP_LICENSE	"GPL"
+#define TP_BANNER	TP_DESCRIP	"\n" \
+			TP_EXTRA	"\n" \
+			TP_REVISION	"\n" \
+			TP_COPYRIGHT	"\n" \
+			TP_DEVICE	"\n" \
+			TP_CONTACT
+#define TP_SPLASH	TP_DESCRIP	" - " \
+			TP_REVISION
 
 #ifdef LINUX
-MODULE_AUTHOR(RAW_CONTACT);
-MODULE_DESCRIPTION(RAW_DESCRIP);
-MODULE_SUPPORTED_DEVICE(RAW_DEVICE);
+MODULE_AUTHOR(TP_CONTACT);
+MODULE_DESCRIPTION(TP_DESCRIP);
+MODULE_SUPPORTED_DEVICE(TP_DEVICE);
 #ifdef MODULE_LICENSE
-MODULE_LICENSE(RAW_LICENSE);
+MODULE_LICENSE(TP_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("streams-rawip");
@@ -192,11 +195,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif				/* LINUX */
 
 #ifdef LFS
-#define RAW_DRV_ID	CONFIG_STREAMS_RAW_MODID
-#define RAW_DRV_NAME	CONFIG_STREAMS_RAW_NAME
-#define RAW_CMAJORS	CONFIG_STREAMS_RAW_NMAJORS
-#define RAW_CMAJOR_0	CONFIG_STREAMS_RAW_MAJOR
-#define RAW_UNITS	CONFIG_STREAMS_RAW_NMINORS
+#define TP_DRV_ID	CONFIG_STREAMS_RAW_MODID
+#define TP_DRV_NAME	CONFIG_STREAMS_RAW_NAME
+#define TP_CMAJORS	CONFIG_STREAMS_RAW_NMAJORS
+#define TP_CMAJOR_0	CONFIG_STREAMS_RAW_MAJOR
+#define TP_UNITS	CONFIG_STREAMS_RAW_NMINORS
 #endif				/* LFS */
 
 #ifdef LINUX
@@ -209,9 +212,9 @@ MODULE_ALIAS("/dev/streams/rawip");
 MODULE_ALIAS("/dev/streams/rawip/*");
 MODULE_ALIAS("/dev/streams/clone/rawip");
 #endif				/* LFS */
-MODULE_ALIAS("char-major-" __stringify(RAW_CMAJOR_0));
-MODULE_ALIAS("char-major-" __stringify(RAW_CMAJOR_0) "-*");
-MODULE_ALIAS("char-major-" __stringify(RAW_CMAJOR_0) "-0");
+MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0));
+MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-*");
+MODULE_ALIAS("char-major-" __stringify(TP_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/rawip2");
 #endif				/* MODULE_ALIAS */
 #endif				/* LINUX */
@@ -224,18 +227,18 @@ MODULE_ALIAS("/dev/rawip2");
  *  ==========================================================================
  */
 
-#define DRV_ID		RAW_DRV_ID
-#define DRV_NAME	RAW_DRV_NAME
-#define CMAJORS		RAW_CMAJORS
-#define CMAJOR_0	RAW_CMAJOR_0
-#define UNITS		RAW_UNITS
+#define DRV_ID		TP_DRV_ID
+#define DRV_NAME	TP_DRV_NAME
+#define CMAJORS		TP_CMAJORS
+#define CMAJOR_0	TP_CMAJOR_0
+#define UNITS		TP_UNITS
 #ifdef MODULE
-#define DRV_BANNER	RAW_BANNER
+#define DRV_BANNER	TP_BANNER
 #else				/* MODULE */
-#define DRV_BANNER	RAW_SPLASH
+#define DRV_BANNER	TP_SPLASH
 #endif				/* MODULE */
 
-STATIC struct module_info raw_rinfo = {
+STATIC struct module_info tp_rinfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
@@ -244,27 +247,27 @@ STATIC struct module_info raw_rinfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC struct module_stat raw_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat raw_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat np_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat np_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a T provider following the TPI. */
 
-STATIC streamscall int raw_qopen(queue_t *, dev_t *, int, int, cred_t *);
-STATIC streamscall int raw_qclose(queue_t *, int, cred_t *);
+STATIC streamscall int tp_qopen(queue_t *, dev_t *, int, int, cred_t *);
+STATIC streamscall int tp_qclose(queue_t *, int, cred_t *);
 
 streamscall int tp_rput(queue_t *, mblk_t *);
 streamscall int tp_rsrv(queue_t *);
 
-STATIC struct qinit raw_rinit = {
+STATIC struct qinit tp_rinit = {
 	.qi_putp = tp_rput,		/* Read put procedure (message from below) */
 	.qi_srvp = tp_rsrv,		/* Read service procedure */
-	.qi_qopen = raw_qopen,		/* Each open */
-	.qi_qclose = raw_qclose,	/* Last close */
-	.qi_minfo = &raw_rinfo,		/* Module information */
-	.qi_mstat = &raw_rstat,		/* Module statistics */
+	.qi_qopen = tp_qopen,		/* Each open */
+	.qi_qclose = tp_qclose,	/* Last close */
+	.qi_minfo = &tp_rinfo,		/* Module information */
+	.qi_mstat = &np_rstat,		/* Module statistics */
 };
 
-STATIC struct module_info raw_winfo = {
+STATIC struct module_info tp_winfo = {
 	.mi_idnum = DRV_ID,		/* Module ID number */
 	.mi_idname = DRV_NAME,		/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
@@ -276,16 +279,16 @@ STATIC struct module_info raw_winfo = {
 streamscall int tp_wput(queue_t *, mblk_t *);
 streamscall int tp_wsrv(queue_t *);
 
-STATIC struct qinit raw_winit = {
+STATIC struct qinit tp_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
-	.qi_minfo = &raw_winfo,		/* Module information */
-	.qi_mstat = &raw_wstat,		/* Module statistics */
+	.qi_minfo = &tp_winfo,		/* Module information */
+	.qi_mstat = &np_wstat,		/* Module statistics */
 };
 
-MODULE_STATIC struct streamtab raw_info = {
-	.st_rdinit = &raw_rinit,	/* Upper read queue */
-	.st_wrinit = &raw_winit,	/* Upper write queue */
+MODULE_STATIC struct streamtab tp_rawinfo = {
+	.st_rdinit = &tp_rinit,	/* Upper read queue */
+	.st_wrinit = &tp_winit,	/* Upper write queue */
 };
 
 #if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
@@ -568,8 +571,8 @@ struct tp_prot_bucket {
 STATIC rwlock_t tp_prot_lock = RW_LOCK_UNLOCKED;
 STATIC struct tp_prot_bucket *tp_prots[256];
 
-STATIC kmem_cachep_t raw_prot_cachep;
-STATIC kmem_cachep_t raw_priv_cachep;
+STATIC kmem_cachep_t tp_raw_prot_cachep;
+STATIC kmem_cachep_t tp_raw_priv_cachep;
 
 static INLINE struct tp *
 tp_get(struct tp *tp)
@@ -583,7 +586,7 @@ tp_put(struct tp *tp)
 {
 	dassert(tp != NULL);
 	if (atomic_dec_and_test(&tp->refcnt)) {
-		kmem_cache_free(raw_priv_cachep, tp);
+		kmem_cache_free(tp_raw_priv_cachep, tp);
 	}
 }
 static INLINE fastcall __hot void
@@ -600,7 +603,7 @@ tp_alloc(void)
 {
 	struct tp *tp;
 
-	if ((tp = kmem_cache_alloc(raw_priv_cachep, GFP_ATOMIC))) {
+	if ((tp = kmem_cache_alloc(tp_raw_priv_cachep, GFP_ATOMIC))) {
 		bzero(tp, sizeof(*tp));
 		atomic_set(&tp->refcnt, 1);
 		spin_lock_init(&tp->lock);	/* "tp-lock" */
@@ -609,7 +612,7 @@ tp_alloc(void)
 		// tp->type = 0;
 		// tp->id = 0;
 		// tp->state = 0;
-		// tp->flags = 0;
+		tp->flags = 0;
 	}
 	return (tp);
 }
@@ -3507,7 +3510,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 			swerr();
 			break;
 		}
-	} else if ((pb = kmem_cache_alloc(raw_prot_cachep, GFP_ATOMIC))) {
+	} else if ((pb = kmem_cache_alloc(tp_raw_prot_cachep, GFP_ATOMIC))) {
 		bzero(pb, sizeof(*pb));
 		pb->refs = 1;
 		switch (type) {
@@ -3550,7 +3553,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					__ptrace(("Cannot override copy entry\n"));
 					net_protocol_unlock();
 					write_unlock_bh(&tp_prot_lock);
-					kmem_cache_free(raw_prot_cachep, pb);
+					kmem_cache_free(tp_raw_prot_cachep, pb);
 					return (NULL);
 				}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
@@ -3561,7 +3564,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 						__ptrace(("Cannot acquire module\n"));
 						net_protocol_unlock();
 						write_unlock_bh(&tp_prot_lock);
-						kmem_cache_free(raw_prot_cachep, pb);
+						kmem_cache_free(tp_raw_prot_cachep, pb);
 						return (NULL);
 					}
 				}
@@ -3639,7 +3642,7 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 			/* unlink from hash slot */
 			tp_prots[proto] = NULL;
 
-			kmem_cache_free(raw_prot_cachep, pb);
+			kmem_cache_free(tp_raw_prot_cachep, pb);
 		}
 	}
 	write_unlock_bh(&tp_prot_lock);
@@ -3928,8 +3931,8 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0
 		/* keep track of high water mark */
-		if (raw_wstat.ms_acnt < tp->sndmem)
-			raw_wstat.ms_acnt = tp->sndmem;
+		if (np_wstat.ms_acnt < tp->sndmem)
+			np_wstat.ms_acnt = tp->sndmem;
 #endif
 #endif
 	}
@@ -4209,7 +4212,8 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
  * @mp: message payload
  */
 STATIC INLINE fastcall __hot_out int
-tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt, mblk_t *mp)
+tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt,
+	    mblk_t *mp)
 {
 	struct rtable *rt;
 	int err;
@@ -4290,7 +4294,7 @@ tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt, mblk_t *mp)
 	_rare();
 	return (err);
       blocked:
-	raw_wstat.ms_ccnt++;
+	np_wstat.ms_ccnt++;
 	tp->sndblk = 1;
       ebusy:
 	return (-EBUSY);
@@ -5573,7 +5577,7 @@ ne_reset_con(queue_t *q, mblk_t *msg, np_ulong RESET_orig, np_ulong RESET_reason
 	int err;
 	pl_t pl;
 
-	if (unlikely((mp = np_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely((err = np_reset_loc(np, RESET_orig, RESET_reason, dp)) != 0))
 		goto free_error;
@@ -6287,6 +6291,7 @@ ne_reset_ind(queue_t *q, mblk_t *dp)
 	bufq_queue(&np->resq, dp);
 	_printd(("%s: <- N_RESET_IND\n", DRV_NAME));
 	putnext(q, mp);
+	return (QR_ABSORBED);
       discard:
 	freemsg(dp);
 	return (QR_ABSORBED);
@@ -6645,7 +6650,11 @@ te_unitdata_req_slow(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely(dp == NULL))
 		goto error;
-	if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
+	if (unlikely((dlen = msgsize(dp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
+		goto error;
+	if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+		goto error;
+	if (unlikely(dlen > tp->info.TSDU_size || tp->info.TSDU_size == T_INVALID))
 		goto error;
 	err = TBADOPT;
 	if (unlikely(p->OPT_length > tp->info.OPT_size))
@@ -6681,6 +6690,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct tp *tp = TP_PRIV(q);
 	struct T_unitdata_req *p;
+	size_t dlen;
 	mblk_t *dp;
 	int err;
 	struct sockaddr_in dst_buf;
@@ -6720,13 +6730,14 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 	prefetch(dp);
 	if (unlikely(p->OPT_length != 0))
 		goto go_slow;
-	{
-		size_t dlen;
-
-		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.TSDU_size))
-			goto go_slow;
-	}
+	if (unlikely((dlen = msgsize(dp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
+		goto go_slow;
+	if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+		goto go_slow;
+	if (unlikely(dlen > tp->info.TSDU_size || tp->info.TSDU_size == T_INVALID))
+		goto go_slow;
 	tp->options.ip.daddr = dst_buf.sin_addr.s_addr;
+
 	if (unlikely((err = tp_senddata(tp, mp, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
 	return (QR_ABSORBED);
@@ -6850,7 +6861,11 @@ te_conn_req(queue_t *q, mblk_t *mp)
 	}
 	if (dp != NULL) {
 		err = TBADDATA;
-		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.CDATA_size))
+		if (unlikely((dlen = msgsize(dp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
+			goto error;
+		if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+			goto error;
+		if (unlikely(dlen > tp->info.CDATA_size || tp->info.CDATA_size == T_INVALID))
 			goto error;
 	}
 	/* Ok, all checking done.  Now we need to connect the new address. */
@@ -6953,9 +6968,14 @@ te_conn_res(queue_t *q, mblk_t *mp)
 			goto error;
 	}
 	err = TBADDATA;
-	if ((dp = mp->b_cont))
-		if (unlikely((dlen = msgsize(dp)) == 0 || dlen > tp->info.CDATA_size))
+	if ((dp = mp->b_cont)) {
+		if (unlikely((dlen = msgsize(dp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
 			goto error;
+		if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+			goto error;
+		if (unlikely(dlen > tp->info.CDATA_size || tp->info.CDATA_size == T_INVALID))
+			goto error;
+	}
 	err = TBADSEQ;
 	if (unlikely(p->SEQ_number == 0))
 		goto error;
@@ -7053,9 +7073,14 @@ te_discon_req(queue_t *q, mblk_t *mp)
 	}
 #endif
 	err = TBADDATA;
-	if ((dp = mp->b_cont) != NULL)
-		if (unlikely((dlen = msgsize(dp)) <= 0 || dlen > tp->info.DDATA_size))
+	if ((dp = mp->b_cont) != NULL) {
+		if (unlikely((dlen = msgsize(dp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
 			goto error;
+		if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+			goto error;
+		if (unlikely(dlen > tp->info.DDATA_size || tp->info.DDATA_size == T_INVALID))
+			goto error;
+	}
 	/* FIXME: hold conq bufq_lock to keep connection indication state from changing */
 	state = tp_get_state(tp);
 	err = TBADSEQ;
@@ -7136,8 +7161,11 @@ te_write_req(queue_t *q, mblk_t *mp)
 	   Stream is bound to a port, at least the size of a UDP header.  The length of the entire
 	   TSDU must not exceed 65535 bytes. */
 	err = TBADDATA;
-	if (unlikely((dlen = msgsize(mp)) == 0
-		     || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
+	if (unlikely((dlen = msgsize(mp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
+		goto error;
+	if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+		goto error;
+	if (unlikely(dlen > tp->info.TSDU_size || tp->info.TSDU_size == T_INVALID))
 		goto error;
 	if (unlikely(tp_senddata(tp, NULL, &tp->options, mp) != QR_ABSORBED))
 		goto error;
@@ -7202,8 +7230,11 @@ te_data_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	if (unlikely
-	    ((dlen = msgsize(dp)) == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.TSDU_size))
+	if (unlikely((dlen = msgsize(dp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
+		goto error;
+	if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+		goto error;
+	if (unlikely(dlen > tp->info.TSDU_size || tp->info.TSDU_size == T_INVALID))
 		goto error;
 	if (unlikely((err = tp_senddata(tp, mp, &tp->options, dp)) != QR_ABSORBED))
 		goto error;
@@ -7217,8 +7248,8 @@ te_data_req(queue_t *q, mblk_t *mp)
 
 /**
  * te_exdata_req - process a T_EXDATA_REQ primitive
- * @q: write queue
- * @mp: the primitive
+ * @q: active queue in queue pair (write queue)
+ * @mp: the T_EXDATA_REQ primitive
  */
 noinline fastcall int
 te_exdata_req(queue_t *q, mblk_t *mp)
@@ -7257,8 +7288,11 @@ te_exdata_req(queue_t *q, mblk_t *mp)
 	err = TBADDATA;
 	if (unlikely((dp = mp->b_cont) == NULL))
 		goto error;
-	dlen = msgsize(dp);
-	if (unlikely(dlen == 0 || dlen > tp->info.TIDU_size || dlen > tp->info.ETSDU_size))
+	if (unlikely((dlen = msgsize(dp)) == 0 && !(tp->info.PROVIDER_flag & T_SNDZERO)))
+		goto error;
+	if (unlikely(dlen > tp->info.TIDU_size || tp->info.TIDU_size == T_INVALID))
+		goto error;
+	if (unlikely(dlen > tp->info.ETSDU_size || tp->info.ETSDU_size == T_INVALID))
 		goto error;
 	err = tp_senddata(tp, mp, &tp->options, dp);
 	if (unlikely(err != QR_ABSORBED))
@@ -8042,10 +8076,12 @@ tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_r_prim_srv(q, mp) != QR_ABSORBED) {
-		raw_rstat.ms_acnt++;
+		np_rstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+		if (unlikely(!putq(q, mp))) {
+			mp->b_band = 0;	/* must succeed */
+			putq(q, mp);
+		}
 	}
 	return (0);
 }
@@ -8059,9 +8095,11 @@ tp_rsrv(queue_t *q)
 		/* remove backpressure */
 		mp->b_wptr -= PRELOAD;
 		if (unlikely(tp_r_prim_srv(q, mp) != QR_ABSORBED)) {
-			if (putbq(q, mp))
-				break;
-			freemsg(mp);
+			if (unlikely(!putbq(q, mp))) {
+				mp->b_band = 0;	/* must succeed */
+				putbq(q, mp);
+			}
+			break;
 		}
 	}
 	return (0);
@@ -8072,10 +8110,12 @@ tp_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
-		raw_wstat.ms_acnt++;
+		np_wstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
-		if (unlikely(putq(q, mp) == 0))
-			freemsg(mp);
+		if (unlikely(!putbq(q, mp))) {
+			mp->b_band = 0;	/* must succeed */
+			putbq(q, mp);
+		}
 	}
 	return (0);
 }
@@ -8088,9 +8128,11 @@ tp_wsrv(queue_t *q)
 	while (likely((mp = getq(q)) != NULL)) {
 		mp->b_wptr -= PRELOAD;
 		if (unlikely(tp_w_prim_srv(q, mp) != QR_ABSORBED)) {
-			if (putbq(q, mp))
-				break;
-			freemsg(mp);
+			if (unlikely(!putbq(q, mp))) {
+				mp->b_band = 0;	/* must succeed */
+				putbq(q, mp);
+			}
+			break;
 		}
 	}
 	return (0);
@@ -8339,7 +8381,7 @@ tp_lookup_common(uint8_t proto, uint32_t daddr, uint16_t dport, uint32_t saddr, 
 STATIC INLINE fastcall __hot_in struct tp *
 tp_lookup(struct iphdr *iph, struct udphdr *uh)
 {
-	return tp_lookup_common(iph->protocol, iph->daddr, uh->dest, iph->saddr, uh->source);
+	return tp_lookup_common(iph->protocol, iph->daddr, uh ? uh->dest : 0, iph->saddr, uh ? uh->source : 0);
 }
 
 /**
@@ -8355,11 +8397,12 @@ tp_lookup_icmp(struct iphdr *iph, unsigned int len)
 {
 	struct udphdr *uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));
 
-	if (len < (iph->ihl << 2) + 4)
-		/* too short: don't have port numbers - ignore it */
-		return (NULL);
+	if (len >= (iph->ihl << 2) + 4)
+		uh = (struct udphdr *) ((unsigned char *) iph + (iph->ihl << 2));
+	else
+		uh = NULL; /* too short: don't have port numbers */
 
-	return tp_lookup_common(iph->protocol, iph->saddr, uh->source, iph->daddr, uh->dest);
+	return tp_lookup_common(iph->protocol, iph->saddr, uh ? uh->source : 0, iph->daddr, uh ? uh->dest : 0);
 }
 
 #if 1
@@ -8420,7 +8463,7 @@ tp_v4_rcv(struct sk_buff *skb)
 {
 	struct tp *tp;
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
-	struct udphdr *uh = (struct udphdr *) (skb_network_header(skb) + (iph->ihl << 2));
+	struct udphdr *uh;
 	struct rtable *rt;
 
 #ifdef HAVE_KFUNC_NF_RESET
@@ -8429,10 +8472,12 @@ tp_v4_rcv(struct sk_buff *skb)
 
 //      IP_INC_STATS_BH(IpInDelivers);  /* should wait... */
 
-	if (unlikely(!pskb_may_pull(skb, 4)))
-		goto too_small;
+	if (unlikely(pskb_may_pull(skb, 4)))
+		uh = (struct udphdr *) (skb_network_header(skb) + (iph->ihl << 2));
+	else
+		uh = NULL;
 #if 0
-	/* I don't think that ip_rcv will ever give us a packet that tis not PACKET_HOST. */
+	/* I don't think that ip_rcv will ever give us a packet that is not PACKET_HOST. */
 	if (unlikely(skb->pkt_type != PACKET_HOST))
 		goto bad_pkt_type;
 #endif
@@ -8524,7 +8569,7 @@ tp_v4_rcv(struct sk_buff *skb)
 		tp_put(tp);
 		return (0);
 	      flow_controlled:
-		raw_rstat.ms_ccnt++;
+		np_rstat.ms_ccnt++;
 		freeb(mp);	/* will take sk_buff with it */
 		tp_put(tp);
 		return (0);
@@ -8544,7 +8589,9 @@ tp_v4_rcv(struct sk_buff *skb)
 #if 0
       bad_pkt_type:
 #endif
+#if 0
       too_small:
+#endif
 	if (tp_v4_rcv_next(skb)) {
 		/* TODO: want to generate an ICMP port unreachable error here */
 	}
@@ -8607,7 +8654,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 		put(q, mp);
 		goto discard_put;
 	      flow_controlled:
-		raw_rstat.ms_ccnt++;
+		np_rstat.ms_ccnt++;
 		ptrace(("ERROR: stream is flow controlled\n"));
 		freeb(mp);
 		goto discard_put;
@@ -8691,6 +8738,8 @@ tp_alloc_priv(queue_t *q, struct tp **tpp, int type, dev_t *devp, cred_t *crp)
 		tp->info.SERV_type = type ? : T_CLTS;
 		tp->info.CURRENT_state = TS_UNBND;
 		tp->info.PROVIDER_flag = T_XPG4_1 | T_SNDZERO;
+		/* We can send zero length IP packets but we could receive them, but I think that I
+		 * fixed that. */
 		bufq_init(&tp->conq);
 		/* option defaults */
 		tp->options.xti.linger = xti_default_linger;
@@ -8787,16 +8836,16 @@ tp_free_priv(queue_t *q)
  *  Open and Close
  */
 #define FIRST_CMINOR	0
-#define    IP_CMINOR	0
-#define  IPCO_CMINOR	T_COTS
-#define  IPCD_CMINOR	T_COTS_ORD
-#define  IPCL_CMINOR	T_CLTS
+#define  PROT_CMINOR	0
+#define  COTS_CMINOR	T_COTS
+#define  COTD_CMINOR	T_COTS_ORD
+#define  CLTS_CMINOR	T_CLTS
 #define  LAST_CMINOR	0
 #define  FREE_CMINOR	1
 STATIC int tp_majors[CMAJORS] = { CMAJOR_0, };
 
 /**
- * raw_qopen - RAW IP driver STREAMS open routine
+ * tp_qopen - RAW IP driver STREAMS open routine
  * @q: read queue of opened Stream
  * @devp: pointer to device number opened
  * @oflag: flags to the open call
@@ -8804,7 +8853,7 @@ STATIC int tp_majors[CMAJORS] = { CMAJOR_0, };
  * @crp: pointer to opener's credentials
  */
 STATIC streamscall int
-raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
+tp_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	int mindex = 0;
 	int type = 0;
@@ -8886,9 +8935,9 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	so->so_flags |= SO_WROFF;
 	so->so_wroff = MAX_HEADER;	/* this is too big */
 	so->so_flags |= SO_MINPSZ;
-	so->so_minpsz = raw_winfo.mi_minpsz;
+	so->so_minpsz = tp_winfo.mi_minpsz;
 	so->so_flags |= SO_MAXPSZ;
-	so->so_maxpsz = raw_winfo.mi_maxpsz;
+	so->so_maxpsz = tp_winfo.mi_maxpsz;
 #if 0
 	so->so_flags |= SO_HIWAT;
 	so->so_hiwat = (SHEADHIWAT << 3) + (STRHIGH << 1);
@@ -8908,13 +8957,13 @@ raw_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 }
 
 /**
- * raw_qclose - RAW IP driver STREAMS close routine
+ * tp_qclose - RAW IP driver STREAMS close routine
  * @q: read queue of closing Stream
  * @oflag: flags to open call
  * @crp: pointer to closer's credentials
  */
 STATIC streamscall int
-raw_qclose(queue_t *q, int oflag, cred_t *crp)
+tp_qclose(queue_t *q, int oflag, cred_t *crp)
 {
 	struct tp *tp = TP_PRIV(q);
 
@@ -8953,52 +9002,52 @@ raw_qclose(queue_t *q, int oflag, cred_t *crp)
 STATIC __unlikely int
 tp_term_caches(void)
 {
-	if (raw_prot_cachep != NULL) {
+	if (tp_raw_prot_cachep != NULL) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
-		if (kmem_cache_destroy(raw_prot_cachep)) {
-			cmn_err(CE_WARN, "%s: did not destroy raw_prot_cachep", __FUNCTION__);
+		if (kmem_cache_destroy(tp_raw_prot_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy tp_raw_prot_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
 #else
-		kmem_cache_destroy(raw_prot_cachep);
+		kmem_cache_destroy(tp_raw_prot_cachep);
 #endif
-		_printd(("%s: destroyed raw_prot_cachep\n", DRV_NAME));
-		raw_prot_cachep = NULL;
+		_printd(("%s: destroyed tp_raw_prot_cachep\n", DRV_NAME));
+		tp_raw_prot_cachep = NULL;
 	}
-	if (raw_priv_cachep != NULL) {
+	if (tp_raw_priv_cachep != NULL) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
-		if (kmem_cache_destroy(raw_priv_cachep)) {
-			cmn_err(CE_WARN, "%s: did not destroy raw_priv_cachep", __FUNCTION__);
+		if (kmem_cache_destroy(tp_raw_priv_cachep)) {
+			cmn_err(CE_WARN, "%s: did not destroy tp_raw_priv_cachep", __FUNCTION__);
 			return (-EBUSY);
 		}
 #else
-		kmem_cache_destroy(raw_priv_cachep);
+		kmem_cache_destroy(tp_raw_priv_cachep);
 #endif
-		_printd(("%s: destroyed raw_priv_cachep\n", DRV_NAME));
-		raw_priv_cachep = NULL;
+		_printd(("%s: destroyed tp_raw_priv_cachep\n", DRV_NAME));
+		tp_raw_priv_cachep = NULL;
 	}
 	return (0);
 }
 STATIC __unlikely int
 tp_init_caches(void)
 {
-	if (raw_priv_cachep == NULL) {
-		raw_priv_cachep =
-		    kmem_create_cache("raw_priv_cachep", sizeof(struct tp), 0,
+	if (tp_raw_priv_cachep == NULL) {
+		tp_raw_priv_cachep =
+		    kmem_create_cache("tp_raw_priv_cachep", sizeof(struct tp), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
-		if (raw_priv_cachep == NULL) {
-			cmn_err(CE_WARN, "%s: Cannot allocate raw_priv_cachep", __FUNCTION__);
+		if (tp_raw_priv_cachep == NULL) {
+			cmn_err(CE_WARN, "%s: Cannot allocate tp_raw_priv_cachep", __FUNCTION__);
 			tp_term_caches();
 			return (-ENOMEM);
 		}
 		_printd(("%s: initialized driver private structure cache\n", DRV_NAME));
 	}
-	if (raw_prot_cachep == NULL) {
-		raw_prot_cachep =
-		    kmem_create_cache("raw_prot_cachep", sizeof(struct tp_prot_bucket), 0,
+	if (tp_raw_prot_cachep == NULL) {
+		tp_raw_prot_cachep =
+		    kmem_create_cache("tp_raw_prot_cachep", sizeof(struct tp_prot_bucket), 0,
 				      SLAB_HWCACHE_ALIGN, NULL, NULL);
-		if (raw_prot_cachep == NULL) {
-			cmn_err(CE_WARN, "%s: Cannot allocate raw_prot_cachep", __FUNCTION__);
+		if (tp_raw_prot_cachep == NULL) {
+			cmn_err(CE_WARN, "%s: Cannot allocate tp_raw_prot_cachep", __FUNCTION__);
 			tp_term_caches();
 			return (-ENOMEM);
 		}
@@ -9096,9 +9145,9 @@ MODULE_PARM_DESC(major, "Device number for the RAWIP driver. (0 for allocation.)
  */
 #ifdef LFS
 
-STATIC struct cdevsw raw_cdev = {
+STATIC struct cdevsw tp_cdev = {
 	.d_name = DRV_NAME,
-	.d_str = &raw_info,
+	.d_str = &tp_rawinfo,
 	.d_flag = D_MP,
 	.d_fop = NULL,
 	.d_mode = S_IFCHR,
@@ -9110,7 +9159,7 @@ tp_register_strdev(major_t major)
 {
 	int err;
 
-	if ((err = register_strdev(&raw_cdev, major)) < 0)
+	if ((err = register_strdev(&tp_cdev, major)) < 0)
 		return (err);
 	return (0);
 }
@@ -9120,7 +9169,7 @@ tp_unregister_strdev(major_t major)
 {
 	int err;
 
-	if ((err = unregister_strdev(&raw_cdev, major)) < 0)
+	if ((err = unregister_strdev(&tp_cdev, major)) < 0)
 		return (err);
 	return (0);
 }
@@ -9137,7 +9186,7 @@ tp_register_strdev(major_t major)
 {
 	int err;
 
-	if ((err = lis_register_strdev(major, &raw_info, UNITS, DRV_NAME)) < 0)
+	if ((err = lis_register_strdev(major, &tp_rawinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
 		major = err;
@@ -9161,7 +9210,7 @@ tp_unregister_strdev(major_t major)
 #endif				/* LIS */
 
 MODULE_STATIC void __exit
-rawterminate(void)
+tp_rawterminate(void)
 {
 	int err, mindex;
 
@@ -9181,7 +9230,7 @@ rawterminate(void)
 }
 
 MODULE_STATIC int __init
-rawinit(void)
+tp_rawinit(void)
 {
 	int err, mindex = 0;
 
@@ -9189,7 +9238,7 @@ rawinit(void)
 	tp_init_hashes();
 	if ((err = tp_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
-		rawterminate();
+		tp_rawterminate();
 		return (err);
 	}
 	for (mindex = 0; mindex < CMAJORS; mindex++) {
@@ -9201,7 +9250,7 @@ rawinit(void)
 			} else {
 				cmn_err(CE_WARN, "%s: could not register driver, err = %d",
 					DRV_NAME, err);
-				rawterminate();
+				tp_rawterminate();
 				return (err);
 			}
 		}
@@ -9220,7 +9269,7 @@ rawinit(void)
  *  Linux Kernel Module Initialization
  *  -------------------------------------------------------------------------
  */
-module_init(rawinit);
-module_exit(rawterminate);
+module_init(tp_rawinit);
+module_exit(tp_rawterminate);
 
 #endif				/* LINUX */
