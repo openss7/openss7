@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-23 09:37:51 $
+ @(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-10-24 08:52:42 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-23 09:37:51 $ by $Author: brian $
+ Last Modified $Date: 2008-10-24 08:52:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_sctp.c,v $
+ Revision 0.9.2.37  2008-10-24 08:52:42  brian
+ - upgrade strinet test cases and documentation
+
  Revision 0.9.2.36  2008-10-23 09:37:51  brian
  - relax disconnect versus orderly release
 
@@ -79,9 +82,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-23 09:37:51 $"
+#ident "@(#) $RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-10-24 08:52:42 $"
 
-static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-23 09:37:51 $";
+static char const ident[] = "$RCSfile: test-inet_sctp.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-10-24 08:52:42 $";
 
 /*
  *  Simple test program for INET streams.
@@ -17480,11 +17483,11 @@ struct test_stream test_1_9_2_3_list = { &preamble_1_9_2_3_list, &test_case_1_9_
 #define name_case_1_9_2_4 "Perform options management -- T_NEGOTIATE T_ALLOPT"
 #define sref_case_1_9_2_4 sref_case_1_9_2
 #define desc_case_1_9_2_4 "\
-Checks that all negotiated options under a level are returned when the option name\n\
-T_ALLOPT is used.  The specification indicates that when T_ALLOPT is specified\n\
-as an option name for a supported level, that the action corresponds to all\n\
-known option at that level.  This test should return all known option negotiated\n\
-to the default values at the specified levels."
+Checks that all negotiated options under a level are returned when the option\n\
+name T_ALLOPT is used.  The specification indicates that when T_ALLOPT is\n\
+specified as an option name for a supported level, that the action corresponds\n\
+to all known option at that level.  This test should return all known option\n\
+negotiated to the default values at the specified levels."
 
 int
 test_case_1_9_2_4(int child)
@@ -19420,10 +19423,10 @@ struct test_stream test_2_2_4_2_list = { &preamble_2_2_list, &test_case_2_2_4_2_
 #define sref_case_2_2_4_3 sref_case_2_2
 #define desc_case_2_2_4_3 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_KEEPALIVE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_TCP_KEEPALIVE.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_4_3_conn(int child)
@@ -19612,10 +19615,10 @@ struct test_stream test_2_2_4_5_list = { &preamble_2_2_list, &test_case_2_2_4_5_
 #define sref_case_2_2_4_6 sref_case_2_2
 #define desc_case_2_2_4_6 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_KEEPINTVL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_TCP_KEEPINTVL.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_4_6_conn(int child)
@@ -19864,10 +19867,10 @@ struct test_stream test_2_2_4_9_list = { &preamble_2_2_list, &test_case_2_2_4_9_
 #define sref_case_2_2_4_10 sref_case_2_2
 #define desc_case_2_2_4_10 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_DEFER_ACCEPT.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_TCP_DEFER_ACCEPT.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_4_10_conn(int child)
@@ -19927,10 +19930,10 @@ struct test_stream test_2_2_4_10_list = { &preamble_2_2_list, &test_case_2_2_4_1
 #define sref_case_2_2_4_11 sref_case_2_2
 #define desc_case_2_2_4_11 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_TCP_WINDOW_CLAMP.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_TCP_WINDOW_CLAMP.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_4_11_conn(int child)
@@ -20555,10 +20558,10 @@ struct test_stream test_2_2_5_7_list = { &preamble_2_2_list, &test_case_2_2_5_7_
 #define sref_case_2_2_5_8 sref_case_2_2
 #define desc_case_2_2_5_8 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_COOKIE_LIFE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_COOKIE_LIFE.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_8_conn(int child)
@@ -20618,10 +20621,10 @@ struct test_stream test_2_2_5_8_list = { &preamble_2_2_list, &test_case_2_2_5_8_
 #define sref_case_2_2_5_9 sref_case_2_2
 #define desc_case_2_2_5_9 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_SACK_DELAY.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_SACK_DELAY.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_9_conn(int child)
@@ -20681,10 +20684,10 @@ struct test_stream test_2_2_5_9_list = { &preamble_2_2_list, &test_case_2_2_5_9_
 #define sref_case_2_2_5_10 sref_case_2_2
 #define desc_case_2_2_5_10 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_PATH_MAX_RETRANS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_PATH_MAX_RETRANS.  The specification indicates that unknown\n\
+options issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_10_conn(int child)
@@ -20744,10 +20747,10 @@ struct test_stream test_2_2_5_10_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_11 sref_case_2_2
 #define desc_case_2_2_5_11 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ASSOC_MAX_RETRANS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_ASSOC_MAX_RETRANS.  The specification indicates that unknown\n\
+options issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_11_conn(int child)
@@ -20807,10 +20810,10 @@ struct test_stream test_2_2_5_11_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_12 sref_case_2_2
 #define desc_case_2_2_5_12 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_MAX_INIT_RETRIES.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_MAX_INIT_RETRIES.  The specification indicates that unknown\n\
+options issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_12_conn(int child)
@@ -20870,10 +20873,10 @@ struct test_stream test_2_2_5_12_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_13 sref_case_2_2
 #define desc_case_2_2_5_13 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_HEARTBEAT_ITVL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_HEARTBEAT_ITVL.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_13_conn(int child)
@@ -20933,10 +20936,10 @@ struct test_stream test_2_2_5_13_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_14 sref_case_2_2
 #define desc_case_2_2_5_14 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_RTO_INITIAL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_RTO_INITIAL.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_14_conn(int child)
@@ -21122,10 +21125,10 @@ struct test_stream test_2_2_5_16_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_17 sref_case_2_2
 #define desc_case_2_2_5_17 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_OSTREAMS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_OSTREAMS.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_17_conn(int child)
@@ -21185,10 +21188,10 @@ struct test_stream test_2_2_5_17_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_18 sref_case_2_2
 #define desc_case_2_2_5_18 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_ISTREAMS.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_ISTREAMS.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_18_conn(int child)
@@ -21248,8 +21251,8 @@ struct test_stream test_2_2_5_18_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_19 sref_case_2_2
 #define desc_case_2_2_5_19 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_COOKIE_INC.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider."
+case is T_SCTP_COOKIE_INC.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider."
 
 int
 test_case_2_2_5_19_conn(int child)
@@ -21309,10 +21312,10 @@ struct test_stream test_2_2_5_19_list = { &preamble_2_2_list, &test_case_2_2_5_1
 #define sref_case_2_2_5_20 sref_case_2_2
 #define desc_case_2_2_5_20 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_THROTTLE_ITVL.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_THROTTLE_ITVL.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_20_conn(int child)
@@ -21372,10 +21375,10 @@ struct test_stream test_2_2_5_20_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define sref_case_2_2_5_21 sref_case_2_2
 #define desc_case_2_2_5_21 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_MAC_TYPE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_MAC_TYPE.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_21_conn(int child)
@@ -21435,10 +21438,10 @@ struct test_stream test_2_2_5_21_list = { &preamble_2_2_list, &test_case_2_2_5_2
 #define sref_case_2_2_5_22 sref_case_2_2
 #define desc_case_2_2_5_22 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_CKSUM_TYPE.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_CKSUM_TYPE.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_22_conn(int child)
@@ -22020,10 +22023,10 @@ struct test_stream test_2_2_5_30_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define sref_case_2_2_5_31 sref_case_2_2
 #define desc_case_2_2_5_31 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_LIFETIME.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_LIFETIME.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_31_conn(int child)
@@ -22083,10 +22086,10 @@ struct test_stream test_2_2_5_31_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define sref_case_2_2_5_32 sref_case_2_2
 #define desc_case_2_2_5_32 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_DISPOSITION.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_DISPOSITION.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_32_conn(int child)
@@ -22146,10 +22149,10 @@ struct test_stream test_2_2_5_32_list = { &preamble_2_2_list, &test_case_2_2_5_3
 #define sref_case_2_2_5_33 sref_case_2_2
 #define desc_case_2_2_5_33 "\
 Transfer connectionless data with options.  The specific option used by this\n\
-case is T_SCTP_MAX_BURST.  The specification indicates that unknown options issued\n\
-in a T_UNITDATA_REQ should be ignored by the transport provider.  T_COTS_ORD\n\
-transport providers are always expected to fail when issued a T_UNITDATA_REQ\n\
-primitive."
+case is T_SCTP_MAX_BURST.  The specification indicates that unknown options\n\
+issued in a T_UNITDATA_REQ should be ignored by the transport provider.\n\
+T_COTS_ORD transport providers are always expected to fail when issued a\n\
+T_UNITDATA_REQ primitive."
 
 int
 test_case_2_2_5_33_conn(int child)
@@ -32462,11 +32465,11 @@ test_case_11_3(int child, long prim)
 #define desc_case_11_3_1 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_ADDR_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_ADDR_REQ primitive."
 
 int
 test_case_11_3_1(int child)
@@ -32485,11 +32488,11 @@ struct test_stream test_11_3_1_list = { &preamble_0, &test_case_11_3_1, &postamb
 #define desc_case_11_3_2 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_BIND_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_BIND_REQ primitive."
 
 int
 test_case_11_3_2(int child)
@@ -32508,11 +32511,12 @@ struct test_stream test_11_3_2_list = { &preamble_0, &test_case_11_3_2, &postamb
 #define desc_case_11_3_3 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_CAPABILITY_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_CAPABILITY_REQ\n\
+primitive."
 
 int
 test_case_11_3_3(int child)
@@ -32531,11 +32535,11 @@ struct test_stream test_11_3_3_list = { &preamble_0, &test_case_11_3_3, &postamb
 #define desc_case_11_3_4 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_CONN_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_CONN_REQ primitive."
 
 int
 test_case_11_3_4(int child)
@@ -32554,11 +32558,11 @@ struct test_stream test_11_3_4_list = { &preamble_0, &test_case_11_3_4, &postamb
 #define desc_case_11_3_5 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_CONN_RES primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_CONN_RES primitive."
 
 int
 test_case_11_3_5(int child)
@@ -32577,11 +32581,11 @@ struct test_stream test_11_3_5_list = { &preamble_0, &test_case_11_3_5, &postamb
 #define desc_case_11_3_6 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_DATA_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_DATA_REQ primitive."
 
 int
 test_case_11_3_6(int child)
@@ -32600,11 +32604,11 @@ struct test_stream test_11_3_6_list = { &preamble_0, &test_case_11_3_6, &postamb
 #define desc_case_11_3_7 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_DISCON_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_DISCON_REQ primitive."
 
 int
 test_case_11_3_7(int child)
@@ -32623,11 +32627,11 @@ struct test_stream test_11_3_7_list = { &preamble_0, &test_case_11_3_7, &postamb
 #define desc_case_11_3_8 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_EXDATA_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_EXDATA_REQ primitive."
 
 int
 test_case_11_3_8(int child)
@@ -32646,11 +32650,11 @@ struct test_stream test_11_3_8_list = { &preamble_0, &test_case_11_3_8, &postamb
 #define desc_case_11_3_9 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_INFO_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_INFO_REQ primitive."
 
 int
 test_case_11_3_9(int child)
@@ -32669,11 +32673,11 @@ struct test_stream test_11_3_9_list = { &preamble_0, &test_case_11_3_9, &postamb
 #define desc_case_11_3_10 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_OPTDATA_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_OPTDATA_REQ primitive."
 
 int
 test_case_11_3_10(int child)
@@ -32692,11 +32696,11 @@ struct test_stream test_11_3_10_list = { &preamble_0, &test_case_11_3_10, &posta
 #define desc_case_11_3_11 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_ORDREL_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_ORDREL_REQ primitive."
 
 int
 test_case_11_3_11(int child)
@@ -32715,11 +32719,11 @@ struct test_stream test_11_3_11_list = { &preamble_0, &test_case_11_3_11, &posta
 #define desc_case_11_3_12 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_UNBIND_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_UNBIND_REQ primitive."
 
 int
 test_case_11_3_12(int child)
@@ -32738,11 +32742,11 @@ struct test_stream test_11_3_12_list = { &preamble_0, &test_case_11_3_12, &posta
 #define desc_case_11_3_13 "\
 Checks than an unsupported primitive returns an error.  Neither the TPI nor the\n\
 XTI specification indicates what action to take when an unsupported primitive\n\
-type is received.  For known primitives belonging to the wrong service class that\n\
-expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK with\n\
-the errror TNOTSUPPORT.  For known primitives belonging to the wrong service\n\
-class that do not expect an acknowledgement, we issue an M_ERROR with a UNIX\n\
-error number of EPROTO.  This test case is for a T_UNITDATA_REQ primitive."
+type is received.  For known primitives belonging to the wrong service class\n\
+that expect an acknowledgement, and unknown primitives, we issue a T_ERROR_ACK\n\
+with the errror TNOTSUPPORT.  For known primitives belonging to the wrong\n\
+service class that do not expect an acknowledgement, we issue an M_ERROR with a\n\
+UNIX error number of EPROTO.  This test case is for a T_UNITDATA_REQ primitive."
 
 int
 test_case_11_3_13(int child)
@@ -33955,10 +33959,10 @@ postamble_ts_wind_ordrel_list(int child)
 #define name_case_13_1_1 "Fatal and non-fatal errors -- T_ADDR_REQ - EPROTO"
 #define sref_case_13_1_1 sref_case_13
 #define desc_case_13_1_1 "\
-Checks that the EPROTO error is returned in response to a T_ADDR_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_ADDR_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_ADDR_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_ADDR_REQ primitive."
 
 int
 test_case_13_1_1_conn(int child)
@@ -33995,10 +33999,10 @@ struct test_stream test_13_1_1_list = { &preamble_13_1_1_list, &test_case_13_1_1
 #define name_case_13_1_2 "Fatal and non-fatal errors -- T_ADDR_REQ - TSYSERR"
 #define sref_case_13_1_2 sref_case_13
 #define desc_case_13_1_2 "\
-Checks that the TSYSERR error is returned in response to a T_ADDR_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_ADDR_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_ADDR_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TSYSERR error for the T_ADDR_REQ primitive."
 
 int
 test_case_13_1_2_conn(int child)
@@ -34035,11 +34039,11 @@ struct test_stream test_13_1_2_list = { &preamble_13_1_2_list, &test_case_13_1_2
 #define name_case_13_2_1 "Fatal and non-fatal errors -- T_BIND_REQ - EPROTO"
 #define sref_case_13_2_1 sref_case_13
 #define desc_case_13_2_1 "\
-Checks that the EPROTO error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_BIND_REQ primitive.  T_BIND_REQ does not have any fatal errors so this\n\
-test is not applicable."
+Checks that the EPROTO error is returned in response to a T_BIND_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_BIND_REQ primitive.  T_BIND_REQ does not have any fatal errors\n\
+so this test is not applicable."
 
 int
 test_case_13_2_1_conn(int child)
@@ -34076,10 +34080,10 @@ struct test_stream test_13_2_1_list = { &preamble_13_2_1_list, &test_case_13_2_1
 #define name_case_13_2_2 "Fatal and non-fatal errors -- T_BIND_REQ - TACCES"
 #define sref_case_13_2_2 sref_case_13
 #define desc_case_13_2_2 "\
-Checks that the TACCES error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TACCES error\n\
-for the T_BIND_REQ primitive."
+Checks that the TACCES error is returned in response to a T_BIND_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the TACCES\n\
+error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_2(int child)
@@ -34133,10 +34137,10 @@ struct test_stream test_13_2_2_list = { &preamble_13_2_2_list, &test_case_13_2_2
 #define name_case_13_2_3 "Fatal and non-fatal errors -- T_BIND_REQ - TADDRBUSY"
 #define sref_case_13_2_3 sref_case_13
 #define desc_case_13_2_3 "\
-Checks that the TADDRBUSY error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TADDRBUSY error\n\
-for the T_BIND_REQ primitive."
+Checks that the TADDRBUSY error is returned in response to a T_BIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TADDRBUSY error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_3(int child)
@@ -34220,10 +34224,10 @@ struct test_stream test_13_2_3_list = { &preamble_13_2_3_list, &test_case_13_2_3
 #define name_case_13_2_4 "Fatal and non-fatal errors -- T_BIND_REQ - TBADADDR"
 #define sref_case_13_2_4 sref_case_13
 #define desc_case_13_2_4 "\
-Checks that the TBADADDR error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADADDR error\n\
-for the T_BIND_REQ primitive."
+Checks that the TBADADDR error is returned in response to a T_BIND_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADADDR error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_4(int child)
@@ -34266,10 +34270,10 @@ struct test_stream test_13_2_4_list = { &preamble_13_2_4_list, &test_case_13_2_4
 #define name_case_13_2_5 "Fatal and non-fatal errors -- T_BIND_REQ - TNOADDR"
 #define sref_case_13_2_5 sref_case_13
 #define desc_case_13_2_5 "\
-Checks that the TNOADDR error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TNOADDR error\n\
-for the T_BIND_REQ primitive."
+Checks that the TNOADDR error is returned in response to a T_BIND_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TNOADDR error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_5(int child)
@@ -34334,10 +34338,10 @@ struct test_stream test_13_2_5_list = { &preamble_13_2_5_list, &test_case_13_2_5
 #define name_case_13_2_6_1 "Fatal and non-fatal errors -- T_BIND_REQ - TOUTSTATE - TS_IDLE"
 #define sref_case_13_2_6_1 sref_case_13
 #define desc_case_13_2_6_1 "\
-Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_BIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_6(int child)
@@ -34391,10 +34395,10 @@ struct test_stream test_13_2_6_1_list = { &preamble_13_2_6_1_list, &test_case_13
 #define name_case_13_2_6_2 "Fatal and non-fatal errors -- T_BIND_REQ - TOUTSTATE - TS_WCON_CREQ"
 #define sref_case_13_2_6_2 sref_case_13
 #define desc_case_13_2_6_2 "\
-Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_BIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_6_2_conn(int child)
@@ -34431,10 +34435,10 @@ struct test_stream test_13_2_6_2_list = { &preamble_13_2_6_2_list, &test_case_13
 #define name_case_13_2_6_3 "Fatal and non-fatal errors -- T_BIND_REQ - TOUTSTATE - TS_WRES_CIND"
 #define sref_case_13_2_6_3 sref_case_13
 #define desc_case_13_2_6_3 "\
-Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_BIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_6_3_conn(int child)
@@ -34471,10 +34475,10 @@ struct test_stream test_13_2_6_3_list = { &preamble_13_2_6_3_list, &test_case_13
 #define name_case_13_2_6_4 "Fatal and non-fatal errors -- T_BIND_REQ - TOUTSTATE - TS_DATA_XFER"
 #define sref_case_13_2_6_4 sref_case_13
 #define desc_case_13_2_6_4 "\
-Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_BIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_6_4_conn(int child)
@@ -34511,10 +34515,10 @@ struct test_stream test_13_2_6_4_list = { &preamble_13_2_6_4_list, &test_case_13
 #define name_case_13_2_6_5 "Fatal and non-fatal errors -- T_BIND_REQ - TOUTSTATE - TS_WIND_ORDREL"
 #define sref_case_13_2_6_5 sref_case_13
 #define desc_case_13_2_6_5 "\
-Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_BIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_6_5_conn(int child)
@@ -34551,10 +34555,10 @@ struct test_stream test_13_2_6_5_list = { &preamble_13_2_6_5_list, &test_case_13
 #define name_case_13_2_6_6 "Fatal and non-fatal errors -- T_BIND_REQ - TOUTSTATE - TS_WREQ_ORDREL"
 #define sref_case_13_2_6_6 sref_case_13
 #define desc_case_13_2_6_6 "\
-Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_BIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_BIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_6_6_conn(int child)
@@ -34591,10 +34595,10 @@ struct test_stream test_13_2_6_6_list = { &preamble_13_2_6_6_list, &test_case_13
 #define name_case_13_2_7 "Fatal and non-fatal errors -- T_BIND_REQ - TSYSERR"
 #define sref_case_13_2_7 sref_case_13
 #define desc_case_13_2_7 "\
-Checks that the TSYSERR error is returned in response to a T_BIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_BIND_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_BIND_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TSYSERR error for the T_BIND_REQ primitive."
 
 int
 test_case_13_2_7_conn(int child)
@@ -34631,10 +34635,10 @@ struct test_stream test_13_2_7_list = { &preamble_13_2_7_list, &test_case_13_2_7
 #define name_case_13_3_1 "Fatal and non-fatal errors -- T_CAPABILITY_REQ - EPROTO"
 #define sref_case_13_3_1 sref_case_13
 #define desc_case_13_3_1 "\
-Checks that the EPROTO error is returned in response to a T_CAPABILITY_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_CAPABILITY_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_CAPABILITY_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_CAPABILITY_REQ primitive."
 
 int
 test_case_13_3_1_conn(int child)
@@ -34671,10 +34675,10 @@ struct test_stream test_13_3_1_list = { &preamble_13_3_1_list, &test_case_13_3_1
 #define name_case_13_3_2 "Fatal and non-fatal errors -- T_CAPABILITY_REQ - TSYSERR"
 #define sref_case_13_3_2 sref_case_13
 #define desc_case_13_3_2 "\
-Checks that the TSYSERR error is returned in response to a T_CAPABILITY_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_CAPABILITY_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_CAPABILITY_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TSYSERR error for the T_CAPABILITY_REQ primitive."
 
 int
 test_case_13_3_2_conn(int child)
@@ -34711,10 +34715,10 @@ struct test_stream test_13_3_2_list = { &preamble_13_3_2_list, &test_case_13_3_2
 #define name_case_13_4_1 "Fatal and non-fatal errors -- T_CONN_REQ - EPROTO"
 #define sref_case_13_4_1 sref_case_13
 #define desc_case_13_4_1 "\
-Checks that the EPROTO error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_CONN_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_CONN_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_1_conn(int child)
@@ -34751,10 +34755,10 @@ struct test_stream test_13_4_1_list = { &preamble_13_4_1_list, &test_case_13_4_1
 #define name_case_13_4_2 "Fatal and non-fatal errors -- T_CONN_REQ - TACCES"
 #define sref_case_13_4_2 sref_case_13
 #define desc_case_13_4_2 "\
-Checks that the TACCES error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TACCES error\n\
-for the T_CONN_REQ primitive."
+Checks that the TACCES error is returned in response to a T_CONN_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the TACCES\n\
+error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_2_conn(int child)
@@ -34824,10 +34828,10 @@ struct test_stream test_13_4_2_list = { &preamble_13_4_2_list, &test_case_13_4_2
 #define name_case_13_4_3 "Fatal and non-fatal errors -- T_CONN_REQ - TADDRBUSY"
 #define sref_case_13_4_3 sref_case_13
 #define desc_case_13_4_3 "\
-Checks that the TADDRBUSY error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TADDRBUSY error\n\
-for the T_CONN_REQ primitive."
+Checks that the TADDRBUSY error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TADDRBUSY error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_3_conn(int child)
@@ -34864,16 +34868,16 @@ struct test_stream test_13_4_3_list = { &preamble_13_4_3_list, &test_case_13_4_3
 #define name_case_13_4_4 "Fatal and non-fatal errors -- T_CONN_REQ - TBADADDR"
 #define sref_case_13_4_4 sref_case_13
 #define desc_case_13_4_4 "\
-Checks that the TBADADDR error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADADDR error\n\
-for the T_CONN_REQ primitive."
+Checks that the TBADADDR error is returned in response to a T_CONN_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADADDR error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_4_conn(int child)
 {
 	test_data = NULL;
-	test_addr = addrs[2];
+	test_addr = &addrs[2];
 	test_alen = sizeof(addrs[2]) - 1;
 	test_opts = NULL;
 	test_olen = 0;
@@ -34920,10 +34924,10 @@ struct test_stream test_13_4_4_list = { &preamble_13_4_4_list, &test_case_13_4_4
 #define name_case_13_4_5 "Fatal and non-fatal errors -- T_CONN_REQ - TBADDATA"
 #define sref_case_13_4_5 sref_case_13
 #define desc_case_13_4_5 "\
-Checks that the TBADDATA error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADDATA error\n\
-for the T_CONN_REQ primitive."
+Checks that the TBADDATA error is returned in response to a T_CONN_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADDATA error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_5_conn(int child)
@@ -34976,10 +34980,10 @@ struct test_stream test_13_4_5_list = { &preamble_13_4_5_list, &test_case_13_4_5
 #define name_case_13_4_6 "Fatal and non-fatal errors -- T_CONN_REQ - TBADOPT"
 #define sref_case_13_4_6 sref_case_13
 #define desc_case_13_4_6 "\
-Checks that the TBADOPT error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADOPT error\n\
-for the T_CONN_REQ primitive."
+Checks that the TBADOPT error is returned in response to a T_CONN_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADOPT error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_6_conn(int child)
@@ -35039,10 +35043,10 @@ struct test_stream test_13_4_6_list = { &preamble_13_4_6_list, &test_case_13_4_6
 #define name_case_13_4_7 "Fatal and non-fatal errors -- T_CONN_REQ - TNOTSUPPORT"
 #define sref_case_13_4_7 sref_case_13
 #define desc_case_13_4_7 "\
-Checks that the TNOTSUPPORT error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TNOTSUPPORT error\n\
-for the T_CONN_REQ primitive."
+Checks that the TNOTSUPPORT error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TNOTSUPPORT error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_7_conn(int child)
@@ -35106,10 +35110,10 @@ struct test_stream test_13_4_7_list = { &preamble_13_4_7_list, &test_case_13_4_7
 #define name_case_13_4_8_1 "Fatal and non-fatal errors -- T_CONN_REQ - TOUTSTATE - TS_UNBND"
 #define sref_case_13_4_8_1 sref_case_13
 #define desc_case_13_4_8_1 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_8(int child)
@@ -35168,10 +35172,10 @@ struct test_stream test_13_4_8_1_list = { &preamble_13_4_8_1_list, &test_case_13
 #define name_case_13_4_8_2 "Fatal and non-fatal errors -- T_CONN_REQ - TOUTSTATE - TS_WCON_CREQ"
 #define sref_case_13_4_8_2 sref_case_13
 #define desc_case_13_4_8_2 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_8_2_conn(int child)
@@ -35208,10 +35212,10 @@ struct test_stream test_13_4_8_2_list = { &preamble_13_4_8_2_list, &test_case_13
 #define name_case_13_4_8_3 "Fatal and non-fatal errors -- T_CONN_REQ - TOUTSTATE - TS_WRES_CIND"
 #define sref_case_13_4_8_3 sref_case_13
 #define desc_case_13_4_8_3 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_8_3_conn(int child)
@@ -35248,10 +35252,10 @@ struct test_stream test_13_4_8_3_list = { &preamble_13_4_8_3_list, &test_case_13
 #define name_case_13_4_8_4 "Fatal and non-fatal errors -- T_CONN_REQ - TOUTSTATE - TS_DATA_XFER"
 #define sref_case_13_4_8_4 sref_case_13
 #define desc_case_13_4_8_4 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_8_4_conn(int child)
@@ -35288,10 +35292,10 @@ struct test_stream test_13_4_8_4_list = { &preamble_13_4_8_4_list, &test_case_13
 #define name_case_13_4_8_5 "Fatal and non-fatal errors -- T_CONN_REQ - TOUTSTATE - TS_WIND_ORDREL"
 #define sref_case_13_4_8_5 sref_case_13
 #define desc_case_13_4_8_5 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_8_5_conn(int child)
@@ -35328,10 +35332,10 @@ struct test_stream test_13_4_8_5_list = { &preamble_13_4_8_5_list, &test_case_13
 #define name_case_13_4_8_6 "Fatal and non-fatal errors -- T_CONN_REQ - TOUTSTATE - TS_WREQ_ORDREL"
 #define sref_case_13_4_8_6 sref_case_13
 #define desc_case_13_4_8_6 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_8_6_conn(int child)
@@ -35368,10 +35372,10 @@ struct test_stream test_13_4_8_6_list = { &preamble_13_4_8_6_list, &test_case_13
 #define name_case_13_4_9 "Fatal and non-fatal errors -- T_CONN_REQ - TSYSERR"
 #define sref_case_13_4_9 sref_case_13
 #define desc_case_13_4_9 "\
-Checks that the TSYSERR error is returned in response to a T_CONN_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_CONN_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_CONN_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TSYSERR error for the T_CONN_REQ primitive."
 
 int
 test_case_13_4_9_conn(int child)
@@ -35408,10 +35412,10 @@ struct test_stream test_13_4_9_list = { &preamble_13_4_9_list, &test_case_13_4_9
 #define name_case_13_5_1 "Fatal and non-fatal errors -- T_CONN_RES - EPROTO"
 #define sref_case_13_5_1 sref_case_13
 #define desc_case_13_5_1 "\
-Checks that the EPROTO error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_CONN_RES primitive."
+Checks that the EPROTO error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_1_conn(int child)
@@ -35448,14 +35452,21 @@ struct test_stream test_13_5_1_list = { &preamble_13_5_1_list, &test_case_13_5_1
 #define name_case_13_5_2 "Fatal and non-fatal errors -- T_CONN_RES - TACCES"
 #define sref_case_13_5_2 sref_case_13
 #define desc_case_13_5_2 "\
-Checks that the TACCES error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TACCES error\n\
-for the T_CONN_RES primitive."
+Checks that the TACCES error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the TACCES\n\
+error for the T_CONN_RES primitive.  In this case, TACCES indicates that the\n\
+user did not have proper permissions for the use of the options or ACCEPTOR_id."
 
 int
 test_case_13_5_2_conn(int child)
 {
+	/* XXX: This is in fact difficult to test.  For the case of not having permission to use
+	   the ACCEPTOR_id, the listening Stream upon which the T_CONN_RES was issued needs to have 
+	   been opened by a user with credentials compatible with those of the user that created
+	   the accepting Stream as specified in the ACCEPTOR_id.  The easiest case of this is where
+	   the accepting Stream was opened by the superuser, but the listening Stream was not. */
+
 	/* if we are super user, we cannot test for access errors */
 	if (getuid() == 0 || geteuid() == 0)
 		goto skipped;
@@ -35521,27 +35532,30 @@ struct test_stream test_13_5_2_list = { &preamble_13_5_2_list, &test_case_13_5_2
 #define name_case_13_5_3 "Fatal and non-fatal errors -- T_CONN_RES - TBADADDR"
 #define sref_case_13_5_3 sref_case_13
 #define desc_case_13_5_3 "\
-Checks that the TBADADDR error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADADDR error\n\
-for the T_CONN_RES primitive."
+Checks that the TBADADDR error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADADDR error for the T_CONN_RES primitive.  In this case, the sepcified\n\
+protocol address (the one bound to the endpoint referenced by ACCEPTOR_id) was\n\
+in an incorrect format or contained illegal information."
 
 int
 test_case_13_5_3_conn(int child)
 {
-	return (__RESULT_SKIPPED);
+	/* XXX: It is not possible to generate this error for TCP or SCTP. */
+	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_3_resp(int child)
 {
-	return (__RESULT_SKIPPED);
+	return (__RESULT_NOTAPPL);
 }
 
 int
 test_case_13_5_3_list(int child)
 {
-	return (__RESULT_SKIPPED);
+	return (__RESULT_NOTAPPL);
 }
 
 #define preamble_13_5_3_conn	preamble_0
@@ -35561,10 +35575,10 @@ struct test_stream test_13_5_3_list = { &preamble_13_5_3_list, &test_case_13_5_3
 #define name_case_13_5_4 "Fatal and non-fatal errors -- T_CONN_RES - TBADDATA"
 #define sref_case_13_5_4 sref_case_13
 #define desc_case_13_5_4 "\
-Checks that the TBADDATA error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADDATA error\n\
-for the T_CONN_RES primitive."
+Checks that the TBADDATA error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADDATA error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_4_conn(int child)
@@ -35625,10 +35639,10 @@ struct test_stream test_13_5_4_list = { &preamble_13_5_4_list, &test_case_13_5_4
 #define name_case_13_5_5 "Fatal and non-fatal errors -- T_CONN_RES - TBADF"
 #define sref_case_13_5_5 sref_case_13
 #define desc_case_13_5_5 "\
-Checks that the TBADF error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADF error\n\
-for the T_CONN_RES primitive."
+Checks that the TBADF error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the TBADF\n\
+error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_5_conn(int child)
@@ -35680,10 +35694,10 @@ struct test_stream test_13_5_5_list = { &preamble_13_5_5_list, &test_case_13_5_5
 #define name_case_13_5_6 "Fatal and non-fatal errors -- T_CONN_RES - TBADOPT"
 #define sref_case_13_5_6 sref_case_13
 #define desc_case_13_5_6 "\
-Checks that the TBADOPT error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADOPT error\n\
-for the T_CONN_RES primitive."
+Checks that the TBADOPT error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADOPT error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_6_conn(int child)
@@ -35742,10 +35756,10 @@ struct test_stream test_13_5_6_list = { &preamble_13_5_6_list, &test_case_13_5_6
 #define name_case_13_5_7 "Fatal and non-fatal errors -- T_CONN_RES - TBADSEQ"
 #define sref_case_13_5_7 sref_case_13
 #define desc_case_13_5_7 "\
-Checks that the TBADSEQ error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADSEQ error\n\
-for the T_CONN_RES primitive."
+Checks that the TBADSEQ error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TBADSEQ error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_7_conn(int child)
@@ -35798,10 +35812,10 @@ struct test_stream test_13_5_7_list = { &preamble_13_5_7_list, &test_case_13_5_7
 #define name_case_13_5_8 "Fatal and non-fatal errors -- T_CONN_RES - TNOTSUPPORT"
 #define sref_case_13_5_8 sref_case_13
 #define desc_case_13_5_8 "\
-Checks that the TNOTSUPPORT error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TNOTSUPPORT error\n\
-for the T_CONN_RES primitive."
+Checks that the TNOTSUPPORT error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TNOTSUPPORT error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_8_conn(int child)
@@ -35864,10 +35878,10 @@ struct test_stream test_13_5_8_list = { &preamble_13_5_8_list, &test_case_13_5_8
 #define name_case_13_5_9_1 "Fatal and non-fatal errors -- T_CONN_RES - TOUTSTATE - TS_UNBND"
 #define sref_case_13_5_9_1 sref_case_13
 #define desc_case_13_5_9_1 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_RES primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_9(int child)
@@ -35926,10 +35940,10 @@ struct test_stream test_13_5_9_1_list = { &preamble_13_5_9_1_list, &test_case_13
 #define name_case_13_5_9_2 "Fatal and non-fatal errors -- T_CONN_RES - TOUTSTATE - TS_IDLE"
 #define sref_case_13_5_9_2 sref_case_13
 #define desc_case_13_5_9_2 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_RES primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_9_2_conn(int child)
@@ -35966,10 +35980,10 @@ struct test_stream test_13_5_9_2_list = { &preamble_13_5_9_2_list, &test_case_13
 #define name_case_13_5_9_3 "Fatal and non-fatal errors -- T_CONN_RES - TOUTSTATE - TS_WCON_CREQ"
 #define sref_case_13_5_9_3 sref_case_13
 #define desc_case_13_5_9_3 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_RES primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_9_3_conn(int child)
@@ -36006,10 +36020,10 @@ struct test_stream test_13_5_9_3_list = { &preamble_13_5_9_3_list, &test_case_13
 #define name_case_13_5_9_4 "Fatal and non-fatal errors -- T_CONN_RES - TOUTSTATE - TS_DATA_XFER"
 #define sref_case_13_5_9_4 sref_case_13
 #define desc_case_13_5_9_4 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_RES primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_9_4_conn(int child)
@@ -36046,10 +36060,10 @@ struct test_stream test_13_5_9_4_list = { &preamble_13_5_9_4_list, &test_case_13
 #define name_case_13_5_9_5 "Fatal and non-fatal errors -- T_CONN_RES - TOUTSTATE - TS_WIND_ORDREL"
 #define sref_case_13_5_9_5 sref_case_13
 #define desc_case_13_5_9_5 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_RES primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_9_5_conn(int child)
@@ -36086,10 +36100,10 @@ struct test_stream test_13_5_9_5_list = { &preamble_13_5_9_5_list, &test_case_13
 #define name_case_13_5_9_6 "Fatal and non-fatal errors -- T_CONN_RES - TOUTSTATE - TS_WREQ_ORDREL"
 #define sref_case_13_5_9_6 sref_case_13
 #define desc_case_13_5_9_6 "\
-Checks that the TOUTSTATE error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_CONN_RES primitive."
+Checks that the TOUTSTATE error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_9_6_conn(int child)
@@ -36126,36 +36140,70 @@ struct test_stream test_13_5_9_6_list = { &preamble_13_5_9_6_list, &test_case_13
 #define name_case_13_5_10 "Fatal and non-fatal errors -- T_CONN_RES - TPROVMISMATCH"
 #define sref_case_13_5_10 sref_case_13
 #define desc_case_13_5_10 "\
-Checks that the TPROVMISMATCH error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TPROVMISMATCH error\n\
-for the T_CONN_RES primitive."
+Checks that the TPROVMISMATCH error is returned in response to a T_CONN_RES\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TPROVMISMATCH error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_10_conn(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
 test_case_13_5_10_resp(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (test_close(child) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_open(child, "/dev/udp", O_RDWR | O_NONBLOCK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (intptr_t) RMSGD) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* wait for connection request to be set up */
+	test_msleep(child, LONGER_WAIT);
+	state++;
+	test_data = NULL;
+	test_opts = NULL;
+	test_olen = 0;
+	test_resfd = test_fd[1]; /* my new fd */
+	if (do_signal(2, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(2, LONG_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TPROVMISMATCH)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
 test_case_13_5_10_list(int child)
 {
-	return (__RESULT_SKIPPED);
+	test_msleep(child, LONGER_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_5_10_conn	preamble_0
-#define preamble_13_5_10_resp	preamble_0
-#define preamble_13_5_10_list	preamble_0
+#define preamble_13_5_10_conn	preamble_ts_wres_cind_conn
+#define preamble_13_5_10_resp	preamble_ts_wres_cind_resp
+#define preamble_13_5_10_list	preamble_ts_wres_cind_list
 
-#define postamble_13_5_10_conn	postamble_0
-#define postamble_13_5_10_resp	postamble_0
-#define postamble_13_5_10_list	postamble_0
+#define postamble_13_5_10_conn	postamble_ts_wres_cind_conn
+#define postamble_13_5_10_resp	postamble_ts_wres_cind_resp
+#define postamble_13_5_10_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_5_10_conn = { &preamble_13_5_10_conn, &test_case_13_5_10_conn, &postamble_13_5_10_conn };
 struct test_stream test_13_5_10_resp = { &preamble_13_5_10_resp, &test_case_13_5_10_resp, &postamble_13_5_10_resp };
@@ -36166,14 +36214,19 @@ struct test_stream test_13_5_10_list = { &preamble_13_5_10_list, &test_case_13_5
 #define name_case_13_5_11 "Fatal and non-fatal errors -- T_CONN_RES - TRESADDR"
 #define sref_case_13_5_11 sref_case_13
 #define desc_case_13_5_11 "\
-Checks that the TRESADDR error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TRESADDR error\n\
-for the T_CONN_RES primitive."
+Checks that the TRESADDR error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TRESADDR error for the T_CONN_RES primitive.  This error is generated when the\n\
+Transport Provider requires both transport endpoints (that is, the one\n\
+referenced by ACCEPTOR_id and the listener) to be bound to the same address."
 
 int
 test_case_13_5_11_conn(int child)
 {
+	/* XXX: This test case is not applicable because we do not require that the accepting
+	   stream be bound to the same address as the listening stream; therefore, it is not
+	   possible to generate this error.  However, we could write the test case anyways. */
 	return (__RESULT_SKIPPED);
 }
 
@@ -36189,13 +36242,13 @@ test_case_13_5_11_list(int child)
 	return (__RESULT_SKIPPED);
 }
 
-#define preamble_13_5_11_conn	preamble_0
-#define preamble_13_5_11_resp	preamble_0
-#define preamble_13_5_11_list	preamble_0
+#define preamble_13_5_11_conn	preamble_ts_wres_cind_conn
+#define preamble_13_5_11_resp	preamble_ts_wres_cind_resp
+#define preamble_13_5_11_list	preamble_ts_wres_cind_list
 
-#define postamble_13_5_11_conn	postamble_0
-#define postamble_13_5_11_resp	postamble_0
-#define postamble_13_5_11_list	postamble_0
+#define postamble_13_5_11_conn	postamble_ts_wres_cind_conn
+#define postamble_13_5_11_resp	postamble_ts_wres_cind_resp
+#define postamble_13_5_11_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_5_11_conn = { &preamble_13_5_11_conn, &test_case_13_5_11_conn, &postamble_13_5_11_conn };
 struct test_stream test_13_5_11_resp = { &preamble_13_5_11_resp, &test_case_13_5_11_resp, &postamble_13_5_11_resp };
@@ -36206,36 +36259,73 @@ struct test_stream test_13_5_11_list = { &preamble_13_5_11_list, &test_case_13_5
 #define name_case_13_5_12 "Fatal and non-fatal errors -- T_CONN_RES - TRESQLEN"
 #define sref_case_13_5_12 sref_case_13
 #define desc_case_13_5_12 "\
-Checks that the TRESQLEN error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TRESQLEN error\n\
-for the T_CONN_RES primitive."
+Checks that the TRESQLEN error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TRESQLEN error for the T_CONN_RES primitive.  This error is generated when the\n\
+endpoint referenced by ACCEPTOR_id was different from the listener, but was\n\
+bound to a protocol addressw with a CONIND_number that is greater than zero."
 
 int
 test_case_13_5_12_conn(int child)
 {
-	return (__RESULT_SKIPPED);
+	if (expect(child, LONGER_WAIT, __EVENT_NO_MSG) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
 test_case_13_5_12_resp(int child)
 {
-	return (__RESULT_SKIPPED);
+	/* Just need to bind the responding stream as a listener. */
+	test_addr = &addrs[child];
+	test_alen = sizeof(addrs[child]);
+	last_qlen = 5;
+	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, SHORT_WAIT, __TEST_BIND_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	/* wait for connection request to be set up */
+	test_msleep(child, LONGER_WAIT);
+	state++;
+	test_data = NULL;
+	test_opts = NULL;
+	test_olen = 0;
+	test_resfd = test_fd[1]; /* my fd */
+	if (do_signal(2, __TEST_CONN_RES) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(2, LONG_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (last_t_errno != TRESQLEN)
+		goto failure;
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
 }
 
 int
 test_case_13_5_12_list(int child)
 {
-	return (__RESULT_SKIPPED);
+	test_msleep(child, LONGER_WAIT);
+	state++;
+	return (__RESULT_SUCCESS);
 }
 
-#define preamble_13_5_12_conn	preamble_0
-#define preamble_13_5_12_resp	preamble_0
-#define preamble_13_5_12_list	preamble_0
+#define preamble_13_5_12_conn	preamble_ts_wres_cind_conn
+#define preamble_13_5_12_resp	preamble_ts_wres_cind_resp
+#define preamble_13_5_12_list	preamble_ts_wres_cind_list
 
-#define postamble_13_5_12_conn	postamble_0
-#define postamble_13_5_12_resp	postamble_0
-#define postamble_13_5_12_list	postamble_0
+#define postamble_13_5_12_conn	postamble_ts_wres_cind_conn
+#define postamble_13_5_12_resp	postamble_ts_wres_cind_resp
+#define postamble_13_5_12_list	postamble_ts_wres_cind_list
 
 struct test_stream test_13_5_12_conn = { &preamble_13_5_12_conn, &test_case_13_5_12_conn, &postamble_13_5_12_conn };
 struct test_stream test_13_5_12_resp = { &preamble_13_5_12_resp, &test_case_13_5_12_resp, &postamble_13_5_12_resp };
@@ -36246,10 +36336,10 @@ struct test_stream test_13_5_12_list = { &preamble_13_5_12_list, &test_case_13_5
 #define name_case_13_5_13 "Fatal and non-fatal errors -- T_CONN_RES - TSYSERR"
 #define sref_case_13_5_13 sref_case_13
 #define desc_case_13_5_13 "\
-Checks that the TSYSERR error is returned in response to a T_CONN_RES primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_CONN_RES primitive."
+Checks that the TSYSERR error is returned in response to a T_CONN_RES primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TSYSERR error for the T_CONN_RES primitive."
 
 int
 test_case_13_5_13_conn(int child)
@@ -36286,10 +36376,10 @@ struct test_stream test_13_5_13_list = { &preamble_13_5_13_list, &test_case_13_5
 #define name_case_13_6_1_1 "Fatal and non-fatal errors -- T_DATA_REQ - EPROTO - TS_UNBND"
 #define sref_case_13_6_1_1 sref_case_13
 #define desc_case_13_6_1_1 "\
-Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_DATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_DATA_REQ primitive."
 
 int
 test_case_13_6_1(int child)
@@ -36361,10 +36451,10 @@ struct test_stream test_13_6_1_1_list = { &preamble_13_6_1_1_list, &test_case_13
 #define name_case_13_6_1_2 "Fatal and non-fatal errors -- T_DATA_REQ - EPROTO - TS_IDLE"
 #define sref_case_13_6_1_2 sref_case_13
 #define desc_case_13_6_1_2 "\
-Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_DATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_DATA_REQ primitive."
 
 int
 test_case_13_6_1_2_conn(int child)
@@ -36401,15 +36491,49 @@ struct test_stream test_13_6_1_2_list = { &preamble_13_6_1_2_list, &test_case_13
 #define name_case_13_6_1_3 "Fatal and non-fatal errors -- T_DATA_REQ - EPROTO - TS_WCON_CREQ"
 #define sref_case_13_6_1_3 sref_case_13
 #define desc_case_13_6_1_3 "\
-Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_DATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_DATA_REQ primitive in the TS_WCON_CREQ state."
 
 int
 test_case_13_6_1_3_conn(int child)
 {
-	return test_case_13_6_1(child);
+	test_data = "Some data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		state++;
+		if (last_errno != EPROTO)
+			goto failure;
+		break;
+	case __TEST_DISCON_IND:
+		/* The connection request was disconnected by the provider before we could issue
+		   the T_DATA_REQ primitive.  The results, therefore, are inconclusive and the test 
+		   case needs to be skipped. */
+		goto skipped;
+	case __TEST_CONN_CON:
+		/* The connection was accepted before we could issue the T_DATA_REQ primitive. This 
+		   is simply a timing problem because we cannot control how fast the opposite side
+		   accepts a connection request.  The results, therefore, are inconclusive and the
+		   test case needs to be skipped. */
+		state++;
+		if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		goto skipped;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+      skipped:
+	return (__RESULT_SKIPPED);
 }
 
 int
@@ -36441,10 +36565,10 @@ struct test_stream test_13_6_1_3_list = { &preamble_13_6_1_3_list, &test_case_13
 #define name_case_13_6_1_4 "Fatal and non-fatal errors -- T_DATA_REQ - EPROTO - TS_WRES_CIND"
 #define sref_case_13_6_1_4 sref_case_13
 #define desc_case_13_6_1_4 "\
-Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_DATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_DATA_REQ primitive."
 
 int
 test_case_13_6_1_4_conn(int child)
@@ -36496,10 +36620,10 @@ struct test_stream test_13_6_1_4_list = { &preamble_13_6_1_4_list, &test_case_13
 #define name_case_13_6_1_5 "Fatal and non-fatal errors -- T_DATA_REQ - EPROTO - TS_WIND_ORDREL"
 #define sref_case_13_6_1_5 sref_case_13
 #define desc_case_13_6_1_5 "\
-Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_DATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_DATA_REQ primitive."
 
 int
 test_case_13_6_1_5_conn(int child)
@@ -36536,10 +36660,10 @@ struct test_stream test_13_6_1_5_list = { &preamble_13_6_1_5_list, &test_case_13
 #define name_case_13_6_2 "Fatal and non-fatal errors -- T_DATA_REQ - EPROTO"
 #define sref_case_13_6_2 sref_case_13
 #define desc_case_13_6_2 "\
-Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_DATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_DATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_DATA_REQ primitive."
 
 int
 test_case_13_6_2_conn(int child)
@@ -36624,10 +36748,10 @@ struct test_stream test_13_6_2_list = { &preamble_13_6_2_list, &test_case_13_6_2
 #define name_case_13_7_1 "Fatal and non-fatal errors -- T_DISCON_REQ - EPROTO"
 #define sref_case_13_7_1 sref_case_13
 #define desc_case_13_7_1 "\
-Checks that the EPROTO error is returned in response to a T_DISCON_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_DISCON_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_DISCON_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_DISCON_REQ primitive."
 
 int
 test_case_13_7_1_conn(int child)
@@ -36664,10 +36788,10 @@ struct test_stream test_13_7_1_list = { &preamble_13_7_1_list, &test_case_13_7_1
 #define name_case_13_7_2 "Fatal and non-fatal errors -- T_DISCON_REQ - TBADDATA"
 #define sref_case_13_7_2 sref_case_13
 #define desc_case_13_7_2 "\
-Checks that the TBADDATA error is returned in response to a T_DISCON_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADDATA error\n\
-for the T_DISCON_REQ primitive."
+Checks that the TBADDATA error is returned in response to a T_DISCON_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TBADDATA error for the T_DISCON_REQ primitive."
 
 int
 test_case_13_7_2_conn(int child)
@@ -36717,10 +36841,10 @@ struct test_stream test_13_7_2_list = { &preamble_13_7_2_list, &test_case_13_7_2
 #define name_case_13_7_3 "Fatal and non-fatal errors -- T_DISCON_REQ - TBADSEQ"
 #define sref_case_13_7_3 sref_case_13
 #define desc_case_13_7_3 "\
-Checks that the TBADSEQ error is returned in response to a T_DISCON_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADSEQ error\n\
-for the T_DISCON_REQ primitive."
+Checks that the TBADSEQ error is returned in response to a T_DISCON_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TBADSEQ error for the T_DISCON_REQ primitive."
 
 int
 test_case_13_7_3_conn(int child)
@@ -36770,10 +36894,10 @@ struct test_stream test_13_7_3_list = { &preamble_13_7_3_list, &test_case_13_7_3
 #define name_case_13_7_4 "Fatal and non-fatal errors -- T_DISCON_REQ - TNOTSUPPORT"
 #define sref_case_13_7_4 sref_case_13
 #define desc_case_13_7_4 "\
-Checks that the TNOTSUPPORT error is returned in response to a T_DISCON_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TNOTSUPPORT error\n\
-for the T_DISCON_REQ primitive."
+Checks that the TNOTSUPPORT error is returned in response to a T_DISCON_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TNOTSUPPORT error for the T_DISCON_REQ primitive."
 
 int
 test_case_13_7_4(int child)
@@ -36826,10 +36950,10 @@ struct test_stream test_13_7_4_list = { &preamble_13_7_4_list, &test_case_13_7_4
 #define name_case_13_7_5_1 "Fatal and non-fatal errors -- T_DISCON_REQ - TOUTSTATE - TS_UNBND"
 #define sref_case_13_7_5_1 sref_case_13
 #define desc_case_13_7_5_1 "\
-Checks that the TOUTSTATE error is returned in response to a T_DISCON_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_DISCON_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_DISCON_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_DISCON_REQ primitive."
 
 int
 test_case_13_7_5(int child)
@@ -36885,10 +37009,10 @@ struct test_stream test_13_7_5_1_list = { &preamble_13_7_5_1_list, &test_case_13
 #define name_case_13_7_5_2 "Fatal and non-fatal errors -- T_DISCON_REQ - TOUTSTATE - TS_IDLE"
 #define sref_case_13_7_5_2 sref_case_13
 #define desc_case_13_7_5_2 "\
-Checks that the TOUTSTATE error is returned in response to a T_DISCON_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_DISCON_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_DISCON_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_DISCON_REQ primitive."
 
 int
 test_case_13_7_5_2_conn(int child)
@@ -36925,10 +37049,10 @@ struct test_stream test_13_7_5_2_list = { &preamble_13_7_5_2_list, &test_case_13
 #define name_case_13_7_6 "Fatal and non-fatal errors -- T_DISCON_REQ - TSYSERR"
 #define sref_case_13_7_6 sref_case_13
 #define desc_case_13_7_6 "\
-Checks that the TSYSERR error is returned in response to a T_DISCON_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_DISCON_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_DISCON_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TSYSERR error for the T_DISCON_REQ primitive."
 
 int
 test_case_13_7_6_conn(int child)
@@ -36965,10 +37089,10 @@ struct test_stream test_13_7_6_list = { &preamble_13_7_6_list, &test_case_13_7_6
 #define name_case_13_8_1_1 "Fatal and non-fatal errors -- T_EXDATA_REQ - EPROTO - TS_UNBND"
 #define sref_case_13_8_1_1 sref_case_13
 #define desc_case_13_8_1_1 "\
-Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_EXDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_EXDATA_REQ primitive."
 
 int
 test_case_13_8_1(int child)
@@ -37040,10 +37164,10 @@ struct test_stream test_13_8_1_1_list = { &preamble_13_8_1_1_list, &test_case_13
 #define name_case_13_8_1_2 "Fatal and non-fatal errors -- T_EXDATA_REQ - EPROTO - TS_IDLE"
 #define sref_case_13_8_1_2 sref_case_13
 #define desc_case_13_8_1_2 "\
-Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_EXDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_EXDATA_REQ primitive."
 
 int
 test_case_13_8_1_2_conn(int child)
@@ -37080,15 +37204,49 @@ struct test_stream test_13_8_1_2_list = { &preamble_13_8_1_2_list, &test_case_13
 #define name_case_13_8_1_3 "Fatal and non-fatal errors -- T_EXDATA_REQ - EPROTO - TS_WCON_CREQ"
 #define sref_case_13_8_1_3 sref_case_13
 #define desc_case_13_8_1_3 "\
-Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_EXDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_EXDATA_REQ primitive in the TS_WCON_CREQ state."
 
 int
 test_case_13_8_1_3_conn(int child)
 {
-	return test_case_13_8_1(child);
+	test_data = "Some data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		state++;
+		if (last_errno != EPROTO)
+			goto failure;
+		break;
+	case __TEST_DISCON_IND:
+		/* The connection request was disconnected by the provider before we could issue
+		   the T_EXDATA_REQ primitive.  The results, therefore, are inconclusive and the
+		   test case needs to be skipped. */
+		goto skipped;
+	case __TEST_CONN_CON:
+		/* The connection was accepted before we could issue the T_EXDATA_REQ primitive.
+		   This is simply a timing problem because we cannot control how fast the opposite 
+		   side accepts a connection request.  The results, therefore, are inconclusive and 
+		   the test case needs to be skipped. */
+		state++;
+		if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		goto skipped;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+      skipped:
+	return (__RESULT_SKIPPED);
 }
 
 int
@@ -37120,10 +37278,10 @@ struct test_stream test_13_8_1_3_list = { &preamble_13_8_1_3_list, &test_case_13
 #define name_case_13_8_1_4 "Fatal and non-fatal errors -- T_EXDATA_REQ - EPROTO - TS_WRES_CIND"
 #define sref_case_13_8_1_4 sref_case_13
 #define desc_case_13_8_1_4 "\
-Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_EXDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_EXDATA_REQ primitive."
 
 int
 test_case_13_8_1_4_conn(int child)
@@ -37174,10 +37332,10 @@ struct test_stream test_13_8_1_4_list = { &preamble_13_8_1_4_list, &test_case_13
 #define name_case_13_8_1_5 "Fatal and non-fatal errors -- T_EXDATA_REQ - EPROTO - TS_WIND_ORDREL"
 #define sref_case_13_8_1_5 sref_case_13
 #define desc_case_13_8_1_5 "\
-Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_EXDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_EXDATA_REQ primitive."
 
 int
 test_case_13_8_1_5_conn(int child)
@@ -37214,10 +37372,10 @@ struct test_stream test_13_8_1_5_list = { &preamble_13_8_1_5_list, &test_case_13
 #define name_case_13_8_2 "Fatal and non-fatal errors -- T_EXDATA_REQ - EPROTO"
 #define sref_case_13_8_2 sref_case_13
 #define desc_case_13_8_2 "\
-Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_EXDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_EXDATA_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_EXDATA_REQ primitive."
 
 int
 test_case_13_8_2_conn(int child)
@@ -37302,10 +37460,10 @@ struct test_stream test_13_8_2_list = { &preamble_13_8_2_list, &test_case_13_8_2
 #define name_case_13_9_1 "Fatal and non-fatal errors -- T_INFO_REQ - EPROTO"
 #define sref_case_13_9_1 sref_case_13
 #define desc_case_13_9_1 "\
-Checks that the EPROTO error is returned in response to a T_INFO_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_INFO_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_INFO_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_INFO_REQ primitive."
 
 int
 test_case_13_9_1_conn(int child)
@@ -37342,10 +37500,10 @@ struct test_stream test_13_9_1_list = { &preamble_13_9_1_list, &test_case_13_9_1
 #define name_case_13_9_2 "Fatal and non-fatal errors -- T_INFO_REQ - TSYSERR"
 #define sref_case_13_9_2 sref_case_13
 #define desc_case_13_9_2 "\
-Checks that the TSYSERR error is returned in response to a T_INFO_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_INFO_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_INFO_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the\n\
+TSYSERR error for the T_INFO_REQ primitive."
 
 int
 test_case_13_9_2_conn(int child)
@@ -37382,10 +37540,10 @@ struct test_stream test_13_9_2_list = { &preamble_13_9_2_list, &test_case_13_9_2
 #define name_case_13_10_1_1 "Fatal and non-fatal errors -- T_OPTDATA_REQ - EPROTO - TS_UNBND"
 #define sref_case_13_10_1_1 sref_case_13
 #define desc_case_13_10_1_1 "\
-Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_OPTDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_OPTDATA_REQ primitive."
 
 int
 test_case_13_10_1(int child)
@@ -37461,10 +37619,10 @@ struct test_stream test_13_10_1_1_list = { &preamble_13_10_1_1_list, &test_case_
 #define name_case_13_10_1_2 "Fatal and non-fatal errors -- T_OPTDATA_REQ - EPROTO - TS_IDLE"
 #define sref_case_13_10_1_2 sref_case_13
 #define desc_case_13_10_1_2 "\
-Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_OPTDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_OPTDATA_REQ primitive."
 
 int
 test_case_13_10_1_2_conn(int child)
@@ -37501,15 +37659,51 @@ struct test_stream test_13_10_1_2_list = { &preamble_13_10_1_2_list, &test_case_
 #define name_case_13_10_1_3 "Fatal and non-fatal errors -- T_OPTDATA_REQ - EPROTO - TS_WCON_CREQ"
 #define sref_case_13_10_1_3 sref_case_13
 #define desc_case_13_10_1_3 "\
-Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_OPTDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_OPTDATA_REQ primitive in the TS_WCON_CREQ state."
 
 int
 test_case_13_10_1_3_conn(int child)
 {
-	return test_case_13_10_1(child);
+	test_data = "Some data.";
+	DATA_flag = 0;
+	test_opts = NULL;
+	test_olen = 0;
+	if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	expect(child, NORMAL_WAIT, __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		state++;
+		if (last_errno != EPROTO)
+			goto failure;
+		break;
+	case __TEST_DISCON_IND:
+		/* The connection request was disconnected by the provider before we could issue
+		   the T_OPTDATA_REQ primitive.  The results, therefore, are inconclusive and the
+		   test case needs to be skipped. */
+		goto skipped;
+	case __TEST_CONN_CON:
+		/* The connection was accepted before we could issue the T_OPTDATA_REQ primitive.
+		   This is simply a timing problem because we cannot control how fast the opposite
+		   side accepts a connection request.  The results, therefore, are inconclusive and
+		   the test case needs to be skipped. */
+		state++;
+		if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
+			goto failure;
+		goto skipped;
+	default:
+		goto failure;
+	}
+	state++;
+	return (__RESULT_SUCCESS);
+      failure:
+	return (__RESULT_FAILURE);
+      skipped:
+	return (__RESULT_SKIPPED);
 }
 
 int
@@ -37541,10 +37735,10 @@ struct test_stream test_13_10_1_3_list = { &preamble_13_10_1_3_list, &test_case_
 #define name_case_13_10_1_4 "Fatal and non-fatal errors -- T_OPTDATA_REQ - EPROTO - TS_WRES_CIND"
 #define sref_case_13_10_1_4 sref_case_13
 #define desc_case_13_10_1_4 "\
-Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_OPTDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_OPTDATA_REQ primitive."
 
 int
 test_case_13_10_1_4_conn(int child)
@@ -37595,10 +37789,10 @@ struct test_stream test_13_10_1_4_list = { &preamble_13_10_1_4_list, &test_case_
 #define name_case_13_10_1_5 "Fatal and non-fatal errors -- T_OPTDATA_REQ - EPROTO - TS_WIND_ORDREL"
 #define sref_case_13_10_1_5 sref_case_13
 #define desc_case_13_10_1_5 "\
-Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_OPTDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_OPTDATA_REQ primitive."
 
 int
 test_case_13_10_1_5_conn(int child)
@@ -37635,10 +37829,10 @@ struct test_stream test_13_10_1_5_list = { &preamble_13_10_1_5_list, &test_case_
 #define name_case_13_10_2 "Fatal and non-fatal errors -- T_OPTDATA_REQ - EPROTO"
 #define sref_case_13_10_2 sref_case_13
 #define desc_case_13_10_2 "\
-Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_OPTDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_OPTDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_OPTDATA_REQ primitive."
 
 int
 test_case_13_10_2_conn(int child)
@@ -37690,10 +37884,10 @@ struct test_stream test_13_10_2_list = { &preamble_13_10_2_list, &test_case_13_1
 #define name_case_13_11_1 "Fatal and non-fatal errors -- T_OPTMGMT_REQ - EPROTO"
 #define sref_case_13_11_1 sref_case_13
 #define desc_case_13_11_1 "\
-Checks that the EPROTO error is returned in response to a T_OPTMGMT_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_OPTMGMT_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_OPTMGMT_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_OPTMGMT_REQ primitive."
 
 int
 test_case_13_11_1_conn(int child)
@@ -37730,10 +37924,10 @@ struct test_stream test_13_11_1_list = { &preamble_13_11_1_list, &test_case_13_1
 #define name_case_13_11_2 "Fatal and non-fatal errors -- T_OPTMGMT_REQ - TACCES"
 #define sref_case_13_11_2 sref_case_13
 #define desc_case_13_11_2 "\
-Checks that the TACCES error is returned in response to a T_OPTMGMT_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TACCES error\n\
-for the T_OPTMGMT_REQ primitive."
+Checks that the TACCES error is returned in response to a T_OPTMGMT_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TACCES error for the T_OPTMGMT_REQ primitive."
 
 int
 test_case_13_11_2(int child)
@@ -37773,10 +37967,10 @@ struct test_stream test_13_11_2_list = { &preamble_13_11_2_list, &test_case_13_1
 #define name_case_13_11_3 "Fatal and non-fatal errors -- T_OPTMGMT_REQ - TBADFLAG"
 #define sref_case_13_11_3 sref_case_13
 #define desc_case_13_11_3 "\
-Checks that the TBADFLAG error is returned in response to a T_OPTMGMT_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADFLAG error\n\
-for the T_OPTMGMT_REQ primitive."
+Checks that the TBADFLAG error is returned in response to a T_OPTMGMT_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TBADFLAG error for the T_OPTMGMT_REQ primitive."
 
 int
 test_case_13_11_3(int child)
@@ -37819,10 +38013,10 @@ struct test_stream test_13_11_3_list = { &preamble_13_11_3_list, &test_case_13_1
 #define name_case_13_11_4 "Fatal and non-fatal errors -- T_OPTMGMT_REQ - TBADOPT"
 #define sref_case_13_11_4 sref_case_13
 #define desc_case_13_11_4 "\
-Checks that the TBADOPT error is returned in response to a T_OPTMGMT_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TBADOPT error\n\
-for the T_OPTMGMT_REQ primitive."
+Checks that the TBADOPT error is returned in response to a T_OPTMGMT_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TBADOPT error for the T_OPTMGMT_REQ primitive."
 
 int
 test_case_13_11_4(int child)
@@ -37872,10 +38066,10 @@ struct test_stream test_13_11_4_list = { &preamble_13_11_4_list, &test_case_13_1
 #define name_case_13_11_5 "Fatal and non-fatal errors -- T_OPTMGMT_REQ - TOUTSTATE"
 #define sref_case_13_11_5 sref_case_13
 #define desc_case_13_11_5 "\
-Checks that the TOUTSTATE error is returned in response to a T_OPTMGMT_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_OPTMGMT_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_OPTMGMT_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_OPTMGMT_REQ primitive."
 
 int
 test_case_13_11_5_conn(int child)
@@ -37912,10 +38106,10 @@ struct test_stream test_13_11_5_list = { &preamble_13_11_5_list, &test_case_13_1
 #define name_case_13_11_6 "Fatal and non-fatal errors -- T_OPTMGMT_REQ - TNOTSUPPORT"
 #define sref_case_13_11_6 sref_case_13
 #define desc_case_13_11_6 "\
-Checks that the TNOTSUPPORT error is returned in response to a T_OPTMGMT_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TNOTSUPPORT error\n\
-for the T_OPTMGMT_REQ primitive."
+Checks that the TNOTSUPPORT error is returned in response to a T_OPTMGMT_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TNOTSUPPORT error for the T_OPTMGMT_REQ primitive."
 
 int
 test_case_13_11_6_conn(int child)
@@ -37952,10 +38146,10 @@ struct test_stream test_13_11_6_list = { &preamble_13_11_6_list, &test_case_13_1
 #define name_case_13_11_7 "Fatal and non-fatal errors -- T_OPTMGMT_REQ - TSYSERR"
 #define sref_case_13_11_7 sref_case_13
 #define desc_case_13_11_7 "\
-Checks that the TSYSERR error is returned in response to a T_OPTMGMT_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_OPTMGMT_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_OPTMGMT_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TSYSERR error for the T_OPTMGMT_REQ primitive."
 
 int
 test_case_13_11_7_conn(int child)
@@ -37992,10 +38186,10 @@ struct test_stream test_13_11_7_list = { &preamble_13_11_7_list, &test_case_13_1
 #define name_case_13_12_1_1 "Fatal and non-fatal errors -- T_ORDREL_REQ - EPROTO - TS_UNBND"
 #define sref_case_13_12_1_1 sref_case_13
 #define desc_case_13_12_1_1 "\
-Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_ORDREL_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_ORDREL_REQ primitive."
 
 int
 test_case_13_12_1(int child)
@@ -38050,10 +38244,10 @@ struct test_stream test_13_12_1_1_list = { &preamble_13_12_1_1_list, &test_case_
 #define name_case_13_12_1_2 "Fatal and non-fatal errors -- T_ORDREL_REQ - EPROTO - TS_IDLE"
 #define sref_case_13_12_1_2 sref_case_13
 #define desc_case_13_12_1_2 "\
-Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_ORDREL_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_ORDREL_REQ primitive."
 
 int
 test_case_13_12_1_2_conn(int child)
@@ -38090,10 +38284,10 @@ struct test_stream test_13_12_1_2_list = { &preamble_13_12_1_2_list, &test_case_
 #define name_case_13_12_1_3 "Fatal and non-fatal errors -- T_ORDREL_REQ - EPROTO - TS_WCON_CREQ"
 #define sref_case_13_12_1_3 sref_case_13
 #define desc_case_13_12_1_3 "\
-Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_ORDREL_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_ORDREL_REQ primitive."
 
 int
 test_case_13_12_1_3_conn(int child)
@@ -38130,10 +38324,10 @@ struct test_stream test_13_12_1_3_list = { &preamble_13_12_1_3_list, &test_case_
 #define name_case_13_12_1_4 "Fatal and non-fatal errors -- T_ORDREL_REQ - EPROTO - TS_WRES_CIND"
 #define sref_case_13_12_1_4 sref_case_13
 #define desc_case_13_12_1_4 "\
-Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_ORDREL_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_ORDREL_REQ primitive."
 
 int
 test_case_13_12_1_4_conn(int child)
@@ -38184,10 +38378,10 @@ struct test_stream test_13_12_1_4_list = { &preamble_13_12_1_4_list, &test_case_
 #define name_case_13_12_1_5 "Fatal and non-fatal errors -- T_ORDREL_REQ - EPROTO - TS_WIND_ORDREL"
 #define sref_case_13_12_1_5 sref_case_13
 #define desc_case_13_12_1_5 "\
-Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_ORDREL_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_ORDREL_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_ORDREL_REQ primitive."
 
 int
 test_case_13_12_1_5_conn(int child)
@@ -38224,10 +38418,10 @@ struct test_stream test_13_12_1_5_list = { &preamble_13_12_1_5_list, &test_case_
 #define name_case_13_13_1 "Fatal and non-fatal errors -- T_UNBIND_REQ - EPROTO"
 #define sref_case_13_13_1 sref_case_13
 #define desc_case_13_13_1 "\
-Checks that the EPROTO error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_UNBIND_REQ primitive\n\
+under proper circumstances.  The TPI specification lists under each primitive\n\
+which fatal and non-fatal errors are permitted.  This test case tests the EPROTO\n\
+error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_1_conn(int child)
@@ -38264,10 +38458,10 @@ struct test_stream test_13_13_1_list = { &preamble_13_13_1_list, &test_case_13_1
 #define name_case_13_13_2_1 "Fatal and non-fatal errors -- T_UNBIND_REQ - TOUTSTATE - TS_UNBND"
 #define sref_case_13_13_2_1 sref_case_13
 #define desc_case_13_13_2_1 "\
-Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_2(int child)
@@ -38321,10 +38515,10 @@ struct test_stream test_13_13_2_1_list = { &preamble_13_13_2_1_list, &test_case_
 #define name_case_13_13_2_2 "Fatal and non-fatal errors -- T_UNBIND_REQ - TOUTSTATE - TS_WCON_CREQ"
 #define sref_case_13_13_2_2 sref_case_13
 #define desc_case_13_13_2_2 "\
-Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_2_2_conn(int child)
@@ -38361,10 +38555,10 @@ struct test_stream test_13_13_2_2_list = { &preamble_13_13_2_2_list, &test_case_
 #define name_case_13_13_2_3 "Fatal and non-fatal errors -- T_UNBIND_REQ - TOUTSTATE - TS_WRES_CIND"
 #define sref_case_13_13_2_3 sref_case_13
 #define desc_case_13_13_2_3 "\
-Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_2_3_conn(int child)
@@ -38405,10 +38599,10 @@ struct test_stream test_13_13_2_3_list = { &preamble_13_13_2_3_list, &test_case_
 #define name_case_13_13_2_4 "Fatal and non-fatal errors -- T_UNBIND_REQ - TOUTSTATE - TS_DATA_XFER"
 #define sref_case_13_13_2_4 sref_case_13
 #define desc_case_13_13_2_4 "\
-Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_2_4_conn(int child)
@@ -38445,10 +38639,10 @@ struct test_stream test_13_13_2_4_list = { &preamble_13_13_2_4_list, &test_case_
 #define name_case_13_13_2_5 "Fatal and non-fatal errors -- T_UNBIND_REQ - TOUTSTATE - TS_WIND_ORDREL"
 #define sref_case_13_13_2_5 sref_case_13
 #define desc_case_13_13_2_5 "\
-Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_2_5_conn(int child)
@@ -38485,10 +38679,10 @@ struct test_stream test_13_13_2_5_list = { &preamble_13_13_2_5_list, &test_case_
 #define name_case_13_13_2_6 "Fatal and non-fatal errors -- T_UNBIND_REQ - TOUTSTATE - TS_WREQ_ORDREL"
 #define sref_case_13_13_2_6 sref_case_13
 #define desc_case_13_13_2_6 "\
-Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TOUTSTATE error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the TOUTSTATE error is returned in response to a T_UNBIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TOUTSTATE error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_2_6_conn(int child)
@@ -38525,10 +38719,10 @@ struct test_stream test_13_13_2_6_list = { &preamble_13_13_2_6_list, &test_case_
 #define name_case_13_13_3 "Fatal and non-fatal errors -- T_UNBIND_REQ - TSYSERR"
 #define sref_case_13_13_3 sref_case_13
 #define desc_case_13_13_3 "\
-Checks that the TSYSERR error is returned in response to a T_UNBIND_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the TSYSERR error\n\
-for the T_UNBIND_REQ primitive."
+Checks that the TSYSERR error is returned in response to a T_UNBIND_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the TSYSERR error for the T_UNBIND_REQ primitive."
 
 int
 test_case_13_13_3_conn(int child)
@@ -38565,10 +38759,10 @@ struct test_stream test_13_13_3_list = { &preamble_13_13_3_list, &test_case_13_1
 #define name_case_13_14_1_1 "Fatal and non-fatal errors -- T_UNITDATA_REQ - EPROTO - TS_UNBND"
 #define sref_case_13_14_1_1 sref_case_13
 #define desc_case_13_14_1_1 "\
-Checks that the EPROTO error is returned in response to a T_UNITDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_UNITDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_UNITDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_UNITDATA_REQ primitive."
 
 int
 test_case_13_14_1(int child)
@@ -38627,10 +38821,10 @@ struct test_stream test_13_14_1_1_list = { &preamble_13_14_1_1_list, &test_case_
 #define name_case_13_14_2 "Fatal and non-fatal errors -- T_UNITDATA_REQ - EPROTO"
 #define sref_case_13_14_2 sref_case_13
 #define desc_case_13_14_2 "\
-Checks that the EPROTO error is returned in response to a T_UNITDATA_REQ primitive under\n\
-proper circumstances.  The TPI specification lists under each primitive which\n\
-fatal and non-fatal errors are permitted.  This test case tests the EPROTO error\n\
-for the T_UNITDATA_REQ primitive."
+Checks that the EPROTO error is returned in response to a T_UNITDATA_REQ\n\
+primitive under proper circumstances.  The TPI specification lists under each\n\
+primitive which fatal and non-fatal errors are permitted.  This test case tests\n\
+the EPROTO error for the T_UNITDATA_REQ primitive."
 
 int
 test_case_13_14_2(int child)
@@ -38643,11 +38837,22 @@ test_case_13_14_2(int child)
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __RESULT_FAILURE) != __RESULT_SUCCESS)
+	expect(child, NORMAL_WAIT, (last_info.PROVIDER_flag & T_SNDZERO) ? __TEST_UNITDATA_IND : __RESULT_FAILURE);
+	switch (last_event) {
+	case __RESULT_FAILURE:
+		if (last_info.PROVIDER_flag & T_SNDZERO)
+			goto failure;
+		state++;
+		if (last_errno != EPROTO)
+			goto failure;
+		break;
+	case __TEST_UNITDATA_IND:
+		if (!(last_info.PROVIDER_flag & T_SNDZERO))
+			goto failure;
+		break;
+	default:
 		goto failure;
-	state++;
-	if (last_errno != EPROTO)
-		goto failure;
+	}
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -38678,9 +38883,10 @@ struct test_stream test_13_14_2_list = { &preamble_13_14_2_list, &test_case_13_1
 #define name_case_14_1_1 "Allowable states -- T_ADDR_REQ -- TS_UNBND"
 #define sref_case_14_1_1 sref_case_14
 #define desc_case_14_1_1 "\
-Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed state\n\
-TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_UNBND state."
+Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed\n\
+state TS_UNBND.  The TPI specification indicates the allowable states in which\n\
+primitives can be issued.  This test case tests the T_ADDR_REQ primitive in the\n\
+TS_UNBND state."
 
 int
 test_case_14_1(int child)
@@ -38717,9 +38923,10 @@ struct test_stream test_14_1_1_list = { &preamble_14_1_1_list, &test_case_14_1_1
 #define name_case_14_1_2 "Allowable states -- T_ADDR_REQ -- TS_IDLE"
 #define sref_case_14_1_2 sref_case_14
 #define desc_case_14_1_2 "\
-Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed state\n\
-TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_IDLE state."
+Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed\n\
+state TS_IDLE.  The TPI specification indicates the allowable states in which\n\
+primitives can be issued.  This test case tests the T_ADDR_REQ primitive in the\n\
+TS_IDLE state."
 
 #define test_case_14_1_2_conn	test_case_14_1
 #define test_case_14_1_2_resp	test_case_14_1
@@ -38742,9 +38949,10 @@ struct test_stream test_14_1_2_list = { &preamble_14_1_2_list, &test_case_14_1_2
 #define name_case_14_1_3 "Allowable states -- T_ADDR_REQ -- TS_WCON_CREQ"
 #define sref_case_14_1_3 sref_case_14
 #define desc_case_14_1_3 "\
-Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed state\n\
-TS_WCON_CREQ.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WCON_CREQ state."
+Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed\n\
+state TS_WCON_CREQ.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_ADDR_REQ primitive\n\
+in the TS_WCON_CREQ state."
 
 int
 test_case_14_1_3_conn(int child)
@@ -38781,9 +38989,10 @@ struct test_stream test_14_1_3_list = { &preamble_14_1_3_list, &test_case_14_1_3
 #define name_case_14_1_4 "Allowable states -- T_ADDR_REQ -- TS_WRES_CIND"
 #define sref_case_14_1_4 sref_case_14
 #define desc_case_14_1_4 "\
-Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed state\n\
-TS_WRES_CIND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WRES_CIND state."
+Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed\n\
+state TS_WRES_CIND.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_ADDR_REQ primitive\n\
+in the TS_WRES_CIND state."
 
 int
 test_case_14_1_4_conn(int child)
@@ -38820,9 +39029,10 @@ struct test_stream test_14_1_4_list = { &preamble_14_1_4_list, &test_case_14_1_4
 #define name_case_14_1_5 "Allowable states -- T_ADDR_REQ -- TS_DATA_XFER"
 #define sref_case_14_1_5 sref_case_14
 #define desc_case_14_1_5 "\
-Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed\n\
+state TS_DATA_XFER.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_ADDR_REQ primitive\n\
+in the TS_DATA_XFER state."
 
 int
 test_case_14_1_5_conn(int child)
@@ -38859,9 +39069,10 @@ struct test_stream test_14_1_5_list = { &preamble_14_1_5_list, &test_case_14_1_5
 #define name_case_14_1_6 "Allowable states -- T_ADDR_REQ -- TS_WIND_ORDREL"
 #define sref_case_14_1_6 sref_case_14
 #define desc_case_14_1_6 "\
-Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed state\n\
-TS_WIND_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WIND_ORDREL state."
+Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed\n\
+state TS_WIND_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_ADDR_REQ primitive\n\
+in the TS_WIND_ORDREL state."
 
 int
 test_case_14_1_6_conn(int child)
@@ -38898,9 +39109,10 @@ struct test_stream test_14_1_6_list = { &preamble_14_1_6_list, &test_case_14_1_6
 #define name_case_14_1_7 "Allowable states -- T_ADDR_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_1_7 sref_case_14
 #define desc_case_14_1_7 "\
-Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ADDR_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_ADDR_REQ primitive can be successfully issued in the allowed\n\
+state TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_ADDR_REQ primitive\n\
+in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_1_7_conn(int child)
@@ -38937,9 +39149,10 @@ struct test_stream test_14_1_7_list = { &preamble_14_1_7_list, &test_case_14_1_7
 #define name_case_14_2_1 "Allowable states -- T_BIND_REQ -- TS_UNBND"
 #define sref_case_14_2_1 sref_case_14
 #define desc_case_14_2_1 "\
-Checks that the T_BIND_REQ primitive can be successfully issued in the allowed state\n\
-TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_BIND_REQ primitive in the TS_UNBND state."
+Checks that the T_BIND_REQ primitive can be successfully issued in the allowed\n\
+state TS_UNBND.  The TPI specification indicates the allowable states in which\n\
+primitives can be issued.  This test case tests the T_BIND_REQ primitive in the\n\
+TS_UNBND state."
 
 int
 test_case_14_2(int child)
@@ -38979,9 +39192,10 @@ struct test_stream test_14_2_1_list = { &preamble_14_2_1_list, &test_case_14_2_1
 #define name_case_14_3_1 "Allowable states -- T_CAPABILITY_REQ -- TS_UNBND"
 #define sref_case_14_3_1 sref_case_14
 #define desc_case_14_3_1 "\
-Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the allowed state\n\
-TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_UNBND state."
+Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the\n\
+allowed state TS_UNBND.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_CAPABILITY_REQ\n\
+primitive in the TS_UNBND state."
 
 int
 test_case_14_3(int child)
@@ -39019,9 +39233,10 @@ struct test_stream test_14_3_1_list = { &preamble_14_3_1_list, &test_case_14_3_1
 #define name_case_14_3_2 "Allowable states -- T_CAPABILITY_REQ -- TS_IDLE"
 #define sref_case_14_3_2 sref_case_14
 #define desc_case_14_3_2 "\
-Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the allowed state\n\
-TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_IDLE state."
+Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the\n\
+allowed state TS_IDLE.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_CAPABILITY_REQ\n\
+primitive in the TS_IDLE state."
 
 #define test_case_14_3_2_conn	test_case_14_3
 #define test_case_14_3_2_resp	test_case_14_3
@@ -39044,9 +39259,10 @@ struct test_stream test_14_3_2_list = { &preamble_14_3_2_list, &test_case_14_3_2
 #define name_case_14_3_3 "Allowable states -- T_CAPABILITY_REQ -- TS_WCON_CREQ"
 #define sref_case_14_3_3 sref_case_14
 #define desc_case_14_3_3 "\
-Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the allowed state\n\
-TS_WCON_CREQ.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WCON_CREQ state."
+Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the\n\
+allowed state TS_WCON_CREQ.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_CAPABILITY_REQ primitive in the TS_WCON_CREQ state."
 
 int
 test_case_14_3_3_conn(int child)
@@ -39083,9 +39299,10 @@ struct test_stream test_14_3_3_list = { &preamble_14_3_3_list, &test_case_14_3_3
 #define name_case_14_3_4 "Allowable states -- T_CAPABILITY_REQ -- TS_WRES_CIND"
 #define sref_case_14_3_4 sref_case_14
 #define desc_case_14_3_4 "\
-Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the allowed state\n\
-TS_WRES_CIND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WRES_CIND state."
+Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the\n\
+allowed state TS_WRES_CIND.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_CAPABILITY_REQ primitive in the TS_WRES_CIND state."
 
 int
 test_case_14_3_4_conn(int child)
@@ -39122,9 +39339,10 @@ struct test_stream test_14_3_4_list = { &preamble_14_3_4_list, &test_case_14_3_4
 #define name_case_14_3_5 "Allowable states -- T_CAPABILITY_REQ -- TS_DATA_XFER"
 #define sref_case_14_3_5 sref_case_14
 #define desc_case_14_3_5 "\
-Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the\n\
+allowed state TS_DATA_XFER.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_CAPABILITY_REQ primitive in the TS_DATA_XFER state."
 
 int
 test_case_14_3_5_conn(int child)
@@ -39161,9 +39379,10 @@ struct test_stream test_14_3_5_list = { &preamble_14_3_5_list, &test_case_14_3_5
 #define name_case_14_3_6 "Allowable states -- T_CAPABILITY_REQ -- TS_WIND_ORDREL"
 #define sref_case_14_3_6 sref_case_14
 #define desc_case_14_3_6 "\
-Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the allowed state\n\
-TS_WIND_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WIND_ORDREL state."
+Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the\n\
+allowed state TS_WIND_ORDREL.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_CAPABILITY_REQ primitive in the TS_WIND_ORDREL state."
 
 int
 test_case_14_3_6_conn(int child)
@@ -39200,9 +39419,10 @@ struct test_stream test_14_3_6_list = { &preamble_14_3_6_list, &test_case_14_3_6
 #define name_case_14_3_7 "Allowable states -- T_CAPABILITY_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_3_7 sref_case_14
 #define desc_case_14_3_7 "\
-Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CAPABILITY_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_CAPABILITY_REQ primitive can be successfully issued in the\n\
+allowed state TS_WREQ_ORDREL.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_CAPABILITY_REQ primitive in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_3_7_conn(int child)
@@ -39239,9 +39459,10 @@ struct test_stream test_14_3_7_list = { &preamble_14_3_7_list, &test_case_14_3_7
 #define name_case_14_4_1 "Allowable states -- T_CONN_REQ -- TS_IDLE"
 #define sref_case_14_4_1 sref_case_14
 #define desc_case_14_4_1 "\
-Checks that the T_CONN_REQ primitive can be successfully issued in the allowed state\n\
-TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CONN_REQ primitive in the TS_IDLE state."
+Checks that the T_CONN_REQ primitive can be successfully issued in the allowed\n\
+state TS_IDLE.  The TPI specification indicates the allowable states in which\n\
+primitives can be issued.  This test case tests the T_CONN_REQ primitive in the\n\
+TS_IDLE state."
 
 int
 test_case_14_4_1_conn(int child)
@@ -39291,9 +39512,10 @@ struct test_stream test_14_4_1_list = { &preamble_14_4_1_list, &test_case_14_4_1
 #define name_case_14_5_1 "Allowable states -- T_CONN_RES -- TS_WRES_CIND"
 #define sref_case_14_5_1 sref_case_14
 #define desc_case_14_5_1 "\
-Checks that the T_CONN_RES primitive can be successfully issued in the allowed state\n\
-TS_WRES_CIND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_CONN_RES primitive in the TS_WRES_CIND state."
+Checks that the T_CONN_RES primitive can be successfully issued in the allowed\n\
+state TS_WRES_CIND.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_CONN_RES primitive\n\
+in the TS_WRES_CIND state."
 
 int
 test_case_14_5_1_conn(int child)
@@ -39344,9 +39566,10 @@ struct test_stream test_14_5_1_list = { &preamble_14_5_1_list, &test_case_14_5_1
 #define name_case_14_6_1 "Allowable states -- T_DATA_REQ -- TS_DATA_XFER"
 #define sref_case_14_6_1 sref_case_14
 #define desc_case_14_6_1 "\
-Checks that the T_DATA_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_DATA_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_DATA_REQ primitive can be successfully issued in the allowed\n\
+state TS_DATA_XFER.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_DATA_REQ primitive\n\
+in the TS_DATA_XFER state."
 
 int
 test_case_14_6_1_conn(int child)
@@ -39403,9 +39626,10 @@ struct test_stream test_14_6_1_list = { &preamble_14_6_1_list, &test_case_14_6_1
 #define name_case_14_6_2 "Allowable states -- T_DATA_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_6_2 sref_case_14
 #define desc_case_14_6_2 "\
-Checks that the T_DATA_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_DATA_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_DATA_REQ primitive can be successfully issued in the allowed\n\
+state TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_DATA_REQ primitive\n\
+in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_6_2_conn(int child)
@@ -39454,9 +39678,10 @@ struct test_stream test_14_6_2_list = { &preamble_14_6_2_list, &test_case_14_6_2
 #define name_case_14_7_1 "Allowable states -- T_DISCON_REQ -- TS_WCON_CREQ"
 #define sref_case_14_7_1 sref_case_14
 #define desc_case_14_7_1 "\
-Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed state\n\
-TS_WCON_CREQ.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WCON_CREQ state."
+Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed\n\
+state TS_WCON_CREQ.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_DISCON_REQ primitive\n\
+in the TS_WCON_CREQ state."
 
 int
 test_case_14_7_1_conn(int child)
@@ -39503,9 +39728,10 @@ struct test_stream test_14_7_1_list = { &preamble_14_7_1_list, &test_case_14_7_1
 #define name_case_14_7_2 "Allowable states -- T_DISCON_REQ -- TS_WRES_CIND"
 #define sref_case_14_7_2 sref_case_14
 #define desc_case_14_7_2 "\
-Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed state\n\
-TS_WRES_CIND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WRES_CIND state."
+Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed\n\
+state TS_WRES_CIND.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_DISCON_REQ primitive\n\
+in the TS_WRES_CIND state."
 
 int
 test_case_14_7_2_conn(int child)
@@ -39556,9 +39782,10 @@ struct test_stream test_14_7_2_list = { &preamble_14_7_2_list, &test_case_14_7_2
 #define name_case_14_7_3 "Allowable states -- T_DISCON_REQ -- TS_DATA_XFER"
 #define sref_case_14_7_3 sref_case_14
 #define desc_case_14_7_3 "\
-Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed\n\
+state TS_DATA_XFER.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_DISCON_REQ primitive\n\
+in the TS_DATA_XFER state."
 
 int
 test_case_14_7_3_conn(int child)
@@ -39610,9 +39837,10 @@ struct test_stream test_14_7_3_list = { &preamble_14_7_3_list, &test_case_14_7_3
 #define name_case_14_7_4 "Allowable states -- T_DISCON_REQ -- TS_WIND_ORDREL"
 #define sref_case_14_7_4 sref_case_14
 #define desc_case_14_7_4 "\
-Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed state\n\
-TS_WIND_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WIND_ORDREL state."
+Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed\n\
+state TS_WIND_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_DISCON_REQ primitive\n\
+in the TS_WIND_ORDREL state."
 
 int
 test_case_14_7_4_conn(int child)
@@ -39664,9 +39892,10 @@ struct test_stream test_14_7_4_list = { &preamble_14_7_4_list, &test_case_14_7_4
 #define name_case_14_7_5 "Allowable states -- T_DISCON_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_7_5 sref_case_14
 #define desc_case_14_7_5 "\
-Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_DISCON_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_DISCON_REQ primitive can be successfully issued in the allowed\n\
+state TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_DISCON_REQ primitive\n\
+in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_7_5_conn(int child)
@@ -39724,9 +39953,10 @@ struct test_stream test_14_7_5_list = { &preamble_14_7_5_list, &test_case_14_7_5
 #define name_case_14_8_1 "Allowable states -- T_EXDATA_REQ -- TS_DATA_XFER"
 #define sref_case_14_8_1 sref_case_14
 #define desc_case_14_8_1 "\
-Checks that the T_EXDATA_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_EXDATA_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_EXDATA_REQ primitive can be successfully issued in the allowed\n\
+state TS_DATA_XFER.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_EXDATA_REQ primitive\n\
+in the TS_DATA_XFER state."
 
 int
 test_case_14_8_1_conn(int child)
@@ -39736,7 +39966,15 @@ test_case_14_8_1_conn(int child)
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+	test_data = "Some normal data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -39750,10 +39988,20 @@ test_case_14_8_1_resp(int child)
 	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
 	test_data = "A";
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_data = "Some normal data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -39783,14 +40031,18 @@ struct test_stream test_14_8_1_list = { &preamble_14_8_1_list, &test_case_14_8_1
 #define name_case_14_8_2 "Allowable states -- T_EXDATA_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_8_2 sref_case_14
 #define desc_case_14_8_2 "\
-Checks that the T_EXDATA_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_EXDATA_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_EXDATA_REQ primitive can be successfully issued in the allowed\n\
+state TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_EXDATA_REQ primitive\n\
+in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_8_2_conn(int child)
 {
 	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -39805,6 +40057,13 @@ test_case_14_8_2_resp(int child)
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_data = "Some normal data.";
+	MORE_flag = 0;
+	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
+		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -39834,9 +40093,10 @@ struct test_stream test_14_8_2_list = { &preamble_14_8_2_list, &test_case_14_8_2
 #define name_case_14_9_1 "Allowable states -- T_INFO_REQ -- TS_UNBND"
 #define sref_case_14_9_1 sref_case_14
 #define desc_case_14_9_1 "\
-Checks that the T_INFO_REQ primitive can be successfully issued in the allowed state\n\
-TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_INFO_REQ primitive in the TS_UNBND state."
+Checks that the T_INFO_REQ primitive can be successfully issued in the allowed\n\
+state TS_UNBND.  The TPI specification indicates the allowable states in which\n\
+primitives can be issued.  This test case tests the T_INFO_REQ primitive in the\n\
+TS_UNBND state."
 
 int
 test_case_14_9(int child, t_uscalar_t CURRENT_state)
@@ -39892,9 +40152,10 @@ struct test_stream test_14_9_1_list = { &preamble_14_9_1_list, &test_case_14_9_1
 #define name_case_14_9_2 "Allowable states -- T_INFO_REQ -- TS_IDLE"
 #define sref_case_14_9_2 sref_case_14
 #define desc_case_14_9_2 "\
-Checks that the T_INFO_REQ primitive can be successfully issued in the allowed state\n\
-TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_INFO_REQ primitive in the TS_IDLE state."
+Checks that the T_INFO_REQ primitive can be successfully issued in the allowed\n\
+state TS_IDLE.  The TPI specification indicates the allowable states in which\n\
+primitives can be issued.  This test case tests the T_INFO_REQ primitive in the\n\
+TS_IDLE state."
 
 int
 test_case_14_9_2_conn(int child)
@@ -39931,9 +40192,10 @@ struct test_stream test_14_9_2_list = { &preamble_14_9_2_list, &test_case_14_9_2
 #define name_case_14_9_3 "Allowable states -- T_INFO_REQ -- TS_WCON_CREQ"
 #define sref_case_14_9_3 sref_case_14
 #define desc_case_14_9_3 "\
-Checks that the T_INFO_REQ primitive can be successfully issued in the allowed state\n\
-TS_WCON_CREQ.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WCON_CREQ state."
+Checks that the T_INFO_REQ primitive can be successfully issued in the allowed\n\
+state TS_WCON_CREQ.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_INFO_REQ primitive\n\
+in the TS_WCON_CREQ state."
 
 int
 test_case_14_9_3_conn(int child)
@@ -39970,9 +40232,10 @@ struct test_stream test_14_9_3_list = { &preamble_14_9_3_list, &test_case_14_9_3
 #define name_case_14_9_4 "Allowable states -- T_INFO_REQ -- TS_WRES_CIND"
 #define sref_case_14_9_4 sref_case_14
 #define desc_case_14_9_4 "\
-Checks that the T_INFO_REQ primitive can be successfully issued in the allowed state\n\
-TS_WRES_CIND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WRES_CIND state."
+Checks that the T_INFO_REQ primitive can be successfully issued in the allowed\n\
+state TS_WRES_CIND.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_INFO_REQ primitive\n\
+in the TS_WRES_CIND state."
 
 int
 test_case_14_9_4_conn(int child)
@@ -40013,9 +40276,10 @@ struct test_stream test_14_9_4_list = { &preamble_14_9_4_list, &test_case_14_9_4
 #define name_case_14_9_5 "Allowable states -- T_INFO_REQ -- TS_DATA_XFER"
 #define sref_case_14_9_5 sref_case_14
 #define desc_case_14_9_5 "\
-Checks that the T_INFO_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_INFO_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_INFO_REQ primitive can be successfully issued in the allowed\n\
+state TS_DATA_XFER.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_INFO_REQ primitive\n\
+in the TS_DATA_XFER state."
 
 int
 test_case_14_9_5_conn(int child)
@@ -40052,9 +40316,10 @@ struct test_stream test_14_9_5_list = { &preamble_14_9_5_list, &test_case_14_9_5
 #define name_case_14_9_6 "Allowable states -- T_INFO_REQ -- TS_WIND_ORDREL"
 #define sref_case_14_9_6 sref_case_14
 #define desc_case_14_9_6 "\
-Checks that the T_INFO_REQ primitive can be successfully issued in the allowed state\n\
-TS_WIND_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WIND_ORDREL state."
+Checks that the T_INFO_REQ primitive can be successfully issued in the allowed\n\
+state TS_WIND_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_INFO_REQ primitive\n\
+in the TS_WIND_ORDREL state."
 
 int
 test_case_14_9_6_conn(int child)
@@ -40091,9 +40356,10 @@ struct test_stream test_14_9_6_list = { &preamble_14_9_6_list, &test_case_14_9_6
 #define name_case_14_9_7 "Allowable states -- T_INFO_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_9_7 sref_case_14
 #define desc_case_14_9_7 "\
-Checks that the T_INFO_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_INFO_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_INFO_REQ primitive can be successfully issued in the allowed\n\
+state TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_INFO_REQ primitive\n\
+in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_9_7_conn(int child)
@@ -40130,9 +40396,10 @@ struct test_stream test_14_9_7_list = { &preamble_14_9_7_list, &test_case_14_9_7
 #define name_case_14_10_1 "Allowable states -- T_OPTDATA_REQ -- TS_DATA_XFER"
 #define sref_case_14_10_1 sref_case_14
 #define desc_case_14_10_1 "\
-Checks that the T_OPTDATA_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTDATA_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_OPTDATA_REQ primitive can be successfully issued in the\n\
+allowed state TS_DATA_XFER.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_OPTDATA_REQ primitive in the TS_DATA_XFER state."
 
 int
 test_case_14_10_1_conn(int child)
@@ -40193,9 +40460,10 @@ struct test_stream test_14_10_1_list = { &preamble_14_10_1_list, &test_case_14_1
 #define name_case_14_10_2 "Allowable states -- T_OPTDATA_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_10_2 sref_case_14
 #define desc_case_14_10_2 "\
-Checks that the T_OPTDATA_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTDATA_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_OPTDATA_REQ primitive can be successfully issued in the\n\
+allowed state TS_WREQ_ORDREL.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_OPTDATA_REQ primitive in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_10_2_conn(int child)
@@ -40246,9 +40514,10 @@ struct test_stream test_14_10_2_list = { &preamble_14_10_2_list, &test_case_14_1
 #define name_case_14_11_1 "Allowable states -- T_OPTMGMT_REQ -- TS_UNBND"
 #define sref_case_14_11_1 sref_case_14
 #define desc_case_14_11_1 "\
-Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowed state\n\
-TS_UNBND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_UNBND state."
+Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the\n\
+allowed state TS_UNBND.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_OPTMGMT_REQ\n\
+primitive in the TS_UNBND state."
 
 int
 test_case_14_11(int child)
@@ -40302,9 +40571,10 @@ struct test_stream test_14_11_1_list = { &preamble_14_11_1_list, &test_case_14_1
 #define name_case_14_11_2 "Allowable states -- T_OPTMGMT_REQ -- TS_IDLE"
 #define sref_case_14_11_2 sref_case_14
 #define desc_case_14_11_2 "\
-Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowed state\n\
-TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_IDLE state."
+Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the\n\
+allowed state TS_IDLE.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_OPTMGMT_REQ\n\
+primitive in the TS_IDLE state."
 
 int
 test_case_14_11_2_conn(int child)
@@ -40341,9 +40611,10 @@ struct test_stream test_14_11_2_list = { &preamble_14_11_2_list, &test_case_14_1
 #define name_case_14_11_3 "Allowable states -- T_OPTMGMT_REQ -- TS_WCON_CREQ"
 #define sref_case_14_11_3 sref_case_14
 #define desc_case_14_11_3 "\
-Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowed state\n\
-TS_WCON_CREQ.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WCON_CREQ state."
+Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the\n\
+allowed state TS_WCON_CREQ.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_OPTMGMT_REQ primitive in the TS_WCON_CREQ state."
 
 int
 test_case_14_11_3_conn(int child)
@@ -40380,9 +40651,10 @@ struct test_stream test_14_11_3_list = { &preamble_14_11_3_list, &test_case_14_1
 #define name_case_14_11_4 "Allowable states -- T_OPTMGMT_REQ -- TS_WRES_CIND"
 #define sref_case_14_11_4 sref_case_14
 #define desc_case_14_11_4 "\
-Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowed state\n\
-TS_WRES_CIND.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WRES_CIND state."
+Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the\n\
+allowed state TS_WRES_CIND.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_OPTMGMT_REQ primitive in the TS_WRES_CIND state."
 
 int
 test_case_14_11_4_conn(int child)
@@ -40421,9 +40693,10 @@ struct test_stream test_14_11_4_list = { &preamble_14_11_4_list, &test_case_14_1
 #define name_case_14_11_5 "Allowable states -- T_OPTMGMT_REQ -- TS_DATA_XFER"
 #define sref_case_14_11_5 sref_case_14
 #define desc_case_14_11_5 "\
-Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the\n\
+allowed state TS_DATA_XFER.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_OPTMGMT_REQ primitive in the TS_DATA_XFER state."
 
 int
 test_case_14_11_5_conn(int child)
@@ -40460,9 +40733,10 @@ struct test_stream test_14_11_5_list = { &preamble_14_11_5_list, &test_case_14_1
 #define name_case_14_11_6 "Allowable states -- T_OPTMGMT_REQ -- TS_WIND_ORDREL"
 #define sref_case_14_11_6 sref_case_14
 #define desc_case_14_11_6 "\
-Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowed state\n\
-TS_WIND_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WIND_ORDREL state."
+Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the\n\
+allowed state TS_WIND_ORDREL.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_OPTMGMT_REQ primitive in the TS_WIND_ORDREL state."
 
 int
 test_case_14_11_6_conn(int child)
@@ -40499,9 +40773,10 @@ struct test_stream test_14_11_6_list = { &preamble_14_11_6_list, &test_case_14_1
 #define name_case_14_11_7 "Allowable states -- T_OPTMGMT_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_11_7 sref_case_14
 #define desc_case_14_11_7 "\
-Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_OPTMGMT_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_OPTMGMT_REQ primitive can be successfully issued in the\n\
+allowed state TS_WREQ_ORDREL.  The TPI specification indicates the allowable\n\
+states in which primitives can be issued.  This test case tests the\n\
+T_OPTMGMT_REQ primitive in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_11_7_conn(int child)
@@ -40538,9 +40813,10 @@ struct test_stream test_14_11_7_list = { &preamble_14_11_7_list, &test_case_14_1
 #define name_case_14_12_1 "Allowable states -- T_ORDREL_REQ -- TS_DATA_XFER"
 #define sref_case_14_12_1 sref_case_14
 #define desc_case_14_12_1 "\
-Checks that the T_ORDREL_REQ primitive can be successfully issued in the allowed state\n\
-TS_DATA_XFER.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ORDREL_REQ primitive in the TS_DATA_XFER state."
+Checks that the T_ORDREL_REQ primitive can be successfully issued in the allowed\n\
+state TS_DATA_XFER.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_ORDREL_REQ primitive\n\
+in the TS_DATA_XFER state."
 
 int
 test_case_14_12_1_conn(int child)
@@ -40588,9 +40864,10 @@ struct test_stream test_14_12_1_list = { &preamble_14_12_1_list, &test_case_14_1
 #define name_case_14_12_2 "Allowable states -- T_ORDREL_REQ -- TS_WREQ_ORDREL"
 #define sref_case_14_12_2 sref_case_14
 #define desc_case_14_12_2 "\
-Checks that the T_ORDREL_REQ primitive can be successfully issued in the allowed state\n\
-TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_ORDREL_REQ primitive in the TS_WREQ_ORDREL state."
+Checks that the T_ORDREL_REQ primitive can be successfully issued in the allowed\n\
+state TS_WREQ_ORDREL.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_ORDREL_REQ primitive\n\
+in the TS_WREQ_ORDREL state."
 
 int
 test_case_14_12_2_conn(int child)
@@ -40638,9 +40915,10 @@ struct test_stream test_14_12_2_list = { &preamble_14_12_2_list, &test_case_14_1
 #define name_case_14_13_1 "Allowable states -- T_UNBIND_REQ -- TS_IDLE"
 #define sref_case_14_13_1 sref_case_14
 #define desc_case_14_13_1 "\
-Checks that the T_UNBIND_REQ primitive can be successfully issued in the allowed state\n\
-TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_UNBIND_REQ primitive in the TS_IDLE state."
+Checks that the T_UNBIND_REQ primitive can be successfully issued in the allowed\n\
+state TS_IDLE.  The TPI specification indicates the allowable states in which\n\
+primitives can be issued.  This test case tests the T_UNBIND_REQ primitive in\n\
+the TS_IDLE state."
 
 int
 test_case_14_13(int child)
@@ -40691,9 +40969,10 @@ struct test_stream test_14_13_1_list = { &preamble_14_13_1_list, &test_case_14_1
 #define name_case_14_14_1 "Allowable states -- T_UNITDATA_REQ -- TS_IDLE"
 #define sref_case_14_14_1 sref_case_14
 #define desc_case_14_14_1 "\
-Checks that the T_UNITDATA_REQ primitive can be successfully issued in the allowed state\n\
-TS_IDLE.  The TPI specification indicates the allowable states in which primitives\n\
-can be issued.  This test case tests the T_UNITDATA_REQ primitive in the TS_IDLE state."
+Checks that the T_UNITDATA_REQ primitive can be successfully issued in the\n\
+allowed state TS_IDLE.  The TPI specification indicates the allowable states in\n\
+which primitives can be issued.  This test case tests the T_UNITDATA_REQ\n\
+primitive in the TS_IDLE state."
 
 int
 test_case_14_14(int child)

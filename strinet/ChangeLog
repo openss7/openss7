@@ -1,3 +1,22 @@
+2008-10-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man3/xti_tcp.3.man: correction
+	* doc/man/man4/rawip.4.man: updated strinet driver docs
+	* doc/man/man4/tcp.4.man: updated strinet driver docs
+	* doc/man/man4/udp.4.man: updated strinet driver docs
+	* doc/manual/bugs.texi: documented bugs
+	* src/drivers/inet.c: notes on T_SNDZERO
+	* src/drivers/rawip.c: rationalize to other drivers in family
+	* src/drivers/udp.c: rationalize to other drivers in family
+	* src/test/test-inet_raw.c: upgrade test cases
+	* src/test/test-inet_sctp.c: upgrade test cases
+	* src/test/test-inet_tcp.c: upgrade test cases
+	* src/test/test-inet_udp.c: upgrade test cases
+	* tests/testsuite-inet_raw.at: upgrade test cases
+	* tests/testsuite-inet_sctp.at: upgrade test cases
+	* tests/testsuite-inet_tcp.at: upgrade test cases
+	* tests/testsuite-inet_udp.at: upgrade test cases
+
 2008-10-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/rawip.c: rationalize to np_ip driver
