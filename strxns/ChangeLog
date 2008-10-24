@@ -1,3 +1,8 @@
+2008-10-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/np_ip.c: rationalize drivers to others in family
+	* src/drivers/np_udp.c: rationalize drivers to others in family
+
 2008-10-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/np_ip.c: cleanup of function prototype types
