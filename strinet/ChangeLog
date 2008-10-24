@@ -1,5 +1,9 @@
 2008-10-24  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-inet_raw.c: final test suites
+	* src/test/test-inet_tcp.c: final test suites
+	* src/test/test-inet_udp.c: final test suites
+
 	* doc/man/man8/test-inet_raw.8.man: updated test suites
 	* doc/man/man8/test-inet_sctp.8.man: updated test suites
 	* doc/man/man8/test-inet_tcp.8.man: updated test suites

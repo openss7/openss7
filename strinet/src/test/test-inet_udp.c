@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-24 15:51:16 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-24 17:47:41 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-24 15:51:16 $ by $Author: brian $
+ Last Modified $Date: 2008-10-24 17:47:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.62  2008-10-24 17:47:41  brian
+ - final test suites
+
  Revision 0.9.2.61  2008-10-24 15:51:16  brian
  - updated test suites
 
@@ -88,9 +91,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-24 15:51:16 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-24 17:47:41 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-24 15:51:16 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008-10-24 17:47:41 $";
 
 /*
  *  Simple test program for INET streams.
@@ -769,12 +772,14 @@ struct {
  * management options
  */
 struct {
+#if 1
 #if 0
 	struct t_opthdr xdb_hdr;
 	t_uscalar_t xdb_val;
 #else
 	struct t_opthdr dbg_hdr;
 	t_uscalar_t dbg_val;
+#endif
 #endif
 	struct t_opthdr lin_hdr;
 	struct t_linger lin_val;
@@ -860,8 +865,10 @@ struct {
 #endif
 } opt_optm = {
 	{
+#if 1
 	sizeof(struct t_opthdr) + sizeof(t_uscalar_t), XTI_GENERIC, XTI_DEBUG, T_SUCCESS}
 	, 0x0, {
+#endif
 	sizeof(struct t_opthdr) + sizeof(struct t_linger), XTI_GENERIC, XTI_LINGER, T_SUCCESS}, {
 	T_NO, T_UNSPEC}
 	, {
@@ -5807,6 +5814,7 @@ postamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
+#if 0
 static int
 postamble_1e(int child)
 {
@@ -5843,6 +5851,7 @@ postamble_1e(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+#endif
 
 static int
 preamble_2_conn(int child)
@@ -18676,7 +18685,7 @@ postamble_2_2(int child)
 	if (last_info.SERV_type == T_CLTS)
 		return postamble_0(child);
 	else
-		return postamble_1e(child);
+		return postamble_1(child);
 }
 
 #define preamble_2_2_conn	preamble_1s
