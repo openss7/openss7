@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 15:51:12 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-24 17:47:39 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-24 15:51:12 $ by $Author: brian $
+ Last Modified $Date: 2008-10-24 17:47:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.64  2008-10-24 17:47:39  brian
+ - final test suites
+
  Revision 0.9.2.63  2008-10-24 15:51:12  brian
  - updated test suites
 
@@ -91,9 +94,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 15:51:12 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-24 17:47:39 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 15:51:12 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-24 17:47:39 $";
 
 /*
  *  Simple test program for INET streams.
@@ -635,8 +638,8 @@ struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 1, 1, 1, 1 };
 
-#define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
+#define TEST_PORT_NUMBER 140
+unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER, TEST_PORT_NUMBER, TEST_PORT_NUMBER };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -4178,17 +4181,17 @@ test_pop(int child)
 static int
 stream_start(int child, int index)
 {
-	int offset = 3 * index;
+	int offset = 3 * 0;
 	int i;
 
 	for (i = 0; i < anums[3]; i++) {
 #if 0
 		addrs[3].port = htons(ports[3] + offset);
-		inet_aton(addr_strings[i], &addrs[child].addr[i]);
+		inet_aton(addr_strings[3], &addrs[child].addr[i]);
 #else				/* SCTP_VERSION_2 */
 		addrs[3][i].sin_family = AF_INET;
 		addrs[3][i].sin_port = htons(ports[3] + offset);
-		inet_aton(addr_strings[i], &addrs[3][i].sin_addr);
+		inet_aton(addr_strings[3], &addrs[3][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 	}
 	switch (child) {
@@ -4198,7 +4201,7 @@ stream_start(int child, int index)
 		for (i = 0; i < anums[child]; i++) {
 #if 0
 			addrs[child].port = htons(ports[child] + offset);
-			inet_aton(addr_strings[i], &addrs[child].addr[i]);
+			inet_aton(addr_strings[child], &addrs[child].addr[i]);
 #else				/* SCTP_VERSION_2 */
 			addrs[child][i].sin_family = AF_INET;
 			if ((child == 0 && !client_port_specified) || ((child == 1 || child == 2) && !server_port_specified))
@@ -4206,7 +4209,7 @@ stream_start(int child, int index)
 			else
 				addrs[child][i].sin_port = htons(ports[child]);
 			if ((child == 0 && !client_host_specified) || ((child == 1 || child == 2) && !server_host_specified))
-				inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
+				inet_aton(addr_strings[child], &addrs[child][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 		}
 		if (test_open(child, devname, O_RDWR | O_NONBLOCK) != __RESULT_SUCCESS)
@@ -5814,6 +5817,7 @@ postamble_1(int child)
 	return (__RESULT_FAILURE);
 }
 
+#if 0
 static int
 postamble_1e(int child)
 {
@@ -5850,6 +5854,7 @@ postamble_1e(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+#endif
 
 static int
 preamble_2_conn(int child)
@@ -18683,7 +18688,7 @@ postamble_2_2(int child)
 	if (last_info.SERV_type == T_CLTS)
 		return postamble_0(child);
 	else
-		return postamble_1e(child);
+		return postamble_1(child);
 }
 
 #define preamble_2_2_conn	preamble_1s
@@ -43256,10 +43261,10 @@ Options:\n\
         repeat test cases on success or failure.\n\
     -R, --repeat-fail\n\
         repeat test cases on failure.\n\
-    -p, --client-port [PORT]\n\
-        port number from which to connect [default: %3$d+index*3]\n\
-    -P, --server-port [PORT]\n\
-        port number to which to connect or upon which to listen\n\
+    -p, --client-proto [PROTO]\n\
+        protocol number from which to connect [default: %3$d+index*3]\n\
+    -P, --server-proto [PROTO]\n\
+        protocol number to which to connect or upon which to listen\n\
         [default: %3$d+index*3+2]\n\
     -i, --client-host [HOSTNAME[,HOSTNAME]*]\n\
         client host names(s) or IP numbers\n\
@@ -43330,8 +43335,8 @@ main(int argc, char *argv[])
 			{"server",	no_argument,		NULL, 'S'},
 			{"again",	no_argument,		NULL, 'a'},
 			{"wait",	no_argument,		NULL, 'w'},
-			{"client-port",	required_argument,	NULL, 'p'},
-			{"server-port",	required_argument,	NULL, 'P'},
+			{"client-proto",required_argument,	NULL, 'p'},
+			{"server-proto",required_argument,	NULL, 'P'},
 			{"client-host",	required_argument,	NULL, 'i'},
 			{"server-host",	required_argument,	NULL, 'I'},
 			{"repeat",	no_argument,		NULL, 'r'},
@@ -43373,12 +43378,12 @@ main(int argc, char *argv[])
 		case 'w':	/* --wait */
 			test_duration = INFINITE_WAIT;
 			break;
-		case 'p':	/* --client-port */
+		case 'p':	/* --client-proto */
 			client_port_specified = 1;
 			ports[3] = atoi(optarg);
 			ports[0] = ports[3];
 			break;
-		case 'P':	/* --server-port */
+		case 'P':	/* --server-proto */
 			server_port_specified = 1;
 			ports[3] = atoi(optarg);
 			ports[1] = ports[3];
