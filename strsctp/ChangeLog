@@ -1,3 +1,9 @@
+2008-10-24  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/test-sctp_t.8.man: updated test suites
+	* src/drivers/sctp2.c: updated test suites
+	* src/test/test-sctp_t.c: updated test suites
+
 2008-10-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/sctp_hooks.h.in: strapped out ip_cmsg_send() whose ABI
