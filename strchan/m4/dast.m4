@@ -70,13 +70,9 @@ if test "$ac_cv_sizeof_bool" = 0 ; then
 fi
 
 AC_CACHE_CHECK(if true is defined, ac_cv_have_true,
- [AC_LANG_SAVE
-  AC_LANG_CPLUSPLUS
-  AC_TRY_COMPILE([],
-    [unsigned int i = true],
-  ac_cv_have_true=yes,
-  ac_cv_have_true=no)
-  AC_LANG_RESTORE
+  AC_LANG_PUSH([C++])
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[unsigned int i = true]])],[ac_cv_have_true=yes],[ac_cv_have_true=no])
+  AC_LANG_POP([])
  ])
 
 if test "$ac_cv_have_true" != yes ; then
@@ -159,8 +155,7 @@ dnl Check for the 3rd arguement to accept
 
 AC_DEFUN([DAST_ACCEPT_ARG], [
   if test -z "$ac_cv_accept_arg" ; then
-    AC_LANG_SAVE
-    AC_LANG_CPLUSPLUS
+    AC_LANG_PUSH([C++])
 
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
       [[$ac_includes_default
@@ -169,7 +164,7 @@ AC_DEFUN([DAST_ACCEPT_ARG], [
        accept( 0, 0, &length );]])],
     ac_cv_accept_arg=$1)
 
-    AC_LANG_RESTORE
+    AC_LANG_POP([])
   fi
 ])
 

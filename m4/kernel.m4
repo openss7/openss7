@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 0.9.2.172 $) $Date: 2008-10-10 10:41:43 $
+# @(#) $RCSfile: kernel.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.173 $) $Date: 2008-10-25 10:35:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-10 10:41:43 $ by $Author: brian $
+# Last Modified $Date: 2008-10-25 10:35:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2164,8 +2164,7 @@ AC_DEFUN([_LINUX_CHECK_MACRO_internal],
 # Kernel environment equivalent of AC_CHECK_FUNCS for macros
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_MACROS_internal],
-[AC_FOREACH([LK_Macro], [$1],
-  [AH_TEMPLATE(AS_TR_CPP(HAVE_KMACRO_[]LK_Macro),
+[m4_foreach_w([LK_Macro],[$1],[AH_TEMPLATE(AS_TR_CPP(HAVE_KMACRO_[]LK_Macro),
 	       [Define to 1 if kernel macro ]LK_Macro[() exists.])])dnl
 for lk_macro in $1
 do
@@ -2226,8 +2225,7 @@ void (*my_autoconf_function_pointer)(void) = (typeof(my_autoconf_function_pointe
 # Kernel environment equivalent of AC_CHECK_FUNCS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_FUNCS_internal],
-[AC_FOREACH([LK_Function], [$1],
-  [AH_TEMPLATE(AS_TR_CPP(HAVE_KFUNC_[]LK_Function),
+[m4_foreach_w([LK_Function],[$1],[AH_TEMPLATE(AS_TR_CPP(HAVE_KFUNC_[]LK_Function),
 	       [Define to 1 if kernel function ]LK_Function[() exists.])])dnl
 for lk_func in $1
 do
@@ -2338,8 +2336,7 @@ AC_DEFUN([_LINUX_CHECK_HEADER_internal], [dnl
 # _LINUX_CHECK_HEADERS_internal
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_HEADERS_internal], [dnl
-    AC_FOREACH([LK_Header], [$1],
-	[AH_TEMPLATE(AS_TR_CPP(HAVE_KINC_[]LK_Header),
+    m4_foreach_w([LK_Header],[$1],[AH_TEMPLATE(AS_TR_CPP(HAVE_KINC_[]LK_Header),
 	    [Define to 1 if you have the <]LK_Header[> header file.])])
 for lk_header in $1
 do
@@ -2643,6 +2640,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 0.9.2.173  2008-10-25 10:35:18  brian
+# - updates for autoconf 2.63
+#
 # Revision 0.9.2.172  2008-10-10 10:41:43  brian
 # - more SuSE 2.6.25 build trials
 #
