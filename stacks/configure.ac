@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2008-08-20 10:56:38 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2008-10-25 13:19:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,16 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-20 10:56:38 $ by $Author: brian $
+# Last Modified $Date: 2008-10-25 13:19:49 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.62])
+AC_PREREQ(2.63)
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.53 $) $Date: 2008-08-20 10:56:38 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.54 $) $Date: 2008-10-25 13:19:49 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -74,7 +74,8 @@ _DISTRO
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 dnl
-dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
+dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid
+dnl typing, but allow user to override with --disable-dependency-tracking.
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
@@ -98,13 +99,13 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
 AC_ARG_VAR([LD], [Linker loader command])
-AC_PROG_LD
+LT_PATH_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LEX
 AC_PROG_YACC
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+
+LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT
@@ -167,7 +168,9 @@ AC_FUNC_MMAP
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_REALLOC fi
 AC_FUNC_SELECT_ARGTYPES
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
-AC_TYPE_SIGNAL
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[void],
+    [Define as the return type of signal handlers (`int' or `void').])
+
 AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
@@ -223,6 +226,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.54  2008-10-25 13:19:49  brian
+# - updates for autoconf 2.63
+#
 # Revision 0.9.2.53  2008-08-20 10:56:38  brian
 # - fixes and build updates from newnet trip
 #
@@ -234,42 +240,6 @@ AC_OUTPUT
 #
 # Revision 0.9.2.50  2008-04-29 07:10:16  brian
 # - updating headers for release
-#
-# Revision 0.9.2.49  2007/10/16 06:04:26  brian
-# - fix cross-compile bug
-#
-# Revision 0.9.2.48  2007/08/19 11:21:13  brian
-# - instead of hardcoding directories
-#
-# Revision 0.9.2.47  2007/08/18 03:53:10  brian
-# - working up configuration files
-#
-# Revision 0.9.2.46  2007/08/13 15:21:55  brian
-# - header updates, added references
-#
-# Revision 0.9.2.45  2007/07/14 01:33:47  brian
-# - make license explicit, add documentation
-#
-# Revision 0.9.2.44  2007/06/27 08:42:02  brian
-# - added MTPI spec document
-#
-# Revision 0.9.2.43  2007/03/26 08:26:16  brian
-# - need gnu gettext version 0.16.1 for autoconf 2.61
-#
-# Revision 0.9.2.42  2007/03/26 07:56:20  brian
-# - install html images properly, needs autoconf 2.61 and automake 2.10
-#
-# Revision 0.9.2.41  2007/03/16 10:30:28  brian
-# - final changes from release
-#
-# Revision 0.9.2.40  2007/02/22 08:47:00  brian
-# - updated required autoconf to 2.60
-#
-# Revision 0.9.2.39  2007/02/12 16:56:00  brian
-# - more autoconf 2.61 support
-#
-# Revision 0.9.2.38  2007/02/12 10:40:23  brian
-# - added support for autoconf 2.61
 #
 # =============================================================================
 # 
