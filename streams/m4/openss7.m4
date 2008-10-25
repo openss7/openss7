@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.77 $) $Date: 2008/09/29 04:21:40 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2008-10-25 10:35:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/29 04:21:40 $ by $Author: brian $
+# Last Modified $Date: 2008-10-25 10:35:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -757,7 +757,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_CFLAGS], [dnl
     AC_MSG_RESULT([${CFLAGS}])
     AC_MSG_CHECKING([for user CFLAGS])
     AC_ARG_WITH([optimize],
-	AC_HELP_STRING([--with-optimize=HOW],
+	AS_HELP_STRING([--with-optimize=HOW],
 	    [specify optimization, normal, size, speed or quick,
 	     @<:@default=auto@:>@]),
 	[with_optimize="$withval"],
@@ -1008,6 +1008,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.78  2008-10-25 10:35:18  brian
+# - updates for autoconf 2.63
+#
 # Revision 0.9.2.77  2008/09/29 04:21:40  brian
 # - wider paths for tool searches
 #
