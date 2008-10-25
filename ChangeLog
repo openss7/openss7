@@ -1,3 +1,7 @@
+2008-10-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/archive.am: ARCHIVE.gz must be gzipped
+
 2008-10-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/texi/compat.texi: document updated compatibility
