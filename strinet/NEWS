@@ -1,4 +1,4 @@
-OpenSS7 INET Networking -- history of user visible changes.  2008-09-30
+OpenSS7 INET Networking -- history of user visible changes.  2008-10-24
 $Id: NEWS,v 0.9.2.73 2008-10-07 13:26:24 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,8 +7,8 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 INET Networking package.
 
- Major changes for release strinet-0.9.2.7.20080930
----------------------------------------------------
+ Major changes for release strinet-0.9.2.7
+------------------------------------------
 
 This `OpenSS7 Project' release is another separate add-on package
 release of the `OpenSS7 INET Networking' package that was formerly
@@ -45,6 +45,9 @@ Major features since the last public release are as follows:
 
    - Support for flex 2.5.33  in maintainer mode.
 
+   - Modifications to build under Fedora 2.6.25-45.fc9 and
+     2.6.26.5-45.fc9 kernels.
+
 
 _This is a public stable production grade release of the package: it
 deprecates previous releases.  Please upgrade to the current release
@@ -62,12 +65,10 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the strinet package page (http://www.openss7.org/strinet_pkg.html).
 
-See
-`http://www.openss7.org/codefiles/strinet-0.9.2.7.20080930/ChangeLog'
-and `http://www.openss7.org/codefiles/strinet-0.9.2.7.20080930/NEWS' in
-the release for more information.  Also, see the `strinet.pdf' manual
-in the release (also in html
-`http://www.openss7.org/strinet_manual.html').
+See `http://www.openss7.org/codefiles/strinet-0.9.2.7/ChangeLog' and
+`http://www.openss7.org/codefiles/strinet-0.9.2.7/NEWS' in the release
+for more information.  Also, see the `strinet.pdf' manual in the
+release (also in html `http://www.openss7.org/strinet_manual.html').
 
  Major changes for release strinet-0.9.2.6
 ------------------------------------------

@@ -1,4 +1,4 @@
-Linux Fast-STREAMS -- history of user visible changes.  2008-09-30
+Linux Fast-STREAMS -- history of user visible changes.  2008-10-24
 $Id: NEWS,v 0.9.2.85 2008-10-07 13:26:23 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -7,8 +7,8 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 `Linux Fast-STREAMS' package.
 
- Major changes for release streams-0.9.2.4.20080930
----------------------------------------------------
+ Major changes for release streams-0.9.2.4
+------------------------------------------
 
 This is the thirteenth  `OpenSS7 Project' release of `Linux
 Fast-STREAMS'.  `LiS' was fully deprecated as of the previous release
@@ -51,6 +51,9 @@ Major features since the last public release are as follows:
 
    - Added workaround for use of crash().
 
+   - Modifications to build under Fedora 2.6.25-45.fc9 and
+     2.6.26.5-45.fc9 kernels.
+
    -
 _This is a public stable production grade release of the package: it
 deprecates previous releases.  Please upgrade to the current release
@@ -68,11 +71,10 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the streams package page (http://www.openss7.org/streams_pkg.html).
 
-See
-`http://www.openss7.org/codefiles/streams-0.9.2.4.20080930/ChangeLog'
-and `http://www.openss7.org/codefiles/streams-0.9.2.4.20080930/NEWS' in
-the release for more information.  Also, see the `STREAMS.pdf' manual in
-the release (also in html `http://www.openss7.org/STREAMS_manual.html').
+See `http://www.openss7.org/codefiles/streams-0.9.2.4/ChangeLog' and
+`http://www.openss7.org/codefiles/streams-0.9.2.4/NEWS' in the release
+for more information.  Also, see the `STREAMS.pdf' manual in the
+release (also in html `http://www.openss7.org/STREAMS_manual.html').
 
  Major changes for release streams-0.9.2.3
 ------------------------------------------
@@ -154,8 +156,8 @@ Major features since the last public release are as follows:
    - Fix for clone open failure locking problems, demand loading of
      clone minors, an error in clone minor device deregistration, and
      an error in queue syncrhornization.  See
-     `http://www.openss7.org/codefiles/streams-0.9.2.4.20080930/BUGS' in
-     the release for more information.
+     `http://www.openss7.org/codefiles/streams-0.9.2.4/BUGS' in the
+     release for more information.
 
    - Added feature to perform automatic reference counting of modules
      for the `esballoc(9)' free routines on Linux 2.6 kernels.  See new

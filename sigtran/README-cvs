@@ -1,4 +1,4 @@
-OpenSS7 STREAMS SIGTRAN -- read me CVS file.  2008-09-30
+OpenSS7 STREAMS SIGTRAN -- read me CVS file.  2008-10-25
 $Id: README-cvs,v 0.9.2.42 2008-10-07 13:26:22 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
@@ -24,7 +24,7 @@ commands to check out a version from the archive:
      % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r sigtran_0.9.2.4.20080930 sigtran
+     % cvs co -r sigtran_0.9.2.4 sigtran
      % cvs logout
 
 It is, of course, possible to check out by date or by other criteria.
