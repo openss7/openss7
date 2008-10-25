@@ -1,3 +1,9 @@
+2008-10-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/prerequisites.texi: documented tool chain updates
+
+	* configure.ac: updates for autoconf 2.63
+
 2008-09-23  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: rpm build corrections

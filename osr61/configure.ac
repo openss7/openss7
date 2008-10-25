@@ -3,27 +3,27 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-08-20 10:56:34 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-25 13:19:48 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,16 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-20 10:56:34 $ by $Author: brian $
+# Last Modified $Date: 2008-10-25 13:19:48 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.62])
+AC_PREREQ(2.63)
 AC_INIT([osr61],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.10 $) $Date: 2008-08-20 10:56:34 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-25 13:19:48 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -74,7 +74,8 @@ _DISTRO
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 dnl
-dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
+dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid
+dnl typing, but allow user to override with --disable-dependency-tracking.
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
@@ -98,13 +99,13 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
 AC_ARG_VAR([LD], [Linker loader command])
-AC_PROG_LD
+LT_PATH_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LEX
 AC_PROG_YACC
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+
+LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 dnl AM_GNU_GETTEXT_VERSION([0.17])
 dnl AM_GNU_GETTEXT
@@ -168,7 +169,9 @@ AC_FUNC_MMAP
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_REALLOC fi
 AC_FUNC_SELECT_ARGTYPES
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
-AC_TYPE_SIGNAL
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[void],
+    [Define as the return type of signal handlers (`int' or `void').])
+
 AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
@@ -185,8 +188,8 @@ AC_CONFIG_FILES([Makefile
 		 lib32/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
-		 doc/manual/texi/args.texi
 		 doc/manual/Makefile
+		 doc/manual/texi/args.texi
 		 src/drivers/Config])
 
 _OPENSS7_OUTPUT
@@ -196,6 +199,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.11  2008-10-25 13:19:48  brian
+# - updates for autoconf 2.63
+#
 # Revision 0.9.2.10  2008-08-20 10:56:34  brian
 # - fixes and build updates from newnet trip
 #
@@ -205,30 +211,9 @@ AC_OUTPUT
 # Revision 0.9.2.8  2008-07-01 13:02:12  brian
 # - gettext updates and references updates
 #
-# Revision 0.9.2.7  2007/10/16 06:04:23  brian
-# - fix cross-compile bug
-#
-# Revision 0.9.2.6  2007/08/19 11:21:09  brian
-# - instead of hardcoding directories
-#
-# Revision 0.9.2.5  2007/08/14 09:06:31  brian
-# - GPLv3 header update
-#
-# Revision 0.9.2.4  2007/03/26 08:26:13  brian
-# - need gnu gettext version 0.16.1 for autoconf 2.61
-#
-# Revision 0.9.2.3  2007/03/26 07:56:17  brian
-# - install html images properly, needs autoconf 2.61 and automake 2.10
-#
-# Revision 0.9.2.2  2007/02/27 08:38:33  brian
-# - release corrections for 2.4 kernel builds
-#
-# Revision 0.9.2.1  2007/02/25 12:26:05  brian
-# - added new files for release package
-#
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

@@ -3,27 +3,27 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.26 $) $Date: 2008-08-20 10:56:33 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.27 $) $Date: 2008-10-25 13:19:48 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 3 of the License.
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU General Public License along with
-# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
-# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,16 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-20 10:56:33 $ by $Author: brian $
+# Last Modified $Date: 2008-10-25 13:19:48 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.62])
+AC_PREREQ(2.63)
 AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
-AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.26 $) $Date: 2008-08-20 10:56:33 $])
+AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.27 $) $Date: 2008-10-25 13:19:48 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -74,7 +74,8 @@ _DISTRO
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 dnl
-dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
+dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid
+dnl typing, but allow user to override with --disable-dependency-tracking.
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
@@ -113,7 +114,7 @@ AC_PROG_CXX
 dnl CXXFLAGS=`echo " $CXXFLAGS " | sed -e "s/ -g / /"` # do not want it implicitly
 AC_PROG_CC
 dnl CFLAGS=`echo " $CFLAGS " | sed -e "s/ -g / /"` # do not want it implicitly
-dnl AC_ISC_POSIX
+dnl AC_SEARCH_LIBS([strerror],[cposix])
 dnl AC_PROG_INSTALL
 dnl AC_PROG_MAKE_SET
 AC_PROG_RANLIB
@@ -209,7 +210,9 @@ if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_FORK fi
 if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MALLOC fi
 if test :"${cross_compiling:-no}" != :yes ; then :; AC_FUNC_MEMCMP fi
 AC_FUNC_SELECT_ARGTYPES
-AC_TYPE_SIGNAL
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[void],
+    [Define as the return type of signal handlers (`int' or `void').])
+
 AC_FUNC_STRFTIME
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([atexit gettimeofday memset pthread_cancel select strchr strerror strtol usleep])
@@ -386,33 +389,18 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.1.1.2.27  2008-10-25 13:19:48  brian
+# - updates for autoconf 2.63
+#
 # Revision 1.1.1.1.2.26  2008-08-20 10:56:33  brian
 # - fixes and build updates from newnet trip
 #
 # Revision 1.1.1.1.2.25  2008-08-02 23:25:06  brian
 # - restore dependency defaults from old autoconf/automake
 #
-# Revision 1.1.1.1.2.24  2007/08/19 11:21:04  brian
-# - instead of hardcoding directories
-#
-# Revision 1.1.1.1.2.23  2007/08/14 21:03:28  brian
-# - GPLv3 header updates
-#
-# Revision 1.1.1.1.2.22  2007/03/26 07:56:14  brian
-# - install html images properly, needs autoconf 2.61 and automake 2.10
-#
-# Revision 1.1.1.1.2.21  2007/02/22 08:46:38  brian
-# - updated required autoconf to 2.60
-#
-# Revision 1.1.1.1.2.20  2007/02/12 16:55:51  brian
-# - more autoconf 2.61 support
-#
-# Revision 1.1.1.1.2.19  2007/02/12 10:39:55  brian
-# - added support for autoconf 2.61
-#
 # =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

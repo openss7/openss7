@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-08-20 10:56:51 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-10-25 13:19:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,16 +48,16 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-20 10:56:51 $ by $Author: brian $
+# Last Modified $Date: 2008-10-25 13:19:52 $ by $Author: brian $
 #
 # =============================================================================
 
 dnl                                               -*- Autoconf -*-
 dnl Process this file with autoconf to produce a configure script.
 dnl
-AC_PREREQ([2.62])
+AC_PREREQ(2.63)
 AC_INIT([strnsl],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.16 $) $Date: 2008-08-20 10:56:51 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.17 $) $Date: 2008-10-25 13:19:52 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -74,7 +74,8 @@ _DISTRO
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_MAINTAINER_MODE
 dnl
-dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid typing
+dnl make --enable-maintainer-mode imply --enable-dependency-tracking to avoid
+dnl typing, but allow user to override with --disable-dependency-tracking.
 dnl
 if test :${USE_MAINTAINER_MODE:-yes} = :yes ; then
 	enable_dependency_tracking="${enable_dependency_tracking:-yes}"
@@ -98,13 +99,13 @@ AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AM_PROG_INSTALL_STRIP
 AC_ARG_VAR([LD], [Linker loader command])
-AC_PROG_LD
+LT_PATH_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LEX
 AC_PROG_YACC
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+
+LT_INIT([dlopen])
 AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION([0.17])
 AM_GNU_GETTEXT
@@ -167,7 +168,9 @@ AC_FUNC_MMAP
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_REALLOC fi
 AC_FUNC_SELECT_ARGTYPES
 if test :${cross_compiling:-no} != :yes ; then :; AC_FUNC_SETPGRP fi
-AC_TYPE_SIGNAL
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[void],
+    [Define as the return type of signal handlers (`int' or `void').])
+
 AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_FUNC_STRNLEN
@@ -186,8 +189,8 @@ AC_CONFIG_FILES([Makefile
 		 lib32/Makefile
 		 doc/Makefile
 		 doc/man/Makefile
-		 doc/manual/texi/args.texi
-		 doc/manual/Makefile])
+		 doc/manual/Makefile
+		 doc/manual/texi/args.texi])
 
 _OPENSS7_OUTPUT
 
@@ -196,6 +199,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.17  2008-10-25 13:19:52  brian
+# - updates for autoconf 2.63
+#
 # Revision 0.9.2.16  2008-08-20 10:56:51  brian
 # - fixes and build updates from newnet trip
 #
@@ -207,60 +213,6 @@ AC_OUTPUT
 #
 # Revision 0.9.2.13  2008-04-28 22:11:44  brian
 # - updated headers for release
-#
-# Revision 0.9.2.12  2007/10/16 06:04:33  brian
-# - fix cross-compile bug
-#
-# Revision 0.9.2.11  2007/08/19 11:21:28  brian
-# - instead of hardcoding directories
-#
-# Revision 0.9.2.10  2007/08/14 04:56:38  brian
-# - GPLv3 header update
-#
-# Revision 0.9.2.9  2007/03/26 08:26:23  brian
-# - need gnu gettext version 0.16.1 for autoconf 2.61
-#
-# Revision 0.9.2.8  2007/03/26 07:56:27  brian
-# - install html images properly, needs autoconf 2.61 and automake 2.10
-#
-# Revision 0.9.2.7  2007/03/16 10:30:38  brian
-# - final changes from release
-#
-# Revision 0.9.2.6  2007/02/22 08:47:12  brian
-# - updated required autoconf to 2.60
-#
-# Revision 0.9.2.5  2007/02/12 16:56:35  brian
-# - more autoconf 2.61 support
-#
-# Revision 0.9.2.4  2007/02/12 10:40:53  brian
-# - added support for autoconf 2.61
-#
-# Revision 0.9.2.3  2006/10/03 13:52:33  brian
-# - changes to pass make check target
-# - added some package config.h files
-# - removed AUTOCONFIG_H from Makefile.am's
-# - source code changes for compile
-# - added missing manual pages
-# - renamed conflicting manual pages
-# - parameterized include Makefile.am
-# - updated release notes
-#
-# Revision 0.9.2.2  2006/09/29 11:50:38  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
-#
-# Revision 0.9.2.1  2006/09/25 12:30:44  brian
-# - added files for new strnsl package
-#
-# Revision 0.9.2.2  2006/09/18 01:15:25  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.1  2006/08/23 10:03:52  brian
-# - started STREAMS Sockets package
 #
 # =============================================================================
 # 
