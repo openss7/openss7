@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-26 12:17:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SIGTRAN_OPTIONS], [dnl
     AC_ARG_WITH([sigtran],
-		AS_HELP_STRING([--with-sigtran=HEADERS],
-			       [specify the SIGTRAN header file directory.
-				@<:@default=$INCLUDEDIR/sigtran@:>@]),
-		[with_sigtran="$withval"],
-		[with_sigtran=''])
+	AS_HELP_STRING([--with-sigtran=HEADERS],
+	    [specify the SIGTRAN header file directory.  @<:@default=INCLUDEDIR/sigtran@:>@]),
+	[with_sigtran="$withval" ; for s in ${!sigtran_cv_*} ; do eval "unset $s" ; done],
+	[with_sigtran=''])
 ])# _SIGTRAN_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${sigtran_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-sigtran="$with_sigtran"
@@ -217,9 +216,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for sigtran include directory])
 	fi
 	if test :"${sigtran_cv_includes:-no}" = :no ; then
-	    # SIGTRAN header files are normally found in the sigtran package now.
-	    # They used to be part of the SIGTRAN add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # SIGTRAN header files are normally found in the sigtran package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "sigtran_search_path=\"
@@ -228,17 +225,10 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/sigtran
 			${DESTDIR}${rootdir}/usr/local/include/sigtran
 			${DESTDIR}${rootdir}/usr/src/sigtran/src/include
-			${DESTDIR}${includedir}/ss7
-			${DESTDIR}${rootdir}${oldincludedir}/ss7
-			${DESTDIR}${rootdir}/usr/include/ss7
-			${DESTDIR}${rootdir}/usr/local/include/ss7
 			${DESTDIR}${oldincludedir}/sigtran
 			${DESTDIR}/usr/include/sigtran
 			${DESTDIR}/usr/local/include/sigtran
-			${DESTDIR}/usr/src/sigtran/src/include
-			${DESTDIR}${oldincludedir}/ss7
-			${DESTDIR}/usr/include/ss7
-			${DESTDIR}/usr/local/include/ss7\""
+			${DESTDIR}/usr/src/sigtran/src/include\""
 		    ;;
 		(LfS)
 		    eval "sigtran_search_path=\"
@@ -270,6 +260,8 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for sigtran include directory... $sigtran_dir])
 		    if test -r "$sigtran_dir/$sigtran_what" ; then
 			sigtran_cv_includes="$sigtran_dir"
+			#sigtran_cv_ldadd=
+			#sigtran_cv_ldadd32=
 			#sigtran_cv_modmap=
 			#sigtran_cv_symver=
 			#sigtran_cv_manpath=
@@ -283,35 +275,77 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for sigtran ldadd native], [sigtran_cv_ldadd], [dnl
+	sigtran_what="libsigtran.la"
 	sigtran_cv_ldadd=
 	for sigtran_dir in $sigtran_cv_includes ; do
-	    if test -f "$sigtran_dir/../../libsigtran.la" ; then
-		sigtran_cv_ldadd=`echo "$sigtran_dir/../../libsigtran.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$sigtran_dir/../../$sigtran_what" ; then
+		sigtran_cv_ldadd=`echo "$sigtran_dir/../../$sigtran_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$sigtran_cv_ldadd" ; then
+	    eval "sigtran_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for sigtran_dir in $sigtran_search_path ; do
+		if test -d "$sigtran_dir" ; then
+		    AC_MSG_CHECKING([for sigtran ldadd native... $sigtran_dir])
+		    if test -r "$sigtran_dir/$sigtran_what" ; then
+			sigtran_cv_ldadd="$sigtran_dir/$sigtran_what"
+			sigtran_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for sigtran ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for sigtran ldflags], [sigtran_cv_ldflags], [dnl
 	sigtran_cv_ldflags=
 	if test -z "$sigtran_cv_ldadd" ; then
-	    sigtran_cv_ldflags= # '-lsigtran'
+	    sigtran_cv_ldflags= # '-L$(DESTDIR)$(rootdir)$(libdir) -lsigtran'
 	else
 	    sigtran_cv_ldflags= # "-L$(dirname $sigtran_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for sigtran ldadd 32-bit], [sigtran_cv_ldadd32], [dnl
+	sigtran_what="libsigtran.la"
 	sigtran_cv_ldadd32=
 	for sigtran_dir in $sigtran_cv_includes ; do
-	    if test -f "$sigtran_dir/../../libsigtran.la" ; then
-		sigtran_cv_ldadd32=`echo "$sigtran_dir/../../lib32/libsigtran.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$sigtran_dir/../../lib32/$sigtran_what" ; then
+		sigtran_cv_ldadd32=`echo "$sigtran_dir/../../lib32/$sigtran_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$sigtran_cv_ldadd32" ; then
+	    eval "sigtran_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for sigtran_dir in $sigtran_search_path ; do
+		if test -d "$sigtran_dir" ; then
+		    AC_MSG_CHECKING([for sigtran ldadd 32-bit... $sigtran_dir])
+		    if test -r "$sigtran_dir/$sigtran_what" ; then
+			sigtran_cv_ldadd32="$sigtran_dir/$sigtran_what"
+			sigtran_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for sigtran ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for sigtran ldflags 32-bit], [sigtran_cv_ldflags32], [dnl
 	sigtran_cv_ldflags32=
 	if test -z "$sigtran_cv_ldadd32" ; then
-	    sigtran_cv_ldflags32= # '-lsigtran'
+	    sigtran_cv_ldflags32= # '-L$(DESTDIR)$(rootdir)$(lib32dir) -lsigtran'
 	else
 	    sigtran_cv_ldflags32= # "-L$(dirname $sigtran_cv_ldadd32)/.libs/"
 	fi
@@ -347,15 +381,14 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS SIGTRAN include directories.  If
-*** you wish to use the STREAMS SIGTRAN package, you will need to specify
+*** you wish to use the STREAMS SIGTRAN package you will need to specify
 *** the location of the STREAMS SIGTRAN (sigtran) include directories with
-*** the --with-sigtran=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-sigtran=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS SIGTRAN package?  The
 *** STREAMS sigtran package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "sigtran-0.9a.3.tar.gz".
+*** named something like "sigtran-0.9.2.4.tar.gz".
 *** ])
     fi
     AC_CACHE_CHECK([for sigtran version], [sigtran_cv_version], [dnl
@@ -381,7 +414,7 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test :"${sigtran_file:-no}" != :no ; then
+	    if test :${sigtran_file:-no} != :no ; then
 		sigtran_cv_version=`grep '#define.*\<SIGTRAN_VERSION\>' $sigtran_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	    fi
 	fi
@@ -407,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$sigtran_version" ; then
 			if test -z "$sigtran_version" -a -s "$sigtran_dir/../configure" ; then
-			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    sigtran_version=`grep '^PACKAGE_VERSION=' $sigtran_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sigtran_version" -a -s "$sigtran_dir/../../configure" ; then
-			    sigtran_version=`grep -m 1 '^PACKAGE_VERSION=' $sigtran_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    sigtran_version=`grep '^PACKAGE_VERSION=' $sigtran_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sigtran_package" -a -s "$sigtran_dir/../.pkgrelease" ; then
 			    sigtran_package=`cat $sigtran_dir/../.pkgrelease`
@@ -495,7 +528,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for sigtran $sigtran_what... $sigtran_dir/$linux_cv_k_release/$target_cpu])
-			if test "$sigtran_dir/$linux_cv_k_release/$target_cpu/$sigtran_what" ; then
+			if test -f "$sigtran_dir/$linux_cv_k_release/$target_cpu/$sigtran_what" ; then
 			    sigtran_cv_includes="$sigtran_dir/$linux_cv_k_release/$target_cpu $sigtran_cv_includes"
 			    sigtran_cv_modversions="$sigtran_dir/$linux_cv_k_release/$target_cpu/$sigtran_what"
 			    AC_MSG_RESULT([yes])
@@ -553,7 +586,7 @@ AC_DEFUN([_SIGTRAN_DEFINES], [dnl
 	    the STREAMS SIGTRAN release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    SIGTRAN_CPPFLAGS="${SIGTRAN_CPPFLAGS:+ ${SIGTRAN_CPPFLAGS}}"
+    SIGTRAN_CPPFLAGS="${SIGTRAN_CPPFLAGS:+ }${SIGTRAN_CPPFLAGS}"
     SIGTRAN_LDADD="$sigtran_cv_ldadd"
     SIGTRAN_LDADD32="$sigtran_cv_ldadd32"
     SIGTRAN_LDFLAGS="$sigtran_cv_ldflags"
@@ -562,7 +595,7 @@ AC_DEFUN([_SIGTRAN_DEFINES], [dnl
     SIGTRAN_SYMVER="$sigtran_cv_symver"
     SIGTRAN_MANPATH="$sigtran_cv_manpath"
     SIGTRAN_VERSION="$sigtran_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${SIGTRAN_SYMVER:+${MODPOST_INPUTS:+ }${SIGTRAN_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${SIGTRAN_SYMVER:+${MODPOST_INPUTS:+ }${SIGTRAN_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and sigtran for
 	that matter.
@@ -587,6 +620,9 @@ AC_DEFUN([_SIGTRAN_], [dnl
 # =============================================================================
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.21  2008-10-26 12:17:19  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.20  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

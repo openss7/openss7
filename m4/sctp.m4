@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-26 12:17:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,8 +65,8 @@
 # _SCTP
 # -----------------------------------------------------------------------------
 # Check for the existence of SCTP header files, particularly sys/xti_sctp.h.
-# SCTP headers files are required for building the XTI interface for SCTP.
-# Without SCTP header files, the SCTP interface to SCTP will not be built.
+# SCTP header files are required for building the XTI interface for SCTP.
+# Without SCTP header files, the XTI interface to SCTP will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP], [dnl
     AC_REQUIRE([_XTI])dnl
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP_OPTIONS], [dnl
     AC_ARG_WITH([sctp],
-		AS_HELP_STRING([--with-sctp=HEADERS],
-			       [specify the SCTP header file directory.
-				@<:@default=$INCLUDEDIR/strsctp@:>@]),
-		[with_sctp="$withval"],
-		[with_sctp=''])
+	AS_HELP_STRING([--with-sctp=HEADERS],
+	    [specify the SCTP header file directory.  @<:@default=INCLUDEDIR/strsctp@:>@]),
+	[with_sctp="$withval" ; for s in ${!sctp_cv_*} ; do eval "unset $s" ; done],
+	[with_sctp=''])
 ])# _SCTP_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${sctp_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-sctp="$with_sctp"
@@ -217,9 +216,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for sctp include directory])
 	fi
 	if test :"${sctp_cv_includes:-no}" = :no ; then
-	    # INET header files are normally found in the strsctp package now.
-	    # They used to be part of the SS7 add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # SCTP header files are normally found in the strsctp package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "sctp_search_path=\"
@@ -228,37 +225,10 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strsctp
 			${DESTDIR}${rootdir}/usr/local/include/strsctp
 			${DESTDIR}${rootdir}/usr/src/strsctp/src/include
-			${DESTDIR}${includedir}/strinet
-			${DESTDIR}${rootdir}${oldincludedir}/strinet
-			${DESTDIR}${rootdir}/usr/include/strinet
-			${DESTDIR}${rootdir}/usr/local/include/strinet
-			${DESTDIR}${rootdir}/usr/src/strinet/src/include
-			${DESTDIR}${includedir}/strxnet
-			${DESTDIR}${rootdir}${oldincludedir}/strxnet
-			${DESTDIR}${rootdir}/usr/include/strxnet
-			${DESTDIR}${rootdir}/usr/local/include/strxnet
-			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
-			${DESTDIR}${includedir}/LiS
-			${DESTDIR}${rootdir}${oldincludedir}/LiS
-			${DESTDIR}${rootdir}/usr/include/LiS
-			${DESTDIR}${rootdir}/usr/local/include/LiS
-			${DESTDIR}${rootdir}/usr/src/LiS/include
 			${DESTDIR}${oldincludedir}/strsctp
 			${DESTDIR}/usr/include/strsctp
 			${DESTDIR}/usr/local/include/strsctp
-			${DESTDIR}/usr/src/strsctp/src/include
-			${DESTDIR}${oldincludedir}/strinet
-			${DESTDIR}/usr/include/strinet
-			${DESTDIR}/usr/local/include/strinet
-			${DESTDIR}/usr/src/strinet/src/include
-			${DESTDIR}${oldincludedir}/strxnet
-			${DESTDIR}/usr/include/strxnet
-			${DESTDIR}/usr/local/include/strxnet
-			${DESTDIR}/usr/src/strxnet/src/include
-			${DESTDIR}${oldincludedir}/LiS
-			${DESTDIR}/usr/include/LiS
-			${DESTDIR}/usr/local/include/LiS
-			${DESTDIR}/usr/src/LiS/include\""
+			${DESTDIR}/usr/src/strsctp/src/include\""
 		    ;;
 		(LfS)
 		    eval "sctp_search_path=\"
@@ -267,16 +237,6 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strsctp
 			${DESTDIR}${rootdir}/usr/local/include/strsctp
 			${DESTDIR}${rootdir}/usr/src/strsctp/src/include
-			${DESTDIR}${includedir}/strinet
-			${DESTDIR}${rootdir}${oldincludedir}/strinet
-			${DESTDIR}${rootdir}/usr/include/strinet
-			${DESTDIR}${rootdir}/usr/local/include/strinet
-			${DESTDIR}${rootdir}/usr/src/strinet/src/include
-			${DESTDIR}${includedir}/strxnet
-			${DESTDIR}${rootdir}${oldincludedir}/strxnet
-			${DESTDIR}${rootdir}/usr/include/strxnet
-			${DESTDIR}${rootdir}/usr/local/include/strxnet
-			${DESTDIR}${rootdir}/usr/src/strxnet/src/include
 			${DESTDIR}${includedir}/streams
 			${DESTDIR}${rootdir}${oldincludedir}/streams
 			${DESTDIR}${rootdir}/usr/include/streams
@@ -286,14 +246,6 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/include/strsctp
 			${DESTDIR}/usr/local/include/strsctp
 			${DESTDIR}/usr/src/strsctp/src/include
-			${DESTDIR}${oldincludedir}/strinet
-			${DESTDIR}/usr/include/strinet
-			${DESTDIR}/usr/local/include/strinet
-			${DESTDIR}/usr/src/strinet/src/include
-			${DESTDIR}${oldincludedir}/strxnet
-			${DESTDIR}/usr/include/strxnet
-			${DESTDIR}/usr/local/include/strxnet
-			${DESTDIR}/usr/src/strxnet/src/include
 			${DESTDIR}${oldincludedir}/streams
 			${DESTDIR}/usr/include/streams
 			${DESTDIR}/usr/local/include/streams
@@ -308,7 +260,7 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for sctp include directory... $sctp_dir])
 		    if test -r "$sctp_dir/$sctp_what" ; then
 			sctp_cv_includes="$sctp_dir"
-			sctp_cv_ldadd=
+			#sctp_cv_ldadd=
 			#sctp_cv_ldadd32=
 			#sctp_cv_modmap=
 			#sctp_cv_symver=
@@ -323,35 +275,77 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for sctp ldadd native], [sctp_cv_ldadd], [dnl
+	sctp_what="libsctp.la"
 	sctp_cv_ldadd=
 	for sctp_dir in $sctp_cv_includes ; do
-	    if test -f "$sctp_dir/../../libsctp.la" ; then
-		sctp_cv_ldadd=`echo "$sctp_dir/../../libsctp.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$sctp_dir/../../$sctp_what" ; then
+		sctp_cv_ldadd=`echo "$sctp_dir/../../$sctp_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$sctp_cv_ldadd" ; then
+	    eval "sctp_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    sctp_search_path=`echo "$sctp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for sctp_dir in $sctp_search_path ; do
+		if test -d "$sctp_dir" ; then
+		    AC_MSG_CHECKING([for sctp ldadd native... $sctp_dir])
+		    if test -r "$sctp_dir/$sctp_what" ; then
+			sctp_cv_ldadd="$sctp_dir/$sctp_what"
+			sctp_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for sctp ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for sctp ldflags], [sctp_cv_ldflags], [dnl
 	sctp_cv_ldflags=
 	if test -z "$sctp_cv_ldadd" ; then
-	    sctp_cv_ldflags= # '-lsctp'
+	    sctp_cv_ldflags= # '-L$(DESTDIR)$(rootdir)$(libdir) -lsctp'
 	else
 	    sctp_cv_ldflags= # "-L$(dirname $sctp_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for sctp ldadd 32-bit], [sctp_cv_ldadd32], [dnl
+	sctp_what="libsctp.la"
 	sctp_cv_ldadd32=
 	for sctp_dir in $sctp_cv_includes ; do
-	    if test -f "$sctp_dir/../../lib32/libsctp.la" ; then
-		sctp_cv_ldadd32=`echo "$sctp_dir/../../lib32/libsctp.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$sctp_dir/../../lib32/$sctp_what" ; then
+		sctp_cv_ldadd32=`echo "$sctp_dir/../../lib32/$sctp_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$sctp_cv_ldadd32" ; then
+	    eval "sctp_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    sctp_search_path=`echo "$sctp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for sctp_dir in $sctp_search_path ; do
+		if test -d "$sctp_dir" ; then
+		    AC_MSG_CHECKING([for sctp ldadd 32-bit... $sctp_dir])
+		    if test -r "$sctp_dir/$sctp_what" ; then
+			sctp_cv_ldadd32="$sctp_dir/$sctp_what"
+			sctp_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for sctp ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for sctp ldflags 32-bit], [sctp_cv_ldflags32], [dnl
 	sctp_cv_ldflags32=
 	if test -z "$sctp_cv_ldadd32" ; then
-	    sctp_cv_ldflags32= # '-lsctp'
+	    sctp_cv_ldflags32= # '-L$(DESTDIR)$(rootdir)$(lib32dir) -lsctp'
 	else
 	    sctp_cv_ldflags32= # "-L$(dirname $sctp_cv_ldadd32)/.libs/"
 	fi
@@ -383,19 +377,18 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${sctp_cv_includes:-no}" = :no ; then :
+    if test :"${sctp_cv_includes:-no}" = :no ; then
 	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS SCTP include directories.  If
-*** you wish to use the STREAMS SCTP package, you will need to specify
+*** you wish to use the STREAMS SCTP package you will need to specify
 *** the location of the STREAMS SCTP (strsctp) include directories with
-*** the --with-sctp=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-sctp=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS SCTP package?  The
 *** STREAMS strsctp package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strsctp-0.9.2.5.tar.gz".
+*** named something like "strsctp-0.9.2.9.tar.gz".
 *** ])
     fi
     AC_CACHE_CHECK([for sctp version], [sctp_cv_version], [dnl
@@ -447,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$sctp_version" ; then
 			if test -z "$sctp_version" -a -s "$sctp_dir/../configure" ; then
-			    sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sctp_version" -a -s "$sctp_dir/../../configure" ; then
-			    sctp_version=`grep -m 1 '^PACKAGE_VERSION=' $sctp_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    sctp_version=`grep '^PACKAGE_VERSION=' $sctp_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sctp_package" -a -s "$sctp_dir/../.pkgrelease" ; then
 			    sctp_package=`cat $sctp_dir/../.pkgrelease`
@@ -535,7 +528,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for sctp $sctp_what... $sctp_dir/$linux_cv_k_release/$target_cpu])
-			if test "$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what" ; then
+			if test -f "$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what" ; then
 			    sctp_cv_includes="$sctp_dir/$linux_cv_k_release/$target_cpu $sctp_cv_includes"
 			    sctp_cv_modversions="$sctp_dir/$linux_cv_k_release/$target_cpu/$sctp_what"
 			    AC_MSG_RESULT([yes])
@@ -593,7 +586,7 @@ AC_DEFUN([_SCTP_DEFINES], [dnl
 	    the STREAMS SCTP release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    SCTP_CPPFLAGS="${SCTP_CPPFLAGS:+ ${SCTP_CPPFLAGS}}"
+    SCTP_CPPFLAGS="${SCTP_CPPFLAGS:+ }${SCTP_CPPFLAGS}"
     SCTP_LDADD="$sctp_cv_ldadd"
     SCTP_LDADD32="$sctp_cv_ldadd32"
     SCTP_LDFLAGS="$sctp_cv_ldflags"
@@ -602,7 +595,7 @@ AC_DEFUN([_SCTP_DEFINES], [dnl
     SCTP_SYMVER="$sctp_cv_symver"
     SCTP_MANPATH="$sctp_cv_manpath"
     SCTP_VERSION="$sctp_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${SCTP_SYMVER:+${MODPOST_INPUTS:+ }${SCTP_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${SCTP_SYMVER:+${MODPOST_INPUTS:+ }${SCTP_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strsctp for
 	that matter.
@@ -637,6 +630,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.50  2008-10-26 12:17:18  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.49  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

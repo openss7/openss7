@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.28 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: nsl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.29 $) $Date: 2008-10-26 12:17:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,7 +64,7 @@
 # =============================================================================
 # _NSL
 # -----------------------------------------------------------------------------
-# Check for the existence of NSL header files, particularly sys/tpi.h.
+# Check for the existence of NSL header files, particularly sys/netconfig.h.
 # NSL header files are required for building the TPI interface for NSL.
 # Without NSL header files, the TPI interface to NSL will not be built.
 # -----------------------------------------------------------------------------
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_NSL_OPTIONS], [dnl
     AC_ARG_WITH([nsl],
-		AS_HELP_STRING([--with-nsl=HEADERS],
-			       [specify the NSL header file directory.
-				@<:@default=$INCLUDEDIR/nsl@:>@]),
-		[with_nsl="$withval"],
-		[with_nsl=''])
+	AS_HELP_STRING([--with-nsl=HEADERS],
+	    [specify the NSL header file directory.  @<:@default=INCLUDEDIR/strnsl@:>@]),
+	[with_nsl="$withval" ; for s in ${!nsl_cv_*} ; do eval "unset $s" ; done],
+	[with_nsl=''])
 ])# _NSL_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${nsl_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-nsl="$with_nsl"
@@ -158,7 +157,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 *** directories.
 *** ])
 	    fi
-	    AC_MSG_CHECKING([for xit include directory])
+	    AC_MSG_CHECKING([for nsl include directory])
 	fi
 	if test :"${nsl_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
@@ -170,7 +169,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    if test -d "$nsl_dir" ; then
 		AC_MSG_CHECKING([for nsl include directory... $nsl_dir $nsl_bld])
 		if test -r "$nsl_dir/$nsl_what" ; then
-		    nsl_cv_includes="$nsl_bld $nsl_dir"
+		    nsl_cv_includes="$nsl_inc $nsl_bld $nsl_dir"
 		    nsl_cv_ldadd="$os7_cv_master_builddir/strnsl/libxnsl.la"
 		    nsl_cv_ldadd32="$os7_cv_master_builddir/strnsl/lib32/libxnsl.la"
 		    nsl_cv_modversions= # "$os7_cv_master_builddir/strnsl/include/sys/strnsl/modversions.h"
@@ -218,8 +217,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	fi
 	if test :"${nsl_cv_includes:-no}" = :no ; then
 	    # NSL header files are normally found in the strnsl package now.
-	    # They used to be part of the XNET add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # They used to be part of the XNET add-on package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "nsl_search_path=\"
@@ -314,11 +312,11 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$nsl_cv_ldadd" ; then
-	    eval "nsl_search_path =\"
+	    eval "nsl_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
 	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
-	    AC_MSG_RESULT([searching])
+	    AC_MSG_RESULT([(searching)])
 	    for nsl_dir in $nsl_search_path ; do
 		if test -d "$nsl_dir" ; then
 		    AC_MSG_CHECKING([for nsl ldadd native... $nsl_dir])
@@ -352,11 +350,11 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$nsl_cv_ldadd32" ; then
-	    eval "nsl_search_path =\"
+	    eval "nsl_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
 	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
-	    AC_MSG_RESULT([searching])
+	    AC_MSG_RESULT([(searching)])
 	    for nsl_dir in $nsl_search_path ; do
 		if test -d "$nsl_dir" ; then
 		    AC_MSG_CHECKING([for nsl ldadd 32-bit... $nsl_dir])
@@ -413,8 +411,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 *** Configure could not find the STREAMS NSL include directories.  If
 *** you wish to use the STREAMS NSL package you will need to specify
 *** the location of the STREAMS NSL (strnsl) include directories with
-*** the --with-nsl=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-nsl=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS NSL package?  The
 *** STREAMS strnsl package is available from The OpenSS7 Project
@@ -471,10 +468,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$nsl_version" ; then
 			if test -z "$nsl_version" -a -s "$nsl_dir/../configure" ; then
-			    nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    nsl_version=`grep '^PACKAGE_VERSION=' $nsl_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$nsl_version" -a -s "$nsl_dir/../../configure" ; then
-			    nsl_version=`grep -m 1 '^PACKAGE_VERSION=' $nsl_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    nsl_version=`grep '^PACKAGE_VERSION=' $nsl_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$nsl_package" -a -s "$nsl_dir/../.pkgrelease" ; then
 			    nsl_package=`cat $nsl_dir/../.pkgrelease`
@@ -559,7 +556,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for nsl $nsl_what... $nsl_dir/$linux_cv_k_release/$target_cpu])
-			if test "$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what" ; then
+			if test -f "$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what" ; then
 			    nsl_cv_includes="$nsl_dir/$linux_cv_k_release/$target_cpu $nsl_cv_includes"
 			    nsl_cv_modversions="$nsl_dir/$linux_cv_k_release/$target_cpu/$nsl_what"
 			    AC_MSG_RESULT([yes])
@@ -617,7 +614,7 @@ AC_DEFUN([_NSL_DEFINES], [dnl
 	    the STREAMS NSL release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    NSL_CPPFLAGS="${NSL_CPPFLAGS:+ ${NSL_CPPFLAGS}}"
+    NSL_CPPFLAGS="${NSL_CPPFLAGS:+ }${NSL_CPPFLAGS}"
     NSL_LDADD="$nsl_cv_ldadd"
     NSL_LDADD32="$nsl_cv_ldadd32"
     NSL_LDFLAGS="$nsl_cv_ldflags"
@@ -626,7 +623,7 @@ AC_DEFUN([_NSL_DEFINES], [dnl
     NSL_SYMVER="$nsl_cv_symver"
     NSL_MANPATH="$nsl_cv_manpath"
     NSL_VERSION="$nsl_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${NSL_SYMVER:+${MODPOST_INPUTS:+ }${NSL_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${NSL_SYMVER:+${MODPOST_INPUTS:+ }${NSL_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strnsl for
 	that matter.
@@ -651,6 +648,9 @@ AC_DEFUN([_NSL_], [dnl
 # =============================================================================
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.29  2008-10-26 12:17:18  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.28  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

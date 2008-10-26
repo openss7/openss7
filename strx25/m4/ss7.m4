@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.27 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: ss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.28 $) $Date: 2008-10-26 12:17:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7_OPTIONS], [dnl
     AC_ARG_WITH([ss7],
-		AS_HELP_STRING([--with-ss7=HEADERS],
-			       [specify the SS7 header file directory.
-				@<:@default=$INCLUDEDIR/ss7@:>@]),
-		[with_ss7="$withval"],
-		[with_ss7=''])
+	AS_HELP_STRING([--with-ss7=HEADERS],
+	    [specify the SS7 header file directory.  @<:@default=INCLUDEDIR/strss7@:>@]),
+	[with_ss7="$withval" ; for s in ${!ss7_cv_*} ; do eval "unset $s" ; done],
+	[with_ss7=''])
 ])# _SS7_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${ss7_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-ss7="$with_ss7"
@@ -221,9 +220,7 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for ss7 include directory])
 	fi
 	if test :"${ss7_cv_includes:-no}" = :no ; then
-	    # SS7 header files are normally found in the strss7 package now.
-	    # They used to be part of the SS7 add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # SS7 header files are normally found in the strss7 package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "ss7_search_path=\"
@@ -289,35 +286,77 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for ss7 ldadd native], [ss7_cv_ldadd], [dnl
+	ss7_what="libss7.la"
 	ss7_cv_ldadd=
 	for ss7_dir in $ss7_cv_includes ; do
-	    if test -f "$ss7_dir/../../libss7.la" ; then
-		ss7_cv_ldadd=`echo "$ss7_dir/../../libss7.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$ss7_dir/../../$ss7_what" ; then
+		ss7_cv_ldadd=`echo "$ss7_dir/../../$ss7_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$ss7_cv_ldadd" ; then
+	    eval "ss7_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    ss7_search_path=`echo "$ss7_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for ss7_dir in $ss7_search_path ; do
+		if test -d "$ss7_dir" ; then
+		    AC_MSG_CHECKING([for ss7 ldadd native... $ss7_dir])
+		    if test -r "$ss7_dir/$ss7_what" ; then
+			ss7_cv_ldadd="$ss7_dir/$ss7_what"
+			ss7_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for ss7 ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for ss7 ldflags], [ss7_cv_ldflags], [dnl
 	ss7_cv_ldflags=
 	if test -z "$ss7_cv_ldadd" ; then
-	    ss7_cv_ldflags= # '-lss7'
+	    ss7_cv_ldflags= # '-L$(DESTDIR)$(rootdir)$(libdir) -lss7'
 	else
 	    ss7_cv_ldflags= # "-L$(dirname $ss7_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for ss7 ldadd 32-bit], [ss7_cv_ldadd32], [dnl
+	ss7_what="libss7.la"
 	ss7_cv_ldadd32=
 	for ss7_dir in $ss7_cv_includes ; do
-	    if test -f "$ss7_dir/../../libss7.la" ; then
-		ss7_cv_ldadd32=`echo "$ss7_dir/../../lib32/libss7.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$ss7_dir/../../lib32/$ss7_what" ; then
+		ss7_cv_ldadd32=`echo "$ss7_dir/../../lib32/$ss7_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$ss7_cv_ldadd32" ; then
+	    eval "ss7_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    ss7_search_path=`echo "$ss7_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for ss7_dir in $ss7_search_path ; do
+		if test -d "$ss7_dir" ; then
+		    AC_MSG_CHECKING([for ss7 ldadd 32-bit... $ss7_dir])
+		    if test -r "$ss7_dir/$ss7_what" ; then
+			ss7_cv_ldadd32="$ss7_dir/$ss7_what"
+			ss7_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for ss7 ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for ss7 ldflags 32-bit], [ss7_cv_ldflags32], [dnl
 	ss7_cv_ldflags32=
 	if test -z "$ss7_cv_ldadd32" ; then
-	    ss7_cv_ldflags32= # '-lss7'
+	    ss7_cv_ldflags32= # '-L$(DESTDIR)$(rootdir)$(lib32dir) -lss7'
 	else
 	    ss7_cv_ldflags32= # "-L$(dirname $ss7_cv_ldadd32)/.libs/"
 	fi
@@ -353,15 +392,14 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS SS7 include directories.  If
-*** you wish to use the STREAMS SS7 package, you will need to specify
+*** you wish to use the STREAMS SS7 package you will need to specify
 *** the location of the STREAMS SS7 (strss7) include directories with
-*** the --with-ss7=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-ss7=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS SS7 package?  The
 *** STREAMS strss7 package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strss7-0.9a.3.tar.gz".
+*** named something like "strss7-0.9a.8.tar.gz".
 *** ])
     fi
     AC_CACHE_CHECK([for ss7 version], [ss7_cv_version], [dnl
@@ -387,7 +425,7 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test :"${ss7_file:-no}" != :no ; then
+	    if test :${ss7_file:-no} != :no ; then
 		ss7_cv_version=`grep '#define.*\<STRSS7_VERSION\>' $ss7_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	    fi
 	fi
@@ -413,10 +451,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$ss7_version" ; then
 			if test -z "$ss7_version" -a -s "$ss7_dir/../configure" ; then
-			    ss7_version=`grep -m 1 '^PACKAGE_VERSION=' $ss7_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    ss7_version=`grep '^PACKAGE_VERSION=' $ss7_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$ss7_version" -a -s "$ss7_dir/../../configure" ; then
-			    ss7_version=`grep -m 1 '^PACKAGE_VERSION=' $ss7_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    ss7_version=`grep '^PACKAGE_VERSION=' $ss7_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$ss7_package" -a -s "$ss7_dir/../.pkgrelease" ; then
 			    ss7_package=`cat $ss7_dir/../.pkgrelease`
@@ -501,7 +539,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for ss7 $ss7_what... $ss7_dir/$linux_cv_k_release/$target_cpu])
-			if test "$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what" ; then
+			if test -f "$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what" ; then
 			    ss7_cv_includes="$ss7_dir/$linux_cv_k_release/$target_cpu $ss7_cv_includes"
 			    ss7_cv_modversions="$ss7_dir/$linux_cv_k_release/$target_cpu/$ss7_what"
 			    AC_MSG_RESULT([yes])
@@ -559,7 +597,7 @@ AC_DEFUN([_SS7_DEFINES], [dnl
 	    the STREAMS SS7 release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    SS7_CPPFLAGS="${SS7_CPPFLAGS:+ ${SS7_CPPFLAGS}}"
+    SS7_CPPFLAGS="${SS7_CPPFLAGS:+ }${SS7_CPPFLAGS}"
     SS7_LDADD="$ss7_cv_ldadd"
     SS7_LDADD32="$ss7_cv_ldadd32"
     SS7_LDFLAGS="$ss7_cv_ldflags"
@@ -568,7 +606,7 @@ AC_DEFUN([_SS7_DEFINES], [dnl
     SS7_SYMVER="$ss7_cv_symver"
     SS7_MANPATH="$ss7_cv_manpath"
     SS7_VERSION="$ss7_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${SS7_SYMVER:+${MODPOST_INPUTS:+ }${SS7_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${SS7_SYMVER:+${MODPOST_INPUTS:+ }${SS7_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strss7 for
 	that matter.
@@ -593,6 +631,9 @@ AC_DEFUN([_SS7_], [dnl
 # =============================================================================
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.28  2008-10-26 12:17:19  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.27  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

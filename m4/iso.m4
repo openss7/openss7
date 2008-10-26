@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-10-26 12:17:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -64,7 +64,7 @@
 # =============================================================================
 # _ISO
 # -----------------------------------------------------------------------------
-# Check for the existence of ISO header files, particularly sys/tpi.h.
+# Check for the existence of ISO header files, particularly sys/xti_osi.h.
 # ISO header files are required for building the TPI interface for ISO.
 # Without ISO header files, the TPI interface to ISO will not be built.
 # -----------------------------------------------------------------------------
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO_OPTIONS], [dnl
     AC_ARG_WITH([iso],
-		AS_HELP_STRING([--with-iso=HEADERS],
-			       [specify the ISO header file directory.
-				@<:@default=$INCLUDEDIR/iso@:>@]),
-		[with_iso="$withval"],
-		[with_iso=''])
+	AS_HELP_STRING([--with-iso=HEADERS],
+	    [specify the ISO header file directory.  @<:@default=INCLUDEDIR/striso@:>@]),
+	[with_iso="$withval" ; for s in ${!iso_cv_*} ; do eval "unset $s" ; done],
+	[with_iso=''])
 ])# _ISO_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${iso_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-iso="$with_iso"
@@ -158,7 +157,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 *** directories.
 *** ])
 	    fi
-	    AC_MSG_CHECKING([for xit include directory])
+	    AC_MSG_CHECKING([for iso include directory])
 	fi
 	if test :"${iso_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
@@ -178,9 +177,9 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 		    iso_cv_symver="$os7_cv_master_builddir/striso/Module.symvers"
 		    iso_cv_manpath="$os7_cv_master_builddir/striso/doc/man"
 		    AC_MSG_RESULT([yes])
-		    break
+		else
+		    AC_MSG_RESULT([no])
 		fi
-		AC_MSG_RESULT([no])
 	    fi
 	    AC_MSG_CHECKING([for iso include directory])
 	fi
@@ -217,9 +216,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for iso include directory])
 	fi
 	if test :"${iso_cv_includes:-no}" = :no ; then
-	    # ISO header files are normally found in the striso package now.
-	    # They used to be part of the XNET add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # ISO header files are normally found in the striso package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "iso_search_path=\"
@@ -290,12 +287,12 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    eval "iso_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    iso_search_path=`echo "$iso_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g'`
-	    AC_MSG_RESULT([searching])
+	    iso_search_path=`echo "$iso_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for iso_dir in $iso_search_path ; do
 		if test -d "$iso_dir" ; then
-		    AC_MSG_CHECKING([for iso siso ldadd native... $iso_dir])
-		    if test -r "$iso_dir/$iso_what"; then
+		    AC_MSG_CHECKING([for iso ldadd native... $iso_dir])
+		    if test -r "$iso_dir/$iso_what" ; then
 			iso_cv_ldadd="$iso_dir/$iso_what"
 			iso_cv_ldflags=
 			AC_MSG_RESULT([yes])
@@ -310,7 +307,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for iso ldflags], [iso_cv_ldflags], [dnl
 	iso_cv_ldflags=
 	if test -z "$iso_cv_ldadd" ; then
-	    iso_cv_ldflags="-liso"
+	    iso_cv_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -losi'
 	else
 	    iso_cv_ldflags="-L$(dirname $iso_cv_ldadd)/.libs/"
 	fi
@@ -328,11 +325,11 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    eval "iso_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    iso_search_path=`echo "$iso_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g'`
-	    AC_MSG_RESULT([searching])
+	    iso_search_path=`echo "$iso_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for iso_dir in $iso_search_path ; do
 		if test -d "$iso_dir" ; then
-		    AC_MSG_CHECKING([for iso siso ldadd 32-bit... $iso_dir])
+		    AC_MSG_CHECKING([for iso ldadd 32-bit... $iso_dir])
 		    if test -r "$iso_dir/$iso_what" ; then
 			iso_cv_ldadd32="$iso_dir/$iso_what"
 			iso_cv_ldflags32=
@@ -348,7 +345,7 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for iso ldflags 32-bit], [iso_cv_ldflags32], [dnl
 	iso_cv_ldflags32=
 	if test -z "$iso_cv_ldadd32" ; then
-	    iso_cv_ldflags32="-liso"
+	    iso_cv_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -losi'
 	else
 	    iso_cv_ldflags32="-L$(dirname $iso_cv_ldadd32)/.libs/"
 	fi
@@ -386,13 +383,12 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 *** Configure could not find the STREAMS ISO include directories.  If
 *** you wish to use the STREAMS ISO package you will need to specify
 *** the location of the STREAMS ISO (striso) include directories with
-*** the --with-iso=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-iso=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS ISO package?  The
 *** STREAMS striso package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "striso-0.9.2.1.tar.gz".
+*** named something like "striso-0.9.2.4.tar.gz".
 *** ])
     fi
     AC_CACHE_CHECK([for iso version], [iso_cv_version], [dnl
@@ -444,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$iso_version" ; then
 			if test -z "$iso_version" -a -s "$iso_dir/../configure" ; then
-			    iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$iso_version" -a -s "$iso_dir/../../configure" ; then
-			    iso_version=`grep -m 1 '^PACKAGE_VERSION=' $iso_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    iso_version=`grep '^PACKAGE_VERSION=' $iso_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$iso_package" -a -s "$iso_dir/../.pkgrelease" ; then
 			    iso_package=`cat $iso_dir/../.pkgrelease`
@@ -532,7 +528,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for iso $iso_what... $iso_dir/$linux_cv_k_release/$target_cpu])
-			if test "$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what" ; then
+			if test -f "$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what" ; then
 			    iso_cv_includes="$iso_dir/$linux_cv_k_release/$target_cpu $iso_cv_includes"
 			    iso_cv_modversions="$iso_dir/$linux_cv_k_release/$target_cpu/$iso_what"
 			    AC_MSG_RESULT([yes])
@@ -590,7 +586,7 @@ AC_DEFUN([_ISO_DEFINES], [dnl
 	    the STREAMS ISO release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    ISO_CPPFLAGS="${ISO_CPPFLAGS:+ ${ISO_CPPFLAGS}}"
+    ISO_CPPFLAGS="${ISO_CPPFLAGS:+ }${ISO_CPPFLAGS}"
     ISO_LDADD="$iso_cv_ldadd"
     ISO_LDADD32="$iso_cv_ldadd32"
     ISO_LDFLAGS="$iso_cv_ldflags"
@@ -599,7 +595,7 @@ AC_DEFUN([_ISO_DEFINES], [dnl
     ISO_SYMVER="$iso_cv_symver"
     ISO_MANPATH="$iso_cv_manpath"
     ISO_VERSION="$iso_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${ISO_SYMVER:+${MODPOST_INPUTS:+ }${ISO_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${ISO_SYMVER:+${MODPOST_INPUTS:+ }${ISO_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and striso for
 	that matter.
@@ -624,6 +620,9 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.25  2008-10-26 12:17:18  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.24  2008-09-28 19:10:58  brian
 # - quotation corrections
 #
