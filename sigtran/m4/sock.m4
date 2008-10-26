@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.29 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.30 $) $Date: 2008-10-26 12:17:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SOCK_OPTIONS], [dnl
     AC_ARG_WITH([sock],
-		AS_HELP_STRING([--with-sock=HEADERS],
-			       [specify the SOCK header file directory.
-				@<:@default=$INCLUDEDIR/sock@:>@]),
-		[with_sock="$withval"],
-		[with_sock=''])
+	AS_HELP_STRING([--with-sock=HEADERS],
+	    [specify the SOCK header file directory.  @<:@default=INCLUDEDIR/strsock@:>@]),
+	[with_sock="$withval" ; for s in ${!sock_cv_*} ; do eval "unset $s" ; done],
+	[with_sock=''])
 ])# _SOCK_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${sock_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-sock="$with_sock"
@@ -158,7 +157,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 *** directories.
 *** ])
 	    fi
-	    AC_MSG_CHECKING([for xit include directory])
+	    AC_MSG_CHECKING([for sock include directory])
 	fi
 	if test :"${sock_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
@@ -217,9 +216,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for sock include directory])
 	fi
 	if test :"${sock_cv_includes:-no}" = :no ; then
-	    # SOCK header files are normally found in the strsock package now.
-	    # They used to be part of the SOCK add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # SOCK header files are normally found in the strsock package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "sock_search_path=\"
@@ -228,26 +225,10 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strsock
 			${DESTDIR}${rootdir}/usr/local/include/strsock
 			${DESTDIR}${rootdir}/usr/src/strsock/src/include
-			${DESTDIR}${includedir}/LiS/sock
-			${DESTDIR}${rootdir}${oldincludedir}/LiS/sock
-			${DESTDIR}${rootdir}/usr/include/LiS/sock
-			${DESTDIR}${rootdir}/usr/local/include/LiS/sock
-			${DESTDIR}${rootdir}/usr/src/LiS/include/sock
-			${DESTDIR}${includedir}/sock
-			${DESTDIR}${rootdir}${oldincludedir}/sock
-			${DESTDIR}${rootdir}/usr/include/sock
-			${DESTDIR}${rootdir}/usr/local/include/sock
 			${DESTDIR}${oldincludedir}/strsock
 			${DESTDIR}/usr/include/strsock
 			${DESTDIR}/usr/local/include/strsock
-			${DESTDIR}/usr/src/strsock/src/include
-			${DESTDIR}${oldincludedir}/LiS/sock
-			${DESTDIR}/usr/include/LiS/sock
-			${DESTDIR}/usr/local/include/LiS/sock
-			${DESTDIR}/usr/src/LiS/include/sock
-			${DESTDIR}${oldincludedir}/sock
-			${DESTDIR}/usr/include/sock
-			${DESTDIR}/usr/local/include/sock\""
+			${DESTDIR}/usr/src/strsock/src/include\""
 		    ;;
 		(LfS)
 		    eval "sock_search_path=\"
@@ -303,11 +284,11 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$sock_cv_ldadd" ; then
-	    eval "sock_search_path =\"
+	    eval "sock_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
 	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
-	    AC_MSG_RESULT([searching])
+	    AC_MSG_RESULT([(searching)])
 	    for sock_dir in $sock_search_path ; do
 		if test -d "$sock_dir" ; then
 		    AC_MSG_CHECKING([for sock ldadd native... $sock_dir])
@@ -341,11 +322,11 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$sock_cv_ldadd32" ; then
-	    eval "sock_search_path =\"
+	    eval "sock_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
 	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
-	    AC_MSG_RESULT([searching])
+	    AC_MSG_RESULT([(searching)])
 	    for sock_dir in $sock_search_path ; do
 		if test -d "$sock_dir" ; then
 		    AC_MSG_CHECKING([for sock ldadd 32-bit... $sock_dir])
@@ -402,8 +383,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 *** Configure could not find the STREAMS SOCK include directories.  If
 *** you wish to use the STREAMS SOCK package you will need to specify
 *** the location of the STREAMS SOCK (strsock) include directories with
-*** the --with-sock=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-sock=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS SOCK package?  The
 *** STREAMS strsock package is available from The OpenSS7 Project
@@ -460,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$sock_version" ; then
 			if test -z "$sock_version" -a -s "$sock_dir/../configure" ; then
-			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sock_version" -a -s "$sock_dir/../../configure" ; then
-			    sock_version=`grep -m 1 '^PACKAGE_VERSION=' $sock_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    sock_version=`grep '^PACKAGE_VERSION=' $sock_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$sock_package" -a -s "$sock_dir/../.pkgrelease" ; then
 			    sock_package=`cat $sock_dir/../.pkgrelease`
@@ -548,7 +528,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for sock $sock_what... $sock_dir/$linux_cv_k_release/$target_cpu])
-			if test "$sock_dir/$linux_cv_k_release/$target_cpu/$sock_what" ; then
+			if test -f "$sock_dir/$linux_cv_k_release/$target_cpu/$sock_what" ; then
 			    sock_cv_includes="$sock_dir/$linux_cv_k_release/$target_cpu $sock_cv_includes"
 			    sock_cv_modversions="$sock_dir/$linux_cv_k_release/$target_cpu/$sock_what"
 			    AC_MSG_RESULT([yes])
@@ -606,7 +586,7 @@ AC_DEFUN([_SOCK_DEFINES], [dnl
 	    the STREAMS SOCK release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    SOCK_CPPFLAGS="${SOCK_CPPFLAGS:+ ${SOCK_CPPFLAGS}}"
+    SOCK_CPPFLAGS="${SOCK_CPPFLAGS:+ }${SOCK_CPPFLAGS}"
     SOCK_LDADD="$sock_cv_ldadd"
     SOCK_LDADD32="$sock_cv_ldadd32"
     SOCK_LDFLAGS="$sock_cv_ldflags"
@@ -615,7 +595,7 @@ AC_DEFUN([_SOCK_DEFINES], [dnl
     SOCK_SYMVER="$sock_cv_symver"
     SOCK_MANPATH="$sock_cv_manpath"
     SOCK_VERSION="$sock_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${SOCK_SYMVER:+${MODPOST_INPUTS:+ }${SOCK_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${SOCK_SYMVER:+${MODPOST_INPUTS:+ }${SOCK_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strsock for
 	that matter.
@@ -640,6 +620,9 @@ AC_DEFUN([_SOCK_], [dnl
 # =============================================================================
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.30  2008-10-26 12:17:19  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.29  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

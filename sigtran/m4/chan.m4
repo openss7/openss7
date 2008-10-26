@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.22 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: chan.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.23 $) $Date: 2008-10-26 12:17:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,12 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
 #
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# This file provides some common macros for finding a STREAMS CHAN
+# This file provides some common macros for finding a STREAMS Channel
 # release and necessary include directories and other configuration for
 # compiling kernel modules to run with the STREAMS Channel package.
 # -----------------------------------------------------------------------------
@@ -64,9 +64,9 @@
 # =============================================================================
 # _CHAN
 # -----------------------------------------------------------------------------
-# Check for the existence of Channel header files, particularly sys/tpi.h.
-# Channel header files are required for building the TPI interface for CHAN.
-# Without Channel header files, the TPI interface to Channel will not be built.
+# Check for the existence of Channel header files, particularly sys/ch.h.
+# Channel header files are required for building the CHI interface for Channel.
+# Without Channel header files, the CHI interface to Channel will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_CHAN], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_CHAN_OPTIONS], [dnl
     AC_ARG_WITH([chan],
-		AS_HELP_STRING([--with-chan=HEADERS],
-			       [specify the Channel header file directory.
-				@<:@default=$INCLUDEDIR/chan@:>@]),
-		[with_chan="$withval"],
-		[with_chan=''])
+	AS_HELP_STRING([--with-chan=HEADERS],
+	    [specify the Channel header file directory.  @<:@default=INCLUDEDIR/strchan@:>@]),
+	[with_chan="$withval" ; for s in ${!chan_cv_*} ; do eval "unset $s" ; done],
+	[with_chan=''])
 ])# _CHAN_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${chan_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-chan="$with_chan"
@@ -158,7 +157,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 *** directories.
 *** ])
 	    fi
-	    AC_MSG_CHECKING([for xit include directory])
+	    AC_MSG_CHECKING([for chan include directory])
 	fi
 	if test :"${chan_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
@@ -217,9 +216,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for chan include directory])
 	fi
 	if test :"${chan_cv_includes:-no}" = :no ; then
-	    # Channel header files are normally found in the strchan package now.
-	    # They used to be part of the XNET add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # Channel header files are normally found in the strchan package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "chan_search_path=\"
@@ -278,35 +275,77 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for chan ldadd native], [chan_cv_ldadd], [dnl
+	chan_what="libchan.la"
 	chan_cv_ldadd=
 	for chan_dir in $chan_cv_includes ; do
-	    if test -f "$chan_dir/../../libchan.la" ; then
-		chan_cv_ldadd=`echo "$chan_dir/../../libchan.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$chan_dir/../../$chan_what" ; then
+		chan_cv_ldadd=`echo "$chan_dir/../../$chan_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$chan_cv_ldadd" ; then
+	    eval "chan_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    chan_search_path=`echo "$chan_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for chan_dir in $chan_search_path ; do
+		if test -d "$chan_dir" ; then
+		    AC_MSG_CHECKING([for chan ldadd native... $chan_dir])
+		    if test -r "$chan_dir/$chan_what" ; then
+			chan_cv_ldadd="$chan_dir/$chan_what"
+			chan_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for chan ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for chan ldflags], [chan_cv_ldflags], [dnl
 	chan_cv_ldflags=
 	if test -z "$chan_cv_ldadd" ; then
-	    chan_cv_ldflags="-lchan"
+	    chan_cv_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -lchan'
 	else
 	    chan_cv_ldflags="-L$(dirname $chan_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for chan ldadd 32-bit], [chan_cv_ldadd32], [dnl
+	chan_what="libchan.la"
 	chan_cv_ldadd32=
 	for chan_dir in $chan_cv_includes ; do
-	    if test -f "$chan_dir/../../lib32/libchan.la" ; then
-		chan_cv_ldadd32=`echo "$chan_dir/../../lib32/libchan.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$chan_dir/../../lib32/$chan_what" ; then
+		chan_cv_ldadd32=`echo "$chan_dir/../../lib32/$chan_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$chan_cv_ldadd32" ; then
+	    eval "chan_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    chan_search_path=`echo "$chan_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for chan_dir in $chan_search_path ; do
+		if test -d "$chan_dir" ; then
+		    AC_MSG_CHECKING([for chan ldadd 32-bit... $chan_dir])
+		    if test -r "$chan_dir/$chan_what" ; then
+			chan_cv_ldadd32="$chan_dir/$chan_what"
+			chan_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for chan ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for chan ldflags 32-bit], [chan_cv_ldflags32], [dnl
 	chan_cv_ldflags32=
 	if test -z "$chan_cv_ldadd32" ; then
-	    chan_cv_ldflags32="-lchan"
+	    chan_cv_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -lchan'
 	else
 	    chan_cv_ldflags32="-L$(dirname $chan_cv_ldadd32)/.libs/"
 	fi
@@ -344,8 +383,7 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 *** Configure could not find the STREAMS Channel include directories.  If
 *** you wish to use the STREAMS Channel package you will need to specify
 *** the location of the STREAMS Channel (strchan) include directories with
-*** the --with-chan=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-chan=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS Channel package?  The
 *** STREAMS strchan package is available from The OpenSS7 Project
@@ -402,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$chan_version" ; then
 			if test -z "$chan_version" -a -s "$chan_dir/../configure" ; then
-			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$chan_version" -a -s "$chan_dir/../../configure" ; then
-			    chan_version=`grep -m 1 '^PACKAGE_VERSION=' $chan_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    chan_version=`grep '^PACKAGE_VERSION=' $chan_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$chan_package" -a -s "$chan_dir/../.pkgrelease" ; then
 			    chan_package=`cat $chan_dir/../.pkgrelease`
@@ -490,7 +528,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for chan $chan_what... $chan_dir/$linux_cv_k_release/$target_cpu])
-			if test "$chan_dir/$linux_cv_k_release/$target_cpu/$chan_what" ; then
+			if test -f "$chan_dir/$linux_cv_k_release/$target_cpu/$chan_what" ; then
 			    chan_cv_includes="$chan_dir/$linux_cv_k_release/$target_cpu $chan_cv_includes"
 			    chan_cv_modversions="$chan_dir/$linux_cv_k_release/$target_cpu/$chan_what"
 			    AC_MSG_RESULT([yes])
@@ -548,7 +586,7 @@ AC_DEFUN([_CHAN_DEFINES], [dnl
 	    the STREAMS Channel release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    CHAN_CPPFLAGS="${CHAN_CPPFLAGS:+ ${CHAN_CPPFLAGS}}"
+    CHAN_CPPFLAGS="${CHAN_CPPFLAGS:+ }${CHAN_CPPFLAGS}"
     CHAN_LDADD="$chan_cv_ldadd"
     CHAN_LDADD32="$chan_cv_ldadd32"
     CHAN_LDFLAGS="$chan_cv_ldflags"
@@ -557,7 +595,7 @@ AC_DEFUN([_CHAN_DEFINES], [dnl
     CHAN_SYMVER="$chan_cv_symver"
     CHAN_MANPATH="$chan_cv_manpath"
     CHAN_VERSION="$chan_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${CHAN_SYMVER:+${MODPOST_INPUTS:+ }${CHAN_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${CHAN_SYMVER:+${MODPOST_INPUTS:+ }${CHAN_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strchan for
 	that matter.
@@ -582,6 +620,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.23  2008-10-26 12:17:18  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.22  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

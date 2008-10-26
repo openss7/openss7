@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.40 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.41 $) $Date: 2008-10-26 12:17:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,12 +48,12 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
 #
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# This file provides some common macros for finding a STREAMS compatiblityu
+# This file provides some common macros for finding a STREAMS compatibility
 # release and necessary include directories and other configuration for
 # compiling kernel modules to run with the STREAMS compatibility package.
 # -----------------------------------------------------------------------------
@@ -64,12 +64,12 @@
 # =============================================================================
 # _STRCOMP
 # -----------------------------------------------------------------------------
-# Check for the existence of COMPAT header file, particularly sys/os7/compat.h.
+# Check for the existence of COMPAT header files, particularly sys/os7/compat.h.
 # COMPAT header files are required for building the ABI interface for STREAMS.
 # Without COMPAT header files, the ABI interface for STREAMS will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP], [dnl
-    AC_REQUIRE([_LINUX_STREAMS])
+    AC_REQUIRE([_LINUX_STREAMS])dnl
     _STRCOMP_OPTIONS
     _STRCOMP_SETUP
 dnl
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP_OPTIONS], [dnl
     AC_ARG_WITH([compat],
-		AS_HELP_STRING([--with-compat=HEADERS],
-			       [specify the STREAMS compatibility header file directory.
-				@<:@default=INCLUDEDIR/strcompat@:>@]),
-		[with_compat="$withval"],
-		[with_compat=''])
+	AS_HELP_STRING([--with-compat=HEADERS],
+	    [specify the STREAMS compatibility header file directory.  @<:@default=INCLUDEDIR/strcompat@:>@]),
+	[with_compat="$withval" ; for s in ${!strcomp_cv_*} ; do eval "unset $s" ; done],
+	[with_compat=''])
 ])# _STRCOMP_OPTIONS
 # =============================================================================
 
@@ -128,8 +127,8 @@ AC_DEFUN([_STRCOMP_SETUP], [dnl
 # _STRCOMP_CHECK_HEADERS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
-    # Test for the existence of Linux STREAMS Compatibility header files.  The
-    # package normally requires compatibility header files to compile.
+    # Test for the existence of STREAMS Compatibility header files.  The
+    # package normally requires STREAMS compatibility header files to compile.
     AC_CACHE_CHECK([for compat include directory], [strcomp_cv_includes], [dnl
 	strcomp_what="sys/os7/compat.h"
 	if test :"${with_compat:-no}" != :no -a :"${with_compat:-no}" != :yes ; then
@@ -139,7 +138,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		if test -d "$strcomp_dir" ; then
 		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir])
 		    if test -r "$strcomp_dir/$strcomp_what" ; then
-			strcomp_cv_cinludes="$with_compat"
+			strcomp_cv_includes="$with_compat"
 			AC_MSG_RESULT([yes])
 			break
 		    fi
@@ -148,7 +147,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${strcomp_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-compat="$with_compat"
@@ -202,10 +201,10 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for compat include directory... $strcomp_dir $strcomp_bld])
 		    if test -d "$strcomp_bld" -a -r "$strcomp_dir/$strcomp_what" ; then
 			strcomp_cv_includes="$strcomp_inc $strcomp_bld $strcomp_dir"
-			strcomp_cv_ldadd= # `echo "$strcomp_bld/../../libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			strcomp_cv_ldadd32= # `echo "$strcomp_bld/../../lib32/libcompat.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_ldadd= # `echo "$strcomp_bld/../../libcompat.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_ldadd32= # `echo "$strcomp_bld/../../lib32/libcompat.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_modversions=`echo "$strcomp_inc/sys/strcompat/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			strcomp_cv_modmap=`echo "$strcomp_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_symver=`echo "$strcomp_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			strcomp_cv_manpath=`echo "$strcomp_bld/../../doc/man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			AC_MSG_RESULT([yes])
@@ -217,9 +216,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for compat include directory])
 	fi
 	if test :"${strcomp_cv_includes:-no}" = :no ; then
-	    # Compat header files are normally found in the strcompat package now.
-	    # They used to be part of the compatibility add-on package and even older
-	    # versions are part of the LfS release packages.
+	    # STRCOMP header files are normally found in the strcompat package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "strcomp_search_path=\"
@@ -228,19 +225,10 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strcompat
 			${DESTDIR}${rootdir}/usr/local/include/strcompat
 			${DESTDIR}${rootdir}/usr/src/strcompat/src/include
-			${DESTDIR}${includedir}/LiS
-			${DESTDIR}${rootdir}${oldincludedir}/LiS
-			${DESTDIR}${rootdir}/usr/include/LiS
-			${DESTDIR}${rootdir}/usr/local/include/LiS
-			${DESTDIR}${rootdir}/usr/src/LiS/include
 			${DESTDIR}${oldincludedir}/strcompat
 			${DESTDIR}/usr/include/strcompat
 			${DESTDIR}/usr/local/include/strcompat
-			${DESTDIR}/usr/src/strcompat/src/include
-			${DESTDIR}${oldincludedir}/LiS
-			${DESTDIR}/usr/include/LiS
-			${DESTDIR}/usr/local/include/LiS
-			${DESTDIR}/usr/src/LiS/include\""
+			${DESTDIR}/usr/src/strcompat/src/include\""
 		    ;;
 		(LfS)
 		    eval "strcomp_search_path=\"
@@ -296,11 +284,11 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$strcomp_cv_ldadd" ; then
-	    eval "strcomp_search_path =\"
+	    eval "strcomp_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
 	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
-	    AC_MSG_RESULT([searching])
+	    AC_MSG_RESULT([(searching)])
 	    for strcomp_dir in $strcomp_search_path ; do
 		if test -d "$strcomp_dir" ; then
 		    AC_MSG_CHECKING([for compat ldadd native... $strcomp_dir])
@@ -319,7 +307,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for compat ldflags], [strcomp_cv_ldflags], [dnl
 	strcomp_cv_ldflags=
 	if test -z "$strcomp_cv_ldadd" ; then
-	    strcomp_cv_ldflags= # '-lcompat'
+	    strcomp_cv_ldflags= # '-L$(DESTDIR)$(rootdir)$(libdir) -lcompat'
 	else
 	    strcomp_cv_ldflags= # "-L$(dirname $strcomp_cv_ldadd)/.libs/"
 	fi
@@ -334,11 +322,11 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    fi
 	done
 	if test -z "$strcomp_cv_ldadd32" ; then
-	    eval "strcomp_search_path =\"
+	    eval "strcomp_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
 	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
-	    AC_MSG_RESULT([searching])
+	    AC_MSG_RESULT([(searching)])
 	    for strcomp_dir in $strcomp_search_path ; do
 		if test -d "$strcomp_dir" ; then
 		    AC_MSG_CHECKING([for compat ldadd 32-bit... $strcomp_dir])
@@ -357,7 +345,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for compat ldflags 32-bit], [strcomp_cv_ldflags32], [dnl
 	strcomp_cv_ldflags32=
 	if test -z "$strcomp_cv_ldadd32" ; then
-	    strcomp_cv_ldflags32= # '-lcompat'
+	    strcomp_cv_ldflags32= # '-L$(DESTDIR)$(rootdir)$(lib32dir) -lcompat'
 	else
 	    strcomp_cv_ldflags32= # "-L$(dirname $strcomp_cv_ldadd32)/.libs/"
 	fi
@@ -365,7 +353,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for compat modmap], [strcomp_cv_modmap], [dnl
 	strcomp_cv_modmap=
 	for strcomp_dir in $strcomp_cv_includes ; do
-	    if test -f $strcomp_dir/../../Modules.map ; then
+	    if test -f "$strcomp_dir/../../Modules.map" ; then
 		strcomp_cv_modmap=`echo "$strcomp_dir/../../Modules.map" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
@@ -374,7 +362,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for compat symver], [strcomp_cv_symver], [dnl
 	strcomp_cv_symver=
 	for strcomp_dir in $strcomp_cv_includes ; do
-	    if test -f $strcomp_dir/../../Module.symvers ; then
+	    if test -f "$strcomp_dir/../../Module.symvers" ; then
 		strcomp_cv_symver=`echo "$strcomp_dir/../../Module.symvers" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
@@ -383,7 +371,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
     AC_CACHE_CHECK([for compat manpath], [strcomp_cv_manpath], [dnl
 	strcomp_cv_manpath=
 	for strcomp_dir in $strcomp_cv_includes ; do
-	    if test -d $strcomp_dir/../../doc/man; then
+	    if test -d "$strcomp_dir/../../doc/man" ; then
 		strcomp_cv_manpath=`echo "$strcomp_dir/../../doc/man" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
@@ -395,13 +383,12 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 *** Configure could not find the STREAMS compat include directories.  If
 *** you wish to use the STREAMS compat package you will need to specify
 *** the location of the STREAMS compat (strcompat) include directories with
-*** the --with-compat=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-compat=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS compat package?  The
 *** STREAMS strcompat package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strcompat-0.9.2.3.tar.gz".
+*** named something like "strcompat-0.9.2.7.tar.gz".
 *** ])
     fi
     AC_CACHE_CHECK([for compat version], [strcomp_cv_version], [dnl
@@ -453,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$strcomp_version" ; then
 			if test -z "$strcomp_version" -a -s "$strcomp_dir/../configure" ; then
-			    strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$strcomp_version" -a -s "$strcomp_dir/../../configure" ; then
-			    strcomp_version=`grep -m 1 '^PACKAGE_VERSION=' $strcomp_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    strcomp_version=`grep '^PACKAGE_VERSION=' $strcomp_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$strcomp_package" -a -s "$strcomp_dir/../.pkgrelease" ; then
 			    strcomp_package=`cat $strcomp_dir/../.pkgrelease`
@@ -560,7 +547,7 @@ dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
 dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
 dnl use defines.
     if test -z "$with_compat" ; then
-	if test :"${strcomp_cv_includes:-no}" = :no ; then :
+	if test :"${strcomp_cv_includes:-no}" = :no ; then
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_compat --with-compat\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-compat'"
 	    AC_MSG_RESULT([--with-compat])
@@ -606,10 +593,10 @@ AC_DEFUN([_STRCOMP_OUTPUT], [dnl
 AC_DEFUN([_STRCOMP_DEFINES], [dnl
     if test :"${strcomp_cv_modversions:-no}" != :no ; then
 	AC_DEFINE_UNQUOTED([HAVE_SYS_STRCOMP_MODVERSIONS_H], [1], [Define when
-	    the STREAMS compatibiltiy release supports module versions such as
+	    the STREAMS compatibility release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    STRCOMP_CPPFLAGS="${STRCOMP_CPPFLAGS:+ ${STRCOMP_CPPFLAGS}}"
+    STRCOMP_CPPFLAGS="${STRCOMP_CPPFLAGS:+ }${STRCOMP_CPPFLAGS}"
     STRCOMP_LDADD="$strcomp_cv_ldadd"
     STRCOMP_LDADD32="$strcomp_cv_ldadd32"
     STRCOMP_LDFLAGS="$strcomp_cv_ldflags"
@@ -643,6 +630,9 @@ AC_DEFUN([_STRCOMP_], [dnl
 # =============================================================================
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.41  2008-10-26 12:17:19  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.40  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

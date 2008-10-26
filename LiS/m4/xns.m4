@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.57 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.58 $) $Date: 2008-10-26 12:17:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,7 +65,7 @@
 # _XNS
 # -----------------------------------------------------------------------------
 # Check for the existence of XNS header files, particularly sys/npi.h.
-# XNS headers files are required for building the NPI interface for XNS.
+# XNS header files are required for building the NPI interface for XNS.
 # Without XNS header files, the NPI interface to XNS will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS], [dnl
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS_OPTIONS], [dnl
     AC_ARG_WITH([xns],
-		AS_HELP_STRING([--with-xns=HEADERS],
-			       [specify the XNS header file directory.
-				@<:@default=$INCLUDEDIR/strxns@:>@]),
-		[with_xns="$withval"],
-		[with_xns=''])
+	AS_HELP_STRING([--with-xns=HEADERS],
+	    [specify the XNS header file directory.  @<:@default=INCLUDEDIR/strxns@:>@]),
+	[with_xns="$withval" ; for s in ${!xns_cv_*} ; do eval "unset $s" ; done],
+	[with_xns=''])
 ])# _XNS_OPTIONS
 # =============================================================================
 
@@ -118,7 +117,7 @@ AC_DEFUN([_XNS_SETUP], [dnl
     if test :"${xns_cv_config:-no}" != :no ; then
 	XNS_CPPFLAGS="${XNS_CPPFLAGS}${XNS_CPPFLAGS:+ }-include ${xns_cv_config}"
     fi
-    if test :"${xns_cv_modversions:=no}" != :no ; then
+    if test :"${xns_cv_modversions:-no}" != :no ; then
 	XNS_MODFLAGS="${XNS_MODFLAGS}${XNS_MODFLAGS:+ }-include ${xns_cv_modversions}"
     fi
 ])# _XNS_SETUP
@@ -148,7 +147,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${xns_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-xns="$with_xns"
@@ -171,8 +170,8 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		AC_MSG_CHECKING([for xns include directory... $xns_dir $xns_bld])
 		if test -r "$xns_dir/$xns_what" ; then
 		    xns_cv_includes="$xns_inc $xns_bld $xns_dir"
-		    xns_cv_ldadd= # "$os7_cv_master_builddir/strxns/libxns.la"
-		    xns_cv_ldadd32= # "$os7_cv_master_builddir/strxns/lib32/libxns.la"
+		    xns_cv_ldadd="$os7_cv_master_builddir/strxns/libdlpi.la"
+		    xns_cv_ldadd32="$os7_cv_master_builddir/strxns/lib32/libdlpi.la"
 		    xns_cv_modversions="$os7_cv_master_builddir/strxns/include/sys/strxns/modversions.h"
 		    xns_cv_modmap="$os7_cv_master_builddir/strxns/Modules.map"
 		    xns_cv_symver="$os7_cv_master_builddir/strxns/Module.symvers"
@@ -202,8 +201,8 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 		    AC_MSG_CHECKING([for xns include directory... $xns_dir $xns_bld])
 		    if test -d "$xns_bld" -a -r "$xns_dir/$xns_what" ; then
 			xns_cv_includes="$xns_inc $xns_bld $xns_dir"
-			xns_cv_ldadd= # `echo "$xns_bld/../../libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			xns_cv_ldadd32= # `echo "$xns_bld/../../lib32/libxns.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_ldadd=`echo "$xns_bld/../../libdlpi.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			xns_cv_ldadd32=`echo "$xns_bld/../../lib32/libdlpi.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_modversions=`echo "$xns_inc/sys/strxns/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_modmap=`echo "$xns_bld/../../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			xns_cv_symver=`echo "$xns_bld/../../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -217,7 +216,7 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for xns include directory])
 	fi
 	if test :"${xns_cv_includes:-no}" = :no ; then
-	    # XNS header files are normaly found in the strxns package now.
+	    # XNS header files are normally found in the strxns package now.
 	    # They used to be part of the INET add-on package and even older
 	    # versions are part of the LiS release packages.
 	    case "$streams_cv_package" in
@@ -339,37 +338,79 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for xns ldadd native], [xns_cv_ldadd], [dnl
+	xns_what="libdlpi.la"
 	xns_cv_ldadd=
 	for xns_dir in $xns_cv_includes ; do
-	    if test -f "$xns_dir/../../libxns.la" ; then
-		xns_cv_ldadd=`echo "$xns_dir/../../libxns.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$xns_dir/../../$xns_what" ; then
+		xns_cv_ldadd=`echo "$xns_dir/../../$xns_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$xns_cv_ldadd" ; then
+	    eval "xns_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for xns_dir in $xns_search_path ; do
+		if test -d "$xns_dir" ; then
+		    AC_MSG_CHECKING([for xns ldadd native... $xns_dir])
+		    if test -r "$xns_dir/$xns_what" ; then
+			xns_cv_ldadd="$xns_dir/$xns_what"
+			xns_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for xns ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for xns ldflags], [xns_cv_ldflags], [dnl
 	xns_cv_ldflags=
 	if test -z "$xns_cv_ldadd" ; then
-	    xns_cv_ldflags= # '-lxns'
+	    xns_cv_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -ldlpi'
 	else
-	    xns_cv_ldflags= # "-L$(dirname $xns_cv_ldflags)/.libs/"
+	    xns_cv_ldflags="-L$(dirname $xns_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for xns ldadd 32-bit], [xns_cv_ldadd32], [dnl
+	xns_what="libdlpi.la"
 	xns_cv_ldadd32=
 	for xns_dir in $xns_cv_includes ; do
-	    if test -f "$xns_dir/../../libxns.la" ; then
-		xns_cv_ldadd32=`echo "$xns_dir/../../libxns.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$xns_dir/../../lib32/$xns_what" ; then
+		xns_cv_ldadd32=`echo "$xns_dir/../../lib32/$xns_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$xns_cv_ldadd32" ; then
+	    eval "xns_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    xns_search_path=`echo "$xns_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for xns_dir in $xns_search_path ; do
+		if test -d "$xns_dir" ; then
+		    AC_MSG_CHECKING([for xns ldadd 32-bit... $xns_dir])
+		    if test -r "$xns_dir/$xns_what" ; then
+			xns_cv_ldadd32="$xns_dir/$xns_what"
+			xns_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for xns ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for xns ldflags 32-bit], [xns_cv_ldflags32], [dnl
 	xns_cv_ldflags32=
 	if test -z "$xns_cv_ldadd32" ; then
-	    xns_cv_ldflags32= # '-lxns'
+	    xns_cv_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -lxns'
 	else
-	    xns_cv_ldflags32= # "-L$(dirname $xns_cv_ldflags32)/.libs/"
+	    xns_cv_ldflags32="-L$(dirname $xns_cv_ldadd32)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for xns modmap], [xns_cv_modmap], [dnl
@@ -399,19 +440,18 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${xns_cv_includes:-no}" = :no ; then :
+    if test :"${xns_cv_includes:-no}" = :no ; then
 	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS XNS include directories.  If
 *** you wish to use the STREAMS XNS package you will need to specify
 *** the location of the STREAMS XNS (strxns) include directories with
-*** the --with-xns=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-xns=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS XNS package?  The
 *** STREAMS strxns package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strxns-0.9.2.3.tar.gz".
+*** named something like "strxns-0.9.2.7.tar.gz".
 *** ])
     fi
     AC_CACHE_CHECK([for xns version], [xns_cv_version], [dnl
@@ -463,10 +503,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$xns_version" ; then
 			if test -z "$xns_version" -a -s "$xns_dir/../configure" ; then
-			    xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$xns_version" -a -s "$xns_dir/../../configure" ; then
-			    xns_version=`grep -m 1 '^PACKAGE_VERSION=' $xns_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    xns_version=`grep '^PACKAGE_VERSION=' $xns_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$xns_package" -a -s "$xns_dir/../.pkgrelease" ; then
 			    xns_package=`cat $xns_dir/../.pkgrelease`
@@ -551,7 +591,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for xns $xns_what... $xns_dir/$linux_cv_k_release/$target_cpu])
-			if test "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
+			if test -f "$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what" ; then
 			    xns_cv_includes="$xns_dir/$linux_cv_k_release/$target_cpu $xns_cv_includes"
 			    xns_cv_modversions="$xns_dir/$linux_cv_k_release/$target_cpu/$xns_what"
 			    AC_MSG_RESULT([yes])
@@ -618,7 +658,7 @@ AC_DEFUN([_XNS_DEFINES], [dnl
     XNS_SYMVER="$xns_cv_symver"
     XNS_MANPATH="$xns_cv_manpath"
     XNS_VERSION="$xns_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${XNS_SYMVER:+${MODPOST_INPUTS:+ }${XNS_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${XNS_SYMVER:+${MODPOST_INPUTS:+ }${XNS_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strxns for
 	that matter.
@@ -643,6 +683,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.58  2008-10-26 12:17:19  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.57  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

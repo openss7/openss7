@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-10-26 12:17:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISDN_OPTIONS], [dnl
     AC_ARG_WITH([isdn],
-		AS_HELP_STRING([--with-isdn=HEADERS],
-			       [specify the ISDN header file directory.
-				@<:@default=$INCLUDEDIR/isdn@:>@]),
-		[with_isdn="$withval"],
-		[with_isdn=''])
+	AS_HELP_STRING([--with-isdn=HEADERS],
+	    [specify the ISDN header file directory.  @<:@default=INCLUDEDIR/strisdn@:>@]),
+	[with_isdn="$withval" ; for s in ${!isdn_cv_*} ; do eval "unset $s" ; done],
+	[with_isdn=''])
 ])# _ISDN_OPTIONS
 # =============================================================================
 
@@ -148,7 +147,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${isdn_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-isdn="$with_isdn"
@@ -217,9 +216,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for isdn include directory])
 	fi
 	if test :"${isdn_cv_includes:-no}" = :no ; then
-	    # ISDN header files are normally found in the strisdn package now.
-	    # They used to be part of the ISDN add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # ISDN header files are normally found in the strisdn package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "isdn_search_path=\"
@@ -228,17 +225,10 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 			${DESTDIR}${rootdir}/usr/include/strisdn
 			${DESTDIR}${rootdir}/usr/local/include/strisdn
 			${DESTDIR}${rootdir}/usr/src/strisdn/src/include
-			${DESTDIR}${includedir}/isdn
-			${DESTDIR}${rootdir}${oldincludedir}/isdn
-			${DESTDIR}${rootdir}/usr/include/isdn
-			${DESTDIR}${rootdir}/usr/local/include/isdn
 			${DESTDIR}${oldincludedir}/strisdn
 			${DESTDIR}/usr/include/strisdn
 			${DESTDIR}/usr/local/include/strisdn
-			${DESTDIR}/usr/src/strisdn/src/include
-			${DESTDIR}${oldincludedir}/isdn
-			${DESTDIR}/usr/include/isdn
-			${DESTDIR}/usr/local/include/isdn\""
+			${DESTDIR}/usr/src/strisdn/src/include\""
 		    ;;
 		(LfS)
 		    eval "isdn_search_path=\"
@@ -285,35 +275,77 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	fi
     ])
     AC_CACHE_CHECK([for isdn ldadd native], [isdn_cv_ldadd], [dnl
+	isdn_what="libisdn.la"
 	isdn_cv_ldadd=
 	for isdn_dir in $isdn_cv_includes ; do
-	    if test -f "$isdn_dir/../../libisdn.la" ; then
-		isdn_cv_ldadd=`echo "$isdn_dir/../../libisdn.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$isdn_dir/../../$isdn_what" ; then
+		isdn_cv_ldadd=`echo "$isdn_dir/../../$isdn_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$isdn_cv_ldadd" ; then
+	    eval "isdn_search_path=\"
+		${DESTDIR}${rootdir}${libdir}
+		${DESTDIR}${libdir}\""
+	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for isdn_dir in $isdn_search_path ; do
+		if test -d "$isdn_dir" ; then
+		    AC_MSG_CHECKING([for isdn ldadd native... $isdn_dir])
+		    if test -r "$isdn_dir/$isdn_what" ; then
+			isdn_cv_ldadd="$isdn_dir/$isdn_what"
+			isdn_cv_ldflags=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for isdn ldadd native])
+	fi
     ])
     AC_CACHE_CHECK([for isdn ldflags], [isdn_cv_ldflags], [dnl
 	isdn_cv_ldflags=
 	if test -z "$isdn_cv_ldadd" ; then
-	    isdn_cv_ldflags= # '-lisdn'
+	    isdn_cv_ldflags= # '-L$(DESTDIR)$(rootdir)$(libdir) -lisdn'
 	else
 	    isdn_cv_ldflags= # "-L$(dirname $isdn_cv_ldadd)/.libs/"
 	fi
     ])
     AC_CACHE_CHECK([for isdn ldadd 32-bit], [isdn_cv_ldadd32], [dnl
+	isdn_what="libisdn.la"
 	isdn_cv_ldadd32=
 	for isdn_dir in $isdn_cv_includes ; do
-	    if test -f "$isdn_dir/../../libisdn.la" ; then
-		isdn_cv_ldadd32=`echo "$isdn_dir/../../lib32/libisdn.la" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+	    if test -f "$isdn_dir/../../lib32/$isdn_what" ; then
+		isdn_cv_ldadd32=`echo "$isdn_dir/../../lib32/$isdn_what" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 		break
 	    fi
 	done
+	if test -z "$isdn_cv_ldadd32" ; then
+	    eval "isdn_search_path=\"
+		${DESTDIR}${rootdir}${lib32dir}
+		${DESTDIR}${lib32dir}\""
+	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
+	    for isdn_dir in $isdn_search_path ; do
+		if test -d "$isdn_dir" ; then
+		    AC_MSG_CHECKING([for isdn ldadd 32-bit... $isdn_dir])
+		    if test -r "$isdn_dir/$isdn_what" ; then
+			isdn_cv_ldadd32="$isdn_dir/$isdn_what"
+			isdn_cv_ldflags32=
+			AC_MSG_RESULT([yes])
+			break
+		    fi
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    AC_MSG_CHECKING([for isdn ldadd 32-bit])
+	fi
     ])
     AC_CACHE_CHECK([for isdn ldflags 32-bit], [isdn_cv_ldflags32], [dnl
 	isdn_cv_ldflags32=
 	if test -z "$isdn_cv_ldadd32" ; then
-	    isdn_cv_ldflags32= # '-lisdn'
+	    isdn_cv_ldflags32= # '-L$(DESTDIR)$(rootdir)$(lib32dir) -lisdn'
 	else
 	    isdn_cv_ldflags32= # "-L$(dirname $isdn_cv_ldadd32)/.libs/"
 	fi
@@ -349,15 +381,14 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS ISDN include directories.  If
-*** you wish to use the STREAMS ISDN package, you will need to specify
+*** you wish to use the STREAMS ISDN package you will need to specify
 *** the location of the STREAMS ISDN (strisdn) include directories with
-*** the --with-isdn=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** the --with-isdn=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
 *** Perhaps you just forgot to load the STREAMS ISDN package?  The
 *** STREAMS strisdn package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strisdn-0.9a.3.tar.gz".
+*** named something like "strisdn-0.9.2.4.tar.gz".
 *** ])
     fi
     AC_CACHE_CHECK([for isdn version], [isdn_cv_version], [dnl
@@ -383,7 +414,7 @@ dnl		    this will just not be set
 		    fi
 		done
 	    fi
-	    if test :"${isdn_file:-no}" != :no ; then
+	    if test :${isdn_file:-no} != :no ; then
 		isdn_cv_version=`grep '#define.*\<STRISDN_VERSION\>' $isdn_file 2>/dev/null | sed -e 's|^[^"]*"||;s|".*$||'`
 	    fi
 	fi
@@ -409,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$isdn_version" ; then
 			if test -z "$isdn_version" -a -s "$isdn_dir/../configure" ; then
-			    isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$isdn_version" -a -s "$isdn_dir/../../configure" ; then
-			    isdn_version=`grep -m 1 '^PACKAGE_VERSION=' $isdn_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    isdn_version=`grep '^PACKAGE_VERSION=' $isdn_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$isdn_package" -a -s "$isdn_dir/../.pkgrelease" ; then
 			    isdn_package=`cat $isdn_dir/../.pkgrelease`
@@ -497,7 +528,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for isdn $isdn_what... $isdn_dir/$linux_cv_k_release/$target_cpu])
-			if test "$isdn_dir/$linux_cv_k_release/$target_cpu/$isdn_what" ; then
+			if test -f "$isdn_dir/$linux_cv_k_release/$target_cpu/$isdn_what" ; then
 			    isdn_cv_includes="$isdn_dir/$linux_cv_k_release/$target_cpu $isdn_cv_includes"
 			    isdn_cv_modversions="$isdn_dir/$linux_cv_k_release/$target_cpu/$isdn_what"
 			    AC_MSG_RESULT([yes])
@@ -555,7 +586,7 @@ AC_DEFUN([_ISDN_DEFINES], [dnl
 	    the STREAMS ISDN release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    ISDN_CPPFLAGS="${ISDN_CPPFLAGS:+ ${ISDN_CPPFLAGS}}"
+    ISDN_CPPFLAGS="${ISDN_CPPFLAGS:+ }${ISDN_CPPFLAGS}"
     ISDN_LDADD="$isdn_cv_ldadd"
     ISDN_LDADD32="$isdn_cv_ldadd32"
     ISDN_LDFLAGS="$isdn_cv_ldflags"
@@ -564,7 +595,7 @@ AC_DEFUN([_ISDN_DEFINES], [dnl
     ISDN_SYMVER="$isdn_cv_symver"
     ISDN_MANPATH="$isdn_cv_manpath"
     ISDN_VERSION="$isdn_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${ISDN_SYMVER:+${MODPOST_INPUTS:+ }${ISDN_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${ISDN_SYMVER:+${MODPOST_INPUTS:+ }${ISDN_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strisdn for
 	that matter.
@@ -589,6 +620,9 @@ AC_DEFUN([_ISDN_], [dnl
 # =============================================================================
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.22  2008-10-26 12:17:18  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.21  2008-09-28 19:10:58  brian
 # - quotation corrections
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: x25.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-28 19:10:58 $
+# @(#) $RCSfile: x25.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-26 12:17:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,14 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 19:10:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
 #
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# This file provides some common macros for finding a STREAMS X.25
+# This file provides some common macros for finding a STREAMS X25
 # release and necessary include directories and other configuration for
-# compiling kernel modules to run with the STREAMS X.25 package.
+# compiling kernel modules to run with the STREAMS X25 package.
 # -----------------------------------------------------------------------------
 # Interesting enough, there is no need to have strx25 loaded on the build
 # machine to compile modules.  Only the proper header files are required.
@@ -64,9 +64,9 @@
 # =============================================================================
 # _X25
 # -----------------------------------------------------------------------------
-# Check for the existence of X.25 header files, particularly sys/xti_xx25.h.
-# X.25 header files are required for building the TPI interface for X.25.
-# Without X.25 header files, the TPI interface to X.25 will not be built.
+# Check for the existence of X25 header files, particularly sys/xti_xx25.h.
+# X25 header files are required for building the TPI interface for X25.
+# Without X25 header files, the TPI interface to X25 will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_X25], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
@@ -99,11 +99,10 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_X25_OPTIONS], [dnl
     AC_ARG_WITH([x25],
-		AS_HELP_STRING([--with-x25=HEADERS],
-			       [specify the X.25 header file directory.
-				@<:@default=$INCLUDEDIR/x25@:>@]),
-		[with_x25="$withval"],
-		[with_x25=''])
+	AS_HELP_STRING([--with-x25=HEADERS],
+	    [specify the X25 header file directory.  @<:@default=INCLUDEDIR/strx25@:>@]),
+	[with_x25="$withval" ; for s in ${!x25_cv_*} ; do eval "unset $s" ; done],
+	[with_x25=''])
 ])# _X25_OPTIONS
 # =============================================================================
 
@@ -128,8 +127,8 @@ AC_DEFUN([_X25_SETUP], [dnl
 # _X25_CHECK_HEADERS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_X25_CHECK_HEADERS], [dnl
-    # Test for the existence of Linux Fast-STREAMS X.25 header files.  The
-    # package normally requires X.25 header files to compile.
+    # Test for the existence of Linux Fast-STREAMS X25 header files.  The
+    # package normally requires X25 header files to compile.
     AC_CACHE_CHECK([for x25 include directory], [x25_cv_includes], [dnl
 	x25_what="sys/xti_xx25.h"
 	if test :"${with_x25:-no}" != :no -a :"${with_x25:-no}" != :yes ; then
@@ -148,7 +147,7 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 	    done
 	    if test :"${x25_cv_includes:-no}" = :no ; then
 		AC_MSG_WARN([
-*** 
+***
 *** You have specified include directories using:
 ***
 ***	    --with-x25="$with_x25"
@@ -158,7 +157,7 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 *** directories.
 *** ])
 	    fi
-	    AC_MSG_CHECKING([for xit include directory])
+	    AC_MSG_CHECKING([for x25 include directory])
 	fi
 	if test :"${x25_cv_includes:-no}" = :no ; then
 	    # The next place to look is under the master source and build
@@ -178,9 +177,9 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 		    x25_cv_symver="$os7_cv_master_builddir/strx25/Module.symvers"
 		    x25_cv_manpath="$os7_cv_master_builddir/strx25/doc/man"
 		    AC_MSG_RESULT([yes])
-		    break
+		else
+		    AC_MSG_RESULT([no])
 		fi
-		AC_MSG_RESULT([no])
 	    fi
 	    AC_MSG_CHECKING([for x25 include directory])
 	fi
@@ -217,9 +216,7 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 	    AC_MSG_CHECKING([for x25 include directory])
 	fi
 	if test :"${x25_cv_includes:-no}" = :no ; then
-	    # X.25 header files are normally found in the strx25 package now.
-	    # They used to be part of the XNET add-on package and even older
-	    # versions are part of the LiS release packages.
+	    # X25 header files are normally found in the strx25 package.
 	    case "$streams_cv_package" in
 		(LiS)
 		    eval "x25_search_path=\"
@@ -290,12 +287,12 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 	    eval "x25_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g'`
-	    AC_MSG_RESULT([searching])
+	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for x25_dir in $x25_search_path ; do
 		if test -d "$x25_dir" ; then
-		    AC_MSG_CHECKING([for x25 sx25 ldadd native... $x25_dir])
-		    if test -r "$x25_dir/$x25_what"; then
+		    AC_MSG_CHECKING([for x25 ldadd native... $x25_dir])
+		    if test -r "$x25_dir/$x25_what" ; then
 			x25_cv_ldadd="$x25_dir/$x25_what"
 			x25_cv_ldflags=
 			AC_MSG_RESULT([yes])
@@ -304,13 +301,13 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 		    AC_MSG_RESULT([no])
 		fi
 	    done
-	    AC_MSG_CHECKING([for x25 sx25 ldadd native])
+	    AC_MSG_CHECKING([for x25 ldadd native])
 	fi
     ])
     AC_CACHE_CHECK([for x25 ldflags], [x25_cv_ldflags], [dnl
 	x25_cv_ldflags=
 	if test -z "$x25_cv_ldadd" ; then
-	    x25_cv_ldflags="-lx25"
+	    x25_cv_ldflags='-L$(DESTDIR)$(rootdir)$(libdir) -lx25'
 	else
 	    x25_cv_ldflags="-L$(dirname $x25_cv_ldadd)/.libs/"
 	fi
@@ -328,11 +325,11 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 	    eval "x25_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g'`
-	    AC_MSG_RESULT([searching])
+	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    AC_MSG_RESULT([(searching)])
 	    for x25_dir in $x25_search_path ; do
 		if test -d "$x25_dir" ; then
-		    AC_MSG_CHECKING([for x25 sx25 ldadd 32-bit... $x25_dir])
+		    AC_MSG_CHECKING([for x25 ldadd 32-bit... $x25_dir])
 		    if test -r "$x25_dir/$x25_what" ; then
 			x25_cv_ldadd32="$x25_dir/$x25_what"
 			x25_cv_ldflags32=
@@ -342,13 +339,13 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 		    AC_MSG_RESULT([no])
 		fi
 	    done
-	    AC_MSG_CHECKING([for x25 sx25 ldadd 32-bit])
+	    AC_MSG_CHECKING([for x25 ldadd 32-bit])
 	fi
     ])
     AC_CACHE_CHECK([for x25 ldflags 32-bit], [x25_cv_ldflags32], [dnl
 	x25_cv_ldflags32=
 	if test -z "$x25_cv_ldadd32" ; then
-	    x25_cv_ldflags32="-lx25"
+	    x25_cv_ldflags32='-L$(DESTDIR)$(rootdir)$(lib32dir) -lx25'
 	else
 	    x25_cv_ldflags32="-L$(dirname $x25_cv_ldadd32)/.libs/"
 	fi
@@ -383,13 +380,12 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
     if test :"${x25_cv_includes:-no}" = :no ; then
 	AC_MSG_ERROR([
 *** 
-*** Configure could not find the STREAMS X.25 include directories.  If
-*** you wish to use the STREAMS X.25 package you will need to specify
-*** the location of the STREAMS X.25 (strx25) include directories with
-*** the --with-x25=@<:@DIRECTORY@<:@ DIRECTORY@:>@@:>@ option to
-*** ./configure and try again.
+*** Configure could not find the STREAMS X25 include directories.  If
+*** you wish to use the STREAMS X25 package you will need to specify
+*** the location of the STREAMS X25 (strx25) include directories with
+*** the --with-x25=@<:@DIRECTORY@:>@ option to ./configure and try again.
 ***
-*** Perhaps you just forgot to load the STREAMS X.25 package?  The
+*** Perhaps you just forgot to load the STREAMS X25 package?  The
 *** STREAMS strx25 package is available from The OpenSS7 Project
 *** download page at http://www.openss7.org/ and comes in a tarball
 *** named something like "strx25-0.9.2.1.tar.gz".
@@ -444,10 +440,10 @@ dnl		    this will just not be set
 		    fi
 		    if test -z "$x25_version" ; then
 			if test -z "$x25_version" -a -s "$x25_dir/../configure" ; then
-			    x25_version=`grep -m 1 '^PACKAGE_VERSION=' $x25_dir/../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    x25_version=`grep '^PACKAGE_VERSION=' $x25_dir/../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$x25_version" -a -s "$x25_dir/../../configure" ; then
-			    x25_version=`grep -m 1 '^PACKAGE_VERSION=' $x25_dir/../../configure | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
+			    x25_version=`grep '^PACKAGE_VERSION=' $x25_dir/../../configure | head -1 | sed -e "s,^[[^']]*',,;s,'.*[$],,"`
 			fi
 			if test -z "$x25_package" -a -s "$x25_dir/../.pkgrelease" ; then
 			    x25_package=`cat $x25_dir/../.pkgrelease`
@@ -532,7 +528,7 @@ dnl	assume normal objects
 dnl			if linux_cv_k_release is not defined (no _LINUX_KERNEL)
 dnl			then this will just not be set
 			AC_MSG_CHECKING([for x25 $x25_what... $x25_dir/$linux_cv_k_release/$target_cpu])
-			if test "$x25_dir/$linux_cv_k_release/$target_cpu/$x25_what" ; then
+			if test -f "$x25_dir/$linux_cv_k_release/$target_cpu/$x25_what" ; then
 			    x25_cv_includes="$x25_dir/$linux_cv_k_release/$target_cpu $x25_cv_includes"
 			    x25_cv_modversions="$x25_dir/$linux_cv_k_release/$target_cpu/$x25_what"
 			    AC_MSG_RESULT([yes])
@@ -587,10 +583,10 @@ AC_DEFUN([_X25_OUTPUT], [dnl
 AC_DEFUN([_X25_DEFINES], [dnl
     if test :"${x25_cv_modversions:-no}" != :no ; then
 	AC_DEFINE_UNQUOTED([HAVE_SYS_X25_MODVERSIONS_H], [1], [Define when
-	    the STREAMS X.25 release supports module versions such as
+	    the STREAMS X25 release supports module versions such as
 	    the OpenSS7 autoconf releases.])
     fi
-    X25_CPPFLAGS="${X25_CPPFLAGS:+ ${X25_CPPFLAGS}}"
+    X25_CPPFLAGS="${X25_CPPFLAGS:+ }${X25_CPPFLAGS}"
     X25_LDADD="$x25_cv_ldadd"
     X25_LDADD32="$x25_cv_ldadd32"
     X25_LDFLAGS="$x25_cv_ldflags"
@@ -599,7 +595,7 @@ AC_DEFUN([_X25_DEFINES], [dnl
     X25_SYMVER="$x25_cv_symver"
     X25_MANPATH="$x25_cv_manpath"
     X25_VERSION="$x25_cv_version"
-    MODPOST_INPUT="${MODPOST_INPUTS}${X25_SYMVER:+${MODPOST_INPUTS:+ }${X25_SYMVER}}"
+    MODPOST_INPUTS="${MODPOST_INPUTS}${X25_SYMVER:+${MODPOST_INPUTS:+ }${X25_SYMVER}}"
     AC_DEFINE_UNQUOTED([_XOPEN_SOURCE], [600], [dnl
 	Define for SuSv3.  This is necessary for LiS and LfS and strx25 for
 	that matter.
@@ -624,6 +620,9 @@ AC_DEFUN([_X25_], [dnl
 # =============================================================================
 #
 # $Log: x25.m4,v $
+# Revision 0.9.2.10  2008-10-26 12:17:19  brian
+# - update package discovery macros
+#
 # Revision 0.9.2.9  2008-09-28 19:10:58  brian
 # - quotation corrections
 #
