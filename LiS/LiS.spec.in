@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name: OpenSS7-0_9_2 $($Revision: 1.1.6.95 $) $Date: 2008-09-29 06:27:50 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.96 $) $Date: 2008-10-27 13:01:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-29 06:27:50 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 13:01:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -121,9 +121,13 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.95  2008-09-29 06:27:50  brian
-# - support older versions of rpm
+# Revision 1.1.6.96  2008-10-27 13:01:07  brian
+# - updated spec files
 #
+
+* Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.95  2008-09-29 06:27:50  brian
+- support older versions of rpm
 
 * Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.94  2008-09-28 17:00:18  brian

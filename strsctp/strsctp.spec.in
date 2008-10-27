@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.144 $) $Date: 2008/09/29 06:28:06 $
+# @(#) $RCSfile: strsctp.spec.in,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2008-10-27 13:01:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008/09/29 06:28:06 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 13:01:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -118,9 +118,13 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strsctp.spec.in,v $
-# Revision 0.9.2.144  2008/09/29 06:28:06  brian
-# - support older versions of rpm
+# Revision 0.9.2.145  2008-10-27 13:01:12  brian
+# - updated spec files
 #
+
+* Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.144  2008/09/29 06:28:06  brian
+- support older versions of rpm
 
 * Sun Sep 28 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.143  2008-09-28 17:00:23  brian

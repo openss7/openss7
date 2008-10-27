@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-09-30 09:37:13 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.83 $) $Date: 2008-10-27 13:01:08 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,873 +47,88 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-30 09:37:13 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 13:01:08 $ by $Author: brian $
 #
 # =============================================================================
 
-# default is to build kernel modules and tools
-# conditional builds of binary rpms relies on the sneaky spec trick that
-# rpmbuild will not build a binary rpm when it has no %files section
-%global BUILD_modules 0
-%global BUILD_devel   1
-%global BUILD_tools   1
-%global BUILD_libs    0
-%global BUILD_debug   1
-%global BUILD_noarch  1
-%global BUILD_arch    1
-%global BUILD_source  0
-%global BUILD_test    1
-%global BUILD_lis     0
-%global BUILD_lfs     0
-
+#global majbase     @STRCONF_MAJBASE@
+#global makedev     @STRCONF_MAKEDEV@
+#global mknods      /usr/sbin/inet_mkdev    # inet style install
+#global rmnods      /usr/sbin/inet_rmdev    # inet style removal
+#global mknods      /usr/sbin/@STRMAKENODES@
+#global rmnods      /usr/sbin/@STRMAKENODES@ --remove
 %global epoch       @PACKAGE_RPMEPOCH@
 %global base        @PACKAGE_LCNAME@
 %global title       @PACKAGE_TITLE@
 %global stitle      @PACKAGE_SHORTTITLE@
 %global virtual     STREAMS
 
-#global modules
-#global preloads
-#global libraries   
-#global tools       
-%global infofiles   %{name}
-#global initfiles
-#global conffiles
-
-#{expand: %%global without_ko_modules %(echo %{_kversion} | sed -e 's|^2\.[56]\..*$|0|;s|^2\.4\..*$|1|')}
-#{expand: %%global have_preloads    %{?preloads: 1}%{!?preloads: 0}}
-#{expand: %%global have_modules     %{?modules:  1}%{!?modules:  0}}
-%{expand: %%global have_libraries   %{?libraries:1}%{!?libraries:0}}
-%{expand: %%global have_tools       %{?tools:    1}%{!?tools:    0}}
-%{expand: %%global have_infofiles   %{?infofiles:1}%{!?infofiles:0}}
-#{expand: %%global have_initscripts %{?initfiles:1}%{!?initfiles:0}}
-#{expand: %%global have_configfiles %{?conffiles:1}%{!?conffiles:0}}
-
-# define new autoconf 2.60, 2.61 stuff
-%{!?_datarootdir:       %{expand: %%global _datarootdir     %%{_datadir}}}
-%{!?_docdir:            %{expand: %%global _docdir          %%{_datarootdir}/doc}}
-%{!?_htmldir:           %{expand: %%global _htmldir         %%{_docdir}}}
-%{!?_dvidir:            %{expand: %%global _dvidir          %%{_docdir}}}
-%{!?_pdfdir:            %{expand: %%global _pdfdir          %%{_docdir}}}
-%{!?_psdir:             %{expand: %%global _psdir           %%{_docdir}}}
-%{!?_localedir:         %{expand: %%global _localedir       %%{_datadir}/locale}}
-%{!?_configdir:         %{expand: %%global _configdir       %%{_sysconfdir}/sysconfig}}
-%{!?_modutildir:        %{expand: %%global _modutildir      %%{_sysconfdir}/modutils}}
-%{!?_pkglibexecdir:     %{expand: %%global _pkglibexecdir   %%{_libexecdir}/%%{name}}}
-%ifarch x86_64 ppc64 sparc64 ia64
-%{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
-%{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
-%endif
-
-# because we only need to build the tools binaries once for each architecture,
-# but need to build the modules binaries once for each architecture and kernel
-# version, we accept the --with[out] options "modules" and "tools"
-#{?_without_modules:    %{expand: %%global BUILD_modules 0}}
-%{?_without_devel:      %{expand: %%global BUILD_devel   0}}
-#{?_without_tools:      %{expand: %%global BUILD_tools   0}}
-%{?_without_indep:      %{expand: %%global BUILD_noarch  0}}
-%{?_without_arch:       %{expand: %%global BUILD_arch    0}}
-%{?_without_public:     %{expand: %%global BUILD_source  0}}
-%{?_without_lis:        %{expand: %%global BUILD_lis     0}}
-%{?_without_lis:        %{expand: %%global BUILD_lfs     1}}
-%{?_without_lfs:        %{expand: %%global BUILD_lfs     0}}
-%{?_without_lfs:        %{expand: %%global BUILD_lis     1}}
-
-#{?_with_devfs:         %{expand: %%global NEED_devs     0}}
-#{?_with_modules:       %{expand: %%global BUILD_modules 1}}
-%{?_with_devel:         %{expand: %%global BUILD_devel   1}}
-#{?_with_tools:         %{expand: %%global BUILD_tools   1}}
-%{?_with_indep:         %{expand: %%global BUILD_noarch  1}}
-%{?_with_arch:          %{expand: %%global BUILD_arch    1}}
-%{?_with_public:        %{expand: %%global BUILD_source  1}}
-%{?_with_lis:           %{expand: %%global BUILD_lis     1}}
-%{?_with_lis:           %{expand: %%global BUILD_lfs     0}}
-%{?_with_lfs:           %{expand: %%global BUILD_lfs     1}}
-%{?_with_lfs:           %{expand: %%global BUILD_lis     0}}
-
-%if %{BUILD_source}
-%global _enable_ksource_package  1
-%else
-%global _enable_ksource_package  0
-%endif
-
-# need manpage references unless otherwise specified
-%global NEED_manrefs  1
-
-%{?_without_cooked_manpages: %{expand: %%global NEED_manrefs 0}}
-%{?_with_cooked_manpages:    %{expand: %%global NEED_manrefs 1}}
-
-%global oldrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 0 ; else echo 1; fi)
-%global newrpm %(if (rpm --version|grep 'RPM version 4' >/dev/null 2>&1) ; then echo 1 ; else echo 0; fi)
-
-#global debug_package %{nil}
-
-%{!?_enable_debug_packages:%{expand: %%global _enable_debug_packages 0}}
-
-%if %{_enable_debug_packages}
-%else
-%global BUILD_debug   0
-%endif
-
-%if %{BUILD_arch}
-%global BUILD_source  0
-%endif
-
-%if %{BUILD_tools}
-%else
-%global BUILD_libs    0
-%global BUILD_source  0
-%endif
-
-%if %{BUILD_devel}
-%else
-%global BUILD_source  0
-%endif
-
-%global _strxns  0
-%global _strxnet 0
-%global _strinet 0
-%global _strsctp 0
-
-%{?_without_xns:     %{expand: %%global _strxns       0}}
-%{?_without_xti:     %{expand: %%global _strxnet      0}}
-%{?_without_inet:    %{expand: %%global _strinet      0}}
-%{?_without_sctp:    %{expand: %%global _strsctp      0}}
-
-%{?_with_xns:        %{expand: %%global _strxns       1}}
-%{?_with_xti:        %{expand: %%global _strxnet      1}}
-%{?_with_inet:       %{expand: %%global _strinet      1}}
-%{?_with_sctp:       %{expand: %%global _strsctp      1}}
-
-%global _STREAMS SVR 4.2
-%global _streams STREAMS
-#global _ksubdir streams
-#global _kmodext streams
-%if %{BUILD_lfs}
-%global _STREAMS LfS
-%global _streams streams
-#global _ksubdir streams
-#global _kmodext streams
-%global _strvers @LFS_VERSION@%{?extrarelease2}
-%endif
-%if %{BUILD_lis}
-%global _STREAMS LiS
-%global _streams LiS
-#global _ksubdir lis
-#global _kmodext lis
-%global _strvers @LIS_VERSION@%{?extrarelease2}
-%endif
-
-%if %{BUILD_tools}
-%global FILES_libs          1
-%global FILES_libs32        1
-%global FILES_debug         1
-%global FILES_dev           1
-%global FILES_devlibs       1
-%global FILES_devlibs32     1
-%global FILES_tools         1
-%global FILES_tools32       1
-%global FILES_test          %{BUILD_test}
-%global FILES_doc           1
-%global FILES_doclibs       1
-%global FILES_source        %{BUILD_source}
-%else
-%global FILES_libs          0
-%global FILES_libs32        0
-%global FILES_debug         0
-%global FILES_dev           0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_tools         0
-%global FILES_tools32       0
-%global FILES_test          0
-%global FILES_doc           0
-%global FILES_doclibs       0
-%global FILES_source        0
-%endif
-
-%if %{BUILD_devel}
-%else
-%global FILES_doc           0
-%global FILES_doclibs       0
-%global FILES_dev           0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_source        0
-%endif
-
-%if %{BUILD_arch}
-%else
-%global FILES_modules       0
-%global FILES_ko_modules    0
-%global FILES_libs          0
-%global FILES_libs32        0
-%global FILES_debug         0
-%global FILES_dev           0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_tools         0
-%global FILES_tools32       0
-%endif
-
-%if %{BUILD_noarch}
-%else
-%global FILES_test          0
-%global FILES_doc           0
-%global FILES_doclibs       0
-%global FILES_source        0
-%endif
-
-%if %{BUILD_debug}
-%else
-%global FILES_debug         0
-%endif
-
-%if %{FILES_debug}
-%global __debug_package     1
-%endif
-
-%if %{BUILD_libs}
-%global FILES_dev           0
-%global FILES_doc           0
-%else
-%global FILES_libs          0
-%global FILES_libs32        0
-%global FILES_devlibs       0
-%global FILES_devlibs32     0
-%global FILES_doclibs       0
-%endif
-
-%ifnarch x86_64 s390x sparc64 ppc64 ia64
-%global FILES_libs32        0
-%global FILES_devlibs32     0
-%global FILES_tools32       0
-%else
-%global FILES_libs          0
-%global FILES_devlibs       0
-%global FILES_tools         0
-%endif
-
-# we have some more options that control configure for the build
-%{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
-%global rpmrelease @PACKAGE_RPMRELEASE@
-%{?extrarelease:  %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
-%{!?extrarelease: %{expand: %%global fullrelease @PACKAGE_RPMRELEASE@}}
-%{?extrarelease2:  %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
-%{!?extrarelease2: %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@}}
-
-# a macro to [build] require one package of the same version as another (possibly virtual) package
-# use the arguments [Build]Requires: package1 [>]= package2
-%global requires_prov() %{expand: %(LANG= rpm -q --provides %3 --qf "%1 %2 %%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%1|')}%{nil}
-%global version_of_or() %{expand: %(LANG= rpm -q --provides %1 --qf "%%{EPOCH}:%%{VERSION}-%%{RELEASE}\\n" | tail -1 | sed -e 's|.*is not.*$|%2|')}%{nil}
-
-%global descripline %{title} is an OpenSS7 Modified version of HP Netperf.
-
-%if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
-%global descriptail %(echo -en '\n\n\nAuthors\n-------\n    Brian Bidulock, <bidulock@openss7.org>\nDistribution: %{distribution} (%{_target_cpu})')
-%else
-%global descriptail %{nil}
-%endif
-
-Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
-Name:           @PACKAGE@
-Epoch:          @PACKAGE_RPMEPOCH@
-Version:        @VERSION@
-Release:        %{rpmrelease}
-License:        AGPLv3
-Group:          System Environment/Kernel
-%{?url:URL:            %{url}}
-%{?_xpm_icon:Icon:           %{_xpm_icon}}
-%{?_gif_icon:Icon:           %{_gif_icon}}
-ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
-ExclusiveOs:    Linux
-#Source:         %{name}-%{version}.tar.bz2
-Source:         http://www.openss7.org/tarballs/%{name}-%{version}.tar.bz2
-%{!?buildroot:BuildRoot:      %{_tmppath}/%{name}-%{version}-%{fullrelease}-root}
-Autoreq:        true
-Autoprov:       true
-
-%define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
-
-%ifarch s390 s390x
-BuildRequires:  gcc >= 2.95.3
-%else
-%ifarch %all_ppc
-BuildRequires:  gcc >= 2.96-75
-%else
-%if %newgcc
-BuildRequires:  gcc >= 2.96-98
-%else
-BuildRequires:  gcc = 2.95.3
-%endif
-%endif
-%endif
-%if %newgcc
-BuildRequires:  gcc >= 2.96
-%else
-BuildRequires:  gcc = 2.95.3
-%endif
-BuildRequires: strcompat-devel >= @STRCOMP_VERSION@%{?extrarelease2}
-%if %{_strxns}
-BuildRequires:    strxns-devel >=    @XNS_VERSION@%{?extrarelease2}
-%endif
-%if %{_strxnet}
-BuildRequires:   strxnet-devel >=    @XTI_VERSION@%{?extrarelease2}
-%endif
-%if %{_strinet}
-BuildRequires:   strinet-devel >=   @INET_VERSION@%{?extrarelease2}
-%endif
-%if %{_strsctp}
-BuildRequires:   strsctp-devel >= @STRSCTP_VERSION@%{?extrarelease2}
-%endif
-
-# these are some needs of the configure script
-# to manipulate manual pages:
-BuildRequires:  /usr/bin/groff
-BuildRequires:  /usr/bin/soelim
-BuildRequires:  /usr/bin/refer
-BuildRequires:  /usr/bin/tbl
-BuildRequires:  /usr/bin/pic
-BuildRequires:  /usr/bin/gzip
-
-# to build documentation
-#BuildRequires: transfig >= 3.2
-#BuildRequires: ImageMagick
-#BuildRequires: tetex >= 1.0
-#BuildRequires: ghostscript >= 6.51
-# to install documentation
-#BuildRequires: texinfo >= 4.0
-# find the rest automagically
-
-# ---------------------------------------------------------------------------
-%description
-%{descripline}
-The %{name} package includes netperf test programs optioned and
-compiled for use with OpenSS7 Linux Native SCTP sockets
-interface as well as OpenSS7 %{_STREAMS} STREAMS DLPI, XTI INET
-driver, and XTI SCTP driver.  The purpose of this package is to
-be able to perform comparison tests agains TCP and SCTP.  This
-distribution is currently applicable to 2.4 and 2.6 kernels and
-is validated for ix86, x86_64, ppc and ppc64 architectures, but
-should build and install well for other architectures.  This
-SRPM builds the following binary packages:
-- %{name}-%{_streams} -- for %{_STREAMS} STREAMS and SCTP
-- %{name}-test -- test utilities.
-- %{name}-doc -- manpages, manuals and docs.
-- %{name}-source -- source package.
-%{descriptail}
-
-%prep
-# ---------------------------------------------------------------------------
-
-%setup -q -n %{name}-%{version}
-
-%build
-# ---------------------------------------------------------------------------
-
-preferred_cflags="%{optflags}"
-
-%ifarch %ix86
-preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
-%endif
-
-%ifarch sparc
-preferred_cflags="$preferred_cflags -fcall-used-g7"
-%endif
-
-%ifarch sparcv9
-preferred_cflags="$preferred_cflags -fcall-used-g7"
-%endif
-
-%ifarch sparc64
-preferred_cflags="$preferred_cflags -mvis -fcall-used-g7"
-%endif
-
-%ifnarch ia64 s390 s390x ppc ppciseries ppc64
-if test "`gcc --version`" != '2.95.3' ; then
-preferred_cflags="$preferred_cflags -freorder-blocks"
-fi
-%endif
-
-%define cache_file %{_builddir}/%{_target_platform}-config.cache
-%define csite_file %{_builddir}/%{_target_platform}-config.site
-
-%define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|') %{nil}
-%define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|') %{nil}
-
-./configure \
-    ${CC+CC="${CC}"} \
-    CFLAGS="${CFLAGS:-$preferred_cflags}" \
-    ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
-    ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
-    ${CPP+CPP="${CPP}"} \
-    ${CXX+CXX="${CXX:-$CC}"} \
-    ${CXX-${CC+CXX="$CC"}} \
-    CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
-    ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
-    ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
-    CONFIG_SITE="%{csite_file}" \
-    --cache-file="%{cache_file}" \
-%ifnarch noarch
-    --host=%{_target_platform} \
-%endif
-    --prefix=%{_prefix} \
-    --exec-prefix=%{_exec_prefix} \
-    --bindir=%{_bindir} \
-    --sbindir=%{_sbindir} \
-    --sysconfdir=%{_sysconfdir} \
-    --datadir=%{_datadir} \
-    --includedir=%{_includedir} \
-    --libdir=%{_libdir} \
-    --libexecdir=%{_libexecdir} \
-    --localstatedir=%{_localstatedir} \
-    --sharedstatedir=%{_sharedstatedir} \
-    --mandir=%{_mandir} \
-    --infodir=%{_infodir} \
-    --datarootdir=%{_datarootdir} \
-    --docdir=%{_docdir} \
-    --htmldir=%{_htmldir} \
-    --dvidir=%{_dvidir} \
-    --pdfdir=%{_pdfdir} \
-    --psdir=%{_psdir} \
-    --localedir=%{_localedir} \
-    --disable-maintainer-mode \
-    --disable-dependency-tracking \
-    --with-gnu-ld \
-    %{?_with_pkg_epoch:                 '%_with_pkg_epoch'} \
-    %{?_without_pkg_epoch:              '%_without_pkg_epoch'} \
-    %{?_with_pkg_release:               '%_with_pkg_release'} \
-    %{?_without_pkg_release:            '%_without_pkg_release'} \
-    %{?_with_pkg_patchlevel:            '%_with_pkg_patchlevel'} \
-    %{?_without_pkg_patchlevel:         '%_without_pkg_patchlevel'} \
-    %{?_with_rpm_epoch:                 '%_with_rpm_epoch'} \
-    %{?_without_rpm_epoch:              '%_without_rpm_epoch'} \
-    %{?_with_rpm_release:               '%_with_rpm_release'} \
-    %{?_without_rpm_release:            '%_without_rpm_release'} \
-    %{?_with_rpm_extra:                 '%_with_rpm_extra'} \
-    %{?_without_rpm_extra:              '%_without_rpm_extra'} \
-    %{?_with_deb_epoch:                 '%_with_deb_epoch'} \
-    %{?_without_deb_epoch:              '%_without_deb_epoch'} \
-    %{?_with_deb_release:               '%_with_deb_release'} \
-    %{?_without_deb_release:            '%_without_deb_release'} \
-    %{?_with_devel:                     '%enable %_with_devel'} \
-    %{?_without_devel:                  '%disable %_without_devel'} \
-    %{?_with_arch:                      '%enable %_with_arch'} \
-    %{?_without_arch:                   '%disable %_without_arch'} \
-    %{?_with_indep:                     '%enable %_with_indep'} \
-    %{?_without_indep:                  '%disable %_without_indep'} \
-    %{?_with_checks:                    '%enable %_with_checks'} \
-    %{?_without_checks:                 '%disable %_without_checks'} \
-    %{?_with_autotest:                  '%enable %_with_autotest'} \
-    %{?_without_autotest:               '%disable %_without_autotest'} \
-    %{?_with_cooked_manpages:           '%_with_cooked_manpages'} \
-    %{?_without_cooked_manpages:        '%_without_cooked_manpages'} \
-    %{?_with_public:                    '%enable %_with_public'} \
-    %{?_without_public:                 '%disable %_without_public'} \
-    %{?_with_lis:                       '%_with_lis'} \
-    %{?_with_lfs:                       '%_with_lfs'} \
-    %{?_with_xns:                       '%_with_xns'} \
-    %{?_without_xns:                    '%_without_xns'} \
-    %{?_with_xti:                       '%_with_xti'} \
-    %{?_without_xti:                    '%_without_xti'} \
-    %{?_with_inet:                      '%_with_inet'} \
-    %{?_without_inet:                   '%_without_inet'} \
-    %{?_with_sctp:                      '%_with_sctp'} \
-    %{?_without_sctp:                   '%_without_sctp'} \
-    %{?_with_netperf_debug_log_file:    '%_with_netperf_debug_log_file'} \
-    %{?_without_netperf_debug_log_file: '%_without_netperf_debug_log_file'} \
-    %{?_with_netperf_dirty:             '%enable %_with_netperf_dirty'} \
-    %{?_without_netperf_dirty:          '%disable %_without_netperf_dirty'} \
-    %{?_with_netperf_histogram:         '%enable %_with_netperf_histogram'} \
-    %{?_without_netperf_histogram:      '%disable %_without_netperf_histogram'} \
-    %{?_with_netperf_old_histogram:     '%enable %_with_netperf_old_histogram'} \
-    %{?_without_netperf_old_histogram:  '%disable %_without_netperf_old_histogram'} \
-    %{?_with_netperf_intervals:         '%enable %_with_netperf_intervals'} \
-    %{?_without_netperf_intervals:      '%disable %_without_netperf_intervals'} \
-    %{?_with_netperf_do_dlpi:           '%enable %_with_netperf_do_dlpi'} \
-    %{?_without_netperf_do_dlpi:        '%disable %_without_netperf_do_dlpi'} \
-    %{?_with_netperf_do_sctp:           '%enable %_with_netperf_do_sctp'} \
-    %{?_without_netperf_do_sctp:        '%disable %_without_netperf_do_sctp'} \
-    %{?_with_netperf_do_select:         '%enable %_with_netperf_do_select'} \
-    %{?_without_netperf_do_select:      '%disable %_without_netperf_do_select'} \
-    %{?_with_netperf_do_lwp:            '%enable %_with_netperf_do_lwp'} \
-    %{?_without_netperf_do_lwp:         '%disable %_without_netperf_do_lwp'} \
-    %{?_with_netperf_do_nbrr:           '%enable %_with_netperf_do_nbrr'} \
-    %{?_without_netperf_do_nbrr:        '%disable %_without_netperf_do_nbrr'} \
-    %{?_with_netperf_do_xti:            '%enable %_with_netperf_do_xti'} \
-    %{?_without_netperf_do_xti:         '%disable %_without_netperf_do_xti'} \
-    %{?_with_netperf_xti_sctp:          '%enable %_with_netperf_xti_sctp'} \
-    %{?_without_netperf_xti_sctp:       '%disable %_without_netperf_xti_sctp'} \
-    %{?_with_netperf_do_unix:           '%enable %_with_netperf_do_unix'} \
-    %{?_without_netperf_do_unix:        '%disable %_without_netperf_do_unix'} \
-    %{?_with_netperf_do_1644:           '%enable %_with_netperf_do_1644'} \
-    %{?_without_netperf_do_1644:        '%disable %_without_netperf_do_1644'} \
-    %{?_with_netperf_do_first_burst:    '%enable %_with_netperf_do_first_burst'} \
-    %{?_without_netperf_do_first_burst: '%disable %_without_netperf_do_first_burst'} \
-    %{?_with_netperf_use_use_looper:    '%enable %_with_netperf_use_use_looper'} \
-    %{?_without_netperf_use_use_looper: '%disable %_without_netperf_use_use_looper'} \
-    %{?_with_netperf_use_pstat:         '%enable %_with_netperf_use_pstat'} \
-    %{?_without_netperf_use_pstat:      '%disable %_without_netperf_use_pstat'} \
-    %{?_with_netperf_use_kstat:         '%enable %_with_netperf_use_kstat'} \
-    %{?_without_netperf_use_kstat:      '%disable %_without_netperf_use_kstat'} \
-    %{?_with_netperf_use_proc_stat:     '%enable %_with_netperf_use_proc_stat'} \
-    %{?_without_netperf_use_proc_stat:  '%disable %_without_netperf_use_proc_stat'} \
-    %{?_with_netperf_do_ipv6:           '%enable %_with_netperf_do_ipv6'} \
-    %{?_without_netperf_do_ipv6:        '%disable %_without_netperf_do_ipv6'} \
-    %{?_with_netperf_do_dns:            '%enable %_with_netperf_do_dns'} \
-    %{?_without_netperf_do_dns:         '%disable %_without_netperf_do_dns'} \
-    %{?_with_netperf_use_sysctl:        '%enable %_with_netperf_use_sysctl'} \
-    %{?_without_netperf_use_sysctl:     '%disable %_without_netperf_use_sysctl'} \
-    %{?_with_netperf_use_perfstat:      '%enable %_with_netperf_use_perfstat'} \
-    %{?_without_netperf_use_perfstat:   '%disable %_without_netperf_use_perfstat'} \
-    %{?_with_netperf_dont_wait:         '%enable %_with_netperf_dont_wait'} \
-    %{?_without_netperf_dont_wait:      '%disable %_without_netperf_dont_wait'} \
-    || { rm -f %{cache_file} ; exit 1 ; }
-
-make
-make check
-
-%install
-# ---------------------------------------------------------------------------
-
-# in case it was not cleaned
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
-
-# if we are going to create debug packages, we need to install unstripped
-# binaries; otherwise use libtoolized install-strip to strip binaries, modules,
-# shared and static libraries.
-make DESTDIR="%{buildroot}" DOCDIR="%{_docdir}" \
-    %{!?_enable_debug_packages: install-strip} \
-    %{?_enable_debug_packages: install}
-
-# copy out our devices list
-# cp -pf %{mybuilddir}/%{makedev} .
-
-# get the installed info directory out of the build root
-[ -e "%{buildroot}/%{_infodir}/dir" ] && rm -f "%{buildroot}/%{_infodir}/dir"
-
-function package_source() {
-# remove include2 symbolic link
-    rm -fr include2
-# punch rpm release to Custom
-    echo '.Custom.1'  > .rpmextra
-# create configured source directory for source package
-    mkdir -p %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
-# tar and move the sources for source release
-    tar cf - . | tar xf - -C %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease}
-# clean out binaries and auxilliary files
-    ( cd %{buildroot}%{_usrsrc}/%{name}-%{version}-%{fullrelease} ; make mostlyclean )
-# create symbolic link
-    ( cd %{buildroot}%{_usrsrc} ; ln -sf %{name}-%{version}-%{fullrelease} %{name} )
-}
-
-%if %{BUILD_source}
-package_source
-%endif
-
-%if %{NEED_manrefs}
-# stupid mandrake spec-helper will compress our macros files otherwise
-#export EXCLUDE_FROM_COMPRESS="%{base}.refs %{base}.macros"
-%endif
-
-# stupid suse check compresses everything (including our macro files)
-#{?suse_check: %{expand: %%define suse_check echo "SuSE Check skipped"}}
-
-%clean
-# ---------------------------------------------------------------------------
-
-[ -n "%{buildroot}" -a "%{buildroot}" != / ] && rm -rf %{buildroot}
-
-# ===========================================================================
-%package %{_streams}
-Summary:        %{title} for %{_STREAMS} STREAMS and SCTP
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_bindir}
-Prefix:         %{_sbindir}
-%{?_strvers:Requires: %{_streams}-lib >= %version_of_or %{_streams}-lib %{_strvers}}
-%{!?_strvers:Requires: %requires_prov %{_streams}-lib >= %{_streams}-lib}
-Provides:       %{name}
-Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-%{_streams} = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description %{_streams}
-%{descripline}
-The %{name}-%{_streams} binary package includes netperf test
-programs optioned and compiled for use with OpenSS7 Linux Native
-SCTP sockets interface as well as OpenSS7 %{_STREAMS} STREAMS
-DLPI, XTI INET driver, and XTI SCTP driver.  The purpose of this
-binary package is to be able to perform comparison tests against
-TCP and SCTP.
-%{descriptail}
-
-%if %{have_tools}
-%pre %{_streams}
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ]; then : # fresh install
-    # This is a fresh install, look for old non-rpm tools.
-    tools="%{tools}" ; for tool in $tools ; do
-        location="`which $tool 2>/dev/null`"
-        while [ -n "$location" -a -x "$location" ] ; do
-            eval "rm -f $location"
-            location="`which $tool 2>/dev/null`"
-            while [ -n "$location" -a -x "$location" ] ; do
-                eval "rm -f $location"
-                location="`which $tool 2>/dev/null`"
-            done
-        done
-    done
-fi
-%endif
-
-%if %{FILES_tools32}
-%files %{_streams}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_bindir}/*
-%{_sbindir}/*
-#{_pkglibexecdir}/*test*
-#{_pkglibexecdir}/*tst
-#{_pkglibexec32dir}/*test*
-#{_pkglibexec32dir}/*tst
-%endif
-
-%if %{FILES_tools}
-%files %{_streams}
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%{_bindir}/*
-%{_sbindir}/*
-#{_pkglibexecdir}/*test*
-#{_pkglibexecdir}/*tst
-%endif
-
-# ===========================================================================
-%package test
-
-Summary:        %{title} test utilities.
-Group:          System Environment/Base
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Provides:       %{name}-test = %{epoch}:%{version}-%{rpmrelease}
-Prefix:         %{_pkglibexecdir}
-#Requires:       %{name}-%{_streams}-util = %{epoch}:%{version}-%{fullrelease2}
-Obsoletes:      %{name}-tests
-Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-test = %{epoch}:%{version}-%{fullrelease2}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description test
-%{descripline}
-The %{name}-test binary package provides the autotest validation
-testsuites used for validating and troubleshooting the %{title}
-package.  It also includes the send-pr script for generating and
-submitting problem reports to @PACKAGE_BUGREPORT@.
-%{descriptail}
-
-%if %{FILES_test}
-%files test
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-#{_pkglibexecdir}/atlocal
-#{_pkglibexecdir}/testsuite*
-%{_pkglibexecdir}/send-pr
-%{_pkglibexecdir}/send-pr.config
-%endif
-
-# ===========================================================================
-%package doc
-
-Summary:        %{title} manpages, manuals and docs.
-Group:          Documentation
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_docdir}
-Prefix:         %{_infodir}
-Prefix:         %{_mandir}
-#Prereq:         /sbin/install-info
-Conflicts:      texinfo < 3.11
-Obsoletes:      %{name}-docs
-Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-doc = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description doc
-%{descripline}
-The %{name}-doc binary package contains text, html, info and pdf
-(texinfo) documentation and manuals for the development of
-%{title} applications, modules and drivers, as well as the
-installation and reference manual.  Also included are extensive
-manual pages for the entire package, including manual pages for
-commands, administrative utilities, user interfaces, and kernel
-functions.
-%{descriptail}
-
-%post doc
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
-%if %{have_infofiles}
-    if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
-        for n in %{infofiles} ; do
-            if [ -f %{_infodir}/$n.info ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info
-            elif [ -f %{_infodir}/$n.info.gz ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-                /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-            fi
-        done
-    fi
-%endif
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
-    fi
-%if %{NEED_manrefs}
-    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
-    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
-    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
-    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
-%endif
-fi
-
-%preun doc
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-%if %{have_infofiles}
-    if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
-        for n in %{infofiles} ; do
-            if [ -f %{_infodir}/$n.info ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info
-            elif [ -f %{_infodir}/$n.info.gz ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz
-            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2
-            fi
-        done
-    fi
-%endif
-%if %{NEED_manrefs}
-    rm -f -- %{_mandir}/%{base}.refs
-    rm -f -- %{_mandir}/%{base}.macros
-%endif
-fi
-
-%postun doc
-# ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -v -u %{_mandir} 2>&1 || :
-    fi
-fi
-
-%if %{NEED_manrefs}
-%global manrefs %{_mandir}/%{base}.refs*
-%global manmacros %{_mandir}/%{base}.macros*
-%endif
-
-%if %{FILES_doclibs}
-%files doc
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-#doc ABOUT-NLS
-%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make THANKS TODO
-%doc %{name}-%{version}.lsm
-%doc manual
-#doc doc/specs
-#doc doc/drafts
-#doc doc/papers
-#doc doc/projects
-%doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes
-%{_infodir}/*
-%{manrefs}
-%{manmacros}
-%{_mandir}/man*/*
-%endif
-
-%if %{FILES_doc}
-%files doc
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LSM MANUAL NEWS PROBLEMS
-%doc README README-alpha README-cvs README-make THANKS TODO
-%doc %{name}-%{version}.lsm
-%doc manual
-#doc doc/specs
-#doc doc/drafts
-#doc doc/papers
-#doc doc/projects
-%doc ACKNWLDGMNTS COPYRIGHT netperf_hp.ps README.ovms Release_Notes
-%{_infodir}/*
-%{manrefs}
-%{manmacros}
-%{_mandir}/man*/*
-%endif
-
-# ===========================================================================
-%package source
-
-Summary:        %{title} source package.
-Group:          Development/System
-Version:        @VERSION@
-%{?_xpm:Icon: %_xpm}
-%{?_gif:Icon: %_gif}
-Autoreq:        true
-Autoprov:       true
-Prefix:         %{_usrsrc}
-Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-source = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-source = %{epoch}:%{version}-%{rpmrelease}
-Release:        %{fullrelease}
-
-# ---------------------------------------------------------------------------
-%description source
-%{descripline}
-The %{name}-source binary package contains the source code
-necessary for building the %{name} release.  It also includes
-the autoconf configuration utilities necessary to create and
-distribute this rpm.  To develop on the package, it would be
-better to use the tarball or source rpm release.
-%{descriptail}
-
-%if %{FILES_source}
-%files source
-# ---------------------------------------------------------------------------
-%defattr(-,root,root)
-%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}
-%{_usrsrc}/%{name}
-%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*
-%{_usrsrc}/%{name}-%{version}-%{fullrelease}/.[^.]*
-%endif
+%global binfiles    %{nil}
+%global sbinfiles   %{nil}
+#global modules     
+%global nonrpmmods  %{nil}
+#global preloads    
+#global libraries   %{nil}
+#global locales     %{nil}
+#global tools       %{base}_mknod
+%global infofiles   %{base}
+#global pngfiles    *.png
+#global initfiles   %{base}
+%global nonrpminit  %{nil}
+#global conffiles   netconfig
+%global testfiles   *test*
+%global testscripts testsuite
+%global sendpr      %{nil}
+#global mibfiles    *.mib
+#global snmpmods
+#global gdmos       %{nil}
+%global netconfig   %{base}
+#global sock2path   %{base}
+%global manual      doc/manual
+#global specs       doc/specs
+#global drafts      doc/drafts
+#global papers      doc/papers
+#global projects    doc/projects
+#global snmpconf    %{nil}
+%global manrefs     %{base}.refs
+%global manmacros   %{base}.macros
+%global manpages    man*
+%global includes    %{nil}
+%global license     AGPLv3
+
+%global NEED_streams    1
+%global NEED_compat     1
+%global NEED_tty        0
+%global NEED_xns        1
+%global NEED_xnet       1
+%global NEED_nsl        1
+%global NEED_sock       1
+%global NEED_inet       1
+%global NEED_sctp       1
+%global NEED_chan       0
+%global NEED_x25        0
+%global NEED_iso        0
+%global NEED_isdn       0
+%global NEED_ss7        0
+%global NEED_sigtran    0
+
+@speccommon@
 
 # ===========================================================================
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
-# Revision 0.9.2.82  2008-09-30 09:37:13  brian
-# - some corrections to build
+# Revision 0.9.2.83  2008-10-27 13:01:08  brian
+# - updated spec files
 #
-# Revision 0.9.2.81  2008-09-22 17:37:24  brian
-# - build and release updates
-#
+
+* Tue Sep 30 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.82  2008-09-30 09:37:13  brian
+- some corrections to build
+
+* Mon Sep 22 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.81  2008-09-22 17:37:24  brian
+- build and release updates
 
 * Sun Sep 21 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.80  2008-09-21 10:55:12  brian
