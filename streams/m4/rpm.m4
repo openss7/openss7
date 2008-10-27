@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.82 $) $Date: 2008-09-28 06:50:23 $
+# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.83 $) $Date: 2008-10-27 12:23:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-28 06:50:23 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 12:23:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -566,6 +566,7 @@ dnl
 		(*) enable_rpms=no ;;
 	    esac
 	fi
+	ac_cv_path_RPM="${am_missing3_run}rpm"
 	RPM="${am_missing3_run}rpm"
     fi
     AC_ARG_VAR([RPMBUILD],
@@ -573,8 +574,14 @@ dnl
     AC_PATH_PROG([RPMBUILD], [rpmbuild], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test ":${RPMBUILD:-no}" = :no; then
-	if test ":$enable_rpms" = :yes; then RPMBUILD="$RPM"
-	else RPMBUILD="${am_missing3_run}rpmbuild"; enable_srpms=no; fi
+	if test ":$enable_rpms" = :yes; then
+	    ac_cv_path_RPMBUILD="$RPM"
+	    RPMBUILD="$RPM"
+	else
+	    ac_cv_path_RPMBUILD="${am_missing3_run}rpmbuild";
+	    RPMBUILD="${am_missing3_run}rpmbuild";
+	    enable_srpms=no;
+	fi
     fi
 dnl
 dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
@@ -584,6 +591,12 @@ dnl
     if test ! -d /var/lib/rpm; then
 	enable_rpms=no
     fi
+    AC_CACHE_CHECK([for rpm build rpms], [rpm_cv_rpms], [dnl
+	rpm_cv_rpms=${enable_rpms:-no}
+    ])
+    AC_CACHE_CHECK([for rpm build srpms], [rpm_cv_srpms], [dnl
+	rpm_cv_srpms=${enable_srpms:-no}
+    ])
     AM_CONDITIONAL([BUILD_RPMS], [test ":$enable_rpms" = :yes])dnl
     AM_CONDITIONAL([BUILD_SRPMS], [test ":$enable_srpms" = :yes])dnl
 dnl
@@ -599,12 +612,17 @@ dnl
     AC_PATH_PROG([CREATEREPO], [createrepo], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test ":${CREATEREPO:-no}" = :no; then
-	if test ":$enable_rpms" = :yes; then
+	if test ":$rpm_cv_rpms" = :yes; then
 	    AC_MSG_WARN([Could not find createrepo program in PATH.])
-	else enable_repo_yum=no; fi
+	fi
+	enable_repo_yum=no
+	ac_cv_path_CREATEREPO="${am_missing3_run}createrepo"
 	CREATEREPO="${am_missing3_run}createrepo"
     fi
-    AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$enable_repo_yum" = :yes])dnl
+    AC_CACHE_CHECK([for rpm yum repo construction], [rpm_cv_repo_yum], [dnl
+	rpm_cv_repo_yum=${enable_repo_yum:-no}
+    ])
+    AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$rpm_cv_repo_yum" = :yes])dnl
     repodir="$topdir/repodata"
     AC_SUBST([repodir])dnl
 
@@ -621,14 +639,19 @@ dnl
     AC_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
     if test ":${CREATE_PACKAGE_DESCR:-no}" = :no; then
-	if test ":$enable_rpms" = :yes; then
+	if test ":$rpm_cv_rpms" = :yes; then
 	    if test ":$target_vendor" = :suse; then
 		AC_MSG_WARN([Could not find create_package_descr program in PATH.])
-	    else enable_repo_yast=no; fi
-	else enable_repo_yast=no; fi
+	    fi
+	fi
+	enable_repo_yast=no
+	ac_cv_path_CREATE_PACKAGE_DESCR="${am_missing3_run}create_package_descr"
 	CREATE_PACKAGE_DESCR="${am_missing3_run}create_package_descr"
     fi
-    AM_CONDITIONAL([BUILD_REPO_YAST], [test ":$enable_repo_yast" = :yes])dnl
+    AC_CACHE_CHECK([for rpm yast repo construction], [rpm_cv_repo_yast], [dnl
+	rpm_cv_repo_yast=${enable_repo_yast:-no}
+    ])
+    AM_CONDITIONAL([BUILD_REPO_YAST], [test ":$rpm_cv_repo_yast" = :yes])dnl
     yastdir="$topdir"
     AC_SUBST([yastdir])dnl
 ])# _RPM_SPEC_SETUP_BUILD
@@ -663,6 +686,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.83  2008-10-27 12:23:34  brian
+# - suppress warning on each iteration and cache results
+#
 # Revision 0.9.2.82  2008-09-28 06:50:23  brian
 # - change order of spec files
 #
