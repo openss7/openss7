@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-10 03:49:49 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-27 17:33:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:49 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:33:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -218,8 +218,6 @@ AC_DEFUN([_ISO_SETUP], [dnl
     _GENKSYMS
     _LINUX_STREAMS
     _STRCOMP
-dnl with_iso='yes'
-dnl _XOPEN
     _XNS
     _XTI
     _NSL
@@ -479,6 +477,9 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.26  2008-10-27 17:33:00  brian
+# - corrections to checks
+#
 # Revision 0.9.2.25  2008-09-10 03:49:49  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #

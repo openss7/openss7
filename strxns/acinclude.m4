@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2008-10-27 13:09:03 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2008-10-27 17:33:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 13:09:03 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:33:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -255,8 +255,6 @@ AC_DEFUN([_XNS_SETUP], [dnl
     # checks on the kernel
     _LINUX_STREAMS
     _STRCOMP
-dnl with_xns='yes'
-dnl _XOPEN
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _XNS_OTHER_SCTP
@@ -1170,6 +1168,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.68  2008-10-27 17:33:01  brian
+# - corrections to checks
+#
 # Revision 0.9.2.67  2008-10-27 13:09:03  brian
 # - get rid of stray linefeed
 #

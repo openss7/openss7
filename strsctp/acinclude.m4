@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2008-10-27 11:46:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.82 $) $Date: 2008-10-27 17:33:00 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 11:46:57 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:33:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -284,8 +284,6 @@ AC_DEFUN([_SCTP_SETUP], [dnl
     _GENKSYMS
     _LINUX_STREAMS
     _STRCOMP
-dnl with_sctp='yes'
-dnl _XOPEN
     _XNS
     _XTI
     _NSL
@@ -1486,6 +1484,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.82  2008-10-27 17:33:00  brian
+# - corrections to checks
+#
 # Revision 0.9.2.81  2008-10-27 11:46:57  brian
 # - get rid of stray linefeed
 #
