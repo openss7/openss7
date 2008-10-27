@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.135 $) $Date: 2008-10-27 13:01:08 $
+# @(#) $RCSfile: sctp.spec.in,v $ $Name:  $($Revision: 0.9.2.136 $) $Date: 2008-10-27 17:56:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 13:01:08 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:56:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3054,10 +3054,8 @@ fi
 %files -n %{_strmpkg}-%{_kversion}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_modules:%dir %{_kmoduledir}/%{base}}
-%{?files_oldmods:%attr(644,root,root) %{_kmoduledir}/modules.%{base}}
-%{?files_oldmods:%{_kmoduledir}/%{base}/*.o*}
-%{?files_newmods:%{_kmoduledir}/%{base}/*.ko*}
+%{?files_oldmods:%{_kmoduledir}/kernel/net/ipv4/*.o*}
+%{?files_newmods:%{_kmoduledir}/kernel/net/ipv4/*.ko*}
 %endif
 
 # ===========================================================================
@@ -3209,9 +3207,13 @@ use this package or when debugging this package.
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: sctp.spec.in,v $
-# Revision 0.9.2.135  2008-10-27 13:01:08  brian
-# - updated spec files
+# Revision 0.9.2.136  2008-10-27 17:56:21  brian
+# - kernel modules in different place
 #
+
+* Mon Oct 27 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.135  2008-10-27 13:01:08  brian
+- updated spec files
 
 * Tue Oct 21 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.134  2008-10-21 03:06:19  brian
