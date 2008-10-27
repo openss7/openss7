@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.84 $) $Date: 2008-10-27 15:13:22 $
+# @(#) $RCSfile: netperf.spec.in,v $ $Name:  $($Revision: 0.9.2.85 $) $Date: 2008-10-27 17:45:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 15:13:22 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:45:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -93,7 +93,7 @@
 %global manrefs     %{base}.refs
 %global manmacros   %{base}.macros
 %global manpages    man*
-%global includes    %{nil}
+#global includes    %{nil}
 %global license     AGPLv3
 
 %global NEED_streams    1
@@ -118,6 +118,9 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: netperf.spec.in,v $
+# Revision 0.9.2.85  2008-10-27 17:45:30  brian
+# - correction
+#
 # Revision 0.9.2.84  2008-10-27 15:13:22  brian
 # - corrections
 #
