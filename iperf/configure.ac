@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.27 $) $Date: 2008-10-25 13:19:48 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.28 $) $Date: 2008-10-27 11:13:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-25 13:19:48 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 11:13:39 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
-AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.27 $) $Date: 2008-10-25 13:19:48 $])
+AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.28 $) $Date: 2008-10-27 11:13:39 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -405,6 +405,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.1.1.2.28  2008-10-27 11:13:39  brian
+# - fixed underquoting of macros
+#
 # Revision 1.1.1.1.2.27  2008-10-25 13:19:48  brian
 # - updates for autoconf 2.63
 #
