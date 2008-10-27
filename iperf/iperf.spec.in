@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2008-10-27 13:01:07 $
+# @(#) $RCSfile: iperf.spec.in,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2008-10-27 15:08:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 13:01:07 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 15:08:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -76,13 +76,13 @@
 #global initfiles   %{base}
 %global nonrpminit  %{nil}
 #global conffiles   netconfig
-%global testfiles   *test*
-%global testscripts testsuite
+#global testfiles   *test*
+#global testscripts testsuite
 %global sendpr      %{nil}
 #global mibfiles    *.mib
 #global snmpmods
 #global gdmos       %{nil}
-%global netconfig   %{base}
+#global netconfig   %{base}
 #global sock2path   %{base}
 %global manual      doc/manual
 #global specs       doc/specs
@@ -118,9 +118,13 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: iperf.spec.in,v $
-# Revision 0.9.2.90  2008-10-27 13:01:07  brian
-# - updated spec files
+# Revision 0.9.2.91  2008-10-27 15:08:31  brian
+# - corrections
 #
+
+* Mon Oct 27 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.90  2008-10-27 13:01:07  brian
+- updated spec files
 
 * Mon Sep 22 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.89  2008-09-22 17:37:24  brian
