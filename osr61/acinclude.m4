@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-10 03:49:12 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-27 17:32:58 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:12 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:32:58 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -504,7 +504,6 @@ AC_DEFUN([_OSR61_SETUP], [dnl
     # checks on the kernel
     _LINUX_STREAMS
     _STRCOMP
-dnl _XOPEN
     _XNS
     _XTI
     _OSR61_CHECKS
@@ -958,6 +957,9 @@ AC_DEFUN([_OSR61_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.18  2008-10-27 17:32:58  brian
+# - corrections to checks
+#
 # Revision 0.9.2.17  2008-09-10 03:49:12  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #

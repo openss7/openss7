@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-21 07:49:03 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-10-27 17:32:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-21 07:49:03 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:32:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -217,8 +217,6 @@ AC_DEFUN([_CHAN_SETUP], [dnl
     _GENKSYMS
     _LINUX_STREAMS
     _STRCOMP
-dnl with_chan='yes'
-dnl _XOPEN
     _XNS
     _XTI
     _NSL
@@ -454,6 +452,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.20  2008-10-27 17:32:59  brian
+# - corrections to checks
+#
 # Revision 0.9.2.19  2008-10-21 07:49:03  brian
 # - adjust major device numbers to reduce conflict
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-27 11:46:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2008-10-27 17:32:59 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 11:46:57 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:32:59 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -297,8 +297,6 @@ AC_DEFUN([_INET_SETUP], [dnl
     _GENKSYMS
     _LINUX_STREAMS
     _STRCOMP
-dnl with_inet='yes'
-dnl _XOPEN
     _XNS
     _XTI
     _NSL
@@ -1345,6 +1343,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.88  2008-10-27 17:32:59  brian
+# - corrections to checks
+#
 # Revision 0.9.2.87  2008-10-27 11:46:57  brian
 # - get rid of stray linefeed
 #
