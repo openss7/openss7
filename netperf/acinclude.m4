@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-10-27 17:32:58 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-10-27 17:38:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 17:32:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 17:38:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -80,6 +80,8 @@ AC_DEFUN([AC_NETPERF], [dnl
     _STRCOMP
     _XNS
     _XTI
+    _NSL
+    _SOCK
     _INET
     _SCTP
     CPPFLAGS="-include ./config.h"
@@ -470,6 +472,9 @@ AC_DEFUN([_NETPERF_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.33  2008-10-27 17:38:51  brian
+# - add missing checks
+#
 # Revision 0.9.2.32  2008-10-27 17:32:58  brian
 # - corrections to checks
 #
