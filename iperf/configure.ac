@@ -107,6 +107,8 @@ AC_ARG_ENABLE([web100], AS_HELP_STRING([--disable-web100],
 	    [disable web100 support (default is autodetect)]))
 
 
+AC_C_BIGENDIAN
+
 dnl
 dnl Checks for programs.
 dnl
@@ -269,15 +271,17 @@ dnl Check for compiler characteristics
 
 DAST_CHECK_BOOL
 
-AC_C_BIGENDIAN
-
 dnl ===================================================================
 dnl Check for system services
 
 dnl check for multicast
 if test "$ac_cv_multicast" != no; then
-  AC_CHECK_TYPES([struct ip_mreq],,,[#include "include/headers_slim.h"])
-  AC_CHECK_DECLS([IP_ADD_MEMBERSHIP],,,[#include "include/headers_slim.h"])
+  AC_CHECK_TYPES([struct ip_mreq],,,[
+#include "include/headers_slim.h"
+])
+  AC_CHECK_DECLS([IP_ADD_MEMBERSHIP],,,[
+#include "include/headers_slim.h"
+])
   AC_MSG_CHECKING([for multicast support])
   ac_cv_multicast=no
   if test "$ac_cv_have_decl_IP_ADD_MEMBERSHIP" = yes; then
@@ -293,9 +297,15 @@ fi
 
 dnl check for IPv6
 if test "$ac_cv_have_ipv6" != no; then
-  AC_CHECK_TYPES([struct sockaddr_storage],,,[#include "include/headers_slim.h"])
-  AC_CHECK_TYPES([struct sockaddr_in6],,,[#include "include/headers_slim.h"])
-  AC_CHECK_DECLS([AF_INET6],,,[#include "include/headers_slim.h"])
+  AC_CHECK_TYPES([struct sockaddr_storage],,,[
+#include "include/headers_slim.h"
+])
+  AC_CHECK_TYPES([struct sockaddr_in6],,,[
+#include "include/headers_slim.h"
+])
+  AC_CHECK_DECLS([AF_INET6],,,[
+#include "include/headers_slim.h"
+])
   AC_MSG_CHECKING([for IPv6 headers and structures])
   ac_cv_have_ipv6=no
   if test "$ac_cv_type_struct_sockaddr_storage" = yes; then
@@ -311,9 +321,15 @@ fi
 
 if test "$ac_cv_have_ipv6" = yes; then
   if test "$ac_cv_multicast" = yes; then
-    AC_CHECK_TYPES([struct ipv6_mreq],,,[#include "include/headers_slim.h"])
-    AC_CHECK_DECLS([IPV6_ADD_MEMBERSHIP],,,[#include "include/headers_slim.h"])
-    AC_CHECK_DECLS([IPV6_MULTICAST_HOPS],,,[#include "include/headers_slim.h"])
+    AC_CHECK_TYPES([struct ipv6_mreq],,,[
+#include "include/headers_slim.h"
+])
+    AC_CHECK_DECLS([IPV6_ADD_MEMBERSHIP],,,[
+#include "include/headers_slim.h"
+])
+    AC_CHECK_DECLS([IPV6_MULTICAST_HOPS],,,[
+#include "include/headers_slim.h"
+])
     AC_MSG_CHECKING([for IPv6 multicast support])
     ac_cv_have_ipv6_multicast=no
     if test "$ac_cv_type_struct_ipv6_mreq" = yes; then
