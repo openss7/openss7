@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.78 $) $Date: 2008-10-25 10:35:18 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2008-10-27 12:23:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-25 10:35:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 12:23:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -930,31 +930,16 @@ AC_DEFUN([_OPENSS7_MISSING3], [dnl
     os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([MD5SUM],
 	       [MD5 sum command. @<:@default=md5sum@:>@])
-    AC_PATH_PROG([MD5SUM], [md5sum], [],
+    AC_PATH_PROG([MD5SUM], [md5sum], [${am_missing3_run}md5sum],
 		 [$os7_tmp])
-    if test :"${MD5SUM:-no}" = :no; then
-	AC_MSG_WARN([Could not find md5sum program in PATH.])
-	MD5SUM="${am_missing3_run}md5sum"
-	#enable_repo_tar=no
-    fi
     AC_ARG_VAR([SHA1SUM],
 	       [SHA1 sum command. @<:@default=sha1sum@:>@])
-    AC_PATH_PROG([SHA1SUM], [sha1sum], [],
+    AC_PATH_PROG([SHA1SUM], [sha1sum], [${am_missing3_run}sha1sum],
 		 [$os7_tmp])
-    if test :"${SHA1SUM:-no}" = :no; then
-	AC_MSG_WARN([Could not find sha1sum program in PATH.])
-	SHA1SUM="${am_missing3_run}sha1sum"
-	#enable_repo_tar=no
-    fi
     AC_ARG_VAR([SHA256SUM],
 	       [SHA256 sum command. @<:@default=sha256sum@:>@])
-    AC_PATH_PROG([SHA256SUM], [sha256sum], [],
+    AC_PATH_PROG([SHA256SUM], [sha256sum], [${am_missing3_run}sha256sum],
 		 [$os7_tmp])
-    if test :"${SHA256SUM:-no}" = :no; then
-	AC_MSG_WARN([Could not find sha256sum program in PATH.])
-	SHA256SUM="${am_missing3_run}sha256sum"
-	#enable_repo_tar=no
-    fi
     AM_CONDITIONAL([BUILD_REPO_TAR], [test ":$enable_repo_tar" = :yes])dnl
 ])# _OPENSS7_MISSING3
 # =============================================================================
@@ -1008,6 +993,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 0.9.2.79  2008-10-27 12:23:34  brian
+# - suppress warning on each iteration and cache results
+#
 # Revision 0.9.2.78  2008-10-25 10:35:18  brian
 # - updates for autoconf 2.63
 #
