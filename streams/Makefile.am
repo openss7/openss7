@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.156 $) $Date: 2008-09-22 17:37:30 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.157 $) $Date: 2008-10-27 21:33:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-22 17:37:30 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 21:33:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -125,7 +125,7 @@ if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= strmib
 endif
 
-dist_bin_SCRIPTS		= scripts/modpost.sh scripts/modsyms.sh
+#dist_bin_SCRIPTS		= scripts/modpost.sh scripts/modsyms.sh
 
 dist_sbin_SCRIPTS		=
 if CONFIG_STREAMS_LOG
@@ -1120,6 +1120,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.157  2008-10-27 21:33:32  brian
+# - skip modpost.sh and modsyms.sh
+#
 # Revision 0.9.2.156  2008-09-22 17:37:30  brian
 # - build and release updates
 #
