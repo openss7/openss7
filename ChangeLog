@@ -1,5 +1,30 @@
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* openss7.spec.in: updated spec files
+	* LiS/LiS.spec.in: updated spec files
+	* iperf/iperf.spec.in: updated spec files
+	* netperf/netperf.spec.in: updated spec files
+	* osr61/osr61.spec.in: updated spec files
+	* sctp/sctp.spec.in: updated spec files
+	* sigtran/sigtran.spec.in: updated spec files
+	* stacks/strss7.spec.in: updated spec files
+	* strbcm/strbcm.spec.in: updated spec files
+	* strchan/strchan.spec.in: updated spec files
+	* strcompat/strcompat.spec.in: updated spec files
+	* streams/streams.spec.in: updated spec files
+	* strinet/strinet.spec.in: updated spec files
+	* strisdn/strisdn.spec.in: updated spec files
+	* striso/striso.spec.in: updated spec files
+	* strnsl/strnsl.spec.in: updated spec files
+	* strsctp/strsctp.spec.in: updated spec files
+	* strsock/strsock.spec.in: updated spec files
+	* strtty/strtty.spec.in: updated spec files
+	* strutil/strutil.spec.in: updated spec files
+	* strvoip/strvoip.spec.in: updated spec files
+	* strx25/strx25.spec.in: updated spec files
+	* strxnet/strxnet.spec.in: updated spec files
+	* strxns/strxns.spec.in: updated spec files
+
 	* m4/streams.m4: tweak STREAMS locator macros
 	* m4/deb.m4: suppress warnings and cache results
 	* m4/doxy.m4: suppress warnings and cache results
