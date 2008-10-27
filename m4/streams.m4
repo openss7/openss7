@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.100 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: streams.m4,v $ $Name:  $($Revision: 0.9.2.101 $) $Date: 2008-10-27 09:32:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 09:32:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -190,11 +190,11 @@ AC_DEFUN([_LFS_OPTIONS], [dnl
 # _LINUX_STREAMS_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS_SETUP], [dnl
-    if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
-	_LIS_CHECK_HEADERS
-    fi
     if test :"${with_lfs:-no}" != :no -o :"${with_lis:-no}" = :no ; then
 	_LFS_CHECK_HEADERS
+    fi
+    if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
+	_LIS_CHECK_HEADERS
     fi
     AC_CACHE_CHECK([for streams include directory], [streams_cv_includes], [dnl
 	if test :"${with_lis:-no}" != :no -o :"${with_lfs:-no}" = :no ; then
@@ -263,60 +263,80 @@ dnl --with and --without rpmpopt syntax, so convert to the equivalent --define
 dnl syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly,
 dnl so we use defines.
     case "$streams_cv_package" in
-	(LiS)
-	    if test -z "$with_lis" 
-	    then :;
-dnl             PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lis --with-lis\""
-dnl		PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lis'"
-dnl             ac_configure_args="$ac_configure_args --with-lis"
-	    fi
-	    AC_MSG_RESULT([--with-lis])
-	    ;;
 	(LfS)
-	    if test -z "$with_lfs" 
-	    then :;
-dnl             PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lfs --with-lfs\""
-dnl		PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lfs'"
-dnl             ac_configure_args="$ac_configure_args --with-lfs"
+	    if test -z "$with_lfs" ; then
+		if test :"${streams_cv_lfs_includes:-no}" = :no ; then
+dnl		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lfs --with-lfs\""
+dnl		    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lfs'"
+		    AC_MSG_RESULT([--with-lfs])
+		else
+dnl		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lfs --without-lfs\""
+dnl		    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lfs'"
+		    AC_MSG_RESULT([--without-lfs])
+		fi
+	    else
+		AC_MSG_RESULT([--with-lfs="$with_lfs"])
 	    fi
-	    AC_MSG_RESULT([--with-lfs])
+	    ;;
+	(LiS)
+	    if test -z "$with_lis" ; then
+		if test :"${streams_cv_lis_includes:-no}" = :no ; then
+dnl		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lis --with-lis\""
+dnl		    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lis'"
+		    AC_MSG_RESULT([--with-lis])
+		else
+dnl		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lis --without-lis\""
+dnl		    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lis'"
+		    AC_MSG_RESULT([--without-lis])
+		fi
+	    else
+		AC_MSG_RESULT([--with-lis="$with_lis"])
+	    fi
 	    ;;
 	(*)
 	    if test :"${with_lis:-no}" != :no ; then
 		AC_MSG_ERROR([
 *** 
 *** Linux GCOM STREAMS was specified with the --with-lis flag, however,
-*** configure could not find the LiS include directories.  This package
-*** requires the presense of LiS include directories when the --with-lis
-*** flag is specified.  Specify the correct location of LiS include
-*** directories with the argument to option --with-lis to configure and
-*** try again.
+*** configure could not find the STREAMS LIS include directories.  If
+*** you wish to use the STREAMS LIS package you will need to specify
+*** the location of the STREAMS LIS (LiS) include directories with
+*** the --with-lis=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LIS package?  The
+*** STREAMS LiS package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "LiS-2.18.7.tar.gz".
 *** ])
 	    fi
 	    if test :"${with_lfs:-no}" != :no ; then
 		AC_MSG_ERROR([
 *** 
 *** Linux Fast STREAMS was specified with the --with-lfs flag, however,
-*** configure could not find the LfS include directories.  This package
-*** requires the presense of LfS include directories when the --with-lfs
-*** flag is specified.  Specify the correct location of LfS include
-*** directories with the argument to option --with-lfs to configure and
-*** try again.
+*** configure could not find the STREAMS LFS include directories.  If
+*** you wish to use the STREAMS LFS package you will need to specify
+*** the location of the STREAMS LFS (streams) include directories with
+*** the --with-lfs=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LFS package?  The
+*** STREAMS streams package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "streams-0.9.2.4.tar.gz".
 *** ])
 	    fi
 	    AC_MSG_ERROR([
 *** 
 *** Configure could not find the STREAMS include directories.  This
 *** package requires the presence of STREAMS include directories.
-*** Specify the correct location of Linux GCOM STREAMS (LiS) include
-*** directories with the --with-lis option to configure, or the correct
-*** location of Linux Fast STREAMS (LfS) include directories with the
-*** --with-lfs option to configure, and try again.
+*** Specify the correct location of Linux Fast STREAMS (LfS) include
+*** directories with the --with-lfs option to configure, or the correct
+*** location of Linux GCOM STREAMS (LiS) include directories with the
+*** --with-lis option to configure, and try again.
 ***
-*** Perhaps you just forgot to load the LfS STREAMS package?  The LfS
-*** STREAMS package is available from The OpenSS7 Project download page
-*** at http://www.openss7.org/ and comes in a tarball named something
-*** like "streams-0.9.2.1-1.tar.gz".
+*** Perhaps you just forgot to load the STREAMS LFS package?  The
+*** STREAMS streams package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "streams-0.9.2.4.tar.gz".
 *** ])
 	    ;;
     esac
@@ -339,6 +359,38 @@ dnl             ac_configure_args="$ac_configure_args --with-lfs"
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SETUP], [dnl
     _LIS_CHECK_HEADERS
+    if test :"${streams_cv_lis_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS LIS include directories.  If
+*** you wish to use the STREAMS LIS package you will need to specify
+*** the location of the STREAMS LIS (LiS) include directories with
+*** the --with-lis=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LIS package?  The
+*** STREAMS LiS package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "LiS-2.18.7.tar.gz".
+*** ])
+    fi
+    AC_MSG_CHECKING([for lis added configure arguments])
+dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
+dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
+dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
+dnl use defines.
+    if test -z "$with_lis" ; then
+	if test :"${streams_cv_lis_includes:-no}" = :no ; then
+dnl	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lis --with-lis\""
+dnl	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lis'"
+	    AC_MSG_RESULT([--with-lis])
+	else
+dnl	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lis --without-lis\""
+dnl	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lis'"
+	    AC_MSG_RESULT([--without-lis])
+	fi
+    else
+	AC_MSG_RESULT([--with-lis="$with_lis"])
+    fi
     for streams_include in $streams_cv_lis_includes ; do
 	STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_include}"
     done
@@ -348,6 +400,7 @@ AC_DEFUN([_LIS_SETUP], [dnl
     if test :"${streams_cv_lis_modversions:-no}" != :no ; then
 	STREAMS_MODFLAGS="${STREAMS_MODFLAGS}${STREAMS_MODFLAGS:+ }-include ${streams_cv_lis_modversions}"
     fi
+    AM_CONDITIONAL([WITH_LIS], [test :"${streams_cv_lis_includes:-no}" != :no])
 ])# _LIS_SETUP
 # =============================================================================
 
@@ -356,6 +409,38 @@ AC_DEFUN([_LIS_SETUP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_CHECK_HEADERS
+    if test :"${streams_cv_lfs_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS LFS include directories.  If
+*** you wish to use the STREAMS LFS package you will need to specify
+*** the location of the STREAMS LFS (streams) include directories with
+*** the --with-lfs=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LFS package?  The
+*** STREAMS streams package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "streams-0.9.2.4.tar.gz".
+*** ])
+    fi
+    AC_MSG_CHECKING([for lfs added configure arguments])
+dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
+dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
+dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
+dnl use defines.
+    if test -z "$with_lfs" ; then
+	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
+dnl	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lfs --with-lfs\""
+dnl	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lfs'"
+	    AC_MSG_RESULT([--with-lfs])
+	else
+dnl	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lfs --without-lfs\""
+dnl	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lfs'"
+	    AC_MSG_RESULT([--without-lfs])
+	fi
+    else
+	AC_MSG_RESULT([--with-lfs="$with_lfs"])
+    fi
     for streams_include in $streams_cv_lfs_includes ; do
 	STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_include}"
     done
@@ -365,6 +450,7 @@ AC_DEFUN([_LFS_SETUP], [dnl
     if test :"${streams_cv_lfs_modversions:-no}" != :no ; then
 	STREAMS_MODFLAGS="${STREAMS_MODFLAGS}${STREAMS_MODFLAGS:+ }-include ${streams_cv_lfs_modversions}"
     fi
+    AM_CONDITIONAL([WITH_LFS], [test :"${streams_cv_lfs_includes:-no}" != :no])
 ])# _LFS_SETUP
 # =============================================================================
 
@@ -417,7 +503,7 @@ AC_DEFUN([_LIS_CHECK_HEADERS], [dnl
 		    streams_cv_lis_includes="$streams_inc $streams_bld $streams_dir"
 		    streams_cv_lis_ldadd="$os7_cv_master_builddir/LiS/libLiS.la"
 		    streams_cv_lis_ldadd32="$os7_cv_master_builddir/LiS/lib32/libLiS.la"
-		    streams_cv_lis_modversions="$os7_cv_master_builddir/LiS/include/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h"
+		    streams_cv_lis_modversions="$os7_cv_master_builddir/LiS/include/sys/LiS/modversions.h"
 		    streams_cv_lis_modmap="$os7_cv_master_builddir/LiS/Modules.map"
 		    streams_cv_lis_symver="$os7_cv_master_builddir/LiS/Module.symvers"
 		    streams_cv_lis_manpath="$os7_cv_master_builddir/LiS/man"
@@ -452,7 +538,7 @@ AC_DEFUN([_LIS_CHECK_HEADERS], [dnl
 			streams_cv_lis_includes="$streams_inc $streams_bld $streams_dir"
 			streams_cv_lis_ldadd=`echo "$streams_bld/../libLiS.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_ldadd32=`echo "$streams_bld/../lib32/libLiS.la" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
-			streams_cv_lis_modversions=`echo "$streams_bld/../include/$linux_cv_k_release/$target_cpu/sys/LiS/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
+			streams_cv_lis_modversions=`echo "$streams_bld/../include/sys/LiS/modversions.h" | sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_modmap=`echo "$streams_bld/../Modules.map" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_symver=`echo "$streams_bld/../Module.symvers" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
 			streams_cv_lis_manpath=`echo "$streams_bld/../man" |sed -e 's|/[[^/]][[^/]]*/\.\./|/|g;s|/[[^/]][[^/]]*/\.\./|/|g;s|/\./|/|g;s|//|/|g'`
@@ -601,20 +687,6 @@ AC_DEFUN([_LIS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${streams_cv_lis_includes:-no}" = :no -a false ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS LIS include directories.  If
-*** you wish to use the STREAMS LIS package you will need to specify
-*** the location of the STREAMS LIS (LiS) include directories with
-*** the --with-lis=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS LIS package?  The
-*** STREAMS LiS package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "LiS-2.18.7.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for lis version], [streams_cv_lis_version], [dnl
 	streams_cv_lis_version=
 	if test -z "$streams_cv_lis_version" ; then
@@ -778,24 +850,6 @@ dnl			then this will just not be set
 	    done
 	fi
     ])
-    AC_MSG_CHECKING([for lis added configure arguments])
-dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
-dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
-dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
-dnl use defines.
-    if test -z "$with_lis" ; then
-	if test :"${streams_cv_lis_includes:-no}" = :no ; then
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lis --with-lis\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lis'"
-	    AC_MSG_RESULT([--with-lis])
-	else
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lis --without-lis\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lis'"
-	    AC_MSG_RESULT([--without-lis])
-	fi
-    else
-	AC_MSG_RESULT([--with-lis="$with_lis"])
-    fi
 ])# _LIS_CHECK_HEADERS
 # =============================================================================
 
@@ -1032,20 +1086,6 @@ AC_DEFUN([_LFS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${streams_cv_lfs_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS LFS include directories.  If
-*** you wish to use the STREAMS LFS package you will need to specify
-*** the location of the STREAMS LFS (streams) include directories with
-*** the --with-lfs=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS LFS package?  The
-*** STREAMS streams package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "streams-0.9.2.4.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for lfs version], [streams_cv_lfs_version], [dnl
 	streams_cv_lfs_version=
 	if test -z "$streams_cv_lfs_version" ; then
@@ -1198,24 +1238,6 @@ dnl			then this will just not be set
 	    fi
 	fi
     ])
-    AC_MSG_CHECKING([for lfs added configure arguments])
-dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
-dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
-dnl Also, I don't know that even rpm 4.2 handles --with xxx=yyy properly, so we
-dnl use defines.
-    if test -z "$with_lfs" ; then
-	if test :"${streams_cv_lfs_includes:-no}" = :no ; then
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_with_lfs --with-lfs\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with-lfs'"
-	    AC_MSG_RESULT([--with-lfs])
-	else
-	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }--define \"_without_lfs --without-lfs\""
-	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--without-lfs'"
-	    AC_MSG_RESULT([--without-lfs])
-	fi
-    else
-	AC_MSG_RESULT([--with-lfs="$with_lfs"])
-    fi
 ])# _LFS_CHECK_HEADERS
 # =============================================================================
 
@@ -1481,6 +1503,9 @@ AC_DEFUN([_LINUX_STREAMS_], [dnl
 # =============================================================================
 #
 # $Log: streams.m4,v $
+# Revision 0.9.2.101  2008-10-27 09:32:54  brian
+# - tweak streams locator macros
+#
 # Revision 0.9.2.100  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

@@ -1,3 +1,7 @@
+2008-10-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* m4/streams.m4: tweak STREAMS locator macros
+
 2008-10-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/install.texi: documented tool chain updates
