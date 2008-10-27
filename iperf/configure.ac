@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.28 $) $Date: 2008-10-27 11:13:39 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.29 $) $Date: 2008-10-27 13:33:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 11:13:39 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 13:33:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
-AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.28 $) $Date: 2008-10-27 11:13:39 $])
+AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.29 $) $Date: 2008-10-27 13:33:42 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -388,6 +388,20 @@ _DEB_DPKG
 AM_CONDITIONAL([WITH_LFS], [false])dnl
 AM_CONDITIONAL([WITH_LIS], [false])dnl
 
+dnl
+dnl These are mostly needed by documentation scripts.
+dnl
+kversion=$(uname -r)
+AC_SUBST([kversion])
+kmoduledir='$(DESTDIR)$(rootdir)/lib/modules/'$kversion
+AC_SUBST([kmoduledir])
+ksysmap='$(DESTDIR)($rootdir)/boot/System.map-'$kversion
+AC_SUBST([ksysmap])
+PACKAGE_KNUMBER=`echo $kversion | sed -e 's,-.*,,'`
+AC_SUBST([PACKAGE_KNUMBER])
+PACKAGE_KVERSION="$kversion"
+AC_SUBST([PACKAGE_KVERSION])
+
 AC_CONFIG_FILES([Makefile
 		scripts/texi/args.texi
 		compat/Makefile
@@ -405,6 +419,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.1.1.2.29  2008-10-27 13:33:42  brian
+# - support documentation scripts
+#
 # Revision 1.1.1.1.2.28  2008-10-27 11:13:39  brian
 # - fixed underquoting of macros
 #
