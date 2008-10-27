@@ -74,7 +74,7 @@
 %global initfiles   %{base}
 %global nonrpminit  %{nil}
 %global conffiles   %{name}.conf
-#global testfiles   *test*
+%global testfiles   *test*
 #global testscripts testsuite
 %global sendpr      %{nil}
 #global mibfiles    *.mib
@@ -3196,8 +3196,8 @@ use this package or when debugging this package.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
-%{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug/lib/modules/%{kernel_version}}}}
-%{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug/lib/modules/%{kernel_version}}}}
+%{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug/lib/modules/%{kernel_version}/kernel/net/ipv4}}}
+%{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug/lib/modules/%{kernel_version}/kernel/net/ipv4}}}
 %{?files_oldmods:%dir %{_includedir}/%{name}/%{kernel_version}}
 %{?files_oldmods:%{_includedir}/%{name}/%{kernel_version}/*}
 #{?files_modules:%{_kmoduledir}/%{base}/Module*}
