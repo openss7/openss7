@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-27 21:50:58 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-10-27 22:20:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-10-27 21:50:58 $ by $Author: brian $
+## Last Modified $Date: 2008-10-27 22:20:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -209,16 +209,21 @@ IMG_JPGS = $(FIG_JPGS) $(TBL_JPGS) $(PNG_JPGS) $(PS_JPGS)
 ##
 MY_SECONDARY	+= $(IMG_EPSS) $(IMG_PDFS) $(IMG_PNGS) $(IMG_TXTS) $(IMG_JPGS)
 
+##
+# Because we do not distribut dvis, pss, or sgmls, we need to know how to
+# make them: especially dvis as they are required for the distcheck target.
+##
+$(DVIS)		: %.dvi  : %.texi $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
+$(PSS)		: %.ps   : %.dvi  $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
+$(SGMLS)	: %.sgml : %.texi $(IMG_JPGS) $(EXTRA_info_TEXINFOS)
+
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 if AMDEP
 ## AMDEP
-$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
-$(PSS)       : %.ps   : %.dvi  $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
-$(PDFS)      : %.pdf  : %.texi $(IMG_PDFS) $(EXTRA_info_TEXINFOS)
-$(HTMLS)     : %.html : %.texi $(IMG_PNGS) $(EXTRA_info_TEXINFOS)
-$(TXTS)	     : %.txt  : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
-$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS) $(EXTRA_info_TEXINFOS)
+$(PDFS)		: %.pdf  : %.texi $(IMG_PDFS) $(EXTRA_info_TEXINFOS)
+$(HTMLS)	: %.html : %.texi $(IMG_PNGS) $(EXTRA_info_TEXINFOS)
+$(TXTS)		: %.txt  : %.texi $(IMG_TXTS) $(EXTRA_info_TEXINFOS)
 ## AMDEP
 else
 ## !AMDEP
@@ -228,30 +233,12 @@ else
 # to be rebuilt  we really only want to rebuild documentation in maintainer
 # mode
 ##
-#$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS)
-#$(PSS)       : %.ps   : %.dvi  $(IMG_EPSS)
-#$(PDFS)      : %.pdf  : %.texi $(IMG_PDFS)
-#$(HTMLS)     : %.html : %.texi $(IMG_PNGS)
-#$(TXTS)	     : %.txt  : %.texi $(IMG_TXTS)
-#$(SGMLS)     : %.sgml : %.texi $(IMG_JPGS)
+#$(PDFS)	: %.pdf  : %.texi $(IMG_PDFS)
+#$(HTMLS)	: %.html : %.texi $(IMG_PNGS)
+#$(TXTS)	: %.txt  : %.texi $(IMG_TXTS)
 ## !AMDEP
 endif
 ## MAINTAINER_MODE
-else
-## !MAINTAINER_MODE
-##
-# Target distcheck needs to know how to build dvis not distributed.
-##
-if AMDEP
-## AMDEP
-$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS) $(EXTRA_info_TEXINFOS)
-## AMDEP
-else
-## !AMDEP
-$(DVIS)      : %.dvi  : %.texi $(IMG_EPSS)
-## !AMDEP
-endif
-## !MAINTAINER_MODE
 endif
 
 ##
@@ -433,6 +420,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 0.9.2.65  2008-10-27 22:20:11  brian
+## - another stab at dvis
+##
 ## Revision 0.9.2.64  2008-10-27 21:50:58  brian
 ## - another stab at dvis
 ##
