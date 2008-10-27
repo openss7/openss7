@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2008-10-21 07:49:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2008-10-27 11:46:57 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-21 07:49:57 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 11:46:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1187,8 +1187,7 @@ dnl
 	    __pollwait,
 	    __release_sock,
 	    skb_linearize,
-	    sysctl_ip_default_ttl
-    ])
+	    sysctl_ip_default_ttl])
     _LINUX_KERNEL_EXPORTS([
 	    add_wait_queue,
 	    add_wait_queue_exclusive,
@@ -1346,6 +1345,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.87  2008-10-27 11:46:57  brian
+# - get rid of stray linefeed
+#
 # Revision 0.9.2.86  2008-10-21 07:49:57  brian
 # - get autoloading working for UDP and RAWIP drivers
 #

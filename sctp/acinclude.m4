@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-09-10 03:49:14 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-10-27 11:46:56 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:14 $ by $Author: brian $
+# Last Modified $Date: 2008-10-27 11:46:56 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -927,8 +927,7 @@ dnl
 	    __pollwait,
 	    __release_sock,
 	    skb_linearize,
-	    sysctl_ip_default_ttl
-    ])
+	    sysctl_ip_default_ttl])
     _LINUX_KERNEL_EXPORTS([
 	    add_wait_queue,
 	    add_wait_queue_exclusive,
@@ -1319,6 +1318,9 @@ AC_DEFUN([_SCTP_CONFIG], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.65  2008-10-27 11:46:56  brian
+# - get rid of stray linefeed
+#
 # Revision 0.9.2.64  2008-09-10 03:49:14  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #
