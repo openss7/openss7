@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.88 2008-08-11 22:23:18 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.89 2008-10-27 23:36:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-11 22:23:18 $ by $Author: brian $
+ Last Modified $Date: 2008-10-27 23:36:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.89  2008-10-27 23:36:16  brian
+ - need declaration for check target
+
  Revision 0.9.2.88  2008-08-11 22:23:18  brian
  - rationalization of header files
 
@@ -125,7 +128,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.88 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.89 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do not include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -797,7 +800,7 @@ __STREAMS_EXTERN int unregister_clone(struct cdevsw *cdev);
 
 /* workaround for crash(8) */
 #define runqueues srunqueues
-__STREAMS_EXTERN void runqueues(void);
+__STREAMS_EXTERN void srunqueues(void);
 
 /* If you use this structure, you might want to upcall to the stream head functions behind these.
  * These are them.  Note that the functions above or below are called after acquiring a reference to
