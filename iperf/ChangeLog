@@ -1,5 +1,6 @@
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* configure.ac: support documentation scripts
 	* configure.ac: fixed underquoting of macros
 	* m4/dast.m4: fixed underquoting of macros
 
