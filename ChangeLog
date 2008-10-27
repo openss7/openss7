@@ -1,5 +1,8 @@
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* am/info.am: need dvis for distcheck target
+	* am/papers.am: need dvis for distcheck target
+
 	* openss7.spec.in: updated spec files
 	* LiS/LiS.spec.in: updated spec files
 	* iperf/iperf.spec.in: updated spec files

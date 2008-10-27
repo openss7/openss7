@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2008/09/22 03:48:04 $
+# @(#) $RCSfile: info.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.63 $) $Date: 2008-10-27 20:58:26 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/22 03:48:04 $ by $Author: brian $
+## Last Modified $Date: 2008-10-27 20:58:26 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -246,6 +246,9 @@ EXTRA_DIST	+= $(EXTRA_info_TEXINFOS) $(TBL_TBLS) $(FIG_FIGS) $(PNG_PNGS) $(PS_PS
 EXTRA_DIST	+= $(PDFS)
 EXTRA_DIST	+= $(HTMLS) $(IMG_PNGS)
 EXTRA_DIST	+= $(TXTS)
+# need dvis for distcheck target
+EXTRA_DIST	+= $(DVIS) $(IMG_EPSS)
+#EXTRA_DIST	+= $(PSS) $(IMG_EPSS)
 
 ##
 # distcheck is not run in maintainer mode, and we need this, otherwise distcheck
@@ -418,6 +421,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 0.9.2.63  2008-10-27 20:58:26  brian
+## - need dvis for distcheck target
+##
 ## Revision 0.9.2.62  2008/09/22 03:48:04  brian
 ## - mark our debugs as such
 ##
