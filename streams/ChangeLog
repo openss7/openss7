@@ -1,5 +1,7 @@
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* include/sys/streams/strsubr.h: need proper declaration for check
+	  target
 	* Makefile.am: don't install modpost.sh or modsyms.sh
 
 2008-10-25  Brian Bidulock  <bidulock@openss7.org>
