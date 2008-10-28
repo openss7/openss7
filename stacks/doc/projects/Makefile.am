@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-08-31 06:57:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008/10/28 07:07:35 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-31 06:57:12 $ by $Author: brian $
+# Last Modified $Date: 2008/10/28 07:07:35 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= lab.texi hlr.texi voip.texi cnam.texi sg.texi
+info_TEXINFOS		+= lab.texi hlr.texi voip.texi cnam.texi sgp.texi
 
 lab_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -75,7 +75,7 @@ cnam_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
-sg_TEXINFOS		= \
+sgp_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
@@ -89,7 +89,7 @@ voip_TEXINFOS		+= \
 			  texi/args.texi
 cnam_TEXINFOS		+= \
 			  texi/args.texi
-sg_TEXINFOS		+= \
+sgp_TEXINFOS		+= \
 			  texi/args.texi
 endif
 endif
@@ -101,7 +101,7 @@ EXTRA_info_TEXINFOS	= \
 			  $(hlr_TEXINFOS) \
 			  $(voip_TEXINFOS) \
 			  $(cnam_TEXINFOS) \
-			  $(sg_TEXINFOS)
+			  $(sgp_TEXINFOS)
 
 
 if PKG_BUILD_INDEP
@@ -242,6 +242,9 @@ include ../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.27  2008/10/28 07:07:35  brian
+## - remove conflict with sigtran package
+##
 ## Revision 0.9.2.26  2008-08-31 06:57:12  brian
 ## - do not customize docs unless maintainer modes and dependency tracking
 ##
