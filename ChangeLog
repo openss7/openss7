@@ -1,3 +1,7 @@
+2008-10-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/rules.in: do not pass base-major from top level
+
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.spec.in: no devices
