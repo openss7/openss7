@@ -1,5 +1,6 @@
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/projects/mg/mg.texi: correct info direntry naming
 	* scripts/check_modules: more names for module name page
 	* doc/man/Makefile.am: added alias manpages
 	* doc/man/man4/ch_pmod.4.man: added alias manpage
