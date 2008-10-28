@@ -1,3 +1,7 @@
+2008-10-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/STREAMS_FAQ.texi: correct direntry naming
+
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* include/sys/streams/strsubr.h: need proper declaration for check
