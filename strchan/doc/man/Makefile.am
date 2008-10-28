@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-28 23:39:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-28 06:22:06 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 23:39:49 $ by $Author: brian $
+# Last Modified $Date: 2008-10-28 06:22:06 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,6 +63,7 @@ man_MANS = \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
 	man4/ch-pmod.4 \
+	man4/ch_pmod.4 \
 	man4/chi_ioctl.4 \
 	man4/MG.4 \
 	man4/mg.4 \
@@ -72,6 +73,7 @@ man_MANS = \
 	man4/mx.4 \
 	man4/mx_ioctl.4 \
 	man4/mx-pmod.4 \
+	man4/mx_pmod.4 \
 	man4/mxi_ioctl.4 \
 	man4/mx_sdl.4 \
 	man4/v401p.4 \
@@ -318,6 +320,7 @@ dist_noinst_MANS = \
 	man4/ch.4.man \
 	man4/ch_ioctl.4.man \
 	man4/ch-pmod.4.man \
+	man4/ch_pmod.4.man \
 	man4/chi_ioctl.4.man \
 	man4/MG.4.man \
 	man4/mg.4.man \
@@ -327,6 +330,7 @@ dist_noinst_MANS = \
 	man4/mx.4.man \
 	man4/mx_ioctl.4.man \
 	man4/mx-pmod.4.man \
+	man4/mx_pmod.4.man \
 	man4/mxi_ioctl.4.man \
 	man4/mx_sdl.4.man \
 	man4/v401p.4.man \
@@ -605,6 +609,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.11  2008-10-28 06:22:06  brian
+# - added manpage aliases
+#
 # Revision 0.9.2.10  2008-04-28 23:39:49  brian
 # - updated headers for release
 #
