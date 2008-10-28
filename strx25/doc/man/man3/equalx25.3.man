@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: equalx25.3.man,v 0.9.2.2 2008-05-03 21:22:35 brian Exp $
+.\" @(#) $Id: equalx25.3.man,v 0.9.2.3 2008-10-28 17:54:27 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-05-03 21:22:35 $ by $Author: brian $
+.\" Last Modified $Date: 2008-10-28 17:54:27 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: equalx25.3.man,v $
+.\" Revision 0.9.2.3  2008-10-28 17:54:27  brian
+.\" - manpage updates
+.\"
 .\" Revision 0.9.2.2  2008-05-03 21:22:35  brian
 .\" - updates for release
 .\"
@@ -82,8 +85,8 @@ sort-adjacent-labels
 .\"
 .TH EQUALX25 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
 .SH NAME
-.B xxx
-\-
+.B equalx25
+\- compare two X.25 addresses
 .\"
 .\"
 .SH SYNOPSIS
@@ -92,7 +95,7 @@ sort-adjacent-labels
 .br
 .B #include <netx25/xnetdb.h>
 .HP
-.BI "int xxx(int " arg );
+.BI "int equalx25(struct xaddrf *" x1 ", struct xaddrf *" x2 );
 .\"
 .\"
 .SH INTERFACE
@@ -107,6 +110,23 @@ X.25 Support Library,
 .\"
 .\"
 .SH DESCRIPTION
+.PP
+.BR equalx25 ()
+compares to X.25 addresses by checking to see whether the two
+.BR xaddrf (5)
+structures holding them are the same.
+.\"
+.\"
+.SH RETURN VALUE
+.PP
+Returns true
+.RB ( 1 )
+if the two structures are the same and false
+.RB ( 0 )
+if they are not.
+.\"
+.\"
+.SH ERRORS
 .PP
 .\"
 .\"

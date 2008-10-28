@@ -1,0 +1,486 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sx25.3.man,v 0.9.2.2 2008-10-28 17:54:27 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2008-10-28 17:54:27 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sx25.3.man,v $
+.\" Revision 0.9.2.2  2008-10-28 17:54:27  brian
+.\" - manpage updates
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strx25.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strx25.macros
+.\"
+.\"
+.\"
+.\"
+.TH SX25 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Library Calls"
+.\"
+.\"
+.SH NAME
+.B sx25, SX25, libsx25
+\- X.25 Library
+.\"
+.\"
+.SH INTERFACE
+.PP
+X.25
+.[
+x25
+.]
+support functions.
+.\"
+.\"
+.SH LIBRARY
+.PP
+X.25 Support Library,
+.BR libsx25 (3).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <netx25/x25_proto.h>
+.br
+.B #include <netx25/xnetdb.h>
+.ad l
+.hy 0
+.HP 12
+.BI "void setpadent(int " stayopen );
+.PD 0
+.HP
+.BI "int getnettype(unsigned char *" snid );
+.HP
+.BI "struct padent *getpadbyaddr(char *" addr );
+.HP
+.BI "struct padent *getpadent(void);
+.HP
+.BI "void endpadent(void);
+.HP
+.BI "int padtos(struct padent *" p ", unsigned char *" strp );
+.PD
+.HP
+.BI "void setxhostent(int " stayopen );
+.PD 0
+.HP
+.BI "struct xhostent *getxhostbyaddr(char *" addr ", int " len ", int " type );
+.HP
+.BI "struct xhostent *getxhostbyname(char *" name );
+.HP
+.BI "struct xhostent *getxhostent(void);
+.HP
+.BI "void endxhostent(void);
+.PD
+.HP
+.BI "unsigned long snidtox25(unsigned char *" snid );
+.PD 0
+.HP
+.BI "int x25tosnid(unsigned long " snid ", unsigned char *" str_snid );
+.HP
+.BI "unsigned long linkidtox25(unsigned char *" linkid );
+.HP
+.BI "int x25tolinkid(unsigned long " linkid ", unsigned char *" str_linkid );
+.PD
+.HP
+.BI "int stox25(unsigned char *" cp ", struct xaddrf *" xad ", int " lookup );
+.PD 0
+.HP
+.BI "int x25tos(struct xaddrf *" xad ", unsigned char *" cp ", int " lookup );
+.HP
+.BI "int equalx25(struct xaddrf *" x1 ", struct xaddrf *" x2 );
+.PD
+.HP
+.BI "int (*x25_set_parse_error_function(int (*" func ")(char *)))(char *);
+.PD 0
+.HP
+.BI "int x25_read_config_parameters(int " linkid ", struct config_ident *" ipt ", struct LINK_config_data *" lpt ", struct X25_config_data *" xpt ", struct MLP_config_data *" mpt ", struct LAPB_config_data *" lpb ", struct LLC2_config_data *" l2p ", struct WAN_config_data *" wpt ", int *" flags );
+.HP
+.BI "int x25_read_config_parameters_file(char *" filename ", struct config_ident *" ipt ", struct LINK_config_data *" lpt ", struct X25_config_data *" xpt ", struct MLP_config_data *" mpt ", struct LAPB_config_data *" lbp ", struct LLC_config_data *" l2p ", struct WAN_config_data *" wpt ", int *" flags );
+.HP
+.BI "int x25_find_link_parameters(struct link_data **" lptr );
+.HP
+.BI "int x25_save_link_parameters(struct link_data *" linkid );
+.HP
+.BI "int x25_write_config_parameters(int " linkid ", struct config_ident *" ipt ", struct LINK_config_data *" lpt ", struct X25_config_data *" xpt ", struct MLP_config_data *" mpt ", struct LAPB_config_data *" lbp ", struct LLC2_config_data *" l2p ", struct WAN_config_data *" wpt );
+.HP
+.BI "int x25_write_config_parameters_file(char *" filename ", struct config_ident *" ipt ", struct LINK_config_data *" lpt ", struct X25_config_data *" xpt ", struct MLP_config_data *" mpt ", struct LAPB_config_data *" lbp ", struct LLC2_config_data *" l2p ", struct WAN_config_data *" wpt );
+.PD
+.ad b
+.hy
+.\"
+.\"
+.SH OVERVIEW
+.PP
+.B libsx25
+is an
+.B OpenSS7
+implementation of the X.25 Library for
+.BR "Linux Fast-STREAMS" .
+.[
+lfs
+.]
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B libsx25
+implements the following X.25 API library functions:
+.\"
+.SS Pad Database Functions
+.PP
+.TP \w'\fBgetpadbyaddr\fR(3)\(em'u
+.BR setpadent (3)
+opens or reopens the
+.BR padent (5)
+file and rewinds to the start of the file.
+.PD 0
+.TP
+.BR getnettype (3)
+.TP
+.BR getpadbyaddr (3)
+.TP
+.BR getpadent (3)
+gets the next entry in the
+.BR padent (5)
+file, opening the file if required.
+.TP
+.BR endpadent (3)
+closes the
+.BR padent (5)
+file.
+.TP
+.BR padtos (3)
+.PD
+.\"
+.SS X.25 Host Database Functions
+.PP
+.TP \w'\fBgetxhostbyname\fR(3)\(em'u
+.BR setxhostent (3)
+.PD 0
+.TP
+.BR getxhostbyaddr (3)
+.TP
+.BR getxhostbyname (3)
+.TP
+.BR getxhostent (3)
+.TP
+.BR endxhostent (3)
+.PD
+.\"
+.SS X.25 Link/Subnetwork Database Functions
+.PP
+.TP \w'\fBx25tolinkid\fR(3)\(em'u
+.BR snidtox25 (3)
+.PD 0
+.TP
+.BR x25tosnid (3)
+.TP
+.BR linkidtox25 (3)
+.TP
+.BR x25tolinkid (3)
+.PD
+.\"
+.SS X.25 Address Functions
+.PP
+.TP \w'\fBequalx25\fR(3)\(em'u
+.BR stox25 (3)
+.PD 0
+.TP
+.BR x25tos (3)
+.TP
+.BR equalx25 (3)
+.PD
+.\"
+.SS X.25 Configuration Functions
+.PP
+.TP \w'\fBx25_write_config_parameters_file\fR(3)\(em'u
+.BR x25_set_parse_error_function (3)
+.PD 0
+.TP
+.BR x25_read_config_parameters (3)
+.TP
+.BR x25_read_config_parameters_file (3)
+.TP
+.BR x25_find_link_parameters (3)
+.TP
+.BR x25_save_link_parameters (3)
+.TP
+.BR x25_write_config_parameters (3)
+.TP
+.BR x25_write_config_parameters_file (3)
+.PD
+.\"
+.\"
+.SH OPTIONS
+.PP
+.\"
+.\"
+.SH RETURN VALUES
+.PP
+These functions normally return
+.BR void ,
+return an integer value,
+.BR int ,
+where zero
+.RB ( 0 )
+indicates success and minus one
+.RB ( -1 )
+indicates failure, or return a pointer to the appropriate database or address structure.
+.\"
+.\"
+.SH ERRORS
+.PP
+Handling of error numbers is not specified in the
+.I SVR 4
+.[
+svr4
+.]
+documentation.
+.\"
+.\"
+.SH NOTICES
+.PP
+Although it would appear that the
+.BR xhosts (5)
+database would be handled using either local files
+.RB ( /etc/xhosts ),
+Berkeley adatabases, or NIS maps, under
+.IR UNIX \(rg,
+it has traditionally only been implemented using flat files.  Although NIS extensions would be nice;
+unfortunately, it is not easy to add a database to the
+.I glibc
+.BR libnsl .
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR setpadent (3),
+.BR getnettype (3),
+.BR getpadbyaddr (3),
+.BR getpadent (3),
+.BR endpadent (3),
+.BR padtos (3),
+.BR setxhostent (3),
+.BR getxhostbyaddr (3),
+.BR getxhostbyname (3),
+.BR getxhostent (3),
+.BR endxhostent (3),
+.BR snidtox25 (3),
+.BR x25tosnid (3),
+.BR linkidtox25 (3),
+.BR x25tolinkid (3),
+.BR stox25 (3),
+.BR x25tos (3),
+.BR equalx25 (3),
+.BR x25_set_parse_error_function (3),
+.BR x25_read_config_parameters (3),
+.BR x25_read_config_parameters_file (3),
+.BR x25_find_link_parameters (3),
+.BR x25_save_link_parameters (3),
+.BR x25_write_config_parameters (3),
+.BR x25_write_config_parameters_file (3).
+.\"
+.\"
+.SH BUGS
+.PP
+The SX25 library has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The SX25 library functions are compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+with the following compatibilty considerations:
+.IP \(em \w'\(em\(em'u
+.IR "Solstice X.25" ,
+.[
+solx25pg
+.]
+refers to the subnetwork identifier as a link identifier.
+.IP \(em
+Some implementations place header files in different locations:
+.IR "Solstice X.25" ,
+.[
+solx25pg
+.]
+includes the
+.B xnetdb.h
+header file from
+.RB < netx25/xnetdb.h >.
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+includes the
+.B xnetdb.h
+header file from
+.IR "Solstice X.25" ,
+.[
+solx25pg
+.]
+includes the
+.B x25_proto.h
+header file from
+.RB < netx25/x25_proto.h >.
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+includes the
+.B x25_proto.h
+header file from
+.RB < sys/snet/X25_proto.h >.
+For
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+it is necessary to include the
+.B x25_proto.h
+header file.  For
+.IR "Solstice X.25" ,
+.[
+solx25pg
+.]
+it is not necessary to include the
+.B x25_proto.h
+header file.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.BR libsx25
+library first appeared in
+.IR "Spider X.25" .
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the OpenSS7 X25 Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
