@@ -1,3 +1,10 @@
+2008-10-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/Makefile.am: change sg.texi to sgp.text
+	* doc/projects/sgp.texi: change sg.texi to sgp.text
+	  previous file conflicted with sigtran package
+
+
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: get rid of stray linefeed
