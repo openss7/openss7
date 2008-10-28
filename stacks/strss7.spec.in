@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.116 $) $Date: 2008-10-27 13:01:09 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.117 $) $Date: 2008/10/28 07:30:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 13:01:09 $ by $Author: brian $
+# Last Modified $Date: 2008/10/28 07:30:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,7 +71,7 @@
 #global libraries   
 #global locales     %{nil}
 %global tools       strss7_mknod test-m2pa test-q781 test-tcpc test-tcps test-udpc test-udps test-x100p test-x400p
-%global infofiles   %{base} libxnet cci tri tci mapi mtpi hlr voip tpi_tcap
+%global infofiles   %{base} x400p sdli sdti sli mtpi tri tci mapi cci lab hlr sgp cnam voip
 %global pngfiles    *.png
 %global initfiles   %{base}
 %global nonrpminit  %{nil}
@@ -118,9 +118,13 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.116  2008-10-27 13:01:09  brian
-# - updated spec files
+# Revision 0.9.2.117  2008/10/28 07:30:14  brian
+# - correct list of info files
 #
+
+* Mon Oct 27 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.116  2008-10-27 13:01:09  brian
+- updated spec files
 
 * Tue Sep 30 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.115  2008-09-30 09:37:14  brian
