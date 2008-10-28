@@ -1,5 +1,14 @@
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* sigtran/sigtran.spec.in: correct list of info files
+	* strchan/strchan.spec.in: correct list of info files
+	* streams/streams.spec.in: correct list of info files
+	* strnsl/strnsl.spec.in: correct list of info files
+	* strvoip/strvoip.spec.in: correct list of info files
+	* strx25/strx25.spec.in: correct list of info files
+	* strxnet/strxnet.spec.in: correct list of info files
+	* strxns/strxns.spec.in: correct list of info files
+
 	* debian/rules.in: do not pass base-major from top level
 
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
