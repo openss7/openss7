@@ -140,6 +140,9 @@ Added workaround for use of crash().
 Modifications to build under Fedora 2.6.25-45.fc9 and 2.6.26.5-45.fc9 kernels.
 
 @item
+Updated tool chain to m4-1.4.12, autoconf-2.63 and texinfo-4.13.
+
+@item
 
 @end itemize
 

@@ -69,7 +69,7 @@
 
 @dircategory STREAMS
 @direntry
-* STREAMS FAQ: (STREAMS FAQ).	STREAMS Frequently Asked Questions
+* STREAMS FAQ: (STREAMS_FAQ).	STREAMS Frequently Asked Questions
 @end direntry
 
 @include texi/args.texi
