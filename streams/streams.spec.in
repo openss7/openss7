@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.185 $) $Date: 2008-10-27 13:01:11 $
+# @(#) $RCSfile: streams.spec.in,v $ $Name:  $($Revision: 0.9.2.186 $) $Date: 2008-10-28 07:46:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 13:01:11 $ by $Author: brian $
+# Last Modified $Date: 2008-10-28 07:46:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,7 +71,7 @@
 %global libraries   streams LiS pLiS
 #global locales     %{nil}
 %global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo lis_test lis_test2
-%global infofiles   %{base} %{virtual} SPG2
+%global infofiles   %{virtual} STREAMS_FAQ SPG SPG2
 %global pngfiles    *.png
 %global initfiles   %{base} specfs streams strerr strace
 %global nonrpminit  strms_up strms_dn
@@ -121,9 +121,13 @@
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: streams.spec.in,v $
-# Revision 0.9.2.185  2008-10-27 13:01:11  brian
-# - updated spec files
+# Revision 0.9.2.186  2008-10-28 07:46:51  brian
+# - correct list of info files
 #
+
+* Mon Oct 27 2008 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.185  2008-10-27 13:01:11  brian
+- updated spec files
 
 * Mon Sep 29 2008 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.184  2008-09-29 06:27:57  brian
