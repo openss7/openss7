@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-05-03 13:23:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-28 17:54:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-05-03 13:23:33 $ by $Author: brian $
+# Last Modified $Date: 2008-10-28 17:54:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -99,11 +99,9 @@ MANS_UNUSED = \
 	man3/OSI.3 \
 	man3/xftam.3 \
 	man3/XMS.3 \
-	man3/xti_x25.3 \
 	man4/apmod.4 \
 	man4/clnp.4 \
 	man4/clnstpi.4 \
-	man4/cons.4 \
 	man4/dl_lapb.4 \
 	man4/ISO.4 \
 	man4/momod.4 \
@@ -114,8 +112,6 @@ MANS_UNUSED = \
 	man4/otpi.4 \
 	man4/romod.4 \
 	man4/xapmod.4 \
-	man4/xos.4 \
-	man4/xx25.4 \
 	man4/iso-ip.4 \
 	man4/iso-udp.4 \
 	man4/isos.4 \
@@ -123,6 +119,20 @@ MANS_UNUSED = \
 	man5/striso.5 \
 	man8/asn1.8 \
 	man8/osinetd.8
+
+x25_mans = \
+	man3/xti_x25.3 \
+	man3/XX25.3 \
+	man4/cons.4 \
+	man4/lapb.4 \
+	man4/x25_lapb.4 \
+	man4/x25-lapb.4 \
+	man4/plp.4 \
+	man4/x25_plp.4 \
+	man4/x25-plp.4 \
+	man4/xos.4 \
+	man4/xot.4 \
+	man4/xx25.4
 
 man_MANS = \
 	man3/ap_bind.3 \
@@ -304,14 +314,11 @@ man_MANS = \
 	man3/xom.3 \
 	man3/xti_mosi.3 \
 	man3/xti_osi.3 \
-	man3/xti_x25.3 \
-	man3/XX25.3 \
 	man4/apmod.4 \
 	man4/clnp.4 \
 	man4/clns.4 \
 	man4/clnstpi.4 \
 	man4/cmot.4 \
-	man4/cons.4 \
 	man4/dl_lapb.4 \
 	man4/ISO.4 \
 	man4/iso-ip.4 \
@@ -321,7 +328,6 @@ man_MANS = \
 	man4/iso-udp.4 \
 	man4/itos.4 \
 	man4/itot.4 \
-	man4/lapb.4 \
 	man4/lpp.4 \
 	man4/momod.4 \
 	man4/ns-tcp.4 \
@@ -330,7 +336,6 @@ man_MANS = \
 	man4/oopi.4 \
 	man4/otk6.4 \
 	man4/otpi.4 \
-	man4/plp.4 \
 	man4/romod.4 \
 	man4/tcpns.4 \
 	man4/tp0.4 \
@@ -339,15 +344,8 @@ man_MANS = \
 	man4/tp3.4 \
 	man4/tp4.4 \
 	man4/tp.4 \
-	man4/x25_lapb.4 \
-	man4/x25-lapb.4 \
-	man4/x25_plp.4 \
-	man4/x25-plp.4 \
 	man4/xapmod.4 \
 	man4/xol.4 \
-	man4/xos.4 \
-	man4/xot.4 \
-	man4/xx25.4 \
 	man5/ap_env_file.5 \
 	man5/striso.5 \
 	man5/xmp_cmis.h.5 \
@@ -516,6 +514,20 @@ man_MANS = \
 	man8/gdmo.8 \
 	man8/osinetd.8 \
 	man8/striso_mknod.8
+
+x25_noinst_mans = \
+	man3/xti_x25.3.man \
+	man3/XX25.3.man \
+	man4/cons.4.man \
+	man4/lapb.4.man \
+	man4/x25_lapb.4.man \
+	man4/x25-lapb.4.man \
+	man4/plp.4.man \
+	man4/x25_plp.4.man \
+	man4/x25-plp.4.man \
+	man4/xos.4.man \
+	man4/xot.4.man \
+	man4/xx25.4.man
 
 dist_noinst_MANS = \
 	man3/ap_bind.3.man \
@@ -697,14 +709,11 @@ dist_noinst_MANS = \
 	man3/xom.3.man \
 	man3/xti_mosi.3.man \
 	man3/xti_osi.3.man \
-	man3/xti_x25.3.man \
-	man3/XX25.3.man \
 	man4/apmod.4.man \
 	man4/clnp.4.man \
 	man4/clns.4.man \
 	man4/clnstpi.4.man \
 	man4/cmot.4.man \
-	man4/cons.4.man \
 	man4/dl_lapb.4.man \
 	man4/ISO.4.man \
 	man4/iso-ip.4.man \
@@ -714,7 +723,6 @@ dist_noinst_MANS = \
 	man4/iso-udp.4.man \
 	man4/itos.4.man \
 	man4/itot.4.man \
-	man4/lapb.4.man \
 	man4/lpp.4.man \
 	man4/momod.4.man \
 	man4/ns-tcp.4.man \
@@ -723,7 +731,6 @@ dist_noinst_MANS = \
 	man4/oopi.4.man \
 	man4/otk6.4.man \
 	man4/otpi.4.man \
-	man4/plp.4.man \
 	man4/romod.4.man \
 	man4/tcpns.4.man \
 	man4/tp0.4.man \
@@ -732,15 +739,8 @@ dist_noinst_MANS = \
 	man4/tp3.4.man \
 	man4/tp4.4.man \
 	man4/tp.4.man \
-	man4/x25_lapb.4.man \
-	man4/x25-lapb.4.man \
-	man4/x25_plp.4.man \
-	man4/x25-plp.4.man \
 	man4/xapmod.4.man \
 	man4/xol.4.man \
-	man4/xos.4.man \
-	man4/xot.4.man \
-	man4/xx25.4.man \
 	man5/ap_env_file.5.man \
 	man5/striso.5.man \
 	man5/xmp_cmis.h.5.man \
@@ -918,6 +918,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2008-10-28 17:54:26  brian
+# - manpage updates
+#
 # Revision 0.9.2.12  2008-05-03 13:23:33  brian
 # - added strx25 sub-package and package updates
 #
