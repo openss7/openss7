@@ -1,0 +1,281 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2006 Novell Inc.   
+#
+# This program is free software; you can redistribute it and/or   
+# modify it under the terms of the GNU General Public License   
+# as published by the Free Software Foundation; either version 2   
+# of the License, or (at your option) any later version.   
+#
+# This program is distributed in the hope that it will be useful,   
+# but WITHOUT ANY WARRANTY; without even the implied warranty of   
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the   
+# GNU General Public License for more details.   
+#
+# You should have received a copy of the GNU General Public License   
+# along with this program; if not, write to the 
+# Free Software Foundation, Inc., 
+# 51 Franklin Street, 
+# Fifth Floor, 
+# Boston, MA  02110-1301, 
+# USA.
+#
+
+sub cp {
+  my $from = shift;
+  my $to = shift;
+  $to =~ s/\/+$//;
+  if (-d $to) {
+    return undef unless $from =~ /([^\/]+)$/;
+    $to = $to ne '' ? "$to/$1" : $1;
+  }
+  return 1 if $to eq $from;
+  if (!open(FROM, "<$from")) {
+    error("cp: $from: $!\n");
+    return undef;
+  }
+  if (!open(TO, ">$to")) {
+    my $errno = $!;
+    close FROM;
+    $! = $errno;
+    error("cp: $to: $!\n");
+    return undef;
+  }
+  my $l;
+  while ($l = <FROM>) {
+    print TO $l;
+  }
+  close FROM;
+  if (!close(TO)) {
+    error("cp: $to: $!\n");
+    return undef;
+  }
+  return 1;
+}
+
+sub usage {
+print <<EOF
+
+Usage: $0 [directory]
+
+       Creates the files ls-lR.gz, INDEX.gz and ARCHIVES.gz in the directory.
+       Containing all content of all files in the directory and his sub-
+       directories. 
+       Useful for searching for special files on the media using tools like 
+       pin or just zgrep.
+
+EOF
+;
+
+exit $_[0] || 0;
+
+}
+
+if (( $ARGV[1] eq "-h" ) || ( $ARGV[1] eq "--help" )){
+  usage(0);
+}
+
+my $rsyncable = "";
+
+my $arg = shift @ARGV;
+my $tmpdir = `mktemp -d /tmp/mk_listings.XXXXXX`;
+chomp ($tmpdir);
+if ( $arg ) {
+    usage(1) unless ( -d $arg );
+}
+
+if ( $arg !~ /^\// ) {
+    $pwd = `pwd`;
+    chomp ($pwd);
+    $arg = "$pwd/$arg";
+}
+
+my $cd_replace = "/CD";
+my $arg_base = $arg;
+$arg_base =~ s/^.*\/([^\/]*)$/$1/;
+$cd_replace = "/DVD" if ( $arg_base =~ /-dvd(.*)/ );
+$cd_replace = "/inst-source" if ( $arg_base =~ /^stable-oss/ );
+
+system (`touch "$tmpdir/fff"`);
+system (`gzip --rsyncable "$tmpdir/fff" >/dev/null 2>/dev/null`);
+if ( -f "$tmpdir/fff.gz" ) {
+    $rsyncable = "--rsyncable";
+}
+system (`rm -f "$tmpdir/fff" "$tmpdir/fff.gz"`);
+
+print "INFO:    creating ls-lR.gz, INDEX.gz and ARCHIVES.gz\n";
+
+open ( FINDALL , "cd $arg ; find . -type f |" );
+my @FINDALL = <FINDALL>;
+close ( FINDALL );
+my @FINDALL2 = @FINDALL;
+
+my @FIND_RPMS = ();
+my @FIND_TARZ = ();
+my @FIND_TARBZ = ();
+my @FIND_TAR = ();
+my @FIND_DEB = ();
+for (@FINDALL) {
+    push @FIND_RPMS, $_ if ( /\.rpm$/ || /\.spm$/ );
+    push @FIND_TARZ, $_ if ( /\.tar.gz$/ || /\.tar.Z$/ || /\.tgz$/ || /\.tar.z$/ || /\.taz$/ );
+    push @FIND_TARBZ, $_ if ( /\.tar.bz2$/ || /\.tbz$/ );
+    push @FIND_TAR, $_ if ( /\.tar$/ );
+    push @FIND_DEB, $_ if ( /\.deb$/ || /\.ddeb$/ || /\.udeb$/ );
+}
+
+open ( ARCHIVES, "| gzip $rsyncable > $tmpdir/ARCHIVES.gz");
+
+print ARCHIVES <<EOF;
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+--------------- Here comes contents of all files: -------------------
+-*.rpm *.tar.gz *.tar.Z *.tgz *.taz *.tar.z *.tar *.deb *.ddeb *.udeb 
+------------------ found in any subdirectory ------------------------
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+EOF
+
+my $curnum = 0;
+my $all_num = $#FIND_RPMS + $#FIND_TARZ + $#FIND_TARBZ + $#FIND_TAR + $#FIND_DEB + 5;
+
+for (@FIND_RPMS) {
+   $curnum++;
+   print "$curnum/$all_num\r" if ( -t STDOUT );
+   my $filename = $_;
+   chomp($filename);
+   my $print_name = $filename;
+   $print_name =~ s/\/CD/$cd_replace/;
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "---> $print_name\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   my $nodigest = "";
+   if ( !system("rpm --nodigest 2>/dev/null") ) {
+	$nodigest = "--nodigest --nosignature";
+   }
+   open (RPML,"rpm $nodigest -qpilv $arg/$filename|");
+   while (<RPML>) {
+      print ARCHIVES "$print_name:    $_";
+   }
+   close (RPML);
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+}
+
+for (@FIND_TARZ) {
+   $curnum++;
+   print "$curnum/$all_num\r" if ( -t STDOUT );
+   my $filename = $_;
+   chomp($filename);
+   my $print_name = $filename;
+   $print_name =~ s/\/CD/$cd_replace/;
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "---> $print_name\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   open (TARL,"tar ztvf $arg/$filename|");
+   while (<TARL>) {
+      print ARCHIVES "$print_name:    $_";
+   }
+   close (TARL);
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+}
+
+for (@FIND_TARBZ) {
+   $curnum++;
+   print "$curnum/$all_num\r" if ( -t STDOUT );
+   my $filename = $_;
+   chomp($filename);
+   my $print_name = $filename;
+   $print_name =~ s/\/CD/$cd_replace/;
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "---> $print_name\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   open (TARL,"tar jtvf $arg/$filename|");
+   while (<TARL>) {
+      print ARCHIVES "$print_name:    $_";
+   }
+   close (TARL);
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+}
+
+for (@FIND_TAR) {
+   $curnum++;
+   print "$curnum/$all_num\r" if ( -t STDOUT );
+   my $filename = $_;
+   chomp($filename);
+   my $print_name = $filename;
+   $print_name =~ s/\/CD/$cd_replace/;
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "---> $print_name\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   open (TARL,"tar tvf $arg/$filename|");
+   while (<TARL>) {
+      print ARCHIVES "$print_name:    $_";
+   }
+   close (TARL);
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+}
+
+for (@FIND_DEB) {
+   $curnum++;
+   print "$curnum/$all_num\r" if ( -t STDOUT );
+   my $filename = $_;
+   chomp($filename);
+   my $print_name = $filename;
+   $print_name =~ s/\/CD/$cd_replace/;
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "---> $print_name\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   open (DEBL,"ar pf $arg/$filename data.tar.gz | tar tzvf -|");
+   while (<DEBL>) {
+      print ARCHIVES "$print_name:    $_";
+   }
+   close (DEBL);
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+   print ARCHIVES "-----------------------------------------------------------------\n";
+}
+
+close (ARCHIVES);
+cp ("$tmpdir/ARCHIVES.gz","$arg/ARCHIVES.gz");
+
+open ( LSLR , "cd $arg ; ls -lR |" );
+open ( LSLRZ, "| gzip $rsyncable > $tmpdir/ls-lR.gz");
+while (<LSLR>) {
+   next if ( /\.listing$/ );
+   $_ =~ s/\/CD/$cd_replace/;
+   print LSLRZ $_;
+}
+close (LSLR);
+close (LSLRZ);
+cp ("$tmpdir/ls-lR.gz","$arg/ls-lR.gz");
+
+open ( INDEX, "| gzip $rsyncable > $tmpdir/INDEX.gz");
+for (@FINDALL2) {
+   next if ( /\.listing$/ );
+   $_ =~ s/\/CD/$cd_replace/;
+   print INDEX $_;
+}
+close (INDEX);
+cp ("$tmpdir/INDEX.gz","$arg/INDEX.gz");
+
+system("rm -rf $tmpdir");
+
+if ( -d "$arg/CD1" ) {
+    unlink "$arg/CD1/ARCHIVES.gz" if ( -f "$arg/CD1/ARCHIVES.gz" );
+    link "$arg/ARCHIVES.gz","$arg/CD1/ARCHIVES.gz";
+}
+
+for (1...9) {
+    next unless ( -d "$arg/CD$_" );
+    unlink "$arg/CD$_/INDEX.gz" if ( -f "$arg/CD$_/INDEX.gz" );
+    link "$arg/INDEX.gz", "$arg/CD$_/INDEX.gz";
+    unlink "$arg/CD$_/ls-lR.gz" if ( -f "$arg/CD$_/ls-lR.gz" );
+    link "$arg/ls-lR.gz","$arg/CD$_/ls-lR.gz";
+}
