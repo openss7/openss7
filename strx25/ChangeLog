@@ -1,5 +1,7 @@
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: remove conflicting hdlc.4 manpage
+
 	* doc/man/man3/endpadent.3.man: manpage updates
 	* doc/man/man3/endxhostent.3.man: manpage updates
 	* doc/man/man3/equalx25.3.man: manpage updates

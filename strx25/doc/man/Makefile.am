@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-07-11 09:46:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-29 09:16:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-07-11 09:46:27 $ by $Author: brian $
+# Last Modified $Date: 2008-10-29 09:16:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,7 @@ MANMACRO_PFX			= @PACKAGE_TARNAME@
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-MANS_UNUSED = 
+MANS_UNUSED =
 
 man_MANS = \
 	man3/libsx25.3 \
@@ -96,7 +96,6 @@ man_MANS = \
 	man4/cons.4 \
 	man4/dlaix.4 \
 	man4/dl-llc.4 \
-	man4/hdlc.4 \
 	man4/ifr.4 \
 	man4/ipx25.4 \
 	man4/ixe.4 \
@@ -261,7 +260,6 @@ dist_noinst_MANS = \
 	man4/cons.4.man \
 	man4/dlaix.4.man \
 	man4/dl-llc.4.man \
-	man4/hdlc.4.man \
 	man4/ifr.4.man \
 	man4/ipx25.4.man \
 	man4/ixe.4.man \
@@ -396,6 +394,9 @@ include ../../am/man.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2008-10-29 09:16:13  brian
+# - remove conflicting manpage
+#
 # Revision 0.9.2.7  2008-07-11 09:46:27  brian
 # - roughed in implementation, updated documentation
 #
