@@ -1,12 +1,12 @@
-OpenSS7 Master Package -- read me CVS file.  2008-10-21
-$Id: README-cvs,v 0.9.2.50 2008-10-25 13:20:43 brian Exp $
+OpenSS7 Master Package -- read me CVS file.  2008-10-27
+$Id: README-cvs,v 0.9.2.51 2008-10-29 12:23:01 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The following is an extract from the manual to assist CVS developers:
 
-6.2.6 Downloading from CVS
+6.2.8 Downloading from CVS
 --------------------------
 
 If you are a subscriber or sponsor of The OpenSS7 Project
@@ -14,7 +14,7 @@ If you are a subscriber or sponsor of The OpenSS7 Project
 can download release, mid-release or release candidate versions of the
 `OpenSS7' package from the project CVS archive.
 
-The OpenSS7 Master Package package is located in the `os7' module of
+The OpenSS7 Master Package package is located in the `openss7' module of
 `/var/cvs'.  For release tag information, see `Releases',in the manual.
 
 To access the archive from the project CVS pserver, use the following
@@ -23,7 +23,7 @@ commands to check out a version from the archive:
      % export CVSROOT='-d:pserver:USERNAME@cvs.openss7.com:2401/var/cvs'
      % cvs login
      Password: *********
-     % cvs co -r openss7_0.9.2.G os7
+     % cvs co -r openss7_0.9.2.G openss7
      % cvs logout
 
 It is, of course, possible to check out by date or by other criteria.
@@ -38,9 +38,9 @@ requires tools not normally distributed with the other releases.
 
 The build host requires the following GNU tools:
 
-   * `m4 1.4.11'
+   * `m4 1.4.12'
 
-   * `autoconf 2.62'
+   * `autoconf 2.63'
 
    * `automake 1.10.1'
 
@@ -60,10 +60,10 @@ Also, these tools can be acquired from the FSF website
 (http://www.fsf.org/) in the free software directory, and also at the
 following locations:
 
-   * m4-1.4.11 (http://www.openss7.org/tarballs/m4-1.4.11.tar.bz2)
+   * m4-1.4.12 (http://www.openss7.org/tarballs/m4-1.4.12.tar.bz2)
 
-   * autoconf-2.62
-     (http://www.openss7.org/tarballs/autoconf-2.62.tar.bz2)
+   * autoconf-2.63
+     (http://www.openss7.org/tarballs/autoconf-2.63.tar.bz2)
 
    * automake-1.10.1
      (http://www.openss7.org/tarballs/automake-1.10.1.tar.bz2)
@@ -78,7 +78,7 @@ following locations:
    * bison-2.3 (http://www.openss7.org/tarballs/bison-2.3.tar.bz2)
 
 It should be stressed that, in particular, the `autoconf(1)', and
-`automake(1)', must be at version releases `2.61' and `1.10'.  _The
+`automake(1)', must be at version releases `2.63' and `1.10.1'.  _The
 versions normally distributed in some mainstream GNU/Linux
 distributions are, in fact, much older than these versions._(2)  GNU
 version of these packages configured and installed to default
@@ -88,25 +88,28 @@ distribution installed versions.
 For building documentation, the build host also requires the following
 documentation tools:
 
-   * `gs 8.15'
+   * `gs 6.51' or `ghostscript 6.51', or newer.
 
-   * `tetex 3.0'
+   * `tetex 3.0' or `texlive 2007', or newer.
 
-   * `texinfo 4.11'
+   * `texinfo 4.13a' or newer.
 
-   * `transfig 3.2.5'
+   * `transfig 3.2.3d' or newer.
 
-   * `imagemagick 6.2.4'
+   * `imagemagick 5.3.8' or `ImageMagick 5.3.8', or newer.
 
-   * `groff 1.17.2'
+   * `groff 1.17.2' or newer.
 
-   * `gnuplot 3.7'
+   * `gnuplot 3.7' or newer.
 
-   * `latex2html 1.71'
+   * `latex2html 1.62' or newer.
 
 Most desktop GNU/Linux distributions will have these tools; however,
 some server-style installations (e.g. `Ubuntu'-server, `SLES 9' or
 `Fedora 6 or 7') will not and they must be installed separately.(3)
+
+Note that `texinfo 4.12' must not be used as it breaks the build
+process.
 
 For uncooked manual pages, the entire `groff(1)' package is required on
 `Debian' and `Ubuntu' systems (the base package does not include
@@ -133,18 +136,18 @@ To generate a configuration script and the necessary scriptlets
 required by the GNU `autoconf(1)' system, execute the following
 commands on the working directory:
 
-     % autoreconf -fiv os7
+     % autoreconf -fiv openss7
 
-where, `os7' is the name of the directory to where the working copy was
-checked out under the previous step.  This command generates the
+where, `openss7' is the name of the directory to where the working copy
+was checked out under the previous step.  This command generates the
 `configure' script and other missing pieces that are normally
 distributed with the release Tar Balls, SRPMs and DSCs.
 
-Make sure that `autoreconf --version' returns `2.61'.  Otherwise, you
+Make sure that `autoreconf --version' returns `2.63'.  Otherwise, you
 may need to perform something like the following:
 
      % PATH="/usr/local/bin:$PATH"
-     % autoreconf -fiv os7
+     % autoreconf -fiv openss7
 
 After reconfiguring the directory, the package can then be configured
 and built using the same instructions as are used for the Tar Ball, see
@@ -154,8 +157,8 @@ Ball',in the manual.
 Do note, however, that `make(1)' will rebuild the documentation that is
 normally released with the package.  Additional tools may be necessary
 for building the documentation.  To avoid building and installing the
-documentation, use the `--disable-devel' option to configure described
-in `Configuring the Tar Ball',in the manual.
+documentation, use the `--disable-devel' or `--disable-docs' option to
+configure described in `Configuring the Tar Ball',in the manual.
 
 When configuring the package in a working directory and while working a
 change-compile-test cycle that involves configuration macros or
@@ -181,8 +184,10 @@ the `gettext-devel' package must be installed.
 
 (3) In particular, for `CentOS', `Fedora 6 or 7', the `tetex-latex' and
 `gnuplot' packages must be loaded as well.  Note also that the
-`latex2html' used to be part of the textex package (or subpackages) but
-is now often packaged on its own.
+`latex2html' used to be part of the `textex' package (or subpackages)
+but is now often packaged on its own.  Recent distributions such as
+SUSE 11.0 and Fedora 9 use the `texlive' package instead of the `tetex'
+package.
 
 -----
 

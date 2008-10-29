@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100 fo+=tcqlorn
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.38 2008-10-23 09:21:55 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.39 2008-10-29 12:23:07 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,12 +53,12 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-10-23 09:21:55 $ by $Author: brian $
+@c Last Modified $Date: 2008-10-29 12:23:07 $ by $Author: brian $
 @c
 @c =========================================================================
 
-The sections that follow provide information on OpenSS7 releases of the @*
-@value{PACKAGE_TITLE} package.
+The sections that follow provide information on OpenSS7 releases of the @cite{@value{PACKAGE_TITLE}}
+package.
 
 @ifnotplaintext
 @ifnothtml
@@ -81,17 +81,20 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
 
-This @cite{OpenSS7 Project} release is another separate add-on package release
-of the @cite{@value{PACKAGE_TITLE}} package that was formerly present in the
-(long deprecated) @cite{LiS} package.  The networking drivers are provided, as
-well as the TPI and XTI header files for INET and loop back operation.  The
-package contains all the necessary manual packages and other documentation for
-INET components in a separate autoconf tarball.  This release is a stable,
-production grade release for @cite{Linux Fast-STREAMS} and is part of the
-OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).
+This is the seventh separate @cite{OpenSS7 Project} release of the @cite{@value{PACKAGE_TITLE}}
+package that was formerly present in the (long deprecated) @cite{LiS} package.
+The networking drivers are provided, as well as the TPI and XTI header files for INET and loop back
+operation.
+The package contains all the necessary manual pages and other documentation for INET components in a
+separate autoconf tarball.
 
-This release is primarily a maintenance release to support recent distributions
-and tool chains.
+This release is a stable, production grade release for @cite{Linux Fast-STREAMS} and is part of the
+OpenSS7 Master Package (@file{openss7-@value{VERSION_OPENSS7}}).
+The release includes maintenance support for recent distributions and tool chain, but also includes
+some performance and feature upgrades and inspection bug fixes.
+It deprecates previous releases.  Please upgrade before reporting bugs on previous releases.
+
+This release is primarily a maintenance release.
 
 Major features since the last public release are as follows:
 
@@ -103,56 +106,70 @@ Minor documentation corrections.
 Kernel module license made explicit "GPL v2".  And then changed back to "GPL".
 
 @item
-License upgrade to AGPL Version 3.
+License upgrade to @cite{AGPL Version 3}.
 
 @item
-Changes to support 2.6.22.5-49.fc6 kernel: handle tcp_push_pending_frames with fewer arguments and
-new sk_buff format (offsets and transport_header).  These changes also support 2.6.22.9-91.fc7
-kernel.
+Modifications to build under @cite{Fedora} @samp{2.6.22.5-49} kernel.  These changes also support
+@samp{2.6.22.9-91.fc7} kernel.
+Handle @command{tcp_push_pending_frames} with fewer arguments and new @type{sk_buff} format (offsets
+and @member{transport_header}).
 
 @item
-Ability to strap out major documentation build and installation primarily for
-embedded targets.
+Ability to strap out major documentation build and installation primarily for embedded targets.
 
 @item
 Improvements to common build process for embedded and cross-compile targets.
 
 @item
-Support for flex 2.5.33  in maintainer mode.
+Modifications to build under @cite{Fedora} @samp{2.6.25-45.fc9} and @samp{2.6.26.5-45.fc9} kernels.
 
 @item
-Modifications to build under Fedora 2.6.25-45.fc9 and 2.6.26.5-45.fc9 kernels.
+Updated tool chain to @file{m4-1.4.12}, @file{autoconf-2.63} and @file{texinfo-4.13}.
+
+@item
+Conversion of RPM spec files to common approach for major subpackages.
+
+@item
+Updated references database for manual pages and roff documents.
+
+@item
+Build system now builds @mantype{yum(8)} repositories for RPMs and @mantype{apt-get(8)} repositories
+for DEBs.  Installation documentation has been updated to include details of repository install
+sourcesref.
+
+@item
+Added @constant{MODULE_VERSION} to all modules and drivers.
+
+@item
+This release contains a significant rework of the @file{inet} driver.  The driver is now
+instrumented using the @manref{mi_strlog(9)} function and uses Mentat Portable STREAMS compatability
+functions extensively.  The driver has been validated over a wider range of kernels and
+distributions on SMP machines.  This drive will no longer work with the long deprecated @cite{LiS}
+and, with this release, is exclusively for use with @cite{Linux Fast-STREAMS}.  Please see
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/BUGS,,@file{BUGS}} in the
+release to see which bugs this rework addressed.
 
 @end itemize
 
-@emph{This is a public stable production grade release of the package: it
-deprecates previous releases.  Please upgrade to the current release before
-reporting bugs.}
+@emph{This is a public stable production grade release of the package: it deprecates previous
+releases.  Please upgrade to the current release before reporting bugs.}
 
-As with other OpenSS7 releases, this release configures, compiles, installs and
-builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based
-distributions, and can be used on production kernels without patching or
-recompiling the kernel.
+As with other OpenSS7 releases, this release configures, compiles, installs and builds RPMs and DEBs
+for a wide range of Linux 2.4 and 2.6 RPM- and DPKG-based distributions, and can be used on
+production kernels without patching or recompiling the kernel.
 
-This package is publicly released under the @cite{GNU Affero General Public License
-Version 3}.  The release is available as an @command{autoconf} tarball, SRPM,
-DSC, and set of binary RPMs and DEBs.  See the
-@uref{http://www.openss7.org/download.html,downloads page} for the
-@command{autoconf} tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and
-binary RPMs and DEBs, see the
-@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,@value{PACKAGE} package
-page}.
+This package is publicly released under the @cite{GNU Affero General Public License Version 3}.  The
+release is available as an @command{autoconf} tarball, SRPM, DSC, and set of binary RPMs and DEBs.
+See the @uref{http://www.openss7.org/download.html,downloads page} for the @command{autoconf}
+tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html,@value{PACKAGE} package page}.
 
-See
-@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog}
-and @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS}
-in the release for more information.  Also, see the @file{@value{PACKAGE}.pdf}
-manual in the release (also in html
+See @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/ChangeLog} and
+@uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS} in the release for more
+information.  Also, see the @file{@value{PACKAGE}.pdf} manual in the release (also in html
 @uref{http://www.openss7.org/@value{PACKAGE}_manual.html}).
 
-@ignore
-For the news release, see @uref{http://www.openss7.org/rel20070315_B.html}.
-@end ignore
+For the news release, see @uref{http://www.openss7.org/rel20081029_B.html}.
 
 @c ----------------------------------------------------------------------------
 

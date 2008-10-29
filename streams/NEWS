@@ -1,5 +1,5 @@
-Linux Fast-STREAMS -- history of user visible changes.  2008-10-25
-$Id: NEWS,v 0.9.2.86 2008-10-25 13:20:47 brian Exp $
+Linux Fast-STREAMS -- history of user visible changes.  2008-10-27
+$Id: NEWS,v 0.9.2.87 2008-10-29 12:23:05 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -10,15 +10,19 @@ The sections that follow provide information on OpenSS7 releases of the
  Major changes for release streams-0.9.2.4
 ------------------------------------------
 
-This is the thirteenth  `OpenSS7 Project' release of `Linux
+This is the thirteenth `OpenSS7 Project' release of `Linux
 Fast-STREAMS'.  `LiS' was fully deprecated as of the previous release
 and `Linux Fast-STREAMS' is the only STREAMS package contained in the
 OpenSS7 Master Package (since `openss7-0.9.2.D').
 
-This release is a stable, production grade release.  The release
-includes maintenance support for recent distributions and tool chain,
-but also includes some performance and feature upgrades and inspection
-bug fixes.
+This release is a stable, production grade release and is part of the
+OpenSS7 Master Package (`openss7-0.9.2.G').  The release includes
+maintenance support for recent distributions and tool chain, but also
+includes some performance and feature upgrades and inspection bug fixes.
+It deprecates previous releases.  Please upgrade before reporting bugs
+on previous releases.
+
+This release is primarily a maintenance release.
 
 Major features since the last public release are as follows:
 
@@ -27,14 +31,28 @@ Major features since the last public release are as follows:
    - Kernel module license made explicit "GPL v2".  And then changed
      back to "GPL".
 
-   - License upgrade to AGPL Version 3.
+   - License upgrade to `AGPL Version 3'.
 
-   - Modifications to build under Fedora 2.6.22.5-49 kernel.  These
-     changes also support 2.6.22.9-91.fc7 kernel.
+   - Modifications to build under `Fedora' `2.6.22.5-49' kernel.  These
+     changes also support `2.6.22.9-91.fc7' kernel.
 
-   - Added SNMP MIB and AgentX sub-agent for STREAMS.  This is a rather
-     significant addition to Linux Fast-STREAMS which permits remote
-     management of the entire STREAMS subsystem using SNMP.
+   - Added SNMP MIBs and AgentX sub-agent for STREAMS.  This is a
+     rather significant addition to Linux Fast-STREAMS which permits
+     remote management of the entire STREAMS subsystem using SNMP.  The
+     agent is compatable with `net-snmp' and `ucd-snmp' back to
+     `ucd-snmp 4.2.5'.  This includes updates to the build process to
+     support `net-snmp' packages all the way back to `RedHat 7.2'.
+
+   - Added the ability for the `sc(4)' STREAMS Configuration module to
+     allow tuning STREAMS module info parameters and collect general
+     purpose STREAMS statistics.  Also, the module generates signals
+     (`SIGPOLL') when STREAMS configuration changes.  See `sc(4)' for
+     more information.
+
+     Also added a STREAMS configuration change notification
+     registration function for use by `sc(4)'.  See
+     `streams_notify(9)', `streams_register_notifier(9)' and
+     `streams_unregister_notifier(9)' for more information.
 
    - Ability to strap out major documentation build and installation
      primarily for embedded targets.
@@ -42,19 +60,38 @@ Major features since the last public release are as follows:
    - Improvements to common build process for embedded and
      cross-compile targets.
 
-   - Support for flex 2.5.33  in maintainer mode.
+   - Support for `flex 2.5.33' in maintainer mode.
 
    - Higher performance and updated performance paper.
 
    - Fixed two POSIX compilance quirks and one soft-lockup when using
-     M_READ.  See BUGS in the release for more information.
+     `M_READ'.  See `BUGS' in the release for more information.
 
-   - Added workaround for use of crash().
+   - Added workaround for use of `crash(8)'.
 
-   - Modifications to build under Fedora 2.6.25-45.fc9 and
-     2.6.26.5-45.fc9 kernels.
+   - Modifications to build under `Fedora' `2.6.25-45.fc9' and
+     `2.6.26.5-45.fc9' kernels.
 
-   -
+   - Updated tool chain to `m4-1.4.12', `autoconf-2.63' and
+     `texinfo-4.13'.
+
+   - Conversion of RPM spec files to common approach for major
+     subpackages.
+
+   - Updated references database for manual pages and roff documents.
+
+   - Added test case 3.1.11.4 and modified test cases 3.2.1, 3.5.1 and
+     3.6.1 for the test-streams tests suite executable to test bug
+     fixes and avoid regressions.  See bug #016 and #017 in `BUGS'.
+
+   - Build system now builds `yum(8)' repositories for RPMs and
+     `apt-get(8)' repositories for DEBs.  Installation documentation
+     has been updated to include details of repository install
+     sourcesref.
+
+   - Added `MODULE_VERSION' to all modules and drivers.
+
+
 _This is a public stable production grade release of the package: it
 deprecates previous releases.  Please upgrade to the current release
 before reporting bugs._
@@ -75,6 +112,8 @@ See `http://www.openss7.org/codefiles/streams-0.9.2.4/ChangeLog' and
 `http://www.openss7.org/codefiles/streams-0.9.2.4/NEWS' in the release
 for more information.  Also, see the `STREAMS.pdf' manual in the
 release (also in html `http://www.openss7.org/STREAMS_manual.html').
+
+For the news release, see `http://www.openss7.org/rel20081029_K.html'.
 
  Major changes for release streams-0.9.2.3
 ------------------------------------------

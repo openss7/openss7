@@ -1,7 +1,7 @@
-@c -*- texinfo -*- vim: ft=texinfo
+@c -*- texinfo -*- vim: ft=texinfo nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.25 2008-10-17 06:04:53 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.26 2008-10-29 12:23:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2008-10-17 06:04:53 $ by $Author: brian $
+@c Last Modified $Date: 2008-10-29 12:23:06 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -68,20 +68,21 @@ only check procedures on @samp{q->q_next}.
 
 @item 024.  2008-10-11T19:36:41+0000
 
-A list delete corruption bug in the STREAMS driver and module lookup functions (e.g. __cdrv_lookup)
-was discovered by the list debugging in the FC9 kernel.
+A list delete corruption bug in the STREAMS driver and module lookup functions (e.g.
+@command{__cdrv_lookup}) was discovered by the list debugging in the @cite{FC9} kernel.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
 @item 023.  2008-10-11T19:36:23+0000
 
 Not really a bug, but newer (2.6.25) kernels no longer permit registration of binary identifiers for
-sysctls (i.e. ctl_name).  The proc filesystem entries (i.e. procname) are still permitted and
-ctl_name should be set to zero for these kernels.  Added a check for the existence of symbol
-sysctl_check_table() to identify when binary registration is forbidden.  Another related problem is
-that when binary registration of system controls is not possible, sysctl(2) becomes worthless.
-Unfortunately, the STREAMS MIB agent was written to use sysctl(2) and needs to be rewritten to use
-the /proc/sys filesystem instead ala sysctl(8).
+sysctls (i.e. @member{ctl_name}).  The proc filesystem entries (i.e. @member{procname}) are still
+permitted and @member{ctl_name} should be set to zero for these kernels.  Added a check for the
+existence of symbol @command{sysctl_check_table()} to identify when binary registration is
+forbidden.  Another related problem is that when binary registration of system controls is not
+possible, @manref{sysctl(2)} becomes worthless.  Unfortunately, the STREAMS MIB agent was written to
+use @manref{sysctl(2)} and needs to be rewritten to use the @file{/proc/sys} filesystem instead ala
+@manref{sysctl(8)}.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
@@ -91,63 +92,71 @@ When overriding 32-bit compatability on input-output controls conflicting from t
 device with STREAMS input-output controls, the override was not properly passing CDROM input-output
 controls through due to a missing break statement in the override loop.  This bug affected
 pre-2.6.11 kernels, likely manifesting itself in a non-function CDROM device while STREAMS was
-loaded.  Bug reported and one-line fix provided by Sylvain Chouleur for DGAC.
+loaded.  Bug reported and one-line fix provided by Sylvain Chouleur for @cite{DGAC}.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
 @item 021.  2008-08-01T22:32:08+0000
 
-When flushing queues the backenable bits were not being initialized to zero in __flushq(), resulting
-in back-enabling of bands (or the normal queue) was being performed depending on the uninitialized
-values in the backenable bit array.  This only affected I_SETSIG signals for SWRNORM and SWBAND, and
-the only when flushing queues.  Fix properly initializes the backenable array.
+When flushing queues the backenable bits were not being initialized to zero in @command{__flushq()},
+resulting in back-enabling of bands (or the normal queue) was being performed depending on the
+uninitialized values in the backenable bit array.  This only affected @streamio{I_SETSIG} signals
+for @constant{SWRNORM} and @constant{SWBAND}, and the only when flushing queues.  Fix properly
+initializes the backenable array.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
 @item 020.  2008-07-31T04:59:41+0000
 
 Not really a bug (for @cite{STREAMS}), but when the @file{streams.ko} kernel module is loaded, the
-@command{crash()} debugger will not debug a running kernel because it finds the
+@mantype{crash(8)} debugger will not debug a running kernel because it finds the
 @command{runqueues()} exported function in the @file{streams.ko} module instead of the the static
 one from the kernel.  This has been temporarily renamed by macro to @command{srunqueues()} (notice
-the leading @samp{s}) until @command{crash()} learns to do the right thing and check that the symbol
-it looks up comes from the kernel instead of a kernel module.
+the leading @samp{s}) until @mantype{crash(8)} learns to do the right thing and check that the
+symbol it looks up comes from the kernel instead of a kernel module.
 
 @emph{*workaround*} in @command{streams-0.9.2.4}
 
 @item 019.  2008-07-25T22:41:47+0000
 
-When M_READ was being issued by the Stream Head downstream an srlock() imbalance in strsendmread()
-was causing soft-lockups on close for recent read-write lock implementations on CentOS 5 for x86_64.
+When @msg{M_READ} was being issued by the Stream Head downstream an @command{srlock()} imbalance in
+@command{strsendmread()} was causing soft-lockups on close for recent read-write lock
+implementations on @cite{CentOS 5.2} for @samp{x86_64}.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
 @item 018.  2008-07-25T01:15:26+0000
 
-Previous fix didn't work too good: returning [EAGAIN] when hung-up on getmsg(), getpmsg(), read(),
-readv() instead of 0 and terminal end of file.  This caused a regression on four or five test cases.
+Previous fix didn't work too good: returning @errno{EAGAIN} when hung-up on @manref{getmsg(2)},
+@manref{getpmsg(2)}, @manref{read(2)}, @manref{readv(2)} instead of 0 and terminal end of file.
+This caused a regression on four or five other test cases.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
 @item 017.  2008-04-10T15:17:30+0000
 
-When M_DATA is sent upstream followed by M_HANGUP, read(2s) is returning zero (0) and not permitting
-the data associated with the M_DATA to be read.  This is a bug per documentation.  read(2s) should
-operate as normal following a hangup until all data is read and then return zero (0).
+When @msg{M_DATA} is sent upstream followed by @msg{M_HANGUP}, @manref{read(2s)} is returning zero
+(0) and not permitting the data associated with the @msg{M_DATA} to be read.  This is a bug per
+documentation.  @manref{read(2s)} should operate as normal following a hangup until all data is read
+and then return zero (0).
 
 The difficulty is that when waking up from a read sleep or when entering read the hangup condition
-was generating an internal ESTRPIPE error.  This was altered so that ESTRPIPE is only returned
-during the hangup condition after the read queue has been tested and the caller is about to sleep on
-read.
+was generating an internal @errno{ESTRPIPE} error.  This was altered so that @errno{ESTRPIPE} is
+only returned during the hangup condition after the read queue has been tested and the caller is
+about to sleep on read.
+
+Test cases 3.2.1, 3.5.1 and 3.6.1 in the test-streams test suite executable were altered to validate
+the fix for this case and curtail regressions.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
 @item 016.  2007-11-14T17:23:57+0000
 
-Read is blocking when data has been read, O_NONBLOCK and O_NDELAY unset, RFILL unset, in non-SVR4
-mode.  This violates POSIX specifications.
+Read is blocking when data has been read, @constant{O_NONBLOCK} and @constant{O_NDELAY} unset,
+@constant{RFILL} unset, in non-SVR4 mode.  This violates POSIX specifications.
 
-A test case needs to be generated for this case and the fix needs to be implemented.
+Test case 3.1.11.4 in the test-streams test suite executable was generated to validate the fix
+for this case and to curtail regressions.
 
 @emph{*fixed*} in @command{streams-0.9.2.4}
 
@@ -162,30 +171,32 @@ number.  This also ensures that module ID and major are the same.
 
 @item 014.  2007-05-17T21:48:24+0000
 
-The dupb() utility had an obnoxious bug where it permitted the db_ref count to wrap to zero, causing
-buffer allocation and freeing problems.  This was very difficult to debug.  dupb() now fails if the
-reference count has reached 255.  When dupb() fails, the user should check if the reference count
-has reached 255, and if it has, attempt a deep copyb() instead.  At some point it might be useful to
-have STREAMS do the deep copy automatically.  This was discovered in strsctp loopback tests where
-message blocks are rapidly duplicated for retransmission.
+The @manref{dupb(9)} utility had an obnoxious bug where it permitted the @member{db_ref} count to
+wrap to zero, causing buffer allocation and freeing problems.  This was very difficult to debug.
+@manref{dupb(9)} now fails if the reference count has reached 255.  When @manref{dupb(9)} fails, the
+user should check if the reference count has reached 255, and if it has, attempt a deep
+@manref{copyb(9)} instead.  At some point it might be useful to have STREAMS do the deep copy
+automatically.  This was discovered in @file{strsctp} loopback tests where message blocks are
+rapidly duplicated for retransmission.
 
 @emph{*fixed*} in @command{streams-0.9.2.3}
 
 @item 013.  2007-05-17T21:48:06+0000
 
-The log driver, strace, strerr and strclean utilities had some bugs.  The strsctp driver now makes
-extensive use of strlog() trace and error logging and the log driver and utilities have been
-corrected.  These facilities are now production grade.
+The log driver, strace, strerr and strclean utilities had some bugs.  The @file{strsctp} driver now
+makes extensive use of @manref{strlog(9)} trace and error logging and the log driver and utilities
+have been corrected.  These facilities are now production grade.
 
 @emph{*fixed*} in @command{streams-0.9.2.3}
 
 @item 012.  2007-04-13T01:47:30+0000
 
-It appears that Ubuntu 6.10 has a rather broken implementation of the LSB install_init that has been
-inherited from Debian (a python script, none the less).  This implementation refuses to properly
-install a disabled service (one with an empty or missing Default-Start: tag), but, rather invokes
-updated-rc.d in such a way that the init script is started at runlevels 2 3 4 5 instead.  This was
-causing problems with the strace and strerr services which are normally installed disabled.
+It appears that @cite{Ubuntu 6.10} has a rather broken implementation of the LSB
+@command{install_init} that has been inherited from Debian (a python script, none the less).  This
+implementation refuses to properly install a disabled service (one with an empty or missing
+Default-Start: tag), but, rather invokes updated-rc.d in such a way that the init script is started
+at runlevels @samp{2 3 4 5} instead.  This was causing problems with the strace and strerr services
+which are normally installed disabled.
 
 This uncovered the fact that the Debian-style init scripts were not working anyway.  The scripts
 have been fixed and the strace and strerr utilities now default to enabled.
@@ -286,8 +297,9 @@ Compostella pointed out syntax error in strsched.c that kept synqs from compilin
 @item 002. 2006-09-24T20:02:00+0000
 
 Discovered asynchronous thread cancellation inconsistencies in libLiS libpLiS by inspection during
-documentation.  isastream(2), fattach(2) were not performing proper asynchronous thread cancellation
-suppression so that these function contained a cancellation point when the should not.
+documentation.  @manref{isastream(2)}, @manref{fattach(2)} were not performing proper asynchronous
+thread cancellation suppression so that these function contained a cancellation point when the
+should not.
 
 @emph{*fixed*} in @command{streams-0.7a.6.rc3}
 

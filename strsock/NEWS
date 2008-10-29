@@ -1,16 +1,16 @@
-OpenSS7 STREAMS Sockets -- history of user visible changes.  2008-10-24
-$Id: NEWS,v 0.9.2.55 2008-10-25 13:20:50 brian Exp $
+OpenSS7 STREAMS Sockets -- history of user visible changes.  2008-10-27
+$Id: NEWS,v 0.9.2.56 2008-10-29 12:23:10 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
-OpenSS7 STREAMS Sockets package.
+`OpenSS7 STREAMS Sockets' package.
 
  Major changes for release strsock-0.9.2.4
 ------------------------------------------
 
-This `OpenSS7 Project' release is the fourth separate release of the
+This is the fourth separate `OpenSS7 Project' release of the
 `OpenSS7 STREAMS Sockets' package whose components were formerly part
 of the `strss7', `strxnet' and `streams' packages.  These networking
 modules provide the Sockets library.  The package contains all the
@@ -18,8 +18,11 @@ necessary manual pages and other documentation.  The package is
 packaged as an OpenSS7 style autoconf tarball.
 
 This is the fourth alpha release and is part of the OpenSS7 Master
-Package (`openss7-0.9.2.G').  This release is primarily a maintenance
-release supporting recent distributions and tool chains.
+Package (`openss7-0.9.2.G').  The release includes maintenance support
+for recent distributions and tool chain, but also includes some
+performance and feature upgrades and inspection bug fixes.  It
+deprecates previous releases.  Please upgrade before reporting bugs on
+previous releases.
 
 Major features since the last public release are as follows:
 
@@ -28,7 +31,9 @@ Major features since the last public release are as follows:
    - Kernel module license made explicit "GPL v2".  And then changed
      back to "GPL".
 
-   - License upgrade to AGPL Version 3.
+   - License upgrade to `AGPL Version 3'.
+
+   - Support for flex 2.5.33  in maintainer mode.
 
    - Ability to strap out major documentation build and installation
      primarily for embedded targets.
@@ -36,11 +41,28 @@ Major features since the last public release are as follows:
    - Improvements to common build process for embedded and
      cross-compile targets.
 
-   - Support for flex 2.5.33  in maintainer mode.
+   - Updated tool chain to `m4-1.4.12', `autoconf-2.63' and
+     `texinfo-4.13'.
+
+   - Conversion of RPM spec files to common approach for major
+     subpackages.
+
+   - Updated references database for manual pages and roff documents.
+
+   - Build system now builds `yum(8)' repositories for RPMs and
+     `apt-get(8)' repositories for DEBs.  Installation documentation
+     has been updated to include details of repository install
+     sourcesref.
+
+   - Added `MODULE_VERSION' to all modules and drivers.
+
+   - Several important bug fixes for thread safety of the socket
+     library: see `BUGS' in the release for more information.
 
 
-_This is a public alpha release of the package.  Please see
-`README-alpha' in the release or `Maturity',in the manual._
+_This is a public alpha release of the package: it deprecates previous
+releases.  Please upgrade to the current release before reporting bugs.
+Please see `README-alpha' in the release, or `Maturity',in the manual._
 
 As with other OpenSS7 releases, this release configures, compiles,
 installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
@@ -58,6 +80,8 @@ See `http://www.openss7.org/codefiles/strsock-0.9.2.4/ChangeLog' and
 `http://www.openss7.org/codefiles/strsock-0.9.2.4/NEWS' in the release
 for more information.  Also, see the `strsock.pdf' manual in the
 release (also in html `http://www.openss7.org/strsock_manual.html').
+
+For the news release, see `http://www.openss7.org/rel20081029_C.html'.
 
  Major changes for release strsock-0.9.2.3
 ------------------------------------------
