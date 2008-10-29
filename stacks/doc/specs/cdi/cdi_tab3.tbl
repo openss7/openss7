@@ -1,0 +1,123 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cbw(1.0in)|cbw(1.0in)|cbw(3.0in)
+l|l|l.
+Phase:Service:Primitives
+=
+T{
+.hy 0
+.ad l
+Data Transfer
+T}:T{
+.hy 0
+.ad l
+Unacknowledged
+T}:T{
+CD_UNITDATA_REQ, CD_UNITDATA_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Acknowledged
+T}:T{
+.hy 0
+.ad l
+CD_UNITDATA_REQ, CD_UNITDATA_IND, CD_UNITDATA_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Paced
+T}:T{
+.hy 0
+.ad l
+CD_UNITDATA_REQ, CD_UNITDATA_IND, CD_UNITDATA_ACK
+T}
+=
+T{
+.hy 0
+.ad l
+Duplex Management
+T}:T{
+.hy 0
+.ad l
+Input Section
+T}:T{
+.hy 0
+.ad l
+CD_READ_REQ, CD_ALLOW_INPUT_REQ, CD_HALT_INPUT_REQ, CD_UNITDATA_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Output Section
+T}:T{
+.hy 0
+.ad l
+CD_ABORT_OUTPUT_REQ, CD_UNITDATA_REQ, CD_UNITDATA_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Input-Output
+T}:T{
+.hy 0
+.ad l
+CD_WRITE_READ_REQ
+T}
+=
+T{
+.hy 0
+.ad l
+Event
+T}:T{
+.hy 0
+.ad l
+Error Reporting
+T}:T{
+.hy 0
+.ad l
+CD_ERROR_IND, CD_BAD_FRAME_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Modem Signals
+T}:T{
+.hy 0
+.ad l
+CD_MODEM_SIG_REQ, CD_MODEM_SIG_IND, CD_MODEM_SIG_POLL
+T}
+.TE

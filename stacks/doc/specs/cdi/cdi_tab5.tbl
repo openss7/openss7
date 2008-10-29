@@ -1,0 +1,71 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb1|cb1|cb1|cb
+l1|l1|l1|l.
+STATE:CDI STATE:DESCRIPTION:SERVICE
+:::TYPE
+_
+0) UNATTACHED:CD_UNATTACHED:T{
+.hy 0
+.ad l
+Stream opened but PPA not attached
+T}:ALL
+1) ATTACH PEND:CD_ATTACH_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_DETACH_REQ
+T}:ALL
+3) UNBOUND:CD_UNBOUND:T{
+.hy 0
+.ad l
+Stream is attached but not bound to a CDSAP
+T}:ALL
+4) BIND PEND:CD_BIND_PENDING:T{
+.hy 0
+.ad l
+Te DSL user is waiting for an acknowledgement of a CD_BIND_REQ
+T}:ALL
+5) UNBIND PEND:CD_UNBIND_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_UNBIND_REQ
+T}:ALL
+6) ICDE:CD_IDLE:T{
+.hy 0
+.ad l
+The stream is bound and activated for use - connection establishment or
+connectionless data transfer may take place.
+T}:ALL
+7) UDQOS PEND:CD_UDQOS_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of CD_UDQOS_REQ
+T}:CD_COCDS
+.TE
