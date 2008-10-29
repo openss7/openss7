@@ -3668,16 +3668,29 @@ Part 1: Protocol Specification
 %I International Organization for Standardization
 %U http://www.iso.org/
 
+%K iso10029
+%L ISO/IEC TR 10029
+%A ISO
+%R ISO/IEC TR 10029:1989
+%T Information Processing Systems \(em Data Communications \(em Operation of an X.25 Interworking Unit
+%D 1989
+%C Geneva
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O See ITU-T Recommendation X.35 (related text).
+
 %K iso10177
 %L ISO/IEC 10177
 %A ISO
 %R ISO/IEC 10177:1993
-%T Information technlology \(em Telecommunications and information excahnge between systems \(em Provision of the connection-mode Network internal layer service by intermediate systems using ISO/IEC 8208, the X.25 Packet Layer Protocol
+%T Information technology \(em Telecommunications and information exchange between systems \(em Provision of the connection-mode Network internal layer service by intermediate systems using ISO/IEC 8208, the X.25 Packet Layer Protocol
 %D 1993
 %C Geneva
 %Q International Organization for Standardization
 %I International Organization for Standardization
 %U http://www.iso.org/
+%O See ITU-T Recommendation X.327 (related text).
 
 %K iso10030
 %L ISO/IEC 10030
@@ -3714,6 +3727,18 @@ Part 1: Protocol Specification
 %I International Organization for Standardization
 %U http://www.iso.org/
 %O Also ITU-T Recommendation X.614 (identical text).
+
+%K iso11577
+%L ISO/IEC 11577
+%A ISO
+%R ISO/IEC 11577:1994 [ITU-T Rec. X.273]
+%T Information Technology \(em Open Systems Interconnection \(em Network Layer Security Protocol
+%D July 1, 1994
+%C Geneva
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
+%O Also ITU-T Recommendation X.273 (identical text).
 
 %K x115
 %L X.115
@@ -4209,6 +4234,42 @@ Part 1: Protocol Specification
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/rec/T-REC-X.264/
+
+%K x273
+%L X.273
+%A ITU
+%R ITU-T Recommendation X.273 [ISO/IEC 11157:1994]
+%C Geneva
+%D July 1994
+%T Information Technology \(em Open Systems Interconnection \(em Network Layer Security Protocol
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.273/
+
+%K x35
+%L X.35
+%A ITU
+%R ITU-T Recommendation X.35
+%C Geneva
+%D November 1993
+%T Data Networks and Open System Communications \(em Public Data Networks \(em Interface Between a PSPDN and a Private PSDN which is based on X.25 Procedures and Enhancements to Define a Gateway Function that is Provided in the PSPDN
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.35-199311-I/
+
+%K x327
+%L X.327
+%A ITU
+%R ITU-T Recommendation X.327
+%C Geneva
+%D November 1993
+%T Data Networks and Open System Communications \(em Interworking Between Networks \(em General Arrangement for Interworking Between Packet Switched Public Data Networks (PSPDNs) and Private Data Networks for the Provision of Data Transmission Services
+%I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/rec/T-REC-X.327-199311-I/
 
 %K x410-1984
 %L X.410

@@ -1,5 +1,29 @@
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
+	* openss7.refs: updated references
+	* LiS/man/lis.refs: updated references
+	* iperf/doc/man/iperf.refs: updated references
+	* netperf/netperf.refs: updated references
+	* osr61/doc/man/osr61.refs: updated references
+	* sctp/doc/man/sctp.refs: updated references
+	* sigtran/doc/man/sigtran.refs: updated references
+	* stacks/doc/man/strss7.refs: updated references
+	* strbcm/doc/man/strbcm.refs: updated references
+	* strchan/doc/man/strchan.refs: updated references
+	* strcompat/doc/man/strcompat.refs: updated references
+	* streams/doc/man/streams.refs: updated references
+	* strinet/doc/man/strinet.refs: updated references
+	* strisdn/doc/man/strisdn.refs: updated references
+	* striso/doc/man/striso.refs: updated references
+	* strnsl/doc/man/strnsl.refs: updated references
+	* strsctp/doc/man/strsctp.refs: updated references
+	* strsock/doc/man/strsock.refs: updated references
+	* strtty/doc/man/strtty.refs: updated references
+	* strutil/doc/man/strutil.refs: updated references
+	* strvoip/doc/man/strvoip.refs: updated references
+	* strxnet/doc/man/strxnet.refs: updated references
+	* strxns/doc/man/strxns.refs: updated references
+
 	* sigtran/sigtran.spec.in: correct list of info files
 	* strchan/strchan.spec.in: correct list of info files
 	* streams/streams.spec.in: correct list of info files
