@@ -1,28 +1,28 @@
-OpenSS7 ISO Stack -- history of user visible changes.  2008-10-25
-$Id: NEWS,v 0.9.2.57 2008-10-25 13:20:48 brian Exp $
+OpenSS7 ISO Stack -- history of user visible changes.  2008-10-27
+$Id: NEWS,v 0.9.2.58 2008-10-29 12:23:08 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
-OpenSS7 ISO Stack package.
+`OpenSS7 ISO Stack' package.
 
- Initial release striso-0.9.2.4
--------------------------------
+ Major changes for release striso-0.9.2.4
+-----------------------------------------
 
-This is the fourth open source release of the `OpenSS7 ISO Stack'
-package.  This release contains modules and drivers formerly only
-available with Commercial releases of the `strss7' package and which
-are only recently available as open source with the release of this
-package.
+This is the fourth separate `OpenSS7 Project' release of the
+`OpenSS7 ISO Stack' package.  This release contains modules and drivers
+formerly only available with Commercial releases of the `strss7'
+package and which are only recently available as open source with the
+release of this package.
 
 With OpenSS7 Master Package release `openss7-0.9.2.D', the ISO/OSI
 components were separated from the `strss7' package and placed in this
 package.  Not all of the ISO/OSI components previously part of the
 `strss7' package have been strapped into this release.  Components will
 be re-validated against `Linux Fast-STREAMS' on a module-by-module and
-driver-by-driver basis.  See `TODO' in the release, or `Schedule',in
-the manual, for information about the release schedule.
+driver-by-driver basis.(1) See `TODO' in the release, or `Schedule',in
+the manual, for more information about the release schedule.
 
 In this fourth release, the major component first available is LAPB.
 `lapb(4)' is a pushable "STREAMS" module that is pushed over a `cdi(4)'
@@ -30,16 +30,20 @@ HDLC channel to form an X.25 data link providing the Data Link Provider
 Interface, `dlpi(7)'.  A complete test suite will be available in a
 further release.
 
-Subsequent releases in 1Q 2007 will include the additional full ISO/OSI
-X.25< CONS, CLNS, and TP0 through TP4, drivers with conformance test
-suites.
+Subsequent releases in 4Q 2008 will include the additional full ISO/OSI
+CONS, CLNS, and TP0 through TP4, drivers with conformance test suites.
 
 Major features since the last public release are as follows:
+
+   - Minor documentation corrections.
 
    - Kernel module license made explicit "GPL v2".  And then changed
      back to "GPL".
 
-   - License upgrade to AGPL Version 3.
+   - License upgrade to `AGPL Version 3'.
+
+   - Modifications to build under `Fedora' `2.6.22.5-49' kernel.  These
+     changes also support `2.6.22.9-91.fc7' kernel.
 
    - Ability to strap out major documentation build and installation
      primarily for embedded targets.
@@ -47,7 +51,23 @@ Major features since the last public release are as follows:
    - Improvements to common build process for embedded and
      cross-compile targets.
 
-   - Support for flex 2.5.33  in maintainer mode.
+   - Modifications to build under `Fedora' `2.6.25-45.fc9' and
+     `2.6.26.5-45.fc9' kernels.
+
+   - Updated tool chain to `m4-1.4.12', `autoconf-2.63' and
+     `texinfo-4.13'.
+
+   - Conversion of RPM spec files to common approach for major
+     subpackages.
+
+   - Updated references database for manual pages and roff documents.
+
+   - Build system now builds `yum(8)' repositories for RPMs and
+     `apt-get(8)' repositories for DEBs.  Installation documentation
+     has been updated to include details of repository install
+     sourcesref.
+
+   - Added `MODULE_VERSION' to all modules and drivers.
 
 
 _This is a public alpha release of the package.  Please see
@@ -73,6 +93,14 @@ See `http://www.openss7.org/codefiles/striso-0.9.2.4/ChangeLog' and
 `http://www.openss7.org/codefiles/striso-0.9.2.4/NEWS' in the release
 for more information.  Also, see the `striso.pdf' manual in the release
 (also in html `http://www.openss7.org/striso_manual.html').
+
+For the news release, see `http://www.openss7.org/rel20081029_8.html'.
+
+---------- Footnotes ----------
+
+(1) Note that no component in this package can be supported by `LiS':
+`LiS' is simply too slow to allow these drivers to acheive any degree
+of efficiency necessary for proper operation.
 
  Initial release striso-0.9.2.3
 -------------------------------

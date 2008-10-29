@@ -1,16 +1,16 @@
-OpenSS7 STREAMS Channels -- history of user visible changes.  2008-10-24
-$Id: NEWS,v 0.9.2.49 2008-10-25 13:20:46 brian Exp $
+OpenSS7 STREAMS Channels -- history of user visible changes.  2008-10-27
+$Id: NEWS,v 0.9.2.50 2008-10-29 12:23:04 brian Exp $
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
-OpenSS7 STREAMS Channels package.
+`OpenSS7 STREAMS Channels' package.
 
  Major changes for release strchan-0.9.2.4
 ------------------------------------------
 
-This is the fourth separate release from `The OpenSS7 Project' of the
+This is the fourth separate `OpenSS7 Project' release of the
 `OpenSS7 STREAMS Channels' package.  The package provides components
 that were previously part of the `strss7' package.
 
@@ -24,15 +24,50 @@ the manual, for more information about the release schedule.
 
 This is the fourth pre-alpha release for `Linux Fast-STREAMS' and is an
 optional part of the OpenSS7 Master Package (as of `openss7-0.9.2.D').
-This release is a maintenance release providing support for recent
-distributions and tool chains.
+The release includes maintenance support for recent distributions and
+tool chain, but also includes some performance and feature upgrades and
+inspection bug fixes.  It deprecates previous releases.  Please upgrade
+before reporting bugs on previous releases.
+
+This release is primarily a maintenance release.
 
 Major features since the last public release are as follows:
 
-   - Added Open Media Gatway project document.
+   - Minor documentation corrections.
 
    - Kernel module license made explicit "GPL v2".  And then changed
      back to "GPL".
+
+   - License upgrade to `AGPL Version 3'.
+
+   - Modifications to build under `Fedora' `2.6.22.5-49' kernel.  These
+     changes also support `2.6.22.9-91.fc7' kernel.
+
+   - Ability to strap out major documentation build and installation
+     primarily for embedded targets.
+
+   - Improvements to common build process for embedded and
+     cross-compile targets.
+
+   - Modifications to build under `Fedora' `2.6.25-45.fc9' and
+     `2.6.26.5-45.fc9' kernels.
+
+   - Updated tool chain to `m4-1.4.12', `autoconf-2.63' and
+     `texinfo-4.13'.
+
+   - Conversion of RPM spec files to common approach for major
+     subpackages.
+
+   - Updated references database for manual pages and roff documents.
+
+   - Build system now builds `yum(8)' repositories for RPMs and
+     `apt-get(8)' repositories for DEBs.  Installation documentation
+     has been updated to include details of repository install
+     sourcesref.
+
+   - Added `MODULE_VERSION' to all modules and drivers.
+
+   - Added Open Media Gatway project document and updated documentation.
 
    - Added `mx-pmod' and `ch-pmod' STREAMS modules and manual pages
      (`ch-pmod(4)' and `mx-pmod(4)').  These STREAMS modules provide
@@ -42,19 +77,7 @@ Major features since the last public release are as follows:
 
    - 64-bit corrections to the CHI header file, `sys/chi.h'.
 
-   - Updated documentation.
-
-   - License upgrade to AGPL Version 3.
-
    - Fix for freezestr() and unfreezestr() on 2.4 kernels.
-
-   - Ability to strap out major documentation build and installation
-     primarily for embedded targets.
-
-   - Improvements to common build process for embedded and
-     cross-compile targets.
-
-   - Support for flex 2.5.33  in maintainer mode.
 
 
 _This is a public pre-alpha release of the package.  Please see
@@ -80,6 +103,8 @@ See `http://www.openss7.org/codefiles/strchan-0.9.2.4/ChangeLog' and
 `http://www.openss7.org/codefiles/strchan-0.9.2.4/NEWS' in the release
 for more information.  Also, see the `strchan.pdf' manual in the
 release (also in html `http://www.openss7.org/strchan_manual.html').
+
+For the news release, see `http://www.openss7.org/rel20081029_9.html'.
 
 ---------- Footnotes ----------
 
