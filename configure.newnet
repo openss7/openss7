@@ -1,0 +1,44 @@
+#!/bin/bash
+
+set -x
+
+export PATH="$HOME/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+
+unset VPATH
+unset BUILD
+unset TARGET
+unset ARCH
+
+mypath=`echo $0 | sed -e 's,[^/]*$,,'`
+mypath=`(cd $mypath; /bin/pwd)`
+
+${mypath}/configure \
+	--enable-maintainer-mode \
+	--without-SCTP \
+	--without-IPERF \
+	--without-LIS \
+	--with-STREAMS \
+	--with-STRCOMPAT \
+	--without-STRUTIL \
+	--without-STRBCM \
+	--without-STRTTY \
+	--with-STRXNS \
+	--with-STRXNET \
+	--with-STRNSL \
+	--with-STRSOCK \
+	--with-STRINET \
+	--without-STRSCTP \
+	--without-STRCHAN \
+	--without-STRX25 \
+	--without-STRISO \
+	--without-NETPERF \
+	--without-STRISDN \
+	--without-STACKS \
+	--without-SIGTRAN \
+	--without-STRVOIP \
+	--without-OSR61 \
+	${1+$@} 2>&1 | tee configure.log
+
+#	--disable-streams-syncqs
+#	--disable-docs
+
