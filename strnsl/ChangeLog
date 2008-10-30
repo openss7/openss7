@@ -1,3 +1,7 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/netdir.h: updated headers
+
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/check_libs: libs might only be shared objects

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp.h,v 0.9.2.6 2008-04-28 23:13:26 brian Exp $
+ @(#) $Id: sctp.h,v 0.9.2.7 2008-10-30 13:37:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp.h,v $
+ Revision 0.9.2.7  2008-10-30 13:37:27  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-28 23:13:26  brian
  - updated headers for release
 
@@ -65,7 +68,9 @@
 #ifndef __SS7_SCTP_H__
 #define __SS7_SCTP_H__
 
-#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/* This file can be processed by doxygen(1). */
 
 #ifdef __KERNEL__
 #include "../../include/npi.h"
@@ -87,31 +92,31 @@
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_SEL_SCTP */
-	/* 
+	/*
 	 *  FIXME: more...
 	 */
 } N_qos_sel_sctp_t;
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_OPT_SEL_SCTP */
-	/* 
+	/*
 	 *  FIXME: more...
 	 */
 } N_qos_opt_sel_sctp_t;
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_RANGE_SCTP */
-	/* 
+	/*
 	 *  FIXME: more...
 	 */
 } N_qos_range_sctp_t;
 
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_STR_SEL_SCTP */
-	long ppi;			/* payload protocol identifier */
-	long sid;			/* stream id */
-	long ssn;			/* strean sequence number */
-	long tsn;			/* transmit sequence number */
+	np_long ppi;			/* payload protocol identifier */
+	np_long sid;			/* stream id */
+	np_long ssn;			/* strean sequence number */
+	np_long tsn;			/* transmit sequence number */
 } N_qos_str_sel_sctp_t;
 
 #define N_QOS_PPI_IUA

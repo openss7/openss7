@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi.h,v 0.9.2.6 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: npi.h,v 0.9.2.7 2008-10-30 13:37:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi.h,v $
+ Revision 0.9.2.7  2008-10-30 13:37:00  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -72,15 +75,15 @@
  *****************************************************************************/
 
 /*
-   npi.h header for the Network Provider Interface (OSI Conforming) 
+   npi.h header for the Network Provider Interface (OSI Conforming)
  */
 
 #ifndef SYS_NPI_H
 #define SYS_NPI_H		/* mark file as included */
 
-#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
-/* This file can be processed with doxygen(1). */
+/* This file can be processed by doxygen(1). */
 
 typedef int32_t np_long;
 typedef u_int32_t np_ulong;
@@ -89,7 +92,7 @@ typedef u_int32_t np_ulong;
 #define N_VERSION_2	    0x02	/* version of npi, December 16, 1991 */
 
 /*
-   Primitives that are initiated by the network user. 
+   Primitives that are initiated by the network user.
  */
 #define N_CONN_REQ		 0	/* NC request */
 #define N_CONN_RES		 1	/* Accept previous connection indication */
@@ -103,7 +106,7 @@ typedef u_int32_t np_ulong;
 #define N_OPTMGMT_REQ		 9	/* Options Management request */
 
 /*
-   Primitives that are initiated by the network provider. 
+   Primitives that are initiated by the network provider.
  */
 #define N_CONN_IND		11	/* Incoming connection indication */
 #define N_CONN_CON		12	/* Connection established */
@@ -118,7 +121,7 @@ typedef u_int32_t np_ulong;
 #define N_UDERROR_IND		21	/* UNITDATA Error Indication */
 
 /*
-   Additional NPI Primitivies 
+   Additional NPI Primitivies
  */
 #define N_DATACK_REQ		23	/* Data acknowledgement request */
 #define N_DATACK_IND		24	/* Data acknowledgement indication */
@@ -128,11 +131,11 @@ typedef u_int32_t np_ulong;
 #define N_RESET_CON		28	/* Reset processing complete */
 
 /*
-   The following are the events that drive the state machine 
+   The following are the events that drive the state machine
  */
 
 /*
-   Initialization events 
+   Initialization events
  */
 #define NE_BIND_REQ		 0	/* bind request */
 #define NE_UNBIND_REQ		 1	/* unbind request */
@@ -145,7 +148,7 @@ typedef u_int32_t np_ulong;
 #define NE_OK_ACK4		 9	/* ok ack, outcnt > 1 */
 
 /*
-   Connection-Mode events 
+   Connection-Mode events
  */
 #define NE_CONN_REQ		10	/* connect request */
 #define NE_CONN_RES		11	/* connect response */
@@ -168,7 +171,7 @@ typedef u_int32_t np_ulong;
 #define NE_RESET_CON		33	/* reset confirm */
 
 /*
-   Connection-less events 
+   Connection-less events
  */
 #define NE_UNITDATA_REQ		25	/* unitdata request */
 #define NE_UNITDATA_IND		26	/* unitdata indication */
@@ -177,7 +180,7 @@ typedef u_int32_t np_ulong;
 #define NE_NOEVENTS		36	/* no events */
 
 /*
-   NPI interface states 
+   NPI interface states
  */
 #define NS_UNBND		 0	/* NS user not bound to network address */
 #define NS_WACK_BREQ		 1	/* Awaiting acknowledgement of N_BIND_REQ */
@@ -200,7 +203,7 @@ typedef u_int32_t np_ulong;
 #define NS_NOSTATES		18	/* No states */
 
 /*
-   N_ERROR_ACK error return code values 
+   N_ERROR_ACK error return code values
  */
 #define NBADADDR		 1	/* Incorrect address format/illegal address information */
 #define NBADOPT			 2	/* Options in incorrect format or contain illegal
@@ -223,7 +226,7 @@ typedef u_int32_t np_ulong;
 #define NNOPROTOID		23	/* Protocol id could not be allocated */
 
 /*
-   N_UDERROR_IND reason codes 
+   N_UDERROR_IND reason codes
  */
 #define N_UD_UNDEFINED		10	/* no reason specified */
 #define N_UD_TD_EXCEEDED	11	/* Transit delay exceeded */
@@ -234,19 +237,19 @@ typedef u_int32_t np_ulong;
 #define N_UD_SEG_REQUIRED	16	/* Segmentation reqd where none permitted */
 
 /*
-   NPI Originator for Resets and Disconnects 
+   NPI Originator for Resets and Disconnects
  */
 #define N_PROVIDER		0x0100	/* provider originated reset/disconnect */
 #define N_USER			0x0101	/* user originated reset/disconnect */
 #define N_UNDEFINED		0x0102	/* reset/disconnect originator undefined */
 
 /*
-   NPI Disconnect & Reset reasons when the originator is the N_UNDEFINED 
+   NPI Disconnect & Reset reasons when the originator is the N_UNDEFINED
  */
 #define N_REASON_UNDEFINED	0x0200
 
 /*
-   NPI Disconnect reasons when the originator is the N_PROVIDER 
+   NPI Disconnect reasons when the originator is the N_PROVIDER
  */
 #define N_DISC_P		0x0300	/* Disconnection-permanent condition */
 #define N_DISC_T		0x0301	/* Disconnection-transient condition */
@@ -258,7 +261,7 @@ typedef u_int32_t np_ulong;
 					   condition) */
 
 /*
-   NPI Disconnect reasons when the originator is the N_USER 
+   NPI Disconnect reasons when the originator is the N_USER
  */
 #define N_DISC_NORMAL		0x0400	/* Disconnection-normal condition */
 #define N_DISC_ABNORMAL		0x0401	/* Disconnection-abnormal condition */
@@ -268,7 +271,7 @@ typedef u_int32_t np_ulong;
 					   NS-user-data */
 
 /*
-   NPI Disconnect reasons when the originator is the N_USER or N_PROVIDER 
+   NPI Disconnect reasons when the originator is the N_USER or N_PROVIDER
  */
 #define N_REJ_QOS_UNAVAIL_P	0x0305	/* Connection rejection-QOS unavailable (permanent
 					   condition) */
@@ -277,13 +280,13 @@ typedef u_int32_t np_ulong;
 #define N_REJ_UNSPECIFIED	0x0307	/* Connection rejection-reason unspecified */
 
 /*
-   NPI Reset reasons when originator is N_PROVIDER 
+   NPI Reset reasons when originator is N_PROVIDER
  */
 #define N_CONGESTION		0x0500	/* Reset due to congestion */
 #define N_RESET_UNSPECIFIED	0x0501	/* Reset-reason "unspecified" */
 
 /*
-   NPI Reset reasons when originator is N_USER 
+   NPI Reset reasons when originator is N_USER
  */
 #define N_USER_RESYNC		0x0600	/* Reset due to user resynchronization */
 
@@ -291,36 +294,36 @@ typedef u_int32_t np_ulong;
    CONN_flags definition; (used in N_conn_req, N_conn_ind, N_conn_res, and N_conn_con primitives)
 
    Flags to indicate support of network provider options; (used with the OPTIONS_flags field of
-   N_info_ack primitive) 
+   N_info_ack primitive)
  */
 #define REC_CONF_OPT		0x00000001L	/* Receipt Confirmation Selection and Support */
 #define EX_DATA_OPT		0x00000002L	/* Expedited Data Selection and Support */
 
 /*
    This flag is used with the OPTIONS_flags field of N_info_ack as well as the OPTMGMT_flags field
-   of the N_optmgmt_req primitive 
+   of the N_optmgmt_req primitive
  */
 #define DEFAULT_RC_SEL		0x00000004L	/* Indicates if default receipt confirmation is
 						   selected */
 
 /*
-   BIND_flags; (used with N_bind_req primitive) 
+   BIND_flags; (used with N_bind_req primitive)
  */
 
-#define DEFAULT_LISTENER	0x00000001L	/* indicates if this stream is the default listener 
+#define DEFAULT_LISTENER	0x00000001L	/* indicates if this stream is the default listener
 						 */
 #define TOKEN_REQUEST		0x00000002L	/* indicates if "token" should be assigned to the
 						   stream */
 #define DEFAULT_DEST		0x00000004L	/* indicates if default dest. stream */
 
 /*
-   QOS Parameter Definitions 
+   QOS Parameter Definitions
  */
 
 /*
    Throughput
 
-   This parameter is specified for both directions. 
+   This parameter is specified for both directions.
  */
 typedef struct {
 	np_long thru_targ_value;	/* target throughput values */
@@ -328,7 +331,7 @@ typedef struct {
 } thru_values_t;
 
 /*
-   Transit Delay 
+   Transit Delay
  */
 typedef struct {
 	np_long td_targ_value;		/* target transit delay */
@@ -336,7 +339,7 @@ typedef struct {
 } td_values_t;
 
 /*
-   Protection Values 
+   Protection Values
  */
 typedef struct {
 	np_long protect_targ_value;	/* target protection value */
@@ -344,7 +347,7 @@ typedef struct {
 } protection_values_t;
 
 /*
-   Priority Values 
+   Priority Values
  */
 typedef struct {
 	np_long priority_targ_value;	/* target priority */
@@ -352,21 +355,21 @@ typedef struct {
 } priority_values_t;
 
 /*
-   Types of protection specifications 
+   Types of protection specifications
  */
 #define N_NO_PROT		0x00000000L	/* no protection */
 #define N_PASSIVE_PROT		0x00000001L	/* protection against passive monitoring */
 #define N_ACTIVE_PROT		0x00000002L	/* protection against active monitoring */
-#define N_ACTIVE_PASSIVE_PROT	0x00000003L	/* protection against active and passive monitoring 
+#define N_ACTIVE_PASSIVE_PROT	0x00000003L	/* protection against active and passive monitoring
 						 */
 
 /*
-   Cost Selection 
+   Cost Selection
  */
 #define N_LEAST_EXPENSIVE	0x00000000L	/* choose least expensive means */
 
 /*
-   QOS STRUCTURE TYPES AND DEFINED VALUES 
+   QOS STRUCTURE TYPES AND DEFINED VALUES
  */
 #define N_QOS_CO_RANGE1		0x0101
 #define N_QOS_CO_SEL1		0x0102
@@ -377,12 +380,12 @@ typedef struct {
 
 /*
    When a NS user/provider cannot determine the value of a QOS field, it should return a value of
-   QOS_UNKNOWN. 
+   QOS_UNKNOWN.
  */
 #define QOS_UNKNOWN			-1
 
 /*
-   QOS range for CONS. (Used with N_CONN_REQ and N_CONN_IND.) 
+   QOS range for CONS. (Used with N_CONN_REQ and N_CONN_IND.)
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_CO_RANGE */
@@ -394,7 +397,7 @@ typedef struct {
 } N_qos_co_range_t;
 
 /*
-   QOS selected for CONS. (Used with N_CONN_RES and N_CONN_CON.) 
+   QOS selected for CONS. (Used with N_CONN_RES and N_CONN_CON.)
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_CO_SEL */
@@ -406,7 +409,7 @@ typedef struct {
 } N_qos_co_sel_t;
 
 /*
-   QOS range for CLNS options management. (Used with N_INFO_ACK.) 
+   QOS range for CLNS options management. (Used with N_INFO_ACK.)
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_CL_RANGE */
@@ -418,7 +421,7 @@ typedef struct {
 } N_qos_cl_range_t;
 
 /*
-   QOS selection for CLNS options management. (Used with N_OPTMGMT_REQ and N_INFO_ACK.) 
+   QOS selection for CLNS options management. (Used with N_OPTMGMT_REQ and N_INFO_ACK.)
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_CL_sel */
@@ -430,7 +433,7 @@ typedef struct {
 } N_qos_cl_sel_t;
 
 /*
-   QOS range for CONS options management. (Used with N_OPTMGMT_REQ.) 
+   QOS range for CONS options management. (Used with N_OPTMGMT_REQ.)
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_CO_OPT_RANGE */
@@ -450,7 +453,7 @@ typedef struct {
 } N_qos_co_opt_range_t;
 
 /*
-   QOS values selected for CONS options management. (Used with N_OPTMGMT_REQ and N_INFO_ACK.) 
+   QOS values selected for CONS options management. (Used with N_OPTMGMT_REQ and N_INFO_ACK.)
  */
 typedef struct {
 	np_ulong n_qos_type;		/* always N_QOS_CO_OPT_SEL */
@@ -470,22 +473,22 @@ typedef struct {
 } N_qos_co_opt_sel_t;
 
 /*
-   NPI Primitive Definitions 
+   NPI Primitive Definitions
  */
 
 /*
-   Local management service primitives 
+   Local management service primitives
  */
 
 /*
-   Information request 
+   Information request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_INFO_REQ */
 } N_info_req_t;
 
 /*
-   Information acknowledgement 
+   Information acknowledgement
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_INFO_ACK */
@@ -512,34 +515,32 @@ typedef struct {
 } N_info_ack_t;
 
 /*
-   Service types supported by NS provider 
+   Service types supported by NS provider
  */
 #define N_CONS 1		/* Connection-mode network service supported */
 #define N_CLNS 2		/* Connection-less network service supported */
 
 /*
-   Valid provider types 
+   Valid provider types
  */
 #define N_SNICFP 1
 #define N_SUBNET 2
 
 /*
-   Bind request 
+   Bind request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_BIND_REQ */
 	np_ulong ADDR_length;		/* length of address */
 	np_ulong ADDR_offset;		/* offset of address */
-	np_ulong CONIND_number;		/* requested # of connect- */
-	/* 
-	   indications to be queued */
+	np_ulong CONIND_number;		/* requested # of connect-indications to be queued */
 	np_ulong BIND_flags;		/* bind flags */
 	np_ulong PROTOID_length;	/* length of bound protocol ids */
 	np_ulong PROTOID_offset;	/* offset of bound protocol ids */
 } N_bind_req_t;
 
 /*
-   Bind acknowledgement 
+   Bind acknowledgement
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_BIND_ACK */
@@ -552,14 +553,14 @@ typedef struct {
 } N_bind_ack_t;
 
 /*
-   Unbind request 
+   Unbind request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_UNBIND_REQ */
 } N_unbind_req_t;
 
 /*
-   Options management request 
+   Options management request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_OPTMGMT_REQ */
@@ -569,7 +570,7 @@ typedef struct {
 } N_optmgmt_req_t;
 
 /*
-   Error acknowledgement for CONS services 
+   Error acknowledgement for CONS services
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_ERROR_ACK */
@@ -579,7 +580,7 @@ typedef struct {
 } N_error_ack_t;
 
 /*
-   Successful completion acknowledgement 
+   Successful completion acknowledgement
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_OK_ACK */
@@ -587,11 +588,11 @@ typedef struct {
 } N_ok_ack_t;
 
 /*
-   CONS PRIMITIVES 
+   CONS PRIMITIVES
  */
 
 /*
-   Network connection request 
+   Network connection request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_CONN_REQ */
@@ -603,7 +604,7 @@ typedef struct {
 } N_conn_req_t;
 
 /*
-   Connection indication 
+   Connection indication
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_CONN_IND */
@@ -618,7 +619,7 @@ typedef struct {
 } N_conn_ind_t;
 
 /*
-   Connection response 
+   Connection response
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_CONN_RES */
@@ -632,7 +633,7 @@ typedef struct {
 } N_conn_res_t;
 
 /*
-   Connection confirmation 
+   Connection confirmation
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_CONN_CON */
@@ -644,7 +645,7 @@ typedef struct {
 } N_conn_con_t;
 
 /*
-   Connection mode data transfer request 
+   Connection mode data transfer request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_DATA_REQ */
@@ -652,18 +653,18 @@ typedef struct {
 } N_data_req_t;
 
 /*
-   NPI MORE_DATA_FLAG for segmenting NSDU into more than 1 NIDUs 
+   NPI MORE_DATA_FLAG for segmenting NSDU into more than 1 NIDUs
  */
 #define N_MORE_DATA_FLAG	0x00000001L	/* Indicates that the next NIDU is part of this
 						   NSDU */
 
 /*
-   NPI Receipt confirmation request set flag 
+   NPI Receipt confirmation request set flag
  */
 #define N_RC_FLAG		0x00000002L	/* Indicates if receipt confirmation is required */
 
 /*
-   Incoming data indication for an NC 
+   Incoming data indication for an NC
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_DATA_IND */
@@ -671,35 +672,35 @@ typedef struct {
 } N_data_ind_t;
 
 /*
-   Data acknowledgement request 
+   Data acknowledgement request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_DATACK_REQ */
 } N_datack_req_t;
 
 /*
-   Data acknowledgement indication 
+   Data acknowledgement indication
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_DATACK_IND */
 } N_datack_ind_t;
 
 /*
-   Expedited data transfer request 
+   Expedited data transfer request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_EXDATA_REQ */
 } N_exdata_req_t;
 
 /*
-   Expedited data transfer indication 
+   Expedited data transfer indication
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_EXDATA_IND */
 } N_exdata_ind_t;
 
 /*
-   NC reset request 
+   NC reset request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_RESET_REQ */
@@ -707,7 +708,7 @@ typedef struct {
 } N_reset_req_t;
 
 /*
-   NC reset indication 
+   NC reset indication
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_RESET_IND */
@@ -716,21 +717,21 @@ typedef struct {
 } N_reset_ind_t;
 
 /*
-   NC reset response 
+   NC reset response
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_RESET_RES */
 } N_reset_res_t;
 
 /*
-   NC reset confirmed 
+   NC reset confirmed
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_RESET_CON */
 } N_reset_con_t;
 
 /*
-   NC disconnection request 
+   NC disconnection request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_DISCON_REQ */
@@ -741,7 +742,7 @@ typedef struct {
 } N_discon_req_t;
 
 /*
-   NC disconnection indication 
+   NC disconnection indication
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_DISCON_IND */
@@ -753,11 +754,11 @@ typedef struct {
 } N_discon_ind_t;
 
 /*
-   CLNS PRIMITIVES 
+   CLNS PRIMITIVES
  */
 
 /*
-   Unitdata transfer request 
+   Unitdata transfer request
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_UNITDATA_REQ */
@@ -767,7 +768,7 @@ typedef struct {
 } N_unitdata_req_t;
 
 /*
-   Unitdata transfer indication 
+   Unitdata transfer indication
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_UNITDATA_IND */
@@ -779,7 +780,7 @@ typedef struct {
 } N_unitdata_ind_t;
 
 /*
-   Unitdata error indication for CLNS services 
+   Unitdata error indication for CLNS services
  */
 typedef struct {
 	np_ulong PRIM_type;		/* always N_UDERROR_IND */
@@ -790,7 +791,7 @@ typedef struct {
 } N_uderror_ind_t;
 
 /*
-   The following represents a union of all the NPI primitives 
+   The following represents a union of all the NPI primitives
  */
 union N_primitives {
 	np_ulong type;

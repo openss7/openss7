@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sockmod.h,v 0.9.2.5 2008-04-28 22:33:32 brian Exp $
+ @(#) $Id: sockmod.h,v 0.9.2.6 2008-10-30 13:37:33 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:33:32 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockmod.h,v $
+ Revision 0.9.2.6  2008-10-30 13:37:33  brian
+ - updated headers for release
+
  Revision 0.9.2.5  2008-04-28 22:33:32  brian
  - updated headers for release
 
@@ -62,9 +65,15 @@
 #ifndef __SYS_SOCKMOD_H__
 #define __SYS_SOCKMOD_H__
 
-#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
+  * Socket Module (sockmod) header file.  */
 
 #define SOCKMOD_IOC_MAGIC	'I'
 
@@ -229,4 +238,8 @@ struct so_so {
 };
 #endif
 
+/** @} */
+
 #endif				/* __SYS_SOCKMOD_H__ */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

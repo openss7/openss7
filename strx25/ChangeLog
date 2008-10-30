@@ -1,3 +1,7 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/xti_xx25.h: updated headers
+
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: remove conflicting hdlc.4 manpage

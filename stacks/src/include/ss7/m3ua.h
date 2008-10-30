@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua.h,v 0.9.2.6 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: m3ua.h,v 0.9.2.7 2008-10-30 13:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua.h,v $
+ Revision 0.9.2.7  2008-10-30 13:36:56  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -65,13 +68,13 @@
 #ifndef __SS7_M3UA_H__
 #define __SS7_M3UA_H__
 
-#ident "@(#) $RCSfile: m3ua.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m3ua.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
-typedef u_int32_t m3ua_ulong;
-typedef u_int16_t m3ua_ushort;
-typedef u_int8_t m3ua_uchar;
+typedef uint32_t m3ua_ulong;
+typedef uint16_t m3ua_ushort;
+typedef uint8_t m3ua_uchar;
 
 typedef struct m3ua_phdr {
 	u16 tag;

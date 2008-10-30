@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_udp.h,v 0.9.2.4 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: npi_udp.h,v 0.9.2.5 2008-10-30 13:37:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,21 +46,105 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_udp.h,v $
+ Revision 0.9.2.5  2008-10-30 13:37:00  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2008-04-29 07:10:46  brian
  - updating headers for release
 
  *****************************************************************************/
 
-#ifndef __NPI_UPD_H__
-#define __NPI_UPD_H__
+#ifndef SYS_NPI_UDP_H
+#define SYS_NPI_UDP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_udp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
-/* This file can be processed with doxygen(1). */
+/* This file can be processed by doxygen(1). */
 
-#endif				/* __NPI_UPD_H__ */
+/// @file
+/// @brief This header file provides the Network Provider Interface (NPI) for User Datagram Protocol (UDP).
+
+#include <sys/npi.h>
+#include <sys/npi_ip.h>
+
+#define UDP_FLAG_DEFAULT_RC_SEL	(1<<0)
+#define UDP_BINDPORT_LOCK	(1<<1)
+
+#define N_QOS_SEL_INFO_UDP	0x0301
+#define N_QOS_RANGE_INFO_UDP	0x0302
+#define N_QOS_SEL_CONN_UDP	0x0303
+#define N_QOS_SEL_UD_UDP	0x0304
+
+typedef struct N_qos_sel_info_udp {
+	np_ulong n_qos_type;		/* always N_QOS_SEL_INFO_UDP */
+	np_ulong protocol;		/* default protocol for data transmission */
+	np_ulong priority;		/* default priority for data transmission */
+	np_ulong ttl;			/* default time-to-live for outgoing packets */
+	np_ulong tos;			/* default type-of-service for outgoing packets */
+	np_ulong mtu;			/* default mtu for outgoing packets */
+	np_ulong saddr;			/* default srce IP address for outgoing packets */
+	np_ulong daddr;			/* default dest IP address for outgoing packets */
+} N_qos_sel_info_udp_t;
+
+typedef struct N_qos_sel_conn_udp {
+	np_ulong n_qos_type;		/* always N_QOS_SEL_CONN_UDP */
+	np_ulong protocol;
+	np_ulong priority;
+	np_ulong ttl;			/* default time-to-live for connection */
+	np_ulong tos;			/* default type-of-service for connection */
+	np_ulong mtu;			/* default maximum-transfer-unit for connection */
+	np_ulong saddr;			/* default srce IP address for outgoing packets */
+	np_ulong daddr;			/* default dest IP address for outgoing packets */
+} N_qos_sel_conn_udp_t;
+
+typedef struct N_qos_sel_ud_udp {
+	np_ulong n_qos_type;		/* always N_QOS_SEL_UD_UDP */
+	np_ulong protocol;		/* protocol for outgoing packet */
+	np_ulong priority;		/* priority for outgoing packet */
+	np_ulong ttl;			/* time to live for outgoing packet */
+	np_ulong tos;			/* type of service for outgoing packet */
+	np_ulong saddr;			/* source IP address for outgoing packet */
+} N_qos_sel_ud_udp_t;
+
+typedef struct {
+	np_long priority_min_value;	/* */
+	np_long priority_max_value;	/* */
+} udp_priority_values_t;
+
+typedef struct {
+	np_long ttl_min_value;		/* */
+	np_long ttl_max_value;		/* */
+} udp_ttl_values_t;
+
+typedef struct {
+	np_long tos_min_value;		/* */
+	np_long tos_max_value;		/* */
+} udp_tos_values_t;
+
+typedef struct {
+	np_long mtu_min_value;		/* */
+	np_long mtu_max_value;		/* */
+} udp_mtu_values_t;
+
+typedef struct N_qos_range_info_udp {
+	np_ulong n_qos_type;		/* always N_QOS_RANGE_INFO_UDP */
+	udp_priority_values_t priority;	/* priority range */
+	udp_ttl_values_t ttl;		/* ttl range */
+	udp_tos_values_t tos;		/* tos range */
+	udp_mtu_values_t mtu;		/* mtu range */
+} N_qos_range_info_udp_t;
+
+union N_qos_udp_types {
+	np_ulong n_qos_type;
+	struct N_qos_sel_info_udp n_qos_sel_info;
+	struct N_qos_sel_conn_udp n_qos_sel_conn;
+	struct N_qos_sel_ud_udp n_qos_sel_ud;
+	struct N_qos_range_info_udp n_qos_range_info;
+};
+
+#endif				/* SYS_NPI_UDP_H */

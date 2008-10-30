@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl.h,v 0.9.2.7 2008-04-28 23:39:56 brian Exp $
+ @(#) $Id: mxi_ioctl.h,v 0.9.2.8 2008-10-30 13:37:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:56 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi_ioctl.h,v $
+ Revision 0.9.2.8  2008-10-30 13:37:05  brian
+ - updated headers for release
+
  Revision 0.9.2.7  2008-04-28 23:39:56  brian
  - updated headers for release
 
@@ -77,7 +80,7 @@
 #ifndef __SYS_MXI_IOCTL_H__
 #define __SYS_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -220,6 +223,7 @@ typedef struct mx_ifconfig {
 #define MX_LEVEL_LBO_6	    9
 
 	mx_ulong ifsync;
+#define MX_SYNCS	    4
 	mx_ulong ifsyncsrc[MX_SYNCS];
 } mx_ifconfig_t;
 #endif

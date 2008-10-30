@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti_mosi.h,v 0.9.2.9 2008-04-28 18:38:37 brian Exp $
+ @(#) $Id: xti_mosi.h,v 0.9.2.10 2008-10-30 13:37:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:37 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_mosi.h,v $
+ Revision 0.9.2.10  2008-10-30 13:37:48  brian
+ - updated headers for release
+
  Revision 0.9.2.9  2008-04-28 18:38:37  brian
  - header updates for release
 
@@ -65,7 +68,7 @@
 #ifndef _SYS_XTI_MOSI_H
 #define _SYS_XTI_MOSI_H
 
-#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_mosi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -99,7 +102,14 @@ struct t_mosiaddr {
 #define T_AP_CNTX_NAME	0x1
 #define T_AP_PCL	0x2
 
-#define T_OPT_VALEN(opt) (opt->len - sizeof(struct t_opthder)).
+/** { iso(1) standard(0) curl(11188) mosi(3) default-application-context(3) } */
+#define T_AP_CNTX_NAME_DEFAULT	"\x28\xB4\x57\x3\x3"
+/** { iso(1) standard(0) curl(11188) mosi(3) default-abstract-syntax(1) version(1) } */
+#define T_AP_ABST_SNTX_DEFAULT	"\x28\xB4\x57\x3\x1\x1"
+/** { iso(1) standard(0) curl(11188) mosi(3) default-transfer-syntax(2) version(1) } */
+#define T_AP_TRAN_SNTX_DEFAULT	"\x28\xB4\x57\x3\x2\x1"
+
+#define T_OPT_VALEN(opt) (opt->len - sizeof(struct t_opthdr)).
 
 /**
   * Presentation Context structure.
@@ -121,7 +131,7 @@ struct t_ap_pc_item {
 /**
   * Presentation Context item element.
   */
-struct t_app_syn_off {
+struct t_ap_syn_off {
 	t_scalar_t size;		/**< Length of syntax object identifier contents. */
 	t_scalar_t offset;		/**< Offset of object identifier for the syntax. */
 };
@@ -132,7 +142,7 @@ struct t_app_syn_off {
   *
   * @{ */
 #define T_PCL_ACCEPT		    0x0000	/**< Pres context accepted. */
-#define T_PCL_USER_REJ		    0x0100	/**< Pres context rejected by perr application. */
+#define T_PCL_USER_REJ		    0x0100	/**< Pres context rejected by peer application. */
 #define T_PCL_PREJ_RSN_NSPEC	    0x0200	/**< Prov reject: no reason specified. */
 #define T_PCL_PREJ_A_SYTX_NSUP	    0x0201	/**< Prov reject: abstract syntax not supported. */
 #define T_PCL_PREJ_T_SYTX_NSUP	    0x0202	/**< Prov reject: transfer syntax not supported. */

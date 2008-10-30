@@ -1,3 +1,37 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/ticlts.h: updated headers
+	* src/include/ticots.h: updated headers
+	* src/include/ticotsord.h: updated headers
+	* src/include/timod.h: updated headers
+	* src/include/tirdwr.h: updated headers
+	* src/include/xti.h: updated headers
+	* src/include/ss7/cdi.h: updated headers
+	* src/include/ss7/chi.h: updated headers
+	* src/include/ss7/chi_ioctl.h: updated headers
+	* src/include/ss7/dlpi_ioctl.h: updated headers
+	* src/include/ss7/m2ua_ioctl.h: updated headers
+	* src/include/ss7/m3ua.h: updated headers
+	* src/include/ss7/mxi.h: updated headers
+	* src/include/ss7/mxi_ioctl.h: updated headers
+	* src/include/ss7/zapata.h: updated headers
+	* src/include/sys/cdi.h: updated headers
+	* src/include/sys/dlpi.h: updated headers
+	* src/include/sys/dlpi_isdn.h: updated headers
+	* src/include/sys/dlpi_lapd.h: updated headers
+	* src/include/sys/npi.h: updated headers
+	* src/include/sys/npi_ip.h: updated headers
+	* src/include/sys/npi_sctp.h: updated headers
+	* src/include/sys/npi_udp.h: updated headers
+	* src/include/sys/sockmod.h: updated headers
+	* src/include/sys/ticlts.h: updated headers
+	* src/include/sys/ticots.h: updated headers
+	* src/include/sys/ticotsord.h: updated headers
+	* src/include/sys/tirdwr.h: updated headers
+	* src/include/sys/tli.h: updated headers
+	* src/include/sys/tpi.h: updated headers
+	* src/include/sys/xti_mosi.h: updated headers
+
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* strss7.spec.in: correct list of info files

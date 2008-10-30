@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: netdir.h,v 0.9.2.4 2008-04-28 22:11:48 brian Exp $
+ @(#) $Id: netdir.h,v 0.9.2.5 2008-10-30 13:37:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:11:48 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.h,v $
+ Revision 0.9.2.5  2008-10-30 13:37:24  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2008-04-28 22:11:48  brian
  - updated headers for release
 
@@ -98,7 +101,7 @@
 #ifndef __NETDIR_H__
 #define __NETDIR_H__
 
-#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: netdir.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -339,25 +342,27 @@ typedef char *(*nd_mga_t) (struct netconfig *, char *, char *);
  *  Symbols from lookup shared objects.
  *  @{ */
 #pragma weak _netdir_getbyname
+#pragma weak _netdir_getbyaddr
+#pragma weak _netdir_options
+#pragma weak _taddr2uaddr
+#pragma weak _uaddr2taddr
+#pragma weak _netdir_mergeaddr
+
+/** netdir_getbyname() internal function. */
 struct nd_addrlist *_netdir_getbyname(struct netconfig *, struct nd_hostserv *);
 
-#pragma weak _netdir_getbyaddr
 /** netdir_getbyaddr() internal function. */
 struct nd_hostservlist *_netdir_getbyaddr(struct netconfig *, struct netbuf *);
 
-#pragma weak _netdir_options
 /** netdir_options() internal function. */
 int _netdir_options(struct netconfig *, int, int, char *);
 
-#pragma weak _taddr2uaddr
 /** taddr2uaddr() internal function. */
 char *_taddr2uaddr(struct netconfig *, struct netbuf *);
 
-#pragma weak _uaddr2taddr
 /** uaddr2taddr() internal function. */
 struct netbuf *_uaddr2taddr(struct netconfig *, struct netbuf *);
 
-#pragma weak _netdir_mergeaddr
 /** netdir_mergeaddr() internal function. */
 char *_netdir_mergeaddr(struct netconfig *, char *, char *);
 
@@ -373,4 +378,4 @@ __END_DECLS
 
 /** @} */
 
-// vim: ft=cpp com=sr\:/**,mb\:\ *,eb\:\ */,sr\:/*,mb\:*,eb\:*/,b\:TRANS
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

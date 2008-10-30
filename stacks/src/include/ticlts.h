@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9.2.6 2008-04-29 07:10:42 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.7 2008-10-30 13:36:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:42 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ticlts.h,v $
+ Revision 0.9.2.7  2008-10-30 13:36:48  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:42  brian
  - updating headers for release
 
@@ -77,15 +80,15 @@
 #ifndef _TICLTS_H
 #define _TICLTS_H
 
-#ident "@(#) $RCSfile: ticlts.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticlts.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+#include <sys/ticlts.h>
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
-
-#include <sys/ticlts.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -94,3 +97,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TICLTS_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: xti.h,v 0.9.2.12 2008-04-28 18:38:36 brian Exp $
+ @(#) $Id: xti.h,v 0.9.2.13 2008-10-30 13:37:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:36 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti.h,v $
+ Revision 0.9.2.13  2008-10-30 13:37:47  brian
+ - updated headers for release
+
  Revision 0.9.2.12  2008-04-28 18:38:36  brian
  - header updates for release
 
@@ -75,7 +78,7 @@
 #ifndef _XTI_H
 #define _XTI_H
 
-#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -241,7 +244,6 @@ extern int __xnet_t_rcvreldata(int, struct t_discon *);
 extern int __xnet_t_rcvudata(int, struct t_unitdata *, int *);
 extern int __xnet_t_rcvuderr(int, struct t_uderr *);
 extern int __xnet_t_rcvv(int, struct t_iovec *, unsigned int, int *);
-
 // extern int __xnet_t_rcvvopt(int fd, const struct t_unitdata *optdata, const
 //                          struct t_iovec *iov, unsigned int iovcount, int flags);
 extern int __xnet_t_rcvvudata(int, struct t_unitdata *, struct t_iovec *, unsigned int, int *);

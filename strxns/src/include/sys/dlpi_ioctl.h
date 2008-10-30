@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi_ioctl.h,v 0.9.2.2 2008-06-18 16:45:40 brian Exp $
+ @(#) $Id: dlpi_ioctl.h,v 0.9.2.3 2008-10-30 13:37:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-06-18 16:45:40 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi_ioctl.h,v $
+ Revision 0.9.2.3  2008-10-30 13:37:49  brian
+ - updated headers for release
+
  Revision 0.9.2.2  2008-06-18 16:45:40  brian
  - widespread updates
 
@@ -62,7 +65,11 @@
 #ifndef __SYS_DLPI_IOCTL_H__
 #define __SYS_DLPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: dlpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/* This file can be processed by doxygen(1). */
+
+#define DL_IOC_MAGIC 'D'
 
 #ifdef _SUN_SOURCE
 

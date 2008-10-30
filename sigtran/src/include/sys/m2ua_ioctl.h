@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m2ua_ioctl.h,v 0.9.2.5 2008-04-29 01:52:23 brian Exp $
+ @(#) $Id: m2ua_ioctl.h,v 0.9.2.6 2008-10-30 13:36:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:23 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_ioctl.h,v $
+ Revision 0.9.2.6  2008-10-30 13:36:44  brian
+ - updated headers for release
+
  Revision 0.9.2.5  2008-04-29 01:52:23  brian
  - updated headers for release
 
@@ -62,7 +65,7 @@
 #ifndef __M2UA_IOCTL_H__
 #define __M2UA_IOCTL_H__
 
-#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -84,7 +87,7 @@
 #define M2UA_OBJ_TYPE_DF	13	/* default */
 
 typedef struct m2ua_addr {
-	ulong spid;			/* signalling point identifier */
+	lmi_ulong spid;			/* signalling point identifier */
 	ushort sdti;			/* signalling data terminal identifier */
 	ushort sdli;			/* signalling data link identifier */
 } m2ua_addr_t;
@@ -94,7 +97,7 @@ typedef struct m2ua_addr {
  *  -----------------------------------
  */
 typedef struct m2ua_opt_conf_as {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_opt_conf_as_t;
 
 /*
@@ -102,9 +105,9 @@ typedef struct m2ua_opt_conf_as {
  *  -----------------------------------
  */
 typedef struct m2ua_opt_conf_sp {
-	ulong tack;
-	ulong tbeat;
-	ulong tidle;
+	lmi_ulong tack;
+	lmi_ulong tbeat;
+	lmi_ulong tidle;
 } m2ua_opt_conf_sp_t;
 
 /*
@@ -112,7 +115,7 @@ typedef struct m2ua_opt_conf_sp {
  *  -----------------------------------
  */
 typedef struct m2ua_opt_conf_spp {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_opt_conf_spp_t;
 
 /*
@@ -120,7 +123,7 @@ typedef struct m2ua_opt_conf_spp {
  *  -----------------------------------
  */
 typedef struct m2ua_opt_conf_sl {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_opt_conf_sl_t;
 
 /*
@@ -128,7 +131,7 @@ typedef struct m2ua_opt_conf_sl {
  *  -----------------------------------
  */
 typedef struct m2ua_opt_conf_xp {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_opt_conf_xp_t;
 
 /*
@@ -142,9 +145,9 @@ typedef struct m2ua_opt_conf_df {
  *  OPTIONS
  */
 typedef struct m2ua_option {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	/* 
+	lmi_ulong type;			/* object type */
+	lmi_ulong id;			/* object id */
+	/*
 	   followed by object-specific option structure */
 } m2ua_option_t;
 
@@ -156,8 +159,8 @@ typedef struct m2ua_option {
  *  -----------------------------------
  */
 typedef struct m2ua_conf_as {
-	ulong spid;			/* signalling process identifier */
-	ulong iid;			/* interface id */
+	lmi_ulong spid;			/* signalling process identifier */
+	lmi_ulong iid;			/* interface id */
 	m2ua_addr_t add;		/* signalling link address */
 } m2ua_conf_as_t;
 
@@ -166,9 +169,9 @@ typedef struct m2ua_conf_as {
  *  -----------------------------------
  */
 typedef struct m2ua_conf_sp {
-	ulong spid;			/* paired signalling process identifier */
-	ulong cost;			/* cost */
-	ulong tmode;			/* traffic mode */
+	lmi_ulong spid;			/* paired signalling process identifier */
+	lmi_ulong cost;			/* cost */
+	lmi_ulong tmode;		/* traffic mode */
 } m2ua_conf_sp_t;
 
 /*
@@ -176,9 +179,9 @@ typedef struct m2ua_conf_sp {
  *  -----------------------------------
  */
 typedef struct m2ua_conf_spp {
-	ulong spid;			/* signalling process identifier */
-	ulong aspid;			/* ASP Id */
-	ulong cost;			/* cost */
+	lmi_ulong spid;			/* signalling process identifier */
+	lmi_ulong aspid;		/* ASP Id */
+	lmi_ulong cost;			/* cost */
 } m2ua_conf_spp_t;
 
 /*
@@ -186,9 +189,9 @@ typedef struct m2ua_conf_spp {
  *  -----------------------------------
  */
 typedef struct m2ua_conf_sl {
-	ulong asid;			/* application server id */
-	ulong muxid;			/* lower multiplexing driver id */
-	ulong iid;			/* interface id */
+	lmi_ulong asid;			/* application server id */
+	lmi_ulong muxid;		/* lower multiplexing driver id */
+	lmi_ulong iid;			/* interface id */
 	m2ua_addr_t add;		/* signalling link address */
 	lmi_option_t proto;		/* protocol variant and options */
 } m2ua_conf_sl_t;
@@ -198,9 +201,9 @@ typedef struct m2ua_conf_sl {
  *  -----------------------------------
  */
 typedef struct m2ua_conf_xp {
-	ulong sppid;			/* signalling process proxy identifier */
-	ulong spid;			/* signalling process identifier */
-	ulong muxid;			/* lower multiplexing driver id */
+	lmi_ulong sppid;		/* signalling process proxy identifier */
+	lmi_ulong spid;			/* signalling process identifier */
+	lmi_ulong muxid;		/* lower multiplexing driver id */
 } m2ua_conf_xp_t;
 
 /*
@@ -215,11 +218,10 @@ typedef struct m2ua_conf_df {
  *  CONFIGURATION
  */
 typedef struct m2ua_config {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* object command */
-	/* 
-	   followed by object-specific config structure */
+	lmi_ulong type;			/* object type */
+	lmi_ulong id;			/* object id */
+	lmi_ulong cmd;			/* object command */
+	/* followed by object-specific config structure */
 } m2ua_config_t;
 
 #define M2UA_GET	0
@@ -237,12 +239,12 @@ typedef struct m2ua_config {
  *  -----------------------------------
  */
 typedef struct m2ua_timers_as {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_timers_as_t;
 typedef struct m2ua_statem_as {
 	m2ua_timers_as_t timers;
-	ulong as_numb;			/* number of id/state pairs for AS */
-	ulong spp_numb;			/* number of id/state pairs for SPP */
+	lmi_ulong as_numb;		/* number of id/state pairs for AS */
+	lmi_ulong spp_numb;		/* number of id/state pairs for SPP */
 	/* followed by id/state pairs for AS */
 	/* followed by id/state pairs for SPP */
 	/* terminated by zero */
@@ -253,11 +255,11 @@ typedef struct m2ua_statem_as {
  *  -----------------------------------
  */
 typedef struct m2ua_timers_sp {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_timers_sp_t;
 typedef struct m2ua_statem_sp {
 	m2ua_timers_sp_t timers;
-	ulong sp_numb;			/* number of id/state pairs for SP */
+	lmi_ulong sp_numb;		/* number of id/state pairs for SP */
 	/* followed by id/state pairs for SP */
 	/* terminated by zero */
 } m2ua_statem_sp_t;
@@ -267,13 +269,13 @@ typedef struct m2ua_statem_sp {
  *  -----------------------------------
  */
 typedef struct m2ua_timers_spp {
-	ulong tack;
-	ulong tbeat;
-	ulong tidle;
+	lmi_ulong tack;
+	lmi_ulong tbeat;
+	lmi_ulong tidle;
 } m2ua_timers_spp_t;
 typedef struct m2ua_statem_spp {
 	m2ua_timers_spp_t timers;
-	ulong as_numb;			/* number of id/state pairs for AS */
+	lmi_ulong as_numb;		/* number of id/state pairs for AS */
 	/* followed by id/state pairs for AS */
 	/* terminated by zero */
 } m2ua_statem_spp_t;
@@ -283,7 +285,7 @@ typedef struct m2ua_statem_spp {
  *  -----------------------------------
  */
 typedef struct m2ua_timers_sl {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_timers_sl_t;
 typedef struct m2ua_statem_sl {
 	m2ua_timers_sl_t timers;
@@ -294,7 +296,7 @@ typedef struct m2ua_statem_sl {
  *  -----------------------------------
  */
 typedef struct m2ua_timers_xp {
-	ulong tack;
+	lmi_ulong tack;
 } m2ua_timers_xp_t;
 typedef struct m2ua_statem_xp {
 	m2ua_timers_xp_t timers;
@@ -314,10 +316,10 @@ typedef struct m2ua_statem_df {
  *  STATE
  */
 typedef struct m2ua_statem {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong flags;			/* object flags */
-	ulong state;			/* object state */
+	lmi_ulong type;			/* object type */
+	lmi_ulong id;			/* object id */
+	lmi_ulong flags;		/* object flags */
+	lmi_ulong state;		/* object state */
 	/* followed by object-specific state structure */
 } m2ua_statem_t;
 
@@ -370,9 +372,9 @@ typedef struct m2ua_stats_df {
  *  STATISTICS
  */
 typedef struct m2ua_stats {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong header;			/* object stats header */
+	lmi_ulong type;			/* object type */
+	lmi_ulong id;			/* object id */
+	lmi_ulong header;		/* object stats header */
 	/* followed by object-specific stats structure */
 } m2ua_stats_t;
 
@@ -385,8 +387,8 @@ typedef struct m2ua_stats {
  *  EVENTS
  */
 typedef struct m2ua_notify {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
+	lmi_ulong type;			/* object type */
+	lmi_ulong id;			/* object id */
 	lmi_notify_t notify;		/* notifications */
 } m2ua_notify_t;
 
@@ -398,9 +400,9 @@ typedef struct m2ua_notify {
  *  MANAGEMENT
  */
 typedef struct m2ua_mgmt {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* object command */
+	lmi_ulong type;			/* object type */
+	lmi_ulong id;			/* object id */
+	lmi_ulong cmd;			/* object command */
 } m2ua_mgmt_t;
 
 #define M2UA_MGMT_UP		1
@@ -418,11 +420,11 @@ typedef struct m2ua_mgmt {
  *  CONTROL LOWER
  */
 typedef struct m2ua_pass {
-	ulong muxid;			/* mux index of lower stream to pass message to */
-	ulong type;			/* type of message block */
-	ulong band;			/* band of message block */
-	ulong ctl_length;		/* length of cntl part */
-	ulong dat_length;		/* length of data part */
+	lmi_ulong muxid;		/* mux index of lower stream to pass message to */
+	lmi_ulong type;			/* type of message block */
+	lmi_ulong band;			/* band of message block */
+	lmi_ulong ctl_length;		/* length of cntl part */
+	lmi_ulong dat_length;		/* length of data part */
 	/* followed by cntl and data part of message to pass to lower */
 } m2ua_pass_t;
 

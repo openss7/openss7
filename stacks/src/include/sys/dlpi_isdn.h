@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi_isdn.h,v 0.9.2.6 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: dlpi_isdn.h,v 0.9.2.7 2008-10-30 13:36:59 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi_isdn.h,v $
+ Revision 0.9.2.7  2008-10-30 13:36:59  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -65,16 +68,16 @@
 #ifndef __DLPI_ISDN_H__
 #define __DLPI_ISDN_H__
 
-#ident "@(#) $RCSfile: dlpi_isdn.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi_isdn.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
 /*
- *  LiS dlpi.h is release 2
+ *  LiS dlpi.h is revision 2
  */
 
 #ifndef DL_VERSION_2
-#error "dlpi_isdn.h requires Release 2 dlpi.h"
+#error "dlpi_isdn.h requires Revision 2 dlpi.h"
 #endif
 
 typedef struct dl_addr {

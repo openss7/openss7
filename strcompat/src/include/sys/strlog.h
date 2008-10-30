@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strlog.h,v 0.9.2.16 2008-04-28 16:47:07 brian Exp $
+ @(#) $Id: strlog.h,v 0.9.2.17 2008-10-30 13:37:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 16:47:07 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlog.h,v $
+ Revision 0.9.2.17  2008-10-30 13:37:08  brian
+ - updated headers for release
+
  Revision 0.9.2.16  2008-04-28 16:47:07  brian
  - updates for release
 
@@ -68,7 +71,11 @@
 #ifndef __SYS_STRLOG_H__
 #define __SYS_STRLOG_H__
 
-#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 0.9.2.17 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/* This file can be processed with doxygen(1). */
+
+#include <stdarg.h>
 
 #define SL_ERROR    0x0001
 #define SL_TRACE    0x0002

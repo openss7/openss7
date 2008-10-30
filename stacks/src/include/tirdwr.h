@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.5 2008-04-29 07:10:42 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.6 2008-10-30 13:36:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:42 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.h,v $
+ Revision 0.9.2.6  2008-10-30 13:36:53  brian
+ - updated headers for release
+
  Revision 0.9.2.5  2008-04-29 07:10:42  brian
  - updating headers for release
 
@@ -74,7 +77,9 @@
 #ifndef _TIRDWR_H
 #define _TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+#include <sys/tirdwr.h>
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
@@ -82,7 +87,7 @@ __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
 
-#include <sys/tirdwr.h>
+/* No library functions. */
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -91,3 +96,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TIRDWR_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

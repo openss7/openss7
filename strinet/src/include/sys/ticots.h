@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticots.h,v 0.9.2.5 2008-04-28 22:52:11 brian Exp $
+ @(#) $Id: ticots.h,v 0.9.2.6 2008-10-30 13:37:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:52:11 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ticots.h,v $
+ Revision 0.9.2.6  2008-10-30 13:37:13  brian
+ - updated headers for release
+
  Revision 0.9.2.5  2008-04-28 22:52:11  brian
  - updated headers for release
 
@@ -80,7 +83,19 @@
 #ifndef _SYS_TICOTS_H
 #define _SYS_TICOTS_H
 
-#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/* This file can be processed with doxygen(1). */
+
+/** @addtogroup loopback
+  * @{ */
+
+/** @file
+  * TPI COTS Loopback header file.  */
+
+/*
+ * TPI COTS Loopback Header File.
+ */
 
 #if 0
 #if !defined _TICOTS_H && !defined __KERNEL__
@@ -92,10 +107,15 @@
 #endif				/* !defined _TICOTS_H && !defined __KERNEL__ */
 #endif
 
-#define TCO_NOPEER		ECONNREFUSED	/* destiniation address is not listening */
-#define TCO_PEERBADSTATE	ECONNREFUSED	/* transport peer in incorrect state */
-#define TCO_PEERNOROMMONQ	ECONNREFUSED	/* no room on connection indication queue */
-#define TCO_PEERINITIATED	ECONNRESET	/* transport peer user-initiated disconnect */
-#define TCO_PROVIDERINITIATED	ECONNRESET	/* transport peer provider-initiated disconnect */
+#define TCO_NOPEER		ECONNREFUSED	/**< Destination address is not listening. */
+#define TCO_PEERNOROMMONQ	ECONNREFUSED	/**< No room on connection indication queue. */
+#define TCO_PEERBADSTATE	ECONNREFUSED	/**< Transport peer in incorrect state. */
+#define TCO_PEERINITIATED	ECONNRESET	/**< Transport peer user-initiated disconnect. */
+#define TCO_PROVIDERINITIATED	ECONNABORTED	/**< Transport peer provider-initiated disconnect. */
+#define TCO_DEFAULTADDRSZ	4
 
 #endif				/* _SYS_TICOTS_H */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

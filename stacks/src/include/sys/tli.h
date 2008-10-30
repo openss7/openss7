@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tli.h,v 0.9.2.6 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: tli.h,v 0.9.2.7 2008-10-30 13:37:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tli.h,v $
+ Revision 0.9.2.7  2008-10-30 13:37:02  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -65,9 +68,17 @@
 #ifndef _SYS_TLI_H
 #define _SYS_TLI_H
 
-#ident "@(#) $RCSfile: tli.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tli.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @addtogroup xnet
+  * @{ */
+
+/** @file
+  * Transport Layer Interface (TLI) header file.
+  *
+  * This file is included by sys/tiuser.h and sys/tihdr.h.  */
 
 #if 0
 #if !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__
@@ -79,7 +90,11 @@
 #endif				/* !defined _TIUSER_H && !defined _TIHDR_H && !defined __KERNEL__ */
 #endif
 
-/* This header file is included by <tiuser.h> and <tihdr.h>. */
+/*
+ * TLI Header File.
+ *
+ * This header file is included by <tiuser.h> and <tihdr.h>.
+ */
 
 #if (!defined _XPG4_2 && !defined _XOPEN_SOURCE) || defined __KERNEL__
 struct opthdr {
@@ -92,5 +107,8 @@ struct opthdr {
 #define OPTVAL(opt) ((caddr_t)((struct opthdr *)opt + 1))
 #endif				/* (!defined _XPG4_2 && !defined _XOPEN_SOURCE) || defined
 				   __KERNEL__ */
-
 #endif				/* _SYS_TLI_H */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

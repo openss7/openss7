@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctpi.h,v 0.9.2.6 2008-04-28 23:13:26 brian Exp $
+ @(#) $Id: sctpi.h,v 0.9.2.7 2008-10-30 13:37:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctpi.h,v $
+ Revision 0.9.2.7  2008-10-30 13:37:27  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-28 23:13:26  brian
  - updated headers for release
 
@@ -65,7 +68,9 @@
 #ifndef __SCTPI_H__
 #define __SCTPI_H__
 
-#ident "@(#) $RCSfile: sctpi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctpi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/* This file can be processed by doxygen(1). */
 
 /*
  *  This is a STREAMS-based definition of the SCTP (Stream Control
@@ -76,9 +81,9 @@
  *  M3UA and SUA.
  */
 
-typedef unsigned long sctp_ulong;
-typedef unsigned short sctp_ushort;
-typedef unsigned char sctp_uchar;
+typedef u_int32_t sctp_ulong;
+typedef u_int16_t sctp_ushort;
+typedef u_int8_t sctp_uchar;
 
 #define SCTP_CONN_REQ		 0	/* ASSOCIATE */
 #define SCTP_CONN_RES		 1	/* ASSOCIATE */
@@ -151,7 +156,7 @@ typedef struct {
 } sctp_initialize_req_t;
 
 /*
-   followed by list of addresses 
+   followed by list of addresses
  */
 
 typedef struct {
@@ -177,7 +182,7 @@ typedef struct {
 } sctp_associate_con_t;
 
 /*
-   followed by list of destination transport addresses 
+   followed by list of destination transport addresses
  */
 
 typedef struct {

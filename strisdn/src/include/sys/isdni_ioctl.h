@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: isdni_ioctl.h,v 0.9.2.4 2008-04-29 00:49:01 brian Exp $
+ @(#) $Id: isdni_ioctl.h,v 0.9.2.5 2008-10-30 13:37:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:49:01 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdni_ioctl.h,v $
+ Revision 0.9.2.5  2008-10-30 13:37:16  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2008-04-29 00:49:01  brian
  - updated headers for release
 
@@ -65,14 +68,14 @@
 #ifndef __SS7_ISDNI_IOCTL_H__
 #define __SS7_ISDNI_IOCTL_H__
 
-#ident "@(#) $RCSfile: isdni_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: isdni_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
 #define ISDN_IOC_MAGIC 'I'
 
 /*
-   protocol options 
+   protocol options
  */
 #define ISDN_POPT_ACK	0x00000001
 #define ISDN_POPT_ENQ	0x00000002
@@ -98,10 +101,10 @@
  *  for the call.
  */
 typedef struct isdn_conf_cr {
-	ulong fgid;			/* facility group identifier */
-	ulong ccid;			/* call control idenitifer */
-	ulong cmid;			/* call management identifier */
-	/* 
+	cc_ulong fgid;			/* facility group identifier */
+	cc_ulong ccid;			/* call control idenitifer */
+	cc_ulong cmid;			/* call management identifier */
+	/*
 	   followed by a list channel configurations */
 } isdn_conf_cr_t;
 
@@ -109,32 +112,32 @@ typedef struct isdn_opt_conf_cr {
 } isdn_opt_conf_cr_t;
 
 typedef struct isdn_timers_cr {
-	ulong t301;			/* ISDN T301 timer */
-	ulong t302;			/* ISDN T302 timer */
-	ulong t303;			/* ISDN T303 timer */
-	ulong t304;			/* ISDN T304 timer */
-	ulong t305;			/* ISDN T305 timer */
-	ulong t306;			/* ISDN T306 timer */
-	ulong t307;			/* ISDN T307 timer */
-	ulong t308;			/* ISDN T308 timer */
-	ulong t309;			/* ISDN T309 timer */
-	ulong t310;			/* ISDN T310 timer */
-	ulong t312;			/* ISDN T312 timer */
-	ulong t313;			/* ISDN T313 timer */
-	ulong t314;			/* ISDN T314 timer */
-	ulong t316;			/* ISDN T316 timer */
-	ulong t317;			/* ISDN T317 timer */
-	ulong t318;			/* ISDN T318 timer */
-	ulong t319;			/* ISDN T319 timer */
-	ulong t320;			/* ISDN T320 timer */
-	ulong t321;			/* ISDN T321 timer */
-	ulong t322;			/* ISDN T322 timer */
+	cc_ulong t301;			/* ISDN T301 timer */
+	cc_ulong t302;			/* ISDN T302 timer */
+	cc_ulong t303;			/* ISDN T303 timer */
+	cc_ulong t304;			/* ISDN T304 timer */
+	cc_ulong t305;			/* ISDN T305 timer */
+	cc_ulong t306;			/* ISDN T306 timer */
+	cc_ulong t307;			/* ISDN T307 timer */
+	cc_ulong t308;			/* ISDN T308 timer */
+	cc_ulong t309;			/* ISDN T309 timer */
+	cc_ulong t310;			/* ISDN T310 timer */
+	cc_ulong t312;			/* ISDN T312 timer */
+	cc_ulong t313;			/* ISDN T313 timer */
+	cc_ulong t314;			/* ISDN T314 timer */
+	cc_ulong t316;			/* ISDN T316 timer */
+	cc_ulong t317;			/* ISDN T317 timer */
+	cc_ulong t318;			/* ISDN T318 timer */
+	cc_ulong t319;			/* ISDN T319 timer */
+	cc_ulong t320;			/* ISDN T320 timer */
+	cc_ulong t321;			/* ISDN T321 timer */
+	cc_ulong t322;			/* ISDN T322 timer */
 } isdn_timers_cr_t;
 
 typedef struct isdn_statem_cr_t {
 	isdn_timers_cr_t timers;
-	ulong t303_count;		/* count of T303 timeouts */
-	ulong t308_count;		/* count of T308 timeouts */
+	cc_ulong t303_count;		/* count of T303 timeouts */
+	cc_ulong t308_count;		/* count of T308 timeouts */
 } isdn_statem_cr_t;
 
 typedef struct isdn_stats_cr {
@@ -149,10 +152,10 @@ typedef struct isdn_stats_cr {
  *  channel.
  */
 typedef struct isdn_conf_ch {
-	ulong fgid;			/* facility group identifier */
-	ulong tgid;			/* transmission group identifier */
-	ulong ts;			/* timeslot in transmission group */
-	/* 
+	cc_ulong fgid;			/* facility group identifier */
+	cc_ulong tgid;			/* transmission group identifier */
+	cc_ulong ts;			/* timeslot in transmission group */
+	/*
 	   followed by a null list */
 } isdn_conf_ch_t;
 
@@ -164,11 +167,11 @@ typedef struct isdn_timers_ch {
 
 typedef struct isdn_statem_ch {
 	isdn_timers_ch_t timers;
-	ulong mgm_bind;
-	ulong mnt_bind;
-	ulong xry_bind;
-	ulong icc_bind;
-	ulong ogc_bind[0];
+	cc_ulong mgm_bind;
+	cc_ulong mnt_bind;
+	cc_ulong xry_bind;
+	cc_ulong icc_bind;
+	cc_ulong ogc_bind[0];
 } isdn_statem_ch_t;
 
 typedef struct isdn_stats_ch {
@@ -181,11 +184,11 @@ typedef struct isdn_stats_ch {
  *  connecting the same two endpoints).
  */
 typedef struct isdn_conf_tg {
-	ulong egid;			/* equipment group identifier */
+	cc_ulong egid;			/* equipment group identifier */
 	lmi_option_t proto;		/* protocol options */
-	/* 
+	/*
 	   followed by list of data link configurations */
-	/* 
+	/*
 	   followed by list of channel configurations */
 } isdn_conf_tg_t;
 
@@ -197,12 +200,12 @@ typedef struct isdn_timers_tg {
 
 typedef struct isdn_statem_tg {
 	isdn_timers_tg_t timers;
-	ulong mgm_actv;
-	ulong mgm_bind;
-	ulong mnt_bind;
-	ulong xry_bind;
-	ulong icc_bind;
-	ulong ogc_bind[0];
+	cc_ulong mgm_actv;
+	cc_ulong mgm_bind;
+	cc_ulong mnt_bind;
+	cc_ulong xry_bind;
+	cc_ulong icc_bind;
+	cc_ulong ogc_bind[0];
 } isdn_statem_tg_t;
 
 typedef struct isdn_stats_tg {
@@ -215,35 +218,35 @@ typedef struct isdn_stats_tg {
  *  connecting the same two endpoints).
  */
 typedef struct isdn_conf_fg {
-	ulong egid;			/* equipment group identifier */
+	cc_ulong egid;			/* equipment group identifier */
 	lmi_option_t proto;		/* protocol options */
-	/* 
+	/*
 	   followed by list of data link configurations */
-	/* 
+	/*
 	   followed by list of channel configurations */
 } isdn_conf_fg_t;
 
 typedef struct isdn_opt_conf_fg {
-	ulong t301;			/* ISDN T301 timer */
-	ulong t302;			/* ISDN T302 timer */
-	ulong t303;			/* ISDN T303 timer */
-	ulong t304;			/* ISDN T304 timer */
-	ulong t305;			/* ISDN T305 timer */
-	ulong t306;			/* ISDN T306 timer */
-	ulong t307;			/* ISDN T307 timer */
-	ulong t308;			/* ISDN T308 timer */
-	ulong t309;			/* ISDN T309 timer */
-	ulong t310;			/* ISDN T310 timer */
-	ulong t312;			/* ISDN T312 timer */
-	ulong t313;			/* ISDN T313 timer */
-	ulong t314;			/* ISDN T314 timer */
-	ulong t316;			/* ISDN T316 timer */
-	ulong t317;			/* ISDN T317 timer */
-	ulong t318;			/* ISDN T318 timer */
-	ulong t319;			/* ISDN T319 timer */
-	ulong t320;			/* ISDN T320 timer */
-	ulong t321;			/* ISDN T321 timer */
-	ulong t322;			/* ISDN T322 timer */
+	cc_ulong t301;			/* ISDN T301 timer */
+	cc_ulong t302;			/* ISDN T302 timer */
+	cc_ulong t303;			/* ISDN T303 timer */
+	cc_ulong t304;			/* ISDN T304 timer */
+	cc_ulong t305;			/* ISDN T305 timer */
+	cc_ulong t306;			/* ISDN T306 timer */
+	cc_ulong t307;			/* ISDN T307 timer */
+	cc_ulong t308;			/* ISDN T308 timer */
+	cc_ulong t309;			/* ISDN T309 timer */
+	cc_ulong t310;			/* ISDN T310 timer */
+	cc_ulong t312;			/* ISDN T312 timer */
+	cc_ulong t313;			/* ISDN T313 timer */
+	cc_ulong t314;			/* ISDN T314 timer */
+	cc_ulong t316;			/* ISDN T316 timer */
+	cc_ulong t317;			/* ISDN T317 timer */
+	cc_ulong t318;			/* ISDN T318 timer */
+	cc_ulong t319;			/* ISDN T319 timer */
+	cc_ulong t320;			/* ISDN T320 timer */
+	cc_ulong t321;			/* ISDN T321 timer */
+	cc_ulong t322;			/* ISDN T322 timer */
 } isdn_opt_conf_fg_t;
 
 typedef struct isdn_timers_fg {
@@ -251,13 +254,13 @@ typedef struct isdn_timers_fg {
 
 typedef struct isdn_statem_fg {
 	isdn_timers_fg_t timers;
-	ulong mgm_actv;
-	ulong xry_actv;
-	ulong mgm_bind;
-	ulong mnt_bind;
-	ulong xry_bind;
-	ulong icc_bind;
-	ulong ogc_bind[0];
+	cc_ulong mgm_actv;
+	cc_ulong xry_actv;
+	cc_ulong mgm_bind;
+	cc_ulong mnt_bind;
+	cc_ulong xry_bind;
+	cc_ulong icc_bind;
+	cc_ulong ogc_bind[0];
 } isdn_statem_fg_t;
 
 typedef struct isdn_stats_fg {
@@ -268,11 +271,11 @@ typedef struct isdn_stats_fg {
  *  -----------------------------------
  */
 typedef struct isdn_conf_eg {
-	ulong xgid;			/* exchange group identifier */
+	cc_ulong xgid;			/* exchange group identifier */
 	lmi_option_t proto;		/* protocol options */
-	/* 
+	/*
 	   followed by list of facility group configurations */
-	/* 
+	/*
 	   followed by list of transmission group configurations */
 } isdn_conf_eg_t;
 
@@ -284,12 +287,12 @@ typedef struct isdn_timers_eg {
 
 typedef struct isdn_statem_eg {
 	isdn_timers_eg_t timers;
-	ulong mgm_actv;
-	ulong mgm_bind;
-	ulong mnt_bind;
-	ulong xry_bind;
-	ulong icc_bind;
-	ulong ogc_bind[0];
+	cc_ulong mgm_actv;
+	cc_ulong mgm_bind;
+	cc_ulong mnt_bind;
+	cc_ulong xry_bind;
+	cc_ulong icc_bind;
+	cc_ulong ogc_bind[0];
 } isdn_statem_eg_t;
 
 typedef struct isdn_stats_eg {
@@ -301,7 +304,7 @@ typedef struct isdn_stats_eg {
  */
 typedef struct isdn_conf_xg {
 	lmi_option_t proto;		/* protocol options */
-	/* 
+	/*
 	   followed by list of equipment group configurations */
 } isdn_conf_xg_t;
 
@@ -313,12 +316,12 @@ typedef struct isdn_timers_xg {
 
 typedef struct isdn_statem_xg {
 	isdn_timers_xg_t timers;
-	ulong mgm_actv;
-	ulong mgm_bind;
-	ulong mnt_bind;
-	ulong xry_bind;
-	ulong icc_bind;
-	ulong ogc_bind[0];
+	cc_ulong mgm_actv;
+	cc_ulong mgm_bind;
+	cc_ulong mnt_bind;
+	cc_ulong xry_bind;
+	cc_ulong icc_bind;
+	cc_ulong ogc_bind[0];
 } isdn_statem_xg_t;
 
 typedef struct isdn_stats_xg {
@@ -329,9 +332,9 @@ typedef struct isdn_stats_xg {
  *  -----------------------------------
  */
 typedef struct isdn_conf_dc {
-	ulong fgid;			/* facility group controlled by this d channel */
-	ulong tgid;			/* transmission group for this d channel */
-	ulong ts;			/* timeslot in transmission group */
+	cc_ulong fgid;			/* facility group controlled by this d channel */
+	cc_ulong tgid;			/* transmission group for this d channel */
+	cc_ulong ts;			/* timeslot in transmission group */
 	struct dl_addr sap;		/* data link address (PPA and SAPI only) */
 	lmi_option_t proto;		/* protocol options */
 } isdn_conf_dc_t;
@@ -345,8 +348,8 @@ typedef struct isdn_opt_conf_dc {
 
 typedef struct isdn_statem_dc {
 	isdn_timers_dc_t timers;
-	ulong mgm_bind;
-	ulong xry_bind;
+	cc_ulong mgm_bind;
+	cc_ulong xry_bind;
 } isdn_statem_dc_t;
 
 typedef struct isdn_stats_dc {
@@ -357,8 +360,8 @@ typedef struct isdn_stats_dc {
  *  -----------------------------------
  */
 typedef struct isdn_conf_dl {
-	ulong muxid;			/* lower multiplexer id */
-	ulong dcid;			/* d channel for this data link */
+	cc_ulong muxid;			/* lower multiplexer id */
+	cc_ulong dcid;			/* d channel for this data link */
 	struct dl_addr dlc;		/* data link address (PPA, SAPI and TEI) */
 	lmi_option_t proto;		/* protocol options */
 } isdn_conf_dl_t;
@@ -371,8 +374,8 @@ typedef struct isdn_timers_dl {
 
 typedef struct isdn_statem_dl {
 	isdn_timers_dl_t timers;
-	ulong mgm_bind;
-	ulong xry_bind;
+	cc_ulong mgm_bind;
+	cc_ulong xry_bind;
 } isdn_statem_dl_t;
 
 typedef struct isdn_stats_dl {
@@ -384,7 +387,7 @@ typedef struct isdn_stats_dl {
  */
 typedef struct isdn_conf_df {
 	lmi_option_t proto;		/* protocol options */
-	/* 
+	/*
 	   followed by list of exchange group configurations */
 } isdn_conf_df_t;
 
@@ -396,11 +399,11 @@ typedef struct isdn_timers_df {
 
 typedef struct isdn_statem_df {
 	isdn_timers_df_t timers;
-	ulong mgm_bind;
-	ulong mnt_bind;
-	ulong xry_bind;
-	ulong icc_bind;
-	ulong ogc_bind[0];
+	cc_ulong mgm_bind;
+	cc_ulong mnt_bind;
+	cc_ulong xry_bind;
+	cc_ulong icc_bind;
+	cc_ulong ogc_bind[0];
 } isdn_statem_df_t;
 
 typedef struct isdn_stats_df {
@@ -410,9 +413,9 @@ typedef struct isdn_stats_df {
  *  OPTIONS
  */
 typedef struct isdn_option {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	/* 
+	cc_ulong type;			/* object type */
+	cc_ulong id;			/* object id */
+	/*
 	   followed by object-specific options structure */
 } isdn_option_t;
 
@@ -423,10 +426,10 @@ typedef struct isdn_option {
  *  CONFIGURATION
  */
 typedef struct isdn_config {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* object command */
-	/* 
+	cc_ulong type;			/* object type */
+	cc_ulong id;			/* object id */
+	cc_ulong cmd;			/* object command */
+	/*
 	   followed by object-specific configuration structure */
 } isdn_config_t;
 
@@ -444,11 +447,11 @@ typedef struct isdn_config {
  *  STATE
  */
 typedef struct isdn_statem {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong flags;			/* object primary flags */
-	ulong state;			/* object primary state */
-	/* 
+	cc_ulong type;			/* object type */
+	cc_ulong id;			/* object id */
+	cc_ulong flags;			/* object primary flags */
+	cc_ulong state;			/* object primary state */
+	/*
 	   followed by object-specific state structure */
 } isdn_statem_t;
 
@@ -459,10 +462,10 @@ typedef struct isdn_statem {
  *  STATISTICS
  */
 typedef struct isdn_stats {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong header;			/* object stats header */
-	/* 
+	cc_ulong type;			/* object type */
+	cc_ulong id;			/* object id */
+	cc_ulong header;		/* object stats header */
+	/*
 	   followed by object-specific stats structure */
 } isdn_stats_t;
 
@@ -475,8 +478,8 @@ typedef struct isdn_stats {
  *  EVENTS
  */
 typedef struct isdn_notify {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
+	cc_ulong type;			/* object type */
+	cc_ulong id;			/* object id */
 	lmi_notify_t notify;		/* notifications */
 } isdn_notify_t;
 
@@ -488,9 +491,9 @@ typedef struct isdn_notify {
  *  ISDN MANAGEMENT
  */
 typedef struct isdn_mgmt {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* command */
+	cc_ulong type;			/* object type */
+	cc_ulong id;			/* object id */
+	cc_ulong cmd;			/* command */
 } isdn_mgmt_t;
 
 #define ISDN_MGMT_BLOCK			1
@@ -504,13 +507,12 @@ typedef struct isdn_mgmt {
  *  CONTROL LOWER
  */
 typedef struct isdn_pass {
-	ulong muxid;			/* mux index of lower DL to pass message to */
-	ulong type;			/* type of message block */
-	ulong band;			/* band of message block */
-	ulong ctl_length;		/* length of cntl part */
-	ulong dat_length;		/* length of data part */
-	/* 
-	   followed by cntl and data part of message to pass to DL */
+	cc_ulong muxid;			/* mux index of lower DL to pass message to */
+	cc_ulong type;			/* type of message block */
+	cc_ulong band;			/* band of message block */
+	cc_ulong ctl_length;		/* length of cntl part */
+	cc_ulong dat_length;		/* length of data part */
+	/* followed by cntl and data part of message to pass to DL */
 } isdn_pass_t;
 
 #define ISDN_IOCCPASS		_IOWR(	ISDN_IOC_MAGIC, 16,  isdn_pass_t )

@@ -1,3 +1,11 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/ss7/sctp.h: updated headers
+	* src/include/ss7/sctpi.h: updated headers
+	* src/include/ss7/sctpi_ioctl.h: updated headers
+	* src/include/sys/npi_sctp.h: updated headers
+	* src/include/sys/xti_sctp.h: updated headers
+
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: get rid of stray linefeed
