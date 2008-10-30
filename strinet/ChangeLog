@@ -1,3 +1,13 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/ticlts.h: updated headers
+	* src/include/ticots.h: updated headers
+	* src/include/ticotsord.h: updated headers
+	* src/include/xti.h: updated headers
+	* src/include/sys/ticlts.h: updated headers
+	* src/include/sys/ticots.h: updated headers
+	* src/include/sys/ticotsord.h: updated headers
+
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* acinclude.m4: get rid of stray linefeed
@@ -1353,7 +1363,7 @@
 	* src/drivers/tcp.c:
 	  - add missing definitions for LiS
 	  - correct printf warnings for LiS
-	* src/drivers/udp.c: 
+	* src/drivers/udp.c:
 	  - defeated trace statements in debug mode
 	  - reworked m_error and te_error_reply
 	  - added const'ness

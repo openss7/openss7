@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_ip.h,v 0.9.2.10 2008-04-25 11:39:33 brian Exp $
+ @(#) $Id: npi_ip.h,v 0.9.2.11 2008-10-30 13:37:49 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-25 11:39:33 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_ip.h,v $
+ Revision 0.9.2.11  2008-10-30 13:37:49  brian
+ - updated headers for release
+
  Revision 0.9.2.10  2008-04-25 11:39:33  brian
  - updates to AGPLv3
 
@@ -86,7 +89,7 @@
 #ifndef SYS_NPI_IP_H
 #define SYS_NPI_IP_H
 
-#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_ip.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

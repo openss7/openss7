@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cdi.h,v 0.9.2.6 2008-04-29 07:10:43 brian Exp $
+ @(#) $Id: cdi.h,v 0.9.2.7 2008-10-30 13:36:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:43 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi.h,v $
+ Revision 0.9.2.7  2008-10-30 13:36:55  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:43  brian
  - updating headers for release
 
@@ -65,9 +68,12 @@
 #ifndef _SYS_CDI_H
 #define _SYS_CDI_H
 
-#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: cdi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
+
+/// @file
+/// @brief This header file provides the Communications Device Interface (CDI).
 
 /*
  * cdi.h header for Communications Device Interface
@@ -117,7 +123,8 @@
 #define CD_DISABLED		0x02	/* PPA attached */
 #define CD_ENABLE_PENDING	0x03	/* Waiting ack of enable req */
 #define CD_ENABLED		0x04	/* Awaiting use */
-#define CD_READ_ACTIVE		0x05	/* Input section enabled; disabled after data arrives */
+#define CD_READ_ACTIVE		0x05	/* Input section enabled; */
+					/* disabled after data arrives */
 #define CD_INPUT_ALLOWED	0x06	/* Input section permanently enabled */
 #define CD_DISABLE_PENDING	0x07	/* Waiting ack of disable req */
 #define CD_OUTPUT_ACTIVE	0x08	/* Output section active only */
@@ -173,16 +180,16 @@
 /*
  * CDI device classes
  */
-#define CD_HDLC			0x00	/* Bit-synchronous */
-#define CD_BISYNC		0x01	/* Character-synchronous */
-#define CD_LAN			0x02	/* ISO 8802-3,4,5 local-area network MAC */
-#define CD_NODEV		0x03	/* no device, ppa used for X-ray */
+#define CD_HDLC		0x00	/* Bit-synchronous */
+#define CD_BISYNC	0x01	/* Character-synchronous */
+#define CD_LAN		0x02	/* ISO 8802-3,4,5 local-area network MAC */
+#define CD_NODEV	0x03	/* no device, ppa used for X-ray */
 
 /*
  * CDI duplex types
  */
-#define CD_FULLDUPLEX		0x00	/* Full duplex; allow input supported */
-#define CD_HALFDUPLEX		0x01	/* Half duplex; read and write/read supported */
+#define CD_FULLDUPLEX	0x00	/* Full duplex; allow input supported */
+#define CD_HALFDUPLEX	0x01	/* Half duplex; read and write/read supported */
 
 /*
  * CDI output styles
@@ -201,9 +208,10 @@
 
 /*
  * CDI provider style.
- * The CDI provider style which determines whether a provider
- * requires a CD_ATTACH_REQ to inform the provider which PPA
- * user messages should be sent/received on.
+ *
+ * The CDI provider style which determines whether a provider requires a
+ * CD_ATTACH_REQ to inform the provider which PPA user messages should be
+ * sent/received on.
  */
 #define CD_STYLE1	0x00	/* PPA is implicitly bound by open(2) */
 #define CD_STYLE2	0x01	/* PPA must be explicitly bound via CD_ATTACH_REQ */
@@ -220,7 +228,7 @@
  CD_HALT_INPUT_REQ
  */
 #define CD_FLUSH	0x00	/* Discard undelivered data */
-#define CD_WAIT 	0x01	/* Attempt to deliver unsent data */
+#define CD_WAIT		0x01	/* Attempt to deliver unsent data */
 #define CD_DELIVER	0x02
 
 /*
@@ -254,15 +262,14 @@
 /*
  * CDI interface primitive definitions.
  *
- * Each primitive is sent as a Stream message.  It is possible that
- * the messages may be viewed as a sequence of bytes that have the
- * following form without any padding. The structure definition
- * of the following messages may have to change depending on the
- * underlying hardware architecture and crossing of a hardware
- * boundary with a different hardware architecture.
+ * Each primitive is sent as a Stream message.  It is possible that the messages
+ * may be viewed as a sequence of bytes that have the following form without any
+ * padding. The structure definition of the following messages may have to
+ * change depending on the underlying hardware architecture and crossing of a
+ * hardware boundary with a different hardware architecture.
  *
- * Each message has the name defined followed by the
- * Stream message type (M_PROTO, M_PCPROTO, M_DATA)
+ * Each message has the name defined followed by the Stream message type
+ * (M_PROTO, M_PCPROTO, M_DATA)
  */
 
 typedef int32_t cd_long;
@@ -277,14 +284,14 @@ typedef u_int16_t cd_ushort;
  * CD_INFO_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 } cd_info_req_t;
 
 /*
  * CD_INFO_ACK, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
 	cd_ulong cd_max_sdu;
 	cd_ulong cd_min_sdu;
@@ -300,7 +307,7 @@ typedef struct {
  * CD_ATTACH_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_ppa;
 } cd_attach_req_t;
 
@@ -308,14 +315,14 @@ typedef struct {
  * CD_DETACH_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 } cd_detach_req_t;
 
 /*
  * CD_ENABLE_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_dial_type;
 	cd_ulong cd_dial_length;
 	cd_ulong cd_dial_offset;
@@ -325,7 +332,7 @@ typedef struct {
  * CD_DISABLE_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_disposal;
 } cd_disable_req_t;
 
@@ -333,18 +340,18 @@ typedef struct {
  * CD_OK_ACK, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
-	cd_long cd_correct_primitive;
+	cd_ulong cd_correct_primitive;
 } cd_ok_ack_t;
 
 /*
  * CD_ERROR_ACK, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
-	cd_long cd_error_primitive;
+	cd_ulong cd_error_primitive;
 	cd_ulong cd_errno;
 	cd_ulong cd_explanation;
 } cd_error_ack_t;
@@ -353,7 +360,7 @@ typedef struct {
  * CD_ENABLE_CON, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
 } cd_enable_con_t;
 
@@ -361,7 +368,7 @@ typedef struct {
  * CD_DISABLE_CON, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
 } cd_disable_con_t;
 
@@ -369,7 +376,7 @@ typedef struct {
  * CD_ERROR_IND, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
 	cd_ulong cd_errno;
 	cd_ulong cd_explanation;
@@ -383,14 +390,14 @@ typedef struct {
  * CD_ALLOW_INPUT_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 } cd_allow_input_req_t;
 
 /*
  * CD_READ_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_msec;
 } cd_read_req_t;
 
@@ -398,7 +405,7 @@ typedef struct {
  * CD_UNITDATA_REQ, optional M_PROTO type, with M_DATA block(s)
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ushort cd_addr_type;
 	cd_ushort cd_priority;
 	cd_ulong cd_dest_addr_length;
@@ -409,7 +416,7 @@ typedef struct {
  * CD_WRITE_READ_REQ, M_PROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_unitdata_req_t cd_unitdata_req;
 	cd_read_req_t cd_read_req;
 } cd_write_read_req_t;
@@ -418,7 +425,7 @@ typedef struct {
  * CD_UNITDATA_ACK, M_PROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
 } cd_unitdata_ack_t;
 
@@ -426,7 +433,7 @@ typedef struct {
  * CD_UNITDATA_IND, optional M_PROTO type, with M_DATA block(s)
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
 	cd_ulong cd_src_addr_length;
 	cd_ulong cd_src_addr_offset;
@@ -440,7 +447,7 @@ typedef struct {
  * CD_BAD_FRAME_IND, M_PROTO type, with M_DATA block(s)
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_state;
 	cd_ulong cd_error;		/* what is wrong with the frame */
 
@@ -449,12 +456,11 @@ typedef struct {
 /*
  * CD_MODEM_SIG_REQ, M_PROTO type
  *
- * Assert the modem signals with '1' bits in the cd_sigs mask and
- * drop those signals with '0' bits.  Sensed modem signals such
- * as DCD or CTS are ignored.
+ * Assert the modem signals with '1' bits in the cd_sigs mask and drop those
+ * signals with '0' bits.  Sensed modem signals such as DCD or CTS are ignored.
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_sigs;
 
 } cd_modem_sig_req_t;
@@ -462,19 +468,19 @@ typedef struct {
 /*
  * CD_MODEM_SIG_IND, M_PROTO type
  *
- * The cd_sigs field reports the current state of the modem signals.
- * This message is sent when modem signals change at the hardware
- * interface.  Only changes in signals selected by the cd_modem_sig_enb_req_t
- * cd_sigs mask will be evaluated for purposes of change detection.
+ * The cd_sigs field reports the current state of the modem signals.  This
+ * message is sent when modem signals change at the hardware interface.  Only
+ * changes in signals selected by the cd_modem_sig_enb_req_t cd_sigs mask will
+ * be evaluated for purposes of change detection.
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_sigs;
 
 } cd_modem_sig_ind_t;
 
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 
 } cd_modem_sig_poll_t;
 
@@ -482,7 +488,7 @@ typedef struct {
  * CD_HALT_INPUT_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_ulong cd_disposal;
 } cd_halt_input_req_t;
 
@@ -490,11 +496,11 @@ typedef struct {
  * CD_ABORT_OUTPUT_REQ, M_PROTO or M_PCPROTO type
  */
 typedef struct {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 } cd_abort_output_req_t;
 
 union CD_primitives {
-	cd_long cd_primitive;
+	cd_ulong cd_primitive;
 	cd_info_req_t info_req;
 	cd_info_ack_t info_ack;
 	cd_attach_req_t attach_req;
@@ -503,9 +509,6 @@ union CD_primitives {
 	cd_disable_req_t disable_req;
 	cd_ok_ack_t ok_ack;
 	cd_error_ack_t error_ack;
-	cd_enable_con_t enable_con;
-	cd_disable_con_t disable_con;
-	cd_error_ind_t error_ind;
 	cd_allow_input_req_t allow_input_req;
 	cd_read_req_t read_req;
 	cd_unitdata_req_t unitdata_req;
@@ -513,6 +516,14 @@ union CD_primitives {
 	cd_unitdata_ack_t unitdata_ack;
 	cd_unitdata_ind_t unitdata_ind;
 	cd_halt_input_req_t halt_input_req;
+	cd_abort_output_req_t abort_output_req;
+	cd_error_ind_t error_ind;
+	cd_enable_con_t enable_con;
+	cd_disable_con_t disable_con;
+	cd_bad_frame_ind_t bad_frame_ind;
+	cd_modem_sig_req_t modem_sig_req;
+	cd_modem_sig_ind_t modem_sig_ind;
+	cd_modem_sig_poll_t modem_sig_poll;
 };
 
 #define CD_INFO_REQ_SIZE		sizeof(cd_info_req_t)

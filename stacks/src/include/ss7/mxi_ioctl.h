@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl.h,v 0.9.2.8 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: mxi_ioctl.h,v 0.9.2.9 2008-10-30 13:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi_ioctl.h,v $
+ Revision 0.9.2.9  2008-10-30 13:36:56  brian
+ - updated headers for release
+
  Revision 0.9.2.8  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -62,7 +65,7 @@
 #ifndef __SS7_MXI_IOCTL_H__
 #define __SS7_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -85,6 +88,7 @@ typedef struct mx_config {
 	mx_ulong opt_flags;		/* options flags */
 } mx_config_t;
 
+#if 0
 typedef struct mx_ifconfig {
 	mx_ulong ifaddr;		/* ppa (card,span,channel) */
 	volatile mx_ulong ifflags;	/* interface flags */
@@ -207,6 +211,7 @@ typedef struct mx_ifconfig {
 #define MX_SYNCS	    4
 	mx_ulong ifsyncsrc[MX_SYNCS];
 } mx_ifconfig_t;
+#endif
 
 #define MX_IOCGCONFIG	_IOR(	MX_IOC_MAGIC,	2,  mx_config_t	    )
 #define MX_IOCSCONFIG	_IOWR(	MX_IOC_MAGIC,	3,  mx_config_t	    )
@@ -231,6 +236,15 @@ typedef struct mx_statem {
 
 typedef struct mx_stats {
 	mx_ulong header;
+	mx_ulong rx_octets;
+	mx_ulong tx_octets;
+	mx_ulong rx_overruns;
+	mx_ulong tx_underruns;
+	mx_ulong rx_buffer_overflows;
+	mx_ulong tx_buffer_overflows;
+	mx_ulong lead_cts_lost;
+	mx_ulong lead_dcd_lost;
+	mx_ulong carrier_lost;
 } mx_stats_t;
 
 #define	MX_IOCGSTATSP	_IOR(	MX_IOC_MAGIC,	 8, mx_stats_t	    )

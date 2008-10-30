@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: zapata.h,v 0.9.2.4 2008-04-29 07:10:45 brian Exp $
+ @(#) $Id: zapata.h,v 0.9.2.5 2008-10-30 13:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:45 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zapata.h,v $
+ Revision 0.9.2.5  2008-10-30 13:36:56  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2008-04-29 07:10:45  brian
  - updating headers for release
 
@@ -68,7 +71,7 @@
 #ifndef __SS7_ZAPATA_H__
 #define __SS7_ZAPATA_H__
 
-#ident "@(#) $RCSfile: zapata.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008  OpenSS7 Corporation"
+#ident "@(#) $RCSfile: zapata.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -130,7 +133,7 @@
 
 #define ZT_CODE			'J'
 
-/* Default chunk size for conferences and such -- static right now, might make variable sometime. 8 
+/* Default chunk size for conferences and such -- static right now, might make variable sometime. 8
    samples = 1 ms = most frequent service interval possible for a USB device */
 #define ZT_CHUNKSIZE		    8
 #define ZT_MIN_CHUNKSIZE	 ZT_CHUNKSIZE
@@ -302,7 +305,7 @@ typedef struct zt_indirect_data {
 #define ZT_SET_PARAMS		_IOW  (ZT_CODE,  6, struct zt_params)	/* Get channel parameters */
 #define ZT_HOOK			_IOW  (ZT_CODE,  7, int)	/* Set Hookswitch Status */
 #define ZT_GETEVENT		_IOR  (ZT_CODE,  8, int)	/* Get Signalling Event */
-#define ZT_IOMUX		_IOWR (ZT_CODE,  9, int)	/* Wait for something to happen (IO 
+#define ZT_IOMUX		_IOWR (ZT_CODE,  9, int)	/* Wait for something to happen (IO
 								   Mux) */
 #define ZT_SPANSTAT		_IOWR (ZT_CODE, 10, struct zt_spaninfo)	/* Get Span Status */
 #define ZT_MAINT		_IOW  (ZT_CODE, 11, struct zt_maintinfo)	/* Set Maintenance
@@ -317,7 +320,7 @@ typedef struct zt_indirect_data {
 #define ZT_SETGAINS		_IOWR (ZT_CODE, 17, struct zt_gains)	/* Set Channel audio gains */
 #define ZT_SPANCONFIG		_IOW  (ZT_CODE, 18, struct zt_lineconfig)	/* Set Line (T1)
 										   Configurations
-										   and start system 
+										   and start system
 										 */
 #define ZT_CHANCONFIG		_IOW  (ZT_CODE, 19, struct zt_chanconfig)	/* Set Channel
 										   Configuration */
@@ -330,9 +333,9 @@ typedef struct zt_indirect_data {
 								   tones (see ZT_TONE_ZONE_*) */
 #define ZT_DEFAULTZONE		_IOW  (ZT_CODE, 24, int)	/* Master unit only -- set default
 								   zone (see ZT_TONE_ZONE_*) */
-#define ZT_LOADZONE		_IOW  (ZT_CODE, 25, struct zt_tone_def_header)	/* Load a tone zone 
+#define ZT_LOADZONE		_IOW  (ZT_CODE, 25, struct zt_tone_def_header)	/* Load a tone zone
 										   from a
-										   ZT_tone_def_header, 
+										   ZT_tone_def_header,
 										   see below...  */
 #define ZT_FREEZONE		_IOW  (ZT_CODE, 26, int)	/* Free a tone zone */
 #define ZT_SET_BUFINFO		_IOW  (ZT_CODE, 27, struct zt_bufferinfo)	/* Set buffer
@@ -343,7 +346,7 @@ typedef struct zt_indirect_data {
 										   parameters */
 #define ZT_SET_DIALPARAMS	_IOW  (ZT_CODE, 30, struct zt_dialparams)	/* Set dialing
 										   parameters */
-#define ZT_DIAL			_IOW  (ZT_CODE, 31, struct zt_dialoperation)	/* Append, replace, 
+#define ZT_DIAL			_IOW  (ZT_CODE, 31, struct zt_dialoperation)	/* Append, replace,
 										   or cancel a dial
 										   string */
 #define ZT_AUDIOMODE		_IOW  (ZT_CODE, 32, int)	/* Set a clear channel into audio
@@ -354,12 +357,12 @@ typedef struct zt_indirect_data {
 								   cancellation and non-zero to
 								   enable echo cancellation.  If
 								   the number is between 32 and
-								   256, it will also set the number 
+								   256, it will also set the number
 								   of taps in the echo canceller */
 #define ZT_CHANNO		_IOR  (ZT_CODE, 34, int)	/* Return a channel's channel
 								   number (useful for the
 								   /dev/zap/pseudo type interfaces */
-#define ZT_DIALING		_IOR  (ZT_CODE, 35, int)	/* Return a flag indicating whether 
+#define ZT_DIALING		_IOR  (ZT_CODE, 35, int)	/* Return a flag indicating whether
 								   channel is currently dialing */
 
 /* Numbers 60 to 90 are reserved for private use of low level hardware drivers */
@@ -367,7 +370,7 @@ typedef struct zt_indirect_data {
 #define ZT_HDLCRAWMODE		_IOW  (ZT_CODE, 36, int)	/* Set a clear channel into HDLC
 								   w/out FCS checking/calculation
 								   mode */
-#define ZT_HDLCFCSMODE		_IOW  (ZT_CODE, 37, int)	/* Set a clear channel into HDLC w/ 
+#define ZT_HDLCFCSMODE		_IOW  (ZT_CODE, 37, int)	/* Set a clear channel into HDLC w/
 								   FCS mode */
 #define ZT_SPECIFY		_IOW  (ZT_CODE, 38, int)	/* Specify a channel on
 								   /dev/zap/chan -- must be done
@@ -375,12 +378,12 @@ typedef struct zt_indirect_data {
 								   only valid on /dev/zap/chan */
 #define ZT_SETLAW		_IOW  (ZT_CODE, 39, int)	/* Temporarily set the law on a
 								   channel to ZT_LAW_DEFAULT,
-								   ZT_LAW_ALAW, or ZT_LAW_MULAW. Is 
+								   ZT_LAW_ALAW, or ZT_LAW_MULAW. Is
 								   reset on close.  */
 #define ZT_SETLINEAR		_IOW  (ZT_CODE, 40, int)	/* Temporarily set the channel to
 								   operate in linear mode when
 								   non-zero or default law if 0 */
-#define ZT_HDLCPPP		_IOW  (ZT_CODE, 41, int)	/* Set a clear channel into HDLC w/ 
+#define ZT_HDLCPPP		_IOW  (ZT_CODE, 41, int)	/* Set a clear channel into HDLC w/
 								   PPP interface mode */
 #define ZT_SETCADENCE		_IOW  (ZT_CODE, 42, struct zt_ring_cadence)	/* Set the ring
 										   cadence for FXS
@@ -399,7 +402,7 @@ typedef struct zt_indirect_data {
 								   for all) */
 #define ZT_GETCONFMUTE		_IOR  (ZT_CODE, 49, int)	/* Get Conference to mute mode */
 #define ZT_ECHOTRAIN		_IOW  (ZT_CODE, 50, int)	/* Request echo training in some
-								   number of ms (with muting in the 
+								   number of ms (with muting in the
 								   mean time) */
 #define ZT_ONHOOKTRANSFER	_IOW  (ZT_CODE, 51, int)	/* Set on hook transfer for n
 								   number of ms -- implemnted by
@@ -414,12 +417,12 @@ typedef struct zt_indirect_data {
 										   /dev/zap/ctl
 										   interface */
 
-/* 
+/*
  *  60-80 are reserved for private drivers
  *  80-85 are reserved for dynamic span stuff
  */
 
-#define ZT_DYNAMIC_CREATE	_IOWR (ZT_CODE, 80, struct zt_dynamic_span)	/* Create a dynamic 
+#define ZT_DYNAMIC_CREATE	_IOWR (ZT_CODE, 80, struct zt_dynamic_span)	/* Create a dynamic
 										   span */
 #define ZT_DYNAMIC_DESTROY	_IOW (ZT_CODE, 81, struct zt_dynamic_span)	/* Destroy a
 										   dynamic span */
@@ -474,7 +477,7 @@ struct zt_tone_def {			/* Structure for zone programming */
 	/* Now come the constants we need to make tones */
 	int shift;			/* How much to scale down the volume (2 is nice) */
 
-	/* 
+	/*
 	   Calculate the next 6 factors using the following equations: l = <level in dbm>, f1 =
 	   <freq1>, f2 = <freq2> gain = pow(10.0, (l - 3.14) / 20.0) * 65536.0 / 2.0;
 
@@ -505,7 +508,7 @@ struct zt_tone_def {			/* Structure for zone programming */
 									   processes */
 #define ZT_FLUSH_EVENT		 4	/* Flush the event queue */
 #define ZT_FLUSH_ALL		(ZT_FLUSH_READ | ZT_FLUSH_WRITE | ZT_FLUSH_EVENT)	/* Flush
-											   everything 
+											   everything
 											 */
 
 #define ZT_ONHOOK		 0	/* Value for ZT_HOOK, set to ON hook */
@@ -531,7 +534,7 @@ struct zt_tone_def {			/* Structure for zone programming */
 #define ZT_EVENT_RINGEROFF	11	/* Ret Value for ringer going off */
 #define ZT_EVENT_HOOKCOMPLETE	12	/* Ret Value for hook change complete */
 #define ZT_EVENT_BITSCHANGED	13	/* Ret Value for bits changing on a CAS / User channel */
-#define ZT_EVENT_PULSE_START	14	/* Ret value for the beginning of a pulse coming on its way 
+#define ZT_EVENT_PULSE_START	14	/* Ret value for the beginning of a pulse coming on its way
 					 */
 #define ZT_EVENT_TIMER_EXPIRED	15	/* Timer event -- timer expired */
 #define ZT_EVENT_TIMER_PING	16	/* Timer event -- ping ready */
@@ -801,12 +804,12 @@ struct zt_chan {
 
 	short getlin[ZT_MAX_CHUNKSIZE];	/* Last transmitted samples */
 	unsigned char getraw[ZT_MAX_CHUNKSIZE];	/* Last received raw data */
-	short getlin_lastchunk[ZT_MAX_CHUNKSIZE];	/* Last transmitted samples from last chunk 
+	short getlin_lastchunk[ZT_MAX_CHUNKSIZE];	/* Last transmitted samples from last chunk
 							 */
 	short putlin[ZT_MAX_CHUNKSIZE];	/* Last received samples */
 	unsigned char putraw[ZT_MAX_CHUNKSIZE];	/* Last received raw data */
 	short conflast[ZT_MAX_CHUNKSIZE];	/* Last conference sample -- base part of channel */
-	short conflast1[ZT_MAX_CHUNKSIZE];	/* Last conference sample -- pseudo part of channel 
+	short conflast1[ZT_MAX_CHUNKSIZE];	/* Last conference sample -- pseudo part of channel
 						 */
 	short conflast2[ZT_MAX_CHUNKSIZE];	/* Previous last conference sample -- pseudo part
 						   of channel */
@@ -949,7 +952,7 @@ struct zt_span {
 
 	/* ==== Span Callback Operations ==== */
 	int (*setchunksize) (struct zt_span * span, int chunksize);	/* Req: Set the requested
-									   chunk size.  This is the 
+									   chunk size.  This is the
 									   unit in which you must
 									   report results for
 									   conferencing, etc */
@@ -1019,7 +1022,7 @@ struct zt_dynamic_driver {
 	char desc[80];			/* Driver description */
 	void *(*create) (struct zt_span * span, char *address);	/* Create a new transmission pipe */
 	void (*destroy) (void *tpipe);	/* Destroy a created transmission pipe */
-	int (*transmit) (void *tpipe, unsigned char *msg, int msglen);	/* Transmit a given message 
+	int (*transmit) (void *tpipe, unsigned char *msg, int msglen);	/* Transmit a given message
 									 */
 	struct zt_dynamic_driver *next;
 };
@@ -1218,7 +1221,7 @@ struct zt_radio_param {
 #define ZT_RADPAR_NOENCODE		 4	/* block the CTCSS/DCS encode (0/1) */
 #define ZT_RADPAR_CORTHRESH		 5	/* COR trigger threshold (0-7) */
 
-#define ZT_RADPAR_EXTRXTONE		 6	/* 0 means use internal decoder, 1 means UIOA logic 
+#define ZT_RADPAR_EXTRXTONE		 6	/* 0 means use internal decoder, 1 means UIOA logic
 						   true is CT decode, 2 means UIOA logic false is
 						   CT decode */
 #define ZT_RADPAR_NUMTONES		 7	/* returns maximum tone index (curently 15) */

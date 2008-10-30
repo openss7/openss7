@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m2ua_ioctl.h,v 0.9.2.6 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: m2ua_ioctl.h,v 0.9.2.7 2008-10-30 13:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_ioctl.h,v $
+ Revision 0.9.2.7  2008-10-30 13:36:56  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -65,11 +68,11 @@
 #ifndef __M2UA_IOCTL_H__
 #define __M2UA_IOCTL_H__
 
-#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
-#define M2UA_IOC_MAGIC '2'
+#define M2UA_IOC_MAGIC	'2'
 
 #define M2UA_OBJ_TYPE_LM	 0	/* layer management */
 #define M2UA_OBJ_TYPE_AS_U	 1	/* application server (user) */
@@ -147,7 +150,7 @@ typedef struct m2ua_opt_conf_df {
 typedef struct m2ua_option {
 	lmi_ulong type;			/* object type */
 	lmi_ulong id;			/* object id */
-	/* 
+	/*
 	   followed by object-specific option structure */
 } m2ua_option_t;
 
@@ -221,8 +224,7 @@ typedef struct m2ua_config {
 	lmi_ulong type;			/* object type */
 	lmi_ulong id;			/* object id */
 	lmi_ulong cmd;			/* object command */
-	/* 
-	   followed by object-specific config structure */
+	/* followed by object-specific config structure */
 } m2ua_config_t;
 
 #define M2UA_GET	0
@@ -246,12 +248,9 @@ typedef struct m2ua_statem_as {
 	m2ua_timers_as_t timers;
 	lmi_ulong as_numb;		/* number of id/state pairs for AS */
 	lmi_ulong spp_numb;		/* number of id/state pairs for SPP */
-	/* 
-	   followed by id/state pairs for AS */
-	/* 
-	   followed by id/state pairs for SPP */
-	/* 
-	   terminated by zero */
+	/* followed by id/state pairs for AS */
+	/* followed by id/state pairs for SPP */
+	/* terminated by zero */
 } m2ua_statem_as_t;
 
 /*
@@ -264,10 +263,8 @@ typedef struct m2ua_timers_sp {
 typedef struct m2ua_statem_sp {
 	m2ua_timers_sp_t timers;
 	lmi_ulong sp_numb;		/* number of id/state pairs for SP */
-	/* 
-	   followed by id/state pairs for SP */
-	/* 
-	   terminated by zero */
+	/* followed by id/state pairs for SP */
+	/* terminated by zero */
 } m2ua_statem_sp_t;
 
 /*
@@ -282,10 +279,8 @@ typedef struct m2ua_timers_spp {
 typedef struct m2ua_statem_spp {
 	m2ua_timers_spp_t timers;
 	lmi_ulong as_numb;		/* number of id/state pairs for AS */
-	/* 
-	   followed by id/state pairs for AS */
-	/* 
-	   terminated by zero */
+	/* followed by id/state pairs for AS */
+	/* terminated by zero */
 } m2ua_statem_spp_t;
 
 /*
@@ -328,8 +323,7 @@ typedef struct m2ua_statem {
 	lmi_ulong id;			/* object id */
 	lmi_ulong flags;		/* object flags */
 	lmi_ulong state;		/* object state */
-	/* 
-	   followed by object-specific state structure */
+	/* followed by object-specific state structure */
 } m2ua_statem_t;
 
 #define M2UA_IOCGSTATEM		_IOWR(	M2UA_IOC_MAGIC,	 6,	m2ua_statem_t	)
@@ -384,8 +378,7 @@ typedef struct m2ua_stats {
 	lmi_ulong type;			/* object type */
 	lmi_ulong id;			/* object id */
 	lmi_ulong header;		/* object stats header */
-	/* 
-	   followed by object-specific stats structure */
+	/* followed by object-specific stats structure */
 } m2ua_stats_t;
 
 #define M2UA_IOCGSTATSP		_IOWR(	M2UA_IOC_MAGIC,	 8,	m2ua_stats_t	)
@@ -435,8 +428,7 @@ typedef struct m2ua_pass {
 	lmi_ulong band;			/* band of message block */
 	lmi_ulong ctl_length;		/* length of cntl part */
 	lmi_ulong dat_length;		/* length of data part */
-	/* 
-	   followed by cntl and data part of message to pass to lower */
+	/* followed by cntl and data part of message to pass to lower */
 } m2ua_pass_t;
 
 #define M2UA_IOCCPASS		_IOWR(	M2UA_IOC_MAGIC,	16,	m2ua_pass_t	)

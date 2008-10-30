@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticots.h,v 0.9.2.9 2008-04-28 18:38:36 brian Exp $
+ @(#) $Id: ticots.h,v 0.9.2.10 2008-10-30 13:37:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:36 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ticots.h,v $
+ Revision 0.9.2.10  2008-10-30 13:37:47  brian
+ - updated headers for release
+
  Revision 0.9.2.9  2008-04-28 18:38:36  brian
  - header updates for release
 
@@ -89,7 +92,7 @@
 #ifndef _SYS_TICOTS_H
 #define _SYS_TICOTS_H
 
-#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -106,7 +109,7 @@
 #if 0
 #if !defined _TICOTS_H && !defined __KERNEL__
 #error ****
-#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
+#error **** DO NOT INCLUDE SYSTEM HEADER FILES DIRECTLY IN USER-SPACE
 #error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <ticots.h>
 #error **** INSTEAD OF <sys/ticots.h>.
 #error ****

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sctp.h,v 0.9.2.7 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: npi_sctp.h,v 0.9.2.8 2008-10-30 13:37:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_sctp.h,v $
+ Revision 0.9.2.8  2008-10-30 13:37:00  brian
+ - updated headers for release
+
  Revision 0.9.2.7  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -65,7 +68,7 @@
 #ifndef _SYS_NPI_SCTP_H
 #define _SYS_NPI_SCTP_H
 
-#ident "@(#) $RCSfile: npi_sctp.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi_sctp.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /*
  *  LiS npi.h is version 1
@@ -93,7 +96,7 @@ typedef struct {
 	np_ulong QOS_range_offset;	/** Offset of QOS values' range. */
 	np_ulong OPTIONS_flags;		/** Bit masking for options supported. */
 	np_ulong NIDU_size;		/** Network i/f data unit size. */
-	np_long SERV_type;			/** Service type. */
+	np_long SERV_type;		/** Service type. */
 	np_ulong CURRENT_state;		/** Current state. */
 	np_ulong PROVIDER_type;		/** Type of NS provider. */
 	np_ulong NODU_size;		/** Optimal NSDU size. */
@@ -122,8 +125,8 @@ typedef struct {
 #endif				/* N_VERSION_2 */
 
 typedef struct sctp_addr {
-	u_int16_t port __attribute__ ((packed));
-	u_int32_t addr[0] __attribute__ ((packed));
+	uint16_t port __attribute__ ((packed));
+	uint32_t addr[0] __attribute__ ((packed));
 } sctp_addr_t;
 
 #define NSF_UNBND	(1<<NS_UNBND	  )

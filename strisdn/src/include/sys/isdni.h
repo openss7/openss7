@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: isdni.h,v 0.9.2.4 2008-04-29 00:49:01 brian Exp $
+ @(#) $Id: isdni.h,v 0.9.2.5 2008-10-30 13:37:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:49:01 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdni.h,v $
+ Revision 0.9.2.5  2008-10-30 13:37:16  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2008-04-29 00:49:01  brian
  - updated headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __SS7_ISDNI_H__
 #define __SS7_ISDNI_H__
 
-#ident "@(#) $RCSfile: isdni.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: isdni.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -74,9 +77,9 @@
  */
 
 typedef struct isdn_addr {
-	ulong scope;			/* the scope of the identifier */
-	ulong id;			/* the identifier within the scope */
-	ulong ci;			/* channel identifier within the scope */
+	cc_ulong scope;			/* the scope of the identifier */
+	cc_ulong id;			/* the identifier within the scope */
+	cc_ulong ci;			/* channel identifier within the scope */
 } isdn_addr_t;
 
 #define ISDN_SCOPE_CH           1	/* channel scope */
@@ -132,7 +135,7 @@ enum {
  *  Q.850 Cause Values
  */
 /*
-   Normal class 
+   Normal class
  */
 #define CC_CAUS_UNALLOCATED_NUMBER		  1	/* Unallocated (unassigned) number */
 #define CC_CAUS_NO_ROUTE_TO_TRANSIT_NETWORK	  2	/* No route to specified transit network */
@@ -156,7 +159,7 @@ enum {
 #define CC_CAUS_FACILITY_REJECTED		 29	/* Facility rejected */
 #define CC_CAUS_NORMAL_UNSPECIFIED		 31	/* Normal unspecified */
 /*
-   Resource Unavailable Class 
+   Resource Unavailable Class
  */
 #define CC_CAUS_NO_CCT_AVAILABLE		 34	/* No circuit/channel available */
 #define CC_CAUS_NETWORK_OUT_OF_ORDER		 38	/* Network out of order */
@@ -167,7 +170,7 @@ enum {
 #define CC_CAUS_PRECEDENCE_CALL_BLOCKED		 46	/* Precedence call blocked */
 #define CC_CAUS_RESOURCE_UNAVAILABLE		 47	/* Resource unavailable, unspecified */
 /*
-   Service or Option Unavaialble Class 
+   Service or Option Unavaialble Class
  */
 #define CC_CAUS_NOT_SUBSCRIBED			 50	/* Requested facility not subscribed */
 #define CC_CAUS_OGC_BARRED_WITHIN_CUG		 53	/* Outgoing calls barred within CUG */
@@ -180,7 +183,7 @@ enum {
 #define CC_CAUS_SERVICE_OPTION_NOT_AVAILABLE	 63	/* Service or option not available,
 							   unspecified */
 /*
-   Service or Option Not Implemented Class 
+   Service or Option Not Implemented Class
  */
 #define CC_CAUS_BC_NOT_IMPLEMENTED		 65	/* Bearer capability not implemented */
 #define CC_CAUS_FACILITY_NOT_IMPLEMENTED	 69	/* Requested facility not implemented */
@@ -189,7 +192,7 @@ enum {
 #define CC_CAUS_SERIVCE_OPTION_NOT_IMPLEMENTED	 79	/* Service or option not implemented,
 							   unspecified */
 /*
-   Invalid Message (e.g., Parameter out of Range) Class 
+   Invalid Message (e.g., Parameter out of Range) Class
  */
 #define CC_CAUS_UNEXPECTED_MESSAGE		 81	/* Unexpected message */
 #define CC_CAUS_USER_NOT_MEMBER_OF_CUG		 87	/* User not member of CUG */
@@ -200,7 +203,7 @@ enum {
 #define CC_CAUS_MISSING_MANDATORY_PARAMETER	 96	/* Invalid message, missing mandatory
 							   parameter */
 /*
-   Protocol Error (e.g., Unknwon Message) Class 
+   Protocol Error (e.g., Unknwon Message) Class
  */
 #define CC_CAUS_MESSAGE_TYPE_NOT_IMPLEMENTED	 97	/* Message typ non-existent or not
 							   implemented. */
@@ -214,14 +217,14 @@ enum {
 							   discarded */
 #define CC_CAUS_PROTOCOL_ERROR			111	/* Protocol error, unspecified */
 /*
-   Interworking Class 
+   Interworking Class
  */
 #define CC_CAUS_INTERWORKING			127	/* Interworking, unspecified */
 /*
  *  ANSI Standard Causes
  */
 /*
-   Normal Class 
+   Normal Class
  */
 #define CC_CAUS_UNALLOCATED_DEST_NUMBER		 23	/* Unallocated destination number */
 #define CC_CAUS_UNKNOWN_BUSINESS_GROUP		 24	/* Unknown business group */
@@ -230,12 +233,12 @@ enum {
 #define CC_CAUS_LNP_QOR_NUMBER_NOT_FOUND	 27	/* Number portability Query on Release
 							   (QoR) number not found. */
 /*
-   Resource Unavailable Class 
+   Resource Unavailable Class
  */
 #define CC_CAUS_RESOURCE_PREEMPTION		 45	/* Preemption. */
 #define CC_CAUS_PRECEDENCE_CALL_BLOCKED		 46	/* Precedence call blocked. */
 /*
-   Service or Option Not Available Class 
+   Service or Option Not Available Class
  */
 #define CC_CAUS_CALL_TYPE_INCOMPATIBLE		 51	/* Call type incompatible with service
 							   request */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lapd_ioctl.h,v 0.9.2.4 2008-04-29 00:49:01 brian Exp $
+ @(#) $Id: lapd_ioctl.h,v 0.9.2.5 2008-10-30 13:37:16 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 00:49:01 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapd_ioctl.h,v $
+ Revision 0.9.2.5  2008-10-30 13:37:16  brian
+ - updated headers for release
+
  Revision 0.9.2.4  2008-04-29 00:49:01  brian
  - updated headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __LAPD_IOCTL_H__
 #define __LAPD_IOCTL_H__
 
-#ident "@(#) $RCSfile: lapd_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lapd_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -76,31 +79,31 @@
 #define LAPD_OBJ_TYPE_CD		2	/* CD provider */
 
 typedef struct lapd_iochdr {
-	ulong type;			/* object type */
-	ulong id;			/* object id */
-	ulong cmd;			/* command or argument */
+	dl_ulong type;			/* object type */
+	dl_ulong id;			/* object id */
+	dl_ulong cmd;			/* command or argument */
 } lapd_iochdr_t;
 
 typedef struct lapd_proto {
-	ulong pvar;
-	ulong popt;
+	dl_ulong pvar;
+	dl_ulong popt;
 } lapd_proto_t;
 
 /*
  *  Timers
  */
 typedef struct lapd_timers_dl {
-	ulong t200;			/* retransmission timeout */
-	ulong t201;			/* retransmission timeout for TEI management */
-	ulong t202;			/* response timeout for TEI management */
-	ulong t203;			/* default inactivity timeout */
+	dl_ulong t200;			/* retransmission timeout */
+	dl_ulong t201;			/* retransmission timeout for TEI management */
+	dl_ulong t202;			/* response timeout for TEI management */
+	dl_ulong t203;			/* default inactivity timeout */
 } lapd_timers_dl_t;
 
 typedef struct lapd_timers_cd {
-	ulong t200;			/* default retransmission timeout for data links */
-	ulong t201;			/* retransmission timeout for TEI management */
-	ulong t202;			/* response timeout for TEI management */
-	ulong t203;			/* default inactivity timeout for data links */
+	dl_ulong t200;			/* default retransmission timeout for data links */
+	dl_ulong t201;			/* retransmission timeout for TEI management */
+	dl_ulong t202;			/* response timeout for TEI management */
+	dl_ulong t203;			/* default inactivity timeout for data links */
 } lapd_timers_cd_t;
 
 typedef struct lapd_timers_df {
@@ -115,10 +118,10 @@ typedef struct lapd_option_dl {
 
 typedef struct lapd_option_cd {
 	struct lapd_timers_cd timers;
-	ulong k;
-	ulong n200;			/* maximum number of retransmissions */
-	ulong n201;			/* maximum size of I field */
-	ulong n202;			/* maximum number of retransmissions TEI management */
+	dl_ulong k;
+	dl_ulong n200;			/* maximum number of retransmissions */
+	dl_ulong n201;			/* maximum size of I field */
+	dl_ulong n202;			/* maximum number of retransmissions TEI management */
 } lapd_option_cd_t;
 
 typedef struct lapd_option_df {
@@ -132,18 +135,18 @@ typedef struct lapd_option_df {
  *  Configuration
  */
 typedef struct lapd_config_dl {
-	ulong ppa;			/* attached PPA (also ID of attached CD) */
+	dl_ulong ppa;			/* attached PPA (also ID of attached CD) */
 	struct lapd_proto proto;	/* protocol options */
 	struct lapd_addr dlc;		/* DL Connection address */
-	ulong mode;			/* DL mode */
+	dl_ulong mode;			/* DL mode */
 } lapd_config_dl_t;
 
 typedef struct lapd_config_cd {
-	ulong muxid;			/* multiplexor id */
+	dl_ulong muxid;			/* multiplexor id */
 	struct lapd_proto proto;	/* protocol options */
-	ulong ppa;			/* associated (CDI) ppa */
-	ulong type;			/* type of comm link */
-	ulong mode;			/* mode of comm link */
+	dl_ulong ppa;			/* associated (CDI) ppa */
+	dl_ulong type;			/* type of comm link */
+	dl_ulong mode;			/* mode of comm link */
 } lapd_config_cd_t;
 
 #define CD_TYPE_B	1	/* ISDN B-Channel (LAPB) */

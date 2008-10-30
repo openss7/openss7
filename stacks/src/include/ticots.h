@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticots.h,v 0.9.2.5 2008-04-29 07:10:42 brian Exp $
+ @(#) $Id: ticots.h,v 0.9.2.6 2008-10-30 13:36:50 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:42 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ticots.h,v $
+ Revision 0.9.2.6  2008-10-30 13:36:50  brian
+ - updated headers for release
+
  Revision 0.9.2.5  2008-04-29 07:10:42  brian
  - updating headers for release
 
@@ -74,15 +77,15 @@
 #ifndef _TICOTS_H
 #define _TICOTS_H
 
-#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticots.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+#include <sys/ticots.h>
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */
 __BEGIN_DECLS
 /* *INDENT-ON* */
 #endif
-
-#include <sys/ticots.h>
 
 #ifdef __END_DECLS
 /* *INDENT-OFF* */
@@ -91,3 +94,5 @@ __END_DECLS
 #endif
 
 #endif				/* _TICOTS_H */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

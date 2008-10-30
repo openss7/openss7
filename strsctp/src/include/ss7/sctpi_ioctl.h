@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctpi_ioctl.h,v 0.9.2.5 2008-04-28 23:13:26 brian Exp $
+ @(#) $Id: sctpi_ioctl.h,v 0.9.2.6 2008-10-30 13:37:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctpi_ioctl.h,v $
+ Revision 0.9.2.6  2008-10-30 13:37:27  brian
+ - updated headers for release
+
  Revision 0.9.2.5  2008-04-28 23:13:26  brian
  - updated headers for release
 
@@ -65,7 +68,9 @@
 #ifndef __SCTPI_IOCTL_H__
 #define __SCTPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sctpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+
+/* This file can be processed by doxygen(1). */
 
 #define SCTP_IOC_MAGIC 'c'
 

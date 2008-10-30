@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticotsord.h,v 0.9.2.10 2008-04-28 18:38:36 brian Exp $
+ @(#) $Id: ticotsord.h,v 0.9.2.11 2008-10-30 13:37:47 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:36 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ticotsord.h,v $
+ Revision 0.9.2.11  2008-10-30 13:37:47  brian
+ - updated headers for release
+
  Revision 0.9.2.10  2008-04-28 18:38:36  brian
  - header updates for release
 
@@ -92,7 +95,7 @@
 #ifndef _SYS_TICOTSORD_H
 #define _SYS_TICOTSORD_H
 
-#ident "@(#) $RCSfile: ticotsord.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticotsord.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -109,7 +112,7 @@
 #if 0
 #if !defined _TICOTSORD_H && !defined __KERNEL__
 #error ****
-#error **** DO NOT INCLUDE SYSTEM HEADER FILS DIRECTLY IN USER-SPACE
+#error **** DO NOT INCLUDE SYSTEM HEADER FILES DIRECTLY IN USER-SPACE
 #error **** PROGRAMS.  LIKELY YOU SHOULD HAVE INCLUDED <ticotsord.h>
 #error **** INSTEAD OF <sys/ticotsord.h>.
 #error ****

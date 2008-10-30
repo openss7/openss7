@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mgi.h,v 0.9.2.3 2008-04-28 23:39:56 brian Exp $
+ @(#) $Id: mgi.h,v 0.9.2.4 2008-10-30 13:37:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:39:56 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mgi.h,v $
+ Revision 0.9.2.4  2008-10-30 13:37:05  brian
+ - updated headers for release
+
  Revision 0.9.2.3  2008-04-28 23:39:56  brian
  - updated headers for release
 
@@ -65,7 +68,7 @@
 #ifndef __SYS_MGI_H__
 #define __SYS_MGI_H__
 
-#ident "@(#) $RCSfile: mgi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mgi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -148,10 +151,10 @@
  *  -------------------------------------------------------------------------
  */
 typedef struct MG_optmgmt_req {
-	ulong mg_primitive;		/* always MG_INFO_REQ */
-	ulong mg_opt_length;		/* length of options */
-	ulong mg_opt_offset;		/* offset of options */
-	ulong mg_mgmt_flags;		/* management flags */
+	mg_ulong mg_primitive;		/* always MG_INFO_REQ */
+	mg_ulong mg_opt_length;		/* length of options */
+	mg_ulong mg_opt_offset;		/* offset of options */
+	mg_ulong mg_mgmt_flags;		/* management flags */
 } MG_optmgmt_req_t;
 
 /*
@@ -159,10 +162,10 @@ typedef struct MG_optmgmt_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MG_optmgmt_ack {
-	ulong mg_primitive;		/* always MG_INFO_ACK */
-	ulong mg_opt_length;		/* length of options */
-	ulong mg_opt_offset;		/* offset of options */
-	ulong mg_mgmt_flags;		/* management flags */
+	mg_ulong mg_primitive;		/* always MG_INFO_ACK */
+	mg_ulong mg_opt_length;		/* length of options */
+	mg_ulong mg_opt_offset;		/* offset of options */
+	mg_ulong mg_mgmt_flags;		/* management flags */
 } MG_optmgmt_ack_t;
 
 #define MG_SUCCESS	0x00	/* indicates successful operation */
@@ -173,45 +176,45 @@ typedef struct MG_optmgmt_ack {
 #define MG_DEFAULT	0x10	/* default options */
 
 typedef struct MG_channel_opt {
-	ulong mg_obj_type;		/* always MG_OBJ_TYPE_CH */
-	ulong mg_obj_id;		/* channel id */
-	ulong ch_type;			/* channel media type */
-	ulong ch_flags;			/* channel media options flags */
-	ulong ch_block_size;		/* data block size (bits) */
-	ulong ch_encoding;		/* encoding */
-	ulong ch_sample_size;		/* sample size (bits) */
-	ulong ch_rate;			/* clock rate (Hz) */
-	ulong ch_tx_channels;		/* number of tx channels */
-	ulong ch_rx_channels;		/* number of rx channels */
-	ulong ch_opt_flags;		/* options flags */
+	mg_ulong mg_obj_type;		/* always MG_OBJ_TYPE_CH */
+	mg_ulong mg_obj_id;		/* channel id */
+	mg_ulong ch_type;		/* channel media type */
+	mg_ulong ch_flags;		/* channel media options flags */
+	mg_ulong ch_block_size;		/* data block size (bits) */
+	mg_ulong ch_encoding;		/* encoding */
+	mg_ulong ch_sample_size;	/* sample size (bits) */
+	mg_ulong ch_rate;		/* clock rate (Hz) */
+	mg_ulong ch_tx_channels;	/* number of tx channels */
+	mg_ulong ch_rx_channels;	/* number of rx channels */
+	mg_ulong ch_opt_flags;		/* options flags */
 } MG_channel_opt_t;
 
 typedef struct MG_connleg_opt {
-	ulong mg_obj_type;		/* always MG_OBJ_TYPE_LG */
-	ulong mg_obj_id;		/* channel id */
-	ulong lg_type;			/* conn leg media type */
-	ulong lg_flags;			/* conn leg media options flags */
-	ulong lg_block_size;		/* data block size (bits) */
-	ulong lg_encoding;		/* encoding */
-	ulong lg_sample_size;		/* sample size (bits) */
-	ulong lg_rate;			/* clock rate (Hz) */
-	ulong lg_tx_channels;		/* number of tx channels */
-	ulong lg_rx_channels;		/* number of rx channels */
-	ulong lg_opt_flags;		/* options flags */
+	mg_ulong mg_obj_type;		/* always MG_OBJ_TYPE_LG */
+	mg_ulong mg_obj_id;		/* channel id */
+	mg_ulong lg_type;		/* conn leg media type */
+	mg_ulong lg_flags;		/* conn leg media options flags */
+	mg_ulong lg_block_size;		/* data block size (bits) */
+	mg_ulong lg_encoding;		/* encoding */
+	mg_ulong lg_sample_size;	/* sample size (bits) */
+	mg_ulong lg_rate;		/* clock rate (Hz) */
+	mg_ulong lg_tx_channels;	/* number of tx channels */
+	mg_ulong lg_rx_channels;	/* number of rx channels */
+	mg_ulong lg_opt_flags;		/* options flags */
 } MG_connleg_opt_t;
 
 typedef struct MG_session_opt {
-	ulong mg_obj_type;		/* always MG_OBJ_TYPE_SE */
-	ulong mg_obj_id;		/* session id */
-	ulong se_type;			/* session media type */
-	ulong se_flags;			/* session media options flags */
-	ulong se_block_size;		/* data block size (bits) */
-	ulong se_encoding;		/* encoding */
-	ulong se_sample_size;		/* sample size (bits) */
-	ulong se_rate;			/* clock rate (Hz) */
-	ulong se_tx_channels;		/* number of tx channels */
-	ulong se_rx_channels;		/* number of rx channels */
-	ulong se_opt_flags;		/* options flags */
+	mg_ulong mg_obj_type;		/* always MG_OBJ_TYPE_SE */
+	mg_ulong mg_obj_id;		/* session id */
+	mg_ulong se_type;		/* session media type */
+	mg_ulong se_flags;		/* session media options flags */
+	mg_ulong se_block_size;		/* data block size (bits) */
+	mg_ulong se_encoding;		/* encoding */
+	mg_ulong se_sample_size;	/* sample size (bits) */
+	mg_ulong se_rate;		/* clock rate (Hz) */
+	mg_ulong se_tx_channels;	/* number of tx channels */
+	mg_ulong se_rx_channels;	/* number of rx channels */
+	mg_ulong se_opt_flags;		/* options flags */
 } MG_session_opt_t;
 
 #define SEF_INTERWORKING	0x01	/* encoding interworking */
@@ -220,8 +223,8 @@ typedef struct MG_session_opt {
 
 typedef union MG_options {
 	struct {
-		ulong mg_obj_type;	/* object type */
-		ulong mg_obj_id;	/* object id */
+		mg_ulong mg_obj_type;	/* object type */
+		mg_ulong mg_obj_id;	/* object id */
 	} obj;
 	struct MG_channel_opt ch;	/* channel options */
 	struct MG_connleg_opt lg;	/* conn leg options */
@@ -239,7 +242,7 @@ typedef union MG_options {
  *  configuration.
  */
 typedef struct MG_info_req {
-	ulong mg_primitive;		/* always MG_INFO_REQ */
+	mg_ulong mg_primitive;		/* always MG_INFO_REQ */
 } MG_info_req_t;
 
 /*
@@ -249,13 +252,13 @@ typedef struct MG_info_req {
  *  channel configuration.
  */
 typedef struct MG_info_ack {
-	ulong mg_primitive;		/* always MG_INFO_ACK */
-	ulong mg_se_id;			/* session id */
-	ulong mg_opt_length;		/* channel options length */
-	ulong mg_opt_offset;		/* channel options offset */
-	ulong mg_prov_flags;		/* provider options flags */
-	ulong mg_style;			/* provider style */
-	ulong mg_version;		/* provider version */
+	mg_ulong mg_primitive;		/* always MG_INFO_ACK */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_opt_length;		/* channel options length */
+	mg_ulong mg_opt_offset;		/* channel options offset */
+	mg_ulong mg_prov_flags;		/* provider options flags */
+	mg_ulong mg_style;		/* provider style */
+	mg_ulong mg_version;		/* provider version */
 } MG_info_ack_t;
 
 #define MG_STYLE1	0x0	/* does not perform attach */
@@ -279,11 +282,11 @@ typedef struct MG_info_ack {
  *  with the requesting stream need be assigned in this fashion.
  */
 typedef struct MG_attach_req {
-	ulong mg_primitive;		/* always MG_ATTACH_REQ */
-	ulong mg_mx_id;			/* multiplex id (or 0 for requesting stream) */
-	ulong mg_mx_slot;		/* multiplex slot number */
-	ulong mg_ch_id;			/* channel id (or 0 for provider assignment) */
-	ulong mg_ch_type;		/* type of channel */
+	mg_ulong mg_primitive;		/* always MG_ATTACH_REQ */
+	mg_ulong mg_mx_id;		/* multiplex id (or 0 for requesting stream) */
+	mg_ulong mg_mx_slot;		/* multiplex slot number */
+	mg_ulong mg_ch_id;		/* channel id (or 0 for provider assignment) */
+	mg_ulong mg_ch_type;		/* type of channel */
 } MG_attach_req_t;
 
 /*
@@ -292,10 +295,10 @@ typedef struct MG_attach_req {
  *  Acknowledges an MG_ATTACH_REQ.  Returns the channel id.
  */
 typedef struct MG_attach_ack {
-	ulong mg_primitive;		/* always MG_ATTACH_ACK */
-	ulong mg_mx_id;			/* multiplex id (or 0 for requesting stream) */
-	ulong mg_mx_slot;		/* multiplex slot number */
-	ulong mg_ch_id;			/* channel id assignment */
+	mg_ulong mg_primitive;		/* always MG_ATTACH_ACK */
+	mg_ulong mg_mx_id;		/* multiplex id (or 0 for requesting stream) */
+	mg_ulong mg_mx_slot;		/* multiplex slot number */
+	mg_ulong mg_ch_id;		/* channel id assignment */
 } MG_attach_ack_t;
 
 /*
@@ -305,8 +308,8 @@ typedef struct MG_attach_ack {
  *  primitive is acknowledged with the MG_OK_ACK.
  */
 typedef struct MG_detach_req {
-	ulong mg_primitive;		/* always MG_DETACH_REQ */
-	ulong mg_ch_id;			/* channel id */
+	mg_ulong mg_primitive;		/* always MG_DETACH_REQ */
+	mg_ulong mg_ch_id;		/* channel id */
 } MG_detach_req_t;
 
 /*
@@ -324,11 +327,11 @@ typedef struct MG_detach_req {
  *  MG_LEAVE_IND primitive.
  */
 typedef struct MG_join_req {
-	ulong mg_primitive;		/* always MG_JOIN_REQ */
-	ulong mg_se_id;			/* session to join (0 to create) */
-	ulong mg_tp_id;			/* joined termination (0 for new) */
-	ulong mg_channel_length;	/* channel ids that make up termination */
-	ulong mg_channel_offset;	/* channel ids that make up termination */
+	mg_ulong mg_primitive;		/* always MG_JOIN_REQ */
+	mg_ulong mg_se_id;		/* session to join (0 to create) */
+	mg_ulong mg_tp_id;		/* joined termination (0 for new) */
+	mg_ulong mg_channel_length;	/* channel ids that make up termination */
+	mg_ulong mg_channel_offset;	/* channel ids that make up termination */
 } MG_join_req_t;
 
 /*
@@ -338,9 +341,9 @@ typedef struct MG_join_req {
  *  and termination point id of the join.
  */
 typedef struct MG_join_con {
-	ulong mg_primitive;		/* always MG_JOIN_CON */
-	ulong mg_se_id;			/* joined session */
-	ulong mg_tp_id;			/* joined termination */
+	mg_ulong mg_primitive;		/* always MG_JOIN_CON */
+	mg_ulong mg_se_id;		/* joined session */
+	mg_ulong mg_tp_id;		/* joined termination */
 } MG_join_con_t;
 
 /*
@@ -378,12 +381,12 @@ typedef struct MG_join_con {
  *  MG_ACTION_LOOPBACK).
  */
 typedef struct MG_action_req {
-	ulong mg_primitive;		/* always MG_ACTION_REQ */
-	ulong mg_action;		/* requested action */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* termination id to perform action */
-	ulong mg_duration;		/* duration in milliseconds */
-	ulong mg_flags;			/* option flags */
+	mg_ulong mg_primitive;		/* always MG_ACTION_REQ */
+	mg_ulong mg_action;		/* requested action */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* termination id to perform action */
+	mg_ulong mg_duration;		/* duration in milliseconds */
+	mg_ulong mg_flags;		/* option flags */
 } MG_action_req_t;
 
 #define MG_ACTION_FIRST			 1
@@ -434,11 +437,11 @@ typedef struct MG_action_req {
  *  duration actions will be indicated with MG_ACTION_IND.
  */
 typedef struct MG_action_con {
-	ulong mg_primitive;		/* always MG_ACTION_CON */
-	ulong mg_action;		/* confirmed action */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* termination id for action confirmed */
-	ulong mg_action_id;		/* action identifier */
+	mg_ulong mg_primitive;		/* always MG_ACTION_CON */
+	mg_ulong mg_action;		/* confirmed action */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* termination id for action confirmed */
+	mg_ulong mg_action_id;		/* action identifier */
 } MG_action_con_t;
 
 /*
@@ -448,11 +451,11 @@ typedef struct MG_action_con {
  *  has completed.
  */
 typedef struct MG_action_ind {
-	ulong mg_primitive;		/* always MG_ACTION_CON */
-	ulong mg_action;		/* completed action */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* termination id for action completed */
-	ulong mg_action_id;		/* action identifier */
+	mg_ulong mg_primitive;		/* always MG_ACTION_CON */
+	mg_ulong mg_action;		/* completed action */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* termination id for action completed */
+	mg_ulong mg_action_id;		/* action identifier */
 } MG_event_ind_t;
 
 /*
@@ -466,10 +469,10 @@ typedef struct MG_action_ind {
  *  aborted.
  */
 typedef struct MG_abort_req {
-	ulong mg_primitive;		/* always MG_ABORT_REQ */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* termination id for action to abort */
-	ulong mg_action_id;		/* identifier of action to abort */
+	mg_ulong mg_primitive;		/* always MG_ABORT_REQ */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* termination id for action to abort */
+	mg_ulong mg_action_id;		/* identifier of action to abort */
 } MG_abort_req_t;
 
 #define MG_ACTION_PREVIOUS	(-1UL)
@@ -490,17 +493,17 @@ typedef struct MG_abort_req {
  *  termination point is to be connected in the directions requested.
  */
 typedef struct MG_conn_req {
-	ulong mg_primitive;		/* always MG_CONN_REQ */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* termination point */
-	ulong mg_conn_flags;		/* connection flags */
-	ulong mg_padding;		/* digital padding */
-	ulong mg_topology_length;	/* length of topology to connect */
-	ulong mg_topology_offset;	/* offset of topology to connect */
+	mg_ulong mg_primitive;		/* always MG_CONN_REQ */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* termination point */
+	mg_ulong mg_conn_flags;		/* connection flags */
+	mg_ulong mg_padding;		/* digital padding */
+	mg_ulong mg_topology_length;	/* length of topology to connect */
+	mg_ulong mg_topology_offset;	/* offset of topology to connect */
 } MG_conn_req_t;
 
 /*
-   connect flags 
+   connect flags
  */
 #define MGF_IC_DIR	0x01
 #define MGF_OG_DIR	0x02
@@ -513,9 +516,9 @@ typedef struct MG_conn_req {
  *  completed.
  */
 typedef struct MG_conn_con {
-	ulong mg_primitive;		/* always MG_CONN_CON */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* connecting channel id */
+	mg_ulong mg_primitive;		/* always MG_CONN_CON */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* connecting channel id */
 } MG_conn_con_t;
 
 /*
@@ -524,9 +527,9 @@ typedef struct MG_conn_con {
  *  Sends channel data to the session from the requesting MG stream.
  */
 typedef struct MG_data_req {
-	ulong mg_primitive;		/* always MG_DATA_REQ */
-	ulong mg_flags;			/* data flags */
-	ulong mg_mx_slot;		/* multiplex slot number */
+	mg_ulong mg_primitive;		/* always MG_DATA_REQ */
+	mg_ulong mg_flags;		/* data flags */
+	mg_ulong mg_mx_slot;		/* multiplex slot number */
 } MG_data_req_t;
 
 /*
@@ -535,9 +538,9 @@ typedef struct MG_data_req {
  *  Receives channel data from the session on the MG stream.
  */
 typedef struct MG_data_ind {
-	ulong mg_primitive;		/* always MG_DATA_IND */
-	ulong mg_flags;			/* data flags */
-	ulong mg_mx_slot;		/* multiplex slot number */
+	mg_ulong mg_primitive;		/* always MG_DATA_IND */
+	mg_ulong mg_flags;		/* data flags */
+	mg_ulong mg_mx_slot;		/* multiplex slot number */
 } MG_data_ind_t;
 
 /*
@@ -556,12 +559,12 @@ typedef struct MG_data_ind {
  *  termination point is to be disconnected in the directions requested.
  */
 typedef struct MG_discon_req {
-	ulong mg_primitive;		/* always MG_DISCON_REQ */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* termination point */
-	ulong mg_conn_flags;		/* connection flags */
-	ulong mg_topology_length;	/* length of topology to disconnect */
-	ulong mg_topology_offset;	/* offset of topology to disconnect */
+	mg_ulong mg_primitive;		/* always MG_DISCON_REQ */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* termination point */
+	mg_ulong mg_conn_flags;		/* connection flags */
+	mg_ulong mg_topology_length;	/* length of topology to disconnect */
+	mg_ulong mg_topology_offset;	/* offset of topology to disconnect */
 } MG_discon_req_t;
 
 /*
@@ -576,11 +579,11 @@ typedef struct MG_discon_req {
  *  participants in the communications session for the directions indicated.
  */
 typedef struct MG_discon_ind {
-	ulong mg_primitive;		/* always MG_DISCON_IND */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* disconnecting termination id */
-	ulong mg_conn_flags;		/* directions disconnected */
-	ulong mg_cause;			/* cause of disconnect */
+	mg_ulong mg_primitive;		/* always MG_DISCON_IND */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* disconnecting termination id */
+	mg_ulong mg_conn_flags;		/* directions disconnected */
+	mg_ulong mg_cause;		/* cause of disconnect */
 } MG_discon_ind_t;
 
 /*
@@ -590,9 +593,9 @@ typedef struct MG_discon_ind {
  *  completed.
  */
 typedef struct MG_discon_con {
-	ulong mg_primitive;		/* always MG_DISCON_CON */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* disconnecting termination id */
+	mg_ulong mg_primitive;		/* always MG_DISCON_CON */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* disconnecting termination id */
 } MG_discon_con_t;
 
 /*
@@ -604,9 +607,9 @@ typedef struct MG_discon_con {
  *  communication session is destroyed.
  */
 typedef struct MG_leave_req {
-	ulong mg_primitive;		/* always MG_LEAVE_REQ */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* leaving termination id */
+	mg_ulong mg_primitive;		/* always MG_LEAVE_REQ */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* leaving termination id */
 } MG_leave_req_t;
 
 /*
@@ -616,10 +619,10 @@ typedef struct MG_leave_req {
  *  communications session.
  */
 typedef struct MG_leave_ind {
-	ulong mg_primitive;		/* always MG_LEAVE_IND */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* leaving termination id */
-	ulong mg_cause;			/* reason for leaving */
+	mg_ulong mg_primitive;		/* always MG_LEAVE_IND */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* leaving termination id */
+	mg_ulong mg_cause;		/* reason for leaving */
 } MG_leave_ind_t;
 
 /*
@@ -629,9 +632,9 @@ typedef struct MG_leave_ind {
  *  point identifier is released.
  */
 typedef struct MG_leave_con {
-	ulong mg_primitive;		/* always MG_LEAVE_CON */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* left termination id */
+	mg_ulong mg_primitive;		/* always MG_LEAVE_CON */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* left termination id */
 } MG_leave_con_t;
 
 /*
@@ -639,8 +642,8 @@ typedef struct MG_leave_con {
  *  -------------------------------------------------------------------------
  */
 typedef struct MG_ok_ack {
-	ulong mg_primitive;		/* always MG_OK_ACK */
-	ulong mg_correct_prim;		/* correct primitive */
+	mg_ulong mg_primitive;		/* always MG_OK_ACK */
+	mg_ulong mg_correct_prim;	/* correct primitive */
 } MG_ok_ack_t;
 
 /*
@@ -648,10 +651,10 @@ typedef struct MG_ok_ack {
  *  -------------------------------------------------------------------------
  */
 typedef struct MG_error_ack {
-	ulong mg_primitive;		/* always MG_INFO_REQ */
-	ulong mg_error_primitive;	/* primitive in error */
-	ulong mg_error_type;		/* MG interface error type */
-	ulong mg_unix_error;		/* UNIX error */
+	mg_ulong mg_primitive;		/* always MG_INFO_REQ */
+	mg_ulong mg_error_primitive;	/* primitive in error */
+	mg_ulong mg_error_type;		/* MG interface error type */
+	mg_ulong mg_unix_error;		/* UNIX error */
 } MG_error_ack_t;
 
 #define MGSYSERR		 0	/* UNIX system error */
@@ -670,8 +673,8 @@ typedef struct MG_error_ack {
  *  -------------------------------------------------------------------------
  */
 typedef struct MG_notify_req {
-	ulong mg_primitive;		/* always MG_NOTIFY_REQ */
-	ulong mg_events;		/* events to notify */
+	mg_ulong mg_primitive;		/* always MG_NOTIFY_REQ */
+	mg_ulong mg_events;		/* events to notify */
 } MG_notify_req_t;
 
 /*
@@ -679,13 +682,13 @@ typedef struct MG_notify_req {
  *  -------------------------------------------------------------------------
  */
 typedef struct MG_notify_ind {
-	ulong mg_primitive;		/* always MG_NOTIFY_IND */
-	ulong mg_event;			/* event */
-	ulong mg_se_id;			/* session id */
-	ulong mg_tp_id;			/* termination id */
-	ulong mg_ch_id;			/* channel id */
-	ulong mg_diag_length;		/* diagnostic length */
-	ulong mg_diag_offset;		/* diagnostic offset */
+	mg_ulong mg_primitive;		/* always MG_NOTIFY_IND */
+	mg_ulong mg_event;		/* event */
+	mg_ulong mg_se_id;		/* session id */
+	mg_ulong mg_tp_id;		/* termination id */
+	mg_ulong mg_ch_id;		/* channel id */
+	mg_ulong mg_diag_length;	/* diagnostic length */
+	mg_ulong mg_diag_offset;	/* diagnostic offset */
 } MG_notify_ind_t;
 
 #endif				/* __SYS_MGI_H__ */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_sctp.h,v 0.9.2.8 2008-04-28 23:13:26 brian Exp $
+ @(#) $Id: npi_sctp.h,v 0.9.2.9 2008-10-30 13:37:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_sctp.h,v $
+ Revision 0.9.2.9  2008-10-30 13:37:28  brian
+ - updated headers for release
+
  Revision 0.9.2.8  2008-04-28 23:13:26  brian
  - updated headers for release
 
@@ -68,7 +71,7 @@
 #ifndef _SYS_NPI_SCTP_H
 #define _SYS_NPI_SCTP_H
 
-#ident "@(#) $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 1997-2008 OpenSS7 Corporation."
+#ident "@(#) $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 1997-2008 OpenSS7 Corporation."
 
 /*
  *  LiS npi.h is version 1
@@ -96,7 +99,7 @@ typedef struct {
 	np_ulong QOS_range_offset;	/** Offset of QOS values' range. */
 	np_ulong OPTIONS_flags;		/** Bit masking for options supported. */
 	np_ulong NIDU_size;		/** Network i/f data unit size. */
-	long SERV_type;			/** Service type. */
+	np_long SERV_type;		/** Service type. */
 	np_ulong CURRENT_state;		/** Current state. */
 	np_ulong PROVIDER_type;		/** Type of NS provider. */
 	np_ulong NODU_size;		/** Optimal NSDU size. */

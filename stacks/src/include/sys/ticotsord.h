@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticotsord.h,v 0.9.2.6 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: ticotsord.h,v 0.9.2.7 2008-10-30 13:37:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ticotsord.h,v $
+ Revision 0.9.2.7  2008-10-30 13:37:01  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -77,9 +80,19 @@
 #ifndef _SYS_TICOTSORD_H
 #define _SYS_TICOTSORD_H
 
-#ident "@(#) $RCSfile: ticotsord.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticotsord.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @addtogroup loopback
+  * @{ */
+
+/** @file
+  * TPI COTS w/ Orderly Release header file.  */
+
+/*
+ * TPI COTS w/ Orderly Release Header File.
+ */
 
 #if 0
 #if !defined _TICOTSORD_H && !defined __KERNEL__
@@ -91,10 +104,24 @@
 #endif				/* !defined _TICOTSORD_H && !defined __KERNEL__ */
 #endif
 
+#if __SVID
+#define TCOO_NOPEER		1	/* destiniation address is not listening */
+#define TCOO_PEERNOROMMONQ	2	/* no room on connection indication queue */
+#define TCOO_PEERBADSTATE	3	/* transport peer in incorrect state */
+#define TCOO_PEERINITIATED	4	/* transport peer user-initiated disconnect */
+#define TCOO_PROVIDERINITIATED	5	/* transport peer provider-initiated disconnect */
+#define TCOO_DEFAULTADDRSZ	4
+#else				/* __SVID */
 #define TCOO_NOPEER		ECONNREFUSED	/* destiniation address is not listening */
-#define TCOO_PEERBADSTATE	ECONNREFUSED	/* transport peer in incorrect state */
 #define TCOO_PEERNOROMMONQ	ECONNREFUSED	/* no room on connection indication queue */
+#define TCOO_PEERBADSTATE	ECONNREFUSED	/* transport peer in incorrect state */
 #define TCOO_PEERINITIATED	ECONNRESET	/* transport peer user-initiated disconnect */
-#define TCOO_PROVIDERINITIATED	ECONNRESET	/* transport peer provider-initiated disconnect */
+#define TCOO_PROVIDERINITIATED	ECONNABORTED	/* transport peer provider-initiated disconnect */
+#define TCOO_DEFAULTADDRSZ	4
+#endif				/* __SVID */
 
 #endif				/* _SYS_TICOTSORD_H */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.7 2008-04-29 07:10:44 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.8 2008-10-30 13:36:56 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:44 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:36:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.8  2008-10-30 13:36:56  brian
+ - updated headers for release
+
  Revision 0.9.2.7  2008-04-29 07:10:44  brian
  - updating headers for release
 
@@ -65,77 +68,77 @@
 #ifndef __SS7_MXI_H__
 #define __SS7_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2008 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
 typedef int32_t mx_long;
-typedef u_int32_t mx_ulong;
-typedef u_int16_t mx_ushort;
-typedef u_int8_t mx_uchar;
+typedef uint32_t mx_ulong;
+typedef uint16_t mx_ushort;
+typedef uint8_t mx_uchar;
 
-#define MX_INFO_REQ		 1UL
-#define MX_OPTMGMT_REQ		 2UL
-#define MX_ATTACH_REQ		 3UL
-#define MX_ENABLE_REQ		 4UL
-#define MX_CONNECT_REQ		 5UL
-#define MX_DATA_REQ		 6UL
-#define MX_DISCONNECT_REQ	 7UL
-#define MX_DISABLE_REQ		 8UL
-#define MX_DETACH_REQ		 9UL
+#define MX_INFO_REQ		 1U
+#define MX_OPTMGMT_REQ		 2U
+#define MX_ATTACH_REQ		 3U
+#define MX_ENABLE_REQ		 4U
+#define MX_CONNECT_REQ		 5U
+#define MX_DATA_REQ		 6U
+#define MX_DISCONNECT_REQ	 7U
+#define MX_DISABLE_REQ		 8U
+#define MX_DETACH_REQ		 9U
 
-#define MX_INFO_ACK		10UL
-#define MX_OPTMGMT_ACK		11UL
-#define MX_OK_ACK		12UL
-#define MX_ERROR_ACK		13UL
-#define MX_ENABLE_CON		14UL
-#define MX_CONNECT_CON		15UL
-#define MX_DATA_IND		16UL
-#define MX_DISCONNECT_IND	17UL
-#define MX_DISCONNECT_CON	18UL
-#define MX_DISABLE_IND		19UL
-#define MX_DISABLE_CON		20UL
-#define MX_EVENT_IND		21UL
+#define MX_INFO_ACK		10U
+#define MX_OPTMGMT_ACK		11U
+#define MX_OK_ACK		12U
+#define MX_ERROR_ACK		13U
+#define MX_ENABLE_CON		14U
+#define MX_CONNECT_CON		15U
+#define MX_DATA_IND		16U
+#define MX_DISCONNECT_IND	17U
+#define MX_DISCONNECT_CON	18U
+#define MX_DISABLE_IND		19U
+#define MX_DISABLE_CON		20U
+#define MX_EVENT_IND		21U
 
 /*
  *  MX STATES
  */
-#define MXS_UNINIT		-2UL
-#define MXS_UNUSABLE		-1UL
-#define MXS_DETACHED		 0UL
-#define MXS_WACK_AREQ		 1UL
-#define MXS_WACK_UREQ		 2UL
-#define MXS_ATTACHED		 3UL
-#define MXS_WACK_EREQ		 4UL
-#define MXS_WCON_EREQ		 5UL
-#define MXS_WACK_RREQ		 6UL
-#define MXS_WCON_RREQ		 7UL
-#define MXS_ENABLED		 8UL
-#define MXS_WACK_CREQ		 9UL
-#define MXS_WCON_CREQ		10UL
-#define MXS_WACK_DREQ		11UL
-#define MXS_WCON_DREQ		12UL
-#define MXS_CONNECTED		13UL
+#define MXS_UNINIT		-2U
+#define MXS_UNUSABLE		-1U
+#define MXS_DETACHED		 0U
+#define MXS_WACK_AREQ		 1U
+#define MXS_WACK_UREQ		 2U
+#define MXS_ATTACHED		 3U
+#define MXS_WACK_EREQ		 4U
+#define MXS_WCON_EREQ		 5U
+#define MXS_WACK_RREQ		 6U
+#define MXS_WCON_RREQ		 7U
+#define MXS_ENABLED		 8U
+#define MXS_WACK_CREQ		 9U
+#define MXS_WCON_CREQ		10U
+#define MXS_WACK_DREQ		11U
+#define MXS_WCON_DREQ		12U
+#define MXS_CONNECTED		13U
 
 /*
  *  MX STATE FLAGS
  */
-#define MXSF_UNINIT		(1<<MXS_UNINIT)
-#define MXSF_UNUSABLE		(1<<MXS_UNUSABLE)
-#define MXSF_DETACHED		(1<<MXS_DETACHED)
-#define MXSF_WACK_AREQ		(1<<MXS_WACK_AREQ)
-#define MXSF_WACK_UREQ		(1<<MXS_WACK_UREQ)
-#define MXSF_ATTACHED		(1<<MXS_ATTACHED)
-#define MXSF_WACK_EREQ		(1<<MXS_WACK_EREQ)
-#define MXSF_WCON_EREQ		(1<<MXS_WCON_EREQ)
-#define MXSF_WACK_RREQ		(1<<MXS_WACK_RREQ)
-#define MXSF_WCON_RREQ		(1<<MXS_WCON_RREQ)
-#define MXSF_ENABLED		(1<<MXS_ENABLED)
-#define MXSF_WACK_CREQ		(1<<MXS_WACK_CREQ)
-#define MXSF_WCON_CREQ		(1<<MXS_WCON_CREQ)
-#define MXSF_WACK_DREQ		(1<<MXS_WACK_DREQ)
-#define MXSF_WCON_DREQ		(1<<MXS_WCON_DREQ)
-#define MXSF_CONNECTED		(1<<MXS_CONNECTED)
+#define MXSF_UNINIT		(1<<(2+MXS_UNINIT))
+#define MXSF_UNUSABLE		(1<<(2+MXS_UNUSABLE))
+#define MXSF_DETACHED		(1<<(2+MXS_DETACHED))
+#define MXSF_WACK_AREQ		(1<<(2+MXS_WACK_AREQ))
+#define MXSF_WACK_UREQ		(1<<(2+MXS_WACK_UREQ))
+#define MXSF_ATTACHED		(1<<(2+MXS_ATTACHED))
+#define MXSF_WACK_EREQ		(1<<(2+MXS_WACK_EREQ))
+#define MXSF_WCON_EREQ		(1<<(2+MXS_WCON_EREQ))
+#define MXSF_WACK_RREQ		(1<<(2+MXS_WACK_RREQ))
+#define MXSF_WCON_RREQ		(1<<(2+MXS_WCON_RREQ))
+#define MXSF_ENABLED		(1<<(2+MXS_ENABLED))
+#define MXSF_WACK_CREQ		(1<<(2+MXS_WACK_CREQ)
+#define MXSF_WCON_CREQ		(1<<(2+MXS_WCON_CREQ))
+#define MXSF_WACK_DREQ		(1<<(2+MXS_WACK_DREQ))
+#define MXSF_WCON_DREQ		(1<<(2+MXS_WCON_DREQ))
+#define MXSF_CONNECTED		(1<<(2+MXS_CONNECTED))
 
 /*
  *  MX PROTOCOL PRIMITIVES
@@ -162,10 +165,13 @@ typedef struct MX_info_ack {
 	mx_ulong mx_parm_length;	/* multiplex paramters length */
 	mx_ulong mx_parm_offset;	/* multiplex paramters offset */
 	mx_ulong mx_prov_flags;		/* provider options flags */
+	mx_ulong mx_prov_class;		/* provider class */
 	mx_ulong mx_style;		/* provider style */
 	mx_ulong mx_version;		/* multiplex interface version */
 	mx_ulong mx_state;		/* multiplex state */
 } MX_info_ack_t;
+
+#define MX_CIRCUIT	0x01	/* circuit provider class */
 
 #define MX_STYLE1	0x0	/* does not perform attach */
 #define MX_STYLE2	0x1	/* does perform attach */
@@ -176,19 +182,19 @@ typedef struct MX_info_ack {
 
 #define MX_PARMS_CIRCUIT	0x01	/* parms structure type */
 typedef struct MX_parms_circuit {
-	mx_ulong cp_type;		/* always MX_PARMS_CIRCUIT */
-	mx_ulong cp_encoding;		/* encoding */
-	mx_ulong cp_block_size;		/* data block size (bits) */
-	mx_ulong cp_samples;		/* samples per block */
-	mx_ulong cp_sample_size;	/* sample size (bits) */
-	mx_ulong cp_rate;		/* clock rate (samples/second) */
-	mx_ulong cp_tx_channels;	/* number of tx channels */
-	mx_ulong cp_rx_channels;	/* number of rx channels */
-	mx_ulong cp_opt_flags;		/* options flags */
+	mx_ulong mp_type;		/* always MX_PARMS_CIRCUIT */
+	mx_ulong mp_encoding;		/* encoding */
+	mx_ulong mp_block_size;		/* data block size (bits) */
+	mx_ulong mp_samples;		/* samples per block */
+	mx_ulong mp_sample_size;	/* sample size (bits) */
+	mx_ulong mp_rate;		/* channel clock rate (samples/second) */
+	mx_ulong mp_tx_channels;	/* number of tx channels */
+	mx_ulong mp_rx_channels;	/* number of rx channels */
+	mx_ulong mp_opt_flags;		/* options flags */
 } MX_parms_circuit_t;
 
 union MX_parms {
-	mx_ulong cp_type;		/* structure type */
+	mx_ulong mp_type;		/* structure type */
 	MX_parms_circuit_t circuit;	/* circuit structure */
 };
 
@@ -234,6 +240,7 @@ union MX_parms {
 #define MX_RATE_192000		192000	/* T1 */
 #define MX_RATE_240000		240000	/* 30B */
 #define MX_RATE_248000		248000	/* E1 */
+#define MX_RATE_5376000		5376000	/* T3 */
 
 /*
  *  MX_OPTMGMT_REQ
@@ -258,7 +265,7 @@ typedef struct MX_optmgmt_ack {
 } MX_optmgmt_ack_t;
 
 /*
-   management flags for MX_OPTMGMT 
+   management flags for MX_OPTMGMT
  */
 #define MX_SET_OPT	0x01
 #define MX_GET_OPT	0x02
@@ -307,7 +314,7 @@ typedef struct MX_error_ack {
 } MX_error_ack_t;
 
 /*
-   error types 
+   error types
  */
 #define MXSYSERR	 0	/* UNIX system error */
 #define MXBADADDR	 1	/* Bad address format or content */
@@ -390,7 +397,7 @@ typedef struct MX_connect_req {
 } MX_connect_req_t;
 
 /*
-   connect flags 
+   connect flags
  */
 #define MXF_RX_DIR	0x01
 #define MXF_TX_DIR	0x02
@@ -442,9 +449,9 @@ typedef struct MX_disconnect_con {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_event_ind {
-	ch_ulong ch_primitive;		/* always MX_EVENT_IND */
-	ch_ulong ch_event;		/* event */
-	ch_ulong ch_slot;		/* slot within channel for event */
+	mx_ulong mx_primitive;		/* always MX_EVENT_IND */
+	mx_ulong mx_event;		/* event */
+	mx_ulong mx_slot;		/* slot within multiplex for event */
 } MX_event_ind_t;
 
 #define MX_EVT_DCD_ASSERT		 0

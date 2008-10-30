@@ -1,3 +1,13 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/xti.h: updated headers
+	* src/include/xti_mosi.h: updated headers
+	* src/include/xti_osi.h: updated headers
+	* src/include/xti_xx25.h: updated headers
+	* src/include/sys/lapb_ioctl.h: updated headers
+	* src/include/sys/xti_mosi.h: updated headers
+	* src/include/sys/xti_osi.h: updated headers
+
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: move conflicting manpages

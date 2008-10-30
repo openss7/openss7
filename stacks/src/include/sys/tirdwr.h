@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tirdwr.h,v 0.9.2.6 2008-04-29 07:10:46 brian Exp $
+ @(#) $Id: tirdwr.h,v 0.9.2.7 2008-10-30 13:37:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:10:46 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 13:37:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.h,v $
+ Revision 0.9.2.7  2008-10-30 13:37:01  brian
+ - updated headers for release
+
  Revision 0.9.2.6  2008-04-29 07:10:46  brian
  - updating headers for release
 
@@ -65,9 +68,18 @@
 #ifndef _SYS_TIRDWR_H
 #define _SYS_TIRDWR_H
 
-#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tirdwr.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
+
+/** @addtogroup tirdwr
+  * @{ */
+
+/** @file
+  * Transport Interface Read/Write (tirdwr) Header File.
+  *
+  * This file contains no definitions.  Nevertheless, this header file should
+  * exist to indicate the existence of support for the tirdwr(4) module.  */
 
 #if !defined _TIRDWR_H && !defined __KERNEL__
 #error ****
@@ -77,7 +89,15 @@
 #error ****
 #endif				/* !defined _TIRDWR_H && !defined __KERNEL__ */
 
-/* No definitions.  Nevertheless, this header file should exist to indicate the existence of
-   support for the tirdwr(4) module. */
+/*
+ * Header file for tirdwr module.
+ *
+ * This file contains no definitions.  Nevertheless, this header file should
+ * exist to indicate the existence of support for the tirdwr(4) module.
+ */
 
 #endif				/* _SYS_TIRDWR_H */
+
+/** @} */
+
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

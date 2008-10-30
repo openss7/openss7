@@ -1,3 +1,8 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/strlog.h: updated headers
+	* src/include/sys/strutil/strlog.h: updated headers
+
 2008-10-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/prerequisites.texi: documented tool chain updates
