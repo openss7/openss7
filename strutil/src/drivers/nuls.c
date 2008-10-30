@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:31:43 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-10-30 18:31:45 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nuls.c,v $
+ Revision 0.9.2.47  2008-10-30 18:31:45  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.46  2008-09-22 20:31:43  brian
  - added module version and truncated logs
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:31:43 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-10-30 18:31:45 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:31:43 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-10-30 18:31:45 $";
 
 #define _LFS_SOURCE
 
@@ -75,7 +79,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-09-22 20:31:43 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2008-10-30 18:31:45 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -87,7 +91,7 @@ static char const ident[] =
 #define NULS_SPLASH	NULS_DEVICE	" - " \
 			NULS_REVISION	"\n"
 
-#if defined LiS && defined MODULE
+#if defined LIS && defined MODULE
 #define CONFIG_STREAMS_NULS_MODULE MODULE
 #endif
 
@@ -164,6 +168,13 @@ MODULE_ALIAS("/dev/streams/clone/nuls");
 #endif
 #endif
 
+#ifdef LIS
+#define STRMINPSZ   0
+#define STRMAXPSZ   4096
+#define STRHIGH	    5120
+#define STRLOW	    1024
+#endif
+
 static struct module_info nuls_minfo = {
 	.mi_idnum = CONFIG_STREAMS_NULS_MODID,
 	.mi_idname = CONFIG_STREAMS_NULS_NAME,
@@ -176,12 +187,22 @@ static struct module_info nuls_minfo = {
 static struct module_stat nuls_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat nuls_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
+#ifdef LIS
+union ioctypes {
+	struct iocblk iocblk;
+	struct copyreq copyreq;
+	struct copyresp copyresp;
+};
+
+#define streamscall _RP
+
+#endif
+
 static streamscall int
 nuls_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	_trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -255,33 +276,25 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 
-	_ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
-		 sflag));
 	if (q->q_ptr != NULL) {
-		_printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		_printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
 	}
 	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) {	/* we could sleep */
-		_printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
 	}
 	bzero(p, sizeof(*p));
 	switch (sflag) {
 	case CLONEOPEN:
-		_printd(("%s: clone open\n", __FUNCTION__));
 		if (cminor < 1)
 			cminor = 1;
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
 
-		_printd(("%s: driver open\n", __FUNCTION__));
 		if (cminor < 1) {
-			_printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
 		spin_lock(&nuls_lock);
@@ -298,7 +311,6 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				else {
 					spin_unlock(&nuls_lock);
 					kmem_free(p, sizeof(*p));
-					pswerr(("%s: stream already open!\n", __FUNCTION__));
 					return (EIO);	/* bad error */
 				}
 			}
@@ -306,7 +318,6 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&nuls_lock);
 			kmem_free(p, sizeof(*p));
-			_printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
@@ -317,11 +328,9 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&nuls_lock);
 		qprocson(q);
-		_printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
 	}
-	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
 
@@ -330,9 +339,7 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct nuls *p;
 
-	_trace();
 	if ((p = q->q_ptr) == NULL) {
-		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
 	}
 	qprocsoff(q);
@@ -343,7 +350,6 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
 	spin_unlock(&nuls_lock);
-	_printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 08:33:27 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-30 18:31:03 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:27 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.13  2008-10-30 18:31:03  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.12  2008-04-29 08:33:27  brian
  - update headers for Affero release
 
@@ -273,9 +276,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 08:33:27 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-30 18:31:03 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-04-29 08:33:27 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-30 18:31:03 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -1973,9 +1976,9 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "M_DATA--------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putpmsg(test_fd[child], ctrl, data, band, flags)) == -1) {
+				print_errno(child, (last_errno = errno));
 				if (last_errno == ERESTART)
 					continue;
-				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
 			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
@@ -1993,9 +1996,9 @@ test_putpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int band, int 
 			print_datcall(child, "M_DATA--------", data ? data->len : 0);
 		for (;;) {
 			if ((last_retval = putmsg(test_fd[child], ctrl, data, flags)) == -1) {
+				print_errno(child, (last_errno = errno));
 				if (last_errno == ERESTART)
 					continue;
-				print_errno(child, (last_errno = errno));
 				return (__RESULT_FAILURE);
 			}
 			if ((verbose > 3 && show) || (verbose > 5 && show_msg))
@@ -2011,9 +2014,9 @@ test_write(int child, const void *buf, size_t len)
 	print_datcall(child, "write(2)------", len);
 	for (;;) {
 		if ((last_retval = write(test_fd[child], buf, len)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2028,9 +2031,9 @@ test_writev(int child, const struct iovec *iov, int num)
 	print_syscall(child, "writev(2)-----");
 	for (;;) {
 		if ((last_retval = writev(test_fd[child], iov, num)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2045,9 +2048,9 @@ test_getmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *flagp)
 	print_datcall(child, "getmsg(2)-----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getmsg(test_fd[child], ctrl, data, flagp)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2062,9 +2065,9 @@ test_getpmsg(int child, struct strbuf *ctrl, struct strbuf *data, int *bandp, in
 	print_datcall(child, "getpmsg(2)----", data ? data->maxlen : -1);
 	for (;;) {
 		if ((last_retval = getpmsg(test_fd[child], ctrl, data, bandp, flagp)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		if ((verbose > 3 && show) || (verbose > 5 && show_msg)) {
@@ -2095,9 +2098,9 @@ test_read(int child, void *buf, size_t count)
 	print_datcall(child, "read(2)-------", count);
 	for (;;) {
 		if ((last_retval = read(test_fd[child], buf, count)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2112,9 +2115,9 @@ test_readv(int child, const struct iovec *iov, int count)
 	print_syscall(child, "readv(2)------");
 	for (;;) {
 		if ((last_retval = readv(test_fd[child], iov, count)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2131,9 +2134,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2142,9 +2145,9 @@ test_nonblock(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags | O_NONBLOCK)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2161,9 +2164,9 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((flags = last_retval = fcntl(test_fd[child], F_GETFL)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2172,9 +2175,9 @@ test_block(int child)
 	print_syscall(child, "fcntl(2)------");
 	for (;;) {
 		if ((last_retval = fcntl(test_fd[child], F_SETFL, flags & ~O_NONBLOCK)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2191,9 +2194,9 @@ test_isastream(int child)
 	print_syscall(child, "isastream(2)--");
 	for (;;) {
 		if ((result = last_retval = isastream(test_fd[child])) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_success_value(child, last_retval);
@@ -2211,9 +2214,9 @@ test_poll(int child, const short events, short *revents, long ms)
 	print_poll(child, events);
 	for (;;) {
 		if ((result = last_retval = poll(&pfd, 1, ms)) == -1) {
+			print_errno(child, (last_errno = errno));
 			if (last_errno == ERESTART)
 				continue;
-			print_errno(child, (last_errno = errno));
 			return (__RESULT_FAILURE);
 		}
 		print_poll_value(child, last_retval, pfd.revents);
@@ -2237,9 +2240,9 @@ test_pipe(int child)
 			print_success(child);
 			return (__RESULT_SUCCESS);
 		}
+		print_errno(child, (last_errno = errno));
 		if (last_errno == ERESTART)
 			continue;
-		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
 	}
 }
@@ -2280,9 +2283,9 @@ test_open(int child, const char *name, int flags)
 			test_fd[child] = fd;
 			return (__RESULT_SUCCESS);
 		}
+		print_errno(child, (last_errno = errno));
 		if (last_errno == ERESTART)
 			continue;
-		print_errno(child, (last_errno = errno));
 		return (__RESULT_FAILURE);
 	}
 }
@@ -2296,9 +2299,9 @@ test_close(int child)
 	for (;;) {
 		if (test_fclose(child, fd) == __RESULT_SUCCESS)
 			return (__RESULT_SUCCESS);
+		print_errno(child, (last_errno = errno));
 		if (last_errno == ERESTART)
 			continue;
-		print_errno(child, (last_errno = errno));
 		return __RESULT_FAILURE;
 	}
 }
@@ -2477,6 +2480,15 @@ preamble_0_2(int child)
 }
 
 int
+preamble_0_3(int child)
+{
+	if (!test_fd[child] && test_open(child, devname, O_RDWR) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+int
 postamble_0(int child)
 {
 	if (test_fd[child] && test_close(child) != __RESULT_SUCCESS)
@@ -2573,6 +2585,38 @@ preamble_2_5(int child)
 	state++;
 	if (test_ioctl(child, TM_IOC_PSIGNAL, (intptr_t) SIGHUP) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
+	state++;
+	return __RESULT_SUCCESS;
+}
+
+/* open a dev, write 4 16-byte data messages, and hang it up */
+int
+preamble_2_6(int child)
+{
+	char buf[16] = { 0, };;
+
+	if (preamble_2(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_block(child) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return __RESULT_FAILURE;
+	state++;
+	if (test_ioctl(child, TM_IOC_HANGUP, (intptr_t) 0) != __RESULT_SUCCESS && last_errno != ENXIO)
+		return __RESULT_FAILURE;
+	state++;
+	test_msleep(child, 1000);
 	state++;
 	return __RESULT_SUCCESS;
 }
@@ -3090,7 +3134,7 @@ static const char sref_case_2_1[] = "POSIX 1003.1 2003/SUSv3 ioctl(2p) reference
 #define name_case_2_1_1 "Perform streamio I_NREAD."
 #define sref_case_2_1_1 sref_case_2_1
 #define desc_case_2_1_1 "\
-Checks that I_NREAD can be performed on a Stream.  Because this test is peformed\n\
+Checks that I_NREAD can be performed on a Stream.  Because this test is performed\n\
 on a freshly opened Stream, it should return zero (0) as a return value and\n\
 return zero (0) in the integer pointed to by arg."
 
@@ -3595,7 +3639,7 @@ struct test_stream test_2_3_2 = { &preamble_0, &test_case_2_3_2, &postamble_0 };
 #define sref_case_2_3_3 sref_case_2_3
 #define desc_case_2_3_3 "\
 Checks that I_POP can be performed on a Stream.  Checks that EINVAL is\n\
-returned when I_POP is peformed twice after a single I_PUSH."
+returned when I_POP is performed twice after a single I_PUSH."
 
 int
 test_case_2_3_3(int child)
@@ -3623,7 +3667,7 @@ struct test_stream test_2_3_3 = { &preamble_0, &test_case_2_3_3, &postamble_0 };
 #define sref_case_2_3_4 sref_case_2_3
 #define desc_case_2_3_4 "\
 Checks that I_POP can be performed on a Stream.  Checks that ENXIO is\n\
-returned when I_POP is peformed on a Stream that is hung up."
+returned when I_POP is performed on a Stream that is hung up."
 
 int
 test_case_2_3_4(int child)
@@ -3645,7 +3689,7 @@ struct test_stream test_2_3_4 = { &preamble_2_1, &test_case_2_3_4, &postamble_2 
 #define sref_case_2_3_5 sref_case_2_3
 #define desc_case_2_3_5 "\
 Checks that I_POP can be performed on a Stream.  Checks that EIO is\n\
-returned when I_POP is peformed on a Stream that has received a read\n\
+returned when I_POP is performed on a Stream that has received a read\n\
 error."
 
 int
@@ -3668,7 +3712,7 @@ struct test_stream test_2_3_5 = { &preamble_2_2, &test_case_2_3_5, &postamble_2 
 #define sref_case_2_3_6 sref_case_2_3
 #define desc_case_2_3_6 "\
 Checks that I_POP can be performed on a Stream.  Checks that EIO is\n\
-returned when I_POP is peformed on a Stream that has received a write\n\
+returned when I_POP is performed on a Stream that has received a write\n\
 error."
 
 int
@@ -3691,7 +3735,7 @@ struct test_stream test_2_3_6 = { &preamble_2_3, &test_case_2_3_6, &postamble_2 
 #define sref_case_2_3_7 sref_case_2_3
 #define desc_case_2_3_7 "\
 Checks that I_POP can be performed on a Stream.  Checks that EIO is\n\
-returned when I_POP is peformed on a Stream that has receive an error."
+returned when I_POP is performed on a Stream that has receive an error."
 
 int
 test_case_2_3_7(int child)
@@ -3713,7 +3757,7 @@ struct test_stream test_2_3_7 = { &preamble_2_4, &test_case_2_3_7, &postamble_2 
 #define sref_case_2_3_8 sref_case_2_3
 #define desc_case_2_3_8 "\
 Checks that I_POP can be performed on a Stream.  Checks that EINVAL\n\
-is returned when I_POP is peformed on a Stream is linked under a\n\
+is returned when I_POP is performed on a Stream is linked under a\n\
 Multiplexing Driver."
 
 int
@@ -4062,7 +4106,7 @@ struct test_stream test_2_5_5 = { &preamble_0, &test_case_2_5_5, &postamble_0 };
 #define sref_case_2_5_6 sref_case_2_5
 #define desc_case_2_5_6 "\
 Checks that I_FLUSH can be performed on a Stream.\n\
-This test is perfomed on a hung up Stream and should return ENXIO."
+This test is performed on a hung up Stream and should return ENXIO."
 
 int
 test_case_2_5_6(int child)
@@ -4084,7 +4128,7 @@ struct test_stream test_2_5_6 = { &preamble_2_1, &test_case_2_5_6, &postamble_2 
 #define sref_case_2_5_7 sref_case_2_5
 #define desc_case_2_5_7 "\
 Checks that I_FLUSH can be performed on a Stream.\n\
-This test is perfomed on a read errored Stream and should return EPROTO."
+This test is performed on a read errored Stream and should return EPROTO."
 
 int
 test_case_2_5_7(int child)
@@ -4106,7 +4150,7 @@ struct test_stream test_2_5_7 = { &preamble_2_2, &test_case_2_5_7, &postamble_2 
 #define sref_case_2_5_8 sref_case_2_5
 #define desc_case_2_5_8 "\
 Checks that I_FLUSH can be performed on a Stream.\n\
-This test is perfomed on a write errored Stream and should return EPROTO."
+This test is performed on a write errored Stream and should return EPROTO."
 
 int
 test_case_2_5_8(int child)
@@ -4128,7 +4172,7 @@ struct test_stream test_2_5_8 = { &preamble_2_3, &test_case_2_5_8, &postamble_2 
 #define sref_case_2_5_9 sref_case_2_5
 #define desc_case_2_5_9 "\
 Checks that I_FLUSH can be performed on a Stream.\n\
-This test is perfomed on a errored Stream and should return EPROTO."
+This test is performed on a errored Stream and should return EPROTO."
 
 int
 test_case_2_5_9(int child)
@@ -4149,7 +4193,7 @@ struct test_stream test_2_5_9 = { &preamble_2_4, &test_case_2_5_9, &postamble_2 
 #define name_case_2_5_10 "Perform streamio I_FLUSH - EINVAL."
 #define sref_case_2_5_10 sref_case_2_5
 #define desc_case_2_5_10 "\
-Checks that I_FLUSH can be performed on a Stream.  This test is perfomed\n\
+Checks that I_FLUSH can be performed on a Stream.  This test is performed\n\
 on a Stream linked under a Muliplexing Driver and should return EINVAL."
 
 int
@@ -5854,7 +5898,7 @@ struct test_stream test_2_9_15 = { &preamble_2, &test_case_2_9_15, &postamble_2 
 #define name_case_2_9_16_1 "Perform streamio I_SETSIG - S_ERROR."
 #define sref_case_2_9_16_1 sref_case_2_9
 #define desc_case_2_9_16_1 "\
-Check that SIGPOLL for S_ERROR is generated when an asyncrhonous read\n\
+Check that SIGPOLL for S_ERROR is generated when an asynchronous read\n\
 error reaches the Stream head."
 
 int
@@ -5886,7 +5930,7 @@ struct test_stream test_2_9_16_1 = { &preamble_2, &test_case_2_9_16_1, &postambl
 #define name_case_2_9_16_2 "Perform streamio I_SETSIG - S_ERROR."
 #define sref_case_2_9_16_2 sref_case_2_9
 #define desc_case_2_9_16_2 "\
-Check that SIGPOLL for S_ERROR is generated when an asyncrhonous write\n\
+Check that SIGPOLL for S_ERROR is generated when an asynchronous write\n\
 error reaches the Stream head."
 
 int
@@ -5918,7 +5962,7 @@ struct test_stream test_2_9_16_2 = { &preamble_2, &test_case_2_9_16_2, &postambl
 #define name_case_2_9_16_3 "Perform streamio I_SETSIG - S_ERROR."
 #define sref_case_2_9_16_3 sref_case_2_9
 #define desc_case_2_9_16_3 "\
-Check that SIGPOLL for S_ERROR is generated when an asyncrhonous error\n\
+Check that SIGPOLL for S_ERROR is generated when an asynchronous error\n\
 reaches the Stream head."
 
 int
@@ -7492,7 +7536,7 @@ struct test_stream test_2_16_3_1 = { &preamble_6_2_2, &test_case_2_16_3_1, &post
 #define desc_case_2_16_3_2 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted  on a Stream (fdi.fildes) that\n\
-has received an asyncrhonous EPROTO read error."
+has received an asynchronous EPROTO read error."
 
 int
 test_case_2_16_3_2(int child)
@@ -7528,7 +7572,7 @@ struct test_stream test_2_16_3_2 = { &preamble_6_2_2, &test_case_2_16_3_2, &post
 #define desc_case_2_16_4_1 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fildes) that has\n\
-received an asyncrhonous EPROTO write error."
+received an asynchronous EPROTO write error."
 
 int
 test_case_2_16_4_1(int child)
@@ -7563,7 +7607,7 @@ struct test_stream test_2_16_4_1 = { &preamble_6_2_3, &test_case_2_16_4_1, &post
 #define desc_case_2_16_4_2 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fdi.fildes) that\n\
-has received an asyncrhonous EPROTO write error."
+has received an asynchronous EPROTO write error."
 
 int
 test_case_2_16_4_2(int child)
@@ -7598,7 +7642,7 @@ struct test_stream test_2_16_4_2 = { &preamble_6_2_3, &test_case_2_16_4_2, &post
 #define desc_case_2_16_5_1 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fildes) that has\n\
-received an asyncrhonous EPROTO error."
+received an asynchronous EPROTO error."
 
 int
 test_case_2_16_5_1(int child)
@@ -7633,7 +7677,7 @@ struct test_stream test_2_16_5_1 = { &preamble_6_2_4, &test_case_2_16_5_1, &post
 #define desc_case_2_16_5_2 "\
 Checks that I_FDINSERT can be performed on a Stream.  Checks that EPROTO\n\
 is returned when I_FDINSERT is attempted on a Stream (fdi.fildes) that\n\
-has received an asyncrhonous EPROTO error."
+has received an asynchronous EPROTO error."
 
 int
 test_case_2_16_5_2(int child)
@@ -9746,7 +9790,7 @@ struct test_stream test_2_24_9 = { &preamble_0, &test_case_2_24_9, &postamble_0 
 #define sref_case_2_24_10 sref_case_2_24
 #define desc_case_2_24_10 "\
 Checks that I_FLUSHBAND succeeds on a non-zero band with FLUSHRW.\n\
-This test is perfomed on a hung up Stream and should return ENXIO."
+This test is performed on a hung up Stream and should return ENXIO."
 
 int
 test_case_2_24_10(int child)
@@ -9770,7 +9814,7 @@ struct test_stream test_2_24_10 = { &preamble_2_1, &test_case_2_24_10, &postambl
 #define sref_case_2_24_11 sref_case_2_24
 #define desc_case_2_24_11 "\
 Checks that I_FLUSHBAND succeeds on a non-zero band with FLUSHRW.\n\
-This test is perfomed on a read errored Stream and should return EPROTO."
+This test is performed on a read errored Stream and should return EPROTO."
 
 int
 test_case_2_24_11(int child)
@@ -9794,7 +9838,7 @@ struct test_stream test_2_24_11 = { &preamble_2_2, &test_case_2_24_11, &postambl
 #define sref_case_2_24_12 sref_case_2_24
 #define desc_case_2_24_12 "\
 Checks that I_FLUSHBAND succeeds on a non-zero band with FLUSHRW.\n\
-This test is perfomed on a write errored Stream and should return EPROTO."
+This test is performed on a write errored Stream and should return EPROTO."
 
 int
 test_case_2_24_12(int child)
@@ -9818,7 +9862,7 @@ struct test_stream test_2_24_12 = { &preamble_2_3, &test_case_2_24_12, &postambl
 #define sref_case_2_24_13 sref_case_2_24
 #define desc_case_2_24_13 "\
 Checks that I_FLUSHBAND succeeds on a non-zero band with FLUSHRW.\n\
-This test is perfomed on an errored Stream and should return EPROTO."
+This test is performed on an errored Stream and should return EPROTO."
 
 int
 test_case_2_24_13(int child)
@@ -9842,7 +9886,7 @@ struct test_stream test_2_24_13 = { &preamble_2_4, &test_case_2_24_13, &postambl
 #define sref_case_2_24_14 sref_case_2_24
 #define desc_case_2_24_14 "\
 Checks that I_FLUSHBAND succeeds on a non-zero band with FLUSHRW.\n\
-This test is perfomed on a Stream linked under a Multiplexing Driver and\n\
+This test is performed on a Stream linked under a Multiplexing Driver and\n\
 should return EINVAL."
 
 int
@@ -13139,20 +13183,32 @@ static const char sref_case_3_1[] = "POSIX 1003.1 2003/SUSv3 read(2p) reference 
 #define sref_case_3_1_1 sref_case_3_1
 #define desc_case_3_1_1 "\
 Check that read() can be performed on a Stream.  Checks that zero (0) is\n\
-returned when read() is attempted on a Stream that has received a hang\n\
-up."
+returned, after data consumed, when read() is attempted on a Stream that\n\
+has received a hang up."
 
 int
 test_case_3_1_1(int child)
 {
 	char buf[16];
 
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
 	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_1_1 = { &preamble_2_1, &test_case_3_1_1, &postamble_2 };
+struct test_stream test_3_1_1 = { &preamble_2_6, &test_case_3_1_1, &postamble_2 };
 
 #define test_case_3_1_1_stream_0 (&test_3_1_1)
 #define test_case_3_1_1_stream_1 (NULL)
@@ -13190,7 +13246,7 @@ struct test_stream test_3_1_2 = { &preamble_2_2, &test_case_3_1_2, &postamble_2 
 #define desc_case_3_1_3 "\
 Check that read() can be performed on a Stream.  Checks that EAGAIN is\n\
 returned when read() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error (and non-blocking operation is set)."
+asynchronous EPROTO write error (and non-blocking operation is set)."
 
 int
 test_case_3_1_3(int child)
@@ -13215,7 +13271,7 @@ struct test_stream test_3_1_3 = { &preamble_2_3, &test_case_3_1_3, &postamble_2 
 #define desc_case_3_1_4 "\
 Check that read() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when read() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_1_4(int child)
@@ -13608,6 +13664,63 @@ struct test_stream test_3_1_11_3 = { &preamble_test_case_3_1_11_3, &test_case_3_
 #define test_case_3_1_11_3_stream_0 (&test_3_1_11_3)
 #define test_case_3_1_11_3_stream_1 (NULL)
 #define test_case_3_1_11_3_stream_2 (NULL)
+
+#define tgrp_case_3_1_11_4 test_group_3_1
+#define numb_case_3_1_11_4 "3.1.11.4"
+#define name_case_3_1_11_4 "Perform read - RNORM."
+#define sref_case_3_1_11_4 sref_case_3_1
+#define desc_case_3_1_11_4 "\
+Check that read() can be performed on a Stream.  Check that if some\n\
+data is read in byte-mode (RNORM) and no more data is immediately\n\
+available, in blocking mode, that a short read results."
+
+int
+preamble_test_case_3_1_11_4(int child)
+{
+	char dbuf[32] = { 0, };
+	struct strbuf dat = { -1, sizeof(dbuf), dbuf };
+	int flags = 0;
+	int i;
+
+	for (i = 0; i < sizeof(dbuf); i++)
+		dbuf[i] = i;
+
+	if (preamble_0_3(child) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_putmsg(child, NULL, &dat, flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+int
+test_case_3_1_11_4(int child)
+{
+	char buf[64] = { 0, };
+	int i;
+
+	if (test_read(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (last_retval != 32)
+		return (__RESULT_FAILURE);
+	state++;
+	for (i = 0; i < 32; i++)
+		if (buf[i] != (char) i)
+			return (__RESULT_FAILURE);
+	state++;
+	return (__RESULT_SUCCESS);
+}
+
+struct test_stream test_3_1_11_4 = { &preamble_test_case_3_1_11_4, &test_case_3_1_11_4, &postamble_0 };
+
+#define test_case_3_1_11_4_stream_0 (&test_3_1_11_4)
+#define test_case_3_1_11_4_stream_1 (NULL)
+#define test_case_3_1_11_4_stream_2 (NULL)
 
 #define tgrp_case_3_1_12_1 test_group_3_1
 #define numb_case_3_1_12_1 "3.1.12.1"
@@ -14250,8 +14363,8 @@ static const char sref_case_3_2[] = "POSIX 1003.1 2003/SUSv3 readv(2p) reference
 #define sref_case_3_2_1 sref_case_3_2
 #define desc_case_3_2_1 "\
 Check that readv() can be performed on a Stream.  Checks that zero (0) is\n\
-returned when readv() is attempted on a Stream that has received a hang\n\
-up."
+returned, after data consumed, when readv() is attempted on a Stream that\n\
+has received a hang up."
 
 int
 test_case_3_2_1(int child)
@@ -14262,12 +14375,24 @@ test_case_3_2_1(int child)
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(buf);
 
+	if (test_readv(child, iov, 1) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_readv(child, iov, 1) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_readv(child, iov, 1) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	if (test_readv(child, iov, 1) != __RESULT_SUCCESS || last_retval != 16)
+		return (__RESULT_FAILURE);
+	state++;
 	if (test_readv(child, iov, 1) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_2_1 = { &preamble_2_1, &test_case_3_2_1, &postamble_2 };
+struct test_stream test_3_2_1 = { &preamble_2_6, &test_case_3_2_1, &postamble_2 };
 
 #define test_case_3_2_1_stream_0 (&test_3_2_1)
 #define test_case_3_2_1_stream_1 (NULL)
@@ -14309,7 +14434,7 @@ struct test_stream test_3_2_2 = { &preamble_2_2, &test_case_3_2_2, &postamble_2 
 #define desc_case_3_2_3 "\
 Check that readv() can be performed on a Stream.  Checks that EAGAIN is\n\
 returned when readv() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error (and non-blocking operation is set)."
+asynchronous EPROTO write error (and non-blocking operation is set)."
 
 int
 test_case_3_2_3(int child)
@@ -14338,7 +14463,7 @@ struct test_stream test_3_2_3 = { &preamble_2_3, &test_case_3_2_3, &postamble_2 
 #define desc_case_3_2_4 "\
 Check that readv() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when readv() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_2_4(int child)
@@ -15467,7 +15592,8 @@ static const char sref_case_3_5[] = "POSIX 1003.1 2003/SUSv3 getmsg(2p) referenc
 #define desc_case_3_5_1 "\
 Check that getmsg() can be performed on a Stream.  Checks that zero is\n\
 returned for both the control part size and data part size, indicating a\n\
-hung up Stream, when getmsg() is called on a hung up Stream."
+hung up Stream, after data consumed, when getmsg() is called on a hung\n\
+up Stream."
 
 int
 test_case_3_5_1(int child)
@@ -15476,27 +15602,61 @@ test_case_3_5_1(int child)
 	struct strbuf dat;
 	int flags;
 	char cbuf[1];
-	char dbuf[1];
+	char dbuf[16];
 
 	ctl.maxlen = 1;
 	ctl.len = -1;
 	ctl.buf = cbuf;
 
-	dat.maxlen = 1;
+	dat.maxlen = 16;
 	dat.len = -1;
 	dat.buf = dbuf;
 
 	flags = 0;
 
+	dat.len = -1;
+	flags = 0;
+	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (dat.len != 16)
+		return __RESULT_FAILURE;
+	state++;
+	dat.len = -1;
+	flags = 0;
+	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (dat.len != 16)
+		return __RESULT_FAILURE;
+	state++;
+	dat.len = -1;
+	flags = 0;
+	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (dat.len != 16)
+		return __RESULT_FAILURE;
+	state++;
+	dat.len = -1;
+	flags = 0;
+	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
+		return __RESULT_FAILURE;
+	state++;
+	if (dat.len != 16)
+		return __RESULT_FAILURE;
+	state++;
+	dat.len = -1;
+	flags = 0;
 	if (test_getmsg(child, &ctl, &dat, &flags) != __RESULT_SUCCESS)
-		return (__RESULT_FAILURE);
+		return __RESULT_FAILURE;
 	state++;
 	if (ctl.len != 0 || dat.len != 0)
-		return (__RESULT_FAILURE);
+		return __RESULT_FAILURE;
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_5_1 = { &preamble_2_1, &test_case_3_5_1, &postamble_2 };
+struct test_stream test_3_5_1 = { &preamble_2_6, &test_case_3_5_1, &postamble_2 };
 
 #define test_case_3_5_1_stream_0 (&test_3_5_1)
 #define test_case_3_5_1_stream_1 (NULL)
@@ -15509,7 +15669,7 @@ struct test_stream test_3_5_1 = { &preamble_2_1, &test_case_3_5_1, &postamble_2 
 #define desc_case_3_5_2 "\
 Check that getmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when getmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_5_2(int child)
@@ -16675,7 +16835,8 @@ static const char sref_case_3_6[] = "POSIX 1003.1 2003/SUSv3 getpmsg(2p) referen
 #define desc_case_3_6_1 "\
 Check that getpmsg() can be performed on a Stream.  Checks that zero is\n\
 returned for both the control part size and data part size, indicating a\n\
-hung up Stream, when getpmsg() is called on a hung up Stream."
+hung up Stream, after data consumed, when getpmsg() is called on a hung\n\
+up Stream."
 
 int
 test_case_3_6_1(int child)
@@ -16685,19 +16846,53 @@ test_case_3_6_1(int child)
 	int band;
 	int flags;
 	char cbuf[1];
-	char dbuf[1];
+	char dbuf[16];
 
 	ctl.maxlen = 1;
 	ctl.len = -1;
 	ctl.buf = cbuf;
 
-	dat.maxlen = 1;
+	dat.maxlen = 16;
 	dat.len = -1;
 	dat.buf = dbuf;
 
 	band = 0;
 	flags = MSG_ANY;
 
+	dat.len = -1;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, NULL, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	dat.len = -1;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, NULL, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	dat.len = -1;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, NULL, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	dat.len = -1;
+	flags = MSG_ANY;
+	if (test_getpmsg(child, NULL, &dat, &band, &flags) != __RESULT_SUCCESS)
+		return (__RESULT_FAILURE);
+	state++;
+	if (dat.len != 16)
+		return (__RESULT_FAILURE);
+	state++;
+	dat.len = -1;
+	flags = MSG_ANY;
 	if (test_getpmsg(child, &ctl, &dat, &band, &flags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -16706,7 +16901,7 @@ test_case_3_6_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
-struct test_stream test_3_6_1 = { &preamble_2_1, &test_case_3_6_1, &postamble_2 };
+struct test_stream test_3_6_1 = { &preamble_2_6, &test_case_3_6_1, &postamble_2 };
 
 #define test_case_3_6_1_stream_0 (&test_3_6_1)
 #define test_case_3_6_1_stream_1 (NULL)
@@ -16719,7 +16914,7 @@ struct test_stream test_3_6_1 = { &preamble_2_1, &test_case_3_6_1, &postamble_2 
 #define desc_case_3_6_2 "\
 Check that getpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when getpmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_6_2(int child)
@@ -18248,7 +18443,7 @@ struct test_stream test_3_7_1 = { &preamble_2_1, &test_case_3_7_1, &postamble_2 
 #define desc_case_3_7_2 "\
 Check that putmsg() can be performed on a Stream.  Checks that putmsg()\n\
 can be successfully performed on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_7_2(int child)
@@ -18287,7 +18482,7 @@ struct test_stream test_3_7_2 = { &preamble_2_2, &test_case_3_7_2, &postamble_2 
 #define desc_case_3_7_3 "\
 Check that putmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error."
+asynchronous EPROTO write error."
 
 int
 test_case_3_7_3(int child)
@@ -18326,7 +18521,7 @@ struct test_stream test_3_7_3 = { &preamble_2_3, &test_case_3_7_3, &postamble_2 
 #define desc_case_3_7_4 "\
 Check that putmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_7_4(int child)
@@ -19027,7 +19222,7 @@ struct test_stream test_3_8_1 = { &preamble_2_1, &test_case_3_8_1, &postamble_2 
 #define desc_case_3_8_2 "\
 Check that putpmsg() can be performed on a Stream.  Checks that putpmsg()\n\
 can be successfully performed on a Stream that has received an\n\
-asyncrhonous EPROTO read error."
+asynchronous EPROTO read error."
 
 int
 test_case_3_8_2(int child)
@@ -19068,7 +19263,7 @@ struct test_stream test_3_8_2 = { &preamble_2_2, &test_case_3_8_2, &postamble_2 
 #define desc_case_3_8_3 "\
 Check that putpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putpmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO write error."
+asynchronous EPROTO write error."
 
 int
 test_case_3_8_3(int child)
@@ -19109,7 +19304,7 @@ struct test_stream test_3_8_3 = { &preamble_2_3, &test_case_3_8_3, &postamble_2 
 #define desc_case_3_8_4 "\
 Check that putpmsg() can be performed on a Stream.  Checks that EPROTO is\n\
 returned when putpmsg() is attempted on a Stream that has received an\n\
-asyncrhonous EPROTO error."
+asynchronous EPROTO error."
 
 int
 test_case_3_8_4(int child)
@@ -19818,7 +20013,7 @@ static const char sref_case_3_9[] = "POSIX 1003.1 2003/SUSv3 isastream(2p) refer
 #define name_case_3_9_1 "Perform isastream."
 #define sref_case_3_9_1 sref_case_3_9
 #define desc_case_3_9_1 "\
-Check that isastream() can be peformed on a Stream.  Checks that\n\
+Check that isastream() can be performed on a Stream.  Checks that\n\
 isastream() successfully identifies a Stream."
 
 int
@@ -19840,7 +20035,7 @@ struct test_stream test_3_9_1 = { &preamble_0, &test_case_3_9_1, &postamble_0 };
 #define name_case_3_9_2 "Perform isastream."
 #define sref_case_3_9_2 sref_case_3_9
 #define desc_case_3_9_2 "\
-Check that isastream() can be peformed on a Stream.  Checks that\n\
+Check that isastream() can be performed on a Stream.  Checks that\n\
 isastream() successfully identifies a file descriptor that is not a Stream."
 
 int
@@ -19869,7 +20064,7 @@ struct test_stream test_3_9_2 = { &preamble_0, &test_case_3_9_2, &postamble_0 };
 #define name_case_3_9_3 "Perform isastream."
 #define sref_case_3_9_3 sref_case_3_9
 #define desc_case_3_9_3 "\
-Check that isastream() can be peformed on a Stream.  Checks that\n\
+Check that isastream() can be performed on a Stream.  Checks that\n\
 EBADF is returned for an invalid file descriptor."
 
 int
@@ -19901,7 +20096,7 @@ static const char sref_case_3_10[] = "POSIX 1003.1 2003/SUSv3 poll(2p) reference
 #define name_case_3_10_1 "Perform poll - POLLNVAL."
 #define sref_case_3_10_1 sref_case_3_10
 #define desc_case_3_10_1 "\
-Check that poll() can be peformed on a Stream.  Checks that POLNVAL is\n\
+Check that poll() can be performed on a Stream.  Checks that POLNVAL is\n\
 returned when an invalid file descriptor is passed to poll()."
 
 int
@@ -19936,7 +20131,7 @@ struct test_stream test_3_10_1 = { &preamble_0, &test_case_3_10_1, &postamble_0 
 #define name_case_3_10_2 "Perform poll - EFAULT."
 #define sref_case_3_10_2 sref_case_3_10
 #define desc_case_3_10_2 "\
-Check that poll() can be peformed on a Stream.  Check that EFAULT is\n\
+Check that poll() can be performed on a Stream.  Check that EFAULT is\n\
 returned if the pollfd pointer extends outside the caller's address\n\
 space."
 
@@ -19967,7 +20162,7 @@ struct test_stream test_3_10_2 = { &preamble_0, &test_case_3_10_2, &postamble_0 
 #define name_case_3_10_3 "Perform poll - EINVAL."
 #define sref_case_3_10_3 sref_case_3_10
 #define desc_case_3_10_3 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_3(int child)
@@ -19997,7 +20192,7 @@ struct test_stream test_3_10_3 = { &preamble_0, &test_case_3_10_3, &postamble_0 
 #define name_case_3_10_4 "Perform poll - EINTR."
 #define sref_case_3_10_4 sref_case_3_10
 #define desc_case_3_10_4 "\
-Check that poll() can be peformed on a Stream.  Check that poll() will\n\
+Check that poll() can be performed on a Stream.  Check that poll() will\n\
 block even (if the Stream is set for non-blocking operation) and can be\n\
 interrupted by a signal and will return EINTR."
 
@@ -20025,7 +20220,7 @@ struct test_stream test_3_10_4 = { &preamble_0, &test_case_3_10_4, &postamble_0 
 #define name_case_3_10_5 "Perform poll POLLIN."
 #define sref_case_3_10_5 sref_case_3_10
 #define desc_case_3_10_5 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_5(int child)
@@ -20077,7 +20272,7 @@ struct test_stream test_3_10_5 = { &preamble_0, &test_case_3_10_5, &postamble_0 
 #define name_case_3_10_6 "Perform poll POLLPRI."
 #define sref_case_3_10_6 sref_case_3_10
 #define desc_case_3_10_6 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_6(int child)
@@ -20130,7 +20325,7 @@ struct test_stream test_3_10_6 = { &preamble_0, &test_case_3_10_6, &postamble_0 
 #define name_case_3_10_7 "Perform poll POLLOUT."
 #define sref_case_3_10_7 sref_case_3_10
 #define desc_case_3_10_7 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_7(int child)
@@ -20197,7 +20392,7 @@ struct test_stream test_3_10_7 = { &preamble_0, &test_case_3_10_7, &postamble_0 
 #define name_case_3_10_8 "Perform poll POLLRDNORM."
 #define sref_case_3_10_8 sref_case_3_10
 #define desc_case_3_10_8 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_8(int child)
@@ -20249,7 +20444,7 @@ struct test_stream test_3_10_8 = { &preamble_0, &test_case_3_10_8, &postamble_0 
 #define name_case_3_10_9 "Perform poll POLLRDBAND."
 #define sref_case_3_10_9 sref_case_3_10
 #define desc_case_3_10_9 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_9(int child)
@@ -20301,7 +20496,7 @@ struct test_stream test_3_10_9 = { &preamble_0, &test_case_3_10_9, &postamble_0 
 #define name_case_3_10_10 "Perform poll POLLWRNORM."
 #define sref_case_3_10_10 sref_case_3_10
 #define desc_case_3_10_10 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_10(int child)
@@ -20368,7 +20563,7 @@ struct test_stream test_3_10_10 = { &preamble_0, &test_case_3_10_10, &postamble_
 #define name_case_3_10_11 "Perform poll POLLWRBAND."
 #define sref_case_3_10_11 sref_case_3_10
 #define desc_case_3_10_11 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_11(int child)
@@ -20437,7 +20632,7 @@ struct test_stream test_3_10_11 = { &preamble_0, &test_case_3_10_11, &postamble_
 #define name_case_3_10_12_1 "Perform poll POLLERR."
 #define sref_case_3_10_12_1 sref_case_3_10
 #define desc_case_3_10_12_1 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_12_1(int child)
@@ -20466,7 +20661,7 @@ struct test_stream test_3_10_12_1 = { &preamble_2_2, &test_case_3_10_12_1, &post
 #define name_case_3_10_12_2 "Perform poll POLLERR."
 #define sref_case_3_10_12_2 sref_case_3_10
 #define desc_case_3_10_12_2 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_12_2(int child)
@@ -20495,7 +20690,7 @@ struct test_stream test_3_10_12_2 = { &preamble_2_3, &test_case_3_10_12_2, &post
 #define name_case_3_10_12_3 "Perform poll POLLERR."
 #define sref_case_3_10_12_3 sref_case_3_10
 #define desc_case_3_10_12_3 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_12_3(int child)
@@ -20524,7 +20719,7 @@ struct test_stream test_3_10_12_3 = { &preamble_2_4, &test_case_3_10_12_3, &post
 #define name_case_3_10_13 "Perform poll POLLHUP."
 #define sref_case_3_10_13 sref_case_3_10
 #define desc_case_3_10_13 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_13(int child)
@@ -20553,7 +20748,7 @@ struct test_stream test_3_10_13 = { &preamble_2_1, &test_case_3_10_13, &postambl
 #define name_case_3_10_14 "Perform poll POLLNVAL."
 #define sref_case_3_10_14 sref_case_3_10
 #define desc_case_3_10_14 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_14(int child)
@@ -20583,7 +20778,7 @@ struct test_stream test_3_10_14 = { &preamble_5, &test_case_3_10_14, &postamble_
 #define name_case_3_10_15 "Perform poll POLLMSG."
 #define sref_case_3_10_15 sref_case_3_10
 #define desc_case_3_10_15 "\
-Check that poll() can be peformed on a Stream."
+Check that poll() can be performed on a Stream."
 
 int
 test_case_3_10_15(int child)
@@ -21649,6 +21844,8 @@ struct test_case {
 	test_case_3_1_11_2_stream_0, test_case_3_1_11_2_stream_1, test_case_3_1_11_2_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_1_11_3, tgrp_case_3_1_11_3, NULL, name_case_3_1_11_3, NULL, desc_case_3_1_11_3, sref_case_3_1_11_3, {
 	test_case_3_1_11_3_stream_0, test_case_3_1_11_3_stream_1, test_case_3_1_11_3_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
+		numb_case_3_1_11_4, tgrp_case_3_1_11_4, NULL, name_case_3_1_11_4, NULL, desc_case_3_1_11_4, sref_case_3_1_11_4, {
+	test_case_3_1_11_4_stream_0, test_case_3_1_11_4_stream_1, test_case_3_1_11_4_stream_2}, &begin_sanity, &end_sanity, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_1_12_1, tgrp_case_3_1_12_1, NULL, name_case_3_1_12_1, NULL, desc_case_3_1_12_1, sref_case_3_1_12_1, {
 	test_case_3_1_12_1_stream_0, test_case_3_1_12_1_stream_1, test_case_3_1_12_1_stream_2}, &begin_tests, &end_tests, 0, 0, __RESULT_SUCCESS}, {
 		numb_case_3_1_12_2, tgrp_case_3_1_12_2, NULL, name_case_3_1_12_2, NULL, desc_case_3_1_12_2, sref_case_3_1_12_2, {
@@ -22329,8 +22526,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+Affero  General Public License (AGPL)  Version 3,  so long  as  the  software is\n\
+distributed with,  and only used for the  testing of,  OpenSS7 modules, drivers,\n\
 and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -22361,7 +22558,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

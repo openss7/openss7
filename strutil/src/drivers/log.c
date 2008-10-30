@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-10-30 18:31:45 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: log.c,v $
+ Revision 0.9.2.46  2008-10-30 18:31:45  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.45  2008-09-22 20:31:43  brian
  - added module version and truncated logs
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-10-30 18:31:45 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-10-30 18:31:45 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -96,7 +100,7 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2008-09-22 20:31:43 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2008-10-30 18:31:45 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"
@@ -180,7 +184,6 @@ static struct module_info log_minfo = {
 static struct module_stat log_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 static struct module_stat log_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
-#if 1
 /*
  *  Locking
  */
@@ -198,7 +201,6 @@ static struct module_stat log_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)
 #define spin_unlock_str(__lkp, __flags) \
 	spin_unlock_irqrestore(__lkp, __flags)
 
-#endif
 #endif
 
 queue_t *log_conq = NULL;
@@ -236,6 +238,7 @@ struct log {
 	dev_t dev;			/* device number */
 	int traceids;			/* the number of trace ids in the trace block */
 	mblk_t *traceblk;		/* a message block containing trace ids */
+	queue_t **logq;			/* log for which we are a queue */
 };
 
 #define PROMOTE_SIZE		(sizeof(int))
@@ -278,7 +281,7 @@ log_rput(queue_t *q, mblk_t *mp)
 		putnext(q, mp);
 		return (1);
 	}
-	if (putq(q, mp))
+	if (bcanput(q, mp->b_band) && putq(q, mp))
 		return (1);
 	freemsg(mp);
 	return (0);
@@ -396,13 +399,11 @@ log_wput(queue_t *q, mblk_t *mp)
 			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
-			err = -EFAULT;
-			if (!dp)
-				goto nak;
 			err = -ENXIO;
 			if (log_conq != NULL)
 				goto nak;
 			log_conq = RD(q);
+			log->logq = &log_conq;
 			goto ack;
 		case I_ERRLOG:
 			err = -EPERM;
@@ -411,13 +412,11 @@ log_wput(queue_t *q, mblk_t *mp)
 			err = -EINVAL;
 			if (ioc->iocblk.ioc_count == TRANSPARENT)
 				goto nak;
-			err = -EFAULT;
-			if (!dp)
-				goto nak;
 			err = -ENXIO;
 			if (log_errq != NULL)
 				goto nak;
 			log_errq = RD(q);
+			log->logq = &log_errq;
 			goto ack;
 		case I_TRCLOG:
 			err = -EPERM;
@@ -437,10 +436,11 @@ log_wput(queue_t *q, mblk_t *mp)
 			    || (dp->b_wptr - dp->b_rptr) % sizeof(struct trace_ids) != 0)
 				goto nak;
 			err = -ENOSR;
-			if ((log->traceblk = dupb(dp)) == NULL)
+			if ((log->traceblk = copyb(dp)) == NULL)
 				goto nak;
 			log->traceids = (dp->b_wptr - dp->b_rptr) / sizeof(struct trace_ids);
 			log_trcq = RD(q);
+			log->logq = &log_trcq;
 			goto ack;
 		}
 		err = -EINVAL;
@@ -464,16 +464,16 @@ log_wput(queue_t *q, mblk_t *mp)
 		if (lp->flags & (SL_CONSOLE | SL_ERROR | SL_TRACE)) {
 			if (lp->flags & SL_CONSOLE)
 				log_deliver_msg(log_conq, lp->mid, lp->sid, lp->level, lp->flags,
-						atomic_add_return(1, &conlog_sequence), mp,
+						atomic_add_return(1, &conlog_sequence), mp->b_cont,
 						LOG_USER);
 			if (lp->flags & SL_ERROR)
 				log_deliver_msg(log_errq, lp->mid, lp->sid, lp->level, lp->flags,
-						atomic_add_return(1, &errlog_sequence), mp,
+						atomic_add_return(1, &errlog_sequence), mp->b_cont,
 						LOG_USER);
 			if (lp->flags & SL_TRACE
 			    && log_trace_filter(log_trcq, lp->mid, lp->sid, lp->level))
 				log_deliver_msg(log_trcq, lp->mid, lp->sid, lp->level, lp->flags,
-						atomic_add_return(1, &trclog_sequence), mp,
+						atomic_add_return(1, &trclog_sequence), mp->b_cont,
 						LOG_USER);
 		}
 		break;
@@ -579,6 +579,10 @@ log_close(queue_t *q, int oflag, cred_t *crp)
 	if ((p = q->q_ptr) == NULL)
 		return (0);	/* already closed */
 	qprocsoff(q);
+	if (p->logq)
+		*p->logq = NULL;
+	if (p->traceblk)
+		freemsg(xchg(&p->traceblk, NULL));
 	spin_lock_str(&log_lock, flags);
 	if ((*(p->prev) = p->next))
 		p->next->prev = p->prev;
@@ -652,6 +656,7 @@ log_alloc_data(char *fmt, va_list args)
 		bp->b_datap->db_type = M_DATA;
 		bp->b_wptr = bp->b_rptr;
 		va_copy(args2, args);
+		/* two passes, one for sizing the next for argument list preparation */
 		for (; *fmt; ++fmt, bp->b_wptr++) {
 			if ((*bp->b_wptr = *fmt) != '%')
 				continue;
@@ -659,13 +664,9 @@ log_alloc_data(char *fmt, va_list args)
 			for (++fmt, bp->b_wptr++;; ++fmt, bp->b_wptr++) {
 				switch ((*bp->b_wptr = *fmt)) {
 				case '-':
-					continue;
 				case '+':
-					continue;
 				case ' ':
-					continue;
 				case '#':
-					continue;
 				case '0':
 					continue;
 				default:
@@ -705,7 +706,6 @@ log_alloc_data(char *fmt, va_list args)
 					++fmt;
 					bp->b_wptr++;
 					alen += PROMOTE_SIZEOF(int);
-
 					(void) va_arg(args2, int);
 
 					if (++nargs == NLOGARGS)
@@ -763,11 +763,6 @@ log_alloc_data(char *fmt, va_list args)
 					break;
 				}
 				switch (type) {
-				case 'c':
-					alen += PROMOTE_SIZEOF(char);
-					(void) va_arg(args2, int);
-
-					break;
 				case 'p':
 					alen += PROMOTE_SIZEOF(void *);
 					(void) va_arg(args2, void *);
@@ -799,6 +794,11 @@ log_alloc_data(char *fmt, va_list args)
 					(void) va_arg(args2, int);
 
 					break;
+				case 'c':
+					alen += PROMOTE_SIZEOF(char);
+					(void) va_arg(args2, int);
+
+					break;
 				case 'i':
 				default:
 					alen += PROMOTE_SIZEOF(int);
@@ -811,11 +811,11 @@ log_alloc_data(char *fmt, va_list args)
 				continue;
 			case 's':
 			{
-				char *s = va_arg(args, char *);
-				size_t len = strnlen(s, LOGMSGSZ);
-				size_t plen = PROMOTE_ALIGN(len + 1);
+				char *s = va_arg(args2, char *);
+				size_t slen = strnlen(s, LOGMSGSZ);
+				size_t splen = PROMOTE_ALIGN(slen + 1);
 
-				alen += plen;
+				alen += splen;
 				if (++nargs == NLOGARGS)
 					break;
 				continue;
@@ -826,10 +826,12 @@ log_alloc_data(char *fmt, va_list args)
 			}
 			break;
 		}
+		*bp->b_wptr++ = '\0';	/* terminate format string */
+		bp->b_wptr = bp->b_rptr + plen;
 		va_end(args2);
 		/* pass through once more with arguments */
 		if ((dp = allocb(alen, BPRI_MED))) {
-			fmt = bp->b_rptr;
+			fmt = (char *) bp->b_rptr;
 			for (; *fmt; ++fmt) {
 				if (*fmt != '%')
 					continue;
@@ -837,13 +839,9 @@ log_alloc_data(char *fmt, va_list args)
 				for (++fmt;; ++fmt) {
 					switch (*fmt) {
 					case '-':
-						continue;
 					case '+':
-						continue;
 					case ' ':
-						continue;
 					case '#':
-						continue;
 					case '0':
 						continue;
 					default:
@@ -952,12 +950,12 @@ log_alloc_data(char *fmt, va_list args)
 						dp->b_wptr += PROMOTE_SIZEOF(ptrdiff_t);
 						break;
 					case 'h':
-						*(short *) dp->b_wptr = va_arg(args, int);
+						*(int *) dp->b_wptr = va_arg(args, int);
 						dp->b_wptr += PROMOTE_SIZEOF(short);
 
 						break;
 					case 'c':
-						*(short *) dp->b_wptr = va_arg(args, int);
+						*(int *) dp->b_wptr = va_arg(args, int);
 						dp->b_wptr += PROMOTE_SIZEOF(short);
 
 						break;
@@ -973,12 +971,12 @@ log_alloc_data(char *fmt, va_list args)
 				case 's':
 				{
 					char *s = va_arg(args, char *);
-					size_t len = strnlen(s, LOGMSGSZ);
-					size_t plen = PROMOTE_ALIGN(len + 1);
+					size_t slen = strnlen(s, LOGMSGSZ);
+					size_t splen = PROMOTE_ALIGN(slen + 1);
 
-					strncpy(dp->b_wptr, s, len);
-					dp->b_wptr[len] = '\0';
-					dp->b_wptr += plen;
+					strncpy((char *) dp->b_wptr, s, slen);
+					dp->b_wptr[slen] = '\0';
+					dp->b_wptr += splen;
 					if (!--nargs)
 						break;
 					continue;

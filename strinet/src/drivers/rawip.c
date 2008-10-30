@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-30 18:31:38 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-24 08:52:40 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.64  2008-10-30 18:31:38  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.63  2008-10-24 08:52:40  brian
  - upgrade strinet test cases and documentation
 
@@ -80,10 +83,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-30 18:31:38 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-30 18:31:38 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -134,7 +137,6 @@ static char const ident[] =
 
 #include <net/udp.h>
 
-
 #ifdef HAVE_KINC_NET_DST_H
 #include <net/dst.h>
 #endif
@@ -165,7 +167,7 @@ static char const ident[] =
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2008-10-24 08:52:40 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-10-30 18:31:38 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"
@@ -247,8 +249,8 @@ STATIC struct module_info tp_rinfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-STATIC struct module_stat np_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat np_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat tp_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat tp_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a T provider following the TPI. */
 
@@ -264,7 +266,7 @@ STATIC struct qinit tp_rinit = {
 	.qi_qopen = tp_qopen,		/* Each open */
 	.qi_qclose = tp_qclose,	/* Last close */
 	.qi_minfo = &tp_rinfo,		/* Module information */
-	.qi_mstat = &np_rstat,		/* Module statistics */
+	.qi_mstat = &tp_rstat,		/* Module statistics */
 };
 
 STATIC struct module_info tp_winfo = {
@@ -283,7 +285,7 @@ STATIC struct qinit tp_winit = {
 	.qi_putp = tp_wput,		/* Write put procedure (message from above) */
 	.qi_srvp = tp_wsrv,		/* Write service procedure */
 	.qi_minfo = &tp_winfo,		/* Module information */
-	.qi_mstat = &np_wstat,		/* Module statistics */
+	.qi_mstat = &tp_wstat,		/* Module statistics */
 };
 
 MODULE_STATIC struct streamtab tp_rawinfo = {
@@ -3931,8 +3933,8 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 		spin_unlock_irqrestore(&tp->qlock, flags);
 #if 0
 		/* keep track of high water mark */
-		if (np_wstat.ms_acnt < tp->sndmem)
-			np_wstat.ms_acnt = tp->sndmem;
+		if (tp_wstat.ms_acnt < tp->sndmem)
+			tp_wstat.ms_acnt = tp->sndmem;
 #endif
 #endif
 	}
@@ -4294,7 +4296,7 @@ tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt,
 	_rare();
 	return (err);
       blocked:
-	np_wstat.ms_ccnt++;
+	tp_wstat.ms_ccnt++;
 	tp->sndblk = 1;
       ebusy:
 	return (-EBUSY);
@@ -4302,7 +4304,7 @@ tp_senddata(struct tp *tp, mblk_t *db, const struct tp_options *opt,
 
 #if 0
 STATIC INLINE fastcall int
-np_datack(queue_t *q)
+tp_datack(queue_t *q)
 {
 	/* not supported */
 	return (-EOPNOTSUPP);
@@ -4726,7 +4728,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 	   information against which we should be checking is contained in the connection
 	   indication packet, and other information is associated with the destination addresses
 	   themselves, that are contained in the responding address(es) for NPI-IP.  Therefore, QOS 
-	   parameter checks must be performed in the np_passive() function instead. */
+	   parameter checks must be performed in the tp_passive() function instead. */
 	if (t_tst_bit(_T_BIT_XTI_RCVBUF, OPT_buffer->flags)) {
 		if (OPT_buffer->xti.rcvbuf > sysctl_rmem_max)
 			OPT_buffer->xti.rcvbuf = sysctl_rmem_max;
@@ -5577,7 +5579,7 @@ ne_reset_con(queue_t *q, mblk_t *msg, np_ulong RESET_orig, np_ulong RESET_reason
 	int err;
 	pl_t pl;
 
-	if (unlikely((mp = tp_allocb(q, size, BPRI_MED)) == NULL))
+	if (unlikely((mp = np_allocb(q, size, BPRI_MED)) == NULL))
 		goto enobufs;
 	if (unlikely((err = np_reset_loc(np, RESET_orig, RESET_reason, dp)) != 0))
 		goto free_error;
@@ -8076,7 +8078,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_r_prim_srv(q, mp) != QR_ABSORBED) {
-		np_rstat.ms_acnt++;
+		tp_rstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(!putq(q, mp))) {
 			mp->b_band = 0;	/* must succeed */
@@ -8110,7 +8112,7 @@ tp_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
-		np_wstat.ms_acnt++;
+		tp_wstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(!putbq(q, mp))) {
 			mp->b_band = 0;	/* must succeed */
@@ -8569,7 +8571,7 @@ tp_v4_rcv(struct sk_buff *skb)
 		tp_put(tp);
 		return (0);
 	      flow_controlled:
-		np_rstat.ms_ccnt++;
+		tp_rstat.ms_ccnt++;
 		freeb(mp);	/* will take sk_buff with it */
 		tp_put(tp);
 		return (0);
@@ -8654,7 +8656,7 @@ tp_v4_err(struct sk_buff *skb, u32 info)
 		put(q, mp);
 		goto discard_put;
 	      flow_controlled:
-		np_rstat.ms_ccnt++;
+		tp_rstat.ms_ccnt++;
 		ptrace(("ERROR: stream is flow controlled\n"));
 		freeb(mp);
 		goto discard_put;

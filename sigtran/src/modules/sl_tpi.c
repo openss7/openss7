@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:04 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-10-30 18:31:06 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:04 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.16  2008-10-30 18:31:06  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.15  2008-09-22 20:31:04  brian
  - added module version and truncated logs
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:04 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-10-30 18:31:06 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-09-22 20:31:04 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-10-30 18:31:06 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -147,10 +150,10 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 STATIC struct module_info sl_minfo = {
 	.mi_idnum = SL_TPI_MOD_ID,	/* Module ID number */
 	.mi_idname = SL_TPI_MOD_NAME,	/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_lowat = 1 << 10,		/* Lo water mark */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,	/* Hi water mark */
+	.mi_lowat = 1 << 10,	/* Lo water mark */
 };
 
 STATIC int streamscall sl_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -160,24 +163,24 @@ STATIC int streamscall sl_rput(queue_t *, mblk_t *);
 STATIC int streamscall sl_rsrv(queue_t *);
 
 STATIC struct qinit sl_rinit = {
-	.qi_putp = sl_rput,		/* Read put (msg from below) */
-	.qi_srvp = sl_rsrv,		/* Read queue service */
-	.qi_qopen = sl_open,		/* Each open */
-	.qi_qclose = sl_close,		/* Last close */
-	.qi_minfo = &sl_minfo,		/* Information */
+	.qi_putp = sl_rput,	/* Read put (msg from below) */
+	.qi_srvp = sl_rsrv,	/* Read queue service */
+	.qi_qopen = sl_open,	/* Each open */
+	.qi_qclose = sl_close,	/* Last close */
+	.qi_minfo = &sl_minfo,	/* Information */
 };
 STATIC int streamscall sl_wput(queue_t *, mblk_t *);
 STATIC int streamscall sl_wsrv(queue_t *);
 
 STATIC struct qinit sl_winit = {
-	.qi_putp = sl_wput,		/* Write put (msg from above) */
-	.qi_srvp = sl_wsrv,		/* Write queue service */
-	.qi_minfo = &sl_minfo,		/* Information */
+	.qi_putp = sl_wput,	/* Write put (msg from above) */
+	.qi_srvp = sl_wsrv,	/* Write queue service */
+	.qi_minfo = &sl_minfo,	/* Information */
 };
 
 STATIC struct streamtab sl_tpiinfo = {
-	.st_rdinit = &sl_rinit,		/* Upper read queue */
-	.st_wrinit = &sl_winit,		/* Upper write queue */
+	.st_rdinit = &sl_rinit,	/* Upper read queue */
+	.st_wrinit = &sl_winit,	/* Upper write queue */
 };
 
 /*
@@ -285,6 +288,7 @@ sl_trylockq(queue_t *q)
 {
 	int res;
 	sl_t *s = PRIV(q);
+
 	if (!(res = spin_trylock(&s->qlock))) {
 		if (q == s->rq)
 			s->rwait = q;
@@ -297,6 +301,7 @@ STATIC INLINE void
 sl_unlockq(queue_t *q)
 {
 	sl_t *s = PRIV(q);
+
 	spin_unlock(&s->qlock);
 	if (s->rwait)
 		qenable(xchg(&s->rwait, NULL));
@@ -319,8 +324,10 @@ STATIC void streamscall
 sl_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
+
 	if (q) {
 		sl_t *sl = PRIV(q);
+
 		if (q == sl->rq) {
 			if (sl->rbid) {
 				sl->rbid = 0;
@@ -345,6 +352,7 @@ STATIC void
 sl_unbufcall(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->rbid) {
 		unbufcall(xchg(&sl->rbid, 0));
 		sl->refcnt--;
@@ -363,11 +371,13 @@ STATIC INLINE mblk_t *
 sl_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(size, prior)))
 		return (mp);
 	rare();
 	{
 		sl_t *sl = PRIV(q);
+
 		if (q == sl->rq) {
 			if (!sl->rbid) {
 				sl->rbid = bufcall(size, prior, &sl_bufsrv, (long) q);
@@ -396,11 +406,13 @@ STATIC INLINE mblk_t *
 sl_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
+
 	if ((mp = esballoc(base, size, prior, frtn)))
 		return (mp);
 	rare();
 	{
 		sl_t *sl = PRIV(q);
+
 		if (q == sl->rq) {
 			if (!sl->rbid) {
 				sl->rbid = esbbcall(prior, &sl_bufsrv, (long) q);
@@ -439,6 +451,7 @@ STATIC INLINE mblk_t *
 sl_fast_allocb(size_t size, int prior)
 {
 	mblk_t *mp;
+
 	spin_lock(&sl_bufpool_lock);
 	{
 		if (size <= FASTBUF && prior == BPRI_HI && (mp = sl_bufpool)) {
@@ -461,6 +474,7 @@ STATIC INLINE void
 sl_fast_freemsg(mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
+
 	while ((bp = bp_next)) {
 		bp_next = bp->b_cont;
 		if (bp->b_datap->db_ref == 1) {
@@ -486,6 +500,7 @@ sl_fast_dupb(mblk_t *mp)
 {
 	int len;
 	mblk_t *dp = NULL;
+
 	if (mp && (len = mp->b_wptr - mp->b_rptr) > 0 && (dp = sl_fast_allocb(FASTBUF, BPRI_HI))) {
 		bcopy(mp->b_rptr, dp->b_wptr, len);
 		dp->b_wptr += len;
@@ -508,6 +523,7 @@ STATIC void
 sl_bufpool_alloc(int n)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sl_bufpool_lock, flags);
 	{
 		while (n--)
@@ -519,9 +535,11 @@ STATIC void
 sl_bufpool_dealloc(int n)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sl_bufpool_lock, flags);
 	{
 		mblk_t *bp, *bp_next = sl_bufpool;
+
 		while (n-- && (bp = bp_next)) {
 			bp_next = bp->b_cont;
 			ctrace(freeb(bp));
@@ -534,9 +552,11 @@ STATIC int
 sl_bufpool_term(void)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sl_bufpool_lock, flags);
 	{
 		mblk_t *bp, *bp_next = sl_bufpool;
+
 		while ((bp = bp_next)) {
 			bp_next = bp->b_cont;
 			ctrace(freeb(bp));
@@ -570,6 +590,7 @@ m_error(queue_t *q, int err)
 {
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
+
 	if ((mp = sl_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -593,6 +614,7 @@ m_hangup(queue_t *q, int err)
 {
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
+
 	if ((mp = sl_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_HANGUP;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -631,8 +653,8 @@ lmi_info_ack(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 		p->lmi_ppa_style = LMI_STYLE2;
 		p->lmi_ppa_length = ppa_len;
 		p->lmi_ppa_offset = sizeof(*p);
-		p->lmi_prov_flags = 0; /* FIXME */
-		p->lmi_prov_state = 0; /* FIXME */
+		p->lmi_prov_flags = 0;	/* FIXME */
+		p->lmi_prov_state = 0;	/* FIXME */
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
 		printd(("%s: %p: <- LMI_INFO_ACK\n", SL_TPI_MOD_NAME, sl));
@@ -653,6 +675,7 @@ lmi_ok_ack(queue_t *q, long prim)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -688,6 +711,7 @@ lmi_error_ack(queue_t *q, long prim, ulong reason, ulong errno)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -731,6 +755,7 @@ lmi_enable_con(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -757,6 +782,7 @@ lmi_disable_con(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -784,6 +810,7 @@ lmi_optmgmt_ack(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -810,6 +837,7 @@ lmi_error_ind(queue_t *q, ulong errno, ulong reason)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -837,6 +865,7 @@ lmi_stats_ind(queue_t *q, ulong interval)
 		sl_t *sl = PRIV(q);
 		mblk_t *mp;
 		lmi_stats_ind_t *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -867,6 +896,7 @@ lmi_event_ind(queue_t *q, ulong oid, ulong level)
 		sl_t *sl = PRIV(q);
 		mblk_t *mp;
 		lmi_event_ind_t *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -898,6 +928,7 @@ sl_pdu_ind(queue_t *q, mblk_t *dp)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_pdu_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -923,6 +954,7 @@ sl_link_congested_ind(queue_t *q, ulong cong, ulong disc)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_link_cong_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -948,6 +980,7 @@ sl_link_congestion_ceased_ind(queue_t *q, ulong cong, ulong disc)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_link_cong_ceased_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -974,6 +1007,7 @@ sl_retrieved_message_ind(queue_t *q, mblk_t *dp)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_retrieved_msg_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -998,6 +1032,7 @@ sl_retrieval_complete_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_retrieval_comp_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1021,6 +1056,7 @@ sl_rb_cleared_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_rb_cleared_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1044,6 +1080,7 @@ sl_bsnt_ind(queue_t *q, ulong bsnt)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_bsnt_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1068,6 +1105,7 @@ sl_in_service_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_in_service_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1091,6 +1129,7 @@ sl_out_of_service_ind(queue_t *q, ulong reason)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_out_of_service_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1116,6 +1155,7 @@ sl_remote_processor_outage_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_rem_proc_out_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1140,6 +1180,7 @@ sl_remote_processor_recovered_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_rem_proc_recovered_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1164,6 +1205,7 @@ sl_rtb_cleared_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_rtb_cleared_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1188,6 +1230,7 @@ sl_retrieval_not_possible_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_retrieval_not_poss_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1211,6 +1254,7 @@ sl_bsnt_not_retrievable_ind(queue_t *q, ulong bsnt)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_bsnt_not_retr_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1235,6 +1279,7 @@ sl_optmgmt_ack(queue_t *q, caddr_t opt_ptr, size_t opt_len, ulong flags)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_optmgmt_ack_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1263,6 +1308,7 @@ sl_notify_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sl_notify_ind_t *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1286,9 +1332,11 @@ sdt_rc_signal_unit_ind(queue_t *q, mblk_t *dp, ulong count)
 {
 	if (count) {
 		sl_t *sl = PRIV(q);
+
 		if (canputnext(sl->rq)) {
 			mblk_t *mp;
 			sdt_rc_signal_unit_ind_t *p;
+
 			if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
 				p = (typeof(p)) mp->b_wptr;
@@ -1321,6 +1369,7 @@ sdt_rc_congestion_accept_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sdt_rc_congestion_accept_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1344,6 +1393,7 @@ sdt_rc_congestion_discard_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sdt_rc_congestion_discard_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1367,6 +1417,7 @@ sdt_rc_no_congestion_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sdt_rc_no_congestion_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1388,9 +1439,11 @@ STATIC INLINE int
 sdt_iac_correct_su_ind(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (canputnext(sl->rq)) {
 		mblk_t *mp;
 		sdt_iac_correct_su_ind_t *p;
+
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1417,6 +1470,7 @@ sdt_iac_abort_proving_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sdt_iac_abort_proving_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1440,6 +1494,7 @@ sdt_lsc_link_failure_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sdt_lsc_link_failure_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1464,6 +1519,7 @@ sdt_txc_transmission_request_ind(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	sdt_txc_transmission_request_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1500,6 +1556,7 @@ t_conn_req(queue_t *q)
 	size_t dst_len = sl->t.add_size, opt_len = 0;
 	mblk_t *mp, *dp = NULL;
 	struct T_conn_req *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1538,6 +1595,7 @@ t_conn_res(queue_t *q, long seq)
 	size_t opt_len = 0;
 	mblk_t *mp, *dp = NULL;
 	struct T_conn_res *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1574,6 +1632,7 @@ t_discon_req(queue_t *q, ulong seq)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp, *dp = NULL;
 	struct T_discon_req *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1619,8 +1678,10 @@ STATIC INLINE mblk_t *
 t_data_req(queue_t *q)
 {
 	mblk_t *mp = NULL;
+
 	if (canputnext(q)) {
 		struct T_data_req *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1643,8 +1704,10 @@ STATIC INLINE mblk_t *
 t_exdata_req(queue_t *q)
 {
 	mblk_t *mp = NULL;
+
 	if (bcanputnext(q, 1)) {
 		struct T_exdata_req *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = 1;
@@ -1674,6 +1737,7 @@ t_info_req(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	struct T_info_req *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1702,6 +1766,7 @@ t_bind_req(queue_t *q)
 	sl_t *sl = PRIV(q);
 	caddr_t add_ptr = (caddr_t) &sl->t.loc;
 	size_t add_len = sl->t.add_size;
+
 #if 0
 	ulong conind = ((sl->t.serv_type == T_COTS || sl->t.serv_type == T_COTS_ORD)
 			&& (sl->sdl.ifmode == SDL_MODE_SERVER)) ? 1 : 0;
@@ -1712,6 +1777,7 @@ t_bind_req(queue_t *q)
 #endif
 	mblk_t *mp;
 	struct T_bind_req *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1744,6 +1810,7 @@ t_unbind_req(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	struct T_unbind_req *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1769,11 +1836,13 @@ STATIC INLINE mblk_t *
 t_unitdata_req(queue_t *q)
 {
 	mblk_t *mp = NULL;
+
 	if (canputnext(q)) {
 		sl_t *sl = PRIV(q);
 		caddr_t dst_ptr = (caddr_t) &sl->t.rem, opt_ptr = NULL;
 		size_t dst_len = sl->t.add_size, opt_len = 0;
 		struct T_unitdata_req *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1806,6 +1875,7 @@ t_optmgmt_req(queue_t *q, caddr_t opt_ptr, size_t opt_len, ulong flags)
 		sl_t *sl = PRIV(q);
 		mblk_t *mp;
 		struct T_optmgmt_req *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1841,6 +1911,7 @@ t_ordrel_req(queue_t *q)
 		sl_t *sl = PRIV(q);
 		mblk_t *mp;
 		struct T_ordrel_req *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1875,6 +1946,7 @@ t_optdata_req(queue_t *q, mblk_t *dp)
 		int flags = 0;
 		mblk_t *mp;
 		struct T_optdata_req *p;
+
 		if ((mp = sl_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = (flags & T_ODF_EX) ? 1 : 0;
@@ -1910,6 +1982,7 @@ t_addr_req(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	struct T_addr_req *p;
+
 	if ((mp = sl_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1954,8 +2027,10 @@ STATIC void streamscall
 sl_t1_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sl.timer.t1, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t1))) {
 			printd(("%s: %p: t1 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -1972,8 +2047,10 @@ STATIC void streamscall
 sl_t2_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sl.timer.t2, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t2))) {
 			printd(("%s: %p: t2 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -1990,8 +2067,10 @@ STATIC void streamscall
 sl_t3_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sl.timer.t3, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t3))) {
 			printd(("%s: %p: t3 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -2008,8 +2087,10 @@ STATIC void streamscall
 sl_t4_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sl.timer.t4, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t4))) {
 			printd(("%s: %p: t4 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -2026,8 +2107,10 @@ STATIC void streamscall
 sl_t5_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sl.timer.t5, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t5))) {
 			printd(("%s: %p: t5 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -2044,8 +2127,10 @@ STATIC void streamscall
 sl_t6_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sl.timer.t6, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t6))) {
 			printd(("%s: %p: t6 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -2062,8 +2147,10 @@ STATIC void streamscall
 sl_t7_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sl.timer.t7, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t7))) {
 			printd(("%s: %p: t7 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -2080,8 +2167,10 @@ STATIC void streamscall
 sl_t8_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sdt.timer.t8, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t8))) {
 			printd(("%s: %p: t8 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -2098,8 +2187,10 @@ STATIC void streamscall
 sl_t9_timeout(caddr_t data)
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(&sl->sdl.timer.t9, 0)) {
 		mblk_t *mp;
+
 		if ((mp = sl_alloc_timeout(t9))) {
 			// printd(("%s: %p: t9 timeout at %lu\n", SL_TPI_MOD_NAME, sl, jiffies));
 			sl->refcnt--;
@@ -2116,6 +2207,7 @@ STATIC INLINE void
 sl_timer_stop(queue_t *q, const uint t)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (t) {
 	case t1:
 		if (sl->sl.timer.t1) {
@@ -2190,6 +2282,7 @@ sl_timer_start(queue_t *q, const uint t)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	spin_lock_irqsave(&sl->qlock, flags);
 	{
 		sl_timer_stop(q, t);
@@ -2269,6 +2362,7 @@ STATIC void
 sl_is_stats(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.stamp.sl_dur_unavail)
 		sl->sl.stats.sl_dur_unavail += jiffies - xchg(&sl->sl.stamp.sl_dur_unavail, 0);
 	if (sl->sl.stamp.sl_dur_unavail_rpo)
@@ -2283,6 +2377,7 @@ STATIC void
 sl_oos_stats(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.stamp.sl_dur_in_service)
 		sl->sl.stats.sl_dur_in_service +=
 		    jiffies - xchg(&sl->sl.stamp.sl_dur_in_service, 0);
@@ -2298,6 +2393,7 @@ STATIC void
 sl_rpo_stats(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.stamp.sl_dur_unavail_rpo)
 		sl->sl.stats.sl_dur_unavail_rpo +=
 		    jiffies - xchg(&sl->sl.stamp.sl_dur_unavail_rpo, 0);
@@ -2306,6 +2402,7 @@ STATIC void
 sl_rpr_stats(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.stamp.sl_dur_unavail_rpo)
 		sl->sl.stats.sl_dur_unavail_rpo +=
 		    jiffies - xchg(&sl->sl.stamp.sl_dur_unavail_rpo, 0);
@@ -2343,6 +2440,7 @@ STATIC INLINE void
 sl_cc_normal(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_timer_stop(q, t5);
 	sl->sl.statem.cc_state = SL_STATE_IDLE;
 }
@@ -2351,6 +2449,7 @@ STATIC INLINE void
 sl_rc_stop(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_cc_normal(q);
 	sl->sl.statem.rc_state = SL_STATE_IDLE;
 }
@@ -2359,6 +2458,7 @@ STATIC INLINE void
 sl_aerm_stop(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sdt.statem.aerm_state = SDT_STATE_IDLE;
 	sl->sdt.statem.Ti = sl->sdt.config.Tin;
 }
@@ -2367,6 +2467,7 @@ STATIC INLINE void
 sl_iac_stop(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.iac_state != SL_STATE_IDLE) {
 		sl_timer_stop(q, t3);
 		sl_timer_stop(q, t2);
@@ -2381,6 +2482,7 @@ STATIC INLINE void
 sl_txc_send_sios(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_timer_stop(q, t7);
 	if (sl->option.pvar == SS7_PVAR_ANSI_92)
 		sl_timer_stop(q, t6);
@@ -2392,6 +2494,7 @@ STATIC INLINE void
 sl_poc_stop(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.poc_state = SL_STATE_IDLE;
 }
 
@@ -2399,6 +2502,7 @@ STATIC INLINE void
 sl_eim_stop(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sdt.statem.eim_state = SDT_STATE_IDLE;
 	sl_timer_stop(q, t8);
 }
@@ -2407,6 +2511,7 @@ STATIC INLINE void
 sl_suerm_stop(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_eim_stop(q);
 	sl->sdt.statem.suerm_state = SDT_STATE_IDLE;
 }
@@ -2416,6 +2521,7 @@ sl_lsc_link_failure(queue_t *q, ulong reason)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		if (sl->sl.statem.lsc_state != SL_STATE_OUT_OF_SERVICE) {
 			if ((err = sl_out_of_service_ind(q, reason)))
@@ -2441,6 +2547,7 @@ STATIC INLINE void
 sl_txc_send_sib(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.tx.sio = LSSU_SIB;
 	sl->sl.statem.lssu_available = 1;
 }
@@ -2449,6 +2556,7 @@ STATIC INLINE void
 sl_txc_send_sipo(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_timer_stop(q, t7);
 	if (sl->option.pvar == SS7_PVAR_ANSI_92)
 		sl_timer_stop(q, t6);
@@ -2460,6 +2568,7 @@ STATIC INLINE void
 sl_txc_send_sio(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.tx.sio = LSSU_SIO;
 	sl->sl.statem.lssu_available = 1;
 }
@@ -2468,6 +2577,7 @@ STATIC INLINE void
 sl_txc_send_sin(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.tx.sio = LSSU_SIN;
 	sl->sl.statem.lssu_available = 1;
 }
@@ -2476,6 +2586,7 @@ STATIC INLINE void
 sl_txc_send_sie(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.tx.sio = LSSU_SIE;
 	sl->sl.statem.lssu_available = 1;
 }
@@ -2484,6 +2595,7 @@ STATIC INLINE void
 sl_txc_send_msu(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.rtb.q_count)
 		sl_timer_start(q, t7);
 	sl->sl.statem.msu_inhibited = 0;
@@ -2494,6 +2606,7 @@ STATIC INLINE void
 sl_txc_send_fisu(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_timer_stop(q, t7);
 	if (sl->option.pvar == SS7_PVAR_ANSI_92 && !(sl->option.popt & SS7_POPT_PCR))
 		sl_timer_stop(q, t6);
@@ -2505,6 +2618,7 @@ STATIC INLINE void
 sl_txc_fsnx_value(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.tx.X.fsn != sl->sl.statem.rx.X.fsn)
 		sl->sl.statem.tx.X.fsn = sl->sl.statem.rx.X.fsn;
 }
@@ -2513,6 +2627,7 @@ STATIC INLINE void
 sl_txc_nack_to_be_sent(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.tx.N.bib = sl->sl.statem.tx.N.bib ? 0 : sl->sl.statem.ib_mask;
 }
 
@@ -2521,6 +2636,7 @@ sl_lsc_rtb_cleared(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if (sl->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		sl->sl.statem.remote_processor_outage = 0;
 		if (sl->sl.statem.local_processor_outage)
@@ -2542,6 +2658,7 @@ sl_txc_bsnr_and_bibr(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int pcr = sl->option.popt & SS7_POPT_PCR;
+
 	sl->sl.statem.tx.R.bsn = sl->sl.statem.rx.R.bsn;
 	sl->sl.statem.tx.R.bib = sl->sl.statem.rx.R.bib;
 	if (sl->sl.statem.clear_rtb) {
@@ -2608,6 +2725,7 @@ STATIC INLINE void
 sl_txc_sib_received(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	/* 
 	   FIXME: consider these variations for all */
 	if (sl->option.pvar == SS7_PVAR_ANSI_92 && sl->sl.statem.lssu_available)
@@ -2626,6 +2744,7 @@ STATIC INLINE void
 sl_txc_clear_rtb(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	bufq_purge(&sl->sl.rtb);
 	sl->sl.statem.Ct = 0;
 	sl->sl.statem.clear_rtb = 1;
@@ -2640,6 +2759,7 @@ STATIC INLINE void
 sl_txc_clear_tb(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	bufq_purge(&sl->sl.tb);
 	flushq(sl->wq, FLUSHDATA);
 	sl->sl.statem.Cm = 0;
@@ -2650,6 +2770,7 @@ STATIC INLINE void
 sl_txc_flush_buffers(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	bufq_purge(&sl->sl.rtb);
 	sl->sl.statem.rtb_full = 0;
 	sl->sl.statem.Ct = 0;
@@ -2672,6 +2793,7 @@ STATIC INLINE void
 sl_rc_fsnt_value(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.rx.T.fsn = sl->sl.statem.tx.N.fsn;
 }
 
@@ -2681,6 +2803,7 @@ sl_txc_retrieval_request_and_fsnc(queue_t *q, sl_ulong fsnc)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
 	int err;
+
 	sl->sl.statem.tx.C.fsn = fsnc & (sl->sl.statem.sn_mask);
 	/* 
 	 *  FIXME: Q.704/5.7.2 states:
@@ -2728,12 +2851,11 @@ STATIC INLINE void
 sl_daedt_fisu(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr =
-		    htons(sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
+		*(sl_ushort *) mp->b_wptr = htons(sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
 		mp->b_wptr += sizeof(sl_ushort);
-		*(sl_ushort *) mp->b_wptr =
-		    htons(sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
+		*(sl_ushort *) mp->b_wptr = htons(sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
 		mp->b_wptr += sizeof(sl_ushort);
 		*(sl_ushort *) mp->b_wptr = 0;
 		mp->b_wptr += sizeof(sl_ushort);
@@ -2751,12 +2873,11 @@ STATIC INLINE void
 sl_daedt_lssu(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->option.popt & SS7_POPT_XSN) {
-		*(sl_ushort *) mp->b_wptr =
-		    htons(sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
+		*(sl_ushort *) mp->b_wptr = htons(sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
 		mp->b_wptr += sizeof(sl_ushort);
-		*(sl_ushort *) mp->b_wptr =
-		    htons(sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
+		*(sl_ushort *) mp->b_wptr = htons(sl->sl.statem.tx.N.fsn | sl->sl.statem.tx.N.fib);
 		mp->b_wptr += sizeof(sl_ushort);
 		*(sl_ushort *) mp->b_wptr = htons(1);
 		mp->b_wptr += sizeof(sl_ushort);
@@ -2797,6 +2918,7 @@ sl_daedt_msu(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	int len = msgdsize(mp);
+
 	if (sl->option.popt & SS7_POPT_XSN) {
 		((sl_ushort *) mp->b_rptr)[0] =
 		    htons(sl->sl.statem.tx.N.bsn | sl->sl.statem.tx.N.bib);
@@ -2816,6 +2938,7 @@ sl_txc_transmission_request(queue_t *q)
 	sl_t *sl = PRIV(q);
 	mblk_t *mp = NULL;
 	int pcr;
+
 	if (sl->sl.statem.txc_state != SL_STATE_IN_SERVICE)
 		return (mp);
 	pcr = sl->option.popt & SS7_POPT_PCR;
@@ -2858,6 +2981,7 @@ sl_txc_transmission_request(queue_t *q)
 		&& (sl->sl.statem.forced_retransmission
 		    || (!sl->sl.tb.q_count && sl->sl.rtb.q_count)))) {
 		mblk_t *bp;
+
 		if ((bp = sl->sl.statem.z_ptr) && !(mp = dupmsg(bp)))
 			return (mp);
 		if (!bp && pcr) {
@@ -2904,6 +3028,7 @@ sl_txc_transmission_request(queue_t *q)
 		spin_lock(&sl->sl.tb.q_lock);
 		if ((mp = bufq_head(&sl->sl.tb)) && (mp = dupmsg(mp))) {
 			mblk_t *bp = bufq_dequeue(&sl->sl.tb);
+
 			sl->sl.statem.Cm--;
 			if (!sl->sl.statem.Cm)
 				qenable(sl->wq);
@@ -2943,6 +3068,7 @@ STATIC INLINE void
 sl_daedr_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sdt.statem.daedr_state = SDT_STATE_IN_SERVICE;
 	sl->sdl.statem.rx_state = SDL_STATE_IN_SERVICE;
 	sl->sdl.config.ifflags |= (SDL_IF_UP | SDL_IF_RX_RUNNING);
@@ -2952,6 +3078,7 @@ STATIC INLINE void
 sl_rc_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.rc_state == SL_STATE_IDLE) {
 		sl->sl.statem.rx.X.fsn = 0;
 		sl->sl.statem.rx.X.fib = sl->sl.statem.ib_mask;
@@ -2981,6 +3108,7 @@ STATIC INLINE void
 sl_rc_reject_msu_fisu(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.msu_fisu_accepted = 0;
 }
 
@@ -2988,6 +3116,7 @@ STATIC INLINE void
 sl_rc_accept_msu_fisu(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.msu_fisu_accepted = 1;
 }
 
@@ -2995,6 +3124,7 @@ STATIC INLINE void
 sl_rc_retrieve_fsnx(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_txc_fsnx_value(q);	/* error in 93 spec */
 	sl->sl.statem.congestion_discard = 0;
 	sl->sl.statem.congestion_accept = 0;
@@ -3012,6 +3142,7 @@ STATIC INLINE int
 sl_rc_clear_rb(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	bufq_purge(&sl->sl.rb);
 	// flushq(sl->rq, FLUSHDATA);
 	sl->sl.statem.Cr = 0;
@@ -3022,6 +3153,7 @@ STATIC INLINE int
 sl_rc_retrieve_bsnt(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.rx.T.bsn = (sl->sl.statem.rx.X.fsn - 1) & 0x7F;
 	return sl_bsnt_ind(q, sl->sl.statem.rx.T.bsn);
 }
@@ -3030,6 +3162,7 @@ STATIC INLINE void
 sl_cc_busy(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.cc_state == SL_STATE_NORMAL) {
 		sl_txc_send_sib(q);
 		sl_timer_start(q, t5);
@@ -3041,6 +3174,7 @@ STATIC INLINE void
 sl_rc_congestion_discard(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		sl->sl.statem.congestion_discard = 1;
 		sl_cc_busy(q);
@@ -3053,6 +3187,7 @@ STATIC INLINE void
 sl_rc_congestion_accept(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		sl->sl.statem.congestion_accept = 1;
 		sl_cc_busy(q);
@@ -3065,6 +3200,7 @@ STATIC INLINE void
 sl_rc_no_congestion(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		sl->sl.statem.congestion_discard = 0;
 		sl->sl.statem.congestion_accept = 0;
@@ -3083,6 +3219,7 @@ STATIC INLINE void
 sl_lsc_congestion_discard(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_rc_congestion_discard(q);
 	sl->sl.statem.l3_congestion_detect = 1;
 }
@@ -3091,6 +3228,7 @@ STATIC INLINE void
 sl_lsc_congestion_accept(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_rc_congestion_accept(q);
 	sl->sl.statem.l3_congestion_detect = 1;
 }
@@ -3099,6 +3237,7 @@ STATIC INLINE void
 sl_lsc_no_congestion(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl_rc_no_congestion(q);
 	sl->sl.statem.l3_congestion_detect = 0;
 }
@@ -3107,6 +3246,7 @@ STATIC INLINE void
 sl_lsc_sio(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 	case SL_STATE_INITIAL_ALIGNMENT:
@@ -3134,6 +3274,7 @@ sl_lsc_alignment_not_possible(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if ((err = sl_out_of_service_ind(q, SL_FAIL_ALIGNMENT_NOT_POSSIBLE)))
 		return (err);
 	sl->sl.statem.failure_reason = SL_FAIL_ALIGNMENT_NOT_POSSIBLE;
@@ -3149,6 +3290,7 @@ STATIC INLINE void
 sl_iac_sio(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.iac_state) {
 	case SL_STATE_NOT_ALIGNED:
 		sl_timer_stop(q, t2);
@@ -3176,6 +3318,7 @@ STATIC INLINE void
 sl_iac_sios(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.iac_state) {
 	case SL_STATE_ALIGNED:
 	case SL_STATE_PROVING:
@@ -3193,6 +3336,7 @@ STATIC INLINE void
 sl_lsc_sios(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_ALIGNED_READY:
 	case SL_STATE_ALIGNED_NOT_READY:
@@ -3217,6 +3361,7 @@ STATIC INLINE void
 sl_lsc_no_processor_outage(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		sl->sl.statem.processor_outage = 0;
 		if (!sl->sl.statem.l3_indication_received)
@@ -3233,6 +3378,7 @@ STATIC INLINE void
 sl_poc_remote_processor_recovered(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.poc_state) {
 	case SL_STATE_REMOTE_PROCESSOR_OUTAGE:
 		sl_lsc_no_processor_outage(q);
@@ -3249,6 +3395,7 @@ sl_lsc_fisu_msu_received(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_ALIGNED_READY:
 		if ((err = sl_in_service_ind(q)))
@@ -3295,6 +3442,7 @@ STATIC INLINE void
 sl_poc_remote_processor_outage(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.poc_state) {
 	case SL_STATE_IDLE:
 		sl->sl.statem.poc_state = SL_STATE_REMOTE_PROCESSOR_OUTAGE;
@@ -3309,6 +3457,7 @@ STATIC INLINE void
 sl_lsc_sib(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_IN_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
@@ -3322,6 +3471,7 @@ sl_lsc_sipo(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_ALIGNED_READY:
 		switch (sl->option.pvar) {
@@ -3415,6 +3565,7 @@ STATIC INLINE void
 sl_poc_local_processor_outage(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.poc_state) {
 	case SL_STATE_IDLE:
 		sl->sl.statem.poc_state = SL_STATE_LOCAL_PROCESSOR_OUTAGE;
@@ -3429,6 +3580,7 @@ STATIC INLINE void
 sl_eim_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sdt.statem.Ce = 0;
 	sl->sdt.statem.interval_error = 0;
 	sl->sdt.statem.su_received = 0;
@@ -3440,6 +3592,7 @@ STATIC INLINE void
 sl_suerm_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->option.popt & SS7_POPT_HSL)
 		sl_eim_start(q);
 	else {
@@ -3453,6 +3606,7 @@ STATIC INLINE void
 sl_lsc_alignment_complete(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state == SL_STATE_INITIAL_ALIGNMENT) {
 		sl_suerm_start(q);
 		sl_timer_start(q, t1);
@@ -3475,6 +3629,7 @@ STATIC INLINE void
 sl_lsc_sin(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_IN_SERVICE:
 		sl_out_of_service_ind(q, SL_FAIL_RECEIVED_SIN);
@@ -3504,6 +3659,7 @@ STATIC INLINE void
 sl_aerm_set_ti_to_tie(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.aerm_state == SDT_STATE_IDLE)
 		sl->sdt.statem.Ti = sl->sdt.config.Tie;
 }
@@ -3512,6 +3668,7 @@ STATIC INLINE void
 sl_aerm_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sdt.statem.Ca = 0;
 	sl->sdt.statem.aborted_proving = 0;
 	sl->sdt.statem.aerm_state = SDT_STATE_MONITORING;
@@ -3521,6 +3678,7 @@ STATIC INLINE void
 sl_iac_sin(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.iac_state) {
 	case SL_STATE_NOT_ALIGNED:
 		sl_timer_stop(q, t2);
@@ -3551,6 +3709,7 @@ STATIC INLINE void
 sl_lsc_sie(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_IN_SERVICE:
 		sl_out_of_service_ind(q, SL_FAIL_RECEIVED_SIE);
@@ -3580,6 +3739,7 @@ STATIC INLINE void
 sl_iac_sie(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.iac_state) {
 	case SL_STATE_NOT_ALIGNED:
 		sl_timer_stop(q, t2);
@@ -3642,6 +3802,7 @@ STATIC INLINE void
 sl_rb_congestion_function(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (!sl->sl.statem.l3_congestion_detect) {
 		if (sl->sl.statem.l2_congestion_detect) {
 			if (sl->sl.statem.Cr <= sl->sl.config.rb_abate && canputnext(sl->rq)) {
@@ -3666,6 +3827,7 @@ sl_rc_signal_unit(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	int pcr = sl->option.popt & SS7_POPT_PCR;
+
 	if (sl->sl.statem.rc_state != SL_STATE_IN_SERVICE) {
 		ctrace(freemsg(mp));
 		return;
@@ -3875,6 +4037,7 @@ STATIC INLINE void
 sl_lsc_stop(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_OUT_OF_SERVICE) {
 		sl_iac_stop(q);	/* ok if not running */
 		sl_timer_stop(q, t1);	/* ok if not running */
@@ -3893,6 +4056,7 @@ STATIC INLINE void
 sl_lsc_clear_rtb(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		sl->sl.statem.local_processor_outage = 0;
 		sl_txc_send_fisu(q);
@@ -3904,6 +4068,7 @@ STATIC INLINE void
 sl_iac_correct_su(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		if (sl->sl.statem.iac_state == SL_STATE_PROVING) {
 			if (sl->sl.statem.further_proving) {
@@ -3922,6 +4087,7 @@ STATIC INLINE void
 sl_iac_abort_proving(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		if (sl->sl.statem.iac_state == SL_STATE_PROVING) {
 			sl->sl.statem.Cp++;
@@ -3946,6 +4112,7 @@ sl_lsc_clear_buffers(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 		switch (sl->option.pvar) {
@@ -4015,6 +4182,7 @@ STATIC INLINE void
 sl_lsc_continue(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state == SL_STATE_PROCESSOR_OUTAGE) {
 		if (sl->sl.statem.processor_outage)
 			return;
@@ -4031,6 +4199,7 @@ STATIC INLINE void
 sl_poc_local_processor_recovered(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.poc_state) {
 	case SL_STATE_LOCAL_PROCESSOR_OUTAGE:
 		sl_lsc_no_processor_outage(q);
@@ -4047,6 +4216,7 @@ STATIC INLINE void
 sl_lsc_local_processor_recovered(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 		sl->sl.statem.local_processor_outage = 0;
@@ -4094,6 +4264,7 @@ STATIC INLINE void
 sl_lsc_local_processor_outage(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 	case SL_STATE_INITIAL_ALIGNMENT:
@@ -4138,6 +4309,7 @@ STATIC INLINE void
 sl_iac_emergency(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.iac_state) {
 	case SL_STATE_PROVING:
 		sl_txc_send_sie(q);
@@ -4163,6 +4335,7 @@ STATIC INLINE void
 sl_lsc_emergency(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.emergency = 1;
 	sl_iac_emergency(q);	/* added to pass Q.781/Test 1.20 */
 }
@@ -4171,6 +4344,7 @@ STATIC INLINE void
 sl_lsc_emergency_ceases(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.emergency = 0;
 }
 
@@ -4178,6 +4352,7 @@ STATIC INLINE void
 sl_iac_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.iac_state == SL_STATE_IDLE) {
 		sl_txc_send_sio(q);
 		sl_timer_start(q, t2);
@@ -4189,6 +4364,7 @@ STATIC INLINE void
 sl_daedt_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sdt.statem.daedt_state = SDT_STATE_IN_SERVICE;
 	sl->sdl.statem.tx_state = SDL_STATE_IN_SERVICE;
 	sl->sdl.config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING);
@@ -4198,6 +4374,7 @@ STATIC INLINE void
 sl_txc_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	sl->sl.statem.forced_retransmission = 0;	/* ok if basic */
 	sl->sl.statem.sib_received = 0;
 	sl->sl.statem.Ct = 0;
@@ -4235,6 +4412,7 @@ STATIC INLINE void
 sl_lsc_start(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 		sl_rc_start(q);
@@ -4259,6 +4437,7 @@ STATIC INLINE int
 sl_lsc_retrieve_bsnt(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
@@ -4271,6 +4450,7 @@ STATIC INLINE int
 sl_lsc_retrieval_request_and_fsnc(queue_t *q, sl_ulong fsnc)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_OUT_OF_SERVICE:
 	case SL_STATE_PROCESSOR_OUTAGE:
@@ -4283,6 +4463,7 @@ STATIC INLINE void
 sl_aerm_set_ti_to_tin(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.aerm_state == SDT_STATE_IDLE)
 		sl->sdt.statem.Ti = sl->sdt.config.Tin;
 }
@@ -4297,6 +4478,7 @@ STATIC INLINE void
 sl_lsc_power_on(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	switch (sl->sl.statem.lsc_state) {
 	case SL_STATE_POWER_OFF:
 		trace();
@@ -4335,6 +4517,7 @@ sl_check_congestion(queue_t *q)
 	int old_cong_status = sl->sl.statem.cong_status;
 	int old_disc_status = sl->sl.statem.disc_status;
 	int multi = sl->option.popt & SS7_POPT_MPLEV;
+
 	switch (sl->sl.statem.cong_status) {
 	case 0:
 		if (occupancy >= sl->sl.config.tb_onset_1) {
@@ -4452,6 +4635,7 @@ STATIC INLINE void
 sl_txc_message_for_transmission(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	bufq_queue(&sl->sl.tb, mp);
 	sl->sl.statem.Cm++;
 	sl_check_congestion(q);
@@ -4463,6 +4647,7 @@ sl_lsc_pdu(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	mblk_t *dp = mp;
 	int hlen = (sl->option.popt & SS7_POPT_XSN) ? 6 : 3;
+
 	ensure(dp, return (-EFAULT));
 	if (sl->sl.tb.q_count > 1024)
 		return (-ENOBUFS);
@@ -4492,6 +4677,7 @@ STATIC INLINE void
 sl_aerm_su_in_error(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.aerm_state == SDT_STATE_MONITORING) {
 		sl->sdt.statem.Ca++;
 		if (sl->sdt.statem.Ca == sl->sdt.statem.Ti) {
@@ -4507,6 +4693,7 @@ STATIC INLINE void
 sl_aerm_correct_su(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.aerm_state == SDT_STATE_IDLE) {
 		if (sl->sdt.statem.aborted_proving) {
 			sl_iac_correct_su(q);
@@ -4519,6 +4706,7 @@ STATIC INLINE void
 sl_suerm_su_in_error(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.suerm_state == SDT_STATE_IN_SERVICE) {
 		sl->sdt.statem.Cs++;
 		if (sl->sdt.statem.Cs >= sl->sdt.config.T) {
@@ -4540,6 +4728,7 @@ STATIC INLINE void
 sl_eim_su_in_error(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.eim_state == SDT_STATE_MONITORING)
 		sl->sdt.statem.interval_error = 1;
 }
@@ -4548,6 +4737,7 @@ STATIC INLINE void
 sl_suerm_correct_su(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.suerm_state == SDT_STATE_IN_SERVICE) {
 		sl->sdt.statem.Ns++;
 		if (sl->sdt.statem.Ns >= sl->sdt.config.D) {
@@ -4562,6 +4752,7 @@ STATIC INLINE void
 sl_eim_correct_su(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sdt.statem.eim_state == SDT_STATE_MONITORING)
 		sl->sdt.statem.su_received = 1;
 }
@@ -4582,6 +4773,7 @@ STATIC INLINE void
 sl_daedr_su_in_error(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		sl_eim_su_in_error(q);
 		sl_suerm_su_in_error(q);
@@ -4600,6 +4792,7 @@ STATIC INLINE void
 sl_daedr_received_bits(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		printd(("%s: %p: -> SL_RC_SIGNAL_UNIT\n", SL_TPI_MOD_NAME, sl));
 		sl_rc_signal_unit(q, mp);
@@ -4607,6 +4800,7 @@ sl_daedr_received_bits(queue_t *q, mblk_t *mp)
 		return;
 	} else if (sl->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		int i, len, mlen = (sl->option.popt & SS7_POPT_XSN) ? 8 : 5;
+
 		// printd(("%s: %p: -> SL_DAEDR_RECEIVED_BITS\n", SL_TPI_MOD_NAME, sl));
 		if (mp) {
 			len = msgdsize(mp);
@@ -4624,6 +4818,7 @@ sl_daedr_received_bits(queue_t *q, mblk_t *mp)
 				if (sl->sdt.rx_repeat) {
 #if 0
 					mblk_t *cp;
+
 					if ((cp = dupb(sl->sdt.rx_cmp))) {
 						if (sdt_rc_signal_unit_ind(q, cp, sl->sdt.rx_repeat)
 						    != QR_ABSORBED) {
@@ -4661,6 +4856,7 @@ sl_daedt_transmission_request(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	mblk_t *mp;
+
 	if (sl->sl.statem.lsc_state != SL_STATE_POWER_OFF) {
 		mp = sl_txc_transmission_request(q);
 	} else if (sl->sdt.statem.daedt_state != SDT_STATE_IDLE) {
@@ -4668,12 +4864,14 @@ sl_daedt_transmission_request(queue_t *q)
 			int len = msgdsize(mp);
 			int hlen = (sl->option.popt & SS7_POPT_XSN) ? 6 : 3;
 			int mlen = hlen + 2;
+
 			if (!sl->sdt.tb.q_count)
 				qenable(sl->wq);	/* back-enable */
 			if (len < hlen)
 				goto dont_repeat;
 			if (len == hlen + 1 || len == hlen + 2) {
 				int li, sio;
+
 				if (sl->option.popt & SS7_POPT_XSN) {
 					li = ((mp->b_rptr[5] << 8) | mp->b_rptr[4]) & 0x1ff;
 					sio = mp->b_rptr[6];
@@ -4697,6 +4895,7 @@ sl_daedt_transmission_request(queue_t *q)
 			}
 			if (sl->sdt.tx_cmp || (sl->sdt.tx_cmp = sl_fast_allocb(mlen, BPRI_HI))) {
 				mblk_t *cp = sl->sdt.tx_cmp;
+
 				if (len > mlen)
 					len = hlen;
 				cp->b_rptr = cp->b_datap->db_base;
@@ -4747,6 +4946,7 @@ STATIC int
 sl_rx_wakeup(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.rb.q_msgs && canputnext(q)) {
 		switch (sl->sl.statem.lsc_state) {
 		case SL_STATE_INITIAL_ALIGNMENT:
@@ -4774,6 +4974,7 @@ sl_rx_wakeup(queue_t *q)
 			   when in service we deliver as many buffers as we can */
 			do {
 				mblk_t *mp;
+
 				mp = bufq_dequeue(&sl->sl.rb);
 				sl->sl.statem.Cr--;
 				putnext(q, mp);
@@ -4792,6 +4993,7 @@ STATIC int
 sl_tx_wakeup(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if ((sl->sl.statem.lsc_state != SL_STATE_POWER_OFF
 	     && sl->sl.statem.txc_state == SL_STATE_IN_SERVICE)
 	    || (sl->sl.statem.lsc_state == SL_STATE_POWER_OFF
@@ -4799,6 +5001,7 @@ sl_tx_wakeup(queue_t *q)
 		mblk_t *mp, *dp;
 		long tdiff;
 		int size;
+
 		for (;;) {
 			if ((tdiff = jiffies - sl->sdl.timestamp) < 0) {
 				/* 
@@ -4866,6 +5069,7 @@ sl_t1_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if ((err = sl_out_of_service_ind(q, SL_FAIL_T1_TIMEOUT)))
 		return (err);
 	sl->sl.statem.failure_reason = SL_FAIL_T1_TIMEOUT;
@@ -4890,6 +5094,7 @@ sl_t2_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if (sl->sl.statem.iac_state == SL_STATE_NOT_ALIGNED) {
 		if ((err = sl_lsc_alignment_not_possible(q)))
 			return (err);
@@ -4908,6 +5113,7 @@ sl_t3_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if (sl->sl.statem.iac_state == SL_STATE_ALIGNED) {
 		if ((err = sl_lsc_alignment_not_possible(q)))
 			return (err);
@@ -4925,6 +5131,7 @@ STATIC int
 sl_t4_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.iac_state == SL_STATE_PROVING) {
 		if (sl->sl.statem.further_proving) {
 			sl_aerm_start(q);
@@ -4948,6 +5155,7 @@ STATIC int
 sl_t5_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->sl.statem.cc_state == SL_STATE_BUSY) {
 		sl_txc_send_sib(q);
 		sl_timer_start(q, t5);
@@ -4964,6 +5172,7 @@ sl_t6_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if ((err = sl_lsc_link_failure(q, SL_FAIL_CONG_TIMEOUT)))
 		return (err);
 	sl->sl.statem.sib_received = 0;
@@ -4980,6 +5189,7 @@ sl_t7_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if ((err = sl_lsc_link_failure(q, SL_FAIL_ACK_TIMEOUT)))
 		return (err);
 	sl_timer_stop(q, t6);
@@ -4997,6 +5207,7 @@ sl_t8_expiry(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	int err;
+
 	if (sl->sdt.statem.eim_state == SDT_STATE_MONITORING) {
 		sl_timer_start(q, t8);
 		if (sl->sdt.statem.su_received) {
@@ -5045,6 +5256,7 @@ STATIC int
 lmi_info_req(queue_t *q, mblk_t *mp)
 {
 	lmi_info_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		return lmi_info_ack(q, NULL, 0);
 	}
@@ -5115,8 +5327,10 @@ STATIC int
 lmi_detach_req(queue_t *q, mblk_t *mp)
 {
 	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state != LMI_UNUSABLE) {
 			if (sl->style == LMI_STYLE2) {
 				if (sl->state == LMI_DISABLED) {
@@ -5220,8 +5434,10 @@ STATIC int
 lmi_disable_req(queue_t *q, mblk_t *mp)
 {
 	lmi_disable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state != LMI_UNUSABLE) {
 			if (sl->state == LMI_ENABLED) {
 				sl->state = LMI_DISABLE_PENDING;
@@ -5254,6 +5470,7 @@ STATIC int
 lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	lmi_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		ptrace(("%s: PROTO: Primitive is not supported\n", SL_TPI_MOD_NAME));
 		return lmi_error_ack(q, LMI_OPTMGMT_REQ, LMI_NOTSUPP, EOPNOTSUPP);
@@ -5279,6 +5496,7 @@ sl_send_data(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	int ret;
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED) {
 		swerr();
 		return (-EPROTO);
@@ -5310,11 +5528,14 @@ STATIC int
 sl_pdu_req(queue_t *q, mblk_t *mp)
 {
 	sl_pdu_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
 			int ret;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				ret = sl_lsc_pdu(q, mp);
@@ -5337,10 +5558,13 @@ STATIC int
 sl_emergency_req(queue_t *q, mblk_t *mp)
 {
 	sl_emergency_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_emergency(q);
@@ -5363,10 +5587,13 @@ STATIC int
 sl_emergency_ceases_req(queue_t *q, mblk_t *mp)
 {
 	sl_emergency_ceases_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_emergency_ceases(q);
@@ -5389,10 +5616,13 @@ STATIC int
 sl_start_req(queue_t *q, mblk_t *mp)
 {
 	sl_start_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_start(q);
@@ -5415,10 +5645,13 @@ STATIC int
 sl_stop_req(queue_t *q, mblk_t *mp)
 {
 	sl_stop_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_stop(q);
@@ -5441,11 +5674,14 @@ STATIC int
 sl_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 {
 	sl_retrieve_bsnt_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			int err;
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				err = sl_lsc_retrieve_bsnt(q);
@@ -5468,11 +5704,14 @@ STATIC int
 sl_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 {
 	sl_retrieval_req_and_fsnc_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			int err;
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				err = sl_lsc_retrieval_request_and_fsnc(q, p->sl_fsnc);
@@ -5495,10 +5734,13 @@ STATIC int
 sl_resume_req(queue_t *q, mblk_t *mp)
 {
 	sl_resume_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_resume(q);
@@ -5521,11 +5763,14 @@ STATIC int
 sl_clear_buffers_req(queue_t *q, mblk_t *mp)
 {
 	sl_clear_buffers_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			int err;
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				err = sl_lsc_clear_buffers(q);
@@ -5548,10 +5793,13 @@ STATIC int
 sl_clear_rtb_req(queue_t *q, mblk_t *mp)
 {
 	sl_clear_rtb_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_clear_rtb(q);
@@ -5574,10 +5822,13 @@ STATIC int
 sl_local_processor_outage_req(queue_t *q, mblk_t *mp)
 {
 	sl_local_proc_outage_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_local_processor_outage(q);
@@ -5600,10 +5851,13 @@ STATIC int
 sl_congestion_discard_req(queue_t *q, mblk_t *mp)
 {
 	sl_cong_discard_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_congestion_discard(q);
@@ -5626,10 +5880,13 @@ STATIC int
 sl_congestion_accept_req(queue_t *q, mblk_t *mp)
 {
 	sl_cong_accept_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_congestion_accept(q);
@@ -5652,10 +5909,13 @@ STATIC int
 sl_no_congestion_req(queue_t *q, mblk_t *mp)
 {
 	sl_no_cong_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_no_congestion(q);
@@ -5678,10 +5938,13 @@ STATIC int
 sl_power_on_req(queue_t *q, mblk_t *mp)
 {
 	sl_power_on_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state == LMI_ENABLED) {
 			psw_t flags;
+
 			spin_lock_irqsave(&sl->lock, flags);
 			{
 				sl_lsc_power_on(q);
@@ -5726,6 +5989,7 @@ sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	int ret;
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5750,6 +6014,7 @@ sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5769,6 +6034,7 @@ sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5788,6 +6054,7 @@ sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5807,6 +6074,7 @@ sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5826,6 +6094,7 @@ sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5845,6 +6114,7 @@ sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5864,6 +6134,7 @@ sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5883,6 +6154,7 @@ sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	if (sl->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	spin_lock_irqsave(&sl->lock, flags);
@@ -5916,6 +6188,7 @@ t_conn_ind(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	struct T_conn_ind *p = (typeof(p)) mp->b_rptr;
+
 	assure(sl->t.state == TS_IDLE);
 	sl->t.state = TS_WRES_CIND;
 	if ((sl->state != LMI_UNUSABLE) && (sl->style == LMI_STYLE2)
@@ -5938,6 +6211,7 @@ STATIC int
 t_conn_con(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->state != LMI_UNUSABLE) {
 		assure(sl->t.state == TS_WCON_CREQ);
 		sl->t.state = TS_DATA_XFER;
@@ -5957,6 +6231,7 @@ t_discon_ind(queue_t *q, mblk_t *mp)
 	int err;
 	sl_t *sl = PRIV(q);
 	struct T_discon_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (sl->state != LMI_UNUSABLE) {
 		if (sl->t.state != TS_DATA_XFER) {
 			sl->t.state = TS_IDLE;
@@ -6002,6 +6277,7 @@ t_data_ind_slow(queue_t *q, mblk_t *mp, int more)
 	sl_t *sl = PRIV(q);
 	mblk_t *newp = NULL, *dp = mp->b_cont;
 	struct T_data_ind *p = (typeof(p)) mp->b_rptr;
+
 	seldom();
 	if (dp->b_cont) {
 		/* 
@@ -6047,6 +6323,7 @@ STATIC int
 t_data_ind(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->state == LMI_ENABLED
 	    &&
 	    ((sl->sl.statem.lsc_state != SL_STATE_POWER_OFF
@@ -6055,6 +6332,7 @@ t_data_ind(queue_t *q, mblk_t *mp)
 		 && sl->sdt.statem.daedr_state != SDT_STATE_IDLE))) {
 		mblk_t *dp = mp->b_cont;
 		struct T_data_ind *p = (typeof(p)) mp->b_rptr;
+
 		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			sl_recv_data(q, dp);
 			return (QR_TRIMMED);	/* absorbed data */
@@ -6083,6 +6361,7 @@ t_exdata_ind_slow(queue_t *q, mblk_t *mp, int more)
 	sl_t *sl = PRIV(q);
 	mblk_t *newp = NULL, *dp = mp->b_cont;
 	struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
+
 	seldom();
 	if (dp->b_cont) {
 		/* 
@@ -6128,6 +6407,7 @@ STATIC int
 t_exdata_ind(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->state == LMI_ENABLED
 	    &&
 	    ((sl->sl.statem.lsc_state != SL_STATE_POWER_OFF
@@ -6136,6 +6416,7 @@ t_exdata_ind(queue_t *q, mblk_t *mp)
 		 && sl->sdt.statem.daedr_state != SDT_STATE_IDLE))) {
 		mblk_t *dp = mp->b_cont;
 		struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
+
 		if (!(p->MORE_flag & T_MORE) && !dp->b_cont) {
 			sl_recv_data(q, dp);
 			return (QR_TRIMMED);	/* absorbed data */
@@ -6160,6 +6441,7 @@ t_info_ack(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	struct T_info_ack *p = ((typeof(p)) mp->b_rptr);
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl->t.pdu_size = p->TSDU_size;
 		if (p->TIDU_size && p->TIDU_size < p->TSDU_size)
@@ -6221,6 +6503,7 @@ STATIC int
 t_bind_ack(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->state != LMI_UNUSABLE) {
 		assure(sl->t.state == TS_WACK_BREQ);
 		sl->t.state = TS_IDLE;
@@ -6238,8 +6521,10 @@ STATIC int
 t_error_ack(queue_t *q, mblk_t *mp)
 {
 	struct T_error_ack *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sl_t *sl = PRIV(q);
+
 		switch (sl->t.state) {
 		case TS_WACK_OPTREQ:
 			assure(p->ERROR_prim == T_OPTMGMT_REQ);
@@ -6335,6 +6620,7 @@ t_ok_ack(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	struct T_ok_ack *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		switch (sl->t.state) {
 		case TS_WACK_UREQ:
@@ -6401,14 +6687,17 @@ STATIC int
 t_unitdata_ind(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->state == LMI_ENABLED) {
 		if (((sl->sl.statem.lsc_state != SL_STATE_POWER_OFF
 		      && sl->sl.statem.rc_state == SL_STATE_IN_SERVICE)
 		     || (sl->sl.statem.lsc_state == SL_STATE_POWER_OFF
 			 && sl->sdt.statem.daedr_state != SDT_STATE_IDLE))) {
 			mblk_t *dp = mp->b_cont;
+
 #if 0
 			struct T_unitdata_ind *p = (typeof(p)) mp->b_rptr;
+
 			/* 
 			   check source of packet */
 			if (p->SRC_length
@@ -6468,6 +6757,7 @@ t_ordrel_ind(queue_t *q, mblk_t *mp)
 {
 	int err;
 	sl_t *sl = PRIV(q);
+
 	if (sl->state != LMI_UNUSABLE) {
 		if (sl->t.state == TS_WIND_ORDREL) {
 			sl->t.state = TS_IDLE;
@@ -6502,6 +6792,7 @@ STATIC int
 t_optdata_ind(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	if (sl->state == LMI_ENABLED
 	    &&
 	    ((sl->sl.statem.lsc_state != SL_STATE_POWER_OFF
@@ -6510,6 +6801,7 @@ t_optdata_ind(queue_t *q, mblk_t *mp)
 		 && sl->sdt.statem.daedr_state != SDT_STATE_IDLE))) {
 		mblk_t *dp = mp->b_cont;
 		struct T_optdata_ind *p = (typeof(p)) mp->b_rptr;
+
 		if (!(p->DATA_flag & T_ODF_MORE) && !dp->b_cont) {
 			sl_recv_data(q, dp);
 			return (QR_TRIMMED);	/* absorbed data */
@@ -6570,6 +6862,7 @@ sl_iocgoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
@@ -6588,6 +6881,7 @@ sl_iocsoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
@@ -6606,6 +6900,7 @@ sl_iocgconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.config;
@@ -6624,6 +6919,7 @@ sl_iocsconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.config = *arg;
@@ -6642,6 +6938,7 @@ sl_ioctconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -6660,6 +6957,7 @@ sl_ioccconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -6678,6 +6976,7 @@ sl_iocgstatem(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statem;
@@ -6696,6 +6995,7 @@ sl_ioccmreset(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.statem = *arg;
@@ -6714,6 +7014,7 @@ sl_iocgstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.statsp;
@@ -6732,6 +7033,7 @@ sl_iocsstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.statsp = *arg;
@@ -6750,6 +7052,7 @@ sl_iocgstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.stats;
@@ -6768,6 +7071,7 @@ sl_ioccstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			bzero(&sl->sl.stats, sizeof(sl->sl.stats));
@@ -6786,6 +7090,7 @@ sl_iocgnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sl.notify;
@@ -6804,6 +7109,7 @@ sl_iocsnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events |= arg->events;
@@ -6822,6 +7128,7 @@ sl_ioccnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sl.notify.events &= ~(arg->events);
@@ -6845,6 +7152,7 @@ sdt_test_config(sl_t * sl, sdt_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags;
+
 	spin_lock_irqsave(&sl->lock, flags);
 	do {
 		if (!arg->t8)
@@ -6881,6 +7189,7 @@ STATIC int
 sdt_commit_config(sl_t * sl, sdt_config_t * arg)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sl->lock, flags);
 	{
 		sdt_test_config(sl, arg);
@@ -6896,6 +7205,7 @@ sdt_iocgoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
@@ -6913,6 +7223,7 @@ sdt_iocsoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
@@ -6930,6 +7241,7 @@ sdt_iocgconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.config;
@@ -6947,6 +7259,7 @@ sdt_iocsconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.config = *arg;
@@ -6963,6 +7276,7 @@ sdt_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		sl_t *sl = PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_test_config(sl, arg);
 	}
 	rare();
@@ -6974,6 +7288,7 @@ sdt_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		sl_t *sl = PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_commit_config(sl, arg);
 	}
 	rare();
@@ -6986,6 +7301,7 @@ sdt_iocgstatem(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.statem;
@@ -7000,6 +7316,7 @@ STATIC int
 sdt_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	(void) sl;
 	(void) mp;
 	fixme(("%s: Master reset\n", SL_TPI_MOD_NAME));
@@ -7012,6 +7329,7 @@ sdt_iocgstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.statsp;
@@ -7029,6 +7347,7 @@ sdt_iocsstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.statsp = *arg;
@@ -7046,6 +7365,7 @@ sdt_iocgstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.stats;
@@ -7061,6 +7381,7 @@ sdt_ioccstats(queue_t *q, mblk_t *mp)
 {
 	psw_t flags;
 	sl_t *sl = PRIV(q);
+
 	(void) mp;
 	spin_lock_irqsave(&sl->lock, flags);
 	{
@@ -7076,6 +7397,7 @@ sdt_iocgnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdt.notify;
@@ -7093,6 +7415,7 @@ sdt_iocsnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.notify = *arg;
@@ -7110,6 +7433,7 @@ sdt_ioccnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdt.notify.events &= ~arg->events;
@@ -7126,6 +7450,7 @@ sdt_ioccabort(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	int ret = 0;
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&sl->lock, flags);
 	{
@@ -7154,6 +7479,7 @@ STATIC void
 sdl_commit_config(sl_t * sl, sdl_config_t * arg)
 {
 	long tdiff;
+
 	sl->sdl.config = *arg;
 	/* 
 	   reshape traffic */
@@ -7177,6 +7503,7 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->option;
@@ -7194,6 +7521,7 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->option = *arg;
@@ -7211,6 +7539,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.config;
@@ -7229,6 +7558,7 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			if (!(ret = sdl_test_config(sl, arg)))
@@ -7248,6 +7578,7 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			ret = sdl_test_config(sl, arg);
@@ -7265,6 +7596,7 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sdl_commit_config(sl, arg);
@@ -7282,6 +7614,7 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.statem;
@@ -7297,6 +7630,7 @@ sdl_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) sl;
 	(void) arg;
 	fixme(("%s: FIXME: Support master reset\n", SL_TPI_MOD_NAME));
@@ -7309,6 +7643,7 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.statsp;
@@ -7326,6 +7661,7 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		fixme(("%s: FIXME: check these settings\n", SL_TPI_MOD_NAME));
 		spin_lock_irqsave(&sl->lock, flags);
 		{
@@ -7344,6 +7680,7 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.stats;
@@ -7359,6 +7696,7 @@ sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&sl->lock, flags);
 	{
@@ -7374,6 +7712,7 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			*arg = sl->sdl.notify;
@@ -7391,6 +7730,7 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdl.notify.events |= arg->events;
@@ -7408,6 +7748,7 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 		sl_t *sl = PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sl->lock, flags);
 		{
 			sl->sdl.notify.events &= ~arg->events;
@@ -7423,6 +7764,7 @@ sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&sl->lock, flags);
 	{
@@ -7436,6 +7778,7 @@ sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&sl->lock, flags);
 	{
@@ -7466,6 +7809,7 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
+
 	switch (type) {
 	case __SID:
 	{
@@ -7704,6 +8048,7 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sl_t *sl = PRIV(q);
 	ulong oldstate = sl->state;
+
 	/* 
 	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SL_PDU_REQ) {
@@ -7848,6 +8193,7 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sl_t *sl = PRIV(q);
 	ulong oldstate = sl->t.state;
+
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == T_UNITDATA_IND) {
@@ -7940,6 +8286,7 @@ STATIC int
 sl_w_data(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	(void) sl;
 	printd(("%s: %p: -> M_DATA (above)\n", SL_TPI_MOD_NAME, sl));
 	return sl_send_data(q, mp);
@@ -7948,6 +8295,7 @@ STATIC int
 sl_r_data(queue_t *q, mblk_t *mp)
 {
 	sl_t *sl = PRIV(q);
+
 	(void) sl;
 	printd(("%s: %p: -> M_DATA (below)\n", SL_TPI_MOD_NAME, sl));
 	return sl_recv_data(q, mp);
@@ -7966,6 +8314,7 @@ sl_r_pcrse(queue_t *q, mblk_t *mp)
 	sl_t *sl = PRIV(q);
 	int rtn;
 	psw_t flags;
+
 	spin_lock_irqsave(&sl->lock, flags);
 	{
 		switch (*(ulong *) mp->b_rptr) {
@@ -8101,6 +8450,7 @@ STATIC INLINE int
 sl_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *))
 {
 	int rtn = 0;
+
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	if (mp->b_datap->db_type < QPCTL || q->q_count) {
@@ -8174,9 +8524,11 @@ STATIC INLINE int
 sl_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *), int (*wakeup) (queue_t *))
 {
 	int rtn = 0;
+
 	ensure(q, return (-EFAULT));
 	if (sl_trylockq(q)) {
 		mblk_t *mp;
+
 		while ((mp = getq(q))) {
 			/* 
 			   Fast Path */
@@ -8316,6 +8668,7 @@ STATIC sl_t *
 sl_alloc_priv(queue_t *q, sl_t ** slp, major_t cmajor, minor_t cminor)
 {
 	sl_t *sl;
+
 	if ((sl = kmem_cache_alloc(sl_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated module private structure\n", SL_TPI_MOD_NAME));
 		bzero(sl, sizeof(*sl));
@@ -8427,6 +8780,7 @@ sl_free_priv(queue_t *q)
 {
 	sl_t *sl = PRIV(q);
 	psw_t flags;
+
 	ensure(sl, return);
 	spin_lock_irqsave(&sl->lock, flags);
 	{
@@ -8530,6 +8884,7 @@ sl_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -8554,6 +8909,7 @@ STATIC int
 sl_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&sl_fmod)) < 0)
 		return (err);
 	return (0);
@@ -8563,6 +8919,7 @@ STATIC int
 sl_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&sl_fmod)) < 0)
 		return (err);
 	return (0);
@@ -8580,6 +8937,7 @@ STATIC int
 sl_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&sl_tpiinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -8593,6 +8951,7 @@ STATIC int
 sl_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&sl_tpiinfo)) < 0)
 		return (err);
 	return (0);
@@ -8604,6 +8963,7 @@ MODULE_STATIC int __init
 sl_tpiinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = sl_bufpool_init())) {
 		cmn_err(CE_WARN, "%s: could not init bufpool, err = %d", MOD_NAME, err);
@@ -8629,6 +8989,7 @@ MODULE_STATIC void __exit
 sl_tpiterminate(void)
 {
 	int err;
+
 	if ((err = sl_bufpool_term()))
 		cmn_err(CE_WARN, "%s: could not terminate bufpool", MOD_NAME);
 	if ((err = sl_unregister_strmod()))

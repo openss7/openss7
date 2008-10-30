@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:26 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:26 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.11  2008-10-30 18:31:26  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.10  2008-04-29 07:11:26  brian
  - updating headers for release
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:26 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:26 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-04-29 07:11:26 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:26 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -672,7 +675,7 @@ struct sockaddr_in addrs[4];
 int anums[4] = { 3, 3, 3, 3 };
 
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -681,7 +684,7 @@ const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.
 
 N_qos_sel_data_sctp_t qos_data = {
 	.n_qos_type = N_QOS_SEL_DATA_SCTP,
-	.ppi = 10,
+	.ppi = 0,
 	.sid = 0,
 	.ssn = 0,
 	.tsn = 0,
@@ -698,7 +701,7 @@ N_qos_sel_info_sctp_t qos_info = {
 	.n_qos_type = N_QOS_SEL_INFO_SCTP,
 	.i_streams = 1,
 	.o_streams = 1,
-	.ppi = 10,
+	.ppi = 0,
 	.sid = 0,
 	.max_inits = 12,
 	.max_retrans = 12,
@@ -5144,15 +5147,18 @@ postamble_1_data_xfer(int child)
 	DATA_buffer = NULL;
 	DATA_length = 0;
 
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT * (1 + child), __TEST_DISCON_IND) == __RESULT_SUCCESS)
 		goto cannot_disconnect;
 	state++;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto cannot_disconnect;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
-		if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
-			failed = (failed == -1) ? state : failed;
+		/* Note: disconnect indication could have flushed our disconnect request before
+		   acknowledgement */
+		if (last_event != __TEST_DISCON_IND)
+			if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
+				failed = (failed == -1) ? state : failed;
 	}
       cannot_disconnect:
 	state++;
@@ -5172,7 +5178,7 @@ postamble_1_refuse(int child)
 
 	if (child != 2)
 		goto cannot_refuse;
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT * (1 + child), __TEST_DISCON_IND) == __RESULT_SUCCESS)
 		goto cannot_refuse;
 	state++;
 	ADDR_buffer = NULL;
@@ -5184,8 +5190,11 @@ postamble_1_refuse(int child)
 		goto cannot_refuse;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
-		if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
-			failed = (failed == -1) ? state : failed;
+		/* Note: disconnect indication could have flushed our disconnect request before
+		   acknowledgement */
+		if (last_event != __TEST_DISCON_IND)
+			if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
+				failed = (failed == -1) ? state : failed;
 	}
       cannot_refuse:
 	state++;
@@ -5344,7 +5353,7 @@ preamble_2_data_xfer_conn(int child)
 	if (last_info.CURRENT_state != NS_DATA_XFER)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5507,7 +5516,7 @@ preamble_2_data_xfer_list(int child)
 	if (last_info.CURRENT_state != NS_DATA_XFER)
 		goto failure;
 	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
+	if (expect(child, LONGER_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6698,29 +6707,18 @@ test_case_6_2_resp(int child)
 int
 test_case_6_2_list(int child)
 {
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
-	state++;
-	if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-		goto failure;
+	/* Expect 2 message sequences, that can be coallesced. */
+	do {
+		if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	} while ((DATA_xfer_flags & N_MORE_DATA_FLAG) != 0);
+	do {
+		if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+			goto failure;
+		state++;
+	} while ((DATA_xfer_flags & N_MORE_DATA_FLAG) != 0);
+	test_msleep(child, LONG_WAIT);	/* must be longer than sack timeout */
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -6754,7 +6752,7 @@ the same stream and delivered to the user first."
 int
 test_case_6_3_conn(int child)
 {
-#if 0
+#if 1
 	int i;
 #endif
 
@@ -6838,10 +6836,11 @@ test_case_6_3_conn(int child)
 	qos_data.sid = 3;
 	if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
-#if 0
+#if 1
 	for (i = 0; i < 4; i++) {
 		state++;
-		if (expect(child, NORMAL_WAIT, __TEST_DATACK_IND) != __RESULT_SUCCESS)
+		/* wait must be longer than sack timeout */
+		if (expect(child, LONGER_WAIT, __TEST_DATACK_IND) != __RESULT_SUCCESS)
 			break;
 	}
 	if (i < 4)
@@ -6873,11 +6872,14 @@ test_case_6_3_list(int child)
 	if (expect(child, NORMAL_WAIT, __TEST_EXDATA_IND) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
-	for (i = 0; i < 16; i++) {
-		if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
-			goto failure;
-		state++;
+	for (i = 0; i < 4; i++) {
+		do {
+			if (expect(child, NORMAL_WAIT, __TEST_DATA_IND) != __RESULT_SUCCESS)
+				goto failure;
+			state++;
+		} while ((DATA_xfer_flags & N_MORE_DATA_FLAG) != 0);
 	}
+	test_msleep(child, LONG_WAIT);	/* must be longer than sack timeout */
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7208,7 +7210,8 @@ test_case_8_1_conn(int child)
 			state++;
 		}
 		for (i += 6, j += 21; i > 0 || j > 0; state++) {
-			switch (wait_event(child, NORMAL_WAIT)) {
+			/* wait must be longer than sack timeout */
+			switch (wait_event(child, LONGER_WAIT)) {
 			case __TEST_DATACK_IND:
 				i--;
 				continue;
@@ -7255,7 +7258,8 @@ test_case_8_1_list(int child)
 			state++;
 		}
 		for (i += 6, j += 21; i > 0 || j > 0; state++) {
-			switch (wait_event(child, NORMAL_WAIT)) {
+			/* wait must be longer than sack timeout */
+			switch (wait_event(child, LONGER_WAIT)) {
 			case __TEST_DATACK_IND:
 				j--;
 				continue;
@@ -7347,7 +7351,8 @@ test_case_8_2_conn(int child)
 	test_sleep(child, qos_info.rto_max / 100 + 1);
 #if 1
 	for (i = 1; i < 5; i++)
-		if (expect(child, NORMAL_WAIT, __TEST_DATACK_IND) != __RESULT_SUCCESS)
+		/* wait must be longer than sack timeout */
+		if (expect(child, LONGER_WAIT, __TEST_DATACK_IND) != __RESULT_SUCCESS)
 			break;
 	if (i != 5)
 		goto failure;
@@ -7442,7 +7447,7 @@ struct test_stream test_8_2_list = { &preamble_8_2_list, &test_case_8_2_list, &p
 #define sref_case_9_1 "NPI Rev 2.0.0"
 #define desc_case_9_1 "\
 Delivery of ordered data under noise with acknowledgement."
-#if 0
+#if 1
 #define TEST_PACKETS 300
 #else
 #define TEST_PACKETS 30
@@ -7452,6 +7457,8 @@ test_case_9_1_conn(int child)
 {
 	int i = TEST_PACKETS, j = TEST_PACKETS, k = TEST_PACKETS;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	while (i > 0) {
 		DATA_xfer_flags = N_RC_FLAG;
 		QOS_buffer = NULL;
@@ -7463,7 +7470,8 @@ test_case_9_1_conn(int child)
 		i--;
 	}
 	while (j > 0 || k > 0) {
-		switch (wait_event(child, LONG_WAIT)) {
+		/* wait must be longer than sack timeout */
+		switch (wait_event(child, LONGER_WAIT)) {
 		case __TEST_DATA_IND:
 			j--;
 			break;
@@ -7475,7 +7483,7 @@ test_case_9_1_conn(int child)
 		}
 		state++;
 	}
-	test_msleep(child, LONG_WAIT);
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7499,6 +7507,8 @@ test_case_9_1_list(int child)
 {
 	int i = TEST_PACKETS, j = TEST_PACKETS, k = TEST_PACKETS;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	while (i > 0) {
 		DATA_xfer_flags = N_RC_FLAG;
 		QOS_buffer = NULL;
@@ -7510,7 +7520,8 @@ test_case_9_1_list(int child)
 		i--;
 	}
 	while (j > 0 || k > 0) {
-		switch (wait_event(child, LONG_WAIT)) {
+		/* wait must be longer than sack timeout */
+		switch (wait_event(child, LONGER_WAIT)) {
 		case __TEST_DATA_IND:
 			j--;
 			break;
@@ -7522,7 +7533,7 @@ test_case_9_1_list(int child)
 		}
 		state++;
 	}
-	test_msleep(child, LONG_WAIT);
+	test_msleep(child, LONGER_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7557,7 +7568,7 @@ struct test_stream test_9_1_list = { &preamble_9_1_list, &test_case_9_1_list, &p
 #define sref_case_9_2 "NPI Rev 2.0.0"
 #define desc_case_9_2 "\
 Delivery of un-ordered data under noise."
-#if 0
+#if 1
 #define TEST_PACKETS 300
 #else
 #define TEST_PACKETS 30
@@ -7567,6 +7578,8 @@ test_case_9_2_conn(int child)
 {
 	int i = 0, j = 0;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	while (i < TEST_PACKETS) {
 		QOS_buffer = &qos_data;
 		QOS_length = sizeof(qos_data);
@@ -7615,6 +7628,8 @@ test_case_9_2_list(int child)
 {
 	int i = 0, j = 0;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	while (i < TEST_PACKETS) {
 		QOS_buffer = &qos_data;
 		QOS_length = sizeof(qos_data);
@@ -7674,7 +7689,7 @@ struct test_stream test_9_2_list = { &preamble_9_2_list, &test_case_9_2_list, &p
 #define sref_case_9_3 "NPI Rev 2.0.0"
 #define desc_case_9_3 "\
 Delivery of ordered data in multiple streams under noise."
-#define TEST_PACKETS 10
+#define TEST_PACKETS 32
 #define TEST_STREAMS 32
 #define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
 int
@@ -7686,6 +7701,8 @@ test_case_9_3_conn(int child)
 	int k[TEST_STREAMS] = { 0, };
 	int I = 0, J = 0, K = 0;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	for (s = 0; s < TEST_STREAMS; s++) {
 		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
 			qos_data.sid = s;
@@ -7705,7 +7722,8 @@ test_case_9_3_conn(int child)
 		}
 	}
 	while (J < TEST_TOTAL || K < TEST_TOTAL) {
-		switch (wait_event(child, NORMAL_WAIT)) {
+		/* wait must be longer than sack timeout */
+		switch (wait_event(child, LONGER_WAIT)) {
 		case __TEST_DATA_IND:
 			j[sid[child]]++;
 			J++;
@@ -7754,6 +7772,8 @@ test_case_9_3_list(int child)
 	int k[TEST_STREAMS] = { 0, };
 	int I = 0, J = 0, K = 0;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	for (s = 0; s < TEST_STREAMS; s++) {
 		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
 			qos_data.sid = s;
@@ -7773,7 +7793,8 @@ test_case_9_3_list(int child)
 		}
 	}
 	while (J < TEST_TOTAL || K < TEST_TOTAL) {
-		switch (wait_event(child, NORMAL_WAIT)) {
+		/* wait must be longer than sack timeout */
+		switch (wait_event(child, LONGER_WAIT)) {
 		case __TEST_DATA_IND:
 			j[sid[child]]++;
 			J++;
@@ -7831,7 +7852,7 @@ struct test_stream test_9_3_list = { &preamble_9_3_list, &test_case_9_3_list, &p
 #define sref_case_9_4 "NPI Rev 2.0.0"
 #define desc_case_9_4 "\
 Delivery of ordered and un-ordered data in multiple streams under noise."
-#define TEST_PACKETS 10
+#define TEST_PACKETS 32
 #define TEST_STREAMS 32
 #define TEST_TOTAL (TEST_PACKETS*TEST_STREAMS)
 int
@@ -7845,6 +7866,8 @@ test_case_9_4_conn(int child)
 	int p[TEST_STREAMS] = { 0, };
 	int I = 0, J = 0, K = 0, O = 0, P = 0;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	for (s = 0; s < TEST_STREAMS; s++) {
 		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
 			qos_data.sid = s;
@@ -7877,6 +7900,7 @@ test_case_9_4_conn(int child)
 		}
 	}
 	while (J < TEST_TOTAL || K < TEST_TOTAL || P < TEST_TOTAL) {
+		/* wait must be longer than sack timeout */
 		switch (wait_event(child, LONGER_WAIT)) {
 		case __TEST_DATA_IND:
 			j[sid[child]]++;
@@ -7928,6 +7952,8 @@ test_case_9_4_list(int child)
 	int p[TEST_STREAMS] = { 0, };
 	int I = 0, J = 0, K = 0, O = 0, P = 0;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	for (s = 0; s < TEST_STREAMS; s++) {
 		while (I < TEST_TOTAL && i[s] < TEST_PACKETS) {
 			qos_data.sid = s;
@@ -7960,6 +7986,7 @@ test_case_9_4_list(int child)
 		}
 	}
 	while (J < TEST_TOTAL || K < TEST_TOTAL || P < TEST_TOTAL) {
+		/* wait must be longer than sack timeout */
 		switch (wait_event(child, LONGER_WAIT)) {
 		case __TEST_DATA_IND:
 			j[sid[child]]++;
@@ -8029,6 +8056,8 @@ test_case_10_1_conn(int child)
 {
 	int i, j;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	for (j = 0; j < 20; j++) {
 		for (i = 0; i < 20; i++) {
 			DATA_xfer_flags = 0;
@@ -8068,6 +8097,8 @@ test_case_10_1_list(int child)
 {
 	int i, j;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	for (j = 0; j < 20; j++) {
 		for (i = 0; i < 20; i++) {
 			DATA_xfer_flags = 0;
@@ -8138,6 +8169,8 @@ test_case_10_2_conn(int child)
 	struct result times[SETS * REPS];
 	ulong atotal = 0;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	bzero(times, sizeof(times));
 	show = 0;
 	for (j = 0; j < SETS; j++) {
@@ -8158,6 +8191,7 @@ test_case_10_2_conn(int child)
 			times[j * REPS + i].req_idx = n++;
 		}
 		for (i = 0; i < REPS; i++, state++) {
+			/* wait must be longer than sack timeout */
 			if (expect(child, LONGER_WAIT, __TEST_DATACK_IND) != __RESULT_SUCCESS)
 				goto failure;
 			times[j * REPS + i].ack = when;
@@ -8207,6 +8241,8 @@ test_case_10_2_list(int child)
 {
 	int i, j;
 
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	show = 0;
 	for (j = 0; j < SETS; j++)
 		for (i = 0; i < REPS; i++, state++)
@@ -8961,17 +8997,17 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
-Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sctp_n", PACKAGE, VERSION, "$Revision: 0.9.2.10 $ $Date: 2008-04-29 07:11:26 $");
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
+", argv[0], ident);
 }
 
 void

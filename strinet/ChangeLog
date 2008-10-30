@@ -1,5 +1,12 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/inet.c: rationalize drivers
+	* src/drivers/rawip.c: rationalize drivers
+	* src/modules/isot.c: rationalize drivers
+	* src/modules/itot.c: rationalize drivers
+	* src/modules/tcpns.c: rationalize drivers
+	* src/modules/xot.c: rationalize drivers
+
 	* src/include/ticlts.h: updated headers
 	* src/include/ticots.h: updated headers
 	* src/include/ticotsord.h: updated headers

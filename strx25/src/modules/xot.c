@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $
+ @(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-30 18:31:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:48 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xot.c,v $
+ Revision 0.9.2.4  2008-10-30 18:31:49  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.3  2008-09-22 20:31:48  brian
  - added module version and truncated logs
 
@@ -62,10 +65,14 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $"
+#ident "@(#) $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-30 18:31:49 $"
 
-static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $";
+static char const ident[] =
+    "$RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-30 18:31:49 $";
 
+/*
+ *  X.25 over TCP (XOT).
+ */
 
 /*
  * This is a XOT [RFC 1613] module.  It pushes over a TCP TPI stream and
@@ -91,7 +98,7 @@ static char const ident[] = "$RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 #define XOT_DESCRIPT	"X.25 OVER TCP MODULE FOR LINUX FAST-STREAMS"
 #define XOT_EXTRA	"Part fo the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define XOT_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2008-09-22 20:31:48 $"
+#define XOT_REVISION	"OpenSS7 $RCSfile: xot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-30 18:31:49 $"
 #define XOT_DEVICE	"SVR 4.2MP X.25 over TCP Module (XOT) for X.25 CONS"
 #define XOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define XOT_LICENSE	"GPL"

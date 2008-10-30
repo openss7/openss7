@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:58:13 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-30 18:31:48 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:13 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: scls.c,v $
+ Revision 0.9.2.19  2008-10-30 18:31:48  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.18  2007/08/14 12:58:13  brian
  - GNUv3 header updates
 
@@ -63,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:58:13 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-30 18:31:48 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:58:13 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-30 18:31:48 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -101,8 +105,8 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 3, included here by reference.\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under AGPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -171,22 +175,22 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
-the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version 3 of the License.\n\
+the terms of the GNU Affero General Public License as published by the Free\n\
+Software Foundation; Version 3 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
 \n\
-You should  have received a copy of the GNU  General  Public License  along with\n\
-this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
+You should have received a copy of the GNU  Affero  General Public License along\n\
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
@@ -435,7 +439,7 @@ main(int argc, char *argv[])
 			else
 				command = CMN_COUNT;
 			break;
-		case 'D':	/* -D, --debug */
+		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
 			if (optarg == NULL) {
@@ -508,7 +512,15 @@ main(int argc, char *argv[])
 		if (debug)
 			fprintf(stderr, "%s: could not open /dev/nuls\n", argv[0]);
 		perror(argv[0]);
-		exit(1);
+		if (debug)
+			fprintf(stderr, "%s: opening /dev/streams/clone/nuls\n", argv[0]);
+		if ((fd = open("/dev/streams/clone/nuls", O_RDWR)) < 0) {
+			if (debug)
+				fprintf(stderr, "%s: could not open /dev/streams/clone/nuls\n",
+					argv[0]);
+			perror(argv[0]);
+			exit(1);
+		}
 	}
 	if (debug)
 		fprintf(stderr, "%s: pushing sc module\n", argv[0]);

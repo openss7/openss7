@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2008-10-30 18:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-24 15:51:11 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.119  2008-10-30 18:31:37  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.118  2008-10-24 15:51:11  brian
  - updated test suites
 
@@ -140,10 +143,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2008-10-30 18:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2008-10-30 18:31:37 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -661,7 +664,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.118 $) $Date: 2008-10-24 15:51:11 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.119 $) $Date: 2008-10-30 18:31:37 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -690,11 +693,13 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
+#ifdef LFS
 #define SS__DRV_ID	CONFIG_STREAMS_SS__MAJOR
 #define SS__DRV_NAME	CONFIG_STREAMS_SS__NAME
 #define SS__CMAJORS	CONFIG_STREAMS_SS__NMAJORS
 #define SS__CMAJOR_0	CONFIG_STREAMS_SS__MAJOR
 #define SS__UNITS	CONFIG_STREAMS_SS__NMINORS
+#endif				/* LFS */
 
 #define IP_CMINOR	32
 
@@ -725,12 +730,14 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 
 #ifdef LINUX
 #ifdef MODULE_ALIAS
+#ifdef LFS
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_SS__MAJOR));
 MODULE_ALIAS("streams-driver-inet");
 MODULE_ALIAS("streams-major-" __stringify(CONFIG_STREAMS_SS__MAJOR));
 MODULE_ALIAS("/dev/streams/inet");
 MODULE_ALIAS("/dev/streams/inet/*");
 MODULE_ALIAS("/dev/streams/clone/inet");
+#endif
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0));
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-*");
 MODULE_ALIAS("char-major-" __stringify(SS__CMAJOR_0) "-0");
@@ -1251,12 +1258,6 @@ enum {
 	_T_BIT_SCTP_MAX_BURST,
 #endif				/* defined HAVE_OPENSS7_SCTP */
 };
-
-typedef struct ss_event {
-	struct sock *sk;		/* sock (child) for event */
-	int state;			/* state at time of event */
-	int error;			/* error to report */
-} ss_event_t;
 
 static rwlock_t ss_lock = RW_LOCK_UNLOCKED;	/* protects ss_opens lists */
 static caddr_t ss_opens = NULL;

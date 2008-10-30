@@ -1,3 +1,27 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* drivers/str/echo.c: rationalize drivers and modules
+	* drivers/str/loop.c: rationalize drivers and modules
+	* drivers/str/mux.c: rationalize drivers and modules
+	* drivers/str/nullmod.c: rationalize drivers and modules: rationalize
+	  drivers and modules
+	* drivers/str/nuls.c
+	* drivers/str/pipemod.c: rationalize drivers and modules
+	* drivers/str/sad.c: rationalize drivers and modules
+	* drivers/str/testmod.c: rationalize drivers and modules
+	* drivers/str/timod.c: rationalize drivers and modules
+	* drivers/str/tirdwr.c: rationalize drivers and modules
+	* drivers/str/linux/connld.c: rationalize drivers and modules
+	* drivers/str/linux/ip_strm_mod.c: rationalize drivers and modules
+	* drivers/str/linux/ip_to_dlpi.c: rationalize drivers and modules
+	* util/perftest.c: rationalize drivers and modules
+	* util/strconf.c: rationalize drivers and modules
+	* util/test-sad.c: rationalize drivers and modules
+	* util/test-streams.c: rationalize drivers and modules
+	* util/linux/fattach.c: rationalize drivers and modules
+	* util/linux/fdetach.c: rationalize drivers and modules
+
+
 2008-10-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/install.texi: documented tool chain updates

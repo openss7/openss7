@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:26 $
+ @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:26 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp.c,v $
+ Revision 0.9.2.10  2008-10-30 18:31:26  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.9  2008-04-29 07:11:26  brian
  - updating headers for release
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:26 $"
+#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:26 $"
 
-static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:26 $";
+static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:26 $";
 
 /* 
  *  This file is for testing the sctp_n driver.
@@ -880,17 +883,13 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
-Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-\n\
-Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sctp", PACKAGE, VERSION, "$Revision: 0.9.2.9 $ $Date: 2008-04-29 07:11:26 $");
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
 }
 
 void

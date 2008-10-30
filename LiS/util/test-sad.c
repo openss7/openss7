@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 08:33:27 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:02 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:27 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.10  2008-10-30 18:31:02  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.9  2008-04-29 08:33:27  brian
  - update headers for Affero release
 
@@ -162,9 +165,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 08:33:27 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:02 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 08:33:27 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:02 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -4015,8 +4018,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+Affero  General Public License (AGPL)  Version 3,  so long  as  the  software is\n\
+distributed with,  and only used for the  testing of,  OpenSS7 modules, drivers,\n\
 and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\

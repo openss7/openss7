@@ -1,5 +1,45 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/lib/libxnet/xnet.c: rationalize drivers
+	* src/modules/dl/dl_lapd.c: rationalize drivers
+	* src/modules/inet/inet.c: rationalize drivers
+	* src/modules/inet/rawip.c: rationalize drivers
+	* src/modules/inet/tcp.c: rationalize drivers
+	* src/modules/inet/udp.c: rationalize drivers
+	* src/modules/m2pa/m2pa_sl.c: rationalize drivers
+	* src/modules/m2tp/m2tp.c: rationalize drivers
+	* src/modules/m3ua/m3ua_lower.c: rationalize drivers
+	* src/modules/m3ua/m3ua_sg.c: rationalize drivers
+	* src/modules/mg/mg.c: rationalize drivers
+	* src/modules/sctp/sctp2.c: rationalize drivers
+	* src/modules/sctp/sctp_t.c: rationalize drivers
+	* src/modules/sl/sl_dl.c: rationalize drivers
+	* src/modules/ss7ip/sl_tpi.c: rationalize drivers
+	* src/modules/ss7sctp/sdl_sctp.c: rationalize drivers
+	* src/modules/tali/tali.c: rationalize drivers
+	* src/modules/ti/timod.c: rationalize drivers
+	* src/modules/ti/tirdwr.c: rationalize drivers
+	* src/test/perftest.c: rationalize drivers
+	* src/test/inet/test-inet_raw.c: rationalize drivers
+	* src/test/inet/test-inet_sctp.c: rationalize drivers
+	* src/test/inet/test-inet_tcp.c: rationalize drivers
+	* src/test/inet/test-inet_udp.c: rationalize drivers
+	* src/test/inet/test-sctp.c: rationalize drivers
+	* src/test/inet/test-sctp_n.c: rationalize drivers
+	* src/test/inet/test-sctp_nc.c: rationalize drivers
+	* src/test/inet/test-sctp_t.c: rationalize drivers
+	* src/test/inet/test-tcpc.c: rationalize drivers
+	* src/test/m2pa/test-m2pa.c: rationalize drivers
+	* src/test/sctp/test-etsi_n.c: rationalize drivers
+	* src/test/sctp/test-etsi_t.c: rationalize drivers
+	* src/test/sctp/test-interop.c: rationalize drivers
+	* src/test/sctp/test-sctp.c: rationalize drivers
+	* src/test/sctp/test-sctp_n.c: rationalize drivers
+	* src/test/sctp/test-sctp_n2.c: rationalize drivers
+	* src/test/sctp/test-sctp_nc.c: rationalize drivers
+	* src/test/sctp/test-sctp_t.c: rationalize drivers
+	* src/test/tli/test-tirdwr.c: rationalize drivers
+
 	* src/include/ticlts.h: updated headers
 	* src/include/ticots.h: updated headers
 	* src/include/ticotsord.h: updated headers

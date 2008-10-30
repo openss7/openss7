@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:09 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:08 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.12  2008-10-30 18:31:09  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.11  2008-09-22 20:31:08  brian
  - added module version and truncated logs
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:09 $"
 
 static char const ident[] =
-    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $";
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:09 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -147,7 +150,7 @@ static char const ident[] =
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:08 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:09 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -263,6 +266,71 @@ MODULE_STATIC struct streamtab tpi_info = {
 	.st_rdinit = &tpi_rinit,	/* Upper read queue */
 	.st_wrinit = &tpi_winit,	/* Upper write queue */
 };
+
+#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
+{
+	return skb->tail;
+}
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
+{
+	return skb->end;
+}
+static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
+{
+	return skb->h.raw;
+}
+static inline unsigned char *skb_network_header(const struct sk_buff *skb)
+{
+	return skb->nh.raw;
+}
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+{
+	return skb->mac.raw;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_reset_end_pointer(struct sk_buff *skb)
+{
+	skb->end = skb->data;
+}
+static inline void skb_reset_transport_header(struct sk_buff *skb)
+{
+	skb->h.raw = skb->data;
+}
+static inline void skb_reset_network_header(struct sk_buff *skb)
+{
+	skb->nh.raw = skb->data;
+}
+static inline void skb_reset_mac_header(struct sk_buff *skb)
+{
+	skb->mac.raw = skb->data;
+}
+static inline void skb_set_tail_pointer(struct sk_buff *skb, const int offset)
+{
+	skb_reset_tail_pointer(skb);
+	skb->tail += offset;
+}
+static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_transport_header(skb);
+	skb->h.raw += offset;
+}
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_network_header(skb);
+	skb->nh.raw += offset;
+}
+static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_mac_header(skb);
+	skb->mac.raw += offset;
+}
+#endif				/* !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER */
+#endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /*
  *  TLI Interface state flags
@@ -1796,7 +1864,7 @@ t_size_negotiate_options(const struct tpi *t, const unsigned char *ip, size_t il
  * Calculates the overall T_OPTMGMT_ACK flag result from individual results.
  */
 STATIC uint
-t_overall_result(uint * overall, uint result)
+t_overall_result(t_scalar_t * overall, uint result)
 {
 	switch (result) {
 	case T_NOTSUPPORT:
@@ -4378,7 +4446,7 @@ STATIC INLINE int
 t_tpi_queue_xmit(struct sk_buff *skb)
 {
 	struct rtable *rt = (struct rtable *) skb->dst;
-	struct iphdr *iph = skb->nh.iph;
+	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
 	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
@@ -4386,6 +4454,9 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 	ip_select_ident(iph, &rt->u.dst, NULL);
 #endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
+#ifndef NF_IP_LOCAL_OUT
+#define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
+#endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
 	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
 #else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
@@ -4482,7 +4553,15 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 				iph->saddr = rt->rt_src;
 			iph->protocol = IPPROTO_TCP;
 			iph->tot_len = htons(tlen);
+#if defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if defined NET_SKBUFF_DATA_USES_OFFSET
+			skb->network_header = (unsigned char *) iph - skb->head;
+#else				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+			skb->network_header = (void *) iph;
+#endif				/* defined NET_SKBUFF_DATA_USES_OFFSET */
+#else				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 			skb->nh.iph = iph;
+#endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #if !defined HAVE_KFUNC_DST_OUTPUT
 #if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
 			__ip_select_ident(iph, &rt->u.dst);
@@ -5376,7 +5455,11 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		ADDR_buffer = (typeof(ADDR_buffer)) (mp->b_rptr + p->ADDR_offset);
 	}
 	add_in = (typeof(add_in)) ADDR_buffer;
+#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
 	type = inet_addr_type(add_in->sin_addr.s_addr);
+#else
+	type = inet_addr_type(&init_net, add_in->sin_addr.s_addr);
+#endif
 	err = TNOADDR;
 	if (sysctl_ip_nonlocal_bind == 0 && add_in->sin_addr.s_addr != INADDR_ANY
 	    && type != RTN_LOCAL && type != RTN_MULTICAST && type != RTN_BROADCAST)
@@ -6385,7 +6468,7 @@ tpi_v4_rcv(struct sk_buff *skb)
 
 //      UDP_INC_STATS_BH(UdpInDatagrams);
 	/* pull up the udp header */
-	th = skb->h.th;
+	th = (typeof(th)) skb_transport_header(skb);
 	ulen = skb->len;
 #if 0
 	ulen = ntohs(th->len);
@@ -6396,7 +6479,7 @@ tpi_v4_rcv(struct sk_buff *skb)
 		goto too_small;
 #endif
 	/* we do the lookup before the checksum */
-	iph = skb->nh.iph;
+	iph = (typeof(iph)) skb_network_header(skb);
 	read_lock(&tpi_lock);
 	if (!(tpi = t_tpi_lookup(th->dest, th->source, iph->daddr, iph->saddr)))
 		goto no_stream;
@@ -6420,14 +6503,14 @@ tpi_v4_rcv(struct sk_buff *skb)
 #endif				/* HAVE_KFUNC_SKB_LINEARIZE_1_ARG */
 	{
 		mblk_t *mp;
-		size_t mlen = skb->len + (skb->data - skb->nh.raw);
+		size_t mlen = skb->len + (skb->data - skb_network_header(skb));
 
 		/* now allocate an mblk */
-		if (!(mp = esballoc(skb->nh.raw, mlen, BPRI_MED, &fr)))
+		if (!(mp = esballoc(skb_network_header(skb), mlen, BPRI_MED, &fr)))
 			goto no_buffers;
 		mp->b_wptr = mp->b_rptr + mlen;
 		/* trim the ip header */
-		mp->b_rptr = skb->h.raw;
+		mp->b_rptr = skb_network_header(skb);
 		th2 = (typeof(th2)) mp->b_rptr;
 		if (th->check != th2->check)
 			goto sanity;
@@ -6529,7 +6612,7 @@ tpi_v4_err(struct sk_buff *skb, u32 info)
 		if (!(mp = allocb(mlen, BPRI_MED)))
 			goto no_buffers;
 		mp->b_datap->db_type = M_ERROR;
-		bcopy(skb->h.icmph, mp->b_wptr, sizeof(struct icmphdr));
+		bcopy(skb_transport_header(skb), mp->b_wptr, sizeof(struct icmphdr));
 		mp->b_wptr += sizeof(struct icmphdr);
 		bcopy(skb->data, mp->b_wptr, skb->len);
 		mp->b_rptr = mp->b_wptr + ihl;
@@ -6797,8 +6880,9 @@ tpi_init_caches(void)
 {
 	if (!tpi_priv_cachep &&
 	    !(tpi_priv_cachep =
-	      kmem_create_cache("tpi_priv_cachep", sizeof(struct tpi),
-				0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
+	      kmem_create_cache("tpi_priv_cachep", sizeof(struct tpi), 0, SLAB_HWCACHE_ALIGN, NULL,
+				NULL)
+	    ))
 		cmn_err(CE_PANIC, "%s: Cannot allocate tpi_priv_cachep", __FUNCTION__);
 	return;
 }
@@ -6906,7 +6990,7 @@ unsigned short modid = DRV_ID;
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
-module_param(modid, short, 0444);
+module_param(modid, ushort, 0444);
 #endif
 MODULE_PARM_DESC(modid, "Module ID for the driver. (0 for allocation.)");
 

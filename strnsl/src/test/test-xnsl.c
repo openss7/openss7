@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:11:50 $
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-30 18:31:43 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:11:50 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnsl.c,v $
+ Revision 0.9.2.6  2008-10-30 18:31:43  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.5  2008-04-28 22:11:50  brian
  - updated headers for release
 
@@ -84,14 +87,14 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:11:50 $"
+#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-30 18:31:43 $"
 
-static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:11:50 $";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-30 18:31:43 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,
  *  that contains the Network Selection Facility and Name-to-address Mapping
- *  functions of the TI-RPC ala Sun TIRPCSRC Release 2.8.  This program uses
+ *  functions of the TI-RPC ala Sun TIRPCSRC Version 2.8.  This program uses
  *  the fact that the library permits the network configuration file name to
  *  be redirected for the purposes of testing.
  */
@@ -5566,7 +5569,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
+Affero  General  Public  License  (GPL)  Version  3,  so long as the software is\n\
 distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
 and libraries.\n\
 \n\

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-22 20:31:20 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-30 18:31:19 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:20 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.34  2008-10-30 18:31:19  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.33  2008-09-22 20:31:20  brian
  - added module version and truncated logs
 
@@ -65,16 +68,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-22 20:31:20 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-30 18:31:19 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-09-22 20:31:20 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-30 18:31:19 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
  *  cam be pushed over a TLI transport to effect an OpenSS7 Signalling Link or
  *  Signalling Data Terminal.
  */
+#define _LFS_SOURCE	1
+#define _SUN_SOURCE	1
+
 #include <sys/os7/compat.h>
 
 #include <linux/socket.h>
@@ -144,10 +150,10 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 STATIC struct module_info sl_minfo = {
 	.mi_idnum = SL_TPI_MOD_ID,	/* Module ID number */
 	.mi_idname = SL_TPI_MOD_NAME,	/* Module name */
-	.mi_minpsz = 0,			/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1 << 15,		/* Hi water mark */
-	.mi_lowat = 1 << 10,		/* Lo water mark */
+	.mi_minpsz = 0,		/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
+	.mi_hiwat = 1 << 15,	/* Hi water mark */
+	.mi_lowat = 1 << 10,	/* Lo water mark */
 };
 
 STATIC int streamscall sl_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -157,24 +163,24 @@ STATIC int streamscall sl_rput(queue_t *, mblk_t *);
 STATIC int streamscall sl_rsrv(queue_t *);
 
 STATIC struct qinit sl_rinit = {
-	.qi_putp = sl_rput,		/* Read put (msg from below) */
-	.qi_srvp = sl_rsrv,		/* Read queue service */
-	.qi_qopen = sl_open,		/* Each open */
-	.qi_qclose = sl_close,		/* Last close */
-	.qi_minfo = &sl_minfo,		/* Information */
+	.qi_putp = sl_rput,	/* Read put (msg from below) */
+	.qi_srvp = sl_rsrv,	/* Read queue service */
+	.qi_qopen = sl_open,	/* Each open */
+	.qi_qclose = sl_close,	/* Last close */
+	.qi_minfo = &sl_minfo,	/* Information */
 };
 STATIC int streamscall sl_wput(queue_t *, mblk_t *);
 STATIC int streamscall sl_wsrv(queue_t *);
 
 STATIC struct qinit sl_winit = {
-	.qi_putp = sl_wput,		/* Write put (msg from above) */
-	.qi_srvp = sl_wsrv,		/* Write queue service */
-	.qi_minfo = &sl_minfo,		/* Information */
+	.qi_putp = sl_wput,	/* Write put (msg from above) */
+	.qi_srvp = sl_wsrv,	/* Write queue service */
+	.qi_minfo = &sl_minfo,	/* Information */
 };
 
 STATIC struct streamtab sl_tpiinfo = {
-	.st_rdinit = &sl_rinit,		/* Upper read queue */
-	.st_wrinit = &sl_winit,		/* Upper write queue */
+	.st_rdinit = &sl_rinit,	/* Upper read queue */
+	.st_wrinit = &sl_winit,	/* Upper write queue */
 };
 
 /*
@@ -631,20 +637,24 @@ STATIC INLINE int
 lmi_info_ack(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 {
 	sl_t *sl = PRIV(q);
-	mblk_t *mp;
 	lmi_info_ack_t *p;
+	mblk_t *mp;
 
 	if ((mp = sl_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sl->state;
 		p->lmi_max_sdu = sl->sdt.config.m + 1 + ((sl->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_min_sdu = ((sl->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE2;
+		p->lmi_ppa_length = ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = 0;	/* FIXME */
+		p->lmi_prov_state = 0;	/* FIXME */
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
 		printd(("%s: %p: <- LMI_INFO_ACK\n", SL_TPI_MOD_NAME, sl));
@@ -4857,9 +4867,9 @@ sl_daedt_transmission_request(queue_t *q)
 
 			if (!sl->sdt.tb.q_count)
 				qenable(sl->wq);	/* back-enable */
-			if (mlen < hlen)
+			if (len < hlen)
 				goto dont_repeat;
-			if (mlen == hlen + 1 || mlen == hlen + 2) {
+			if (len == hlen + 1 || len == hlen + 2) {
 				int li, sio;
 
 				if (sl->option.popt & SS7_POPT_XSN) {
@@ -4869,7 +4879,7 @@ sl_daedt_transmission_request(queue_t *q)
 					li = mp->b_rptr[2] & 0x3f;
 					sio = mp->b_rptr[3];
 				}
-				if (li != mlen - hlen)
+				if (li != len - hlen)
 					goto dont_repeat;
 				switch (sio) {
 				case LSSU_SIO:
@@ -5265,19 +5275,19 @@ STATIC int
 lmi_attach_req(queue_t *q, mblk_t *mp)
 {
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
-	int mlen = mp->b_wptr - mp->b_rptr;
 
-	if (mlen >= sizeof(*p)) {
+	if (MBLKIN(mp, 0, sizeof(*p))) {
 		sl_t *sl = PRIV(q);
 
 		if (sl->state != LMI_UNUSABLE) {
 			if (sl->style == LMI_STYLE2) {
 				if (sl->state == LMI_UNATTACHED) {
 					sl->state = LMI_ATTACH_PENDING;
-					if (mlen - sizeof(*p) >= sl->t.add_size) {
-						bcopy(p->lmi_ppa, &sl->t.loc, sl->t.add_size);
-						/* 
-						   start bind in motion */
+					if (MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length) &&
+					    p->lmi_ppa_length >= sl->t.add_size) {
+						bcopy(mp->b_rptr + p->lmi_ppa_offset, &sl->t.loc,
+						      sl->t.add_size);
+						/* start bind in motion */
 						return t_bind_req(q);
 					} else {
 						ptrace(("%s: PROTO: bad ppa (too short)\n",
@@ -5363,10 +5373,9 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 STATIC int
 lmi_enable_req(queue_t *q, mblk_t *mp)
 {
-	int mlen;
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if ((mlen = mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
+	if (MBLKIN(mp, 0, sizeof(*p))) {
 		sl_t *sl = PRIV(q);
 
 		if (sl->state != LMI_UNUSABLE) {
@@ -5374,7 +5383,9 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				sl->state = LMI_ENABLE_PENDING;
 				if (sl->t.serv_type == T_CLTS) {
 					assure(sl->t.state == TS_IDLE);
-					if (mlen - sizeof(*p) < sl->t.add_size)
+					if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+						goto emsgsize;
+					if (p->lmi_rem_length < sl->t.add_size)
 						goto emsgsize;
 					bcopy(p->lmi_rem, &sl->t.rem, sl->t.add_size);
 					return lmi_enable_con(q);
@@ -5384,15 +5395,16 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 						return lmi_enable_con(q);
 					} else {
 						assure(sl->t.state == TS_IDLE);
-						if (mlen == sizeof(*p))
-							/* 
-							   wait for T_CONN_IND */
+						if (p->lmi_rem_length == 0)
+							/* wait for T_CONN_IND */
 							return (QR_DONE);
-						if (mlen - sizeof(*p) < sl->t.add_size)
+						if (!MBLKIN(mp, p->lmi_rem_offset,
+							    p->lmi_rem_length))
+							goto emsgsize;
+						if (p->lmi_rem_length < sl->t.add_size)
 							goto emsgsize;
 						bcopy(p->lmi_rem, &sl->t.rem, sl->t.add_size);
-						/* 
-						   start connection in motion */
+						/* start connection in motion */
 						return t_conn_req(q);
 					}
 				}
@@ -5401,8 +5413,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				return lmi_error_ack(q, LMI_ENABLE_REQ, LMI_OUTSTATE, EPROTO);
 			}
 		} else {
-			/* 
-			   wait for stream to become usable */
+			/* wait for stream to become usable */
 			return (-EAGAIN);
 		}
 	}
@@ -6437,11 +6448,11 @@ t_info_ack(queue_t *q, mblk_t *mp)
 			sl->t.pdu_size = p->TIDU_size;
 		if ((sl->sdt.config.m =
 		     sl->t.pdu_size - 1 - ((sl->option.popt & SS7_POPT_XSN) ? 6 : 3)) < 272)
-			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %ld",
-				SL_TPI_MOD_NAME, (long) sl->sdt.config.m);
+			cmn_err(CE_WARN, "%s: transport provider TDU_size is too small %lu",
+				SL_TPI_MOD_NAME, (ulong) sl->sdt.config.m);
 		if ((sl->t.add_size = p->ADDR_size) > sizeof(struct sockaddr))
-			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %ld",
-				SL_TPI_MOD_NAME, (long) p->ADDR_size);
+			cmn_err(CE_WARN, "%s: transport provider ADDR_size is too large %lu",
+				SL_TPI_MOD_NAME, (ulong) p->ADDR_size);
 		sl->t.opt_size = p->OPT_size;
 		sl->t.state = p->CURRENT_state;
 		sl->t.serv_type = p->SERV_type;

@@ -1,5 +1,14 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/m3ua_lm.c: rationalize drivers
+	* src/drivers/m3ua_nsp.c: rationalize drivers
+	* src/drivers/m3ua_tsp.c: rationalize drivers
+	* src/drivers/sua_lm.c: rationalize drivers
+	* src/drivers/sua_sccp.c: rationalize drivers
+	* src/drivers/sua_sm.c: rationalize drivers
+	* src/drivers/sua_tsp.c: rationalize drivers
+	* src/modules/sl_tpi.c: rationalize drivers
+
 	* src/include/sys/m2ua_ioctl.h: updated headers
 	* src/include/sys/m3ua.h: updated headers
 	* src/include/sys/ua_lm.h: updated headers

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:21 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:20 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:21 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_sctp.c,v $
+ Revision 0.9.2.26  2008-10-30 18:31:20  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.25  2008-09-22 20:31:21  brian
  - added module version and truncated logs
 
@@ -62,10 +65,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:21 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:20 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:21 $";
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:20 $";
+
+#define _LFS_SOURCE	1
+#define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
 
@@ -80,7 +86,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:21 $"
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:20 $"
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -234,8 +240,8 @@ typedef struct sdl {
 STATIC int
 lmi_info_ack(sdl_t * sp)
 {
-	mblk_t *mp;
 	lmi_info_ack_t *p;
+	mblk_t *mp;
 
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -243,12 +249,21 @@ lmi_info_ack(sdl_t * sp)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sp->state;
 		p->lmi_max_sdu = -1;
 		p->lmi_min_sdu = 0;
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE1;
+		p->lmi_ppa_length = 0;
+		p->lmi_ppa_length = sizeof(*p);
+		p->lmi_prov_flags = 0;
+		if (sp->flags & SDL_FLAG_TX_ENABLED)
+			p->lmi_prov_flags |= SDL_TX_DIRECTION;
+		if (sp->flags & SDL_FLAG_RX_ENABLED)
+			p->lmi_prov_flags |= SDL_RX_DIRECTION;
+
+		p->lmi_prov_state = p->lmi_prov_flags ? SDL_CONNECTED : SDL_DISCONNECTED;
 		putnext(sp->iq, mp);
 		return (0);
 	}
@@ -266,7 +281,6 @@ lmi_ok_ack(sdl_t * sp, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -301,7 +315,6 @@ lmi_error_ack(sdl_t * sp, long prim, long err)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
-
 	switch (err) {
 	case -EBUSY:
 	case -EAGAIN:
@@ -353,7 +366,6 @@ lmi_enable_con(sdl_t * sp)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
-
 	ensure(sp, return (-EFAULT));
 	ensure(sp->state == LMI_ENABLE_PENDING, return (-EFAULT));
 	if (canputnext(sp->iq)) {
@@ -382,7 +394,6 @@ lmi_disable_con(sdl_t * sp)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
-
 	ensure(sp, return (-EFAULT));
 	ensure(sp->state == LMI_DISABLE_PENDING, return (-EFAULT));
 	if (canputnext(sp->iq)) {
@@ -412,7 +423,6 @@ lmi_optmgmt_ack(sdl_t * sp, ulong flags, void *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -441,7 +451,6 @@ lmi_error_ind(sdl_t * sp, long err)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -468,7 +477,6 @@ lmi_stats_ind(sdl_t * sp, ulong interval, ulong timestamp)
 {
 	mblk_t *mp;
 	lmi_stats_ind_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -498,7 +506,6 @@ lmi_event_ind(sdl_t * sp, ulong oid, ulong severity, ulong timestamp)
 {
 	mblk_t *mp;
 	lmi_event_ind_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -541,7 +548,6 @@ sdl_daedr_received_bits_ind(sdl_t * sp, ulong count, mblk_t *dp)
 {
 	mblk_t *mp;
 	sdl_daedr_received_bits_ind_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -570,7 +576,6 @@ sdl_daedr_correct_su_ind(sdl_t * sp, ulong count)
 {
 	mblk_t *mp;
 	sdl_daedr_correct_su_ind_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -595,7 +600,6 @@ sdl_daedr_su_in_error_ind(sdl_t * sp)
 {
 	mblk_t *mp;
 	sdl_daedr_su_in_error_ind_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -619,7 +623,6 @@ sdl_daedt_transmission_request_ind(sdl_t * sp)
 {
 	mblk_t *mp;
 	sdl_daedt_transmission_request_ind_t *p;
-
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -650,7 +653,6 @@ n_data_req(sdl_t * sp, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
 	N_data_req_t *p;
-
 	ensure(sp, return (-EFAULT));
 	ensure(dp, return (-EFAULT));
 	if (canputnext(sp->oq)) {
@@ -683,7 +685,6 @@ n_exdata_req(sdl_t * sp, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
 	N_exdata_req_t *p;
-
 	ensure(sp, return (-EFAULT));
 	ensure(dp, return (-EFAULT));
 	if (bcanputnext(sp->oq, 1)) {
@@ -720,7 +721,6 @@ STATIC int
 sdl_write(sdl_t * sp, mblk_t *mp)
 {
 	int err;
-
 #if 0
 	uint xsn = sp->lmi_conf.popt & SS7_POPT_XSN;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
@@ -763,14 +763,13 @@ lmi_info_req(sdl_t * sp, mblk_t *mp)
 STATIC int
 lmi_attach_req(sdl_t * sp, mblk_t *mp)
 {
-	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_attach_req_t *p = (lmi_attach_req_t *) mp->b_rptr;
+	int err;
 
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
-		if (mlen >= sizeof(*p)) {
+		if (MBLKIN(mp, 0, sizeof(*p))) {
 			if (sp->state == LMI_UNATTACHED) {
 				sp->state = LMI_ATTACH_PENDING;
 
@@ -799,7 +798,6 @@ lmi_detach_req(sdl_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_detach_req_t *p = (lmi_detach_req_t *) mp->b_rptr;
-
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -829,14 +827,13 @@ lmi_detach_req(sdl_t * sp, mblk_t *mp)
 STATIC int
 lmi_enable_req(sdl_t * sp, mblk_t *mp)
 {
-	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_enable_req_t *p = (lmi_enable_req_t *) mp->b_rptr;
+	int err;
 
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
-		if (mlen >= sizeof(*p)) {
+		if (MBLKIN(mp, 0, sizeof(*p))) {
 			if (sp->state == LMI_DISABLED) {
 				sp->state = LMI_ENABLE_PENDING;
 
@@ -865,7 +862,6 @@ lmi_disable_req(sdl_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_disable_req_t *p = (lmi_disable_req_t *) mp->b_rptr;
-
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -904,7 +900,6 @@ lmi_optmgmt_req(sdl_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_optmgmt_req_t *p = (lmi_optmgmt_req_t *) mp->b_rptr;
-
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -932,7 +927,6 @@ STATIC int
 m_error_reply(sdl_t * sp, int err)
 {
 	mblk_t *mp;
-
 	ensure(sp, return (-EFAULT));
 	switch (err) {
 	case -EBUSY:
@@ -964,7 +958,6 @@ sdl_bits_for_transmission_req(sdl_t * sp, mblk_t *mp)
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	sdl_bits_for_transmission_req_t *p = (sdl_bits_for_transmission_req_t *) mp->b_rptr;
-
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -1014,7 +1007,6 @@ sdl_connect_req(sdl_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	sdl_connect_req_t *p = (sdl_connect_req_t *) mp->b_rptr;
-
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -1052,7 +1044,6 @@ sdl_disconnect_req(sdl_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	sdl_disconnect_req_t *p = (sdl_disconnect_req_t *) mp->b_rptr;
-
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -1142,7 +1133,6 @@ n_data_ind(sdl_t * sp, mblk_t *mp)
 	int err;
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
-
 	// N_data_ind_t *p = (N_data_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -1180,7 +1170,6 @@ n_exdata_ind(sdl_t * sp, mblk_t *mp)
 	int err;
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
-
 	// N_exdata_ind_t *p = (N_exdata_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -1331,7 +1320,6 @@ sdl_iocgoptions(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
 	lmi_option_t *opt = (lmi_option_t *) arg;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1349,7 +1337,6 @@ sdl_iocsoptions(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
 	lmi_option_t *opt = (lmi_option_t *) arg;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1390,7 +1377,6 @@ sdl_iocgconfig(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
 	sdl_config_t *cnf = (sdl_config_t *) arg;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1408,7 +1394,6 @@ sdl_iocsconfig(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
 	sdl_config_t *cnf = (sdl_config_t *) arg;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1426,7 +1411,6 @@ dev_iocsifclock(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
 	ulong *val = (ulong *) arg;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1460,7 +1444,6 @@ dev_iocgifclock(queue_t *q, int cmd, void *arg)
 {
 	sdl_t *sp;
 	ulong *val = (ulong *) arg;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1514,7 +1497,6 @@ sdl_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sdl_t *sp;
 	ulong oldstate;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	oldstate = sp->state;
@@ -1564,7 +1546,6 @@ sdl_r_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	ulong prim;
 	sdl_t *sp;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1628,7 +1609,6 @@ sdl_w_data(queue_t *q, mblk_t *mp)
 {
 	int err;
 	sdl_t *sp;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1642,7 +1622,6 @@ sdl_r_data(queue_t *q, mblk_t *mp)
 {
 	int err;
 	sdl_t *sp;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1664,7 +1643,6 @@ STATIC int
 sdl_r_ctl(queue_t *q, mblk_t *mp)
 {
 	sdl_t *sp;
-
 	ensure(q, return (-EFAULT));
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1695,7 +1673,6 @@ sdl_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd);
 	int nr = _IOC_NR(cmd);
 	int size = _IOC_SIZE(cmd);
-
 	(void) nr;
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -1896,7 +1873,6 @@ STATIC streamscall int
 sdl_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	if (mp->b_datap->db_type < QPCTL && q->q_count) {
@@ -1963,7 +1939,6 @@ sdl_wsrv(queue_t *q)
 {
 	int rtn;
 	mblk_t *mp;
-
 	ensure(q, return (-EFAULT));
 	if (ss7_trylockq(q)) {
 		while ((mp = getq(q))) {
@@ -2036,7 +2011,6 @@ STATIC streamscall int
 sdl_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
-
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	if (mp->b_datap->db_type < QPCTL && q->q_count) {
@@ -2104,7 +2078,6 @@ sdl_rsrv(queue_t *q)
 {
 	int rtn;
 	mblk_t *mp;
-
 	ensure(q, return (-EFAULT));
 	if (ss7_trylockq(q)) {
 		while ((mp = getq(q))) {
@@ -2183,9 +2156,9 @@ kmem_cachep_t sdl_cachep = NULL;
 STATIC int
 sdl_init_caches(void)
 {
-	if (!sdl_cachep
-	    && !(sdl_cachep =
-		 kmem_create_cache("sdl_cachep", sizeof(sdl_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
+	if (!sdl_cachep &&
+	    !(sdl_cachep = kmem_create_cache
+	      ("sdl_cachep", sizeof(sdl_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		cmn_err(CE_PANIC, "%s: Cannot alloc sdl_cachep.", __FUNCTION__);
 	return (0);
 }
@@ -2208,7 +2181,6 @@ STATIC sdl_t *
 sdl_alloc_priv(queue_t *q)
 {
 	sdl_t *sp;
-
 	ensure(q, return (NULL));
 
 	if ((sp = kmem_cache_alloc(sdl_cachep, GFP_ATOMIC))) {
@@ -2225,7 +2197,6 @@ STATIC void
 sdl_free_priv(queue_t *q)
 {
 	sdl_t *sp;
-
 	ensure(q, return);
 	sp = (sdl_t *) q->q_ptr;
 	ensure(sp, return);
@@ -2281,7 +2252,6 @@ sdl_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
-
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -2306,7 +2276,6 @@ STATIC int
 sdl_register_strmod(void)
 {
 	int err;
-
 	if ((err = register_strmod(&sdl_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2316,7 +2285,6 @@ STATIC int
 sdl_unregister_strmod(void)
 {
 	int err;
-
 	if ((err = unregister_strmod(&sdl_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2334,7 +2302,6 @@ STATIC int
 sdl_register_strmod(void)
 {
 	int err;
-
 	if ((err = lis_register_strmod(&sdl_sctpinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -2348,7 +2315,6 @@ STATIC int
 sdl_unregister_strmod(void)
 {
 	int err;
-
 	if ((err = lis_unregister_strmod(&sdl_sctpinfo)) < 0)
 		return (err);
 	return (0);
@@ -2360,7 +2326,6 @@ MODULE_STATIC int __init
 sdl_sctpinit(void)
 {
 	int err;
-
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = sdl_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -2380,7 +2345,6 @@ MODULE_STATIC void __exit
 sdl_sctpterminate(void)
 {
 	int err;
-
 	if ((err = sdl_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = sdl_term_caches()))

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-22 20:31:43 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-10-30 18:31:46 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: spx.c,v $
+ Revision 0.9.2.38  2008-10-30 18:31:46  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.37  2008-09-22 20:31:43  brian
  - added module version and truncated logs
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-22 20:31:43 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-10-30 18:31:46 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-22 20:31:43 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-10-30 18:31:46 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -74,7 +78,7 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2008-09-22 20:31:43 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-10-30 18:31:46 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"

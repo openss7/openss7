@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-09-22 20:31:30 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-10-30 18:31:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: echo.c,v $
+ Revision 0.9.2.65  2008-10-30 18:31:35  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.64  2008-09-22 20:31:30  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-09-22 20:31:30 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-10-30 18:31:35 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-09-22 20:31:30 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-10-30 18:31:35 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -83,7 +86,7 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2008-09-22 20:31:30 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.65 $) $Date: 2008-10-30 18:31:35 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"
@@ -173,10 +176,12 @@ MODULE_ALIAS("/dev/streams/clone/echo");
 #endif
 
 #ifdef LIS
+#ifndef STRMINPSZ
 #define STRMINPSZ   0
 #define STRMAXPSZ   4096
 #define STRHIGH	    5120
 #define STRLOW	    1024
+#endif
 #endif
 
 static struct module_info echo_minfo = {
@@ -192,7 +197,6 @@ static struct module_stat echo_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES
 static struct module_stat echo_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 #ifdef LIS
-
 #define QSVCBUSY QRUNNING
 
 union ioctypes {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:43 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-10-30 18:31:45 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 0.9.2.39  2008-10-30 18:31:45  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.38  2008-09-22 20:31:43  brian
  - added module version and truncated logs
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:43 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-10-30 18:31:45 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:43 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-10-30 18:31:45 $";
 
 #define _LFS_SOURCE
 
@@ -84,7 +88,7 @@ extern struct file_operations strm_f_ops;
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2008-09-22 20:31:43 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-10-30 18:31:45 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -171,6 +175,7 @@ static struct module_stat fifo_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES
 LFSSTATIC struct qinit fifo_rinit = {
 #ifdef LFS
 	.qi_putp = strrput,
+	.qi_srvp = strrsrv,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 #endif
@@ -233,30 +238,13 @@ fifo_open(struct inode *inode, struct file *file)
 	int err;
 	dev_t dev = makedevice(fifo_cdev.d_modid, 0);
 
-	_printd(("%s: %s: putting file operations\n", __FUNCTION__, file->f_dentry->d_name.name));
-	_printd(("%s: %s: getting file operations\n", __FUNCTION__, fifo_cdev.d_name));
 	{
 		struct file_operations *f_op;
 
 		err = -ENXIO;
 		if (!(f_op = fops_get(fifo_cdev.d_fop))) {
-			_ptrace(("Error path taken!\n"));
 			goto error;
 		}
-#ifdef _DEBUG
-		if (f_op->owner)
-			_printd(("%s: [%s] new f_ops count is now %d\n", __FUNCTION__,
-				 f_op->owner->name, module_refcount(f_op->owner)));
-		else
-			_printd(("%s: new f_ops have no owner!\n", __FUNCTION__));
-#endif
-#ifdef _DEBUG
-		if (file->f_op->owner)
-			_printd(("%s: [%s] old f_ops count is now %d\n", __FUNCTION__,
-				 file->f_op->owner->name, module_refcount(file->f_op->owner) - 1));
-		else
-			_printd(("%s: old f_ops have no owner!\n", __FUNCTION__));
-#endif
 		fops_put(file->f_op);
 		file->f_op = f_op;
 	}

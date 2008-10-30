@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 23:13:28 $
+ @(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:44 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 23:13:28 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp.c,v $
+ Revision 0.9.2.12  2008-10-30 18:31:44  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.11  2008-04-28 23:13:28  brian
  - updated headers for release
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 23:13:28 $"
+#ident "@(#) $RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:44 $"
 
-static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-28 23:13:28 $";
+static char const ident[] = "$RCSfile: test-sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:44 $";
 
 /* 
  *  This file is for testing the sctp_n driver.
@@ -778,7 +781,7 @@ do_tests(void)
 
 	printf("Simple test program for streams-sctp driver.\n");
 
-	addr1.port = TEST_PORT_NUMBER + 0;
+	addr1.port = TEST_PORT_NUMBER;
 	inet_aton("127.0.0.1", addr1.addr);
 
 	addr2.port = TEST_PORT_NUMBER + 1;

@@ -1,5 +1,8 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/x25-lapb.c: rationalize drivers
+	* src/modules/xot.c: rationalize drivers
+
 	* src/include/sys/xti_xx25.h: updated headers
 
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-29 07:11:27 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-10-30 18:31:27 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:27 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.28  2008-10-30 18:31:27  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.27  2008-04-29 07:11:27  brian
  - updating headers for release
 
@@ -120,9 +123,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-29 07:11:27 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-10-30 18:31:27 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-04-29 07:11:27 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-10-30 18:31:27 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -1096,7 +1099,7 @@ struct sockaddr_in addrs[4];
 int anums[4] = { 3, 3, 3, 3 };
 
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -6670,6 +6673,7 @@ do_signal(int child, int action)
 
 	case __TEST_POWER_ON:
 		if (child == CHILD_PTU) {
+#ifndef TEST_M2PA
 			ctrl->len = sizeof(p->sdt.daedt_start_req);
 			p->sdt.daedt_start_req.sdt_primitive = SDT_DAEDT_START_REQ;
 			data = NULL;
@@ -6677,6 +6681,7 @@ do_signal(int child, int action)
 			ctrl->len = sizeof(p->sdt.daedr_start_req);
 			p->sdt.daedr_start_req.sdt_primitive = SDT_DAEDR_START_REQ;
 			data = NULL;
+#endif
 		} else {
 			ctrl->len = sizeof(p->sl.power_on_req);
 			p->sl.power_on_req.sl_primitive = SL_POWER_ON_REQ;
@@ -6685,7 +6690,13 @@ do_signal(int child, int action)
 			test_pband = 0;
 		}
 		print_command_state(child, ":power on");
+#ifdef TEST_M2PA
+		if (child != CHILD_PTU)
+			return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+		return __RESULT_SUCCESS;
+#else
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
+#endif
 	case __TEST_START:
 		ctrl->len = sizeof(p->sl.start_req);
 		p->sl.start_req.sl_primitive = SL_START_REQ;
@@ -7013,6 +7024,8 @@ do_signal(int child, int action)
 	case __TEST_ATTACH_REQ:
 		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.attach_req.lmi_primitive = LMI_ATTACH_REQ;
+		p->lmi.attach_req.lmi_ppa_length = ADDR_length;
+		p->lmi.attach_req.lmi_ppa_offset = sizeof(p->lmi.attach_req);
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.attach_req), ADDR_length);
 		data = NULL;
@@ -7043,6 +7056,8 @@ do_signal(int child, int action)
 	case __TEST_ENABLE_REQ:
 		ctrl->len = sizeof(p->lmi.enable_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.enable_req.lmi_primitive = LMI_ENABLE_REQ;
+		p->lmi.enable_req.lmi_rem_length = ADDR_length;
+		p->lmi.enable_req.lmi_rem_offset = sizeof(p->lmi.enable_req);
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.enable_req), ADDR_length);
 		data = NULL;
@@ -14914,8 +14929,6 @@ test_4_1a_11_ptu(int child)
 					goto failure;
 				break;
 			case __TEST_ACK:
-				if (bsn[1] != fsn[0])
-					continue;
 				if (ack == 0) {
 					ack++;
 					if (dat != 2)
@@ -17568,7 +17581,10 @@ test_8_4_ptu(int child)
 	for (;;) {
 		switch (state - origin) {
 		case 0:
+#if 0
+			/* this was discarding an event */
 			wait_event(child, 0);
+#endif
 			if (do_signal(child, __TEST_ACK))
 				goto failure;
 			state++;
@@ -18492,11 +18508,14 @@ test_8_12a_ptu(int child)
 	for (;;) {
 		switch (state - origin) {
 		case 0:
+#if 0
+			/* already fully in service */
 			if (expect(child, 0, __EVENT_NO_MSG))
 				if (last_event != __STATUS_IN_SERVICE)
 					goto failure;
 			if (do_signal(child, __STATUS_IN_SERVICE))
 				goto failure;
+#endif
 			state++;
 		case 1:
 			if (expect(child, INFINITE_WAIT, __TEST_DATA)) {
@@ -21416,17 +21435,17 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
-Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.27 $ $Date: 2008-04-29 07:11:27 $");
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
+", argv[0], ident);
 }
 
 void

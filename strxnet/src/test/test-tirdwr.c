@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-04-28 18:38:41 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-10-30 18:31:56 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:41 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.33  2008-10-30 18:31:56  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.32  2008-04-28 18:38:41  brian
  - header updates for release
 
@@ -148,9 +151,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-04-28 18:38:41 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-10-30 18:31:56 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-04-28 18:38:41 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-10-30 18:31:56 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -256,6 +259,8 @@ static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.
  *
  *  -------------------------------------------------------------------------
  */
+
+#define NAME "test-tirdwr"
 
 static const char *lpkgname = "OpenSS7 XTI/TLI Library";
 
@@ -9226,7 +9231,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-Affero  General  Public  License  (GPL)  Version  3,  so long as the software is\n\
+Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
 distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
 and libraries.\n\
 \n\
@@ -9253,17 +9258,17 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
+Written by Brian Bidulock\n\
 \n\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
+Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
-    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
-    incorporated here by reference.\n\
-\n\
-    See `%1$s --copying' for copying permission.\n\
-\n\
-", argv[0], ident);
+Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
+incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.33 $ $Date: 2008-10-30 18:31:56 $");
 }
 
 void

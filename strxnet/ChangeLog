@@ -1,5 +1,13 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/lib/netdir.c: rationalize drivers
+	* src/test/test-inet_raw.c: rationalize drivers
+	* src/test/test-inet_tcp.c: rationalize drivers
+	* src/test/test-inet_udp.c: rationalize drivers
+	* src/test/test-timod.c: rationalize drivers
+	* src/test/test-tirdwr.c: rationalize drivers
+	* src/test/test-xnet.c: rationalize drivers
+
 	* src/include/xti.h: updated headers
 	* src/include/sys/ticlts.h: updated headers
 	* src/include/sys/ticots.h: updated headers

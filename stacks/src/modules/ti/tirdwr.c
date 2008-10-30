@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:23 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.24  2008-10-30 18:31:21  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.23  2008-09-22 20:31:23  brian
  - added module version and truncated logs
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $";
 
 #include <sys/os7/compat.h>
 
@@ -86,7 +89,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL"
@@ -114,13 +117,23 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #endif
 #endif				/* LINUX */
 
-#ifndef TIRDWR_MOD_NAME
-#define TIRDWR_MOD_NAME		"tirdwr"
-#endif				/* TIRDWR_MOD_NAME */
+#ifndef CONFIG_STREAMS_TIRDWR_NAME
+//#define CONFIG_STREAMS_TIRDWR_NAME "timod"
+#error "CONFIG_STREAMS_TIRDWR_NAME must be defined."
+#endif
+#ifndef CONFIG_STREAMS_TIRDWR_MODID
+//#define CONFIG_STREAMS_TIRDWR_MODID "5060"
+#error "CONFIG_STREAMS_TIRDWR_MODID must be defined."
+#endif
 
-#ifndef TIRDWR_MOD_ID
-#define TIRDWR_MOD_ID		0
-#endif				/* TIRDWR_MOD_ID */
+modID_t modid = CONFIG_STREAMS_TIRDWR_MODID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0444);
+#endif
+MODULE_PARM_DESC(modid, "Module ID for TIRDWR. (0 for allocation.)");
 
 /*
  *  =========================================================================
@@ -130,20 +143,14 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
  *  =========================================================================
  */
 
-#define MOD_ID		TIRDWR_MOD_ID
-#define MOD_NAME	TIRDWR_MOD_NAME
-#ifdef MODULE
-#define MOD_BANNER	TIRDWR_BANNER
-#else				/* MODULE */
-#define MOD_BANNER	TIRDWR_SPLASH
-#endif				/* MODULE */
+#define MOD_NAME	CONFIG_STREAMS_TIRDWR_NAME
 
 static struct module_info tirdwr_minfo = {
-	.mi_idnum = MOD_ID,		/* Module ID number */
-	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_idnum = CONFIG_STREAMS_TIRDWR_MODID,	/* Module ID number */
+	.mi_idname = CONFIG_STREAMS_TIRDWR_NAME,	/* Module name */
 	.mi_minpsz = 0,			/* Min packet size accepted */
 	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
-	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_hiwat = 0,			/* Hi water mark */
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
@@ -198,10 +205,10 @@ static kmem_cachep_t tirdwr_priv_cachep = NULL;
 static int
 tirdwr_init_caches(void)
 {
-	if (!tirdwr_priv_cachep
-	    && !(tirdwr_priv_cachep =
-		 kmem_create_cache(MOD_NAME, sizeof(tirdwr_t), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+	if (!tirdwr_priv_cachep &&
+	    !(tirdwr_priv_cachep =
+	      kmem_create_cache(MOD_NAME, sizeof(tirdwr_t), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
+	    )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate tirdwr_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);
@@ -757,7 +764,7 @@ tirdwr_pop(queue_t *q)
 	}
 #   if defined M_UNHANGUP
 	if ((priv->flags & TIRDWR_HANGUP)) {
-		if ((mp = allocb(0, BRPI_WAITOK))) {
+		if ((mp = allocb(0, BPRI_WAITOK))) {
 			mp->b_datap->db_type = M_UNHANGUP;
 			putnext(priv->rq, mp);
 		}
@@ -835,15 +842,6 @@ tirdwr_close(queue_t *q, int oflag, cred_t *crp)
  *  -------------------------------------------------------------------------
  */
 
-unsigned short modid = MOD_ID;
-
-#ifndef module_param
-MODULE_PARM(modid, "h");
-#else
-module_param(modid, ushort, 0444);
-#endif
-MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
-
 /*
  *  Linux Fast-STREAMS Registration
  *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -916,7 +914,11 @@ tirdwrinit(void)
 {
 	int err;
 
-	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+#ifdef CONFIG_STREAMS_TIRDWR_MODULE
+	cmn_err(CE_NOTE, TIRDWR_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, TIRDWR_SPLASH);	/* banner message */
+#endif
 	if ((err = tirdwr_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);
