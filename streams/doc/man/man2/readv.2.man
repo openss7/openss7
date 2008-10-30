@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: readv.2.man,v 0.9.2.12 2008-04-28 12:53:39 brian Exp $
+.\" @(#) $Id: readv.2.man,v 0.9.2.13 2008-10-30 08:20:47 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -17,7 +17,7 @@
 .\" manual under the conditions for verbatim copying, provided that the
 .\" entire resulting derived work is distributed under the terms of a
 .\" permission notice identical to this one
-.\" 
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this
 .\" manual page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from
@@ -25,7 +25,7 @@
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
 .\" professionally.  The author(s) will take no responsibility in it.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
 .\"
@@ -47,17 +47,20 @@
 .\" NASA Supplement to the FAR (or any successor regulations).
 .\"
 .\" =========================================================================
-.\" 
+.\"
 .\" Commercial licensing and support of this software is available from
 .\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
+.\"
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2008-04-28 12:53:39 $ by $Author: brian $
+.\" Last Modified $Date: 2008-10-30 08:20:47 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: readv.2.man,v $
+.\" Revision 0.9.2.13  2008-10-30 08:20:47  brian
+.\" - UNIX nroff use to hate trailing space
+.\"
 .\" Revision 0.9.2.12  2008-04-28 12:53:39  brian
 .\" - update file headers for release
 .\"
@@ -146,19 +149,19 @@ sort-adjacent-labels
 \fBstruct iovec {\fR
 .br
   \fB__ptr_t \fIiov_base\fB;\fR /* Starting address.  */
-.br  
+.br
   \fBsize_t \fIiov_len\fB;\fR /* Length in bytes.  */
 .br
 \fB};\fR
 .fi
 .SH DESCRIPTION
-\fBreadv\fR reads data from file descriptor \fIfd\fR, and puts the result 
+\fBreadv\fR reads data from file descriptor \fIfd\fR, and puts the result
 in the buffers described by \fIvector\fR. The number of buffers is
 specified by \fIcount\fR. The buffers are filled in the order specified.
 Operates just like \fBread\fR except that data is put in \fIvector\fR
 instead of a contiguous buffer.
 
-\fBwritev\fR writes data to file descriptor \fIfd\fR, and from  
+\fBwritev\fR writes data to file descriptor \fIfd\fR, and from
 the buffers described by \fIvector\fR. The number of buffers is
 specified by \fIcount\fR. The buffers are used in the order specified.
 Operates just like \fBwrite\fR except that data is taken from \fIvector\fR
@@ -172,13 +175,13 @@ On error, \-1 is returned, and \fIerrno\fR is set appropriately.
 .SH ERRORS
 .TP
 .B EINVAL
-An invalid argument was given. For instance \fIcount\fR might be 
-greater than \fBMAX_IOVEC\fR, or zero.  \fIfd\fR could also be attached 
+An invalid argument was given. For instance \fIcount\fR might be
+greater than \fBMAX_IOVEC\fR, or zero.  \fIfd\fR could also be attached
 to an object  which  is  unsuitable for reading (for \fBreadv\fR) or
 writing (for \fBwritev\fR).
 .TP
 .B EFAULT
-"Segmentation fault." Most likely \fIvector\fR or some of the 
+"Segmentation fault." Most likely \fIvector\fR or some of the
 \fIiov_base\fR pointers points to memory that is not properly allocated.
 .TP
 .B EBADF
@@ -188,7 +191,7 @@ The file descriptor \fIfd\fR is not valid.
 The call was interrupted by a signal before any data was read/written.
 .TP
 .B EAGAIN
-Non-blocking I/O has been selected using 
+Non-blocking I/O has been selected using
 \fBO_NONBLOCK\fR and no data was immediately available for reading.
 (Or the file descriptor \fIfd\fR is for an object that is locked.)
 .TP
