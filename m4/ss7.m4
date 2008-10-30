@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: ss7.m4,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without SS7 header files, the SS7 interface will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SS7], [dnl
+    _SS7_CHECK
+    if test :"${ss7_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS SS7 include directories.  If
+*** you wish to use the STREAMS SS7 package you will need to specify
+*** the location of the STREAMS SS7 (strss7) include directories with
+*** the --with-ss7=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS SS7 package?  The
+*** STREAMS strss7 package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strss7-0.9a.8.tar.gz".
+*** ])
+    fi
+])# _SS7
+# =============================================================================
+
+# =============================================================================
+# _SS7_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SS7_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _SS7_OPTIONS
     _SS7_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([SS7_SYMVER])dnl
     AC_SUBST([SS7_MANPATH])dnl
     AC_SUBST([SS7_VERSION])dnl
-])# _SS7
+])# _SS7_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -388,20 +410,6 @@ AC_DEFUN([_SS7_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${ss7_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS SS7 include directories.  If
-*** you wish to use the STREAMS SS7 package you will need to specify
-*** the location of the STREAMS SS7 (strss7) include directories with
-*** the --with-ss7=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS SS7 package?  The
-*** STREAMS strss7 package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strss7-0.9a.8.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for ss7 version], [ss7_cv_version], [dnl
 	ss7_cv_version=
 	if test -z "$ss7_cv_version" ; then
@@ -631,6 +639,9 @@ AC_DEFUN([_SS7_], [dnl
 # =============================================================================
 #
 # $Log: ss7.m4,v $
+# Revision 0.9.2.29  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.28  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

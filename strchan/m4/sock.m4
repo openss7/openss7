@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.30 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: sock.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.31 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without SOCK header files, the TPI interface to SOCK will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SOCK], [dnl
+    _SOCK_CHECK
+    if test :"${sock_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS SOCK include directories.  If
+*** you wish to use the STREAMS SOCK package you will need to specify
+*** the location of the STREAMS SOCK (strsock) include directories with
+*** the --with-sock=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS SOCK package?  The
+*** STREAMS strsock package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strsock-0.9.2.1.tar.gz".
+*** ])
+    fi
+])# _SOCK
+# =============================================================================
+
+# =============================================================================
+# _SOCK_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SOCK_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _SOCK_OPTIONS
     _SOCK_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([SOCK_SYMVER])dnl
     AC_SUBST([SOCK_MANPATH])dnl
     AC_SUBST([SOCK_VERSION])dnl
-])# _SOCK
+])# _SOCK_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${sock_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS SOCK include directories.  If
-*** you wish to use the STREAMS SOCK package you will need to specify
-*** the location of the STREAMS SOCK (strsock) include directories with
-*** the --with-sock=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS SOCK package?  The
-*** STREAMS strsock package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strsock-0.9.2.1.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for sock version], [sock_cv_version], [dnl
 	sock_cv_version=
 	if test -z "$sock_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_SOCK_], [dnl
 # =============================================================================
 #
 # $Log: sock.m4,v $
+# Revision 0.9.2.31  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.30  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

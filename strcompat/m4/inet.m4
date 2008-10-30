@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.51 $) $Date: 2008-10-26 12:17:18 $
+# @(#) $RCSfile: inet.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.52 $) $Date: 2008-10-30 11:36:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without INET header files, the XTI interface to INET will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INET], [dnl
+    _INET_CHECK
+    if test :"${inet_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS INET include directories.  If
+*** you wish to use the STREAMS INET package you will need to specify
+*** the location of the STREAMS INET (strinet) include directories with
+*** the --with-inet=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS INET package?  The
+*** STREAMS strinet package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strinet-0.9.2.7.tar.gz".
+*** ])
+    fi
+])# _INET
+# =============================================================================
+
+# =============================================================================
+# _INET_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_INET_CHECK], [dnl
     AC_REQUIRE([_XTI])dnl
     _INET_OPTIONS
     _INET_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([INET_SYMVER])dnl
     AC_SUBST([INET_MANPATH])dnl
     AC_SUBST([INET_VERSION])dnl
-])# _INET
+])# _INET_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${inet_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS INET include directories.  If
-*** you wish to use the STREAMS INET package you will need to specify
-*** the location of the STREAMS INET (strinet) include directories with
-*** the --with-inet=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS INET package?  The
-*** STREAMS strinet package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strinet-0.9.2.7.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for inet version], [inet_cv_version], [dnl
 	inet_cv_version=
 	if test -z "$inet_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 #
 # $Log: inet.m4,v $
+# Revision 0.9.2.52  2008-10-30 11:36:15  brian
+# - corrections to build
+#
 # Revision 0.9.2.51  2008-10-26 12:17:18  brian
 # - update package discovery macros
 #

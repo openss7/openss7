@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-09-10 03:49:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-30 11:36:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:57 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -332,7 +332,7 @@ AC_DEFUN([_TTY_CONFIG_KERNEL], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TTY_OUTPUT], [dnl
     _TTY_CONFIG
-    _TTY_STRCONF
+    _TTY_STRCONF dnl
 ])# _TTY_OUTPUT
 # =============================================================================
 
@@ -387,7 +387,7 @@ dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF
+    _STRCONF dnl
 ])# _TTY_STRCONF
 # =============================================================================
 
@@ -401,6 +401,9 @@ AC_DEFUN([_TTY_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.15  2008-10-30 11:36:20  brian
+# - corrections to build
+#
 # Revision 0.9.2.14  2008-09-10 03:49:57  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #

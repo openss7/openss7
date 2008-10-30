@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: sigtran.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without SIGTRAN header files, the SIGTRAN interface will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SIGTRAN], [dnl
+    _SIGTRAN_CHECK
+    if test :"${sigtran_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS SIGTRAN include directories.  If
+*** you wish to use the STREAMS SIGTRAN package you will need to specify
+*** the location of the STREAMS SIGTRAN (sigtran) include directories with
+*** the --with-sigtran=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS SIGTRAN package?  The
+*** STREAMS sigtran package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "sigtran-0.9.2.4.tar.gz".
+*** ])
+    fi
+])# _SIGTRAN
+# =============================================================================
+
+# =============================================================================
+# _SIGTRAN_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SIGTRAN_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _SIGTRAN_OPTIONS
     _SIGTRAN_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([SIGTRAN_SYMVER])dnl
     AC_SUBST([SIGTRAN_MANPATH])dnl
     AC_SUBST([SIGTRAN_VERSION])dnl
-])# _SIGTRAN
+])# _SIGTRAN_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${sigtran_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS SIGTRAN include directories.  If
-*** you wish to use the STREAMS SIGTRAN package you will need to specify
-*** the location of the STREAMS SIGTRAN (sigtran) include directories with
-*** the --with-sigtran=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS SIGTRAN package?  The
-*** STREAMS sigtran package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "sigtran-0.9.2.4.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for sigtran version], [sigtran_cv_version], [dnl
 	sigtran_cv_version=
 	if test -z "$sigtran_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_SIGTRAN_], [dnl
 # =============================================================================
 #
 # $Log: sigtran.m4,v $
+# Revision 0.9.2.22  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.21  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2008-10-26 12:17:18 $
+# @(#) $RCSfile: sctp.m4,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without SCTP header files, the XTI interface to SCTP will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SCTP], [dnl
+    _SCTP_CHECK
+    if test :"${sctp_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS SCTP include directories.  If
+*** you wish to use the STREAMS SCTP package you will need to specify
+*** the location of the STREAMS SCTP (strsctp) include directories with
+*** the --with-sctp=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS SCTP package?  The
+*** STREAMS strsctp package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strsctp-0.9.2.9.tar.gz".
+*** ])
+    fi
+])# _SCTP
+# =============================================================================
+
+# =============================================================================
+# _SCTP_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_SCTP_CHECK], [dnl
     AC_REQUIRE([_XTI])dnl
     _SCTP_OPTIONS
     _SCTP_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([SCTP_SYMVER])dnl
     AC_SUBST([SCTP_MANPATH])dnl
     AC_SUBST([SCTP_VERSION])dnl
-])# _SCTP
+])# _SCTP_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_SCTP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${sctp_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS SCTP include directories.  If
-*** you wish to use the STREAMS SCTP package you will need to specify
-*** the location of the STREAMS SCTP (strsctp) include directories with
-*** the --with-sctp=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS SCTP package?  The
-*** STREAMS strsctp package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strsctp-0.9.2.9.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for sctp version], [sctp_cv_version], [dnl
 	sctp_cv_version=
 	if test -z "$sctp_cv_version" ; then
@@ -630,6 +638,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: sctp.m4,v $
+# Revision 0.9.2.51  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.50  2008-10-26 12:17:18  brian
 # - update package discovery macros
 #

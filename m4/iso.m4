@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-10-26 12:17:18 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 11:36:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without ISO header files, the TPI interface to ISO will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISO], [dnl
+    _ISO_CHECK
+    if test :"${iso_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS ISO include directories.  If
+*** you wish to use the STREAMS ISO package you will need to specify
+*** the location of the STREAMS ISO (striso) include directories with
+*** the --with-iso=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS ISO package?  The
+*** STREAMS striso package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "striso-0.9.2.4.tar.gz".
+*** ])
+    fi
+])# _ISO
+# =============================================================================
+
+# =============================================================================
+# _ISO_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISO_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _ISO_OPTIONS
     _ISO_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([ISO_SYMVER])dnl
     AC_SUBST([ISO_MANPATH])dnl
     AC_SUBST([ISO_VERSION])dnl
-])# _ISO
+])# _ISO_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_ISO_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${iso_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS ISO include directories.  If
-*** you wish to use the STREAMS ISO package you will need to specify
-*** the location of the STREAMS ISO (striso) include directories with
-*** the --with-iso=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS ISO package?  The
-*** STREAMS striso package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "striso-0.9.2.4.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for iso version], [iso_cv_version], [dnl
 	iso_cv_version=
 	if test -z "$iso_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 #
 # $Log: iso.m4,v $
+# Revision 0.9.2.26  2008-10-30 11:36:15  brian
+# - corrections to build
+#
 # Revision 0.9.2.25  2008-10-26 12:17:18  brian
 # - update package discovery macros
 #

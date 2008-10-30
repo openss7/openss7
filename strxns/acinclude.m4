@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2008-10-27 17:33:01 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2008-10-30 11:36:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 17:33:01 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -111,7 +111,6 @@ AC_DEFUN([AC_XNS], [dnl
     _XNS_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     if test :${linux_cv_k_ko_modules:-no} = :no ; then
@@ -143,9 +142,6 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH='$(mandir)'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     PKG_MANPATH="${STREAMS_MANPATH:+${STREAMS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
-    PKG_MANPATH="${SS7_MANPATH:+${SS7_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
-    PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
-    PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -1111,10 +1107,10 @@ AC_DEFUN([_XNS_CONFIG], [dnl
     pkg_bld=`(cd . ; /bin/pwd)`
     xns_cv_config="${pkg_bld}/src/include/sys/strxns/config.h"
     xns_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
-    xns_cv_ldadd=""
-    xns_cv_ldflags=""
-    xns_cv_ldadd32=""
-    xns_cv_ldflags32=""
+    xns_cv_ldadd="${pkg_bld}/libdlpi.la"
+    xns_cv_ldflags="-L${pkg_bld}/.libs/"
+    xns_cv_ldadd32="${pkg_bld}/lib32/libdlpi.la"
+    xns_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
     xns_cv_manpath="${pkg_bld}/doc/man"
     xns_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     xns_cv_modmap="${pkg_bld}/Modules.map"
@@ -1168,6 +1164,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.69  2008-10-30 11:36:22  brian
+# - corrections to build
+#
 # Revision 0.9.2.68  2008-10-27 17:33:01  brian
 # - corrections to checks
 #

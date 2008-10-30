@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-08-11 22:27:22 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 11:36:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-08-11 22:27:22 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,7 @@ m4_include([m4/streams.m4])
 m4_include([m4/strcomp.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
+m4_include([m4/ss7.m4])
 m4_include([m4/doxy.m4])
 
 # =============================================================================
@@ -111,6 +112,7 @@ AC_DEFUN([AC_XNSL], [dnl
     _XNSL_SETUP
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
@@ -146,6 +148,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SS7_MANPATH:+${SS7_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -176,6 +179,7 @@ dnl _GENKSYMS
     _STRCOMP
     _XNS
     _XTI
+    _SS7_CHECK
 ])# _XNSL_SETUP
 # =============================================================================
 
@@ -197,9 +201,9 @@ AC_DEFUN([_XNSL_CONFIG], [dnl
     nsl_cv_config="${pkg_bld}/src/include/sys/strnsl/config.h"
     nsl_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     nsl_cv_ldadd="${pkg_bld}/libxnsl.la"
-    nsl_cv_ldflags="${pkg_bld}/lib32/libxnsl.la"
-    nsl_cv_ldadd32="-L${pkg_bld}/.libs/"
-    nsl_cv_ldflags32="${pkg_bld}/lib32/.libs/"
+    nsl_cv_ldflags="-L${pkg_bld}/.libs/"
+    nsl_cv_ldadd32="${pkg_bld}/lib32/libxnsl.la"
+    nsl_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
     nsl_cv_manpath="${pkg_bld}/doc/man"
     nsl_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     nsl_cv_modmap= # "${pkg_bld}/Modules.map"
@@ -239,7 +243,7 @@ dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF
+    _STRCONF dnl
 ])# _XNSL_STRCONF
 # =============================================================================
 
@@ -253,6 +257,9 @@ AC_DEFUN([_XNSL_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.12  2008-10-30 11:36:20  brian
+# - corrections to build
+#
 # Revision 0.9.2.11  2008-08-11 22:27:22  brian
 # - added makefile variables for modules to acinclude
 #

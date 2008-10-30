@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-10-26 12:17:18 $
+# @(#) $RCSfile: isdn.m4,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-10-30 11:36:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without ISDN header files, the ISDN interface will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ISDN], [dnl
+    _ISDN_CHECK
+    if test :"${isdn_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS ISDN include directories.  If
+*** you wish to use the STREAMS ISDN package you will need to specify
+*** the location of the STREAMS ISDN (strisdn) include directories with
+*** the --with-isdn=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS ISDN package?  The
+*** STREAMS strisdn package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strisdn-0.9.2.4.tar.gz".
+*** ])
+    fi
+])# _ISDN
+# =============================================================================
+
+# =============================================================================
+# _ISDN_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_ISDN_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _ISDN_OPTIONS
     _ISDN_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([ISDN_SYMVER])dnl
     AC_SUBST([ISDN_MANPATH])dnl
     AC_SUBST([ISDN_VERSION])dnl
-])# _ISDN
+])# _ISDN_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${isdn_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS ISDN include directories.  If
-*** you wish to use the STREAMS ISDN package you will need to specify
-*** the location of the STREAMS ISDN (strisdn) include directories with
-*** the --with-isdn=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS ISDN package?  The
-*** STREAMS strisdn package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strisdn-0.9.2.4.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for isdn version], [isdn_cv_version], [dnl
 	isdn_cv_version=
 	if test -z "$isdn_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_ISDN_], [dnl
 # =============================================================================
 #
 # $Log: isdn.m4,v $
+# Revision 0.9.2.23  2008-10-30 11:36:15  brian
+# - corrections to build
+#
 # Revision 0.9.2.22  2008-10-26 12:17:18  brian
 # - update package discovery macros
 #

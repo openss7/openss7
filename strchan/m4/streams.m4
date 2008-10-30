@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.101 $) $Date: 2008-10-27 09:32:54 $
+# @(#) $RCSfile: streams.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.102 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 09:32:54 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,64 @@
 # _LINUX_STREAMS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_STREAMS], [dnl
+    _LINUX_STREAMS_CHECK
+    case "$streams_cv_package" in
+    (LfS|LiS)
+	;;
+    (*)
+	if test :"${with_lis:-no}" != :no ; then
+	    AC_MSG_ERROR([
+*** 
+*** Linux GCOM STREAMS was specified with the --with-lis flag, however,
+*** configure could not find the STREAMS LIS include directories.  If
+*** you wish to use the STREAMS LIS package you will need to specify
+*** the location of the STREAMS LIS (LiS) include directories with
+*** the --with-lis=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LIS package?  The
+*** STREAMS LiS package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "LiS-2.18.7.tar.gz".
+*** ])
+	fi
+	if test :"${with_lfs:-no}" != :no ; then
+	    AC_MSG_ERROR([
+*** 
+*** Linux Fast STREAMS was specified with the --with-lfs flag, however,
+*** configure could not find the STREAMS LFS include directories.  If
+*** you wish to use the STREAMS LFS package you will need to specify
+*** the location of the STREAMS LFS (streams) include directories with
+*** the --with-lfs=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LFS package?  The
+*** STREAMS streams package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "streams-0.9.2.4.tar.gz".
+*** ])
+	fi
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS include directories.  This
+*** package requires the presence of STREAMS include directories.
+*** Specify the correct location of Linux Fast STREAMS (LfS) include
+*** directories with the --with-lfs option to configure, or the correct
+*** location of Linux GCOM STREAMS (LiS) include directories with the
+*** --with-lis option to configure, and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LFS package?  The
+*** STREAMS streams package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "streams-0.9.2.4.tar.gz".
+*** ])
+	;;
+    esac
+])# _LINUX_STREAMS
+# =============================================================================
+
+# =============================================================================
+# _LINUX_STREAMS_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_STREAMS_CHECK], [dnl
     _LINUX_STREAMS_OPTIONS
     _LINUX_STREAMS_SETUP
 dnl
@@ -88,7 +146,7 @@ dnl
     AC_SUBST([STREAMS_SYMVER])dnl
     AC_SUBST([STREAMS_MANPATH])dnl
     AC_SUBST([STREAMS_VERSION])dnl
-])# _LINUX_STREAMS
+])# _LINUX_STREAMS_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -99,6 +157,28 @@ dnl
 # Without LIS header files, the TPI interface to LIS will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS], [dnl
+    _LIS_CHECK
+    if test :"${streams_cv_lis_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS LIS include directories.  If
+*** you wish to use the STREAMS LIS package you will need to specify
+*** the location of the STREAMS LIS (LiS) include directories with
+*** the --with-lis=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LIS package?  The
+*** STREAMS LiS package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "LiS-2.18.7.tar.gz".
+*** ])
+    fi
+])# _LIS
+# =============================================================================
+
+# =============================================================================
+# _LIS_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LIS_CHECK], [dnl
     _LIS_OPTIONS
     _LIS_SETUP
 dnl
@@ -117,7 +197,7 @@ dnl
     AC_SUBST([STREAMS_SYMVER])dnl
     AC_SUBST([STREAMS_MANPATH])dnl
     AC_SUBST([STREAMS_VERSION])dnl
-])# _LIS
+])# _LIS_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -128,6 +208,28 @@ dnl
 # Without LFS header files, the TPI interface to LFS will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS], [dnl
+    _LFS_CHECK
+    if test :"${streams_cv_lfs_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS LFS include directories.  If
+*** you wish to use the STREAMS LFS package you will need to specify
+*** the location of the STREAMS LFS (streams) include directories with
+*** the --with-lfs=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS LFS package?  The
+*** STREAMS streams package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "streams-0.9.2.4.tar.gz".
+*** ])
+    fi
+])# _LFS
+# =============================================================================
+
+# =============================================================================
+# _LFS_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LFS_CHECK], [dnl
     _LFS_OPTIONS
     _LFS_SETUP
 dnl
@@ -146,7 +248,7 @@ dnl
     AC_SUBST([STREAMS_SYMVER])dnl
     AC_SUBST([STREAMS_MANPATH])dnl
     AC_SUBST([STREAMS_VERSION])dnl
-])# _LFS
+])# _LFS_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -293,52 +395,6 @@ dnl		    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--wit
 		AC_MSG_RESULT([--with-lis="$with_lis"])
 	    fi
 	    ;;
-	(*)
-	    if test :"${with_lis:-no}" != :no ; then
-		AC_MSG_ERROR([
-*** 
-*** Linux GCOM STREAMS was specified with the --with-lis flag, however,
-*** configure could not find the STREAMS LIS include directories.  If
-*** you wish to use the STREAMS LIS package you will need to specify
-*** the location of the STREAMS LIS (LiS) include directories with
-*** the --with-lis=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS LIS package?  The
-*** STREAMS LiS package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "LiS-2.18.7.tar.gz".
-*** ])
-	    fi
-	    if test :"${with_lfs:-no}" != :no ; then
-		AC_MSG_ERROR([
-*** 
-*** Linux Fast STREAMS was specified with the --with-lfs flag, however,
-*** configure could not find the STREAMS LFS include directories.  If
-*** you wish to use the STREAMS LFS package you will need to specify
-*** the location of the STREAMS LFS (streams) include directories with
-*** the --with-lfs=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS LFS package?  The
-*** STREAMS streams package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "streams-0.9.2.4.tar.gz".
-*** ])
-	    fi
-	    AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS include directories.  This
-*** package requires the presence of STREAMS include directories.
-*** Specify the correct location of Linux Fast STREAMS (LfS) include
-*** directories with the --with-lfs option to configure, or the correct
-*** location of Linux GCOM STREAMS (LiS) include directories with the
-*** --with-lis option to configure, and try again.
-***
-*** Perhaps you just forgot to load the STREAMS LFS package?  The
-*** STREAMS streams package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "streams-0.9.2.4.tar.gz".
-*** ])
-	    ;;
     esac
     for streams_include in $streams_cv_includes ; do
 	STREAMS_CPPFLAGS="${STREAMS_CPPFLAGS}${STREAMS_CPPFLAGS:+ }-I${streams_include}"
@@ -359,20 +415,6 @@ dnl		    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--wit
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_SETUP], [dnl
     _LIS_CHECK_HEADERS
-    if test :"${streams_cv_lis_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS LIS include directories.  If
-*** you wish to use the STREAMS LIS package you will need to specify
-*** the location of the STREAMS LIS (LiS) include directories with
-*** the --with-lis=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS LIS package?  The
-*** STREAMS LiS package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "LiS-2.18.7.tar.gz".
-*** ])
-    fi
     AC_MSG_CHECKING([for lis added configure arguments])
 dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
 dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
@@ -409,20 +451,6 @@ dnl	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }'--with
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LFS_SETUP], [dnl
     _LFS_CHECK_HEADERS
-    if test :"${streams_cv_lfs_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS LFS include directories.  If
-*** you wish to use the STREAMS LFS package you will need to specify
-*** the location of the STREAMS LFS (streams) include directories with
-*** the --with-lfs=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS LFS package?  The
-*** STREAMS streams package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "streams-0.9.2.4.tar.gz".
-*** ])
-    fi
     AC_MSG_CHECKING([for lfs added configure arguments])
 dnl Older rpms (particularly those used by SuSE) are too stupid to handle --with
 dnl and --without rpmopt syntax, so convert to the equivalent --define syntax.
@@ -1503,6 +1531,9 @@ AC_DEFUN([_LINUX_STREAMS_], [dnl
 # =============================================================================
 #
 # $Log: streams.m4,v $
+# Revision 0.9.2.102  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.101  2008-10-27 09:32:54  brian
 # - tweak streams locator macros
 #
