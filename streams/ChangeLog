@@ -1,3 +1,29 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man2/fattach.2.man: remove trailing space
+	* doc/man/man2/fcntl.2.man: remove trailing space
+	* doc/man/man2/fcntl.2s.man: remove trailing space
+	* doc/man/man2/fdetach.2.man: remove trailing space
+	* doc/man/man2/getmsg.2.man: remove trailing space
+	* doc/man/man2/getpmsg.2s.man: remove trailing space
+	* doc/man/man2/isastream.2.man: remove trailing space
+	* doc/man/man2/pipe.2.man: remove trailing space
+	* doc/man/man2/pipe.2s.man: remove trailing space
+	* doc/man/man2/poll.2.man: remove trailing space
+	* doc/man/man2/poll.2s.man: remove trailing space
+	* doc/man/man2/putmsg.2.man: remove trailing space
+	* doc/man/man2/putpmsg.2s.man: remove trailing space
+	* doc/man/man2/read.2.man: remove trailing space
+	* doc/man/man2/read.2s.man: remove trailing space
+	* doc/man/man2/readv.2.man: remove trailing space
+	* doc/man/man2/readv.2s.man: remove trailing space
+	* doc/man/man2/soon.2.man: remove trailing space
+	* doc/man/man2/write.2.man: remove trailing space
+	* doc/man/man2/write.2s.man: remove trailing space
+
+	* doc/man/man2/writev.2s.man: linking to readv.2s frags out debian,
+	  copy instead
+
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/STREAMS_FAQ.texi: correct direntry naming
