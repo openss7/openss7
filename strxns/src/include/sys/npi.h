@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi.h,v 0.9.2.9 2008-10-30 13:37:49 brian Exp $
+ @(#) $Id: npi.h,v 0.9.2.10 2008-10-30 18:42:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 13:37:49 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:42:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi.h,v $
+ Revision 0.9.2.10  2008-10-30 18:42:05  brian
+ - type alignment
+
  Revision 0.9.2.9  2008-10-30 13:37:49  brian
  - updated headers for release
 
@@ -78,7 +81,7 @@
 #ifndef SYS_NPI_H
 #define SYS_NPI_H		/* mark file as included */
 
-#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: npi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -87,6 +90,7 @@
 
 typedef int32_t np_long;
 typedef u_int32_t np_ulong;
+typedef u_int16_t np_ushort;
 
 #define N_CURRENT_VERSION   0x02	/* current version of NPI */
 #define N_VERSION_2	    0x02	/* version of npi, December 16, 1991 */

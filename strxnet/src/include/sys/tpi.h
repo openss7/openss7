@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tpi.h,v 0.9.2.12 2008-04-28 18:38:37 brian Exp $
+ @(#) $Id: tpi.h,v 0.9.2.13 2008-10-30 18:42:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 18:38:37 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:42:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpi.h,v $
+ Revision 0.9.2.13  2008-10-30 18:42:05  brian
+ - type alignment
+
  Revision 0.9.2.12  2008-04-28 18:38:37  brian
  - header updates for release
 
@@ -99,7 +102,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2008 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -126,14 +129,14 @@
  * TPI Common Header File.
  *
  * This file contains definitions that are common to XTI, TLI and TPI.  It is
- * included by <xti.h> and <tiuser.h> as well as <tihdr.h>. 
+ * included by <xti.h> and <tiuser.h> as well as <tihdr.h>.
  */
 
 /**
   * @name XTI Errors
   * Transport service error numbers (error codes used by TLI transport
   * providers) The following are the error codes needed by both the kernel level
-  * transport providers and the user level library. 
+  * transport providers and the user level library.
   * @{
   */
 #define TBADADDR	 1	/**< Bad address format. */
@@ -156,7 +159,7 @@
 #define TNOTSUPPORT	18	/**< Not supported. */
 #define TSTATECHNG	19	/**< State is currently changing		(not TPI). */
 /*
-   The following are XPG3 and up.  
+   The following are XPG3 and up.
  */
 #if defined _XPG3 || defined _XOPEN_SOURCE || defined __KERNEL__
 #define TNOSTRUCTYPE	20	/**< Structure type not supported		(not TPI). */
@@ -165,7 +168,7 @@
 #define TADDRBUSY	23	/**< Address already in use			(not TPI). */
 #endif
 /*
-   The following are _XOPEN_SOURCE (XPG4 and up).  
+   The following are _XOPEN_SOURCE (XPG4 and up).
  */
 #if defined _XOPEN_SOURCE || defined __KERNEL__
 #define TINDOUT		24	/**< Outstanding connect indications		(not TPI). */
@@ -310,21 +313,21 @@ struct t_opthdr {
 #define _T_OPT_DATA_OFS(p, o)							\
 	((unsigned char *)(_T_ALIGN_OFS((struct t_opthdr *)(p)+1, (o))))
 
-/** 
+/**
   * Get aligned start of first option header.  This implementation assumes
   * option buffers are allocated by t_alloc() and hence aligned to start any
   * sized object (including option header) is guaranteed.
   */
 #define T_OPT_FIRSTHDR(b)	_T_OPT_FIRSTHDR_OFS((b)->buf, (b)->len, 0)
 
-/** 
+/**
   * Get aligned start of data part after option header This implementation
   * assumes "sizeof (t_uscalar_t)" as the alignment size for its option data and
   * option header with no padding in "struct t_opthdr" definition.
   */
 #define T_OPT_NEXTHDR(b, p)	_T_OPT_NEXTHDR_OFS((b)->buf, (b)->len, p, 0)
 
-/** 
+/**
   * Get aligned start of data part after option header This implementation
   * assumes "sizeof (t_uscalar_t)" as the alignment size for its option data and
   * option header with no padding in "struct t_opthdr" definition.

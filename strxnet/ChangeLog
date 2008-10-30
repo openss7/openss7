@@ -1,5 +1,8 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/sys/tpi.h: types
+	* src/include/sys/npi.h: types
+
 	* src/lib/netdir.c: rationalize drivers
 	* src/test/test-inet_raw.c: rationalize drivers
 	* src/test/test-inet_tcp.c: rationalize drivers

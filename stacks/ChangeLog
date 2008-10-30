@@ -1,5 +1,8 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/include/sys/dlpi.h: types
+	* src/include/sys/npi.h: types
+
 	* src/modules/sccp/sccp.c: pointer types
 
 	* src/lib/libxnet/xnet.c: rationalize drivers
