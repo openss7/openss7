@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpi.h,v 0.9.2.13 2008-10-30 13:37:49 brian Exp $
+ @(#) $Id: dlpi.h,v 0.9.2.14 2008-10-30 18:34:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 13:37:49 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:34:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.h,v $
+ Revision 0.9.2.14  2008-10-30 18:34:54  brian
+ - corrected types
+
  Revision 0.9.2.13  2008-10-30 13:37:49  brian
  - updated headers for release
 
@@ -83,7 +86,7 @@
 #ifndef _SYS_DLPI_H
 #define _SYS_DLPI_H
 
-#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpi.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -91,8 +94,8 @@
 /// @brief This header file provides the Data Link Provider Interface (DLPI).
 
 typedef int32_t dl_long;
-typedef uint32_t dl_ulong;
-typedef uint16_t dl_ushort;
+typedef u_int32_t dl_ulong;
+typedef u_int16_t dl_ushort;
 
 /*
    DLPI revision definition history
