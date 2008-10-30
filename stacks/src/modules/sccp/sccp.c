@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:14 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:14 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:34:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.30  2008-10-30 18:34:53  brian
+ - corrected types
+
  Revision 0.9.2.29  2008-09-22 20:31:14  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:14 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:14 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -102,7 +105,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2008-09-22 20:31:14 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-10-30 18:34:53 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -14902,10 +14905,10 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	struct sccp_addr *a;
 	uchar *op, *oe;
 	struct t_opthdr *oh;
-	t_uscalar_t *sls = NULL;
-	t_uscalar_t *pri = NULL;
-	t_uscalar_t *pcl = NULL;
-	t_uscalar_t *imp = NULL;
+	np_ulong *sls = NULL;
+	np_ulong *pri = NULL;
+	np_ulong *pcl = NULL;
+	np_ulong *imp = NULL;
 
 	if (sccp_get_t_state(sc) != TS_IDLE)
 		goto outstate;
@@ -14953,16 +14956,16 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 			case T_SS7_SCCP:
 				switch (oh->name) {
 				case T_SCCP_SEQ_CTRL:
-					sls = (t_uscalar_t *) (oh + 1);
+					sls = (np_ulong *) (oh + 1);
 					continue;
 				case T_SCCP_PRIORITY:
-					pri = (t_uscalar_t *) (oh + 1);
+					pri = (np_ulong *) (oh + 1);
 					continue;
 				case T_SCCP_PCLASS:
-					pcl = (t_uscalar_t *) (oh + 1);
+					pcl = (np_ulong *) (oh + 1);
 					continue;
 				case T_SCCP_IMPORTANCE:
-					imp = (t_uscalar_t *) (oh + 1);
+					imp = (np_ulong *) (oh + 1);
 					continue;
 				default:
 				case T_SCCP_PVAR:
