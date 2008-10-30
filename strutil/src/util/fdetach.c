@@ -1,26 +1,27 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:58:13 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:48 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +46,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:13 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fdetach.c,v $
+ Revision 0.9.2.12  2008-10-30 18:31:48  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.11  2007/08/14 12:58:13  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:58:13 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:48 $"
 
 static char const ident[] =
-    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:58:13 $";
+    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:48 $";
 
 /* 
  *  SVR 4.2 Utility: fdetach(8)
@@ -95,8 +99,8 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 3, included here by reference.\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under AGPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -108,7 +112,8 @@ usage(int argc, char *argv[])
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] [PATH]\n\
+    %1$s [options] {-a|--all}\n\
+    %1$s [options] PATH ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -122,14 +127,17 @@ help(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [PATH]\n\
+    %1$s [options] {-a|--all}\n\
+    %1$s [options] PATH ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
-    PATH\n\
-        the path to the mounted STREAMS-special file\n\
+    PATH ...\n\
+        the path or paths to the mounted STREAMS-special file(s)\n\
 Options:\n\
+    -a, --all\n\
+        detach all paths\n\
     -q, --quiet\n\
         suppress normal output\n\
     -D, --debug [LEVEL]\n\
@@ -154,22 +162,22 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
-the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version 3 of the License.\n\
+the terms of the GNU Affero General Public License as published by the Free\n\
+Software Foundation; Version 3 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
 \n\
-You should  have received a copy of the GNU  General  Public License  along with\n\
-this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
+You should have received a copy of the GNU  Affero  General Public License along\n\
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
@@ -191,9 +199,15 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
+
 int
 main(int argc, char *argv[])
 {
+	char path[PATH_MAX];
+
 	while (1) {
 		int c, val;
 
@@ -201,6 +215,7 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"all",		no_argument,		NULL, 'a'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
@@ -212,9 +227,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "qD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "aqD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "qDvhVC?");
+		c = getopt(argc, argv, "aqDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -224,6 +239,9 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
+		case 'a':	/* -a, --all */
+			strcpy(path, "*");
+			break;
 		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
@@ -298,18 +316,40 @@ main(int argc, char *argv[])
 			fprintf(stderr, "%s: missing path argument\n", argv[0]);
 		goto bad_nonopt;
 	}
-	if (argc - optind != 1) {
-		if (debug)
-			fprintf(stderr, "%s: too many arguments\n", argv[0]);
-		goto bad_nonopt;
-	}
 	if (debug) {
 		fprintf(stderr, "%s: path = \"%s\"\n", argv[0], argv[optind]);
 	}
-	if (fdetach(argv[optind]) < 0) {
-		if (output || debug)
-			fprintf(stderr, "%s: fdetach(): %s\n", argv[0], strerror(errno));
-		exit(1);
+	if (strcmp(path, "*") == 0) {
+		if (optind < argc)
+			goto bad_nonopt;
+		if (fdetach("*") < 0) {
+			if (output)
+				fprintf(stderr, "%s: -a failed: %s\n", argv[0], strerror(errno));
+			exit(1);
+		} else {
+			if (output > 1)
+				printf("%s: -a OK\n", argv[0]);
+		}
+	} else {
+		if (optind == argc) {
+			if (output)
+				fprintf(stderr, "%s: missing path\n", argv[0]);
+			goto bad_usage;
+		}
+		while (optind < argc) {
+			strcpy(path, argv[optind++]);
+
+			if (fdetach(path) < 0) {
+				if (output)
+					fprintf(stderr, "fdetach( \"%s\" ) failed: %s\n", path,
+						strerror(errno));
+				exit(1);
+			} else {
+				if (output > 1)
+					printf("fdetach( \"%s\" ) OK\n", path);
+			}
+		}
 	}
+
 	exit(0);
 }

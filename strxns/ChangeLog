@@ -1,5 +1,8 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/ip_to_dlpi.c: rationalize drivers
+	* src/modules/ip_strm_mod.c: rationalize drivers
+
 	* src/include/sys/cdi.h: updated headers
 	* src/include/sys/dlpi.h: updated headers
 	* src/include/sys/dlpi_ioctl.h: updated headers

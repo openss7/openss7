@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:06 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:06 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.26  2008-10-30 18:31:07  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.25  2008-09-22 20:31:06  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:06 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:07 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:06 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:07 $";
 
 #include <sys/os7/compat.h>
 
@@ -80,7 +83,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2008-09-22 20:31:06 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2008-10-30 18:31:07 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -6376,7 +6379,7 @@ dl_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 
 	dl->i_oldstate = dl_get_state(dl);
-	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
+	if (mp->b_wptr > mp->b_rptr + sizeof(prim))
 		return (-EMSGSIZE);
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case DL_INFO_REQ:

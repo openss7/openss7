@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:11 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-30 18:31:14 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:11 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2tp.c,v $
+ Revision 0.9.2.21  2008-10-30 18:31:14  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.20  2008-09-22 20:31:11  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:11 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-30 18:31:14 $"
 
 static char const ident[] =
-    "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-09-22 20:31:11 $";
+    "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-30 18:31:14 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -71,7 +74,7 @@ static char const ident[] =
  */
 #include <sys/os7/compat.h>
 
-#include <sys/tpi.h>
+#include <tihdr.h>
 #include <sys/tpi_sctp.h>
 
 #include <ss7/lmi.h>
@@ -82,10 +85,10 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 #include <ss7/sli.h>
 #include <ss7/sli_ioctl.h>
-#include <ss7/m2tp_ioctl.h>
+//#include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -113,6 +116,11 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
+
+#ifdef LFS
+#define M2TP_MOD_ID		CONFIG_STREAMS_M2TP_MODID
+#define M2TP_MOD_NAME		CONFIG_STREAMS_M2TP_NAME
+#endif
 
 /*
  *  =========================================================================
@@ -177,17 +185,16 @@ MODULE_STATIC struct streamtab m2tp_info = {
  *  =========================================================================
  */
 
-typedef struct m2tp m2tp_t;
-
-struct m2tp {
+typedef struct m2tp {
 	struct m2tp *next;
 	queue_t *rq;			/* STREAM read queue */
 	queue_t *wq;			/* STREAM write queue */
 	uint state;			/* M2TP state */
 	uint t_state;			/* T-Provider state */
-	sdt_state_t sdt_state;		/* Signalling Link State */
+	uint sdt_state;			/* Signalling Link State */
+	uint opt_flags;
 
-	sdt_info_ack_t info;
+	lmi_info_ack_t info;
 
 	struct {
 		int state;
@@ -214,11 +221,11 @@ static inline int
 sdt_info_ack(m2tp_t * mt)
 {
 	mblk_t *mp;
-	sdt_info_ack_t *p;
+	lmi_info_ack_t *p;
 
-	if ((mp = allocb(sizeof(*p)), BPRI_HI)) {
+	if ((mp = allocb(sizeof(*p), BPRI_HI))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (sdt_info_ack_t *) mp->b_wptr;
+		p = (lmi_info_ack_t *) mp->b_wptr;
 		*p = mt->info;
 		mp->b_wptr += sizeof(*p);
 		putnext(mt->rq, mp);
@@ -230,14 +237,14 @@ static inline int
 sdt_ok_ack(m2tp_t * mt)
 {
 	mblk_t *mp;
-	sdt_ok_ack_t *p;
+	lmi_ok_ack_t *p;
 
-	if ((mp = allocb(sizeof(*p)), BPRI_HI)) {
+	if ((mp = allocb(sizeof(*p), BPRI_HI))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (sdt_ok_ack_t *) mp->b_wptr;
-		p->sdt_primitive = SDT_OK_ACK;
-		p->sdt_correct_primitive = mt->d.prim;
-		p->sdt_state = mt->d.state;
+		p = (lmi_ok_ack_t *) mp->b_wptr;
+		p->lmi_primitive = LMI_OK_ACK;
+		p->lmi_correct_primitive = mt->d.prim;
+		p->lmi_state = mt->d.state;
 		mp->b_wptr += sizeof(*p);
 		putnext(mt->rq, mp);
 		return (0);
@@ -248,16 +255,16 @@ static inline int
 sdt_error_ack(m2tp_t * mt)
 {
 	mblk_t *mp;
-	sdt_error_ack_t *p;
+	lmi_error_ack_t *p;
 
-	if ((mp = allocb(sizeof(*p)), BPRI_HI)) {
+	if ((mp = allocb(sizeof(*p), BPRI_HI))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (sdt_error_ack_t *) mp->b_wptr;
-		p->sdt_primitive = SDT_ERROR_ACK;
-		p->sdt_errno = mt->d.err;
-		p->sdt_reason = mt->d.reason;
-		p->sdt_error_primitive = mt->d.prim;
-		p->sdt_state = mt->d.state;
+		p = (lmi_error_ack_t *) mp->b_wptr;
+		p->lmi_primitive = LMI_ERROR_ACK;
+		p->lmi_errno = mt->d.err;
+		p->lmi_reason = mt->d.reason;
+		p->lmi_error_primitive = mt->d.prim;
+		p->lmi_state = mt->d.state;
 		mp->b_wptr += sizeof(*p);
 		putnext(mt->rq, mp);
 		return (0);
@@ -268,15 +275,15 @@ static inline int
 sdt_optmgmt_ack(m2tp_t * mt, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
-	sdt_optmgmt_ack_t *p;
+	lmi_optmgmt_ack_t *p;
 
-	if ((mp = allocb(sizeof(*p) + opt_len), BPRI_HI)) {
+	if ((mp = allocb(sizeof(*p) + opt_len, BPRI_HI))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = (sdt_optmgmt_ack_t *) mp->b_wptr;
-		p->sdt_primitive = SDT_ERROR_ACK;
-		p->sdt_opt_offset = sizeof(*p);
-		p->sdt_opt_length = opt_len;
-		p->sdt_mgmt_flags = mt->opt_flags;
+		p = (lmi_optmgmt_ack_t *) mp->b_wptr;
+		p->lmi_primitive = LMI_ERROR_ACK;
+		p->lmi_opt_offset = sizeof(*p);
+		p->lmi_opt_length = opt_len;
+		p->lmi_mgmt_flags = mt->opt_flags;
 		mp->b_wptr += sizeof(*p);
 		bcopy(opt_ptr, mp->b_wptr, opt_len);
 		mp->b_wptr += opt_len;
@@ -290,9 +297,9 @@ static inline int
 sdt_uprim(m2tp_t * mt, int type, int prim, mblk_t *dp)
 {
 	mblk_t *mp;
-	if ((mp = allocb(sizeof(long)), BPRI_HI)) {
+	if ((mp = allocb(sizeof(long), BPRI_HI))) {
 		mp->b_datap->db_type = type;
-		*((long) mp->b_wptr)++ = prim;
+		*(uint32_t *) mp->b_wptr++ = prim;
 		mp->b_cont = dp;
 		putnext(mt->rq, mp);
 		return (0);
@@ -302,47 +309,47 @@ sdt_uprim(m2tp_t * mt, int type, int prim, mblk_t *dp)
 static inline int
 sdt_event_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PROTO, SDT_EVENT_IND, NULL);
+	return sdt_uprim(mt, M_PROTO, LMI_EVENT_IND, NULL);
 }
 static inline int
 sdt_rc_signal_unit_ind(m2tp_t * mt, mblk_t *dp)
 {
-	return sdt_uprim(m2, M_PROTO, SDT_RC_SIGNAL_UNIT_IND, dp);
+	return sdt_uprim(mt, M_PROTO, SDT_RC_SIGNAL_UNIT_IND, dp);
 }
 static inline int
 sdt_rc_congestion_accept_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PCPROTO, SDT_RC_CONGESTION_ACCEPT_IND, NULL);
+	return sdt_uprim(mt, M_PCPROTO, SDT_RC_CONGESTION_ACCEPT_IND, NULL);
 }
 static inline int
 sdt_rc_congestion_discard_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PCPROTO, SDT_RC_CONGESTION_DISCARD_IND, NULL);
+	return sdt_uprim(mt, M_PCPROTO, SDT_RC_CONGESTION_DISCARD_IND, NULL);
 }
 static inline int
 sdt_rc_no_congestion_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PCPROTO, SDT_RC_NO_CONGESTION_IND, NULL);
+	return sdt_uprim(mt, M_PCPROTO, SDT_RC_NO_CONGESTION_IND, NULL);
 }
 static inline int
 sdt_iac_correct_su_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PROTO, SDT_IAC_CORRECT_SU_IND, NULL);
+	return sdt_uprim(mt, M_PROTO, SDT_IAC_CORRECT_SU_IND, NULL);
 }
 static inline int
 sdt_iac_abort_proving_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PROTO, SDT_IAC_ABORT_PROVING_IND, NULL);
+	return sdt_uprim(mt, M_PROTO, SDT_IAC_ABORT_PROVING_IND, NULL);
 }
 static inline int
 sdt_lsc_link_failure_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PCPROTO, SDT_LSC_LINK_FAILURE_IND, NULL);
+	return sdt_uprim(mt, M_PCPROTO, SDT_LSC_LINK_FAILURE_IND, NULL);
 }
 static inline int
 sdt_txc_transmission_request_ind(m2tp_t * mt)
 {
-	return sdt_uprim(m2, M_PROTO, SDT_TXC_TRANSMISSION_REQUEST_IND, NULL);
+	return sdt_uprim(mt, M_PROTO, SDT_TXC_TRANSMISSION_REQUEST_IND, NULL);
 }
 
 /*
@@ -363,7 +370,6 @@ t_info_req(m2tp_t * mt)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
 	return (-EFAULT);
 }
 
@@ -374,11 +380,10 @@ t_info_req(m2tp_t * mt)
  *  before attempting to connect the T-Provider.
  */
 static int
-t_bind_req(m2tp_t * mt)
+t_bind_req(m2tp_t * mt, caddr_t ppa_ptr, size_t ppa_len)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
 	return (-EFAULT);
 }
 
@@ -393,7 +398,6 @@ t_optmgmt_req(m2tp_t * mt)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
 	return (-EFAULT);
 }
 
@@ -410,7 +414,6 @@ t_addr_req(m2tp_t * mt)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
 	return (-EFAULT);
 }
 
@@ -424,7 +427,6 @@ t_conn_req(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
 	return (-EFAULT);
 }
 
@@ -442,7 +444,6 @@ t_conn_res(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
 	return (-EFAULT);
 }
 
@@ -458,7 +459,7 @@ t_data_req(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
+	(void) dp;
 	return (-EFAULT);
 }
 
@@ -473,7 +474,7 @@ t_exdata_req(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
+	(void) dp;
 	return (-EFAULT);
 }
 
@@ -488,7 +489,7 @@ t_optdata_req(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
+	(void) dp;
 	return (-EFAULT);
 }
 
@@ -502,7 +503,7 @@ t_discon_req(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
+	(void) dp;
 	return (-EFAULT);
 }
 
@@ -516,7 +517,7 @@ t_ordrel_req(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
+	(void) dp;
 	return (-EFAULT);
 }
 
@@ -532,7 +533,7 @@ t_unitdata_req(m2tp_t * mt, mblk_t *dp)
 {
 	ptrace(("Unimplemented T-Provider primitive invoked\n"));
 	(void) mt;
-	(void) mp;
+	(void) dp;
 	return (-EFAULT);
 }
 
@@ -562,6 +563,14 @@ t_unitdata_req(m2tp_t * mt, mblk_t *dp)
  *  -------------------     --------------------------------------------
  */
 
+static int
+t_unbind_req(m2tp_t * mt)
+{
+	ptrace(("Unimplemented T-Provider primitive invoked\n"));
+	(void) mt;
+	return (-EFAULT);
+}
+
 /*
  *  =========================================================================
  *
@@ -577,7 +586,7 @@ m2tp_send_data(m2tp_t * mt, mblk_t *dp)
 
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (T_ata_req_t *) mp->b_wptr;
+		p = (struct T_data_req *) mp->b_wptr;
 		p->PRIM_type = T_OPTDATA_REQ;
 		p->MORE_flag = 0;
 		mp->b_wptr += sizeof(*p);
@@ -598,7 +607,7 @@ m2tp_send_data(m2tp_t * mt, mblk_t *dp)
 static inline int
 m2tp_recv_data(m2tp_t * mt, mblk_t *dp)
 {
-	return sdt_rc_signal_unit_ind(m2, dp);
+	return sdt_rc_signal_unit_ind(mt, dp);
 }
 
 /*
@@ -636,8 +645,8 @@ static int
 sdt_attach_req(m2tp_t * mt, mblk_t *mp)
 {
 	lmi_attach_req_t *p = (lmi_attach_req_t *) mp->b_rptr;
-	caddr_t ppa_ptr = mp->b_rptr + p->ppa_offset;
-	size_t ppa_len = p->ppa_length;
+	caddr_t ppa_ptr = p->lmi_ppa;
+	size_t ppa_len = 1;
 
 	ensure(p->lmi_primitive == LMI_ATTACH_REQ, return -EFAULT);
 
@@ -699,6 +708,7 @@ sdt_detach_req(m2tp_t * mt, mblk_t *mp)
 static int
 sdt_optmgmt_req(m2tp_t * mt, mblk_t *mp)
 {
+	return (-EFAULT);
 }
 
 /*
@@ -921,7 +931,7 @@ sdt_aerm_start_req(m2tp_t * mt, mblk_t *mp)
 	if (mt->t_state == TS_DATA_XFER)
 		if (!(mt->flags & (M2TP_RX_FAIL | M2TP_TX_FAIL))) {
 			struct m2tp_options *opt =
-			    (m2->flags & M2TP_EMERGENCY) ? &m2tp_emer_options : &m2tp_norm_options;
+			    (mt->flags & M2TP_EMERGENCY) ? &m2tp_emer_options : &m2tp_norm_options;
 
 			mt->oflags |= M2TP_RX_FAIL | M2TP_TX_FAIL;
 
@@ -955,7 +965,7 @@ sdt_aerm_stop_req(m2tp_t * mt, mblk_t *mp)
 				return -EAGAIN;
 		}
 
-	m2->flags &= ~M2TP_AERM_IN_SERVICE;
+	mt->flags &= ~M2TP_AERM_IN_SERVICE;
 	freemsg(mp);
 	return (0);
 }
@@ -974,7 +984,7 @@ sdt_aerm_set_ti_to_tin_req(m2tp_t * mt, mblk_t *mp)
 {
 	/* 
 	   we don't change proving parameters in the middle of proving */
-	m2->flags &= ~M2TP_EMERGENCY;
+	mt->flags &= ~M2TP_EMERGENCY;
 	freemsg(mp);
 	return (0);
 }
@@ -993,7 +1003,7 @@ sdt_aerm_set_ti_to_tie_req(m2tp_t * mt, mblk_t *mp)
 {
 	/* 
 	   we don't change proving parameters in the middle of proving */
-	m2->flags |= M2TP_EMERGENCY;
+	mt->flags |= M2TP_EMERGENCY;
 	freemsg(mp);
 	return (0);
 }
@@ -1020,7 +1030,7 @@ sdt_suerm_start_req(m2tp_t * mt, mblk_t *mp)
 			if (t_optmgmt_req(mt, T_NEGOTIATE, &opt, sizeof(opt)) == -ENOBUFS)
 				return -EAGAIN;
 
-			m2->flags |= M2TP_SUERM_IN_SERVICE;
+			mt->flags |= M2TP_SUERM_IN_SERVICE;
 		}
 	freemsg(mp);
 	return (0);
@@ -1046,7 +1056,7 @@ sdt_suerm_stop_req(m2tp_t * mt, mblk_t *mp)
 			if (t_optmgmt_req(mt, T_NEGOTIATE, &opt, sizeof(opt)) == -ENOBUFS)
 				return -EAGAIN;
 		}
-	m2->flags &= ~M2TP_SUERM_IN_SERVICE;
+	mt->flags &= ~M2TP_SUERM_IN_SERVICE;
 	freemsg(mp);
 	return (0);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008/07/11 00:23:41 $
+ @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-30 18:31:52 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008/07/11 00:23:41 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.c,v $
+ Revision 0.9.2.9  2008-10-30 18:31:52  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.8  2008/07/11 00:23:41  brian
  - gettext declarations
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008/07/11 00:23:41 $"
+#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-30 18:31:52 $"
 
 static char const ident[] =
-    "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008/07/11 00:23:41 $";
+    "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-30 18:31:52 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -864,15 +867,15 @@ __nsl_netdir_sperror(void)
 		case ND_FAILCTRL:
 		case ND_SYSTEM:
 		case ND_NOCONVERT:
-			(void) strncpy(nd_errbuf, gettext(__nsl_nd_errlist[idx]), NDERR_BUFSZ);
+			(void) strncpy(nd_errbuf, __nsl_nd_errlist[idx], NDERR_BUFSZ);
 			break;
 		case ND_NOSYM:
 		case ND_OPEN:
-			(void) snprintf(nd_errbuf, NDERR_BUFSZ, gettext(__nsl_nd_errlist[idx]), dlerror());
+			(void) snprintf(nd_errbuf, NDERR_BUFSZ, __nsl_nd_errlist[idx], dlerror());
 			break;
 		default:
 			idx = ND_ERROR_MAX - ND_ERROR_OFS;
-			(void) snprintf(nd_errbuf, NDERR_BUFSZ, gettext(__nsl_nd_errlist[idx]), err);
+			(void) snprintf(nd_errbuf, NDERR_BUFSZ, __nsl_nd_errlist[idx], err);
 			break;
 		}
 	}

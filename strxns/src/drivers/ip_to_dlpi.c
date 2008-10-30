@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-11 04:31:38 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:38 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_to_dlpi.c,v $
+ Revision 0.9.2.35  2008-10-30 18:31:58  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.34  2008-10-11 04:31:38  brian
  - handle -Wpointer-sign
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-11 04:31:38 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-11 04:31:38 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $";
 
 #include <sys/os7/compat.h>
 
@@ -86,7 +89,7 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.34 $) $Date: 2008-10-11 04:31:38 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.35 $) $Date: 2008-10-30 18:31:58 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP2XINET_LICENSE	"GPL"
@@ -434,8 +437,10 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 				flushband(RD(q), mp->b_rptr[1], FLUSHDATA);
 			else
 				flushq(RD(q), FLUSHDATA);
-			if (!putq(RD(q), mp))
-				freemsg(mp);
+			if (!putq(RD(q), mp)) {
+				mp->b_band = 0;
+				putq(RD(q), mp);
+			}
 		} else
 			freemsg(mp);
 		break;
@@ -486,8 +491,10 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 			if ((nmp = allocb(sizeof(union DL_primitives), BPRI_LO)) == NULL) {
 				iocp->ioc_error = ENOSR;
 				mp->b_datap->db_type = M_IOCNAK;
-				if (!putq(RD(q), mp))
-					freemsg(mp);
+				if (!putq(RD(q), mp)) {
+					mp->b_band = 0;
+					putq(RD(q), mp);
+				}
 				spin_unlock(ip2xinet_lock);
 				printk("pktioctl: I_LINK failed: allocb failed");
 				return (0);
@@ -505,13 +512,17 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 			/* experience shows that an I_LINKed queue needs to be enabled so that the
 			   service routine will be run. */
 			qenable(ip2xinet_status.lowerq);
-			if (!putq(ip2xinet_status.lowerq, nmp))
-				freemsg(nmp);
+			if (!putq(ip2xinet_status.lowerq, nmp)) {
+				nmp->b_band = 0;
+				putq(ip2xinet_status.lowerq, nmp);
+			}
 
 			/* all went well */
 			mp->b_datap->db_type = M_IOCACK;
-			if (!putq(RD(q), mp))
-				freemsg(mp);	/* fall back on timout */
+			if (!putq(RD(q), mp)) {
+				mp->b_band = 0;
+				putq(RD(q), mp);
+			}
 			break;
 
 		case I_UNLINK:
@@ -539,8 +550,10 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 			ip2xinet_status.readq = NULL;
 			ip2xinet_status.lowerq = NULL;
 			mp->b_datap->db_type = M_IOCACK;
-			if (!putq(RD(q), mp))
-				freemsg(mp);	/* fall back on timout */
+			if (!putq(RD(q), mp)) {
+				mp->b_band = 0;
+				putq(RD(q), mp);
+			}
 
 			break;
 		}
@@ -548,8 +561,10 @@ ip2xinet_uwput(queue_t *q, mblk_t *mp)
 		default:
 			iocp->ioc_error = EINVAL;
 			mp->b_datap->db_type = M_IOCNAK;
-			if (!putq(RD(q), mp))
-				freemsg(mp);	/* fall back on timout */
+			if (!putq(RD(q), mp)) {
+				mp->b_band = 0;
+				putq(RD(q), mp);
+			}
 			break;
 		}
 
@@ -889,16 +904,20 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 			else
 				flushq(WR(q), FLUSHDATA);
 			qenable(WR(q));
-			if (!putq(WR(q), mp))
-				freemsg(mp);
+			if (!putq(WR(q), mp)) {
+				mp->b_band = 0;
+				putq(WR(q), mp);
+			}
 		} else
 			freemsg(mp);
 		break;
 
 	case M_HANGUP:
 		/* send it to the guy that linked us up, what he does is his problem. */
-		if (!putq(ip2xinet_status.readq, mp))
-			freemsg(mp);
+		if (!putq(ip2xinet_status.readq, mp)) {
+			mp->b_band = 0;
+			putq(ip2xinet_status.readq, mp);
+		}
 		break;
 
 	case M_IOCACK:
@@ -906,8 +925,10 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 		if (iocp->ioc_cmd == SIOCSIFMTU) {
 			/* The set MTU ioctl was a success Rejoice :-) */
 			freemsg(mp);
-		} else if (!putq(ip2xinet_status.readq, mp))
-			freemsg(mp);
+		} else if (!putq(ip2xinet_status.readq, mp)) {
+			mp->b_band = 0;
+			putq(ip2xinet_status.readq, mp);
+		}
 		break;
 
 	case M_IOCNAK:
@@ -917,8 +938,10 @@ ip2xinet_lrput(queue_t *q, mblk_t *mp)
 			   impossible, so ignore it */
 
 			freemsg(mp);
-		} else if (!putq(ip2xinet_status.readq, mp))
-			freemsg(mp);
+		} else if (!putq(ip2xinet_status.readq, mp)) {
+			mp->b_band = 0;
+			putq(ip2xinet_status.readq, mp);
+		}
 		break;
 
 	default:
@@ -972,8 +995,10 @@ ip2xinet_send_down_bind(queue_t *q)
 	bindmp = (dl_bind_req_t *) mp->b_rptr;
 	bindmp->dl_primitive = DL_BIND_REQ;
 	bindmp->dl_sap = IP_SAP;
-	if (!putq(q, mp))
-		freemsg(mp);
+	if (!putq(q, mp)) {
+		mp->b_band = 0;
+		putq(q, mp);
+	}
 	return 0;
 }
 
@@ -1060,8 +1085,10 @@ ip2xinet_release(struct net_device *dev)
 			mp->b_wptr += DL_UNBIND_REQ_SIZE;
 			unbindmp = (dl_unbind_req_t *) mp->b_rptr;
 			unbindmp->dl_primitive = DL_UNBIND_REQ;
-			if (!putq(q, mp))
-				freemsg(mp);
+			if (!putq(q, mp)) {
+				mp->b_band = 0;
+				putq(q, mp);
+			}
 		}
 	}
 	spin_unlock(ip2xinet_lock);
@@ -1203,8 +1230,10 @@ ip2xinet_hw_tx(unsigned char *buf, int len, struct net_device *dev)
 	linkb(mp, nmp);
 	bcopy(buf + sizeof(struct ethhdr), nmp->b_rptr, mylen);
 	nmp->b_wptr += mylen;
-	if (!putq(q, mp))
-		freemsg(mp);
+	if (!putq(q, mp)) {
+		mp->b_band = 0;
+		putq(q, mp);
+	}
 	privp->stats.tx_packets++;
 }
 

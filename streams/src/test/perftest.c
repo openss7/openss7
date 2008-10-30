@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-28 12:54:08 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-10-30 18:31:35 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:08 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.20  2008-10-30 18:31:35  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.19  2008-04-28 12:54:08  brian
  - update file headers for release
 
@@ -128,9 +131,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-28 12:54:08 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-10-30 18:31:35 $"
 
-static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-04-28 12:54:08 $";
+static char const ident[] =
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-10-30 18:31:35 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -268,8 +272,10 @@ start_timer(void)
 int
 test_sync(int fds[])
 {
-	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0, tbyttot = 0;
-	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0, rbyttot = 0;
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin =
+	    PIPE_BUF, tbytmax = 0, tbyttot = 0;
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin =
+	    PIPE_BUF, rbytmax = 0, rbyttot = 0;
 	long long tmsize = msgsize;
 	long long rmsize = msgsize;
 	long long report_count = 0;
@@ -298,10 +304,17 @@ test_sync(int fds[])
 				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 				tavg_tput = (3 * tavg_tput + thrput) / 4;
 #else
-				tavg_msgs = (tavg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
-				tavg_tput = (tavg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				tavg_msgs =
+				    (tavg_msgs * report_count +
+				     msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				tavg_tput =
+				    (tavg_tput * report_count +
+				     thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
 #endif
-				fprintf(stdout, "%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n", fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
+				fprintf(stdout,
+					"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
+					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz,
+					tbytmin, tbytmax);
 				fflush(stdout);
 			}
 			{
@@ -313,10 +326,17 @@ test_sync(int fds[])
 				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 				ravg_tput = (3 * ravg_tput + thrput) / 4;
 #else
-				ravg_msgs = (ravg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
-				ravg_tput = (ravg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				ravg_msgs =
+				    (ravg_msgs * report_count +
+				     msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				ravg_tput =
+				    (ravg_tput * report_count +
+				     thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
 #endif
-				fprintf(stdout, "%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n", fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
+				fprintf(stdout,
+					"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
+					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz,
+					rbytmin, rbytmax);
 				fflush(stdout);
 			}
 			tbyttot -= rbyttot;
@@ -363,7 +383,8 @@ test_sync(int fds[])
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { rmsize, 0, my_msg };
 
-				while (!timer_timeout && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
+				while (!timer_timeout
+				       && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
 					rbyttot += dbuf.len;
 					if (rbytcnt < 0)
@@ -409,7 +430,8 @@ test_sync(int fds[])
 			} else {
 				struct strbuf dbuf = { 0, tmsize, my_msg };
 
-				while (!timer_timeout && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
+				while (!timer_timeout
+				       && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
 					tbytcnt += tmsize;
 					tbyttot += tmsize;
 					if (tbytcnt < 0)
@@ -448,7 +470,8 @@ test_sync(int fds[])
 int
 read_child(int fd)
 {
-	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0;
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin =
+	    PIPE_BUF, rbytmax = 0;
 	long long reintr = 0, reagain = 0, rerestart = 0;
 	long long rmsize = msgsize;
 	struct pollfd pfd = { fd, (POLLIN | POLLRDNORM), 0 };
@@ -481,10 +504,17 @@ read_child(int fd)
 			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 			ravg_tput = (3 * ravg_tput + thrput) / 4;
 #else
-			ravg_msgs = (ravg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
-			ravg_tput = (ravg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+			ravg_msgs =
+			    (ravg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+			ravg_tput =
+			    (ravg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
 #endif
-			fprintf(stdout, "%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n", fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax, errcnt, reintr, rerestart);
+			fprintf(stdout,
+				"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax,
+				errcnt, reintr, rerestart);
 			fflush(stdout);
 			rbytcnt = 0;
 			rmsgcnt = 0;
@@ -540,7 +570,8 @@ read_child(int fd)
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { rmsize, 0, my_msg };
 
-				while (!timer_timeout && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
+				while (!timer_timeout
+				       && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
 					if (rbytcnt < 0)
 						goto dead;
@@ -586,7 +617,8 @@ read_child(int fd)
 int
 write_child(int fd)
 {
-	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0;
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin =
+	    PIPE_BUF, tbytmax = 0;
 	long long teintr = 0, teagain = 0, terestart = 0;
 	long long tmsize = msgsize;
 	struct pollfd pfd = { fd, (POLLOUT | POLLWRNORM), 0 };
@@ -617,10 +649,17 @@ write_child(int fd)
 			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 			tavg_tput = (3 * tavg_tput + thrput) / 4;
 #else
-			tavg_msgs = (tavg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
-			tavg_tput = (tavg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+			tavg_msgs =
+			    (tavg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+			tavg_tput =
+			    (tavg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
 #endif
-			fprintf(stdout, "%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n", fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax, errcnt, teintr, terestart);
+			fprintf(stdout,
+				"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax,
+				errcnt, teintr, terestart);
 			fflush(stdout);
 			tbytcnt = 0;
 			tmsgcnt = 0;
@@ -996,7 +1035,8 @@ do_tests(void)
 		int i;
 
 		if (verbose > 1) {
-			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname, fds[0]);
+			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname,
+				fds[0]);
 		}
 		for (i = 0; i < push; i++) {
 			if (ioctl(fds[1], I_PUSH, modname) < 0) {
@@ -1098,7 +1138,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
@@ -1219,7 +1259,8 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "MwR::S::Fm:Hafp:bs:rt:i:qvhV?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "MwR::S::Fm:Hafp:bs:rt:i:qvhV?W:", long_options,
+				&option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "MwR::S::Fm:Hafp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */

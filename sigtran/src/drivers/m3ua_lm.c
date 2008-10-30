@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_lm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 01:52:21 $
+ @(#) $RCSfile: m3ua_lm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-30 18:31:05 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 01:52:21 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_lm.c,v $
+ Revision 0.9.2.5  2008-10-30 18:31:05  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.4  2008-04-29 01:52:21  brian
  - updated headers for release
 
@@ -80,4 +83,6 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.4 $) $Date: 2008-04-29 01:52:21 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-30 18:31:05 $";
+
+static char const ident[] = "$RCSfile: m3ua_lm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-30 18:31:05 $";

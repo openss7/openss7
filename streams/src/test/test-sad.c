@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 12:54:09 $
+ @(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-30 18:31:36 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:09 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sad.c,v $
+ Revision 0.9.2.34  2008-10-30 18:31:36  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.33  2008-04-28 12:54:09  brian
  - update file headers for release
 
@@ -174,9 +177,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 12:54:09 $"
+#ident "@(#) $RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-30 18:31:36 $"
 
-static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-04-28 12:54:09 $";
+static char const ident[] = "$RCSfile: test-sad.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-30 18:31:36 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -4059,7 +4062,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

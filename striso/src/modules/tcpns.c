@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:41 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:38 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.12  2008-10-30 18:31:41  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.11  2008-09-22 20:31:38  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:41 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:41 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -98,7 +101,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2008-09-22 20:31:38 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:41 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"
@@ -159,6 +162,9 @@ static struct module_info tcpns_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
+static struct module_stat tcpns_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tcpns_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+
 static streamscall int tcpns_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int tcpns_close(queue_t *, int, cred_t *);
 
@@ -170,11 +176,13 @@ static struct qinit tcpns_rinit = {
 	.qi_qopen = tcpns_open,		/* Each open */
 	.qi_qclose = tcpns_close,	/* Last close */
 	.qi_minfo = &tcpns_minfo,	/* Information */
+	.qi_mstat = &tcpns_rstat,	/* Statistics */
 };
 
 static struct qinit tcpns_winit = {
 	.qi_putp = tcpns_wput,		/* Write put (message from above) */
 	.qi_minfo = &tcpns_minfo,	/* Information */
+	.qi_mstat = &tcpns_wstat,	/* Statistics */
 };
 
 MODULE_STATIC struct streamtab tcpnsinfo = {

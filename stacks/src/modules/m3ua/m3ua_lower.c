@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:00 $
+ @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:15 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:00 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_lower.c,v $
+ Revision 0.9.2.12  2008-10-30 18:31:15  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.11  2008-04-29 07:11:00  brian
  - updating headers for release
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:00 $"
+#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:15 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:00 $";
+    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:15 $";
 
 #define __NO_VERSION__
 
@@ -164,15 +167,15 @@ ss7_r_ctl(queue_t *q, mblk_t *mp)
 static int
 xxx_r_flush(queue_t *q, mblk_t *mp)
 {
-	if (mp->b_rptr[0] & FLUSHR) {
-		if (mp->b_rptr[0] & FLUSHBAND)
+	if (*mp->b_rptr & FLUSHR) {
+		if (*mp->b_rptr & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
 			flushall(q, FLUSHDATA);
-		mp->b_rptr[0] &= ~FLUSHR;
+		*mp->b_rptr &= ~FLUSHR;
 	}
-	if ((mp->b_rptr[0] & FLUSHW) && !(mp->b_flags & MSGNOLOOP)) {
-		if (mp->b_rptr[0] & FLUSHBAND)
+	if ((*mp->b_rptr & FLUSHW) && !(mp->b_flags & MSGNOLOOP)) {
+		if (*mp->b_rptr & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHDATA);
 		else
 			flushall(q, FLUSHDATA);

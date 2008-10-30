@@ -1,5 +1,42 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/clone.c: rationalize drivers
+	* src/drivers/echo.c: rationalize drivers
+	* src/drivers/fifo.c: rationalize drivers
+	* src/drivers/log.c: rationalize drivers
+	* src/drivers/nsdev.c: rationalize drivers
+	* src/drivers/nuls.c: rationalize drivers
+	* src/drivers/pipe.c: rationalize drivers
+	* src/drivers/sad.c: rationalize drivers
+	* src/drivers/sfx.c: rationalize drivers
+	* src/drivers/spx.c: rationalize drivers
+	* src/modules/connld.c: rationalize drivers
+	* src/modules/pipemod.c: rationalize drivers
+	* src/modules/sc.c: rationalize drivers
+	* src/test/test-clone.c: rationalize drivers
+	* src/test/test-connld.c: rationalize drivers
+	* src/test/test-echo.c: rationalize drivers
+	* src/test/test-nsdev.c: rationalize drivers
+	* src/test/test-nuls.c: rationalize drivers
+	* src/test/test-pipe.c: rationalize drivers
+	* src/test/test-pipemod.c: rationalize drivers
+	* src/test/test-sad.c: rationalize drivers
+	* src/test/test-sc.c: rationalize drivers
+	* src/test/test-streams.c: rationalize drivers
+	* src/util/autopush.c: rationalize drivers
+	* src/util/fattach.c: rationalize drivers
+	* src/util/fdetach.c: rationalize drivers
+	* src/util/insf.c: rationalize drivers
+	* src/util/scls.c: rationalize drivers
+	* src/util/strace.c: rationalize drivers
+	* src/util/strchg.c: rationalize drivers
+	* src/util/strconf.c: rationalize drivers
+	* src/util/strerr.c: rationalize drivers
+	* src/util/strinfo.c: rationalize drivers
+	* src/util/strlog.c: rationalize drivers
+	* src/util/strreset.c: rationalize drivers
+	* src/util/strvf.c: rationalize drivers
+
 	* src/include/sys/strlog.h: updated headers
 	* src/include/sys/strutil/strlog.h: updated headers
 

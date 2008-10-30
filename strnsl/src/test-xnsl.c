@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:11:47 $
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-30 18:31:42 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 22:11:47 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnsl.c,v $
+ Revision 0.9.2.6  2008-10-30 18:31:42  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.5  2008-04-28 22:11:47  brian
  - updated headers for release
 
@@ -84,14 +87,14 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:11:47 $"
+#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-30 18:31:42 $"
 
-static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-04-28 22:11:47 $";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-10-30 18:31:42 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,
  *  that contains the Network Selection Facility and Name-to-address Mapping
- *  functions of the TI-RPC ala Sun TIRPCSRC Release 2.8.  This program uses
+ *  functions of the TI-RPC ala Sun TIRPCSRC Version 2.8.  This program uses
  *  the fact that the library permits the network configuration file name to
  *  be redirected for the purposes of testing.
  */
@@ -5540,7 +5543,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -5566,8 +5569,9 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 3,  so long as the  software is distributed\n\
-with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+Affero  General  Public  License  (GPL)  Version  3,  so long as the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -5595,9 +5599,9 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

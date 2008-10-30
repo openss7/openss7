@@ -1,5 +1,8 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/tcpns.c: rationalize drivers
+	* src/modules/xot.c: rationalize drivers
+
 	* src/include/xti.h: updated headers
 	* src/include/xti_mosi.h: updated headers
 	* src/include/xti_osi.h: updated headers

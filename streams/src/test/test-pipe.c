@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 12:54:09 $
+ @(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-10-30 18:31:36 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:09 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-pipe.c,v $
+ Revision 0.9.2.31  2008-10-30 18:31:36  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.30  2008-04-28 12:54:09  brian
  - update file headers for release
 
@@ -171,9 +174,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 12:54:09 $"
+#ident "@(#) $RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-10-30 18:31:36 $"
 
-static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2008-04-28 12:54:09 $";
+static char const ident[] = "$RCSfile: test-pipe.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-10-30 18:31:36 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -5489,8 +5492,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-Affero  General Public License (AGPL)  Version 3,  so long  as  the  software is\n\
-distributed with,  and only used for the  testing of,  OpenSS7 modules, drivers,\n\
+Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
+distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
 and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -5521,7 +5524,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

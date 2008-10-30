@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:23 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:21 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:23 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.10  2008-10-30 18:31:21  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.9  2008-04-29 07:11:23  brian
  - updating headers for release
 
@@ -87,9 +90,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:23 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:21 $"
 
-static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:23 $";
+static char const ident[] =
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:21 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -141,7 +145,9 @@ int sndmread = 0;
 int readfill = 0;
 int fullreads = 0;
 int niceread = 0;
+int nicerval = 19;
 int nicesend = 0;
+int nicesval = 19;
 int fifo = 0;
 int push = 0;
 int blocking = 0;
@@ -217,14 +223,18 @@ start_timer(void)
 }
 
 #ifndef PIPE_BUF
-#define PIPE_BUF 4096
+#define PIPE_BUF 8192
 #endif
+
+#define RECENT_WEIGHT 2
 
 int
 test_sync(int fds[])
 {
-	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0, tbyttot = 0;
-	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0, rbyttot = 0;
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin =
+	    PIPE_BUF, tbytmax = 0, tbyttot = 0;
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin =
+	    PIPE_BUF, rbytmax = 0, rbyttot = 0;
 	long long tmsize = msgsize;
 	long long rmsize = msgsize;
 	long long report_count = 0;
@@ -249,9 +259,21 @@ test_sync(int fds[])
 				long long msgcnt = tmsgcnt / report;
 				long long avgsiz = tbytcnt / tmsgcnt;
 
+#if 0
 				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 				tavg_tput = (3 * tavg_tput + thrput) / 4;
-				fprintf(stdout, "%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n", fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
+#else
+				tavg_msgs =
+				    (tavg_msgs * report_count +
+				     msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				tavg_tput =
+				    (tavg_tput * report_count +
+				     thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
+				fprintf(stdout,
+					"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
+					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz,
+					tbytmin, tbytmax);
 				fflush(stdout);
 			}
 			{
@@ -259,9 +281,21 @@ test_sync(int fds[])
 				long long msgcnt = rmsgcnt / report;
 				long long avgsiz = rbytcnt / rmsgcnt;
 
+#if 0
 				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 				ravg_tput = (3 * ravg_tput + thrput) / 4;
-				fprintf(stdout, "%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n", fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
+#else
+				ravg_msgs =
+				    (ravg_msgs * report_count +
+				     msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				ravg_tput =
+				    (ravg_tput * report_count +
+				     thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
+				fprintf(stdout,
+					"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
+					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz,
+					rbytmin, rbytmax);
 				fflush(stdout);
 			}
 			tbyttot -= rbyttot;
@@ -308,7 +342,8 @@ test_sync(int fds[])
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { rmsize, 0, my_msg };
 
-				while (!timer_timeout && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
+				while (!timer_timeout
+				       && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
 					rbyttot += dbuf.len;
 					if (rbytcnt < 0)
@@ -354,7 +389,8 @@ test_sync(int fds[])
 			} else {
 				struct strbuf dbuf = { 0, tmsize, my_msg };
 
-				while (!timer_timeout && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
+				while (!timer_timeout
+				       && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
 					tbytcnt += tmsize;
 					tbyttot += tmsize;
 					if (tbytcnt < 0)
@@ -393,14 +429,15 @@ test_sync(int fds[])
 int
 read_child(int fd)
 {
-	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin = PIPE_BUF, rbytmax = 0;
+	long long rbytcnt = 0, rmsgcnt = 0, ravg_msgs = 0, ravg_tput = 0, rbytmin =
+	    PIPE_BUF, rbytmax = 0;
 	long long reintr = 0, reagain = 0, rerestart = 0;
 	long long rmsize = msgsize;
 	struct pollfd pfd = { fd, (POLLIN | POLLRDNORM), 0 };
 	int rtn, report_count = 0;
 
 	if (niceread)
-		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
+		if (setpriority(PRIO_PROCESS, 0, nicerval) != 0) {
 			perror("setpriority()");
 			goto dead;
 		}
@@ -422,9 +459,21 @@ read_child(int fd)
 			long long errcnt = reagain / report;
 			long long avgsiz = rbytcnt / rmsgcnt;
 
+#if 0
 			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 			ravg_tput = (3 * ravg_tput + thrput) / 4;
-			fprintf(stdout, "%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n", fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax, errcnt, reintr, rerestart);
+#else
+			ravg_msgs =
+			    (ravg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+			ravg_tput =
+			    (ravg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+#endif
+			fprintf(stdout,
+				"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax,
+				errcnt, reintr, rerestart);
 			fflush(stdout);
 			rbytcnt = 0;
 			rmsgcnt = 0;
@@ -480,7 +529,8 @@ read_child(int fd)
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { rmsize, 0, my_msg };
 
-				while (!timer_timeout && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
+				while (!timer_timeout
+				       && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
 					if (rbytcnt < 0)
 						goto dead;
@@ -526,14 +576,15 @@ read_child(int fd)
 int
 write_child(int fd)
 {
-	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin = PIPE_BUF, tbytmax = 0;
+	long long tbytcnt = 0, tmsgcnt = 0, tavg_msgs = 0, tavg_tput = 0, tbytmin =
+	    PIPE_BUF, tbytmax = 0;
 	long long teintr = 0, teagain = 0, terestart = 0;
 	long long tmsize = msgsize;
 	struct pollfd pfd = { fd, (POLLOUT | POLLWRNORM), 0 };
 	int rtn, report_count = 0;
 
 	if (nicesend)
-		if (setpriority(PRIO_PROCESS, 0, 19) != 0) {
+		if (setpriority(PRIO_PROCESS, 0, nicesval) != 0) {
 			perror("setpriority()");
 			goto dead;
 		}
@@ -553,9 +604,21 @@ write_child(int fd)
 			long long errcnt = teagain / report;
 			long long avgsiz = tbytcnt / tmsgcnt;
 
+#if 0
 			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 			tavg_tput = (3 * tavg_tput + thrput) / 4;
-			fprintf(stdout, "%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n", fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax, errcnt, teintr, terestart);
+#else
+			tavg_msgs =
+			    (tavg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+			tavg_tput =
+			    (tavg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+#endif
+			fprintf(stdout,
+				"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
+				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax,
+				errcnt, teintr, terestart);
 			fflush(stdout);
 			tbytcnt = 0;
 			tmsgcnt = 0;
@@ -931,7 +994,8 @@ do_tests(void)
 		int i;
 
 		if (verbose > 1) {
-			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname, fds[0]);
+			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname,
+				fds[0]);
 		}
 		for (i = 0; i < push; i++) {
 			if (ioctl(fds[1], I_PUSH, modname) < 0) {
@@ -1000,8 +1064,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+Affero  General Public License (AGPL)  Version 3,  so long  as  the  software is\n\
+distributed with,  and only used for the  testing of,  OpenSS7 modules, drivers,\n\
 and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -1028,17 +1092,17 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
-Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.9 $ $Date: 2008-04-29 07:11:23 $");
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
+", argv[0], ident);
 }
 
 void
@@ -1077,9 +1141,9 @@ Options:\n\
         Issue M_READ messages.\n\
     -w, --readfill\n\
         Read fill mode.\n\
-    -R, --niceread\n\
+    -R, --niceread [NICE]\n\
         Run read child nice 19.\n\
-    -S, --nicesend\n\
+    -S, --nicesend [NICE]\n\
         Run write child nice 19.\n\
     -F, --full\n\
         Perform full size reads.\n\
@@ -1131,8 +1195,8 @@ main(int argc, char *argv[])
 			{"lowat",	required_argument,	NULL, '\2'},
 			{"mread",	no_argument,		NULL, 'M'},
 			{"readfill",	no_argument,		NULL, 'w'},
-			{"niceread",	no_argument,		NULL, 'R'},
-			{"nicesend",	no_argument,		NULL, 'S'},
+			{"niceread",	optional_argument,	NULL, 'R'},
+			{"nicesend",	optional_argument,	NULL, 'S'},
 			{"full",	no_argument,		NULL, 'F'},
 			{"module",	required_argument,	NULL, 'm'},
 			{"hold",	no_argument,		NULL, 'H'},
@@ -1154,9 +1218,10 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?W:", long_options, &option_index);
+		c = getopt_long(argc, argv, "MwR::S::Fm:Hafp:bs:rt:i:qvhV?W:", long_options,
+				&option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?");
+		c = getopt(argc, argv, "MwR::S::Fm:Hafp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1)
 			break;
@@ -1181,9 +1246,17 @@ main(int argc, char *argv[])
 			break;
 		case 'R':
 			niceread = 1;
+			if (optarg != NULL)
+				nicerval = strtoul(optarg, NULL, 0);
+			else
+				nicerval = 19;
 			break;
 		case 'S':
 			nicesend = 1;
+			if (optarg != NULL)
+				nicesval = strtoul(optarg, NULL, 0);
+			else
+				nicesval = 19;
 			break;
 		case 'F':
 			fullreads = 1;

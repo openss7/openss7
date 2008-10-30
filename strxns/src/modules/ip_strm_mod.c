@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-10-11 04:31:38 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-10-30 18:31:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-11 04:31:38 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.32  2008-10-30 18:31:58  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.31  2008-10-11 04:31:38  brian
  - handle -Wpointer-sign
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-10-11 04:31:38 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-10-30 18:31:58 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2008-10-11 04:31:38 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2008-10-30 18:31:58 $";
 
 #include <sys/os7/compat.h>
 
@@ -98,7 +101,7 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.31 $) $Date: 2008-10-11 04:31:38 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.32 $) $Date: 2008-10-30 18:31:58 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define IP_TO_STREAMS_LICENSE		"GPL"
@@ -400,8 +403,6 @@ ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
  *  @param q pointer to the read queue of the queue pair
  *  @param oflag open flags
  *  @param credp pointer to a credentials structure
- *
- *  
  */
 STATIC int streamscall
 ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
@@ -568,8 +569,10 @@ ip_to_streams_wput(queue_t *q, mblk_t *mp)
 	case M_DATA:
 		if (canputnext(q))	/* data uses flow control */
 			putnext(q, mp);
-		else if (!putq(q, mp))
-			freemsg(mp);
+		else if (!putq(q, mp)) {
+			mp->b_band = 0;
+			putq(q, mp);
+		}
 		break;
 
 	case M_PROTO:
@@ -589,8 +592,10 @@ ip_to_streams_wput(queue_t *q, mblk_t *mp)
 
 			if (canputnext(q))	/* data uses flow control */
 				putnext(q, mp);
-			else if (!putq(q, mp))
-				freemsg(mp);
+			else if (!putq(q, mp)) {
+				mp->b_band = 0;
+				putq(q, mp);
+			}
 			return (0);
 		}
 
@@ -1009,8 +1014,10 @@ ip_to_streams_wsrv(queue_t *q)
 				}
 			} else {
 				netif_stop_queue(dev);
-				if (!putbq(q, mp))
-					freemsg(mp);	/* FIXME */
+				if (!putbq(q, mp)) {
+					mp->b_band = 0;
+					putbq(q, mp);
+				}
 				return (0);	/* quit */
 			}
 			minor_ptr->stats.tx_packets++;
@@ -1062,8 +1069,10 @@ ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 			return (1);
 		}
 
-		if (!putq(q, mp))
-			freemsg(mp);
+		if (!putq(q, mp)) {
+			mp->b_band = 0;
+			putq(q, mp);
+		}
 
 		break;
 
@@ -1073,8 +1082,10 @@ ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 			return (1);
 		}
 
-		if (!putq(q, mp))
-			freemsg(mp);
+		if (!putq(q, mp)) {
+			mp->b_band = 0;
+			putq(q, mp);
+		}
 		break;
 	}
 
@@ -1141,8 +1152,10 @@ ip_to_streams_rput(queue_t *q, mblk_t *mp)
 			/* It will go here if we are not putting to IP */
 			if (canputnext(q))
 				putnext(q, mp);
-			else if (!putq(q, mp))
-				freemsg(mp);
+			else if (!putq(q, mp)) {
+				mp->b_band = 0;
+				putq(q, mp);
+			}
 		}
 		break;
 	}
@@ -1183,16 +1196,20 @@ ip_to_streams_rput(queue_t *q, mblk_t *mp)
 			} else {
 				if (canputnext(q))
 					putnext(q, mp);
-				else if (!putq(q, mp))
-					freemsg(mp);
+				else if (!putq(q, mp)) {
+					mp->b_band = 0;
+					putq(q, mp);
+				}
 			}
 			break;
 
 		default:	/* everything else just goes upstream */
 			if (canputnext(q))
 				putnext(q, mp);
-			else if (!putq(q, mp))
-				freemsg(mp);
+			else if (!putq(q, mp)) {
+				mp->b_band = 0;
+				putq(q, mp);
+			}
 			break;
 
 		}
@@ -1428,8 +1445,10 @@ ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
 		ipptr->stats.tx_packets++;
 	} else {
 		netif_stop_queue(dev);
-		if (!putq(ipptr->dl_wrq, mpt))
-			freemsg(mpt);
+		if (!putq(ipptr->dl_wrq, mpt)) {
+			mpt->b_band = 0;
+			putq(ipptr->dl_wrq, mpt);
+		}
 	}
 
 	if (ip_to_streams_debug_mask & DBG_PUT)

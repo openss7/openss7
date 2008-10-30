@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:35 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:39 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:35 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.10  2008-10-30 18:31:39  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.9  2008-09-22 20:31:35  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:35 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:39 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:35 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:39 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -92,9 +95,13 @@ static char const ident[] =
 #   include <sys/tihdr.h>
 #endif
 
+#include <sys/npi.h>
+#include <net/sock.h>
+#include <net/ip.h>
+
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2008-09-22 20:31:35 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:39 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL"
@@ -209,8 +216,8 @@ tcpns_init_caches(void)
 {
 	if (!tcpns_priv_cachep
 	    && !(tcpns_priv_cachep =
-		 kmem_create_cache(MOD_NAME, sizeof(struct tcpns), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+		 kmem_create_cache(MOD_NAME, sizeof(struct tcpns), 0, SLAB_HWCACHE_ALIGN, NULL, NULL)
+		 )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate tcpns_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);
@@ -297,7 +304,7 @@ tcpns_free_priv(queue_t *q)
 static streamscall int
 tcpns_rput(queue_t *q, mblk_t *mp)
 {
-	struct tcpns *priv = q->q_ptr;
+	// struct tcpns *priv = q->q_ptr;
 
 #if defined LIS
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
@@ -311,7 +318,7 @@ tcpns_rput(queue_t *q, mblk_t *mp)
 	case M_PROTO:
 	case M_PCPROTO:
 	{
-		union T_primitives *p = (union T_primitives * p) mp->b_rptr;
+		union T_primitives *p = (union T_primitives *) mp->b_rptr;
 
 		if (mp->b_wptr < mp->b_rptr + sizeof(p->type))
 			goto fault;
@@ -399,10 +406,180 @@ tcpns_rput(queue_t *q, mblk_t *mp)
 	}
       fault:
 	swerr();
-	return;
+	return (0);
 }
 
 static streamscall int
 tcpns_wput(queue_t *q, mblk_t *mp)
 {
+	return (0);
 }
+
+static streamscall int
+tcpns_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
+{
+	int err = 0;
+
+	if (q->q_ptr != NULL)
+		goto quit;	/* already open */
+	err = ENXIO;
+	if (sflag != MODOPEN || WR(q)->q_next == NULL)
+		goto quit;
+	err = ENOMEM;
+	if (!(tcpns_alloc_priv(q)))
+		goto quit;
+	qprocson(q);
+	return (0);
+      quit:
+	return (err);
+}
+
+/*
+ *  Open and Close
+ */
+static streamscall int
+tcpns_close(queue_t *q, int oflag, cred_t *crp)
+{
+	(void) oflag;
+	(void) crp;
+#if defined LIS
+	/* protect against LiS bugs */
+	if (q->q_ptr == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
+		goto quit;
+	}
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			MOD_NAME, __FUNCTION__);
+		goto free;
+	}
+#endif
+	goto free;
+      free:
+	qprocsoff(q);
+	tcpns_free_priv(q);
+	goto quit;
+      quit:
+	return (0);
+}
+
+/*
+ *  Registration and initialization
+ */
+#ifdef LINUX
+/*
+ *  Linux registration
+ */
+unsigned short modid = MOD_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0444);
+#endif
+MODULE_PARM_DESC(modid, "Module ID for TCPNS module. (0 for allocation.)");
+
+/*
+ *  Linux Fast-STREAMS Registration
+ */
+#ifdef LFS
+
+STATIC struct fmodsw tcpns_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &tcpnsinfo,
+	.f_flag = D_MP,
+	.f_kmod = THIS_MODULE,
+};
+
+STATIC __unlikely int
+tcpns_register_strmod(void)
+{
+	int err;
+
+	if ((err = register_strmod(&tcpns_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+STATIC __unlikely int
+tcpns_unregister_strmod(void)
+{
+	int err;
+
+	if ((err = unregister_strmod(&tcpns_fmod)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LFS */
+
+/*
+ *  Linux STREAMS Registration
+ */
+#ifdef LIS
+
+STATIC __unlikely int
+tcpns_register_strmod(void)
+{
+	int err;
+
+	if ((err = lis_register_strmod(&tcpnsinfo, MOD_NAME)) == LIS_NULL_MID)
+		return (-EIO);
+	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
+		lis_unregister_strmod(&tcpnsinfo);
+		return (err);
+	}
+	return (0);
+}
+
+STATIC __unlikely int
+tcpns_unregister_strmod(void)
+{
+	int err;
+
+	if ((err = lis_unregister_strmod(&tcpnsinfo)) < 0)
+		return (err);
+	return (0);
+}
+
+#endif				/* LIS */
+
+MODULE_STATIC int __init
+tcpnsinit(void)
+{
+	int err;
+
+	cmn_err(CE_NOTE, MOD_BANNER);
+	if ((err = tcpns_init_caches())) {
+		cmn_err(CE_WARN, "%s: could nod init caches, err = %d", MOD_NAME, err);
+		return (err);
+	}
+	if ((err = tcpns_register_strmod())) {
+		cmn_err(CE_WARN, "%s: could not regsiter module, err = %d", MOD_NAME, err);
+		tcpns_term_caches();
+		return (err);
+	}
+	if (modid == 0)
+		modid = err;
+	return (0);
+}
+
+MODULE_STATIC void __exit
+tcpnsterminate(void)
+{
+	int err;
+
+	if ((err = tcpns_unregister_strmod()))
+		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
+	if ((err = tcpns_term_caches()))
+		cmn_err(CE_WARN, "%s: could not terminate caches", MOD_NAME);
+	return;
+}
+
+/*
+ *  Linux Kernel Module Initialization
+ */
+module_init(tcpnsinit);
+module_exit(tcpnsterminate);
+
+#endif				/* LINUX */

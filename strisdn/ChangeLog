@@ -1,5 +1,7 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/dl_lapd.c: rationalize drivers
+
 	* src/include/sys/cci.h: updated headers
 	* src/include/sys/isdni.h: updated headers
 	* src/include/sys/isdni_ioctl.h: updated headers

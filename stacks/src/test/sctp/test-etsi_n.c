@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:27 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-30 18:31:28 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:27 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_n.c,v $
+ Revision 0.9.2.8  2008-10-30 18:31:28  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.7  2008-04-29 07:11:27  brian
  - updating headers for release
 
@@ -108,9 +111,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:27 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-30 18:31:28 $"
 
-static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:27 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-30 18:31:28 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -644,7 +647,7 @@ addr_t addrs[4];
 struct sockaddr_in addrs[4][3];
 #endif				/* SCTP_VERSION_2 */
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -11118,17 +11121,17 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
-Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-etsi_n", PACKAGE, VERSION, "$Revision: 0.9.2.7 $ $Date: 2008-04-29 07:11:27 $");
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
+", argv[0], ident);
 }
 
 void

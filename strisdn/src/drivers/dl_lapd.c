@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:40 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:35 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.11  2008-10-30 18:31:40  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.10  2008-09-22 20:31:35  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:40 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:40 $";
 
 #include <sys/os7/compat.h>
 
@@ -80,7 +83,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-09-22 20:31:35 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-10-30 18:31:40 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -3566,6 +3569,7 @@ lapd_term_caches(void)
 		}
 #else
 		kmem_cache_destroy(dl_priv_cachep);
+		dl_priv_cachep = NULL;
 #endif
 	}
 	if (dl_link_cachep) {
@@ -3579,6 +3583,7 @@ lapd_term_caches(void)
 		}
 #else
 		kmem_cache_destroy(dl_link_cachep);
+		dl_link_cachep = NULL;
 #endif
 	}
 	return (err);

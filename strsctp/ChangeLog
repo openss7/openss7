@@ -1,5 +1,8 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/test/test-sctp.c: rationalize drivers
+	* src/test/test-sctp_ns.c: rationalize drivers
+
 	* src/include/ss7/sctp.h: updated headers
 	* src/include/ss7/sctpi.h: updated headers
 	* src/include/ss7/sctpi_ioctl.h: updated headers

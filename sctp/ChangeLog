@@ -1,3 +1,10 @@
+2008-10-30  Brian Bidulock  <bidulock@openss7.org>
+
+	* test/test-tcpc.c: rationalize drivers and modules
+	* test/test-tcps.c: rationalize drivers and modules
+	* test/test-udpc.c: rationalize drivers and modules
+	* test/test-udps.c: rationalize drivers and modules
+
 2008-10-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* sctp.spec.in: kernel modules in different place

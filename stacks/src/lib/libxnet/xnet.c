@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:39 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-10-30 18:31:07 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-08-20 10:56:39 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnet.c,v $
+ Revision 0.9.2.14  2008-10-30 18:31:07  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.13  2008-08-20 10:56:39  brian
  - fixes and build updates from newnet trip
 
@@ -65,10 +68,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:39 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-10-30 18:31:07 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-08-20 10:56:39 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-10-30 18:31:07 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -382,6 +385,10 @@ struct _t_user {
 
 #ifndef T_ACK
 #define T_ACK (-2)		/**< for now */
+#endif
+
+#ifndef OPEN_MAX
+#define OPEN_MAX 256
 #endif
 
 static struct _t_user *_t_fds[OPEN_MAX] = { NULL, };
@@ -6187,10 +6194,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.13 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.14 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.13 $)
-  * @date \$Date: 2008-08-20 10:56:39 $
+  * @version \$Name:  $(\$Revision: 0.9.2.14 $)
+  * @date \$Date: 2008-10-30 18:31:07 $
   */
 
 /** @} */

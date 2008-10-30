@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:26 $
+ @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:27 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcpc.c,v $
+ Revision 0.9.2.12  2008-10-30 18:31:27  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.11  2008-04-29 07:11:26  brian
  - updating headers for release
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:26 $"
+#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:27 $"
 
-static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 07:11:26 $";
+static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:27 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -179,10 +182,8 @@ test_tcpc(void)
 	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
 	unsigned char my_msg[] =
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.";
+	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.";
 	unsigned char ur_msg[2048];
 
 	fprintf(stderr, "Opening socket\n");
@@ -381,7 +382,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.11 $ $Date: 2008-04-29 07:11:26 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.12 $ $Date: 2008-10-30 18:31:27 $");
 }
 
 void

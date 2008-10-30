@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-10-30 18:31:45 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nsdev.c,v $
+ Revision 0.9.2.41  2008-10-30 18:31:45  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.40  2008-09-22 20:31:43  brian
  - added module version and truncated logs
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-10-30 18:31:45 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-10-30 18:31:45 $";
 
 #define _LFS_SOURCE
 
@@ -79,7 +83,7 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-09-22 20:31:43 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-10-30 18:31:45 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NSDEV_LICENSE	"GPL"
@@ -210,10 +214,8 @@ nsdevopen(struct inode *inode, struct file *file)
 		dev_t dev = makedevice(major, minor);
 		int sflag = (file->f_flags & O_CLONE) ? CLONEOPEN : DRVOPEN;
 
-		_printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 		err = spec_open(file, cdev, dev, sflag);
-		_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-		_ctrace(sdev_put(cdev));
+		sdev_put(cdev);
 	} else
 		err = -ENOENT;
 	return (err);
@@ -290,9 +292,8 @@ nsdev_open(struct inode *inode, struct file *file)
 	major = nsdev_cdev.d_major;
 	modid = nsdev_cdev.d_modid;
 	err = -ENXIO;
-	if (!(cdev = cdev_match(file->f_dentry->d_name.name)))
+	if (!(cdev = cdev_match((char *) file->f_dentry->d_name.name)))
 		goto exit;
-	_printd(("%s: %s: matched device\n", __FUNCTION__, cdev->d_name));
 	err = -ENXIO;
 	if (cdev == &nsdev_cdev)
 		goto cdev_put_exit;	/* would loop */
@@ -300,8 +301,7 @@ nsdev_open(struct inode *inode, struct file *file)
 	dev = makedevice(modid, instance);
 	err = spec_open(file, cdev, dev, CLONEOPEN);
       cdev_put_exit:
-	_printd(("%s: %s: putting device\n", __FUNCTION__, cdev->d_name));
-	_ctrace(sdev_put(cdev));
+	sdev_put(cdev);
       exit:
 	return (err);
 #endif

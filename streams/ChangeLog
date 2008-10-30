@@ -1,5 +1,14 @@
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/echo.c: rationalize drivers
+	* src/drivers/nuls.c: rationalize drivers
+	* src/test/perftest.c: rationalize drivers
+	* src/test/test-fifo.c: rationalize drivers
+	* src/test/test-pipe.c: rationalize drivers
+	* src/test/test-sad.c: rationalize drivers
+	* src/util/fdetach.c: rationalize drivers
+	* src/util/strlogd.c: rationalize drivers
+
 	* doc/man/man2/fattach.2.man: remove trailing space
 	* doc/man/man2/fcntl.2.man: remove trailing space
 	* doc/man/man2/fcntl.2s.man: remove trailing space

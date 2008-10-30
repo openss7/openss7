@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:10 $
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-30 18:31:37 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-28 12:54:10 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fdetach.c,v $
+ Revision 0.9.2.15  2008-10-30 18:31:37  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.14  2008-04-28 12:54:10  brian
  - update file headers for release
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:10 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-30 18:31:37 $"
 
 static char const ident[] =
-    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2008-04-28 12:54:10 $";
+    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-10-30 18:31:37 $";
 
 /* 
  *  SVR 4.2 Utility: fdetach(8)
@@ -115,7 +118,8 @@ usage(int argc, char *argv[])
 		return;
 	fprintf(stderr, "\
 Usage:\n\
-    %1$s [options] [PATH]\n\
+    %1$s [options] {-a|--all}\n\
+    %1$s [options] PATH ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
@@ -129,14 +133,17 @@ help(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 Usage:\n\
-    %1$s [options] [PATH]\n\
+    %1$s [options] {-a|--all}\n\
+    %1$s [options] PATH ...\n\
     %1$s {-h|--help}\n\
     %1$s {-V|--version}\n\
     %1$s {-C|--copying}\n\
 Arguments:\n\
-    PATH\n\
-        the path to the mounted STREAMS-special file\n\
+    PATH ...\n\
+        the path or paths to the mounted STREAMS-special file(s)\n\
 Options:\n\
+    -a, --all\n\
+        detach all paths\n\
     -q, --quiet\n\
         suppress normal output\n\
     -D, --debug [LEVEL]\n\
@@ -198,9 +205,15 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", ident);
 }
 
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
+
 int
 main(int argc, char *argv[])
 {
+	char path[PATH_MAX];
+
 	while (1) {
 		int c, val;
 
@@ -208,6 +221,7 @@ main(int argc, char *argv[])
 		int option_index = 0;
 		/* *INDENT-OFF* */
 		static struct option long_options[] = {
+			{"all",		no_argument,		NULL, 'a'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'D'},
 			{"verbose",	optional_argument,	NULL, 'v'},
@@ -219,9 +233,9 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "qD::v::hVC?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "aqD::v::hVC?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, "qDvhVC?");
+		c = getopt(argc, argv, "aqDvhVC?");
 #endif				/* defined _GNU_SOURCE */
 		if (c == -1) {
 			if (debug)
@@ -231,6 +245,9 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 0:
 			goto bad_usage;
+		case 'a':	/* -a, --all */
+			strcpy(path, "*");
+			break;
 		case 'D':	/* -D, --debug [level] */
 			if (debug)
 				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
@@ -305,18 +322,40 @@ main(int argc, char *argv[])
 			fprintf(stderr, "%s: missing path argument\n", argv[0]);
 		goto bad_nonopt;
 	}
-	if (argc - optind != 1) {
-		if (debug)
-			fprintf(stderr, "%s: too many arguments\n", argv[0]);
-		goto bad_nonopt;
-	}
 	if (debug) {
 		fprintf(stderr, "%s: path = \"%s\"\n", argv[0], argv[optind]);
 	}
-	if (fdetach(argv[optind]) < 0) {
-		if (output || debug)
-			fprintf(stderr, "%s: fdetach(): %s\n", argv[0], strerror(errno));
-		exit(1);
+	if (strcmp(path, "*") == 0) {
+		if (optind < argc)
+			goto bad_nonopt;
+		if (fdetach("*") < 0) {
+			if (output)
+				fprintf(stderr, "%s: -a failed: %s\n", argv[0], strerror(errno));
+			exit(1);
+		} else {
+			if (output > 1)
+				printf("%s: -a OK\n", argv[0]);
+		}
+	} else {
+		if (optind == argc) {
+			if (output)
+				fprintf(stderr, "%s: missing path\n", argv[0]);
+			goto bad_usage;
+		}
+		while (optind < argc) {
+			strcpy(path, argv[optind++]);
+
+			if (fdetach(path) < 0) {
+				if (output)
+					fprintf(stderr, "fdetach( \"%s\" ) failed: %s\n", path,
+						strerror(errno));
+				exit(1);
+			} else {
+				if (output > 1)
+					printf("fdetach( \"%s\" ) OK\n", path);
+			}
+		}
 	}
+
 	exit(0);
 }

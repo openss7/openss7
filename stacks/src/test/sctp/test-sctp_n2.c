@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:28 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-30 18:31:30 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:28 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n2.c,v $
+ Revision 0.9.2.8  2008-10-30 18:31:30  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.7  2008-04-29 07:11:28  brian
  - updating headers for release
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:28 $"
+#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-30 18:31:30 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-29 07:11:28 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-10-30 18:31:30 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -5192,15 +5195,18 @@ postamble_1_data_xfer(int child)
 	DATA_buffer = NULL;
 	DATA_length = 0;
 
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT * (1 + child), __TEST_DISCON_IND) == __RESULT_SUCCESS)
 		goto cannot_disconnect;
 	state++;
 	if (do_signal(child, __TEST_DISCON_REQ) != __RESULT_SUCCESS)
 		goto cannot_disconnect;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
-		if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
-			failed = (failed == -1) ? state : failed;
+		/* Note: disconnect indication could have flushed our disconnect request before
+		   acknowledgement */
+		if (last_event != __TEST_DISCON_IND)
+			if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
+				failed = (failed == -1) ? state : failed;
 	}
       cannot_disconnect:
 	state++;
@@ -5220,7 +5226,7 @@ postamble_1_refuse(int child)
 
 	if (child != 2)
 		goto cannot_refuse;
-	if (expect(child, SHORT_WAIT, __TEST_DISCON_IND) == __RESULT_SUCCESS)
+	if (expect(child, SHORT_WAIT * (1 + child), __TEST_DISCON_IND) == __RESULT_SUCCESS)
 		goto cannot_refuse;
 	state++;
 	ADDR_buffer = NULL;
@@ -5232,8 +5238,11 @@ postamble_1_refuse(int child)
 		goto cannot_refuse;
 	state++;
 	if (expect(child, NORMAL_WAIT, __TEST_OK_ACK) != __RESULT_SUCCESS) {
-		if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
-			failed = (failed == -1) ? state : failed;
+		/* Note: disconnect indication could have flushed our disconnect request before
+		   acknowledgement */
+		if (last_event != __TEST_DISCON_IND)
+			if (last_event != __TEST_ERROR_ACK || NPI_error != NOUTSTATE)
+				failed = (failed == -1) ? state : failed;
 	}
       cannot_refuse:
 	state++;
@@ -9645,8 +9654,6 @@ test_case_3_6_1(int child)
 			goto failure;
 		state++;
 	}
-	test_msleep(child, LONG_WAIT);
-	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -11871,17 +11878,17 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
-Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.7 $ $Date: 2008-04-29 07:11:28 $");
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    incorporated here by reference.\n\
+\n\
+    See `%1$s --copying' for copying permission.\n\
+\n\
+", argv[0], ident);
 }
 
 void

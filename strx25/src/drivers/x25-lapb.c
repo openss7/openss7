@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 21:22:40 $
+ @(#) $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-30 18:31:49 $
 
  -----------------------------------------------------------------------------
 
@@ -46,18 +46,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-05-03 21:22:40 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-lapb.c,v $
+ Revision 0.9.2.2  2008-10-30 18:31:49  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.1  2008-05-03 21:22:40  brian
  - updates for release
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x25-lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 21:22:40 $"
+#ident "@(#) $RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-30 18:31:49 $"
 
-static char const ident[] = "$RCSfile: x25-lapb.c,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.1 $) $Date: 2008-05-03 21:22:40 $";
+static char const ident[] =
+    "$RCSfile: x25-lapb.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2008-10-30 18:31:49 $";
 
-
+/*
+ *  Here is an X.25 lapb (SLP and MLP) driver.  This is a DLPI driver that can push over or link a
+ *  CDI stream.  CDI streams can be CD_HLDC or CD_LAN.  CD_HDLC streams need to be raw packet
+ *  streams.  This driver will use LAPB over these streams as described in X.25 Clause 2.  CD_LAN
+ *  streams need to be raw packet streams with or without SNAP headers.  This driver will use LLC2
+ *  over these streams as described under ISO/IEC 8881.
+ */

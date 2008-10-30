@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-09-22 20:31:30 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-30 18:31:35 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:30 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nuls.c,v $
+ Revision 0.9.2.61  2008-10-30 18:31:35  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.60  2008-09-22 20:31:30  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-09-22 20:31:30 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-30 18:31:35 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-09-22 20:31:30 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-30 18:31:35 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -83,7 +86,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2008-09-22 20:31:30 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2008-10-30 18:31:35 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -95,7 +98,7 @@ static char const ident[] =
 #define NULS_SPLASH	NULS_DEVICE	" - " \
 			NULS_REVISION	"\n"
 
-#if defined LiS && defined MODULE
+#if defined LIS && defined MODULE
 #define CONFIG_STREAMS_NULS_MODULE MODULE
 #endif
 
@@ -192,8 +195,6 @@ static struct module_stat nuls_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES
 static struct module_stat nuls_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 #ifdef LIS
-#define pswerr(__x) while (0) { }
-
 union ioctypes {
 	struct iocblk iocblk;
 	struct copyreq copyreq;
@@ -317,7 +318,6 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				else {
 					spin_unlock(&nuls_lock);
 					kmem_free(p, sizeof(*p));
-					pswerr(("%s: stream already open!\n", __FUNCTION__));
 					return (EIO);	/* bad error */
 				}
 			}
@@ -338,7 +338,6 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		return (0);
 	}
 	}
-	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
 
@@ -348,7 +347,6 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 	struct nuls *p;
 
 	if ((p = q->q_ptr) == NULL) {
-		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
 	}
 	qprocsoff(q);

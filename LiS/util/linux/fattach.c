@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.12.7 $) $Date: 2008-04-29 08:33:28 $
+ @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2008-10-30 18:31:03 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:28 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fattach.c,v $
+ Revision 1.1.1.1.12.8  2008-10-30 18:31:03  brian
+ - rationalized drivers, modules and test programs
+
  Revision 1.1.1.1.12.7  2008-04-29 08:33:28  brian
  - update headers for Affero release
 
@@ -58,17 +62,12 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.12.7 $) $Date: 2008-04-29 08:33:28 $"
+#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2008-10-30 18:31:03 $"
 
 static char const ident[] =
-    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.12.7 $) $Date: 2008-04-29 08:33:28 $";
+    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2008-10-30 18:31:03 $";
 
-/*
- *  fattach.c - try to fattach a list of paths to a path naming a STREAMS
- *  device, or to the ends of a pipe.
- *
- *  Copyright (C) 2000  John A. Boyd Jr.  protologos, LLC
- */
+#define _XOPEN_SOURCE 600
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -89,100 +88,51 @@ static char const ident[] =
 #include <sys/sysmacros.h>
 #include <sys/ioctl.h>
 
-int output = 1;
+static int debug = 0;			/* default no debug */
+static int output = 1;			/* default normal output */
 
-void
-copying(int argc, char *argv[])
-{
-	if (!output)
-		return;
-	fprintf(stdout, "\
-\n\
-%1$s %2$s:\n\
-\n\
-Copyright (c) 2003-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
-\n\
-All Rights Reserved.\n\
-\n\
-This program is free software;  you can  redistribute  it and/or modify it under\n\
-the terms of the GNU General  Public License as  published by the  Free Software\n\
-Foundation; version 3 of the License.\n\
-\n\
-This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
-WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
-\n\
-You should  have received  a copy of the GNU  General  Public License along with\n\
-this program.  If not, see <http://www.gnu.org/licenses/>,  or write to the Free\n\
-Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
-\n\
-U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
-of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
-If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
-fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
-Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
-regulations) and the  Government  is acquiring  only the license rights  granted\n\
-herein (the license  rights customarily  provided to non-Government  users).  If\n\
-the Software is supplied to any unit or agency of the Government other than DoD,\n\
-it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
-in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
-Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
-paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
-regulations).\n\
-\n\
-", argv[0], ident);
-}
-
-void
+static void
 version(int argc, char *argv[])
 {
-	if (!output)
+	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
-\n\
-%1$s %2$s:\n\
-    Copyright (c) 2003-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
-\n\
-    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
-    included here by reference.\n\
-\n\
-    See `%1$s --copying' for copying permissions.\n\
-\n\
+%2$s\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under AGPL Version 3, included here by reference.\n\
+See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
 
-void
+static void
 usage(int argc, char *argv[])
 {
-	if (!output)
+	if (!output && !debug)
 		return;
 	fprintf(stderr, "\
 Usage:\n\
     %1$s [options] -p PATH ...\n\
     %1$s [options] -c PATH ...\n\
     %1$s [options] DEVICE PATH ...\n\
-    %1$s {-h,--help}\n\
-    %1$s {-V,--version}\n\
-    %1$s {-C,--copying}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 ", argv[0]);
 }
 
-void
+static void
 help(int argc, char *argv[])
 {
-	if (!output)
+	if (!output && !debug)
 		return;
 	fprintf(stdout, "\
-\n\
 Usage:\n\
     %1$s [options] -p PATH ...\n\
     %1$s [options] -c PATH ...\n\
     %1$s [options] DEVICE PATH ...\n\
-    %1$s {-h,--help}\n\
-    %1$s {-V,--version}\n\
-    %1$s {-C,--copying}\n\
+    %1$s {-h|--help}\n\
+    %1$s {-V|--version}\n\
+    %1$s {-C|--copying}\n\
 Arguments:\n\
     DEVICE\n\
         the STREAMS device to open and attach\n\
@@ -200,23 +150,71 @@ Options:\n\
         apply the umask after attaching to PATH\n\
     -M, --mode MODE\n\
         apply mode MODE after attaching to PATH\n\
-    -v, --verbose\n\
-        verbose output\n\
     -q, --quiet\n\
         suppress normal output\n\
+    -D, --debug [LEVEL]\n\
+        increment or set debug LEVEL (default: 0)\n\
+    -v, --verbose [LEVEL]\n\
+        increment or set output verbosity LEVEL (default: 1)\n\
     -h, --help, -?\n\
-        print this usage message and exit\n\
+        print this usage information and exit\n\
     -V, --version\n\
-        print version and exit\n\
+        print the version and exit\n\
     -C, --copying\n\
         print copying permission and exit\n\
-\n\
 ", argv[0]);
+}
+
+static void
+copying(int argc, char *argv[])
+{
+	if (!output && !debug)
+		return;
+	fprintf(stdout, "\
+--------------------------------------------------------------------------------\n\
+%1$s\n\
+--------------------------------------------------------------------------------\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+\n\
+All Rights Reserved.\n\
+--------------------------------------------------------------------------------\n\
+This program is free software; you can  redistribute  it and/or modify  it under\n\
+the terms of the GNU Affero General Public License as published by the Free\n\
+Software Foundation; Version 3 of the License.\n\
+\n\
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
+\n\
+You should have received a copy of the GNU  Affero  General Public License along\n\
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
+--------------------------------------------------------------------------------\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
+the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
+as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the  license rights granted\n\
+herein (the license rights customarily provided to non-Government users). If the\n\
+Software is supplied to any unit or agency of the Government  other than DoD, it\n\
+is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
+Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
+regulations).\n\
+--------------------------------------------------------------------------------\n\
+Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
+Corporation at a fee.  See http://www.openss7.com/\n\
+--------------------------------------------------------------------------------\n\
+", ident);
 }
 
 #ifndef PATH_MAX
 #define PATH_MAX 4096
 #endif
+
 int
 main(int argc, char *argv[])
 {
@@ -228,38 +226,41 @@ main(int argc, char *argv[])
 
 	um = umask(0);
 	umask(um);
-
 	for (;;) {
-		int c;
+		int c, val;
 
-#ifdef _GNU_SOURCE
+#if defined _GNU_SOURCE
 		int option_index = 0;
-	/* *INDENT-OFF* */
-	static struct option long_options[] = {
-	    { "umask",	 no_argument,	    NULL, 'u' },
-	    { "mode",	 optional_argument, NULL, 'M' },
-	    { "pipe",	 no_argument,	    NULL, 'p' },
-	    { "connld",	 no_argument,	    NULL, 'c' },
-	    { "verbose", no_argument,	    NULL, 'v' },
-	    { "quiet",	 no_argument,	    NULL, 'q' },
-	    { "version", no_argument,	    NULL, 'V' },
-	    { "copying", no_argument,	    NULL, 'C' },
-	    { "help",	 no_argument,	    NULL, 'h' },
-	    { "?",	 no_argument,	    NULL, 'h' },
-	    { 0, }
-	};
-	/* *INDENT-ON* */
+		/* *INDENT-OFF* */
+		static struct option long_options[] = {
+			{"umask",	no_argument,		NULL, 'u'},
+			{"mode",	optional_argument,	NULL, 'M'},
+			{"pipe",	no_argument,		NULL, 'p'},
+			{"connld",	no_argument,		NULL, 'c'},
+			{"quiet",	no_argument,		NULL, 'q'},
+			{"debug",	optional_argument,	NULL, 'D'},
+			{"verbose",	optional_argument,	NULL, 'v'},
+			{"help",	no_argument,		NULL, 'h'},
+			{"version",	no_argument,		NULL, 'V'},
+			{"copying",	no_argument,		NULL, 'C'},
+			{"?",		no_argument,		NULL, 'H'},
+			{ 0, }
+		};
+		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "muM:pcvqVCh?", long_options, &option_index);
-#else				/* _GNU_SOURCE */
-		c = getopt(argc, argv, "muM:pcvqVCh?");
-#endif				/* _GNU_SOURCE */
-		if (c == -1)
+		c = getopt_long_only(argc, argv, "muM:pcqD::v::hVC?W:", long_options,
+				     &option_index);
+#else				/* defined _GNU_SOURCE */
+		c = getopt(argc, argv, "muM:pcqDvhVC?");
+#endif				/* defined _GNU_SOURCE */
+		if (c == -1) {
+			if (debug)
+				fprintf(stderr, "%s: done options processing\n", argv[0]);
 			break;
+		}
 		switch (c) {
 		case 0:
-			usage(argc, argv);
-			exit(2);
+			goto bad_usage;
 		case 'm':	/* -m */
 			use_mode = 1;
 			break;
@@ -283,49 +284,88 @@ main(int argc, char *argv[])
 			push_connld = use_pipe = use_new_mode = 1;
 			new_mode[0] = new_mode[1] = (0666 & ~um);
 			break;
-		case 'v':	/* -v, --verbose */
-			output += 1;
+		case 'D':	/* -D, --debug [level] */
+			if (debug)
+				fprintf(stderr, "%s: increasing debug verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				debug++;
+			} else {
+				if ((val = strtol(optarg, NULL, 0)) < 0)
+					goto bad_option;
+				debug = val;
+			}
 			break;
 		case 'q':	/* -q, --quiet */
+			if (debug)
+				fprintf(stderr, "%s: suppressing normal output\n", argv[0]);
+			debug = 0;
 			output = 0;
 			break;
-		case 'h':	/* -h, --help, -?, --? */
+		case 'v':	/* -v, --verbose [level] */
+			if (debug)
+				fprintf(stderr, "%s: increasing output verbosity\n", argv[0]);
+			if (optarg == NULL) {
+				output++;
+				break;
+			}
+			if ((val = strtol(optarg, NULL, 0)) < 0)
+				goto bad_option;
+			output = val;
+			break;
+		case 'h':	/* -h, --help */
+		case 'H':	/* -H, --? */
+			if (debug)
+				fprintf(stderr, "%s: printing help message\n", argv[0]);
 			help(argc, argv);
 			exit(0);
 		case 'V':	/* -V, --version */
+			if (debug)
+				fprintf(stderr, "%s: printing version message\n", argv[0]);
 			version(argc, argv);
 			exit(0);
 		case 'C':	/* -C, --copying */
+			if (debug)
+				fprintf(stderr, "%s: printing copying message\n", argv[0]);
 			copying(argc, argv);
 			exit(0);
-		default:
 		case '?':
+		default:
+		      bad_option:
 			optind--;
-			if (optind < argc && output) {
-				fprintf(stderr, "%s: illegal syntax -- ", argv[0]);
-				for (; optind < argc; optind++)
-					fprintf(stderr, "%s ", argv[optind]);
-				fprintf(stderr, "\n");
+		      bad_nonopt:
+			if (output || debug) {
+				if (optind < argc) {
+					fprintf(stderr, "%s: syntax error near '", argv[0]);
+					while (optind < argc)
+						fprintf(stderr, "%s ", argv[optind++]);
+					fprintf(stderr, "'\n");
+				} else {
+					fprintf(stderr, "%s: missing option or argument", argv[0]);
+					fprintf(stderr, "\n");
+				}
+				fflush(stderr);
+			      bad_usage:
+				usage(argc, argv);
 			}
-		      bad_usage:
-			usage(argc, argv);
 			exit(2);
 		}
 	}
+	/* 
+	 * dont' ignore non-option arguments
+	 */
 	if (argc - optind < 1) {
-		if (output)
+		if (output || debug)
 			fprintf(stderr, "%s: missing path", argv[0]);
-		goto bad_usage;
+		goto bad_nonopt;
 	}
 	if (argc - optind < 2 && !use_pipe) {
-		if (output)
+		if (output || debug)
 			fprintf(stderr, "%s: missing streams device name", argv[0]);
-		goto bad_usage;
+		goto bad_nonopt;
 	}
-
 	if (use_pipe) {
 		if (pipe(fd) < 0) {
-			if (output)
+			if (output || debug)
 				fprintf(stderr, "pipe() failed: %s\n", strerror(errno));
 			exit(1);
 		}
@@ -337,7 +377,7 @@ main(int argc, char *argv[])
 		}
 		if (push_connld) {
 			if (ioctl(fd[0], I_PUSH, "connld") < 0) {
-				if (output)
+				if (output || debug)
 					fprintf(stderr, "ioctl( %d, I_PUSH, connld ) failed: %s\n",
 						fd[0], strerror(errno));
 				exit(1);
@@ -345,15 +385,14 @@ main(int argc, char *argv[])
 		}
 	} else {
 		strcpy(path, argv[optind++]);
-
 		if ((fd[0] = open(path, O_RDONLY | O_NONBLOCK)) < 0) {
-			if (output)
+			if (output || debug)
 				fprintf(stderr, "open failed for device %s: %s (%d)\n", path,
 					strerror(errno), errno);
 			exit(1);
 		}
 		if (!isastream(fd[0])) {
-			if (output)
+			if (output || debug)
 				fprintf(stderr, "\"%s\" is not a STREAMS device\n", path);
 			exit(1);
 		}
@@ -363,15 +402,13 @@ main(int argc, char *argv[])
 				new_mode[0] = new_mode[1] = st.st_mode;
 		}
 	}
-
-	if (output > 1) {
+	if (debug) {
 		if (use_pipe) {
 			fstat(fd[0], &st);
 			printf("pipe() fd[0]=%d mode 0%o dev 0x%x rdev 0x%x", fd[0],
 			       (int) st.st_mode, (int) st.st_dev, (int) st.st_rdev);
 			printf("%s", (push_connld ? " <connld>" : ""));
 			printf(" [%s]\n", (isastream(fd[0]) ? "STREAM" : "Linux"));
-
 			fstat(fd[1], &st);
 			printf("pipe() fd[1]=%d mode 0%o dev 0x%x rdev 0x%x", fd[1],
 			       (int) st.st_mode, (int) st.st_dev, (int) st.st_rdev);
@@ -382,27 +419,23 @@ main(int argc, char *argv[])
 			       (int) st.st_mode, (int) st.st_dev, (int) st.st_rdev);
 		}
 	}
-
 	x = 0;
 	while (argc > optind) {
 		strcpy(path, argv[optind++]);
-
 		if (use_mode && !use_new_mode)
 			if (!(stat(path, &st) < 0))
 				new_mode[x] = st.st_mode;
-
 		if (fattach(fd[x], path) < 0) {
-			if (output)
+			if (output || debug)
 				fprintf(stderr, "fattach( %d, \"%s\" ) failed: %s\n", fd[x], path,
 					strerror(errno));
 			exit(1);
 		} else {
-			if (output > 1)
+			if (debug)
 				printf("fattach( %d, \"%s\" ) OK\n", fd[x], path);
 		}
 		x ^= 1;
 	}
-
 	if (use_mode || use_new_mode)
 		fchmod(fd[0], new_mode[0]);
 	close(fd[0]);
@@ -411,6 +444,5 @@ main(int argc, char *argv[])
 			fchmod(fd[1], new_mode[1]);
 		close(fd[1]);
 	}
-
 	exit(0);
 }

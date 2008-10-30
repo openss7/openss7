@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-30 18:31:01 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:30:53 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nuls.c,v $
+ Revision 0.9.2.18  2008-10-30 18:31:01  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.17  2008-09-22 20:30:53  brian
  - added module version and truncated logs
 
@@ -59,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-30 18:31:01 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-30 18:31:01 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -83,7 +86,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2008-09-22 20:30:53 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-30 18:31:01 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL"
@@ -192,11 +195,6 @@ static struct module_stat nuls_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES
 static struct module_stat nuls_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 #ifdef LIS
-#define _trace() while (0) { }
-#define _ptrace(__x) while (0) { }
-#define _printd(__x) while (0) { }
-#define pswerr(__x) while (0) { }
-
 union ioctypes {
 	struct iocblk iocblk;
 	struct copyreq copyreq;
@@ -212,7 +210,6 @@ nuls_put(queue_t *q, mblk_t *mp)
 {
 	int err = 0;
 
-	_trace();
 	switch (mp->b_datap->db_type) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
@@ -286,33 +283,25 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 
-	_ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
-		 sflag));
 	if (q->q_ptr != NULL) {
-		_printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */
 	}
 	if (sflag == MODOPEN || WR(q)->q_next) {
-		_printd(("%s: cannot open as module\n", __FUNCTION__));
 		return (ENXIO);	/* can't open as module */
 	}
 	if (!(p = kmem_alloc(sizeof(*p), KM_NOSLEEP))) {	/* we could sleep */
-		_printd(("%s: could not allocate private structure\n", __FUNCTION__));
 		return (ENOMEM);	/* no memory */
 	}
 	bzero(p, sizeof(*p));
 	switch (sflag) {
 	case CLONEOPEN:
-		_printd(("%s: clone open\n", __FUNCTION__));
 		if (cminor < 1)
 			cminor = 1;
 	case DRVOPEN:
 	{
 		major_t dmajor = cmajor;
 
-		_printd(("%s: driver open\n", __FUNCTION__));
 		if (cminor < 1) {
-			_printd(("%s: attempt to open minor zero non-clone\n", __FUNCTION__));
 			return (ENXIO);
 		}
 		spin_lock(&nuls_lock);
@@ -329,7 +318,6 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				else {
 					spin_unlock(&nuls_lock);
 					kmem_free(p, sizeof(*p));
-					pswerr(("%s: stream already open!\n", __FUNCTION__));
 					return (EIO);	/* bad error */
 				}
 			}
@@ -337,7 +325,6 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (getminor(makedevice(cmajor, cminor)) == 0) {	/* no minors left */
 			spin_unlock(&nuls_lock);
 			kmem_free(p, sizeof(*p));
-			_printd(("%s: no minor devices left\n", __FUNCTION__));
 			return (EBUSY);	/* no minors left */
 		}
 		p->dev = *devp = makedevice(cmajor, cminor);
@@ -348,11 +335,9 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		q->q_ptr = OTHERQ(q)->q_ptr = p;
 		spin_unlock(&nuls_lock);
 		qprocson(q);
-		_printd(("%s: opened major %hu, minor %hu\n", __FUNCTION__, cmajor, cminor));
 		return (0);
 	}
 	}
-	pswerr(("%s: bad sflag %d\n", __FUNCTION__, sflag));
 	return (ENXIO);
 }
 
@@ -361,9 +346,7 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct nuls *p;
 
-	_trace();
 	if ((p = q->q_ptr) == NULL) {
-		pswerr(("%s: already closed\n", __FUNCTION__));
 		return (0);	/* already closed */
 	}
 	qprocsoff(q);
@@ -374,7 +357,6 @@ nuls_close(queue_t *q, int oflag, cred_t *crp)
 	p->prev = &p->next;
 	q->q_ptr = OTHERQ(q)->q_ptr = NULL;
 	spin_unlock(&nuls_lock);
-	_printd(("%s: closed stream with read queue %p\n", __FUNCTION__, q));
 	return (0);
 }
 

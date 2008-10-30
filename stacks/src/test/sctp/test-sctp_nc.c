@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:29 $
+ @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:30 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:29 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_nc.c,v $
+ Revision 0.9.2.10  2008-10-30 18:31:30  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.9  2008-04-29 07:11:29  brian
  - updating headers for release
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:29 $"
+#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:30 $"
 
-static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-04-29 07:11:29 $";
+static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2008-10-30 18:31:30 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -573,8 +576,8 @@ splash(int argc, char *argv[])
 	fprintf(stdout, "\
 RFC 2960 SCTP - OpenSS7 STREAMS SCTP - Conformance Test Suite\n\
 \n\
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -625,17 +628,13 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock\n\
+%1$s:\n\
+    %2$s\n\
+    Copyright (c) 2001-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
-Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
-This is free software; see the source for copying conditions.  There is NO\n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-\n\
-Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sctp_nc", PACKAGE, VERSION, "$Revision: 0.9.2.9 $ $Date: 2008-04-29 07:11:29 $");
+    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
+    incorporated here by reference.\n\
+", argv[0], ident);
 }
 
 void
@@ -703,7 +702,7 @@ main(int argc, char **argv)
 	char hostbufr[HOST_BUF_LEN];
 	char **hostlp = &hostl;
 	char **hostrp = &hostr;
-	short portl = TEST_PORT_NUMBER;
+	short portl = TEST_PORT_NUMBER + 0;
 	short portr = TEST_PORT_NUMBER + 1;
 	struct hostent *haddr;
 

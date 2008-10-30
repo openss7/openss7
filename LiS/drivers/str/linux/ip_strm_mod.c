@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2008-04-29 08:33:12 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2008-10-30 18:31:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:12 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 1.1.1.3.4.11  2008-10-30 18:31:02  brian
+ - rationalized drivers, modules and test programs
+
  Revision 1.1.1.3.4.10  2008-04-29 08:33:12  brian
  - update headers for Affero release
 
@@ -58,7 +61,175 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2008-04-29 08:33:12 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2008-10-30 18:31:02 $"
+
+static char const ident[] =
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2008-10-30 18:31:02 $";
+
+#include <sys/os7/compat.h>
+
+#include <linux/slab.h>
+
+#include <linux/bitops.h>
+#include <linux/net.h>
+#include <linux/in.h>
+
+#include <linux/netdevice.h>
+#include <linux/etherdevice.h>
+#include <linux/skbuff.h>
+#include <linux/ethtool.h>
+#include <linux/delay.h>
+#include <linux/types.h>
+#include <linux/if_arp.h>
+
+#include <sys/dlpi.h>
+
+#undef WITH_32BIT_COMPATIBILITY
+#if defined LFS && defined __LP64__
+#define WITH_32BIT_COMPATIBILITY 1
+#endif
+
+#define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
+#define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
+#define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 1.1.1.3.4.11 $) $Date: 2008-10-30 18:31:02 $"
+#define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
+#define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
+#define IP_TO_STREAMS_LICENSE		"GPL"
+#define IP_TO_STREAMS_BANNER		IP_TO_STREAMS_DESCRIP	"\n" \
+					IP_TO_STREAMS_EXTRA	"\n" \
+					IP_TO_STREAMS_REVISION	"\n" \
+					IP_TO_STREAMS_COPYRIGHT	"\n" \
+					IP_TO_STREAMS_DEVICE	"\n" \
+					IP_TO_STREAMS_CONTACT
+#define IP_TO_STREAMS_SPLASH		IP_TO_STREAMS_DEVICE	"\n" \
+					IP_TO_STREAMS_REVISION
+
+#ifdef LINUX
+MODULE_AUTHOR(IP_TO_STREAMS_CONTACT);
+MODULE_DESCRIPTION(IP_TO_STREAMS_DESCRIP);
+MODULE_SUPPORTED_DEVICE(IP_TO_STREAMS_DEVICE);
+#ifdef MODULE_LICENSE
+MODULE_LICENSE(IP_TO_STREAMS_LICENSE);
+#endif				/* MODULE_LICENSE */
+#if defined MODULE_ALIAS
+MODULE_ALIAS("streams-ip_strm_mod");
+#endif
+#ifdef MODULE_VERSION
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
+	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+#endif
+#endif				/* LINUX */
+
+#ifdef LFS
+#define IP_TO_STREAMS_MOD_ID	CONFIG_STREAMS_IP_TO_STREAMS_MODID
+#define IP_TO_STREAMS_MOD_NAME	CONFIG_STREAMS_IP_TO_STREAMS_NAME
+#endif				/* LFS */
+
+#define MOD_ID		IP_TO_STREAMS_MOD_ID
+#define MOD_NAME	IP_TO_STREAMS_MOD_NAME
+
+#ifdef MODULE
+#define MOD_BANNER	IP_TO_STREAMS_BANNER
+#else				/* MODULE */
+#define MOD_BANNER	IP_TO_STREAMS_SPLASH
+#endif				/* MODULE */
+
+STATIC struct module_info ip_to_streams_minfo = {
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 20000,		/* Hi water mark */
+	.mi_lowat = 2000,		/* Lo water mark */
+};
+
+STATIC int streamscall ip_to_streams_open(queue_t *, dev_t *, int, int, cred_t *);
+STATIC int streamscall ip_to_streams_close(queue_t *, int, cred_t *);
+
+STATIC int streamscall ip_to_streams_rput(queue_t *, mblk_t *);
+STATIC int streamscall ip_to_streams_rsrv(queue_t *);
+STATIC int streamscall ip_to_streams_wput(queue_t *, mblk_t *);
+STATIC int streamscall ip_to_streams_wsrv(queue_t *);
+
+STATIC struct qinit ip_to_streams_rinit = {
+	.qi_putp = ip_to_streams_rput,	/* Read put (message from below) */
+	.qi_srvp = ip_to_streams_rsrv,	/* Read service */
+	.qi_qopen = ip_to_streams_open,	/* Each open */
+	.qi_qclose = ip_to_streams_close,	/* Last close */
+	.qi_minfo = &ip_to_streams_minfo,	/* Information */
+};
+
+STATIC struct qinit ip_to_streams_winit = {
+	.qi_putp = ip_to_streams_wput,	/* Read put (message from below) */
+	.qi_srvp = ip_to_streams_wsrv,	/* Read service */
+	.qi_minfo = &ip_to_streams_minfo,	/* Information */
+};
+
+STATIC struct streamtab ip_to_streams_info = {
+	.st_rdinit = &ip_to_streams_rinit,	/* Upper read queue */
+	.st_wrinit = &ip_to_streams_winit,	/* Upper write queue */
+};
+
+#if !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER
+#if !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER
+static inline unsigned char *skb_tail_pointer(const struct sk_buff *skb)
+{
+	return skb->tail;
+}
+static inline unsigned char *skb_end_pointer(const struct sk_buff *skb)
+{
+	return skb->end;
+}
+static inline unsigned char *skb_transport_header(const struct sk_buff *skb)
+{
+	return skb->h.raw;
+}
+static inline unsigned char *skb_network_header(const struct sk_buff *skb)
+{
+	return skb->nh.raw;
+}
+static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+{
+	return skb->mac.raw;
+}
+static inline void skb_reset_tail_pointer(struct sk_buff *skb)
+{
+	skb->tail = skb->data;
+}
+static inline void skb_reset_end_pointer(struct sk_buff *skb)
+{
+	skb->end = skb->data;
+}
+static inline void skb_reset_transport_header(struct sk_buff *skb)
+{
+	skb->h.raw = skb->data;
+}
+static inline void skb_reset_network_header(struct sk_buff *skb)
+{
+	skb->nh.raw = skb->data;
+}
+static inline void skb_reset_mac_header(struct sk_buff *skb)
+{
+	skb->mac.raw = skb->data;
+}
+static inline void skb_set_transport_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_transport_header(skb);
+	skb->h.raw += offset;
+}
+static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_network_header(skb);
+	skb->nh.raw += offset;
+}
+static inline void skb_set_mac_header(struct sk_buff *skb, const int offset)
+{
+	skb_reset_mac_header(skb);
+	skb->mac.raw += offset;
+}
+#endif				/* !defined HAVE_KFUNC_SKB_TRANSPORT_HEADER */
+#endif				/* !defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 
 /************************************************************************
 *									*
@@ -98,94 +269,18 @@
  * tear down the whole thing by closing the streams file.
  */
 
-/************************************************************************
-*                              SCCS ID                                  *
-*************************************************************************
-*									*
-* The following strings identify this module as to version info.	*
-*									*
-************************************************************************/
-
-/*
- * C language includes
- */
-
-/*
- * UNIX includes
- */
-#include <sys/stream.h>
-#include <sys/stropts.h>
-#include <linux/ioctl.h>
-#include <linux/types.h>
-#include <sys/cmn_err.h>
-#include <linux/errno.h>
-#include <sys/dlpi.h>
-#include <sys/npi.h>
-#include <sys/tihdr.h>
-
-/*
- * These interfere with sock.h in 2.1 kernel
- */
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
-
-/*
- * ASSERT, which we don't use, interferes with irda.
- */
-#ifdef ASSERT
-#undef ASSERT
-#endif
- /* 
-  * Likewise queue_t
-  */
-#define queue_t	irda_queue_t
-
-#include <linux/termios.h>
-#include <linux/in.h>
-
-#  include <sys/mkdev.h>
-#  include <sys/ddi.h>
-# ifdef RH_71_KLUDGE		/* boogered up incls in 2.4.2 */
-#  undef CONFIG_HIGHMEM		/* b_page has semi-circular reference */
+#ifdef LFS
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
+#define	KERNEL_2_0
+#else
+#define	KERNEL_2_1
+# if LINUX_VERSION_CODE > KERNEL_VERSION(2,3,0)
+# define KERNEL_2_3
 # endif
-#include <linux/skbuff.h>
+#endif
+#endif
 
-/* #include <linux/autoconf.h> */
-#include <linux/kernel.h>
-#include <linux/param.h>
-/*
-#include <linux/sched.h>
-*/
-#include <linux/interrupt.h>
-#include <linux/fs.h>
-#include <linux/types.h>
-#include <linux/string.h>
-#include <linux/socket.h>
-#include <linux/fcntl.h>
-#include <linux/in.h>
-#include <linux/if.h>
-
-#include <asm/system.h>
-#include <asm/segment.h>
-#include <asm/io.h>
-
-#include <linux/inet.h>
-#include <linux/netdevice.h>
-#include <linux/etherdevice.h>
-#include <linux/if_ether.h>	/* For the statistics structure. */
-#include <linux/if_arp.h>	/* For ARPHRD_ETHER */
-#include <sys/cred.h>
-
-#undef queue_t			/* allow visibility again */
-#include <sys/stream.h>
-
-#include <sys/LiS/mod.h>
 #include "ip_strm_mod.h"
-#include <sys/osif.h>
 
 /************************************************************************
 *                        Function Prototypes                            *
@@ -196,23 +291,6 @@
  */
 extern int ip_strm_init(struct ism_dev *dev);
 
-/************************************************************************
-*                    Streams Entry Point Routines                       *
-*************************************************************************
-*									*
-* The following section of code contains the entry point routines for	*
-* the streams driver.  These are the open, close, put and service	*
-* routines pointed to by the qinit structures above.			*
-*									*
-************************************************************************/
-
-extern int _RP ip_to_streams_open(queue_t *, dev_t *, int, int, cred_t *);
-extern int _RP ip_to_streams_close(queue_t *, int, cred_t *);
-extern int _RP ip_to_streams_wput(queue_t *, mblk_t *);
-extern int _RP ip_to_streams_wsrv(queue_t *);
-extern int _RP ip_to_streams_rput(queue_t *, mblk_t *);
-extern int _RP ip_to_streams_rsrv(queue_t *);
-
 extern int ip_to_streams_conn_req(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry);
 extern int ip_to_streams_proto(ip_to_streams_minor_t *, mblk_t *, int);
 
@@ -221,39 +299,6 @@ extern void netman_hex_mp(mblk_t *, char *);
 extern void Rsys_print_traced_token(char *bufp);
 extern void Rsys_hex_print(char *, unsigned char *, int);
 #endif
-
-/************************************************************************
-*                    Linkage to Streams System                          *
-************************************************************************/
-
-struct module_info ip_to_streams_minfo = { 0	/* mi_idnum */
-	    , "ip_to_streams"		/* mi_idname */
-	    , 0				/* mi_minpsz */
-	    , INFPSZ			/* mi_maxpsz */
-	    , 20000			/* mi_hiwat */
-	    , 2000			/* mi_lowat */
-};
-struct qinit ip_to_streams_rinit = { ip_to_streams_rput, ip_to_streams_rsrv	/* qi_srvp */
-	    , ip_to_streams_open	/* qi_open */
-	    , ip_to_streams_close	/* qi_close */
-	    , NULL			/* qi_admin */
-	    , &ip_to_streams_minfo	/* qi_minfo */
-	    , NULL			/* qi_mstat */
-};
-struct qinit ip_to_streams_winit = { ip_to_streams_wput	/* qi_putp */
-	    , ip_to_streams_wsrv	/* qi_srvp */
-	    , NULL			/* qi_open */
-	    , NULL			/* qi_close */
-	    , NULL			/* qi_admin */
-	    , &ip_to_streams_minfo	/* qi_minfo */
-	    , NULL			/* qi_mstat */
-};
-
-struct streamtab ip_to_streams_info = { &ip_to_streams_rinit	/* read queue definition */
-	    , &ip_to_streams_winit	/* write queue definition */
-	    , NULL			/* mux read queue */
-	    , NULL			/* mux write queue */
-};
 
 int ip_to_streamsdevflag = 0;
 
@@ -272,38 +317,67 @@ unsigned long ip_to_streams_debug_mask = 0;
 * The streams open routine. Called when this is pushed on to the stack	*
 *									*
 ************************************************************************/
+/**
+ *  @internal
+ *  @brief STREAMS open routine
+ *  @param q the read queue pointer of the newly created queue pair
+ *  @param devp a pointer to the dev_t (ignored for modules)
+ *  @param oflag open flags
+ *  @param sflag streams flag, should always be MODOPEN
+ *  @param credp pointer to a cred_t credential structure of the pushing
+ *  process
+ *
+ *  This is the STREAMS open entry point to the IP_STRM module.  This entry
+ *  point is called when the IP_STRM module is first pushed onto the stack as
+ *  well as each time that a module is pushed above it.
+ */
 int _RP
-ip_to_streams_open(queue_t *rdq, dev_t *devp, int flag, int sflag, cred_t *credp)
+ip_to_streams_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *credp)
 {
+	int err;
 	ip_to_streams_minor_t *minor_ptr;
 
 	if (ip_to_streams_debug_mask & (DBG_OPEN))
-		cmn_err(CE_CONT, "\nip_to_streams_open: q=%x sflag=%d", sflag);
+		cmn_err(CE_NOTE, "ip_to_streams_open: q=%p sflag=%d", q, sflag);
 
-	minor_ptr = (ip_to_streams_minor_p) ALLOC(sizeof(ip_to_streams_minor_t));
-	if (minor_ptr == NULL)
-		return (-ENOMEM);
+	err = 0;
+	if (q->q_ptr != NULL)
+		goto quit;	/* already open */
+	err = ENXIO;
+	if (sflag != MODOPEN || WR(q)->q_next == NULL)
+		goto quit;
+	err = ENOMEM;
+	if ((minor_ptr = (ip_to_streams_minor_p)
+	     kmem_alloc(sizeof(ip_to_streams_minor_t), KM_NOSLEEP)) == NULL)
+		goto quit;
 
 	memset(minor_ptr, 0, sizeof(*minor_ptr));	/* clear to zero */
 
 	minor_ptr->dl_magic = DL_MAGIC;
-	rdq->q_ptr = (caddr_t) minor_ptr;
-	WR(rdq)->q_ptr = (caddr_t) minor_ptr;
+	q->q_ptr = (caddr_t) minor_ptr;
+	WR(q)->q_ptr = (caddr_t) minor_ptr;
 
-	minor_ptr->dl_rdq = rdq;
-	minor_ptr->dl_wrq = WR(rdq);
-	minor_ptr->dl_q = rdq;
+	minor_ptr->dl_rdq = q;
+	minor_ptr->dl_wrq = WR(q);
+	minor_ptr->dl_q = q;
 	minor_ptr->dl_err_prim = -1;	/* ensure no retry */
 
 	strcpy(minor_ptr->myname, "is");	/* initial name Ip/Streams */
+#if defined(KERNEL_2_3)
 	strcpy(minor_ptr->mydev.name, "is");	/* initial name Ip/Streams */
+#else
+	minor_ptr->mydev.name = minor_ptr->myname;
+#endif
 	minor_ptr->mydev.init = ip_strm_init;
 	minor_ptr->mydev.priv = minor_ptr;
 
 	if (ip_to_streams_debug_mask & (DBG_OPEN))
 		cmn_err(CE_CONT, "\nip_to_streams_open succeeded");
 
+	qprocson(q);
 	return (0);		/* success */
+      quit:
+	return (err);
 
 }				/* ip_to_streams_open */
 
@@ -314,35 +388,56 @@ ip_to_streams_open(queue_t *rdq, dev_t *devp, int flag, int sflag, cred_t *credp
 * Called when closing the stream					*
 *									*
 ************************************************************************/
-
+/**
+ *  @internal
+ *  @brief STREAMS close routine
+ *  @param q pointer to the read queue of the queue pair
+ *  @param oflag open flags
+ *  @param credp pointer to a credentials structure
+ */
 int _RP
-ip_to_streams_close(queue_t *q, int dummy, cred_t *credp)
+ip_to_streams_close(queue_t *q, int oflag, cred_t *credp)
 {
 	ip_to_streams_minor_t *minor_ptr;
 
+	(void) oflag;
+	(void) credp;
 	if (ip_to_streams_debug_mask & (DBG_OPEN))
-		cmn_err(CE_CONT, "\nip_to_streams_close: q=%x ", q);
-
+		cmn_err(CE_NOTE, "%s: q=%p ", __FUNCTION__, q);
+#if defined LIS
+	/* protect against LiS bugs */
+	if (q->q_ptr == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
+		goto quit;
+	}
+	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
+		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
+			MOD_NAME, __FUNCTION__);
+		goto skip_pop;
+	}
+#endif
 	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
-
-	if (minor_ptr != (ip_to_streams_minor_t *) NULL && minor_ptr->dl_magic == DL_MAGIC) {
+	if (minor_ptr != NULL && minor_ptr->dl_magic == DL_MAGIC) {
 		if (ip_to_streams_debug_mask & (DBG_OPEN))
-			cmn_err(CE_CONT, "ip_to_streams_close: %s\n", minor_ptr->myname);
-
+			cmn_err(CE_NOTE, "%s: %s", __FUNCTION__, minor_ptr->myname);
 		if (minor_ptr->dev_registered != 0)	/* still open to IP */
 			unregister_netdev(&minor_ptr->mydev);
-
 		minor_ptr->dl_magic = ~DL_MAGIC;
-		FREE(minor_ptr);
-	} else if (ip_to_streams_debug_mask & (DBG_OPEN))
-		cmn_err(CE_CONT, "ip_to_streams_close: invalid minor ptr q_ptr=%x\n", q->q_ptr);
-
+	} else {
+		if (ip_to_streams_debug_mask & (DBG_OPEN))
+			cmn_err(CE_NOTE, "%s: invalid minor ptr q_ptr=%p", __FUNCTION__, q->q_ptr);
+		goto quit;
+	}
+	goto skip_pop;
+      skip_pop:
+	qprocsoff(q);
+	kmem_free(q->q_ptr, sizeof(*minor_ptr));
 	q->q_ptr = NULL;	/* zot the q ptrs */
 	WR(q)->q_ptr = NULL;	/* zot the q ptrs */
-
+	goto quit;
+      quit:
 	return (0);
-
-}				/* ip_to_streams_close */
+}
 
 /************************************************************************
 *                          ip_to_streams_ioctl                          *
@@ -378,9 +473,14 @@ ip_to_streams_ioctl(queue_t *q, mblk_t *mp)
 		 * simple "set if-name" ioctl will make the interface appear
 		 * under IP again.
 		 */
+		/* FIXME: this function does not check for TRANSPARENT ioctl! */
 		if (xmp != NULL && *xmp->b_rptr != 0) {	/* name specified */
-			strncpy(minor_ptr->myname, xmp->b_rptr, sizeof(minor_ptr->myname));
+			strncpy(minor_ptr->myname, (char *) xmp->b_rptr, sizeof(minor_ptr->myname));
+#if defined(KERNEL_2_3)
 			strcpy(minor_ptr->mydev.name, minor_ptr->myname);
+#else
+			minor_ptr->mydev.name = minor_ptr->myname;
+#endif
 			if ((result = register_netdev(&minor_ptr->mydev)) != 0)
 				printk("ip_to_streams_ioctl: " "register_netdev(%s) failed: %d\n",
 				       minor_ptr->myname, result);
@@ -443,7 +543,7 @@ ip_to_streams_wput(queue_t *q, mblk_t *mp)
 	ip_to_streams_minor_t *minor_ptr;
 
 	if (ip_to_streams_debug_mask & DBG_PUT)
-		cmn_err(CE_CONT, "\nip_to_streams_wput: q=%x mp=%x\n", q, mp);
+		cmn_err(CE_CONT, "\nip_to_streams_wput: q=%p mp=%p\n", q, mp);
 
 	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
 
@@ -460,8 +560,10 @@ ip_to_streams_wput(queue_t *q, mblk_t *mp)
 	case M_DATA:
 		if (canputnext(q))	/* data uses flow control */
 			putnext(q, mp);
-		else
-			putqf(q, mp);
+		else if (!putq(q, mp)) {
+			mp->b_band = 0;
+			putq(q, mp);
+		}
 		break;
 
 	case M_PROTO:
@@ -481,8 +583,10 @@ ip_to_streams_wput(queue_t *q, mblk_t *mp)
 
 			if (canputnext(q))	/* data uses flow control */
 				putnext(q, mp);
-			else
-				putqf(q, mp);
+			else if (!putq(q, mp)) {
+				mp->b_band = 0;
+				putq(q, mp);
+			}
 			return (0);
 		}
 
@@ -642,7 +746,7 @@ ip_to_streams_m_error(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int errno, 
 
 	if (minor_ptr == (ip_to_streams_minor_t *) NULL) {
 		if (ip_to_streams_debug_mask & DBG_SQUAWK)
-			cmn_err(CE_NOTE, "ip_to_streams_m_error: bad or detached minor %x",
+			cmn_err(CE_NOTE, "ip_to_streams_m_error: bad or detached minor %p",
 				minor_ptr);
 
 		if (mp != (mblk_t *) NULL)
@@ -816,7 +920,7 @@ ip_to_streams_rsrv(queue_t *q)
 	int done;
 
 	if (ip_to_streams_debug_mask & DBG_SVC)
-		cmn_err(CE_CONT, "\nip_to_streams_rsrv: q=%x\n", q);
+		cmn_err(CE_CONT, "\nip_to_streams_rsrv: q=%p\n", q);
 
 	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
 
@@ -874,7 +978,7 @@ ip_to_streams_wsrv(queue_t *q)
 	int wakeup = 0;
 
 	if (ip_to_streams_debug_mask & DBG_SVC)
-		cmn_err(CE_CONT, "\nip_to_streams_wsrv: q=%x\n", q);
+		cmn_err(CE_CONT, "\nip_to_streams_wsrv: q=%p\n", q);
 
 	minor_ptr = (ip_to_streams_minor_t *) q->q_ptr;
 
@@ -901,7 +1005,10 @@ ip_to_streams_wsrv(queue_t *q)
 				}
 			} else {
 				netif_stop_queue(dev);
-				putbqf(q, mp);
+				if (!putbq(q, mp)) {
+					mp->b_band;
+					putbq(q, mp);
+				}
 				return (0);	/* quit */
 			}
 			minor_ptr->stats.tx_packets++;
@@ -953,7 +1060,10 @@ ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 			return (1);
 		}
 
-		putqf(q, mp);
+		if (!putq(q, mp)) {
+			mp->b_band = 0;
+			putq(q, mp);
+		}
 
 		break;
 
@@ -963,7 +1073,10 @@ ip_to_streams_proto(ip_to_streams_minor_t * minor_ptr, mblk_t *mp, int retry)
 			return (1);
 		}
 
-		putqf(q, mp);
+		if (!putq(q, mp)) {
+			mp->b_band = 0;
+			putq(q, mp);
+		}
 		break;
 	}
 
@@ -993,7 +1106,7 @@ ip_to_streams_rput(queue_t *q, mblk_t *mp)
 
 	dev = &minor_ptr->mydev;
 	if (ip_to_streams_debug_mask & DBG_PUT)
-		cmn_err(CE_CONT, "\nip_to_streams_rput: q=%x mp=%x minor:0x%x, dev:0x%x\n", q, mp,
+		cmn_err(CE_CONT, "\nip_to_streams_rput: q=%p mp=%p minor:0x%p, dev:0x%p\n", q, mp,
 			minor_ptr, dev);
 
 	/* checking, checking, checking... */
@@ -1030,8 +1143,10 @@ ip_to_streams_rput(queue_t *q, mblk_t *mp)
 			/* It will go here if we are not putting to IP */
 			if (canputnext(q))
 				putnext(q, mp);
-			else
-				putqf(q, mp);
+			else if (!putq(q, mp)) {
+				mp->b_band = 0;
+				putq(q, mp);
+			}
 		}
 		break;
 	}
@@ -1072,16 +1187,20 @@ ip_to_streams_rput(queue_t *q, mblk_t *mp)
 			} else {
 				if (canputnext(q))
 					putnext(q, mp);
-				else
-					putqf(q, mp);
+				else if (!putq(q, mp)) {
+					mp->b_band = 0;
+					putq(q, mp);
+				}
 			}
 			break;
 
 		default:	/* everything else just goes upstream */
 			if (canputnext(q))
 				putnext(q, mp);
-			else
-				putqf(q, mp);
+			else if (!putq(q, mp)) {
+				mp->b_band = 0;
+				putq(q, mp);
+			}
 			break;
 
 		}
@@ -1136,7 +1255,7 @@ convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 	struct sk_buff *skb;
 	int len;
 	mblk_t *tmp = mp;
-	char *ctmp;
+	unsigned char *ctmp;
 
 	if ((mp->b_datap->db_type == M_PROTO)
 	    || (mp->b_datap->db_type == M_PCPROTO)
@@ -1146,7 +1265,7 @@ convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 	len = msgdsize(tmp);
 
 	if (ip_to_streams_debug_mask & DBG_SQUAWK)
-		cmn_err(CE_CONT, "\nconvert_to_skbuf: minor_ptr 0x%x, mp 0x%x, len %d\n", minor_ptr,
+		cmn_err(CE_CONT, "\nconvert_to_skbuf: minor_ptr 0x%p, mp 0x%p, len %d\n", minor_ptr,
 			mp, len);
 
 	skb = dev_alloc_skb(len + 4);
@@ -1162,10 +1281,10 @@ convert_to_skbuf(ip_to_streams_minor_t * minor_ptr, mblk_t *mp)
 	skb_reserve(skb, 2);
 	skb->protocol = htons(ETH_P_IP);
 	skb->pkt_type = PACKET_HOST;
-	skb->h.raw = skb->data;
-	skb->mac.raw = skb->data;
+	skb_reset_transport_header(skb);
+	skb_reset_mac_header(skb);
 #if defined(KERNEL_2_1)
-	skb->nh.raw = skb->data;
+	skb_reset_network_header(skb);
 #endif
 	skb->ip_summed = CHECKSUM_NONE;
 
@@ -1226,7 +1345,7 @@ ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
 	mblk_t *mp, *mpt;
 
 	if (ip_to_streams_debug_mask & DBG_PUT)
-		cmn_err(CE_CONT, "\nip_strm_xmit: skb 0x%lx dev 0x%lx\n", skb, dev);
+		cmn_err(CE_CONT, "\nip_strm_xmit: skb 0x%p dev 0x%p\n", skb, dev);
 
 	/* make sure everything is ok */
 	if (skb == NULL || dev == NULL) {
@@ -1317,7 +1436,10 @@ ip_strm_xmit(struct sk_buff *skb, struct ism_dev *dev)
 		ipptr->stats.tx_packets++;
 	} else {
 		netif_stop_queue(dev);
-		putqf(ipptr->dl_wrq, mpt);
+		if (!putq(ipptr->dl_wrq, mpt)) {
+			mpt->b_band = 0;
+			putq(ipptr->dl_wrq, mpt);
+		}
 	}
 
 	if (ip_to_streams_debug_mask & DBG_PUT)
@@ -1382,7 +1504,7 @@ ip_strm_open(struct ism_dev *dev)
 	ip_to_streams_minor_t *ipptr = (ip_to_streams_minor_t *) dev->priv;
 
 	if (ip_to_streams_debug_mask & (DBG_OPEN))
-		cmn_err(CE_CONT, "ip_strm_open: dev 0x%x\n", dev);
+		cmn_err(CE_CONT, "ip_strm_open: dev 0x%p\n", dev);
 
 	/* if the stream has not been opened, fail */
 	if (ipptr == NULL)
@@ -1458,12 +1580,16 @@ ip_strm_init(struct ism_dev *dev)
 	dev->mtu = IP_STRM_MTU;
 	dev->hard_start_xmit = ip_strm_xmit;
 	dev->do_ioctl = ip_strm_ioctl;
+#if defined HAVE_KMEMB_STRUCT_NET_DEVICE_HARD_HEADER
 	dev->hard_header = 0;
+#endif
 	dev->hard_header_len = 0;
 	dev->addr_len = 0;
 	dev->tx_queue_len = 100;
 	dev->type = ARPHRD_DLCI;	/* 0x0001 */
+#if defined HAVE_KMEMB_STRUCT_NET_DEVICE_REBUILD_HEADER
 	dev->rebuild_header = 0;
+#endif
 	dev->open = ip_strm_open;
 	dev->flags |= IFF_POINTOPOINT;
 #ifdef KERNEL_2_1
@@ -1487,3 +1613,119 @@ ip_strm_init(struct ism_dev *dev)
 
 	return (0);
 }
+
+#ifdef LINUX
+modID_t modid = MOD_ID;
+
+#ifndef module_param
+MODULE_PARM(modid, "h");
+#else
+module_param(modid, ushort, 0444);
+#endif
+MODULE_PARM_DESC(modid, "Module ID for IP_STRMS.");
+#endif				/* LINUX */
+
+#ifdef LFS
+STATIC struct fmodsw ip_to_streams_fmod = {
+	.f_name = MOD_NAME,
+	.f_str = &ip_to_streams_info,
+	.f_flag = D_MTPERQ,		/* consistent with LiS */
+	.f_kmod = THIS_MODULE,
+};
+
+#ifdef WITH_32BIT_COMPATIBILITY
+static void *ip_to_streams_ioctl32;
+#endif				/* WITH_32BIT_COMPATIBILITY */
+
+static void
+ip_to_streams_unregister_ioctl32(void)
+{
+#ifdef WITH_32BIT_COMPATIBILITY
+	if (ip_to_streams_ioctl32 != NULL)
+		unregister_ioctl32(ip_to_streams_ioctl32);
+	ip_to_streams_ioctl32 = NULL;
+#endif				/* WITH_32BIT_COMPATIBILITY */
+}
+
+static int
+ip_to_streams_register_ioctl32(void)
+{
+#ifdef WITH_32BIT_COMPATIBILITY
+	if (ip_to_streams_ioctl32 == NULL)
+		if ((ip_to_streams_ioctl32 = register_ioctl32(SIOCSIFNAME)) == NULL)
+			return (-ENOMEM);
+#endif				/* WITH_32BIT_COMPATIBILITY */
+	return (0);
+}
+
+STATIC int
+ip_to_streams_register_module(void)
+{
+	int err;
+
+	if ((err = ip_to_streams_register_ioctl32()) < 0) {
+		cmn_err(CE_WARN, "%s: could not register 32-bit ioctl, err = %d", MOD_NAME, -err);
+		return (err);
+	}
+
+	if ((err = register_strmod(&ip_to_streams_fmod)) < 0) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, -err);
+		ip_to_streams_unregister_ioctl32();
+		return (err);
+	}
+	if (modid == 0 && err > 0)
+		modid = err;
+	return (0);
+};
+STATIC void
+ip_to_streams_unregister_module(void)
+{
+	unregister_strmod(&ip_to_streams_fmod);
+	ip_to_streams_unregister_ioctl32();
+}
+#else
+#ifdef LIS
+STATIC int
+ip_to_streams_register_module(void)
+{
+	int ret;
+
+	if ((ret = lis_register_strmod(&ip_to_streams_info, MOD_NAME)) != LIS_NULL_MID) {
+		if (modid == 0)
+			modid = ret;
+		return (0);
+	}
+	/* LiS is not too good on giving informative errors here. */
+	return (EIO);
+}
+STATIC void
+ip_to_streams_unregister_module(void)
+{
+	/* LiS provides detailed error here when they are discarded. */
+	return (void) lis_unregister_strmod(&ip_to_streams_info);
+}
+#endif
+#endif
+
+STATIC int __init
+ip_to_streams_init(void)
+{
+	int err;
+
+	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+	if ((err = ip_to_streams_register_module())) {
+		cmn_err(CE_WARN, "%s: could not register module, err = %d", MOD_NAME, -err);
+		return (err);
+	}
+	return (0);
+};
+
+STATIC void __exit
+ip_to_streams_exit(void)
+{
+	ip_to_streams_unregister_module();
+	return;
+}
+
+module_init(ip_to_streams_init);
+module_exit(ip_to_streams_exit);

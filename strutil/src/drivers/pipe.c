@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:43 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-30 18:31:45 $
 
  -----------------------------------------------------------------------------
 
@@ -10,17 +10,18 @@
  All Rights Reserved.
 
  This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
  details.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+ write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+ 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:43 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipe.c,v $
+ Revision 0.9.2.36  2008-10-30 18:31:45  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.35  2008-09-22 20:31:43  brian
  - added module version and truncated logs
 
@@ -58,10 +62,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:43 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-30 18:31:45 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:43 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-30 18:31:45 $";
 
 #define _LFS_SOURCE
 
@@ -80,7 +84,7 @@ extern struct file_operations strm_f_ops;
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2008-09-22 20:31:43 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2008-10-30 18:31:45 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PIPE_LICENSE	"GPL"
@@ -168,6 +172,7 @@ static struct module_stat pipe_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES
 static struct qinit pipe_rinit = {
 #ifdef LFS
 	.qi_putp = strrput,
+	.qi_srvp = strrsrv,
 	.qi_qopen = str_open,
 	.qi_qclose = str_close,
 #endif

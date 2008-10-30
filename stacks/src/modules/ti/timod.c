@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $
 
  -----------------------------------------------------------------------------
 
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:23 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.24  2008-10-30 18:31:21  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.23  2008-09-22 20:31:23  brian
  - added module version and truncated logs
 
@@ -62,10 +65,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Release 2 transport
@@ -95,7 +98,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2008-09-22 20:31:23 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2008-10-30 18:31:21 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL"
@@ -203,15 +206,24 @@ struct timod {
 	ulong cons;			/* outstanding connection indications */
 };
 
-static kmem_cachep_t timod_priv_cachep = NULL;
+#define TIMOD_PRIV(__q) ((struct timod *)((__q)->q_ptr))
 
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Private Structure allocation, deallocation and cache
+ *
+ *  -------------------------------------------------------------------------
+ */
+static kmem_cachep_t timod_priv_cachep = NULL;
 static __unlikely int
 timod_init_caches(void)
 {
 	if (!timod_priv_cachep
 	    && !(timod_priv_cachep =
 		 kmem_create_cache(MOD_NAME, sizeof(struct timod), 0, SLAB_HWCACHE_ALIGN, NULL,
-				   NULL))) {
+				   NULL)
+	    )) {
 		cmn_err(CE_WARN, "%s: %s: Cannot allocate timod_priv_cachep", MOD_NAME,
 			__FUNCTION__);
 		return (-ENOMEM);
@@ -593,12 +605,21 @@ timod_rput(queue_t *q, mblk_t *mp)
 	return timod_rput_slow(q, mp);
 }
 
+/**
+ *  timod_wput_slow - slow write put procedure
+ *  @q: the write queue
+ *  @mp: the message to put
+ */
 static noinline streams_fastcall __unlikely int
 timod_wput_slow(queue_t *q, mblk_t *mp)
 {
 	struct timod *priv = q->q_ptr;
 
 #if defined LIS
+	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
+	   modules and, of course, does not properly suppress queue procedures while closing.  We
+	   can check this as many times as we would like on SMP and the q->q_next pointer could be
+	   invalidate immediately after we check it.  Never use LiS. */
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			MOD_NAME, __FUNCTION__);
@@ -933,12 +954,17 @@ timod_wput_slow(queue_t *q, mblk_t *mp)
 	putnext(q, mp);
 	return (0);
 }
+
 static streamscall __hot_out int
 timod_wput(queue_t *q, mblk_t *mp)
 {
 	union T_primitives *p;
 
 #if defined LIS
+	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
+	   modules and, of course, does not properly suppress queue procedures while closing.  We
+	   can check this as many times as we would like on SMP and the q->q_next pointer could be
+	   invalidate immediately after we check it.  Never use LiS. */
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			MOD_NAME, __FUNCTION__);
@@ -985,7 +1011,7 @@ timod_wput(queue_t *q, mblk_t *mp)
 #   endif
 #endif
 
-static void
+static __unlikely void
 timod_pop(queue_t *q)
 {
 	struct timod *priv = (typeof(priv)) q->q_ptr;
@@ -1015,7 +1041,6 @@ timod_pop(queue_t *q)
 			qreply(q, mp);
 		}
 		break;
-		break;
 	case TS_IDLE:
 	default:
 		break;
@@ -1025,7 +1050,7 @@ timod_pop(queue_t *q)
 			mp->b_datap->db_type = M_ERROR;
 			*(mp->b_wptr)++ = 0;
 			*(mp->b_wptr)++ = 0;
-			qreply(q, mp);
+			putnext(q, mp);
 		}
 #	    if defined M_ERROR_UNDOES_M_HANGUP
 		priv->flags &= ~(TIMOD_EPROTO | TIMOD_HANGUP);
@@ -1035,15 +1060,29 @@ timod_pop(queue_t *q)
 	}
 #   if defined M_UNHANGUP
 	if ((priv->flags & TIMOD_HANGUP)) {
-		if ((mp = allocb(0, BRPI_WAITOK))) {
+		if ((mp = allocb(0, BPRI_WAITOK))) {
 			mp->b_datap->db_type = M_UNHANGUP;
-			qreply(q, mp);
+			putnext(q, mp);
 		}
 		priv->flags &= ~TIMOD_HANGUP;
 	}
 #   endif			/* defined M_UNHANGUP */
 }
 
+/**
+ * timod_open = open the timod module
+ * @q: read queue
+ * @devp: device to open
+ * @flag: flags to open call
+ * @sflag: should be just MODOPEN
+ * @crp: pointer to opening process' credentials
+ *
+ * Some applications programs that are too knowledgable about the internal organization of STREAMS
+ * have the habit of popping the timod module and pushing the sockmod module and then popping
+ * sockmod and pushing timod.  Therefore, it cannot be assumed that timod is being pushed onto a
+ * freshly opened Stream as is the case when the XTI library is pushing the module.  Therefore, we
+ * should immediately issue a capability request to determine the state of the TPI Stream.
+ */
 static streamscall int
 timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
@@ -1053,7 +1092,7 @@ timod_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		goto quit;	/* already open */
 	err = ENXIO;
 	if (sflag != MODOPEN || WR(q)->q_next == NULL)
-		goto quit;
+		goto quit;	/* can't be opened as driver */
 	err = ENOMEM;
 	if (!(timod_alloc_priv(q)))
 		goto quit;
@@ -1074,6 +1113,10 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
 		cmn_err(CE_WARN, "%s: %s: LiS double-close bug detected.", MOD_NAME, __FUNCTION__);
 		goto quit;
 	}
+	/* LiS has this nasty bug where it breaks a STREAMS-based pipe in two _before_ popping
+	   modules and, of course, does not properly suppress queue procedures while closing.  We
+	   can check this as many times as we would like on SMP and the q->q_next pointer could be
+	   invalidate immediately after we check it.  Never use LiS. */
 	if (q->q_next == NULL || OTHERQ(q)->q_next == NULL) {
 		cmn_err(CE_WARN, "%s: %s: LiS pipe bug: called with NULL q->q_next pointer",
 			MOD_NAME, __FUNCTION__);
@@ -1102,15 +1145,6 @@ timod_close(queue_t *q, int oflag, cred_t *crp)
  *  Linux Registration
  *  -------------------------------------------------------------------------
  */
-
-unsigned short modid = MOD_ID;
-
-#ifndef module_param
-MODULE_PARM(modid, "h");
-#else
-module_param(modid, ushort, 0444);
-#endif
-MODULE_PARM_DESC(modid, "Module ID for the TIMOD module. (0 for allocation.)");
 
 /*
  *  Linux Fast-STREAMS Registration
@@ -1248,7 +1282,11 @@ timodinit(void)
 {
 	int err;
 
-	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
+#ifdef CONFIG_STREAMS_TIMOD_MODULE
+	cmn_err(CE_NOTE, TIMOD_BANNER);	/* banner message */
+#else
+	cmn_err(CE_NOTE, TIMOD_SPLASH);	/* banner message */
+#endif
 	if ((err = timod_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
 		return (err);

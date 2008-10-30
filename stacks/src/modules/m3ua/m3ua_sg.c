@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:11 $
+ @(#) $RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2008-10-30 18:31:16 $
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +46,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-09-22 20:31:11 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.20  2008-10-30 18:31:16  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.19  2008-09-22 20:31:11  brian
  - added module version and truncated logs
 
@@ -59,7 +62,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 20:31:11 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.20 $) $Date: 2008-10-30 18:31:16 $";
 
 #include <sys/os7/compat.h>
 
@@ -67,7 +70,7 @@ static char const ident[] = "$Name:  $($Revision: 0.9.2.19 $) $Date: 2008-09-22 
 #include <ss7/m3ua_ioctl.h>
 
 #define M3UA_DESCRIP	"M3UA/SCTP STREAMS MULTIPLEXOR."
-#define M3UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corp.  All Rights Reserved."
+#define M3UA_COPYRIGHT	"Copyright (c) 1997-2008 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_DEVICES	"Supports OpenSS7 drivers."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_LICENSE	"GPL"

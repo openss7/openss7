@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 07:11:31 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-10-30 18:31:31 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 07:11:31 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.16  2008-10-30 18:31:31  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.15  2008-04-29 07:11:31  brian
  - updating headers for release
 
@@ -96,9 +99,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 07:11:31 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-10-30 18:31:31 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2008-04-29 07:11:31 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2008-10-30 18:31:31 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -6377,12 +6380,14 @@ test_case_1_3_top(int child)
 	if (expect(child, INFINITE_WAIT, __TEST_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#if 0
 	if (expect(child, INFINITE_WAIT, __TEST_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	if (expect(child, INFINITE_WAIT, __TEST_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+#endif
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -6858,6 +6863,8 @@ test_case_3_1_top(int child)
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -6912,6 +6919,8 @@ test_case_3_2_top(int child)
 	state++;
 	if (do_signal(child, __TEST_WRITEV) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -6968,6 +6977,8 @@ test_case_3_3_top(int child)
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -7022,6 +7033,8 @@ test_case_3_4_top(int child)
 	state++;
 	if (do_signal(child, __TEST_PUTPMSG_DATA) == __RESULT_SUCCESS || last_errno != EPROTO)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7078,6 +7091,8 @@ test_case_3_5_top(int child)
 	state++;
 	if (do_signal(child, __TEST_WRITE) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7142,6 +7157,8 @@ test_case_3_6_top(int child)
 	if (do_signal(child, __TEST_WRITE) == __RESULT_SUCCESS || last_errno != ENXIO)
 		goto failure;
 	state++;
+	test_msleep(child, NORMAL_WAIT);
+	state++;
 	return (__RESULT_SUCCESS);
       failure:
 	return (__RESULT_FAILURE);
@@ -7200,6 +7217,8 @@ test_case_3_7_top(int child)
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) != __RESULT_SUCCESS)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -7263,6 +7282,8 @@ test_case_3_8_top(int child)
 	state++;
 	if (do_signal(child, __TEST_PUTMSG_DATA) == __RESULT_SUCCESS || last_errno != ENXIO)
 		goto failure;
+	state++;
+	test_msleep(child, NORMAL_WAIT);
 	state++;
 	return (__RESULT_SUCCESS);
       failure:
@@ -9193,7 +9214,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.15 $ $Date: 2008-04-29 07:11:31 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.16 $ $Date: 2008-10-30 18:31:31 $");
 }
 
 void

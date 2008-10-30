@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 08:33:26 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-30 18:31:02 $
 
  -----------------------------------------------------------------------------
 
@@ -9,19 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>, or
- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
- 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ Affero General Public License (GPL) Version 3, so long as the software is
+ distributed with, and only used for the testing of, OpenSS7 modules, drivers,
+ and libraries.
 
  -----------------------------------------------------------------------------
 
@@ -46,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:33:26 $ by $Author: brian $
+ Last Modified $Date: 2008-10-30 18:31:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.9  2008-10-30 18:31:02  brian
+ - rationalized drivers, modules and test programs
+
  Revision 0.9.2.8  2008-04-29 08:33:26  brian
  - update headers for Affero release
 
@@ -83,10 +99,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 08:33:26 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-30 18:31:02 $"
 
 static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2008-04-29 08:33:26 $";
+    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2008-10-30 18:31:02 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -216,8 +232,10 @@ start_timer(void)
 }
 
 #ifndef PIPE_BUF
-#define PIPE_BUF 4096
+#define PIPE_BUF 8192
 #endif
+
+#define RECENT_WEIGHT 2
 
 int
 test_sync(int fds[])
@@ -250,8 +268,17 @@ test_sync(int fds[])
 				long long msgcnt = tmsgcnt / report;
 				long long avgsiz = tbytcnt / tmsgcnt;
 
+#if 0
 				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 				tavg_tput = (3 * tavg_tput + thrput) / 4;
+#else
+				tavg_msgs =
+				    (tavg_msgs * report_count +
+				     msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				tavg_tput =
+				    (tavg_tput * report_count +
+				     thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
 				fprintf(stdout,
 					"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
 					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz,
@@ -263,8 +290,17 @@ test_sync(int fds[])
 				long long msgcnt = rmsgcnt / report;
 				long long avgsiz = rbytcnt / rmsgcnt;
 
+#if 0
 				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 				ravg_tput = (3 * ravg_tput + thrput) / 4;
+#else
+				ravg_msgs =
+				    (ravg_msgs * report_count +
+				     msgcnt * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+				ravg_tput =
+				    (ravg_tput * report_count +
+				     thrput * RECENT_WEIGHT) / (report_count + RECENT_WEIGHT);
+#endif
 				fprintf(stdout,
 					"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
 					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz,
@@ -432,8 +468,17 @@ read_child(int fd)
 			long long errcnt = reagain / report;
 			long long avgsiz = rbytcnt / rmsgcnt;
 
+#if 0
 			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 			ravg_tput = (3 * ravg_tput + thrput) / 4;
+#else
+			ravg_msgs =
+			    (ravg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+			ravg_tput =
+			    (ravg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+#endif
 			fprintf(stdout,
 				"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
 				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax,
@@ -568,8 +613,17 @@ write_child(int fd)
 			long long errcnt = teagain / report;
 			long long avgsiz = tbytcnt / tmsgcnt;
 
+#if 0
 			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 			tavg_tput = (3 * tavg_tput + thrput) / 4;
+#else
+			tavg_msgs =
+			    (tavg_msgs * report_count + msgcnt * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+			tavg_tput =
+			    (tavg_tput * report_count + thrput * RECENT_WEIGHT) / (report_count +
+										   RECENT_WEIGHT);
+#endif
 			fprintf(stdout,
 				"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
 				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax,
@@ -1019,8 +1073,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-Affero  General  Public  License  (AGPL)  Version  3, so long as the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
+Affero  General Public License (AGPL)  Version 3,  so long  as  the  software is\n\
+distributed with,  and only used for the  testing of,  OpenSS7 modules, drivers,\n\
 and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
