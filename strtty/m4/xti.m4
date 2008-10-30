@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xti.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.65 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: xti.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.66 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without XTI header files, the TPI interface to XTI will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XTI], [dnl
+    _XTI_CHECK
+    if test :"${xti_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS XTI include directories.  If
+*** you wish to use the STREAMS XTI package you will need to specify
+*** the location of the STREAMS XTI (strxnet) include directories with
+*** the --with-xti=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS XTI package?  The
+*** STREAMS strxnet package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strxnet-0.9.2.8.tar.gz".
+*** ])
+    fi
+])# _XTI
+# =============================================================================
+
+# =============================================================================
+# _XTI_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XTI_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XTI_OPTIONS
     _XTI_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([XTI_SYMVER])dnl
     AC_SUBST([XTI_MANPATH])dnl
     AC_SUBST([XTI_VERSION])dnl
-])# _XTI
+])# _XTI_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -395,20 +417,6 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${xti_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS XTI include directories.  If
-*** you wish to use the STREAMS XTI package you will need to specify
-*** the location of the STREAMS XTI (strxnet) include directories with
-*** the --with-xti=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS XTI package?  The
-*** STREAMS strxnet package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strxnet-0.9.2.8.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for xti version], [xti_cv_version], [dnl
 	xti_cv_version=
 	if test -z "$xti_cv_version" ; then
@@ -638,6 +646,9 @@ AC_DEFUN([_XTI_], [dnl
 # =============================================================================
 #
 # $Log: xti.m4,v $
+# Revision 0.9.2.66  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.65  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

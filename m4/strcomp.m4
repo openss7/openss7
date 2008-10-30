@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without COMPAT header files, the ABI interface for STREAMS will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_STRCOMP], [dnl
+    _STRCOMP_CHECK
+    if test :"${strcomp_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS compat include directories.  If
+*** you wish to use the STREAMS compat package you will need to specify
+*** the location of the STREAMS compat (strcompat) include directories with
+*** the --with-compat=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS compat package?  The
+*** STREAMS strcompat package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strcompat-0.9.2.7.tar.gz".
+*** ])
+    fi
+])# _STRCOMP
+# =============================================================================
+
+# =============================================================================
+# _STRCOMP_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_STRCOMP_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _STRCOMP_OPTIONS
     _STRCOMP_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([STRCOMP_SYMVER])dnl
     AC_SUBST([STRCOMP_MANPATH])dnl
     AC_SUBST([STRCOMP_VERSION])dnl
-])# _STRCOMP
+])# _STRCOMP_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${strcomp_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS compat include directories.  If
-*** you wish to use the STREAMS compat package you will need to specify
-*** the location of the STREAMS compat (strcompat) include directories with
-*** the --with-compat=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS compat package?  The
-*** STREAMS strcompat package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strcompat-0.9.2.7.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for compat version], [strcomp_cv_version], [dnl
 	strcomp_cv_version=
 	if test -z "$strcomp_cv_version" ; then
@@ -630,6 +638,9 @@ AC_DEFUN([_STRCOMP_], [dnl
 # =============================================================================
 #
 # $Log: strcomp.m4,v $
+# Revision 0.9.2.42  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.41  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

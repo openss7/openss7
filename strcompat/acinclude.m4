@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-09-10 03:49:40 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-10-30 11:36:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:40 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1192,9 +1192,9 @@ AC_DEFUN([_COMPAT_CONFIG], [dnl
     strcomp_cv_config="${pkg_bld}/src/include/sys/strcompat/config.h"
     strcomp_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     strcomp_cv_ldadd= # "${pkg_bld}/libcompat.la"
-    strcomp_cv_ldflags= # "${pkg_bld}/lib32/libcompat.la"
-    strcomp_cv_ldadd32= # "-L${pkg_bld}/.libs/"
-    strcomp_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    strcomp_cv_ldflags= # "-L${pkg_bld}/.libs/"
+    strcomp_cv_ldadd32= # "${pkg_bld}/lib32/libcompat.la"
+    strcomp_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
     strcomp_cv_manpath="${pkg_bld}/doc/man"
     strcomp_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     strcomp_cv_modmap="${pkg_bld}/Modules.map"
@@ -1248,6 +1248,9 @@ AC_DEFUN([_COMPAT_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.40  2008-10-30 11:36:18  brian
+# - corrections to build
+#
 # Revision 0.9.2.39  2008-09-10 03:49:40  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #

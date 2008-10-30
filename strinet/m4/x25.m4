@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: x25.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.10 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: x25.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.11 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without X25 header files, the TPI interface to X25 will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_X25], [dnl
+    _X25_CHECK
+    if test :"${x25_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS X25 include directories.  If
+*** you wish to use the STREAMS X25 package you will need to specify
+*** the location of the STREAMS X25 (strx25) include directories with
+*** the --with-x25=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS X25 package?  The
+*** STREAMS strx25 package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strx25-0.9.2.1.tar.gz".
+*** ])
+    fi
+])# _X25
+# =============================================================================
+
+# =============================================================================
+# _X25_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_X25_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _X25_OPTIONS
     _X25_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([X25_SYMVER])dnl
     AC_SUBST([X25_MANPATH])dnl
     AC_SUBST([X25_VERSION])dnl
-])# _X25
+])# _X25_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${x25_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS X25 include directories.  If
-*** you wish to use the STREAMS X25 package you will need to specify
-*** the location of the STREAMS X25 (strx25) include directories with
-*** the --with-x25=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS X25 package?  The
-*** STREAMS strx25 package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strx25-0.9.2.1.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for x25 version], [x25_cv_version], [dnl
 	x25_cv_version=
 	if test -z "$x25_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_X25_], [dnl
 # =============================================================================
 #
 # $Log: x25.m4,v $
+# Revision 0.9.2.11  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.10  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

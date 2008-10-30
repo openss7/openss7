@@ -2,7 +2,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL vim: ft=config sw=4 noet nocindent
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2008-10-27 17:38:51 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 17:38:51 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,6 +61,7 @@ m4_include([m4/xti.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
+m4_include([m4/ss7.m4])
 m4_include([m4/man.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
@@ -83,8 +84,10 @@ AC_DEFUN([AC_NETPERF], [dnl
     _NSL
     _SOCK
     _INET
-    _SCTP
+    _SCTP_CHECK
+    _SS7_CHECK
     CPPFLAGS="-include ./config.h"
+    CPPFLAGS="${CPPFLAGS}${SS7_CPPFLAGS:+ $SS7_CPPFLAGS}"
     CPPFLAGS="${CPPFLAGS}${XTI_CPPFLAGS:+ $XTI_CPPFLAGS}"
     CPPFLAGS="${CPPFLAGS}${INET_CPPFLAGS:+ $INET_CPPFLAGS}"
     CPPFLAGS="${CPPFLAGS}${SCTP_CPPFLAGS:+ $SCTP_CPPFLAGS}"
@@ -472,6 +475,9 @@ AC_DEFUN([_NETPERF_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.34  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.33  2008-10-27 17:38:51  brian
 # - add missing checks
 #

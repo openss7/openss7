@@ -3,12 +3,12 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.154 $) $Date: 2008-10-21 03:06:47 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.155 $) $Date: 2008-10-30 11:36:18 $
 #
 # -----------------------------------------------------------------------------
 #
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-21 03:06:47 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1762,6 +1762,9 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.155  2008-10-30 11:36:18  brian
+# - corrections to build
+#
 # Revision 0.9.2.154  2008-10-21 03:06:47  brian
 # - tweaks for 2.6.26.5-45.fc9 kernel
 #

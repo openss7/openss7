@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.58 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: xns.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.59 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without XNS header files, the NPI interface to XNS will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_XNS], [dnl
+    _XNS_CHECK
+    if test :"${xns_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS XNS include directories.  If
+*** you wish to use the STREAMS XNS package you will need to specify
+*** the location of the STREAMS XNS (strxns) include directories with
+*** the --with-xns=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS XNS package?  The
+*** STREAMS strxns package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strxns-0.9.2.7.tar.gz".
+*** ])
+    fi
+])# _XNS
+# =============================================================================
+
+# =============================================================================
+# _XNS_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_XNS_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _XNS_OPTIONS
     _XNS_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([XNS_SYMVER])dnl
     AC_SUBST([XNS_MANPATH])dnl
     AC_SUBST([XNS_VERSION])dnl
-])# _XNS
+])# _XNS_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -440,20 +462,6 @@ AC_DEFUN([_XNS_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${xns_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS XNS include directories.  If
-*** you wish to use the STREAMS XNS package you will need to specify
-*** the location of the STREAMS XNS (strxns) include directories with
-*** the --with-xns=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS XNS package?  The
-*** STREAMS strxns package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strxns-0.9.2.7.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for xns version], [xns_cv_version], [dnl
 	xns_cv_version=
 	if test -z "$xns_cv_version" ; then
@@ -683,6 +691,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: xns.m4,v $
+# Revision 0.9.2.59  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.58  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

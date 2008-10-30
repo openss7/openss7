@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2008-10-26 12:17:19 $
+# @(#) $RCSfile: voip.m4,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:19 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without VOIP header files, the VOIP interface will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_VOIP], [dnl
+    _VOIP_CHECK
+    if test :"${voip_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS VOIP include directories.  If
+*** you wish to use the STREAMS VOIP package you will need to specify
+*** the location of the STREAMS VOIP (strvoip) include directories with
+*** the --with-voip=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS VOIP package?  The
+*** STREAMS strvoip package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strvoip-0.9.2.4.tar.gz".
+*** ])
+    fi
+])# _VOIP
+# =============================================================================
+
+# =============================================================================
+# _VOIP_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_VOIP_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _VOIP_OPTIONS
     _VOIP_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([VOIP_SYMVER])dnl
     AC_SUBST([VOIP_MANPATH])dnl
     AC_SUBST([VOIP_VERSION])dnl
-])# _VOIP
+])# _VOIP_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${voip_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS VOIP include directories.  If
-*** you wish to use the STREAMS VOIP package you will need to specify
-*** the location of the STREAMS VOIP (strvoip) include directories with
-*** the --with-voip=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS VOIP package?  The
-*** STREAMS strvoip package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strvoip-0.9.2.4.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for voip version], [voip_cv_version], [dnl
 	voip_cv_version=
 	if test -z "$voip_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_VOIP_], [dnl
 # =============================================================================
 #
 # $Log: voip.m4,v $
+# Revision 0.9.2.22  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.21  2008-10-26 12:17:19  brian
 # - update package discovery macros
 #

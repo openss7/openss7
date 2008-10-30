@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: chan.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.23 $) $Date: 2008-10-26 12:17:18 $
+# @(#) $RCSfile: chan.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.24 $) $Date: 2008-10-30 11:36:15 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:15 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without Channel header files, the CHI interface to Channel will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_CHAN], [dnl
+    _CHAN_CHECK
+    if test :"${chan_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS Channel include directories.  If
+*** you wish to use the STREAMS Channel package you will need to specify
+*** the location of the STREAMS Channel (strchan) include directories with
+*** the --with-chan=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS Channel package?  The
+*** STREAMS strchan package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strchan-0.9.2.1.tar.gz".
+*** ])
+    fi
+])# _CHAN
+# =============================================================================
+
+# =============================================================================
+# _CHAN_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_CHAN_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _CHAN_OPTIONS
     _CHAN_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([CHAN_SYMVER])dnl
     AC_SUBST([CHAN_MANPATH])dnl
     AC_SUBST([CHAN_VERSION])dnl
-])# _CHAN
+])# _CHAN_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -377,20 +399,6 @@ AC_DEFUN([_CHAN_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${chan_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS Channel include directories.  If
-*** you wish to use the STREAMS Channel package you will need to specify
-*** the location of the STREAMS Channel (strchan) include directories with
-*** the --with-chan=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS Channel package?  The
-*** STREAMS strchan package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strchan-0.9.2.1.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for chan version], [chan_cv_version], [dnl
 	chan_cv_version=
 	if test -z "$chan_cv_version" ; then
@@ -620,6 +628,9 @@ AC_DEFUN([_CHAN_], [dnl
 # =============================================================================
 #
 # $Log: chan.m4,v $
+# Revision 0.9.2.24  2008-10-30 11:36:15  brian
+# - corrections to build
+#
 # Revision 0.9.2.23  2008-10-26 12:17:18  brian
 # - update package discovery macros
 #

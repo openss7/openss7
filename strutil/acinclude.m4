@@ -3,12 +3,12 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2008-09-10 03:49:58 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2008-10-30 11:36:21 $
 #
 # -----------------------------------------------------------------------------
 #
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -943,7 +943,7 @@ dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF
+    _STRCONF dnl
 ])# _UTIL_STRCONF
 # =============================================================================
 
@@ -957,6 +957,9 @@ AC_DEFUN([_UTIL_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.28  2008-10-30 11:36:21  brian
+# - corrections to build
+#
 # Revision 0.9.2.27  2008-09-10 03:49:58  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #

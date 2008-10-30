@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2008-10-27 17:33:01 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2008-10-30 11:36:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 17:33:01 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -75,6 +75,7 @@ m4_include([m4/nsl.m4])
 m4_include([m4/sock.m4])
 m4_include([m4/inet.m4])
 m4_include([m4/sctp.m4])
+m4_include([m4/ss7.m4])
 m4_include([m4/chan.m4])
 m4_include([m4/doxy.m4])
 
@@ -119,14 +120,14 @@ AC_DEFUN([AC_X25], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${CHAN_CPPFLAGS:+ }}${CHAN_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SCTP_CPPFLAGS:+ }}${SCTP_CPPFLAGS}"
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${INET_CPPFLAGS:+ }}${INET_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SOCK_CPPFLAGS:+ }}${SOCK_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${NSL_CPPFLAGS:+ }}${NSL_CPPFLAGS}"
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
-    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STREAMS_CPPFLAGS:+ }}${STREAMS_CPPFLAGS}"
     if test :${linux_cv_k_ko_modules:-no} = :no ; then
@@ -158,14 +159,14 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH='$(mandir)'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     PKG_MANPATH="${STREAMS_MANPATH:+${STREAMS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
-    PKG_MANPATH="${SS7_MANPATH:+${SS7_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
-    PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${NSL_MANPATH:+${NSL_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${SOCK_MANPATH:+${SOCK_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${INET_MANPATH:+${INET_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${SCTP_MANPATH:+${SCTP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${CHAN_MANPATH:+${CHAN_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SS7_MANPATH:+${SS7_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -222,6 +223,7 @@ AC_DEFUN([_X25_SETUP], [dnl
     _INET
     _SCTP
     _CHAN
+    _SS7_CHECK
     # here we have our flags set and can perform preprocessor and compiler
     # checks on the kernel
     _X25_OTHER_SCTP
@@ -285,7 +287,6 @@ AC_DEFUN([_X25_CONFIG_KERNEL], [dnl
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
-#include <linux/types.h>
 #include <linux/types.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -416,10 +417,10 @@ AC_DEFUN([_X25_CONFIG], [dnl
     pkg_bld=`(cd . ; /bin/pwd)`
     x25_cv_config="${pkg_bld}/src/include/sys/strx25/config.h"
     x25_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
-    x25_cv_ldadd= # "${pkg_bld}/libsx25.la"
-    x25_cv_ldflags= # "${pkg_bld}/lib32/libsx25.la"
-    x25_cv_ldadd32= # "-L${pkg_bld}/.libs/"
-    x25_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    x25_cv_ldadd="${pkg_bld}/libsx25.la"
+    x25_cv_ldflags="-L${pkg_bld}/.libs/"
+    x25_cv_ldadd32="${pkg_bld}/lib32/libsx25.la"
+    x25_cv_ldflags32="-L${pkg_bld}/lib32/.libs/"
     x25_cv_manpath="${pkg_bld}/doc/man"
     x25_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     x25_cv_modmap="${pkg_bld}/Modules.map"
@@ -473,6 +474,9 @@ AC_DEFUN([_X25_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.5  2008-10-30 11:36:21  brian
+# - corrections to build
+#
 # Revision 0.9.2.4  2008-10-27 17:33:01  brian
 # - corrections to checks
 #

@@ -3,12 +3,12 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008-10-27 17:32:58 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-30 11:36:17 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 17:32:58 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:17 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -71,6 +71,7 @@ m4_include([m4/strcomp.m4])
 dnl m4_include([m4/xopen.m4])
 m4_include([m4/xns.m4])
 m4_include([m4/xti.m4])
+m4_include([m4/ss7.m4])
 m4_include([m4/doxy.m4])
 
 # =============================================================================
@@ -114,6 +115,7 @@ AC_DEFUN([AC_OSR61], [dnl
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/config.h'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-imacros ${top_builddir}/${STRCONF_CONFIG}'
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_srcdir}'
+    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${SS7_CPPFLAGS:+ }}${SS7_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XTI_CPPFLAGS:+ }}${XTI_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${XNS_CPPFLAGS:+ }}${XNS_CPPFLAGS}"
     PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+${STRCOMP_CPPFLAGS:+ }}${STRCOMP_CPPFLAGS}"
@@ -149,6 +151,7 @@ dnl AC_MSG_NOTICE([final streams MODFLAGS  = $STREAMS_MODFLAGS])
     PKG_MANPATH="${STRCOMP_MANPATH:+${STRCOMP_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XNS_MANPATH:+${XNS_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH="${XTI_MANPATH:+${XTI_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
+    PKG_MANPATH="${SS7_MANPATH:+${SS7_MANPATH}${PKG_MANPATH:+:}}${PKG_MANPATH}"
     PKG_MANPATH='$(top_builddir)/doc/man'"${PKG_MANPATH:+:}${PKG_MANPATH}"
     AC_SUBST([PKG_MANPATH])dnl
     CPPFLAGS=
@@ -506,6 +509,7 @@ AC_DEFUN([_OSR61_SETUP], [dnl
     _STRCOMP
     _XNS
     _XTI
+    _SS7_CHECK
     _OSR61_CHECKS
 ])# _OSR61_SETUP
 # =============================================================================
@@ -901,9 +905,9 @@ AC_DEFUN([_OSR61_CONFIG], [dnl
     osr_cv_config="${pkg_bld}/src/include/sys/osr61/config.h"
     osr_cv_includes="${pkg_bld}/include ${pkg_bld}/src/include ${pkg_src}/src/include"
     osr_cv_ldadd= # "${pkg_bld}/libosr.la"
-    osr_cv_ldflags= # "${pkg_bld}/lib32/libosr.la"
-    osr_cv_ldadd32= # "-L${pkg_bld}/.libs/"
-    osr_cv_ldflags32= # "${pkg_bld}/lib32/.libs/"
+    osr_cv_ldflags= # "-L${pkg_bld}/.libs/"
+    osr_cv_ldadd32= # "${pkg_bld}/lib32/libosr.la"
+    osr_cv_ldflags32= # "-L${pkg_bld}/lib32/.libs/"
     osr_cv_manpath="${pkg_bld}/doc/man"
     osr_cv_modversions="${pkg_bld}/include/sys/${PACKAGE}/modversions.h"
     osr_cv_modmap="${pkg_bld}/Modules.map"
@@ -943,7 +947,7 @@ dnl
     AC_REQUIRE([_LINUX_STREAMS])
     strconf_cv_package=${streams_cv_package:-LiS}
     strconf_cv_minorbits="${linux_cv_minorbits:-8}"
-    _STRCONF
+    _STRCONF dnl
 ])# _OSR61_STRCONF
 # =============================================================================
 
@@ -957,6 +961,9 @@ AC_DEFUN([_OSR61_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.19  2008-10-30 11:36:17  brian
+# - corrections to build
+#
 # Revision 0.9.2.18  2008-10-27 17:32:58  brian
 # - corrections to checks
 #

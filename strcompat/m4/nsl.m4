@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: nsl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.29 $) $Date: 2008-10-26 12:17:18 $
+# @(#) $RCSfile: nsl.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.30 $) $Date: 2008-10-30 11:36:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-26 12:17:18 $ by $Author: brian $
+# Last Modified $Date: 2008-10-30 11:36:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,28 @@
 # Without NSL header files, the TPI interface to NSL will not be built.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_NSL], [dnl
+    _NSL_CHECK
+    if test :"${nsl_cv_includes:-no}" = :no ; then
+	AC_MSG_ERROR([
+*** 
+*** Configure could not find the STREAMS NSL include directories.  If
+*** you wish to use the STREAMS NSL package you will need to specify
+*** the location of the STREAMS NSL (strnsl) include directories with
+*** the --with-nsl=@<:@DIRECTORY@:>@ option to ./configure and try again.
+***
+*** Perhaps you just forgot to load the STREAMS NSL package?  The
+*** STREAMS strnsl package is available from The OpenSS7 Project
+*** download page at http://www.openss7.org/ and comes in a tarball
+*** named something like "strnsl-0.9.2.1.tar.gz".
+*** ])
+    fi
+])# _NSL
+# =============================================================================
+
+# =============================================================================
+# _NSL_CHECK
+# -----------------------------------------------------------------------------
+AC_DEFUN([_NSL_CHECK], [dnl
     AC_REQUIRE([_LINUX_STREAMS])dnl
     _NSL_OPTIONS
     _NSL_SETUP
@@ -89,7 +111,7 @@ dnl
     AC_SUBST([NSL_SYMVER])dnl
     AC_SUBST([NSL_MANPATH])dnl
     AC_SUBST([NSL_VERSION])dnl
-])# _NSL
+])# _NSL_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -405,20 +427,6 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    fi
 	done
     ])
-    if test :"${nsl_cv_includes:-no}" = :no ; then
-	AC_MSG_ERROR([
-*** 
-*** Configure could not find the STREAMS NSL include directories.  If
-*** you wish to use the STREAMS NSL package you will need to specify
-*** the location of the STREAMS NSL (strnsl) include directories with
-*** the --with-nsl=@<:@DIRECTORY@:>@ option to ./configure and try again.
-***
-*** Perhaps you just forgot to load the STREAMS NSL package?  The
-*** STREAMS strnsl package is available from The OpenSS7 Project
-*** download page at http://www.openss7.org/ and comes in a tarball
-*** named something like "strnsl-0.9.2.1.tar.gz".
-*** ])
-    fi
     AC_CACHE_CHECK([for nsl version], [nsl_cv_version], [dnl
 	nsl_cv_version=
 	if test -z "$nsl_cv_version" ; then
@@ -648,6 +656,9 @@ AC_DEFUN([_NSL_], [dnl
 # =============================================================================
 #
 # $Log: nsl.m4,v $
+# Revision 0.9.2.30  2008-10-30 11:36:16  brian
+# - corrections to build
+#
 # Revision 0.9.2.29  2008-10-26 12:17:18  brian
 # - update package discovery macros
 #
