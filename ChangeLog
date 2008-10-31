@@ -1,5 +1,7 @@
 2008-10-31  Brian Bidulock  <bidulock@openss7.org>
 
+	* scripts/speccommon.in: cannot pass majbase to configure, should not
+	  even use it in the SRPM file at all
 	* am/archive.am: do not build stuff already in the repository
 	* am/deb.am: do not build stuff already in the repository
 	* am/lsm.am: do not build stuff already in the repository
