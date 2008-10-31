@@ -1,3 +1,8 @@
+2008-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/streams.conf.in: moved config file
+	* src/modules/streams.conf.in: moved config file
+
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/m3ua_lm.c: rationalize drivers

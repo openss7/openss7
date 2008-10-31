@@ -1,3 +1,53 @@
+2008-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/acb56/streams.conf: moved config file
+	* src/modules/bicc/streams.conf: moved config file
+	* src/modules/capi/streams.conf: moved config file
+	* src/modules/cdi/streams.conf: moved config file
+	* src/modules/cd/streams.conf.in: moved config file
+	* src/modules/cpc388/streams.conf: moved config file
+	* src/modules/cpc396/streams.conf: moved config file
+	* src/modules/devi/streams.conf: moved config file
+	* src/modules/dl/streams.conf.in: moved config file
+	* src/modules/dlpi/streams.conf: moved config file
+	* src/modules/h225/streams.conf.in: moved config file
+	* src/modules/hdlc/streams.conf: moved config file
+	* src/modules/inet/streams.conf.in: moved config file
+	* src/modules/ip/streams.conf: moved config file
+	* src/modules/isdn/streams.conf.in: moved config file
+	* src/modules/isup/streams.conf: moved config file
+	* src/modules/lk/streams.conf: moved config file
+	* src/modules/lm/streams.conf: moved config file
+	* src/modules/m2pa/streams.conf.in: moved config file
+	* src/modules/m2tp/streams.conf.in: moved config file
+	* src/modules/m2ua/streams.conf.in: moved config file
+	* src/modules/m3ua/streams.conf.in: moved config file
+	* src/modules/matrix/streams.conf: moved config file
+	* src/modules/mgcp/streams.conf: moved config file
+	* src/modules/mg/streams.conf.in: moved config file
+	* src/modules/mtp3b/streams.conf: moved config file
+	* src/modules/mtp/streams.conf: moved config file
+	* src/modules/mx/streams.conf: moved config file
+	* src/modules/npi/streams.conf: moved config file
+	* src/modules/raw_sctp/streams.conf: moved config file
+	* src/modules/sccp/streams.conf: moved config file
+	* src/modules/sctp/streams.conf.in: moved config file
+	* src/modules/sdl/streams.conf: moved config file
+	* src/modules/sdt/streams.conf: moved config file
+	* src/modules/sl/streams.conf: moved config file
+	* src/modules/ss7ip/streams.conf.in: moved config file
+	* src/modules/ss7sctp/streams.conf.in: moved config file
+	* src/modules/sscop/streams.conf: moved config file
+	* src/modules/sua/streams.conf.in: moved config file
+	* src/modules/switch/streams.conf: moved config file
+	* src/modules/tali/streams.conf.in: moved config file
+	* src/modules/tcap/streams.conf: moved config file
+	* src/modules/ti/streams.conf.in: moved config file
+	* src/modules/tormenta/streams.conf: moved config file
+	* src/modules/tua/streams.conf.in: moved config file
+	* src/modules/x400p-ss7/streams.conf: moved config file
+	* src/modules/xti_sctp/streams.conf: moved config file
+
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/include/sys/dlpi.h: types

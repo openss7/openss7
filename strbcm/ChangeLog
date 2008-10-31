@@ -1,3 +1,9 @@
+2008-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* pkg/streams.conf: moved config file
+	* src/drivers/streams.conf.in: moved config file
+	* src/modules/streams.conf.in: moved config file
+
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* pkg/socksys.c: rationalize drivers
