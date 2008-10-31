@@ -1,0 +1,93 @@
+#
+# Configuration file for STREAMS device drivers
+#
+# The built-in STREAMS drivers are configured in this file.  External
+# binary packages are configured in /usr/src/linux/drivers/streams/pkg
+# (see the Makefile in that directory and the one above it).
+#
+# Pushable module specifications
+#
+# Names must be a max of 8 chars for Solaris/UnixWare compatibility
+#
+#	name		prefix
+@CONFIG_STREAMS_STH_TRUE@	module	sth		sth
+@CONFIG_STREAMS_BUFMOD_TRUE@	module	bufmod		bufmod
+@CONFIG_STREAMS_NULLMOD_TRUE@	module	nullmod		nullmod
+@CONFIG_STREAMS_PIPEMOD_TRUE@	module	pipemod		pipemod
+@CONFIG_STREAMS_CONNLD_TRUE@	module	connld		connld
+@CONFIG_STREAMS_SC_TRUE@	module	sc		sc
+@CONFIG_STREAMS_TESTMOD_TRUE@	module	testmod		testmod
+#@CONFIG_STREAMS_TIMOD_TRUE@	module	timod		timod
+#@CONFIG_STREAMS_TIRDWR_TRUE@	module	tirdwr		tirdwr
+#@CONFIG_STREAMS_SOCKMOD_TRUE@	module	sockmod		sockmod
+@CONFIG_STREAMS_STH_MODULE_TRUE@	module	sth		sth
+@CONFIG_STREAMS_BUFMOD_MODULE_TRUE@	module	bufmod		bufmod
+@CONFIG_STREAMS_NULLMOD_MODULE_TRUE@	module	nullmod		nullmod
+@CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@	module	pipemod		pipemod
+@CONFIG_STREAMS_CONNLD_MODULE_TRUE@	module	connld		connld
+@CONFIG_STREAMS_SC_MODULE_TRUE@		module	sc		sc
+@CONFIG_STREAMS_TESTMOD_MODULE_TRUE@	module	testmod		testmod
+#@CONFIG_STREAMS_TIMOD_MODULE_TRUE@	module	timod		timod
+#@CONFIG_STREAMS_TIRDWR_MODULE_TRUE@	module	tirdwr		tirdwr
+#@CONFIG_STREAMS_SOCKMOD_MODULE_TRUE@	module	sockmod		sockmod
+
+#
+# Object name specifications
+#
+#	type	name		object name
+@CONFIG_STREAMS_STH_TRUE@	objname module	sth		sth
+@CONFIG_STREAMS_BUFMOD_TRUE@	objname module	bufmod		bufmod
+@CONFIG_STREAMS_NULLMOD_TRUE@	objname module	nullmod		nullmod
+@CONFIG_STREAMS_PIPEMOD_TRUE@	objname module	pipemod		pipemod
+@CONFIG_STREAMS_CONNLD_TRUE@	objname module	connld		connld
+@CONFIG_STREAMS_SC_TRUE@	objname	module	sc		sc
+@CONFIG_STREAMS_TESTMOD_TRUE@	objname	module	testmod		testmod
+#@CONFIG_STREAMS_TIMOD_TRUE@	objname module	timod		timod
+#@CONFIG_STREAMS_TIRDWR_TRUE@	objname module	tirdwr		tirdwr
+#@CONFIG_STREAMS_SOCKMOD_TRUE@	objname module	sockmod		sockmod
+@CONFIG_STREAMS_STH_MODULE_TRUE@	objname module	sth		sth
+@CONFIG_STREAMS_BUFMOD_MODULE_TRUE@	objname module	bufmod		bufmod
+@CONFIG_STREAMS_NULLMOD_MODULE_TRUE@	objname module	nullmod		nullmod
+@CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@	objname module	pipemod		pipemod
+@CONFIG_STREAMS_CONNLD_MODULE_TRUE@	objname module	connld		connld
+@CONFIG_STREAMS_SC_MODULE_TRUE@		objname	module	sc		sc
+@CONFIG_STREAMS_TESTMOD_MODULE_TRUE@	objname	module	testmod		testmod
+#@CONFIG_STREAMS_TIMOD_MODULE_TRUE@	objname module	timod		timod
+#@CONFIG_STREAMS_TIRDWR_MODULE_TRUE@	objname module	tirdwr		tirdwr
+#@CONFIG_STREAMS_SOCKMOD_MODULE_TRUE@	objname module	sockmod		sockmod
+
+#
+# Loadable specifications
+#
+#
+# If you do not have a system with support for demand-loading modules
+# into the kernel, you will have to load these modules by hand or in
+# the startup scripts.
+# If you do not use the loadable keyword at all, everything is linked
+# into streams.o.
+#
+@CONFIG_STREAMS_STH_MODULE_TRUE@	loadable sth
+@CONFIG_STREAMS_BUFMOD_MODULE_TRUE@	loadable bufmod
+@CONFIG_STREAMS_NULLMOD_MODULE_TRUE@	loadable nullmod
+@CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@	loadable pipemod
+@CONFIG_STREAMS_CONNLD_MODULE_TRUE@	loadable connld
+@CONFIG_STREAMS_SC_MODULE_TRUE@		loadable sc
+@CONFIG_STREAMS_TESTMOD_MODULE_TRUE@	loadable testmod
+#@CONFIG_STREAMS_TIMOD_MODULE_TRUE@	loadable timod
+#@CONFIG_STREAMS_TIRDWR_MODULE_TRUE@	loadable tirdwr
+#@CONFIG_STREAMS_SOCKMOD_MODULE_TRUE@	loadable sockmod
+
+#
+# Initialization specifications
+#
+#initialize clone-drvr
+#initialize fifo
+#initialize link-drvr
+#initialize loop-around
+
+#
+# Termination specifications
+#
+#terminate fifo
+#terminate loop-around
+
