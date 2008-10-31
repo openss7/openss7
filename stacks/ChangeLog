@@ -1,5 +1,18 @@
 2008-10-31  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/specs/cdi/cdi_tab1.tbl: corrected width specification
+	* doc/specs/cdi/cdi_tab2.tbl: corrected width specification
+	* doc/specs/cdi/cdi_tab3.tbl: corrected width specification
+	* doc/specs/sdli/lmit01.tbl: corrected width specification
+	* doc/specs/sdli/sdlit01.tbl: corrected width specification
+	* doc/specs/sdli/sdlit02.tbl: corrected width specification
+	* doc/specs/sdti/lmit01.tbl: corrected width specification
+	* doc/specs/sdti/sdtit01.tbl: corrected width specification
+	* doc/specs/sdti/sdtit02.tbl: corrected width specification
+	* doc/specs/sli/lmit01.tbl: corrected width specification
+	* doc/specs/sli/slit01.tbl: corrected width specification
+	* doc/specs/sli/slit02.tbl: corrected width specification
+
 	* src/modules/acb56/streams.conf: moved config file
 	* src/modules/bicc/streams.conf: moved config file
 	* src/modules/capi/streams.conf: moved config file

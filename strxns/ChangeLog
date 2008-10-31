@@ -1,5 +1,9 @@
 2008-10-31  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/specs/cdi/cdi_tab1.tbl: corrected width specification
+	* doc/specs/cdi/cdi_tab2.tbl: corrected width specification
+	* doc/specs/cdi/cdi_tab3.tbl: corrected width specification
+
 	* src/drivers/streams.conf: moved config file
 	* src/modules/streams.conf: moved config file
 
