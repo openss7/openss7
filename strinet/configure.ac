@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2008-10-25 13:19:51 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2008-10-31 06:54:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-25 13:19:51 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([strinet],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.39 $) $Date: 2008-10-25 13:19:51 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.40 $) $Date: 2008-10-31 06:54:54 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -190,7 +190,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi
 		 doc/papers/Makefile
-		 src/drivers/lis.conf])
+		 src/drivers/streams.conf])
 
 _OPENSS7_OUTPUT
 
@@ -199,6 +199,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.40  2008-10-31 06:54:54  brian
+# - move config files, better strconf handling
+#
 # Revision 0.9.2.39  2008-10-25 13:19:51  brian
 # - updates for autoconf 2.63
 #

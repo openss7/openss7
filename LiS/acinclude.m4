@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.62 $) $Date: 2008-09-10 03:49:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.63 $) $Date: 2008-10-31 06:54:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-09-10 03:49:09 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 06:54:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1778,34 +1778,35 @@ dnl streams_cv_symver="$streams_cv_lis_symver"
 # _LIS_STRCONF
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LIS_STRCONF], [dnl
-    case "$lis_cv_target" in
-	user)
-	    strconf_cv_stem='Config.user'
-	    ;;
-	linux | *)
-	    strconf_cv_stem='Config'
-	    ;;
-    esac
-    strconf_cv_input='Config.master'
-    strconf_cv_majbase=231
-    strconf_cv_midbase=1
-    strconf_cv_config='include/sys/LiS/config.h'
-    strconf_cv_modconf='head/modconf.inc'
-    strconf_cv_drvconf='drvconf.mk'
-    strconf_cv_confmod='conf.modules'
-    strconf_cv_makedev='devices.lst'
-    strconf_cv_mknodes='util/linux/strmakenodes.c'
-    strconf_cv_strsetup='strsetup.conf'
-    strconf_cv_strload='strload.conf'
-    strconf_cv_package='LiS'
-    strconf_cv_minorbits="${linux_cv_minorbits:-8}"
+    AC_REQUIRE([_LINUX_KERNEL])
+    strconf_prefix='lis'
+    AC_CACHE_CHECK([for lis config file name], [lis_cv_stem], [dnl
+	case "$lis_cv_target" in
+	    user)
+		lis_cv_stem='Config.user'
+		;;
+	    linux | *)
+		lis_cv_stem='Config'
+		;;
+	esac
+    ])
+    lis_cv_majbase=231
+    lis_cv_midbase=1
+    lis_cv_sconfig='include/sys/LiS/config.h'
+    lis_cv_modconf='head/modconf.inc'
+    lis_cv_mknodes='util/linux/strmakenodes.c'
     _STRCONF
+    ((lis_cv_majlast=lis_cv_majbase+10))
+    ((lis_cv_midlast=lis_cv_midbase+10))
 ])# _LIS_STRCONF
 # =============================================================================
 
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.6.63  2008-10-31 06:54:51  brian
+# - move config files, better strconf handling
+#
 # Revision 1.1.6.62  2008-09-10 03:49:09  brian
 # - changes to accomodate FC9, SUSE 11.0 and Ubuntu 8.04
 #
