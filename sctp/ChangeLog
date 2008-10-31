@@ -1,3 +1,22 @@
+2008-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* test/test-sctp-dc.c: missing definition
+	* test/test-sctp-ds.c: missing definition
+	* test/test-sctp-sc.c: missing definition
+	* test/test-sctp-ss.c: missing definition
+	* test/test-sctp-tc.c: missing definition
+	* test/test-sctp-ts.c: missing definition
+	* test/test-sctpc.c: missing definition
+	* test/test-sctps.c: missing definition
+	* test/test-tcp-dc.c: missing definition
+	* test/test-tcp-ds.c: missing definition
+	* test/test-tcp-tc.c: missing definition
+	* test/test-tcp-ts.c: missing definition
+	* test/test-tcpc.c: missing definition
+	* test/test-tcps.c: missing definition
+	* test/test-udpc.c: missing definition
+	* test/test-udps.c: missing definition
+
 2008-10-30  Brian Bidulock  <bidulock@openss7.org>
 
 	* test/test-tcpc.c: rationalize drivers and modules
