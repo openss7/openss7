@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.83 $) $Date: 2008-10-27 12:23:34 $
+# @(#) $RCSfile: rpm.m4,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.84 $) $Date: 2008-10-31 11:58:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-27 12:23:34 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 11:58:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -157,6 +157,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra=".centos3"	;;
 			    (4|4.?)	rpm_cv_dist_extra=".centos4"	;;
 			    (5|5.?)	rpm_cv_dist_extra=".centos5"	;;
+			    (*)		rpm_cv_dist_extra=".centos${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (lineox)
@@ -164,6 +165,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra=".lel3"	;;
 			    (4|4.?)	rpm_cv_dist_extra=".lel4"	;;
 			    (5|5.?)	rpm_cv_dist_extra=".lel5"	;;
+			    (*)		rpm_cv_dist_extra=".lel${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (whitebox)
@@ -171,6 +173,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra=".WB3"	;;
 			    (4|4.?)	rpm_cv_dist_extra=".WB4"	;;
 			    (5|5.?)	rpm_cv_dist_extra=".WB5"	;;
+			    (*)		rpm_cv_dist_extra=".WB${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (fedora)
@@ -182,6 +185,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (5)		rpm_cv_dist_extra=".FC5"	;;
 			    (6)		rpm_cv_dist_extra=".FC6"	;;
 			    (7)		rpm_cv_dist_extra=".fc7"	;;
+			    (8)		rpm_cv_dist_extra=".fc8"	;;
+			    (9)		rpm_cv_dist_extra=".fc9"	;;
+			    (*)		rpm_cv_dist_extra=".fc${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (redhat)
@@ -196,6 +202,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (3|3.?)	rpm_cv_dist_extra=".E3"		;;
 			    (4|4.?)	rpm_cv_dist_extra=".EL4"	;;
 			    (5|5.?)	rpm_cv_dist_extra=".EL5"	;;
+			    (*)		rpm_cv_dist_extra2=".EL${dist_cv_host_release}" ;;
 			esac
 			;;
 		    (mandrake)
@@ -263,6 +270,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (5)		rpm_cv_dist_extra2=".FC5"	;;
 			    (6)		rpm_cv_dist_extra2=".FC6"	;;
 			    (7)		rpm_cv_dist_extra2=".fc7"	;;
+			    (8)		rpm_cv_dist_extra2=".fc8"	;;
+			    (9)		rpm_cv_dist_extra2=".fc9"	;;
 			    (*)		rpm_cv_dist_extra2=".fc${dist_cv_host_release}" ;;
 			esac
 			;;
@@ -686,6 +695,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 0.9.2.84  2008-10-31 11:58:28  brian
+# - more distros
+#
 # Revision 0.9.2.83  2008-10-27 12:23:34  brian
 # - suppress warning on each iteration and cache results
 #
