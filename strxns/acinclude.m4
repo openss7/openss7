@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.70 $) $Date: 2008-10-31 06:54:57 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2008-10-31 07:24:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 06:54:57 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 07:24:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1127,7 +1127,7 @@ AC_DEFUN([_XNS_STRCONF], [dnl
     strconf_prefix='xns'
     AC_CACHE_CHECK([for xns major device number base], [xns_cv_majbase], [dnl
 	if test ${streams_cv_majbase-0} -gt 9 ; then
-	    ((xns_cv_majbase=streams_cv_majbase-0))
+	    ((xns_cv_majbase=streams_cv_majbase-9))
 	else
 	    xns_cv_majbase=222
 	    if test ${streams_cv_package:-LfS} = LfS ; then
@@ -1165,6 +1165,9 @@ AC_DEFUN([_XNS_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.71  2008-10-31 07:24:44  brian
+# - correction
+#
 # Revision 0.9.2.70  2008-10-31 06:54:57  brian
 # - move config files, better strconf handling
 #
