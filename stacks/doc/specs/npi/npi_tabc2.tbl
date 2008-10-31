@@ -27,9 +27,9 @@
 .\}
 .TS
 box center tab(:);
-rb1|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb
-lb1|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb
-l1|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c.
+rb1|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb
+lb1|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb0|cb
+l1|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c0|c.
 PRIM X:I1:I2:I3:I4:I5:I6:I7:I8:I9:I10:I11:I12:I13:I14
 PRIM Y on queue
 =
