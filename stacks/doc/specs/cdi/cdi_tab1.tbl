@@ -27,7 +27,7 @@
 .\}
 .TS
 box center tab(:);
-cbw(1.0in)|cbw(1.0in)|cbw(3.0in)
+cbw(1.0i)|cbw(1.0i)|cbw(3.0i)
 l|l|l.
 Phase:Service:Primitives
 =
