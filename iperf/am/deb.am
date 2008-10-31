@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.109 $) $Date: 2008-09-23 19:32:13 $
+# @(#) $RCSfile: deb.am,v $ $Name: OpenSS7-0_9_2 $($Revision: 0.9.2.110 $) $Date: 2008-10-31 10:30:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-09-23 19:32:13 $ by $Author: brian $
+## Last Modified $Date: 2008-10-31 10:30:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -151,14 +151,14 @@ $(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
 $(debtop_dsc_file) $(debtop_tar_file)::
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^$(debdir)/|$(debbuilddir)/|'`; \
-	test ! \( "$@" -ef "$$f" \) || exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f; }; \
 	test ! \( "$@" -ef "$$f" \) || exit 0; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
-		$(ECHO) "cp -f -- $$f $@"; \
-		cp -f -- $$f $@; }
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
+		$(ECHO) "cp -f -- $$d$$f $@"; \
+		cp -f -- $$d$$f $@; }
 
 $(debtop_sig_file): $(debtop_dsc_file)
 	@$(ECHO) "D: Making $@ in `pwd`"
@@ -226,7 +226,7 @@ chg-deb:
 		list="$(debian_binary_files) $(debian_change_files)"; for f in $$list; do \
 			test -f $$f || continue; \
 			t=`echo $$f | sed -e 's|^$(debbuilddir)/|$(debdir)/|'`; \
-			if test ":$(FORCE)" = :force -o \( ! -f "$$t" -o "$$t" -ot "$$f" \); then \
+			if test ":$(FORCE)" = :force -o ! -f "$$t"; then \
 				$(ECHO) "cp -f -- $$f $$t"; \
 				cp -f -- $$f $$t; \
 			fi; \
@@ -630,6 +630,9 @@ EXTRA_DIST		+= debian/changelog \
 ## =============================================================================
 ##
 ## $Log: deb.am,v $
+## Revision 0.9.2.110  2008-10-31 10:30:51  brian
+## - do no rebuild stuff already in the repository
+##
 ## Revision 0.9.2.109  2008-09-23 19:32:13  brian
 ## - do not remove cache files on release clean
 ##

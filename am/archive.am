@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2008-10-30 01:24:13 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 0.9.2.59 $) $Date: 2008-10-31 10:30:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008-10-30 01:24:13 $ by $Author: brian $
+## Last Modified $Date: 2008-10-31 10:30:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -127,14 +127,14 @@ RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR) $(tardir)
 $(archive_files)::
 	@$(ECHO) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'`; \
-	test ! \( "$@" -ef "$$f" \) || exit 0; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGS) -- $$f; }; \
 	test ! \( "$@" -ef "$$f" \) || exit 0; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
-		$(ECHO) "cp -f -- $$f $@"; \
-		cp -f -- $$f $@; }
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
+		$(ECHO) "cp -f -- $$d$$f $@"; \
+		cp -f -- $$d$$f $@; }
 
 ##
 # How to make an archive if we ask for one.  We do not make archives on demand if they already
@@ -503,6 +503,9 @@ EXTRA_DIST		+= scripts/OPENSS7-GPG-KEY \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 0.9.2.59  2008-10-31 10:30:51  brian
+## - do no rebuild stuff already in the repository
+##
 ## Revision 0.9.2.58  2008-10-30 01:24:13  brian
 ## - error
 ##

@@ -1,3 +1,10 @@
+2008-10-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* am/archive.am: do not build stuff already in the repository
+	* am/deb.am: do not build stuff already in the repository
+	* am/lsm.am: do not build stuff already in the repository
+	* am/rpm.am: do not build stuff already in the repository
+
 2008-10-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: updated references

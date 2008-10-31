@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: lsm.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2008/09/22 07:45:25 $
+# @(#) $RCSfile: lsm.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2008-10-31 10:30:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -47,7 +47,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2008/09/22 07:45:25 $ by $Author: brian $
+## Last Modified $Date: 2008-10-31 10:30:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,16 +57,16 @@ if MAINTAINER_MODE
 LSM $(PACKAGE)-$(VERSION).lsm: $(PACKAGE_TARNAME).lsm
 	cat $< > $@
 
-$(tardir)/$(PACKAGE)-$(VERSION).lsm: LSM $(PACKAGE)-$(VERSION).lsm
+$(tardir)/$(PACKAGE)-$(VERSION).lsm:
 	@f=`$(ECHO) "$@" | sed -e 's|^.*/||'` ; \
-	test ! \( "$@" -ef "$$f" \) || exit 0 ; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f" ; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f ; } ; \
-	test ! \( "$@" -ef "$$f" \) || exit 0 ; \
-	test ":$(FORCE)" != :force -a \( -f "$@" -a "$@" -nt "$$f" \) || { \
-		$(ECHO) "cp -f -- $$f $@" ; \
-		cp -f -- $$f $@ ; }
+	d=; test -f $$f || d='$(srcdir)/'; \
+	test ! \( "$@" -ef "$$d$$f" \) || exit 0 ; \
+	test ":$(FORCE)" != :force -a -f "$@" || { \
+		$(ECHO) "cp -f -- $$d$$f $@" ; \
+		cp -f -- $$d$$f $@ ; }
 
 release-lsm: $(tardir)/$(PACKAGE)-$(VERSION).lsm
 
@@ -129,6 +129,9 @@ EXTRA_DIST		+= LSM $(PACKAGE)-$(VERSION).lsm
 ## =============================================================================
 ##
 ## $Log: lsm.am,v $
+## Revision 0.9.2.19  2008-10-31 10:30:51  brian
+## - do no rebuild stuff already in the repository
+##
 ## Revision 0.9.2.18  2008/09/22 07:45:25  brian
 ## - corrections to logic
 ##
