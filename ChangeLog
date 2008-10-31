@@ -1,5 +1,6 @@
 2008-10-31  Brian Bidulock  <bidulock@openss7.org>
 
+	* m4/rpm.m4: more distributions
 	* scripts/speccommon.in: cannot pass majbase to configure, should not
 	  even use it in the SRPM file at all
 	* am/archive.am: do not build stuff already in the repository
