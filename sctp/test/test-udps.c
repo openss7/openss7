@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:05 $
+ @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-31 12:47:13 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-10-30 18:31:05 $ by $Author: brian $
+ Last Modified $Date: 2008-10-31 12:47:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-udps.c,v $
+ Revision 0.9.2.13  2008-10-31 12:47:13  brian
+ - missing definition
+
  Revision 0.9.2.12  2008-10-30 18:31:05  brian
  - rationalized drivers, modules and test programs
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:05 $"
+#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-31 12:47:13 $"
 
-static char const ident[] = "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-30 18:31:05 $";
+static char const ident[] = "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2008-10-31 12:47:13 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -112,6 +115,8 @@ static char const ident[] = "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.
 #ifdef _GNU_SOURCE
 #include <getopt.h>
 #endif
+
+#define NAME "test-udps"
 
 #define MSG_LEN 32
 
@@ -329,7 +334,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.12 $ $Date: 2008-10-30 18:31:05 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.13 $ $Date: 2008-10-31 12:47:13 $");
 }
 
 void

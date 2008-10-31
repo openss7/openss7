@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 08:49:53 $
+ @(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-31 12:47:12 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2008-04-29 08:49:53 $ by $Author: brian $
+ Last Modified $Date: 2008-10-31 12:47:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp-dc.c,v $
+ Revision 0.9.2.12  2008-10-31 12:47:12  brian
+ - missing definition
+
  Revision 0.9.2.11  2008-04-29 08:49:53  brian
  - updated headers for Affero release
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 08:49:53 $"
+#ident "@(#) $RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-31 12:47:12 $"
 
-static char const ident[] = "$RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2008-04-29 08:49:53 $";
+static char const ident[] = "$RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2008-10-31 12:47:12 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -106,6 +109,12 @@ static char const ident[] = "$RCSfile: test-sctp-dc.c,v $ $Name:  $($Revision: 0
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _GNU_SOURCE
+#include <getopt.h>
+#endif
+
+#define NAME "test-sctp-dc"
 
 #define MSG_LEN 64
 
@@ -321,8 +330,8 @@ splash(int argc, char *argv[])
 %1$s: SCTP Performance Test Program\n\
 %2$s\n\
 \n\
-Copyright (c) 2001-2008 OpenSS7 Corporation <http://www.openss7.com/>\n\
-Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
@@ -374,13 +383,17 @@ version(int argc, char *argv[])
 	if (verbose <= 0)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
+%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
+Written by Brian Bidulock\n\
 \n\
-    Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
-    incorporated here by reference.\n\
-", argv[0], ident);
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
+Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+\n\
+Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
+incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.12 $ $Date: 2008-10-31 12:47:12 $");
 }
 
 void
