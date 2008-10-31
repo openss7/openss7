@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.66 $) $Date: 2008-10-31 06:54:53 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.67 $) $Date: 2008-10-31 07:10:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-10-31 06:54:53 $ by $Author: brian $
+# Last Modified $Date: 2008-10-31 07:10:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.63)
 AC_INIT([streams],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.66 $) $Date: 2008-10-31 06:54:53 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.67 $) $Date: 2008-10-31 07:10:32 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -185,8 +185,8 @@ AC_CONFIG_FILES([Makefile
 		 doc/manual/Makefile
 		 doc/manual/texi/args.texi
 		 doc/papers/Makefile
-		 src/modules/streams.conf
-		 src/drivers/streams.conf])
+		 src/modules/Config
+		 src/drivers/Config])
 
 _OPENSS7_OUTPUT
 
@@ -195,6 +195,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.67  2008-10-31 07:10:32  brian
+# - move config files back for streams due to conflict
+#
 # Revision 0.9.2.66  2008-10-31 06:54:53  brian
 # - move config files, better strconf handling
 #
